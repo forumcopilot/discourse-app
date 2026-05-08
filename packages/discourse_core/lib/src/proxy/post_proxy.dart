@@ -73,8 +73,9 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         authorIconUrl: avatarUrl,
         timestamp:
             DateTime.tryParse(t['created_at']?.toString() ?? '') ?? DateTime.now(),
-        replyCount: (t['reply_count'] as int?) ??
-            (((t['posts_count'] as int?) ?? 1) - 1).clamp(0, 1 << 30),
+        // Discourse `reply_count` is cross-thread replies, not total. Use
+        // `posts_count - 1`.
+        replyCount: (((t['posts_count'] as int?) ?? 1) - 1).clamp(0, 1 << 30),
         viewCount: (t['views'] as int?) ?? 0,
         isClosed: (t['closed'] as bool?) ?? false,
         isSubscribed: (t['notification_level'] as int? ?? 1) >= 2,
@@ -87,7 +88,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         isPinned: (t['pinned'] as bool?) ?? false,
         isAnnouncement: (t['pinned_globally'] as bool?) ?? false,
         url: '${siteContext.site.url}/t/$id',
-        shortContent: posts.isNotEmpty ? posts.first.content : null,
+        shortContent: posts.isNotEmpty ? posts.first.content : '',
       );
     } catch (e) {
       return _emptyThread(message: 'Error: $e');
@@ -359,6 +360,9 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     return FCPost(
       id: (p['id'] ?? '').toString(),
       title: '',
+      // Discourse returns rendered HTML in `cooked`. The inherited UI is a
+      // BBCode renderer (XF baseline) and shows the markup as text — Phase 4
+      // swaps the renderer to HTML/Markdown rendering at the UI layer.
       content: (p['cooked'] ?? p['raw'] ?? '').toString(),
       topicId: topicId,
       authorId: (p['user_id'] ?? '').toString(),

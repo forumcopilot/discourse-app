@@ -179,7 +179,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
           authorName: (m['username'] ?? '').toString(),
           timestamp: DateTime.tryParse(m['created_at']?.toString() ?? '') ??
               DateTime.now(),
-          shortContent: m['excerpt']?.toString(),
+          shortContent: (m['excerpt'] as String?) ?? '',
         ));
       }
       return FCParticipatedTopicResult(
@@ -406,8 +406,9 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       authorIconUrl: authorIconUrl,
       timestamp:
           DateTime.tryParse(t['created_at']?.toString() ?? '') ?? DateTime.now(),
-      replyCount: (t['reply_count'] as int?) ??
-          (((t['posts_count'] as int?) ?? 1) - 1).clamp(0, 1 << 30),
+      // Discourse's `reply_count` is "cross-thread replies" (not what we
+      // want). Total replies in the topic is `posts_count - 1`.
+      replyCount: (((t['posts_count'] as int?) ?? 1) - 1).clamp(0, 1 << 30),
       viewCount: (t['views'] as int?) ?? 0,
       hasNewPosts: t['unseen'] == true || (t['unread_posts'] as int? ?? 0) > 0,
       isClosed: (t['closed'] as bool?) ?? false,
@@ -416,7 +417,9 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       url: slug != null && slug.isNotEmpty
           ? '${siteContext.site.url}/t/$slug/$id'
           : '${siteContext.site.url}/t/$id',
-      shortContent: t['excerpt']?.toString(),
+      // Some inherited UI does `topic.shortContent!.isNotEmpty` (XF assumed
+      // non-null); keep this string non-null so we don't trip the null check.
+      shortContent: (t['excerpt'] as String?) ?? '',
       isPinned: (t['pinned'] as bool?) ?? false,
       isAnnouncement: (t['pinned_globally'] as bool?) ?? false,
       canReply: !(t['closed'] == true || t['archived'] == true),
