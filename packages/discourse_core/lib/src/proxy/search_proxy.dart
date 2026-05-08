@@ -1,6 +1,9 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_search_proxy.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_like.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_thanks.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 import 'package:forumcopilot_sdk/models/results/fc_search_result.dart';
 
@@ -348,6 +351,14 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       canReport: true,
       canLike: true,
       isLiked: false,
+      // Mutable lists so optimistic-UI in post_actions.dart can call .add().
+      attachments: <FCAttachment>[],
+      inlineAttachments: <FCAttachment>[],
+      thanksInfo: <FCThanks>[],
+      likesInfo: List<FCLike>.generate(
+        (p['like_count'] as int?) ?? 0,
+        (_) => FCLike(userId: '', username: '', avatarUrl: ''),
+      ),
     );
   }
 

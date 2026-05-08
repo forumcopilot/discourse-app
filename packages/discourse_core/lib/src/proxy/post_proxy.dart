@@ -1,7 +1,10 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_post_proxy.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_like.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_thanks.dart';
 import 'package:forumcopilot_sdk/models/results/fc_post_result.dart';
 
 import '../base_discourse_proxy.dart';
@@ -378,7 +381,45 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       canReport: true,
       canLike: canLike,
       isLiked: isLiked,
+      // Pass mutable empty lists so optimistic-UI code in post_actions.dart
+      // can call `.add()` without tripping "Cannot add to an unmodifiable
+      // list" (FCPost defaults these to `const []`). Discourse's
+      // `actions_summary` only gives us a count + acted flag — we don't
+      // know individual likers without /post_actions/users — so we
+      // pre-seed `likeCount` placeholder entries so the UI's
+      // `likesInfo.length` reads correctly. The current user is placed
+      // first when they've liked, so `removeWhere(username==me)` works
+      // for un-like.
+      likesInfo: _buildLikesInfo(isLiked: isLiked, likeCount: likeCount),
+      attachments: <FCAttachment>[],
+      inlineAttachments: <FCAttachment>[],
+      thanksInfo: <FCThanks>[],
     );
+  }
+
+  List<FCLike> _buildLikesInfo({
+    required bool isLiked,
+    required int likeCount,
+  }) {
+    final likers = <FCLike>[];
+    if (isLiked) {
+      likers.add(FCLike(
+        userId: siteContext.currentUserId ?? '',
+        username: siteContext.currentUsername ?? '',
+        avatarUrl: siteContext.loginDataOutput?.user?.iconUrl ?? '',
+        timestamp: DateTime.now(),
+      ));
+    }
+    final remaining = (likeCount - likers.length).clamp(0, 1 << 30);
+    for (var i = 0; i < remaining; i++) {
+      likers.add(FCLike(
+        userId: '',
+        username: '',
+        avatarUrl: '',
+        timestamp: null,
+      ));
+    }
+    return likers;
   }
 
   FCThreadResult _emptyThread({required String message}) {
