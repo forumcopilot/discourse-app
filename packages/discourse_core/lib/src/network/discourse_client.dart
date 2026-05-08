@@ -1,175 +1,156 @@
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/network/fc_call_result.dart';
 import 'package:forumcopilot_sdk/services/fc_http_client.dart';
 import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 
-/// Discourse HTTP client for ForumCopilot plugin communication
-/// Simplified to work exclusively with the FC_Discourse2 plugin endpoint
+import '../context/discourse_site_context_extension.dart';
+
+/// Thin HTTP wrapper around the SDK's [FCHttpClient] for talking to a
+/// Discourse forum.
+///
+/// Auth model: User API Keys (https://meta.discourse.org/t/-/32504). When a
+/// key has been provisioned via [DiscourseAuthManager] it is read off the
+/// [SiteContext] and attached to every request as `User-Api-Key` /
+/// `User-Api-Client-Id` headers. Anonymous calls (e.g. `/site.json` before
+/// login) work without those headers.
+///
+/// Accept header is always `application/json` so we never have to worry about
+/// the `.json` URL suffix Discourse uses for content negotiation; either form
+/// works against the same controllers, and `Accept` is cleaner for the
+/// non-resource endpoints (`/search`, `/user-api-key/revoke`, ...).
 class DiscourseClient {
-  /// Call ForumCopilot plugin API endpoint
-  /// This replaces all REST API calls with a single plugin endpoint
-  Future<FCCallResult> forumcopilotApi(
+  Future<FCCallResult> get(
     SiteContext context,
-    Map<String, dynamic> requestData,
-  ) async {
+    String path, {
+    Map<String, dynamic>? query,
+    Map<String, String>? extraHeaders,
+  }) =>
+      _request(context, 'GET', path, query: query, extraHeaders: extraHeaders);
+
+  Future<FCCallResult> post(
+    SiteContext context,
+    String path, {
+    Map<String, dynamic>? query,
+    Object? body,
+    Map<String, String>? extraHeaders,
+  }) =>
+      _request(context, 'POST', path,
+          query: query, body: body, extraHeaders: extraHeaders);
+
+  Future<FCCallResult> put(
+    SiteContext context,
+    String path, {
+    Map<String, dynamic>? query,
+    Object? body,
+    Map<String, String>? extraHeaders,
+  }) =>
+      _request(context, 'PUT', path,
+          query: query, body: body, extraHeaders: extraHeaders);
+
+  Future<FCCallResult> delete(
+    SiteContext context,
+    String path, {
+    Map<String, dynamic>? query,
+    Object? body,
+    Map<String, String>? extraHeaders,
+  }) =>
+      _request(context, 'DELETE', path,
+          query: query, body: body, extraHeaders: extraHeaders);
+
+  Future<FCCallResult> _request(
+    SiteContext context,
+    String method,
+    String path, {
+    Map<String, dynamic>? query,
+    Object? body,
+    Map<String, String>? extraHeaders,
+  }) async {
+    await FCDioClient.instance.initialize();
+
+    final headers = <String, String>{
+      'Accept': 'application/json',
+      ...context.userApiAuthHeaders(),
+      if (body != null) 'Content-Type': 'application/json',
+      ...?extraHeaders,
+    };
+
+    final base = Uri.parse(context.site.url);
+    final url = base.replace(path: _joinPath(base.path, path));
+    final encodedBody =
+        body is String ? body : (body == null ? null : jsonEncode(body));
+
     try {
-      // Simple headers for plugin communication
-      final requestHeaders = <String, String>{
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        // Session authentication handled by cookies - no custom auth headers needed
-      };
-
-      // Single plugin endpoint URL
-      final pluginUrl = context.site.pluginUrl;
-
-      final url = Uri.parse(pluginUrl);
-      print('🔍 [DISCOURSE_CLIENT] Sending request to: $pluginUrl');
-      print('🔍 [DISCOURSE_CLIENT] Method: ${requestData['method']}');
-      print('🔍 [DISCOURSE_CLIENT] Headers: $requestHeaders');
-
-      // Ensure CookieJar is initialized before making requests
-      await FCDioClient.instance.initialize();
-
-      var response = await FCHttpClient.post<String>(
+      final response = await FCHttpClient.request<String>(
+        method,
         url,
-        headers: requestHeaders,
-        body: jsonEncode(requestData),
+        headers: headers,
+        body: encodedBody,
+        queryParameters: query,
         responseType: ResponseType.plain,
       );
-
-      // Handle redirects manually if needed (301, 302, etc.)
-      int redirectCount = 0;
-      while ((response.statusCode ?? 0) >= 300 && (response.statusCode ?? 0) < 400 && redirectCount < 5) {
-        final location = response.headers.value('location');
-        if (location != null) {
-          final redirectUrl = Uri.parse(location);
-          final resolvedUrl = redirectUrl.isAbsolute ? redirectUrl : url.resolveUri(redirectUrl);
-          print('🔄 [DISCOURSE_CLIENT] Following redirect to: ${resolvedUrl.toString()}');
-          response = await FCHttpClient.post<String>(
-            resolvedUrl,
-            headers: requestHeaders,
-            body: jsonEncode(requestData),
-            responseType: ResponseType.plain,
-          );
-          redirectCount++;
-        } else {
-          break;
-        }
-      }
-
-      return _parseResponse(response);
+      return _toCallResult(response);
     } on DioException catch (e) {
-      // DioException contains the actual HTTP response even when status code triggers an exception
-      // Extract the real status code and response body for proper error handling
-      final statusCode = e.response?.statusCode ?? 0;
-      final headers = <String, String>{};
-      
-      // Extract headers from DioException response
-      if (e.response != null) {
-        e.response!.headers.forEach((key, value) {
-          if (value.isNotEmpty) {
-            headers[key] = value.first;
-          }
-        });
-      }
-      
-      // Extract fc_is_login header value
-      bool fcIsLogin = false;
-      if (headers.containsKey('fc_is_login')) {
-        final loginValue = headers['fc_is_login']?.toLowerCase() ?? '';
-        fcIsLogin = (loginValue == 'true' || loginValue == '1');
-      }
-      
-      // Extract response body - try to get it as string
-      String bodyString = '';
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        if (responseData is String) {
-          bodyString = responseData;
-        } else if (responseData != null) {
-          bodyString = responseData.toString();
-        }
-      }
-      
-      // If body is empty, create a structured error message
-      if (bodyString.isEmpty) {
-        bodyString = jsonEncode({
-          'error': e.message ?? 'HTTP request failed',
-          'type': e.type.toString(),
-        });
-      }
-      
-      return FCCallResult(
-        statusCode: statusCode,
-        body: bodyString,
-        headers: headers,
-        fcIsLogin: fcIsLogin,
-      );
+      return _toCallResultFromException(e);
     } catch (e) {
-      // For non-Dio exceptions, return a generic error
       return FCCallResult(
         statusCode: 0,
         body: jsonEncode({'error': e.toString()}),
-        headers: {},
+        headers: const {},
         fcIsLogin: false,
       );
     }
   }
 
-  /// Parse plugin API response
-  /// Simplified from Discourse REST API response parsing
-  FCCallResult _parseResponse(Response response) {
-    final statusCode = response.statusCode ?? 0;
+  FCCallResult _toCallResult(Response<dynamic> response) {
     final headers = <String, String>{};
-
-    // Convert response headers
-    response.headers.forEach((key, value) {
-      if (value.isNotEmpty) {
-        headers[key] = value.first;
-      }
+    response.headers.forEach((k, v) {
+      if (v.isNotEmpty) headers[k] = v.first;
     });
-
-    // Extract fc_is_login header value
-    bool fcIsLogin = false;
-    if (headers.containsKey('fc_is_login')) {
-      final loginValue = headers['fc_is_login']?.toLowerCase() ?? '';
-      fcIsLogin = (loginValue == 'true' || loginValue == '1');
-    }
-
-    // Parse JSON response from plugin
-    Map<String, dynamic> data;
-    try {
-      final bodyString = response.data?.toString() ?? '';
-      if (bodyString.isEmpty) {
-        data = {};
-      } else {
-        data = jsonDecode(bodyString) as Map<String, dynamic>;
-      }
-    } catch (e) {
-      data = {'error': 'Failed to parse JSON response: $e'};
-    }
-
-    // Plugin returns FC-compliant data directly, so simplified error handling
-    if (data.containsKey('error')) {
-      return FCCallResult(
-        statusCode: statusCode,
-        body: jsonEncode({
-          'error': data['error'],
-          'result': false,
-        }),
-        headers: headers,
-        fcIsLogin: fcIsLogin,
-      );
-    }
-
+    final body = response.data?.toString() ?? '';
     return FCCallResult(
-      statusCode: statusCode,
-      body: jsonEncode(data),
+      statusCode: response.statusCode ?? 0,
+      body: body,
       headers: headers,
-      fcIsLogin: fcIsLogin,
+      // Discourse's User API Key auth doesn't speak fc_is_login. Treat any
+      // 2xx with the User-Api-Key header set as "logged in"; the proxy layer
+      // owns the higher-level interpretation (e.g. 403 → key revoked).
+      fcIsLogin: false,
     );
+  }
+
+  FCCallResult _toCallResultFromException(DioException e) {
+    final headers = <String, String>{};
+    e.response?.headers.forEach((k, v) {
+      if (v.isNotEmpty) headers[k] = v.first;
+    });
+    String body = '';
+    final data = e.response?.data;
+    if (data is String) {
+      body = data;
+    } else if (data != null) {
+      body = data.toString();
+    }
+    if (body.isEmpty) {
+      body = jsonEncode({
+        'error': e.message ?? 'HTTP request failed',
+        'type': e.type.toString(),
+      });
+    }
+    return FCCallResult(
+      statusCode: e.response?.statusCode ?? 0,
+      body: body,
+      headers: headers,
+      fcIsLogin: false,
+    );
+  }
+
+  String _joinPath(String basePath, String suffix) {
+    if (basePath.isEmpty || basePath == '/') return suffix;
+    final left =
+        basePath.endsWith('/') ? basePath.substring(0, basePath.length - 1) : basePath;
+    return suffix.startsWith('/') ? '$left$suffix' : '$left/$suffix';
   }
 }

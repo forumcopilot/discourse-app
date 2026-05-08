@@ -7,6 +7,7 @@ import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.d
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 import '../base_discourse_proxy.dart';
+import '../context/discourse_site_context_extension.dart';
 
 /// Discourse implementation of IFCUserProxy
 /// Handles user operations and profile management for Discourse forums
@@ -92,108 +93,106 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
 
   @override
   Future<FCUserInfoResult> getUserInfoAsync(String? username, String? userId) async {
-    print('✅ [DISCOURSE_USER] getUserInfo called - IMPLEMENTED');
-    print('   📋 Parameters: username=$username, userId=$userId');
+    if ((username == null || username.isEmpty) && (userId == null || userId.isEmpty)) {
+      return FCUserInfoResult(
+        result: false,
+        resultText: 'username or userId required',
+        id: '',
+        username: '',
+      );
+    }
+    if (username == null || username.isEmpty) {
+      // Discourse exposes `/u/{username}.json`; resolving id-only requires an
+      // admin endpoint we don't want to depend on. Phase 2: hit `/admin/users/{id}.json`
+      // when the caller has staff scopes.
+      return FCUserInfoResult(
+        result: false,
+        resultText: 'Discourse user lookup requires a username (id-only lookup not yet supported)',
+        id: userId ?? '',
+        username: '',
+      );
+    }
 
     try {
-      final response = await callPluginApi('getUserInfo', {
-        'username': username,
-        'userId': userId,
-      });
+      final response = await apiGet('/u/${Uri.encodeComponent(username)}.json');
+      final user = (response['user'] as Map<String, dynamic>?) ?? const {};
 
-      // Parse registrationTime and lastActivityTime from milliseconds
-      DateTime? registrationTime;
-      if (response['registrationTime'] != null) {
-        registrationTime = DateTime.fromMillisecondsSinceEpoch(int.tryParse(response['registrationTime'].toString()) ?? 0);
+      String? avatarUrl;
+      final avatarTemplate = user['avatar_template'] as String?;
+      if (avatarTemplate != null && avatarTemplate.isNotEmpty) {
+        final filled = avatarTemplate.replaceAll('{size}', '240');
+        avatarUrl = filled.startsWith('http')
+            ? filled
+            : '${siteContext.site.url}$filled';
       }
 
-      DateTime? lastActivityTime;
-      if (response['lastActivityTime'] != null) {
-        lastActivityTime = DateTime.fromMillisecondsSinceEpoch(int.tryParse(response['lastActivityTime'].toString()) ?? 0);
+      DateTime? parseTs(Object? raw) {
+        if (raw == null) return null;
+        if (raw is int) return DateTime.fromMillisecondsSinceEpoch(raw);
+        if (raw is String && raw.isNotEmpty) return DateTime.tryParse(raw);
+        return null;
       }
 
-      // Parse customFields from array
-      // Can be: array of objects with name/value, or associative array (Map)
-      List<FCUserCustomField> customFields = [];
-      if (response['customFields'] != null) {
-        if (response['customFields'] is List) {
-          for (var field in response['customFields'] as List) {
-            if (field is Map<String, dynamic>) {
-              // Handle object format: {name: "...", value: "..."}
-              if (field.containsKey('name') && field.containsKey('value')) {
-                customFields.add(FCUserCustomField(
-                  name: field['name']?.toString() ?? '',
-                  value: field['value']?.toString() ?? '',
-                ));
-              }
-            }
-          }
-        } else if (response['customFields'] is Map) {
-          // Handle associative array format: {fieldName: fieldValue, ...}
-          final fieldsMap = response['customFields'] as Map;
-          fieldsMap.forEach((key, value) {
-            customFields.add(FCUserCustomField(
-              name: key.toString(),
-              value: value?.toString() ?? '',
-            ));
-          });
-        }
+      final groupsRaw = user['groups'] as List? ?? const [];
+      final groups = groupsRaw
+          .whereType<Map>()
+          .map((g) => (g['name'] ?? '').toString())
+          .where((s) => s.isNotEmpty)
+          .toList();
+
+      final customFields = <FCUserCustomField>[];
+      final cfRaw = user['custom_fields'];
+      if (cfRaw is Map) {
+        cfRaw.forEach((k, v) {
+          customFields.add(FCUserCustomField(name: k.toString(), value: v?.toString() ?? ''));
+        });
       }
 
-      // Parse userGroups from array
-      List<String> userGroups = [];
-      if (response['userGroups'] != null && response['userGroups'] is List) {
-        userGroups = (response['userGroups'] as List).map((e) => e.toString()).toList();
-      }
+      final lastSeenAt = parseTs(user['last_seen_at']);
+      final fiveMinAgo = DateTime.now().subtract(const Duration(minutes: 5));
+      final isOnline = lastSeenAt != null && lastSeenAt.isAfter(fiveMinAgo);
 
       return FCUserInfoResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString() ?? '',
-        // FCUser required fields
-        id: response['id']?.toString() ?? '',
-        username: response['username']?.toString() ?? '',
-        // FCUser optional fields
-        loginName: response['loginName']?.toString(),
-        userType: response['userType']?.toString(),
-        iconUrl: response['iconUrl']?.toString(),
-        postCount: response['postCount'] != null ? int.tryParse(response['postCount'].toString()) ?? 0 : 0,
-        registrationTime: registrationTime,
-        lastActivityTime: lastActivityTime,
-        isOnline: response['isOnline'] ?? false,
-        // New fields replacing canPM/canSendPM
-        acceptsPM: response['acceptsPM'] ?? false,
-        // Deprecated fields (set to false for backward compatibility)
-        canSendPM: false, // Removed from API - use acceptsPM instead
-        canPM: false, // Removed from API - use acceptsPM instead
-        // Following relationships
-        isFollowing: response['isFollowing'] ?? false,
-        isFollowingMe: response['isFollowingMe'] ?? false,
-        acceptsFollowers: response['acceptsFollowers'] ?? false,
-        followingCount: response['followingCount'] != null ? int.tryParse(response['followingCount'].toString()) ?? 0 : 0,
-        followerCount: response['followerCount'] != null ? int.tryParse(response['followerCount'].toString()) ?? 0 : 0,
-        // Moderation fields
-        canBan: response['canBan'] ?? false,
-        isBanned: response['isBanned'] ?? false,
-        isIgnored: response['isIgnored'] ?? false,
-        canSpamClean: response['canSpamClean'] ?? false,
-        canBeReported: response['canBeReported'] ?? false,
-        userGroups: userGroups,
+        result: true,
+        resultText: '',
+        id: (user['id'] ?? '').toString(),
+        username: (user['username'] ?? '').toString(),
+        loginName: (user['username'] ?? '').toString(),
+        userType: (user['admin'] == true)
+            ? 'admin'
+            : ((user['moderator'] == true) ? 'moderator' : 'normal'),
+        iconUrl: avatarUrl,
+        postCount: (user['post_count'] as int?) ?? 0,
+        registrationTime: parseTs(user['created_at']),
+        lastActivityTime: lastSeenAt,
+        isOnline: isOnline,
+        acceptsPM: user['can_send_private_message_to_user'] == true,
+        canSendPM: false,
+        canPM: false,
+        isFollowing: false,
+        isFollowingMe: false,
+        acceptsFollowers: false,
+        followingCount: 0,
+        followerCount: 0,
+        canBan: false,
+        isBanned: user['suspended'] == true,
+        isIgnored: user['ignored'] == true,
+        canSpamClean: false,
+        canBeReported: true,
+        userGroups: groups,
         customFields: customFields,
-        // Removed fields (set to defaults)
-        canModerate: false, // Removed from API
-        canSearch: false, // Removed from API
-        currentActivity: null, // Removed from API
-        currentTopicId: null, // Removed from API
-        displayText: response['displayText']?.toString(),
-        email: null, // Removed from API
-        // Profile fields
-        location: response['location']?.toString(),
-        website: response['website']?.toString(),
-        signature: response['signature']?.toString(),
-        bio: response['about']?.toString(), // Map 'about' from API to 'bio' field
+        canModerate: user['moderator'] == true,
+        canSearch: false,
+        currentActivity: null,
+        currentTopicId: null,
+        displayText: user['name']?.toString(),
+        email: null,
+        location: user['location']?.toString(),
+        website: user['website_name']?.toString() ?? user['website']?.toString(),
+        signature: null,
+        bio: (user['bio_excerpt'] ?? user['bio_raw'])?.toString(),
       );
     } catch (e) {
-      print('❌ [DISCOURSE_USER] getUserInfo error: $e');
       return FCUserInfoResult(
         result: false,
         resultText: 'Error getting user info: $e',
@@ -276,6 +275,15 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     throw UnimplementedError();
   }
 
+  /// Discourse does not expose a username/password JSON login endpoint to
+  /// third-party clients — mobile auth goes through the User API Key
+  /// handshake (RSA-encrypted, scoped, per-device key).
+  ///
+  /// This method is left in place to satisfy the SDK contract; Phase 1.x
+  /// will rewrite the login UI to call [DiscourseAuthManager.beginHandshake]
+  /// in a webview and pass the redirect payload to
+  /// [DiscourseAuthManager.completeHandshake]. Until then, the existing
+  /// username/password form returns a guidance message.
   @override
   Future<FCLoginResult> loginAsync(
     String loginname,
@@ -289,195 +297,13 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     Map<String, String>? webauthnPayload,
     bool trustDevice = false,
   }) async {
-    print('✅ [DISCOURSE_USER] login called - IMPLEMENTED');
-    print(
-        '   📋 Parameters: loginname=$loginname, password=***, anonymous=$anonymous, trustCode=$trustCode, tfaCode=${tfaCode != null ? '***' : null}, tfaProvider=$tfaProvider, trustDevice=$trustDevice');
-
-    try {
-      final cookieCountBefore = await FCDioClient.instance.cookieCountForUrl(Uri.parse(siteContext.site.pluginUrl));
-      print('🍪 [DISCOURSE_USER] Cookie count before login: $cookieCountBefore');
-
-      final params = <String, dynamic>{
-        'loginname': loginname,
-        'password': password,
-        'anonymous': anonymous,
-        'remember': remember,
-      };
-
-      if (trustCode != null) {
-        params['trustCode'] = trustCode;
-      }
-
-      // Add TFA parameters if provided
-      if (tfaCode != null) {
-        params['tfaCode'] = tfaCode;
-      }
-      if (tfaProvider != null) {
-        params['tfaProvider'] = tfaProvider;
-      }
-      if (webauthnChallenge != null) {
-        params['webauthn_challenge'] = webauthnChallenge;
-      }
-      if (webauthnPayload != null) {
-        params['webauthn_payload'] = webauthnPayload;
-      }
-      if (trustDevice) {
-        params['trustDevice'] = true;
-      }
-
-      final response = await callPluginApi('login', params);
-      final setCookieHeader = siteContext.lastCallResponse?.headers['set-cookie'] ?? siteContext.lastCallResponse?.headers['Set-Cookie'];
-      print('🍪 [DISCOURSE_USER] Login response Set-Cookie present: ${setCookieHeader != null && setCookieHeader.isNotEmpty}');
-      final loginResult = _buildLoginResult(
-        response,
-        password: password,
-        trustCode: trustCode,
-      );
-
-      // Clear cache after successful login
-      // This ensures fresh data is loaded after authentication
-      // Note: Cookies are NOT cleared - they are maintained for session persistence
-      if (loginResult.result) {
-        siteContext.setLoginData(loginResult);
-        siteContext.resetOnLogin();
-        print('✅ [DISCOURSE_USER] Login data saved to SiteContext');
-        final cookieCountAfter = await FCDioClient.instance.cookieCountForUrl(Uri.parse(siteContext.site.pluginUrl));
-        print('🍪 [DISCOURSE_USER] Cookie count after login: $cookieCountAfter');
-      }
-
-      return loginResult;
-    } catch (e) {
-      print('❌ [DISCOURSE_USER] login error: $e');
-      return FCLoginResult(
-        result: false,
-        resultText: 'Error logging in: $e',
-        user: null,
-        canWhosonline: false,
-        canProfile: false,
-        canUploadAvatar: false,
-        maxAttachment: 0,
-        maxPngSize: 0,
-        maxJpgSize: 0,
-        postCountdown: 0,
-      );
-    }
-  }
-
-  FCLoginResult _buildLoginResult(
-    Map<String, dynamic> response, {
-    String? password,
-    String? trustCode,
-  }) {
-    // Parse user from response
-    FCUser? user;
-    if (response['user'] != null && response['user'] is Map<String, dynamic>) {
-      final userData = response['user'] as Map<String, dynamic>;
-      user = FCUser(
-        id: userData['id']?.toString() ?? '',
-        username: userData['username']?.toString() ?? '',
-        loginName: userData['loginName']?.toString() ?? userData['username']?.toString() ?? '',
-        email: userData['email']?.toString(),
-        userType: userData['userType']?.toString(),
-        iconUrl: userData['iconUrl']?.toString(),
-        postCount: userData['postCount'] ?? 0,
-        registrationTime: userData['registrationTime'] != null ? DateTime.fromMillisecondsSinceEpoch(userData['registrationTime'] as int) : null,
-        lastActivityTime: userData['lastActivityTime'] != null ? DateTime.fromMillisecondsSinceEpoch(userData['lastActivityTime'] as int) : null,
-        isOnline: userData['isOnline'] ?? true,
-        canPM: userData['canPM'] ?? false,
-        canSendPM: userData['canSendPM'] ?? false,
-        canModerate: userData['canModerate'] ?? false,
-        canSearch: userData['canSearch'] ?? true,
-        userGroups: userData['userGroups'] != null ? (userData['userGroups'] as List).map((e) => e.toString()).toList() : [],
-        userState: userData['userState']?.toString() ?? 'valid',
-      );
-    }
-
-    // Parse allowedFileExtensions - can be array or comma-separated string
-    List<String>? allowedFileExtensionsList;
-    if (response['allowedFileExtensions'] != null) {
-      if (response['allowedFileExtensions'] is List) {
-        allowedFileExtensionsList = (response['allowedFileExtensions'] as List).map((e) => e.toString().toLowerCase()).toList();
-      } else if (response['allowedFileExtensions'] is String) {
-        final extensionsStr = response['allowedFileExtensions'] as String;
-        allowedFileExtensionsList = extensionsStr.split(',').map((e) => e.trim().toLowerCase()).where((e) => e.isNotEmpty).toList();
-      }
-    }
-    // Fallback to allowedExtensions string if allowedFileExtensions not present
-    if (allowedFileExtensionsList == null && response['allowedExtensions'] != null) {
-      final extensionsStr = response['allowedExtensions'].toString();
-      allowedFileExtensionsList = extensionsStr.split(',').map((e) => e.trim().toLowerCase()).where((e) => e.isNotEmpty).toList();
-    }
-
-    // Parse maxAttachmentSize - use maxAttachmentSize if present, otherwise fallback to maxPngSize
-    final maxAttachmentSize = response['maxAttachmentSize'] != null
-        ? (response['maxAttachmentSize'] is int ? response['maxAttachmentSize'] as int : int.tryParse(response['maxAttachmentSize'].toString()) ?? 0)
-        : (response['maxPngSize'] ?? 0);
-
-    // Parse TFA providers if present
-    List<FCTFAProvider>? providers;
-    if (response['providers'] != null && response['providers'] is List) {
-      providers = [];
-      for (var providerData in response['providers'] as List) {
-        if (providerData is Map<String, dynamic>) {
-          providers.add(FCTFAProvider(
-            id: providerData['id']?.toString() ?? '',
-            title: providerData['title']?.toString() ?? '',
-            description: providerData['description']?.toString() ?? '',
-            type: providerData['type']?.toString(),
-          ));
-        }
-      }
-    }
-
-    // Parse TFA fields
-    final tfaRequired = response['tfaRequired'] ?? response['twoStepRequired'] ?? false;
-    final providerId = response['providerId']?.toString();
-
-    final availableTfaMethods = response['availableTfaMethods'];
-    bool passkeyAvailable = false;
-    bool codeAvailable = false;
-    if (availableTfaMethods is Map) {
-      passkeyAvailable = availableTfaMethods['passkey'] == true;
-      codeAvailable = availableTfaMethods['code'] == true;
-    }
-    if (providers != null) {
-      passkeyAvailable = passkeyAvailable || providers.any((provider) => provider.id == 'passkey' || provider.type == 'passkey');
-      codeAvailable = codeAvailable || providers.any((provider) => provider.type == 'code' || provider.id == 'totp' || provider.id == 'backup' || provider.id == 'email');
-    }
-
-    final passkeyTimeout = response['passkeyTimeout'] != null ? (response['passkeyTimeout'] is int ? response['passkeyTimeout'] as int : int.tryParse(response['passkeyTimeout'].toString())) : null;
-
     return FCLoginResult(
-      result: response['result'] ?? false,
-      resultText: response['resultText']?.toString() ?? '',
-      user: user,
-      canWhosonline: response['canWhosonline'] ?? false,
-      canProfile: response['canProfile'] ?? false,
-      canUploadAvatar: response['canUploadAvatar'] ?? false,
-      maxAttachment: response['maxAttachment'] ?? 0,
-      maxPngSize: response['maxPngSize'] ?? 0,
-      maxJpgSize: response['maxJpgSize'] ?? 0,
-      ignoredUids: response['ignoredUids']?.toString(),
-      allowedExtensions: response['allowedExtensions']?.toString(),
-      canUploadAttachment: response['canUploadAttachment'] ?? false,
-      canUploadConversationAttachment: response['canUploadConversationAttachment'] ?? false,
-      maxAttachmentSize: maxAttachmentSize,
-      allowedFileExtensions: allowedFileExtensionsList,
-      maxImageWidth: response['maxImageWidth'] != null ? (response['maxImageWidth'] is int ? response['maxImageWidth'] as int : int.tryParse(response['maxImageWidth'].toString()) ?? 0) : 0,
-      maxImageHeight: response['maxImageHeight'] != null ? (response['maxImageHeight'] is int ? response['maxImageHeight'] as int : int.tryParse(response['maxImageHeight'].toString()) ?? 0) : 0,
-      postCountdown: response['postCountdown'] ?? 0,
-      trustCode: response['trustCode']?.toString() ?? trustCode,
-      twoStepRequired: response['twoStepRequired'] ?? false,
-      tfaRequired: tfaRequired,
-      providers: providers,
-      providerId: providerId,
-      passkeyAvailable: passkeyAvailable,
-      codeAvailable: codeAvailable,
-      passkeyChallenge: response['passkeyChallenge']?.toString(),
-      passkeyRpId: response['passkeyRpId']?.toString(),
-      passkeyTimeout: passkeyTimeout,
-      userpassword: password, // Store password for internal use
-      isProblematicUrl: response['isProblematicUrl'] ?? false,
+      result: false,
+      resultText:
+          'Discourse mobile login uses User API Keys (handshake via webview). '
+          'Phase 1.x will wire the new flow into the UI; for now, see '
+          'DiscourseAuthManager.beginHandshake in packages/discourse_core.',
+      user: null,
     );
   }
 
@@ -497,27 +323,22 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     );
   }
 
+  /// Discourse handles passkeys via its own login UI (which the User API Key
+  /// handshake webview lands on). The mobile app does not need a separate
+  /// passkey path — when the webview shows Discourse's login page, passkey
+  /// works there.
   @override
   Future<FCLoginResult> loginWithPasskeyAsync({
     required String webauthnChallenge,
     required Map<String, String> webauthnPayload,
   }) async {
-    print('✅ [DISCOURSE_USER] loginWithPasskeyAsync called - IMPLEMENTED');
-
-    final response = await callPluginApi('login', {
-      'webauthn_challenge': webauthnChallenge,
-      'webauthn_payload': webauthnPayload,
-      'remember': true,
-    });
-
-    final loginResult = _buildLoginResult(response);
-    if (loginResult.result) {
-      siteContext.setLoginData(loginResult);
-      siteContext.resetOnLogin();
-      print('✅ [DISCOURSE_USER] Login data saved to SiteContext (passkey)');
-    }
-
-    return loginResult;
+    return FCLoginResult(
+      result: false,
+      resultText:
+          'Discourse passkey auth happens inside the User API Key handshake webview. '
+          'See DiscourseAuthManager.beginHandshake.',
+      user: null,
+    );
   }
 
   @override
@@ -528,23 +349,16 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
 
   @override
   Future<void> logoutUserAsync() async {
-    print('✅ [DISCOURSE_USER] logoutUser called - IMPLEMENTED');
-    print('   📋 Parameters: none');
-
+    // Best-effort: ask Discourse to revoke the User API Key, then drop it
+    // locally regardless of the network response.
     try {
-      final cookieCountBefore = await FCDioClient.instance.cookieCountForUrl(Uri.parse(siteContext.site.pluginUrl));
-      print('🍪 [DISCOURSE_USER] Cookie count before logout: $cookieCountBefore');
-      await callPluginApi('logout', {});
-      final setCookieHeader = siteContext.lastCallResponse?.headers['set-cookie'] ?? siteContext.lastCallResponse?.headers['Set-Cookie'];
-      print('🍪 [DISCOURSE_USER] Logout response Set-Cookie present: ${setCookieHeader != null && setCookieHeader.isNotEmpty}');
-      print('✅ [DISCOURSE_USER] Logout successful');
+      await apiPost('/user-api-key/revoke');
     } catch (e) {
-      print('❌ [DISCOURSE_USER] logout error: $e');
-      // Don't throw - logout should be best effort
+      // ignore: avoid_print
+      print('⚠️ [DISCOURSE_USER] /user-api-key/revoke failed (continuing local logout): $e');
     }
+    await siteContext.clearUserApiCredentials();
     siteContext.resetOnLogout();
-    final cookieCountAfter = await FCDioClient.instance.cookieCountForUrl(Uri.parse(siteContext.site.pluginUrl));
-    print('🍪 [DISCOURSE_USER] Cookie count after logout: $cookieCountAfter');
   }
 
   @override

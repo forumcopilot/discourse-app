@@ -21,14 +21,18 @@ dependencies:
   # JSON serialization
   json_annotation: ^4.9.0
   
-  # OAuth2 support
+  # OAuth2 support (legacy, scheduled for removal once User API Key flow is wired into login UI)
   oauth2: ^2.0.2
-  
-  # Shared preferences for token storage
+
+  # Shared preferences for User API Key storage
   shared_preferences: ^2.5.1
-  
+
   # Crypto for hashing
   crypto: ^3.0.3
+
+  # RSA keypair generation + OAEP decryption for the Discourse User API Key handshake
+  pointycastle: ^3.9.1
+  asn1lib: ^1.5.3
   
   # Dart mappable for serialization
   dart_mappable: ^4.3.1
