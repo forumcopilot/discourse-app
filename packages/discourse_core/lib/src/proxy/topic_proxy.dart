@@ -290,6 +290,13 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         topicId: (response['topic_id'] ?? '').toString(),
         state: 0,
       );
+    } on DiscourseApiException catch (e) {
+      return FCNewTopicResult(
+        result: false,
+        resultText: e.userMessage,
+        topicId: '',
+        state: 0,
+      );
     } catch (e) {
       return FCNewTopicResult(
         result: false,

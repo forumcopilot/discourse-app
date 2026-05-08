@@ -224,11 +224,10 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         canEdit: response['can_edit'] == true,
         canDelete: response['can_delete'] == true,
       );
+    } on DiscourseApiException catch (e) {
+      return FCReplyPostResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCReplyPostResult(
-        result: false,
-        resultText: 'Error: $e',
-      );
+      return FCReplyPostResult(result: false, resultText: 'Error: $e');
     }
   }
 

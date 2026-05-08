@@ -163,7 +163,9 @@ abstract class BaseDiscourseProxy {
 
 /// Thrown by [BaseDiscourseProxy] when Discourse returns a non-2xx response.
 /// Catch and translate to an `FC*Result(result: false, resultText: ...)` in
-/// each proxy.
+/// each proxy. Use [userMessage] when surfacing to the UI — that pulls just
+/// the human-readable bit out of Discourse's `{ "errors": [...] }` envelope
+/// instead of the framing wrapper.
 class DiscourseApiException implements Exception {
   final int statusCode;
   final String method;
@@ -181,6 +183,38 @@ class DiscourseApiException implements Exception {
   /// Key has likely been revoked or never had the requested scope. The
   /// caller should clear stored credentials and trigger a re-handshake.
   bool get isAuthFailure => statusCode == 401 || statusCode == 403;
+
+  /// User-facing summary. Discourse's standard error envelope is
+  /// `{"errors": ["..."], "error_type": "..."}` — we extract the messages.
+  /// Fallback shapes: `{"error": "..."}`, `{"message": "..."}`, or a raw
+  /// status-code string.
+  String get userMessage {
+    if (body.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(body);
+        if (decoded is Map) {
+          final errors = decoded['errors'];
+          if (errors is List && errors.isNotEmpty) {
+            return errors.map((e) => e.toString()).join('; ');
+          }
+          for (final key in const ['error', 'message', 'reason']) {
+            final v = decoded[key];
+            if (v is String && v.isNotEmpty) return v;
+          }
+        }
+      } catch (_) {
+        // not JSON — fall through.
+      }
+    }
+    if (statusCode == 0) return 'Network error';
+    if (statusCode == 401 || statusCode == 403) {
+      return 'Not authorized (HTTP $statusCode)';
+    }
+    if (statusCode == 404) return 'Not found';
+    if (statusCode == 422) return 'Request rejected (HTTP 422)';
+    if (statusCode >= 500) return 'Server error (HTTP $statusCode)';
+    return 'HTTP $statusCode';
+  }
 
   @override
   String toString() =>
