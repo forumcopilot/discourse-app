@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:forumcopilot_flutter/controllers/site_controller.dart';
 import 'package:forumcopilot_flutter/controllers/login_controller.dart';
+import 'package:forumcopilot_flutter/services/discourse_login_service.dart';
 import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 import 'package:forumcopilot_flutter/views/login_page.dart';
 import 'package:forumcopilot_flutter/core/async/async_utils.dart';
@@ -180,6 +181,23 @@ class SiteInitializationService {
       siteController.isInitialized.value = true;
       siteController.currentSiteContext.value = siteContext;
       siteController.attachReloginHandler(siteContext);
+
+      // Restore a persisted Discourse User API Key (if any) and refresh the
+      // current user record from /session/current.json. Failure is silent
+      // and leaves the user signed-out — the login UI handles re-auth.
+      if (siteContext.siteType == 'discourse') {
+        try {
+          final restored =
+              await DiscourseLoginService(siteContext).restorePersistedSession();
+          if (restored) {
+            AppLogger.info(
+                'SiteInitializationService: Restored persisted Discourse session');
+          }
+        } catch (e) {
+          AppLogger.warning(
+              'SiteInitializationService: Could not restore session: $e');
+        }
+      }
 
       // Record this visit in the history
       AppLogger.debug('Recording visit for site: ${site.name}');

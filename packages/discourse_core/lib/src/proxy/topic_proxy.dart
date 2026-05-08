@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_topic_proxy.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
@@ -23,6 +25,13 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
   DiscourseTopicProxy(SiteContext context) : super(context);
 
   static const int _perPage = 30;
+
+  // Process-lifetime cache of category id → name. /categories.json is the
+  // only place to resolve `forumName`, so we warm this lazily on the first
+  // topic-list call. A stale cache is acceptable for v1 — categories rarely
+  // rename. Phase 2.x: invalidate on logout / forum switch.
+  static Map<int, String>? _catNamesById;
+  static Future<Map<int, String>>? _catNamesLoading;
 
   @override
   Future<FCLatestTopicResult> getLatestTopicAsync(
@@ -307,11 +316,14 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         '/c/$forumId/l/$filter.json',
         page: _pageOf(startNum),
       );
+      final catId = int.tryParse(forumId);
+      final forumName =
+          catId == null ? '' : (_catNamesById?[catId] ?? '');
       return FCTopicDataResult(
         result: true,
         resultText: '',
         forumId: forumId,
-        forumName: '',
+        forumName: forumName,
         canPost: list.canPost,
         canUpload: list.canPost,
         unreadStickyCount: 0,
@@ -333,9 +345,13 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     int page = 0,
     bool filterPinnedGlobally = false,
   }) async {
-    final response = await apiGet(path, query: {
+    final responseFuture = apiGet(path, query: {
       if (page > 0) 'page': page.toString(),
     });
+    final catNamesFuture = _loadCategoryNames();
+    final response = await responseFuture;
+    final catNames = await catNamesFuture;
+
     final users = <int, Map<String, dynamic>>{};
     for (final u
         in ((response['users'] as List?) ?? const []).whereType<Map>()) {
@@ -349,12 +365,42 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         in ((list['topics'] as List?) ?? const []).whereType<Map>()) {
       final m = raw.cast<String, dynamic>();
       if (filterPinnedGlobally && m['pinned_globally'] != true) continue;
-      topics.add(_topicFromTopicJson(m, users: users));
+      topics.add(_topicFromTopicJson(m, users: users, catNames: catNames));
     }
     return _TopicListResponse(
       topics: topics,
       canPost: (list['can_create_topic'] as bool?) ?? false,
     );
+  }
+
+  /// Warm-once cache of category id → name. Resolves [FCTopic.forumName]
+  /// on topic listings without paying for /categories.json on every call.
+  Future<Map<int, String>> _loadCategoryNames() async {
+    if (_catNamesById != null) return _catNamesById!;
+    if (_catNamesLoading != null) return _catNamesLoading!;
+    final completer = Completer<Map<int, String>>();
+    _catNamesLoading = completer.future;
+    try {
+      final response = await apiGet('/categories.json');
+      final list = (response['category_list'] as Map<String, dynamic>?) ??
+          const <String, dynamic>{};
+      final cats = (list['categories'] as List?) ?? const [];
+      final m = <int, String>{};
+      for (final c in cats.whereType<Map<String, dynamic>>()) {
+        final id = c['id'];
+        final name = c['name']?.toString();
+        if (id is int && name != null && name.isNotEmpty) m[id] = name;
+      }
+      _catNamesById = m;
+      completer.complete(m);
+      return m;
+    } catch (_) {
+      _catNamesById = const {};
+      completer.complete(const {});
+      return const {};
+    } finally {
+      _catNamesLoading = null;
+    }
   }
 
   /// Build an [FCTopic] from a Discourse topic object — works for the
@@ -363,6 +409,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
   FCTopic _topicFromTopicJson(
     Map<String, dynamic> t, {
     Map<int, Map<String, dynamic>> users = const {},
+    Map<int, String> catNames = const {},
   }) {
     final posters = (t['posters'] as List?) ?? const [];
     int? opUserId;
@@ -394,13 +441,20 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
 
     final id = (t['id'] ?? '').toString();
     final slug = t['slug']?.toString();
+    final categoryIdInt = t['category_id'] as int?;
     final categoryId = (t['category_id'] ?? '').toString();
+    final participatedUserIds = posters
+        .whereType<Map>()
+        .map((p) => p['user_id']?.toString() ?? '')
+        .where((s) => s.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
 
     return FCTopic(
       id: id,
       title: (t['title'] ?? '').toString(),
       forumId: categoryId,
-      forumName: '',
+      forumName: categoryIdInt == null ? '' : (catNames[categoryIdInt] ?? ''),
       authorId: authorId,
       authorName: authorName,
       authorIconUrl: authorIconUrl,
@@ -420,6 +474,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       // Some inherited UI does `topic.shortContent!.isNotEmpty` (XF assumed
       // non-null); keep this string non-null so we don't trip the null check.
       shortContent: (t['excerpt'] as String?) ?? '',
+      participatedUserIds: participatedUserIds,
       isPinned: (t['pinned'] as bool?) ?? false,
       isAnnouncement: (t['pinned_globally'] as bool?) ?? false,
       canReply: !(t['closed'] == true || t['archived'] == true),

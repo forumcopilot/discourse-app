@@ -1,263 +1,364 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_social_proxy.dart';
 import 'package:forumcopilot_sdk/models/results/fc_social_result.dart';
+
 import '../base_discourse_proxy.dart';
 
-/// Discourse implementation of IFCSocialProxy
-/// Handles social operations for Discourse forums
+/// Discourse implementation of [IFCSocialProxy].
+///
+/// Endpoints used:
+///   * POST   `/post_actions`           — create a like (post_action_type_id=2)
+///   * DELETE `/post_actions/{post_id}` — remove a like
+///   * GET    `/notifications.json`     — alerts feed
+///   * GET    `/user_actions.json`      — activity feed
+///
+/// Notes / gaps:
+/// - Discourse has no separate "Thanks" — `thankPostAsync` is mapped to
+///   `like` (lossy; XF treated them as distinct).
+/// - `follow/unfollow` require the optional `discourse-follow` plugin.
+///   Stubbed `result:false` so the UI's follow button reports clearly when
+///   the feature isn't available on the forum.
 class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy {
   DiscourseSocialProxy(SiteContext context) : super(context);
 
+  // PostActionType id for "Like" — see app/models/post_action_type.rb in
+  // Discourse.
+  static const int _likeType = 2;
+
+  // Discourse Notification type ids (subset). Full list lives in
+  // app/models/notification.rb#types — we only enumerate types we surface
+  // a friendly label for; everything else falls through to a generic msg.
+  static const int _ntMentioned = 1;
+  static const int _ntReplied = 2;
+  static const int _ntQuoted = 3;
+  static const int _ntEdited = 4;
+  static const int _ntLiked = 5;
+  static const int _ntPrivateMessage = 6;
+  static const int _ntInvitedToPm = 7;
+  static const int _ntInviteeAccepted = 8;
+  static const int _ntPosted = 9;
+  static const int _ntMovedPost = 10;
+  static const int _ntLinked = 11;
+  static const int _ntGrantedBadge = 12;
+
+  @override
+  Future<FCLikePostResult> likePostAsync(String postId) =>
+      _toggleLike(postId, like: true,
+          buildResult: (result) => FCLikePostResult(
+                result: result.success,
+                resultText: result.resultText,
+                isLiked: result.isLiked,
+                likeCount: result.likeCount,
+              ));
+
+  @override
+  Future<FCUnlikePostResult> unlikePostAsync(String postId) async {
+    final r = await _toggleLikeRaw(postId, like: false);
+    return FCUnlikePostResult(
+      result: r.success,
+      resultText: r.resultText,
+      isLiked: r.isLiked,
+      likeCount: r.likeCount,
+    );
+  }
+
+  @override
+  Future<FCLikePostResult> likeConversationMessageAsync(String messageId) =>
+      likePostAsync(messageId); // PMs are topics; messages are posts.
+
+  @override
+  Future<FCUnlikePostResult> unlikeConversationMessageAsync(String messageId) =>
+      unlikePostAsync(messageId);
+
   @override
   Future<FCThankPostResult> thankPostAsync(String postId) async {
-    print('✅ [DISCOURSE_SOCIAL] thankPostAsync called via plugin API');
-    print('   📋 Parameters: postId=$postId');
-
-    try {
-      final response = await callPluginApi('thankPost', {
-        'postId': postId,
-      });
-
-      return FCThankPostResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString() ?? '',
-      );
-    } catch (e) {
-      print('❌ [DISCOURSE_SOCIAL] thankPostAsync error: $e');
-      return FCThankPostResult(
-        result: false,
-        resultText: 'Error thanking post: $e',
-      );
-    }
+    // Lossy: Discourse has no "Thanks" type. Map to like.
+    final r = await _toggleLikeRaw(postId, like: true);
+    return FCThankPostResult(
+      result: r.success,
+      resultText: r.resultText,
+    );
   }
 
   @override
   Future<FCFollowResult> followAsync(String userId) async {
-    print('✅ [DISCOURSE_SOCIAL] followAsync called via plugin API');
-    print('   📋 Parameters: userId=$userId');
-
-    try {
-      final response = await callPluginApi('follow', {
-        'userId': userId,
-      });
-
-      return FCFollowResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString() ?? '',
-      );
-    } catch (e) {
-      print('❌ [DISCOURSE_SOCIAL] followAsync error: $e');
-      return FCFollowResult(
-        result: false,
-        resultText: 'Error following user: $e',
-      );
-    }
+    // discourse-follow plugin: PUT /follow/{username}.json. Without the
+    // plugin the route 404s. For now report as unsupported so the UI
+    // surfaces a clear message; Phase 2.x can detect the plugin and
+    // enable the call.
+    return FCFollowResult(
+      result: false,
+      resultText:
+          'Follow requires the discourse-follow plugin — not implemented yet.',
+    );
   }
 
   @override
   Future<FCUnfollowResult> unfollowAsync(String userId) async {
-    print('✅ [DISCOURSE_SOCIAL] unfollowAsync called via plugin API');
-    print('   📋 Parameters: userId=$userId');
-
-    try {
-      final response = await callPluginApi('unfollow', {
-        'userId': userId,
-      });
-
-      return FCUnfollowResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString() ?? '',
-      );
-    } catch (e) {
-      print('❌ [DISCOURSE_SOCIAL] unfollowAsync error: $e');
-      return FCUnfollowResult(
-        result: false,
-        resultText: 'Error unfollowing user: $e',
-      );
-    }
-  }
-
-  @override
-  Future<FCLikePostResult> likePostAsync(String postId) async {
-    print('✅ [DISCOURSE_SOCIAL] likePostAsync called via plugin API');
-    print('   📋 Parameters: postId=$postId');
-
-    try {
-      final response = await callPluginApi('likePost', {
-        'postId': postId,
-      });
-
-      return FCLikePostResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString() ?? '',
-        isLiked: response['isLiked'] ?? true,
-        likeCount: response['likeCount'] != null ? int.tryParse(response['likeCount'].toString()) ?? 0 : 0,
-      );
-    } catch (e) {
-      print('❌ [DISCOURSE_SOCIAL] likePostAsync error: $e');
-      return FCLikePostResult(
-        result: false,
-        resultText: 'Error liking post: $e',
-      );
-    }
-  }
-
-  @override
-  Future<FCUnlikePostResult> unlikePostAsync(String postId) async {
-    print('✅ [DISCOURSE_SOCIAL] unlikePostAsync called via plugin API');
-    print('   📋 Parameters: postId=$postId');
-
-    try {
-      final response = await callPluginApi('unlikePost', {
-        'postId': postId,
-      });
-
-      return FCUnlikePostResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString() ?? '',
-        isLiked: response['isLiked'] ?? false,
-        likeCount: response['likeCount'] != null ? int.tryParse(response['likeCount'].toString()) ?? 0 : 0,
-      );
-    } catch (e) {
-      print('❌ [DISCOURSE_SOCIAL] unlikePostAsync error: $e');
-      return FCUnlikePostResult(
-        result: false,
-        resultText: 'Error unliking post: $e',
-      );
-    }
-  }
-
-  @override
-  Future<FCLikePostResult> likeConversationMessageAsync(String messageId) async {
-    print('✅ [DISCOURSE_SOCIAL] likeConversationMessageAsync called via plugin API');
-    print('   📋 Parameters: messageId=$messageId');
-
-    try {
-      final response = await callPluginApi('likeConversationMessage', {
-        'messageId': messageId,
-      });
-
-      return FCLikePostResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString() ?? '',
-        isLiked: response['isLiked'] ?? true,
-        likeCount: response['likeCount'] != null ? int.tryParse(response['likeCount'].toString()) ?? 0 : 0,
-      );
-    } catch (e) {
-      print('❌ [DISCOURSE_SOCIAL] likeConversationMessageAsync error: $e');
-      return FCLikePostResult(
-        result: false,
-        resultText: 'Error liking conversation message: $e',
-      );
-    }
-  }
-
-  @override
-  Future<FCUnlikePostResult> unlikeConversationMessageAsync(String messageId) async {
-    print('✅ [DISCOURSE_SOCIAL] unlikeConversationMessageAsync called via plugin API');
-    print('   📋 Parameters: messageId=$messageId');
-
-    try {
-      final response = await callPluginApi('unlikeConversationMessage', {
-        'messageId': messageId,
-      });
-
-      return FCUnlikePostResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString() ?? '',
-        isLiked: response['isLiked'] ?? false,
-        likeCount: response['likeCount'] != null ? int.tryParse(response['likeCount'].toString()) ?? 0 : 0,
-      );
-    } catch (e) {
-      print('❌ [DISCOURSE_SOCIAL] unlikeConversationMessageAsync error: $e');
-      return FCUnlikePostResult(
-        result: false,
-        resultText: 'Error unliking conversation message: $e',
-      );
-    }
+    return FCUnfollowResult(
+      result: false,
+      resultText:
+          'Unfollow requires the discourse-follow plugin — not implemented yet.',
+    );
   }
 
   @override
   Future<FCAlertResult> getAlertAsync(int page, int perpage, bool forceRefresh) async {
-    print('✅ [DISCOURSE_SOCIAL] getAlertAsync called via plugin API');
-    print('   📋 Parameters: page=$page, perpage=$perpage, forceRefresh=$forceRefresh');
-
     try {
-      final response = await callPluginApi('getAlert', {
-        'page': page,
-        'perpage': perpage,
-        'forceRefresh': forceRefresh,
+      final perPage = perpage <= 0 ? 30 : perpage;
+      final response = await apiGet('/notifications.json', query: {
+        if (page > 0) 'offset': (page * perPage).toString(),
+        'limit': perPage.toString(),
       });
-
-      // Parse alert list - PHP returns 'items' array with alert data
-      final List<FCAlert> alertList = [];
-      if (response['items'] != null && response['items'] is List) {
-        for (var alertData in response['items'] as List) {
-          if (alertData is Map<String, dynamic>) {
-            // Get alert type
-            final alertType = alertData['type']?.toString() ?? '';
-            
-            // Use API-provided contentId
-            final contentId = alertData['contentId']?.toString() ?? '';
-            
-            // Handle timestamp - can be number (milliseconds) or string
-            String timestampStr;
-            if (alertData['timestamp'] != null) {
-              if (alertData['timestamp'] is num) {
-                // Convert number (milliseconds) to string
-                timestampStr = alertData['timestamp'].toString();
-              } else {
-                timestampStr = alertData['timestamp'].toString();
-              }
-            } else {
-              timestampStr = DateTime.now().millisecondsSinceEpoch.toString();
-            }
-            
-            // Map PHP response structure to FCAlert
-            alertList.add(FCAlert(
-              userId: alertData['fromUserId']?.toString() ?? '',
-              username: alertData['fromUsername']?.toString() ?? '',
-              iconUrl: alertData['fromUserIconUrl']?.toString() ?? '',
-              message: alertData['message']?.toString() ?? '',
-              timestamp: timestampStr,
-              contentType: alertType,
-              contentId: contentId,
-              topicId: alertData['topicId']?.toString(),
-              postId: alertData['postId']?.toString(),
-              conversationId: alertData['conversationId']?.toString(),
-              actionUrl: alertData['actionUrl']?.toString(),
-              fromUsername: alertData['fromUsername']?.toString(),
-              action: alertData['action']?.toString(),
-            ));
-          }
-        }
-      }
-
+      final items = ((response['notifications'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((n) => _toAlert(n.cast<String, dynamic>()))
+          .toList();
       return FCAlertResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString() ?? '',
-        total: response['total'] ?? 0,
-        items: alertList,
+        result: true,
+        resultText: '',
+        total: (response['total_rows_notifications'] as int?) ?? items.length,
+        items: items,
       );
     } catch (e) {
-      print('❌ [DISCOURSE_SOCIAL] getAlertAsync error: $e');
       return FCAlertResult(
         result: false,
-        resultText: 'Error getting alerts: $e',
+        resultText: 'Error: $e',
         total: 0,
-        items: [],
+        items: const [],
       );
     }
   }
 
   @override
   Future<FCActivityResult> getActivityAsync(int page, int perpage) async {
-    print('⚠️ [DISCOURSE_SOCIAL] getActivityAsync not fully implemented, returning stub result.');
-    return FCActivityResult(
-      result: false,
-      resultText: 'Get activity not implemented',
-      total: 0,
-      items: [],
+    final username = siteContext.currentUsername;
+    if (username == null || username.isEmpty) {
+      return FCActivityResult(
+        result: false,
+        resultText: 'Not signed in',
+        total: 0,
+        items: const [],
+      );
+    }
+    try {
+      final perPage = perpage <= 0 ? 30 : perpage;
+      final response = await apiGet('/user_actions.json', query: {
+        'username': username,
+        // Filter values: 1=Like, 2=WasLiked, 3=Bookmark, 4=NewTopic,
+        // 5=Reply, 6=Response, 7=Mention, 9=Quote, 11=Edit, 12=Message,
+        // 13=GotPrivateMessage, 14=Pending. We surface user-driven ones.
+        'filter': '4,5,9,12',
+        if (page > 0) 'offset': (page * perPage).toString(),
+      });
+      final actions = ((response['user_actions'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((a) => _toActivity(a.cast<String, dynamic>()))
+          .toList();
+      return FCActivityResult(
+        result: true,
+        resultText: '',
+        total: actions.length,
+        items: actions,
+      );
+    } catch (e) {
+      return FCActivityResult(
+        result: false,
+        resultText: 'Error: $e',
+        total: 0,
+        items: const [],
+      );
+    }
+  }
+
+  // ===== Helpers =====
+
+  Future<_LikeOutcome> _toggleLikeRaw(String postId,
+      {required bool like}) async {
+    try {
+      Map<String, dynamic> response;
+      if (like) {
+        response = await apiPost('/post_actions.json', body: {
+          'id': int.tryParse(postId) ?? postId,
+          'post_action_type_id': _likeType,
+        });
+      } else {
+        response = await apiDelete('/post_actions/$postId.json',
+            query: {'post_action_type_id': _likeType.toString()});
+      }
+      final actions = (response['actions_summary'] as List?) ?? const [];
+      final likeAction = actions.whereType<Map>().firstWhere(
+            (a) => a['id'] == _likeType,
+            orElse: () => <String, dynamic>{},
+          );
+      return _LikeOutcome(
+        success: true,
+        resultText: '',
+        isLiked: likeAction['acted'] == true,
+        likeCount: (likeAction['count'] as int?) ?? 0,
+      );
+    } catch (e) {
+      return _LikeOutcome(
+        success: false,
+        resultText: 'Error: $e',
+        isLiked: !like, // best-effort: keep prior state on failure
+        likeCount: 0,
+      );
+    }
+  }
+
+  Future<R> _toggleLike<R>(
+    String postId, {
+    required bool like,
+    required R Function(_LikeOutcome) buildResult,
+  }) async {
+    final r = await _toggleLikeRaw(postId, like: like);
+    return buildResult(r);
+  }
+
+  FCAlert _toAlert(Map<String, dynamic> n) {
+    final type = (n['notification_type'] as int?) ?? 0;
+    final data = (n['data'] as Map<String, dynamic>?) ?? const {};
+    final fromUser = data['display_username']?.toString() ?? '';
+    final topicTitle =
+        (n['fancy_title'] ?? data['topic_title'] ?? '').toString();
+    final topicId = n['topic_id']?.toString();
+    final postNumber = n['post_number'] as int?;
+    final readableMessage = _readableNotification(type, fromUser, topicTitle);
+    final contentType = _alertContentType(type);
+    final contentId =
+        contentType == 'topic' ? (topicId ?? '') : (postNumber?.toString() ?? '');
+
+    String? actionUrl;
+    if (topicId != null && (n['slug'] ?? '').toString().isNotEmpty) {
+      actionUrl = '${siteContext.site.url}/t/${n['slug']}/$topicId'
+          '${postNumber != null ? '/$postNumber' : ''}';
+    }
+
+    return FCAlert(
+      userId: (n['user_id'] ?? '').toString(),
+      username: fromUser,
+      iconUrl: '',
+      message: readableMessage,
+      timestamp: (n['created_at'] ?? '').toString(),
+      contentType: contentType,
+      contentId: contentId,
+      topicId: topicId,
+      position: postNumber,
+      postId: null,
+      conversationId: type == _ntPrivateMessage ? topicId : null,
+      actionUrl: actionUrl,
+      fromUsername: fromUser,
+      action: _alertActionVerb(type),
     );
   }
+
+  FCActivity _toActivity(Map<String, dynamic> a) {
+    final actionType = (a['action_type'] as int?) ?? 0;
+    return FCActivity(
+      userId: (a['user_id'] ?? '').toString(),
+      username: (a['username'] ?? '').toString(),
+      iconUrl: '',
+      message: _readableActivity(actionType, a),
+      timestamp: (a['created_at'] ?? '').toString(),
+      contentType: 'topic',
+      contentId: (a['topic_id'] ?? '').toString(),
+      topicId: a['topic_id']?.toString(),
+    );
+  }
+
+  String _readableNotification(int type, String from, String topic) {
+    switch (type) {
+      case _ntMentioned:
+        return '$from mentioned you in "$topic"';
+      case _ntReplied:
+        return '$from replied to your post in "$topic"';
+      case _ntQuoted:
+        return '$from quoted your post in "$topic"';
+      case _ntEdited:
+        return '$from edited your post in "$topic"';
+      case _ntLiked:
+        return '$from liked your post in "$topic"';
+      case _ntPrivateMessage:
+        return 'New message from $from: "$topic"';
+      case _ntInvitedToPm:
+        return '$from invited you to a private message: "$topic"';
+      case _ntInviteeAccepted:
+        return '$from accepted your invitation';
+      case _ntPosted:
+        return '$from posted in "$topic"';
+      case _ntMovedPost:
+        return 'A post was moved to "$topic"';
+      case _ntLinked:
+        return '$from linked to your post in "$topic"';
+      case _ntGrantedBadge:
+        return 'You earned a new badge';
+      default:
+        return 'New activity in "$topic"';
+    }
+  }
+
+  String _readableActivity(int actionType, Map<String, dynamic> a) {
+    final title = (a['title'] ?? '').toString();
+    switch (actionType) {
+      case 4:
+        return 'Created topic "$title"';
+      case 5:
+        return 'Replied to "$title"';
+      case 9:
+        return 'Quoted in "$title"';
+      case 12:
+        return 'Sent message: "$title"';
+      default:
+        return title.isNotEmpty ? title : 'Activity';
+    }
+  }
+
+  String _alertContentType(int type) {
+    switch (type) {
+      case _ntPrivateMessage:
+      case _ntInvitedToPm:
+        return 'message';
+      case _ntGrantedBadge:
+        return 'badge';
+      default:
+        return 'topic';
+    }
+  }
+
+  String _alertActionVerb(int type) {
+    switch (type) {
+      case _ntMentioned:
+        return 'mention';
+      case _ntReplied:
+      case _ntPosted:
+        return 'reply';
+      case _ntQuoted:
+        return 'quote';
+      case _ntLiked:
+        return 'like';
+      case _ntPrivateMessage:
+      case _ntInvitedToPm:
+        return 'pm';
+      case _ntLinked:
+        return 'link';
+      case _ntGrantedBadge:
+        return 'badge';
+      default:
+        return 'activity';
+    }
+  }
+}
+
+class _LikeOutcome {
+  final bool success;
+  final String resultText;
+  final bool isLiked;
+  final int likeCount;
+  const _LikeOutcome({
+    required this.success,
+    required this.resultText,
+    required this.isLiked,
+    required this.likeCount,
+  });
 }
