@@ -17,11 +17,38 @@ class AppForumConfig {
   /// Example: https://forum.example.com
   static const String forumBaseUrl = 'https://forum.example.com';
 
-  /// Plugin endpoint path relative to [forumBaseUrl].
-  /// Common values:
-  /// - forumcopilot.php
-  /// - forumcopilot/api
-  static const String pluginEndpoint = 'forumcopilot.php';
+  /// Legacy plugin endpoint path. **Not used in v1** — Discourse
+  /// authentication and data fetching go through stock REST endpoints.
+  /// Kept on the [Site] object only because the SDK's persistence still
+  /// keys on `pluginUrl` (= base + endpoint) for SharedPreferences.
+  /// Treat any value here as a stable opaque identifier; do not serve a
+  /// custom endpoint at this path.
+  static const String pluginEndpoint = '';
+
+  /// Display name shown to the user on Discourse's User API Key grant page
+  /// (`/user-api-key/new`). Discourse stores this verbatim on the
+  /// `UserApiKeyClient` row.
+  static const String userApiApplicationName = 'My Discourse Forum app';
+
+  /// Custom-scheme redirect Discourse appends `?payload=<base64>` to after
+  /// the user authorizes the User API Key request. Must match the redirect
+  /// the in-app webview intercepts and (for OS-level launches in v2) what
+  /// `Info.plist` / `AndroidManifest.xml` register. Choose any unique
+  /// scheme; the host (`auth-callback`) is just a path segment.
+  static const String userApiAuthRedirect = 'discourseapp://auth-callback';
+
+  /// Scopes requested during the User API Key handshake.
+  /// See `app/models/user_api_key_scope.rb` in the Discourse source for
+  /// the full list. `read,write,session_info,notifications,message_bus`
+  /// covers a forum mobile client; add `push` once the push relay is wired.
+  static const List<String> userApiRequestedScopes = <String>[
+    'read',
+    'write',
+    'session_info',
+    'notifications',
+    'message_bus',
+    'one_time_password',
+  ];
 
   /// Optional branding metadata.
   static const String forumDescription = 'Discourse community';
@@ -80,9 +107,6 @@ class AppForumConfig {
     if (trimmedBaseUrl.isEmpty) {
       throw StateError('AppForumConfig.forumBaseUrl must not be empty.');
     }
-    if (trimmedEndpoint.isEmpty) {
-      throw StateError('AppForumConfig.pluginEndpoint must not be empty.');
-    }
 
     final parsedBaseUrl = Uri.tryParse(trimmedBaseUrl);
     if (parsedBaseUrl == null ||
@@ -96,8 +120,9 @@ class AppForumConfig {
     final normalizedBaseUrl = trimmedBaseUrl.endsWith('/')
         ? trimmedBaseUrl.substring(0, trimmedBaseUrl.length - 1)
         : trimmedBaseUrl;
-    final normalizedEndpoint =
-        trimmedEndpoint.startsWith('/') ? trimmedEndpoint.substring(1) : trimmedEndpoint;
+    final normalizedEndpoint = trimmedEndpoint.startsWith('/')
+        ? trimmedEndpoint.substring(1)
+        : trimmedEndpoint;
 
     return Site(
       id: siteId,

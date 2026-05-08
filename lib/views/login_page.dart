@@ -1,3 +1,4 @@
+import 'package:discourse_core/discourse_core.dart' show DiscourseUserApiHandshakeRequest;
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -5,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:forumcopilot_flutter/controllers/global_loader_controller.dart';
 import 'package:forumcopilot_flutter/controllers/login_controller.dart';
 import 'package:forumcopilot_flutter/controllers/site_controller.dart';
+import 'package:forumcopilot_flutter/services/discourse_login_service.dart';
+import 'package:forumcopilot_flutter/views/discourse_login_webview_page.dart';
 import 'package:forumcopilot_flutter/views/widgets/forum_header_widget.dart';
 import 'package:forumcopilot_flutter/views/site_home_page.dart';
 import 'package:forumcopilot_flutter/utils/passkey_android_validation.dart';
@@ -57,47 +60,85 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      final loginController = Get.put(LoginController());
-      final success = await loginController.handleLogin(
-        siteContext: widget.siteContext,
-        username: _usernameController.text,
-        password: _passwordController.text,
-      );
+    // Discourse mobile login: User API Key handshake. The username/password
+    // form fields above are ignored — the user types credentials into
+    // Discourse's own login UI inside the webview, which also handles 2FA,
+    // passkeys, and SSO. Phase 1.2 will replace the form widgets with a
+    // dedicated CTA.
+    final loginService = DiscourseLoginService(widget.siteContext);
 
-      if (success && mounted) {
-        // Ensure loader is hidden so it does not block the next screen
+    DiscourseUserApiHandshakeRequest handshake;
+    try {
+      handshake = await loginService.beginLogin();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not start sign-in: $e')),
+      );
+      return;
+    }
+    if (!mounted) return;
+
+    final redirectUrl = await Navigator.of(context).push<Uri?>(
+      MaterialPageRoute<Uri?>(
+        builder: (_) => DiscourseLoginWebViewPage(
+          url: handshake.url,
+          redirectMatcher: loginService.isAuthCallback,
+          title: 'Sign in to ${_getSiteDomain()}',
+        ),
+      ),
+    );
+    if (!mounted) return;
+
+    if (redirectUrl == null) {
+      // User backed out — silent.
+      return;
+    }
+    final payload = loginService.extractPayload(redirectUrl);
+    if (payload == null || payload.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sign-in cancelled — no payload returned')),
+      );
+      return;
+    }
+
+    try {
+      await loginService.finishLogin(payload);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sign-in failed: $e')),
+      );
+      return;
+    }
+
+    if (!mounted) return;
+    if (Get.isRegistered<GlobalLoaderController>()) {
+      GlobalLoaderController.to.forceHide();
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      try {
         if (Get.isRegistered<GlobalLoaderController>()) {
           GlobalLoaderController.to.forceHide();
         }
-        // Success means login completed - navigate away on next frame
-        // Use addPostFrameCallback so navigation runs after current frame; works with
-        // both Get.to() and Navigator.push() (e.g. from forum_app_bar)
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          try {
-            if (Get.isRegistered<GlobalLoaderController>()) {
-              GlobalLoaderController.to.forceHide();
-            }
-            final siteController = Get.find<SiteController>();
-            final isSiteInitialized = siteController.isInitialized.value;
-            final navigator = Navigator.of(context, rootNavigator: true);
-            final canPop = navigator.canPop();
+        final siteController = Get.find<SiteController>();
+        final isSiteInitialized = siteController.isInitialized.value;
+        final navigator = Navigator.of(context, rootNavigator: true);
+        final canPop = navigator.canPop();
 
-            if (isSiteInitialized && canPop) {
-              navigator.pop(true);
-            } else {
-              Get.offAll(() => const SiteHomePage());
-            }
-          } catch (_) {
-            if (Get.isRegistered<GlobalLoaderController>()) {
-              GlobalLoaderController.to.forceHide();
-            }
-            Get.offAll(() => const SiteHomePage());
-          }
-        });
+        if (isSiteInitialized && canPop) {
+          navigator.pop(true);
+        } else {
+          Get.offAll(() => const SiteHomePage());
+        }
+      } catch (_) {
+        if (Get.isRegistered<GlobalLoaderController>()) {
+          GlobalLoaderController.to.forceHide();
+        }
+        Get.offAll(() => const SiteHomePage());
       }
-    }
+    });
   }
 
   Future<void> _handlePasskeyLogin() async {
