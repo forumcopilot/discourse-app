@@ -1,222 +1,209 @@
-import 'dart:typed_data';
 import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_attachment_proxy.dart';
 import 'package:forumcopilot_sdk/models/results/fc_attachment_result.dart';
-import '../base_discourse_proxy.dart';
+import 'package:forumcopilot_sdk/services/fc_http_client.dart';
+import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 
-/// Discourse implementation of IFCAttachmentProxy
-/// Handles attachment operations for Discourse forums
-class DiscourseAttachmentProxy extends BaseDiscourseProxy implements IFCAttachmentProxy {
+import '../base_discourse_proxy.dart';
+import '../context/discourse_site_context_extension.dart';
+
+/// Discourse implementation of [IFCAttachmentProxy].
+///
+/// Discourse stores all uploads (post images, avatars, etc.) through a
+/// single endpoint:
+///
+///   `POST /uploads.json` (multipart/form-data)
+///       file=<bytes>           — required
+///       type=<scope>           — composer | avatar | profile_background | …
+///       synchronous=true       — block until processed (we want the URL back)
+///
+/// The response is a JSON body with `id`, `url`, `short_url`,
+/// `original_filename`, `filesize`, `width`, `height`, `extension`. The
+/// short_url (`upload://<base62>.{ext}`) is what gets embedded in posts;
+/// the absolute `url` is the CDN/local path.
+class DiscourseAttachmentProxy extends BaseDiscourseProxy
+    implements IFCAttachmentProxy {
   DiscourseAttachmentProxy(SiteContext context) : super(context);
 
   @override
-  Future<FCAttachmentRemoveResult> removeAttachmentAsync(String attachmentId, String forumId, String groupId, String postId) async {
-    print('✅ [DISCOURSE_ATTACHMENT] removeAttachment called - IMPLEMENTED');
-    print('   📋 Parameters: attachmentId=$attachmentId, forumId=$forumId, groupId=$groupId, postId=$postId');
+  Future<FCAttachmentUploadResult> uploadAttachmentAsync(
+    String type,
+    String id,
+    String groupId,
+    String attachmentName,
+    Uint8List attachmentBytes,
+  ) =>
+      _upload(attachmentName, attachmentBytes, uploadType: 'composer');
 
-    try {
-      // Build parameters map - only include non-empty optional parameters
-      // For associated attachments (already attached to post), groupId should be omitted
-      final params = <String, dynamic>{
-        'attachmentId': attachmentId,
-      };
-      
-      // Only include optional parameters if they're not empty
-      // Note: groupId is only needed for temporary attachments, not associated ones
-      if (forumId.isNotEmpty) {
-        params['forumId'] = forumId;
-      }
-      // Only include groupId if it's not empty (for temporary attachments)
-      // For associated attachments, omit groupId entirely
-      if (groupId.isNotEmpty) {
-        params['groupId'] = groupId;
-      }
-      if (postId.isNotEmpty) {
-        params['postId'] = postId;
-      }
-      
-      print('   📋 Final params: $params');
-      
-      // Call plugin API with removeAttachment method
-      final response = await callPluginApi('removeAttachment', params);
+  @override
+  Future<FCAttachmentUploadResult> uploadAvatarAsync(
+    String imageExtension,
+    Uint8List attachmentBytes,
+  ) async {
+    final ext =
+        imageExtension.startsWith('.') ? imageExtension.substring(1) : imageExtension;
+    final filename = 'avatar.$ext';
+    final upload = await _upload(filename, attachmentBytes, uploadType: 'avatar');
+    if (!upload.result || upload.attachmentId == null) return upload;
 
-      final result = response['result'] ?? false;
-      // Handle both string and null resultText
-      final resultText = response['resultText']?.toString().trim() ?? '';
-      
-      print('   📋 Response: result=$result, resultText="$resultText"');
-      
-      // If result is false but resultText is empty, provide a default message
-      if (!result && resultText.isEmpty) {
-        print('   ⚠️ Warning: API returned false with empty resultText');
+    // Step 2: tell Discourse to use this upload as the user's avatar.
+    final username = siteContext.currentUsername;
+    if (username != null && username.isNotEmpty) {
+      try {
+        await apiPut('/u/$username/preferences/avatar/pick.json', body: {
+          'upload_id': int.tryParse(upload.attachmentId!) ?? upload.attachmentId,
+          'type': 'uploaded',
+        });
+      } catch (e) {
+        return FCAttachmentUploadResult(
+          result: false,
+          resultText: 'Uploaded but could not set avatar: $e',
+          attachmentId: upload.attachmentId,
+          fileName: upload.fileName,
+          groupId: upload.groupId,
+          fileSize: upload.fileSize,
+        );
       }
-      
-      return FCAttachmentRemoveResult(
-        result: result,
-        resultText: resultText,
-      );
-    } catch (e, stackTrace) {
-      print('❌ [DISCOURSE_ATTACHMENT] removeAttachment error: $e');
-      print('❌ [DISCOURSE_ATTACHMENT] Stack trace: $stackTrace');
-      return FCAttachmentRemoveResult(
-        result: false,
-        resultText: 'Error removing attachment: $e',
-      );
     }
+    return upload;
   }
 
   @override
-  Future<FCAttachmentUploadResult> uploadAttachmentAsync(String type, String id, String groupId, String attachmentName, Uint8List attachmentBytes) async {
-    print('✅ [DISCOURSE_ATTACHMENT] uploadAttachment called - IMPLEMENTED');
-    print('   📋 Parameters:');
-    print('      - type: "$type" (isEmpty: ${type.isEmpty})');
-    print('      - id: "$id" (isEmpty: ${id.isEmpty})');
-    print('      - groupId: "$groupId" (isEmpty: ${groupId.isEmpty})');
-    print('      - attachmentName: "$attachmentName" (isEmpty: ${attachmentName.isEmpty})');
-    print('      - bytes: ${attachmentBytes.length}');
-
-    try {
-      // Map type to API-expected values
-      // API expects "post" or "conversation_message", but we receive "pm" for private messages
-      final apiType = type == 'pm' ? 'conversation_message' : type;
-      print('🔍 [DISCOURSE_ATTACHMENT] Mapped type "$type" to API type "$apiType"');
-
-      // Convert Uint8List to base64 string
-      print('🔍 [DISCOURSE_ATTACHMENT] Encoding bytes to base64...');
-      final base64String = base64Encode(attachmentBytes);
-      print('🔍 [DISCOURSE_ATTACHMENT] Base64 string length: ${base64String.length}');
-
-      print('🔍 [DISCOURSE_ATTACHMENT] Preparing API call parameters...');
-      final params = {
-        'type': apiType,
-        'id': id,
-        'groupId': groupId,
-        'attachmentName': attachmentName,
-        'attachmentData': base64String, // Use attachmentData to match PHP parameter name
-      };
-      
-      print('🔍 [DISCOURSE_ATTACHMENT] API params:');
-      params.forEach((key, value) {
-        final valueStr = value.toString();
-        if (valueStr.length > 100) {
-          print('      - $key: "${valueStr.substring(0, 100)}..." (length: ${valueStr.length})');
-        } else {
-          print('      - $key: "$valueStr"');
-        }
-      });
-
-      print('🔍 [DISCOURSE_ATTACHMENT] Calling callPluginApi...');
-      final response = await callPluginApi('uploadAttachment', params);
-      print('🔍 [DISCOURSE_ATTACHMENT] API response received:');
-      print('      - response keys: ${response.keys.toList()}');
-      print('      - result: ${response['result']}');
-      print('      - resultText: "${response['resultText']}"');
-      print('      - attachmentId: "${response['attachmentId']}"');
-      print('      - fileName: "${response['fileName']}"');
-      print('      - groupId: "${response['groupId']}"');
-      print('      - fileSize: ${response['fileSize']}');
-
-      // Check if result is true but attachmentId is missing (shouldn't happen, but handle gracefully)
-      final apiResult = response['result'] ?? false;
-      final attachmentId = response['attachmentId']?.toString();
-      
-      if (apiResult == true && (attachmentId == null || attachmentId.isEmpty)) {
-        print('⚠️ [DISCOURSE_ATTACHMENT] Warning: API returned result=true but no attachmentId');
-      }
-
-      final result = FCAttachmentUploadResult(
-        result: apiResult,
-        resultText: response['resultText']?.toString() ?? '',
-        attachmentId: attachmentId ?? '',
-        fileName: response['fileName']?.toString() ?? attachmentName,
-        groupId: response['groupId']?.toString(),
-        fileSize: response['fileSize'] is int ? response['fileSize'] as int : (response['fileSize'] is String ? int.tryParse(response['fileSize']) : null),
-      );
-      
-      print('🔍 [DISCOURSE_ATTACHMENT] Created FCAttachmentUploadResult:');
-      print('      - result: ${result.result}');
-      print('      - resultText: "${result.resultText}"');
-      print('      - attachmentId: "${result.attachmentId}"');
-      print('      - fileName: "${result.fileName}"');
-      print('      - groupId: "${result.groupId}"');
-      print('      - fileSize: ${result.fileSize}');
-      
-      return result;
-    } catch (e, stackTrace) {
-      print('❌ [DISCOURSE_ATTACHMENT] uploadAttachment error: $e');
-      print('❌ [DISCOURSE_ATTACHMENT] Stack trace: $stackTrace');
-      return FCAttachmentUploadResult(
-        result: false,
-        resultText: 'Error uploading attachment: $e',
-        attachmentId: '',
-        fileName: attachmentName,
-        fileSize: null,
-      );
-    }
+  Future<FCAttachmentRemoveResult> removeAttachmentAsync(
+    String attachmentId,
+    String forumId,
+    String groupId,
+    String postId,
+  ) async {
+    // Discourse doesn't have a "drop this upload" client endpoint — uploads
+    // become orphaned when no post references them and a daily Sidekiq job
+    // (`Jobs::CleanUpUploads`) garbage-collects them. From the client's
+    // perspective the upload "removal" happens by editing the post raw to
+    // strip the markdown image; that's a post edit, not an upload action.
+    //
+    // Report success so the UI can drop the upload from its compose state.
+    return FCAttachmentRemoveResult(
+      result: true,
+      resultText: '',
+      groupId: groupId,
+    );
   }
 
   @override
-  Future<FCAttachmentUploadResult> uploadAvatarAsync(String imageExtension, Uint8List attachmentBytes) async {
-    print('✅ [DISCOURSE_ATTACHMENT] uploadAvatar called - IMPLEMENTED');
-    print('   📋 Parameters: imageExtension=$imageExtension, bytes=${attachmentBytes.length}');
-
-    try {
-      // Convert Uint8List to base64 string
-      final base64String = base64Encode(attachmentBytes);
-
-      final response = await callPluginApi('uploadAvatar', {
-        'imageExtension': imageExtension,
-        'attachmentData': base64String, // Use attachmentData to match PHP parameter name
-      });
-
-      return FCAttachmentUploadResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString() ?? '',
-        attachmentId: response['attachmentId'] ?? '',
-        fileName: response['fileName'] ?? 'avatar.$imageExtension',
-        fileSize: response['fileSize'],
-      );
-    } catch (e) {
-      print('❌ [DISCOURSE_ATTACHMENT] uploadAvatar error: $e');
-      return FCAttachmentUploadResult(
-        result: false,
-        resultText: 'Error uploading avatar: $e',
-        attachmentId: '',
-        fileName: 'avatar.$imageExtension',
-        fileSize: null,
-      );
-    }
-  }
-
-  @override
-  Future<FCTapatalkImageUploadResult> uploadTapatalkImageAsync(String attachmentName, Uint8List attachmentBytes) async {
-    print('✅ [DISCOURSE_ATTACHMENT] uploadTapatalkImage called - IMPLEMENTED');
-    print('   📋 Parameters: attachmentName=$attachmentName, bytes=${attachmentBytes.length}');
-
-    try {
-      // Convert Uint8List to base64 string
-      final base64String = base64Encode(attachmentBytes);
-
-      final response = await callPluginApi('uploadTapatalkImage', {
-        'attachmentName': attachmentName,
-        'attachmentBytes': base64String,
-      });
-
-      return FCTapatalkImageUploadResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString() ?? '',
-        imageId: response['imageId'] ?? '',
-        imageUrl: response['imageUrl'] ?? '',
-      );
-    } catch (e) {
-      print('❌ [DISCOURSE_ATTACHMENT] uploadTapatalkImage error: $e');
+  Future<FCTapatalkImageUploadResult> uploadTapatalkImageAsync(
+    String attachmentName,
+    Uint8List attachmentBytes,
+  ) async {
+    // Tapatalk-hosted media is XF/Tapatalk-only. On Discourse there is no
+    // separate "Tapatalk image bucket" — all images live in /uploads. Map
+    // through to the same endpoint and surface the resulting CDN URL.
+    final upload = await _upload(attachmentName, attachmentBytes,
+        uploadType: 'composer');
+    if (!upload.result) {
       return FCTapatalkImageUploadResult(
         result: false,
-        resultText: 'Error uploading Tapatalk image: $e',
-        imageId: '',
-        imageUrl: '',
+        resultText: upload.resultText,
       );
     }
+    return FCTapatalkImageUploadResult(
+      result: true,
+      resultText: '',
+      imageId: upload.attachmentId,
+      imageUrl: _resolveImageUrl(upload),
+      thumbnailUrl: _resolveImageUrl(upload),
+    );
+  }
+
+  // ===== Helpers =====
+
+  Future<FCAttachmentUploadResult> _upload(
+    String filename,
+    Uint8List bytes, {
+    required String uploadType,
+  }) async {
+    try {
+      await FCDioClient.instance.initialize();
+      final base = Uri.parse(siteContext.site.url);
+      final url = base.replace(path: _joinPath(base.path, '/uploads.json'));
+
+      final form = FormData.fromMap({
+        'type': uploadType,
+        'synchronous': 'true',
+        'file': MultipartFile.fromBytes(bytes, filename: filename),
+      });
+
+      final headers = <String, String>{
+        'Accept': 'application/json',
+        ...siteContext.userApiAuthHeaders(),
+      };
+
+      final response = await FCHttpClient.post<String>(
+        url,
+        headers: headers,
+        body: form,
+        responseType: ResponseType.plain,
+      );
+
+      final code = response.statusCode ?? 0;
+      if (code < 200 || code >= 300) {
+        return FCAttachmentUploadResult(
+          result: false,
+          resultText: 'Upload failed: HTTP $code — ${response.data}',
+        );
+      }
+      final data = response.data;
+      final body = data is String
+          ? jsonDecode(data) as Map<String, dynamic>
+          : (data as Map<String, dynamic>?) ?? const <String, dynamic>{};
+      return FCAttachmentUploadResult(
+        result: true,
+        resultText: '',
+        attachmentId: body['id']?.toString(),
+        fileName: body['original_filename']?.toString() ?? filename,
+        // Discourse has no "group" concept on uploads — surface the
+        // short_url so the caller can embed it in markdown.
+        groupId: body['short_url']?.toString(),
+        fileSize: (body['filesize'] as int?) ?? bytes.length,
+      );
+    } on DioException catch (e) {
+      final body = e.response?.data;
+      final reason = body is Map ? (body['errors']?.toString() ?? body.toString()) : '$body';
+      return FCAttachmentUploadResult(
+        result: false,
+        resultText: 'Upload failed: $reason',
+      );
+    } catch (e) {
+      return FCAttachmentUploadResult(
+        result: false,
+        resultText: 'Upload error: $e',
+      );
+    }
+  }
+
+  String? _resolveImageUrl(FCAttachmentUploadResult upload) {
+    final short = upload.groupId; // we stashed short_url here
+    if (short == null || short.isEmpty) return null;
+    if (short.startsWith('http')) return short;
+    if (short.startsWith('upload://')) {
+      // The short_url won't render directly; the markdown post-render
+      // resolves it. For preview UI we need the absolute URL — Discourse
+      // doesn't return that from the upload response in older versions,
+      // so we fall back to the short_url as-is. Phase 2.x can chase the
+      // `url` field when present.
+      return short;
+    }
+    return '${siteContext.site.url}$short';
+  }
+
+  String _joinPath(String basePath, String suffix) {
+    if (basePath.isEmpty || basePath == '/') return suffix;
+    final left = basePath.endsWith('/')
+        ? basePath.substring(0, basePath.length - 1)
+        : basePath;
+    return suffix.startsWith('/') ? '$left$suffix' : '$left/$suffix';
   }
 }

@@ -27,9 +27,58 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
   }
 
   @override
-  Future<FCInboxStatResult> getInboxStatAsync(DateTime pmLastCheckedTime, DateTime subscribedTopicLastCheckedTime) {
-    // TODO: implement getInboxStatAsync
-    throw UnimplementedError();
+  Future<FCInboxStatResult> getInboxStatAsync(
+      DateTime pmLastCheckedTime, DateTime subscribedTopicLastCheckedTime) async {
+    // Drives the home-tab unread badge. We approximate the FC inbox stat
+    // shape from /notifications.json: unread PMs (notification_type=6 or 7)
+    // map to unread conversations/messages; totalConversations is the
+    // grand-total count of notifications (Discourse doesn't expose a
+    // separate "all conversations ever" number).
+    if (!siteContext.hasUserApiKey) {
+      return FCInboxStatResult(
+        result: true,
+        resultText: '',
+        totalConversations: 0,
+        unreadConversations: 0,
+        unreadMessages: 0,
+      );
+    }
+    try {
+      final response = await apiGet('/notifications.json', query: {
+        'recent': 'true',
+      });
+      final notifications =
+          ((response['notifications'] as List?) ?? const []).whereType<Map>();
+      var unreadPms = 0;
+      var unreadOther = 0;
+      for (final n in notifications) {
+        if (n['read'] == true) continue;
+        final type = n['notification_type'] as int?;
+        if (type == 6 /* private_message */ || type == 7 /* invited_to_pm */) {
+          unreadPms++;
+        } else {
+          unreadOther++;
+        }
+      }
+      final total =
+          (response['total_rows_notifications'] as int?) ?? unreadPms + unreadOther;
+      return FCInboxStatResult(
+        result: true,
+        resultText: '',
+        totalConversations: total,
+        unreadConversations: unreadPms,
+        unreadMessages: unreadPms,
+      );
+    } catch (e) {
+      // Failure shouldn't crash the home tab — just report zero unreads.
+      return FCInboxStatResult(
+        result: false,
+        resultText: 'Error: $e',
+        totalConversations: 0,
+        unreadConversations: 0,
+        unreadMessages: 0,
+      );
+    }
   }
 
   @override
