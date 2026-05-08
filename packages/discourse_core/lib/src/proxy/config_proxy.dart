@@ -17,16 +17,27 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
 
   @override
   Future<FCConfigResult> getConfig(String url, {bool forceRefresh = false}) async {
+    // /site.json is the canonical capability dump but doesn't expose the
+    // Discourse version or read-only state. /about.json gives us both.
+    String version = 'discourse';
+    bool isOpen = true;
     try {
-      final response = await apiGet('/site.json');
-      final version = (response['version'] as String?) ?? '';
-      final isReadonly = response['is_readonly'] as bool? ?? false;
-      return _buildResult(url, version: version, isOpen: !isReadonly);
+      final about = await apiGet('/about.json');
+      final aboutInner = (about['about'] as Map<String, dynamic>?) ?? const {};
+      final v = aboutInner['version'] as String?;
+      if (v != null && v.isNotEmpty) version = v;
     } catch (e) {
       // ignore: avoid_print
-      print('❌ [DISCOURSE_CONFIG] /site.json failed: $e');
-      return _buildResult(url, version: '', isOpen: true);
+      print('⚠️ [DISCOURSE_CONFIG] /about.json failed (continuing): $e');
     }
+    try {
+      final site = await apiGet('/site.json');
+      isOpen = !(site['is_readonly'] as bool? ?? false);
+    } catch (e) {
+      // ignore: avoid_print
+      print('⚠️ [DISCOURSE_CONFIG] /site.json failed (continuing): $e');
+    }
+    return _buildResult(url, version: version, isOpen: isOpen);
   }
 
   FCConfigResult _buildResult(

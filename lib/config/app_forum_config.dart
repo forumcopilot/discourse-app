@@ -11,11 +11,12 @@ class AppForumConfig {
   static const int siteId = 1;
 
   /// Human-readable forum name shown in app UI.
-  static const String forumName = 'My Discourse Forum';
+  static const String forumName = 'Local Discourse';
 
   /// Base forum URL (without trailing slash).
   /// Example: https://forum.example.com
-  static const String forumBaseUrl = 'https://forum.example.com';
+  /// Local dev: http://localhost:3000 (Rails server from /Volumes/CRUCIAL/discourse).
+  static const String forumBaseUrl = 'http://localhost:3000';
 
   /// Legacy plugin endpoint path. **Not used in v1** — Discourse
   /// authentication and data fetching go through stock REST endpoints.

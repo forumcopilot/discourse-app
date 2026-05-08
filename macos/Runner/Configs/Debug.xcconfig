@@ -1,2 +1,10 @@
 #include "../../Flutter/Flutter-Debug.xcconfig"
 #include "Warnings.xcconfig"
+
+// Local-dev override: ad-hoc sign so flutter run works without an Apple
+// Developer team. Not committed to source control should be revisited
+// when shipping a real signed build.
+CODE_SIGN_IDENTITY = -
+CODE_SIGNING_REQUIRED = NO
+CODE_SIGN_STYLE = Manual
+DEVELOPMENT_TEAM =
