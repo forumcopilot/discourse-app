@@ -603,34 +603,63 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     Map<String, dynamic> t, {
     Map<int, Map<String, dynamic>> users = const {},
   }) {
+    // Collect every user the topic surfaces:
+    //   posters[]      = OP + most-recent-poster (with `description` tags)
+    //   participants[] = other recipients of the PM (no description)
+    // Each entry has `user_id`; the actual username/avatar is in the
+    // parallel `users[]` array of the response.
     final posters = (t['posters'] as List?) ?? const [];
+    final participantsField = (t['participants'] as List?) ?? const [];
     int? startUserId;
     int? lastUserId;
+    final participantUserIds = <int>[];
+    final seen = <int>{};
     for (final p in posters.whereType<Map>()) {
+      final id = p['user_id'] as int?;
+      if (id == null) continue;
+      if (seen.add(id)) participantUserIds.add(id);
       final desc = (p['description'] ?? '').toString();
-      if (desc.contains('Original Poster')) {
-        startUserId = p['user_id'] as int?;
-      }
-      if (desc.contains('Most Recent Poster')) {
-        lastUserId = p['user_id'] as int?;
-      }
+      if (desc.contains('Original Poster')) startUserId = id;
+      if (desc.contains('Most Recent Poster')) lastUserId = id;
+    }
+    for (final p in participantsField.whereType<Map>()) {
+      final id = p['user_id'] as int?;
+      if (id == null) continue;
+      if (seen.add(id)) participantUserIds.add(id);
     }
 
-    final allowedUserIds = ((t['allowed_user_ids'] as List?) ?? const [])
-        .whereType<int>()
-        .toList();
-    final participants = allowedUserIds
+    final participants = participantUserIds
         .map((id) => users[id])
         .whereType<Map<String, dynamic>>()
         .map(_participantFrom)
         .toList();
+
+    // Fall back to `last_poster_username` (a string Discourse always
+    // includes on PM listings) if the user lookup didn't resolve a name —
+    // matters when the participants array is otherwise empty.
+    if (participants.isEmpty) {
+      final lastUsername = t['last_poster_username']?.toString();
+      if (lastUsername != null && lastUsername.isNotEmpty) {
+        final placeholderId =
+            lastUserId?.toString() ?? startUserId?.toString() ?? '';
+        participants.add(FCParticipant(
+          userId: placeholderId,
+          username: lastUsername,
+          iconUrl: null,
+          isOnline: false,
+        ));
+        // Make sure last_user_id matches one of the participants so the
+        // UI's `firstWhere(p.userId == last_user_id)` succeeds.
+        lastUserId ??= int.tryParse(placeholderId);
+      }
+    }
 
     return FCConversationSummary(
       convId: (t['id'] ?? '').toString(),
       replyCount: (((t['posts_count'] as int?) ?? 1) - 1)
           .clamp(0, 1 << 30)
           .toString(),
-      participantCount: participants.length.clamp(1, 1 << 30),
+      participantCount: participants.isEmpty ? 1 : participants.length,
       startUserId: startUserId?.toString(),
       startTime: t['created_at']?.toString(),
       subject: t['title']?.toString(),
