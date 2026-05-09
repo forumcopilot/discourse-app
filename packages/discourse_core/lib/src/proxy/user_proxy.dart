@@ -411,65 +411,66 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
   }
 
   @override
-  Future<FCSearchUserResult> searchUserAsync(String keywords, int page, int perpage) async {
-    print('✅ [DISCOURSE_USER] searchUserAsync called via plugin API');
-    print('   📋 Parameters: keywords=$keywords, page=$page, perpage=$perpage');
-
-    try {
-      final response = await callPluginApi('searchUser', {
-        'keywords': keywords,
-        'page': page,
-        'perpage': perpage,
-      });
-
-      print('📥 [DISCOURSE_USER] searchUserAsync raw response: $response');
-
-      // Parse total
-      final total = response['total'] != null ? int.tryParse(response['total'].toString()) ?? 0 : 0;
-      print('📥 [DISCOURSE_USER] Parsed total: $total');
-
-      // Parse user list
-      final List<FCSearchUser> userList = [];
-      if (response['list'] != null && response['list'] is List) {
-        print('📥 [DISCOURSE_USER] Parsing ${(response['list'] as List).length} users from response');
-        for (var userData in response['list'] as List) {
-          if (userData is Map<String, dynamic>) {
-            try {
-              final user = FCSearchUser(
-                id: userData['id']?.toString() ?? '',
-                username: userData['username']?.toString() ?? 'Unknown',
-                iconUrl: userData['iconUrl']?.toString(),
-                postCount: userData['postCount'] != null ? int.tryParse(userData['postCount'].toString()) ?? 0 : 0,
-                registrationTime: userData['registrationTime'] != null ? DateTime.fromMillisecondsSinceEpoch(int.tryParse(userData['registrationTime'].toString()) ?? 0) : null,
-                isOnline: userData['isOnline'] ?? false,
-              );
-              userList.add(user);
-              print('   ✅ Parsed user: id=${user.id}, username=${user.username}, iconUrl=${user.iconUrl}');
-            } catch (e) {
-              print('   ❌ Error parsing user: $e, userData: $userData');
-            }
-          }
-        }
-      } else {
-        print('⚠️  [DISCOURSE_USER] No list field in response or list is not an array');
-      }
-
-      print('📥 [DISCOURSE_USER] Final result: total=$total, userCount=${userList.length}');
-
+  Future<FCSearchUserResult> searchUserAsync(
+      String keywords, int page, int perpage) async {
+    // Discourse user typeahead. The `topic_allowed_users=true` flag is
+    // important for PM-recipient pickers — it filters out users who can't
+    // be added to PMs (suspended, etc.). The endpoint returns up to 5
+    // matches by default; we don't paginate (the SDK's page/perpage are
+    // not honored).
+    if (keywords.trim().length < 1) {
       return FCSearchUserResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString() ?? '',
-        total: total,
-        list: userList,
+        result: true,
+        resultText: '',
+        total: 0,
+        list: const [],
       );
-    } catch (e, stackTrace) {
-      print('❌ [DISCOURSE_USER] searchUserAsync error: $e');
-      print('❌ [DISCOURSE_USER] Stack trace: $stackTrace');
+    }
+    try {
+      final response = await apiGet('/u/search/users.json', query: {
+        'term': keywords.trim(),
+        'topic_allowed_users': 'true',
+        'include_groups': 'false',
+      });
+      final users = (response['users'] as List?) ?? const [];
+      final list = users.whereType<Map>().map((u) {
+        final m = u.cast<String, dynamic>();
+        String? avatarUrl;
+        final tpl = m['avatar_template'] as String?;
+        if (tpl != null && tpl.isNotEmpty) {
+          final filled = tpl.replaceAll('{size}', '90');
+          avatarUrl = filled.startsWith('http')
+              ? filled
+              : '${siteContext.site.url}$filled';
+        }
+        return FCSearchUser(
+          id: (m['id'] ?? '').toString(),
+          username: (m['username'] ?? '').toString(),
+          iconUrl: avatarUrl,
+          postCount: 0,
+          registrationTime: null,
+          isOnline: false,
+        );
+      }).toList();
+      return FCSearchUserResult(
+        result: true,
+        resultText: '',
+        total: list.length,
+        list: list,
+      );
+    } on DiscourseApiException catch (e) {
       return FCSearchUserResult(
         result: false,
-        resultText: 'Error searching users: $e',
+        resultText: e.userMessage,
         total: 0,
-        list: [],
+        list: const [],
+      );
+    } catch (e) {
+      return FCSearchUserResult(
+        result: false,
+        resultText: 'Error: $e',
+        total: 0,
+        list: const [],
       );
     }
   }
