@@ -15,15 +15,76 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
   DiscourseUserProxy(SiteContext context) : super(context);
 
   @override
-  Future<String> getAvatarAsync(String userId, String username) {
-    // TODO: implement getAvatarAsync
-    throw UnimplementedError();
+  Future<String> getAvatarAsync(String userId, String username) async {
+    // Discourse avatars are content-addressable; the canonical URL pattern
+    // is /letter_avatar_proxy/v4/letter/{first}/{color_hex}/{size}.png for
+    // letter-style or /user_avatar/{forum_host}/{username}/{size}/{id}.png
+    // for uploaded. We don't have an `avatar_id` here, so we hit
+    // /u/{username}.json's avatar_template and fill {size}=120. For empty
+    // username, fall back to a placeholder URL the UI can show.
+    if (username.isEmpty) return '';
+    try {
+      final response = await apiGet('/u/${Uri.encodeComponent(username)}.json');
+      final user = (response['user'] as Map<String, dynamic>?) ?? const {};
+      final tpl = user['avatar_template'] as String?;
+      if (tpl == null || tpl.isEmpty) return '';
+      final filled = tpl.replaceAll('{size}', '120');
+      return filled.startsWith('http')
+          ? filled
+          : '${siteContext.site.url}$filled';
+    } catch (_) {
+      return '';
+    }
   }
 
   @override
-  Future<FCIgnoredUserResult> getIgnoredUsersAsync(int page, int perpage) {
-    // TODO: implement getIgnoredUsersAsync
-    throw UnimplementedError();
+  Future<FCIgnoredUserResult> getIgnoredUsersAsync(int page, int perpage) async {
+    // Discourse keeps ignored usernames on UserOption.ignored_usernames.
+    // The current user's profile JSON exposes them via /u/{me}.json's
+    // `user.ignored_usernames` field (empty array when none). There is no
+    // dedicated paginated endpoint — we return the full list at once.
+    final username = siteContext.currentUsername;
+    if (username == null || username.isEmpty) {
+      return FCIgnoredUserResult(
+        result: false,
+        resultText: 'Not signed in',
+        total: 0,
+        list: const [],
+      );
+    }
+    try {
+      final response =
+          await apiGet('/u/${Uri.encodeComponent(username)}.json');
+      final user = (response['user'] as Map<String, dynamic>?) ?? const {};
+      final names =
+          ((user['ignored_usernames'] as List?) ?? const []).whereType<String>();
+      final list = names
+          .map((name) => FCIgnoredUser(
+                id: '',
+                username: name,
+              ))
+          .toList();
+      return FCIgnoredUserResult(
+        result: true,
+        resultText: '',
+        total: list.length,
+        list: list,
+      );
+    } on DiscourseApiException catch (e) {
+      return FCIgnoredUserResult(
+        result: false,
+        resultText: e.userMessage,
+        total: 0,
+        list: const [],
+      );
+    } catch (e) {
+      return FCIgnoredUserResult(
+        result: false,
+        resultText: 'Error: $e',
+        total: 0,
+        list: const [],
+      );
+    }
   }
 
   @override
@@ -82,45 +143,52 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
   }
 
   @override
-  Future<FCOnlineUserResult> getOnlineUsersAsync(int page, int perpage, String? id, String? area) async {
-    print('✅ [DISCOURSE_USER] getOnlineUsersAsync called via plugin API');
-
+  Future<FCOnlineUserResult> getOnlineUsersAsync(
+      int page, int perpage, String? id, String? area) async {
+    // Discourse has no "currently online" REST endpoint — presence is
+    // tracked via MessageBus (websocket-style). The closest REST proxy
+    // is /directory_items.json sorted by last seen, which lists the
+    // most-recently-active users for a period. We use period=daily so the
+    // result feels "online-ish".
+    //
+    // The `id` and `area` parameters (XF: forum/thread filter) have no
+    // Discourse equivalent — we ignore them.
     try {
-      final params = <String, dynamic>{
-        'page': page,
-        'perpage': perpage,
-      };
-      if (id != null && id.isNotEmpty) {
-        params['id'] = id;
-      }
-      if (area != null && area.isNotEmpty) {
-        params['area'] = area;
-      }
-
-      final response = await callPluginApi('getOnlineUsers', params);
-
-      // Parse user list
-      final List<FCOnlineUser> userList = [];
-      if (response['list'] != null && response['list'] is List) {
-        for (var userData in response['list'] as List) {
-          if (userData is Map<String, dynamic>) {
-            userList.add(FCOnlineUser(
-              id: userData['id']?.toString() ?? '',
-              username: userData['username']?.toString() ?? '',
-              iconUrl: userData['iconUrl']?.toString(),
-              isOnline: userData['isOnline'] ?? false,
-              currentActivity: userData['currentActivity']?.toString(),
-              currentTopicId: userData['currentTopicId']?.toString(),
-              lastActivityTime: userData['lastActivityTime'] != null ? DateTime.fromMillisecondsSinceEpoch(userData['lastActivityTime'] as int) : null,
-            ));
-          }
+      final response = await apiGet('/directory_items.json', query: {
+        'period': 'daily',
+        'order': 'days_visited',
+        if (page > 0) 'page': page.toString(),
+      });
+      final items = ((response['directory_items'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((d) => d.cast<String, dynamic>())
+          .toList();
+      final userList = items.map((item) {
+        final user = (item['user'] as Map<String, dynamic>?) ?? const {};
+        String? avatarUrl;
+        final tpl = user['avatar_template'] as String?;
+        if (tpl != null && tpl.isNotEmpty) {
+          final filled = tpl.replaceAll('{size}', '90');
+          avatarUrl = filled.startsWith('http')
+              ? filled
+              : '${siteContext.site.url}$filled';
         }
-      }
-
+        return FCOnlineUser(
+          id: (user['id'] ?? '').toString(),
+          username: (user['username'] ?? '').toString(),
+          iconUrl: avatarUrl,
+          // /directory_items doesn't expose live presence; surface false
+          // to be honest about it. The list is "recently active" not
+          // "online right now".
+          isOnline: false,
+        );
+      }).toList();
+      final meta = (response['meta'] as Map<String, dynamic>?) ?? const {};
+      final total = (meta['total_rows_directory_items'] as int?) ?? userList.length;
       return FCOnlineUserResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString(),
-        total: response['total'] ?? 0,
+        result: true,
+        resultText: '',
+        total: total,
         list: userList,
       );
     } catch (e) {
@@ -135,9 +203,20 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
   }
 
   @override
-  Future<FCRecommendedUserResult> getRecommendedUsersAsync(int page, int perpage, int mode) {
-    // TODO: implement getRecommendedUsersAsync
-    throw UnimplementedError();
+  Future<FCRecommendedUserResult> getRecommendedUsersAsync(
+      int page, int perpage, int mode) async {
+    // Discourse has no notion of "recommended users for messaging" — the
+    // closest analog is recent direct-message participants, but that
+    // requires walking /topics/private-messages/* and dedup'ing the
+    // remote participants. Return empty so the UI just shows the
+    // typeahead-only path. Phase 2.x can add this if a UI consumer
+    // surfaces.
+    return FCRecommendedUserResult(
+      result: true,
+      resultText: '',
+      total: 0,
+      list: const [],
+    );
   }
 
   @override
@@ -252,76 +331,181 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
   }
 
   @override
-  Future<FCUserReplyResult> getUserReplyPostAsync(int startNum, int lastNum, String? searchId, String? username, String? userId) async {
-    print('✅ [DISCOURSE_USER] getUserReplyPostAsync called via plugin API');
-
-    try {
-      final params = <String, dynamic>{
-        'startNum': startNum,
-        'lastNum': lastNum,
-      };
-      if (searchId != null && searchId.isNotEmpty) {
-        params['searchId'] = searchId;
-      }
-      if (username != null && username.isNotEmpty) {
-        params['username'] = username;
-      }
-      if (userId != null && userId.isNotEmpty) {
-        params['userId'] = userId;
-      }
-
-      final response = await callPluginApi('getUserReplyPost', params);
-
-      // Parse reply list
-      final List<FCUserReply> replyList = [];
-      if (response['list'] != null && response['list'] is List) {
-        for (var replyData in response['list'] as List) {
-          if (replyData is Map<String, dynamic>) {
-            replyList.add(FCUserReply(
-              postId: replyData['postId']?.toString() ?? '',
-              topicId: replyData['topicId']?.toString() ?? '',
-              topicTitle: replyData['topicTitle']?.toString() ?? '',
-              forumId: replyData['forumId']?.toString() ?? '',
-              forumName: replyData['forumName']?.toString() ?? '',
-              authorId: replyData['authorId']?.toString() ?? '',
-              authorName: replyData['authorName']?.toString() ?? '',
-              authorIconUrl: replyData['authorIconUrl']?.toString(),
-              postTime: replyData['postTime'] != null ? DateTime.fromMillisecondsSinceEpoch(replyData['postTime'] as int) : DateTime.now(),
-              replyNumber: replyData['replyNumber'] ?? 0,
-              postContent: replyData['postContent']?.toString(),
-              shortContent: replyData['shortContent']?.toString(),
-            ));
-          }
-        }
-      }
-
-      return FCUserReplyResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString(),
-        total: response['total'] ?? 0,
-        list: replyList,
-      );
-    } catch (e) {
-      print('❌ [DISCOURSE_USER] getUserReplyPostAsync error: $e');
+  Future<FCUserReplyResult> getUserReplyPostAsync(
+      int startNum,
+      int lastNum,
+      String? searchId,
+      String? username,
+      String? userId) async {
+    if (username == null || username.isEmpty) {
       return FCUserReplyResult(
         result: false,
-        resultText: 'Error getting user reply posts: $e',
+        resultText: 'username required',
         total: 0,
-        list: [],
+        list: const [],
+      );
+    }
+    try {
+      // /user_actions filter values:
+      //   1=Like, 2=WasLiked, 3=Bookmark, 4=NewTopic, 5=Reply,
+      //   6=Response (got replied to), 7=Mention, 9=Quote, 11=Edit,
+      //   12=Message
+      // We surface 5 (replies the user wrote).
+      final response = await apiGet('/user_actions.json', query: {
+        'username': username,
+        'filter': '5',
+        if (startNum > 0) 'offset': startNum.toString(),
+      });
+      final actions = ((response['user_actions'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((a) => a.cast<String, dynamic>())
+          .toList();
+      final replyList = actions.map((a) {
+        String? avatarUrl;
+        final tpl = a['avatar_template'] as String?;
+        if (tpl != null && tpl.isNotEmpty) {
+          final filled = tpl.replaceAll('{size}', '90');
+          avatarUrl = filled.startsWith('http')
+              ? filled
+              : '${siteContext.site.url}$filled';
+        }
+        return FCUserReply(
+          postId: (a['post_id'] ?? '').toString(),
+          topicId: (a['topic_id'] ?? '').toString(),
+          topicTitle: (a['title'] ?? '').toString(),
+          forumId: (a['category_id'] ?? '').toString(),
+          forumName: '',
+          authorId: (a['user_id'] ?? '').toString(),
+          authorName: (a['username'] ?? '').toString(),
+          authorIconUrl: avatarUrl,
+          postTime: DateTime.tryParse(a['created_at']?.toString() ?? '') ??
+              DateTime.now(),
+          replyNumber: (a['post_number'] as int?) ?? 0,
+          postContent: a['excerpt']?.toString(),
+          shortContent: a['excerpt']?.toString(),
+        );
+      }).toList();
+      return FCUserReplyResult(
+        result: true,
+        resultText: '',
+        total: replyList.length,
+        list: replyList,
+      );
+    } on DiscourseApiException catch (e) {
+      return FCUserReplyResult(
+        result: false,
+        resultText: e.userMessage,
+        total: 0,
+        list: const [],
+      );
+    } catch (e) {
+      return FCUserReplyResult(
+        result: false,
+        resultText: 'Error: $e',
+        total: 0,
+        list: const [],
       );
     }
   }
 
   @override
-  Future<FCUserTopicResult> getUserTopicAsync(String? username, String? userId) {
-    // TODO: implement getUserTopicAsync
-    throw UnimplementedError();
+  Future<FCUserTopicResult> getUserTopicAsync(
+      String? username, String? userId) async {
+    if (username == null || username.isEmpty) {
+      return FCUserTopicResult(
+        result: false,
+        resultText: 'username required',
+        total: 0,
+        list: const [],
+      );
+    }
+    try {
+      // /user_actions filter=4 → "new_topic" (topics the user created).
+      final response = await apiGet('/user_actions.json', query: {
+        'username': username,
+        'filter': '4',
+      });
+      final actions = ((response['user_actions'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((a) => a.cast<String, dynamic>())
+          .toList();
+      final topics = <FCUserTopic>[];
+      final seen = <String>{};
+      for (final a in actions) {
+        final topicId = a['topic_id']?.toString() ?? '';
+        if (topicId.isEmpty || !seen.add(topicId)) continue;
+        topics.add(FCUserTopic(
+          topicId: topicId,
+          topicTitle: (a['title'] ?? '').toString(),
+          forumId: (a['category_id'] ?? '').toString(),
+          forumName: '',
+          authorId: (a['user_id'] ?? '').toString(),
+          authorName: (a['username'] ?? '').toString(),
+          postTime:
+              DateTime.tryParse(a['created_at']?.toString() ?? '') ??
+                  DateTime.now(),
+          shortContent: a['excerpt']?.toString(),
+        ));
+      }
+      return FCUserTopicResult(
+        result: true,
+        resultText: '',
+        total: topics.length,
+        list: topics,
+      );
+    } on DiscourseApiException catch (e) {
+      return FCUserTopicResult(
+        result: false,
+        resultText: e.userMessage,
+        total: 0,
+        list: const [],
+      );
+    } catch (e) {
+      return FCUserTopicResult(
+        result: false,
+        resultText: 'Error: $e',
+        total: 0,
+        list: const [],
+      );
+    }
   }
 
   @override
-  Future<FCIgnoreUserResult> ignoreUserAsync(String userId, int mode) {
-    // TODO: implement ignoreUserAsync
-    throw UnimplementedError();
+  Future<FCIgnoreUserResult> ignoreUserAsync(String userId, int mode) async {
+    // The SDK contract takes `userId` but Discourse's notification-level
+    // endpoint expects a username. We accept either: numeric → look up via
+    // /admin/users/{id}.json (admin only) or assume the caller actually
+    // passed a username.
+    String username = userId;
+    final asInt = int.tryParse(userId);
+    if (asInt != null) {
+      // userId looks numeric — try resolving via the public /u path. If
+      // that fails (Discourse returns 404 for id-based lookups by
+      // default), fall through and pass it as-is.
+      try {
+        final user = await apiGet('/u/by-external-or-id/$asInt.json',
+                query: {'external': 'false'})
+            .catchError((_) => <String, dynamic>{});
+        final u = user['user'] as Map<String, dynamic>?;
+        final name = u?['username']?.toString();
+        if (name != null && name.isNotEmpty) username = name;
+      } catch (_) {
+        // Best-effort; fall back to the raw value.
+      }
+    }
+    // Discourse user notification levels:
+    //   0 = muted, 1 = normal, 2 = ignored
+    // SDK contract: mode 1 = ignore, 0 = unignore.
+    final level = mode == 1 ? 2 : 1;
+    try {
+      await apiPut('/u/${Uri.encodeComponent(username)}/notification_level.json',
+          body: {'notification_level': level});
+      return FCIgnoreUserResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCIgnoreUserResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCIgnoreUserResult(result: false, resultText: 'Error: $e');
+    }
   }
 
   /// Discourse does not expose a username/password JSON login endpoint to
