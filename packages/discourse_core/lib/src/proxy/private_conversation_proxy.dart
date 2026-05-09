@@ -193,25 +193,52 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       );
     }
     try {
-      final response = await apiGet(
-        '/topics/private-messages/${Uri.encodeComponent(username)}.json',
-        query: {
-          if (startNum > 0) 'page': (startNum / 30).floor().toString(),
-        },
-      );
-      final users = _usersById(response);
-      final list = (response['topic_list'] as Map<String, dynamic>?) ??
-          const <String, dynamic>{};
-      final summaries = ((list['topics'] as List?) ?? const [])
-          .whereType<Map>()
-          .map((t) =>
-              _conversationSummaryFrom(t.cast<String, dynamic>(), users: users))
-          .toList();
+      // Discourse splits PMs into separate listing endpoints:
+      //   /topics/private-messages/{u}        → received only
+      //   /topics/private-messages-sent/{u}   → sent only
+      // For a unified WhatsApp-style "all conversations" view, fetch both
+      // in parallel and merge (dedup + sort by last activity).
+      final encUser = Uri.encodeComponent(username);
+      final pageQuery = <String, dynamic>{
+        if (startNum > 0) 'page': (startNum / 30).floor().toString(),
+      };
+      final responses = await Future.wait([
+        apiGet('/topics/private-messages/$encUser.json', query: pageQuery),
+        apiGet(
+          '/topics/private-messages-sent/$encUser.json',
+          query: pageQuery,
+        ).catchError((_) => <String, dynamic>{}),
+      ]);
+
+      final byId = <String, FCConversationSummary>{};
+      var unread = 0;
+      for (final response in responses) {
+        final users = _usersById(response);
+        final list = (response['topic_list'] as Map<String, dynamic>?) ??
+            const <String, dynamic>{};
+        for (final raw
+            in ((list['topics'] as List?) ?? const []).whereType<Map>()) {
+          final t = raw.cast<String, dynamic>();
+          final summary = _conversationSummaryFrom(t, users: users);
+          byId[summary.convId] = summary;
+          if (summary.newPost == true) unread++;
+        }
+      }
+
+      final summaries = byId.values.toList()
+        ..sort((a, b) {
+          final at = DateTime.tryParse(a.lastReplyTime ?? '') ??
+              DateTime.fromMillisecondsSinceEpoch(0);
+          final bt = DateTime.tryParse(b.lastReplyTime ?? '') ??
+              DateTime.fromMillisecondsSinceEpoch(0);
+          return bt.compareTo(at);
+        });
+
       return FCConversationsResult(
         result: true,
         resultText: '',
         conversationCount: summaries.length,
-        unreadCount: summaries.where((c) => c.newPost == true).length,
+        unreadCount: unread,
         canUpload: true,
         list: summaries,
       );
