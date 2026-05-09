@@ -6,7 +6,6 @@ import 'package:forumcopilot_flutter/views/widgets/user_replied_posts.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_custom_field.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
-import 'private_messaging/traditional/pages/new_traditional_pm_page.dart';
 import 'package:intl/intl.dart';
 import 'package:forumcopilot_flutter/views/widgets/full_screen_image_viewer.dart';
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
@@ -456,30 +455,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     SizedBox(width: DesignTokens.spacingM),
                                     FilledButton.icon(
                                       onPressed: () {
-                                        final conversationSupported = widget.siteContext.configDataOutput?.conversation ?? false;
-                                        if (conversationSupported) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => NewConversationPage(
-                                                siteContext: widget.siteContext,
-                                                initialRecipient: _userInfo!.username,
-                                                initialRecipientIconUrl: (_userInfo!.iconUrl != null && _userInfo!.iconUrl!.isNotEmpty) ? _userInfo!.iconUrl! : (widget.profilePictureUrl ?? null),
-                                              ),
+                                        // Discourse PMs are always conversations.
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => NewConversationPage(
+                                              siteContext: widget.siteContext,
+                                              initialRecipient: _userInfo!.username,
+                                              initialRecipientIconUrl: (_userInfo!.iconUrl != null && _userInfo!.iconUrl!.isNotEmpty) ? _userInfo!.iconUrl! : (widget.profilePictureUrl ?? null),
                                             ),
-                                          );
-                                        } else {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => NewTraditionalPMPage(
-                                                siteContext: widget.siteContext,
-                                                initialRecipient: _userInfo!.username,
-                                                initialRecipientIconUrl: (_userInfo!.iconUrl != null && _userInfo!.iconUrl!.isNotEmpty) ? _userInfo!.iconUrl! : (widget.profilePictureUrl ?? null),
-                                              ),
-                                            ),
-                                          );
-                                        }
+                                          ),
+                                        );
                                       },
                                       icon: Icon(Icons.message, size: DesignTokens.iconSizeM),
                                       label: Text(

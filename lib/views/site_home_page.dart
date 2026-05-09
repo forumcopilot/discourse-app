@@ -22,7 +22,6 @@ import 'tabs/topic_list_tab.dart';
 import 'tabs/notification_list_tab.dart';
 import 'tabs/privatemessage_list_tab.dart';
 import 'tabs/profile_tab.dart';
-import 'private_messaging/traditional/pages/new_traditional_pm_page.dart';
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
 import 'widgets/resettable_widget.dart';
 import 'package:forumcopilot_flutter/core/logging/app_logger.dart';
@@ -550,20 +549,15 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
   void _onNewMessagePressed() async {
     if (_siteContext == null) return;
 
-    if (_siteContext!.configDataOutput?.conversation ?? false) {
-      final result = await Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => NewConversationPage(siteContext: _siteContext!)),
-      );
-      if (result == true) {
-        _pmListKey.currentState?.resetTab();
-      }
-    } else {
-      final result = await Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => NewTraditionalPMPage(siteContext: _siteContext!)),
-      );
-      if (result == true) {
-        _pmListKey.currentState?.resetTab();
-      }
+    // Discourse PMs are always conversations; the XF-style traditional
+    // inbox/sent split was removed for discourseapp.
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (context) =>
+              NewConversationPage(siteContext: _siteContext!)),
+    );
+    if (result == true) {
+      _pmListKey.currentState?.resetTab();
     }
   }
 
@@ -731,7 +725,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           ? FloatingActionButton.extended(
               onPressed: _onNewMessagePressed,
               icon: const Icon(Icons.post_add_rounded),
-              label: Text(_siteContext?.configDataOutput?.conversation ?? false ? AppLocalizations.of(context)!.newConversation : AppLocalizations.of(context)!.newMessage),
+              label: Text(AppLocalizations.of(context)!.newConversation),
             )
           : null,
     );

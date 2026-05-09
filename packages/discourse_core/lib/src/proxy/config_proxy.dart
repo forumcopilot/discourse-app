@@ -80,7 +80,10 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       guestWhosOnline: true,
       searchId: true,
       avatar: true,
-      pmLoad: true,
+      // Discourse has no traditional XF "PM inbox/sent" model; PMs are
+      // always conversations. Signaling false makes the UI skip the
+      // legacy PM tabs and use the conversation flow exclusively.
+      pmLoad: false,
       subscribeLoad: true,
       // Discourse uses `notification_level` (Watching/Tracking/Normal/Muted),
       // not the XF-style email/notification toggle. The 'level' literal is
