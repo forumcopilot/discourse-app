@@ -13,6 +13,7 @@ import 'package:forumcopilot_flutter/core/logging/app_logger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import '../theme/design_tokens.dart';
+import '../utils/discourse_draft_controller.dart';
 
 class ReplyPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -49,6 +50,13 @@ class _ReplyPageState extends State<ReplyPage> {
   String? _createdPostId; // Store the created post ID
   Future<forumcopilot_sdk.FCQuotePostResult>? _quoteFuture;
 
+  // Server-side draft persistence. Discourse keys reply drafts as
+  // `topic_<topicId>` — same key the web composer uses, so drafts written
+  // here are visible/recoverable on the web side too.
+  late final TextEditingController _titleController;
+  late final TextEditingController _contentController;
+  late final DiscourseDraftController _draftController;
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +64,27 @@ class _ReplyPageState extends State<ReplyPage> {
     if (widget.isQuote && widget.postId != null) {
       _quoteFuture = SiteProxyFactory.getPostProxy().getQuotePostAsync(widget.postId!);
     }
+    _titleController = TextEditingController();
+    _contentController = TextEditingController();
+    final initialContent = _getInitialContent();
+    if (initialContent != null) {
+      _contentController.text = initialContent;
+    }
+    _draftController = DiscourseDraftController(
+      draftKey: 'topic_${widget.threadId}',
+      titleController: _titleController,
+      contentController: _contentController,
+      extraData: const {'action': 'reply'},
+    );
+    _draftController.initialize();
+  }
+
+  @override
+  void dispose() {
+    _draftController.dispose();
+    _titleController.dispose();
+    _contentController.dispose();
+    super.dispose();
   }
 
   String? _getInitialContent() {
@@ -63,6 +92,16 @@ class _ReplyPageState extends State<ReplyPage> {
       return '[QUOTE="${widget.quoteAuthor}"]${widget.quoteText}[/QUOTE]\n\n';
     }
     return null;
+  }
+
+  /// Wraps the underlying submit so we can clean up the server-side draft
+  /// when the post lands successfully.
+  Future<bool> _handleSubmitWithDraftDiscard(String title, String content) async {
+    final ok = await _handleSubmit(title, content);
+    if (ok) {
+      await _draftController.discard();
+    }
+    return ok;
   }
 
   Future<bool> _handleSubmit(String title, String content) async {
@@ -326,8 +365,10 @@ class _ReplyPageState extends State<ReplyPage> {
             title: AppLocalizations.of(context)?.reply ?? 'Reply',
             showTitleField: false,
             initialContent: quoteContent,
+            titleController: _titleController,
+            contentController: _contentController,
             contentHint: AppLocalizations.of(context)?.writeYourReply ?? 'Write your reply...',
-            onSubmit: _handleSubmit,
+            onSubmit: _handleSubmitWithDraftDiscard,
             onFileUpload: (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false) ? _handleFileUpload : null,
             topicTitle: widget.topicTitle,
             onRemoveAttachment: (attachmentId) async {
@@ -385,8 +426,10 @@ class _ReplyPageState extends State<ReplyPage> {
         title: AppLocalizations.of(context)?.reply ?? 'Reply',
         showTitleField: false,
         initialContent: _getInitialContent(),
+        titleController: _titleController,
+        contentController: _contentController,
         contentHint: 'Write your reply...',
-        onSubmit: _handleSubmit,
+        onSubmit: _handleSubmitWithDraftDiscard,
         onFileUpload: (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false) ? _handleFileUpload : null,
         topicTitle: widget.topicTitle,
         onRemoveAttachment: (attachmentId) async {

@@ -10,6 +10,7 @@ import 'package:forumcopilot_flutter/utils/attachment_validation_utils.dart';
 import 'package:forumcopilot_flutter/utils/image_optimization_utils.dart';
 import 'package:forumcopilot_flutter/utils/file_utils.dart';
 import 'package:forumcopilot_flutter/theme/design_tokens.dart';
+import 'package:forumcopilot_flutter/utils/discourse_draft_controller.dart';
 
 class NewTopicPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -38,10 +39,37 @@ class _NewTopicPageState extends State<NewTopicPage> {
   bool _isLoadingPrefixes = true;
   String? _prefixError;
 
+  // Server-side draft. Discourse uses 'new_topic' as a global key for the
+  // current user, scoped per-category by data['categoryId']. We tag the
+  // forumId here so resuming on a different category starts fresh.
+  late final TextEditingController _titleController;
+  late final TextEditingController _contentController;
+  late final DiscourseDraftController _draftController;
+
   @override
   void initState() {
     super.initState();
     _loadPrefixes();
+    _titleController = TextEditingController();
+    _contentController = TextEditingController();
+    _draftController = DiscourseDraftController(
+      draftKey: 'new_topic',
+      titleController: _titleController,
+      contentController: _contentController,
+      extraData: {
+        'action': 'createTopic',
+        if (widget.forumId.isNotEmpty) 'categoryId': widget.forumId,
+      },
+    );
+    _draftController.initialize();
+  }
+
+  @override
+  void dispose() {
+    _draftController.dispose();
+    _titleController.dispose();
+    _contentController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadPrefixes() async {
@@ -79,6 +107,16 @@ class _NewTopicPageState extends State<NewTopicPage> {
         });
       }
     }
+  }
+
+  /// Wraps the underlying submit so we can clean up the server-side draft
+  /// when the new topic lands successfully.
+  Future<bool> _handleSubmitWithDraftDiscard(String title, String content) async {
+    final ok = await _handleSubmit(title, content);
+    if (ok) {
+      await _draftController.discard();
+    }
+    return ok;
   }
 
   Future<bool> _handleSubmit(String title, String content) async {
@@ -324,7 +362,9 @@ class _NewTopicPageState extends State<NewTopicPage> {
       showTitleField: true,
       titleHint: 'Write your topic title...',
       contentHint: 'Write your topic content...',
-      onSubmit: _handleSubmit,
+      titleController: _titleController,
+      contentController: _contentController,
+      onSubmit: _handleSubmitWithDraftDiscard,
       onFileUpload: (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false) ? _handleFileUpload : null,
       forumName: widget.forumName,
       prefixes: _availablePrefixes,

@@ -1,3 +1,5 @@
+import 'dart:convert' show jsonDecode, jsonEncode;
+
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_post_proxy.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
@@ -385,6 +387,85 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       return true;
     } catch (_) {
       return false;
+    }
+  }
+
+  /// Discourse-only: save a server-side draft. [draftKey] follows
+  /// Discourse's conventions:
+  ///   - 'new_topic'                 — composing a brand-new topic
+  ///   - 'topic_{id}'                — reply to topic id
+  ///   - 'new_private_message'       — composing a new PM
+  ///   - 'topic_{id}'                — reply within a PM thread (Discourse
+  ///     uses the same key prefix)
+  ///
+  /// [data] is a JSON-encodable map containing at least `reply` (body
+  /// markdown) and optionally `title`, `categoryId`, `tags`, `action`.
+  /// Returns true on success.
+  Future<bool> saveDraftAsync({
+    required String draftKey,
+    required Map<String, dynamic> data,
+    int sequence = 0,
+  }) async {
+    try {
+      // Discourse expects the data field as a JSON-encoded *string*, not
+      // a nested object — the server stores it raw and re-parses on read.
+      // Empty drafts are deleted by the server, so callers should pass a
+      // non-empty `reply` to actually persist.
+      await apiPost('/drafts.json', body: {
+        'draft_key': draftKey,
+        'sequence': sequence,
+        'data': _encodeDraftData(data),
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Discourse-only: load an existing draft by [draftKey]. Returns the
+  /// inner data map (e.g. `{reply, title, ...}`) or null when no draft
+  /// exists.
+  Future<Map<String, dynamic>?> loadDraftAsync(String draftKey) async {
+    try {
+      final response =
+          await apiGet('/drafts/${Uri.encodeComponent(draftKey)}.json');
+      // Shape: { draft: "<json string>", draft_sequence: N }
+      // Older versions sometimes return draft as a parsed map directly.
+      final draft = response['draft'];
+      if (draft == null) return null;
+      if (draft is Map) {
+        return draft.cast<String, dynamic>();
+      }
+      if (draft is String && draft.isNotEmpty) {
+        return _decodeDraftData(draft);
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Discourse-only: delete a draft. Used after the composer
+  /// successfully submits or when the user explicitly discards.
+  Future<bool> deleteDraftAsync(String draftKey, {int sequence = 0}) async {
+    try {
+      await apiDelete(
+          '/drafts/${Uri.encodeComponent(draftKey)}.json?sequence=$sequence');
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  String _encodeDraftData(Map<String, dynamic> data) => jsonEncode(data);
+
+  Map<String, dynamic>? _decodeDraftData(String raw) {
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map) return decoded.cast<String, dynamic>();
+      return null;
+    } catch (_) {
+      return null;
     }
   }
 
