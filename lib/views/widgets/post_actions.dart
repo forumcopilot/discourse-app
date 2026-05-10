@@ -1061,12 +1061,14 @@ class PostActionsHandler {
     setLikeCount(message.likesInfo.length);
     try {
       final socialProxy = SiteProxyFactory.getSocialProxy();
+      // Discourse PM messages are just posts under the hood, so the same
+      // like/unlike endpoint handles them. (Stock Discourse PMs don't
+      // support likes — this only fires on forums where the host has
+      // enabled likes in PMs.)
       if (wasLiked) {
-        // Unlike the message
-        await socialProxy.unlikeConversationMessageAsync(message.messageId);
+        await socialProxy.unlikePostAsync(message.messageId);
       } else {
-        // Like the message
-        await socialProxy.likeConversationMessageAsync(message.messageId);
+        await socialProxy.likePostAsync(message.messageId);
       }
     } catch (e) {
       // Revert UI if failed

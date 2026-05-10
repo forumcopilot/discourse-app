@@ -1,58 +1,33 @@
 import '../models/results/fc_social_result.dart';
 
-/// Forum Copilot Social Proxy Interface
+/// Social operations exposed to the app.
 ///
-/// This interface defines the contract for social operations including:
-/// - Like/unlike posts
-/// - Thank posts
-/// - Follow/unfollow users
-/// - Get alerts and activities
+/// Trimmed Discourse-native surface. The XF-flavored `thankPostAsync`
+/// is gone — Discourse has likes + (optionally) emoji reactions, no
+/// separate "thanks" concept. PM-message likes are also dropped:
+/// Discourse PMs don't support likes. Follow/unfollow stay here for
+/// SDK compatibility, but the Discourse implementation lives on
+/// `DiscourseUserProxy.followUserAsync` / `unfollowUserAsync` (Phase
+/// 5.8) since Discourse's follow endpoint is keyed by username, not
+/// user id.
 abstract class IFCSocialProxy {
-  /// Send Thank You to a specific post
-  ///
-  /// [postId] - Post ID to thank
-  Future<FCThankPostResult> thankPostAsync(String postId);
-
-  /// Allows user to follow a specific person
-  ///
-  /// [userId] - User ID to follow
+  /// Follow a user by id. Discourse-native callers should prefer
+  /// `DiscourseUserProxy.followUserAsync(username)`.
   Future<FCFollowResult> followAsync(String userId);
 
-  /// Allows user to unfollow a specific person
-  ///
-  /// [userId] - User ID to unfollow
+  /// Unfollow a user by id. Discourse-native callers should prefer
+  /// `DiscourseUserProxy.unfollowUserAsync(username)`.
   Future<FCUnfollowResult> unfollowAsync(String userId);
 
-  /// Send Like to a specific post
-  ///
-  /// [postId] - Post ID to like
+  /// Like a post.
   Future<FCLikePostResult> likePostAsync(String postId);
 
-  /// Remove Like from a specific post
-  ///
-  /// [postId] - Post ID to unlike
+  /// Remove a like from a post.
   Future<FCUnlikePostResult> unlikePostAsync(String postId);
 
-  /// Send Like to a specific conversation message
-  ///
-  /// [messageId] - Conversation message ID to like
-  Future<FCLikePostResult> likeConversationMessageAsync(String messageId);
-
-  /// Remove Like from a specific conversation message
-  ///
-  /// [messageId] - Conversation message ID to unlike
-  Future<FCUnlikePostResult> unlikeConversationMessageAsync(String messageId);
-
-  /// Get user alerts
-  ///
-  /// [page] - Page number for pagination
-  /// [perpage] - Number of items per page
-  /// [forceRefresh] - Whether to force refresh the data
+  /// Get user alerts (notifications).
   Future<FCAlertResult> getAlertAsync(int page, int perpage, bool forceRefresh);
 
-  /// Get user activities
-  ///
-  /// [page] - Page number for pagination
-  /// [perpage] - Number of items per page
+  /// Get user activity stream.
   Future<FCActivityResult> getActivityAsync(int page, int perpage);
 }

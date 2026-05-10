@@ -1538,7 +1538,7 @@ class _ConversationPageState extends State<ConversationPage> {
       final socialProxy = SiteProxyFactory.getSocialProxy();
 
       if (wasLiked) {
-        final result = await socialProxy.unlikeConversationMessageAsync(message.messageId);
+        final result = await socialProxy.unlikePostAsync(message.messageId);
         if (result.result) {
           // Update UI with response data from server
           setState(() {
@@ -1560,7 +1560,7 @@ class _ConversationPageState extends State<ConversationPage> {
           throw Exception(result.resultText ?? 'Failed to unlike message');
         }
       } else {
-        final result = await socialProxy.likeConversationMessageAsync(message.messageId);
+        final result = await socialProxy.likePostAsync(message.messageId);
         if (result.result) {
           // Update UI with response data from server
           setState(() {

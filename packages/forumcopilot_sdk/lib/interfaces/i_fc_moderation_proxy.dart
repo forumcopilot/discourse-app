@@ -1,84 +1,84 @@
 import '../models/results/fc_moderation_result.dart';
 
-/// Forum Copilot Moderation Proxy Interface
+/// Moderation operations exposed to the app.
 ///
-/// This interface defines the contract for moderation operations including:
-/// - Topic moderation (stick/unstick, close/unclose, delete/undelete, move, rename, merge)
-/// - Post moderation (delete/undelete, move, approve)
-/// - User moderation (ban/unban, mark as spam)
-/// - Moderation queue management (get moderate topics/posts, deleted topics/posts, reported posts)
-/// - Moderator authentication
+/// This is the trimmed Discourse-native surface. The XF/Tapatalk
+/// review-queue methods (getModerateTopic/Post, getDeleted*, getReported*,
+/// approveTopic/Post, doLoginMod) have been dropped — Discourse's review
+/// queue lives at `/review.json` with a unified shape that doesn't map
+/// onto these signatures, and no UI in `lib/` ever called them. If the
+/// review queue is wired in a future phase it should land as new
+/// Discourse-shaped methods, not the inherited XF ones.
 abstract class IFCModerationProxy {
-  /// Authenticate as a moderator
-  Future<FCLoginModResult> doLoginModAsync(String username, String password);
+  // ===== Topic status toggles =====
 
-  /// Stick a topic
+  /// Stick (pin) a topic.
   Future<FCStickTopicResult> stickTopicAsync(String topicId);
 
-  /// Unstick a topic
+  /// Unstick a topic.
   Future<FCStickTopicResult> unstickTopicAsync(String topicId);
 
-  /// Close a topic
+  /// Close a topic (prevent replies).
   Future<FCCloseTopicResult> closeTopicAsync(String topicId);
 
-  /// Unclose a topic
+  /// Reopen a closed topic.
   Future<FCCloseTopicResult> uncloseTopicAsync(String topicId);
 
-  /// Delete a topic
-  Future<FCDeleteTopicResult> deleteTopicAsync(String topicId, int mode, String reason);
+  // ===== Delete / restore =====
 
-  /// Delete a post
-  Future<FCDeletePostResult> deletePostAsync(String postId, int mode, String reason);
+  /// Soft-delete a topic. `mode` / `reason` are XF-flavored and ignored
+  /// by the Discourse implementation.
+  Future<FCDeleteTopicResult> deleteTopicAsync(
+      String topicId, int mode, String reason);
 
-  /// Undelete a topic
-  Future<FCUndeleteTopicResult> undeleteTopicAsync(String topicId, String reason);
+  /// Soft-delete a post. `mode` / `reason` are XF-flavored.
+  Future<FCDeletePostResult> deletePostAsync(
+      String postId, int mode, String reason);
 
-  /// Undelete a post
-  Future<FCUndeletePostResult> undeletePostAsync(String postId, String reason);
+  /// Restore a previously-deleted topic.
+  Future<FCUndeleteTopicResult> undeleteTopicAsync(
+      String topicId, String reason);
 
-  /// Move a topic
-  Future<FCMoveTopicResult> moveTopicAsync(String topicId, String forumId, bool redirect);
+  /// Restore a previously-deleted post.
+  Future<FCUndeletePostResult> undeletePostAsync(
+      String postId, String reason);
 
-  /// Rename a topic
+  // ===== Move / rename / merge =====
+
+  /// Move a topic into another category. `redirect` (XF "leave
+  /// forwarding link") has no Discourse equivalent.
+  Future<FCMoveTopicResult> moveTopicAsync(
+      String topicId, String forumId, bool redirect);
+
+  /// Rename a topic.
   Future<FCRenameTopicResult> renameTopicAsync(String topicId, String title);
 
-  /// Move a post
-  Future<FCMovePostResult> movePostAsync(String postId, String? topicId, String? topicTitle, String? forumId);
+  /// Move a post into another topic (split). Pass either a destination
+  /// topic id or a new topic title + category.
+  Future<FCMovePostResult> movePostAsync(String postId, String? topicId,
+      String? topicTitle, String? forumId);
 
-  /// Merge topics
-  Future<FCMergeTopicResult> mergeTopicAsync(String topicId1, String topicId2, bool redirect);
+  /// Merge `topicId2` into `topicId1` (move topic2's posts to topic1).
+  Future<FCMergeTopicResult> mergeTopicAsync(
+      String topicId1, String topicId2, bool redirect);
 
-  /// Get moderate topics
-  Future<FCModerateTopicResult> getModerateTopicAsync(int startNum, int lastNum);
+  // ===== User moderation =====
 
-  /// Get moderate posts
-  Future<FCModeratePostResult> getModeratePostAsync(int startNum, int lastNum);
+  /// Suspend a user.
+  Future<FCBanUserResult> banUserAsync(
+      String userName,
+      String reason,
+      int banExpires,
+      int deletePostMode,
+      int deletePostValue);
 
-  /// Get deleted topics
-  Future<FCDeletedTopicResult> getDeletedTopicAsync(int startNum, int lastNum);
-
-  /// Get deleted posts
-  Future<FCDeletedPostResult> getDeletedPostAsync(int startNum, int lastNum);
-
-  /// Get reported posts
-  Future<FCReportedPostResult> getReportedPostAsync(int startNum, int lastNum);
-
-  /// Approve a topic
-  Future<FCApproveTopicResult> approveTopicAsync(String topicId);
-
-  /// Approve a post
-  Future<FCApprovePostResult> approvePostAsync(String postId);
-
-  /// Ban a user
-  Future<FCBanUserResult> banUserAsync(String userName, String reason, int banExpires, int deletePostMode, int deletePostValue);
-
-  /// Unban a user
+  /// Lift a user suspension.
   Future<FCUnbanUserResult> unbanUserAsync(String userId);
 
-  /// Mark user as spam
+  /// Silence a user (Discourse: can't post, account intact).
   Future<FCMarkAsSpamResult> markAsSpamAsync(String userId);
 
-  /// Clean spam content from a user account
+  /// Suspend (or silence) + optionally delete the user's content.
   Future<FCSpamCleanUserResult> spamCleanUserAsync({
     String? userId,
     String? username,

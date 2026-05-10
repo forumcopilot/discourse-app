@@ -13,11 +13,12 @@ import '../base_discourse_proxy.dart';
 ///   * GET    `/user_actions.json`      — activity feed
 ///
 /// Notes / gaps:
-/// - Discourse has no separate "Thanks" — `thankPostAsync` is mapped to
-///   `like` (lossy; XF treated them as distinct).
 /// - `follow/unfollow` require the optional `discourse-follow` plugin.
 ///   Stubbed `result:false` so the UI's follow button reports clearly when
-///   the feature isn't available on the forum.
+///   the feature isn't available on the forum. Discourse-native
+///   integrations should use `DiscourseUserProxy.followUserAsync` / its
+///   unfollow counterpart (Phase 5.8), which target the plugin endpoint
+///   directly with a username.
 class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy {
   DiscourseSocialProxy(SiteContext context) : super(context);
 
@@ -59,24 +60,6 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       resultText: r.resultText,
       isLiked: r.isLiked,
       likeCount: r.likeCount,
-    );
-  }
-
-  @override
-  Future<FCLikePostResult> likeConversationMessageAsync(String messageId) =>
-      likePostAsync(messageId); // PMs are topics; messages are posts.
-
-  @override
-  Future<FCUnlikePostResult> unlikeConversationMessageAsync(String messageId) =>
-      unlikePostAsync(messageId);
-
-  @override
-  Future<FCThankPostResult> thankPostAsync(String postId) async {
-    // Lossy: Discourse has no "Thanks" type. Map to like.
-    final r = await _toggleLikeRaw(postId, like: true);
-    return FCThankPostResult(
-      result: r.success,
-      resultText: r.resultText,
     );
   }
 

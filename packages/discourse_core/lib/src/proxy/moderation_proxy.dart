@@ -26,16 +26,6 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
     implements IFCModerationProxy {
   DiscourseModerationProxy(SiteContext context) : super(context);
 
-  // ===== Auth =====
-
-  @override
-  Future<FCLoginModResult> doLoginModAsync(
-      String username, String password) async {
-    // Discourse has no separate mod login. The User API Key holder's
-    // role is checked per-request.
-    return FCLoginModResult(result: true, resultText: '');
-  }
-
   // ===== Topic status toggles =====
 
   @override
@@ -264,98 +254,6 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
       return FCMergeTopicResult(
           result: false, resultText: 'Error: $e', isLoginMod: true);
     }
-  }
-
-  // ===== Approve =====
-
-  @override
-  Future<FCApproveTopicResult> approveTopicAsync(String topicId) async {
-    // Discourse approval flows go through the unified review queue:
-    //   PUT /review/{review_id}/perform/approve_post.json
-    // We don't know the review_id from a topic_id without an extra
-    // lookup, and the queue is staff-only. Phase 2.x can wire this when
-    // a UI consumer surfaces. For now, report success so the optimistic
-    // UI doesn't get stuck.
-    return FCApproveTopicResult(result: true, resultText: '', isLoginMod: true);
-  }
-
-  @override
-  Future<FCApprovePostResult> approvePostAsync(String postId) async {
-    // Same as approveTopicAsync. The review queue is the right path; for
-    // now report success.
-    return FCApprovePostResult(result: true, resultText: '', isLoginMod: true);
-  }
-
-  // ===== Review-queue listings =====
-
-  @override
-  Future<FCModerateTopicResult> getModerateTopicAsync(
-      int startNum, int lastNum) async {
-    // The review queue is unified at /review.json and mixes topics +
-    // posts; mapping it cleanly to FCModerateTopic requires knowledge
-    // of the SDK's expected shape per row. Phase 2.x: hit /review.json
-    // with type=ReviewableQueuedTopic. For now, return empty.
-    return FCModerateTopicResult(
-      result: true,
-      resultText: '',
-      isLoginMod: true,
-      total: 0,
-      list: const [],
-    );
-  }
-
-  @override
-  Future<FCModeratePostResult> getModeratePostAsync(
-      int startNum, int lastNum) async {
-    return FCModeratePostResult(
-      result: true,
-      resultText: '',
-      isLoginMod: true,
-      total: 0,
-      list: const [],
-    );
-  }
-
-  @override
-  Future<FCDeletedTopicResult> getDeletedTopicAsync(
-      int startNum, int lastNum) async {
-    // Discourse doesn't expose "all deleted topics" outside admin SQL
-    // panel. /admin/users/list/deleted exists for users. For topics
-    // there's no dedicated REST endpoint — staff browse via filtered
-    // search. Return empty.
-    return FCDeletedTopicResult(
-      result: true,
-      resultText: '',
-      isLoginMod: true,
-      total: 0,
-      list: const [],
-    );
-  }
-
-  @override
-  Future<FCDeletedPostResult> getDeletedPostAsync(
-      int startNum, int lastNum) async {
-    return FCDeletedPostResult(
-      result: true,
-      resultText: '',
-      isLoginMod: true,
-      total: 0,
-      list: const [],
-    );
-  }
-
-  @override
-  Future<FCReportedPostResult> getReportedPostAsync(
-      int startNum, int lastNum) async {
-    // Reported posts live in the review queue. Could be wired via
-    // GET /review.json?type=ReviewableFlaggedPost; for now empty.
-    return FCReportedPostResult(
-      result: true,
-      resultText: '',
-      isLoginMod: true,
-      total: 0,
-      list: const [],
-    );
   }
 
   // ===== User moderation =====
