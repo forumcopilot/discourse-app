@@ -173,7 +173,8 @@ class NotificationSettingsPage extends StatelessWidget {
           SizedBox(height: DesignTokens.spacingXS),
           _buildDebugInfoRow(
             'API Base URL',
-            PushNotificationService.baseUrl,
+            // Push relay backend isn't wired on Discourse yet (Phase 3).
+            '— (deferred)',
             colorScheme,
             textTheme,
           ),

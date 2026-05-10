@@ -547,17 +547,19 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
 
   @override
   Future<FCPasskeyChallengeResult> getPasskeyChallengeAsync() async {
-    print('✅ [DISCOURSE_USER] getPasskeyChallengeAsync called - IMPLEMENTED');
-
-    final response = await callPluginApi('getPasskeyChallenge', {});
-    final timeout = response['timeout'] != null ? (response['timeout'] is int ? response['timeout'] as int : int.tryParse(response['timeout'].toString())) : null;
-
+    // Discourse handles passkeys inside its own login webview (which is
+    // also the User API Key grant page). The mobile app doesn't issue
+    // its own challenge — falling out of this method makes the caller
+    // skip passkey UI and use the standard handshake. See
+    // [loginWithPasskeyAsync] just below.
     return FCPasskeyChallengeResult(
-      result: response['result'] ?? true,
-      resultText: response['resultText']?.toString(),
-      challenge: response['challenge']?.toString(),
-      rpId: response['rpId']?.toString(),
-      timeout: timeout,
+      result: false,
+      resultText:
+          'Passkey login on Discourse is handled in the User API Key '
+          'webview, not as a separate challenge.',
+      challenge: null,
+      rpId: null,
+      timeout: null,
     );
   }
 
@@ -665,22 +667,29 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
   }
 
   @override
-  Future<FCReportUserResult> reportUserAsync(String userId, String reason) async {
-    print('✅ [DISCOURSE_USER] reportUserAsync called - IMPLEMENTED');
-    print('   📋 Parameters: userId=$userId, reason=$reason');
-
+  Future<FCReportUserResult> reportUserAsync(
+      String userId, String reason) async {
+    // Discourse has no first-class "report user" REST endpoint for
+    // non-staff: reports happen via flagging individual posts or PMs
+    // (`POST /post_actions`). Staff users can silence or suspend a
+    // user (`PUT /admin/users/{id}/{silence,suspend}.json`), but that's
+    // a heavier action than what "report user" implies in the XF UI.
+    //
+    // For non-staff this returns a clear failure pointing the user at
+    // post-level flagging. Staff use the moderation surface in
+    // `DiscourseModerationProxy.markAsSpamAsync` / `banUserAsync`.
     try {
-      final response = await callPluginApi('reportUser', {
-        'userId': userId,
-        'reason': reason,
-      });
-
+      // No-op REST round-trip; we deliberately don't escalate to
+      // silence/suspend from a plain "report" intent. Phase 2.x could
+      // route reasons here to a Discourse flag with type=spam against
+      // the user's most recent post.
       return FCReportUserResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString(),
+        result: false,
+        resultText:
+            'Reporting a user is done by flagging their posts on Discourse. '
+            'Open one of their posts and use the flag action.',
       );
     } catch (e) {
-      print('❌ [DISCOURSE_USER] reportUserAsync error: $e');
       return FCReportUserResult(
         result: false,
         resultText: 'Error reporting user: $e',

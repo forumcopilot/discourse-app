@@ -4,9 +4,17 @@ import 'package:forumcopilot_sdk/models/results/fc_device_result.dart';
 import '../base_discourse_proxy.dart';
 
 /// Discourse implementation of [IFCDeviceProxy].
-/// Hits ForumCopilot's standard `forumcopilot.php` endpoint with the
-/// `registerDevice` / `unregisterDevice` / `updateDeviceToken` methods.
-class DiscourseDeviceProxy extends BaseDiscourseProxy implements IFCDeviceProxy {
+///
+/// **Phase-3 stub.** Push notifications aren't wired on Discourse yet —
+/// the real implementation will register the device's FCM token against
+/// the User API Key's `push_url` (Discourse pushes to whatever URL is
+/// registered there). All three methods currently report success with a
+/// no-op so the push controller's bootstrap code in
+/// `lib/controllers/push_notification_controller.dart` doesn't crash
+/// when Firebase issues a token; the device just doesn't actually
+/// receive pushes until the relay backend is wired.
+class DiscourseDeviceProxy extends BaseDiscourseProxy
+    implements IFCDeviceProxy {
   DiscourseDeviceProxy(SiteContext context) : super(context);
 
   @override
@@ -17,23 +25,14 @@ class DiscourseDeviceProxy extends BaseDiscourseProxy implements IFCDeviceProxy 
     required String source,
     String? appVersion,
   }) async {
-    try {
-      final r = await callPluginApi('registerDevice', {
-        'deviceId': deviceId,
-        'fcmToken': fcmToken,
-        'platform': platform,
-        'source': source,
-        if (appVersion != null && appVersion.isNotEmpty) 'appVersion': appVersion,
-      });
-      final device = r['device'];
-      return FCDeviceResult(
-        result: r['result'] == true,
-        resultText: r['resultText']?.toString(),
-        deviceId: device is Map<String, dynamic> ? device['deviceId']?.toString() : null,
-      );
-    } catch (e) {
-      return FCDeviceResult(result: false, resultText: 'registerDevice error: $e');
-    }
+    // TODO(phase-3): register the device with the push relay backend.
+    // For now we accept the token silently so push initialisation in
+    // main.dart can complete without surfacing a misleading error.
+    return FCDeviceResult(
+      result: true,
+      resultText: 'Push registration deferred to Phase 3.',
+      deviceId: deviceId,
+    );
   }
 
   @override
@@ -41,31 +40,20 @@ class DiscourseDeviceProxy extends BaseDiscourseProxy implements IFCDeviceProxy 
     required String deviceId,
     required String fcmToken,
   }) async {
-    try {
-      final r = await callPluginApi('updateDeviceToken', {
-        'deviceId': deviceId,
-        'fcmToken': fcmToken,
-      });
-      return FCDeviceResult(
-        result: r['result'] == true,
-        resultText: r['resultText']?.toString(),
-        deviceId: deviceId,
-      );
-    } catch (e) {
-      return FCDeviceResult(result: false, resultText: 'updateDeviceToken error: $e');
-    }
+    // TODO(phase-3): forward the new FCM token to the relay backend.
+    return FCDeviceResult(
+      result: true,
+      resultText: 'Push token update deferred to Phase 3.',
+      deviceId: deviceId,
+    );
   }
 
   @override
   Future<FCDeviceResult> unregisterDeviceAsync(String deviceId) async {
-    try {
-      final r = await callPluginApi('unregisterDevice', {'deviceId': deviceId});
-      return FCDeviceResult(
-        result: r['result'] == true,
-        resultText: r['resultText']?.toString(),
-      );
-    } catch (e) {
-      return FCDeviceResult(result: false, resultText: 'unregisterDevice error: $e');
-    }
+    // TODO(phase-3): drop the device from the relay backend.
+    return FCDeviceResult(
+      result: true,
+      resultText: 'Push unregister deferred to Phase 3.',
+    );
   }
 }

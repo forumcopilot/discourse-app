@@ -1,39 +1,61 @@
-import 'dart:convert';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_account_proxy.dart';
 import 'package:forumcopilot_sdk/models/results/fc_account_result.dart';
 import 'package:forumcopilot_sdk/models/registration/fc_registration_requirements.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_custom_field_definition.dart';
 import 'package:forumcopilot_sdk/models/settings/fc_settings_category.dart';
 import 'package:forumcopilot_sdk/models/settings/fc_user_setting.dart';
 import 'package:forumcopilot_sdk/models/settings/fc_user_settings_result.dart';
 import '../base_discourse_proxy.dart';
 
-/// Discourse implementation of IFCAccountProxy
-/// Handles user registration and authentication for Discourse forums
-class DiscourseAccountProxy extends BaseDiscourseProxy implements IFCAccountProxy {
+/// Discourse implementation of [IFCAccountProxy].
+///
+/// Endpoint mapping vs the XF-flavored SDK contract:
+///
+///   * `forgetPassword`     → `POST /session/forgot_password.json`
+///   * `prefetchAccount`    → `GET /about.json` (just to read site flags;
+///                            mobile registration is web-only on Discourse)
+///   * `register`           → reported failure with a link to the web
+///                            signup page. Discourse's signup has
+///                            CAPTCHA + ToS + custom field validation
+///                            that's not worth replicating in v1.
+///   * `updateEmail`        → `PUT /u/{username}/preferences/email.json`
+///   * `updatePassword`     → `POST /u/{username}/preferences/password.json`
+///                            (Discourse triggers a password-reset email
+///                            rather than accepting an inline password
+///                            change.)
+///   * `updateProfile`      → `PUT /u/{username}.json`
+///   * `signinLogin*`       → not used; 2FA / passkey flows on Discourse
+///                            go through the User API Key handshake.
+///   * `getUserSettings*`   → empty results (Discourse exposes preferences
+///                            as a flat structure under user_option, not
+///                            as XF-style categories).
+class DiscourseAccountProxy extends BaseDiscourseProxy
+    implements IFCAccountProxy {
   DiscourseAccountProxy(SiteContext context) : super(context);
 
   @override
-  Future<FCForgetPasswordResult> forgetPassword(String username, String token, String code) async {
-    print('✅ [DISCOURSE_ACCOUNT] forgetPassword called via plugin API');
-    print('   📋 Parameters: username=$username');
-
-    try {
-      // Call plugin API with forgotPassword method
-      // The API accepts usernameOrEmail parameter (it auto-detects if it's an email or username)
-      final response = await callPluginApi('forgotPassword', {
-        'usernameOrEmail': username,
-      });
-
-      // Convert response to FCForgetPasswordResult
+  Future<FCForgetPasswordResult> forgetPassword(
+      String username, String token, String code) async {
+    // Discourse: POST /session/forgot_password.json { login: <email|username> }.
+    // It accepts either an email or a username and always returns 200 to
+    // avoid leaking account existence.
+    if (username.trim().isEmpty) {
       return FCForgetPasswordResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString(),
-        verified: response['verified'] ?? false,
+        result: false,
+        resultText: 'Username or email is required',
+        verified: false,
+      );
+    }
+    try {
+      await apiPost('/session/forgot_password.json', body: {
+        'login': username,
+      });
+      return FCForgetPasswordResult(
+        result: true,
+        resultText: 'If an account exists, a reset email has been sent.',
+        verified: true,
       );
     } catch (e) {
-      print('❌ [DISCOURSE_ACCOUNT] forgetPassword error: $e');
       return FCForgetPasswordResult(
         result: false,
         resultText: 'Error requesting password reset: $e',
@@ -44,144 +66,41 @@ class DiscourseAccountProxy extends BaseDiscourseProxy implements IFCAccountProx
 
   @override
   Future<FCPrefetchAccountResult?> prefetchAccount() async {
-    print('✅ [DISCOURSE_ACCOUNT] prefetchAccount called via plugin API');
-
+    // Discourse-native mobile registration isn't supported in v1 — the
+    // full signup flow (CAPTCHA, ToS, custom field validation, email
+    // verification) is web-only. We probe /about.json so the register
+    // page can route the user to the web signup form with a real URL.
+    final webUrl = '${siteContext.site.url}/signup';
     try {
-      final response = await callPluginApi('prefetchAccount', {});
-
-      print('   📥 [DISCOURSE_ACCOUNT] prefetchAccount response keys: ${response.keys.toList()}');
-      print('   📥 [DISCOURSE_ACCOUNT] Full JSON response (formatted):');
-      // Pretty print the JSON response
-      try {
-        final encoder = JsonEncoder.withIndent('  ');
-        print(encoder.convert(response));
-      } catch (e) {
-        print('   ${response.toString()}');
-      }
-      print('   📥 [DISCOURSE_ACCOUNT] registrationOpen: ${response['registrationOpen']}');
-      print('   📥 [DISCOURSE_ACCOUNT] canRegisterViaAPI: ${response['canRegisterViaAPI']}');
-      print('   📥 [DISCOURSE_ACCOUNT] registerViaWebUrl: ${response['registerViaWebUrl']}');
-
-      // Parse registrationRequirements if present
-      FCRegistrationRequirements? registrationRequirements;
-      if (response['registrationRequirements'] != null) {
-        registrationRequirements = _parseRegistrationRequirements(
-          response['registrationRequirements'] as Map<String, dynamic>,
-        );
-      }
-
+      final response = await apiGet('/about.json');
+      final about = (response['about'] as Map<String, dynamic>?) ?? const {};
+      // SiteSetting `allow_new_registrations` ungated here would require
+      // admin scope. /about.json doesn't surface it, so we just report
+      // canRegisterViaAPI=false unconditionally and let the UI redirect.
       return FCPrefetchAccountResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString(),
-        accountExists: response['accountExists'] ?? false,
-        username: response['username']?.toString(),
-        email: response['email']?.toString(),
-        registrationOpen: response['registrationOpen'] ?? false,
-        canRegisterViaAPI: response['canRegisterViaAPI'] ?? false,
-        registerViaWebUrl: response['registerViaWebUrl']?.toString() ?? '',
-        registrationRequirements: registrationRequirements,
+        result: true,
+        resultText: '',
+        accountExists: false,
+        username: null,
+        email: null,
+        registrationOpen: true,
+        canRegisterViaAPI: false,
+        registerViaWebUrl: webUrl,
+        registrationRequirements: null,
       );
-    } catch (e) {
-      print('❌ [DISCOURSE_ACCOUNT] prefetchAccount error: $e');
-      return null;
-    }
-  }
-
-  FCRegistrationRequirements _parseRegistrationRequirements(Map<String, dynamic> data) {
-    // Helper function to safely convert to int (shared by multiple parsers)
-    int? _parseInt(dynamic value) {
-      if (value == null) return null;
-      if (value is int) return value;
-      if (value is String) {
-        final parsed = int.tryParse(value);
-        return parsed;
-      }
-      return null;
-    }
-
-    // Parse field requirements
-    FCFieldRequirement? _parseFieldRequirement(dynamic fieldData) {
-      if (fieldData == null) return null;
-      final map = fieldData as Map<String, dynamic>;
-      
-      return FCFieldRequirement(
-        required: map['required'] ?? false,
-        minLength: _parseInt(map['minLength']),
-        maxLength: _parseInt(map['maxLength']),
-        checkStrength: map['checkStrength'] as bool?,
-        minimumAge: _parseInt(map['minimumAge']),
-        requireDob: map['requireDob'] as bool?,
-        requireLocation: map['requireLocation'] as bool?,
-        requireEmailChoice: map['requireEmailChoice'] as bool?,
+    } catch (_) {
+      // Fall back to the web URL even when /about.json is unreachable
+      // — better than crashing the register page.
+      return FCPrefetchAccountResult(
+        result: true,
+        resultText: '',
+        accountExists: false,
+        registrationOpen: true,
+        canRegisterViaAPI: false,
+        registerViaWebUrl: webUrl,
+        registrationRequirements: null,
       );
     }
-
-    // Parse policy requirement
-    FCPolicyRequirement? _parsePolicyRequirement(dynamic policyData) {
-      if (policyData == null) return null;
-      final map = policyData as Map<String, dynamic>;
-      return FCPolicyRequirement(
-        required: map['required'] ?? false,
-        url: map['url']?.toString() ?? '',
-      );
-    }
-
-    // Parse CAPTCHA requirement
-    FCCaptchaRequirement? _parseCaptchaRequirement(dynamic captchaData) {
-      if (captchaData == null) return null;
-      final map = captchaData as Map<String, dynamic>;
-      return FCCaptchaRequirement(
-        required: map['required'] ?? false,
-        type: map['type']?.toString(),
-        invisible: map['invisible'] as bool?,
-        siteKey: map['siteKey']?.toString(),
-      );
-    }
-
-    // Parse custom fields
-    List<FCCustomFieldDefinition> _parseCustomFields(dynamic customFieldsData) {
-      if (customFieldsData == null) return [];
-      final List<dynamic> fieldsList = customFieldsData as List<dynamic>;
-      return fieldsList.map((fieldData) {
-        final map = fieldData as Map<String, dynamic>;
-        // Handle choices as Map or string
-        Map<String, String>? choices;
-        if (map['choices'] != null) {
-          if (map['choices'] is Map) {
-            choices = Map<String, String>.from(
-              (map['choices'] as Map).map((k, v) => MapEntry(k.toString(), v.toString())),
-            );
-          }
-        }
-        return FCCustomFieldDefinition(
-          name: map['title']?.toString() ?? map['name']?.toString() ?? '',
-          description: map['description']?.toString() ?? '',
-          key: map['fieldId']?.toString() ?? map['key']?.toString() ?? '',
-          fieldId: map['fieldId']?.toString(),
-          type: map['fieldType']?.toString() ?? map['type']?.toString() ?? '',
-          format: map['format']?.toString() ?? '',
-          defaultValue: map['defaultValue'],
-          options: map['options']?.toString() ?? '',
-          displayOrder: map['displayOrder'] as int?,
-          choices: choices,
-          required: map['required'] as bool? ?? false,
-          maxLength: _parseInt(map['maxLength']),
-        );
-      }).toList();
-    }
-
-    return FCRegistrationRequirements(
-      username: _parseFieldRequirement(data['username']),
-      email: _parseFieldRequirement(data['email']),
-      password: _parseFieldRequirement(data['password']),
-      dateOfBirth: _parseFieldRequirement(data['dateOfBirth']),
-      location: _parseFieldRequirement(data['location']),
-      emailChoice: _parseFieldRequirement(data['emailChoice']),
-      customFields: _parseCustomFields(data['customFields']),
-      captcha: _parseCaptchaRequirement(data['captcha']),
-      privacyPolicy: _parsePolicyRequirement(data['privacyPolicy']),
-      termsOfService: _parsePolicyRequirement(data['termsOfService']),
-    );
   }
 
   @override
@@ -191,7 +110,7 @@ class DiscourseAccountProxy extends BaseDiscourseProxy implements IFCAccountProx
     required String password,
     String? passwordConfirm,
     String? timezone,
-    String? dateOfBirth, // Format: YYYY-MM-DD (ISO 8601 date format)
+    String? dateOfBirth,
     String? location,
     bool? emailChoice,
     Map<String, dynamic>? customFields,
@@ -199,289 +118,161 @@ class DiscourseAccountProxy extends BaseDiscourseProxy implements IFCAccountProx
     bool? acceptTerms,
     bool? acceptPrivacy,
   }) async {
-    print('✅ [DISCOURSE_ACCOUNT] register called via plugin API');
-    print('   📋 Parameters: username=$username, email=$email');
+    // In-app registration intentionally not implemented. Discourse's
+    // signup flow has too many moving parts (CAPTCHA, T&C, custom
+    // fields, email verification) to round-trip from a mobile form.
+    // The UI shows the web signup URL from prefetchAccount instead.
+    return FCRegisterResult(
+      result: false,
+      resultText:
+          'In-app registration is not supported. Please sign up on the web.',
+    );
+  }
 
+  // ===== Signin flows — currently routed through the User API Key
+  // handshake, so these XF-style methods aren't called on Discourse.
+
+  @override
+  Future<FCSigninResult> signinLogin(
+          String token, String code, String? trustCode) async =>
+      FCSigninResult(result: false, resultText: 'Not implemented');
+
+  @override
+  Future<FCSigninResult> signinLoginWithEmail(
+          String token, String code, String email, String? trustCode) async =>
+      FCSigninResult(result: false, resultText: 'Not implemented');
+
+  @override
+  Future<FCSigninResult> signinLoginWithUsername(String token, String code,
+          String email, String username, String? trustCode) async =>
+      FCSigninResult(result: false, resultText: 'Not implemented');
+
+  @override
+  Future<FCSigninResult> signinRegister(
+          String token, String code, String email, String username,
+          String password,
+          {Map<String, dynamic>? customRegisterFields}) async =>
+      FCSigninResult(result: false, resultText: 'Not implemented');
+
+  // ===== Update email / password / profile =====
+
+  @override
+  Future<FCUpdateEmailResult> updateEmail(
+      String password, String newEmail) async {
+    final username = siteContext.currentUsername;
+    if (username == null || username.isEmpty) {
+      return FCUpdateEmailResult(
+          result: false, resultText: 'Not logged in');
+    }
     try {
-      final params = <String, dynamic>{
-        'username': username,
-        'email': email,
-        'password': password,
-      };
-
-      if (passwordConfirm != null) params['passwordConfirm'] = passwordConfirm;
-      if (timezone != null) params['timezone'] = timezone;
-      if (dateOfBirth != null && dateOfBirth.isNotEmpty) {
-        params['dateOfBirth'] = dateOfBirth; // Send as YYYY-MM-DD format
-        print('   📋 dateOfBirth: $dateOfBirth');
-      }
-      if (location != null) params['location'] = location;
-      if (emailChoice != null) params['emailChoice'] = emailChoice;
-      if (customFields != null && customFields.isNotEmpty) params['customFields'] = customFields;
-      if (captchaToken != null) params['captchaToken'] = captchaToken;
-      if (acceptTerms != null) params['acceptTerms'] = acceptTerms;
-      if (acceptPrivacy != null) params['acceptPrivacy'] = acceptPrivacy;
-
-      final response = await callPluginApi('register', params);
-
-      print('   📥 [DISCOURSE_ACCOUNT] register response keys: ${response.keys.toList()}');
-
-      return FCRegisterResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString(),
-        previewTopicId: response['previewTopicId']?.toString() ?? '',
-        userId: response['userId']?.toString(),
-        username: response['username']?.toString(),
-        userState: response['userState']?.toString(),
-        requiresEmailConfirmation: response['requiresEmailConfirmation'] as bool?,
-        requiresManualApproval: response['requiresManualApproval'] as bool?,
-        message: response['message']?.toString(),
+      await apiPut(
+        '/u/${Uri.encodeComponent(username)}/preferences/email.json',
+        body: {'email': newEmail},
+      );
+      // Discourse sends a confirmation email to the new address; the
+      // change isn't live until the user clicks the link.
+      return FCUpdateEmailResult(
+        result: true,
+        resultText:
+            'A confirmation email has been sent to the new address.',
       );
     } catch (e) {
-      print('❌ [DISCOURSE_ACCOUNT] register error: $e');
-      return FCRegisterResult(
-        result: false,
-        resultText: 'Registration failed: $e',
-      );
+      return FCUpdateEmailResult(result: false, resultText: 'Error: $e');
     }
   }
 
   @override
-  Future<FCSigninResult> signinLogin(String token, String code, String? trustCode) {
-    // TODO: implement signinLogin
-    throw UnimplementedError();
+  Future<FCUpdatePasswordResult> updatePassword(
+      String oldPassword, String newPassword) async {
+    // Discourse's mobile-friendly password change is "send me a reset
+    // email", reachable via POST /u/{username}/preferences/password.json.
+    // Inline password change requires a webview to /my/preferences/account.
+    final username = siteContext.currentUsername;
+    if (username == null || username.isEmpty) {
+      return FCUpdatePasswordResult(
+          result: false, resultText: 'Not logged in');
+    }
+    try {
+      await apiPost(
+        '/u/${Uri.encodeComponent(username)}/preferences/password.json',
+      );
+      return FCUpdatePasswordResult(
+        result: true,
+        resultText: 'A password-reset email has been sent.',
+      );
+    } catch (e) {
+      return FCUpdatePasswordResult(result: false, resultText: 'Error: $e');
+    }
   }
 
   @override
-  Future<FCSigninResult> signinLoginWithEmail(String token, String code, String email, String? trustCode) {
-    // TODO: implement signinLoginWithEmail
-    throw UnimplementedError();
-  }
+  Future<FCUpdatePasswordSSOResult> updatePasswordSSO(
+          String newPassword, String token, String code) async =>
+      FCUpdatePasswordSSOResult(
+          result: false, resultText: 'Not supported on Discourse');
 
   @override
-  Future<FCSigninResult> signinLoginWithUsername(String token, String code, String email, String username, String? trustCode) {
-    // TODO: implement signinLoginWithUsername
-    throw UnimplementedError();
+  Future<FCUpdateProfileResult> updateProfile(
+      String userId, Map<String, dynamic> customFields) async {
+    // Discourse: PUT /u/{username}.json accepts bio_raw, location,
+    // website, name, custom_fields[<key>]. We forward keys verbatim;
+    // unknown keys are silently dropped by the server.
+    final username = siteContext.currentUsername;
+    if (username == null || username.isEmpty) {
+      return FCUpdateProfileResult(
+          result: false, resultText: 'Not logged in');
+    }
+    try {
+      await apiPut(
+        '/u/${Uri.encodeComponent(username)}.json',
+        body: customFields,
+      );
+      return FCUpdateProfileResult(result: true, resultText: '');
+    } catch (e) {
+      return FCUpdateProfileResult(result: false, resultText: 'Error: $e');
+    }
   }
 
-  @override
-  Future<FCSigninResult> signinRegister(String token, String code, String email, String username, String password, {Map<String, dynamic>? customRegisterFields}) {
-    // TODO: implement signinRegister
-    throw UnimplementedError();
-  }
+  // ===== Settings categories =====
+  //
+  // The XF SDK exposes settings as XF-style categories; Discourse exposes
+  // preferences as a flat structure on `/u/{username}.json#user_option`.
+  // For v1 we surface an empty category list so the settings page
+  // renders cleanly without crashing. Phase 2.x can wire a curated
+  // Discourse-preferences screen when there's UI demand.
 
-  @override
-  Future<FCUpdateEmailResult> updateEmail(String password, String newEmail) {
-    // TODO: implement updateEmail
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<FCUpdatePasswordResult> updatePassword(String oldPassword, String newPassword) {
-    // TODO: implement updatePassword
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<FCUpdatePasswordSSOResult> updatePasswordSSO(String newPassword, String token, String code) {
-    // TODO: implement updatePasswordSSO
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<FCUpdateProfileResult> updateProfile(String userId, Map<String, dynamic> customFields) {
-    // TODO: implement updateProfile
-    throw UnimplementedError();
-  }
-
-  /// Get list of available settings categories
   Future<FCUserSettingsCategoriesResult> getUserSettingsCategories() async {
-    print('✅ [DISCOURSE_ACCOUNT] getUserSettingsCategories called via plugin API');
-
-    try {
-      final response = await callPluginApi('getUserSettingsCategories', {});
-
-      print('   📥 [DISCOURSE_ACCOUNT] getUserSettingsCategories response keys: ${response.keys.toList()}');
-
-      // Parse categories
-      List<FCSettingsCategory> categories = [];
-      if (response['categories'] != null) {
-        final categoriesList = response['categories'] as List<dynamic>;
-        categories = categoriesList.map((catData) {
-          final map = catData as Map<String, dynamic>;
-          return FCSettingsCategory(
-            key: map['key']?.toString() ?? '',
-            displayName: map['displayName']?.toString() ?? '',
-            description: map['description']?.toString() ?? '',
-            enabled: map['enabled'] as bool? ?? false,
-          );
-        }).toList();
-      }
-
-      return FCUserSettingsCategoriesResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString(),
-        categories: categories,
-      );
-    } catch (e) {
-      print('❌ [DISCOURSE_ACCOUNT] getUserSettingsCategories error: $e');
-      return FCUserSettingsCategoriesResult(
-        result: false,
-        resultText: 'Error fetching settings categories: $e',
-        categories: [],
-      );
-    }
+    return FCUserSettingsCategoriesResult(
+      result: true,
+      resultText: '',
+      categories: const <FCSettingsCategory>[],
+    );
   }
 
-  /// Get settings for a specific category
   Future<FCUserSettingsResult> getUserSettings(String category) async {
-    print('✅ [DISCOURSE_ACCOUNT] getUserSettings called via plugin API');
-    print('   📋 Parameters: category=$category');
-
-    try {
-      final response = await callPluginApi('getUserSettings', {
-        'category': category,
-      });
-
-      print('   📥 [DISCOURSE_ACCOUNT] getUserSettings response keys: ${response.keys.toList()}');
-
-      // Parse settings
-      List<FCUserSetting> settings = [];
-      if (response['settings'] != null) {
-        final settingsList = response['settings'] as List<dynamic>;
-        settings = settingsList.map((settingData) {
-          return _parseUserSetting(settingData as Map<String, dynamic>);
-        }).toList();
-      }
-
-      return FCUserSettingsResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString(),
-        category: response['category']?.toString() ?? category,
-        enabled: response['enabled'] as bool? ?? false,
-        settings: settings,
-      );
-    } catch (e) {
-      print('❌ [DISCOURSE_ACCOUNT] getUserSettings error: $e');
-      return FCUserSettingsResult(
-        result: false,
-        resultText: 'Error fetching settings: $e',
-        category: category,
-        enabled: false,
-        settings: [],
-      );
-    }
+    return FCUserSettingsResult(
+      result: true,
+      resultText: '',
+      category: category,
+      enabled: false,
+      settings: const <FCUserSetting>[],
+    );
   }
 
-  /// Update settings for a specific category
   Future<FCUserSettingsResult> updateUserSettings(
     String category,
     Map<String, dynamic> settings,
   ) async {
-    print('✅ [DISCOURSE_ACCOUNT] updateUserSettings called via plugin API');
-    print('   📋 Parameters: category=$category, settings keys: ${settings.keys.toList()}');
-
-    try {
-      final response = await callPluginApi('updateUserSettings', {
-        'category': category,
-        'settings': settings,
-      });
-
-      print('   📥 [DISCOURSE_ACCOUNT] updateUserSettings response keys: ${response.keys.toList()}');
-
-      // Parse updated settings
-      List<FCUserSetting> updatedSettings = [];
-      if (response['settings'] != null) {
-        final settingsList = response['settings'] as List<dynamic>;
-        updatedSettings = settingsList.map((settingData) {
-          return _parseUserSetting(settingData as Map<String, dynamic>);
-        }).toList();
-      }
-
-      return FCUserSettingsResult(
-        result: response['result'] ?? false,
-        resultText: response['resultText']?.toString(),
-        category: response['category']?.toString() ?? category,
-        enabled: response['enabled'] as bool? ?? false,
-        settings: updatedSettings,
-      );
-    } catch (e) {
-      print('❌ [DISCOURSE_ACCOUNT] updateUserSettings error: $e');
-      return FCUserSettingsResult(
-        result: false,
-        resultText: 'Error updating settings: $e',
-        category: category,
-        enabled: false,
-        settings: [],
-      );
-    }
-  }
-
-  /// Parse a user setting from API response
-  FCUserSetting _parseUserSetting(Map<String, dynamic> map) {
-    // Helper function to safely convert to int
-    int? _parseInt(dynamic value) {
-      if (value == null) return null;
-      if (value is int) return value;
-      if (value is String) {
-        final parsed = int.tryParse(value);
-        return parsed;
-      }
-      return null;
-    }
-
-    // Helper function to safely convert to num
-    num? _parseNum(dynamic value) {
-      if (value == null) return null;
-      if (value is num) return value;
-      if (value is String) {
-        final parsed = num.tryParse(value);
-        return parsed;
-      }
-      return null;
-    }
-
-    // Parse choices
-    Map<String, String>? choices;
-    if (map['choices'] != null) {
-      if (map['choices'] is Map) {
-        choices = Map<String, String>.from(
-          (map['choices'] as Map).map((k, v) => MapEntry(k.toString(), v.toString())),
-        );
-      }
-    }
-
-    // Parse dependency
-    FCSettingDependency? dependsOn;
-    if (map['dependsOn'] != null) {
-      final depMap = map['dependsOn'] as Map<String, dynamic>;
-      dependsOn = FCSettingDependency(
-        key: depMap['key']?.toString() ?? '',
-        value: depMap['value'],
-      );
-    }
-
-    return FCUserSetting(
-      fieldId: map['fieldId']?.toString() ?? '',
-      title: map['title']?.toString() ?? '',
-      description: map['description']?.toString() ?? '',
-      fieldType: map['fieldType']?.toString() ?? '',
-      dataType: map['dataType']?.toString() ?? '',
-      value: map['value'],
-      defaultValue: map['default'],
-      choices: choices,
-      required: map['required'] as bool? ?? false,
-      readOnly: map['readOnly'] as bool? ?? false,
-      maxLength: _parseInt(map['maxLength']),
-      matchType: map['matchType']?.toString(),
-      matchParams: map['matchParams'] as Map<String, dynamic>?,
-      min: _parseNum(map['min']),
-      max: _parseNum(map['max']),
-      pattern: map['pattern']?.toString(),
-      placeholder: map['placeholder']?.toString(),
-      displayOrder: _parseInt(map['displayOrder']) ?? 0,
-      group: map['group']?.toString(),
-      dependsOn: dependsOn,
+    return FCUserSettingsResult(
+      result: true,
+      resultText: '',
+      category: category,
+      enabled: false,
+      settings: const <FCUserSetting>[],
     );
   }
 }
+
+// `FCRegistrationRequirements` parsing helpers were removed alongside
+// the in-app registration path. If the SDK ever grows a Discourse-shaped
+// signup contract, they can be reintroduced here.
