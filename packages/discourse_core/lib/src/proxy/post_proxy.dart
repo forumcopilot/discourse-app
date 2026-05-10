@@ -11,6 +11,7 @@ import 'package:forumcopilot_sdk/models/results/fc_post_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../data/post/discourse_bookmark.dart';
+import '../data/post/discourse_suggested_topic.dart';
 
 /// Discourse implementation of [IFCPostProxy].
 ///
@@ -685,6 +686,65 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       return null;
     } catch (_) {
       return null;
+    }
+  }
+
+  /// Discourse-only: fetch the "Suggested Topics" Discourse appends to
+  /// every topic page response. Re-fetches `/t/{id}.json` once; the
+  /// suggestions array isn't included in any other endpoint we call.
+  Future<List<DiscourseSuggestedTopic>> getSuggestedTopicsAsync(
+      String topicId) async {
+    if (topicId.isEmpty) return const [];
+    try {
+      final t = await apiGet('/t/$topicId.json');
+      // Build a user-id → user-record lookup so we can resolve last
+      // posters when Discourse only inlines `posters` (a list of
+      // `{user_id, description}`) on each suggested topic.
+      final users = <int, Map<String, dynamic>>{};
+      for (final raw in ((t['users'] as List?) ?? const []).whereType<Map>()) {
+        final u = raw.cast<String, dynamic>();
+        final id = u['id'];
+        if (id is int) users[id] = u;
+      }
+      final suggested = (t['suggested_topics'] as List?) ?? const [];
+      final out = <DiscourseSuggestedTopic>[];
+      for (final raw in suggested.whereType<Map>()) {
+        final s = raw.cast<String, dynamic>();
+        Map<String, dynamic>? lastUser;
+        final posters = (s['posters'] as List?) ?? const [];
+        for (final p in posters.whereType<Map>()) {
+          // The "last poster" entry has 'Most Recent Poster' in
+          // description on stock Discourse.
+          final desc = (p['description'] ?? '').toString();
+          if (desc.contains('Most Recent Poster')) {
+            final uid = p['user_id'] as int?;
+            if (uid != null) lastUser = users[uid];
+            break;
+          }
+        }
+        // Fallback: use the first poster if no "most recent" tag.
+        if (lastUser == null && posters.isNotEmpty) {
+          final uid = (posters.first as Map)['user_id'] as int?;
+          if (uid != null) lastUser = users[uid];
+        }
+        out.add(DiscourseSuggestedTopic(
+          id: (s['id'] as num).toInt(),
+          title: (s['fancy_title'] ?? s['title'] ?? '').toString(),
+          slug: s['slug']?.toString(),
+          postsCount: (s['posts_count'] as num?)?.toInt(),
+          lastActivity:
+              DateTime.tryParse(s['bumped_at']?.toString() ?? '') ??
+                  DateTime.tryParse(s['last_posted_at']?.toString() ?? ''),
+          lastPosterUsername: lastUser?['username']?.toString(),
+          lastPosterAvatarTemplate:
+              lastUser?['avatar_template']?.toString(),
+          hasUnread: (s['unread_posts'] as int? ?? 0) > 0,
+          isNew: s['unseen'] == true,
+        ));
+      }
+      return out;
+    } catch (_) {
+      return const [];
     }
   }
 

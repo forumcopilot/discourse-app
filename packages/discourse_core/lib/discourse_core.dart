@@ -41,6 +41,7 @@ export 'src/data/auth/oauth_token.dart';
 export 'src/data/auth/auth_request.dart';
 export 'src/data/auth/auth_response.dart';
 export 'src/data/post/discourse_bookmark.dart';
+export 'src/data/post/discourse_suggested_topic.dart';
 
 // Converters
 export 'src/converter/discourse_user_converter.dart';

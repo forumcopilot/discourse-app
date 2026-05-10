@@ -11,6 +11,7 @@ import 'package:forumcopilot_flutter/views/widgets/post_actions.dart';
 import 'package:forumcopilot_flutter/views/widgets/image_actions.dart';
 import 'package:forumcopilot_flutter/views/widgets/avatar_actions.dart';
 import 'package:forumcopilot_flutter/views/widgets/thread_poll_mini_card.dart';
+import 'package:forumcopilot_flutter/views/widgets/suggested_topics_card.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -1032,10 +1033,20 @@ class _PostsState extends State<PostsList> {
     if (postIndex == postsListLength - 1) {
       // Add padding equal to the toolbar height so the last post can scroll above it
       final double toolbarHeight = _getBottomToolbarHeight(context);
+      // Discourse appends a "Suggested Topics" footer below the last
+      // post — only render once we know there are no more posts to
+      // page in (otherwise the suggestion card would jump as new posts
+      // load above it).
+      final showSuggested = !_hasMorePosts;
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           postWidget,
+          if (showSuggested)
+            SuggestedTopicsCard(
+              siteContext: widget.siteContext,
+              topicId: widget.topicId,
+            ),
           SizedBox(height: toolbarHeight),
         ],
       );
