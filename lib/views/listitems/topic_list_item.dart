@@ -1,4 +1,3 @@
-import 'package:discourse_core/discourse_core.dart' show DiscourseTopicTags;
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
@@ -166,12 +165,11 @@ class TopicListItem extends StatelessWidget {
                 ],
               ),
             ),
-            // Discourse tags (chips below the title). DiscourseTopicTags
-            // returns const [] for non-Discourse forums, so this row is
-            // automatically hidden in those cases.
+            // Topic tags (chips below the title). Empty list on
+            // non-Discourse forums or topics without tags hides the row.
             Builder(
               builder: (context) {
-                final tags = DiscourseTopicTags.of(topic);
+                final tags = topic.tags;
                 if (tags.isEmpty) return const SizedBox.shrink();
                 return Padding(
                   padding: EdgeInsets.fromLTRB(

@@ -82,6 +82,7 @@ class FCThreadResult extends FCTopic with FCThreadResultMappable {
     bool canThank = false,
     bool hasPoll = false,
     FCPoll? poll,
+    List<String> tags = const [],
   }) : super(
           id: id,
           title: title,
@@ -128,6 +129,7 @@ class FCThreadResult extends FCTopic with FCThreadResultMappable {
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
+          tags: tags,
         );
 }
 
@@ -216,6 +218,7 @@ class FCThreadByUnreadResult extends FCTopic with FCThreadByUnreadResultMappable
     bool canThank = false,
     bool hasPoll = false,
     FCPoll? poll,
+    List<String> tags = const [],
   }) : super(
           id: id,
           title: title,
@@ -262,6 +265,7 @@ class FCThreadByUnreadResult extends FCTopic with FCThreadByUnreadResultMappable
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
+          tags: tags,
         );
 }
 
@@ -350,6 +354,7 @@ class FCThreadByPostResult extends FCTopic with FCThreadByPostResultMappable {
     bool canThank = false,
     bool hasPoll = false,
     FCPoll? poll,
+    List<String> tags = const [],
   }) : super(
           id: id,
           title: title,
@@ -396,6 +401,7 @@ class FCThreadByPostResult extends FCTopic with FCThreadByPostResultMappable {
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
+          tags: tags,
         );
 }
 
@@ -605,6 +611,7 @@ class FCAnnouncementResult extends FCTopic with FCAnnouncementResultMappable {
     bool canThank = false,
     bool hasPoll = false,
     FCPoll? poll,
+    List<String> tags = const [],
   }) : super(
           id: id,
           title: title,
@@ -651,5 +658,6 @@ class FCAnnouncementResult extends FCTopic with FCAnnouncementResultMappable {
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
+          tags: tags,
         );
 }

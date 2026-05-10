@@ -7,9 +7,6 @@
 // Factory
 export 'factory/discourse_proxy_factory.dart';
 
-// Discourse-native concepts that aren't modeled on the SDK's FC* types
-export 'src/topic_tags.dart';
-
 // Core proxies
 export 'src/proxy/config_proxy.dart';
 export 'src/proxy/account_proxy.dart';

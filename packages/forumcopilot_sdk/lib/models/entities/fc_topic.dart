@@ -113,6 +113,11 @@ class FCTopic with FCTopicMappable {
   /// Full poll data when thread has a poll; null otherwise. Only present in thread responses.
   FCPoll? poll;
 
+  /// Topic tags. First-class on Discourse (`tags:[...]` on every topic JSON);
+  /// XF-flavored implementations leave this empty. UI surfaces these as
+  /// chips below the topic title.
+  List<String> tags;
+
   FCTopic({
     required this.id,
     required this.title,
@@ -163,5 +168,6 @@ class FCTopic with FCTopicMappable {
     this.canThank = false,
     this.hasPoll = false,
     this.poll,
+    this.tags = const [],
   });
 }

@@ -566,6 +566,7 @@ abstract class FCThreadResultCopyWith<$R, $In extends FCThreadResult, $Out>
     bool? canThank,
     bool? hasPoll,
     FCPoll? poll,
+    List<String>? tags,
   });
   FCThreadResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -648,6 +649,7 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
     bool? canThank,
     bool? hasPoll,
     Object? poll = $none,
+    List<String>? tags,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -700,6 +702,7 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
       if (canThank != null) #canThank: canThank,
       if (hasPoll != null) #hasPoll: hasPoll,
       if (poll != $none) #poll: poll,
+      if (tags != null) #tags: tags,
     }),
   );
   @override
@@ -756,6 +759,7 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
     canThank: data.get(#canThank, or: $value.canThank),
     hasPoll: data.get(#hasPoll, or: $value.hasPoll),
     poll: data.get(#poll, or: $value.poll),
+    tags: data.get(#tags, or: $value.tags),
   );
 
   @override
@@ -1342,6 +1346,7 @@ abstract class FCThreadByUnreadResultCopyWith<
     bool? canThank,
     bool? hasPoll,
     FCPoll? poll,
+    List<String>? tags,
   });
   FCThreadByUnreadResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -1426,6 +1431,7 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
     bool? canThank,
     bool? hasPoll,
     Object? poll = $none,
+    List<String>? tags,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -1479,6 +1485,7 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
       if (canThank != null) #canThank: canThank,
       if (hasPoll != null) #hasPoll: hasPoll,
       if (poll != $none) #poll: poll,
+      if (tags != null) #tags: tags,
     }),
   );
   @override
@@ -1536,6 +1543,7 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
     canThank: data.get(#canThank, or: $value.canThank),
     hasPoll: data.get(#hasPoll, or: $value.hasPoll),
     poll: data.get(#poll, or: $value.poll),
+    tags: data.get(#tags, or: $value.tags),
   );
 
   @override
@@ -2121,6 +2129,7 @@ abstract class FCThreadByPostResultCopyWith<
     bool? canThank,
     bool? hasPoll,
     FCPoll? poll,
+    List<String>? tags,
   });
   FCThreadByPostResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -2204,6 +2213,7 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
     bool? canThank,
     bool? hasPoll,
     Object? poll = $none,
+    List<String>? tags,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -2257,6 +2267,7 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
       if (canThank != null) #canThank: canThank,
       if (hasPoll != null) #hasPoll: hasPoll,
       if (poll != $none) #poll: poll,
+      if (tags != null) #tags: tags,
     }),
   );
   @override
@@ -2314,6 +2325,7 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
     canThank: data.get(#canThank, or: $value.canThank),
     hasPoll: data.get(#hasPoll, or: $value.hasPoll),
     poll: data.get(#poll, or: $value.poll),
+    tags: data.get(#tags, or: $value.tags),
   );
 
   @override
@@ -3881,6 +3893,7 @@ abstract class FCAnnouncementResultCopyWith<
     bool? canThank,
     bool? hasPoll,
     FCPoll? poll,
+    List<String>? tags,
   });
   FCAnnouncementResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -3965,6 +3978,7 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
     bool? canThank,
     bool? hasPoll,
     Object? poll = $none,
+    List<String>? tags,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -4020,6 +4034,7 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
       if (canThank != null) #canThank: canThank,
       if (hasPoll != null) #hasPoll: hasPoll,
       if (poll != $none) #poll: poll,
+      if (tags != null) #tags: tags,
     }),
   );
   @override
@@ -4084,6 +4099,7 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
     canThank: data.get(#canThank, or: $value.canThank),
     hasPoll: data.get(#hasPoll, or: $value.hasPoll),
     poll: data.get(#poll, or: $value.poll),
+    tags: data.get(#tags, or: $value.tags),
   );
 
   @override

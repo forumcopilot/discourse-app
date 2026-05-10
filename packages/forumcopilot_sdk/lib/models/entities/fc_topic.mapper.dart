@@ -306,6 +306,13 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     _$poll,
     opt: true,
   );
+  static List<String> _$tags(FCTopic v) => v.tags;
+  static const Field<FCTopic, List<String>> _f$tags = Field(
+    'tags',
+    _$tags,
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<FCTopic> fields = const {
@@ -354,6 +361,7 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     #canThank: _f$canThank,
     #hasPoll: _f$hasPoll,
     #poll: _f$poll,
+    #tags: _f$tags,
   };
 
   static FCTopic _instantiate(DecodingData data) {
@@ -403,6 +411,7 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
       canThank: data.dec(_f$canThank),
       hasPoll: data.dec(_f$hasPoll),
       poll: data.dec(_f$poll),
+      tags: data.dec(_f$tags),
     );
   }
 
@@ -512,6 +521,7 @@ abstract class FCTopicCopyWith<$R, $In extends FCTopic, $Out>
     bool? canThank,
     bool? hasPoll,
     FCPoll? poll,
+    List<String>? tags,
   });
   FCTopicCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -581,6 +591,7 @@ class _FCTopicCopyWithImpl<$R, $Out>
     bool? canThank,
     bool? hasPoll,
     Object? poll = $none,
+    List<String>? tags,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -629,6 +640,7 @@ class _FCTopicCopyWithImpl<$R, $Out>
       if (canThank != null) #canThank: canThank,
       if (hasPoll != null) #hasPoll: hasPoll,
       if (poll != $none) #poll: poll,
+      if (tags != null) #tags: tags,
     }),
   );
   @override
@@ -681,6 +693,7 @@ class _FCTopicCopyWithImpl<$R, $Out>
     canThank: data.get(#canThank, or: $value.canThank),
     hasPoll: data.get(#hasPoll, or: $value.hasPoll),
     poll: data.get(#poll, or: $value.poll),
+    tags: data.get(#tags, or: $value.tags),
   );
 
   @override
