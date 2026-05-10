@@ -479,6 +479,64 @@ puts "\n[7/9] Bookmarks…"
 end
 
 # ----------------------------------------------------------------------
+# 7b. Reactions (Phase 5.11) — only when discourse-reactions installed
+# ----------------------------------------------------------------------
+
+puts "\n[7b] Reactions…"
+
+# Enable the plugin if the constant is loaded but the setting is off.
+if defined?(DiscourseReactions) &&
+   SiteSetting.respond_to?(:discourse_reactions_enabled) &&
+   !SiteSetting.discourse_reactions_enabled
+  SiteSetting.discourse_reactions_enabled = true
+  puts "  · flipped discourse_reactions_enabled = true"
+end
+
+reactions_plugin_loaded =
+  defined?(DiscourseReactions) &&
+  SiteSetting.respond_to?(:discourse_reactions_enabled) &&
+  SiteSetting.discourse_reactions_enabled
+
+if reactions_plugin_loaded
+  begin
+    # Pre-seed a few emoji reactions on the bookmark topic + the poll
+    # topic so the chips row has something to render in the app.
+    # Use Discourse's stock enabled-reaction set. Anything outside the
+    # SiteSetting.discourse_reactions_enabled_reactions list raises
+    # "Invalid reaction".
+    reaction_seeds = [
+      [users[:bob],   topic_solved.posts.where(user_id: users[:alice].id).first, 'heart'],
+      [users[:eve],   topic_solved.posts.where(user_id: users[:alice].id).first, 'clap'],
+      [users[:carol], topic_solved.posts.where(user_id: users[:alice].id).first, 'clap'],
+      [users[:alice], topic_with_poll.posts.first,                                'confetti_ball'],
+      [users[:bob],   topic_with_poll.posts.first,                                'heart']
+    ]
+    reaction_seeds.each do |user, post, value|
+      next unless post
+
+      next if DiscourseReactions::ReactionUser
+                .joins(:reaction)
+                .where(user_id: user.id,
+                       post_id: post.id,
+                       discourse_reactions_reactions: { reaction_value: value })
+                .exists?
+
+      manager = DiscourseReactions::ReactionManager.new(
+        reaction_value: value,
+        user: user,
+        post: post
+      )
+      manager.toggle!
+      puts "  + @#{user.username} reacted :#{value}: on “#{post.topic.title.truncate(40)}”"
+    end
+  rescue => e
+    puts "  ! reaction seeding skipped: #{e.message}"
+  end
+else
+  puts "  - discourse-reactions plugin not installed, skipping"
+end
+
+# ----------------------------------------------------------------------
 # 8. Badges (Phase 5.7) + follows (Phase 5.8) + notification levels (5.4)
 # ----------------------------------------------------------------------
 

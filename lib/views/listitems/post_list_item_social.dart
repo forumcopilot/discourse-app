@@ -16,6 +16,10 @@ class PostListItemSocial extends StatelessWidget {
   final int likeCount;
   final bool isLoggedIn;
   final VoidCallback? onLike;
+  /// Optional long-press on the like button. Used on Discourse to open
+  /// the discourse-reactions picker so the user can pick any emoji
+  /// instead of just like.
+  final VoidCallback? onLongPressLike;
   final VoidCallback? onShowLikes;
   final bool isBookmarked;
   final VoidCallback? onBookmark;
@@ -28,6 +32,7 @@ class PostListItemSocial extends StatelessWidget {
     required this.likeCount,
     this.isLoggedIn = false,
     this.onLike,
+    this.onLongPressLike,
     this.onShowLikes,
     this.isBookmarked = false,
     this.onBookmark,
@@ -154,20 +159,32 @@ class PostListItemSocial extends StatelessWidget {
               Builder(
                 builder: (context) {
                   final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-                  final iconColor = isLiked 
-                      ? colorScheme.error 
+                  final iconColor = isLiked
+                      ? colorScheme.error
                       : colorScheme.onSurfaceVariant.withOpacity(isDarkMode ? 0.4 : 0.5);
-                  return AccessibilityHelpers.accessibleIconButton(
+                  final likeButton = AccessibilityHelpers.accessibleIconButton(
                     icon: Icon(
                       Icons.favorite,
                       color: iconColor,
                       size: DesignTokens.iconSizeMedium,
                     ),
                     onTap: onLike,
-                    label: AccessibilityHelpers.getLikeButtonLabel(context, isLiked, likeCount),
+                    label: AccessibilityHelpers.getLikeButtonLabel(
+                        context, isLiked, likeCount),
                     isSelected: isLiked,
                     context: context,
                   );
+                  // When the discourse-reactions picker is wired,
+                  // long-press opens the full emoji picker. Tapping
+                  // still toggles like. Falls back to plain tap on
+                  // non-Discourse forums.
+                  if (onLongPressLike != null) {
+                    return GestureDetector(
+                      onLongPress: onLongPressLike,
+                      child: likeButton,
+                    );
+                  }
+                  return likeButton;
                 },
               ),
             ],

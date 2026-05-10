@@ -4,6 +4,8 @@ import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import '../widgets/custom_bb_stylesheet.dart' show BBCodeCallbacks;
 import '../widgets/rich_text_content.dart';
+import '../widgets/reaction_chips_row.dart';
+import '../widgets/reaction_picker_sheet.dart';
 import '../widgets/link_preview_card.dart';
 import '../widgets/video_card.dart';
 import '../widgets/full_screen_video_viewer.dart';
@@ -147,6 +149,11 @@ class _PostListItemState extends State<PostListItem> {
   late int _likeCount; // Add local state for like count
   late final PostActionsHandler _postActionsHandler;
 
+  // discourse-reactions sidecar copy. Mirrors what DiscoursePostProxy
+  // stamped on the FCPost at parse time; mutated locally on toggle so
+  // the chips row updates without a full thread refetch.
+  late List<DiscourseReaction> _reactions;
+
   @override
   void initState() {
     super.initState();
@@ -158,6 +165,8 @@ class _PostListItemState extends State<PostListItem> {
     _isLiked = widget.post.isLiked;
     _likeCount = widget.post.likesInfo.length;
     _isBookmarked = widget.post.bookmarked;
+    _reactions =
+        List.of(DiscoursePostProxy.reactionsFor(widget.post), growable: false);
   }
 
   /// Checks if a URL is a mention link (link text starts with @ and has no spaces)
@@ -604,12 +613,21 @@ class _PostListItemState extends State<PostListItem> {
           ],
           // Discourse posts arrive as server-rendered HTML in the
           // `cooked` field, so we render it directly with flutter_html
-                  // via RichTextContent — the BBCode pipeline is XF-only.
+          // via RichTextContent — the BBCode pipeline is XF-only.
           RichTextContent(
             siteContext: widget.siteContext,
             content: widget.translatedContent ?? widget.post.content,
             callbacks: callbacks,
           ),
+          // discourse-reactions chips (hidden when the plugin isn't
+          // installed or no reactions exist on this post). Tap toggles
+          // the viewer's reaction; long-press on the like button opens
+          // the full picker for other emojis.
+          if (_reactions.isNotEmpty)
+            ReactionChipsRow(
+              reactions: _reactions,
+              onTap: _toggleReaction,
+            ),
           if (data.limitedYoutubeUrls.isNotEmpty) ...[
             const SizedBox(height: DesignTokens.spacingM),
             StyleBuilders.divider(colorScheme: colorScheme),
@@ -659,6 +677,7 @@ class _PostListItemState extends State<PostListItem> {
             likeCount: _likeCount,
             isLoggedIn: widget.siteContext.isLoggedIn,
             onLike: _handleLikeAction,
+            onLongPressLike: _openReactionPicker,
             onShowLikes: _showLikesBottomSheet,
             isBookmarked: _isBookmarked,
             onBookmark: _handleBookmarkAction,
@@ -945,5 +964,62 @@ class _PostListItemState extends State<PostListItem> {
         ),
       );
     }
+  }
+
+  /// Toggle a specific reaction by id (called from the chips row when
+  /// the user taps an existing chip). When [reactionId] is the
+  /// viewer's current reaction, the server removes it; otherwise it
+  /// becomes the viewer's reaction (replacing any previous one).
+  Future<void> _toggleReaction(String reactionId) async {
+    if (!widget.siteContext.isLoggedIn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to react')),
+      );
+      return;
+    }
+    final proxy = SiteProxyService.getPostProxy();
+    if (proxy is! DiscoursePostProxy) return;
+    final updated =
+        await proxy.toggleReactionAsync(widget.post.id, reactionId);
+    if (!mounted) return;
+    if (updated == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Could not update reaction.')),
+      );
+      return;
+    }
+    setState(() {
+      _reactions = updated;
+      DiscoursePostProxy.setReactionsFor(widget.post, updated);
+    });
+  }
+
+  /// Open the full reaction picker. Reachable from a long-press on the
+  /// like button (added below) so users can pick any of the forum's
+  /// enabled emojis, not just the ones already showing.
+  Future<void> _openReactionPicker() async {
+    if (!widget.siteContext.isLoggedIn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to react')),
+      );
+      return;
+    }
+    final current = _reactions
+        .firstWhere(
+          (r) => r.viewerReacted,
+          orElse: () => const DiscourseReaction(id: '', count: 0),
+        )
+        .id;
+    final updated = await ReactionPickerSheet.show(
+      context: context,
+      postId: widget.post.id,
+      currentReactionId: current.isEmpty ? null : current,
+    );
+    if (updated == null || !mounted) return;
+    setState(() {
+      _reactions = updated;
+      DiscoursePostProxy.setReactionsFor(widget.post, updated);
+    });
   }
 }

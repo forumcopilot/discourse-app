@@ -11,6 +11,7 @@ import 'package:forumcopilot_sdk/models/results/fc_post_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../data/post/discourse_bookmark.dart';
+import '../data/post/discourse_reaction.dart';
 import '../data/post/discourse_suggested_topic.dart';
 
 /// Discourse implementation of [IFCPostProxy].
@@ -35,6 +36,13 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   /// poll's name (default 'poll'). We stash both here at parse time so
   /// the vote call doesn't need to refetch the topic.
   static final Expando<_DiscoursePollMeta> _pollMeta = Expando('pollMeta');
+
+  /// Sidecar that carries [discourse-reactions] data per parsed FCPost.
+  /// Same pattern as [_pollMeta] — avoids mapper edits on FCPost while
+  /// still letting UI code recover the typed reaction list via
+  /// [reactionsFor].
+  static final Expando<List<DiscourseReaction>> _reactions =
+      Expando('reactions');
 
   @override
   Future<FCThreadResult> getThreadAsync(
@@ -689,6 +697,61 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     }
   }
 
+  /// Discourse-only: toggle an emoji reaction on [postId] using the
+  /// `discourse-reactions` plugin. [reactionValue] is the reaction's
+  /// shortcode (e.g. "heart", "tada", "+1"). Returns the updated post's
+  /// reactions on success (parsed from the response), or null on
+  /// failure (e.g. plugin not installed → 404).
+  Future<List<DiscourseReaction>?> toggleReactionAsync(
+      String postId, String reactionValue) async {
+    final pid = int.tryParse(postId);
+    if (pid == null) return null;
+    try {
+      final response = await apiPut(
+        '/discourse-reactions/posts/$pid/custom-reactions/'
+        '${Uri.encodeComponent(reactionValue)}/toggle.json',
+      );
+      // The plugin echoes the full updated post serializer; rebuild the
+      // reaction list from that.
+      return _parseReactions(response.cast<String, dynamic>());
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Discourse-only: list the emoji reactions the forum has enabled
+  /// (admin setting). Returns the configured shortcodes in display
+  /// order, plus the main reaction id (`heart` on stock) at the front
+  /// so the UI can pin it as the "default like".
+  ///
+  /// Falls back to a small built-in set if the endpoint 404s (plugin
+  /// absent) so the picker can degrade gracefully.
+  Future<List<String>> getAvailableReactionsAsync() async {
+    try {
+      final response = await apiGet('/discourse-reactions/custom-reactions');
+      final reactions =
+          ((response['reactions'] as List?) ?? const []).whereType<String>();
+      if (reactions.isEmpty) return _defaultReactions;
+      return reactions.toList(growable: false);
+    } catch (_) {
+      return _defaultReactions;
+    }
+  }
+
+  // Stock discourse-reactions enabled set on a fresh install. Used as a
+  // fallback so the picker shows something usable while the
+  // /custom-reactions endpoint is unreachable.
+  static const List<String> _defaultReactions = [
+    'heart',
+    '+1',
+    'laughing',
+    'open_mouth',
+    'clap',
+    'tada',
+    'rocket',
+    'eyes',
+  ];
+
   /// Discourse-only: fetch the "Suggested Topics" Discourse appends to
   /// every topic page response. Re-fetches `/t/{id}.json` once; the
   /// suggestions array isn't included in any other endpoint we call.
@@ -793,7 +856,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     final canLike = like['can_act'] == true;
     final likeCount = (like['count'] as int?) ?? 0;
 
-    return FCPost(
+    final post = FCPost(
       id: (p['id'] ?? '').toString(),
       title: '',
       // Discourse returns rendered HTML in `cooked`. The inherited UI is a
@@ -830,6 +893,41 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       inlineAttachments: <FCAttachment>[],
       thanksInfo: <FCThanks>[],
     );
+
+    // Stash discourse-reactions data via the Expando sidecar (no FCPost
+    // mapper edit needed). Returns an empty list when the plugin isn't
+    // installed — the post JSON simply won't have a `reactions` field.
+    _reactions[post] = _parseReactions(p);
+    return post;
+  }
+
+  /// Public accessor for reactions on a parsed [FCPost]. Returns an
+  /// empty list when no reactions were attached (plugin absent, post
+  /// hasn't been parsed by this proxy, or just no reactions yet).
+  static List<DiscourseReaction> reactionsFor(FCPost post) =>
+      _reactions[post] ?? const [];
+
+  /// Replace the reactions sidecar for [post] (used by UI after a
+  /// successful toggle so subsequent reads reflect server truth).
+  static void setReactionsFor(FCPost post, List<DiscourseReaction> next) {
+    _reactions[post] = next;
+  }
+
+  List<DiscourseReaction> _parseReactions(Map<String, dynamic> p) {
+    final raw = (p['reactions'] as List?) ?? const [];
+    if (raw.isEmpty) return const [];
+    final current = (p['current_user_reaction'] as Map?)?.cast<String, dynamic>();
+    final viewerId = current?['id']?.toString();
+    final canUndo = current?['can_undo'] == true;
+    return raw
+        .whereType<Map>()
+        .map((r) => DiscourseReaction.fromJson(
+              r.cast<String, dynamic>(),
+              viewerReactionId: viewerId,
+              viewerCanUndo: canUndo,
+            ))
+        .where((r) => r.count > 0)
+        .toList(growable: false);
   }
 
   List<FCLike> _buildLikesInfo({
