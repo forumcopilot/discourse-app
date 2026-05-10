@@ -101,11 +101,6 @@ class AccessibilityHelpers {
     }
   }
 
-  /// Creates an accessibility label for thank button.
-  static String getThankButtonLabel(BuildContext context, bool isThanked) {
-    return 'Thank post';
-  }
-
   /// Creates an accessibility label for quote button.
   static String getQuoteButtonLabel(BuildContext context) {
     final localizations = AppLocalizations.of(context);

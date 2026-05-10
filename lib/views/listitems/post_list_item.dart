@@ -139,9 +139,8 @@ class PostListItem extends StatefulWidget {
 }
 
 class _PostListItemState extends State<PostListItem> {
-  // Local state for like and thanks
+  // Local state for like + bookmark
   late bool _isLiked;
-  bool _isThanked = false;
   late bool _isBookmarked;
   bool _bookmarkInFlight = false;
   late final PostController _postsController;
@@ -689,13 +688,10 @@ class _PostListItemState extends State<PostListItem> {
           PostListItemSocial(
             post: widget.post,
             isLiked: _isLiked,
-            isThanked: _isThanked,
             likeCount: _likeCount,
             isLoggedIn: widget.siteContext.isLoggedIn,
             onLike: _handleLikeAction,
-            onThank: _handleThankAction,
             onShowLikes: _showLikesBottomSheet,
-            onShowThanks: _showThanksBottomSheet,
             isBookmarked: _isBookmarked,
             onBookmark: _handleBookmarkAction,
             trailing: (widget.siteContext.isLoggedIn &&
@@ -927,11 +923,6 @@ class _PostListItemState extends State<PostListItem> {
         context, widget.post, widget.siteContext);
   }
 
-  void _showThanksBottomSheet() {
-    PostListItemSocial.showThanksBottomSheet(
-        context, widget.post, widget.siteContext);
-  }
-
   void _handleLikeAction() async {
     await _postActionsHandler.handleLike(
       context: context,
@@ -941,17 +932,6 @@ class _PostListItemState extends State<PostListItem> {
       setIsLiked: (val) => setState(() => _isLiked = val),
       setLikeCount: (val) => setState(() => _likeCount = val),
       isLiked: _isLiked,
-    );
-  }
-
-  void _handleThankAction() async {
-    await _postActionsHandler.handleThank(
-      context: context,
-      siteContext: widget.siteContext,
-      post: widget.post,
-      onRefresh: widget.actions?.onRefresh ?? () {},
-      setIsThanked: (val) => setState(() => _isThanked = val),
-      isThanked: _isThanked,
     );
   }
 
