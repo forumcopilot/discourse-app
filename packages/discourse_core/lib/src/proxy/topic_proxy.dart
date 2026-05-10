@@ -534,7 +534,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       //   [{id,name,slug}, ...]                  (post tag-system upgrade)
       // Accept both shapes.
       tags: ((t['tags'] as List?) ?? const [])
-          .map((entry) {
+          .map<String>((entry) {
             if (entry is String) return entry;
             if (entry is Map) return (entry['name'] ?? '').toString();
             return '';
