@@ -121,7 +121,7 @@ class FCTopic with FCTopicMappable {
   /// Whether any post in this topic has been marked as the accepted answer
   /// (Discourse: `has_accepted_answer:true`, requires the
   /// discourse-solved plugin). XF-flavored impls leave false.
-  bool hasAcceptedAnswer;
+  bool isSolved;
 
   FCTopic({
     required this.id,
@@ -174,6 +174,6 @@ class FCTopic with FCTopicMappable {
     this.hasPoll = false,
     this.poll,
     this.tags = const [],
-    this.hasAcceptedAnswer = false,
+    this.isSolved = false,
   });
 }

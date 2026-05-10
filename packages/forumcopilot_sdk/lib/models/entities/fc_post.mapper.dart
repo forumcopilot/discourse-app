@@ -215,10 +215,10 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
     opt: true,
     def: false,
   );
-  static bool _$acceptedAnswer(FCPost v) => v.acceptedAnswer;
-  static const Field<FCPost, bool> _f$acceptedAnswer = Field(
-    'acceptedAnswer',
-    _$acceptedAnswer,
+  static bool _$isSolution(FCPost v) => v.isSolution;
+  static const Field<FCPost, bool> _f$isSolution = Field(
+    'isSolution',
+    _$isSolution,
     opt: true,
     def: false,
   );
@@ -256,7 +256,7 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
     #canLike: _f$canLike,
     #canThank: _f$canThank,
     #bookmarked: _f$bookmarked,
-    #acceptedAnswer: _f$acceptedAnswer,
+    #isSolution: _f$isSolution,
   };
 
   static FCPost _instantiate(DecodingData data) {
@@ -292,7 +292,7 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
       canLike: data.dec(_f$canLike),
       canThank: data.dec(_f$canThank),
       bookmarked: data.dec(_f$bookmarked),
-      acceptedAnswer: data.dec(_f$acceptedAnswer),
+      isSolution: data.dec(_f$isSolution),
     );
   }
 
@@ -389,7 +389,7 @@ abstract class FCPostCopyWith<$R, $In extends FCPost, $Out>
     bool? canLike,
     bool? canThank,
     bool? bookmarked,
-    bool? acceptedAnswer,
+    bool? isSolution,
   });
   FCPostCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -469,7 +469,7 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
     bool? canLike,
     bool? canThank,
     bool? bookmarked,
-    bool? acceptedAnswer,
+    bool? isSolution,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -503,7 +503,7 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
       if (canLike != null) #canLike: canLike,
       if (canThank != null) #canThank: canThank,
       if (bookmarked != null) #bookmarked: bookmarked,
-      if (acceptedAnswer != null) #acceptedAnswer: acceptedAnswer,
+      if (isSolution != null) #isSolution: isSolution,
     }),
   );
   @override
@@ -542,7 +542,7 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
     canLike: data.get(#canLike, or: $value.canLike),
     canThank: data.get(#canThank, or: $value.canThank),
     bookmarked: data.get(#bookmarked, or: $value.bookmarked),
-    acceptedAnswer: data.get(#acceptedAnswer, or: $value.acceptedAnswer),
+    isSolution: data.get(#isSolution, or: $value.isSolution),
   );
 
   @override

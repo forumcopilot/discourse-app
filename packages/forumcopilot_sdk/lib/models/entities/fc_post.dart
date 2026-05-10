@@ -89,7 +89,7 @@ class FCPost with FCPostMappable {
 
   /// Whether this post is the accepted answer for its topic (Discourse:
   /// `accepted_answer:true`, requires the discourse-solved plugin).
-  bool acceptedAnswer;
+  bool isSolution;
 
   FCPost(
       {required this.id,
@@ -127,5 +127,5 @@ class FCPost with FCPostMappable {
       this.canLike = false,
       this.canThank = false,
       this.bookmarked = false,
-      this.acceptedAnswer = false});
+      this.isSolution = false});
 }

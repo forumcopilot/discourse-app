@@ -463,7 +463,7 @@ class _PostListItemState extends State<PostListItem> {
         children: [
           // Discourse "solved" banner: shown on the post that was
           // marked as the accepted answer for this topic.
-          if (widget.post.acceptedAnswer) ...[
+          if (widget.post.isSolution) ...[
             Container(
               padding: EdgeInsets.symmetric(
                 horizontal: DesignTokens.spacingS,

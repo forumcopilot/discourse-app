@@ -246,7 +246,7 @@ class TopicListItem extends StatelessWidget {
                 // Count status icons to determine if we should show labels
                 final statusIconCount = [
                   if (topicIcon != null) 1,
-                  if (topic.hasAcceptedAnswer) 1,
+                  if (topic.isSolved) 1,
                   if (topic.isPinned) 1,
                   if (topic.isSubscribed) 1,
                   if (topic.isClosed) 1,
@@ -342,7 +342,7 @@ class TopicListItem extends StatelessWidget {
                             ],
                           ],
                         ),
-                      if (topic.hasAcceptedAnswer)
+                      if (topic.isSolved)
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [

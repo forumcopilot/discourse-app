@@ -815,7 +815,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       canLike: canLike,
       isLiked: isLiked,
       bookmarked: (p['bookmarked'] as bool?) ?? false,
-      acceptedAnswer: (p['accepted_answer'] as bool?) ?? false,
+      isSolution: (p['accepted_answer'] as bool?) ?? false,
       // Pass mutable empty lists so optimistic-UI code in post_actions.dart
       // can call `.add()` without tripping "Cannot add to an unmodifiable
       // list" (FCPost defaults these to `const []`). Discourse's

@@ -313,10 +313,10 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     opt: true,
     def: const [],
   );
-  static bool _$hasAcceptedAnswer(FCTopic v) => v.hasAcceptedAnswer;
-  static const Field<FCTopic, bool> _f$hasAcceptedAnswer = Field(
-    'hasAcceptedAnswer',
-    _$hasAcceptedAnswer,
+  static bool _$isSolved(FCTopic v) => v.isSolved;
+  static const Field<FCTopic, bool> _f$isSolved = Field(
+    'isSolved',
+    _$isSolved,
     opt: true,
     def: false,
   );
@@ -369,7 +369,7 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     #hasPoll: _f$hasPoll,
     #poll: _f$poll,
     #tags: _f$tags,
-    #hasAcceptedAnswer: _f$hasAcceptedAnswer,
+    #isSolved: _f$isSolved,
   };
 
   static FCTopic _instantiate(DecodingData data) {
@@ -420,7 +420,7 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
       hasPoll: data.dec(_f$hasPoll),
       poll: data.dec(_f$poll),
       tags: data.dec(_f$tags),
-      hasAcceptedAnswer: data.dec(_f$hasAcceptedAnswer),
+      isSolved: data.dec(_f$isSolved),
     );
   }
 
@@ -531,7 +531,7 @@ abstract class FCTopicCopyWith<$R, $In extends FCTopic, $Out>
     bool? hasPoll,
     FCPoll? poll,
     List<String>? tags,
-    bool? hasAcceptedAnswer,
+    bool? isSolved,
   });
   FCTopicCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -602,7 +602,7 @@ class _FCTopicCopyWithImpl<$R, $Out>
     bool? hasPoll,
     Object? poll = $none,
     List<String>? tags,
-    bool? hasAcceptedAnswer,
+    bool? isSolved,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -652,7 +652,7 @@ class _FCTopicCopyWithImpl<$R, $Out>
       if (hasPoll != null) #hasPoll: hasPoll,
       if (poll != $none) #poll: poll,
       if (tags != null) #tags: tags,
-      if (hasAcceptedAnswer != null) #hasAcceptedAnswer: hasAcceptedAnswer,
+      if (isSolved != null) #isSolved: isSolved,
     }),
   );
   @override
@@ -706,7 +706,7 @@ class _FCTopicCopyWithImpl<$R, $Out>
     hasPoll: data.get(#hasPoll, or: $value.hasPoll),
     poll: data.get(#poll, or: $value.poll),
     tags: data.get(#tags, or: $value.tags),
-    hasAcceptedAnswer: data.get(#hasAcceptedAnswer, or: $value.hasAcceptedAnswer),
+    isSolved: data.get(#isSolved, or: $value.isSolved),
   );
 
   @override
