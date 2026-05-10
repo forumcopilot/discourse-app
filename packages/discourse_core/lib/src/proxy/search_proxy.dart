@@ -8,6 +8,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 import 'package:forumcopilot_sdk/models/results/fc_search_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/search/discourse_search_filters.dart';
 
 /// Discourse implementation of [IFCSearchProxy].
 ///
@@ -217,6 +218,44 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
     }
   }
 
+  /// Discourse-native: search topics + posts with structured
+  /// [DiscourseSearchFilters] layered on top of free-text [keywords].
+  ///
+  /// Returns the raw split { topics, posts } so callers can decide how
+  /// to render. Pass [page] to paginate (1-indexed, matching Discourse).
+  Future<DiscourseSearchResult> searchWithFiltersAsync({
+    required String keywords,
+    DiscourseSearchFilters filters = const DiscourseSearchFilters(),
+    int page = 1,
+    int perPage = _defaultPerPage,
+  }) async {
+    final fragment = filters.toQueryFragment();
+    final q = [keywords.trim(), fragment]
+        .where((p) => p.isNotEmpty)
+        .join(' ')
+        .trim();
+    if (q.isEmpty) {
+      return const DiscourseSearchResult(topics: [], posts: []);
+    }
+    try {
+      final response =
+          await _searchRaw(q, page: page <= 1 ? 0 : page - 1, perPage: perPage);
+      final users = _usersById(response);
+      final topics = ((response['topics'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((t) =>
+              _topicFromSearchResult(t.cast<String, dynamic>(), users: users))
+          .toList();
+      final posts = ((response['posts'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((p) => _postFromSearchResult(p.cast<String, dynamic>()))
+          .toList();
+      return DiscourseSearchResult(topics: topics, posts: posts);
+    } catch (_) {
+      return const DiscourseSearchResult(topics: [], posts: []);
+    }
+  }
+
   // ===== Helpers =====
 
   Future<Map<String, dynamic>> _searchRaw(
@@ -370,4 +409,16 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
     final span = e - s + 1;
     return span > 0 ? span.clamp(1, 50) : _defaultPerPage;
   }
+}
+
+/// Result of [DiscourseSearchProxy.searchWithFiltersAsync] — keeps
+/// topics and posts separated so the UI can present them on different
+/// tabs.
+class DiscourseSearchResult {
+  final List<FCTopic> topics;
+  final List<FCPost> posts;
+  const DiscourseSearchResult({
+    required this.topics,
+    required this.posts,
+  });
 }

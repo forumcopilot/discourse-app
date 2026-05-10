@@ -5,6 +5,8 @@ import '../models/cache_context.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseSearchFilters, DiscourseSearchProxy;
 import '../theme/design_tokens.dart';
 import '../theme/style_builders.dart';
 import 'listitems/topic_list_item.dart';
@@ -13,6 +15,7 @@ import 'post_page.dart';
 import 'package:get/get.dart';
 import '../controllers/login_controller.dart';
 import 'login_page.dart';
+import 'widgets/search_filters_sheet.dart';
 
 class SearchPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -55,6 +58,11 @@ class _SearchPageState extends State<SearchPage> {
   String? _postSearchId;
   String? _topicSearchId;
   String? _titlesOnlySearchId;
+
+  /// Discourse-native filter set. When non-empty, results route through
+  /// DiscourseSearchProxy.searchWithFiltersAsync instead of the
+  /// XF-flavored search methods.
+  DiscourseSearchFilters _filters = const DiscourseSearchFilters();
 
   @override
   void initState() {
@@ -134,6 +142,24 @@ class _SearchPageState extends State<SearchPage> {
     _searchFocusNode.requestFocus();
   }
 
+  Future<void> _openFiltersSheet() async {
+    final updated = await SearchFiltersSheet.show(
+      context: context,
+      initial: _filters,
+      loggedIn: widget.siteContext.isLoggedIn,
+    );
+    if (updated == null) return;
+    setState(() => _filters = updated);
+    // If a query is already active, re-run it with the new filters.
+    final q = _currentQuery;
+    if (q != null && q.isNotEmpty) {
+      // Force a re-search by clearing _currentQuery so _performSearch
+      // doesn't bail on the "same query" guard.
+      _currentQuery = null;
+      _performSearch(q);
+    }
+  }
+
   void _performSearch(String query) async {
     if (query.isEmpty) return;
 
@@ -174,6 +200,26 @@ class _SearchPageState extends State<SearchPage> {
     });
     final hasAdvancedSearch = widget.siteContext.ConfigData.advancedSearch == true;
     final proxy = SiteProxyService.getSearchProxy();
+
+    // Discourse-native filter route. When the user has selected filters
+    // we bypass the XF-shaped advance/search APIs and call the
+    // Discourse-specific search method that knows about the operator DSL.
+    if (proxy is DiscourseSearchProxy && !_filters.isEmpty) {
+      final result = await proxy.searchWithFiltersAsync(
+        keywords: _currentQuery!,
+        filters: _filters,
+        page: _topicPage,
+        perPage: _pageSize,
+      );
+      if (!mounted) return;
+      setState(() {
+        _topics.addAll(result.topics);
+        _isLoadingTopics = false;
+        _hasMoreTopics = result.topics.length == _pageSize;
+        if (_hasMoreTopics) _topicPage++;
+      });
+      return;
+    }
 
     if (!hasAdvancedSearch) {
       final startNum = (_topicPage - 1) * _pageSize;
@@ -224,6 +270,22 @@ class _SearchPageState extends State<SearchPage> {
     });
     final hasAdvancedSearch = widget.siteContext.ConfigData.advancedSearch == true;
     final proxy = SiteProxyService.getSearchProxy();
+    if (proxy is DiscourseSearchProxy && !_filters.isEmpty) {
+      final result = await proxy.searchWithFiltersAsync(
+        keywords: _currentQuery!,
+        filters: _filters,
+        page: _postPage,
+        perPage: _pageSize,
+      );
+      if (!mounted) return;
+      setState(() {
+        _posts.addAll(result.posts);
+        _isLoadingPosts = false;
+        _hasMorePosts = result.posts.length == _pageSize;
+        if (_hasMorePosts) _postPage++;
+      });
+      return;
+    }
     if (!hasAdvancedSearch) {
       final startNum = (_postPage - 1) * _pageSize;
       final lastNum = _postPage * _pageSize;
@@ -336,6 +398,31 @@ class _SearchPageState extends State<SearchPage> {
         surfaceTintColor: colorScheme.surfaceTint,
         iconTheme: IconThemeData(color: colorScheme.onSurface),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const Icon(Icons.tune),
+                if (!_filters.isEmpty)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            tooltip: 'Filters',
+            onPressed: _openFiltersSheet,
+          ),
+        ],
       ),
       body: Column(
         children: [
