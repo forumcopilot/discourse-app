@@ -1,62 +1,85 @@
-# Forum App (Standalone Discourse Template)
+# Discourse App
 
-This repository is an open-source Flutter template for building a **single-forum** mobile app for Discourse communities.
+An open-source Flutter mobile app template for a **single Discourse forum**. Hard-bound to one community at build time via `lib/config/app_forum_config.dart`; talks to Discourse's stock REST/JSON API + User API Keys directly — **no server-side plugin required**.
 
-The app connects directly to one Discourse forum through Discourse's stock REST/JSON API + User API Keys. **No server-side Discourse plugin is required** in v1; an optional `FC_Discourse` plugin may be added later only if concrete gaps justify it.
-
-> **Phase 0 status (current):** This project was scaffolded by copying `byo/xenforoapp/` and renaming. Compiles, but every `Discourse*Proxy` still calls a XenForo-style plugin endpoint that doesn't exist on Discourse — runtime failure expected until Phase 1 implements real REST calls. See `CLAUDE.md` for the phase plan.
+Targets Android, iOS, macOS, Windows, Linux, and the web. Built on Flutter `^3.6.1` / Dart `^3.6.1`.
 
 ---
 
-## Features
+## Project family
 
-This app provides a full-featured forum experience for a single Discourse site:
+This app is part of a small family of forum mobile apps:
 
-### Browsing & discovery
-- **Forums** – Browse forum list and nodes; view subscribed forums.
-- **Topics** – Latest, unread, subscribed, and participated topic lists with infinite scroll.
-- **Search** – Forum-wide search (topics and posts).
-- **Members** – Member list and member search.
+| Project | Backend | Source |
+|---|---|---|
+| **discourseapp** *(this repo)* | Discourse | [github.com/forumcopilot/discourse-app](https://github.com/forumcopilot/discourse-app) |
+| **xenforoapp** | XenForo (via the Forum Copilot add-on) | [github.com/forumcopilot/xenforoapp](https://github.com/forumcopilot/xenforoapp) |
+| **ForumCopilot.com** | Hosted SaaS (multi-forum, push relay, white-label apps) | [forumcopilot.com](https://forumcopilot.com) |
 
-### Reading & content
-- **Thread view** – Read threads with post list, BBCode rendering, and rich content (tables, code, quotes).
-- **Attachments** – View images and files; full-screen image viewer and attachment carousel.
-- **Polls** – View and vote in thread polls.
-- **Link previews** – Inline link preview cards (Twitter/YouTube degrade to normal links in standalone mode).
+The lineage:
 
-### Posting & participation
-- **New topic** – Create threads with optional poll.
-- **Reply** – Reply to threads with BBCode editor.
-- **Edit post** – Edit your own posts.
-- **Attachments** – Add images (camera/gallery) and files (e.g. PDFs) when composing; image compression and file picker (including native macOS file picker).
+- **[ForumCopilot.com](https://forumcopilot.com)** is the original product — a hosted service that builds white-label mobile apps for forum communities and handles push delivery, app-store releases, and per-forum branding.
+- **[xenforoapp](https://github.com/forumcopilot/xenforoapp)** is the open-source single-forum template extracted from ForumCopilot for XenForo communities, paired with a server-side `FC_XenForo2` PHP add-on that exposes a unified forum API.
+- **discourseapp** *(you are here)* is the Discourse-native sibling: same UI shell, same SDK shape (`forumcopilot_sdk`), but the proxy layer talks to Discourse's stock REST endpoints + User API Keys instead of an XF plugin. No server-side plugin in v1 — the app is a pure REST client.
 
-### Private messaging
-- **Conversations** – Modern conversation-style private messages (when enabled by forum).
-- **Traditional PM** – Inbox/sent style private messages.
-- **Compose** – New conversation or PM, reply, edit; attachments and BBCode.
+---
 
-### Account & profile
-- **Login / logout** – Session with optional “remember me”.
-- **Registration** – Create account with custom registration fields when enabled.
-- **Forgot password** – Password reset flow.
-- **Profile** – View profile, avatar, recent posts, and custom profile fields.
-- **Profile picture** – Change avatar from device or camera.
-- **Passkeys** – Sign in with passkeys where supported (requires Android/iOS app and assetlinks/AASA configured).
+## What works today
 
-### Notifications & alerts
-- **Alerts** – In-app alerts list (when enabled by forum).
-- **Push notifications** – Optional Firebase-based push (disabled by default; requires config).
+The app is past the bootstrap phase and exercises most of Discourse's read + write surface natively.
 
-### Settings & UX
-- **Forum settings** – Per-category settings from Discourse (when provided by add-on).
-- **Notification settings** – Control push and in-app notification behavior.
-- **Localization** – Multi-language support (e.g. English, Spanish, Italian) via `gen-l10n`.
-- **Theme** – Material Design with forum-aware styling.
+### Browsing & reading
+- **Latest / Unread / Subscribed / Participated** feeds, with infinite scroll.
+- **Categories** browser, sub-categories, category-filtered topic lists.
+- **Topic view** — rendered from Discourse's `cooked` HTML via `flutter_html` (Markdown, oneboxes, quoted posts, syntax-highlighted code, mentions, native emoji).
+- **Tags** — chips on topic rows; tap a chip to see all topics with that tag (`/tag/{name}.json`).
+- **Polls** — voting widget at the top of a topic backed by `PUT /polls/vote` with full chart/result rendering.
+- **Suggested Topics** footer card at the bottom of every topic, mirroring Discourse's web client.
+- **Solution indicator** — green banner on accepted-answer posts (requires `discourse-solved`).
 
-### Technical
-- **Single-forum** – No forum chooser; app is tied to one forum via config.
-- **Discourse API** – Uses `discourse_core` and Forum Copilot add-on API.
-- **Platforms** – Android, iOS, macOS, web, Windows, Linux (Flutter).
+### Authentication
+- **User API Key handshake** — RSA-2048 keypair, OAEP decryption, in-app webview for grant. No plugin needed; lands a stock User API Key with `read/write/session_info/notifications/message_bus/one_time_password` scopes.
+- Custom URL scheme `discourseapp://auth-callback` for the grant redirect.
+
+### Writing
+- **Markdown composer** — first-party Discourse-flavored Markdown (the BBCode pipeline inherited from XF was removed in Phase 5.10).
+- **New topic** with category + tag selection.
+- **Reply / quote / edit / delete**.
+- **Attachments** — image and file uploads via `/uploads`.
+- **Server-side drafts** — composer state round-trips through `/drafts.json` so a draft written in the app appears in the web composer and vice versa (`new_topic` / `topic_{id}` keys).
+
+### Social
+- **Like / unlike** posts (`/post_actions`).
+- **Bookmarks** — toggle on any post; full bookmarks list reachable from your profile (`/u/{me}/bookmarks.json`).
+- **Follow / unfollow** users (requires `discourse-follow` plugin).
+- **Notifications** — `/notifications.json` feed with type-aware rendering.
+
+### Notification levels
+- Tap the bell on any topic or category for the full **Watching / Tracking / Normal / Muted** picker (plus *Watching First Post* on categories) — `POST /t/{id}/notifications`, `POST /category/{id}/notifications`.
+
+### User profile
+- Trust level chip (TL0–TL4), badge row, follow button, send-message button, bookmarks button.
+- Recent replies feed.
+
+### Search
+- Free-text search with a structured filter sheet: status (`open` / `closed` / `solved` / `unsolved` / `noreplies` / `public` / `archived`), personal (`in:bookmarks` / `in:liked` / `in:posted` / `in:watching` / `in:tracking` / `in:seen` / `in:unseen`), tags, sort order (relevance / latest / likes / views / latest_topic).
+
+### Moderation (visible to staff users)
+- Pin / unpin · Close / reopen · Archive / unarchive · List / unlist · Rename · Soft and hard delete · Move topic · Split posts · Merge topics · Ban / silence users.
+
+### Localisation
+- ARB-based; English template at `lib/l10n/app_en.arb`; per-locale files for de/es/fr/it/ja/ko/nl/pt/ru/zh. Discourse-native terminology — *Topic* / *Category* / *Watching* / *Solution*, not the XF-flavored equivalents.
+
+---
+
+## Not yet implemented
+
+- **Push notifications** — disabled by default. Discourse's `push_url` registration is wired on the User API Key, but the relay backend that converts those POSTs into FCM/APNs deliveries is shared with [xenforoapp's push setup](https://github.com/forumcopilot/xenforoapp#push-notifications-optional) and is the Phase 3 deliverable. Until then the app starts cleanly without Firebase config files.
+- **Account-settings page** — Discourse-specific bits (email, username change, 2FA, etc.) still call legacy XF stubs that throw at runtime. Tagged with `TODO(phase-1)` in `packages/discourse_core/lib/src/proxy/account_proxy.dart`.
+- **Discourse Chat / Reactions plugin / Post-voting / Calendar** — installed on many Discourse forums but not yet surfaced in this client.
+- **New / Top home feed tabs** — `/new.json` and `/top.json` exist on the SDK side but aren't wired into the home page yet (boilerplate-heavy; deferred).
+
+The Phase 5.x history at the bottom of this README has the full feature timeline.
 
 ---
 
@@ -69,155 +92,178 @@ This app provides a full-featured forum experience for a single Discourse site:
 
 ---
 
-## Build and run on macOS
+## Build and run
 
-Follow these steps to build and start the app on macOS.
+### 1. Install Flutter
 
-### 1. Install Flutter and Xcode
+Install the [Flutter SDK](https://docs.flutter.dev/get-started/install) and confirm `flutter doctor` is happy.
 
-- Install the [Flutter SDK](https://docs.flutter.dev/get-started/install) and ensure `flutter` is on your `PATH`.
-- Install **Xcode** from the Mac App Store and open it once to accept the license. Install the Xcode Command Line Tools if prompted:
-  ```bash
-  xcode-select --install
-  ```
-- Confirm Flutter sees your environment:
-  ```bash
-  flutter doctor
-  ```
-  Fix any reported issues (e.g. Xcode license, Android licenses) before continuing.
-
-### 2. Clone and open the project
+### 2. Clone
 
 ```bash
-git clone https://github.com/forumcopilot/discourseapp.git
-cd discourseapp
+git clone https://github.com/forumcopilot/discourse-app.git
+cd discourse-app
 ```
-
-(Or open your existing clone in your editor.)
 
 ### 3. Configure your forum
 
-Edit `lib/config/app_forum_config.dart` and set at least:
+Edit `lib/config/app_forum_config.dart` and set the forum URL, name, and User API Key client identifiers:
 
 ```dart
 static const String forumName = 'My Discourse Forum';
 static const String forumBaseUrl = 'https://forum.example.com';
-static const String pluginEndpoint = 'forumcopilot.php';
+// User API Key client identifiers (registered once per app build):
+static const String userApiKeyClientId = 'com.example.discourseapp';
+static const String userApiKeyApplicationName = 'My Discourse App';
 ```
 
-Optionally set `forumDescription`, `logoUrl`, `backgroundUrl`, `pushApiBaseUrl`, `androidPackageName`, and `androidSha256CertFingerprint` as needed.
+Optionally set `forumDescription`, `logoUrl`, push-relay endpoint, and Android passkey identifiers.
 
 ### 4. Install dependencies
-
-From the project root:
 
 ```bash
 flutter pub get
 ```
 
-### 5. Generate SDK and localizations
-
-The app uses local packages (`forumcopilot_sdk`, `discourse_core`) and generated localizations. Run:
+### 5. Generate SDK and localisations
 
 ```bash
-./buildlib.sh
+./buildlib.sh          # codegen for forumcopilot_sdk + flutter gen-l10n
+                       # Windows: buildlib.bat
 ```
 
-This runs `build_runner` in `packages/forumcopilot_sdk` and then `flutter gen-l10n`. On Windows use the equivalent steps (e.g. run the SDK build and `flutter gen-l10n` manually).
+`buildlib.sh` runs `dart run build_runner build --delete-conflicting-outputs` inside `packages/forumcopilot_sdk` and `packages/discourse_core`, then `flutter gen-l10n`. **Re-run it whenever** you change an ARB file or a `dart_mappable`-annotated class.
 
-### 6. Run the app on macOS
+> ⚠ On Dart 3.10 the `dart_mappable` build hook is currently broken (`'dart compile' does not support build hooks, use 'dart build' instead`). When you hit this, hand-edit the affected `.mapper.dart` file — see the recent commits for `acceptedAnswer → isSolution` or the `trustLevel` addition for the pattern.
+
+### 6. Run
 
 ```bash
-flutter run -d macos
+flutter run -d macos     # or -d chrome, -d <ios-device>, -d <android-id>
 ```
 
-If multiple devices are available, pick `macos` from the list. The app will start and connect to the forum configured in `app_forum_config.dart`.
-
-### 7. (Optional) Build a release macOS app
+### 7. Release build
 
 ```bash
-flutter build macos
+flutter build macos      # or ios, android, web
 ```
-
-The built app is under `build/macos/Build/Products/Release/`. You can sign and distribute it according to Apple’s guidelines.
-
-### macOS-specific notes
-
-- **File picker** – For attachments (e.g. in reply or PM), the app uses the native file picker. macOS entitlements for file access are set in `macos/Runner/DebugProfile.entitlements` and `macos/Runner/Release.entitlements` (e.g. `com.apple.security.files.user-selected.read-write`). See `docs/guides/MACOS_FILE_PICKER_SETUP.md` for details.
-- **Firebase (push)** – To enable push on macOS, add your `GoogleService-Info.plist` under `macos/Runner/` (see “Configure Firebase” below).
 
 ---
 
-## Push notifications (optional)
+## Local development against Discourse
 
-Push notifications are **disabled by default**. The app needs two things to deliver them:
+The simplest setup is to clone Discourse locally and seed it with demo data.
 
-- A **Firebase project** that issues `GoogleService-Info.plist` (iOS/macOS) and `google-services.json` (Android), each registered with your app's bundle ID / package name.
-- A **dispatcher** that takes alert events from the Discourse `forumcopilot.php` addon and turns them into FCM/APNs pushes.
+```bash
+git clone https://github.com/discourse/discourse.git /path/to/discourse
+cd /path/to/discourse
+bin/dev                                                 # boots Discourse at localhost:4200
 
-You have three ways to set this up. Pick the one that matches your operational comfort:
+# in another shell, populate demo content (idempotent):
+cd /path/to/discourseapp
+./scripts/seed_demo.sh                                  # wraps bin/rails runner
 
-| Path | Where Firebase lives | Where the dispatcher lives | Best for |
-|---|---|---|---|
-| **1. Hosted ForumCopilot Push** | ForumCopilot's project | ForumCopilot's backend | Anyone who doesn't want to manage Firebase or run a backend |
-| **2. BYO Firebase + direct dispatch** | Your project | Inside the addon (no extra backend) | Self-hosters who own their stack but don't want to write a dispatcher |
-| **3. BYO Firebase + your own dispatch backend** | Your project | Your own server | Advanced — you have a custom routing requirement that doesn't fit modes 1 or 2 |
+# … or point at a different Discourse install:
+DISCOURSE_DIR=/elsewhere ./scripts/seed_demo.sh
+```
 
-### Path 1 — Hosted ForumCopilot Push (managed, easiest)
+The seed script (`scripts/seed_discourse_demo.rb`) creates:
 
-ForumCopilot Push is a managed service that handles the Firebase project AND the dispatcher for you. You provide your iOS bundle ID, Android package name, and an APNs auth key (`.p8`) generated in your Apple Developer account; ForumCopilot issues the `GoogleService-Info.plist` / `google-services.json` your build needs and gives you a push API endpoint.
+- 6 users at every trust level + a moderator (`alice` TL3, `bob` TL2, `carol` TL1, `dave` TL0, `eve` TL4, `mallory` mod). Password for all: `demo-password-1234!`.
+- 3 categories (General / Support / Announcements) + 13 tags.
+- 8 topics in a variety of states — open, closed-and-archived, unlisted, globally pinned, solved (via `discourse-solved`), with embedded polls, with reply chains.
+- 5 bookmarks, 2 server-side drafts, ~10 badge grants, per-topic and per-category notification levels.
 
-Setup overview (see https://forumcopilot.com for full details and pricing):
+Use this to exercise every Phase 5 feature in the app.
 
-1. Sign up at https://forumcopilot.com and register your forum.
-2. Provide your iOS bundle ID, Android package name, and macOS bundle ID in the dashboard.
-3. Upload an APNs auth key (`.p8`) and your Apple Team ID.
-4. Download the issued config files and drop them into your project:
-   ```bash
-   # files come from your ForumCopilot dashboard
-   cp ~/Downloads/google-services.json     android/app/google-services.json
-   cp ~/Downloads/GoogleService-Info.plist  ios/Runner/GoogleService-Info.plist
-   cp ~/Downloads/GoogleService-Info.plist  macos/Runner/GoogleService-Info.plist
-   ```
-5. In `lib/config/app_forum_config.dart`:
-   - Set `pushApiBaseUrl` to the endpoint shown in your dashboard.
-   - Leave `pushSource = 'forumcopilot'` (the default).
-6. Install the ForumCopilot discourse addon (under `plugins/FC_Discourse2/`) and paste your customer API key into its admin settings so the addon can talk to ForumCopilot Push.
+---
 
-### Path 2 — Bring your own Firebase + direct dispatch from the addon
+## Repository layout
 
-The most self-hosted path that doesn't require running an extra service. The addon (v1.3.4 or newer) ships its own FCM HTTP v1 client and can dispatch notifications **directly** using your Firebase service-account JSON. No separate dispatcher process needed.
+```
+lib/                                       # the app
+├─ config/app_forum_config.dart            # the only file a fork normally edits
+├─ controllers/                            # GetX controllers
+├─ services/                               # init, push, site proxy wiring
+├─ views/                                  # pages + widgets
+├─ core/                                   # logging, error handling, cache
+├─ l10n/                                   # ARB files + generated output
+└─ utils/                                  # url helpers, time formatting, drafts
 
-1. Create your own Firebase project. Register your iOS/macOS/Android apps in it (one entry per platform).
-2. Download the resulting Firebase config files into your project:
-   ```bash
-   cp ~/Downloads/google-services.json     android/app/google-services.json
-   cp ~/Downloads/GoogleService-Info.plist  ios/Runner/GoogleService-Info.plist
-   cp ~/Downloads/GoogleService-Info.plist  macos/Runner/GoogleService-Info.plist
-   ```
-3. In **Firebase Console → Project Settings → Service accounts → Generate new private key**, download the service-account JSON and upload it to your Discourse server, *outside* the web root for security (e.g. `/var/secrets/firebase-sa.json`).
-4. In `lib/config/app_forum_config.dart`:
-   - Set `pushSource = 'direct'`.
-   - Leave `pushApiBaseUrl = ''` (empty — there is no separate backend).
-5. Install the ForumCopilot discourse addon (`plugins/FC_Discourse2/`). In **Admin CP → Options → ForumCopilot Options**:
-   - Enable the master push toggle.
-   - Enable **"Direct push (your own white-label app + Firebase)"**.
-   - Set **"Firebase service-account JSON path"** to the absolute path from step 3.
+packages/forumcopilot_sdk/                 # forum-agnostic abstractions
+├─ lib/interfaces/                         # IFC*Proxy contracts
+├─ lib/models/                             # FC*Result wrappers + entities
+└─ lib/factory/                            # SiteProxyFactory
 
-When users open the app, it registers their FCM token directly with your Discourse server via the `registerDevice` plugin API. When a notification fires, the addon's dispatch router reads the token from `xf_fc_device_token` and POSTs to FCM HTTP v1 using your service-account credentials.
+packages/discourse_core/                   # Discourse implementation
+├─ lib/factory/                            # DiscourseProxyFactory
+├─ lib/src/proxy/                          # Per-area proxies (Account, Topic, Post, Search, ...)
+├─ lib/src/data/                           # Typed Discourse models (bookmark, badge, suggested topic, ...)
+├─ lib/src/network/                        # Dio + User API Key handshake
+└─ lib/src/converter/                      # Discourse JSON → FC* entities
 
-### Path 3 — Bring your own Firebase + custom dispatch backend (advanced)
+scripts/                                   # Local dev helpers
+├─ seed_discourse_demo.rb                  # Rails-runner seed (idempotent)
+└─ seed_demo.sh                            # Wrapper for local discourse install
 
-For unusual setups where you need a custom routing layer between the addon and FCM (e.g. multi-region routing, custom analytics, fan-out to non-FCM channels):
+docs/guides/                               # Platform-specific setup notes
+CLAUDE.md                                  # Codebase guide for Claude Code / AI tooling
+```
 
-1. Same Firebase setup as Path 2.
-2. In `lib/config/app_forum_config.dart`:
-   - Set `pushApiBaseUrl` to your backend's base URL (e.g. `https://push.example.com/api`).
-   - Leave `pushSource = 'forumcopilot'` (the controller will register tokens with your backend the same way the hosted backend would).
-3. Stand up a push backend that:
-   - accepts FCM token registrations from the app at `POST <pushApiBaseUrl>/...` endpoints
-   - receives notification events from the `forumcopilot.php` addon and dispatches them via the FCM HTTP v1 API
-4. Configure the `forumcopilot.php` addon's hosted-push admin options to point at your backend.
+---
+
+## Architecture
+
+`main.dart` runs critical init (error handling, `MemoryManager`, `ForumcopilotSdk.ensureInitialized`, `UserStateService`, `SettingsContext.loadFromDevice`) then `runApp(ForumCopilotApp())`. Firebase + push init runs **in the background after `runApp`** so the UI doesn't block on it; `PushNotificationController` is created lazily once an FCM token arrives.
+
+`ForumCopilotApp` registers `GlobalLoaderController` and `SiteController`, then renders `GetMaterialApp` with a global loader overlay and a `UserStateBanner`. The home is `SingleForumBootstrapPage`, which builds the forum's `Site` from `AppForumConfig` and drives the rest of the app.
+
+State is managed with **GetX** (`Get.put` / `Obx`). Navigation uses `globalNavigatorKey` (defined in `forumcopilot_sdk`) so SDK code can show dialogs (e.g. Cloudflare challenge UI) without a `BuildContext`. All forum I/O goes through `SiteProxyFactory.get*Proxy()` returning the `discourse_core` implementations registered at startup; results follow a uniform `FC*Result { result, resultText, ...payload }` shape.
+
+### Discourse-native escape hatches
+
+The `forumcopilot_sdk` interface was originally XenForo-shaped. Where Discourse has a concept that doesn't map cleanly, we **extend the SDK** rather than coerce Discourse to fit:
+
+- **Tags** — first-class field on `FCTopic`.
+- **Polls** — `FCPoll` populated from the first post's `polls` field; `votePollAsync` routes to `PUT /polls/vote`.
+- **Bookmarks** — `DiscoursePostProxy.bookmarkPostAsync` / `getBookmarksAsync` / `unbookmarkPostAsync`.
+- **Notification levels** — `DiscourseSubscriptionProxy.setTopicNotificationLevelAsync` / `setCategoryNotificationLevelAsync` (the XF-style `subscribeTopicAsync(id, int subscribeMode)` is still on the interface but its int gets translated to a Discourse level).
+- **Search filters** — `DiscourseSearchFilters` + `DiscourseSearchProxy.searchWithFiltersAsync` exposing the full `/search.json` operator DSL.
+- **Drafts** — `DiscourseDraftController` (`saveDraftAsync` / `loadDraftAsync` / `deleteDraftAsync`), keys cross-compatible with the web composer.
+- **Badges / trust level / solved / follow / suggested topics** — all surfaced as native Discourse fields rather than lossy mappings to XF concepts.
+
+Callsites that use these features cast `proxy is DiscoursePostProxy` (or similar) at the boundary, falling back to the XF-shaped interface when the proxy is a different implementation.
+
+---
+
+## Editing notes
+
+- **Forum config is compile-time.** Changes to `lib/config/app_forum_config.dart` require a rebuild; there is no runtime override. `siteId = 1` is the stable local-storage key — don't change it unless you intend to invalidate persisted state.
+- **Adding a UI string.** Edit `lib/l10n/app_en.arb` (template) plus the per-locale ARBs you want translated, then `flutter gen-l10n` (or rerun `buildlib.sh`).
+- **Adding/changing an SDK model or proxy.** Update the interface in `packages/forumcopilot_sdk/lib/interfaces/`, the result/entity in `models/`, then implement on the Discourse side in `packages/discourse_core/lib/` (proxy + converter). Re-run `build_runner` in whichever package(s) you touched.
+- **Cloudflare interceptor.** `ForumcopilotSdk.ensureInitialized` takes `onCloudflareStart`/`onCloudflareEnd` callbacks; the app uses them to hide/show the global spinner so the Cloudflare challenge UI is visible. Preserve this when refactoring init.
+- **Linting.** `analysis_options.yaml` extends `package:flutter_lints/flutter.yaml`.
+
+---
+
+## Phase history
+
+| Phase | What |
+|---|---|
+| **0** | Scaffolding — forked from xenforoapp, packages renamed, app compiles. |
+| **1** | Auth + read path. Real `DiscourseClient`, User API Key handshake, all read-side proxies against stock Discourse REST. |
+| **2** | Write path + PMs. Replies, new topics, edit/delete, attachments, conversation-style PMs via `archetype: 'private_message'`. |
+| **4** | Composer Markdown swap + `flutter_html` post renderer + native Unicode emoji. |
+| **5.0–5.1** | Tags as first-class chips + tag-filtered topic lists. |
+| **5.2** | Solved indicator + bookmark proxy. |
+| **5.3** | Bookmark button + bookmarks list, trust levels, server-side drafts, polls voting. |
+| **5.4** | 4-level notification picker (Watching / Tracking / Normal / Muted). |
+| **5.5a** | Suggested Topics footer. |
+| **5.6** | Search filters (status / in: / tags / sort). |
+| **5.7** | User badges row on profile. |
+| **5.8** | Follow / unfollow toggle. |
+| **5.9** | Moderator surface — archive / unlist / rename in topic menu. |
+| **5.10** | XF cruft removal — drop dead thanks UI, BBCode renderer, lossy `subscribeMode`, retire unreachable interface methods, rename `acceptedAnswer → isSolution`, native terminology in ARB. |
 
 ---
 
@@ -225,24 +271,23 @@ For unusual setups where you need a custom routing layer between the addon and F
 
 Before publishing your own fork:
 
-1. Confirm forum URL and branding values in `app_forum_config.dart`.
-2. Confirm Firebase files are your own values (or keep placeholders if push is disabled).
+1. Set forum URL, name, and branding values in `app_forum_config.dart`.
+2. Register your own User API Key client identifiers (one per app build).
 3. Set your own bundle/application IDs for Android/iOS/macOS.
 4. Set your Apple Development Team in Xcode project settings before signing.
 5. Configure passkey association files (`assetlinks.json`, `apple-app-site-association`) with your package/team IDs and certificate fingerprints.
+6. If wiring push later: add your own Firebase config files; never commit a service-account JSON.
 
 ---
 
-## Notes
+## Contributing
 
-- Translation and cloud media enrichment were intentionally removed in standalone mode.
-- Twitter/YouTube rich cards degrade to normal links.
-- Runtime forum discovery APIs are not used by this app template.
+Issues and pull requests welcome. For larger Discourse-native features, please open an issue first so we can discuss whether the SDK interface needs an extension (`DiscourseFooProxy` method) versus a lossy XF mapping.
+
+When working with Claude Code or another AI coding tool, `CLAUDE.md` documents the codebase conventions and phase plan — point your agent at it first.
 
 ---
 
 ## License
 
 This project is licensed under the MIT License — see [LICENSE](LICENSE) for the full text.
-
-The `plugins/FC_Discourse2/` add-on is also released under MIT, but installing or running it on a Discourse forum still requires a valid Discourse license from Discourse Ltd.
