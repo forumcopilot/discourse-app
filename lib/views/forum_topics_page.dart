@@ -6,6 +6,9 @@ import 'package:forumcopilot_flutter/views/appbars/forum_topics_app_bar.dart';
 import 'package:forumcopilot_flutter/views/lists/forum_topic_list.dart';
 import 'package:forumcopilot_flutter/views/new_topic_page.dart';
 import 'package:forumcopilot_flutter/views/widgets/forum_actions.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseSubscriptionProxy;
+import 'package:forumcopilot_flutter/views/widgets/notification_level_sheet.dart';
 
 class ForumTopicsPage extends StatefulWidget {
   final FCForum forum;
@@ -83,8 +86,26 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
       return;
     }
 
+    final subscriptionProxy = SiteProxyFactory.getSubscriptionProxy();
+    if (subscriptionProxy is DiscourseSubscriptionProxy) {
+      // Discourse-native picker: Watching / Watching First Post / Tracking
+      // / Normal / Muted. The 'isSubscribed' field on the forum is binary
+      // (>= Tracking) — we leave it for the next refresh to update.
+      await NotificationLevelSheet.showForCategory(
+        context: context,
+        categoryId: widget.forum.id,
+        currentLevel: widget.forum.isSubscribed
+            ? DiscourseSubscriptionProxy.levelTracking
+            : DiscourseSubscriptionProxy.levelRegular,
+        onChanged: () {
+          if (!mounted) return;
+          if (_refreshCallback != null) _refreshCallback!();
+        },
+      );
+      return;
+    }
+
     try {
-      final subscriptionProxy = SiteProxyFactory.getSubscriptionProxy();
       final isSubscribed = widget.forum.isSubscribed;
 
       if (isSubscribed) {

@@ -34,6 +34,16 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
   static const int _levelTracking = 2;
   static const int _levelWatching = 3;
 
+  /// Public level constants. UI uses these instead of magic numbers when
+  /// calling [setTopicNotificationLevelAsync] /
+  /// [setCategoryNotificationLevelAsync].
+  static const int levelMuted = _levelMuted;
+  static const int levelRegular = _levelRegular;
+  static const int levelTracking = _levelTracking;
+  static const int levelWatching = _levelWatching;
+  // 4 == Watching first post (per-category); per-topic doesn't use it.
+  static const int levelWatchingFirstPost = 4;
+
   @override
   Future<FCSubscribeTopicResult> subscribeTopicAsync(
       String topicId, int subscribeMode) async {
@@ -168,6 +178,69 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
         resultText: 'Error: $e',
         totalTopicNum: 0,
       );
+    }
+  }
+
+  /// Discourse-native: set the per-topic notification level directly.
+  /// [level] must be one of [levelMuted], [levelRegular], [levelTracking],
+  /// [levelWatching]. Returns true on success.
+  Future<bool> setTopicNotificationLevelAsync(
+      String topicId, int level) async {
+    try {
+      await apiPost('/t/$topicId/notifications.json', body: {
+        'notification_level': level,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Discourse-native: set the per-category notification level directly.
+  /// [level] supports [levelWatchingFirstPost] in addition to the four
+  /// topic levels. Returns true on success.
+  Future<bool> setCategoryNotificationLevelAsync(
+      String categoryId, int level) async {
+    try {
+      await apiPost('/category/$categoryId/notifications.json', body: {
+        'notification_level': level,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Discourse-native: read the current per-topic notification level.
+  /// Returns null if the topic can't be loaded. Hits `/t/{id}.json`.
+  Future<int?> getTopicNotificationLevelAsync(String topicId) async {
+    try {
+      final t = await apiGet('/t/$topicId.json');
+      return t['notification_level'] as int?;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Discourse-native: read the current per-category notification level.
+  /// Pulls from `/categories.json` (only categories the user can see are
+  /// returned). Returns null when the category isn't found.
+  Future<int?> getCategoryNotificationLevelAsync(String categoryId) async {
+    try {
+      final response = await apiGet('/categories.json');
+      final list = (response['category_list'] as Map<String, dynamic>?) ??
+          const <String, dynamic>{};
+      final cats = ((list['categories'] as List?) ?? const [])
+          .whereType<Map>();
+      for (final raw in cats) {
+        final c = raw.cast<String, dynamic>();
+        if (c['id'].toString() == categoryId) {
+          return c['notification_level'] as int?;
+        }
+      }
+      return null;
+    } catch (_) {
+      return null;
     }
   }
 

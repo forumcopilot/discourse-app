@@ -3,7 +3,9 @@ import '../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/results/fc_moderation_result.dart';
-import 'package:discourse_core/discourse_core.dart' show DiscourseModerationProxy;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseModerationProxy, DiscourseSubscriptionProxy;
+import 'widgets/notification_level_sheet.dart';
 import '../theme/design_tokens.dart';
 import '../core/logging/app_logger.dart';
 import 'widgets/forum_breadcrumb.dart';
@@ -168,8 +170,30 @@ class _PostPageState extends State<PostPage> {
       return;
     }
 
+    final proxy = SiteProxyFactory.getSubscriptionProxy();
+    if (proxy is DiscourseSubscriptionProxy) {
+      // Discourse-native: surface the full 4-level Watching/Tracking/
+      // Normal/Muted picker instead of a binary toggle.
+      await NotificationLevelSheet.showForTopic(
+        context: context,
+        topicId: widget.topicId,
+        currentLevel: _isSubscribed
+            ? DiscourseSubscriptionProxy.levelWatching
+            : DiscourseSubscriptionProxy.levelRegular,
+        onChanged: () {
+          if (!mounted) return;
+          // Refresh /t/{id}.json so the subscribed banner + bell icon
+          // reflect the new level. We intentionally don't try to mirror
+          // the chosen level locally — the picker may set Tracking or
+          // Muted, neither of which maps cleanly to _isSubscribed.
+          if (_refreshCallback != null) _refreshCallback!();
+        },
+      );
+      return;
+    }
+
     try {
-      final subscriptionProxy = SiteProxyFactory.getSubscriptionProxy();
+      final subscriptionProxy = proxy;
 
       if (_isSubscribed) {
         await subscriptionProxy.unsubscribeTopicAsync(widget.topicId);
