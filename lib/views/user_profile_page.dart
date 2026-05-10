@@ -9,6 +9,7 @@ import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'package:intl/intl.dart';
 import 'package:forumcopilot_flutter/views/widgets/full_screen_image_viewer.dart';
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
+import 'bookmarks_page.dart';
 import 'package:forumcopilot_flutter/utils/error_dialog.dart';
 import 'package:forumcopilot_flutter/utils/avatar_cache_utils.dart';
 import 'package:forumcopilot_flutter/utils/signature_processor.dart';
@@ -529,6 +530,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                       ),
                                     ),
                                   ],
+                                ],
+                                // Bookmarks button on the current user's own profile.
+                                if (widget.siteContext.loginDataOutput?.user?.id == _userInfo!.id) ...[
+                                  OutlinedButton.icon(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => BookmarksPage(
+                                            siteContext: widget.siteContext,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.bookmark_outline),
+                                    label: const Text('Bookmarks'),
+                                  ),
                                 ],
                               ],
                             ),

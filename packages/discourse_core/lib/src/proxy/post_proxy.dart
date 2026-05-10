@@ -8,6 +8,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_thanks.dart';
 import 'package:forumcopilot_sdk/models/results/fc_post_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/post/discourse_bookmark.dart';
 
 /// Discourse implementation of [IFCPostProxy].
 ///
@@ -384,6 +385,31 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       return true;
     } catch (_) {
       return false;
+    }
+  }
+
+  /// Discourse-only: fetch the current user's bookmarks list.
+  /// Hits `/u/{username}/bookmarks.json`. Returns a list of
+  /// [DiscourseBookmark] entries, newest first (Discourse's default order).
+  ///
+  /// [page] is 0-indexed and uses Discourse's `page` query param. Pass
+  /// `null` (default) for the first page.
+  Future<List<DiscourseBookmark>> getBookmarksAsync({int? page}) async {
+    final username = siteContext.currentUsername;
+    if (username == null || username.isEmpty) return const [];
+    try {
+      final qs = (page != null && page > 0) ? '?page=$page' : '';
+      final response = await apiGet(
+          '/u/${Uri.encodeComponent(username)}/bookmarks.json$qs');
+      final ub = (response['user_bookmark_list'] as Map<String, dynamic>?) ??
+          const <String, dynamic>{};
+      final bookmarks = (ub['bookmarks'] as List?) ?? const [];
+      return bookmarks
+          .whereType<Map>()
+          .map((b) => DiscourseBookmark.fromJson(b.cast<String, dynamic>()))
+          .toList();
+    } catch (_) {
+      return const [];
     }
   }
 
