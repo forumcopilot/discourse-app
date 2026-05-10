@@ -8,6 +8,7 @@ import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
+import '../data/user/discourse_badge.dart';
 
 /// Discourse implementation of IFCUserProxy
 /// Handles user operations and profile management for Discourse forums
@@ -681,6 +682,46 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         result: false,
         resultText: 'Error reporting user: $e',
       );
+    }
+  }
+
+  /// Discourse-only: fetch the badges granted to [username]. Hits
+  /// `/user-badges/{username}.json` (Discourse's stable endpoint for
+  /// per-user badge grants), de-dupes multi-grants, and returns the
+  /// merged definitions newest-first.
+  Future<List<DiscourseBadge>> getUserBadgesAsync(String username) async {
+    if (username.isEmpty) return const [];
+    try {
+      final response = await apiGet(
+          '/user-badges/${Uri.encodeComponent(username)}.json');
+      final defs = <int, Map<String, dynamic>>{};
+      for (final raw in ((response['badges'] as List?) ?? const [])
+          .whereType<Map>()) {
+        final d = raw.cast<String, dynamic>();
+        final id = d['id'];
+        if (id is int) defs[id] = d;
+      }
+      final out = <DiscourseBadge>[];
+      // Discourse may return user_badges or user_badge_info — we accept
+      // both shapes. The list is the per-user grants (one entry per
+      // grant, so duplicates exist for stackable badges).
+      final grants = ((response['user_badges'] as List?) ?? const [])
+          .whereType<Map>()
+          .toList();
+      // Track which badge ids we've already emitted; first wins for
+      // newest-first if Discourse returns them in granted order.
+      final seen = <int>{};
+      for (final raw in grants) {
+        final g = raw.cast<String, dynamic>();
+        final badgeId = (g['badge_id'] as num?)?.toInt();
+        if (badgeId == null || !seen.add(badgeId)) continue;
+        final def = defs[badgeId];
+        if (def == null) continue;
+        out.add(DiscourseBadge.fromJson(definition: def, grant: g));
+      }
+      return out;
+    } catch (_) {
+      return const [];
     }
   }
 }

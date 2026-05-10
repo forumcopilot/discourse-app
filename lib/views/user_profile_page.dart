@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:forumcopilot_flutter/views/widgets/full_screen_image_viewer.dart';
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
 import 'bookmarks_page.dart';
+import 'widgets/user_badges_row.dart';
 import 'package:forumcopilot_flutter/utils/error_dialog.dart';
 import 'package:forumcopilot_flutter/utils/avatar_cache_utils.dart';
 import 'package:forumcopilot_flutter/utils/signature_processor.dart';
@@ -468,6 +469,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 ),
                               ),
                             ],
+                            // Discourse badges row (Bronze/Silver/Gold).
+                            // Hidden when the user has no granted badges.
+                            SizedBox(height: DesignTokens.spacingS),
+                            UserBadgesRow(username: _userInfo!.username),
                             SizedBox(height: DesignTokens.spacingM),
                             // Follow and Send Message buttons
                             Row(
