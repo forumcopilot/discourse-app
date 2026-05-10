@@ -28,6 +28,13 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   // Discourse default chunk size for /t/{id}.json post_stream is 20.
   static const int _defaultChunk = 20;
 
+  /// Carries the (post_id, poll_name) that a parsed [FCPoll] originated
+  /// from. The SDK contract for [votePollAsync] is keyed on topic id, but
+  /// Discourse needs the post id of the post hosting the poll plus the
+  /// poll's name (default 'poll'). We stash both here at parse time so
+  /// the vote call doesn't need to refetch the topic.
+  static final Expando<_DiscoursePollMeta> _pollMeta = Expando('pollMeta');
+
   @override
   Future<FCThreadResult> getThreadAsync(
     String topicId,
@@ -41,10 +48,24 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     try {
       final t = await apiGet('/t/$topicId.json');
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
-      final posts = ((stream['posts'] as List?) ?? const [])
+      final rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
-          .map((p) => _postFrom(p.cast<String, dynamic>(), topicId: topicId))
+          .map((p) => p.cast<String, dynamic>())
           .toList();
+      final posts =
+          rawPosts.map((p) => _postFrom(p, topicId: topicId)).toList();
+
+      // Pull a poll out of the first post if present so the topic header
+      // can render a Twitter-style poll card.
+      final firstPostJson = rawPosts.isNotEmpty
+          ? rawPosts.firstWhere(
+              (p) => (p['post_number'] as int?) == 1,
+              orElse: () => rawPosts.first,
+            )
+          : null;
+      final poll = firstPostJson == null
+          ? null
+          : _firstPollFromPost(firstPostJson, topicId: topicId);
 
       final details = (t['details'] as Map<String, dynamic>?) ?? const {};
       final createdBy =
@@ -95,6 +116,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         isAnnouncement: (t['pinned_globally'] as bool?) ?? false,
         url: '${siteContext.site.url}/t/$id',
         shortContent: posts.isNotEmpty ? posts.first.content : '',
+        poll: poll,
       );
     } catch (e) {
       return _emptyThread(message: 'Error: $e');
@@ -120,10 +142,19 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       final postNumber = (p['post_number'] as int?) ?? 1;
       final t = await apiGet('/t/$topicId/$postNumber.json');
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
-      final posts = ((stream['posts'] as List?) ?? const [])
+      final rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
-          .map((m) => _postFrom(m.cast<String, dynamic>(), topicId: topicId))
+          .map((m) => m.cast<String, dynamic>())
           .toList();
+      final posts =
+          rawPosts.map((p) => _postFrom(p, topicId: topicId)).toList();
+      final firstPostJson = rawPosts.firstWhere(
+        (p) => (p['post_number'] as int?) == 1,
+        orElse: () => const {},
+      );
+      final poll = firstPostJson.isEmpty
+          ? null
+          : _firstPollFromPost(firstPostJson, topicId: topicId);
       final details = (t['details'] as Map<String, dynamic>?) ?? const {};
       final createdBy =
           (details['created_by'] as Map<String, dynamic>?) ?? const {};
@@ -146,6 +177,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         canReply: !(t['closed'] == true || t['archived'] == true),
         canReport: true,
         canUpload: true,
+        poll: poll,
       );
     } catch (e) {
       return _emptyThreadByPost(message: 'Error: $e');
@@ -168,10 +200,21 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     try {
       final t = await apiGet('/t/$topicId.json');
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
-      final posts = ((stream['posts'] as List?) ?? const [])
+      final rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
-          .map((m) => _postFrom(m.cast<String, dynamic>(), topicId: topicId))
+          .map((m) => m.cast<String, dynamic>())
           .toList();
+      final posts =
+          rawPosts.map((p) => _postFrom(p, topicId: topicId)).toList();
+      final firstPostJson = rawPosts.isNotEmpty
+          ? rawPosts.firstWhere(
+              (p) => (p['post_number'] as int?) == 1,
+              orElse: () => rawPosts.first,
+            )
+          : null;
+      final poll = firstPostJson == null
+          ? null
+          : _firstPollFromPost(firstPostJson, topicId: topicId);
       final details = (t['details'] as Map<String, dynamic>?) ?? const {};
       final createdBy =
           (details['created_by'] as Map<String, dynamic>?) ?? const {};
@@ -195,6 +238,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         canReply: !(t['closed'] == true || t['archived'] == true),
         canReport: true,
         canUpload: true,
+        poll: poll,
       );
     } catch (e) {
       return _emptyThreadByUnread(message: 'Error: $e');
@@ -337,9 +381,184 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   Future<FCPoll?> votePollAsync(
       String topicId, List<String> responseIds) async {
     // Discourse poll vote: PUT /polls/vote { post_id, poll_name, options[] }.
-    // The SDK contract is keyed on topic_id, so we look up the first post id
-    // first. Phase 2.0 punt: not yet wired.
+    // We stash (post_id, poll_name) on the FCPoll via [_pollMeta] when
+    // parsing; the caller hands us back option ids (poll-option digests),
+    // so we can vote without refetching the topic to find the host post.
+    if (responseIds.isEmpty) return null;
+    // Look up the meta from the first response id — we expose a helper
+    // below so the UI doesn't need to know about the Expando, but if it
+    // hasn't seen the poll instance we have to fall back to fetching
+    // /t/{id}.json to find the first post.
+    int? postId;
+    String pollName = 'poll';
+    final meta = _lookupPollMetaByResponseId(responseIds.first);
+    if (meta != null) {
+      postId = meta.postId;
+      pollName = meta.pollName;
+    } else {
+      final fallback = await _findFirstPostId(topicId);
+      if (fallback == null) return null;
+      postId = fallback;
+    }
+    try {
+      final response = await apiPut('/polls/vote', body: {
+        'post_id': postId,
+        'poll_name': pollName,
+        'options[]': responseIds,
+      });
+      final pollJson = (response['poll'] as Map?)?.cast<String, dynamic>();
+      if (pollJson == null) return null;
+      final votedAfter = ((response['vote'] as List?) ?? const [])
+          .whereType<String>()
+          .toList();
+      return _pollFromJson(
+        pollJson,
+        topicId: topicId,
+        postId: postId,
+        viewerVotes: votedAfter,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Reverse-lookup helper: scans recently-parsed polls for one whose
+  /// option list contains [responseId]. Cheap because [_pollMeta] is an
+  /// Expando keyed on FCPoll instances — we keep a parallel small list of
+  /// recent (poll, meta) tuples for this lookup.
+  static final List<_RecentPoll> _recentPolls = [];
+
+  _DiscoursePollMeta? _lookupPollMetaByResponseId(String responseId) {
+    for (final entry in _recentPolls) {
+      for (final opt in entry.poll.responses) {
+        if (opt.id == responseId) {
+          return _pollMeta[entry.poll];
+        }
+      }
+    }
     return null;
+  }
+
+  Future<int?> _findFirstPostId(String topicId) async {
+    try {
+      final t = await apiGet('/t/$topicId.json');
+      final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
+      final posts = (stream['posts'] as List?) ?? const [];
+      for (final raw in posts.whereType<Map>()) {
+        final p = raw.cast<String, dynamic>();
+        if ((p['post_number'] as int?) == 1) {
+          return (p['id'] as num?)?.toInt();
+        }
+      }
+      // Some endpoints omit post_number; fall back to first.
+      if (posts.isNotEmpty) {
+        return ((posts.first as Map)['id'] as num?)?.toInt();
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  /// Build an FCPoll from a Discourse poll object (`p['polls'][0]`),
+  /// stamping the [_pollMeta] sidecar so [votePollAsync] knows which
+  /// post_id + poll_name to use.
+  FCPoll? _pollFromJson(
+    Map<String, dynamic> pollJson, {
+    required String topicId,
+    required int postId,
+    List<String>? viewerVotes,
+  }) {
+    final name = (pollJson['name'] ?? 'poll').toString();
+    final type = (pollJson['type'] ?? 'regular').toString();
+    final status = (pollJson['status'] ?? 'open').toString();
+    final results = (pollJson['results'] ?? 'always').toString();
+    final isClosed = status == 'closed';
+    final voters = (pollJson['voters'] as num?)?.toInt();
+    final maxRaw = pollJson['max'];
+    final int max;
+    if (type == 'multiple') {
+      max = (maxRaw is num) ? maxRaw.toInt() : 0;
+    } else {
+      max = 1;
+    }
+    final voted = (viewerVotes ?? const <String>[]).toSet();
+    final options = ((pollJson['options'] as List?) ?? const [])
+        .whereType<Map>()
+        .map((o) => o.cast<String, dynamic>())
+        .map((o) {
+      final id = (o['id'] ?? '').toString();
+      // Discourse uses `votes` only when the viewer is allowed to see
+      // counts; otherwise it omits the field.
+      final hasCount = o.containsKey('votes');
+      return FCPollResponse(
+        id: id,
+        text: (o['html'] ?? o['text'] ?? '').toString(),
+        voteCount: hasCount ? (o['votes'] as num?)?.toInt() : null,
+        viewerVotedFor: voted.contains(id),
+      );
+    }).toList();
+
+    final hasVoted = voted.isNotEmpty;
+    final canViewResults = results == 'always' ||
+        (results == 'on_vote' && hasVoted) ||
+        (results == 'on_close' && isClosed);
+    final canVote = !isClosed && (!hasVoted || (pollJson['can_change_vote'] == true));
+
+    final poll = FCPoll(
+      pollId: name,
+      topicId: topicId,
+      question: (pollJson['title'] ?? '').toString(),
+      responses: options,
+      voterCount: canViewResults ? voters : null,
+      maxVotes: max,
+      changeVote: pollJson['can_change_vote'] == true,
+      publicVotes: pollJson['public'] == true,
+      viewResultsUnvoted: results == 'always',
+      closeDate: () {
+        final close = pollJson['close']?.toString();
+        if (close == null || close.isEmpty) return 0;
+        final dt = DateTime.tryParse(close);
+        return dt?.millisecondsSinceEpoch ?? 0;
+      }(),
+      isClosed: isClosed,
+      canVote: canVote,
+      hasVoted: hasVoted,
+      canViewResults: canViewResults,
+    );
+    _pollMeta[poll] = _DiscoursePollMeta(postId: postId, pollName: name);
+    _trackRecentPoll(poll);
+    return poll;
+  }
+
+  void _trackRecentPoll(FCPoll poll) {
+    // Cap the recent-polls list at a small size; this is only a fallback
+    // for the Expando lookup path.
+    _recentPolls.removeWhere((e) => e.poll.pollId == poll.pollId &&
+        e.poll.topicId == poll.topicId);
+    _recentPolls.insert(0, _RecentPoll(poll));
+    if (_recentPolls.length > 20) {
+      _recentPolls.removeRange(20, _recentPolls.length);
+    }
+  }
+
+  /// Extract the first poll from a Discourse post payload, if any.
+  FCPoll? _firstPollFromPost(Map<String, dynamic> p, {required String topicId}) {
+    final polls = (p['polls'] as List?) ?? const [];
+    if (polls.isEmpty) return null;
+    final first = (polls.first as Map?)?.cast<String, dynamic>();
+    if (first == null) return null;
+    final postId = (p['id'] as num?)?.toInt();
+    if (postId == null) return null;
+    final votesByPoll = (p['polls_votes'] as Map?)?.cast<String, dynamic>();
+    final pollName = (first['name'] ?? 'poll').toString();
+    final viewerVotes = ((votesByPoll?[pollName] as List?) ?? const [])
+        .whereType<String>()
+        .toList();
+    return _pollFromJson(
+      first,
+      topicId: topicId,
+      postId: postId,
+      viewerVotes: viewerVotes,
+    );
   }
 
   /// Discourse-only: bookmark [postId]. Returns true on success. UI uses
@@ -627,4 +846,19 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       timestamp: DateTime.now(),
     );
   }
+}
+
+/// Sidecar struct stamped on every parsed [FCPoll] so the vote endpoint
+/// can be called without re-fetching the topic.
+class _DiscoursePollMeta {
+  final int postId;
+  final String pollName;
+  const _DiscoursePollMeta({required this.postId, required this.pollName});
+}
+
+/// Holds a strong reference to a recently-parsed poll so the Expando
+/// lookup can succeed during a vote round-trip. Ring-buffer cap at 20.
+class _RecentPoll {
+  final FCPoll poll;
+  _RecentPoll(this.poll);
 }
