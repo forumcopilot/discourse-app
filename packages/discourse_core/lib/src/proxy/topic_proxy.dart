@@ -307,6 +307,45 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     }
   }
 
+  /// Discourse-only: list topics filtered by [tagName]. Hits
+  /// `/tag/{tagName}.json` (paginated). Used by the tag-chip → tag-page
+  /// navigation in the topic list. Not exposed on IFCTopicProxy because
+  /// XF-shaped forums don't have a tag concept.
+  Future<FCTopicDataResult> getTopicsByTagAsync(
+    String tagName, {
+    int page = 0,
+  }) async {
+    if (tagName.isEmpty) {
+      return _emptyTopicData(forumId: '', message: 'tag required');
+    }
+    try {
+      final list = await _listTopics(
+        '/tag/${Uri.encodeComponent(tagName)}.json',
+        page: page,
+      );
+      return FCTopicDataResult(
+        result: true,
+        resultText: '',
+        forumId: '',
+        forumName: '#$tagName',
+        canPost: list.canPost,
+        canUpload: list.canPost,
+        unreadStickyCount: 0,
+        unreadAnnounceCount: 0,
+        canSubscribe: true,
+        isSubscribed: false,
+        requirePrefix: false,
+        prefixes: const [],
+        totalTopicNum: list.topics.length,
+        topics: list.topics,
+      );
+    } on DiscourseApiException catch (e) {
+      return _emptyTopicData(forumId: '', message: e.userMessage);
+    } catch (e) {
+      return _emptyTopicData(forumId: '', message: 'Error: $e');
+    }
+  }
+
   // ===== Helpers =====
 
   Future<FCTopicDataResult> _topicListInForum(

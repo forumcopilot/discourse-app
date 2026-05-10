@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 import 'package:forumcopilot_flutter/utils/time_utils.dart';
 import 'package:forumcopilot_flutter/utils/number_utils.dart';
 import 'package:forumcopilot_flutter/views/widgets/user_avatar.dart';
+import 'package:forumcopilot_flutter/views/tag_topics_page.dart';
 import '../../theme/design_tokens.dart';
 import '../../theme/style_builders.dart';
 
@@ -181,30 +182,46 @@ class TopicListItem extends StatelessWidget {
                   child: Wrap(
                     spacing: DesignTokens.spacingXS,
                     runSpacing: DesignTokens.spacingXS,
-                    children: tags
-                        .map((tag) => Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
+                    children: tags.map((tag) {
+                      final chipShape = RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(DesignTokens.radiusS),
+                      );
+                      return Material(
+                        color: colorScheme.surfaceContainerHighest,
+                        shape: chipShape.copyWith(
+                          side: BorderSide(
+                            color: colorScheme.outlineVariant,
+                            width: 0.5,
+                          ),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: InkWell(
+                          customBorder: chipShape,
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => TagTopicsPage(
+                                siteContext: siteContext,
+                                tag: tag,
                               ),
-                              decoration: BoxDecoration(
-                                color: colorScheme.surfaceContainerHighest,
-                                borderRadius: BorderRadius.circular(
-                                    DesignTokens.radiusS),
-                                border: Border.all(
-                                  color: colorScheme.outlineVariant,
-                                  width: 0.5,
-                                ),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            child: Text(
+                              tag,
+                              style: textTheme.labelSmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                                letterSpacing: DesignTokens.letterSpacingWide,
                               ),
-                              child: Text(
-                                tag,
-                                style: textTheme.labelSmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                  letterSpacing: DesignTokens.letterSpacingWide,
-                                ),
-                              ),
-                            ))
-                        .toList(),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 );
               },
