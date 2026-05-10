@@ -529,8 +529,16 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       isLiked: (t['liked'] as bool?) ?? false,
       likeCount: (t['like_count'] as int?) ?? 0,
       hasPoll: false,
+      // Discourse returns tags as either:
+      //   ["foo","bar"]                          (older endpoints)
+      //   [{id,name,slug}, ...]                  (post tag-system upgrade)
+      // Accept both shapes.
       tags: ((t['tags'] as List?) ?? const [])
-          .whereType<String>()
+          .map((entry) {
+            if (entry is String) return entry;
+            if (entry is Map) return (entry['name'] ?? '').toString();
+            return '';
+          })
           .where((s) => s.isNotEmpty)
           .toList(growable: false),
     );
