@@ -246,6 +246,7 @@ class TopicListItem extends StatelessWidget {
                 // Count status icons to determine if we should show labels
                 final statusIconCount = [
                   if (topicIcon != null) 1,
+                  if (topic.hasAcceptedAnswer) 1,
                   if (topic.isPinned) 1,
                   if (topic.isSubscribed) 1,
                   if (topic.isClosed) 1,
@@ -335,6 +336,27 @@ class TopicListItem extends StatelessWidget {
                                 'Announcement',
                                 style: textTheme.bodySmall?.copyWith(
                                   color: metaColor,
+                                  letterSpacing: DesignTokens.letterSpacingWide,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      if (topic.hasAcceptedAnswer)
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              size: textTheme.bodySmall?.fontSize ?? 12,
+                              color: Colors.green.shade600,
+                            ),
+                            if (showLabels) ...[
+                              SizedBox(width: DesignTokens.spacingXS),
+                              Text(
+                                'Solved',
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: Colors.green.shade600,
                                   letterSpacing: DesignTokens.letterSpacingWide,
                                 ),
                               ),

@@ -83,6 +83,7 @@ class FCThreadResult extends FCTopic with FCThreadResultMappable {
     bool hasPoll = false,
     FCPoll? poll,
     List<String> tags = const [],
+    bool hasAcceptedAnswer = false,
   }) : super(
           id: id,
           title: title,
@@ -130,6 +131,7 @@ class FCThreadResult extends FCTopic with FCThreadResultMappable {
           canReport: canReport,
           canUpload: canUpload,
           tags: tags,
+          hasAcceptedAnswer: hasAcceptedAnswer,
         );
 }
 
@@ -219,6 +221,7 @@ class FCThreadByUnreadResult extends FCTopic with FCThreadByUnreadResultMappable
     bool hasPoll = false,
     FCPoll? poll,
     List<String> tags = const [],
+    bool hasAcceptedAnswer = false,
   }) : super(
           id: id,
           title: title,
@@ -266,6 +269,7 @@ class FCThreadByUnreadResult extends FCTopic with FCThreadByUnreadResultMappable
           canReport: canReport,
           canUpload: canUpload,
           tags: tags,
+          hasAcceptedAnswer: hasAcceptedAnswer,
         );
 }
 
@@ -355,6 +359,7 @@ class FCThreadByPostResult extends FCTopic with FCThreadByPostResultMappable {
     bool hasPoll = false,
     FCPoll? poll,
     List<String> tags = const [],
+    bool hasAcceptedAnswer = false,
   }) : super(
           id: id,
           title: title,
@@ -402,6 +407,7 @@ class FCThreadByPostResult extends FCTopic with FCThreadByPostResultMappable {
           canReport: canReport,
           canUpload: canUpload,
           tags: tags,
+          hasAcceptedAnswer: hasAcceptedAnswer,
         );
 }
 
@@ -612,6 +618,7 @@ class FCAnnouncementResult extends FCTopic with FCAnnouncementResultMappable {
     bool hasPoll = false,
     FCPoll? poll,
     List<String> tags = const [],
+    bool hasAcceptedAnswer = false,
   }) : super(
           id: id,
           title: title,
@@ -659,5 +666,6 @@ class FCAnnouncementResult extends FCTopic with FCAnnouncementResultMappable {
           canReport: canReport,
           canUpload: canUpload,
           tags: tags,
+          hasAcceptedAnswer: hasAcceptedAnswer,
         );
 }

@@ -208,6 +208,20 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
     opt: true,
     def: false,
   );
+  static bool _$bookmarked(FCPost v) => v.bookmarked;
+  static const Field<FCPost, bool> _f$bookmarked = Field(
+    'bookmarked',
+    _$bookmarked,
+    opt: true,
+    def: false,
+  );
+  static bool _$acceptedAnswer(FCPost v) => v.acceptedAnswer;
+  static const Field<FCPost, bool> _f$acceptedAnswer = Field(
+    'acceptedAnswer',
+    _$acceptedAnswer,
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<FCPost> fields = const {
@@ -241,6 +255,8 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
     #isThanked: _f$isThanked,
     #canLike: _f$canLike,
     #canThank: _f$canThank,
+    #bookmarked: _f$bookmarked,
+    #acceptedAnswer: _f$acceptedAnswer,
   };
 
   static FCPost _instantiate(DecodingData data) {
@@ -275,6 +291,8 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
       isThanked: data.dec(_f$isThanked),
       canLike: data.dec(_f$canLike),
       canThank: data.dec(_f$canThank),
+      bookmarked: data.dec(_f$bookmarked),
+      acceptedAnswer: data.dec(_f$acceptedAnswer),
     );
   }
 
@@ -370,6 +388,8 @@ abstract class FCPostCopyWith<$R, $In extends FCPost, $Out>
     bool? isThanked,
     bool? canLike,
     bool? canThank,
+    bool? bookmarked,
+    bool? acceptedAnswer,
   });
   FCPostCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -448,6 +468,8 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
     bool? isThanked,
     bool? canLike,
     bool? canThank,
+    bool? bookmarked,
+    bool? acceptedAnswer,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -480,6 +502,8 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
       if (isThanked != null) #isThanked: isThanked,
       if (canLike != null) #canLike: canLike,
       if (canThank != null) #canThank: canThank,
+      if (bookmarked != null) #bookmarked: bookmarked,
+      if (acceptedAnswer != null) #acceptedAnswer: acceptedAnswer,
     }),
   );
   @override
@@ -517,6 +541,8 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
     isThanked: data.get(#isThanked, or: $value.isThanked),
     canLike: data.get(#canLike, or: $value.canLike),
     canThank: data.get(#canThank, or: $value.canThank),
+    bookmarked: data.get(#bookmarked, or: $value.bookmarked),
+    acceptedAnswer: data.get(#acceptedAnswer, or: $value.acceptedAnswer),
   );
 
   @override

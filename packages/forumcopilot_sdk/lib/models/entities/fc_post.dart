@@ -83,6 +83,14 @@ class FCPost with FCPostMappable {
   bool canLike;
   bool canThank;
 
+  /// Whether the current user has bookmarked this post (Discourse:
+  /// `bookmarked:true`). XF-flavored impls leave false.
+  bool bookmarked;
+
+  /// Whether this post is the accepted answer for its topic (Discourse:
+  /// `accepted_answer:true`, requires the discourse-solved plugin).
+  bool acceptedAnswer;
+
   FCPost(
       {required this.id,
       required this.title,
@@ -117,5 +125,7 @@ class FCPost with FCPostMappable {
       this.isLiked = false,
       this.isThanked = false,
       this.canLike = false,
-      this.canThank = false});
+      this.canThank = false,
+      this.bookmarked = false,
+      this.acceptedAnswer = false});
 }

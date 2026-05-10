@@ -541,6 +541,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
           })
           .where((s) => s.isNotEmpty)
           .toList(growable: false),
+      hasAcceptedAnswer: (t['has_accepted_answer'] as bool?) ?? false,
     );
   }
 

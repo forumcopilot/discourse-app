@@ -567,6 +567,7 @@ abstract class FCThreadResultCopyWith<$R, $In extends FCThreadResult, $Out>
     bool? hasPoll,
     FCPoll? poll,
     List<String>? tags,
+    bool? hasAcceptedAnswer,
   });
   FCThreadResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -650,6 +651,7 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
     bool? hasPoll,
     Object? poll = $none,
     List<String>? tags,
+    bool? hasAcceptedAnswer,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -703,6 +705,7 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
       if (hasPoll != null) #hasPoll: hasPoll,
       if (poll != $none) #poll: poll,
       if (tags != null) #tags: tags,
+      if (hasAcceptedAnswer != null) #hasAcceptedAnswer: hasAcceptedAnswer,
     }),
   );
   @override
@@ -760,6 +763,7 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
     hasPoll: data.get(#hasPoll, or: $value.hasPoll),
     poll: data.get(#poll, or: $value.poll),
     tags: data.get(#tags, or: $value.tags),
+    hasAcceptedAnswer: data.get(#hasAcceptedAnswer, or: $value.hasAcceptedAnswer),
   );
 
   @override
@@ -1347,6 +1351,7 @@ abstract class FCThreadByUnreadResultCopyWith<
     bool? hasPoll,
     FCPoll? poll,
     List<String>? tags,
+    bool? hasAcceptedAnswer,
   });
   FCThreadByUnreadResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -1432,6 +1437,7 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
     bool? hasPoll,
     Object? poll = $none,
     List<String>? tags,
+    bool? hasAcceptedAnswer,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -1486,6 +1492,7 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
       if (hasPoll != null) #hasPoll: hasPoll,
       if (poll != $none) #poll: poll,
       if (tags != null) #tags: tags,
+      if (hasAcceptedAnswer != null) #hasAcceptedAnswer: hasAcceptedAnswer,
     }),
   );
   @override
@@ -1544,6 +1551,7 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
     hasPoll: data.get(#hasPoll, or: $value.hasPoll),
     poll: data.get(#poll, or: $value.poll),
     tags: data.get(#tags, or: $value.tags),
+    hasAcceptedAnswer: data.get(#hasAcceptedAnswer, or: $value.hasAcceptedAnswer),
   );
 
   @override
@@ -2130,6 +2138,7 @@ abstract class FCThreadByPostResultCopyWith<
     bool? hasPoll,
     FCPoll? poll,
     List<String>? tags,
+    bool? hasAcceptedAnswer,
   });
   FCThreadByPostResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -2214,6 +2223,7 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
     bool? hasPoll,
     Object? poll = $none,
     List<String>? tags,
+    bool? hasAcceptedAnswer,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -2268,6 +2278,7 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
       if (hasPoll != null) #hasPoll: hasPoll,
       if (poll != $none) #poll: poll,
       if (tags != null) #tags: tags,
+      if (hasAcceptedAnswer != null) #hasAcceptedAnswer: hasAcceptedAnswer,
     }),
   );
   @override
@@ -2326,6 +2337,7 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
     hasPoll: data.get(#hasPoll, or: $value.hasPoll),
     poll: data.get(#poll, or: $value.poll),
     tags: data.get(#tags, or: $value.tags),
+    hasAcceptedAnswer: data.get(#hasAcceptedAnswer, or: $value.hasAcceptedAnswer),
   );
 
   @override
@@ -3894,6 +3906,7 @@ abstract class FCAnnouncementResultCopyWith<
     bool? hasPoll,
     FCPoll? poll,
     List<String>? tags,
+    bool? hasAcceptedAnswer,
   });
   FCAnnouncementResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -3979,6 +3992,7 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
     bool? hasPoll,
     Object? poll = $none,
     List<String>? tags,
+    bool? hasAcceptedAnswer,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -4035,6 +4049,7 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
       if (hasPoll != null) #hasPoll: hasPoll,
       if (poll != $none) #poll: poll,
       if (tags != null) #tags: tags,
+      if (hasAcceptedAnswer != null) #hasAcceptedAnswer: hasAcceptedAnswer,
     }),
   );
   @override
@@ -4100,6 +4115,7 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
     hasPoll: data.get(#hasPoll, or: $value.hasPoll),
     poll: data.get(#poll, or: $value.poll),
     tags: data.get(#tags, or: $value.tags),
+    hasAcceptedAnswer: data.get(#hasAcceptedAnswer, or: $value.hasAcceptedAnswer),
   );
 
   @override

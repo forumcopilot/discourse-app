@@ -339,6 +339,54 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     return null;
   }
 
+  /// Discourse-only: bookmark [postId]. Returns true on success. UI uses
+  /// this for the bookmark icon toggle on individual posts.
+  Future<bool> bookmarkPostAsync(String postId) async {
+    try {
+      await apiPost('/bookmarks.json', body: {
+        'bookmarkable_type': 'Post',
+        'bookmarkable_id': int.tryParse(postId) ?? postId,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Discourse-only: remove the bookmark from [postId]. Discourse's
+  /// DELETE endpoint requires the bookmark id (not post id), so we look
+  /// it up via /u/{me}/bookmarks.json first. Returns true on success.
+  Future<bool> unbookmarkPostAsync(String postId) async {
+    final username = siteContext.currentUsername;
+    if (username == null || username.isEmpty) return false;
+    final pid = int.tryParse(postId);
+    if (pid == null) return false;
+    try {
+      final response = await apiGet(
+          '/u/${Uri.encodeComponent(username)}/bookmarks.json');
+      final ub = (response['user_bookmark_list'] as Map<String, dynamic>?) ??
+          const <String, dynamic>{};
+      final bookmarks = (ub['bookmarks'] as List?) ?? const [];
+      int? bookmarkId;
+      for (final raw in bookmarks.whereType<Map>()) {
+        final b = raw.cast<String, dynamic>();
+        // Discourse exposes either post_id or bookmarkable_id depending on
+        // version. Match against either.
+        final matchPostId = b['post_id'] == pid ||
+            (b['bookmarkable_type'] == 'Post' && b['bookmarkable_id'] == pid);
+        if (matchPostId) {
+          bookmarkId = b['id'] as int?;
+          break;
+        }
+      }
+      if (bookmarkId == null) return false;
+      await apiDelete('/bookmarks/$bookmarkId.json');
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   // ===== Helpers =====
 
   FCPost _postFrom(Map<String, dynamic> p, {required String topicId}) {
@@ -380,6 +428,8 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       canReport: true,
       canLike: canLike,
       isLiked: isLiked,
+      bookmarked: (p['bookmarked'] as bool?) ?? false,
+      acceptedAnswer: (p['accepted_answer'] as bool?) ?? false,
       // Pass mutable empty lists so optimistic-UI code in post_actions.dart
       // can call `.add()` without tripping "Cannot add to an unmodifiable
       // list" (FCPost defaults these to `const []`). Discourse's
