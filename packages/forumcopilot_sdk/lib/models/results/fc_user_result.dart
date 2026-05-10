@@ -441,6 +441,10 @@ class FCUserInfoResult extends FCUser with FCUserInfoResultMappable {
   /// Is ignored (compatibility)
   bool? infoIsIgnored;
 
+  /// Discourse trust level (0 = new, 1 = basic, 2 = member, 3 = regular,
+  /// 4 = leader). XF-flavored impls leave this null.
+  int? trustLevel;
+
   FCUserInfoResult({
     required this.result,
     this.resultText,
@@ -503,6 +507,7 @@ class FCUserInfoResult extends FCUser with FCUserInfoResultMappable {
     this.isBan,
     this.canMarkSpam,
     this.infoIsIgnored,
+    this.trustLevel,
   }) : super(
           id: id,
           username: username,

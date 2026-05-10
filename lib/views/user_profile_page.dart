@@ -126,6 +126,25 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
+  /// Discourse trust level label. 0–4 are the canonical
+  /// levels; anything outside that range falls back to "TLn".
+  String _trustLevelLabel(int level) {
+    switch (level) {
+      case 0:
+        return 'TL0 · New';
+      case 1:
+        return 'TL1 · Basic';
+      case 2:
+        return 'TL2 · Member';
+      case 3:
+        return 'TL3 · Regular';
+      case 4:
+        return 'TL4 · Leader';
+      default:
+        return 'TL$level';
+    }
+  }
+
   /// Refresh the entire user profile page by resetting state and fetching fresh data
   Future<void> _refreshProfile() async {
     AppLogger.debug('Refreshing user profile page');
@@ -415,6 +434,36 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   textAlign: TextAlign.center,
                                   maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                            // Discourse trust level badge (0–4). Hidden on
+                            // forums that don't expose trustLevel.
+                            if (_userInfo!.trustLevel != null) ...[
+                              SizedBox(height: DesignTokens.spacingS),
+                              Center(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.surfaceContainerHighest,
+                                    borderRadius: BorderRadius.circular(
+                                        DesignTokens.radiusM),
+                                    border: Border.all(
+                                      color: colorScheme.outlineVariant,
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    _trustLevelLabel(_userInfo!.trustLevel!),
+                                    style: textTheme.labelSmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                      letterSpacing:
+                                          DesignTokens.letterSpacingWide,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],

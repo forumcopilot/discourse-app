@@ -319,6 +319,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         website: user['website_name']?.toString() ?? user['website']?.toString(),
         signature: null,
         bio: (user['bio_excerpt'] ?? user['bio_raw'])?.toString(),
+        trustLevel: user['trust_level'] as int?,
       );
     } catch (e) {
       return FCUserInfoResult(

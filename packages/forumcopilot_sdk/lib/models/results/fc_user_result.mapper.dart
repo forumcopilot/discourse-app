@@ -2400,6 +2400,12 @@ class FCUserInfoResultMapper extends ClassMapperBase<FCUserInfoResult> {
     _$infoIsIgnored,
     opt: true,
   );
+  static int? _$trustLevel(FCUserInfoResult v) => v.trustLevel;
+  static const Field<FCUserInfoResult, int> _f$trustLevel = Field(
+    'trustLevel',
+    _$trustLevel,
+    opt: true,
+  );
 
   @override
   final MappableFields<FCUserInfoResult> fields = const {
@@ -2461,6 +2467,7 @@ class FCUserInfoResultMapper extends ClassMapperBase<FCUserInfoResult> {
     #isBan: _f$isBan,
     #canMarkSpam: _f$canMarkSpam,
     #infoIsIgnored: _f$infoIsIgnored,
+    #trustLevel: _f$trustLevel,
   };
 
   static FCUserInfoResult _instantiate(DecodingData data) {
@@ -2523,6 +2530,7 @@ class FCUserInfoResultMapper extends ClassMapperBase<FCUserInfoResult> {
       isBan: data.dec(_f$isBan),
       canMarkSpam: data.dec(_f$canMarkSpam),
       infoIsIgnored: data.dec(_f$infoIsIgnored),
+      trustLevel: data.dec(_f$trustLevel),
     );
   }
 
@@ -2659,6 +2667,7 @@ abstract class FCUserInfoResultCopyWith<$R, $In extends FCUserInfoResult, $Out>
     bool? isBan,
     bool? canMarkSpam,
     bool? infoIsIgnored,
+    int? trustLevel,
   });
   FCUserInfoResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -2760,6 +2769,7 @@ class _FCUserInfoResultCopyWithImpl<$R, $Out>
     Object? isBan = $none,
     Object? canMarkSpam = $none,
     Object? infoIsIgnored = $none,
+    Object? trustLevel = $none,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -2821,6 +2831,7 @@ class _FCUserInfoResultCopyWithImpl<$R, $Out>
       if (isBan != $none) #isBan: isBan,
       if (canMarkSpam != $none) #canMarkSpam: canMarkSpam,
       if (infoIsIgnored != $none) #infoIsIgnored: infoIsIgnored,
+      if (trustLevel != $none) #trustLevel: trustLevel,
     }),
   );
   @override
@@ -2889,6 +2900,7 @@ class _FCUserInfoResultCopyWithImpl<$R, $Out>
     isBan: data.get(#isBan, or: $value.isBan),
     canMarkSpam: data.get(#canMarkSpam, or: $value.canMarkSpam),
     infoIsIgnored: data.get(#infoIsIgnored, or: $value.infoIsIgnored),
+    trustLevel: data.get(#trustLevel, or: $value.trustLevel),
   );
 
   @override
