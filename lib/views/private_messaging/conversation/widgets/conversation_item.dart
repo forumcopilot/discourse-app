@@ -4,9 +4,8 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_like.dart';
 import 'package:forumcopilot_flutter/views/widgets/user_avatar.dart';
-import 'package:flutter_bbcode/flutter_bbcode.dart';
-import '../../../../utils/bbcode_processor.dart';
-import '../../../widgets/custom_bb_stylesheet.dart';
+import '../../../widgets/custom_bb_stylesheet.dart' show BBCodeCallbacks;
+import '../../../widgets/rich_text_content.dart';
 import 'package:forumcopilot_flutter/views/user_profile_page.dart';
 import '../../../../utils/time_utils.dart';
 import '../../../../utils/url_utils.dart';
@@ -64,8 +63,6 @@ class ConversationHeaderItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
-    final processedText = BBCodeProcessor.processText(message.textBody ?? '', siteContext: siteContext).trimRight();
 
     // Filter out attachments that are already displayed inline
     final nonInlineAttachments = message.attachments.where((att) {
@@ -183,12 +180,6 @@ class ConversationHeaderItem extends StatelessWidget {
       inlineAttachments: message.attachments,
       attachments: message.attachments,
     );
-    final stylesheet = CustomBBStylesheet(
-      siteContext: siteContext,
-      callbacks: callbacks,
-      context: context,
-    );
-
     return Material(
       color: isHighlighted ? colorScheme.primaryContainer.withOpacity(0.3) : (message.isUnread == true ? colorScheme.primaryContainer.withOpacity(0.1) : colorScheme.surface),
       child: InkWell(
@@ -332,36 +323,11 @@ class ConversationHeaderItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Builder(
-                    builder: (context) {
-                      final processor = BBCodeProcessor();
-                      String textToRender = processor.getValidBBCodeText(processedText);
-                      if (textToRender == processedText && !processor.isBBCodeStructurallyValid(textToRender)) {
-                        return Text(
-                          processedText,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface,
-                            height: DesignTokens.lineHeightTight,
-                          ),
-                        );
-                      }
-                      try {
-                        return BBCodeText(
-                          data: textToRender,
-                          stylesheet: stylesheet,
-                        );
-                      } catch (error, stackTrace) {
-                        debugPrint('BBCode parsing error in conversation: \n$error\nStackTrace: $stackTrace');
-                        debugPrint('Conversation content that caused error:\n$textToRender');
-                        return Text(
-                          processedText,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface,
-                            height: DesignTokens.lineHeightTight,
-                          ),
-                        );
-                      }
-                    },
+                  // Discourse PMs come as cooked HTML in textBody.
+                  RichTextContent(
+                    siteContext: siteContext,
+                    content: message.textBody ?? '',
+                    callbacks: callbacks,
                   ),
                 ],
               ),
@@ -913,8 +879,6 @@ class ConversationItem extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final processedText = BBCodeProcessor.processText(message.textBody ?? '', siteContext: siteContext).trimRight();
-
     // Filter out attachments that are already displayed inline
     final nonInlineAttachments = message.attachments.where((att) {
       // Check if attachment has isInline property - filter out inline attachments
@@ -1029,12 +993,6 @@ class ConversationItem extends StatelessWidget {
       },
       inlineAttachments: message.attachments,
       attachments: message.attachments,
-    );
-
-    final stylesheet = CustomBBStylesheet(
-      siteContext: siteContext,
-      callbacks: callbacks,
-      context: context,
     );
 
     return Material(
@@ -1180,36 +1138,11 @@ class ConversationItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Builder(
-                    builder: (context) {
-                      final processor = BBCodeProcessor();
-                      String textToRender = processor.getValidBBCodeText(processedText);
-                      if (textToRender == processedText && !processor.isBBCodeStructurallyValid(textToRender)) {
-                        return Text(
-                          processedText,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface,
-                            height: DesignTokens.lineHeightTight,
-                          ),
-                        );
-                      }
-                      try {
-                        return BBCodeText(
-                          data: textToRender,
-                          stylesheet: stylesheet,
-                        );
-                      } catch (error, stackTrace) {
-                        debugPrint('BBCode parsing error in conversation: \n$error\nStackTrace: $stackTrace');
-                        debugPrint('Conversation content that caused error:\n$textToRender');
-                        return Text(
-                          processedText,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface,
-                            height: DesignTokens.lineHeightTight,
-                          ),
-                        );
-                      }
-                    },
+                  // Discourse PMs come as cooked HTML in textBody.
+                  RichTextContent(
+                    siteContext: siteContext,
+                    content: message.textBody ?? '',
+                    callbacks: callbacks,
                   ),
                 ],
               ),

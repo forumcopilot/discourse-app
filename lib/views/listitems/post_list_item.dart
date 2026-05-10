@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
-import '../widgets/custom_bb_stylesheet.dart';
+import '../widgets/custom_bb_stylesheet.dart' show BBCodeCallbacks;
+import '../widgets/rich_text_content.dart';
 import '../widgets/link_preview_card.dart';
 import '../widgets/video_card.dart';
 import '../widgets/full_screen_video_viewer.dart';
@@ -438,11 +438,6 @@ class _PostListItemState extends State<PostListItem> {
       inlineAttachments: widget.post.inlineAttachments,
       attachments: widget.post.attachments,
     );
-    final stylesheet = CustomBBStylesheet(
-      siteContext: widget.siteContext,
-      callbacks: callbacks,
-      context: context,
-    );
     // Check if attachments/images are the last items - if so, reduce bottom padding
     // to avoid excessive white space between images and social buttons
     // Attachments and filteredInlineAttachments always come last (after text, videos, links)
@@ -607,40 +602,13 @@ class _PostListItemState extends State<PostListItem> {
               ),
             ),
           ],
-          Builder(
-            builder: (context) {
-              final processor = BBCodeProcessor();
-              String textToRender =
-                  processor.getValidBBCodeText(data.processedText);
-              if (textToRender == data.processedText &&
-                  !processor.isBBCodeStructurallyValid(textToRender)) {
-                return Text(
-                  data.processedText,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                    height: DesignTokens.lineHeightTight,
-                  ),
-                );
-              }
-              try {
-                return BBCodeText(
-                  data: textToRender,
-                  stylesheet: stylesheet,
-                );
-              } catch (error, stackTrace) {
-                debugPrint(
-                    'BBCode parsing error in post: \n$error\nStackTrace: $stackTrace');
-                debugPrint('Post content that caused error:\n$textToRender');
-                // If BBCode parsing fails, display as plain text instead of rich text
-                return Text(
-                  data.processedText,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                    height: DesignTokens.lineHeightTight,
-                  ),
-                );
-              }
-            },
+          // Discourse posts arrive as server-rendered HTML in the
+          // `cooked` field, so we render it directly with flutter_html
+                  // via RichTextContent — the BBCode pipeline is XF-only.
+          RichTextContent(
+            siteContext: widget.siteContext,
+            content: widget.translatedContent ?? widget.post.content,
+            callbacks: callbacks,
           ),
           if (data.limitedYoutubeUrls.isNotEmpty) ...[
             const SizedBox(height: DesignTokens.spacingM),

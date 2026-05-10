@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_message_result.dart';
 import 'package:forumcopilot_flutter/views/widgets/user_avatar.dart';
-import 'package:flutter_bbcode/flutter_bbcode.dart';
-import '../../utils/bbcode_processor.dart';
-import '../widgets/custom_bb_stylesheet.dart';
+import '../widgets/custom_bb_stylesheet.dart' show BBCodeCallbacks;
+import '../widgets/rich_text_content.dart';
 import 'package:forumcopilot_flutter/views/user_profile_page.dart';
 import '../../utils/time_utils.dart';
 import '../../utils/url_utils.dart';
@@ -27,7 +26,6 @@ class MessageItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final processedText = BBCodeProcessor.processText(message.textBody, siteContext: siteContext).trimRight();
 
     final callbacks = BBCodeCallbacks(
       onUrlTap: (url) async {
@@ -57,12 +55,6 @@ class MessageItem extends StatelessWidget {
         );
       },
       // You can add onImageTap/onVideoTap if needed
-    );
-
-    final stylesheet = CustomBBStylesheet(
-      siteContext: siteContext,
-      callbacks: callbacks,
-      context: context,
     );
 
     return Column(
@@ -240,29 +232,11 @@ class MessageItem extends StatelessWidget {
                   colorScheme: colorScheme,
                 ),
                 const SizedBox(height: DesignTokens.spacingL),
-                // Message Body (BBCode)
-                Builder(
-                  builder: (context) {
-                    try {
-                      final processor = BBCodeProcessor();
-                      String textToRender = processor.getValidBBCodeText(processedText);
-                      return BBCodeText(
-                        data: textToRender,
-                        stylesheet: stylesheet,
-                      );
-                    } catch (error, stackTrace) {
-                      debugPrint('BBCode parsing error in message: \n$error\nStackTrace: $stackTrace');
-                      debugPrint('Message content that caused error:\n$processedText');
-                      // If BBCode parsing fails, display as plain text instead of rich text
-                      return Text(
-                        processedText,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurface,
-                          height: 1.2,
-                        ),
-                      );
-                    }
-                  },
+                // Message body (Discourse renders cooked HTML).
+                RichTextContent(
+                  siteContext: siteContext,
+                  content: message.textBody,
+                  callbacks: callbacks,
                 ),
               ],
             ),
