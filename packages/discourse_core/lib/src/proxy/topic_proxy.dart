@@ -7,6 +7,7 @@ import 'package:forumcopilot_sdk/models/results/fc_topic_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
+import '../topic_tags.dart';
 
 /// Discourse implementation of [IFCTopicProxy].
 ///
@@ -457,7 +458,11 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         .toSet()
         .toList(growable: false);
 
-    return FCTopic(
+    final tags = ((t['tags'] as List?) ?? const [])
+        .whereType<String>()
+        .where((s) => s.isNotEmpty)
+        .toList(growable: false);
+    final topic = FCTopic(
       id: id,
       title: (t['title'] ?? '').toString(),
       forumId: categoryId,
@@ -491,6 +496,8 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       likeCount: (t['like_count'] as int?) ?? 0,
       hasPoll: false,
     );
+    DiscourseTopicTags.set(topic, tags);
+    return topic;
   }
 
   FCTopicDataResult _emptyTopicData({

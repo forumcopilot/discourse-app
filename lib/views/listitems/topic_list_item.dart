@@ -1,3 +1,4 @@
+import 'package:discourse_core/discourse_core.dart' show DiscourseTopicTags;
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
@@ -164,6 +165,51 @@ class TopicListItem extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+            // Discourse tags (chips below the title). DiscourseTopicTags
+            // returns const [] for non-Discourse forums, so this row is
+            // automatically hidden in those cases.
+            Builder(
+              builder: (context) {
+                final tags = DiscourseTopicTags.of(topic);
+                if (tags.isEmpty) return const SizedBox.shrink();
+                return Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    DesignTokens.spacingL,
+                    0.0,
+                    DesignTokens.spacingL,
+                    DesignTokens.spacingS,
+                  ),
+                  child: Wrap(
+                    spacing: DesignTokens.spacingXS,
+                    runSpacing: DesignTokens.spacingXS,
+                    children: tags
+                        .map((tag) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(
+                                    DesignTokens.radiusS),
+                                border: Border.all(
+                                  color: colorScheme.outlineVariant,
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Text(
+                                tag,
+                                style: textTheme.labelSmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                  letterSpacing: DesignTokens.letterSpacingWide,
+                                ),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                );
+              },
             ),
             // Short content if available
             if (topic.shortContent!.isNotEmpty && !topic.isAnnouncement) ...[
