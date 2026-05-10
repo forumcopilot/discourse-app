@@ -17,13 +17,24 @@ abstract class IFCTopicProxy {
 
   /// Post new topic to a particular forum
   ///
-  /// [forumId] Forum ID where the topic will be created
-  /// [subject] Subject/title of the topic
-  /// [textBody] Content/body of the topic
-  /// [prefixId] Optional prefix ID for the topic
-  /// [attachmentIds] Optional list of attachment IDs
-  /// [groupId] Optional group ID for attachments
-  Future<FCNewTopicResult> newTopic(String forumId, String subject, String textBody, {String? prefixId, List<String>? attachmentIds, String? groupId});
+  /// [forumId] Forum (category) ID where the topic will be created.
+  /// [subject] Subject/title of the topic.
+  /// [textBody] Content/body of the topic.
+  /// [prefixId] Optional prefix ID for the topic (XF-flavored; Discourse
+  /// implementations ignore this).
+  /// [attachmentIds] Optional list of attachment IDs.
+  /// [groupId] Optional group ID for attachments.
+  /// [tags] Discourse-native tag names to attach to the new topic.
+  /// Forums without a tag concept ignore the field.
+  Future<FCNewTopicResult> newTopic(
+    String forumId,
+    String subject,
+    String textBody, {
+    String? prefixId,
+    List<String>? attachmentIds,
+    String? groupId,
+    List<String>? tags,
+  });
 
   /// Returns a list of topics under a specific forum. It can also return sticky topics
   /// and announcement, given the "mode" parameter is provided.

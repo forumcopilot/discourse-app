@@ -59,6 +59,11 @@ class MessageComposePage extends StatefulWidget {
   // Show signature toggle for new topic editor
   final bool showSignatureToggle;
 
+  // Optional widget slot rendered between the prefix selector and the
+  // title field. Discourse uses this for the tag-input row; XF builds
+  // leave it null.
+  final Widget? extraHeader;
+
   const MessageComposePage({
     super.key,
     required this.siteContext,
@@ -89,6 +94,7 @@ class MessageComposePage extends StatefulWidget {
     this.onRemoveAttachment,
     this.submitIcon,
     this.showSignatureToggle = false,
+    this.extraHeader,
   });
 
   @override
@@ -1847,6 +1853,11 @@ class _MessageComposePageState extends State<MessageComposePage> {
                             // Add prefix selector here
                             _buildPrefixSelector(),
                             if (widget.prefixes != null && widget.prefixes!.isNotEmpty) SizedBox(height: DesignTokens.spacingL),
+                            // Discourse tag input slot.
+                            if (widget.extraHeader != null) ...[
+                              widget.extraHeader!,
+                              SizedBox(height: DesignTokens.spacingL),
+                            ],
                             if (widget.showTitleField)
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

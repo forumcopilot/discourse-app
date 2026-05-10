@@ -11,6 +11,7 @@ import 'package:forumcopilot_flutter/utils/image_optimization_utils.dart';
 import 'package:forumcopilot_flutter/utils/file_utils.dart';
 import 'package:forumcopilot_flutter/theme/design_tokens.dart';
 import 'package:forumcopilot_flutter/utils/discourse_draft_controller.dart';
+import 'package:forumcopilot_flutter/views/widgets/tag_input_field.dart';
 
 class NewTopicPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -38,6 +39,10 @@ class _NewTopicPageState extends State<NewTopicPage> {
   bool _requirePrefix = false;
   bool _isLoadingPrefixes = true;
   String? _prefixError;
+
+  // Discourse-native: tags attached to the new topic. Replaces the
+  // XF-flavored prefix dropdown for forums that support tagging.
+  List<String> _tags = const [];
 
   // Server-side draft. Discourse uses 'new_topic' as a global key for the
   // current user, scoped per-category by data['categoryId']. We tag the
@@ -161,6 +166,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
         prefixId: _selectedPrefixId, // Pass the selected prefix
         attachmentIds: _attachmentIds.isNotEmpty ? _attachmentIds : null,
         groupId: _groupId,
+        tags: _tags.isNotEmpty ? _tags : null,
       );
 
       debugPrint('🔍 [NEW_TOPIC] Submit result:');
@@ -365,6 +371,10 @@ class _NewTopicPageState extends State<NewTopicPage> {
       titleController: _titleController,
       contentController: _contentController,
       onSubmit: _handleSubmitWithDraftDiscard,
+      extraHeader: TagInputField(
+        initial: _tags,
+        onChanged: (tags) => _tags = tags,
+      ),
       onFileUpload: (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false) ? _handleFileUpload : null,
       forumName: widget.forumName,
       prefixes: _availablePrefixes,

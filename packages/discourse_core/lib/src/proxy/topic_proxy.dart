@@ -276,14 +276,21 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     String? prefixId,
     List<String>? attachmentIds,
     String? groupId,
+    List<String>? tags,
   }) async {
     try {
-      final response = await apiPost('/posts.json', body: {
+      final body = <String, dynamic>{
         'title': subject,
         'raw': textBody,
         'category': int.tryParse(forumId) ?? forumId,
         'archetype': 'regular',
-      });
+      };
+      // Discourse-native: pass tags as `tags[]`. Dio handles the array
+      // encoding correctly when given a List value.
+      if (tags != null && tags.isNotEmpty) {
+        body['tags[]'] = tags;
+      }
+      final response = await apiPost('/posts.json', body: body);
       return FCNewTopicResult(
         result: true,
         resultText: '',
@@ -304,6 +311,27 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         topicId: '',
         state: 0,
       );
+    }
+  }
+
+  /// Discourse-only: autocomplete tag names. Hits
+  /// `/tags/filter/search.json?q={prefix}&limit={N}` and returns the
+  /// matching tag names. Used by the tag-input field in the composer.
+  Future<List<String>> searchTagsAsync(String query, {int limit = 10}) async {
+    if (query.trim().isEmpty) return const [];
+    try {
+      final response = await apiGet('/tags/filter/search.json', query: {
+        'q': query.trim(),
+        'limit': limit.toString(),
+      });
+      final results = (response['results'] as List?) ?? const [];
+      return results
+          .whereType<Map>()
+          .map((r) => r['name']?.toString() ?? '')
+          .where((n) => n.isNotEmpty)
+          .toList(growable: false);
+    } catch (_) {
+      return const [];
     }
   }
 
