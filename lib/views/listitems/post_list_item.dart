@@ -6,6 +6,7 @@ import '../widgets/custom_bb_stylesheet.dart' show BBCodeCallbacks;
 import '../widgets/rich_text_content.dart';
 import '../widgets/reaction_chips_row.dart';
 import '../widgets/reaction_picker_sheet.dart';
+import '../widgets/post_vote_column.dart';
 import '../widgets/link_preview_card.dart';
 import '../widgets/video_card.dart';
 import '../widgets/full_screen_video_viewer.dart';
@@ -154,6 +155,10 @@ class _PostListItemState extends State<PostListItem> {
   // the chips row updates without a full thread refetch.
   late List<DiscourseReaction> _reactions;
 
+  // discourse-post-voting sidecar copy. Null when voting isn't
+  // enabled on this topic, in which case the vote column is hidden.
+  DiscoursePostVote? _vote;
+
   @override
   void initState() {
     super.initState();
@@ -167,6 +172,7 @@ class _PostListItemState extends State<PostListItem> {
     _isBookmarked = widget.post.bookmarked;
     _reactions =
         List.of(DiscoursePostProxy.reactionsFor(widget.post), growable: false);
+    _vote = DiscoursePostProxy.voteFor(widget.post);
   }
 
   /// Checks if a URL is a mention link (link text starts with @ and has no spaces)
@@ -470,6 +476,28 @@ class _PostListItemState extends State<PostListItem> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // discourse-post-voting vertical arrows. Only renders on
+          // posts in Q&A-style topics where the plugin populated
+          // post_voting_* fields on the JSON.
+          if (_vote != null) ...[
+            Padding(
+              padding: EdgeInsets.only(bottom: DesignTokens.spacingS),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: PostVoteColumn(
+                  postId: widget.post.id,
+                  vote: _vote!,
+                  isLoggedIn: widget.siteContext.isLoggedIn,
+                  onVoteChanged: (next) {
+                    setState(() {
+                      _vote = next;
+                      DiscoursePostProxy.setVoteFor(widget.post, next);
+                    });
+                  },
+                ),
+              ),
+            ),
+          ],
           // Discourse "solved" banner: shown on the post that was
           // marked as the accepted answer for this topic.
           if (widget.post.isSolution) ...[

@@ -11,6 +11,7 @@ import 'package:forumcopilot_sdk/models/results/fc_post_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../data/post/discourse_bookmark.dart';
+import '../data/post/discourse_post_vote.dart';
 import '../data/post/discourse_reaction.dart';
 import '../data/post/discourse_suggested_topic.dart';
 
@@ -43,6 +44,10 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   /// [reactionsFor].
   static final Expando<List<DiscourseReaction>> _reactions =
       Expando('reactions');
+
+  /// Sidecar for [discourse-post-voting]. Null on posts in topics that
+  /// don't have voting enabled (UI hides the vote arrows in that case).
+  static final Expando<DiscoursePostVote> _votes = Expando('votes');
 
   @override
   Future<FCThreadResult> getThreadAsync(
@@ -752,6 +757,39 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     'eyes',
   ];
 
+  /// Discourse-only: cast a Q&A-style vote on [postId] using the
+  /// `discourse-post-voting` plugin. [direction] is 'up' or 'down'.
+  /// Returns true on success; the caller is responsible for refetching
+  /// post state (or updating the sidecar via [setVoteFor]) since the
+  /// plugin's response doesn't echo the new vote count.
+  Future<bool> castPostVoteAsync(String postId, String direction) async {
+    final pid = int.tryParse(postId);
+    if (pid == null) return false;
+    try {
+      await apiPost('/vote.json', body: {
+        'post_id': pid,
+        'direction': direction,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Discourse-only: remove the viewer's vote on [postId]. Subject to
+  /// the `post_voting_undo_vote_action_window` site setting (typically
+  /// 10 seconds after voting).
+  Future<bool> removePostVoteAsync(String postId) async {
+    final pid = int.tryParse(postId);
+    if (pid == null) return false;
+    try {
+      await apiDelete('/vote.json?post_id=$pid');
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Discourse-only: fetch the "Suggested Topics" Discourse appends to
   /// every topic page response. Re-fetches `/t/{id}.json` once; the
   /// suggestions array isn't included in any other endpoint we call.
@@ -898,7 +936,27 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     // mapper edit needed). Returns an empty list when the plugin isn't
     // installed — the post JSON simply won't have a `reactions` field.
     _reactions[post] = _parseReactions(p);
+    // Same idea for discourse-post-voting. Only stash a value when the
+    // plugin actually populates one of its fields, so callers can
+    // distinguish "no votes yet" from "voting not enabled".
+    if (p.containsKey('post_voting_vote_count') ||
+        p.containsKey('post_voting_has_votes') ||
+        p.containsKey('post_voting_user_voted_direction')) {
+      _votes[post] = DiscoursePostVote.fromJson(p);
+    }
     return post;
+  }
+
+  /// Public accessor for the vote state attached to [post]. Returns
+  /// null when post-voting isn't enabled on the topic (or when the
+  /// post wasn't parsed by this proxy).
+  static DiscoursePostVote? voteFor(FCPost post) => _votes[post];
+
+  /// Replace the vote sidecar on [post] (used by UI after a successful
+  /// toggle so subsequent reads reflect server truth without a full
+  /// refetch).
+  static void setVoteFor(FCPost post, DiscoursePostVote next) {
+    _votes[post] = next;
   }
 
   /// Public accessor for reactions on a parsed [FCPost]. Returns an

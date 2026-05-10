@@ -537,6 +537,124 @@ else
 end
 
 # ----------------------------------------------------------------------
+# 7c. Q&A post-voting (Phase 5.14) — only when discourse-post-voting
+# is installed and enabled
+# ----------------------------------------------------------------------
+
+puts "\n[7c] Q&A post-voting…"
+
+if defined?(PostVoting) &&
+   SiteSetting.respond_to?(:post_voting_enabled) &&
+   !SiteSetting.post_voting_enabled
+  SiteSetting.post_voting_enabled = true
+  puts "  · flipped post_voting_enabled = true"
+end
+
+post_voting_loaded = defined?(PostVoting) &&
+                     SiteSetting.respond_to?(:post_voting_enabled) &&
+                     SiteSetting.post_voting_enabled
+
+if post_voting_loaded
+  begin
+    # Create a Q&A-style topic: subtype=question. The plugin allows
+    # any topic to be flagged Q&A via custom field.
+    qa_title = 'Best practices for handling Cloudflare in mobile apps?'
+    qa_topic = Topic.where(title: qa_title).first
+    if qa_topic.nil?
+      # Discourse post-voting topics are marked at creation time by
+      # passing `create_as_post_voting: true` to PostCreator — that
+      # flips topic.subtype to 'question_answer', which the plugin's
+      # is_post_voting? predicate checks. Subtype can't be changed
+      # after creation, so existing topics can't be retro-fitted.
+      qa_post = PostCreator.create!(
+        users[:carol],
+        title: qa_title,
+        category: cat_support.id,
+        raw: <<~MARKDOWN,
+          We're building a mobile app that talks to a Discourse forum
+          behind Cloudflare. Sometimes the WAF challenges block our
+          API calls. What's the cleanest way to handle this?
+
+          Looking for community wisdom — multiple voted answers
+          welcome.
+        MARKDOWN
+        tags: %w[mobile flutter howto],
+        # `create_as_post_voting` only flips the subtype when going
+        # through NewPostManager — which PostCreator.create! bypasses.
+        # Set the subtype directly via update_columns to skip the
+        # plugin's "no changing subtype after creation" validation.
+        skip_validations: true,
+        bypass_rate_limiter: true
+      )
+      qa_topic = qa_post.topic
+      qa_topic.update_columns(subtype: Topic::POST_VOTING_SUBTYPE)
+      qa_topic.reload
+
+      # A few answers from different users.
+      [
+        [users[:alice], <<~A1],
+          The cleanest pattern is to intercept 403/503 responses in
+          your HTTP client and pop a webview to let the user solve
+          the challenge. Once they pass, the cf_clearance cookie
+          persists in your shared cookie jar and subsequent API
+          calls go through.
+        A1
+        [users[:eve], <<~A2],
+          Make sure your User API Key webview shares cookies with
+          the rest of the app's HTTP stack. Otherwise the challenge
+          cookie won't be there when the SDK calls /t/{id}.json.
+        A2
+        [users[:bob], <<~A3]
+          You can also reach out to your forum host and ask them to
+          whitelist a User-Agent your app sets uniformly — much less
+          friction for users than the challenge UI.
+        A3
+      ].each do |user, body|
+        PostCreator.create!(
+          user,
+          topic_id: qa_topic.id,
+          raw: body,
+          skip_validations: true,
+          bypass_rate_limiter: true
+        )
+      end
+      qa_topic.reload
+      puts "  + Q&A topic “#{qa_title.truncate(40)}” (#{qa_topic.posts_count} posts)"
+    else
+      puts "  · Q&A topic already exists"
+    end
+
+    # Cast a few votes so the score column has something to render.
+    vote_seeds = [
+      [users[:bob],   qa_topic.posts.where(user_id: users[:alice].id).first, 'up'],
+      [users[:carol], qa_topic.posts.where(user_id: users[:alice].id).first, 'up'],
+      [users[:eve],   qa_topic.posts.where(user_id: users[:alice].id).first, 'up'],
+      [users[:alice], qa_topic.posts.where(user_id: users[:eve].id).first,   'up'],
+      [users[:carol], qa_topic.posts.where(user_id: users[:eve].id).first,   'up'],
+      [users[:dave],  qa_topic.posts.where(user_id: users[:bob].id).first,   'down']
+    ]
+    vote_seeds.each do |user, post, direction|
+      next unless post
+
+      # Skip if already voted.
+      if PostVotingVote.exists?(votable: post, user_id: user.id)
+        next
+      end
+      begin
+        PostVoting::VoteManager.vote(post, user, direction: direction)
+        puts "  + @#{user.username} voted #{direction} on post by @#{post.user.username}"
+      rescue => e
+        puts "  ! vote failed: #{e.message}"
+      end
+    end
+  rescue => e
+    puts "  ! post-voting seeding skipped: #{e.message}"
+  end
+else
+  puts "  - discourse-post-voting plugin not installed, skipping"
+end
+
+# ----------------------------------------------------------------------
 # 8. Badges (Phase 5.7) + follows (Phase 5.8) + notification levels (5.4)
 # ----------------------------------------------------------------------
 
