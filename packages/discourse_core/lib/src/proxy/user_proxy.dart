@@ -298,11 +298,14 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         acceptsPM: user['can_send_private_message_to_user'] == true,
         canSendPM: false,
         canPM: false,
-        isFollowing: false,
-        isFollowingMe: false,
-        acceptsFollowers: false,
-        followingCount: 0,
-        followerCount: 0,
+        // Discourse 3.x exposes follow state inline on the user JSON.
+        // `is_followed` is true when the viewer follows this user;
+        // `can_follow` is true when the user permits being followed.
+        isFollowing: user['is_followed'] == true,
+        isFollowingMe: user['is_following_me'] == true,
+        acceptsFollowers: user['can_follow'] != false,
+        followingCount: (user['total_following'] as int?) ?? 0,
+        followerCount: (user['total_followers'] as int?) ?? 0,
         canBan: false,
         isBanned: user['suspended'] == true,
         isIgnored: user['ignored'] == true,
@@ -682,6 +685,29 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         result: false,
         resultText: 'Error reporting user: $e',
       );
+    }
+  }
+
+  /// Discourse-only: follow [username] via Discourse 3.x's
+  /// `/follow/{username}.json` endpoint. Returns true on success.
+  Future<bool> followUserAsync(String username) async {
+    if (username.isEmpty) return false;
+    try {
+      await apiPut('/follow/${Uri.encodeComponent(username)}.json');
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Discourse-only: unfollow [username]. Returns true on success.
+  Future<bool> unfollowUserAsync(String username) async {
+    if (username.isEmpty) return false;
+    try {
+      await apiDelete('/follow/${Uri.encodeComponent(username)}.json');
+      return true;
+    } catch (_) {
+      return false;
     }
   }
 

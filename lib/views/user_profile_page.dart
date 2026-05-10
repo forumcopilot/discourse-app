@@ -11,6 +11,7 @@ import 'package:forumcopilot_flutter/views/widgets/full_screen_image_viewer.dart
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
 import 'bookmarks_page.dart';
 import 'widgets/user_badges_row.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseUserProxy;
 import 'package:forumcopilot_flutter/utils/error_dialog.dart';
 import 'package:forumcopilot_flutter/utils/avatar_cache_utils.dart';
 import 'package:forumcopilot_flutter/utils/signature_processor.dart';
@@ -48,6 +49,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _userRepliedPostsKey = GlobalKey();
   bool _didAttemptAutoLogin = false;
+  bool _isTogglingFollow = false;
 
   @override
   void initState() {
@@ -144,6 +146,49 @@ class _UserProfilePageState extends State<UserProfilePage> {
         return 'TL4 · Leader';
       default:
         return 'TL$level';
+    }
+  }
+
+  /// Toggle the viewer's follow relationship with the displayed user.
+  /// Optimistically flips state; reverts on failure. Discourse-only.
+  Future<void> _handleToggleFollow() async {
+    if (_userInfo == null || _isTogglingFollow) return;
+    if (!widget.siteContext.isLoggedIn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to follow users')),
+      );
+      return;
+    }
+    final proxy = SiteProxyService.getUserProxy();
+    if (proxy is! DiscourseUserProxy) return;
+    final wasFollowing = _userInfo!.isFollowing ?? false;
+    setState(() {
+      _isTogglingFollow = true;
+      _userInfo!.isFollowing = !wasFollowing;
+    });
+    bool ok;
+    try {
+      ok = wasFollowing
+          ? await proxy.unfollowUserAsync(_userInfo!.username)
+          : await proxy.followUserAsync(_userInfo!.username);
+    } catch (_) {
+      ok = false;
+    }
+    if (!mounted) return;
+    setState(() {
+      _isTogglingFollow = false;
+      if (!ok) {
+        _userInfo!.isFollowing = wasFollowing;
+      }
+    });
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            wasFollowing ? 'Failed to unfollow' : 'Failed to follow',
+          ),
+        ),
+      );
     }
   }
 
@@ -479,33 +524,28 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 if (widget.siteContext.loginDataOutput?.user?.id != _userInfo!.id) ...[
-                                  // HIDE FOLLOW/UNFOLLOW BUTTONS FOR NOW
-                                  // if (_userInfo!.accept_follow) ...[
-                                  //   if (_userInfo!.i_follow_u)
-                                  //     OutlinedButton.icon(
-                                  //       onPressed: () {
-                                  //         // TODO: Implement unfollow action
-                                  //       },
-                                  //       icon: Icon(Icons.person_remove, size: DesignTokens.iconSizeL),
-                                  //       label: Text('Unfollow', style: textTheme.labelLarge?.copyWith(fontSize: DesignTokens.fontSizeM)),
-                                  //       style: OutlinedButton.styleFrom(
-                                  //         padding: DesignTokens.paddingHorizontalL.copyWith(top: DesignTokens.spacingS, bottom: DesignTokens.spacingS),
-                                  //         minimumSize: Size(100, DesignTokens.spacingXXXL),
-                                  //       ),
-                                  //     )
-                                  //   else
-                                  //     OutlinedButton.icon(
-                                  //       onPressed: () {
-                                  //         // TODO: Implement follow action
-                                  //       },
-                                  //       icon: Icon(Icons.person_add, size: DesignTokens.iconSizeM),
-                                  //       label: Text('Follow', style: textTheme.labelLarge?.copyWith(fontSize: DesignTokens.fontSizeS)),
-                                  //       style: OutlinedButton.styleFrom(
-                                  //         padding: DesignTokens.paddingHorizontalL.copyWith(top: DesignTokens.spacingS, bottom: DesignTokens.spacingS),
-                                  //         minimumSize: Size(100, DesignTokens.spacingXXXL),
-                                  //       ),
-                                  //     ),
-                                  // ],
+                                  // Follow / Unfollow toggle (Discourse 3.x).
+                                  // acceptsFollowers is wired off `can_follow`
+                                  // — we only show the button when the
+                                  // target permits follows.
+                                  if (_userInfo!.acceptsFollowers ?? false) ...[
+                                    OutlinedButton.icon(
+                                      onPressed: _isTogglingFollow
+                                          ? null
+                                          : _handleToggleFollow,
+                                      icon: Icon(
+                                        (_userInfo!.isFollowing ?? false)
+                                            ? Icons.person_remove
+                                            : Icons.person_add,
+                                        size: DesignTokens.iconSizeM,
+                                      ),
+                                      label: Text(
+                                        (_userInfo!.isFollowing ?? false)
+                                            ? 'Unfollow'
+                                            : 'Follow',
+                                      ),
+                                    ),
+                                  ],
                                   if (_userInfo!.acceptsPM ?? false) ...[
                                     SizedBox(width: DesignTokens.spacingM),
                                     FilledButton.icon(
