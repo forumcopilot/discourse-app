@@ -378,15 +378,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String pleaseLoginToSubscribe(String action) {
-    return '이 스레드를 $action하려면 로그인하세요';
-  }
-
-  @override
-  String get subscribeTo => '구독';
-
-  @override
-  String get unsubscribeFrom => '구독 취소';
+  String get pleaseLoginToSubscribe => '이 스레드를 null하려면 로그인하세요';
 
   @override
   String get subscribe => '구독';
@@ -395,9 +387,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get unsubscribe => '구독 취소';
 
   @override
-  String failedToSubscribeToThread(String action) {
-    return '스레드 $action 실패';
-  }
+  String get failedToSubscribeToThread => '스레드 null 실패';
 
   @override
   String get youCannotReplyToThisThread => '이 스레드에 답변할 수 없습니다';

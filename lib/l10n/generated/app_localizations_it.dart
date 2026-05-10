@@ -397,15 +397,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String pleaseLoginToSubscribe(String action) {
-    return 'Accedi per $action questo thread';
-  }
-
-  @override
-  String get subscribeTo => 'iscriverti a';
-
-  @override
-  String get unsubscribeFrom => 'disiscriverti da';
+  String get pleaseLoginToSubscribe => 'Accedi per null questo thread';
 
   @override
   String get subscribe => 'Iscriviti';
@@ -414,9 +406,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get unsubscribe => 'Disiscriviti';
 
   @override
-  String failedToSubscribeToThread(String action) {
-    return 'Impossibile $action thread';
-  }
+  String get failedToSubscribeToThread => 'Impossibile null thread';
 
   @override
   String get youCannotReplyToThisThread =>

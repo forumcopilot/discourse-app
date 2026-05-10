@@ -398,15 +398,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String pleaseLoginToSubscribe(String action) {
-    return 'Log in om $action dit onderwerp';
-  }
-
-  @override
-  String get subscribeTo => 'abonneren op';
-
-  @override
-  String get unsubscribeFrom => 'abonnement opzeggen van';
+  String get pleaseLoginToSubscribe => 'Log in om null dit onderwerp';
 
   @override
   String get subscribe => 'Abonneren';
@@ -415,9 +407,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get unsubscribe => 'Afmelden';
 
   @override
-  String failedToSubscribeToThread(String action) {
-    return 'Kon $action onderwerp niet';
-  }
+  String get failedToSubscribeToThread => 'Kon null onderwerp niet';
 
   @override
   String get youCannotReplyToThisThread =>

@@ -215,14 +215,17 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
               child: Row(
                 children: [
                   Icon(
-                    widget.isSubscribed ? Icons.watch_rounded : Icons.watch_outlined,
+                    // Bell is filled when the user is at least at the
+                    // Tracking level on Discourse (the proxy maps this
+                    // to isSubscribed).
+                    widget.isSubscribed
+                        ? Icons.notifications_active
+                        : Icons.notifications_none,
                     color: colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
-                    widget.isSubscribed
-                        ? (AppLocalizations.of(context)?.unsubscribe ?? 'Unsubscribe')
-                        : (AppLocalizations.of(context)?.subscribe ?? 'Subscribe'),
+                    AppLocalizations.of(context)?.subscribe ?? 'Notifications',
                     style: textTheme.titleMedium?.copyWith(
                       color: colorScheme.onSurface,
                     ),

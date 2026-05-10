@@ -402,15 +402,8 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String pleaseLoginToSubscribe(String action) {
-    return 'Por favor, faça login para $action este tópico';
-  }
-
-  @override
-  String get subscribeTo => 'inscrever-se em';
-
-  @override
-  String get unsubscribeFrom => 'cancelar inscrição de';
+  String get pleaseLoginToSubscribe =>
+      'Por favor, faça login para null este tópico';
 
   @override
   String get subscribe => 'Inscrever-se';
@@ -419,9 +412,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get unsubscribe => 'Cancelar inscrição';
 
   @override
-  String failedToSubscribeToThread(String action) {
-    return 'Falha ao $action tópico';
-  }
+  String get failedToSubscribeToThread => 'Falha ao null tópico';
 
   @override
   String get youCannotReplyToThisThread =>

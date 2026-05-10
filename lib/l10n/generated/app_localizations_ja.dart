@@ -382,15 +382,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String pleaseLoginToSubscribe(String action) {
-    return 'このスレッドを $action するにはログインしてください';
-  }
-
-  @override
-  String get subscribeTo => '購読する';
-
-  @override
-  String get unsubscribeFrom => '購読を解除する';
+  String get pleaseLoginToSubscribe => 'このスレッドを null するにはログインしてください';
 
   @override
   String get subscribe => '購読';
@@ -399,9 +391,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get unsubscribe => '購読解除';
 
   @override
-  String failedToSubscribeToThread(String action) {
-    return 'スレッドの $action に失敗しました';
-  }
+  String get failedToSubscribeToThread => 'スレッドの null に失敗しました';
 
   @override
   String get youCannotReplyToThisThread => 'このスレッドに返信できません';

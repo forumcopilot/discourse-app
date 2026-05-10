@@ -158,7 +158,7 @@ class _PostPageState extends State<PostPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            AppLocalizations.of(context)!.pleaseLoginToSubscribe(_isSubscribed ? AppLocalizations.of(context)!.unsubscribeFrom : AppLocalizations.of(context)!.subscribeTo),
+            AppLocalizations.of(context)!.pleaseLoginToSubscribe,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
@@ -220,7 +220,7 @@ class _PostPageState extends State<PostPage> {
         scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text(
-              AppLocalizations.of(context)!.failedToSubscribeToThread(_isSubscribed ? AppLocalizations.of(context)!.unsubscribeFrom : AppLocalizations.of(context)!.subscribeTo),
+              AppLocalizations.of(context)!.failedToSubscribeToThread,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),

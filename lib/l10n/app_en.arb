@@ -114,19 +114,19 @@
   "signInToViewUnreadTopics": "Sign in to view unread topics",
   "youNeedToBeSignedInToViewUnreadTopics": "You need to be signed in to view your unread topics",
   
-  "noSubscribedTopics": "No Subscribed Topics",
-  "noSubscribedTopicsMessage": "You did not subscribe to any topics. Tap the star button on a topic to subscribe and receive notifications for new updates.",
-  "signInToViewSubscribedTopics": "Sign in to view subscribed topics",
-  "youNeedToBeSignedInToViewSubscribedTopics": "You need to be signed in to view your subscribed topics",
-  
-  "noParticipatedTopics": "No Participated Topics",
+  "noSubscribedTopics": "No watched topics",
+  "noSubscribedTopicsMessage": "You aren't watching or tracking any topics. Open the bell menu on a topic to change its notification level.",
+  "signInToViewSubscribedTopics": "Sign in to view watched topics",
+  "youNeedToBeSignedInToViewSubscribedTopics": "You need to be signed in to view your watched topics",
+
+  "noParticipatedTopics": "No participated topics",
   "topicsYouParticipatedIn": "Topics that you have participated in will be shown here.",
   "signInToViewParticipatedTopics": "Sign in to view participated topics",
   "youNeedToBeSignedInToViewParticipatedTopics": "You need to be signed in to view topics you have participated in",
-  
+
   "latest": "Latest",
   "unread": "Unread",
-  "subscribed": "Subscribed",
+  "subscribed": "Watched",
   "participated": "Participated",
   
   "connectionTimedOut": "Connection timed out. The site may be down or unreachable.",
@@ -164,27 +164,15 @@
       }
     }
   },
-  "pleaseLoginToSubscribe": "Please login to {action} this thread",
+  "pleaseLoginToSubscribe": "Please login to change notifications on this topic",
   "@pleaseLoginToSubscribe": {
-    "description": "Message asking user to login to subscribe/unsubscribe",
-    "placeholders": {
-      "action": {
-        "type": "String"
-      }
-    }
+    "description": "Message asking user to login before changing topic notifications"
   },
-  "subscribeTo": "subscribe to",
-  "unsubscribeFrom": "unsubscribe from",
-  "subscribe": "Subscribe",
-  "unsubscribe": "Unsubscribe",
-  "failedToSubscribeToThread": "Failed to {action} thread",
+  "subscribe": "Notifications",
+  "unsubscribe": "Notifications",
+  "failedToSubscribeToThread": "Failed to update notifications",
   "@failedToSubscribeToThread": {
-    "description": "Error message when subscribe/unsubscribe fails",
-    "placeholders": {
-      "action": {
-        "type": "String"
-      }
-    }
+    "description": "Error message when changing notification level fails"
   },
   
   "youCannotReplyToThisThread": "You cannot reply to this thread",

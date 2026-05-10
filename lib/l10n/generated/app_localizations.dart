@@ -641,13 +641,13 @@ abstract class AppLocalizations {
   /// No description provided for @noSubscribedTopics.
   ///
   /// In en, this message translates to:
-  /// **'No Subscribed Topics'**
+  /// **'No watched topics'**
   String get noSubscribedTopics;
 
   /// No description provided for @noSubscribedTopicsMessage.
   ///
   /// In en, this message translates to:
-  /// **'You did not subscribe to any topics. Tap the star button on a topic to subscribe and receive notifications for new updates.'**
+  /// **'You aren\'t watching or tracking any topics. Open the bell menu on a topic to change its notification level.'**
   String get noSubscribedTopicsMessage;
 
   /// No description provided for @signInToViewSubscribedTopics.
@@ -665,7 +665,7 @@ abstract class AppLocalizations {
   /// No description provided for @noParticipatedTopics.
   ///
   /// In en, this message translates to:
-  /// **'No Participated Topics'**
+  /// **'No participated topics'**
   String get noParticipatedTopics;
 
   /// No description provided for @topicsYouParticipatedIn.
@@ -701,7 +701,7 @@ abstract class AppLocalizations {
   /// No description provided for @subscribed.
   ///
   /// In en, this message translates to:
-  /// **'Subscribed'**
+  /// **'Watched'**
   String get subscribed;
 
   /// No description provided for @participated.
@@ -806,41 +806,29 @@ abstract class AppLocalizations {
   /// **'Failed to share topic: {error}'**
   String failedToShareTopic(String error);
 
-  /// Message asking user to login to subscribe/unsubscribe
+  /// Message asking user to login before changing topic notifications
   ///
   /// In en, this message translates to:
-  /// **'Please login to {action} this thread'**
-  String pleaseLoginToSubscribe(String action);
-
-  /// No description provided for @subscribeTo.
-  ///
-  /// In en, this message translates to:
-  /// **'subscribe to'**
-  String get subscribeTo;
-
-  /// No description provided for @unsubscribeFrom.
-  ///
-  /// In en, this message translates to:
-  /// **'unsubscribe from'**
-  String get unsubscribeFrom;
+  /// **'Please login to change notifications on this topic'**
+  String get pleaseLoginToSubscribe;
 
   /// No description provided for @subscribe.
   ///
   /// In en, this message translates to:
-  /// **'Subscribe'**
+  /// **'Notifications'**
   String get subscribe;
 
   /// No description provided for @unsubscribe.
   ///
   /// In en, this message translates to:
-  /// **'Unsubscribe'**
+  /// **'Notifications'**
   String get unsubscribe;
 
-  /// Error message when subscribe/unsubscribe fails
+  /// Error message when changing notification level fails
   ///
   /// In en, this message translates to:
-  /// **'Failed to {action} thread'**
-  String failedToSubscribeToThread(String action);
+  /// **'Failed to update notifications'**
+  String get failedToSubscribeToThread;
 
   /// No description provided for @youCannotReplyToThisThread.
   ///

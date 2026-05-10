@@ -403,15 +403,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String pleaseLoginToSubscribe(String action) {
-    return 'Por favor inicia sesión para $action este hilo';
-  }
-
-  @override
-  String get subscribeTo => 'suscribirte a';
-
-  @override
-  String get unsubscribeFrom => 'desuscribirte de';
+  String get pleaseLoginToSubscribe =>
+      'Por favor inicia sesión para null este hilo';
 
   @override
   String get subscribe => 'Suscribirse';
@@ -420,9 +413,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get unsubscribe => 'Cancelar suscripción';
 
   @override
-  String failedToSubscribeToThread(String action) {
-    return 'Error al $action hilo';
-  }
+  String get failedToSubscribeToThread => 'Error al null hilo';
 
   @override
   String get youCannotReplyToThisThread => 'No puedes responder a este hilo';

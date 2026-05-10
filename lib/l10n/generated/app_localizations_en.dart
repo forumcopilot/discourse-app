@@ -302,11 +302,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'You need to be signed in to view your unread topics.';
 
   @override
-  String get noSubscribedTopics => 'No Subscribed Topics';
+  String get noSubscribedTopics => 'No watched topics';
 
   @override
   String get noSubscribedTopicsMessage =>
-      'You did not subscribe to any topics. Tap the star button on a topic to subscribe and receive notifications for new updates.';
+      'You aren\'t watching or tracking any topics. Open the bell menu on a topic to change its notification level.';
 
   @override
   String get signInToViewSubscribedTopics =>
@@ -317,7 +317,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'You need to be signed in to view your subscribed topics.';
 
   @override
-  String get noParticipatedTopics => 'No Participated Topics';
+  String get noParticipatedTopics => 'No participated topics';
 
   @override
   String get topicsYouParticipatedIn =>
@@ -338,7 +338,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unread => 'Unread';
 
   @override
-  String get subscribed => 'Subscribed';
+  String get subscribed => 'Watched';
 
   @override
   String get participated => 'Participated';
@@ -398,26 +398,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String pleaseLoginToSubscribe(String action) {
-    return 'Please login to $action this thread';
-  }
+  String get pleaseLoginToSubscribe =>
+      'Please login to change notifications on this topic';
 
   @override
-  String get subscribeTo => 'subscribe to';
+  String get subscribe => 'Notifications';
 
   @override
-  String get unsubscribeFrom => 'unsubscribe from';
+  String get unsubscribe => 'Notifications';
 
   @override
-  String get subscribe => 'Subscribe';
-
-  @override
-  String get unsubscribe => 'Unsubscribe';
-
-  @override
-  String failedToSubscribeToThread(String action) {
-    return 'Failed to $action thread';
-  }
+  String get failedToSubscribeToThread => 'Failed to update notifications';
 
   @override
   String get youCannotReplyToThisThread => 'You cannot reply to this thread';

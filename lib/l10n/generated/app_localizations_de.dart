@@ -403,15 +403,8 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String pleaseLoginToSubscribe(String action) {
-    return 'Bitte melden Sie sich an, um $action diesen Thread';
-  }
-
-  @override
-  String get subscribeTo => 'zu abonnieren';
-
-  @override
-  String get unsubscribeFrom => 'das Abonnement zu kündigen';
+  String get pleaseLoginToSubscribe =>
+      'Bitte melden Sie sich an, um null diesen Thread';
 
   @override
   String get subscribe => 'Abonnieren';
@@ -420,9 +413,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get unsubscribe => 'Abbestellen';
 
   @override
-  String failedToSubscribeToThread(String action) {
-    return 'Thread $action fehlgeschlagen';
-  }
+  String get failedToSubscribeToThread => 'Thread null fehlgeschlagen';
 
   @override
   String get youCannotReplyToThisThread =>

@@ -403,15 +403,8 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String pleaseLoginToSubscribe(String action) {
-    return 'Пожалуйста, войдите, чтобы $action эту тему';
-  }
-
-  @override
-  String get subscribeTo => 'подписаться на';
-
-  @override
-  String get unsubscribeFrom => 'отписаться от';
+  String get pleaseLoginToSubscribe =>
+      'Пожалуйста, войдите, чтобы null эту тему';
 
   @override
   String get subscribe => 'Подписаться';
@@ -420,9 +413,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get unsubscribe => 'Отписаться';
 
   @override
-  String failedToSubscribeToThread(String action) {
-    return 'Не удалось $action тему';
-  }
+  String get failedToSubscribeToThread => 'Не удалось null тему';
 
   @override
   String get youCannotReplyToThisThread => 'Вы не можете ответить на эту тему';

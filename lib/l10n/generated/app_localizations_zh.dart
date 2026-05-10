@@ -364,15 +364,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String pleaseLoginToSubscribe(String action) {
-    return '请登录以$action此主题';
-  }
-
-  @override
-  String get subscribeTo => '订阅';
-
-  @override
-  String get unsubscribeFrom => '取消订阅';
+  String get pleaseLoginToSubscribe => '请登录以null此主题';
 
   @override
   String get subscribe => '订阅';
@@ -381,9 +373,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unsubscribe => '取消订阅';
 
   @override
-  String failedToSubscribeToThread(String action) {
-    return '无法$action主题';
-  }
+  String get failedToSubscribeToThread => '无法null主题';
 
   @override
   String get youCannotReplyToThisThread => '您无法回复此主题';

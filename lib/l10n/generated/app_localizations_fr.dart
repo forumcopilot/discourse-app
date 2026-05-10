@@ -404,15 +404,8 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String pleaseLoginToSubscribe(String action) {
-    return 'Veuillez vous connecter pour $action ce fil';
-  }
-
-  @override
-  String get subscribeTo => 's\'abonner à';
-
-  @override
-  String get unsubscribeFrom => 'se désabonner de';
+  String get pleaseLoginToSubscribe =>
+      'Veuillez vous connecter pour null ce fil';
 
   @override
   String get subscribe => 'S\'abonner';
@@ -421,9 +414,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get unsubscribe => 'Se désabonner';
 
   @override
-  String failedToSubscribeToThread(String action) {
-    return 'Échec de $action du fil';
-  }
+  String get failedToSubscribeToThread => 'Échec de null du fil';
 
   @override
   String get youCannotReplyToThisThread =>
