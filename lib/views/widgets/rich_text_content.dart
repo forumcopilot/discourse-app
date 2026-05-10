@@ -1,3 +1,4 @@
+import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -141,17 +142,41 @@ class RichTextContent extends StatelessWidget {
         ),
       },
       // Resolve relative URLs (img src, a href) to absolute against the
-      // forum base. Discourse cooks emoji as `/images/emoji/...` and
-      // uploaded images as `/uploads/...`; both need the base prefix.
+      // forum base. For Discourse emoji (`<img class="emoji" alt=":wave:">`)
+      // we look up the alt-shortcode in the Unicode emoji table and render
+      // the system glyph instead of fetching the PNG — looks native to
+      // the OS, works offline, no network round-trips. Falls back to the
+      // PNG for forum-custom emoji that aren't in standard Unicode.
       extensions: [
         TagExtension(
           tagsToExtend: {'img'},
           builder: (extensionContext) {
             final src = extensionContext.attributes['src'];
-            if (src == null || src.isEmpty) return const SizedBox.shrink();
-            final resolved = _resolveUrl(src);
+            final alt = extensionContext.attributes['alt'] ?? '';
             final classes = (extensionContext.attributes['class'] ?? '');
             final isEmoji = classes.contains('emoji');
+
+            if (isEmoji) {
+              final shortcode = alt.replaceAll(':', '').trim();
+              if (shortcode.isNotEmpty) {
+                final unicode = Emoji.byShortName(shortcode)?.char;
+                if (unicode != null && unicode.isNotEmpty) {
+                  return Text(
+                    unicode,
+                    style: body.copyWith(
+                      // Bump emoji slightly so they sit nicely with text.
+                      fontSize: (body.fontSize ?? 14) * 1.15,
+                      height: 1.0,
+                    ),
+                  );
+                }
+              }
+              // Fall through to the image renderer (forum-custom emoji,
+              // shortcodes our table doesn't know).
+            }
+
+            if (src == null || src.isEmpty) return const SizedBox.shrink();
+            final resolved = _resolveUrl(src);
             final w = double.tryParse(
                     extensionContext.attributes['width'] ?? '') ??
                 (isEmoji ? 20 : null);
@@ -162,10 +187,8 @@ class RichTextContent extends StatelessWidget {
               resolved,
               width: w,
               height: h,
-              errorBuilder: (_, __, ___) => Text(
-                extensionContext.attributes['alt'] ?? '',
-                style: TextStyle(color: mutedColor),
-              ),
+              errorBuilder: (_, __, ___) =>
+                  Text(alt, style: TextStyle(color: mutedColor)),
             );
           },
         ),
