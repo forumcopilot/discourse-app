@@ -51,6 +51,8 @@ class _PostPageState extends State<PostPage> {
   bool _isClosed = false;
   bool _isSticky = false;
   bool _isDeleted = false;
+  bool _isArchived = false;
+  bool _isVisible = true;
   bool _showDeletedBanner = true;
   bool _showClosedBanner = true;
   bool _showStickyBanner = true;
@@ -60,6 +62,9 @@ class _PostPageState extends State<PostPage> {
   bool _canClose = false;
   bool _canSticky = false;
   bool _canDelete = false;
+  bool _canArchive = false;
+  bool _canRename = false;
+  bool _canToggleVisibility = false;
   bool _isRefreshing = false; // Add loading state for refresh
   String _actualTopicTitle = ''; // Track the actual topic title from server
   String? _threadUrl; // Track the thread URL from server
@@ -389,6 +394,70 @@ class _PostPageState extends State<PostPage> {
     }
   }
 
+  void _handleArchive() async {
+    final proxy = SiteProxyFactory.getModerationProxy();
+    if (proxy is! DiscourseModerationProxy) return;
+    final wasArchived = _isArchived;
+    setState(() => _isArchived = !wasArchived);
+    final ok = await proxy.archiveTopicAsync(widget.topicId,
+        enable: !wasArchived);
+    if (!mounted) return;
+    if (!ok) {
+      setState(() => _isArchived = wasArchived);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(wasArchived
+                ? 'Failed to unarchive topic'
+                : 'Failed to archive topic')),
+      );
+    } else {
+      _refreshCallback?.call();
+    }
+  }
+
+  void _handleToggleVisibility() async {
+    final proxy = SiteProxyFactory.getModerationProxy();
+    if (proxy is! DiscourseModerationProxy) return;
+    final wasVisible = _isVisible;
+    setState(() => _isVisible = !wasVisible);
+    final ok = await proxy.setTopicVisibilityAsync(widget.topicId,
+        visible: !wasVisible);
+    if (!mounted) return;
+    if (!ok) {
+      setState(() => _isVisible = wasVisible);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(wasVisible
+                ? 'Failed to unlist topic'
+                : 'Failed to list topic')),
+      );
+    } else {
+      _refreshCallback?.call();
+    }
+  }
+
+  void _handleRename() async {
+    final pending = _appBarKey.currentState?.pendingRename;
+    if (pending == null || pending.trim().isEmpty) return;
+    final proxy = SiteProxyFactory.getModerationProxy();
+    final result = await proxy.renameTopicAsync(widget.topicId, pending);
+    if (!mounted) return;
+    if (result.result) {
+      // Optimistically update both our cached title and the app bar's.
+      setState(() {
+        _actualTopicTitle = pending;
+      });
+      _appBarKey.currentState?.updateTitle(pending);
+      _refreshCallback?.call();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                'Failed to rename: ${result.resultText ?? "unknown error"}')),
+      );
+    }
+  }
+
   void _handleDelete() async {
     final moderationProxy = SiteProxyFactory.getModerationProxy();
 
@@ -474,6 +543,9 @@ class _PostPageState extends State<PostPage> {
         onClose: _handleClose,
         onSticky: _handleSticky,
         onDelete: _handleDelete,
+        onArchive: _handleArchive,
+        onRename: _handleRename,
+        onToggleVisibility: _handleToggleVisibility,
         onRefresh: () async {
           if (_refreshCallback != null && !_isRefreshing) {
             setState(() {
@@ -533,6 +605,11 @@ class _PostPageState extends State<PostPage> {
         canClose: _canClose,
         canSticky: _canSticky,
         canDelete: _canDelete,
+        canArchive: _canArchive,
+        canRename: _canRename,
+        canToggleVisibility: _canToggleVisibility,
+        isArchived: _isArchived,
+        isVisible: _isVisible,
       ),
       body: Stack(
         children: [
@@ -784,6 +861,13 @@ class _PostPageState extends State<PostPage> {
                   onCanCloseChanged: (canClose) {
                     setState(() {
                       _canClose = canClose;
+                      // Discourse mods who can close can also archive,
+                      // unlist, and rename. We piggyback on canClose
+                      // rather than wiring three more PostsList
+                      // callbacks for caps that always move together.
+                      _canArchive = canClose;
+                      _canRename = canClose;
+                      _canToggleVisibility = canClose;
                     });
                   },
                   onCanStickyChanged: (canSticky) {

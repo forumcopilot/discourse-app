@@ -78,6 +78,28 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
             result: false, resultText: m, isLoginMod: true));
   }
 
+  /// Discourse-only: toggle the archived status. Archiving disables
+  /// edits in addition to replies; it's a stronger lock than [close].
+  Future<bool> archiveTopicAsync(String topicId, {bool enable = true}) async {
+    return _setStatus(topicId,
+        status: 'archived',
+        enabled: enable,
+        successResult: () => true,
+        errorResult: (_) => false);
+  }
+
+  /// Discourse-only: toggle the topic visibility. When `false`, the
+  /// topic is "unlisted" — accessible by URL but hidden from category
+  /// and Latest listings. Mirrors the web admin's "Unlist Topic".
+  Future<bool> setTopicVisibilityAsync(String topicId,
+      {required bool visible}) async {
+    return _setStatus(topicId,
+        status: 'visible',
+        enabled: visible,
+        successResult: () => true,
+        errorResult: (_) => false);
+  }
+
   // ===== Topic delete / restore =====
 
   @override

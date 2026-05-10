@@ -13,16 +13,24 @@ class PostsPageAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.onClose,
     this.onSticky,
     this.onDelete,
+    this.onArchive,
+    this.onRename,
+    this.onToggleVisibility,
     this.onRefresh,
     this.isSubscribed = false,
     this.showMarkRead = false,
     this.isClosed = false,
     this.isDeleted = false,
     this.isSticky = false,
+    this.isArchived = false,
+    this.isVisible = true,
     this.canSubscribe = false,
     this.canClose = false,
     this.canSticky = false,
     this.canDelete = false,
+    this.canArchive = false,
+    this.canRename = false,
+    this.canToggleVisibility = false,
     super.key,
   }) : _title = title;
 
@@ -34,16 +42,24 @@ class PostsPageAppBar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? onClose;
   final VoidCallback? onSticky;
   final VoidCallback? onDelete;
+  final VoidCallback? onArchive;
+  final VoidCallback? onRename;
+  final VoidCallback? onToggleVisibility;
   final VoidCallback? onRefresh;
   final bool isSubscribed;
   final bool showMarkRead;
   final bool isClosed;
   final bool isDeleted;
   final bool isSticky;
+  final bool isArchived;
+  final bool isVisible;
   final bool canSubscribe;
   final bool canClose;
   final bool canSticky;
   final bool canDelete;
+  final bool canArchive;
+  final bool canRename;
+  final bool canToggleVisibility;
 
   @override
   State<PostsPageAppBar> createState() => PostsPageAppBarState();
@@ -256,6 +272,67 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                 ],
               ),
             ),
+          if (widget.siteContext.isLoggedIn && widget.canArchive)
+            PopupMenuItem(
+              value: 'archive',
+              child: Row(
+                children: [
+                  Icon(
+                    widget.isArchived
+                        ? Icons.unarchive_outlined
+                        : Icons.archive_outlined,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: DesignTokens.spacingM),
+                  Text(
+                    widget.isArchived ? 'Unarchive' : 'Archive',
+                    style: textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (widget.siteContext.isLoggedIn && widget.canToggleVisibility)
+            PopupMenuItem(
+              value: 'visibility',
+              child: Row(
+                children: [
+                  Icon(
+                    widget.isVisible
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: DesignTokens.spacingM),
+                  Text(
+                    widget.isVisible ? 'Unlist topic' : 'List topic',
+                    style: textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (widget.siteContext.isLoggedIn && widget.canRename)
+            PopupMenuItem(
+              value: 'rename',
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.edit_outlined,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: DesignTokens.spacingM),
+                  Text(
+                    'Rename topic',
+                    style: textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           if (widget.siteContext.isLoggedIn && widget.canDelete)
             PopupMenuItem(
               value: 'delete',
@@ -327,6 +404,35 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
               break;
             case 'view_on_web':
               widget.onViewOnWeb?.call();
+              break;
+            case 'archive':
+              _confirmAndDo(
+                context: context,
+                title: widget.isArchived ? 'Unarchive Topic' : 'Archive Topic',
+                body: widget.isArchived
+                    ? 'Reopen the topic for replies and edits?'
+                    : 'Archiving locks the topic against any further '
+                        'replies and edits. Existing content stays visible.',
+                confirmLabel: widget.isArchived ? 'Unarchive' : 'Archive',
+                onConfirm: () => widget.onArchive?.call(),
+              );
+              break;
+            case 'visibility':
+              _confirmAndDo(
+                context: context,
+                title: widget.isVisible ? 'Unlist Topic' : 'List Topic',
+                body: widget.isVisible
+                    ? 'Unlisted topics stay accessible by URL but are '
+                        'hidden from category and Latest listings.'
+                    : 'Re-list this topic so it appears in category and '
+                        'Latest listings again.',
+                confirmLabel:
+                    widget.isVisible ? 'Unlist' : 'List',
+                onConfirm: () => widget.onToggleVisibility?.call(),
+              );
+              break;
+            case 'rename':
+              _showRenameDialog(context: context);
               break;
             case 'lock':
               showDialog(
@@ -516,5 +622,103 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
         },
       ),
     ];
+  }
+
+  /// Generic confirm-dialog helper used by the archive / unlist actions.
+  void _confirmAndDo({
+    required BuildContext context,
+    required String title,
+    required String body,
+    required String confirmLabel,
+    required VoidCallback onConfirm,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(title,
+              style: textTheme.titleLarge
+                  ?.copyWith(color: colorScheme.onSurface)),
+          content: Text(body,
+              style: textTheme.bodyLarge
+                  ?.copyWith(color: colorScheme.onSurfaceVariant)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                onConfirm();
+              },
+              child: Text(confirmLabel),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Rename-topic dialog. Pre-fills the current title and emits the
+  /// new value through onRename when the user taps Save.
+  void _showRenameDialog({required BuildContext context}) {
+    final controller = TextEditingController(text: _currentTitle);
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Rename Topic'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              hintText: 'New title',
+              border: OutlineInputBorder(),
+            ),
+            maxLength: 255,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (value) {
+              final trimmed = value.trim();
+              if (trimmed.isEmpty || trimmed == _currentTitle) {
+                Navigator.of(dialogContext).pop();
+                return;
+              }
+              Navigator.of(dialogContext).pop();
+              _renameTo(trimmed);
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final trimmed = controller.text.trim();
+                if (trimmed.isEmpty || trimmed == _currentTitle) {
+                  Navigator.of(dialogContext).pop();
+                  return;
+                }
+                Navigator.of(dialogContext).pop();
+                _renameTo(trimmed);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Stash the candidate title so [PostsPageAppBarState.updateTitle] can
+  /// be called optimistically by post_page when the rename completes.
+  String? _pendingRename;
+  String? get pendingRename => _pendingRename;
+  void _renameTo(String title) {
+    _pendingRename = title;
+    widget.onRename?.call();
   }
 }
