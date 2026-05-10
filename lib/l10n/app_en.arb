@@ -175,8 +175,8 @@
     "description": "Error message when changing notification level fails"
   },
   
-  "youCannotReplyToThisThread": "You cannot reply to this thread",
-  "pleaseWaitForThreadToLoad": "Please wait for the thread to load",
+  "youCannotReplyToThisThread": "You cannot reply to this topic",
+  "pleaseWaitForThreadToLoad": "Please wait for the topic to load",
   
   "softDelete": "Soft Delete",
   "postCanBeRestoredLater": "Post can be restored later",
@@ -272,7 +272,7 @@
     }
   },
   "confirmSpamClean": "Confirm Spam Clean",
-  "handleThreads": "Handle Threads",
+  "handleThreads": "Handle topics",
   "deleteMessages": "Delete Messages",
   "deleteConversations": "Delete Conversations",
   
@@ -373,9 +373,9 @@
   "areYouSureYouWantToLogout": "Are you sure you want to logout?",
   "register": "Register",
   "signIn": "Sign In",
-  "markForumRead": "Mark Forum Read",
+  "markForumRead": "Mark category read",
   "notificationTest": "Notification Test",
-  "forum": "Forum",
+  "forum": "Category",
   "profile": "Profile",
   "messages": "Messages",
   "add": "Add",
@@ -500,8 +500,8 @@
     }
   },
   "selectActionsToPerform": "Select the actions to perform:",
-  "handleThreads": "Handle Threads",
-  "moveOrDeleteThreadsBasedOnAdminSettings": "Move or delete threads based on admin settings",
+  "handleThreads": "Handle topics",
+  "moveOrDeleteThreadsBasedOnAdminSettings": "Move or delete topics based on admin settings",
   "deleteMessages": "Delete Messages",
   "deleteConversations": "Delete Conversations",
   "messageUpdatedSuccessfully": "Message updated successfully",
@@ -846,7 +846,7 @@
   "@cleanSpam": {
     "description": "Button to execute spam clean"
   },
-  "handledThreads": "Handled threads",
+  "handledThreads": "Handled topics",
   "@handledThreads": {
     "description": "Action performed: handled threads"
   },
@@ -1316,9 +1316,9 @@
     "description": "Hint text for number input field"
   },
   
-  "failedToNavigateToForum": "Failed to navigate to forum",
+  "failedToNavigateToForum": "Failed to navigate to category",
   "@failedToNavigateToForum": {
-    "description": "Error message when navigation to forum fails"
+    "description": "Error message when navigation to category fails"
   },
   "failedToNavigateToForumName": "Failed to navigate to {forumName}",
   "@failedToNavigateToForumName": {
@@ -1334,16 +1334,16 @@
     "description": "Error message when saving conversation fails"
   },
   
-  "forumNotFound": "Forum not found: {forumName}",
+  "forumNotFound": "Category not found: {forumName}",
   "@forumNotFound": {
-    "description": "Error message when forum is not found",
+    "description": "Error message when category is not found",
     "placeholders": {
       "forumName": {
         "type": "String"
       }
     }
   },
-  "forumNotFoundById": "Forum not found: {forumId}",
+  "forumNotFoundById": "Category not found: {forumId}",
   "@forumNotFoundById": {
     "description": "Error message when forum is not found by ID",
     "placeholders": {

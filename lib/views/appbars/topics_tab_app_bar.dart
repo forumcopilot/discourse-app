@@ -55,7 +55,7 @@ class TopicsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildMarkReadButton(BuildContext context, ColorScheme colorScheme) {
     return IconButton(
       icon: const Icon(Icons.done_all_rounded),
-      tooltip: AppLocalizations.of(context)?.markForumRead ?? 'Mark Forum Read',
+      tooltip: AppLocalizations.of(context)?.markForumRead ?? 'Mark category read',
       onPressed: () => _showMarkReadConfirmation(context),
     );
   }

@@ -411,10 +411,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedToSubscribeToThread => 'Failed to update notifications';
 
   @override
-  String get youCannotReplyToThisThread => 'You cannot reply to this thread';
+  String get youCannotReplyToThisThread => 'You cannot reply to this topic';
 
   @override
-  String get pleaseWaitForThreadToLoad => 'Please wait for the thread to load';
+  String get pleaseWaitForThreadToLoad => 'Please wait for the topic to load';
 
   @override
   String get softDelete => 'Soft Delete';
@@ -581,7 +581,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmSpamClean => 'Confirm Spam Clean';
 
   @override
-  String get handleThreads => 'Handle Threads';
+  String get handleThreads => 'Handle topics';
 
   @override
   String get deleteMessages => 'Delete Messages';
@@ -745,13 +745,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signIn => 'Sign In';
 
   @override
-  String get markForumRead => 'Mark Forum Read';
+  String get markForumRead => 'Mark category read';
 
   @override
   String get notificationTest => 'Notification Test';
 
   @override
-  String get forum => 'Forum';
+  String get forum => 'Category';
 
   @override
   String get profile => 'Profile';
@@ -906,7 +906,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moveOrDeleteThreadsBasedOnAdminSettings =>
-      'Move or delete threads based on admin settings';
+      'Move or delete topics based on admin settings';
 
   @override
   String get messageUpdatedSuccessfully => 'Message updated successfully';
@@ -1175,7 +1175,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get banTheUserAccount => 'Ban the user account';
 
   @override
-  String get handledThreads => 'Handled threads';
+  String get handledThreads => 'Handled topics';
 
   @override
   String get deletedMessages => 'Deleted messages';
@@ -1483,7 +1483,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterANumber => 'Enter a number';
 
   @override
-  String get failedToNavigateToForum => 'Failed to navigate to forum';
+  String get failedToNavigateToForum => 'Failed to navigate to category';
 
   @override
   String failedToNavigateToForumName(String forumName) {
@@ -1492,12 +1492,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String forumNotFound(String forumName) {
-    return 'Forum not found: $forumName';
+    return 'Category not found: $forumName';
   }
 
   @override
   String forumNotFoundById(String forumId) {
-    return 'Forum not found: $forumId';
+    return 'Category not found: $forumId';
   }
 
   @override

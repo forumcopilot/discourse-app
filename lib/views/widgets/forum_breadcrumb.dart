@@ -139,7 +139,7 @@ class ForumBreadcrumb extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)?.forumNotFound(forum.name) ?? 'Forum not found: ${forum.name}'),
+              content: Text(AppLocalizations.of(context)?.forumNotFound(forum.name) ?? 'Category not found: ${forum.name}'),
               duration: const Duration(seconds: 2),
             ),
           );

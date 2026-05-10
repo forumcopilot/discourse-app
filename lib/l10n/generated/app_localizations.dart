@@ -833,13 +833,13 @@ abstract class AppLocalizations {
   /// No description provided for @youCannotReplyToThisThread.
   ///
   /// In en, this message translates to:
-  /// **'You cannot reply to this thread'**
+  /// **'You cannot reply to this topic'**
   String get youCannotReplyToThisThread;
 
   /// No description provided for @pleaseWaitForThreadToLoad.
   ///
   /// In en, this message translates to:
-  /// **'Please wait for the thread to load'**
+  /// **'Please wait for the topic to load'**
   String get pleaseWaitForThreadToLoad;
 
   /// Option for soft delete (can be restored)
@@ -1139,7 +1139,7 @@ abstract class AppLocalizations {
   /// No description provided for @handleThreads.
   ///
   /// In en, this message translates to:
-  /// **'Handle Threads'**
+  /// **'Handle topics'**
   String get handleThreads;
 
   /// No description provided for @deleteMessages.
@@ -1433,7 +1433,7 @@ abstract class AppLocalizations {
   /// No description provided for @markForumRead.
   ///
   /// In en, this message translates to:
-  /// **'Mark Forum Read'**
+  /// **'Mark category read'**
   String get markForumRead;
 
   /// No description provided for @notificationTest.
@@ -1445,7 +1445,7 @@ abstract class AppLocalizations {
   /// No description provided for @forum.
   ///
   /// In en, this message translates to:
-  /// **'Forum'**
+  /// **'Category'**
   String get forum;
 
   /// No description provided for @profile.
@@ -1703,7 +1703,7 @@ abstract class AppLocalizations {
   /// No description provided for @moveOrDeleteThreadsBasedOnAdminSettings.
   ///
   /// In en, this message translates to:
-  /// **'Move or delete threads based on admin settings'**
+  /// **'Move or delete topics based on admin settings'**
   String get moveOrDeleteThreadsBasedOnAdminSettings;
 
   /// No description provided for @messageUpdatedSuccessfully.
@@ -2189,7 +2189,7 @@ abstract class AppLocalizations {
   /// Action performed: handled threads
   ///
   /// In en, this message translates to:
-  /// **'Handled threads'**
+  /// **'Handled topics'**
   String get handledThreads;
 
   /// Action performed: deleted messages
@@ -2720,10 +2720,10 @@ abstract class AppLocalizations {
   /// **'Enter a number'**
   String get enterANumber;
 
-  /// Error message when navigation to forum fails
+  /// Error message when navigation to category fails
   ///
   /// In en, this message translates to:
-  /// **'Failed to navigate to forum'**
+  /// **'Failed to navigate to category'**
   String get failedToNavigateToForum;
 
   /// Error message when navigation to specific forum fails
@@ -2732,16 +2732,16 @@ abstract class AppLocalizations {
   /// **'Failed to navigate to {forumName}'**
   String failedToNavigateToForumName(String forumName);
 
-  /// Error message when forum is not found
+  /// Error message when category is not found
   ///
   /// In en, this message translates to:
-  /// **'Forum not found: {forumName}'**
+  /// **'Category not found: {forumName}'**
   String forumNotFound(String forumName);
 
   /// Error message when forum is not found by ID
   ///
   /// In en, this message translates to:
-  /// **'Forum not found: {forumId}'**
+  /// **'Category not found: {forumId}'**
   String forumNotFoundById(String forumId);
 
   /// Error message when opening link fails

@@ -111,7 +111,7 @@ class _LinkPreviewCardState extends State<LinkPreviewCard> with AutomaticKeepAli
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)?.forumNotFoundById(forumId) ?? 'Forum not found: $forumId'),
+              content: Text(AppLocalizations.of(context)?.forumNotFoundById(forumId) ?? 'Category not found: $forumId'),
               duration: const Duration(seconds: 2),
             ),
           );
@@ -122,7 +122,7 @@ class _LinkPreviewCardState extends State<LinkPreviewCard> with AutomaticKeepAli
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)?.failedToNavigateToForum ?? 'Failed to navigate to forum'),
+            content: Text(AppLocalizations.of(context)?.failedToNavigateToForum ?? 'Failed to navigate to category'),
             duration: const Duration(seconds: 2),
           ),
         );

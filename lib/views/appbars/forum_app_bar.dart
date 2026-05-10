@@ -116,7 +116,7 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (isLoggedIn) {
           // Show logged-in menu items
           return [
-            _buildMenuItem('mark_read', Icons.visibility_off_rounded, AppLocalizations.of(context)?.markForumRead ?? 'Mark Forum Read', colorScheme, textTheme),
+            _buildMenuItem('mark_read', Icons.visibility_off_rounded, AppLocalizations.of(context)?.markForumRead ?? 'Mark category read', colorScheme, textTheme),
             _buildMenuItem('notification_test', Icons.notifications_active_rounded, AppLocalizations.of(context)?.notificationTest ?? 'Notification Test', colorScheme, textTheme),
             _buildMenuItem('logout', Icons.logout_rounded, AppLocalizations.of(context)?.logout ?? 'Logout', colorScheme, textTheme, isDestructive: true),
           ];
