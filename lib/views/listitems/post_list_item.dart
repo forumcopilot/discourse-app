@@ -28,6 +28,8 @@ import '../../controllers/login_controller.dart';
 import '../login_page.dart';
 import '../post_page.dart';
 import '../lists/posts_list.dart';
+import '../../services/site_proxy_service.dart';
+import 'package:discourse_core/discourse_core.dart';
 
 class _PostContentData {
   final String processedText;
@@ -140,6 +142,8 @@ class _PostListItemState extends State<PostListItem> {
   // Local state for like and thanks
   late bool _isLiked;
   bool _isThanked = false;
+  late bool _isBookmarked;
+  bool _bookmarkInFlight = false;
   late final PostController _postsController;
   late int _likeCount; // Add local state for like count
   late final PostActionsHandler _postActionsHandler;
@@ -154,6 +158,7 @@ class _PostListItemState extends State<PostListItem> {
     _postActionsHandler.setDefaultRefreshCallback(widget.actions?.onRefresh);
     _isLiked = widget.post.isLiked;
     _likeCount = widget.post.likesInfo.length;
+    _isBookmarked = widget.post.bookmarked;
   }
 
   /// Checks if a URL is a mention link (link text starts with @ and has no spaces)
@@ -462,6 +467,43 @@ class _PostListItemState extends State<PostListItem> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Discourse "solved" banner: shown on the post that was
+          // marked as the accepted answer for this topic.
+          if (widget.post.acceptedAnswer) ...[
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: DesignTokens.spacingS,
+                vertical: DesignTokens.spacingXS,
+              ),
+              margin: EdgeInsets.only(bottom: DesignTokens.spacingS),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
+                border: Border.all(
+                  color: Colors.green.withOpacity(0.45),
+                  width: 0.75,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    color: Colors.green.shade700,
+                    size: DesignTokens.iconSizeS,
+                  ),
+                  const SizedBox(width: DesignTokens.spacingXS),
+                  Text(
+                    'Solution',
+                    style: textTheme.labelMedium?.copyWith(
+                      color: Colors.green.shade800,
+                      fontWeight: DesignTokens.fontWeightBold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           // Show topic title for the first post (topic starter)
           if (widget.post.postNumber == 1 && widget.topicTitle.isNotEmpty) ...[
             Text(
@@ -654,6 +696,8 @@ class _PostListItemState extends State<PostListItem> {
             onThank: _handleThankAction,
             onShowLikes: _showLikesBottomSheet,
             onShowThanks: _showThanksBottomSheet,
+            isBookmarked: _isBookmarked,
+            onBookmark: _handleBookmarkAction,
             trailing: (widget.siteContext.isLoggedIn &&
                     (_postsController.threadDataOutput.value?.topic.canReply ??
                         false))
@@ -909,5 +953,49 @@ class _PostListItemState extends State<PostListItem> {
       setIsThanked: (val) => setState(() => _isThanked = val),
       isThanked: _isThanked,
     );
+  }
+
+  /// Toggle bookmark on the current post via /bookmarks.json.
+  /// Optimistically flips state; reverts on failure.
+  void _handleBookmarkAction() async {
+    if (_bookmarkInFlight) return;
+    final proxy = SiteProxyService.getPostProxy();
+    if (proxy is! DiscoursePostProxy) return;
+    final wasBookmarked = _isBookmarked;
+    setState(() {
+      _isBookmarked = !wasBookmarked;
+      _bookmarkInFlight = true;
+    });
+    bool ok;
+    try {
+      if (wasBookmarked) {
+        ok = await proxy.unbookmarkPostAsync(widget.post.id);
+      } else {
+        ok = await proxy.bookmarkPostAsync(widget.post.id);
+      }
+    } catch (_) {
+      ok = false;
+    }
+    if (!mounted) return;
+    setState(() {
+      if (!ok) {
+        // Revert on failure.
+        _isBookmarked = wasBookmarked;
+      } else {
+        // Mirror the new value back onto the FCPost so reopening
+        // the thread continues to reflect the latest state.
+        widget.post.bookmarked = _isBookmarked;
+      }
+      _bookmarkInFlight = false;
+    });
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(wasBookmarked
+              ? 'Failed to remove bookmark'
+              : 'Failed to bookmark post'),
+        ),
+      );
+    }
   }
 }

@@ -21,6 +21,8 @@ class PostListItemSocial extends StatelessWidget {
   final VoidCallback? onThank;
   final VoidCallback? onShowLikes;
   final VoidCallback? onShowThanks;
+  final bool isBookmarked;
+  final VoidCallback? onBookmark;
   final Widget? trailing;
 
   const PostListItemSocial({
@@ -34,6 +36,8 @@ class PostListItemSocial extends StatelessWidget {
     this.onThank,
     this.onShowLikes,
     this.onShowThanks,
+    this.isBookmarked = false,
+    this.onBookmark,
     this.trailing,
   });
 
@@ -234,6 +238,33 @@ class PostListItemSocial extends StatelessWidget {
                   },
                 ),
               ],
+            ],
+            // Discourse bookmark button. Only meaningful when logged in.
+            if (isLoggedIn && onBookmark != null) ...[
+              SizedBox(width: DesignTokens.spacingXL),
+              Builder(
+                builder: (context) {
+                  final isDarkMode =
+                      Theme.of(context).brightness == Brightness.dark;
+                  final iconColor = isBookmarked
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant
+                          .withOpacity(isDarkMode ? 0.4 : 0.5);
+                  return AccessibilityHelpers.accessibleIconButton(
+                    icon: Icon(
+                      isBookmarked
+                          ? Icons.bookmark
+                          : Icons.bookmark_border,
+                      color: iconColor,
+                      size: DesignTokens.iconSizeMedium,
+                    ),
+                    onTap: onBookmark,
+                    label: isBookmarked ? 'Remove bookmark' : 'Bookmark post',
+                    isSelected: isBookmarked,
+                    context: context,
+                  );
+                },
+              ),
             ],
           ],
         ),
