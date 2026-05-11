@@ -5,19 +5,24 @@ import '../models/results/fc_social_result.dart';
 /// Trimmed Discourse-native surface. The XF-flavored `thankPostAsync`
 /// is gone — Discourse has likes + (optionally) emoji reactions, no
 /// separate "thanks" concept. PM-message likes are also dropped:
-/// Discourse PMs don't support likes. Follow/unfollow stay here for
-/// SDK compatibility, but the Discourse implementation lives on
-/// `DiscourseUserProxy.followUserAsync` / `unfollowUserAsync` (Phase
-/// 5.8) since Discourse's follow endpoint is keyed by username, not
-/// user id.
+/// Discourse PMs don't support likes.
+///
+/// Phase 5.30 — follow/unfollow are now first-class on this
+/// interface (Discourse implementation lives in
+/// `DiscourseSocialProxy`). The earlier
+/// `DiscourseUserProxy.followUserAsync/unfollowUserAsync` sidecar
+/// was deleted because it duplicated the contract.
 abstract class IFCSocialProxy {
-  /// Follow a user by id. Discourse-native callers should prefer
-  /// `DiscourseUserProxy.followUserAsync(username)`.
-  Future<FCFollowResult> followAsync(String userId);
+  /// Follow the user identified by [username]. Implementations may
+  /// interpret the identifier however their backend requires —
+  /// Discourse uses the username directly against its `/follow/{u}`
+  /// endpoint (the discourse-follow plugin); XF-shaped backends
+  /// would resolve the username to a user id internally.
+  Future<FCFollowResult> followAsync(String username);
 
-  /// Unfollow a user by id. Discourse-native callers should prefer
-  /// `DiscourseUserProxy.unfollowUserAsync(username)`.
-  Future<FCUnfollowResult> unfollowAsync(String userId);
+  /// Stop following the user identified by [username]. Mirrors
+  /// [followAsync] — same identifier conventions.
+  Future<FCUnfollowResult> unfollowAsync(String username);
 
   /// Like a post.
   Future<FCLikePostResult> likePostAsync(String postId);

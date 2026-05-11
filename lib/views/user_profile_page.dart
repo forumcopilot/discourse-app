@@ -150,7 +150,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   /// Toggle the viewer's follow relationship with the displayed user.
-  /// Optimistically flips state; reverts on failure. Discourse-only.
+  /// Optimistically flips state; reverts on failure. Phase 5.30 —
+  /// routed through `IFCSocialProxy` (was via the deleted
+  /// `DiscourseUserProxy.followUserAsync` sidecar). The richer
+  /// `FCFollowResult` shape lets us surface the plugin-not-installed
+  /// case explicitly instead of a generic "failed to follow".
   Future<void> _handleToggleFollow() async {
     if (_userInfo == null || _isTogglingFollow) return;
     if (!widget.siteContext.isLoggedIn) {
@@ -159,35 +163,42 @@ class _UserProfilePageState extends State<UserProfilePage> {
       );
       return;
     }
-    final proxy = SiteProxyService.getUserProxy();
-    if (proxy is! DiscourseUserProxy) return;
+    final proxy = SiteProxyService.getSocialProxy();
     final wasFollowing = _userInfo!.isFollowing ?? false;
     setState(() {
       _isTogglingFollow = true;
       _userInfo!.isFollowing = !wasFollowing;
     });
-    bool ok;
+    String? errorText;
     try {
-      ok = wasFollowing
-          ? await proxy.unfollowUserAsync(_userInfo!.username)
-          : await proxy.followUserAsync(_userInfo!.username);
-    } catch (_) {
-      ok = false;
+      if (wasFollowing) {
+        final result = await proxy.unfollowAsync(_userInfo!.username);
+        if (!result.result) {
+          errorText = result.resultText?.isNotEmpty == true
+              ? result.resultText
+              : 'Failed to unfollow';
+        }
+      } else {
+        final result = await proxy.followAsync(_userInfo!.username);
+        if (!result.result) {
+          errorText = result.resultText?.isNotEmpty == true
+              ? result.resultText
+              : 'Failed to follow';
+        }
+      }
+    } catch (e) {
+      errorText = 'Error: $e';
     }
     if (!mounted) return;
     setState(() {
       _isTogglingFollow = false;
-      if (!ok) {
+      if (errorText != null) {
         _userInfo!.isFollowing = wasFollowing;
       }
     });
-    if (!ok) {
+    if (errorText != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            wasFollowing ? 'Failed to unfollow' : 'Failed to follow',
-          ),
-        ),
+        SnackBar(content: Text(errorText)),
       );
     }
   }

@@ -772,28 +772,14 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     }
   }
 
-  /// Discourse-only: follow [username] via Discourse 3.x's
-  /// `/follow/{username}.json` endpoint. Returns true on success.
-  Future<bool> followUserAsync(String username) async {
-    if (username.isEmpty) return false;
-    try {
-      await apiPut('/follow/${Uri.encodeComponent(username)}.json');
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  /// Discourse-only: unfollow [username]. Returns true on success.
-  Future<bool> unfollowUserAsync(String username) async {
-    if (username.isEmpty) return false;
-    try {
-      await apiDelete('/follow/${Uri.encodeComponent(username)}.json');
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
+  // Phase 5.30 — `followUserAsync` / `unfollowUserAsync` deleted.
+  // Follow/unfollow moved to `IFCSocialProxy.followAsync` /
+  // `unfollowAsync` (with the real Discourse impl in
+  // `DiscourseSocialProxy`). Callers should reach for the social
+  // proxy via `SiteProxyFactory.getSocialProxy()` — `FCFollowResult`
+  // / `FCUnfollowResult` give richer error surfacing than the
+  // bool-returning sidecar did (e.g. "requires the discourse-follow
+  // plugin" vs. a silent false).
 
   /// Discourse-only: fetch the badges granted to [username]. Hits
   /// `/user-badges/{username}.json` (Discourse's stable endpoint for

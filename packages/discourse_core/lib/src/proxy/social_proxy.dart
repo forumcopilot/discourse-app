@@ -96,25 +96,58 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
   }
 
   @override
-  Future<FCFollowResult> followAsync(String userId) async {
-    // discourse-follow plugin: PUT /follow/{username}.json. Without the
-    // plugin the route 404s. For now report as unsupported so the UI
-    // surfaces a clear message; Phase 2.x can detect the plugin and
-    // enable the call.
-    return FCFollowResult(
-      result: false,
-      resultText:
-          'Follow requires the discourse-follow plugin — not implemented yet.',
-    );
+  Future<FCFollowResult> followAsync(String username) async {
+    // Phase 5.30 — implementation lifted from the deleted
+    // `DiscourseUserProxy.followUserAsync` sidecar. The
+    // discourse-follow plugin exposes `PUT /follow/{username}.json`;
+    // when the plugin isn't installed the route 404s and we surface
+    // a clear error rather than a generic failure.
+    if (username.isEmpty) {
+      return FCFollowResult(
+        result: false,
+        resultText: 'No username supplied',
+      );
+    }
+    try {
+      await apiPut('/follow/${Uri.encodeComponent(username)}.json');
+      return FCFollowResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      if (e.statusCode == 404) {
+        return FCFollowResult(
+          result: false,
+          resultText:
+              'Follow requires the discourse-follow plugin on this forum.',
+        );
+      }
+      return FCFollowResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCFollowResult(result: false, resultText: 'Error: $e');
+    }
   }
 
   @override
-  Future<FCUnfollowResult> unfollowAsync(String userId) async {
-    return FCUnfollowResult(
-      result: false,
-      resultText:
-          'Unfollow requires the discourse-follow plugin — not implemented yet.',
-    );
+  Future<FCUnfollowResult> unfollowAsync(String username) async {
+    if (username.isEmpty) {
+      return FCUnfollowResult(
+        result: false,
+        resultText: 'No username supplied',
+      );
+    }
+    try {
+      await apiDelete('/follow/${Uri.encodeComponent(username)}.json');
+      return FCUnfollowResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      if (e.statusCode == 404) {
+        return FCUnfollowResult(
+          result: false,
+          resultText:
+              'Unfollow requires the discourse-follow plugin on this forum.',
+        );
+      }
+      return FCUnfollowResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCUnfollowResult(result: false, resultText: 'Error: $e');
+    }
   }
 
   @override
