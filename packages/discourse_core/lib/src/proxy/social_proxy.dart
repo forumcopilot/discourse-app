@@ -218,12 +218,24 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
           '${postNumber != null ? '/$postNumber' : ''}';
     }
 
+    // The FC SDK contract for FCAlert.timestamp is a millisecond-epoch
+    // string (the notification list tab parses it with `int.parse` then
+    // `DateTime.fromMillisecondsSinceEpoch`). Discourse returns ISO 8601
+    // in `created_at`, so we convert here. Without this conversion the
+    // list ends up silently empty because the tab's .map() throws on
+    // every row.
+    final createdAtRaw = (n['created_at'] ?? '').toString();
+    final timestampMs = createdAtRaw.isEmpty
+        ? DateTime.now().millisecondsSinceEpoch
+        : (DateTime.tryParse(createdAtRaw)?.millisecondsSinceEpoch ??
+            DateTime.now().millisecondsSinceEpoch);
+
     return FCAlert(
       userId: (n['user_id'] ?? '').toString(),
       username: fromUser,
       iconUrl: '',
       message: readableMessage,
-      timestamp: (n['created_at'] ?? '').toString(),
+      timestamp: timestampMs.toString(),
       contentType: contentType,
       contentId: contentId,
       topicId: topicId,
@@ -238,12 +250,20 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
 
   FCActivity _toActivity(Map<String, dynamic> a) {
     final actionType = (a['action_type'] as int?) ?? 0;
+    // FCActivity.timestamp follows the same contract as FCAlert.timestamp:
+    // millisecond-epoch string. Convert ISO 8601 → ms here so consumers
+    // can `int.parse` without surprises.
+    final createdAtRaw = (a['created_at'] ?? '').toString();
+    final timestampMs = createdAtRaw.isEmpty
+        ? DateTime.now().millisecondsSinceEpoch
+        : (DateTime.tryParse(createdAtRaw)?.millisecondsSinceEpoch ??
+            DateTime.now().millisecondsSinceEpoch);
     return FCActivity(
       userId: (a['user_id'] ?? '').toString(),
       username: (a['username'] ?? '').toString(),
       iconUrl: '',
       message: _readableActivity(actionType, a),
-      timestamp: (a['created_at'] ?? '').toString(),
+      timestamp: timestampMs.toString(),
       contentType: 'topic',
       contentId: (a['topic_id'] ?? '').toString(),
       topicId: a['topic_id']?.toString(),
