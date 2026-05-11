@@ -15,7 +15,20 @@ import 'chat_channel_view.dart';
 class ChatChannelListPage extends StatefulWidget {
   final SiteContext siteContext;
 
-  const ChatChannelListPage({super.key, required this.siteContext});
+  /// When true, render the channel list as a tab body (no Scaffold /
+  /// AppBar of our own — the parent provides them). Used by Phase
+  /// 5.18a's bottom-nav Chat slot, where `SiteHomePage` owns the
+  /// Scaffold + drawer + AppBar and embeds us via IndexedStack.
+  ///
+  /// Default (false) is the legacy push-as-route mode: we wrap the
+  /// list in our own Scaffold + AppBar.
+  final bool embedded;
+
+  const ChatChannelListPage({
+    super.key,
+    required this.siteContext,
+    this.embedded = false,
+  });
 
   @override
   State<ChatChannelListPage> createState() => _ChatChannelListPageState();
@@ -83,6 +96,13 @@ class _ChatChannelListPageState extends State<ChatChannelListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final body = RefreshIndicator(
+      onRefresh: _load,
+      child: _buildBody(),
+    );
+    // Embedded mode (Phase 5.18a bottom-nav Chat slot): caller owns
+    // the Scaffold + AppBar. We just render the list.
+    if (widget.embedded) return body;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -101,10 +121,7 @@ class _ChatChannelListPageState extends State<ChatChannelListPage> {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: _load,
-        child: _buildBody(),
-      ),
+      body: body,
     );
   }
 

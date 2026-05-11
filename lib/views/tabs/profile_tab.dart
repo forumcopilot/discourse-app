@@ -1,3 +1,4 @@
+import 'package:discourse_core/discourse_core.dart';
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_flutter/views/widgets/resettable_widget.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -389,6 +390,13 @@ class _ProfileActionsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    // Phase 5.18a — Messages lives in the bottom nav when Chat isn't
+    // enabled (we took its slot). To avoid surfacing Messages twice,
+    // hide the Profile row in that case. When Chat is enabled, the
+    // bottom-nav slot is Chat and Messages needs this row as its
+    // entry point (Discourse web nests PMs under the user menu the
+    // same way).
+    final showMessagesRow = siteContext.chatEnabled;
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: DesignTokens.spacingL,
@@ -404,21 +412,23 @@ class _ProfileActionsSection extends StatelessWidget {
         ),
         child: Column(
           children: [
-            _ActionRow(
-              icon: Icons.mail_outline,
-              title: 'Messages',
-              subtitle: 'Private messages and conversations',
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => MessagesPage(siteContext: siteContext),
+            if (showMessagesRow) ...[
+              _ActionRow(
+                icon: Icons.mail_outline,
+                title: 'Messages',
+                subtitle: 'Private messages and conversations',
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => MessagesPage(siteContext: siteContext),
+                  ),
                 ),
               ),
-            ),
-            Divider(
-              height: 1,
-              indent: 56,
-              color: colorScheme.outlineVariant.withOpacity(0.4),
-            ),
+              Divider(
+                height: 1,
+                indent: 56,
+                color: colorScheme.outlineVariant.withOpacity(0.4),
+              ),
+            ],
             _ActionRow(
               icon: Icons.bookmark_outline,
               title: 'Bookmarks',

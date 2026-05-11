@@ -3,6 +3,7 @@ import 'package:forumcopilot_sdk/interfaces/i_fc_config_proxy.dart';
 import 'package:forumcopilot_sdk/models/results/fc_config_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../context/discourse_site_context_extension.dart';
 
 /// Discourse implementation of [IFCConfigProxy].
 ///
@@ -36,6 +37,22 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
     } catch (e) {
       // ignore: avoid_print
       print('⚠️ [DISCOURSE_CONFIG] /site.json failed (continuing): $e');
+    }
+    // Phase 5.18a — probe the chat plugin via its `/chat/api/me/channels`
+    // route. Discourse's `/site.json` doesn't expose `enabled_plugins`
+    // for anonymous viewers, so a route-probe is the most portable
+    // signal. We treat anything other than 404 (including 401/403 for
+    // unauth'd requests against installed plugins) as "chat installed";
+    // 404 means the chat plugin's routes aren't registered.
+    try {
+      await apiGet('/chat/api/me/channels');
+      siteContext.setChatEnabled(true);
+    } on DiscourseApiException catch (e) {
+      siteContext.setChatEnabled(e.statusCode != 404);
+    } catch (_) {
+      // Network error or unknown — leave the existing cached value
+      // (defaults to false on a fresh install, true if a previous
+      // probe succeeded).
     }
     return _buildResult(url, version: version, isOpen: isOpen);
   }

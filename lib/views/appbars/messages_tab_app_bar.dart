@@ -23,7 +23,13 @@ class MessagesTabAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 3,
       shadowColor: colorScheme.shadow.withOpacity(DesignTokens.opacityLow),
       surfaceTintColor: colorScheme.surfaceTint,
-      automaticallyImplyLeading: false,
+      // Phase 5.18a — auto-imply true is intentional: when this AppBar
+      // is hosted in `SiteHomePage`'s Scaffold (Messages-as-bottom-nav-
+      // slot path) Flutter inserts the drawer hamburger; when hosted
+      // in `MessagesPage` (the pushed route from Profile → Messages or
+      // from the drawer when chat is the bottom-nav slot) it inserts a
+      // back button instead. Same widget, right leading icon in both
+      // contexts.
       title: Text(
         AppLocalizations.of(context)?.messages ?? 'Messages',
         style: textTheme.titleLarge?.copyWith(

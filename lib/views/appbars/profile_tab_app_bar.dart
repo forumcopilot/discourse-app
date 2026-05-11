@@ -25,7 +25,9 @@ class ProfileTabAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 3,
       shadowColor: colorScheme.shadow.withOpacity(DesignTokens.opacityLow),
       surfaceTintColor: colorScheme.surfaceTint,
-      automaticallyImplyLeading: false,
+      // Phase 5.18a — auto-imply true so the drawer hamburger renders.
+      // The sign-out action moved into the drawer's Account section
+      // but we keep the AppBar logout icon as a discoverability backup.
       title: Text(
         AppLocalizations.of(context)?.profile ?? 'Profile',
         style: textTheme.titleLarge?.copyWith(

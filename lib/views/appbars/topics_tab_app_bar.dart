@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import '../chat/chat_channel_list_page.dart';
 import '../search_page.dart';
 import '../widgets/forum_actions.dart';
 import 'package:forumcopilot_flutter/theme/design_tokens.dart';
@@ -25,7 +24,10 @@ class TopicsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 3,
       shadowColor: colorScheme.shadow.withOpacity(DesignTokens.opacityLow),
       surfaceTintColor: colorScheme.surfaceTint,
-      automaticallyImplyLeading: false,
+      // Phase 5.18a — auto-imply true so the parent Scaffold's drawer
+      // hamburger renders as the leading icon. Chat moved out of the
+      // AppBar actions because it lives in the primary bottom nav now
+      // (when the plugin is enabled).
       title: Text(
         AppLocalizations.of(context)?.home ?? 'Home',
         style: textTheme.titleLarge?.copyWith(
@@ -36,23 +38,9 @@ class TopicsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       centerTitle: false,
       actions: [
-        if (isLoggedIn) _buildChatButton(context, colorScheme),
         if (isLoggedIn) _buildSearchButton(context, colorScheme),
         if (isLoggedIn) _buildMarkReadButton(context, colorScheme),
       ],
-    );
-  }
-
-  Widget _buildChatButton(BuildContext context, ColorScheme colorScheme) {
-    return IconButton(
-      icon: const Icon(Icons.chat_bubble_outline),
-      tooltip: 'Chat',
-      onPressed: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ChatChannelListPage(siteContext: siteContext),
-        ),
-      ),
     );
   }
 

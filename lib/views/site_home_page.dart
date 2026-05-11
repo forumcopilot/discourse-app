@@ -11,20 +11,22 @@ import 'package:get/get.dart';
 import 'package:discourse_core/discourse_core.dart';
 import '../theme/design_tokens.dart';
 import '../theme/style_builders.dart';
+import 'appbars/chat_tab_app_bar.dart';
 import 'appbars/forum_app_bar.dart';
 import 'appbars/topics_tab_app_bar.dart';
 import 'appbars/forums_tab_app_bar.dart';
 import 'appbars/messages_tab_app_bar.dart';
 import 'appbars/notifications_tab_app_bar.dart';
 import 'appbars/profile_tab_app_bar.dart';
+import 'chat/chat_channel_list_page.dart';
 import 'tabs/forum_list_tab.dart';
-import 'tabs/tags_tab.dart';
 import 'tabs/topic_list_tab.dart';
 import 'tabs/notification_list_tab.dart';
 import 'tabs/privatemessage_list_tab.dart';
 import 'tabs/profile_tab.dart';
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
 import 'widgets/resettable_widget.dart';
+import 'widgets/site_drawer.dart';
 import 'package:forumcopilot_flutter/core/logging/app_logger.dart';
 import 'package:forumcopilot_flutter/core/async/async_utils.dart';
 import 'dart:async';
@@ -512,6 +514,11 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           return _forumListKey.currentState;
         case _messagesTab:
           return _pmListKey.currentState;
+        case _chatTab:
+          // ChatChannelListPage doesn't implement FCTabStatefulWidget;
+          // it pulls fresh data on each tab activation via its own
+          // RefreshIndicator. No reset key needed.
+          return null;
         case _notificationsTab:
           return _notificationTabKey.currentState;
         case _profileTab:
@@ -565,21 +572,27 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
   // Define tab types for better organization
   static const String _topicsTab = 'topics';
   static const String _forumsTab = 'forums';
-  static const String _tagsTab = 'tags';
+  static const String _chatTab = 'chat';
   static const String _messagesTab = 'messages';
   static const String _notificationsTab = 'notifications';
   static const String _profileTab = 'profile';
 
+  /// Phase 5.18a — whether the Discourse Chat plugin is enabled. The
+  /// bottom-nav third slot is Chat when true, Messages when false.
+  /// Resolved from `enabled_plugins` on `/site.json`, cached in
+  /// `DiscourseSiteContextExtension`. Empty list (config not yet
+  /// fetched) → false, so the slot defaults to Messages.
+  bool get _isChatEnabled => _siteContext?.chatEnabled ?? false;
+
   // Get the list of enabled tabs based on user permissions
   List<String> get _enabledTabs {
-    // Phase 5.17d bottom nav: Home / Categories / Tags / Notifications
-    // / Profile (5 items, matching Discourse web's primary surfaces).
-    // Messages used to live here as its own tab but moved under
-    // Profile → Messages — Discourse itself nests PMs in the user
-    // menu, and dropping it frees a slot for Tags without exceeding
-    // Material's 5-destination NavigationBar guidance. The unread-PM
-    // count badge now decorates Profile instead of a Messages icon.
-    final tabs = [_topicsTab, _forumsTab, _tagsTab];
+    // Phase 5.18a bottom nav: Home / Categories / {Chat or Messages}
+    // / Notifications / Profile. Tags moved out into the hamburger
+    // drawer (Discourse web's mobile IA buries Tags there too). The
+    // third slot follows plugin availability: Chat when the
+    // discourse-chat plugin is installed, otherwise Messages (PMs).
+    final tabs = <String>[_topicsTab, _forumsTab];
+    tabs.add(_isChatEnabled ? _chatTab : _messagesTab);
     if (_siteContext?.configDataOutput?.alert ?? false) tabs.add(_notificationsTab);
     tabs.add(_profileTab);
     return tabs;
@@ -611,8 +624,11 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           siteContext: _siteContext!,
           isLoggedIn: isLoggedIn,
         );
-      case _tagsTab:
-        return _buildSimpleAppBar(context, 'Tags');
+      case _chatTab:
+        return ChatTabAppBar(
+          siteContext: _siteContext!,
+          isLoggedIn: isLoggedIn,
+        );
       case _messagesTab:
         return MessagesTabAppBar(
           siteContext: _siteContext!,
@@ -634,29 +650,6 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           isLoggedIn: isLoggedIn,
         );
     }
-  }
-
-  // Minimal AppBar for tabs that don't need any custom actions —
-  // currently the Tags tab. Mirrors the visual style of TopicsTabAppBar
-  // (same surface color, elevation, weight).
-  PreferredSizeWidget _buildSimpleAppBar(BuildContext context, String title) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return AppBar(
-      backgroundColor: colorScheme.surface,
-      elevation: 3,
-      shadowColor: colorScheme.shadow.withOpacity(0.3),
-      surfaceTintColor: colorScheme.surfaceTint,
-      automaticallyImplyLeading: false,
-      title: Text(
-        title,
-        style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onSurface,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      centerTitle: false,
-    );
   }
 
   @override
@@ -734,6 +727,12 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
 
     return Scaffold(
       appBar: _buildAppBarForCurrentTab(isLoggedIn, canSendPM),
+      // Phase 5.18a — hamburger drawer hosts the moved Tags tab plus
+      // future community directories (Users / Groups / Badges) and
+      // account actions. Drawer is mounted at the Scaffold level so
+      // every tab's AppBar can open it via the auto-imply leading
+      // hamburger.
+      drawer: SiteDrawer(siteContext: _siteContext!),
       body: IndexedStack(
         index: _tabController.index,
         children: _buildTabWidgets(),
@@ -780,10 +779,15 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
               isActive: _isCurrentTab(_forumsTab),
               siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
               boardStats: _boardStats);
-        case _tagsTab:
-          return TagsTab(
-              isActive: _isCurrentTab(_tagsTab),
-              siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')));
+        case _chatTab:
+          // Phase 5.18a — Chat is the bottom-nav slot when the
+          // plugin is installed. Embed mode strips the page's own
+          // Scaffold so our SiteHomePage Scaffold + ChatTabAppBar +
+          // drawer hamburger stay in charge.
+          return ChatChannelListPage(
+            siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
+            embedded: true,
+          );
         case _messagesTab:
           return PrivateMessageListTab(
               key: _pmListKey,
@@ -823,10 +827,14 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
             icon: Icon(Icons.forum_outlined),
             label: '',
           );
-        case _tagsTab:
+        case _chatTab:
+          // Phase 5.18a — distinct icon from Topics' chat_bubble so
+          // users can tell the two surfaces apart. Forum chat lives
+          // under the chat-launch icon (chat_outlined / chat_rounded);
+          // Topics is a single "speech bubble".
           return const NavigationDestination(
-            selectedIcon: Icon(Icons.label),
-            icon: Icon(Icons.label_outline),
+            selectedIcon: Icon(Icons.chat_rounded),
+            icon: Icon(Icons.chat_outlined),
             label: '',
           );
         case _messagesTab:

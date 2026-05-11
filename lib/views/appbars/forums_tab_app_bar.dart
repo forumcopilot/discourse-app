@@ -24,7 +24,8 @@ class ForumsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 3,
       shadowColor: colorScheme.shadow.withOpacity(DesignTokens.opacityLow),
       surfaceTintColor: colorScheme.surfaceTint,
-      automaticallyImplyLeading: false,
+      // Phase 5.18a — auto-imply true so the parent Scaffold's drawer
+      // hamburger renders in the leading slot.
       title: Text(
         AppLocalizations.of(context)?.forums ?? 'Categories',
         style: textTheme.titleLarge?.copyWith(

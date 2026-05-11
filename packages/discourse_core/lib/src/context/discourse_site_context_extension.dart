@@ -92,5 +92,28 @@ extension DiscourseSiteContextExtension on SiteContext {
         prefs.getBool('${prefix}_user_api_push_enabled') ?? false;
   }
 
+  // ===== Discourse plugin availability =====
+  //
+  // Discourse's `/site.json` payload doesn't expose `enabled_plugins` for
+  // anonymous viewers, and the field shape varies by version, so we use a
+  // route-probe pattern: hit a known plugin route and watch for 404
+  // (plugin not installed → no Rails route) versus any other status code
+  // (route exists → plugin installed; auth-required responses still
+  // confirm the plugin is wired in). Results are cached on the context
+  // for the lifetime of the session so the bottom-nav slot decision is
+  // synchronous from `_enabledTabs`.
+
+  /// Phase 5.18a — true when the `discourse-chat` plugin is installed and
+  /// reachable. Drives the bottom-nav third slot (Chat when true, PMs
+  /// when false). Defaults to false before the first probe so the
+  /// fallback (Messages) renders during cold start.
+  bool get chatEnabled => (_data()['chatEnabled'] as bool?) ?? false;
+
+  /// Cache the result of a chat-route probe. Called by
+  /// `DiscourseConfigProxy.getConfig` once per site init.
+  void setChatEnabled(bool enabled) {
+    _data()['chatEnabled'] = enabled;
+  }
+
   String _prefsPrefix() => 'discourse:${site.pluginUrl}';
 }

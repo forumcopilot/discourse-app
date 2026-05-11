@@ -1,30 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_flutter/theme/design_tokens.dart';
-import '../../l10n/generated/app_localizations.dart';
+import 'package:forumcopilot_sdk/context/site_context.dart';
 
-class NotificationsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
+/// AppBar for the Chat bottom-nav tab (Phase 5.18a). Matches the
+/// visual cadence of `TopicsTabAppBar` / `ForumsTabAppBar` — surface
+/// background, elevation 3, drawer hamburger in the leading slot via
+/// `automaticallyImplyLeading: true`.
+///
+/// The Refresh action that used to live on `ChatChannelListPage`'s
+/// standalone AppBar is intentionally dropped here — the embedded
+/// `ChatChannelListPage(embedded: true)` body still exposes
+/// pull-to-refresh, and a redundant button button would compete with
+/// the search/markRead patterns used by sibling tabs. We can add it
+/// back as an icon action later if the gesture proves unreliable.
+class ChatTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isLoggedIn;
   final SiteContext siteContext;
-  const NotificationsTabAppBar({
+
+  const ChatTabAppBar({
+    super.key,
     required this.siteContext,
     this.isLoggedIn = false,
-    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
     return AppBar(
       backgroundColor: colorScheme.surface,
       elevation: 3,
       shadowColor: colorScheme.shadow.withOpacity(DesignTokens.opacityLow),
       surfaceTintColor: colorScheme.surfaceTint,
-      // Phase 5.18a — auto-imply true so the drawer hamburger renders.
       title: Text(
-        AppLocalizations.of(context)?.notifications ?? 'Notifications',
+        'Chat',
         style: textTheme.titleLarge?.copyWith(
           color: colorScheme.onSurface,
           fontWeight: FontWeight.w500,
