@@ -1,7 +1,7 @@
-import 'package:discourse_core/discourse_core.dart'
-    show DiscourseChatChannel, DiscourseChatProxy;
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_chat_channel.dart';
 
 import '../../theme/design_tokens.dart';
 import '../widgets/empty_state_view.dart';
@@ -36,7 +36,7 @@ class ChatChannelListPage extends StatefulWidget {
 }
 
 class _ChatChannelListPageState extends State<ChatChannelListPage> {
-  List<DiscourseChatChannel>? _channels;
+  List<FCChatChannel>? _channels;
   bool _loading = false;
   String? _error;
 
@@ -52,21 +52,20 @@ class _ChatChannelListPageState extends State<ChatChannelListPage> {
       _error = null;
     });
     try {
-      final proxy = DiscourseChatProxy.forCurrentSite();
-      if (proxy == null) {
-        setState(() {
-          _channels = const [];
-          _loading = false;
-          _error = 'Chat is not available on this forum.';
-        });
-        return;
-      }
-      final channels = await proxy.getMyChannelsAsync();
+      final result =
+          await SiteProxyService.getChatProxy().getMyChannelsAsync();
       if (!mounted) return;
       setState(() {
-        _channels = channels;
         _loading = false;
-        if (channels.isEmpty) {
+        if (!result.result) {
+          _channels = const [];
+          _error = result.resultText?.isNotEmpty == true
+              ? result.resultText
+              : 'Chat is not available on this forum.';
+          return;
+        }
+        _channels = result.channels;
+        if (result.channels.isEmpty) {
           _error =
               'No chat channels yet. Ask an admin to invite you to one.';
         }
@@ -81,7 +80,7 @@ class _ChatChannelListPageState extends State<ChatChannelListPage> {
     }
   }
 
-  void _open(DiscourseChatChannel ch) {
+  void _open(FCChatChannel ch) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => Scaffold(
@@ -155,7 +154,7 @@ class _ChatChannelListPageState extends State<ChatChannelListPage> {
 }
 
 class _ChannelTile extends StatelessWidget {
-  final DiscourseChatChannel channel;
+  final FCChatChannel channel;
   final VoidCallback onTap;
 
   const _ChannelTile({required this.channel, required this.onTap});

@@ -193,6 +193,17 @@ abstract class SiteProxyFactory {
     return factory.createTagProxy(_context!);
   }
 
+  /// Get chat proxy (Phase 5.39 — chat channels/messages lifted off
+  /// the DiscourseChatProxy.forCurrentSite() sidecar).
+  static IFCChatProxy getChatProxy() {
+    if (_context == null) throw Exception('SiteProxyFactory not initialized');
+
+    final factory = _providers[_context!.siteType];
+    if (factory == null) throw Exception('No provider registered for site type: ${_context!.siteType}');
+
+    return factory.createChatProxy(_context!);
+  }
+
   // Abstract methods that must be implemented by concrete factories
   IFCUserProxy createUserProxy(SiteContext context);
   IFCForumProxy createForumProxy(SiteContext context);
@@ -211,4 +222,5 @@ abstract class SiteProxyFactory {
   IFCBookmarkProxy createBookmarkProxy(SiteContext context);
   IFCDraftProxy createDraftProxy(SiteContext context);
   IFCTagProxy createTagProxy(SiteContext context);
+  IFCChatProxy createChatProxy(SiteContext context);
 }

@@ -10,6 +10,7 @@ import '../src/proxy/topic_proxy.dart';
 import '../src/proxy/post_proxy.dart';
 import '../src/proxy/attachment_proxy.dart';
 import '../src/proxy/bookmark_proxy.dart';
+import '../src/proxy/chat_proxy.dart';
 import '../src/proxy/draft_proxy.dart';
 import '../src/proxy/search_proxy.dart';
 import '../src/proxy/social_proxy.dart';
@@ -89,5 +90,9 @@ class DiscourseProxyFactory extends SiteProxyFactory {
 
   IFCTagProxy createTagProxy(SiteContext context) {
     return DiscourseTagProxy(context);
+  }
+
+  IFCChatProxy createChatProxy(SiteContext context) {
+    return DiscourseChatProxy(context);
   }
 }

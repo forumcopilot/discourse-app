@@ -3,6 +3,7 @@ export 'fc_account_result.dart';
 export '../registration/registration.dart';
 export 'fc_attachment_result.dart';
 export 'fc_bookmark_result.dart';
+export 'fc_chat_result.dart';
 export 'fc_config_result.dart';
 export 'fc_directory_result.dart';
 export 'fc_draft_result.dart';

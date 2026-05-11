@@ -123,4 +123,10 @@ class SiteProxyService with ServiceErrorHandlingMixin {
     if (!_initialized) throw Exception('SiteProxyService not initialized');
     return SiteProxyFactory.getTagProxy();
   }
+
+  /// Get chat proxy
+  static IFCChatProxy getChatProxy() {
+    if (!_initialized) throw Exception('SiteProxyService not initialized');
+    return SiteProxyFactory.getChatProxy();
+  }
 }

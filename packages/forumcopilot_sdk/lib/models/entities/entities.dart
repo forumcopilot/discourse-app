@@ -10,6 +10,8 @@ export 'fc_forum.dart';
 export 'fc_attachment.dart';
 export 'fc_badge.dart';
 export 'fc_bookmark.dart';
+export 'fc_chat_channel.dart';
+export 'fc_chat_message.dart';
 export 'fc_directory_item.dart';
 export 'fc_draft.dart';
 export 'fc_like.dart';

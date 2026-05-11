@@ -1,6 +1,6 @@
-import 'package:discourse_core/discourse_core.dart' show DiscourseChatMessage;
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
 
 import '../../../theme/design_tokens.dart';
 import '../../../utils/time_utils.dart';
@@ -24,7 +24,7 @@ class ChatMessageBubble extends StatelessWidget {
     this.onLongPress,
   });
 
-  final DiscourseChatMessage message;
+  final FCChatMessage message;
   final SiteContext siteContext;
   final bool isSelf;
   final VoidCallback? onLongPress;
@@ -51,7 +51,7 @@ class ChatMessageBubble extends StatelessWidget {
     final textColor = isSelf ? colorScheme.onPrimaryContainer : colorScheme.onSurface;
     final mutedTextColor = textColor.withOpacity(0.7);
 
-    final avatarUrl = message.avatarUrl(siteContext.site.url);
+    final avatarUrl = message.authorAvatarUrl;
     final avatar = UserAvatar(
       username: message.authorUsername,
       iconUrl: avatarUrl?.isEmpty ?? true ? null : avatarUrl,

@@ -1,27 +1,23 @@
 import 'dart:async';
 
-import 'package:discourse_core/discourse_core.dart'
-    show DiscourseChatChannel, DiscourseChatMessage, DiscourseChatProxy;
 import 'package:flutter/widgets.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_chat_channel.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
 import 'package:get/get.dart';
 
 import '../core/logging/app_logger.dart';
 
-/// Owns one Discourse Chat channel view: message list + send/edit/
-/// delete actions + the polling loop that keeps messages fresh.
+/// Owns one chat channel view: message list + send/edit/delete actions
+/// + the polling loop that keeps messages fresh.
 ///
-/// Lifecycle:
-///   - Polling starts when [start] is called (typically when the
-///     channel page becomes visible).
-///   - Polling pauses on app background (WidgetsBindingObserver).
-///   - Polling stops + dispose runs when the controller is removed.
+/// Phase 5.39 — routes through `IFCChatProxy` (no more `DiscourseChatProxy`
+/// casts). Lifecycle is unchanged:
+///   - Polling starts on [start] / resumes on app foreground.
+///   - Polling pauses on background and stops on dispose.
 ///
 /// Discourse Chat has no native long-poll; the web client uses
-/// MessageBus + websockets. This controller polls every [pollInterval]
-/// using `pollNewerAsync(channelId, lastMessageId)`. A future revision
-/// can subscribe to `/chat/:channel_id` via MessageBus for real-time
-/// updates. Polling cadence is intentionally on the slow side (default
-/// 4s) to keep battery + network friendly; bump it down for testing.
+/// MessageBus + websockets. This controller polls every [pollInterval].
 class ChatChannelController extends GetxController
     with WidgetsBindingObserver {
   ChatChannelController({
@@ -34,18 +30,11 @@ class ChatChannelController extends GetxController
 
   // ---- observable state ------------------------------------------------
 
-  /// Messages, oldest first.
-  final messages = <DiscourseChatMessage>[].obs;
-
-  /// Channel metadata (name, status, unread count, etc.).
-  final channel = Rxn<DiscourseChatChannel>();
-
+  final messages = <FCChatMessage>[].obs;
+  final channel = Rxn<FCChatChannel>();
   final isLoadingInitial = false.obs;
   final isLoadingOlder = false.obs;
   final isSending = false.obs;
-
-  /// Last error message surfaced to the UI (transient — caller clears
-  /// after showing).
   final lastError = ''.obs;
 
   // ---- internal --------------------------------------------------------
@@ -84,18 +73,13 @@ class ChatChannelController extends GetxController
   Future<void> _bootstrap() async {
     isLoadingInitial.value = true;
     try {
-      final proxy = DiscourseChatProxy.forCurrentSite();
-      if (proxy == null) {
-        lastError.value = 'Chat is not enabled on this forum.';
-        return;
-      }
-      // Channel metadata + first slice in parallel.
-      final results = await Future.wait([
-        proxy.getChannelAsync(channelId),
-        proxy.getMessagesAsync(channelId, pageSize: 50),
-      ]);
-      final ch = results[0] as DiscourseChatChannel?;
-      final firstBatch = results[1] as List<DiscourseChatMessage>;
+      final proxy = SiteProxyService.getChatProxy();
+      final channelFuture = proxy.getChannelAsync(channelId);
+      final messagesFuture = proxy.getMessagesAsync(channelId, pageSize: 50);
+      final channelResult = await channelFuture;
+      final messagesResult = await messagesFuture;
+      final ch = channelResult.channel;
+      final firstBatch = messagesResult.messages;
       if (ch != null) channel.value = ch;
       if (firstBatch.isNotEmpty) {
         // Discourse returns newest-first; flip to oldest-first for the
@@ -105,9 +89,9 @@ class ChatChannelController extends GetxController
         messages.assignAll(sorted);
         _highWatermark = sorted.last.id;
       }
-      // Mark the channel read up to the latest message we just loaded.
       if (_highWatermark > 0) {
-        unawaited(proxy.markChannelReadAsync(channelId, messageId: _highWatermark));
+        unawaited(proxy.markChannelReadAsync(channelId,
+            messageId: _highWatermark));
       }
     } catch (e) {
       AppLogger.error('ChatChannelController bootstrap error: $e');
@@ -119,10 +103,7 @@ class ChatChannelController extends GetxController
 
   // ---- public polling control -----------------------------------------
 
-  /// Resume polling — call when the channel view becomes visible.
   void start() => _startPolling();
-
-  /// Pause polling — call when the channel view becomes hidden.
   void stop() => _stopPolling();
 
   // ---- polling ---------------------------------------------------------
@@ -141,17 +122,17 @@ class ChatChannelController extends GetxController
   Future<void> _tick() async {
     if (_disposed || _highWatermark == 0) return;
     try {
-      final proxy = DiscourseChatProxy.forCurrentSite();
-      if (proxy == null) return;
-      final newer = await proxy.pollNewerAsync(
+      final proxy = SiteProxyService.getChatProxy();
+      final result = await proxy.pollNewerAsync(
         channelId,
         lastMessageId: _highWatermark,
       );
-      if (newer.isEmpty) return;
+      if (!result.result || result.messages.isEmpty) return;
       // Drop anything we already have; keep new messages sorted by id.
       final existing = {for (final m in messages) m.id};
-      final fresh = newer.where((m) => !existing.contains(m.id)).toList()
-        ..sort((a, b) => a.id.compareTo(b.id));
+      final fresh =
+          result.messages.where((m) => !existing.contains(m.id)).toList()
+            ..sort((a, b) => a.id.compareTo(b.id));
       if (fresh.isEmpty) return;
       messages.addAll(fresh);
       _highWatermark = fresh.last.id;
@@ -160,7 +141,6 @@ class ChatChannelController extends GetxController
       // hook.
     } catch (e) {
       AppLogger.warning('ChatChannelController poll error: $e');
-      // Don't surface transient errors — next tick may recover.
     }
   }
 
@@ -170,17 +150,16 @@ class ChatChannelController extends GetxController
     if (text.trim().isEmpty) return false;
     isSending.value = true;
     try {
-      final proxy = DiscourseChatProxy.forCurrentSite();
-      if (proxy == null) {
-        lastError.value = 'Chat is not enabled on this forum.';
+      final result =
+          await SiteProxyService.getChatProxy().sendMessageAsync(channelId, text);
+      if (!result.result || result.message == null) {
+        lastError.value = result.resultText?.isNotEmpty == true
+            ? result.resultText!
+            : 'Failed to send message.';
         return false;
       }
-      final m = await proxy.sendMessageAsync(channelId, text);
-      if (m == null) {
-        lastError.value = 'Failed to send message.';
-        return false;
-      }
-      // Optimistic append; the next poll will reconcile if the server
+      final m = result.message!;
+      // Optimistic append; the next poll reconciles if the server
       // returns a slightly different shape.
       if (!messages.any((x) => x.id == m.id)) {
         messages.add(m);
@@ -199,17 +178,34 @@ class ChatChannelController extends GetxController
     if (text.trim().isEmpty) return false;
     isSending.value = true;
     try {
-      final proxy = DiscourseChatProxy.forCurrentSite();
-      if (proxy == null) return false;
-      final ok = await proxy.editMessageAsync(channelId, messageId, text);
-      if (!ok) {
-        lastError.value = 'Failed to edit message.';
+      final result = await SiteProxyService.getChatProxy()
+          .editMessageAsync(channelId, messageId, text);
+      if (!result.result) {
+        lastError.value = result.resultText?.isNotEmpty == true
+            ? result.resultText!
+            : 'Failed to edit message.';
         return false;
       }
       // Optimistic update — replace the message body locally.
       final idx = messages.indexWhere((m) => m.id == messageId);
       if (idx >= 0) {
-        messages[idx] = messages[idx].copyWith(message: text, edited: true);
+        final old = messages[idx];
+        messages[idx] = FCChatMessage(
+          id: old.id,
+          channelId: old.channelId,
+          threadId: old.threadId,
+          message: text,
+          cooked: old.cooked,
+          excerpt: old.excerpt,
+          authorId: old.authorId,
+          authorUsername: old.authorUsername,
+          authorName: old.authorName,
+          authorAvatarUrl: old.authorAvatarUrl,
+          createdAt: old.createdAt,
+          edited: true,
+          deleted: old.deleted,
+          streaming: old.streaming,
+        );
       }
       return true;
     } catch (e) {
@@ -223,11 +219,12 @@ class ChatChannelController extends GetxController
   Future<bool> deleteMessage(int messageId) async {
     isSending.value = true;
     try {
-      final proxy = DiscourseChatProxy.forCurrentSite();
-      if (proxy == null) return false;
-      final ok = await proxy.deleteMessageAsync(channelId, messageId);
-      if (!ok) {
-        lastError.value = 'Failed to delete message.';
+      final result = await SiteProxyService.getChatProxy()
+          .deleteMessageAsync(channelId, messageId);
+      if (!result.result) {
+        lastError.value = result.resultText?.isNotEmpty == true
+            ? result.resultText!
+            : 'Failed to delete message.';
         return false;
       }
       messages.removeWhere((m) => m.id == messageId);
@@ -244,18 +241,17 @@ class ChatChannelController extends GetxController
     if (isLoadingOlder.value || messages.isEmpty) return;
     isLoadingOlder.value = true;
     try {
-      final proxy = DiscourseChatProxy.forCurrentSite();
-      if (proxy == null) return;
-      final batch = await proxy.getMessagesAsync(
+      final result = await SiteProxyService.getChatProxy().getMessagesAsync(
         channelId,
         pageSize: pageSize,
         targetMessageId: messages.first.id,
-        direction: 'older',
+        direction: 'past',
       );
-      if (batch.isEmpty) return;
+      if (!result.result || result.messages.isEmpty) return;
       final existing = {for (final m in messages) m.id};
-      final older = batch.where((m) => !existing.contains(m.id)).toList()
-        ..sort((a, b) => a.id.compareTo(b.id));
+      final older =
+          result.messages.where((m) => !existing.contains(m.id)).toList()
+            ..sort((a, b) => a.id.compareTo(b.id));
       if (older.isEmpty) return;
       messages.insertAll(0, older);
     } catch (e) {
@@ -267,8 +263,7 @@ class ChatChannelController extends GetxController
 
   Future<void> markRead() async {
     if (_highWatermark == 0) return;
-    final proxy = DiscourseChatProxy.forCurrentSite();
-    if (proxy == null) return;
-    await proxy.markChannelReadAsync(channelId, messageId: _highWatermark);
+    await SiteProxyService.getChatProxy()
+        .markChannelReadAsync(channelId, messageId: _highWatermark);
   }
 }
