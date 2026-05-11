@@ -111,4 +111,10 @@ class SiteProxyService with ServiceErrorHandlingMixin {
     if (!_initialized) throw Exception('SiteProxyService not initialized');
     return SiteProxyFactory.getBookmarkProxy();
   }
+
+  /// Get draft proxy
+  static IFCDraftProxy getDraftProxy() {
+    if (!_initialized) throw Exception('SiteProxyService not initialized');
+    return SiteProxyFactory.getDraftProxy();
+  }
 }

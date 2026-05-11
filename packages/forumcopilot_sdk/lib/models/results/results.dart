@@ -4,6 +4,7 @@ export '../registration/registration.dart';
 export 'fc_attachment_result.dart';
 export 'fc_bookmark_result.dart';
 export 'fc_config_result.dart';
+export 'fc_draft_result.dart';
 export 'fc_forum_result.dart';
 export 'fc_moderation_result.dart';
 export 'fc_passkey_result.dart';

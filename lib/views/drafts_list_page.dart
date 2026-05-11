@@ -1,8 +1,7 @@
-import 'package:discourse_core/discourse_core.dart'
-    show DiscourseDraft, DiscoursePostProxy;
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_draft.dart';
 
 import '../theme/design_tokens.dart';
 import '../utils/time_utils.dart';
@@ -27,7 +26,7 @@ class DraftsListPage extends StatefulWidget {
 }
 
 class _DraftsListPageState extends State<DraftsListPage> {
-  List<DiscourseDraft>? _drafts;
+  List<FCDraft>? _drafts;
   bool _loading = false;
   String? _error;
 
@@ -38,26 +37,28 @@ class _DraftsListPageState extends State<DraftsListPage> {
   }
 
   Future<void> _load() async {
-    final proxy = SiteProxyFactory.getPostProxy();
-    if (proxy is! DiscoursePostProxy) {
-      setState(() {
-        _drafts = const [];
-        _loading = false;
-        _error = 'Drafts require a Discourse forum.';
-      });
-      return;
-    }
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
-      final drafts = await proxy.getMyDraftsAsync();
+      final result =
+          await SiteProxyService.getDraftProxy().getMyDraftsAsync();
       if (!mounted) return;
+      if (!result.result) {
+        setState(() {
+          _drafts = const [];
+          _loading = false;
+          _error = result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : 'Failed to load drafts.';
+        });
+        return;
+      }
       setState(() {
-        _drafts = drafts;
+        _drafts = result.items;
         _loading = false;
-        if (drafts.isEmpty) {
+        if (result.items.isEmpty) {
           _error = 'No saved drafts.';
         }
       });
@@ -71,7 +72,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
     }
   }
 
-  Future<void> _delete(DiscourseDraft draft) async {
+  Future<void> _delete(FCDraft draft) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -90,21 +91,23 @@ class _DraftsListPageState extends State<DraftsListPage> {
       ),
     );
     if (confirm != true) return;
-    final proxy = SiteProxyFactory.getPostProxy();
-    if (proxy is! DiscoursePostProxy) return;
-    final ok = await proxy.deleteDraftAsync(draft.draftKey,
-        sequence: draft.sequence);
+    final result = await SiteProxyService.getDraftProxy()
+        .deleteDraftAsync(draft.draftKey, sequence: draft.sequence);
     if (!mounted) return;
-    if (ok) {
+    if (result.result) {
       setState(() => _drafts?.removeWhere((d) => d.draftKey == draft.draftKey));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to discard draft')),
+        SnackBar(
+          content: Text(result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : 'Failed to discard draft'),
+        ),
       );
     }
   }
 
-  void _resume(DiscourseDraft draft) {
+  void _resume(FCDraft draft) {
     // Reply drafts → ReplyPage anchored on the topic.
     // New-topic drafts → NewTopicPage in the saved category (or "" if
     //   the draft is uncategorised).

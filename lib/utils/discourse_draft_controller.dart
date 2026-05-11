@@ -1,15 +1,20 @@
 import 'dart:async';
 
-import 'package:discourse_core/discourse_core.dart' show DiscoursePostProxy;
 import 'package:flutter/widgets.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 
 import '../core/logging/app_logger.dart';
 
 /// Wraps a pair of [TextEditingController]s (title + content) and
-/// transparently mirrors their contents to a Discourse server-side draft
-/// at the configured `draftKey`, with debounce. Hand the controllers to
+/// transparently mirrors their contents to a server-side draft at the
+/// configured `draftKey`, with debounce. Hand the controllers to
 /// `MessageComposePage` and the rest just works.
+///
+/// Phase 5.34 — now routes through `IFCDraftProxy` instead of casting
+/// to `DiscoursePostProxy`. The class name keeps the `Discourse`
+/// prefix because the draft-key conventions (`topic_<id>`, `new_topic`,
+/// `new_private_message`) are Discourse's; on a future XF backend this
+/// controller would be renamed or replaced.
 ///
 /// Lifecycle:
 ///   1. `initialize()` — fetch any existing draft and prefill controllers.
@@ -31,6 +36,7 @@ class DiscourseDraftController {
   bool _saving = false;
   bool _disposed = false;
   bool _loaded = false;
+  int _sequence = 0;
   String _lastSavedReply = '';
   String _lastSavedTitle = '';
 
@@ -45,36 +51,29 @@ class DiscourseDraftController {
   /// Hydrate the controllers from the server-side draft (if any) and
   /// start watching for user changes.
   Future<void> initialize() async {
-    final proxy = SiteProxyFactory.getPostProxy();
-    if (proxy is! DiscoursePostProxy) {
-      _loaded = true;
-      _attach();
-      return;
-    }
     try {
-      final draft = await proxy.loadDraftAsync(draftKey);
+      final result =
+          await SiteProxyService.getDraftProxy().loadDraftAsync(draftKey);
       if (_disposed) return;
-      if (draft != null) {
-        final reply = draft['reply']?.toString();
-        final title = draft['title']?.toString();
+      final draft = result.draft;
+      if (result.result && draft != null) {
+        _sequence = draft.sequence;
+        final reply = draft.reply;
+        final title = draft.topicTitle ?? draft.title ?? '';
         // Only seed the field if it's currently empty — the caller may
         // already have populated initial text (e.g. quote prefill) and
         // we don't want to clobber that.
-        if (reply != null &&
-            reply.isNotEmpty &&
-            contentController.text.isEmpty) {
+        if (reply.isNotEmpty && contentController.text.isEmpty) {
           contentController.text = reply;
           contentController.selection = TextSelection.fromPosition(
             TextPosition(offset: reply.length),
           );
         }
-        if (title != null &&
-            title.isNotEmpty &&
-            titleController.text.isEmpty) {
+        if (title.isNotEmpty && titleController.text.isEmpty) {
           titleController.text = title;
         }
-        _lastSavedReply = reply ?? '';
-        _lastSavedTitle = title ?? '';
+        _lastSavedReply = reply;
+        _lastSavedTitle = title;
       }
     } catch (e) {
       AppLogger.debug('DiscourseDraftController initial load failed: $e');
@@ -102,21 +101,21 @@ class DiscourseDraftController {
     // Discourse auto-deletes drafts whose reply text is empty/whitespace,
     // so only POST when we have something worth saving.
     if (reply.trim().isEmpty && title.trim().isEmpty) return;
-    final proxy = SiteProxyFactory.getPostProxy();
-    if (proxy is! DiscoursePostProxy) return;
     _saving = true;
     try {
-      final ok = await proxy.saveDraftAsync(
+      final result = await SiteProxyService.getDraftProxy().saveDraftAsync(
         draftKey: draftKey,
+        sequence: _sequence,
         data: {
           ...extraData,
           'reply': reply,
           if (title.isNotEmpty) 'title': title,
         },
       );
-      if (ok) {
+      if (result.result) {
         _lastSavedReply = reply;
         _lastSavedTitle = title;
+        if (result.sequence != null) _sequence = result.sequence!;
       }
     } finally {
       _saving = false;
@@ -134,10 +133,9 @@ class DiscourseDraftController {
   /// so the next composer open starts fresh.
   Future<void> discard() async {
     _debounce?.cancel();
-    final proxy = SiteProxyFactory.getPostProxy();
-    if (proxy is! DiscoursePostProxy) return;
     try {
-      await proxy.deleteDraftAsync(draftKey);
+      await SiteProxyService.getDraftProxy()
+          .deleteDraftAsync(draftKey, sequence: _sequence);
     } catch (_) {
       // Best-effort; server-side drafts auto-expire.
     }

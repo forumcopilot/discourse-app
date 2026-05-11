@@ -171,6 +171,17 @@ abstract class SiteProxyFactory {
     return factory.createBookmarkProxy(_context!);
   }
 
+  /// Get draft proxy (Phase 5.34 — server-side drafts lifted off the
+  /// per-forum post proxy onto a first-class IFCDraftProxy).
+  static IFCDraftProxy getDraftProxy() {
+    if (_context == null) throw Exception('SiteProxyFactory not initialized');
+
+    final factory = _providers[_context!.siteType];
+    if (factory == null) throw Exception('No provider registered for site type: ${_context!.siteType}');
+
+    return factory.createDraftProxy(_context!);
+  }
+
   // Abstract methods that must be implemented by concrete factories
   IFCUserProxy createUserProxy(SiteContext context);
   IFCForumProxy createForumProxy(SiteContext context);
@@ -187,4 +198,5 @@ abstract class SiteProxyFactory {
   IFCConfigProxy createConfigProxy(SiteContext context);
   IFCDeviceProxy createDeviceProxy(SiteContext context);
   IFCBookmarkProxy createBookmarkProxy(SiteContext context);
+  IFCDraftProxy createDraftProxy(SiteContext context);
 }
