@@ -204,6 +204,17 @@ abstract class SiteProxyFactory {
     return factory.createChatProxy(_context!);
   }
 
+  /// Get group proxy (Phase 5.40 — groups lifted off the
+  /// DiscourseGroupProxy.forCurrentSite() sidecar).
+  static IFCGroupProxy getGroupProxy() {
+    if (_context == null) throw Exception('SiteProxyFactory not initialized');
+
+    final factory = _providers[_context!.siteType];
+    if (factory == null) throw Exception('No provider registered for site type: ${_context!.siteType}');
+
+    return factory.createGroupProxy(_context!);
+  }
+
   // Abstract methods that must be implemented by concrete factories
   IFCUserProxy createUserProxy(SiteContext context);
   IFCForumProxy createForumProxy(SiteContext context);
@@ -223,4 +234,5 @@ abstract class SiteProxyFactory {
   IFCDraftProxy createDraftProxy(SiteContext context);
   IFCTagProxy createTagProxy(SiteContext context);
   IFCChatProxy createChatProxy(SiteContext context);
+  IFCGroupProxy createGroupProxy(SiteContext context);
 }

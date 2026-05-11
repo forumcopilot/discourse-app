@@ -1,7 +1,8 @@
-import 'package:discourse_core/discourse_core.dart';
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_directory_item.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_group.dart';
 
 import '../theme/design_tokens.dart';
 import 'user_profile_page.dart';
@@ -34,7 +35,7 @@ class GroupDetailPage extends StatefulWidget {
 
 class _GroupDetailPageState extends State<GroupDetailPage> {
   final ScrollController _scrollController = ScrollController();
-  DiscourseGroup? _group;
+  FCGroup? _group;
   final List<FCDirectoryItem> _members = [];
   bool _loadingGroup = true;
   bool _loadingMembers = false;
@@ -71,30 +72,21 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
       _loadingGroup = true;
       _error = null;
     });
-    final proxy = DiscourseGroupProxy.forCurrentSite();
-    if (proxy == null) {
-      setState(() {
-        _loadingGroup = false;
-        _error = 'Groups require a Discourse forum.';
-      });
-      return;
-    }
     try {
-      final results = await Future.wait([
-        proxy.getGroupAsync(widget.groupName),
-        proxy.getGroupMembersAsync(widget.groupName,
-            offset: 0, limit: _pageSize),
-      ]);
+      final proxy = SiteProxyService.getGroupProxy();
+      final groupFuture = proxy.getGroupAsync(widget.groupName);
+      final membersFuture = proxy.getGroupMembersAsync(widget.groupName,
+          offset: 0, limit: _pageSize);
+      final groupResult = await groupFuture;
+      final membersResult = await membersFuture;
       if (!mounted) return;
-      final group = results[0] as DiscourseGroup?;
-      final members = results[1] as List<FCDirectoryItem>;
       setState(() {
-        _group = group;
+        _group = groupResult.group;
         _members
           ..clear()
-          ..addAll(members);
-        _offset = members.length;
-        _hasMore = members.length >= _pageSize;
+          ..addAll(membersResult.members);
+        _offset = membersResult.members.length;
+        _hasMore = membersResult.members.length >= _pageSize;
         _loadingGroup = false;
       });
     } catch (e) {
@@ -111,19 +103,18 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
     setState(() {
       _loadingMembers = true;
     });
-    final proxy = DiscourseGroupProxy.forCurrentSite();
-    if (proxy == null) return;
     try {
-      final next = await proxy.getGroupMembersAsync(
+      final result = await SiteProxyService.getGroupProxy()
+          .getGroupMembersAsync(
         widget.groupName,
         offset: _offset,
         limit: _pageSize,
       );
       if (!mounted) return;
       setState(() {
-        _members.addAll(next);
-        _offset += next.length;
-        if (next.length < _pageSize) _hasMore = false;
+        _members.addAll(result.members);
+        _offset += result.members.length;
+        if (result.members.length < _pageSize) _hasMore = false;
         _loadingMembers = false;
       });
     } catch (_) {

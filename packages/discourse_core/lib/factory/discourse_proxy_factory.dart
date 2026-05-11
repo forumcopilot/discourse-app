@@ -12,6 +12,7 @@ import '../src/proxy/attachment_proxy.dart';
 import '../src/proxy/bookmark_proxy.dart';
 import '../src/proxy/chat_proxy.dart';
 import '../src/proxy/draft_proxy.dart';
+import '../src/proxy/group_proxy.dart';
 import '../src/proxy/search_proxy.dart';
 import '../src/proxy/social_proxy.dart';
 import '../src/proxy/subscription_proxy.dart';
@@ -94,5 +95,9 @@ class DiscourseProxyFactory extends SiteProxyFactory {
 
   IFCChatProxy createChatProxy(SiteContext context) {
     return DiscourseChatProxy(context);
+  }
+
+  IFCGroupProxy createGroupProxy(SiteContext context) {
+    return DiscourseGroupProxy(context);
   }
 }

@@ -1,75 +1,67 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_sdk/interfaces/i_fc_group_proxy.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_directory_item.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_group.dart';
+import 'package:forumcopilot_sdk/models/results/fc_group_result.dart';
 
 import '../base_discourse_proxy.dart';
-import '../data/group/discourse_group.dart';
 
-/// Discourse-only proxy for the Groups API.
+/// Discourse implementation of [IFCGroupProxy] (Phase 5.40 — lifted
+/// off the `DiscourseGroupProxy.forCurrentSite()` sidecar).
 ///
-/// Phase 5.18c-2 surfaces three endpoints:
-/// - `GET /groups.json` — paginated directory of all visible groups.
-/// - `GET /groups/{name}.json` — single-group metadata (bio, flair,
-///   membership policy).
-/// - `GET /groups/{name}/members.json` — paginated member listing.
-///
-/// Following the same pattern as `DiscourseChatProxy`: not part of
-/// the typed `IFC*Proxy` registry (groups are a Discourse-native
-/// concept the XF-shaped SDK doesn't model), so callers reach us
-/// via a static `forCurrentSite()` factory.
-class DiscourseGroupProxy extends BaseDiscourseProxy {
+/// Endpoints used:
+///   * `GET /groups.json`                       — paginated directory
+///   * `GET /groups/{name}.json`                — single-group details
+///   * `GET /groups/{name}/members.json`        — paginated members
+class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
   DiscourseGroupProxy(SiteContext context) : super(context);
 
-  /// Convenience accessor: returns a proxy bound to the current site
-  /// context, or null when no site is initialised. Mirrors
-  /// `DiscourseChatProxy.forCurrentSite` so Discourse-only callsites
-  /// don't have to round-trip through the typed factory registry.
+  /// Convenience accessor used during the transition from the old
+  /// `forCurrentSite()` pattern. New callers should reach the proxy
+  /// via `SiteProxyService.getGroupProxy()`.
   static DiscourseGroupProxy? forCurrentSite() {
     final ctx = SiteProxyFactory.context;
     if (ctx == null) return null;
     return DiscourseGroupProxy(ctx);
   }
 
-  /// List a page of groups. Discourse returns 36 per page by default
-  /// and includes a `load_more_groups` URL in the response; we keep
-  /// it simple and just use `page=N` (1-indexed).
-  Future<List<DiscourseGroup>> getGroupsAsync({int page = 1}) async {
+  @override
+  Future<FCGroupListResult> getGroupsAsync({int page = 1}) async {
     try {
       final response = await apiGet('/groups.json', query: {
         if (page > 1) 'page': page.toString(),
       });
       final raw = (response['groups'] as List?) ?? const [];
-      return raw
+      final groups = raw
           .whereType<Map>()
-          .map((g) => DiscourseGroup.fromJson(g.cast<String, dynamic>()))
+          .map((g) => _groupFromJson(g.cast<String, dynamic>()))
           .toList(growable: false);
-    } catch (_) {
-      return const [];
+      return FCGroupListResult(result: true, groups: groups);
+    } on DiscourseApiException catch (e) {
+      return FCGroupListResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCGroupListResult(result: false, resultText: 'Error: $e');
     }
   }
 
-  /// Fetch a single group by its slug name (e.g. `moderators`,
-  /// `trust_level_3`). Returns null on 404 or other failure — the
-  /// caller's UI shows a "group not found" message.
-  Future<DiscourseGroup?> getGroupAsync(String name) async {
+  @override
+  Future<FCGroupResult> getGroupAsync(String name) async {
     try {
-      final response = await apiGet('/groups/${Uri.encodeComponent(name)}.json');
+      final response =
+          await apiGet('/groups/${Uri.encodeComponent(name)}.json');
       final raw = (response['group'] as Map?)?.cast<String, dynamic>();
-      if (raw == null) return null;
-      return DiscourseGroup.fromJson(raw);
-    } catch (_) {
-      return null;
+      if (raw == null) return FCGroupResult(result: true);
+      return FCGroupResult(result: true, group: _groupFromJson(raw));
+    } on DiscourseApiException catch (e) {
+      return FCGroupResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCGroupResult(result: false, resultText: 'Error: $e');
     }
   }
 
-  /// List the members of a group. Reuses [FCDirectoryItem] because
-  /// Discourse returns the same user shape here as in
-  /// `/directory_items.json` (without the activity stats — those
-  /// fall back to 0).
-  ///
-  /// [limit] caps the page size; Discourse accepts up to 200 but
-  /// defaults to 50 if absent.
-  Future<List<FCDirectoryItem>> getGroupMembersAsync(
+  @override
+  Future<FCGroupMembersResult> getGroupMembersAsync(
     String name, {
     int offset = 0,
     int limit = 50,
@@ -82,9 +74,9 @@ class DiscourseGroupProxy extends BaseDiscourseProxy {
           'limit': limit.toString(),
         },
       );
-      // The response wraps members in `members: [...]` plus
-      // `owners: [...]` for the group's admins. Merge both so the UI
-      // shows everyone — owners appear at the top as the API returns.
+      // Discourse returns `members: [...]` plus `owners: [...]` for
+      // group admins. Merge both — owners appear at the top as
+      // returned.
       final members = <FCDirectoryItem>[];
       for (final key in const ['owners', 'members']) {
         final list = (response[key] as List?) ?? const [];
@@ -109,9 +101,41 @@ class DiscourseGroupProxy extends BaseDiscourseProxy {
           ));
         }
       }
-      return members;
-    } catch (_) {
-      return const [];
+      return FCGroupMembersResult(result: true, members: members);
+    } on DiscourseApiException catch (e) {
+      return FCGroupMembersResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCGroupMembersResult(result: false, resultText: 'Error: $e');
     }
+  }
+
+  FCGroup _groupFromJson(Map<String, dynamic> json) {
+    return FCGroup(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      name: (json['name'] ?? '').toString(),
+      fullName: (json['full_name'] as String?)?.trim().isNotEmpty == true
+          ? json['full_name'] as String
+          : null,
+      bio: (json['bio_raw'] ?? json['bio_cooked'] ?? json['bio_excerpt'])
+          ?.toString(),
+      memberCount: (json['user_count'] as num?)?.toInt() ?? 0,
+      automatic: (json['automatic'] as bool?) ?? false,
+      visible: (json['visible'] as bool?) ?? true,
+      publicAdmission: (json['public_admission'] as bool?) ?? false,
+      allowMembershipRequests:
+          (json['allow_membership_requests'] as bool?) ?? false,
+      mentionableLevel: (json['mentionable_level'] as num?)?.toInt(),
+      messageableLevel: (json['messageable_level'] as num?)?.toInt(),
+      flairColor: (json['flair_color'] as String?)?.trim().isNotEmpty == true
+          ? json['flair_color'] as String
+          : null,
+      flairBgColor:
+          (json['flair_bg_color'] as String?)?.trim().isNotEmpty == true
+              ? json['flair_bg_color'] as String
+              : null,
+      flairUrl: (json['flair_url'] as String?)?.trim().isNotEmpty == true
+          ? json['flair_url'] as String
+          : null,
+    );
   }
 }

@@ -14,6 +14,7 @@ export 'fc_chat_channel.dart';
 export 'fc_chat_message.dart';
 export 'fc_directory_item.dart';
 export 'fc_draft.dart';
+export 'fc_group.dart';
 export 'fc_like.dart';
 export 'fc_notification_level.dart';
 export 'fc_notification_prefs.dart';

@@ -10,6 +10,7 @@ export 'i_fc_bookmark_proxy.dart';
 export 'i_fc_chat_proxy.dart';
 export 'i_fc_draft_proxy.dart';
 export 'i_fc_forum_proxy.dart';
+export 'i_fc_group_proxy.dart';
 export 'i_fc_topic_proxy.dart';
 export 'i_fc_post_proxy.dart';
 export 'i_fc_account_proxy.dart';

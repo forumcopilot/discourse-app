@@ -1,6 +1,7 @@
-import 'package:discourse_core/discourse_core.dart';
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_group.dart';
 
 import '../theme/design_tokens.dart';
 import 'group_detail_page.dart';
@@ -26,7 +27,7 @@ class GroupsListPage extends StatefulWidget {
 
 class _GroupsListPageState extends State<GroupsListPage> {
   final ScrollController _scrollController = ScrollController();
-  final List<DiscourseGroup> _groups = [];
+  final List<FCGroup> _groups = [];
   int _page = 1;
   bool _loading = false;
   bool _hasMore = true;
@@ -61,31 +62,26 @@ class _GroupsListPageState extends State<GroupsListPage> {
       if (reset) _error = null;
     });
     try {
-      final proxy = DiscourseGroupProxy.forCurrentSite();
-      if (proxy == null) {
-        setState(() {
-          _loading = false;
-          _error = 'Groups require a Discourse forum.';
-          _hasMore = false;
-        });
-        return;
-      }
       final fetchedPage = reset ? 1 : _page + 1;
-      final result = await proxy.getGroupsAsync(page: fetchedPage);
+      final result = await SiteProxyService.getGroupProxy()
+          .getGroupsAsync(page: fetchedPage);
       if (!mounted) return;
       setState(() {
         if (reset) {
           _groups.clear();
           _page = 1;
         }
-        if (result.isEmpty) {
+        if (!result.result) {
+          _hasMore = false;
+          _error = result.resultText?.isNotEmpty == true
+              ? result.resultText
+              : 'Failed to load groups.';
+        } else if (result.groups.isEmpty) {
           _hasMore = false;
         } else {
-          _groups.addAll(result);
+          _groups.addAll(result.groups);
           _page = fetchedPage;
-          // Discourse pages groups at 36 per request; treat anything
-          // smaller as the final page.
-          if (result.length < 36) _hasMore = false;
+          if (result.groups.length < 36) _hasMore = false;
         }
         _loading = false;
       });
@@ -155,7 +151,7 @@ class _GroupsListPageState extends State<GroupsListPage> {
 }
 
 class _GroupRow extends StatelessWidget {
-  final DiscourseGroup group;
+  final FCGroup group;
   final VoidCallback onTap;
 
   const _GroupRow({required this.group, required this.onTap});
