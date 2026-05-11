@@ -158,6 +158,18 @@ class FCAlert with FCAlertMappable {
   String? get topic_id => topicId;
 }
 
+/// Forum Copilot Mark Alerts Read Result (Discourse:
+/// `PUT /notifications/mark-read` — clears every unread notification
+/// in one shot). Same shape as the other bare-success results.
+@MappableClass()
+class FCMarkAlertsReadResult extends FCBaseResult
+    with FCMarkAlertsReadResultMappable {
+  FCMarkAlertsReadResult({
+    required bool result,
+    String? resultText,
+  }) : super(result: result, resultText: resultText);
+}
+
 /// Forum Copilot Activity Result
 /// Maps from ActivityData_Output
 @MappableClass()

@@ -569,6 +569,35 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     }
   }
 
+  /// Phase 5.32 — clears every unread notification on the server via
+  /// `IFCSocialProxy.markAllAlertsReadAsync` (Discourse:
+  /// `PUT /notifications/mark-read`) and refreshes the visible list so
+  /// the user sees the cleared state without manually pulling-to-refresh.
+  Future<void> _handleMarkAllNotificationsRead() async {
+    if (_siteContext == null || !(_siteContext!.isLoggedIn)) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final result =
+        await SiteProxyService.getSocialProxy().markAllAlertsReadAsync();
+
+    if (!mounted) return;
+
+    if (result.result) {
+      _notificationTabKey.currentState?.resetTab();
+      messenger.showSnackBar(
+        const SnackBar(content: Text('All notifications marked as read')),
+      );
+    } else {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : 'Failed to mark notifications as read'),
+        ),
+      );
+    }
+  }
+
   // Define tab types for better organization
   static const String _topicsTab = 'topics';
   static const String _forumsTab = 'forums';
@@ -638,6 +667,8 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
         return NotificationsTabAppBar(
           siteContext: _siteContext!,
           isLoggedIn: isLoggedIn,
+          onMarkAllRead:
+              isLoggedIn ? _handleMarkAllNotificationsRead : null,
         );
       case _profileTab:
         return ProfileTabAppBar(

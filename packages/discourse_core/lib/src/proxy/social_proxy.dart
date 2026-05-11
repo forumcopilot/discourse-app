@@ -219,6 +219,33 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     }
   }
 
+  @override
+  Future<FCMarkAlertsReadResult> markAllAlertsReadAsync() async {
+    // Phase 5.32 — Discourse: `PUT /notifications/mark-read` with no
+    // body clears every unread notification for the current user in
+    // one call. Returns 200 on success, 403/404 on auth failure.
+    if (!siteContext.isLoggedIn) {
+      return FCMarkAlertsReadResult(
+        result: false,
+        resultText: 'Not signed in',
+      );
+    }
+    try {
+      await apiPut('/notifications/mark-read');
+      return FCMarkAlertsReadResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCMarkAlertsReadResult(
+        result: false,
+        resultText: e.userMessage,
+      );
+    } catch (e) {
+      return FCMarkAlertsReadResult(
+        result: false,
+        resultText: 'Error: $e',
+      );
+    }
+  }
+
   // ===== Helpers =====
 
   Future<_LikeOutcome> _toggleLikeRaw(String postId,

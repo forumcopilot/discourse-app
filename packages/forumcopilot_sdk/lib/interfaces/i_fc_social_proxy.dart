@@ -35,4 +35,10 @@ abstract class IFCSocialProxy {
 
   /// Get user activity stream.
   Future<FCActivityResult> getActivityAsync(int page, int perpage);
+
+  /// Mark every unread alert as read in one call. Discourse:
+  /// `PUT /notifications/mark-read`. UI surfaces this as a
+  /// "Mark all read" action in the notifications tab AppBar so
+  /// users can clear an unread badge without tapping each row.
+  Future<FCMarkAlertsReadResult> markAllAlertsReadAsync();
 }
