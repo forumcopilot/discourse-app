@@ -1,22 +1,34 @@
-import 'package:discourse_core/discourse_core.dart' show DiscourseUserApiHandshakeRequest;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseUserApiHandshakeRequest;
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:get/get.dart';
 import 'package:forumcopilot_flutter/controllers/global_loader_controller.dart';
-import 'package:forumcopilot_flutter/controllers/login_controller.dart';
 import 'package:forumcopilot_flutter/controllers/site_controller.dart';
 import 'package:forumcopilot_flutter/services/discourse_login_service.dart';
 import 'package:forumcopilot_flutter/views/discourse_login_webview_page.dart';
 import 'package:forumcopilot_flutter/views/widgets/forum_header_widget.dart';
 import 'package:forumcopilot_flutter/views/site_home_page.dart';
-import 'package:forumcopilot_flutter/utils/passkey_android_validation.dart';
-import 'package:forumcopilot_flutter/utils/passkey_ios_validation.dart';
-import 'package:forumcopilot_flutter/utils/passkey_validation_result.dart';
 import 'forgot_password_page.dart';
 import '../theme/design_tokens.dart';
 import '../theme/style_builders.dart';
 
+/// Phase 5.20a — the login page on Discourse is a single
+/// "Sign in with {domain}" CTA that launches the User API Key
+/// handshake webview. The legacy username/password form + passkey
+/// outlined button were dead — the form fields were captured but
+/// ignored by `_handleLogin` (handshake goes to webview), and the
+/// passkey button's underlying proxy methods returned STUB-FAIL on
+/// Discourse since passkey login is handled inside the same webview
+/// (the user picks "passkey" on Discourse's own login screen, not
+/// here). Both removed.
+///
+/// The legacy `LoginController.handleLogin` / `handlePasskeyLogin`
+/// entry points still exist on the controller for now — they are
+/// not invoked from this page anymore. A future cleanup phase will
+/// delete them from the controller once we confirm nothing else
+/// reaches into them.
 class LoginPage extends StatefulWidget {
   final SiteContext siteContext;
   const LoginPage({Key? key, required this.siteContext}) : super(key: key);
@@ -27,20 +39,13 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
-  final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _passwordFocusNode = FocusNode();
-  bool _isPasswordVisible = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  Future<PasskeyValidationResult>? _passkeyValidationFuture;
+  bool _isHandshakeRunning = false;
 
   @override
   void initState() {
     super.initState();
-    _usernameController.text = widget.siteContext.username ?? '';
-    _passwordController.text = widget.siteContext.password ?? '';
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
@@ -52,102 +57,69 @@ class _LoginPageState extends State<LoginPage>
       ),
     );
     _animationController.forward();
-
-    if (widget.siteContext.siteType == 'discourse' &&
-        LoginController.isPasskeySupportedByPlatform) {
-      _passkeyValidationFuture = _validatePasskeyAvailability();
-    }
   }
 
+  /// Discourse mobile login: User API Key handshake. The user lands
+  /// on Discourse's own login UI inside the webview, which handles
+  /// email + password, 2FA, passkeys, and SSO — every login method
+  /// the forum's site settings allow. We just receive the redirect
+  /// payload and exchange it for a long-lived `User-Api-Key`.
   Future<void> _handleLogin() async {
-    // Discourse mobile login: User API Key handshake. The username/password
-    // form fields above are ignored — the user types credentials into
-    // Discourse's own login UI inside the webview, which also handles 2FA,
-    // passkeys, and SSO. Phase 1.2 will replace the form widgets with a
-    // dedicated CTA.
-    final loginService = DiscourseLoginService(widget.siteContext);
-
-    DiscourseUserApiHandshakeRequest handshake;
-    try {
-      handshake = await loginService.beginLogin();
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not start sign-in: $e')),
-      );
-      return;
-    }
-    if (!mounted) return;
-
-    final redirectUrl = await Navigator.of(context).push<Uri?>(
-      MaterialPageRoute<Uri?>(
-        builder: (_) => DiscourseLoginWebViewPage(
-          url: handshake.url,
-          redirectMatcher: loginService.isAuthCallback,
-          title: 'Sign in to ${_getSiteDomain()}',
-        ),
-      ),
-    );
-    if (!mounted) return;
-
-    if (redirectUrl == null) {
-      // User backed out — silent.
-      return;
-    }
-    final payload = loginService.extractPayload(redirectUrl);
-    if (payload == null || payload.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sign-in cancelled — no payload returned')),
-      );
-      return;
-    }
-
-    try {
-      await loginService.finishLogin(payload);
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sign-in failed: $e')),
-      );
-      return;
-    }
-
-    if (!mounted) return;
-    if (Get.isRegistered<GlobalLoaderController>()) {
-      GlobalLoaderController.to.forceHide();
-    }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      try {
-        if (Get.isRegistered<GlobalLoaderController>()) {
-          GlobalLoaderController.to.forceHide();
-        }
-        final siteController = Get.find<SiteController>();
-        final isSiteInitialized = siteController.isInitialized.value;
-        final navigator = Navigator.of(context, rootNavigator: true);
-        final canPop = navigator.canPop();
-
-        if (isSiteInitialized && canPop) {
-          navigator.pop(true);
-        } else {
-          Get.offAll(() => const SiteHomePage());
-        }
-      } catch (_) {
-        if (Get.isRegistered<GlobalLoaderController>()) {
-          GlobalLoaderController.to.forceHide();
-        }
-        Get.offAll(() => const SiteHomePage());
-      }
+    if (_isHandshakeRunning) return;
+    setState(() {
+      _isHandshakeRunning = true;
     });
-  }
+    try {
+      final loginService = DiscourseLoginService(widget.siteContext);
 
-  Future<void> _handlePasskeyLogin() async {
-    final loginController = Get.put(LoginController());
-    final success = await loginController.handlePasskeyLogin(
-      siteContext: widget.siteContext,
-    );
+      DiscourseUserApiHandshakeRequest handshake;
+      try {
+        handshake = await loginService.beginLogin();
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not start sign-in: $e')),
+        );
+        return;
+      }
+      if (!mounted) return;
 
-    if (success && mounted) {
+      final redirectUrl = await Navigator.of(context).push<Uri?>(
+        MaterialPageRoute<Uri?>(
+          builder: (_) => DiscourseLoginWebViewPage(
+            url: handshake.url,
+            redirectMatcher: loginService.isAuthCallback,
+            title: 'Sign in to ${_getSiteDomain()}',
+          ),
+        ),
+      );
+      if (!mounted) return;
+
+      if (redirectUrl == null) {
+        // User backed out of the webview — silent.
+        return;
+      }
+      final payload = loginService.extractPayload(redirectUrl);
+      if (payload == null || payload.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Sign-in cancelled — no payload returned'),
+          ),
+        );
+        return;
+      }
+
+      try {
+        await loginService.finishLogin(payload);
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign-in failed: $e')),
+        );
+        return;
+      }
+
+      if (!mounted) return;
       if (Get.isRegistered<GlobalLoaderController>()) {
         GlobalLoaderController.to.forceHide();
       }
@@ -174,127 +146,45 @@ class _LoginPageState extends State<LoginPage>
           Get.offAll(() => const SiteHomePage());
         }
       });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isHandshakeRunning = false;
+        });
+      }
     }
   }
 
-  /// Extract domain name from forum URL
+  /// Extract the host portion of the forum URL for the CTA label and
+  /// the webview's AppBar title. Falls back to "this forum" when the
+  /// URL is missing or unparseable.
   String _getSiteDomain() {
     final siteController = Get.put(SiteController());
     final siteUrl = siteController.currentSite.value?.url;
-
-    if (siteUrl == null || siteUrl.isEmpty) {
-      return 'this forum';
-    }
-
+    if (siteUrl == null || siteUrl.isEmpty) return 'this forum';
     try {
       final uri = Uri.parse(siteUrl);
       return uri.host.isNotEmpty ? uri.host : 'this forum';
-    } catch (e) {
-      // Fallback if URL parsing fails
+    } catch (_) {
       return 'this forum';
     }
   }
 
   @override
   void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    _passwordFocusNode.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
-  Future<PasskeyValidationResult> _validatePasskeyAvailability() async {
-    final url = widget.siteContext.site.pluginUrl;
-    final domain = _extractDomain(url);
-    if (domain == null) {
-      return const PasskeyValidationResult.enabled();
-    }
-
-    if (LoginController.isIOSPlatform) {
-      return PasskeyIosValidationService.validateForDomain(domain);
-    }
-
-    if (LoginController.isAndroidPlatform) {
-      return PasskeyAndroidValidationService.validateForDomain(domain);
-    }
-
-    return const PasskeyValidationResult.enabled();
-  }
-
-  String? _extractDomain(String url) {
-    final trimmed = url.trim();
-    if (trimmed.isEmpty) return null;
-
-    final direct = Uri.tryParse(trimmed);
-    if (direct != null && direct.host.isNotEmpty) {
-      return direct.host;
-    }
-
-    final withScheme = Uri.tryParse('https://$trimmed');
-    if (withScheme != null && withScheme.host.isNotEmpty) {
-      return withScheme.host;
-    }
-
-    return null;
-  }
-
-  Widget _buildPasskeyButton({
-    required ColorScheme colorScheme,
-    required TextTheme textTheme,
-    required AppLocalizations l10n,
-    required bool enabled,
-    int? errorCode,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        OutlinedButton.icon(
-          onPressed: enabled ? _handlePasskeyLogin : null,
-          style: OutlinedButton.styleFrom(
-            padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingL),
-            foregroundColor: colorScheme.primary,
-            side: BorderSide(color: colorScheme.primary),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusL),
-            ),
-          ),
-          icon: Icon(Icons.key_rounded, color: colorScheme.primary),
-          label: Text(
-            l10n.signInWithPasskey,
-            style: StyleBuilders.titleTextStyle(
-              colorScheme: colorScheme,
-              textTheme: textTheme,
-              color: colorScheme.primary,
-              fontWeight: DesignTokens.fontWeightBold,
-            ),
-          ),
-        ),
-        if (!enabled && errorCode != null) ...[
-          const SizedBox(height: DesignTokens.spacingS),
-          Text(
-            'Passkey is currently not availalbe in this forum (code: $errorCode)',
-            style: StyleBuilders.smallTextStyle(
-              colorScheme: colorScheme,
-              textTheme: textTheme,
-            ).copyWith(
-              color: colorScheme.error,
-              fontSize: DesignTokens.fontSizeXS,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final l10n = AppLocalizations.of(context)!;
+    final domain = _getSiteDomain();
 
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: Text(
           l10n.loginTitle,
@@ -316,173 +206,122 @@ class _LoginPageState extends State<LoginPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Standardized Forum Header
               ForumHeaderWidget(
-                boardStats: null, // Login page doesn't need board stats
-                extendUnderAppBar: false, // Don't extend under app bar
+                boardStats: null,
+                extendUnderAppBar: false,
               ),
-
-              // Login Form
               Padding(
                 padding: DesignTokens.paddingScreen,
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Username field
-                      TextFormField(
-                        controller: _usernameController,
-                        keyboardType: TextInputType.text,
-                        autocorrect: false,
-                        enableSuggestions: false,
-                        textCapitalization: TextCapitalization.none,
-                        decoration: StyleBuilders.inputDecoration(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Lead copy — sets expectation that the next tap
+                    // opens Discourse's own login UI.
+                    Text(
+                      'Sign in to continue',
+                      style: textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: DesignTokens.fontWeightSemiBold,
+                      ),
+                    ),
+                    const SizedBox(height: DesignTokens.spacingS),
+                    Text(
+                      "You'll be taken to $domain to sign in. Email "
+                      'and password, single sign-on, passkeys, and '
+                      'two-factor are all handled there.',
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        height: DesignTokens.lineHeightRelaxed,
+                      ),
+                    ),
+                    const SizedBox(height: DesignTokens.spacingXL),
+                    FilledButton.icon(
+                      onPressed:
+                          _isHandshakeRunning ? null : _handleLogin,
+                      icon: _isHandshakeRunning
+                          ? SizedBox(
+                              width: DesignTokens.iconSizeS,
+                              height: DesignTokens.iconSizeS,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: colorScheme.onPrimary,
+                              ),
+                            )
+                          : const Icon(Icons.lock_open_rounded),
+                      label: Text(
+                        _isHandshakeRunning
+                            ? 'Opening sign-in…'
+                            : 'Sign in with $domain',
+                        style: StyleBuilders.titleTextStyle(
                           colorScheme: colorScheme,
-                          labelText: l10n.usernameLabel,
-                          prefixIcon: Icons.person_rounded,
+                          textTheme: textTheme,
+                          color: colorScheme.onPrimary,
+                          fontWeight: DesignTokens.fontWeightBold,
                         ),
-                        textInputAction: TextInputAction.next,
-                        onFieldSubmitted: (_) {
-                          _passwordFocusNode.requestFocus();
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return l10n.pleaseEnterUsername;
-                          }
-                          return null;
-                        },
                       ),
-                      const SizedBox(height: DesignTokens.spacingL),
-                      // Password field
-                      TextFormField(
-                        controller: _passwordController,
-                        focusNode: _passwordFocusNode,
-                        obscureText: !_isPasswordVisible,
-                        decoration: StyleBuilders.inputDecoration(
-                          colorScheme: colorScheme,
-                          labelText: l10n.passwordLabel,
-                          prefixIcon: Icons.lock_rounded,
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isPasswordVisible
-                                  ? Icons.visibility_off_rounded
-                                  : Icons.visibility_rounded,
-                              color: colorScheme.onSurfaceVariant,
+                      style: FilledButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                            vertical: DesignTokens.spacingL),
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(DesignTokens.radiusL),
+                        ),
+                        elevation: DesignTokens.elevationMedium,
+                      ),
+                    ),
+                    const SizedBox(height: DesignTokens.spacingS),
+                    // Forgot-password helper. Discourse exposes a
+                    // first-class reset-password flow at
+                    // /password-reset/{token}; the inline button posts
+                    // to /session/forgot_password.json which works
+                    // for stock Discourse installs (no plugin
+                    // required).
+                    Align(
+                      alignment: Alignment.center,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ForgotPasswordPage(
+                                siteContext: widget.siteContext,
+                              ),
                             ),
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordVisible = !_isPasswordVisible;
-                              });
-                            },
-                          ),
-                        ),
-                        textInputAction: TextInputAction.done,
-                        onFieldSubmitted: (_) => _handleLogin(),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return l10n.pleaseEnterPassword;
-                          }
-                          return null;
+                          );
                         },
-                      ),
-                      // Forgot password link
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (context) => ForgotPasswordPage(
-                                      siteContext: widget.siteContext)),
-                            );
-                          },
-                          child: Text(
-                            l10n.forgotPassword,
-                            style: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.primary,
-                              fontWeight: DesignTokens.fontWeightMedium,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: DesignTokens.spacingXL),
-                      // Login button
-                      FilledButton(
-                        onPressed: _handleLogin,
-                        style: FilledButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                              vertical: DesignTokens.spacingL),
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(DesignTokens.radiusL),
-                          ),
-                          elevation: DesignTokens.elevationMedium,
-                        ),
                         child: Text(
-                          l10n.loginButton,
-                          style: StyleBuilders.titleTextStyle(
-                            colorScheme: colorScheme,
-                            textTheme: textTheme,
-                            color: colorScheme.onPrimary,
-                            fontWeight: DesignTokens.fontWeightBold,
+                          l10n.forgotPassword,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: DesignTokens.fontWeightMedium,
                           ),
                         ),
                       ),
-                      if (widget.siteContext.siteType == 'discourse' &&
-                          LoginController.isPasskeySupportedByPlatform) ...[
-                        const SizedBox(height: DesignTokens.spacingM),
-                        if (_passkeyValidationFuture != null)
-                          FutureBuilder<PasskeyValidationResult>(
-                            future: _passkeyValidationFuture,
-                            builder: (context, snapshot) {
-                              final validation = snapshot.data;
-                              final disabled = validation?.isDisabled ?? false;
-                              final code = validation?.errorCode;
-
-                              return _buildPasskeyButton(
-                                colorScheme: colorScheme,
-                                textTheme: textTheme,
-                                l10n: l10n,
-                                enabled: !disabled,
-                                errorCode: code,
-                              );
-                            },
-                          )
-                        else
-                          _buildPasskeyButton(
-                            colorScheme: colorScheme,
-                            textTheme: textTheme,
-                            l10n: l10n,
-                            enabled: true,
-                          ),
-                      ],
-                      const SizedBox(height: DesignTokens.spacingXL),
-                      // Advisory text about credentials being sent to forum domain
-                      Obx(() {
-                        final domain = _getSiteDomain();
-
-                        return Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: DesignTokens.spacingXS),
-                          child: Text(
-                            l10n.credentialsSentToDomain(domain),
-                            style: StyleBuilders.smallTextStyle(
-                              colorScheme: colorScheme,
-                              textTheme: textTheme,
-                            ).copyWith(
-                              fontSize: DesignTokens.fontSizeXS,
-                              fontStyle: FontStyle.italic,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        );
-                      }),
-                      const SizedBox(height: DesignTokens.spacingL),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: DesignTokens.spacingXL),
+                    // Reassurance copy — credentials never reach this
+                    // app's process; the webview talks to the forum
+                    // directly and we only receive the User API Key.
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: DesignTokens.spacingXS),
+                      child: Text(
+                        "Your password is never seen by this app — "
+                        "you'll type it into $domain's own page inside "
+                        'a secure browser view.',
+                        style: StyleBuilders.smallTextStyle(
+                          colorScheme: colorScheme,
+                          textTheme: textTheme,
+                        ).copyWith(
+                          fontSize: DesignTokens.fontSizeXS,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: DesignTokens.spacingL),
+                  ],
                 ),
               ),
             ],
