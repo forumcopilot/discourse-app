@@ -246,6 +246,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 switch (value) {
                   // 'report' case removed in Phase 5.20a along with
                   // the menu item — see commentary further down.
+                  case 'ignore':
+                    _handleToggleIgnore(context);
+                    break;
                   case 'ban':
                     if (_userInfo!.isBanned) {
                       _handleUnbanUser(context);
@@ -267,6 +270,31 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 // item itself was net-negative UX. Per-post flagging
                 // remains fully wired via `reportPostAsync` (see
                 // `post_actions.dart`).
+                // Phase 5.25 — Ignore / Unignore. Wires
+                // `userProxy.ignoreUserAsync` which PUTs the user's
+                // notification level to 2 (ignored) or 1 (normal).
+                PopupMenuItem<String>(
+                  value: 'ignore',
+                  child: Row(
+                    children: [
+                      Icon(
+                        _userInfo!.isIgnored
+                            ? Icons.notifications_active_outlined
+                            : Icons.notifications_off_outlined,
+                        color: colorScheme.onSurface,
+                      ),
+                      const SizedBox(width: DesignTokens.spacingM),
+                      Text(
+                        _userInfo!.isIgnored
+                            ? 'Unignore user'
+                            : 'Ignore user',
+                        style: textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 // Ban/Unban User - only show if user has permission
                 if (_userInfo!.canBan)
                   PopupMenuItem<String>(
@@ -896,6 +924,61 @@ class _UserProfilePageState extends State<UserProfilePage> {
         text: TextSpan(children: spans),
       ),
     );
+  }
+
+  /// Phase 5.25 — toggle the ignore state for the viewed user.
+  /// Discourse: `PUT /u/{username}/notification_level.json` with
+  /// `notification_level: 2` (ignored) or `1` (normal). The proxy's
+  /// `ignoreUserAsync(userId, mode)` API takes `mode == 1` to
+  /// ignore, `0` to unignore.
+  Future<void> _handleToggleIgnore(BuildContext context) async {
+    if (_userInfo == null) return;
+    final wantIgnore = !_userInfo!.isIgnored;
+    final messenger = ScaffoldMessenger.of(context);
+    final username = _userInfo!.username;
+    // Optimistic flip — the menu's next render shows the new state.
+    // Reverted on failure. `isIgnored` is a mutable field on FCUser
+    // (no `final`), so direct mutation inside setState is fine.
+    setState(() {
+      _userInfo!.isIgnored = wantIgnore;
+    });
+    try {
+      final proxy = SiteProxyService.getUserProxy();
+      final result = await proxy.ignoreUserAsync(username, wantIgnore ? 1 : 0);
+      if (!mounted) return;
+      if (!result.result) {
+        setState(() {
+          _userInfo!.isIgnored = !wantIgnore;
+        });
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              result.resultText?.isNotEmpty == true
+                  ? result.resultText!
+                  : "Couldn't update ignore state",
+            ),
+          ),
+        );
+        return;
+      }
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            wantIgnore
+                ? "You're ignoring @$username. Their posts will be hidden."
+                : "Stopped ignoring @$username.",
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _userInfo!.isIgnored = !wantIgnore;
+      });
+      messenger.showSnackBar(
+        SnackBar(content: Text('Ignore toggle failed: $e')),
+      );
+    }
   }
 
   Future<void> _handleBanUser(BuildContext context) async {

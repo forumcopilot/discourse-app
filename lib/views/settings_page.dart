@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../theme/design_tokens.dart';
 import 'change_email_page.dart';
+import 'ignored_users_page.dart';
 import 'settings/notification_settings_page.dart';
 import 'widgets/simple_list_app_bar.dart';
 
@@ -98,6 +99,26 @@ class ForumSettingsPage extends StatelessWidget {
             trailing: Icon(Icons.chevron_right_rounded,
                 color: colorScheme.onSurfaceVariant),
             onTap: () => _confirmPasswordReset(context),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: Icon(Icons.notifications_off_outlined,
+                color: colorScheme.onSurfaceVariant),
+            title: const Text('Ignored users'),
+            subtitle: Text(
+              'See and manage users whose posts are hidden from you',
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            trailing: Icon(Icons.chevron_right_rounded,
+                color: colorScheme.onSurfaceVariant),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) =>
+                    IgnoredUsersPage(siteContext: siteContext),
+              ),
+            ),
           ),
           const Divider(height: 1),
           Padding(
