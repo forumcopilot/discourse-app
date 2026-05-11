@@ -13,6 +13,9 @@ import '../widgets/profile_picture_section.dart';
 import '../widgets/profile_info_section.dart';
 import '../widgets/recent_posts_section.dart';
 import '../widgets/not_signed_in_view.dart';
+import '../bookmarks_page.dart';
+import '../drafts_list_page.dart';
+import '../messages_page.dart';
 import '../settings_page.dart';
 import 'package:forumcopilot_flutter/core/logging/app_logger.dart';
 import 'package:get/get.dart';
@@ -310,6 +313,15 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
 
                   SizedBox(height: DesignTokens.spacingL),
 
+                  // Phase 5.17d — Discourse-native "Your stuff"
+                  // section. Aggregates Messages / Bookmarks / Drafts
+                  // under the Profile tab, matching how Discourse web
+                  // exposes them under the user menu. Replaces what
+                  // was a dedicated Messages bottom-nav tab.
+                  _ProfileActionsSection(siteContext: widget.siteContext),
+
+                  SizedBox(height: DesignTokens.spacingL),
+
                   // Recent Posts Section
                   RecentPostsSection(
                     siteContext: widget.siteContext,
@@ -361,6 +373,134 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
         // Show profile content without forum header when user is logged in
         return _buildLoggedInContent();
       },
+    );
+  }
+}
+
+/// Compact list of links to the current user's stuff — Messages,
+/// Bookmarks, Drafts. Each row navigates to a dedicated page. Pre-
+/// Phase-5.17d the Messages slot lived as a top-level bottom-nav tab;
+/// the badge moved into Profile so the bottom nav can stay at 5 items
+/// (Home / Categories / Tags / Notifications / Profile).
+class _ProfileActionsSection extends StatelessWidget {
+  final SiteContext siteContext;
+  const _ProfileActionsSection({required this.siteContext});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DesignTokens.spacingL,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+          border: Border.all(
+            color: colorScheme.outlineVariant.withOpacity(0.5),
+            width: 0.5,
+          ),
+        ),
+        child: Column(
+          children: [
+            _ActionRow(
+              icon: Icons.mail_outline,
+              title: 'Messages',
+              subtitle: 'Private messages and conversations',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => MessagesPage(siteContext: siteContext),
+                ),
+              ),
+            ),
+            Divider(
+              height: 1,
+              indent: 56,
+              color: colorScheme.outlineVariant.withOpacity(0.4),
+            ),
+            _ActionRow(
+              icon: Icons.bookmark_outline,
+              title: 'Bookmarks',
+              subtitle: "Posts you've saved for later",
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BookmarksPage(siteContext: siteContext),
+                ),
+              ),
+            ),
+            Divider(
+              height: 1,
+              indent: 56,
+              color: colorScheme.outlineVariant.withOpacity(0.4),
+            ),
+            _ActionRow(
+              icon: Icons.edit_note_outlined,
+              title: 'Drafts',
+              subtitle: 'Unfinished topics and replies',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => DraftsListPage(siteContext: siteContext),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionRow extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+  const _ActionRow({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: DesignTokens.spacingL,
+          vertical: DesignTokens.spacingM,
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: colorScheme.onSurfaceVariant),
+            const SizedBox(width: DesignTokens.spacingM),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: textTheme.titleSmall
+                        ?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    subtitle,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right,
+                size: 20, color: colorScheme.onSurfaceVariant),
+          ],
+        ),
+      ),
     );
   }
 }

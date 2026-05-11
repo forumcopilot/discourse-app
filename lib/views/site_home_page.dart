@@ -572,12 +572,14 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
 
   // Get the list of enabled tabs based on user permissions
   List<String> get _enabledTabs {
-    final tabs = [_topicsTab, _forumsTab];
-    // Tags are a Discourse-native concept — surface globally between
-    // Categories ("Forums") and Messages. Phase 5.17d will move
-    // Messages into Profile so we can keep the bottom nav at 5 items.
-    tabs.add(_tagsTab);
-    tabs.add(_messagesTab); // Always show Messages tab
+    // Phase 5.17d bottom nav: Home / Categories / Tags / Notifications
+    // / Profile (5 items, matching Discourse web's primary surfaces).
+    // Messages used to live here as its own tab but moved under
+    // Profile → Messages — Discourse itself nests PMs in the user
+    // menu, and dropping it frees a slot for Tags without exceeding
+    // Material's 5-destination NavigationBar guidance. The unread-PM
+    // count badge now decorates Profile instead of a Messages icon.
+    final tabs = [_topicsTab, _forumsTab, _tagsTab];
     if (_siteContext?.configDataOutput?.alert ?? false) tabs.add(_notificationsTab);
     tabs.add(_profileTab);
     return tabs;

@@ -11,6 +11,7 @@ import 'package:forumcopilot_sdk/models/results/fc_post_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../data/post/discourse_bookmark.dart';
+import '../data/post/discourse_draft.dart';
 import '../data/post/discourse_post_vote.dart';
 import '../data/post/discourse_reaction.dart';
 import '../data/post/discourse_suggested_topic.dart';
@@ -699,6 +700,28 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       return null;
     } catch (_) {
       return null;
+    }
+  }
+
+  /// Discourse-only: list the current user's server-side drafts.
+  /// Backs the Drafts entry under the Profile tab — `/drafts.json`
+  /// (no key) returns the user's full draft set, including the
+  /// `draft_key`, parsed `data` payload, and topic/category metadata
+  /// when the draft is a reply.
+  ///
+  /// Returns an empty list on failure or when no user is signed in.
+  Future<List<DiscourseDraft>> getMyDraftsAsync({int? page}) async {
+    if (siteContext.currentUsername == null) return const [];
+    try {
+      final qs = (page != null && page > 0) ? '?page=$page' : '';
+      final response = await apiGet('/drafts.json$qs');
+      final raw = (response['drafts'] as List?) ?? const [];
+      return raw
+          .whereType<Map>()
+          .map((d) => DiscourseDraft.fromJson(d.cast<String, dynamic>()))
+          .toList(growable: false);
+    } catch (_) {
+      return const [];
     }
   }
 
