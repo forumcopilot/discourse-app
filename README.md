@@ -50,9 +50,17 @@ The app is past the bootstrap phase and exercises most of Discourse's read + wri
 
 ### Social
 - **Like / unlike** posts (`/post_actions`).
+- **Emoji reactions** (`discourse-reactions`) — long-press a like to open the emoji picker; chips render under the post body with viewer-reacted highlighting; tap a chip to toggle.
 - **Bookmarks** — toggle on any post; full bookmarks list reachable from your profile (`/u/{me}/bookmarks.json`).
 - **Follow / unfollow** users (requires `discourse-follow` plugin).
-- **Notifications** — `/notifications.json` feed with type-aware rendering.
+- **Notifications** — `/notifications.json` feed with type-aware rendering; badge count + list both read from the same endpoint.
+
+### Plugin integrations
+- **`discourse-solved`** — green Solution banner on accepted answers + `status:solved` / `status:unsolved` search filters.
+- **`discourse-reactions`** — emoji reactions picker + chips (see Social).
+- **`discourse-post-voting`** — Stack-Overflow-style up/down vote arrows on Q&A topics (topics with `subtype: 'question_answer'`).
+- **Discourse Chat** — full channel browser + channel view + composer + DM support. Channels list (`/chat/api/me/channels`) sorted unread-first with mention/unread badges; channel view polls `/chat/api/channels/:id/messages` every 4s for new messages; send / edit / delete / mark-read all wired. UI is ported from the [qhtt xenforoapp](https://github.com/forumcopilot/xenforoapp/) Siropu chat — generic enough that the API swap was clean.
+- **`discourse-follow`** — Follow/Unfollow button on user profiles (when the plugin is installed).
 
 ### Notification levels
 - Tap the bell on any topic or category for the full **Watching / Tracking / Normal / Muted** picker (plus *Watching First Post* on categories) — `POST /t/{id}/notifications`, `POST /category/{id}/notifications`.
@@ -75,9 +83,12 @@ The app is past the bootstrap phase and exercises most of Discourse's read + wri
 ## Not yet implemented
 
 - **Push notifications** — disabled by default. Discourse's `push_url` registration is wired on the User API Key, but the relay backend that converts those POSTs into FCM/APNs deliveries is shared with [xenforoapp's push setup](https://github.com/forumcopilot/xenforoapp#push-notifications-optional) and is the Phase 3 deliverable. Until then the app starts cleanly without Firebase config files.
-- **Account-settings page** — Discourse-specific bits (email, username change, 2FA, etc.) still call legacy XF stubs that throw at runtime. Tagged with `TODO(phase-1)` in `packages/discourse_core/lib/src/proxy/account_proxy.dart`.
-- **Discourse Chat / Reactions plugin / Post-voting / Calendar** — installed on many Discourse forums but not yet surfaced in this client.
+- **Chat over MessageBus** — Chat currently polls every 4s. The Discourse web client subscribes to `/chat/:channel_id` over MessageBus + websockets for sub-second latency. A follow-up phase could swap polling for MessageBus subscription (would also benefit topic live-updates and the notifications badge).
+- **Chat reactions + threads + uploads** — Chat messages don't yet support emoji reactions, threaded replies, or file uploads. Each is a separate plugin endpoint (`/chat/api/channels/:cid/messages/:mid/reactions`, `/chat/api/channels/:cid/threads/...`).
+- **Account-settings page** — Email + password updates land via the proxy (Phase 5.12), but inline username change, 2FA setup, and avatar upload are still stubbed out.
+- **Other Discourse plugins** — Calendar, Cakeday, Assign, Templates aren't surfaced yet. Each follows the reactions / post-voting / chat pattern (typed model + proxy method + small UI).
 - **New / Top home feed tabs** — `/new.json` and `/top.json` exist on the SDK side but aren't wired into the home page yet (boilerplate-heavy; deferred).
+- **Markdown preview in the composer** — text-only editor for now; rendered preview is a planned follow-up.
 
 The Phase 5.x history at the bottom of this README has the full feature timeline.
 
@@ -169,12 +180,19 @@ DISCOURSE_DIR=/elsewhere ./scripts/seed_demo.sh
 
 The seed script (`scripts/seed_discourse_demo.rb`) creates:
 
-- 6 users at every trust level + a moderator (`alice` TL3, `bob` TL2, `carol` TL1, `dave` TL0, `eve` TL4, `mallory` mod). Password for all: `demo-password-1234!`.
-- 3 categories (General / Support / Announcements) + 13 tags.
-- 8 topics in a variety of states — open, closed-and-archived, unlisted, globally pinned, solved (via `discourse-solved`), with embedded polls, with reply chains.
-- 5 bookmarks, 2 server-side drafts, ~10 badge grants, per-topic and per-category notification levels.
+- **10 users** spread across trust levels: `alice` TL3, `bob` TL2, `carol` TL1, `dave` TL0, `eve` TL4 (Leader), `mallory` (moderator), plus `frank` / `grace` / `henry` / `ivy` for diversity in chat + topics. Password for all: `demo-password-1234!`.
+- **3 categories** (General / Support / Announcements) + **13 tags**.
+- **~16 topics** in a variety of states — open, closed-and-archived, unlisted, globally pinned, solved (via `discourse-solved`), with embedded polls, with Q&A subtype (`discourse-post-voting`), with reply chains. Timestamps are spread from 8 min ago through 2 weeks ago so the Latest feed feels real.
+- **~90 posts**, **80+ likes**, **~25 emoji reactions** (via `discourse-reactions`), **6 post-voting up/down votes**.
+- **10 bookmarks**, **2 server-side drafts**, **~10 badge grants**, per-topic and per-category notification levels.
+- **6 PMs (conversation-style)** covering every demo user — 1:1, 3-person group, mod-question. These populate the Messages tab.
+- **5 chat channels**:
+  - `#demo-watercooler` — 35 messages, 10 members, with one synthetically-edited message so the *(edited)* indicator renders.
+  - `#mobile-dev` — 13 messages, focused tech thread.
+  - `alice ↔ bob` DM — 6 messages.
+  - (plus older test channels from previous runs)
 
-Use this to exercise every Phase 5 feature in the app.
+Re-running is idempotent throughout. Use this to exercise every Phase 5 feature in the app — log in as `alice` for the most-populated view (PMs, drafts, bookmarks, badges).
 
 ---
 
@@ -224,13 +242,17 @@ State is managed with **GetX** (`Get.put` / `Obx`). Navigation uses `globalNavig
 
 The `forumcopilot_sdk` interface was originally XenForo-shaped. Where Discourse has a concept that doesn't map cleanly, we **extend the SDK** rather than coerce Discourse to fit:
 
-- **Tags** — first-class field on `FCTopic`.
+- **Tags** — first-class field on `FCTopic`; `newTopic(..., tags: [...])` on `IFCTopicProxy`; `searchTagsAsync` for composer autocomplete.
 - **Polls** — `FCPoll` populated from the first post's `polls` field; `votePollAsync` routes to `PUT /polls/vote`.
 - **Bookmarks** — `DiscoursePostProxy.bookmarkPostAsync` / `getBookmarksAsync` / `unbookmarkPostAsync`.
 - **Notification levels** — `DiscourseSubscriptionProxy.setTopicNotificationLevelAsync` / `setCategoryNotificationLevelAsync` (the XF-style `subscribeTopicAsync(id, int subscribeMode)` is still on the interface but its int gets translated to a Discourse level).
 - **Search filters** — `DiscourseSearchFilters` + `DiscourseSearchProxy.searchWithFiltersAsync` exposing the full `/search.json` operator DSL.
 - **Drafts** — `DiscourseDraftController` (`saveDraftAsync` / `loadDraftAsync` / `deleteDraftAsync`), keys cross-compatible with the web composer.
-- **Badges / trust level / solved / follow / suggested topics** — all surfaced as native Discourse fields rather than lossy mappings to XF concepts.
+- **Reactions** — `DiscourseReaction` + `toggleReactionAsync(postId, value)` / `getAvailableReactionsAsync`. Sidecar Expando on `FCPost` so the model stays untouched.
+- **Post voting** — `DiscoursePostVote` + `castPostVoteAsync(postId, 'up'|'down')` / `removePostVoteAsync`. Same Expando pattern.
+- **Suggested Topics** — `DiscourseSuggestedTopic` + `getSuggestedTopicsAsync(topicId)`.
+- **Chat** — full `DiscourseChatProxy` (channels list, channel meta, history with `target_message_id + direction`, polling helper, send/edit/delete, mark-read). Static `forCurrentSite()` factory.
+- **Badges / trust level / solved / follow** — all surfaced as native Discourse fields rather than lossy mappings to XF concepts.
 
 Callsites that use these features cast `proxy is DiscoursePostProxy` (or similar) at the boundary, falling back to the XF-shaped interface when the proxy is a different implementation.
 
@@ -264,6 +286,12 @@ Callsites that use these features cast `proxy is DiscoursePostProxy` (or similar
 | **5.8** | Follow / unfollow toggle. |
 | **5.9** | Moderator surface — archive / unlist / rename in topic menu. |
 | **5.10** | XF cruft removal — drop dead thanks UI, BBCode renderer, lossy `subscribeMode`, retire unreachable interface methods, rename `acceptedAnswer → isSolution`, native terminology in ARB. |
+| **5.11** | `discourse-reactions` plugin — typed model + Expando sidecar on FCPost + toggle API + ReactionPickerSheet (long-press the like button) + chips row below post body. |
+| **5.12** | Replaced every remaining `callPluginApi` stub with real Discourse REST or graceful no-ops — forgot password / register / email update / password update / profile update / device push / passkey / report-user. First commit where `flutter analyze` returns **zero errors**. |
+| **5.13** | Native tag input on new topics — chip field with `/tags/filter/search.json` autocomplete, configurable maxTags cap, `extraHeader` slot on the composer. `IFCTopicProxy.newTopic` grew an optional `tags: List<String>?` parameter. |
+| **5.14** | `discourse-post-voting` plugin — typed `DiscoursePostVote` model, `POST/DELETE /vote.json`, vertical up/down arrow column on Q&A topics with optimistic flip + revert. |
+| **5.15** | **Discourse Chat support** — channels + messages + send/edit/delete + polling lifecycle. ChatChannelListPage (sorted unread-first, mention badges, DM/TopicChat/Category icons), ChatChannelView (auto-scroll, load-older on scroll-up, long-press → edit/delete sheet), ChatComposer (rounded input + send button). UI ported from the qhtt xenforoapp's Siropu chat. Static `DiscourseChatProxy.forCurrentSite()` accessor avoids touching the typed IFC*Proxy registry. |
+| **5.16** | Fix: notifications list silently empty because `_toAlert` wrote ISO 8601 into `FCAlert.timestamp` while the consumer did `int.parse`. Convert to millisecond-epoch string in the proxy. |
 
 ---
 
