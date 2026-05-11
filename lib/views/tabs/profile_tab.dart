@@ -16,6 +16,7 @@ import '../widgets/recent_posts_section.dart';
 import '../widgets/not_signed_in_view.dart';
 import '../bookmarks_page.dart';
 import '../drafts_list_page.dart';
+import '../edit_profile_page.dart';
 import '../messages_page.dart';
 import '../settings_page.dart';
 import 'package:forumcopilot_flutter/core/logging/app_logger.dart';
@@ -280,34 +281,67 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
                     },
                   ),
 
-                  // Profile Information Section (includes Settings button after displayText)
+                  // Profile Information Section (includes Edit profile +
+                  // Settings buttons after the displayText). Phase 5.22
+                  // promoted the lone Settings button into a side-by-
+                  // side row with the new Edit profile entry — the
+                  // EditProfilePage pops with `true` on a successful
+                  // save so we re-fetch user info and surface the
+                  // new values without a full tab reset.
                   if (_userInfo != null)
                     ProfileInfoSection(
                       userInfo: _userInfo!,
                       settingsButton: Padding(
                         padding: DesignTokens.paddingScreenHorizontal,
-                        child: FilledButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ForumSettingsPage(
-                                  siteContext: widget.siteContext,
-                                ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: FilledButton.tonalIcon(
+                                onPressed: () async {
+                                  final saved = await Navigator.push<bool>(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => EditProfilePage(
+                                        siteContext: widget.siteContext,
+                                        userInfo: _userInfo!,
+                                      ),
+                                    ),
+                                  );
+                                  if (saved == true && mounted) {
+                                    // Force a fresh fetch so name /
+                                    // bio / location / website re-
+                                    // render with the saved values.
+                                    setState(() {
+                                      _userInfo = null;
+                                    });
+                                    _fetchUserInfo();
+                                  }
+                                },
+                                icon: Icon(Icons.edit_outlined,
+                                    size: DesignTokens.iconSizeM),
+                                label: const Text('Edit profile'),
                               ),
-                            );
-                          },
-                          icon: Icon(Icons.settings, size: DesignTokens.iconSizeM),
-                          label: Text(
-                            'Settings',
-                            style: textTheme.titleMedium?.copyWith(
-                              color: colorScheme.onPrimary,
-                              fontWeight: DesignTokens.fontWeightBold,
                             ),
-                          ),
-                          style: StyleBuilders.extendedFilledButtonStyle(
-                            colorScheme: colorScheme,
-                          ),
+                            SizedBox(width: DesignTokens.spacingS),
+                            Expanded(
+                              child: FilledButton.tonalIcon(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ForumSettingsPage(
+                                        siteContext: widget.siteContext,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: Icon(Icons.settings_outlined,
+                                    size: DesignTokens.iconSizeM),
+                                label: const Text('Settings'),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
