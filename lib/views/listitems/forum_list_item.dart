@@ -1,4 +1,3 @@
-import 'package:discourse_core/discourse_core.dart' show DiscourseForumProxy;
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
@@ -62,12 +61,14 @@ class ForumListItem extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final hasDescription = forum.description != null && forum.description!.isNotEmpty;
 
-    // Discourse-only sidecar with color + topic_count. Null on non-
-    // Discourse forums; in that case we skip the stripe + count badge.
-    final meta = DiscourseForumProxy.metaFor(forum);
+    // Phase 5.41 — color + topic_count now live on FCForum directly
+    // (was a DiscoursePostProxy.metaFor Expando sidecar that got lost
+    // on tree rebuild). Empty color means the fetching endpoint didn't
+    // include the field, so we skip the stripe + count badge.
+    final colorHex = forum.color ?? '';
     final stripeColor =
-        (meta != null && meta.color.isNotEmpty) ? _parseDiscourseHex(meta.color) : null;
-    final topicCount = meta?.topicCount ?? 0;
+        colorHex.isNotEmpty ? _parseDiscourseHex(colorHex) : null;
+    final topicCount = forum.topicCount;
 
     return Material(
       color: colorScheme.surface,

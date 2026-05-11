@@ -58,6 +58,24 @@ class FCForum with FCForumMappable {
   /// Child forums, if any
   List<FCForum> childForums;
 
+  /// Phase 5.41 — Discourse category color hex (e.g. `"BF1E2E"`), no
+  /// leading `#`. Empty when not available — UI hides the stripe.
+  String? color;
+
+  /// Phase 5.41 — Discourse category text color hex, no leading `#`.
+  String? textColor;
+
+  /// Phase 5.41 — number of topics in this forum (Discourse:
+  /// `topic_count`). 0 when not available.
+  int topicCount;
+
+  /// Phase 5.41 — number of posts in this forum (Discourse:
+  /// `post_count`). 0 when not available.
+  int postCount;
+
+  /// Phase 5.41 — slug-style identifier for URLs (Discourse: `slug`).
+  String? slug;
+
   FCForum({
     required this.id,
     required this.name,
@@ -76,5 +94,10 @@ class FCForum with FCForumMappable {
     this.isLinkForum = false,
     this.isSubForumContainer = false,
     this.childForums = const [],
+    this.color,
+    this.textColor,
+    this.topicCount = 0,
+    this.postCount = 0,
+    this.slug,
   });
 }

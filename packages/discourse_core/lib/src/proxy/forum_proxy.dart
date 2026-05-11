@@ -13,16 +13,10 @@ import '../base_discourse_proxy.dart';
 class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
   DiscourseForumProxy(SiteContext context) : super(context);
 
-  /// Per-FCForum sidecar carrying the Discourse-native fields that
-  /// don't have a slot on the XF-shaped FCForum model: hex color, hex
-  /// text color, and topic count. Same pattern as the polls / reactions
-  /// Expandos elsewhere — avoids hand-editing the FCForum mapper.
-  static final Expando<DiscourseCategoryMeta> _meta = Expando('catMeta');
-
-  /// Public accessor used by the Categories list UI to render the
-  /// color stripe + topic-count badge on each tile. Returns null on
-  /// non-Discourse forums.
-  static DiscourseCategoryMeta? metaFor(FCForum forum) => _meta[forum];
+  // Phase 5.41 — the per-FCForum DiscourseCategoryMeta Expando sidecar
+  // is gone. Hex color, text color, topic/post counts and slug now live
+  // on FCForum itself so they survive the tree rebuild in [_buildTree]
+  // (which used to drop the sidecar on the floor).
 
   @override
   Future<FCForumDataResult> getForumAsync(
@@ -268,6 +262,11 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
         isLinkForum: f.isLinkForum,
         isSubForumContainer: f.isSubForumContainer || kids.isNotEmpty,
         childForums: kids.map(withChildren).toList(),
+        color: f.color,
+        textColor: f.textColor,
+        topicCount: f.topicCount,
+        postCount: f.postCount,
+        slug: f.slug,
       );
     }
 
@@ -287,7 +286,7 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
     final bg =
         (c['uploaded_background'] as Map<String, dynamic>?)?['url'] as String?;
 
-    final forum = FCForum(
+    return FCForum(
       id: (c['id'] ?? '').toString(),
       name: (c['name'] ?? '').toString(),
       description:
@@ -307,18 +306,16 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
       isSubForumContainer: (c['has_children'] as bool? ?? false) &&
           (c['topic_count'] as int? ?? 0) == 0,
       childForums: const [],
-    );
-    // Sidecar with Discourse-only fields. Empty string is fine for
-    // color/textColor — the UI hides the stripe when color is empty
-    // (e.g. when fetched via an endpoint that doesn't include it).
-    _meta[forum] = DiscourseCategoryMeta(
+      // Phase 5.41 — Discourse-only fields now first-class on FCForum.
+      // Empty string fine for color/textColor; UI hides the stripe when
+      // color is empty (e.g. when fetched via an endpoint that doesn't
+      // include them).
       color: (c['color'] as String?) ?? '',
       textColor: (c['text_color'] as String?) ?? 'FFFFFF',
       topicCount: (c['topic_count'] as int?) ?? 0,
       postCount: (c['post_count'] as int?) ?? 0,
       slug: c['slug']?.toString(),
     );
-    return forum;
   }
 
   String? _absoluteUrl(String? maybeRelative) {
@@ -328,25 +325,3 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
   }
 }
 
-/// Discourse-only sidecar holding category fields that don't fit on the
-/// XF-shaped FCForum model. Accessed via
-/// `DiscourseForumProxy.metaFor(forum)`; the categories list UI reads
-/// it to render the color stripe + topic count.
-class DiscourseCategoryMeta {
-  /// Hex color string (e.g. "BF1E2E"), no leading `#`. Empty when the
-  /// fetching endpoint didn't include the field — caller should hide
-  /// the stripe.
-  final String color;
-  final String textColor;
-  final int topicCount;
-  final int postCount;
-  final String? slug;
-
-  const DiscourseCategoryMeta({
-    this.color = '',
-    this.textColor = 'FFFFFF',
-    this.topicCount = 0,
-    this.postCount = 0,
-    this.slug,
-  });
-}
