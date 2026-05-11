@@ -1,7 +1,6 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_account_proxy.dart';
 import 'package:forumcopilot_sdk/models/results/fc_account_result.dart';
-import 'package:forumcopilot_sdk/models/registration/fc_registration_requirements.dart';
 import 'package:forumcopilot_sdk/models/settings/fc_settings_category.dart';
 import 'package:forumcopilot_sdk/models/settings/fc_user_setting.dart';
 import 'package:forumcopilot_sdk/models/settings/fc_user_settings_result.dart';
@@ -236,11 +235,14 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
 
   // ===== Settings categories =====
   //
-  // The XF SDK exposes settings as XF-style categories; Discourse exposes
-  // preferences as a flat structure on `/u/{username}.json#user_option`.
-  // For v1 we surface an empty category list so the settings page
-  // renders cleanly without crashing. Phase 2.x can wire a curated
-  // Discourse-preferences screen when there's UI demand.
+  // The XF SDK exposes settings as XF-style categories; Discourse
+  // exposes preferences as a flat structure on
+  // `/u/{username}.json#user_option`. Phase 5.20d rebuilt the
+  // consuming `ForumSettingsPage` as a curated Discourse-native
+  // section list that bypasses these methods, but the IFC contract
+  // still requires them — we keep them as no-op STUBs returning
+  // empty data so any future caller that goes through the typed
+  // interface gets a clean response rather than a crash.
 
   Future<FCUserSettingsCategoriesResult> getUserSettingsCategories() async {
     return FCUserSettingsCategoriesResult(
