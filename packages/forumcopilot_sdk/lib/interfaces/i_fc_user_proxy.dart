@@ -60,9 +60,10 @@ abstract class IFCUserProxy {
   /// Returns a list of posts (max. 50) that's a particular user has replied to.
   Future<FCUserReplyResult> getUserReplyPostAsync(int startNum, int lastNum, String? searchId, String? username, String? userId);
 
-  /// Return a list of recommended users for conversation or pm. Flag 'user_recommended'
-  /// returned in get_config will indicate the plugin support this function.
-  Future<FCRecommendedUserResult> getRecommendedUsersAsync(int page, int perpage, int mode);
+  // Phase 5.43 — `getRecommendedUsersAsync` deleted. Discourse has no
+  // "recommended users for messaging" concept and the app's typeahead
+  // PM recipient picker doesn't need it. The XF-shaped flag
+  // `user_recommended` in get_config now has no opt-in surface.
 
   /// Return a list of users by giving key word. Flag 'search_user' returned in get_config
   /// will indicate the plugin support this function.

@@ -335,22 +335,9 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     );
   }
 
-  @override
-  Future<FCRecommendedUserResult> getRecommendedUsersAsync(
-      int page, int perpage, int mode) async {
-    // Discourse has no notion of "recommended users for messaging" — the
-    // closest analog is recent direct-message participants, but that
-    // requires walking /topics/private-messages/* and dedup'ing the
-    // remote participants. Return empty so the UI just shows the
-    // typeahead-only path. Phase 2.x can add this if a UI consumer
-    // surfaces.
-    return FCRecommendedUserResult(
-      result: true,
-      resultText: '',
-      total: 0,
-      list: const [],
-    );
-  }
+  // Phase 5.43 — `getRecommendedUsersAsync` deleted from IFCUserProxy
+  // (Discourse has no equivalent concept; PM recipient picker uses
+  // typeahead-only).
 
   @override
   Future<FCUserInfoResult> getUserInfoAsync(String? username, String? userId) async {
