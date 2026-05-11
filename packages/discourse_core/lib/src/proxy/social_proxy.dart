@@ -27,8 +27,13 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
   static const int _likeType = 2;
 
   // Discourse Notification type ids (subset). Full list lives in
-  // app/models/notification.rb#types — we only enumerate types we surface
-  // a friendly label for; everything else falls through to a generic msg.
+  // app/models/notification.rb#types — Phase 5.20c extended this from
+  // the original 12 to cover every documented Discourse notification
+  // type, including the chat plugin's five (29–33), reactions (25),
+  // bookmark reminders, post-approval, event invites, assignment,
+  // and the various "consolidated" digest types Discourse emits when
+  // it batches multiple events into a single notification. Anything
+  // we don't recognise still falls through to a generic message.
   static const int _ntMentioned = 1;
   static const int _ntReplied = 2;
   static const int _ntQuoted = 3;
@@ -41,6 +46,33 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
   static const int _ntMovedPost = 10;
   static const int _ntLinked = 11;
   static const int _ntGrantedBadge = 12;
+  static const int _ntInvitedToTopic = 13;
+  static const int _ntCustom = 14;
+  static const int _ntGroupMentioned = 15;
+  static const int _ntGroupMessageSummary = 16;
+  static const int _ntWatchingFirstPost = 17;
+  static const int _ntTopicReminder = 18;
+  static const int _ntLikedConsolidated = 19;
+  static const int _ntPostApproved = 20;
+  static const int _ntCodeReviewCommitApproved = 21;
+  static const int _ntMembershipRequestAccepted = 22;
+  static const int _ntMembershipRequestConsolidated = 23;
+  static const int _ntBookmarkReminder = 24;
+  static const int _ntReaction = 25;
+  static const int _ntVotesReleased = 26;
+  static const int _ntEventReminder = 27;
+  static const int _ntEventInvitation = 28;
+  static const int _ntChatMention = 29;
+  static const int _ntChatMessage = 30;
+  static const int _ntChatInvitation = 31;
+  static const int _ntChatGroupMention = 32;
+  static const int _ntChatQuoted = 33;
+  static const int _ntAssigned = 34;
+  static const int _ntQuestionAnswerUserCommented = 35;
+  static const int _ntWatchingCategoryOrTag = 36;
+  static const int _ntNewFeatures = 37;
+  static const int _ntAdminProblems = 38;
+  static const int _ntLinkedConsolidated = 39;
 
   @override
   Future<FCLikePostResult> likePostAsync(String postId) =>
@@ -207,7 +239,8 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         (n['fancy_title'] ?? data['topic_title'] ?? '').toString();
     final topicId = n['topic_id']?.toString();
     final postNumber = n['post_number'] as int?;
-    final readableMessage = _readableNotification(type, fromUser, topicTitle);
+    final readableMessage =
+        _readableNotification(type, fromUser, topicTitle, data);
     final contentType = _alertContentType(type);
     final contentId =
         contentType == 'topic' ? (topicId ?? '') : (postNumber?.toString() ?? '');
@@ -270,7 +303,22 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     );
   }
 
-  String _readableNotification(int type, String from, String topic) {
+  String _readableNotification(
+    int type,
+    String from,
+    String topic,
+    Map<String, dynamic> data,
+  ) {
+    // Read a hint from the data blob — Discourse stuffs supplementary
+    // fields (group name, chat channel name, badge name, etc.) here.
+    String s(String key) => (data[key] ?? '').toString();
+    int? i(String key) {
+      final raw = data[key];
+      if (raw is num) return raw.toInt();
+      if (raw is String) return int.tryParse(raw);
+      return null;
+    }
+
     switch (type) {
       case _ntMentioned:
         return '$from mentioned you in "$topic"';
@@ -295,9 +343,105 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       case _ntLinked:
         return '$from linked to your post in "$topic"';
       case _ntGrantedBadge:
-        return 'You earned a new badge';
+        final badgeName = s('badge_name');
+        return badgeName.isNotEmpty
+            ? 'You earned the "$badgeName" badge'
+            : 'You earned a new badge';
+      // Phase 5.20c additions:
+      case _ntInvitedToTopic:
+        return '$from invited you to "$topic"';
+      case _ntCustom:
+        // Discourse plugins fire `custom` with their own message
+        // payload — fall back to topic title when present.
+        return topic.isNotEmpty ? topic : 'New activity';
+      case _ntGroupMentioned:
+        final group = s('group_name');
+        return group.isNotEmpty
+            ? '$from mentioned @$group in "$topic"'
+            : '$from mentioned your group in "$topic"';
+      case _ntGroupMessageSummary:
+        final count = i('inbox_count') ?? 0;
+        final group = s('group_name');
+        if (count > 0 && group.isNotEmpty) {
+          return '$count new messages in @$group';
+        }
+        return 'New group messages';
+      case _ntWatchingFirstPost:
+        return 'New topic: "$topic"';
+      case _ntTopicReminder:
+        return 'Reminder: "$topic"';
+      case _ntLikedConsolidated:
+        final count = i('count') ?? 0;
+        return count > 0
+            ? 'Your posts received $count likes'
+            : 'Your posts received new likes';
+      case _ntPostApproved:
+        return 'Your post in "$topic" was approved';
+      case _ntCodeReviewCommitApproved:
+        return 'A commit you submitted was approved';
+      case _ntMembershipRequestAccepted:
+        final group = s('group_name');
+        return group.isNotEmpty
+            ? 'You joined @$group'
+            : 'Membership request accepted';
+      case _ntMembershipRequestConsolidated:
+        final count = i('count') ?? 0;
+        return count > 0
+            ? '$count new membership requests'
+            : 'New membership requests';
+      case _ntBookmarkReminder:
+        return 'Reminder: "$topic"';
+      case _ntReaction:
+        final actor = from.isNotEmpty ? from : s('username');
+        return actor.isNotEmpty
+            ? '$actor reacted to your post in "$topic"'
+            : 'New reaction on your post in "$topic"';
+      case _ntVotesReleased:
+        return 'Votes released on "$topic"';
+      case _ntEventReminder:
+        return 'Event reminder: "$topic"';
+      case _ntEventInvitation:
+        return '$from invited you to "$topic"';
+      case _ntChatMention:
+        final channel = s('chat_channel_title');
+        return channel.isNotEmpty
+            ? '$from mentioned you in #$channel'
+            : '$from mentioned you in chat';
+      case _ntChatMessage:
+        final channel = s('chat_channel_title');
+        return channel.isNotEmpty
+            ? 'New message in #$channel'
+            : 'New chat message';
+      case _ntChatInvitation:
+        return '$from invited you to chat';
+      case _ntChatGroupMention:
+        final group = s('identifier');
+        final channel = s('chat_channel_title');
+        if (group.isNotEmpty && channel.isNotEmpty) {
+          return '@$group was mentioned in #$channel';
+        }
+        return 'Your group was mentioned in chat';
+      case _ntChatQuoted:
+        return '$from quoted you in chat';
+      case _ntAssigned:
+        return '"$topic" was assigned to you';
+      case _ntQuestionAnswerUserCommented:
+        return '$from commented on the accepted answer in "$topic"';
+      case _ntWatchingCategoryOrTag:
+        return 'New topic: "$topic"';
+      case _ntNewFeatures:
+        return 'New features available';
+      case _ntAdminProblems:
+        return 'Admin: site problem detected';
+      case _ntLinkedConsolidated:
+        final count = i('count') ?? 0;
+        return count > 0
+            ? 'Your post was linked $count times'
+            : 'Your post was linked';
       default:
-        return 'New activity in "$topic"';
+        return topic.isNotEmpty
+            ? 'New activity in "$topic"'
+            : 'New notification';
     }
   }
 
@@ -330,23 +474,70 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
   }
 
   String _alertActionVerb(int type) {
+    // Phase 5.20c — the UI uses this verb as a key for the small
+    // overlay icon on the notification list row. New verbs match
+    // the icon mapper in `notification_list_item.dart::iconForAction`.
     switch (type) {
       case _ntMentioned:
+      case _ntGroupMentioned:
         return 'mention';
       case _ntReplied:
       case _ntPosted:
+      case _ntWatchingFirstPost:
+      case _ntWatchingCategoryOrTag:
         return 'reply';
       case _ntQuoted:
+      case _ntChatQuoted:
         return 'quote';
+      case _ntEdited:
+        return 'edit';
       case _ntLiked:
+      case _ntLikedConsolidated:
         return 'like';
       case _ntPrivateMessage:
       case _ntInvitedToPm:
+      case _ntInvitedToTopic:
+      case _ntEventInvitation:
         return 'pm';
+      case _ntGroupMessageSummary:
+        return 'group_message';
       case _ntLinked:
+      case _ntLinkedConsolidated:
         return 'link';
       case _ntGrantedBadge:
         return 'badge';
+      case _ntBookmarkReminder:
+      case _ntTopicReminder:
+      case _ntEventReminder:
+        return 'reminder';
+      case _ntReaction:
+        return 'reaction';
+      case _ntPostApproved:
+      case _ntCodeReviewCommitApproved:
+      case _ntMembershipRequestAccepted:
+        return 'approved';
+      case _ntMembershipRequestConsolidated:
+        return 'group_request';
+      case _ntChatMention:
+      case _ntChatMessage:
+      case _ntChatInvitation:
+      case _ntChatGroupMention:
+        return 'chat';
+      case _ntAssigned:
+        return 'assigned';
+      case _ntQuestionAnswerUserCommented:
+        return 'qa_comment';
+      case _ntVotesReleased:
+        return 'vote';
+      case _ntMovedPost:
+        return 'moved';
+      case _ntInviteeAccepted:
+        return 'accepted';
+      case _ntNewFeatures:
+        return 'new_feature';
+      case _ntAdminProblems:
+        return 'admin';
+      case _ntCustom:
       default:
         return 'activity';
     }

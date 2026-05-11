@@ -573,6 +573,11 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
               topic: topic,
               onTap: () => _onAlertTap(topic, originalAlert),
               contentType: originalAlert.content_type,
+              // Phase 5.20c — forwards the notification's action
+              // verb so the row can render a per-type icon badge
+              // on the avatar (heart for likes, @ for mentions,
+              // reply arrow for replies, etc.).
+              action: originalAlert.action,
             );
           } else {
             // Loading indicator for load more
