@@ -2,6 +2,7 @@
 export 'fc_topic.dart';
 export 'fc_poll.dart';
 export 'fc_post.dart';
+export 'fc_tag.dart';
 export 'fc_user.dart';
 export 'fc_forum.dart';
 export 'fc_attachment.dart';

@@ -14,6 +14,7 @@ import '../src/proxy/draft_proxy.dart';
 import '../src/proxy/search_proxy.dart';
 import '../src/proxy/social_proxy.dart';
 import '../src/proxy/subscription_proxy.dart';
+import '../src/proxy/tag_proxy.dart';
 import '../src/proxy/moderation_proxy.dart';
 import '../src/proxy/private_conversation_proxy.dart';
 import '../src/proxy/private_message_proxy.dart';
@@ -84,5 +85,9 @@ class DiscourseProxyFactory extends SiteProxyFactory {
 
   IFCDraftProxy createDraftProxy(SiteContext context) {
     return DiscourseDraftProxy(context);
+  }
+
+  IFCTagProxy createTagProxy(SiteContext context) {
+    return DiscourseTagProxy(context);
   }
 }

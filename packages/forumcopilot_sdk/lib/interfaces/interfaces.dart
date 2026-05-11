@@ -17,6 +17,7 @@ export 'i_fc_user_proxy.dart';
 export 'i_fc_moderation_proxy.dart';
 export 'i_fc_search_proxy.dart';
 export 'i_fc_social_proxy.dart';
+export 'i_fc_tag_proxy.dart';
 export 'i_fc_private_conversation_proxy.dart';
 export 'i_fc_private_message_proxy.dart';
 export 'i_fc_device_proxy.dart';

@@ -1,7 +1,6 @@
-import 'package:discourse_core/discourse_core.dart' show DiscourseTopicProxy;
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 
 import '../core/logging/app_logger.dart';
@@ -58,11 +57,6 @@ class _TagTopicsPageState extends State<TagTopicsPage> {
   }
 
   Future<void> _load({required bool reset}) async {
-    final proxy = SiteProxyFactory.getTopicProxy();
-    if (proxy is! DiscourseTopicProxy) {
-      setState(() => _error = 'Tag browsing requires a Discourse forum');
-      return;
-    }
     if (reset) {
       _topics.clear();
       _page = 0;
@@ -71,7 +65,8 @@ class _TagTopicsPageState extends State<TagTopicsPage> {
     }
     setState(() => _isLoading = true);
     try {
-      final result = await proxy.getTopicsByTagAsync(widget.tag, page: _page);
+      final result = await SiteProxyService.getTagProxy()
+          .getTopicsByTagAsync(widget.tag, page: _page);
       if (!mounted) return;
       setState(() {
         if (result.result) {

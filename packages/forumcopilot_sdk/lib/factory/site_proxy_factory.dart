@@ -182,6 +182,17 @@ abstract class SiteProxyFactory {
     return factory.createDraftProxy(_context!);
   }
 
+  /// Get tag proxy (Phase 5.35 — tag listing/search/topic-by-tag lifted
+  /// off the per-forum topic proxy onto a first-class IFCTagProxy).
+  static IFCTagProxy getTagProxy() {
+    if (_context == null) throw Exception('SiteProxyFactory not initialized');
+
+    final factory = _providers[_context!.siteType];
+    if (factory == null) throw Exception('No provider registered for site type: ${_context!.siteType}');
+
+    return factory.createTagProxy(_context!);
+  }
+
   // Abstract methods that must be implemented by concrete factories
   IFCUserProxy createUserProxy(SiteContext context);
   IFCForumProxy createForumProxy(SiteContext context);
@@ -199,4 +210,5 @@ abstract class SiteProxyFactory {
   IFCDeviceProxy createDeviceProxy(SiteContext context);
   IFCBookmarkProxy createBookmarkProxy(SiteContext context);
   IFCDraftProxy createDraftProxy(SiteContext context);
+  IFCTagProxy createTagProxy(SiteContext context);
 }

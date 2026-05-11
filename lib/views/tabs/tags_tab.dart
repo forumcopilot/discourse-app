@@ -1,8 +1,7 @@
-import 'package:discourse_core/discourse_core.dart'
-    show DiscourseTag, DiscourseTopicProxy;
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_tag.dart';
 
 import '../../theme/design_tokens.dart';
 import '../tag_topics_page.dart';
@@ -36,7 +35,7 @@ class TagsTab extends StatefulWidget {
 class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
   final TextEditingController _filterController = TextEditingController();
 
-  List<DiscourseTag> _allTags = const [];
+  List<FCTag> _allTags = const [];
   bool _loading = false;
   bool _loaded = false;
   String? _error;
@@ -69,27 +68,25 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
   }
 
   Future<void> _load() async {
-    final proxy = SiteProxyFactory.getTopicProxy();
-    if (proxy is! DiscourseTopicProxy) {
-      setState(() {
-        _allTags = const [];
-        _loaded = true;
-        _error = 'Tags require a Discourse forum.';
-      });
-      return;
-    }
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
-      final tags = await proxy.getAllTagsAsync();
+      final result = await SiteProxyService.getTagProxy().getAllTagsAsync();
       if (!mounted) return;
       setState(() {
-        _allTags = tags;
         _loading = false;
         _loaded = true;
-        if (tags.isEmpty) {
+        if (!result.result) {
+          _allTags = const [];
+          _error = result.resultText?.isNotEmpty == true
+              ? result.resultText
+              : 'Failed to load tags.';
+          return;
+        }
+        _allTags = result.items;
+        if (result.items.isEmpty) {
           _error = 'No tags yet on this forum.';
         }
       });
@@ -109,9 +106,9 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
     await _load();
   }
 
-  List<DiscourseTag> get _filteredTags {
+  List<FCTag> get _filteredTags {
     final q = _filterController.text.trim().toLowerCase();
-    Iterable<DiscourseTag> base = _allTags;
+    Iterable<FCTag> base = _allTags;
     if (q.isNotEmpty) {
       base = base.where((t) =>
           t.name.toLowerCase().contains(q) ||
@@ -135,7 +132,7 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
     return out;
   }
 
-  void _openTag(DiscourseTag tag) {
+  void _openTag(FCTag tag) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => TagTopicsPage(
@@ -283,7 +280,7 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
 enum _SortMode { byCount, alphabetical }
 
 class _TagTile extends StatelessWidget {
-  final DiscourseTag tag;
+  final FCTag tag;
   final VoidCallback onTap;
 
   const _TagTile({required this.tag, required this.onTap});

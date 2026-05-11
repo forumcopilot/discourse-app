@@ -7,7 +7,6 @@ import 'package:forumcopilot_sdk/models/results/fc_topic_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
-import '../data/tag/discourse_tag.dart';
 
 /// Discourse implementation of [IFCTopicProxy].
 ///
@@ -352,77 +351,32 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     }
   }
 
-  /// Discourse-only: full tag listing. Hits `/tags.json` and returns
-  /// every tag the current user can see, with topic counts. Powers the
-  /// global Tags tab on the home screen.
+  // Phase 5.35 — getAllTagsAsync / searchTagsAsync / getTopicsByTagAsync
+  // moved to DiscourseTagProxy (IFCTagProxy). DiscourseTagProxy reuses
+  // [listTopicsByPathAsync] below for the topics-by-tag query so the
+  // topic-list parser doesn't have to be duplicated.
+
+  /// Discourse-only public helper: fetch a topic-list-shaped endpoint
+  /// (`/latest.json`, `/tag/{name}.json`, `/c/{id}.json`, …) and parse
+  /// it into the SDK's [FCTopicDataResult]. Intended for use by other
+  /// Discourse-specific proxies (e.g. [DiscourseTagProxy]) that need a
+  /// topic listing but don't want to duplicate the user-resolution +
+  /// category-name lookup logic.
   ///
-  /// [includePmOnly] defaults to false — PM-only tags are admin-set
-  /// allowlists for private messages and don't belong on the public
-  /// tags browser.
-  Future<List<DiscourseTag>> getAllTagsAsync({bool includePmOnly = false}) async {
-    try {
-      final response = await apiGet('/tags.json');
-      final list = (response['tags'] as List?) ?? const [];
-      final tags = list
-          .whereType<Map>()
-          .map((t) => DiscourseTag.fromJson(t.cast<String, dynamic>()))
-          .where((t) => includePmOnly || !t.pmOnly)
-          .toList();
-      // Sort by topic count desc, then alphabetical for ties — matches
-      // the Discourse web /tags page.
-      tags.sort((a, b) {
-        final byCount = b.count.compareTo(a.count);
-        if (byCount != 0) return byCount;
-        return a.name.toLowerCase().compareTo(b.name.toLowerCase());
-      });
-      return tags;
-    } catch (_) {
-      return const [];
-    }
-  }
-
-  /// Discourse-only: autocomplete tag names. Hits
-  /// `/tags/filter/search.json?q={prefix}&limit={N}` and returns the
-  /// matching tag names. Used by the tag-input field in the composer.
-  Future<List<String>> searchTagsAsync(String query, {int limit = 10}) async {
-    if (query.trim().isEmpty) return const [];
-    try {
-      final response = await apiGet('/tags/filter/search.json', query: {
-        'q': query.trim(),
-        'limit': limit.toString(),
-      });
-      final results = (response['results'] as List?) ?? const [];
-      return results
-          .whereType<Map>()
-          .map((r) => r['name']?.toString() ?? '')
-          .where((n) => n.isNotEmpty)
-          .toList(growable: false);
-    } catch (_) {
-      return const [];
-    }
-  }
-
-  /// Discourse-only: list topics filtered by [tagName]. Hits
-  /// `/tag/{tagName}.json` (paginated). Used by the tag-chip → tag-page
-  /// navigation in the topic list. Not exposed on IFCTopicProxy because
-  /// XF-shaped forums don't have a tag concept.
-  Future<FCTopicDataResult> getTopicsByTagAsync(
-    String tagName, {
+  /// [forumName] is surfaced as the result's display label — pass
+  /// `'#tagname'` for tag pages, the category name for categories, etc.
+  Future<FCTopicDataResult> listTopicsByPathAsync({
+    required String path,
     int page = 0,
+    String forumName = '',
   }) async {
-    if (tagName.isEmpty) {
-      return _emptyTopicData(forumId: '', message: 'tag required');
-    }
     try {
-      final list = await _listTopics(
-        '/tag/${Uri.encodeComponent(tagName)}.json',
-        page: page,
-      );
+      final list = await _listTopics(path, page: page);
       return FCTopicDataResult(
         result: true,
         resultText: '',
         forumId: '',
-        forumName: '#$tagName',
+        forumName: forumName,
         canPost: list.canPost,
         canUpload: list.canPost,
         unreadStickyCount: 0,

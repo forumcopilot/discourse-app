@@ -117,4 +117,10 @@ class SiteProxyService with ServiceErrorHandlingMixin {
     if (!_initialized) throw Exception('SiteProxyService not initialized');
     return SiteProxyFactory.getDraftProxy();
   }
+
+  /// Get tag proxy
+  static IFCTagProxy getTagProxy() {
+    if (!_initialized) throw Exception('SiteProxyService not initialized');
+    return SiteProxyFactory.getTagProxy();
+  }
 }

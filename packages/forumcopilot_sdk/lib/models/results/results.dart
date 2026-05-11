@@ -14,5 +14,6 @@ export 'fc_private_message_result.dart';
 export 'fc_search_result.dart';
 export 'fc_social_result.dart';
 export 'fc_subscription_result.dart';
+export 'fc_tag_result.dart';
 export 'fc_topic_result.dart';
 export 'fc_user_result.dart';

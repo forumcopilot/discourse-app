@@ -50,7 +50,6 @@ export 'src/data/post/discourse_post_vote.dart';
 export 'src/data/post/discourse_reaction.dart';
 export 'src/data/post/discourse_suggested_topic.dart';
 export 'src/data/search/discourse_search_filters.dart';
-export 'src/data/tag/discourse_tag.dart';
 export 'src/data/group/discourse_group.dart';
 export 'src/data/user/discourse_badge.dart';
 export 'src/data/user/discourse_directory_item.dart';

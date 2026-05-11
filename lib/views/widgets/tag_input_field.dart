@@ -1,8 +1,7 @@
 import 'dart:async';
 
-import 'package:discourse_core/discourse_core.dart' show DiscourseTopicProxy;
 import 'package:flutter/material.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 
 import '../../theme/design_tokens.dart';
 
@@ -86,14 +85,6 @@ class _TagInputFieldState extends State<TagInputField> {
   }
 
   Future<void> _search(String query) async {
-    final proxy = SiteProxyFactory.getTopicProxy();
-    if (proxy is! DiscourseTopicProxy) {
-      setState(() {
-        _suggestions = const [];
-        _searching = false;
-      });
-      return;
-    }
     if (query.trim().isEmpty) {
       setState(() {
         _suggestions = const [];
@@ -102,10 +93,10 @@ class _TagInputFieldState extends State<TagInputField> {
       return;
     }
     setState(() => _searching = true);
-    final results = await proxy.searchTagsAsync(query);
+    final result = await SiteProxyService.getTagProxy().searchTagsAsync(query);
     if (!mounted) return;
     setState(() {
-      _suggestions = results
+      _suggestions = result.names
           .where((s) => !_tags.contains(s))
           .take(8)
           .toList(growable: false);
