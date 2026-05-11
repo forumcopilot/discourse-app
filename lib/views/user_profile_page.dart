@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 import 'package:forumcopilot_flutter/views/widgets/user_avatar.dart';
-import 'package:forumcopilot_flutter/views/widgets/user_replied_posts.dart';
+import 'package:forumcopilot_flutter/views/widgets/user_activity_tabs.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_custom_field.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
@@ -807,12 +807,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               ),
                             ),
                             SizedBox(height: DesignTokens.spacingS),
-                            // Add UserRepliedPosts widget
-                            UserRepliedPosts(
-                              key: _userRepliedPostsKey,
+                            // Phase 5.24 — Replies / Topics tab strip
+                            // replaces the standalone UserRepliedPosts
+                            // widget. The selected tab loads lazily;
+                            // `repliesKey` still drives the existing
+                            // pull-to-refresh path on the Replies tab.
+                            UserActivityTabs(
                               siteContext: widget.siteContext,
                               userId: _userInfo!.id,
                               userName: _userInfo!.username,
+                              repliesKey: _userRepliedPostsKey,
                             ),
                             SizedBox(height: DesignTokens.spacingL),
                           ],

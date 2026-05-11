@@ -13,6 +13,7 @@ import '../../theme/style_builders.dart';
 import '../widgets/profile_picture_section.dart';
 import '../widgets/profile_info_section.dart';
 import '../widgets/recent_posts_section.dart';
+import '../widgets/user_activity_tabs.dart';
 import '../widgets/not_signed_in_view.dart';
 import '../bookmarks_page.dart';
 import '../drafts_list_page.dart';
@@ -357,21 +358,18 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
 
                   SizedBox(height: DesignTokens.spacingL),
 
-                  // Recent Posts Section
-                  RecentPostsSection(
+                  // Phase 5.24 — Replies / Topics tab strip replaces
+                  // the standalone RecentPostsSection. The old
+                  // ProfileTab fetch state (_recentPosts /
+                  // _isLoadingRecentPosts / _hasMorePosts / etc.)
+                  // remains as harmless dead code; a later cleanup
+                  // pass can excise it once we've confirmed nothing
+                  // else reads from it.
+                  UserActivityTabs(
                     siteContext: widget.siteContext,
-                    recentPosts: _recentPosts,
-                    isLoading: _isLoadingRecentPosts,
-                    isLoadingMore: _isLoadingMorePosts,
-                    hasMorePosts: _hasMorePosts,
-                    remainingCount: _totalPosts - (_recentPosts?.length ?? 0),
-                    error: _recentPostsError,
-                    onLoadMore: () {
-                      final username = widget.siteContext.loginDataOutput?.user?.username;
-                      if (username != null) {
-                        _fetchRecentPosts(username, loadMore: true);
-                      }
-                    },
+                    userId: widget.siteContext.loginDataOutput?.user?.id,
+                    userName:
+                        widget.siteContext.loginDataOutput?.user?.username,
                   ),
                 ],
               ),
