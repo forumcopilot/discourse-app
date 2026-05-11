@@ -4,12 +4,13 @@ import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_like.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_post_vote.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_reaction.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_thanks.dart';
 import 'package:forumcopilot_sdk/models/results/fc_post_result.dart';
+import 'package:forumcopilot_sdk/models/results/fc_reaction_result.dart';
 
 import '../base_discourse_proxy.dart';
-import '../data/post/discourse_post_vote.dart';
-import '../data/post/discourse_reaction.dart';
 import '../data/post/discourse_suggested_topic.dart';
 
 /// Discourse implementation of [IFCPostProxy].
@@ -34,17 +35,6 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   /// poll's name (default 'poll'). We stash both here at parse time so
   /// the vote call doesn't need to refetch the topic.
   static final Expando<_DiscoursePollMeta> _pollMeta = Expando('pollMeta');
-
-  /// Sidecar that carries [discourse-reactions] data per parsed FCPost.
-  /// Same pattern as [_pollMeta] — avoids mapper edits on FCPost while
-  /// still letting UI code recover the typed reaction list via
-  /// [reactionsFor].
-  static final Expando<List<DiscourseReaction>> _reactions =
-      Expando('reactions');
-
-  /// Sidecar for [discourse-post-voting]. Null on posts in topics that
-  /// don't have voting enabled (UI hides the vote arrows in that case).
-  static final Expando<DiscoursePostVote> _votes = Expando('votes');
 
   @override
   Future<FCThreadResult> getThreadAsync(
@@ -667,44 +657,64 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   // `SiteProxyService.getDraftProxy().saveDraftAsync` /
   // `loadDraftAsync` / `deleteDraftAsync` / `getMyDraftsAsync` instead.
 
-  /// Discourse-only: toggle an emoji reaction on [postId] using the
-  /// `discourse-reactions` plugin. [reactionValue] is the reaction's
-  /// shortcode (e.g. "heart", "tada", "+1"). Returns the updated post's
-  /// reactions on success (parsed from the response), or null on
-  /// failure (e.g. plugin not installed → 404).
-  Future<List<DiscourseReaction>?> toggleReactionAsync(
-      String postId, String reactionValue) async {
+  @override
+  Future<FCToggleReactionResult> toggleReactionAsync(
+      String postId, String reactionId) async {
     final pid = int.tryParse(postId);
-    if (pid == null) return null;
+    if (pid == null) {
+      return FCToggleReactionResult(
+          result: false, resultText: 'Invalid post id');
+    }
     try {
       final response = await apiPut(
         '/discourse-reactions/posts/$pid/custom-reactions/'
-        '${Uri.encodeComponent(reactionValue)}/toggle.json',
+        '${Uri.encodeComponent(reactionId)}/toggle.json',
       );
       // The plugin echoes the full updated post serializer; rebuild the
       // reaction list from that.
-      return _parseReactions(response.cast<String, dynamic>());
-    } catch (_) {
-      return null;
+      final reactions = _parseReactions(response.cast<String, dynamic>());
+      return FCToggleReactionResult(result: true, reactions: reactions);
+    } on DiscourseApiException catch (e) {
+      return FCToggleReactionResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCToggleReactionResult(result: false, resultText: 'Error: $e');
     }
   }
 
-  /// Discourse-only: list the emoji reactions the forum has enabled
-  /// (admin setting). Returns the configured shortcodes in display
-  /// order, plus the main reaction id (`heart` on stock) at the front
-  /// so the UI can pin it as the "default like".
-  ///
-  /// Falls back to a small built-in set if the endpoint 404s (plugin
-  /// absent) so the picker can degrade gracefully.
-  Future<List<String>> getAvailableReactionsAsync() async {
+  @override
+  Future<FCAvailableReactionsResult> getAvailableReactionsAsync() async {
     try {
       final response = await apiGet('/discourse-reactions/custom-reactions');
-      final reactions =
-          ((response['reactions'] as List?) ?? const []).whereType<String>();
-      if (reactions.isEmpty) return _defaultReactions;
-      return reactions.toList(growable: false);
-    } catch (_) {
-      return _defaultReactions;
+      final reactions = ((response['reactions'] as List?) ?? const [])
+          .whereType<String>()
+          .toList(growable: false);
+      if (reactions.isEmpty) {
+        // Plugin returned an empty list — fall back so the picker still
+        // works. Mark result:true since the fallback set is intentional.
+        return FCAvailableReactionsResult(
+            result: true, reactions: _defaultReactions);
+      }
+      return FCAvailableReactionsResult(result: true, reactions: reactions);
+    } on DiscourseApiException catch (e) {
+      // 404 means plugin isn't installed — degrade to the built-in set
+      // so the picker stays usable.
+      if (e.statusCode == 404) {
+        return FCAvailableReactionsResult(
+          result: true,
+          reactions: _defaultReactions,
+        );
+      }
+      return FCAvailableReactionsResult(
+        result: false,
+        resultText: e.userMessage,
+        reactions: _defaultReactions,
+      );
+    } catch (e) {
+      return FCAvailableReactionsResult(
+        result: false,
+        resultText: 'Error: $e',
+        reactions: _defaultReactions,
+      );
     }
   }
 
@@ -722,37 +732,92 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     'eyes',
   ];
 
-  /// Discourse-only: cast a Q&A-style vote on [postId] using the
-  /// `discourse-post-voting` plugin. [direction] is 'up' or 'down'.
-  /// Returns true on success; the caller is responsible for refetching
-  /// post state (or updating the sidecar via [setVoteFor]) since the
-  /// plugin's response doesn't echo the new vote count.
-  Future<bool> castPostVoteAsync(String postId, String direction) async {
+  @override
+  Future<FCPostVoteResult> castPostVoteAsync(
+    String postId,
+    String direction, {
+    FCPostVote? previous,
+  }) async {
     final pid = int.tryParse(postId);
-    if (pid == null) return false;
+    if (pid == null) {
+      return FCPostVoteResult(
+          result: false, resultText: 'Invalid post id', vote: previous);
+    }
     try {
       await apiPost('/vote.json', body: {
         'post_id': pid,
         'direction': direction,
       });
-      return true;
-    } catch (_) {
-      return false;
+      // Plugin doesn't echo the new vote count; compute it from the
+      // previous state plus the requested direction.
+      return FCPostVoteResult(
+        result: true,
+        vote: _applyVoteCast(previous, direction),
+      );
+    } on DiscourseApiException catch (e) {
+      return FCPostVoteResult(
+          result: false, resultText: e.userMessage, vote: previous);
+    } catch (e) {
+      return FCPostVoteResult(
+          result: false, resultText: 'Error: $e', vote: previous);
     }
   }
 
-  /// Discourse-only: remove the viewer's vote on [postId]. Subject to
-  /// the `post_voting_undo_vote_action_window` site setting (typically
-  /// 10 seconds after voting).
-  Future<bool> removePostVoteAsync(String postId) async {
+  @override
+  Future<FCPostVoteResult> removePostVoteAsync(
+    String postId, {
+    FCPostVote? previous,
+  }) async {
     final pid = int.tryParse(postId);
-    if (pid == null) return false;
+    if (pid == null) {
+      return FCPostVoteResult(
+          result: false, resultText: 'Invalid post id', vote: previous);
+    }
     try {
       await apiDelete('/vote.json?post_id=$pid');
-      return true;
-    } catch (_) {
-      return false;
+      return FCPostVoteResult(
+        result: true,
+        vote: _applyVoteRemove(previous),
+      );
+    } on DiscourseApiException catch (e) {
+      return FCPostVoteResult(
+          result: false, resultText: e.userMessage, vote: previous);
+    } catch (e) {
+      return FCPostVoteResult(
+          result: false, resultText: 'Error: $e', vote: previous);
     }
+  }
+
+  FCPostVote _applyVoteCast(FCPostVote? prev, String direction) {
+    final base = prev ?? FCPostVote();
+    if (base.viewerDirection == direction) {
+      // No-op: already voted that way. Caller's optimistic flip should
+      // also have skipped, but be defensive.
+      return base;
+    }
+    final int delta;
+    if (base.viewerVoted) {
+      // Switching sides — net swing is ±2.
+      delta = direction == 'up' ? 2 : -2;
+    } else {
+      delta = direction == 'up' ? 1 : -1;
+    }
+    return FCPostVote(
+      voteCount: base.voteCount + delta,
+      hasVotes: true,
+      viewerDirection: direction,
+    );
+  }
+
+  FCPostVote _applyVoteRemove(FCPostVote? prev) {
+    final base = prev ?? FCPostVote();
+    if (!base.viewerVoted) return base;
+    return FCPostVote(
+      voteCount:
+          base.voteCount + (base.viewerDirection == 'up' ? -1 : 1),
+      hasVotes: base.voteCount.abs() > 1,
+      viewerDirection: null,
+    );
   }
 
   /// Discourse-only: fetch the "Suggested Topics" Discourse appends to
@@ -838,7 +903,18 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     final canLike = like['can_act'] == true;
     final likeCount = (like['count'] as int?) ?? 0;
 
-    final post = FCPost(
+    // Phase 5.36 — reactions and Q&A votes now live as proper FCPost
+    // fields (was an Expando sidecar). Empty list / null when the
+    // plugin isn't installed.
+    final reactions = _parseReactions(p);
+    final FCPostVote? vote =
+        (p.containsKey('post_voting_vote_count') ||
+                p.containsKey('post_voting_has_votes') ||
+                p.containsKey('post_voting_user_voted_direction'))
+            ? _postVoteFromJson(p)
+            : null;
+
+    return FCPost(
       id: (p['id'] ?? '').toString(),
       title: '',
       // Discourse returns rendered HTML in `cooked`. The inherited UI is a
@@ -883,62 +959,42 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       attachments: <FCAttachment>[],
       inlineAttachments: <FCAttachment>[],
       thanksInfo: <FCThanks>[],
+      reactions: reactions,
+      vote: vote,
     );
-
-    // Stash discourse-reactions data via the Expando sidecar (no FCPost
-    // mapper edit needed). Returns an empty list when the plugin isn't
-    // installed — the post JSON simply won't have a `reactions` field.
-    _reactions[post] = _parseReactions(p);
-    // Same idea for discourse-post-voting. Only stash a value when the
-    // plugin actually populates one of its fields, so callers can
-    // distinguish "no votes yet" from "voting not enabled".
-    if (p.containsKey('post_voting_vote_count') ||
-        p.containsKey('post_voting_has_votes') ||
-        p.containsKey('post_voting_user_voted_direction')) {
-      _votes[post] = DiscoursePostVote.fromJson(p);
-    }
-    return post;
   }
 
-  /// Public accessor for the vote state attached to [post]. Returns
-  /// null when post-voting isn't enabled on the topic (or when the
-  /// post wasn't parsed by this proxy).
-  static DiscoursePostVote? voteFor(FCPost post) => _votes[post];
-
-  /// Replace the vote sidecar on [post] (used by UI after a successful
-  /// toggle so subsequent reads reflect server truth without a full
-  /// refetch).
-  static void setVoteFor(FCPost post, DiscoursePostVote next) {
-    _votes[post] = next;
-  }
-
-  /// Public accessor for reactions on a parsed [FCPost]. Returns an
-  /// empty list when no reactions were attached (plugin absent, post
-  /// hasn't been parsed by this proxy, or just no reactions yet).
-  static List<DiscourseReaction> reactionsFor(FCPost post) =>
-      _reactions[post] ?? const [];
-
-  /// Replace the reactions sidecar for [post] (used by UI after a
-  /// successful toggle so subsequent reads reflect server truth).
-  static void setReactionsFor(FCPost post, List<DiscourseReaction> next) {
-    _reactions[post] = next;
-  }
-
-  List<DiscourseReaction> _parseReactions(Map<String, dynamic> p) {
+  List<FCReaction> _parseReactions(Map<String, dynamic> p) {
     final raw = (p['reactions'] as List?) ?? const [];
     if (raw.isEmpty) return const [];
-    final current = (p['current_user_reaction'] as Map?)?.cast<String, dynamic>();
+    final current =
+        (p['current_user_reaction'] as Map?)?.cast<String, dynamic>();
     final viewerId = current?['id']?.toString();
     final canUndo = current?['can_undo'] == true;
-    return raw
-        .whereType<Map>()
-        .map((r) => DiscourseReaction.fromJson(
-              r.cast<String, dynamic>(),
-              viewerReactionId: viewerId,
-              viewerCanUndo: canUndo,
-            ))
-        .where((r) => r.count > 0)
-        .toList(growable: false);
+    final out = <FCReaction>[];
+    for (final raw in raw.whereType<Map>()) {
+      final m = raw.cast<String, dynamic>();
+      final id = (m['id'] ?? '').toString();
+      final isViewer = viewerId != null && viewerId == id;
+      final count = (m['count'] as num?)?.toInt() ?? 0;
+      if (count <= 0) continue;
+      out.add(FCReaction(
+        id: id,
+        type: (m['type'] ?? 'emoji').toString(),
+        count: count,
+        viewerReacted: isViewer,
+        canUndo: isViewer ? canUndo : false,
+      ));
+    }
+    return out;
+  }
+
+  FCPostVote _postVoteFromJson(Map<String, dynamic> p) {
+    return FCPostVote(
+      voteCount: (p['post_voting_vote_count'] as num?)?.toInt() ?? 0,
+      hasVotes: p['post_voting_has_votes'] == true,
+      viewerDirection: p['post_voting_user_voted_direction']?.toString(),
+    );
   }
 
   List<FCLike> _buildLikesInfo({

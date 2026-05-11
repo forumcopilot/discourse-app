@@ -1,7 +1,6 @@
-import 'package:discourse_core/discourse_core.dart'
-    show DiscoursePostProxy, DiscoursePostVote;
 import 'package:flutter/material.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_post_vote.dart';
 
 import '../../theme/design_tokens.dart';
 
@@ -20,9 +19,9 @@ import '../../theme/design_tokens.dart';
 /// re-tapping the active direction) the viewer's vote.
 class PostVoteColumn extends StatefulWidget {
   final String postId;
-  final DiscoursePostVote vote;
+  final FCPostVote vote;
   final bool isLoggedIn;
-  final ValueChanged<DiscoursePostVote> onVoteChanged;
+  final ValueChanged<FCPostVote> onVoteChanged;
 
   const PostVoteColumn({
     super.key,
@@ -47,8 +46,6 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
       );
       return;
     }
-    final proxy = SiteProxyFactory.getPostProxy();
-    if (proxy is! DiscoursePostProxy) return;
     setState(() => _inFlight = true);
 
     final prev = widget.vote;
@@ -57,16 +54,15 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
     // viewer's vote; tapping the other direction swaps (which is
     // equivalent to remove+add on the server, two net-2 / net-1 deltas
     // depending on prior state).
-    DiscoursePostVote next;
+    FCPostVote next;
     if (wasSameDirection) {
       next = prev.copyWith(
         voteCount: prev.voteCount + (direction == 'up' ? -1 : 1),
-        clearViewer: true,
+        viewerDirection: null,
       );
     } else if (prev.viewerVoted) {
       next = prev.copyWith(
-        voteCount:
-            prev.voteCount + (direction == 'up' ? 2 : -2),
+        voteCount: prev.voteCount + (direction == 'up' ? 2 : -2),
         viewerDirection: direction,
       );
     } else {
@@ -78,19 +74,25 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
     }
     widget.onVoteChanged(next);
 
-    final ok = wasSameDirection
-        ? await proxy.removePostVoteAsync(widget.postId)
-        : await proxy.castPostVoteAsync(widget.postId, direction);
+    final proxy = SiteProxyService.getPostProxy();
+    final result = wasSameDirection
+        ? await proxy.removePostVoteAsync(widget.postId, previous: prev)
+        : await proxy
+            .castPostVoteAsync(widget.postId, direction, previous: prev);
 
     if (!mounted) return;
     setState(() => _inFlight = false);
-    if (!ok) {
+    if (!result.result) {
       // Revert.
       widget.onVoteChanged(prev);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(wasSameDirection
-            ? 'Could not remove vote (past undo window?)'
-            : 'Could not cast vote')),
+        SnackBar(
+          content: Text(result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : (wasSameDirection
+                  ? 'Could not remove vote (past undo window?)'
+                  : 'Could not cast vote')),
+        ),
       );
     }
   }
@@ -164,9 +166,9 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
 /// line.
 class PostVoteRow extends StatelessWidget {
   final String postId;
-  final DiscoursePostVote vote;
+  final FCPostVote vote;
   final bool isLoggedIn;
-  final ValueChanged<DiscoursePostVote> onVoteChanged;
+  final ValueChanged<FCPostVote> onVoteChanged;
 
   const PostVoteRow({
     super.key,

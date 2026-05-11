@@ -1,8 +1,7 @@
-import 'package:discourse_core/discourse_core.dart'
-    show DiscoursePostProxy, DiscourseReaction;
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_reaction.dart';
 
 import '../../theme/design_tokens.dart';
 
@@ -22,12 +21,12 @@ class ReactionPickerSheet extends StatefulWidget {
     this.currentReactionId,
   });
 
-  static Future<List<DiscourseReaction>?> show({
+  static Future<List<FCReaction>?> show({
     required BuildContext context,
     required String postId,
     String? currentReactionId,
   }) {
-    return showModalBottomSheet<List<DiscourseReaction>>(
+    return showModalBottomSheet<List<FCReaction>>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -57,37 +56,30 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
   }
 
   Future<void> _load() async {
-    final proxy = SiteProxyFactory.getPostProxy();
-    if (proxy is! DiscoursePostProxy) {
-      setState(() {
-        _available = const [];
-        _loading = false;
-      });
-      return;
-    }
-    final reactions = await proxy.getAvailableReactionsAsync();
+    final result =
+        await SiteProxyService.getPostProxy().getAvailableReactionsAsync();
     if (!mounted) return;
     setState(() {
-      _available = reactions;
+      _available = result.reactions;
       _loading = false;
     });
   }
 
   Future<void> _toggle(String reaction) async {
-    final proxy = SiteProxyFactory.getPostProxy();
-    if (proxy is! DiscoursePostProxy) return;
     setState(() => _toggling = reaction);
-    final updated =
-        await proxy.toggleReactionAsync(widget.postId, reaction);
+    final result = await SiteProxyService.getPostProxy()
+        .toggleReactionAsync(widget.postId, reaction);
     if (!mounted) return;
-    if (updated != null) {
-      Navigator.of(context).pop(updated);
+    if (result.result) {
+      Navigator.of(context).pop(result.reactions);
     } else {
       setState(() => _toggling = null);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Could not update reaction. The plugin may not be installed.')),
+        SnackBar(
+          content: Text(result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : 'Could not update reaction. The plugin may not be installed.'),
+        ),
       );
     }
   }

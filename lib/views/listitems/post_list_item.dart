@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_post_vote.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_reaction.dart';
 import '../widgets/custom_bb_stylesheet.dart' show BBCodeCallbacks;
 import '../widgets/rich_text_content.dart';
 import '../widgets/reaction_chips_row.dart';
@@ -151,14 +153,15 @@ class _PostListItemState extends State<PostListItem> {
   late int _likeCount; // Add local state for like count
   late final PostActionsHandler _postActionsHandler;
 
-  // discourse-reactions sidecar copy. Mirrors what DiscoursePostProxy
-  // stamped on the FCPost at parse time; mutated locally on toggle so
-  // the chips row updates without a full thread refetch.
-  late List<DiscourseReaction> _reactions;
+  // discourse-reactions local copy. Mirrors widget.post.reactions at
+  // parse time; mutated locally on toggle so the chips row updates
+  // without a full thread refetch. Phase 5.36 — lifted from a
+  // DiscoursePostProxy Expando sidecar to a proper FCPost field.
+  late List<FCReaction> _reactions;
 
-  // discourse-post-voting sidecar copy. Null when voting isn't
-  // enabled on this topic, in which case the vote column is hidden.
-  DiscoursePostVote? _vote;
+  // discourse-post-voting local copy. Null when voting isn't enabled
+  // on this topic, in which case the vote column is hidden.
+  FCPostVote? _vote;
 
   @override
   void initState() {
@@ -171,9 +174,8 @@ class _PostListItemState extends State<PostListItem> {
     _isLiked = widget.post.isLiked;
     _likeCount = widget.post.likesInfo.length;
     _isBookmarked = widget.post.bookmarked;
-    _reactions =
-        List.of(DiscoursePostProxy.reactionsFor(widget.post), growable: false);
-    _vote = DiscoursePostProxy.voteFor(widget.post);
+    _reactions = List.of(widget.post.reactions, growable: false);
+    _vote = widget.post.vote;
   }
 
   /// Checks if a URL is a mention link (link text starts with @ and has no spaces)
@@ -492,7 +494,7 @@ class _PostListItemState extends State<PostListItem> {
                   onVoteChanged: (next) {
                     setState(() {
                       _vote = next;
-                      DiscoursePostProxy.setVoteFor(widget.post, next);
+                      widget.post.vote = next;
                     });
                   },
                 ),
@@ -1068,21 +1070,22 @@ class _PostListItemState extends State<PostListItem> {
       );
       return;
     }
-    final proxy = SiteProxyService.getPostProxy();
-    if (proxy is! DiscoursePostProxy) return;
-    final updated =
-        await proxy.toggleReactionAsync(widget.post.id, reactionId);
+    final result = await SiteProxyService.getPostProxy()
+        .toggleReactionAsync(widget.post.id, reactionId);
     if (!mounted) return;
-    if (updated == null) {
+    if (!result.result) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Could not update reaction.')),
+        SnackBar(
+          content: Text(result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : 'Could not update reaction.'),
+        ),
       );
       return;
     }
     setState(() {
-      _reactions = updated;
-      DiscoursePostProxy.setReactionsFor(widget.post, updated);
+      _reactions = result.reactions;
+      widget.post.reactions = result.reactions;
     });
   }
 
@@ -1099,7 +1102,7 @@ class _PostListItemState extends State<PostListItem> {
     final current = _reactions
         .firstWhere(
           (r) => r.viewerReacted,
-          orElse: () => const DiscourseReaction(id: '', count: 0),
+          orElse: () => FCReaction(id: '', count: 0),
         )
         .id;
     final updated = await ReactionPickerSheet.show(
@@ -1110,7 +1113,7 @@ class _PostListItemState extends State<PostListItem> {
     if (updated == null || !mounted) return;
     setState(() {
       _reactions = updated;
-      DiscoursePostProxy.setReactionsFor(widget.post, updated);
+      widget.post.reactions = updated;
     });
   }
 }

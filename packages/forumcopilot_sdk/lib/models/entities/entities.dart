@@ -2,6 +2,8 @@
 export 'fc_topic.dart';
 export 'fc_poll.dart';
 export 'fc_post.dart';
+export 'fc_post_vote.dart';
+export 'fc_reaction.dart';
 export 'fc_tag.dart';
 export 'fc_user.dart';
 export 'fc_forum.dart';

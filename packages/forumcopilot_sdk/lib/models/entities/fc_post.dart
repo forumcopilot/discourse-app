@@ -2,6 +2,8 @@ import 'package:dart_mappable/dart_mappable.dart';
 import 'package:forumcopilot_sdk/models/mapping/hooks.dart';
 import 'fc_attachment.dart';
 import 'fc_like.dart';
+import 'fc_post_vote.dart';
+import 'fc_reaction.dart';
 import 'fc_thanks.dart';
 
 part 'fc_post.mapper.dart';
@@ -97,6 +99,18 @@ class FCPost with FCPostMappable {
   /// can render an "Accept this answer" button per reply.
   bool canAcceptAnswer;
 
+  /// Emoji reactions on this post (Discourse: `discourse-reactions`
+  /// plugin). Empty when the plugin isn't installed or no one has
+  /// reacted. Phase 5.36 lifted this off a DiscoursePostProxy
+  /// Expando sidecar so the chips row can render straight off the
+  /// FCPost without a separate proxy cast.
+  List<FCReaction> reactions;
+
+  /// Q&A vote state on this post (Discourse: `discourse-post-voting`
+  /// plugin). Null on posts in topics that don't have voting enabled
+  /// — the UI uses null to hide the vote arrows entirely.
+  FCPostVote? vote;
+
   FCPost(
       {required this.id,
       required this.title,
@@ -134,5 +148,7 @@ class FCPost with FCPostMappable {
       this.canThank = false,
       this.bookmarked = false,
       this.isSolution = false,
-      this.canAcceptAnswer = false});
+      this.canAcceptAnswer = false,
+      this.reactions = const [],
+      this.vote});
 }

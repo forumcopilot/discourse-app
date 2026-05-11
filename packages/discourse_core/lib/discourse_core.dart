@@ -46,8 +46,6 @@ export 'src/data/auth/auth_request.dart';
 export 'src/data/auth/auth_response.dart';
 export 'src/data/chat/discourse_chat_channel.dart';
 export 'src/data/chat/discourse_chat_message.dart';
-export 'src/data/post/discourse_post_vote.dart';
-export 'src/data/post/discourse_reaction.dart';
 export 'src/data/post/discourse_suggested_topic.dart';
 export 'src/data/search/discourse_search_filters.dart';
 export 'src/data/group/discourse_group.dart';

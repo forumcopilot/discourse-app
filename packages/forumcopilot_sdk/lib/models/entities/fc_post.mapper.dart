@@ -229,6 +229,19 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
     opt: true,
     def: false,
   );
+  static List<FCReaction> _$reactions(FCPost v) => v.reactions;
+  static const Field<FCPost, List<FCReaction>> _f$reactions = Field(
+    'reactions',
+    _$reactions,
+    opt: true,
+    def: const [],
+  );
+  static FCPostVote? _$vote(FCPost v) => v.vote;
+  static const Field<FCPost, FCPostVote> _f$vote = Field(
+    'vote',
+    _$vote,
+    opt: true,
+  );
 
   @override
   final MappableFields<FCPost> fields = const {
@@ -265,6 +278,8 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
     #bookmarked: _f$bookmarked,
     #isSolution: _f$isSolution,
     #canAcceptAnswer: _f$canAcceptAnswer,
+    #reactions: _f$reactions,
+    #vote: _f$vote,
   };
 
   static FCPost _instantiate(DecodingData data) {
@@ -302,6 +317,8 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
       bookmarked: data.dec(_f$bookmarked),
       isSolution: data.dec(_f$isSolution),
       canAcceptAnswer: data.dec(_f$canAcceptAnswer),
+      reactions: data.dec(_f$reactions),
+      vote: data.dec(_f$vote),
     );
   }
 
@@ -400,6 +417,8 @@ abstract class FCPostCopyWith<$R, $In extends FCPost, $Out>
     bool? bookmarked,
     bool? isSolution,
     bool? canAcceptAnswer,
+    List<FCReaction>? reactions,
+    FCPostVote? vote,
   });
   FCPostCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -481,6 +500,8 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
     bool? bookmarked,
     bool? isSolution,
     bool? canAcceptAnswer,
+    List<FCReaction>? reactions,
+    Object? vote = $none,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -516,6 +537,8 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
       if (bookmarked != null) #bookmarked: bookmarked,
       if (isSolution != null) #isSolution: isSolution,
       if (canAcceptAnswer != null) #canAcceptAnswer: canAcceptAnswer,
+      if (reactions != null) #reactions: reactions,
+      if (vote != $none) #vote: vote,
     }),
   );
   @override
@@ -556,6 +579,8 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
     bookmarked: data.get(#bookmarked, or: $value.bookmarked),
     isSolution: data.get(#isSolution, or: $value.isSolution),
     canAcceptAnswer: data.get(#canAcceptAnswer, or: $value.canAcceptAnswer),
+    reactions: data.get(#reactions, or: $value.reactions),
+    vote: data.get(#vote, or: $value.vote),
   );
 
   @override

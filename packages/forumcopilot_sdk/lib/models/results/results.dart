@@ -10,6 +10,7 @@ export 'fc_moderation_result.dart';
 export 'fc_passkey_result.dart';
 export 'fc_post_result.dart';
 export 'fc_private_conversation_result.dart';
+export 'fc_reaction_result.dart';
 export 'fc_private_message_result.dart';
 export 'fc_search_result.dart';
 export 'fc_social_result.dart';
