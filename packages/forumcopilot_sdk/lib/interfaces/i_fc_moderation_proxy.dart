@@ -87,4 +87,28 @@ abstract class IFCModerationProxy {
     bool deleteConversations = false,
     bool banUser = false,
   });
+
+  /// Phase 5.42 — toggle a topic's archived state (Discourse-specific:
+  /// `PUT /t/{id}/status.json` with `status=archived`). Archived topics
+  /// are hidden from latest/unread but still reachable via direct link.
+  /// Stub-fails on XF-shaped backends.
+  Future<FCDeleteTopicResult> archiveTopicAsync(
+    String topicId, {
+    required bool archived,
+  });
+
+  /// Phase 5.42 — toggle a topic's listed/unlisted state (Discourse-
+  /// specific: `PUT /t/{id}/status.json` with `status=visible`).
+  Future<FCDeleteTopicResult> setTopicVisibilityAsync(
+    String topicId, {
+    required bool visible,
+  });
+
+  /// Phase 5.42 — hard-delete a topic (Discourse: `DELETE /t/{id}.json?
+  /// delete_for_real=true`). [deleteForReal] true skips the soft-delete
+  /// grace period; false matches [deleteTopicAsync].
+  Future<FCDeleteTopicResult> deleteTopicExtendedAsync(
+    String topicId, {
+    bool deleteForReal = false,
+  });
 }

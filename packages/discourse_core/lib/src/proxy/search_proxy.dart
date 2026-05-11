@@ -6,9 +6,9 @@ import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_thanks.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 import 'package:forumcopilot_sdk/models/results/fc_search_result.dart';
+import 'package:forumcopilot_sdk/models/search/fc_search_filters.dart';
 
 import '../base_discourse_proxy.dart';
-import '../data/search/discourse_search_filters.dart';
 
 /// Discourse implementation of [IFCSearchProxy].
 ///
@@ -219,13 +219,13 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
   }
 
   /// Discourse-native: search topics + posts with structured
-  /// [DiscourseSearchFilters] layered on top of free-text [keywords].
+  /// [FCSearchFilters] layered on top of free-text [keywords].
   ///
   /// Returns the raw split { topics, posts } so callers can decide how
   /// to render. Pass [page] to paginate (1-indexed, matching Discourse).
   Future<DiscourseSearchResult> searchWithFiltersAsync({
     required String keywords,
-    DiscourseSearchFilters filters = const DiscourseSearchFilters(),
+    FCSearchFilters filters = const FCSearchFilters(),
     int page = 1,
     int perPage = _defaultPerPage,
   }) async {

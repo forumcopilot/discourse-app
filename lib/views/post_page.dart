@@ -401,20 +401,21 @@ class _PostPageState extends State<PostPage> {
   }
 
   void _handleArchive() async {
-    final proxy = SiteProxyFactory.getModerationProxy();
-    if (proxy is! DiscourseModerationProxy) return;
     final wasArchived = _isArchived;
     setState(() => _isArchived = !wasArchived);
-    final ok = await proxy.archiveTopicAsync(widget.topicId,
-        enable: !wasArchived);
+    final result = await SiteProxyFactory.getModerationProxy()
+        .archiveTopicAsync(widget.topicId, archived: !wasArchived);
     if (!mounted) return;
-    if (!ok) {
+    if (!result.result) {
       setState(() => _isArchived = wasArchived);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(wasArchived
-                ? 'Failed to unarchive topic'
-                : 'Failed to archive topic')),
+          content: Text(result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : (wasArchived
+                  ? 'Failed to unarchive topic'
+                  : 'Failed to archive topic')),
+        ),
       );
     } else {
       _refreshCallback?.call();
@@ -422,20 +423,21 @@ class _PostPageState extends State<PostPage> {
   }
 
   void _handleToggleVisibility() async {
-    final proxy = SiteProxyFactory.getModerationProxy();
-    if (proxy is! DiscourseModerationProxy) return;
     final wasVisible = _isVisible;
     setState(() => _isVisible = !wasVisible);
-    final ok = await proxy.setTopicVisibilityAsync(widget.topicId,
-        visible: !wasVisible);
+    final result = await SiteProxyFactory.getModerationProxy()
+        .setTopicVisibilityAsync(widget.topicId, visible: !wasVisible);
     if (!mounted) return;
-    if (!ok) {
+    if (!result.result) {
       setState(() => _isVisible = wasVisible);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(wasVisible
-                ? 'Failed to unlist topic'
-                : 'Failed to list topic')),
+          content: Text(result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : (wasVisible
+                  ? 'Failed to unlist topic'
+                  : 'Failed to list topic')),
+        ),
       );
     } else {
       _refreshCallback?.call();
@@ -672,24 +674,18 @@ class _PostPageState extends State<PostPage> {
 
     final hardDelete = result['hardDelete'] as bool;
     final reason = result['reason'] as String? ?? '';
-    final starterAlert = result['starterAlert'] as bool? ?? false;
-    final starterAlertReason = result['starterAlertReason'] as String?;
 
     try {
-      // Use extended method if available, otherwise fall back to basic method
-      FCDeleteTopicResult deleteResult;
-      if (moderationProxy is DiscourseModerationProxy) {
-        deleteResult = await moderationProxy.deleteTopicExtendedAsync(
-          topicId: widget.topicId,
-          hardDelete: hardDelete,
-          reason: reason,
-          starterAlert: starterAlert,
-          starterAlertReason: starterAlertReason,
-        );
-      } else {
-        // Fallback to basic method (map hardDelete to mode: 0 = soft, 1 = hard)
-        final mode = hardDelete ? 1 : 0;
-        deleteResult = await moderationProxy.deleteTopicAsync(widget.topicId, mode, reason);
+      // Phase 5.42 — deleteTopicExtendedAsync is on IFCModerationProxy
+      // now; no more is-DiscourseModerationProxy cast.
+      final deleteResult = await moderationProxy.deleteTopicExtendedAsync(
+        widget.topicId,
+        deleteForReal: hardDelete,
+      );
+      // The XF-shaped `reason` parameter doesn't round-trip on
+      // Discourse; preserve it for audit trail in the snackbar only.
+      if (reason.isNotEmpty) {
+        AppLogger.debug('Topic delete reason (Discourse drops): $reason');
       }
 
       if (!deleteResult.result) {

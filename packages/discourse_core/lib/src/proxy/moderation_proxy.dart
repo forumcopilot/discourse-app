@@ -68,26 +68,36 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
             result: false, resultText: m, isLoginMod: true));
   }
 
-  /// Discourse-only: toggle the archived status. Archiving disables
-  /// edits in addition to replies; it's a stronger lock than [close].
-  Future<bool> archiveTopicAsync(String topicId, {bool enable = true}) async {
-    return _setStatus(topicId,
-        status: 'archived',
-        enabled: enable,
-        successResult: () => true,
-        errorResult: (_) => false);
+  @override
+  Future<FCDeleteTopicResult> archiveTopicAsync(
+    String topicId, {
+    required bool archived,
+  }) async {
+    return _setStatus(
+      topicId,
+      status: 'archived',
+      enabled: archived,
+      successResult: () =>
+          FCDeleteTopicResult(result: true, resultText: '', isLoginMod: true),
+      errorResult: (m) =>
+          FCDeleteTopicResult(result: false, resultText: m, isLoginMod: true),
+    );
   }
 
-  /// Discourse-only: toggle the topic visibility. When `false`, the
-  /// topic is "unlisted" — accessible by URL but hidden from category
-  /// and Latest listings. Mirrors the web admin's "Unlist Topic".
-  Future<bool> setTopicVisibilityAsync(String topicId,
-      {required bool visible}) async {
-    return _setStatus(topicId,
-        status: 'visible',
-        enabled: visible,
-        successResult: () => true,
-        errorResult: (_) => false);
+  @override
+  Future<FCDeleteTopicResult> setTopicVisibilityAsync(
+    String topicId, {
+    required bool visible,
+  }) async {
+    return _setStatus(
+      topicId,
+      status: 'visible',
+      enabled: visible,
+      successResult: () =>
+          FCDeleteTopicResult(result: true, resultText: '', isLoginMod: true),
+      errorResult: (m) =>
+          FCDeleteTopicResult(result: false, resultText: m, isLoginMod: true),
+    );
   }
 
   // ===== Topic delete / restore =====
@@ -381,22 +391,14 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
     }
   }
 
-  /// Discourse-specific extension used by `lib/views/post_page.dart` for
-  /// the topic-delete dialog. Maps the XF "extended delete" flow
-  /// (hard vs soft, optional starter alert) onto Discourse's two-tier
-  /// delete (soft via DELETE /t/{id}.json, hard via the same with
-  /// `delete_for_real=true`). Discourse has no starter-alert concept, so
-  /// `starterAlert` / `starterAlertReason` are dropped.
-  Future<FCDeleteTopicResult> deleteTopicExtendedAsync({
-    required String topicId,
-    bool hardDelete = false,
-    String reason = '',
-    bool starterAlert = false,
-    String? starterAlertReason,
+  @override
+  Future<FCDeleteTopicResult> deleteTopicExtendedAsync(
+    String topicId, {
+    bool deleteForReal = false,
   }) async {
     try {
       await apiDelete('/t/$topicId.json',
-          query: hardDelete ? {'delete_for_real': 'true'} : null);
+          query: deleteForReal ? {'delete_for_real': 'true'} : null);
       return FCDeleteTopicResult(
           result: true, resultText: '', isLoginMod: true);
     } on DiscourseApiException catch (e) {

@@ -6,7 +6,8 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseSearchFilters, DiscourseSearchProxy;
+    show DiscourseSearchProxy;
+import 'package:forumcopilot_sdk/models/search/fc_search_filters.dart';
 import '../theme/design_tokens.dart';
 import '../theme/style_builders.dart';
 import 'listitems/topic_list_item.dart';
@@ -62,7 +63,7 @@ class _SearchPageState extends State<SearchPage> {
   /// Discourse-native filter set. When non-empty, results route through
   /// DiscourseSearchProxy.searchWithFiltersAsync instead of the
   /// XF-flavored search methods.
-  DiscourseSearchFilters _filters = const DiscourseSearchFilters();
+  FCSearchFilters _filters = const FCSearchFilters();
 
   @override
   void initState() {

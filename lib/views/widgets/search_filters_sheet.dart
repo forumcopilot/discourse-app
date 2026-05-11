@@ -1,19 +1,14 @@
-import 'package:discourse_core/discourse_core.dart'
-    show
-        DiscourseSearchFilters,
-        DiscourseSearchPersonal,
-        DiscourseSearchSort,
-        DiscourseSearchStatus;
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_sdk/models/search/fc_search_filters.dart';
 
 import '../../theme/design_tokens.dart';
 
 /// Bottom sheet that lets the user toggle Discourse-native search filters
 /// (status, personal, sort, tags) on top of a free-text query. Returns
-/// the new [DiscourseSearchFilters] when the user taps Apply, or null
+/// the new [FCSearchFilters] when the user taps Apply, or null
 /// when they back out.
 class SearchFiltersSheet extends StatefulWidget {
-  final DiscourseSearchFilters initial;
+  final FCSearchFilters initial;
   final bool loggedIn;
 
   const SearchFiltersSheet({
@@ -22,12 +17,12 @@ class SearchFiltersSheet extends StatefulWidget {
     this.loggedIn = false,
   });
 
-  static Future<DiscourseSearchFilters?> show({
+  static Future<FCSearchFilters?> show({
     required BuildContext context,
-    required DiscourseSearchFilters initial,
+    required FCSearchFilters initial,
     bool loggedIn = false,
   }) {
-    return showModalBottomSheet<DiscourseSearchFilters>(
+    return showModalBottomSheet<FCSearchFilters>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -55,11 +50,11 @@ class SearchFiltersSheet extends StatefulWidget {
 }
 
 class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
-  late Set<DiscourseSearchStatus> _status;
-  late Set<DiscourseSearchPersonal> _personal;
+  late Set<FCSearchStatus> _status;
+  late Set<FCSearchPersonal> _personal;
   late bool _firstPostsOnly;
   late bool _titleOnly;
-  late DiscourseSearchSort? _sort;
+  late FCSearchSort? _sort;
   late TextEditingController _tagController;
 
   @override
@@ -80,13 +75,13 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
     super.dispose();
   }
 
-  DiscourseSearchFilters _buildResult() {
+  FCSearchFilters _buildResult() {
     final tags = _tagController.text
         .trim()
         .split(RegExp(r'[\s,]+'))
         .where((t) => t.isNotEmpty)
         .toList();
-    return DiscourseSearchFilters(
+    return FCSearchFilters(
       status: _status,
       personal: _personal,
       firstPostsOnly: _firstPostsOnly,
@@ -149,7 +144,7 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
               children: [
                 _section('Status', textTheme, colorScheme),
                 _wrap([
-                  for (final s in DiscourseSearchStatus.values)
+                  for (final s in FCSearchStatus.values)
                     FilterChip(
                       label: Text(s.label),
                       selected: _status.contains(s),
@@ -168,7 +163,7 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
                   const SizedBox(height: DesignTokens.spacingM),
                   _section('My activity', textTheme, colorScheme),
                   _wrap([
-                    for (final p in DiscourseSearchPersonal.values)
+                    for (final p in FCSearchPersonal.values)
                       FilterChip(
                         label: Text(p.label),
                         selected: _personal.contains(p),
@@ -223,7 +218,7 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
                       if (v) setState(() => _sort = null);
                     },
                   ),
-                  for (final s in DiscourseSearchSort.values)
+                  for (final s in FCSearchSort.values)
                     ChoiceChip(
                       label: Text(s.label),
                       selected: _sort == s,
