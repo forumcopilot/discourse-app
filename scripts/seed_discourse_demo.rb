@@ -1166,6 +1166,152 @@ else
 end
 
 # ----------------------------------------------------------------------
+# 7e. Private messages (PMs / conversations) — Discourse's
+# archetype:'private_message' topics. Distinct from Chat: PMs are
+# email-style threads, Chat is IRC-style channels. The app's Messages
+# tab reads these.
+# ----------------------------------------------------------------------
+
+puts "\n[7e] Private messages…"
+
+# Helper: idempotently create a PM between `from` and target_users
+# (recipients, NOT including the sender). Returns the PM topic.
+def find_or_create_pm(title:, from:, target_users:, body:, replies: [])
+  existing = Topic
+              .where(archetype: Archetype.private_message, title: title)
+              .joins(:allowed_users)
+              .where(users: { id: from.id })
+              .first
+  return existing if existing
+
+  post = PostCreator.create!(
+    from,
+    title: title,
+    raw: body,
+    archetype: Archetype.private_message,
+    target_usernames: target_users.map(&:username).join(','),
+    skip_validations: true,
+    bypass_rate_limiter: true
+  )
+  topic = post.topic
+  replies.each do |reply|
+    PostCreator.create!(
+      reply[:user],
+      topic_id: topic.id,
+      raw: reply[:raw],
+      skip_validations: true,
+      bypass_rate_limiter: true
+    )
+  end
+  topic.reload
+  puts "  + PM “#{title.truncate(40)}” (#{topic.posts.count} posts; #{[from, *target_users].map { |u| "@#{u.username}" }.join(', ')})"
+  topic
+end
+
+# 1) Alice ↔ Bob — code review back-and-forth (mirrors the chat DM
+#    so the same pair has both surfaces populated).
+find_or_create_pm(
+  title: 'Re: bookmark PR review',
+  from: users[:bob],
+  target_users: [users[:alice]],
+  body: <<~MD,
+    Hey Alice — pushed the latest bookmark PR. Could you take another
+    look when you get a sec? Mostly small refactors after your last
+    round of comments.
+  MD
+  replies: [
+    { user: users[:alice], raw: 'Looking now. The optimistic-flip pattern is much cleaner this time 👌' },
+    { user: users[:bob],   raw: "Glad it's holding up. One thing I'm not sure about: should we revert on `_bookmarkInFlight` race? Right now we double-tap-protect but don't surface the error if the second tap was the one that landed." },
+    { user: users[:alice], raw: 'Good call. Add an `unawaited` SnackBar there. The simpler the better — UI just needs to say "tap again" if it fails.' },
+    { user: users[:bob],   raw: 'On it.' }
+  ]
+)
+
+# 2) Group PM — Alice + Carol + Eve about UX feedback on the dark theme.
+find_or_create_pm(
+  title: 'Dark-mode feedback — collecting notes',
+  from: users[:eve],
+  target_users: [users[:alice], users[:carol]],
+  body: <<~MD,
+    Quick notes thread for the dark-theme polish pass. Drop screenshots
+    or specific complaints below — I'll roll them up into a tracking
+    topic once we have a few.
+  MD
+  replies: [
+    { user: users[:carol], raw: 'Bottom toolbar shadow is too heavy. Looks fine on light but bleeds into the surface in dark.' },
+    { user: users[:alice], raw: 'Agreed on the shadow. Also: the muted-text color on quote blocks blends with the bubble background. Needs +10% lightness.' },
+    { user: users[:eve],   raw: 'Both noted. Carol — can you grab a screenshot of the toolbar issue?' },
+    { user: users[:carol], raw: 'Will do tonight 📸' }
+  ]
+)
+
+# 3) Bob → Mallory (moderator) — admin question
+find_or_create_pm(
+  title: 'Question about archived topics',
+  from: users[:bob],
+  target_users: [users[:mallory]],
+  body: <<~MD,
+    Hey Mallory — what's the policy on un-archiving topics? I saw
+    "Old thread — closed for historical reference" got archived; I
+    have a similar one I'd actually like to reopen for a follow-up.
+  MD
+  replies: [
+    { user: users[:mallory], raw: "Generally we only un-archive if there's new info worth surfacing. If you DM me the topic id I'll take a look." },
+    { user: users[:bob],     raw: 'Topic #14. Reasoning: the original poster came back with a fix that solves the issue from the original thread.' },
+    { user: users[:mallory], raw: 'Sounds reasonable. Will un-archive and pin a note linking to the resolution. Give me 10 min.' }
+  ]
+)
+
+# 4) Dave (TL0 newcomer) → Alice — "how does this work?"
+find_or_create_pm(
+  title: 'New here — how do trust levels work?',
+  from: users[:dave],
+  target_users: [users[:alice]],
+  body: <<~MD,
+    Hi! Just signed up. Saw on your profile you're TL3. How does the
+    promotion thing work — is it just time-on-site, or am I supposed
+    to actively do stuff to level up?
+  MD
+  replies: [
+    { user: users[:alice], raw: "Welcome! It's mostly automatic — based on time spent, topics read, posts written, likes given/received. There's a Discourse blog post that lays out the criteria but tl;dr: post regularly and don't be a jerk and you'll get to TL2 within a couple of weeks." },
+    { user: users[:alice], raw: 'TL3 (Regular) takes longer — like 50 days of activity. TL4 (Leader) is appointed by staff.' },
+    { user: users[:dave],  raw: 'Got it. Thanks!' }
+  ]
+)
+
+# 5) Group support PM — Carol asking Henry + Frank about a bug
+find_or_create_pm(
+  title: 'Repro for the poll crash on iOS',
+  from: users[:carol],
+  target_users: [users[:henry], users[:frank]],
+  body: <<~MD,
+    You two were on the simulator install earlier — can you confirm
+    this repro?
+
+    1. Open the "Which feature should we prioritize next?" topic
+    2. Scroll to the poll
+    3. Tap an option
+
+    iPhone 15 simulator, iOS 17.2. Crashes 100% on my end.
+  MD
+  replies: [
+    { user: users[:henry], raw: 'Reproduces on my simulator (15 Pro, 17.2). Stack trace incoming.' },
+    { user: users[:frank], raw: 'Same here. Already filed as #1234.' }
+  ]
+)
+
+# 6) Ivy → Eve — a quick thank-you (single-reply PM)
+find_or_create_pm(
+  title: 'Thanks for the search-filter walkthrough',
+  from: users[:ivy],
+  target_users: [users[:eve]],
+  body: 'Just used `status:solved tag:flutter` to find an answer I needed in 30 seconds. The whole filter sheet is gold — really nice work 🙏',
+  replies: [
+    { user: users[:eve], raw: 'Glad it helped! `in:bookmarks` + `@username` together is also worth trying when you remember "someone said something useful but I forgot who".' }
+  ]
+)
+
+# ----------------------------------------------------------------------
 # 8. Badges (Phase 5.7) + follows (Phase 5.8) + notification levels (5.4)
 # ----------------------------------------------------------------------
 

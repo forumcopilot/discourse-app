@@ -29,5 +29,16 @@ if [[ ! -f "$SEED_SCRIPT" ]]; then
 fi
 
 cd "$DISCOURSE_DIR"
+
+# Wire up rbenv if the Discourse install pins a Ruby version via
+# .ruby-version. System Ruby on macOS is 2.6 which Discourse can't
+# boot — without this, bundler errors out before the runner starts.
+if [[ -f "$DISCOURSE_DIR/.ruby-version" ]] && command -v rbenv >/dev/null 2>&1; then
+  eval "$(rbenv init - bash 2>/dev/null)" || true
+  RUBY_VERSION="$(cat "$DISCOURSE_DIR/.ruby-version" | tr -d '[:space:]')"
+  rbenv shell "$RUBY_VERSION" 2>/dev/null || true
+  echo "→ using Ruby $(ruby -v)"
+fi
+
 echo "→ running seed against $DISCOURSE_DIR"
 exec bin/rails runner "$SEED_SCRIPT"
