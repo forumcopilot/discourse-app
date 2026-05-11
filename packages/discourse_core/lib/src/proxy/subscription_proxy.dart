@@ -1,5 +1,7 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_subscription_proxy.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
+import 'package:forumcopilot_sdk/models/results/fc_notification_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_subscription_result.dart';
 
 import '../base_discourse_proxy.dart';
@@ -181,51 +183,65 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
     }
   }
 
-  /// Discourse-native: set the per-topic notification level directly.
-  /// [level] must be one of [levelMuted], [levelRegular], [levelTracking],
-  /// [levelWatching]. Returns true on success.
-  Future<bool> setTopicNotificationLevelAsync(
-      String topicId, int level) async {
+  @override
+  Future<FCNotificationLevelResult> setTopicNotificationLevelAsync(
+    String topicId,
+    FCNotificationLevel level,
+  ) async {
     try {
       await apiPost('/t/$topicId/notifications.json', body: {
-        'notification_level': level,
+        'notification_level': level.level,
       });
-      return true;
-    } catch (_) {
-      return false;
+      return FCNotificationLevelResult(result: true, level: level);
+    } on DiscourseApiException catch (e) {
+      return FCNotificationLevelResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCNotificationLevelResult(result: false, resultText: 'Error: $e');
     }
   }
 
-  /// Discourse-native: set the per-category notification level directly.
-  /// [level] supports [levelWatchingFirstPost] in addition to the four
-  /// topic levels. Returns true on success.
-  Future<bool> setCategoryNotificationLevelAsync(
-      String categoryId, int level) async {
+  @override
+  Future<FCNotificationLevelResult> setCategoryNotificationLevelAsync(
+    String categoryId,
+    FCNotificationLevel level,
+  ) async {
     try {
       await apiPost('/category/$categoryId/notifications.json', body: {
-        'notification_level': level,
+        'notification_level': level.level,
       });
-      return true;
-    } catch (_) {
-      return false;
+      return FCNotificationLevelResult(result: true, level: level);
+    } on DiscourseApiException catch (e) {
+      return FCNotificationLevelResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCNotificationLevelResult(result: false, resultText: 'Error: $e');
     }
   }
 
-  /// Discourse-native: read the current per-topic notification level.
-  /// Returns null if the topic can't be loaded. Hits `/t/{id}.json`.
-  Future<int?> getTopicNotificationLevelAsync(String topicId) async {
+  @override
+  Future<FCNotificationLevelResult> getTopicNotificationLevelAsync(
+    String topicId,
+  ) async {
     try {
       final t = await apiGet('/t/$topicId.json');
-      return t['notification_level'] as int?;
-    } catch (_) {
-      return null;
+      final raw = t['notification_level'] as int?;
+      return FCNotificationLevelResult(
+        result: true,
+        level: raw != null ? FCNotificationLevel.fromInt(raw) : null,
+      );
+    } on DiscourseApiException catch (e) {
+      return FCNotificationLevelResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCNotificationLevelResult(result: false, resultText: 'Error: $e');
     }
   }
 
-  /// Discourse-native: read the current per-category notification level.
-  /// Pulls from `/categories.json` (only categories the user can see are
-  /// returned). Returns null when the category isn't found.
-  Future<int?> getCategoryNotificationLevelAsync(String categoryId) async {
+  @override
+  Future<FCNotificationLevelResult> getCategoryNotificationLevelAsync(
+    String categoryId,
+  ) async {
     try {
       final response = await apiGet('/categories.json');
       final list = (response['category_list'] as Map<String, dynamic>?) ??
@@ -235,12 +251,19 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       for (final raw in cats) {
         final c = raw.cast<String, dynamic>();
         if (c['id'].toString() == categoryId) {
-          return c['notification_level'] as int?;
+          final lvl = c['notification_level'] as int?;
+          return FCNotificationLevelResult(
+            result: true,
+            level: lvl != null ? FCNotificationLevel.fromInt(lvl) : null,
+          );
         }
       }
-      return null;
-    } catch (_) {
-      return null;
+      return FCNotificationLevelResult(result: true);
+    } on DiscourseApiException catch (e) {
+      return FCNotificationLevelResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCNotificationLevelResult(result: false, resultText: 'Error: $e');
     }
   }
 

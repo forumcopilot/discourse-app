@@ -1,11 +1,12 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_account_proxy.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_notification_prefs.dart';
 import 'package:forumcopilot_sdk/models/results/fc_account_result.dart';
+import 'package:forumcopilot_sdk/models/results/fc_notification_result.dart';
 import 'package:forumcopilot_sdk/models/settings/fc_settings_category.dart';
 import 'package:forumcopilot_sdk/models/settings/fc_user_setting.dart';
 import 'package:forumcopilot_sdk/models/settings/fc_user_settings_result.dart';
 import '../base_discourse_proxy.dart';
-import '../data/user/discourse_user_notification_prefs.dart';
 
 /// Discourse implementation of [IFCAccountProxy].
 ///
@@ -291,15 +292,14 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
   //                                   UserUpdater::OPTION_ATTR for
   //                                   the accepted field list)
 
-  /// Fetch current notification preferences for the logged-in user.
-  /// Returns Discourse defaults (email digest weekly, like notif
-  /// always, etc.) on any failure rather than throwing — the UI
-  /// renders the defaults and the user can flip them; the next save
-  /// pushes the corrected state.
-  Future<DiscourseUserNotificationPrefs> getNotificationPrefsAsync() async {
+  @override
+  Future<FCNotificationPrefsResult> getNotificationPrefsAsync() async {
     final username = siteContext.currentUsername;
     if (username == null || username.isEmpty) {
-      return const DiscourseUserNotificationPrefs();
+      return FCNotificationPrefsResult(
+        result: false,
+        resultText: 'Not signed in',
+      );
     }
     try {
       final response =
@@ -307,29 +307,86 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
       final user = (response['user'] as Map<String, dynamic>?) ?? const {};
       final userOption =
           (user['user_option'] as Map<String, dynamic>?) ?? const {};
-      return DiscourseUserNotificationPrefs.fromUserOption(userOption);
-    } catch (_) {
-      return const DiscourseUserNotificationPrefs();
+      return FCNotificationPrefsResult(
+        result: true,
+        prefs: _prefsFromUserOption(userOption),
+      );
+    } on DiscourseApiException catch (e) {
+      return FCNotificationPrefsResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCNotificationPrefsResult(
+          result: false, resultText: 'Error: $e');
     }
   }
 
-  /// Persist the supplied notification preferences server-side.
-  /// Returns true on success; the settings page uses this to revert
-  /// the optimistic UI flip when the PUT fails.
-  Future<bool> updateNotificationPrefsAsync(
-    DiscourseUserNotificationPrefs prefs,
+  @override
+  Future<FCNotificationPrefsResult> updateNotificationPrefsAsync(
+    FCNotificationPrefs prefs,
   ) async {
     final username = siteContext.currentUsername;
-    if (username == null || username.isEmpty) return false;
+    if (username == null || username.isEmpty) {
+      return FCNotificationPrefsResult(
+        result: false,
+        resultText: 'Not signed in',
+      );
+    }
     try {
       await apiPut(
         '/u/${Uri.encodeComponent(username)}.json',
-        body: prefs.toUpdateBody(),
+        body: _prefsToUpdateBody(prefs),
       );
-      return true;
-    } catch (_) {
-      return false;
+      return FCNotificationPrefsResult(result: true, prefs: prefs);
+    } on DiscourseApiException catch (e) {
+      return FCNotificationPrefsResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCNotificationPrefsResult(
+          result: false, resultText: 'Error: $e');
     }
+  }
+
+  FCNotificationPrefs _prefsFromUserOption(Map<String, dynamic> userOption) {
+    int asInt(String key, int fallback) {
+      final v = userOption[key];
+      if (v is num) return v.toInt();
+      if (v is String) return int.tryParse(v) ?? fallback;
+      return fallback;
+    }
+
+    bool asBool(String key, bool fallback) {
+      final v = userOption[key];
+      if (v is bool) return v;
+      if (v is num) return v != 0;
+      if (v is String) {
+        if (v.toLowerCase() == 'true') return true;
+        if (v.toLowerCase() == 'false') return false;
+      }
+      return fallback;
+    }
+
+    return FCNotificationPrefs(
+      emailLevel: asInt('email_level', 1),
+      emailMessagesLevel: asInt('email_messages_level', 1),
+      emailDigests: asBool('email_digests', true),
+      digestAfterMinutes: asInt('digest_after_minutes', 10080),
+      mailingListMode: asBool('mailing_list_mode', false),
+      likeNotificationFrequency: asInt('like_notification_frequency', 0),
+      notificationLevelWhenReplying:
+          asInt('notification_level_when_replying', 2),
+    );
+  }
+
+  Map<String, dynamic> _prefsToUpdateBody(FCNotificationPrefs prefs) {
+    return {
+      'email_level': prefs.emailLevel,
+      'email_messages_level': prefs.emailMessagesLevel,
+      'email_digests': prefs.emailDigests,
+      'digest_after_minutes': prefs.digestAfterMinutes,
+      'mailing_list_mode': prefs.mailingListMode,
+      'like_notification_frequency': prefs.likeNotificationFrequency,
+      'notification_level_when_replying': prefs.notificationLevelWhenReplying,
+    };
   }
 }
 

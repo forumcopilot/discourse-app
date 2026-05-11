@@ -51,7 +51,6 @@ export 'src/data/search/discourse_search_filters.dart';
 export 'src/data/group/discourse_group.dart';
 export 'src/data/user/discourse_badge.dart';
 export 'src/data/user/discourse_directory_item.dart';
-export 'src/data/user/discourse_user_notification_prefs.dart';
 
 // Converters
 export 'src/converter/discourse_user_converter.dart';

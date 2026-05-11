@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
 import 'package:forumcopilot_sdk/models/results/fc_moderation_result.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseModerationProxy, DiscourseSubscriptionProxy;
@@ -188,8 +189,8 @@ class _PostPageState extends State<PostPage> {
         context: context,
         topicId: widget.topicId,
         currentLevel: _isSubscribed
-            ? DiscourseSubscriptionProxy.levelWatching
-            : DiscourseSubscriptionProxy.levelRegular,
+            ? FCNotificationLevel.watching
+            : FCNotificationLevel.normal,
         onChanged: () {
           if (!mounted) return;
           // Refresh /t/{id}.json so the subscribed banner + bell icon

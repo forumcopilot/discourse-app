@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_flutter/views/appbars/forum_topics_app_bar.dart';
@@ -95,8 +96,8 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
         context: context,
         categoryId: widget.forum.id,
         currentLevel: widget.forum.isSubscribed
-            ? DiscourseSubscriptionProxy.levelTracking
-            : DiscourseSubscriptionProxy.levelRegular,
+            ? FCNotificationLevel.tracking
+            : FCNotificationLevel.normal,
         onChanged: () {
           if (!mounted) return;
           if (_refreshCallback != null) _refreshCallback!();

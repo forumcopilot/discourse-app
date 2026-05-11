@@ -1,7 +1,7 @@
-import 'package:discourse_core/discourse_core.dart';
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 import 'package:forumcopilot_flutter/theme/design_tokens.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_notification_prefs.dart';
 
 import '../widgets/empty_state_view.dart';
 import '../widgets/simple_list_app_bar.dart';
@@ -37,7 +37,7 @@ class NotificationSettingsPage extends StatefulWidget {
 }
 
 class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
-  DiscourseUserNotificationPrefs? _prefs;
+  FCNotificationPrefs? _prefs;
   bool _loading = true;
   bool _saving = false;
   String? _error;
@@ -54,19 +54,18 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       _error = null;
     });
     try {
-      final proxy = SiteProxyService.getAccountProxy();
-      if (proxy is! DiscourseAccountProxy) {
-        setState(() {
-          _loading = false;
-          _error = 'Notification preferences require a Discourse forum.';
-        });
-        return;
-      }
-      final prefs = await proxy.getNotificationPrefsAsync();
+      final result =
+          await SiteProxyService.getAccountProxy().getNotificationPrefsAsync();
       if (!mounted) return;
       setState(() {
-        _prefs = prefs;
         _loading = false;
+        if (!result.result) {
+          _error = result.resultText?.isNotEmpty == true
+              ? result.resultText
+              : 'Failed to load notification preferences.';
+          return;
+        }
+        _prefs = result.prefs ?? FCNotificationPrefs();
       });
     } catch (e) {
       if (!mounted) return;
@@ -80,23 +79,23 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   /// Push `next` to the server. Optimistic flip; on failure revert
   /// to `previous` and show a snackbar.
   Future<void> _save(
-    DiscourseUserNotificationPrefs next,
-    DiscourseUserNotificationPrefs previous,
+    FCNotificationPrefs next,
+    FCNotificationPrefs previous,
   ) async {
     setState(() {
       _prefs = next;
       _saving = true;
     });
-    final proxy = SiteProxyService.getAccountProxy();
-    if (proxy is! DiscourseAccountProxy) {
-      // Shouldn't happen — load already gated on this. Defensive.
-      _revert(previous, 'Discourse proxy unavailable');
-      return;
-    }
-    final ok = await proxy.updateNotificationPrefsAsync(next);
+    final result = await SiteProxyService.getAccountProxy()
+        .updateNotificationPrefsAsync(next);
     if (!mounted) return;
-    if (!ok) {
-      _revert(previous, "Couldn't save — check your connection");
+    if (!result.result) {
+      _revert(
+        previous,
+        result.resultText?.isNotEmpty == true
+            ? result.resultText!
+            : "Couldn't save — check your connection",
+      );
     } else {
       setState(() {
         _saving = false;
@@ -104,7 +103,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     }
   }
 
-  void _revert(DiscourseUserNotificationPrefs previous, String message) {
+  void _revert(FCNotificationPrefs previous, String message) {
     setState(() {
       _prefs = previous;
       _saving = false;

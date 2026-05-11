@@ -7,6 +7,7 @@ export 'fc_config_result.dart';
 export 'fc_draft_result.dart';
 export 'fc_forum_result.dart';
 export 'fc_moderation_result.dart';
+export 'fc_notification_result.dart';
 export 'fc_passkey_result.dart';
 export 'fc_post_result.dart';
 export 'fc_private_conversation_result.dart';

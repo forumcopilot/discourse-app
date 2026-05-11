@@ -1,22 +1,21 @@
-import 'package:discourse_core/discourse_core.dart'
-    show DiscourseSubscriptionProxy;
 import 'package:flutter/material.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
 
 import '../../theme/design_tokens.dart';
 
 /// A bottom-sheet picker that mirrors Discourse's per-topic / per-category
 /// notification-level dropdown. Supports the full 4-level enum:
-///   * Watching (3)  — get notified for every reply
-///   * Tracking (2)  — show in unread, no email
-///   * Normal   (1)  — Discourse's default
-///   * Muted    (0)  — hide entirely
+///   * Watching        — get notified for every reply
+///   * Tracking        — show in unread, no email
+///   * Normal          — Discourse's default
+///   * Muted           — hide entirely
 ///
 /// For per-category sheets, [allowWatchingFirstPost] adds a fifth option
-/// (level 4) which Discourse only honors at the category level.
+/// which Discourse only honors at the category level.
 class NotificationLevelSheet extends StatefulWidget {
-  final int? initialLevel;
-  final Future<bool> Function(int level) onLevelChanged;
+  final FCNotificationLevel? initialLevel;
+  final Future<bool> Function(FCNotificationLevel level) onLevelChanged;
   final bool allowWatchingFirstPost;
   final String title;
 
@@ -32,14 +31,16 @@ class NotificationLevelSheet extends StatefulWidget {
   static Future<void> showForTopic({
     required BuildContext context,
     required String topicId,
-    int? currentLevel,
+    FCNotificationLevel? currentLevel,
     VoidCallback? onChanged,
   }) async {
-    final proxy = SiteProxyFactory.getSubscriptionProxy();
-    if (proxy is! DiscourseSubscriptionProxy) return;
-    final level = currentLevel ??
-        (await proxy.getTopicNotificationLevelAsync(topicId)) ??
-        DiscourseSubscriptionProxy.levelRegular;
+    final proxy = SiteProxyService.getSubscriptionProxy();
+    FCNotificationLevel level =
+        currentLevel ?? FCNotificationLevel.normal;
+    if (currentLevel == null) {
+      final result = await proxy.getTopicNotificationLevelAsync(topicId);
+      level = result.level ?? FCNotificationLevel.normal;
+    }
     if (!context.mounted) return;
     await showModalBottomSheet(
       context: context,
@@ -51,10 +52,10 @@ class NotificationLevelSheet extends StatefulWidget {
           initialLevel: level,
           title: 'Topic notification level',
           onLevelChanged: (newLevel) async {
-            final ok = await proxy.setTopicNotificationLevelAsync(
-                topicId, newLevel);
-            if (ok && onChanged != null) onChanged();
-            return ok;
+            final result =
+                await proxy.setTopicNotificationLevelAsync(topicId, newLevel);
+            if (result.result && onChanged != null) onChanged();
+            return result.result;
           },
         );
       },
@@ -65,14 +66,17 @@ class NotificationLevelSheet extends StatefulWidget {
   static Future<void> showForCategory({
     required BuildContext context,
     required String categoryId,
-    int? currentLevel,
+    FCNotificationLevel? currentLevel,
     VoidCallback? onChanged,
   }) async {
-    final proxy = SiteProxyFactory.getSubscriptionProxy();
-    if (proxy is! DiscourseSubscriptionProxy) return;
-    final level = currentLevel ??
-        (await proxy.getCategoryNotificationLevelAsync(categoryId)) ??
-        DiscourseSubscriptionProxy.levelRegular;
+    final proxy = SiteProxyService.getSubscriptionProxy();
+    FCNotificationLevel level =
+        currentLevel ?? FCNotificationLevel.normal;
+    if (currentLevel == null) {
+      final result =
+          await proxy.getCategoryNotificationLevelAsync(categoryId);
+      level = result.level ?? FCNotificationLevel.normal;
+    }
     if (!context.mounted) return;
     await showModalBottomSheet(
       context: context,
@@ -85,10 +89,10 @@ class NotificationLevelSheet extends StatefulWidget {
           title: 'Category notification level',
           allowWatchingFirstPost: true,
           onLevelChanged: (newLevel) async {
-            final ok = await proxy.setCategoryNotificationLevelAsync(
+            final result = await proxy.setCategoryNotificationLevelAsync(
                 categoryId, newLevel);
-            if (ok && onChanged != null) onChanged();
-            return ok;
+            if (result.result && onChanged != null) onChanged();
+            return result.result;
           },
         );
       },
@@ -100,17 +104,16 @@ class NotificationLevelSheet extends StatefulWidget {
 }
 
 class _NotificationLevelSheetState extends State<NotificationLevelSheet> {
-  late int _selected;
+  late FCNotificationLevel _selected;
   bool _saving = false;
 
   @override
   void initState() {
     super.initState();
-    _selected =
-        widget.initialLevel ?? DiscourseSubscriptionProxy.levelRegular;
+    _selected = widget.initialLevel ?? FCNotificationLevel.normal;
   }
 
-  Future<void> _pick(int level) async {
+  Future<void> _pick(FCNotificationLevel level) async {
     if (_saving) return;
     setState(() => _saving = true);
     final ok = await widget.onLevelChanged(level);
@@ -138,32 +141,32 @@ class _NotificationLevelSheetState extends State<NotificationLevelSheet> {
 
     final entries = <_LevelEntry>[
       const _LevelEntry(
-        level: DiscourseSubscriptionProxy.levelWatching,
+        level: FCNotificationLevel.watching,
         title: 'Watching',
         description: 'Notified of every new reply.',
         icon: Icons.notifications_active,
       ),
       if (widget.allowWatchingFirstPost)
         const _LevelEntry(
-          level: DiscourseSubscriptionProxy.levelWatchingFirstPost,
+          level: FCNotificationLevel.watchingFirstPost,
           title: 'Watching First Post',
           description: 'Notified only for new topics in this category.',
           icon: Icons.fiber_new,
         ),
       const _LevelEntry(
-        level: DiscourseSubscriptionProxy.levelTracking,
+        level: FCNotificationLevel.tracking,
         title: 'Tracking',
         description: 'Shown in your unread list. No email.',
         icon: Icons.visibility,
       ),
       const _LevelEntry(
-        level: DiscourseSubscriptionProxy.levelRegular,
+        level: FCNotificationLevel.normal,
         title: 'Normal',
         description: 'Notified only when @mentioned or directly replied to.',
         icon: Icons.notifications_none,
       ),
       const _LevelEntry(
-        level: DiscourseSubscriptionProxy.levelMuted,
+        level: FCNotificationLevel.muted,
         title: 'Muted',
         description: 'No notifications, hidden from latest/unread.',
         icon: Icons.notifications_off,
@@ -232,7 +235,7 @@ class _NotificationLevelSheetState extends State<NotificationLevelSheet> {
 }
 
 class _LevelEntry {
-  final int level;
+  final FCNotificationLevel level;
   final String title;
   final String description;
   final IconData icon;

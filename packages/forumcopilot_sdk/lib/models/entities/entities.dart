@@ -11,5 +11,7 @@ export 'fc_attachment.dart';
 export 'fc_bookmark.dart';
 export 'fc_draft.dart';
 export 'fc_like.dart';
+export 'fc_notification_level.dart';
+export 'fc_notification_prefs.dart';
 export 'fc_thanks.dart';
 export 'fc_custom_field.dart';
