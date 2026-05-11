@@ -655,6 +655,85 @@ else
 end
 
 # ----------------------------------------------------------------------
+# 7d. Discourse Chat (Phase 5.15) — only when the chat plugin is enabled
+# ----------------------------------------------------------------------
+
+puts "\n[7d] Chat…"
+
+if defined?(Chat) && SiteSetting.respond_to?(:chat_enabled) &&
+   SiteSetting.chat_enabled
+  begin
+    # Make sure all our demo users are allowed to chat: the default
+    # SiteSetting.chat_allowed_groups is "trust_level_1" — Dave (TL0)
+    # would be excluded otherwise. Widen to "everyone" for the demo.
+    if SiteSetting.respond_to?(:chat_allowed_groups) &&
+       !SiteSetting.chat_allowed_groups.to_s.include?(Group::AUTO_GROUPS[:everyone].to_s)
+      SiteSetting.chat_allowed_groups = Group::AUTO_GROUPS[:everyone].to_s
+      puts "  · widened chat_allowed_groups → everyone"
+    end
+
+    # Channel name: tied to the General category. Create if it doesn't
+    # exist; the plugin requires a chatable (Category) reference.
+    chat_channel_name = 'demo-watercooler'
+    channel = Chat::Channel.find_by(name: chat_channel_name)
+    if channel.nil?
+      channel = Chat::CategoryChannel.create!(
+        chatable: cat_general,
+        name: chat_channel_name,
+        description: 'Open chat room for the demo forum',
+        slug: chat_channel_name,
+        status: Chat::Channel.statuses[:open]
+      )
+      puts "  + chat channel ##{channel.name}"
+    else
+      puts "  · chat channel ##{channel.name} already exists"
+    end
+
+    # Join everyone we've created so they show up in /chat/api/me/channels.
+    %i[alice bob carol dave eve mallory].each do |handle|
+      u = users[handle]
+      next unless u
+      begin
+        Chat::ChannelMembershipManager.new(channel).follow(u)
+      rescue => e
+        puts "  ! follow @#{u.username} failed: #{e.message}"
+      end
+    end
+
+    # Seed some messages so the channel isn't empty.
+    chat_seeds = [
+      [users[:alice], "👋 Welcome to the watercooler!"],
+      [users[:bob],   "Quick question — does the mobile app handle Cloudflare challenges OK?"],
+      [users[:alice], "It does — there's an in-app webview that pops up when CF sends a 403/503."],
+      [users[:carol], "Nice. I'll test on iOS later today."],
+      [users[:eve],   "Let me know if you hit anything weird with the User API Key handshake."],
+      [users[:bob],   "Will do 🙂"]
+    ]
+    chat_seeds.each do |user, body|
+      # Idempotent: skip if a message with this body already exists.
+      if Chat::Message.where(chat_channel_id: channel.id, user_id: user.id)
+                       .where("message ILIKE ?", body.first(40) + '%').exists?
+        next
+      end
+      begin
+        Chat::CreateMessage.call(
+          guardian: Guardian.new(user),
+          params: { chat_channel_id: channel.id, message: body }
+        )
+      rescue => e
+        puts "  ! send by @#{user.username} failed: #{e.class}: #{e.message}"
+      end
+    end
+    channel.reload
+    puts "  · channel ##{channel.name}: #{Chat::Message.where(chat_channel_id: channel.id).count} messages"
+  rescue => e
+    puts "  ! chat seeding skipped: #{e.class}: #{e.message}"
+  end
+else
+  puts "  - Discourse Chat not installed/enabled, skipping"
+end
+
+# ----------------------------------------------------------------------
 # 8. Badges (Phase 5.7) + follows (Phase 5.8) + notification levels (5.4)
 # ----------------------------------------------------------------------
 

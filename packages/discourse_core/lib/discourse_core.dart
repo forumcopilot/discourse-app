@@ -15,6 +15,9 @@ export 'src/proxy/forum_proxy.dart';
 export 'src/proxy/topic_proxy.dart';
 export 'src/proxy/post_proxy.dart';
 
+// Discourse-only proxies
+export 'src/proxy/chat_proxy.dart';
+
 // Stub proxies
 export 'src/proxy/attachment_proxy.dart';
 export 'src/proxy/search_proxy.dart';
@@ -40,6 +43,8 @@ export 'src/base_discourse_proxy.dart';
 export 'src/data/auth/oauth_token.dart';
 export 'src/data/auth/auth_request.dart';
 export 'src/data/auth/auth_response.dart';
+export 'src/data/chat/discourse_chat_channel.dart';
+export 'src/data/chat/discourse_chat_message.dart';
 export 'src/data/post/discourse_bookmark.dart';
 export 'src/data/post/discourse_post_vote.dart';
 export 'src/data/post/discourse_reaction.dart';
