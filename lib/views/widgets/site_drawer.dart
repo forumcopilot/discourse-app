@@ -5,9 +5,12 @@ import 'package:get/get.dart';
 import '../../config/app_forum_config.dart';
 import '../../controllers/login_controller.dart';
 import '../../theme/design_tokens.dart';
+import '../badges_directory_page.dart';
+import '../groups_list_page.dart';
 import '../login_page.dart';
 import '../settings/notification_settings_page.dart';
 import '../tags_page.dart';
+import '../users_directory_page.dart';
 
 /// Phase 5.18a — hamburger drawer ("More" menu).
 ///
@@ -65,19 +68,28 @@ class SiteDrawer extends StatelessWidget {
                     icon: Icons.people_outline,
                     title: 'Users',
                     subtitle: 'Browse the user directory',
-                    onTap: () => _comingSoon(context, 'Users directory'),
+                    onTap: () => _push(
+                      context,
+                      UsersDirectoryPage(siteContext: siteContext),
+                    ),
                   ),
                   _DrawerRow(
                     icon: Icons.groups_outlined,
                     title: 'Groups',
                     subtitle: 'See community groups',
-                    onTap: () => _comingSoon(context, 'Groups'),
+                    onTap: () => _push(
+                      context,
+                      GroupsListPage(siteContext: siteContext),
+                    ),
                   ),
                   _DrawerRow(
                     icon: Icons.emoji_events_outlined,
                     title: 'Badges',
                     subtitle: 'Achievements you can earn',
-                    onTap: () => _comingSoon(context, 'Badges'),
+                    onTap: () => _push(
+                      context,
+                      BadgesDirectoryPage(siteContext: siteContext),
+                    ),
                   ),
                   const Divider(height: 1),
                   _SectionLabel(label: 'Account'),

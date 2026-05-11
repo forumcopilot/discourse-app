@@ -9,6 +9,7 @@ import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../data/user/discourse_badge.dart';
+import '../data/user/discourse_directory_item.dart';
 
 /// Discourse implementation of IFCUserProxy
 /// Handles user operations and profile management for Discourse forums
@@ -200,6 +201,80 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         total: 0,
         list: [],
       );
+    }
+  }
+
+  /// Phase 5.18c-1 — fetch a page of the Discourse user directory.
+  /// Hits `/directory_items.json?period={period}&order={order}&page={page}`
+  /// and returns rich `DiscourseDirectoryItem` rows (username + avatar
+  /// + the seven stats Discourse sorts the directory by).
+  ///
+  /// This is the Discourse-native equivalent of the legacy
+  /// XF-shaped `getOnlineUsersAsync` (which is hard-pinned to
+  /// `daily/days_visited`). Callers that want all-time top likes,
+  /// most posts in the last month, etc. should use this method
+  /// instead — `getOnlineUsersAsync` stays for the existing Members
+  /// page only.
+  ///
+  /// [period] is one of `all` / `yearly` / `quarterly` / `monthly` /
+  /// `weekly` / `daily` (Discourse defaults to `weekly`).
+  /// [order] is one of `likes_received` / `likes_given` /
+  /// `topics_entered` / `topic_count` / `post_count` / `posts_read` /
+  /// `days_visited`.
+  /// [page] is 1-indexed; Discourse returns 50 rows per page.
+  Future<List<DiscourseDirectoryItem>> getDirectoryItemsAsync({
+    String period = 'all',
+    String order = 'likes_received',
+    int page = 1,
+  }) async {
+    try {
+      final response = await apiGet('/directory_items.json', query: {
+        'period': period,
+        'order': order,
+        if (page > 1) 'page': page.toString(),
+      });
+      final items = ((response['directory_items'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((d) => d.cast<String, dynamic>())
+          .toList();
+      return items
+          .map((j) => DiscourseDirectoryItem.fromJson(
+                j,
+                siteUrl: siteContext.site.url,
+              ))
+          .toList(growable: false);
+    } catch (e) {
+      // ignore: avoid_print
+      print('❌ [DISCOURSE_USER] getDirectoryItemsAsync error: $e');
+      return const [];
+    }
+  }
+
+  /// Phase 5.18c-3 — fetch every visible badge on the forum from
+  /// `/badges.json`. Unlike `getUserBadgesAsync` (which returns only
+  /// the badges granted to a specific user), this lists the full
+  /// badge catalogue with each badge's `grant_count` so the
+  /// directory can rank by "how many people have earned this".
+  ///
+  /// Returns badges sorted by `grant_count` descending — the most
+  /// commonly-held badges surface first, which matches how
+  /// Discourse's own `/badges` web page ranks them.
+  Future<List<DiscourseBadge>> getAllBadgesAsync() async {
+    try {
+      final response = await apiGet('/badges.json');
+      final raw = (response['badges'] as List?) ?? const [];
+      final badges = raw
+          .whereType<Map>()
+          .map((d) => DiscourseBadge.fromJson(
+                definition: d.cast<String, dynamic>(),
+              ))
+          .toList();
+      badges.sort((a, b) => b.grantCount.compareTo(a.grantCount));
+      return badges;
+    } catch (e) {
+      // ignore: avoid_print
+      print('❌ [DISCOURSE_USER] getAllBadgesAsync error: $e');
+      return const [];
     }
   }
 
