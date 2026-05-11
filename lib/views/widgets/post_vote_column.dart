@@ -110,14 +110,19 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            iconSize: 22,
+            // Phase 5.29 — matches the post action-button icon size
+            // so the vote column reads at the same visual weight as
+            // the Like / Bookmark / Reply row.
+            iconSize: DesignTokens.iconSizeMedium,
             visualDensity: VisualDensity.compact,
             padding: EdgeInsets.zero,
             tooltip: 'Upvote',
             icon: Icon(
               upActive ? Icons.arrow_drop_up : Icons.arrow_drop_up_outlined,
-              color:
-                  upActive ? colorScheme.primary : colorScheme.onSurfaceVariant,
+              color: upActive
+                  ? colorScheme.primary
+                  : colorScheme.onSurfaceVariant
+                      .withOpacity(DesignTokens.opacityMediumLow),
             ),
             onPressed: _inFlight ? null : () => _vote('up'),
           ),
@@ -129,11 +134,11 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
                   : score < 0
                       ? colorScheme.error
                       : colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
+              fontWeight: DesignTokens.fontWeightSemiBold,
             ),
           ),
           IconButton(
-            iconSize: 22,
+            iconSize: DesignTokens.iconSizeMedium,
             visualDensity: VisualDensity.compact,
             padding: EdgeInsets.zero,
             tooltip: 'Downvote',
@@ -143,7 +148,8 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
                   : Icons.arrow_drop_down_outlined,
               color: downActive
                   ? colorScheme.error
-                  : colorScheme.onSurfaceVariant,
+                  : colorScheme.onSurfaceVariant
+                      .withOpacity(DesignTokens.opacityMediumLow),
             ),
             onPressed: _inFlight ? null : () => _vote('down'),
           ),

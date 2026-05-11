@@ -220,12 +220,19 @@ class PostListItemHeader extends StatelessWidget {
               ],
             ),
           ),
-          // Menu Button
+          // Menu Button — explicit `iconSizeL` (24px) so the
+          // overflow affordance reads as a clear primary action,
+          // visually distinct from the 22px action buttons in the
+          // post's trailing row. Without an explicit size,
+          // PopupMenuButton renders the icon at Material's default
+          // (24px) which happens to be the same; we set it here to
+          // make the contract explicit and survive theme overrides.
           if (buildPopupMenuItems(this.context).isNotEmpty)
             PopupMenuButton<String>(
               icon: Icon(
                 Icons.more_vert_rounded,
                 color: colorScheme.onSurfaceVariant,
+                size: DesignTokens.iconSizeL,
               ),
               onSelected: onMenuSelected,
               itemBuilder: buildPopupMenuItems,

@@ -34,6 +34,11 @@ class ReactionChipsRow extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    // Phase 5.29 — token-aligned chip styling. The pill radius
+    // (14) is bigger than `radiusS` (8) and smaller than `radiusM`
+    // (12); it intentionally hugs the chip content. Padding uses
+    // `spacingS` horizontal / `spacingXS` vertical to read as a
+    // compact pill at the same vertical rhythm as `TrustLevelChip`.
     return Padding(
       padding: const EdgeInsets.only(top: DesignTokens.spacingS),
       child: Wrap(
@@ -43,33 +48,43 @@ class ReactionChipsRow extends StatelessWidget {
           for (final r in reactions)
             InkWell(
               onTap: () => onTap(r.id),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(DesignTokens.radiusL - 6),
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 3),
+                  horizontal: DesignTokens.spacingS,
+                  vertical: DesignTokens.spacingXS - 1,
+                ),
                 decoration: BoxDecoration(
                   color: r.viewerReacted
                       ? colorScheme.primaryContainer
                       : colorScheme.surfaceContainerHighest
-                          .withOpacity(0.55),
-                  borderRadius: BorderRadius.circular(14),
+                          .withOpacity(DesignTokens.opacityMediumLow),
+                  borderRadius:
+                      BorderRadius.circular(DesignTokens.radiusL - 6),
                   border: Border.all(
                     color: r.viewerReacted
-                        ? colorScheme.primary.withOpacity(0.6)
-                        : colorScheme.outlineVariant.withOpacity(0.45),
-                    width: r.viewerReacted ? 1.0 : 0.5,
+                        ? colorScheme.primary
+                            .withOpacity(DesignTokens.opacityMedium)
+                        : colorScheme.outlineVariant
+                            .withOpacity(DesignTokens.opacityDivider),
+                    width: r.viewerReacted
+                        ? DesignTokens.borderWidthThin
+                        : DesignTokens.borderWidthThin / 2,
                   ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(_glyphFor(r.id),
-                        style: const TextStyle(fontSize: 15)),
-                    const SizedBox(width: 4),
+                    Text(
+                      _glyphFor(r.id),
+                      style: const TextStyle(
+                          fontSize: DesignTokens.fontSizeS - 1),
+                    ),
+                    const SizedBox(width: DesignTokens.spacingXS),
                     Text(
                       r.count.toString(),
                       style: textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
+                        fontWeight: DesignTokens.fontWeightSemiBold,
                         color: r.viewerReacted
                             ? colorScheme.onPrimaryContainer
                             : colorScheme.onSurfaceVariant,

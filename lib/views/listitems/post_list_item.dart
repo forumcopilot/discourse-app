@@ -6,6 +6,7 @@ import '../widgets/custom_bb_stylesheet.dart' show BBCodeCallbacks;
 import '../widgets/rich_text_content.dart';
 import '../widgets/reaction_chips_row.dart';
 import '../widgets/reaction_picker_sheet.dart';
+import '../widgets/post_action_button.dart';
 import '../widgets/post_vote_column.dart';
 import '../widgets/link_preview_card.dart';
 import '../widgets/video_card.dart';
@@ -761,11 +762,15 @@ class _PostListItemState extends State<PostListItem> {
 
   Widget _buildReplyButtonWithMenu(
       BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final iconColor =
-        colorScheme.onSurfaceVariant.withOpacity(isDarkMode ? 0.4 : 0.5);
-
-    return GestureDetector(
+    // Phase 5.29 — Reply uses the same PostActionButton recipe as
+    // Like and Bookmark so all three buttons share the 48×48 touch
+    // target + 22px icon + `opacityMediumLow` inactive tint. Tap
+    // opens the Reply / Reply-with-Quote chooser dialog; there's no
+    // active state.
+    return PostActionButton(
+      icon: Icons.reply_rounded,
+      semanticLabel:
+          AppLocalizations.of(context)?.reply ?? 'Reply',
       onTap: () {
         showDialog(
           context: context,
@@ -818,11 +823,6 @@ class _PostListItemState extends State<PostListItem> {
           },
         );
       },
-      child: Icon(
-        Icons.reply_rounded,
-        color: iconColor,
-        size: DesignTokens.iconSizeMedium,
-      ),
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_like.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../../utils/accessibility_helpers.dart';
 import '../../l10n/generated/app_localizations.dart';
+import 'package:forumcopilot_flutter/views/widgets/post_action_button.dart';
 import 'package:forumcopilot_flutter/views/widgets/user_avatar.dart';
 import 'package:forumcopilot_flutter/views/user_profile_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -153,66 +154,36 @@ class PostListItemSocial extends StatelessWidget {
           children: [
             // Reply button (trailing widget)
             if (trailing != null) trailing!,
-            // Show like button only if logged in and can like
+            // Phase 5.29 — Like / Bookmark both use the shared
+            // PostActionButton recipe (48x48 target, iconSizeMedium,
+            // opacityMediumLow inactive). Spacing between buttons is
+            // a uniform `spacingXL` (24px).
             if (isLoggedIn && post.canLike) ...[
               if (trailing != null) SizedBox(width: DesignTokens.spacingXL),
-              Builder(
-                builder: (context) {
-                  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-                  final iconColor = isLiked
-                      ? colorScheme.error
-                      : colorScheme.onSurfaceVariant.withOpacity(isDarkMode ? 0.4 : 0.5);
-                  final likeButton = AccessibilityHelpers.accessibleIconButton(
-                    icon: Icon(
-                      Icons.favorite,
-                      color: iconColor,
-                      size: DesignTokens.iconSizeMedium,
-                    ),
-                    onTap: onLike,
-                    label: AccessibilityHelpers.getLikeButtonLabel(
-                        context, isLiked, likeCount),
-                    isSelected: isLiked,
-                    context: context,
-                  );
-                  // When the discourse-reactions picker is wired,
-                  // long-press opens the full emoji picker. Tapping
-                  // still toggles like. Falls back to plain tap on
-                  // non-Discourse forums.
-                  if (onLongPressLike != null) {
-                    return GestureDetector(
-                      onLongPress: onLongPressLike,
-                      child: likeButton,
-                    );
-                  }
-                  return likeButton;
-                },
+              PostActionButton(
+                icon: Icons.favorite_border,
+                activeIcon: Icons.favorite,
+                active: isLiked,
+                activeColor: colorScheme.error,
+                onTap: onLike,
+                // Long-press opens the reaction picker when wired
+                // (discourse-reactions plugin); plain tap still
+                // toggles like.
+                onLongPress: onLongPressLike,
+                semanticLabel: AccessibilityHelpers.getLikeButtonLabel(
+                    context, isLiked, likeCount),
               ),
             ],
-            // Discourse bookmark button. Only meaningful when logged in.
             if (isLoggedIn && onBookmark != null) ...[
               SizedBox(width: DesignTokens.spacingXL),
-              Builder(
-                builder: (context) {
-                  final isDarkMode =
-                      Theme.of(context).brightness == Brightness.dark;
-                  final iconColor = isBookmarked
-                      ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant
-                          .withOpacity(isDarkMode ? 0.4 : 0.5);
-                  return AccessibilityHelpers.accessibleIconButton(
-                    icon: Icon(
-                      isBookmarked
-                          ? Icons.bookmark
-                          : Icons.bookmark_border,
-                      color: iconColor,
-                      size: DesignTokens.iconSizeMedium,
-                    ),
-                    onTap: onBookmark,
-                    label: isBookmarked ? 'Remove bookmark' : 'Bookmark post',
-                    isSelected: isBookmarked,
-                    context: context,
-                  );
-                },
+              PostActionButton(
+                icon: Icons.bookmark_border,
+                activeIcon: Icons.bookmark,
+                active: isBookmarked,
+                onTap: onBookmark,
+                semanticLabel: isBookmarked
+                    ? 'Remove bookmark'
+                    : 'Bookmark post',
               ),
             ],
           ],
