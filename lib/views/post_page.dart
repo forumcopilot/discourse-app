@@ -64,6 +64,11 @@ class _PostPageState extends State<PostPage> {
   bool _canDelete = false;
   bool _canArchive = false;
   bool _canRename = false;
+  // Phase 5.26 — move/merge ride on the same mod cap cluster as
+  // close/archive/rename/unlist (Discourse's `can_perform_action`
+  // for mods).
+  bool _canMove = false;
+  bool _canMerge = false;
   bool _canToggleVisibility = false;
   bool _isRefreshing = false; // Add loading state for refresh
   String _actualTopicTitle = ''; // Track the actual topic title from server
@@ -458,6 +463,182 @@ class _PostPageState extends State<PostPage> {
     }
   }
 
+  /// Phase 5.26 — show a category picker bottom sheet, then
+  /// PUT `/t/{id}.json` with the chosen `category_id`. Reuses the
+  /// existing `forumProxy.getForumAsync` to populate the list.
+  void _handleMoveTopic() async {
+    final forumProxy = SiteProxyFactory.getForumProxy();
+    final messenger = ScaffoldMessenger.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    final forumResult = await forumProxy.getForumAsync(false, '', false);
+    if (!mounted) return;
+    if (!forumResult.result || forumResult.forums.isEmpty) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text("Couldn't load categories.")),
+      );
+      return;
+    }
+    final categories = forumResult.forums;
+
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return DraggableScrollableSheet(
+          expand: false,
+          maxChildSize: 0.85,
+          initialChildSize: 0.6,
+          builder: (_, scrollController) => SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    DesignTokens.spacingL, 0,
+                    DesignTokens.spacingL, DesignTokens.spacingS,
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Move to category',
+                      style: textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: DesignTokens.fontWeightSemiBold,
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.separated(
+                    controller: scrollController,
+                    itemCount: categories.length,
+                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    itemBuilder: (_, i) {
+                      final c = categories[i];
+                      return ListTile(
+                        leading: Icon(Icons.folder_outlined,
+                            color: colorScheme.onSurfaceVariant),
+                        title: Text(c.name),
+                        onTap: () =>
+                            Navigator.of(sheetContext).pop(c.id),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (picked == null || !mounted) return;
+
+    final modProxy = SiteProxyFactory.getModerationProxy();
+    final result = await modProxy.moveTopicAsync(
+      widget.topicId,
+      picked,
+      false,
+    );
+    if (!mounted) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(result.result
+            ? 'Moved.'
+            : result.resultText?.isNotEmpty == true
+                ? result.resultText!
+                : "Couldn't move topic"),
+      ),
+    );
+    if (result.result) _refreshCallback?.call();
+  }
+
+  /// Phase 5.26 — merge this topic into another. Discourse: POST
+  /// `/t/{source}/merge-topic.json { destination_topic_id: <id> }`.
+  /// Power-user surface; the picker is just a numeric topic-id
+  /// input. Most mods know their target ids from web admin tools.
+  void _handleMergeTopic() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final controller = TextEditingController();
+
+    final confirmed = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Merge into topic'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "All posts from this topic will be moved into the "
+                "target topic. This can't be undone via the app — "
+                'recover via web admin if needed.',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: DesignTokens.spacingM),
+              TextField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Destination topic id',
+                  hintText: 'e.g. 1234',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final v = controller.text.trim();
+                if (v.isEmpty || int.tryParse(v) == null) return;
+                Navigator.of(dialogContext).pop(v);
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: colorScheme.error,
+                foregroundColor: colorScheme.onError,
+              ),
+              child: const Text('Merge'),
+            ),
+          ],
+        );
+      },
+    );
+    controller.dispose();
+    if (confirmed == null || !mounted) return;
+
+    final modProxy = SiteProxyFactory.getModerationProxy();
+    // mergeTopicAsync(topicId1, topicId2) is "merge topic2 into
+    // topic1" — caller-facing semantics flip the args.
+    final result = await modProxy.mergeTopicAsync(
+      confirmed,
+      widget.topicId,
+      false,
+    );
+    if (!mounted) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(result.result
+            ? 'Merged.'
+            : result.resultText?.isNotEmpty == true
+                ? result.resultText!
+                : "Couldn't merge topic"),
+      ),
+    );
+    if (result.result) Navigator.of(context).pop();
+  }
+
   void _handleDelete() async {
     final moderationProxy = SiteProxyFactory.getModerationProxy();
 
@@ -545,6 +726,8 @@ class _PostPageState extends State<PostPage> {
         onDelete: _handleDelete,
         onArchive: _handleArchive,
         onRename: _handleRename,
+        onMove: _handleMoveTopic,
+        onMerge: _handleMergeTopic,
         onToggleVisibility: _handleToggleVisibility,
         onRefresh: () async {
           if (_refreshCallback != null && !_isRefreshing) {
@@ -607,6 +790,8 @@ class _PostPageState extends State<PostPage> {
         canDelete: _canDelete,
         canArchive: _canArchive,
         canRename: _canRename,
+        canMove: _canMove,
+        canMerge: _canMerge,
         canToggleVisibility: _canToggleVisibility,
         isArchived: _isArchived,
         isVisible: _isVisible,
@@ -868,6 +1053,8 @@ class _PostPageState extends State<PostPage> {
                       _canArchive = canClose;
                       _canRename = canClose;
                       _canToggleVisibility = canClose;
+                      _canMove = canClose;
+                      _canMerge = canClose;
                     });
                   },
                   onCanStickyChanged: (canSticky) {

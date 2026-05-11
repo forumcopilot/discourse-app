@@ -16,6 +16,8 @@ class PostsPageAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.onArchive,
     this.onRename,
     this.onToggleVisibility,
+    this.onMove,
+    this.onMerge,
     this.onRefresh,
     this.isSubscribed = false,
     this.showMarkRead = false,
@@ -31,6 +33,8 @@ class PostsPageAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.canArchive = false,
     this.canRename = false,
     this.canToggleVisibility = false,
+    this.canMove = false,
+    this.canMerge = false,
     super.key,
   }) : _title = title;
 
@@ -45,6 +49,8 @@ class PostsPageAppBar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? onArchive;
   final VoidCallback? onRename;
   final VoidCallback? onToggleVisibility;
+  final VoidCallback? onMove;
+  final VoidCallback? onMerge;
   final VoidCallback? onRefresh;
   final bool isSubscribed;
   final bool showMarkRead;
@@ -60,6 +66,8 @@ class PostsPageAppBar extends StatefulWidget implements PreferredSizeWidget {
   final bool canArchive;
   final bool canRename;
   final bool canToggleVisibility;
+  final bool canMove;
+  final bool canMerge;
 
   @override
   State<PostsPageAppBar> createState() => PostsPageAppBarState();
@@ -336,6 +344,47 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                 ],
               ),
             ),
+          // Phase 5.26 — Move topic (re-categorise). Rides on the
+          // same mod permissions as rename.
+          if (widget.siteContext.isLoggedIn && widget.canMove)
+            PopupMenuItem(
+              value: 'move',
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.drive_file_move_outline,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: DesignTokens.spacingM),
+                  Text(
+                    'Move to category',
+                    style: textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          // Phase 5.26 — Merge into another topic. Mod-only.
+          if (widget.siteContext.isLoggedIn && widget.canMerge)
+            PopupMenuItem(
+              value: 'merge',
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.merge_type_rounded,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: DesignTokens.spacingM),
+                  Text(
+                    'Merge into topic',
+                    style: textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           if (widget.siteContext.isLoggedIn && widget.canDelete)
             PopupMenuItem(
               value: 'delete',
@@ -436,6 +485,16 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
               break;
             case 'rename':
               _showRenameDialog(context: context);
+              break;
+            // Phase 5.26 — Move + Merge handlers fire callbacks
+            // owned by `post_page.dart`. The handlers there show
+            // their own picker UI (category sheet for move; topic-
+            // id dialog for merge) and call the moderation proxy.
+            case 'move':
+              widget.onMove?.call();
+              break;
+            case 'merge':
+              widget.onMerge?.call();
               break;
             case 'lock':
               showDialog(
