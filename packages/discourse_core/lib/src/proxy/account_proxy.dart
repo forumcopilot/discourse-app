@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/models/settings/fc_settings_category.dart';
 import 'package:forumcopilot_sdk/models/settings/fc_user_setting.dart';
 import 'package:forumcopilot_sdk/models/settings/fc_user_settings_result.dart';
 import '../base_discourse_proxy.dart';
+import '../data/user/discourse_user_notification_prefs.dart';
 
 /// Discourse implementation of [IFCAccountProxy].
 ///
@@ -270,6 +271,63 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
       enabled: false,
       settings: const <FCUserSetting>[],
     );
+  }
+
+  // ===== Discourse-native user notification preferences =====
+  //
+  // Phase 5.20b — read + write the subset of `user_option.*` fields
+  // that are notification-relevant (email frequency, like aggregation,
+  // mailing list mode, auto-watch on reply). The legacy XF-shaped
+  // per-type toggles persisted only to SharedPreferences; these
+  // methods round-trip to Discourse so changes stick across devices
+  // and the user's email/notification cadence is actually under
+  // their control.
+  //
+  // Endpoint:
+  //   GET  /u/{username}.json       → user.user_option block
+  //   PUT  /u/{username}.json       → top-level params (see
+  //                                   UserUpdater::OPTION_ATTR for
+  //                                   the accepted field list)
+
+  /// Fetch current notification preferences for the logged-in user.
+  /// Returns Discourse defaults (email digest weekly, like notif
+  /// always, etc.) on any failure rather than throwing — the UI
+  /// renders the defaults and the user can flip them; the next save
+  /// pushes the corrected state.
+  Future<DiscourseUserNotificationPrefs> getNotificationPrefsAsync() async {
+    final username = siteContext.currentUsername;
+    if (username == null || username.isEmpty) {
+      return const DiscourseUserNotificationPrefs();
+    }
+    try {
+      final response =
+          await apiGet('/u/${Uri.encodeComponent(username)}.json');
+      final user = (response['user'] as Map<String, dynamic>?) ?? const {};
+      final userOption =
+          (user['user_option'] as Map<String, dynamic>?) ?? const {};
+      return DiscourseUserNotificationPrefs.fromUserOption(userOption);
+    } catch (_) {
+      return const DiscourseUserNotificationPrefs();
+    }
+  }
+
+  /// Persist the supplied notification preferences server-side.
+  /// Returns true on success; the settings page uses this to revert
+  /// the optimistic UI flip when the PUT fails.
+  Future<bool> updateNotificationPrefsAsync(
+    DiscourseUserNotificationPrefs prefs,
+  ) async {
+    final username = siteContext.currentUsername;
+    if (username == null || username.isEmpty) return false;
+    try {
+      await apiPut(
+        '/u/${Uri.encodeComponent(username)}.json',
+        body: prefs.toUpdateBody(),
+      );
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 }
 
