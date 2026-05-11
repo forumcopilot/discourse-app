@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_flutter/views/widgets/resettable_widget.dart';
 import 'package:forumcopilot_flutter/views/lists/latest_topics_list.dart';
+import 'package:forumcopilot_flutter/views/lists/new_topics_list.dart';
+import 'package:forumcopilot_flutter/views/lists/top_topics_list.dart';
 import 'package:forumcopilot_flutter/views/lists/unread_topics_list.dart';
-import 'package:forumcopilot_flutter/views/lists/participated_topics_list.dart';
-import 'package:forumcopilot_flutter/views/lists/subscribed_topics_list.dart';
 import 'package:forumcopilot_flutter/views/widgets/forum_header_widget.dart';
 import 'package:forumcopilot_flutter/theme/design_tokens.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -83,11 +83,14 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   int _selectedFilterIndex = 0;
   bool _isLoadingMore = false;
 
-  // Add keys for each list
+  // Add keys for each list. Phase 5.17c reshuffled the indices to
+  // match Discourse's native order: Latest, New, Unread, Top.
+  // Subscribed + Participated moved off this tab (Phase 5.17d will
+  // surface them under Profile).
   final GlobalKey<LatestTopicsListState> _latestTopicsKey = GlobalKey();
+  final GlobalKey<NewTopicsListState> _newTopicsKey = GlobalKey();
   final GlobalKey<UnreadTopicsListState> _unreadTopicsKey = GlobalKey();
-  final GlobalKey<SubscribedTopicsListState> _subscribedTopicsKey = GlobalKey();
-  final GlobalKey<ParticipatedTopicsListState> _participatedTopicsKey = GlobalKey();
+  final GlobalKey<TopTopicsListState> _topTopicsKey = GlobalKey();
 
   // Scroll controller for the main ListView
   final ScrollController _scrollController = ScrollController();
@@ -98,12 +101,16 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   late final VoidCallback _authStateListener;
 
   List<String> _getFilterLabels(BuildContext context) {
+    // Discourse-native order: Latest, New, Unread, Top. "Subscribed" /
+    // "Participated" from the old XF-flavored chip set moved out of
+    // this tab in Phase 5.17c; they'll resurface under the Profile
+    // tab as Watching / Posted-in in Phase 5.17d.
     final l10n = AppLocalizations.of(context)!;
     return [
       l10n.latest,
+      'New',     // Discourse's /new.json
       l10n.unread,
-      l10n.subscribed,
-      l10n.participated,
+      'Top',     // Discourse's /top.json with period selector
     ];
   }
 
@@ -131,9 +138,9 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
 
         // Reset all child lists when credentials change
         _latestTopicsKey.currentState?.resetList();
+        _newTopicsKey.currentState?.resetList();
         _unreadTopicsKey.currentState?.resetList();
-        _subscribedTopicsKey.currentState?.resetList();
-        _participatedTopicsKey.currentState?.resetList();
+        _topTopicsKey.currentState?.resetList();
       }
     };
 
@@ -148,19 +155,20 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
     final tabJustBecameActive = !oldWidget.isActive && widget.isActive;
     if (tabJustBecameActive) {
       AppLogger.debug('📋 [TOPIC_LIST_TAB] Tab just became active - refreshing active list');
-      // Trigger refresh on the active topic list
+      // Trigger refresh on the active topic list. Index map: 0=Latest,
+      // 1=New, 2=Unread, 3=Top.
       switch (_selectedFilterIndex) {
         case 0:
           _latestTopicsKey.currentState?.refreshList();
           break;
         case 1:
-          _unreadTopicsKey.currentState?.refreshList();
+          _newTopicsKey.currentState?.refreshList();
           break;
         case 2:
-          _subscribedTopicsKey.currentState?.refreshList();
+          _unreadTopicsKey.currentState?.refreshList();
           break;
         case 3:
-          _participatedTopicsKey.currentState?.refreshList();
+          _topTopicsKey.currentState?.refreshList();
           break;
       }
       // Force rebuild to show updated content
@@ -200,19 +208,19 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
           }
           break;
         case 1:
-          final state = _unreadTopicsKey.currentState;
+          final state = _newTopicsKey.currentState;
           if (state != null && state.hasMoreItems) {
             await state.loadMore();
           }
           break;
         case 2:
-          final state = _subscribedTopicsKey.currentState;
+          final state = _unreadTopicsKey.currentState;
           if (state != null && state.hasMoreItems) {
             await state.loadMore();
           }
           break;
         case 3:
-          final state = _participatedTopicsKey.currentState;
+          final state = _topTopicsKey.currentState;
           if (state != null && state.hasMoreItems) {
             await state.loadMore();
           }
@@ -231,9 +239,9 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   void resetTab() {
     // Reset all child lists
     _latestTopicsKey.currentState?.resetList();
+    _newTopicsKey.currentState?.resetList();
     _unreadTopicsKey.currentState?.resetList();
-    _subscribedTopicsKey.currentState?.resetList();
-    _participatedTopicsKey.currentState?.resetList();
+    _topTopicsKey.currentState?.resetList();
 
     // Reset to first filter if needed
     setState(() {
@@ -305,20 +313,15 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   List<Widget> _buildTopicItems() {
     switch (_selectedFilterIndex) {
       case 0:
-        final state = _latestTopicsKey.currentState;
-        return state?.buildTopicItems() ?? [];
+        return _latestTopicsKey.currentState?.buildTopicItems() ?? [];
       case 1:
-        final state = _unreadTopicsKey.currentState;
-        return state?.buildTopicItems() ?? [];
+        return _newTopicsKey.currentState?.buildTopicItems() ?? [];
       case 2:
-        final state = _subscribedTopicsKey.currentState;
-        return state?.buildTopicItems() ?? [];
+        return _unreadTopicsKey.currentState?.buildTopicItems() ?? [];
       case 3:
-        final state = _participatedTopicsKey.currentState;
-        return state?.buildTopicItems() ?? [];
+        return _topTopicsKey.currentState?.buildTopicItems() ?? [];
       default:
-        final state = _latestTopicsKey.currentState;
-        return state?.buildTopicItems() ?? [];
+        return _latestTopicsKey.currentState?.buildTopicItems() ?? [];
     }
   }
 
@@ -328,11 +331,11 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
       case 0:
         return _latestTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
       case 1:
-        return _unreadTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
+        return _newTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
       case 2:
-        return _subscribedTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
+        return _unreadTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
       case 3:
-        return _participatedTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
+        return _topTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
       default:
         return _latestTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
     }
@@ -344,11 +347,11 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
       case 0:
         return _latestTopicsKey.currentState?.buildEmptyState();
       case 1:
-        return _unreadTopicsKey.currentState?.buildEmptyState();
+        return _newTopicsKey.currentState?.buildEmptyState();
       case 2:
-        return _subscribedTopicsKey.currentState?.buildEmptyState();
+        return _unreadTopicsKey.currentState?.buildEmptyState();
       case 3:
-        return _participatedTopicsKey.currentState?.buildEmptyState();
+        return _topTopicsKey.currentState?.buildEmptyState();
       default:
         return _latestTopicsKey.currentState?.buildEmptyState();
     }
@@ -377,18 +380,18 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
                     isActive: widget.isActive && _selectedFilterIndex == 0,
                     siteContext: widget.siteContext,
                   ),
-                  UnreadTopicsList(
-                    key: _unreadTopicsKey,
+                  NewTopicsList(
+                    key: _newTopicsKey,
                     isActive: widget.isActive && _selectedFilterIndex == 1,
                     siteContext: widget.siteContext,
                   ),
-                  SubscribedTopicsList(
-                    key: _subscribedTopicsKey,
+                  UnreadTopicsList(
+                    key: _unreadTopicsKey,
                     isActive: widget.isActive && _selectedFilterIndex == 2,
                     siteContext: widget.siteContext,
                   ),
-                  ParticipatedTopicsList(
-                    key: _participatedTopicsKey,
+                  TopTopicsList(
+                    key: _topTopicsKey,
                     isActive: widget.isActive && _selectedFilterIndex == 3,
                     siteContext: widget.siteContext,
                   ),
@@ -408,13 +411,13 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
         await _latestTopicsKey.currentState?.refreshList();
         break;
       case 1:
-        await _unreadTopicsKey.currentState?.refreshList();
+        await _newTopicsKey.currentState?.refreshList();
         break;
       case 2:
-        await _subscribedTopicsKey.currentState?.refreshList();
+        await _unreadTopicsKey.currentState?.refreshList();
         break;
       case 3:
-        await _participatedTopicsKey.currentState?.refreshList();
+        await _topTopicsKey.currentState?.refreshList();
         break;
     }
   }

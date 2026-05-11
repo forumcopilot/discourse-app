@@ -95,6 +95,35 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     return _topicListInForum(forumId, startNum, filter: 'top');
   }
 
+  /// Discourse-only: site-wide Top feed, optionally scoped to a time
+  /// [period]. Maps to `/top.json` (all-time) or `/top/{period}.json`
+  /// (`all` / `yearly` / `quarterly` / `monthly` / `weekly` / `daily`).
+  ///
+  /// Used by the Home tab's Top sub-segment (Phase 5.17c).
+  Future<FCLatestTopicResult> getTopTopicsGlobalAsync({
+    String period = 'all',
+    int page = 0,
+  }) async {
+    final path = period == 'all'
+        ? '/top.json'
+        : '/top/${Uri.encodeComponent(period)}.json';
+    try {
+      final list = await _listTopics(path, page: page);
+      return FCLatestTopicResult(
+        result: true,
+        resultText: '',
+        totalLatestNum: list.topics.length,
+        topics: list.topics,
+      );
+    } catch (e) {
+      return FCLatestTopicResult(
+        result: false,
+        resultText: 'Error: $e',
+        totalLatestNum: 0,
+      );
+    }
+  }
+
   @override
   Future<FCTopicDataResult> getAnnTopicAsync(
       String forumId, int startNum, int lastNum) async {
