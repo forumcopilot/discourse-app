@@ -32,7 +32,7 @@ The app is past the bootstrap phase and exercises most of Discourse's read + wri
 - **Latest / Unread / Subscribed / Participated** feeds, with infinite scroll.
 - **Categories** browser, sub-categories, category-filtered topic lists.
 - **Topic view** — rendered from Discourse's `cooked` HTML via `flutter_html` (Markdown, oneboxes, quoted posts, syntax-highlighted code, mentions, native emoji).
-- **Tags** — chips on topic rows; tap a chip to see all topics with that tag (`/tag/{name}.json`).
+- **Tags** — chips on topic rows; tap a chip to see all topics with that tag (`/tag/{name}.json`); dedicated **Tags** bottom-nav tab listing every tag on the forum (`/tags.json`) with search + popularity/alphabetical sort.
 - **Polls** — voting widget at the top of a topic backed by `PUT /polls/vote` with full chart/result rendering.
 - **Suggested Topics** footer card at the bottom of every topic, mirroring Discourse's web client.
 - **Solution indicator** — green banner on accepted-answer posts (requires `discourse-solved`).
@@ -292,6 +292,7 @@ Callsites that use these features cast `proxy is DiscoursePostProxy` (or similar
 | **5.14** | `discourse-post-voting` plugin — typed `DiscoursePostVote` model, `POST/DELETE /vote.json`, vertical up/down arrow column on Q&A topics with optimistic flip + revert. |
 | **5.15** | **Discourse Chat support** — channels + messages + send/edit/delete + polling lifecycle. ChatChannelListPage (sorted unread-first, mention badges, DM/TopicChat/Category icons), ChatChannelView (auto-scroll, load-older on scroll-up, long-press → edit/delete sheet), ChatComposer (rounded input + send button). UI ported from the qhtt xenforoapp's Siropu chat. Static `DiscourseChatProxy.forCurrentSite()` accessor avoids touching the typed IFC*Proxy registry. |
 | **5.16** | Fix: notifications list silently empty because `_toAlert` wrote ISO 8601 into `FCAlert.timestamp` while the consumer did `int.parse`. Convert to millisecond-epoch string in the proxy. |
+| **5.17b** | **Tags tab** — new primary bottom-nav surface (`Home / Categories / Tags / Messages / Notifications / Profile`). `DiscourseTag` model + `DiscourseTopicProxy.getAllTagsAsync` (sorted by topic count desc, PM-only hidden by default). `TagsTab` widget with search input + sort-mode toggle (popularity ↔ alphabetical); rows show name + description + count badge. Drills into the existing `TagTopicsPage` from Phase 5.1. First step of the wider home/forums reorganization — see commit history for the staged plan (5.17a Categories rename, 5.17c Home sub-tabs Latest/New/Unread/Top, 5.17d Profile consolidation). |
 
 ---
 

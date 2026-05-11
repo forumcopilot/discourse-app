@@ -18,6 +18,7 @@ import 'appbars/messages_tab_app_bar.dart';
 import 'appbars/notifications_tab_app_bar.dart';
 import 'appbars/profile_tab_app_bar.dart';
 import 'tabs/forum_list_tab.dart';
+import 'tabs/tags_tab.dart';
 import 'tabs/topic_list_tab.dart';
 import 'tabs/notification_list_tab.dart';
 import 'tabs/privatemessage_list_tab.dart';
@@ -564,6 +565,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
   // Define tab types for better organization
   static const String _topicsTab = 'topics';
   static const String _forumsTab = 'forums';
+  static const String _tagsTab = 'tags';
   static const String _messagesTab = 'messages';
   static const String _notificationsTab = 'notifications';
   static const String _profileTab = 'profile';
@@ -571,6 +573,10 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
   // Get the list of enabled tabs based on user permissions
   List<String> get _enabledTabs {
     final tabs = [_topicsTab, _forumsTab];
+    // Tags are a Discourse-native concept — surface globally between
+    // Categories ("Forums") and Messages. Phase 5.17d will move
+    // Messages into Profile so we can keep the bottom nav at 5 items.
+    tabs.add(_tagsTab);
     tabs.add(_messagesTab); // Always show Messages tab
     if (_siteContext?.configDataOutput?.alert ?? false) tabs.add(_notificationsTab);
     tabs.add(_profileTab);
@@ -603,6 +609,8 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           siteContext: _siteContext!,
           isLoggedIn: isLoggedIn,
         );
+      case _tagsTab:
+        return _buildSimpleAppBar(context, 'Tags');
       case _messagesTab:
         return MessagesTabAppBar(
           siteContext: _siteContext!,
@@ -624,6 +632,29 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           isLoggedIn: isLoggedIn,
         );
     }
+  }
+
+  // Minimal AppBar for tabs that don't need any custom actions —
+  // currently the Tags tab. Mirrors the visual style of TopicsTabAppBar
+  // (same surface color, elevation, weight).
+  PreferredSizeWidget _buildSimpleAppBar(BuildContext context, String title) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return AppBar(
+      backgroundColor: colorScheme.surface,
+      elevation: 3,
+      shadowColor: colorScheme.shadow.withOpacity(0.3),
+      surfaceTintColor: colorScheme.surfaceTint,
+      automaticallyImplyLeading: false,
+      title: Text(
+        title,
+        style: textTheme.titleLarge?.copyWith(
+          color: colorScheme.onSurface,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      centerTitle: false,
+    );
   }
 
   @override
@@ -747,6 +778,10 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
               isActive: _isCurrentTab(_forumsTab),
               siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
               boardStats: _boardStats);
+        case _tagsTab:
+          return TagsTab(
+              isActive: _isCurrentTab(_tagsTab),
+              siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')));
         case _messagesTab:
           return PrivateMessageListTab(
               key: _pmListKey,
@@ -784,6 +819,12 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           return const NavigationDestination(
             selectedIcon: Icon(Icons.forum),
             icon: Icon(Icons.forum_outlined),
+            label: '',
+          );
+        case _tagsTab:
+          return const NavigationDestination(
+            selectedIcon: Icon(Icons.label),
+            icon: Icon(Icons.label_outline),
             label: '',
           );
         case _messagesTab:

@@ -7,6 +7,7 @@ import 'package:forumcopilot_sdk/models/results/fc_topic_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
+import '../data/tag/discourse_tag.dart';
 
 /// Discourse implementation of [IFCTopicProxy].
 ///
@@ -311,6 +312,35 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         topicId: '',
         state: 0,
       );
+    }
+  }
+
+  /// Discourse-only: full tag listing. Hits `/tags.json` and returns
+  /// every tag the current user can see, with topic counts. Powers the
+  /// global Tags tab on the home screen.
+  ///
+  /// [includePmOnly] defaults to false — PM-only tags are admin-set
+  /// allowlists for private messages and don't belong on the public
+  /// tags browser.
+  Future<List<DiscourseTag>> getAllTagsAsync({bool includePmOnly = false}) async {
+    try {
+      final response = await apiGet('/tags.json');
+      final list = (response['tags'] as List?) ?? const [];
+      final tags = list
+          .whereType<Map>()
+          .map((t) => DiscourseTag.fromJson(t.cast<String, dynamic>()))
+          .where((t) => includePmOnly || !t.pmOnly)
+          .toList();
+      // Sort by topic count desc, then alphabetical for ties — matches
+      // the Discourse web /tags page.
+      tags.sort((a, b) {
+        final byCount = b.count.compareTo(a.count);
+        if (byCount != 0) return byCount;
+        return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+      });
+      return tags;
+    } catch (_) {
+      return const [];
     }
   }
 
