@@ -91,6 +91,12 @@ class FCPost with FCPostMappable {
   /// `accepted_answer:true`, requires the discourse-solved plugin).
   bool isSolution;
 
+  /// Whether the current viewer can mark this post as the accepted
+  /// answer (Discourse: topic-level `can_accept_answer` and the post
+  /// isn't the OP's first post). Phase 5.31 wires this so the UI
+  /// can render an "Accept this answer" button per reply.
+  bool canAcceptAnswer;
+
   FCPost(
       {required this.id,
       required this.title,
@@ -127,5 +133,6 @@ class FCPost with FCPostMappable {
       this.canLike = false,
       this.canThank = false,
       this.bookmarked = false,
-      this.isSolution = false});
+      this.isSolution = false,
+      this.canAcceptAnswer = false});
 }

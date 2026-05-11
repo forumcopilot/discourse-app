@@ -710,6 +710,11 @@ class _PostListItemState extends State<PostListItem> {
             onShowLikes: _showLikesBottomSheet,
             isBookmarked: _isBookmarked,
             onBookmark: _handleBookmarkAction,
+            // Phase 5.31 — discourse-solved accept/unaccept. Gated
+            // inside PostListItemSocial on `post.canAcceptAnswer` or
+            // `post.isSolution` so the button only renders when
+            // meaningful.
+            onToggleAcceptAnswer: _handleToggleAcceptAnswer,
             trailing: (widget.siteContext.isLoggedIn &&
                     (_postsController.threadDataOutput.value?.topic.canReply ??
                         false))
@@ -990,6 +995,57 @@ class _PostListItemState extends State<PostListItem> {
               ? 'Failed to remove bookmark'
               : 'Failed to bookmark post'),
         ),
+      );
+    }
+  }
+
+  /// Phase 5.31 — toggle the topic's accepted-answer state for this
+  /// post. Routes through `IFCPostProxy.acceptAnswerAsync` /
+  /// `unacceptAnswerAsync` (the SDK-aligned interface — no
+  /// Discourse-only sidecar). Optimistic flip with revert on
+  /// failure; surfaces the proxy's `resultText` in a snackbar so
+  /// the "plugin not installed" case reads clearly.
+  Future<void> _handleToggleAcceptAnswer() async {
+    if (!widget.siteContext.isLoggedIn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to mark answers')),
+      );
+      return;
+    }
+    final wasSolution = widget.post.isSolution;
+    setState(() {
+      widget.post.isSolution = !wasSolution;
+    });
+    final messenger = ScaffoldMessenger.of(context);
+    final proxy = SiteProxyService.getPostProxy();
+    try {
+      final result = wasSolution
+          ? await proxy.unacceptAnswerAsync(widget.post.id)
+          : await proxy.acceptAnswerAsync(widget.post.id);
+      if (!mounted) return;
+      if (!result.result) {
+        setState(() {
+          widget.post.isSolution = wasSolution;
+        });
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              result.resultText?.isNotEmpty == true
+                  ? result.resultText!
+                  : (wasSolution
+                      ? 'Failed to unmark answer'
+                      : 'Failed to mark answer'),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        widget.post.isSolution = wasSolution;
+      });
+      messenger.showSnackBar(
+        SnackBar(content: Text('Error: $e')),
       );
     }
   }

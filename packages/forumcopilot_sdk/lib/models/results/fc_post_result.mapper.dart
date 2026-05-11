@@ -2718,6 +2718,151 @@ class _FCReportPostResultCopyWithImpl<$R, $Out>
   ) => _FCReportPostResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
+class FCAcceptAnswerResultMapper extends ClassMapperBase<FCAcceptAnswerResult> {
+  FCAcceptAnswerResultMapper._();
+
+  static FCAcceptAnswerResultMapper? _instance;
+  static FCAcceptAnswerResultMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = FCAcceptAnswerResultMapper._());
+      FCBaseResultMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'FCAcceptAnswerResult';
+
+  static bool _$result(FCAcceptAnswerResult v) => v.result;
+  static const Field<FCAcceptAnswerResult, bool> _f$result = Field(
+    'result',
+    _$result,
+  );
+  static String? _$resultText(FCAcceptAnswerResult v) => v.resultText;
+  static const Field<FCAcceptAnswerResult, String> _f$resultText = Field(
+    'resultText',
+    _$resultText,
+    opt: true,
+  );
+
+  @override
+  final MappableFields<FCAcceptAnswerResult> fields = const {
+    #result: _f$result,
+    #resultText: _f$resultText,
+  };
+
+  static FCAcceptAnswerResult _instantiate(DecodingData data) {
+    return FCAcceptAnswerResult(
+      result: data.dec(_f$result),
+      resultText: data.dec(_f$resultText),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static FCAcceptAnswerResult fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<FCAcceptAnswerResult>(map);
+  }
+
+  static FCAcceptAnswerResult fromJson(String json) {
+    return ensureInitialized().decodeJson<FCAcceptAnswerResult>(json);
+  }
+}
+
+mixin FCAcceptAnswerResultMappable {
+  String toJson() {
+    return FCAcceptAnswerResultMapper.ensureInitialized()
+        .encodeJson<FCAcceptAnswerResult>(this as FCAcceptAnswerResult);
+  }
+
+  Map<String, dynamic> toMap() {
+    return FCAcceptAnswerResultMapper.ensureInitialized()
+        .encodeMap<FCAcceptAnswerResult>(this as FCAcceptAnswerResult);
+  }
+
+  FCAcceptAnswerResultCopyWith<
+    FCAcceptAnswerResult,
+    FCAcceptAnswerResult,
+    FCAcceptAnswerResult
+  >
+  get copyWith =>
+      _FCAcceptAnswerResultCopyWithImpl<
+        FCAcceptAnswerResult,
+        FCAcceptAnswerResult
+      >(this as FCAcceptAnswerResult, $identity, $identity);
+  @override
+  String toString() {
+    return FCAcceptAnswerResultMapper.ensureInitialized().stringifyValue(
+      this as FCAcceptAnswerResult,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return FCAcceptAnswerResultMapper.ensureInitialized().equalsValue(
+      this as FCAcceptAnswerResult,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return FCAcceptAnswerResultMapper.ensureInitialized().hashValue(
+      this as FCAcceptAnswerResult,
+    );
+  }
+}
+
+extension FCAcceptAnswerResultValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, FCAcceptAnswerResult, $Out> {
+  FCAcceptAnswerResultCopyWith<$R, FCAcceptAnswerResult, $Out>
+  get $asFCAcceptAnswerResult => $base.as(
+    (v, t, t2) => _FCAcceptAnswerResultCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class FCAcceptAnswerResultCopyWith<
+  $R,
+  $In extends FCAcceptAnswerResult,
+  $Out
+>
+    implements FCBaseResultCopyWith<$R, $In, $Out> {
+  @override
+  $R call({bool? result, String? resultText});
+  FCAcceptAnswerResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _FCAcceptAnswerResultCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, FCAcceptAnswerResult, $Out>
+    implements FCAcceptAnswerResultCopyWith<$R, FCAcceptAnswerResult, $Out> {
+  _FCAcceptAnswerResultCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<FCAcceptAnswerResult> $mapper =
+      FCAcceptAnswerResultMapper.ensureInitialized();
+  @override
+  $R call({bool? result, Object? resultText = $none}) => $apply(
+    FieldCopyWithData({
+      if (result != null) #result: result,
+      if (resultText != $none) #resultText: resultText,
+    }),
+  );
+  @override
+  FCAcceptAnswerResult $make(CopyWithData data) => FCAcceptAnswerResult(
+    result: data.get(#result, or: $value.result),
+    resultText: data.get(#resultText, or: $value.resultText),
+  );
+
+  @override
+  FCAcceptAnswerResultCopyWith<$R2, FCAcceptAnswerResult, $Out2> $chain<$R2,
+          $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _FCAcceptAnswerResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
 class FCQuotePostResultMapper extends ClassMapperBase<FCQuotePostResult> {
   FCQuotePostResultMapper._();
 

@@ -24,6 +24,14 @@ class PostListItemSocial extends StatelessWidget {
   final VoidCallback? onShowLikes;
   final bool isBookmarked;
   final VoidCallback? onBookmark;
+
+  /// Phase 5.31 — Discourse-solved plugin. When the viewer can
+  /// accept this post as the topic's answer (`post.canAcceptAnswer`)
+  /// a green check button appears in the action row. Tapping flips
+  /// the topic-wide accepted-answer state via
+  /// `IFCPostProxy.acceptAnswerAsync`/`unacceptAnswerAsync`. The
+  /// active state (post.isSolution) renders the filled check.
+  final VoidCallback? onToggleAcceptAnswer;
   final Widget? trailing;
 
   const PostListItemSocial({
@@ -37,6 +45,7 @@ class PostListItemSocial extends StatelessWidget {
     this.onShowLikes,
     this.isBookmarked = false,
     this.onBookmark,
+    this.onToggleAcceptAnswer,
     this.trailing,
   });
 
@@ -184,6 +193,27 @@ class PostListItemSocial extends StatelessWidget {
                 semanticLabel: isBookmarked
                     ? 'Remove bookmark'
                     : 'Bookmark post',
+              ),
+            ],
+            // Phase 5.31 — Accept answer (discourse-solved). Two
+            // independent gating conditions: the viewer can accept
+            // (canAcceptAnswer, set by the proxy from topic-level
+            // `can_accept_answer`) OR the post is already the answer
+            // (so the topic OP can unmark it). When neither is true
+            // the button is hidden.
+            if (isLoggedIn &&
+                onToggleAcceptAnswer != null &&
+                (post.canAcceptAnswer || post.isSolution)) ...[
+              SizedBox(width: DesignTokens.spacingXL),
+              PostActionButton(
+                icon: Icons.check_circle_outline,
+                activeIcon: Icons.check_circle,
+                active: post.isSolution,
+                activeColor: colorScheme.tertiary,
+                onTap: onToggleAcceptAnswer,
+                semanticLabel: post.isSolution
+                    ? 'Unmark as accepted answer'
+                    : 'Mark as accepted answer',
               ),
             ],
           ],

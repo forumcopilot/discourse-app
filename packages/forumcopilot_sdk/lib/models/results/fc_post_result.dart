@@ -455,6 +455,19 @@ class FCReportPostResult extends FCBaseResult with FCReportPostResultMappable {
   }) : super(result: result, resultText: resultText);
 }
 
+/// Forum Copilot Accept Answer Result (discourse-solved). Same
+/// shape on both `acceptAnswerAsync` and `unacceptAnswerAsync` —
+/// the operation either succeeded or it didn't, with optional
+/// human-readable reason on failure.
+@MappableClass()
+class FCAcceptAnswerResult extends FCBaseResult
+    with FCAcceptAnswerResultMappable {
+  FCAcceptAnswerResult({
+    required bool result,
+    String? resultText,
+  }) : super(result: result, resultText: resultText);
+}
+
 /// Forum Copilot Quote Post Result
 /// Maps from QuotePostData_Output
 @MappableClass()

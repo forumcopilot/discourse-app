@@ -222,6 +222,13 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
     opt: true,
     def: false,
   );
+  static bool _$canAcceptAnswer(FCPost v) => v.canAcceptAnswer;
+  static const Field<FCPost, bool> _f$canAcceptAnswer = Field(
+    'canAcceptAnswer',
+    _$canAcceptAnswer,
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<FCPost> fields = const {
@@ -257,6 +264,7 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
     #canThank: _f$canThank,
     #bookmarked: _f$bookmarked,
     #isSolution: _f$isSolution,
+    #canAcceptAnswer: _f$canAcceptAnswer,
   };
 
   static FCPost _instantiate(DecodingData data) {
@@ -293,6 +301,7 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
       canThank: data.dec(_f$canThank),
       bookmarked: data.dec(_f$bookmarked),
       isSolution: data.dec(_f$isSolution),
+      canAcceptAnswer: data.dec(_f$canAcceptAnswer),
     );
   }
 
@@ -390,6 +399,7 @@ abstract class FCPostCopyWith<$R, $In extends FCPost, $Out>
     bool? canThank,
     bool? bookmarked,
     bool? isSolution,
+    bool? canAcceptAnswer,
   });
   FCPostCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -470,6 +480,7 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
     bool? canThank,
     bool? bookmarked,
     bool? isSolution,
+    bool? canAcceptAnswer,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -504,6 +515,7 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
       if (canThank != null) #canThank: canThank,
       if (bookmarked != null) #bookmarked: bookmarked,
       if (isSolution != null) #isSolution: isSolution,
+      if (canAcceptAnswer != null) #canAcceptAnswer: canAcceptAnswer,
     }),
   );
   @override
@@ -543,6 +555,7 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
     canThank: data.get(#canThank, or: $value.canThank),
     bookmarked: data.get(#bookmarked, or: $value.bookmarked),
     isSolution: data.get(#isSolution, or: $value.isSolution),
+    canAcceptAnswer: data.get(#canAcceptAnswer, or: $value.canAcceptAnswer),
   );
 
   @override

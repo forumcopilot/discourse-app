@@ -67,8 +67,15 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
           .whereType<Map>()
           .map((p) => p.cast<String, dynamic>())
           .toList();
-      final posts =
-          rawPosts.map((p) => _postFrom(p, topicId: topicId)).toList();
+      // Phase 5.31 — discourse-solved exposes topic-level
+      // `can_accept_answer` to the OP and staff. Per-post
+      // canAcceptAnswer in `_postFrom` ANDs this with "not the
+      // first post" so the question itself isn't markable.
+      final topicCanAccept = (t['can_accept_answer'] as bool?) ?? false;
+      final posts = rawPosts
+          .map((p) => _postFrom(p,
+              topicId: topicId, topicCanAcceptAnswer: topicCanAccept))
+          .toList();
 
       // Pull a poll out of the first post if present so the topic header
       // can render a Twitter-style poll card.
@@ -161,8 +168,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
           .whereType<Map>()
           .map((m) => m.cast<String, dynamic>())
           .toList();
-      final posts =
-          rawPosts.map((p) => _postFrom(p, topicId: topicId)).toList();
+      final topicCanAccept = (t['can_accept_answer'] as bool?) ?? false;
+      final posts = rawPosts
+          .map((p) => _postFrom(p,
+              topicId: topicId, topicCanAcceptAnswer: topicCanAccept))
+          .toList();
       final firstPostJson = rawPosts.firstWhere(
         (p) => (p['post_number'] as int?) == 1,
         orElse: () => const {},
@@ -219,8 +229,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
           .whereType<Map>()
           .map((m) => m.cast<String, dynamic>())
           .toList();
-      final posts =
-          rawPosts.map((p) => _postFrom(p, topicId: topicId)).toList();
+      final topicCanAccept = (t['can_accept_answer'] as bool?) ?? false;
+      final posts = rawPosts
+          .map((p) => _postFrom(p,
+              topicId: topicId, topicCanAcceptAnswer: topicCanAccept))
+          .toList();
       final firstPostJson = rawPosts.isNotEmpty
           ? rawPosts.firstWhere(
               (p) => (p['post_number'] as int?) == 1,
@@ -401,6 +414,66 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       return FCReportPostResult(result: true, resultText: '');
     } catch (e) {
       return FCReportPostResult(result: false, resultText: 'Error: $e');
+    }
+  }
+
+  @override
+  Future<FCAcceptAnswerResult> acceptAnswerAsync(String postId) async {
+    // Phase 5.31 — discourse-solved plugin endpoint
+    //   POST /accept-answer { id: <post_id> }
+    // Marks the post as the accepted answer for its topic and bumps
+    // the topic's "solved" state. The FCPost.canAcceptAnswer cap is
+    // computed at parse time from the topic-level `can_accept_answer`
+    // flag.
+    if (postId.isEmpty) {
+      return FCAcceptAnswerResult(
+        result: false,
+        resultText: 'No post id supplied',
+      );
+    }
+    try {
+      await apiPost('/accept-answer', body: {
+        'id': int.tryParse(postId) ?? postId,
+      });
+      return FCAcceptAnswerResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      if (e.statusCode == 404) {
+        return FCAcceptAnswerResult(
+          result: false,
+          resultText:
+              'Accepting answers requires the discourse-solved plugin.',
+        );
+      }
+      return FCAcceptAnswerResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCAcceptAnswerResult(result: false, resultText: 'Error: $e');
+    }
+  }
+
+  @override
+  Future<FCAcceptAnswerResult> unacceptAnswerAsync(String postId) async {
+    if (postId.isEmpty) {
+      return FCAcceptAnswerResult(
+        result: false,
+        resultText: 'No post id supplied',
+      );
+    }
+    try {
+      await apiPost('/unaccept-answer', body: {
+        'id': int.tryParse(postId) ?? postId,
+      });
+      return FCAcceptAnswerResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      if (e.statusCode == 404) {
+        return FCAcceptAnswerResult(
+          result: false,
+          resultText:
+              'Accepting answers requires the discourse-solved plugin.',
+        );
+      }
+      return FCAcceptAnswerResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCAcceptAnswerResult(result: false, resultText: 'Error: $e');
     }
   }
 
@@ -911,7 +984,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
 
   // ===== Helpers =====
 
-  FCPost _postFrom(Map<String, dynamic> p, {required String topicId}) {
+  FCPost _postFrom(
+    Map<String, dynamic> p, {
+    required String topicId,
+    bool topicCanAcceptAnswer = false,
+  }) {
     final tpl = p['avatar_template'] as String?;
     String? avatarUrl;
     if (tpl != null && tpl.isNotEmpty) {
@@ -952,6 +1029,15 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       isLiked: isLiked,
       bookmarked: (p['bookmarked'] as bool?) ?? false,
       isSolution: (p['accepted_answer'] as bool?) ?? false,
+      // Phase 5.31 — viewer can accept this post as the topic's
+      // answer only when:
+      //   1. The topic's `can_accept_answer` flag is true (the
+      //      discourse-solved plugin grants this to the topic OP
+      //      and staff).
+      //   2. The post isn't the OP's first post — you can't mark
+      //      the question itself as the answer.
+      canAcceptAnswer: topicCanAcceptAnswer &&
+          (p['post_number'] as int?) != 1,
       // Pass mutable empty lists so optimistic-UI code in post_actions.dart
       // can call `.add()` without tripping "Cannot add to an unmodifiable
       // list" (FCPost defaults these to `const []`). Discourse's

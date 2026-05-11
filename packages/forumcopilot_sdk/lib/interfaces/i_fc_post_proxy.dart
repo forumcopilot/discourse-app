@@ -83,4 +83,19 @@ abstract class IFCPostProxy {
   /// [responseIds] IDs of the chosen options (from poll.responses[].id).
   /// Returns the updated poll on success, or null on failure.
   Future<FCPoll?> votePollAsync(String topicId, List<String> responseIds);
+
+  /// Mark a post as the accepted answer for its topic
+  /// (Discourse: discourse-solved plugin; XF-shaped backends would
+  /// surface the equivalent of a "marked solution"). The post's
+  /// `isSolution` flag and the topic's solved state both flip.
+  /// Gated on `FCPost.canAcceptAnswer` — typically the topic OP
+  /// or staff.
+  ///
+  /// [postId] ID of the post to mark.
+  Future<FCAcceptAnswerResult> acceptAnswerAsync(String postId);
+
+  /// Reverse of [acceptAnswerAsync]. Clears the solved state.
+  ///
+  /// [postId] ID of the post to unmark.
+  Future<FCAcceptAnswerResult> unacceptAnswerAsync(String postId);
 }
