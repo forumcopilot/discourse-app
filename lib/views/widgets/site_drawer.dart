@@ -216,12 +216,12 @@ class _Header extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
-                radius: 20,
+                radius: DesignTokens.avatarRadiusM,
                 backgroundColor: colorScheme.primary,
                 child: Icon(
                   Icons.forum,
                   color: colorScheme.onPrimary,
-                  size: 20,
+                  size: DesignTokens.iconSizeM,
                 ),
               ),
               const SizedBox(width: DesignTokens.spacingM),
@@ -230,7 +230,7 @@ class _Header extends StatelessWidget {
                   AppForumConfig.forumName,
                   style: textTheme.titleMedium?.copyWith(
                     color: colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: DesignTokens.fontWeightSemiBold,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -243,7 +243,8 @@ class _Header extends StatelessWidget {
                 ? 'Signed in as $username'
                 : 'Not signed in',
             style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onPrimaryContainer.withOpacity(0.85),
+              color: colorScheme.onPrimaryContainer
+                  .withOpacity(DesignTokens.opacityHigh),
             ),
           ),
         ],
@@ -271,8 +272,8 @@ class _SectionLabel extends StatelessWidget {
         label.toUpperCase(),
         style: textTheme.labelSmall?.copyWith(
           color: colorScheme.onSurfaceVariant,
-          letterSpacing: 0.8,
-          fontWeight: FontWeight.w600,
+          letterSpacing: DesignTokens.letterSpacingExtraWide,
+          fontWeight: DesignTokens.fontWeightSemiBold,
         ),
       ),
     );
@@ -330,7 +331,8 @@ class _Footer extends StatelessWidget {
       child: Text(
         '${AppForumConfig.forumName} · v1',
         style: textTheme.labelSmall?.copyWith(
-          color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+          color: colorScheme.onSurfaceVariant
+              .withOpacity(DesignTokens.opacityMedium),
         ),
       ),
     );

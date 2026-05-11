@@ -4,6 +4,8 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 
 import '../theme/design_tokens.dart';
 import 'group_detail_page.dart';
+import 'widgets/empty_state_view.dart';
+import 'widgets/simple_list_app_bar.dart';
 
 /// Phase 5.18c-2 — Groups directory, the second drawer destination
 /// under **Community**. Lists every visible group on the forum
@@ -99,52 +101,21 @@ class _GroupsListPageState extends State<GroupsListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: colorScheme.surface,
-        elevation: 3,
-        shadowColor: colorScheme.shadow.withOpacity(0.3),
-        surfaceTintColor: colorScheme.surfaceTint,
-        title: Text(
-          'Groups',
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        centerTitle: false,
-      ),
+      appBar: const SimpleListAppBar(title: 'Groups'),
       body: _buildBody(),
     );
   }
 
   Widget _buildBody() {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     if (_groups.isEmpty && _loading) {
       return const Center(child: CircularProgressIndicator());
     }
     if (_groups.isEmpty && _error != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(DesignTokens.spacingXL),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.groups_outlined,
-                  size: 48, color: colorScheme.onSurfaceVariant),
-              const SizedBox(height: DesignTokens.spacingM),
-              Text(
-                _error!,
-                style: textTheme.bodyMedium
-                    ?.copyWith(color: colorScheme.onSurfaceVariant),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
+      return EmptyStateView(
+        icon: Icons.groups_outlined,
+        message: _error!,
       );
     }
     return RefreshIndicator(
@@ -155,7 +126,8 @@ class _GroupsListPageState extends State<GroupsListPage> {
         separatorBuilder: (_, __) => Divider(
           height: 1,
           indent: 72,
-          color: colorScheme.outlineVariant.withOpacity(0.4),
+          color: colorScheme.outlineVariant
+              .withOpacity(DesignTokens.opacityDivider),
         ),
         itemBuilder: (_, i) {
           if (i >= _groups.length) {
@@ -205,7 +177,7 @@ class _GroupRow extends StatelessWidget {
     return ListTile(
       onTap: onTap,
       leading: CircleAvatar(
-        radius: 20,
+        radius: DesignTokens.avatarRadiusM,
         backgroundColor: iconBg,
         child: Icon(Icons.groups, color: iconFg),
       ),
@@ -213,7 +185,7 @@ class _GroupRow extends StatelessWidget {
         group.displayName,
         style: textTheme.titleSmall?.copyWith(
           color: colorScheme.onSurface,
-          fontWeight: FontWeight.w600,
+          fontWeight: DesignTokens.fontWeightSemiBold,
         ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
@@ -229,13 +201,14 @@ class _GroupRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.person_outline,
-              size: 14, color: colorScheme.onSurfaceVariant),
-          const SizedBox(width: 4),
+              size: DesignTokens.iconSizeXS,
+              color: colorScheme.onSurfaceVariant),
+          const SizedBox(width: DesignTokens.spacingXS),
           Text(
             group.memberCount.toString(),
             style: textTheme.labelMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
+              fontWeight: DesignTokens.fontWeightSemiBold,
             ),
           ),
         ],

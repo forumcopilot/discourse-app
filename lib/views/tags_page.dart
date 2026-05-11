@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 
 import 'tabs/tags_tab.dart';
+import 'widgets/simple_list_app_bar.dart';
 
 /// Standalone wrapper around `TagsTab` for full-page navigation.
 ///
@@ -10,6 +11,10 @@ import 'tabs/tags_tab.dart';
 /// drawer pushes `TagsPage` as a `MaterialPageRoute`; the inner
 /// `TagsTab` content is unchanged, just hosted under our own
 /// `Scaffold` with an AppBar instead of being a tab in `SiteHomePage`.
+///
+/// Phase 5.18d: AppBar consolidated onto the shared `SimpleListAppBar`
+/// to keep the visual cadence consistent with every other drawer-
+/// pushed destination (Users / Groups / Badges / Drafts / Messages).
 class TagsPage extends StatelessWidget {
   final SiteContext siteContext;
 
@@ -17,23 +22,8 @@ class TagsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: colorScheme.surface,
-        elevation: 3,
-        shadowColor: colorScheme.shadow.withOpacity(0.3),
-        surfaceTintColor: colorScheme.surfaceTint,
-        title: Text(
-          'Tags',
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        centerTitle: false,
-      ),
+      appBar: const SimpleListAppBar(title: 'Tags'),
       body: TagsTab(
         isActive: true,
         siteContext: siteContext,

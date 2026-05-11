@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:forumcopilot_flutter/theme/design_tokens.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 
-/// AppBar for the Chat bottom-nav tab (Phase 5.18a). Matches the
-/// visual cadence of `TopicsTabAppBar` / `ForumsTabAppBar` — surface
-/// background, elevation 3, drawer hamburger in the leading slot via
-/// `automaticallyImplyLeading: true`.
+import '../widgets/simple_list_app_bar.dart';
+
+/// AppBar for the Chat bottom-nav tab (Phase 5.18a).
 ///
-/// The Refresh action that used to live on `ChatChannelListPage`'s
-/// standalone AppBar is intentionally dropped here — the embedded
-/// `ChatChannelListPage(embedded: true)` body still exposes
-/// pull-to-refresh, and a redundant button button would compete with
-/// the search/markRead patterns used by sibling tabs. We can add it
-/// back as an icon action later if the gesture proves unreliable.
+/// Phase 5.18d: rebuilt as a thin wrapper around `SimpleListAppBar`
+/// so it picks up the same elevation / shadow / title cadence as
+/// every other directory page in the app. We keep the dedicated
+/// class so callers (`site_home_page.dart`'s `_buildAppBarForCurrentTab`)
+/// can switch on it the same way they switch on
+/// `TopicsTabAppBar` etc.
+///
+/// The Refresh action that used to live on the standalone
+/// `ChatChannelListPage` AppBar stays dropped — the embedded body's
+/// pull-to-refresh covers that, and a redundant icon button would
+/// fight the search/markRead patterns used by sibling tabs.
 class ChatTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isLoggedIn;
   final SiteContext siteContext;
@@ -25,23 +28,7 @@ class ChatTabAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return AppBar(
-      backgroundColor: colorScheme.surface,
-      elevation: 3,
-      shadowColor: colorScheme.shadow.withOpacity(DesignTokens.opacityLow),
-      surfaceTintColor: colorScheme.surfaceTint,
-      title: Text(
-        'Chat',
-        style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onSurface,
-          fontWeight: FontWeight.w500,
-          fontSize: DesignTokens.fontSizeL,
-        ),
-      ),
-      centerTitle: false,
-    );
+    return const SimpleListAppBar(title: 'Chat');
   }
 
   @override

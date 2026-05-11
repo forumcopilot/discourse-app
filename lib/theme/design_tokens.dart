@@ -59,6 +59,10 @@ class DesignTokens {
   static const double letterSpacingNormal = 0.0;
   static const double letterSpacingMedium = 0.15;
   static const double letterSpacingWide = 0.4;
+  // For UPPERCASE section labels in drawers / settings groupings —
+  // wider than `letterSpacingWide` because all-caps text needs more
+  // air for legibility.
+  static const double letterSpacingExtraWide = 0.8;
 
   // ============================================================================
   // COMMON PADDING/MARGIN EDGE INSETS
@@ -107,7 +111,13 @@ class DesignTokens {
   static const double avatarSizeM = 32.0;
   static const double avatarSizeL = 48.0;
   static const double avatarSizeXL = 64.0;
-  static const double avatarRadiusM = 20.0; // Common avatar radius for list items
+  // Avatar radii — `M` (20) is the canonical list-row size used by
+  // TopicListItem and the legacy bookmarks page. `S` (18) is for
+  // compact rows where two avatars stack (e.g. badge tiles), and `L`
+  // (24) is for header / detail sections that anchor a screen.
+  static const double avatarRadiusS = 18.0;
+  static const double avatarRadiusM = 20.0;
+  static const double avatarRadiusL = 24.0;
   static const double statusDotSize = 10.0; // Online status indicator dot size
 
   // ============================================================================
@@ -128,6 +138,12 @@ class DesignTokens {
   static const double opacityMedium = 0.6;
   static const double opacityHigh = 0.8;
   static const double opacityFull = 1.0;
+  // Canonical divider / separator opacity (applied to
+  // `colorScheme.outlineVariant`). Sits between `opacityLow` (0.3)
+  // and `opacityMediumLow` (0.5) — kept distinct so a global tweak
+  // to the divider weight doesn't ripple into AppBar shadows or
+  // disabled-button tinting.
+  static const double opacityDivider = 0.4;
 
   // ============================================================================
   // BORDER WIDTHS

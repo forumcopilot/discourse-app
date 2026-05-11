@@ -4,6 +4,9 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 
 import '../theme/design_tokens.dart';
 import 'user_profile_page.dart';
+import 'widgets/empty_state_view.dart';
+import 'widgets/simple_list_app_bar.dart';
+import 'widgets/trust_level_chip.dart';
 
 /// Phase 5.18c-2 — single-group screen. Fetches the group's metadata
 /// (`/groups/{name}.json`) and the first page of members
@@ -133,55 +136,21 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final title = _group?.displayName ?? widget.groupName;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: colorScheme.surface,
-        elevation: 3,
-        shadowColor: colorScheme.shadow.withOpacity(0.3),
-        surfaceTintColor: colorScheme.surfaceTint,
-        title: Text(
-          title,
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w500,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        centerTitle: false,
-      ),
+      appBar: SimpleListAppBar(title: title),
       body: _buildBody(),
     );
   }
 
   Widget _buildBody() {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     if (_loadingGroup && _members.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
     if (_error != null && _members.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(DesignTokens.spacingXL),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.error_outline,
-                  size: 48, color: colorScheme.onSurfaceVariant),
-              const SizedBox(height: DesignTokens.spacingM),
-              Text(
-                _error!,
-                style: textTheme.bodyMedium
-                    ?.copyWith(color: colorScheme.onSurfaceVariant),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
+      return EmptyStateView(
+        icon: Icons.error_outline,
+        message: _error!,
       );
     }
     return RefreshIndicator(
@@ -228,7 +197,8 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
         color: colorScheme.surfaceContainerLowest,
         border: Border(
           bottom: BorderSide(
-            color: colorScheme.outlineVariant.withOpacity(0.4),
+            color: colorScheme.outlineVariant
+                .withOpacity(DesignTokens.opacityDivider),
           ),
         ),
       ),
@@ -238,7 +208,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
           Row(
             children: [
               CircleAvatar(
-                radius: 24,
+                radius: DesignTokens.avatarRadiusL,
                 backgroundColor: colorScheme.primaryContainer,
                 child: Icon(Icons.groups,
                     color: colorScheme.onPrimaryContainer),
@@ -252,7 +222,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
                       group?.displayName ?? widget.groupName,
                       style: textTheme.titleMedium?.copyWith(
                         color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: DesignTokens.fontWeightSemiBold,
                       ),
                     ),
                     Text(
@@ -266,13 +236,14 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
               ),
               if (group != null) ...[
                 Icon(Icons.person_outline,
-                    size: 14, color: colorScheme.onSurfaceVariant),
-                const SizedBox(width: 4),
+                    size: DesignTokens.iconSizeXS,
+                    color: colorScheme.onSurfaceVariant),
+                const SizedBox(width: DesignTokens.spacingXS),
                 Text(
                   group.memberCount.toString(),
                   style: textTheme.labelMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: DesignTokens.fontWeightSemiBold,
                   ),
                 ),
               ],
@@ -305,20 +276,22 @@ class _MemberRow extends StatelessWidget {
     return ListTile(
       onTap: onTap,
       leading: CircleAvatar(
-        radius: 18,
+        radius: DesignTokens.avatarRadiusS,
         backgroundColor: colorScheme.surfaceContainerHighest,
         backgroundImage: item.avatarUrl.isNotEmpty
             ? NetworkImage(item.avatarUrl)
             : null,
         child: item.avatarUrl.isEmpty
-            ? Icon(Icons.person, color: colorScheme.onSurfaceVariant, size: 18)
+            ? Icon(Icons.person,
+                color: colorScheme.onSurfaceVariant,
+                size: DesignTokens.iconSizeSMedium)
             : null,
       ),
       title: Text(
         item.username,
         style: textTheme.bodyLarge?.copyWith(
           color: colorScheme.onSurface,
-          fontWeight: FontWeight.w500,
+          fontWeight: DesignTokens.fontWeightMedium,
         ),
       ),
       subtitle: item.name != null
@@ -331,20 +304,7 @@ class _MemberRow extends StatelessWidget {
             )
           : null,
       trailing: item.trustLevel != null
-          ? Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'TL${item.trustLevel}',
-                style: textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            )
+          ? TrustLevelChip(level: item.trustLevel!)
           : null,
     );
   }

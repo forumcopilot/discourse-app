@@ -4,6 +4,8 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 
 import '../theme/design_tokens.dart';
+import 'widgets/empty_state_view.dart';
+import 'widgets/simple_list_app_bar.dart';
 
 /// Phase 5.18c-3 — Badges directory, third drawer destination under
 /// **Community**. Lists every visible badge on the forum, grouped
@@ -67,61 +69,26 @@ class _BadgesDirectoryPageState extends State<BadgesDirectoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: colorScheme.surface,
-        elevation: 3,
-        shadowColor: colorScheme.shadow.withOpacity(0.3),
-        surfaceTintColor: colorScheme.surfaceTint,
-        title: Text(
-          'Badges',
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        centerTitle: false,
-      ),
+      appBar: const SimpleListAppBar(title: 'Badges'),
       body: _buildBody(),
     );
   }
 
   Widget _buildBody() {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     if (_loading && _badges.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
     if (_badges.isEmpty && _error != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(DesignTokens.spacingXL),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.emoji_events_outlined,
-                  size: 48, color: colorScheme.onSurfaceVariant),
-              const SizedBox(height: DesignTokens.spacingM),
-              Text(
-                _error!,
-                style: textTheme.bodyMedium
-                    ?.copyWith(color: colorScheme.onSurfaceVariant),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
+      return EmptyStateView(
+        icon: Icons.emoji_events_outlined,
+        message: _error!,
       );
     }
     if (_badges.isEmpty) {
-      return Center(
-        child: Text(
-          'No badges on this forum.',
-          style: textTheme.bodyMedium
-              ?.copyWith(color: colorScheme.onSurfaceVariant),
-        ),
+      return const EmptyStateView(
+        icon: Icons.emoji_events_outlined,
+        message: 'No badges on this forum.',
       );
     }
     // Group by tier — gold/silver/bronze sections. Within each
@@ -176,8 +143,8 @@ class _BadgeSection extends StatelessWidget {
             label.toUpperCase(),
             style: textTheme.labelSmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
-              letterSpacing: 0.8,
-              fontWeight: FontWeight.w600,
+              letterSpacing: DesignTokens.letterSpacingExtraWide,
+              fontWeight: DesignTokens.fontWeightSemiBold,
             ),
           ),
         ),
@@ -199,21 +166,21 @@ class _BadgeRow extends StatelessWidget {
     return ListTile(
       onTap: () => _showDetail(context),
       leading: CircleAvatar(
-        radius: 18,
+        radius: DesignTokens.avatarRadiusS,
         backgroundColor: _tierColor(badge.tier),
         backgroundImage: (badge.imageUrl != null && badge.imageUrl!.isNotEmpty)
             ? NetworkImage(badge.imageUrl!)
             : null,
         child: (badge.imageUrl == null || badge.imageUrl!.isEmpty)
             ? const Icon(Icons.emoji_events_outlined,
-                color: Colors.white, size: 18)
+                color: Colors.white, size: DesignTokens.iconSizeSMedium)
             : null,
       ),
       title: Text(
         badge.name,
         style: textTheme.titleSmall?.copyWith(
           color: colorScheme.onSurface,
-          fontWeight: FontWeight.w600,
+          fontWeight: DesignTokens.fontWeightSemiBold,
         ),
       ),
       subtitle: badge.description != null && badge.description!.isNotEmpty
@@ -229,13 +196,14 @@ class _BadgeRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.people_outline,
-              size: 14, color: colorScheme.onSurfaceVariant),
-          const SizedBox(width: 4),
+              size: DesignTokens.iconSizeXS,
+              color: colorScheme.onSurfaceVariant),
+          const SizedBox(width: DesignTokens.spacingXS),
           Text(
             _formatCount(badge.grantCount),
             style: textTheme.labelMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
+              fontWeight: DesignTokens.fontWeightSemiBold,
             ),
           ),
         ],
@@ -265,7 +233,7 @@ class _BadgeRow extends StatelessWidget {
                 Row(
                   children: [
                     CircleAvatar(
-                      radius: 24,
+                      radius: DesignTokens.avatarRadiusL,
                       backgroundColor: _tierColor(badge.tier),
                       backgroundImage: (badge.imageUrl != null &&
                               badge.imageUrl!.isNotEmpty)
@@ -286,7 +254,7 @@ class _BadgeRow extends StatelessWidget {
                             badge.name,
                             style: textTheme.titleMedium?.copyWith(
                               color: colorScheme.onSurface,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: DesignTokens.fontWeightSemiBold,
                             ),
                           ),
                           Text(

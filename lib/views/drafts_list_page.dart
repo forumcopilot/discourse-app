@@ -10,6 +10,8 @@ import 'lists/posts_list.dart';
 import 'new_topic_page.dart';
 import 'post_page.dart';
 import 'reply_page.dart';
+import 'widgets/empty_state_view.dart';
+import 'widgets/simple_list_app_bar.dart';
 
 /// Discourse-native drafts list (`/drafts.json`). Surfaces all of the
 /// current user's saved drafts — new topics, replies, and PMs.
@@ -157,16 +159,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
     final drafts = _drafts;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            Icon(Icons.edit_note, size: 20),
-            SizedBox(width: 8),
-            Text('Drafts'),
-          ],
-        ),
-      ),
+      appBar: const SimpleListAppBar(title: 'Drafts'),
       body: RefreshIndicator(
         onRefresh: _load,
         child: () {
@@ -174,39 +167,28 @@ class _DraftsListPageState extends State<DraftsListPage> {
             return const Center(child: CircularProgressIndicator());
           }
           if ((drafts == null || drafts.isEmpty) && _error != null) {
-            return ListView(
-              padding: const EdgeInsets.all(DesignTokens.spacingL),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 48),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Icon(Icons.edit_note_outlined,
-                            size: 48, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(height: DesignTokens.spacingM),
-                        Text(
-                          _error!,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+            return EmptyStateView.scrollable(
+              icon: Icons.edit_note_outlined,
+              message: _error!,
+            );
+          }
+          if (drafts == null || drafts.isEmpty) {
+            return const EmptyStateView.scrollable(
+              icon: Icons.edit_note_outlined,
+              message: 'No drafts yet.',
+              hint: 'Drafts auto-save as you type — start a reply or '
+                  'topic and come back here to find it.',
             );
           }
           return ListView.separated(
-            itemCount: drafts?.length ?? 0,
+            itemCount: drafts.length,
             separatorBuilder: (_, __) => Divider(
               height: 1,
-              color: colorScheme.outlineVariant.withOpacity(0.4),
+              color: colorScheme.outlineVariant
+                  .withOpacity(DesignTokens.opacityDivider),
             ),
             itemBuilder: (_, i) {
-              final d = drafts![i];
+              final d = drafts[i];
               final title = d.isNewTopic
                   ? (d.topicTitle?.isNotEmpty ?? false
                       ? d.topicTitle!
@@ -223,8 +205,8 @@ class _DraftsListPageState extends State<DraftsListPage> {
                 ),
                 title: Text(
                   title,
-                  style: textTheme.titleSmall
-                      ?.copyWith(fontWeight: FontWeight.w600),
+                  style: textTheme.titleSmall?.copyWith(
+                      fontWeight: DesignTokens.fontWeightSemiBold),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

@@ -5,6 +5,9 @@ import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 
 import '../theme/design_tokens.dart';
 import 'user_profile_page.dart';
+import 'widgets/empty_state_view.dart';
+import 'widgets/simple_list_app_bar.dart';
+import 'widgets/trust_level_chip.dart';
 
 /// Phase 5.18c-1 — the Discourse Users directory.
 ///
@@ -215,31 +218,16 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: colorScheme.surface,
-        elevation: 3,
-        shadowColor: colorScheme.shadow.withOpacity(0.3),
-        surfaceTintColor: colorScheme.surfaceTint,
-        title: Text(
-          'Users',
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        centerTitle: false,
-      ),
+      appBar: const SimpleListAppBar(title: 'Users'),
       body: Column(
         children: [
           _buildSelector(
-            label: 'Sort by',
             children: _DirectoryOrder.values.map((o) {
               return Padding(
                 padding: const EdgeInsets.only(right: DesignTokens.spacingS),
                 child: ChoiceChip(
-                  avatar: Icon(o.icon, size: 16),
+                  avatar: Icon(o.icon, size: DesignTokens.iconSizeS),
                   label: Text(o.label),
                   selected: _order == o,
                   onSelected: (_) => _setOrder(o),
@@ -248,7 +236,6 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
             }).toList(),
           ),
           _buildSelector(
-            label: 'Period',
             children: _DirectoryPeriod.values.map((p) {
               return Padding(
                 padding: const EdgeInsets.only(right: DesignTokens.spacingS),
@@ -262,7 +249,8 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
           ),
           Divider(
             height: 1,
-            color: colorScheme.outlineVariant.withOpacity(0.4),
+            color: colorScheme.outlineVariant
+                .withOpacity(DesignTokens.opacityDivider),
           ),
           Expanded(child: _buildList()),
         ],
@@ -270,10 +258,7 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
     );
   }
 
-  Widget _buildSelector({
-    required String label,
-    required List<Widget> children,
-  }) {
+  Widget _buildSelector({required List<Widget> children}) {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: DesignTokens.spacingL,
@@ -288,39 +273,20 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
 
   Widget _buildList() {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     if (_items.isEmpty && _loading) {
       return const Center(child: CircularProgressIndicator());
     }
     if (_items.isEmpty && _error != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(DesignTokens.spacingXL),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.people_outline,
-                  size: 48, color: colorScheme.onSurfaceVariant),
-              const SizedBox(height: DesignTokens.spacingM),
-              Text(
-                _error!,
-                style: textTheme.bodyMedium
-                    ?.copyWith(color: colorScheme.onSurfaceVariant),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
+      return EmptyStateView(
+        icon: Icons.people_outline,
+        message: _error!,
       );
     }
     if (_items.isEmpty) {
-      return Center(
-        child: Text(
-          'No users found for this period.',
-          style: textTheme.bodyMedium
-              ?.copyWith(color: colorScheme.onSurfaceVariant),
-        ),
+      return const EmptyStateView(
+        icon: Icons.people_outline,
+        message: 'No users found for this period.',
       );
     }
     return RefreshIndicator(
@@ -331,7 +297,8 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
         separatorBuilder: (_, __) => Divider(
           height: 1,
           indent: 72,
-          color: colorScheme.outlineVariant.withOpacity(0.4),
+          color: colorScheme.outlineVariant
+              .withOpacity(DesignTokens.opacityDivider),
         ),
         itemBuilder: (_, i) {
           if (i >= _items.length) {
@@ -380,7 +347,7 @@ class _UserRow extends StatelessWidget {
     return ListTile(
       onTap: onTap,
       leading: CircleAvatar(
-        radius: 20,
+        radius: DesignTokens.avatarRadiusM,
         backgroundColor: colorScheme.surfaceContainerHighest,
         backgroundImage: item.avatarUrl.isNotEmpty
             ? NetworkImage(item.avatarUrl)
@@ -396,7 +363,7 @@ class _UserRow extends StatelessWidget {
               item.username,
               style: textTheme.titleSmall?.copyWith(
                 color: colorScheme.onSurface,
-                fontWeight: FontWeight.w600,
+                fontWeight: DesignTokens.fontWeightSemiBold,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -404,20 +371,7 @@ class _UserRow extends StatelessWidget {
           ),
           if (item.trustLevel != null) ...[
             const SizedBox(width: DesignTokens.spacingS),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'TL${item.trustLevel}',
-                style: textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+            TrustLevelChip(level: item.trustLevel!),
           ],
         ],
       ),
@@ -434,13 +388,14 @@ class _UserRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(order.icon,
-              size: 14, color: colorScheme.onSurfaceVariant),
-          const SizedBox(width: 4),
+              size: DesignTokens.iconSizeXS,
+              color: colorScheme.onSurfaceVariant),
+          const SizedBox(width: DesignTokens.spacingXS),
           Text(
             _formatCount(stat),
             style: textTheme.labelMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
+              fontWeight: DesignTokens.fontWeightSemiBold,
             ),
           ),
         ],

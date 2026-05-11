@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 
 import '../../theme/design_tokens.dart';
+import '../widgets/empty_state_view.dart';
 import 'chat_channel_view.dart';
 
 /// Top-level Chat surface: lists the user's joined channels and opens
@@ -127,43 +128,23 @@ class _ChatChannelListPageState extends State<ChatChannelListPage> {
 
   Widget _buildBody() {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final channels = _channels;
 
     if (_loading && channels == null) {
       return const Center(child: CircularProgressIndicator());
     }
     if ((channels == null || channels.isEmpty) && _error != null) {
-      return ListView(
-        padding: const EdgeInsets.all(DesignTokens.spacingL),
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 48),
-            child: Center(
-              child: Column(
-                children: [
-                  Icon(Icons.chat_bubble_outline,
-                      size: 48, color: colorScheme.onSurfaceVariant),
-                  const SizedBox(height: DesignTokens.spacingM),
-                  Text(
-                    _error!,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+      return EmptyStateView.scrollable(
+        icon: Icons.chat_bubble_outline,
+        message: _error!,
       );
     }
     return ListView.separated(
       itemCount: channels?.length ?? 0,
       separatorBuilder: (_, __) => Divider(
         height: 1,
-        color: colorScheme.outlineVariant.withOpacity(0.4),
+        color: colorScheme.outlineVariant
+            .withOpacity(DesignTokens.opacityDivider),
       ),
       itemBuilder: (_, i) {
         final ch = channels![i];
@@ -200,18 +181,13 @@ class _ChannelTile extends StatelessWidget {
 
     return ListTile(
       onTap: onTap,
-      leading: Container(
-        width: 40,
-        height: 40,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(20),
-        ),
+      leading: CircleAvatar(
+        radius: DesignTokens.avatarRadiusM,
+        backgroundColor: colorScheme.surfaceContainerHighest,
         child: Icon(
           _iconFor(),
           color: colorScheme.onSurfaceVariant,
-          size: 20,
+          size: DesignTokens.iconSizeM,
         ),
       ),
       title: Row(

@@ -406,7 +406,8 @@ class _ProfileActionsSection extends StatelessWidget {
           color: colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(DesignTokens.radiusM),
           border: Border.all(
-            color: colorScheme.outlineVariant.withOpacity(0.5),
+            color: colorScheme.outlineVariant
+                .withOpacity(DesignTokens.opacityMediumLow),
             width: 0.5,
           ),
         ),
@@ -426,7 +427,8 @@ class _ProfileActionsSection extends StatelessWidget {
               Divider(
                 height: 1,
                 indent: 56,
-                color: colorScheme.outlineVariant.withOpacity(0.4),
+                color: colorScheme.outlineVariant
+                    .withOpacity(DesignTokens.opacityDivider),
               ),
             ],
             _ActionRow(
@@ -442,7 +444,8 @@ class _ProfileActionsSection extends StatelessWidget {
             Divider(
               height: 1,
               indent: 56,
-              color: colorScheme.outlineVariant.withOpacity(0.4),
+              color: colorScheme.outlineVariant
+                  .withOpacity(DesignTokens.opacityDivider),
             ),
             _ActionRow(
               icon: Icons.edit_note_outlined,
@@ -495,7 +498,8 @@ class _ActionRow extends StatelessWidget {
                   Text(
                     title,
                     style: textTheme.titleSmall
-                        ?.copyWith(fontWeight: FontWeight.w600),
+                        ?.copyWith(
+                            fontWeight: DesignTokens.fontWeightSemiBold),
                   ),
                   Text(
                     subtitle,

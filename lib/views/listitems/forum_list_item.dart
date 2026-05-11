@@ -51,7 +51,8 @@ class ForumListItem extends StatelessWidget {
     return Divider(
       height: 1,
       thickness: 1,
-      color: colorScheme.outlineVariant.withOpacity(0.3),
+      color: colorScheme.outlineVariant
+          .withOpacity(DesignTokens.opacityDivider),
     );
   }
 
@@ -151,7 +152,8 @@ class ForumListItem extends StatelessWidget {
                                     colorScheme: colorScheme,
                                     backgroundColor: colorScheme
                                         .surfaceContainerHighest
-                                        .withOpacity(0.6),
+                                        .withOpacity(
+                                            DesignTokens.opacityMedium),
                                     borderRadius: DesignTokens.radiusM,
                                   ),
                                   child: Row(
@@ -185,7 +187,9 @@ class ForumListItem extends StatelessWidget {
                                   ),
                                   decoration: StyleBuilders.badgeDecoration(
                                     colorScheme: colorScheme,
-                                    backgroundColor: colorScheme.surfaceVariant.withOpacity(0.5),
+                                    backgroundColor: colorScheme.surfaceVariant
+                                        .withOpacity(
+                                            DesignTokens.opacityMediumLow),
                                     borderRadius: DesignTokens.radiusM,
                                   ),
                                   child: Row(
@@ -218,7 +222,9 @@ class ForumListItem extends StatelessWidget {
                                   ),
                                   decoration: StyleBuilders.badgeDecoration(
                                     colorScheme: colorScheme,
-                                    backgroundColor: colorScheme.errorContainer.withOpacity(0.5),
+                                    backgroundColor: colorScheme.errorContainer
+                                        .withOpacity(
+                                            DesignTokens.opacityMediumLow),
                                     borderRadius: DesignTokens.radiusM,
                                   ),
                                   child: Row(

@@ -194,12 +194,13 @@ class TopTopicsListState extends FCStatefulWidget<TopTopicsList>
                 color: selected
                     ? colorScheme.onPrimaryContainer
                     : colorScheme.onSurfaceVariant,
-                fontWeight:
-                    selected ? FontWeight.w600 : FontWeight.normal,
+                fontWeight: selected
+                    ? DesignTokens.fontWeightSemiBold
+                    : DesignTokens.fontWeightNormal,
               ),
               selectedColor: colorScheme.primaryContainer,
-              backgroundColor:
-                  colorScheme.surfaceContainerHighest.withOpacity(0.5),
+              backgroundColor: colorScheme.surfaceContainerHighest
+                  .withOpacity(DesignTokens.opacityMediumLow),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(DesignTokens.radiusL),
               ),
