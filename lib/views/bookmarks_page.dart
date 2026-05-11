@@ -1,8 +1,7 @@
-import 'package:discourse_core/discourse_core.dart'
-    show DiscoursePostProxy, DiscourseBookmark;
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_bookmark.dart';
 
 import '../core/logging/app_logger.dart';
 import '../theme/design_tokens.dart';
@@ -24,7 +23,7 @@ class BookmarksPage extends StatefulWidget {
 }
 
 class _BookmarksPageState extends State<BookmarksPage> {
-  final List<DiscourseBookmark> _bookmarks = [];
+  final List<FCBookmark> _bookmarks = [];
   final ScrollController _scrollController = ScrollController();
   int _page = 0;
   bool _isLoading = false;
@@ -54,11 +53,6 @@ class _BookmarksPageState extends State<BookmarksPage> {
   }
 
   Future<void> _load({required bool reset}) async {
-    final proxy = SiteProxyFactory.getPostProxy();
-    if (proxy is! DiscoursePostProxy) {
-      setState(() => _error = 'Bookmarks require a Discourse forum');
-      return;
-    }
     if (reset) {
       _bookmarks.clear();
       _page = 0;
@@ -67,8 +61,22 @@ class _BookmarksPageState extends State<BookmarksPage> {
     }
     setState(() => _isLoading = true);
     try {
-      final batch = await proxy.getBookmarksAsync(page: _page);
+      final result =
+          await SiteProxyService.getBookmarkProxy().getBookmarksAsync(
+        page: _page,
+      );
       if (!mounted) return;
+      if (!result.result) {
+        setState(() {
+          _error = result.resultText?.isNotEmpty == true
+              ? result.resultText
+              : 'Failed to load bookmarks';
+          _isLoading = false;
+          _hasMore = false;
+        });
+        return;
+      }
+      final batch = result.items;
       setState(() {
         _bookmarks.addAll(batch);
         // Discourse returns up to 30 per page; treat anything short as
@@ -90,27 +98,27 @@ class _BookmarksPageState extends State<BookmarksPage> {
 
   Future<void> _refresh() => _load(reset: true);
 
-  Future<void> _removeBookmark(DiscourseBookmark b) async {
-    final proxy = SiteProxyFactory.getPostProxy();
-    if (proxy is! DiscoursePostProxy) return;
+  Future<void> _removeBookmark(FCBookmark b) async {
     // We have the bookmark id directly; bypass the lookup that
-    // unbookmarkPostAsync does by deleting it via the bookmark id endpoint.
-    final pid = b.bookmarkableId;
-    bool ok = false;
-    if (b.bookmarkableType == 'Post' && pid != null) {
-      ok = await proxy.unbookmarkPostAsync(pid.toString());
-    }
+    // removePostBookmarkAsync does by deleting it via the bookmark id
+    // endpoint.
+    final result =
+        await SiteProxyService.getBookmarkProxy().removeBookmarkByIdAsync(b.id);
     if (!mounted) return;
-    if (ok) {
+    if (result.result) {
       setState(() => _bookmarks.remove(b));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to remove bookmark')),
+        SnackBar(
+          content: Text(result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : 'Failed to remove bookmark'),
+        ),
       );
     }
   }
 
-  void _open(DiscourseBookmark b) {
+  void _open(FCBookmark b) {
     final tid = b.topicId;
     if (tid == null) return;
     final isPost = b.bookmarkableType == 'Post' && b.bookmarkableId != null;
@@ -213,7 +221,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
 
 class _BookmarkTile extends StatelessWidget {
   final SiteContext siteContext;
-  final DiscourseBookmark bookmark;
+  final FCBookmark bookmark;
   final VoidCallback onTap;
   final VoidCallback onRemove;
 
@@ -229,7 +237,7 @@ class _BookmarkTile extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final username = bookmark.username ?? '';
-    final avatarUrl = bookmark.avatarUrl(siteContext.site.url);
+    final avatarUrl = bookmark.avatarUrl;
     final title = (bookmark.title?.isNotEmpty ?? false)
         ? bookmark.title!
         : '(untitled)';

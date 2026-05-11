@@ -105,4 +105,10 @@ class SiteProxyService with ServiceErrorHandlingMixin {
     if (!_initialized) throw Exception('SiteProxyService not initialized');
     return SiteProxyFactory.getDeviceProxy();
   }
+
+  /// Get bookmark proxy
+  static IFCBookmarkProxy getBookmarkProxy() {
+    if (!_initialized) throw Exception('SiteProxyService not initialized');
+    return SiteProxyFactory.getBookmarkProxy();
+  }
 }

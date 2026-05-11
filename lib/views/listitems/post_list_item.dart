@@ -955,23 +955,28 @@ class _PostListItemState extends State<PostListItem> {
     );
   }
 
-  /// Toggle bookmark on the current post via /bookmarks.json.
+  /// Toggle bookmark on the current post via IFCBookmarkProxy
+  /// (Phase 5.33 — was a DiscoursePostProxy sidecar pre-lift).
   /// Optimistically flips state; reverts on failure.
   void _handleBookmarkAction() async {
     if (_bookmarkInFlight) return;
-    final proxy = SiteProxyService.getPostProxy();
-    if (proxy is! DiscoursePostProxy) return;
     final wasBookmarked = _isBookmarked;
     setState(() {
       _isBookmarked = !wasBookmarked;
       _bookmarkInFlight = true;
     });
+    final proxy = SiteProxyService.getBookmarkProxy();
     bool ok;
+    String? errText;
     try {
       if (wasBookmarked) {
-        ok = await proxy.unbookmarkPostAsync(widget.post.id);
+        final result = await proxy.removePostBookmarkAsync(widget.post.id);
+        ok = result.result;
+        errText = result.resultText;
       } else {
-        ok = await proxy.bookmarkPostAsync(widget.post.id);
+        final result = await proxy.addPostBookmarkAsync(widget.post.id);
+        ok = result.result;
+        errText = result.resultText;
       }
     } catch (_) {
       ok = false;
@@ -991,9 +996,11 @@ class _PostListItemState extends State<PostListItem> {
     if (!ok && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(wasBookmarked
-              ? 'Failed to remove bookmark'
-              : 'Failed to bookmark post'),
+          content: Text(errText?.isNotEmpty == true
+              ? errText!
+              : (wasBookmarked
+                  ? 'Failed to remove bookmark'
+                  : 'Failed to bookmark post')),
         ),
       );
     }

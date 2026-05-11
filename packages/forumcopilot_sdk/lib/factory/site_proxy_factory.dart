@@ -160,6 +160,17 @@ abstract class SiteProxyFactory {
     return factory.createDeviceProxy(_context!);
   }
 
+  /// Get bookmark proxy (Phase 5.33 — bookmarks lifted off the
+  /// per-forum post proxy onto a first-class IFCBookmarkProxy).
+  static IFCBookmarkProxy getBookmarkProxy() {
+    if (_context == null) throw Exception('SiteProxyFactory not initialized');
+
+    final factory = _providers[_context!.siteType];
+    if (factory == null) throw Exception('No provider registered for site type: ${_context!.siteType}');
+
+    return factory.createBookmarkProxy(_context!);
+  }
+
   // Abstract methods that must be implemented by concrete factories
   IFCUserProxy createUserProxy(SiteContext context);
   IFCForumProxy createForumProxy(SiteContext context);
@@ -175,4 +186,5 @@ abstract class SiteProxyFactory {
   IFCAttachmentProxy createAttachmentProxy(SiteContext context);
   IFCConfigProxy createConfigProxy(SiteContext context);
   IFCDeviceProxy createDeviceProxy(SiteContext context);
+  IFCBookmarkProxy createBookmarkProxy(SiteContext context);
 }

@@ -9,6 +9,7 @@ import '../src/proxy/forum_proxy.dart';
 import '../src/proxy/topic_proxy.dart';
 import '../src/proxy/post_proxy.dart';
 import '../src/proxy/attachment_proxy.dart';
+import '../src/proxy/bookmark_proxy.dart';
 import '../src/proxy/search_proxy.dart';
 import '../src/proxy/social_proxy.dart';
 import '../src/proxy/subscription_proxy.dart';
@@ -74,5 +75,9 @@ class DiscourseProxyFactory extends SiteProxyFactory {
 
   IFCDeviceProxy createDeviceProxy(SiteContext context) {
     return DiscourseDeviceProxy(context);
+  }
+
+  IFCBookmarkProxy createBookmarkProxy(SiteContext context) {
+    return DiscourseBookmarkProxy(context);
   }
 }

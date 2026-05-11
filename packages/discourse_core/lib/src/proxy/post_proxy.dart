@@ -10,7 +10,6 @@ import 'package:forumcopilot_sdk/models/entities/fc_thanks.dart';
 import 'package:forumcopilot_sdk/models/results/fc_post_result.dart';
 
 import '../base_discourse_proxy.dart';
-import '../data/post/discourse_bookmark.dart';
 import '../data/post/discourse_draft.dart';
 import '../data/post/discourse_post_vote.dart';
 import '../data/post/discourse_reaction.dart';
@@ -661,53 +660,10 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     );
   }
 
-  /// Discourse-only: bookmark [postId]. Returns true on success. UI uses
-  /// this for the bookmark icon toggle on individual posts.
-  Future<bool> bookmarkPostAsync(String postId) async {
-    try {
-      await apiPost('/bookmarks.json', body: {
-        'bookmarkable_type': 'Post',
-        'bookmarkable_id': int.tryParse(postId) ?? postId,
-      });
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  /// Discourse-only: remove the bookmark from [postId]. Discourse's
-  /// DELETE endpoint requires the bookmark id (not post id), so we look
-  /// it up via /u/{me}/bookmarks.json first. Returns true on success.
-  Future<bool> unbookmarkPostAsync(String postId) async {
-    final username = siteContext.currentUsername;
-    if (username == null || username.isEmpty) return false;
-    final pid = int.tryParse(postId);
-    if (pid == null) return false;
-    try {
-      final response = await apiGet(
-          '/u/${Uri.encodeComponent(username)}/bookmarks.json');
-      final ub = (response['user_bookmark_list'] as Map<String, dynamic>?) ??
-          const <String, dynamic>{};
-      final bookmarks = (ub['bookmarks'] as List?) ?? const [];
-      int? bookmarkId;
-      for (final raw in bookmarks.whereType<Map>()) {
-        final b = raw.cast<String, dynamic>();
-        // Discourse exposes either post_id or bookmarkable_id depending on
-        // version. Match against either.
-        final matchPostId = b['post_id'] == pid ||
-            (b['bookmarkable_type'] == 'Post' && b['bookmarkable_id'] == pid);
-        if (matchPostId) {
-          bookmarkId = b['id'] as int?;
-          break;
-        }
-      }
-      if (bookmarkId == null) return false;
-      await apiDelete('/bookmarks/$bookmarkId.json');
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
+  // Phase 5.33 — bookmark methods moved to DiscourseBookmarkProxy
+  // (IFCBookmarkProxy). Callers should use
+  // `SiteProxyService.getBookmarkProxy().addPostBookmarkAsync` /
+  // `removePostBookmarkAsync` / `getBookmarksAsync` instead.
 
   /// Discourse-only: save a server-side draft. [draftKey] follows
   /// Discourse's conventions:
@@ -952,31 +908,6 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         ));
       }
       return out;
-    } catch (_) {
-      return const [];
-    }
-  }
-
-  /// Discourse-only: fetch the current user's bookmarks list.
-  /// Hits `/u/{username}/bookmarks.json`. Returns a list of
-  /// [DiscourseBookmark] entries, newest first (Discourse's default order).
-  ///
-  /// [page] is 0-indexed and uses Discourse's `page` query param. Pass
-  /// `null` (default) for the first page.
-  Future<List<DiscourseBookmark>> getBookmarksAsync({int? page}) async {
-    final username = siteContext.currentUsername;
-    if (username == null || username.isEmpty) return const [];
-    try {
-      final qs = (page != null && page > 0) ? '?page=$page' : '';
-      final response = await apiGet(
-          '/u/${Uri.encodeComponent(username)}/bookmarks.json$qs');
-      final ub = (response['user_bookmark_list'] as Map<String, dynamic>?) ??
-          const <String, dynamic>{};
-      final bookmarks = (ub['bookmarks'] as List?) ?? const [];
-      return bookmarks
-          .whereType<Map>()
-          .map((b) => DiscourseBookmark.fromJson(b.cast<String, dynamic>()))
-          .toList();
     } catch (_) {
       return const [];
     }
