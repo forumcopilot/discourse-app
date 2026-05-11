@@ -896,15 +896,15 @@
   "@notifications": {
     "description": "Notifications tab title"
   },
-  "forums": "Forums",
+  "forums": "Categories",
   "@forums": {
-    "description": "Forums tab title (plural)"
+    "description": "Categories tab title (Discourse-native term; the ARB key keeps the legacy 'forums' name for compatibility)"
   },
-  "markAllForumsAsRead": "Mark All Forums as Read?",
+  "markAllForumsAsRead": "Mark all categories as read?",
   "@markAllForumsAsRead": {
     "description": "Dialog title for marking all forums as read"
   },
-  "markAllForumsAsReadMessage": "This will mark all forums and topics as read. This action cannot be undone.",
+  "markAllForumsAsReadMessage": "This will mark all categories and topics as read. This action cannot be undone.",
   "@markAllForumsAsReadMessage": {
     "description": "Message explaining mark all forums as read action"
   },

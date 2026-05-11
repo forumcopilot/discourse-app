@@ -26,7 +26,7 @@ class ForumsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
       surfaceTintColor: colorScheme.surfaceTint,
       automaticallyImplyLeading: false,
       title: Text(
-        AppLocalizations.of(context)?.forums ?? 'Forums',
+        AppLocalizations.of(context)?.forums ?? 'Categories',
         style: textTheme.titleLarge?.copyWith(
           color: colorScheme.onSurface,
           fontWeight: FontWeight.w500,
@@ -68,13 +68,13 @@ class ForumsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          AppLocalizations.of(context)?.markAllForumsAsRead ?? 'Mark All Forums as Read?',
+          AppLocalizations.of(context)?.markAllForumsAsRead ?? 'Mark all categories as read?',
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
           ),
         ),
         content: Text(
-          AppLocalizations.of(context)?.markAllForumsAsReadMessage ?? 'This will mark all forums and topics as read. This action cannot be undone.',
+          AppLocalizations.of(context)?.markAllForumsAsReadMessage ?? 'This will mark all categories and topics as read. This action cannot be undone.',
           style: textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),

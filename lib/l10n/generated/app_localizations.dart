@@ -2240,22 +2240,22 @@ abstract class AppLocalizations {
   /// **'Notifications'**
   String get notifications;
 
-  /// Forums tab title (plural)
+  /// Categories tab title (Discourse-native term; the ARB key keeps the legacy 'forums' name for compatibility)
   ///
   /// In en, this message translates to:
-  /// **'Forums'**
+  /// **'Categories'**
   String get forums;
 
   /// Dialog title for marking all forums as read
   ///
   /// In en, this message translates to:
-  /// **'Mark All Forums as Read?'**
+  /// **'Mark all categories as read?'**
   String get markAllForumsAsRead;
 
   /// Message explaining mark all forums as read action
   ///
   /// In en, this message translates to:
-  /// **'This will mark all forums and topics as read. This action cannot be undone.'**
+  /// **'This will mark all categories and topics as read. This action cannot be undone.'**
   String get markAllForumsAsReadMessage;
 
   /// Button text to mark as read

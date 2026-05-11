@@ -1206,14 +1206,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifications => 'Notifications';
 
   @override
-  String get forums => 'Forums';
+  String get forums => 'Categories';
 
   @override
-  String get markAllForumsAsRead => 'Mark All Forums as Read?';
+  String get markAllForumsAsRead => 'Mark all categories as read?';
 
   @override
   String get markAllForumsAsReadMessage =>
-      'This will mark all forums and topics as read. This action cannot be undone.';
+      'This will mark all categories and topics as read. This action cannot be undone.';
 
   @override
   String get markAsRead => 'Mark as Read';
