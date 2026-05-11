@@ -313,22 +313,21 @@ class _ReplyPageState extends State<ReplyPage> {
       
       if (uploadAttachmentResult.result) {
         debugPrint('✅ [REPLY] File upload successful');
-        
-        // Store attachment ID and group ID
-        if (uploadAttachmentResult.attachmentId != null && uploadAttachmentResult.attachmentId!.isNotEmpty) {
+
+        // Phase 5.19 — store Discourse's `short_url` so the proxy can
+        // append `![image](upload://...)` markdown to the post body
+        // before submitting. The numeric `attachmentId` isn't useful
+        // on Discourse — it's the short_url that goes in the post raw.
+        final shortUrl = uploadAttachmentResult.groupId;
+        if (shortUrl != null && shortUrl.isNotEmpty) {
           setState(() {
-            _attachmentIds.add(uploadAttachmentResult.attachmentId!);
-            // Update groupId if provided (should be consistent across all uploads)
-            if (uploadAttachmentResult.groupId != null && uploadAttachmentResult.groupId!.isNotEmpty) {
-              _groupId = uploadAttachmentResult.groupId;
-            }
+            _attachmentIds.add(shortUrl);
           });
-          debugPrint('✅ [REPLY] Stored attachmentId: ${uploadAttachmentResult.attachmentId}');
-          debugPrint('✅ [REPLY] Current attachmentIds: $_attachmentIds');
-          debugPrint('✅ [REPLY] Current groupId: "$_groupId"');
-          return uploadAttachmentResult.attachmentId;
+          debugPrint('✅ [REPLY] Stored shortUrl: $shortUrl');
+          debugPrint('✅ [REPLY] Current attachmentRefs: $_attachmentIds');
+          return shortUrl;
         } else {
-          debugPrint('⚠️ [REPLY] Upload succeeded but attachmentId is null or empty');
+          debugPrint('⚠️ [REPLY] Upload succeeded but short_url is null or empty');
           return null;
         }
       } else {

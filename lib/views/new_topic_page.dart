@@ -325,19 +325,22 @@ class _NewTopicPageState extends State<NewTopicPage> {
       if (uploadAttachmentResult.result) {
         debugPrint('✅ [NEW_TOPIC] File upload successful');
 
-        // Store attachment ID and group ID
-        if (uploadAttachmentResult.attachmentId != null && uploadAttachmentResult.attachmentId!.isNotEmpty) {
+        // Phase 5.19 — store Discourse's `short_url` (carried in
+        // `FCAttachmentUploadResult.groupId` because the SDK's XF
+        // shape doesn't have a dedicated short_url field). The
+        // numeric `attachmentId` is useless on Discourse — what the
+        // post needs to reference the upload is the `upload://...`
+        // short_url, which the proxy's `appendAttachmentMarkdown`
+        // turns into the right Markdown image / file ref before
+        // POSTing.
+        final shortUrl = uploadAttachmentResult.groupId;
+        if (shortUrl != null && shortUrl.isNotEmpty) {
           setState(() {
-            _attachmentIds.add(uploadAttachmentResult.attachmentId!);
-            // Update groupId if provided (should be consistent across all uploads)
-            if (uploadAttachmentResult.groupId != null && uploadAttachmentResult.groupId!.isNotEmpty) {
-              _groupId = uploadAttachmentResult.groupId;
-            }
+            _attachmentIds.add(shortUrl);
           });
-          debugPrint('✅ [NEW_TOPIC] Stored attachmentId: ${uploadAttachmentResult.attachmentId}');
-          debugPrint('✅ [NEW_TOPIC] Current attachmentIds: $_attachmentIds');
-          debugPrint('✅ [NEW_TOPIC] Current groupId: "$_groupId"');
-          return uploadAttachmentResult.attachmentId;
+          debugPrint('✅ [NEW_TOPIC] Stored shortUrl: $shortUrl');
+          debugPrint('✅ [NEW_TOPIC] Current attachmentRefs: $_attachmentIds');
+          return shortUrl;
         } else {
           debugPrint('⚠️ [NEW_TOPIC] Upload succeeded but attachmentId is null or empty');
           return null;

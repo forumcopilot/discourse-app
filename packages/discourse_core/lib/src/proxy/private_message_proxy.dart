@@ -200,12 +200,19 @@ class DiscoursePrivateMessageProxy extends BaseDiscourseProxy
     List<String>? attachmentIds,
     String? groupId,
   ) async {
+    // Phase 5.19 — append Markdown refs for any uploaded attachments
+    // before posting (same pattern as `topic_proxy.newTopic` and
+    // `post_proxy.replyPostAsync`). PM uploads should have been
+    // performed with `for_private_message=true` so the attachment URLs
+    // are scoped to sender + recipient only.
+    final rawWithAttachments =
+        appendAttachmentMarkdown(textBody, attachmentIds);
     if (action == 1 && pmId != null && pmId.isNotEmpty) {
       // Reply: post into the existing PM topic.
       try {
         final response = await apiPost('/posts.json', body: {
           'topic_id': int.tryParse(pmId) ?? pmId,
-          'raw': textBody,
+          'raw': rawWithAttachments,
           'archetype': 'private_message',
         });
         return FCCreateMessageResult(
@@ -237,7 +244,7 @@ class DiscoursePrivateMessageProxy extends BaseDiscourseProxy
         'archetype': 'private_message',
         'target_recipients': userName.join(','),
         'title': subject,
-        'raw': textBody,
+        'raw': rawWithAttachments,
       });
       return FCCreateMessageResult(
         result: true,

@@ -256,20 +256,19 @@ class _EditConversationMessagePageState extends State<EditConversationMessagePag
       );
 
       if (uploadAttachmentResult.result) {
-        // Store attachment ID and group ID
-        if (uploadAttachmentResult.attachmentId != null && uploadAttachmentResult.attachmentId!.isNotEmpty) {
+        // Phase 5.19 — store Discourse short_url (carried in `groupId`)
+        // so the proxy can build `![image](upload://...)` Markdown
+        // when the edit is saved.
+        final shortUrl = uploadAttachmentResult.groupId;
+        if (shortUrl != null && shortUrl.isNotEmpty) {
           setState(() {
-            _attachmentIds.add(uploadAttachmentResult.attachmentId!);
-            // Update groupId if provided (should be consistent across all uploads)
-            if (uploadAttachmentResult.groupId != null && uploadAttachmentResult.groupId!.isNotEmpty) {
-              _groupId = uploadAttachmentResult.groupId;
-            }
+            _attachmentIds.add(shortUrl);
           });
         } else {
           return null;
         }
 
-        return uploadAttachmentResult.attachmentId;
+        return shortUrl;
       } else {
         throw Exception(uploadAttachmentResult.resultText ?? 'Failed to upload file');
       }

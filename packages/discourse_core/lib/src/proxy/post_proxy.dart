@@ -271,9 +271,16 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     bool returnHtml,
   ) async {
     try {
+      // Phase 5.19 — append Markdown image/file refs for each
+      // uploaded attachment before posting. See `appendAttachmentMarkdown`
+      // for the format (`![image](upload://...)` for images, file
+      // attachment syntax for everything else). `attachmentIds`
+      // carries Discourse short_urls here, not numeric IDs.
+      final rawWithAttachments =
+          appendAttachmentMarkdown(textBody, attachmentIds);
       final response = await apiPost('/posts.json', body: {
         'topic_id': int.tryParse(topicId) ?? topicId,
-        'raw': textBody,
+        'raw': rawWithAttachments,
         'archetype': 'regular',
       });
       return FCReplyPostResult(
@@ -352,9 +359,14 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     String? prefix,
   ) async {
     try {
+      // Phase 5.19 — append Markdown refs for any newly-uploaded
+      // attachments before saving the edit. Already-embedded
+      // attachments stay in `postContent` as-is.
+      final rawWithAttachments =
+          appendAttachmentMarkdown(postContent, attachmentIds);
       final body = <String, dynamic>{
         'post': {
-          'raw': postContent,
+          'raw': rawWithAttachments,
           if (reason != null && reason.isNotEmpty) 'edit_reason': reason,
         },
       };

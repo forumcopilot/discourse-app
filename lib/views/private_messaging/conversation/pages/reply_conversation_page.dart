@@ -366,22 +366,21 @@ class _ReplyConversationPageState extends State<ReplyConversationPage> {
       if (uploadAttachmentResult.result) {
         debugPrint('✅ [REPLY_CONVERSATION] File upload successful');
 
-        // Store attachment ID and group ID, and add file to local list
-        if (uploadAttachmentResult.attachmentId != null && uploadAttachmentResult.attachmentId!.isNotEmpty) {
+        // Phase 5.19 — store Discourse's `short_url`. The upload was
+        // made with `for_private_message=true` (the proxy translates
+        // type='pm' to that flag) so the URL is access-scoped to the
+        // PM participants.
+        final shortUrl = uploadAttachmentResult.groupId;
+        if (shortUrl != null && shortUrl.isNotEmpty) {
           setState(() {
-            _attachmentIds.add(uploadAttachmentResult.attachmentId!);
+            _attachmentIds.add(shortUrl);
             _attachments.add(file);
-            // Update groupId if provided (should be consistent across all uploads)
-            if (uploadAttachmentResult.groupId != null && uploadAttachmentResult.groupId!.isNotEmpty) {
-              _groupId = uploadAttachmentResult.groupId;
-            }
           });
-          debugPrint('✅ [REPLY_CONVERSATION] Stored attachmentId: ${uploadAttachmentResult.attachmentId}');
-          debugPrint('✅ [REPLY_CONVERSATION] Current attachmentIds: $_attachmentIds');
-          debugPrint('✅ [REPLY_CONVERSATION] Current groupId: "$_groupId"');
-          return uploadAttachmentResult.attachmentId;
+          debugPrint('✅ [REPLY_CONVERSATION] Stored shortUrl: $shortUrl');
+          debugPrint('✅ [REPLY_CONVERSATION] Current attachmentRefs: $_attachmentIds');
+          return shortUrl;
         } else {
-          debugPrint('⚠️ [REPLY_CONVERSATION] Upload succeeded but attachmentId is null or empty');
+          debugPrint('⚠️ [REPLY_CONVERSATION] Upload succeeded but short_url is null or empty');
           setState(() {
             _attachments.add(file); // Still add to UI even if no ID
           });

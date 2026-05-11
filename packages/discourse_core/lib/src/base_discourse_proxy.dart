@@ -134,6 +134,71 @@ abstract class BaseDiscourseProxy {
   String? get currentUserId => siteContext.currentUserId;
   String? get currentUsername => siteContext.currentUsername;
 
+  // ===== Attachment markdown helpers (Phase 5.19) =====
+
+  /// Append Discourse-flavoured Markdown image / file references for
+  /// each uploaded attachment onto a post's `raw` body.
+  ///
+  /// `attachmentRefs` should be a list of Discourse `short_url` strings
+  /// (`upload://abc12345.png`) — that's what `DiscourseAttachmentProxy`
+  /// stashes into `FCAttachmentUploadResult.groupId` after a successful
+  /// upload. The composer pages reinterpret the SDK's legacy
+  /// `attachmentIds` parameter as a list of these short_urls (XF used
+  /// numeric IDs there; Discourse needs the short_url to build the
+  /// markdown reference).
+  ///
+  /// For images (extension `.png` / `.jpg` / `.jpeg` / `.gif` / `.webp`
+  /// / `.heic` / `.bmp` / `.svg`) we emit `![image](upload://...)`
+  /// which Discourse renders inline. For anything else we emit
+  /// `[file|attachment](upload://...)` which renders as a download
+  /// chip — Discourse's standard non-image attachment syntax.
+  ///
+  /// Separator: two newlines between the existing body and the
+  /// attachments block, single newlines between each ref. Matches
+  /// what Discourse web inserts when you drop a file into the
+  /// composer.
+  String appendAttachmentMarkdown(
+    String raw,
+    List<String>? attachmentRefs,
+  ) {
+    if (attachmentRefs == null || attachmentRefs.isEmpty) return raw;
+    // Filter to Discourse short_url refs only. The XF-shaped SDK
+    // passes numeric attachment IDs through this same slot — the
+    // edit flow seeds `_attachmentIds` from the existing post's
+    // `FCAttachment.id` (a numeric id), which on Discourse isn't a
+    // valid post reference. Those numeric IDs would otherwise emit
+    // broken Markdown like `[file|attachment](42)`. Existing
+    // attachments are already in the post raw via Markdown, so
+    // they don't need to be re-appended anyway; the safe move is
+    // to skip anything that isn't a Discourse upload short_url.
+    final pending = attachmentRefs
+        .where((url) =>
+            url.isNotEmpty &&
+            url.startsWith('upload://') &&
+            // Dedup against refs the user already placed inline (the
+            // message composer's tap-to-insert puts `![image](upload://...)`
+            // at the cursor; we don't want to duplicate them at the
+            // bottom on send).
+            !raw.contains(url))
+        .toList();
+    if (pending.isEmpty) return raw;
+    final block = pending.map(_markdownForUpload).join('\n');
+    final trimmed = raw.trimRight();
+    if (trimmed.isEmpty) return block;
+    return '$trimmed\n\n$block';
+  }
+
+  String _markdownForUpload(String shortUrl) {
+    final lower = shortUrl.toLowerCase();
+    const imageExts = [
+      '.png', '.jpg', '.jpeg', '.gif', '.webp', '.heic', '.bmp', '.svg',
+    ];
+    final isImage = imageExts.any(lower.endsWith);
+    return isImage
+        ? '![image]($shortUrl)'
+        : '[file|attachment]($shortUrl)';
+  }
+
   // ===== Legacy plugin-call (deprecated, throws) =====
 
   /// Throws. Phase 0 stub proxies still call this; replace each with

@@ -282,8 +282,26 @@ class _MessageComposePageState extends State<MessageComposePage> {
     );
   }
 
-  /// Inserts attachment BBCode at the current cursor position
-  void _insertAttachmentBBCode(String attachmentId, String insertType) {
+  /// Inserts an attachment reference at the current cursor position.
+  ///
+  /// Phase 5.19 — previously emitted XenForo `[ATTACH=full]id[/ATTACH]`
+  /// BBCode, which Discourse's Markdown engine doesn't parse. Now emits
+  /// Discourse Markdown referencing the upload's `short_url`
+  /// (`![image](upload://abc12345.png)` for images,
+  /// `[file|attachment](upload://...)` for everything else).
+  ///
+  /// `attachmentRef` is the Discourse `short_url` for the upload — the
+  /// composer state stores these in `_fileToAttachmentId` (despite the
+  /// XF-flavoured name; we reinterpret the slot for Discourse). The
+  /// composer's parent page also forwards the same short_urls to the
+  /// post proxy on send; the proxy's `appendAttachmentMarkdown` dedups
+  /// against what's already inline so refs aren't doubled.
+  ///
+  /// `insertType` is retained for API compatibility but no longer
+  /// branches on `full` vs `thumb` — Discourse Markdown doesn't have
+  /// that distinction; the rendered size is governed by the post's
+  /// site/category settings.
+  void _insertAttachmentBBCode(String attachmentRef, String insertType) {
     // Ensure content field has focus
     if (!_contentFocusNode.hasFocus) {
       _contentFocusNode.requestFocus();
@@ -293,22 +311,28 @@ class _MessageComposePageState extends State<MessageComposePage> {
     final int start = value.selection.start;
     final int end = value.selection.end;
 
-    // Construct BBCode based on insert type
-    final String bbcode = insertType == 'full' 
-        ? '[ATTACH=full]$attachmentId[/ATTACH]'
-        : '[ATTACH]$attachmentId[/ATTACH]';
+    // Discourse-flavoured Markdown: image refs get rendered inline;
+    // other file refs render as a download chip.
+    final lower = attachmentRef.toLowerCase();
+    const imageExts = [
+      '.png', '.jpg', '.jpeg', '.gif', '.webp', '.heic', '.bmp', '.svg',
+    ];
+    final isImage = imageExts.any(lower.endsWith);
+    final String markdown = isImage
+        ? '![image]($attachmentRef)'
+        : '[file|attachment]($attachmentRef)';
 
     String newText;
     int cursorPosition;
 
     if (start < 0) {
       // No valid cursor position - append to end
-      newText = '${value.text}$bbcode';
+      newText = '${value.text}$markdown';
       cursorPosition = newText.length;
     } else {
       // Insert at cursor position (replacing selection if any)
-      newText = value.text.replaceRange(start, end, bbcode);
-      cursorPosition = start + bbcode.length;
+      newText = value.text.replaceRange(start, end, markdown);
+      cursorPosition = start + markdown.length;
     }
 
     // Update controller with new text and cursor position

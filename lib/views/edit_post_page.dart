@@ -320,20 +320,19 @@ class _EditPostPageState extends State<EditPostPage> {
       var uploadAttachmentResult = await attachmentProxy.uploadAttachmentAsync("post", forumId, groupId, fileToUpload.name, fileBytes);
 
       if (uploadAttachmentResult.result) {
-        // Store attachment ID and group ID
-        if (uploadAttachmentResult.attachmentId != null && uploadAttachmentResult.attachmentId!.isNotEmpty) {
+        // Phase 5.19 — store Discourse short_url (carried in `groupId`)
+        // so the post-edit proxy can append `![image](upload://...)`
+        // Markdown for the newly-uploaded attachment.
+        final shortUrl = uploadAttachmentResult.groupId;
+        if (shortUrl != null && shortUrl.isNotEmpty) {
           setState(() {
-            _attachmentIds.add(uploadAttachmentResult.attachmentId!);
-            // Update groupId if provided (should be consistent across all uploads)
-            if (uploadAttachmentResult.groupId != null && uploadAttachmentResult.groupId!.isNotEmpty) {
-              _groupId = uploadAttachmentResult.groupId;
-            }
+            _attachmentIds.add(shortUrl);
           });
         } else {
           return null;
         }
 
-        return uploadAttachmentResult.attachmentId;
+        return shortUrl;
       } else {
         throw Exception(uploadAttachmentResult.resultText ?? 'Failed to upload file');
       }

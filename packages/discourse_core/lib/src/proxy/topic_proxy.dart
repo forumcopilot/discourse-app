@@ -309,9 +309,17 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     List<String>? tags,
   }) async {
     try {
+      // Phase 5.19 — `attachmentIds` carries Discourse `upload://` short
+      // URLs (not numeric IDs; the SDK param name is XF-flavoured but
+      // we reinterpret it for Discourse). Append Markdown image/file
+      // refs to the body before posting — otherwise the upload exists
+      // server-side but the post has no reference to it and Discourse
+      // garbage-collects the upload after 7 days.
+      final rawWithAttachments =
+          appendAttachmentMarkdown(textBody, attachmentIds);
       final body = <String, dynamic>{
         'title': subject,
-        'raw': textBody,
+        'raw': rawWithAttachments,
         'category': int.tryParse(forumId) ?? forumId,
         'archetype': 'regular',
       };

@@ -17,9 +17,14 @@ import '../context/discourse_site_context_extension.dart';
 /// single endpoint:
 ///
 ///   `POST /uploads.json` (multipart/form-data)
-///       file=<bytes>           — required
-///       type=<scope>           — composer | avatar | profile_background | …
-///       synchronous=true       — block until processed (we want the URL back)
+///       file=<bytes>             — required
+///       upload_type=<scope>      — composer | avatar | profile_background | …
+///       for_private_message=true — set when the upload will be embedded in
+///                                  a PM, so Discourse scopes the upload's
+///                                  permissions to sender + recipient only.
+///                                  Without this flag the upload is public
+///                                  to anyone who knows the URL — a real
+///                                  privacy leak for PM attachments.
 ///
 /// The response is a JSON body with `id`, `url`, `short_url`,
 /// `original_filename`, `filesize`, `width`, `height`, `extension`. The
@@ -37,7 +42,16 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
     String attachmentName,
     Uint8List attachmentBytes,
   ) =>
-      _upload(attachmentName, attachmentBytes, uploadType: 'composer');
+      // Phase 5.19 — translate the legacy XF-shaped `type` enum
+      // ("post" / "pm" / etc.) into Discourse's two-dimensional
+      // (upload_type, for_private_message) shape. For everything that
+      // isn't a PM, the upload_type is "composer".
+      _upload(
+        attachmentName,
+        attachmentBytes,
+        uploadType: 'composer',
+        forPrivateMessage: type == 'pm',
+      );
 
   @override
   Future<FCAttachmentUploadResult> uploadAvatarAsync(
@@ -124,15 +138,22 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
     String filename,
     Uint8List bytes, {
     required String uploadType,
+    bool forPrivateMessage = false,
   }) async {
     try {
       await FCDioClient.instance.initialize();
       final base = Uri.parse(siteContext.site.url);
       final url = base.replace(path: _joinPath(base.path, '/uploads.json'));
 
+      // `upload_type` is the current Discourse param name (3.4+);
+      // legacy `type` still works but is deprecated. The `synchronous`
+      // flag we used to send was a no-op — `/uploads.json` is always
+      // synchronous from the client's perspective (Discourse processes
+      // optimization async via Sidekiq but returns the upload row
+      // immediately).
       final form = FormData.fromMap({
-        'type': uploadType,
-        'synchronous': 'true',
+        'upload_type': uploadType,
+        if (forPrivateMessage) 'for_private_message': 'true',
         'file': MultipartFile.fromBytes(bytes, filename: filename),
       });
 

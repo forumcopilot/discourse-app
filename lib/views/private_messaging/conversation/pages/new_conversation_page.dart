@@ -915,28 +915,31 @@ class _NewConversationPageState extends State<NewConversationPage> {
       if (uploadAttachmentResult.result) {
         debugPrint('✅ [NEW_CONVERSATION] File upload successful');
 
-        // Store attachment ID and group ID
-        if (uploadAttachmentResult.attachmentId != null && uploadAttachmentResult.attachmentId!.isNotEmpty) {
+        // Phase 5.19 — store Discourse's `short_url` (in `groupId`)
+        // at the matching file index. The proxy turns these into
+        // Discourse `![image](upload://...)` markdown when posting.
+        // PMs were uploaded with `for_private_message=true` (see
+        // `DiscourseAttachmentProxy.uploadAttachmentAsync` translating
+        // type='pm') so the URL is scoped to sender + recipient.
+        final shortUrl = uploadAttachmentResult.groupId;
+        if (shortUrl != null && shortUrl.isNotEmpty) {
           setState(() {
             // Find the index of this file in the attachments list
             final fileIndex = _attachments.indexWhere((f) => f.path == file.path);
             if (fileIndex != -1) {
-              // Insert attachment ID at the correct position
+              // Insert at the correct position so the order in
+              // `_attachmentIds` mirrors `_attachments` (the UI may
+              // pair them up by index for thumbnail rendering).
               while (_attachmentIds.length <= fileIndex) {
                 _attachmentIds.add('');
               }
-              _attachmentIds[fileIndex] = uploadAttachmentResult.attachmentId!;
-            }
-            // Update groupId if provided (should be consistent across all uploads)
-            if (uploadAttachmentResult.groupId != null && uploadAttachmentResult.groupId!.isNotEmpty) {
-              _groupId = uploadAttachmentResult.groupId;
+              _attachmentIds[fileIndex] = shortUrl;
             }
             _uploadingFiles.remove(file.path);
           });
-          debugPrint('✅ [NEW_CONVERSATION] Stored attachmentId: ${uploadAttachmentResult.attachmentId}');
-          debugPrint('✅ [NEW_CONVERSATION] Current attachmentIds: $_attachmentIds');
-          debugPrint('✅ [NEW_CONVERSATION] Current groupId: "$_groupId"');
-          return uploadAttachmentResult.attachmentId;
+          debugPrint('✅ [NEW_CONVERSATION] Stored shortUrl: $shortUrl');
+          debugPrint('✅ [NEW_CONVERSATION] Current attachmentRefs: $_attachmentIds');
+          return shortUrl;
         } else {
           debugPrint('⚠️ [NEW_CONVERSATION] Upload succeeded but attachmentId is null or empty');
           setState(() {
