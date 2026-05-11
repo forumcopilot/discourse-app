@@ -1,15 +1,16 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_user_proxy.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_badge.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_directory_item.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_user.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_tfa_provider.dart';
+import 'package:forumcopilot_sdk/models/results/fc_directory_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_passkey_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
-import '../data/user/discourse_badge.dart';
-import '../data/user/discourse_directory_item.dart';
 
 /// Discourse implementation of IFCUserProxy
 /// Handles user operations and profile management for Discourse forums
@@ -222,60 +223,116 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
   /// `topics_entered` / `topic_count` / `post_count` / `posts_read` /
   /// `days_visited`.
   /// [page] is 1-indexed; Discourse returns 50 rows per page.
-  Future<List<DiscourseDirectoryItem>> getDirectoryItemsAsync({
-    String period = 'all',
-    String order = 'likes_received',
-    int page = 1,
-  }) async {
+  @override
+  Future<FCDirectoryItemResult> getDirectoryItemsAsync(
+    String period,
+    String order,
+    int page,
+  ) async {
     try {
       final response = await apiGet('/directory_items.json', query: {
         'period': period,
         'order': order,
         if (page > 1) 'page': page.toString(),
       });
-      final items = ((response['directory_items'] as List?) ?? const [])
+      final raw = ((response['directory_items'] as List?) ?? const [])
           .whereType<Map>()
           .map((d) => d.cast<String, dynamic>())
           .toList();
-      return items
-          .map((j) => DiscourseDirectoryItem.fromJson(
-                j,
-                siteUrl: siteContext.site.url,
-              ))
+      final items = raw
+          .map((j) => _directoryItemFromJson(j))
           .toList(growable: false);
+      final total = (response['total_rows_directory_items'] as num?)
+              ?.toInt() ??
+          items.length;
+      return FCDirectoryItemResult(
+        result: true,
+        total: total,
+        items: items,
+      );
+    } on DiscourseApiException catch (e) {
+      return FCDirectoryItemResult(
+        result: false,
+        resultText: e.userMessage,
+        total: 0,
+        items: const [],
+      );
     } catch (e) {
-      // ignore: avoid_print
-      print('❌ [DISCOURSE_USER] getDirectoryItemsAsync error: $e');
-      return const [];
+      return FCDirectoryItemResult(
+        result: false,
+        resultText: 'Error: $e',
+        total: 0,
+        items: const [],
+      );
     }
   }
 
-  /// Phase 5.18c-3 — fetch every visible badge on the forum from
-  /// `/badges.json`. Unlike `getUserBadgesAsync` (which returns only
-  /// the badges granted to a specific user), this lists the full
-  /// badge catalogue with each badge's `grant_count` so the
-  /// directory can rank by "how many people have earned this".
-  ///
-  /// Returns badges sorted by `grant_count` descending — the most
-  /// commonly-held badges surface first, which matches how
-  /// Discourse's own `/badges` web page ranks them.
-  Future<List<DiscourseBadge>> getAllBadgesAsync() async {
+  @override
+  Future<FCBadgeResult> getAllBadgesAsync() async {
     try {
       final response = await apiGet('/badges.json');
       final raw = (response['badges'] as List?) ?? const [];
       final badges = raw
           .whereType<Map>()
-          .map((d) => DiscourseBadge.fromJson(
-                definition: d.cast<String, dynamic>(),
-              ))
+          .map((d) => _badgeFromJson(definition: d.cast<String, dynamic>()))
           .toList();
       badges.sort((a, b) => b.grantCount.compareTo(a.grantCount));
-      return badges;
+      return FCBadgeResult(result: true, badges: badges);
+    } on DiscourseApiException catch (e) {
+      return FCBadgeResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      // ignore: avoid_print
-      print('❌ [DISCOURSE_USER] getAllBadgesAsync error: $e');
-      return const [];
+      return FCBadgeResult(result: false, resultText: 'Error: $e');
     }
+  }
+
+  FCDirectoryItem _directoryItemFromJson(Map<String, dynamic> json) {
+    final user = (json['user'] as Map<String, dynamic>?) ?? const {};
+    String avatarUrl = '';
+    final tpl = user['avatar_template'] as String?;
+    if (tpl != null && tpl.isNotEmpty) {
+      final filled = tpl.replaceAll('{size}', '90');
+      avatarUrl =
+          filled.startsWith('http') ? filled : '${siteContext.site.url}$filled';
+    }
+    int statAt(String key) {
+      final raw = json[key] ?? user[key];
+      if (raw is num) return raw.toInt();
+      return 0;
+    }
+
+    return FCDirectoryItem(
+      id: (user['id'] as num?)?.toInt() ?? 0,
+      username: (user['username'] ?? '').toString(),
+      name: (user['name'] as String?)?.trim().isNotEmpty == true
+          ? user['name'] as String
+          : null,
+      avatarUrl: avatarUrl,
+      trustLevel: (user['trust_level'] as num?)?.toInt(),
+      likesReceived: statAt('likes_received'),
+      likesGiven: statAt('likes_given'),
+      topicsEntered: statAt('topics_entered'),
+      postsRead: statAt('posts_read'),
+      daysVisited: statAt('days_visited'),
+      topicCount: statAt('topic_count'),
+      postCount: statAt('post_count'),
+    );
+  }
+
+  FCBadge _badgeFromJson({
+    required Map<String, dynamic> definition,
+    Map<String, dynamic>? grant,
+  }) {
+    return FCBadge(
+      id: (definition['id'] as num).toInt(),
+      name: (definition['name'] ?? '').toString(),
+      description: definition['description']?.toString(),
+      icon: definition['icon']?.toString(),
+      imageUrl: definition['image_url']?.toString(),
+      badgeTypeId: (definition['badge_type_id'] as num?)?.toInt() ?? 1,
+      grantedAt: DateTime.tryParse(grant?['granted_at']?.toString() ?? ''),
+      grantCount: (grant?['count'] as num?)?.toInt() ?? 1,
+      granted: grant != null,
+    );
   }
 
   @override
@@ -781,12 +838,11 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
   // bool-returning sidecar did (e.g. "requires the discourse-follow
   // plugin" vs. a silent false).
 
-  /// Discourse-only: fetch the badges granted to [username]. Hits
-  /// `/user-badges/{username}.json` (Discourse's stable endpoint for
-  /// per-user badge grants), de-dupes multi-grants, and returns the
-  /// merged definitions newest-first.
-  Future<List<DiscourseBadge>> getUserBadgesAsync(String username) async {
-    if (username.isEmpty) return const [];
+  @override
+  Future<FCBadgeResult> getUserBadgesAsync(String username) async {
+    if (username.isEmpty) {
+      return FCBadgeResult(result: false, resultText: 'username required');
+    }
     try {
       final response = await apiGet(
           '/user-badges/${Uri.encodeComponent(username)}.json');
@@ -797,15 +853,14 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         final id = d['id'];
         if (id is int) defs[id] = d;
       }
-      final out = <DiscourseBadge>[];
+      final out = <FCBadge>[];
       // Discourse may return user_badges or user_badge_info — we accept
       // both shapes. The list is the per-user grants (one entry per
-      // grant, so duplicates exist for stackable badges).
+      // grant, so duplicates exist for stackable badges). First wins
+      // for newest-first if Discourse returns them in granted order.
       final grants = ((response['user_badges'] as List?) ?? const [])
           .whereType<Map>()
           .toList();
-      // Track which badge ids we've already emitted; first wins for
-      // newest-first if Discourse returns them in granted order.
       final seen = <int>{};
       for (final raw in grants) {
         final g = raw.cast<String, dynamic>();
@@ -813,11 +868,13 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         if (badgeId == null || !seen.add(badgeId)) continue;
         final def = defs[badgeId];
         if (def == null) continue;
-        out.add(DiscourseBadge.fromJson(definition: def, grant: g));
+        out.add(_badgeFromJson(definition: def, grant: g));
       }
-      return out;
-    } catch (_) {
-      return const [];
+      return FCBadgeResult(result: true, badges: out);
+    } on DiscourseApiException catch (e) {
+      return FCBadgeResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCBadgeResult(result: false, resultText: 'Error: $e');
     }
   }
 }

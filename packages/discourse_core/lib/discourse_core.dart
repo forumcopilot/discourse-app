@@ -49,8 +49,6 @@ export 'src/data/chat/discourse_chat_message.dart';
 export 'src/data/post/discourse_suggested_topic.dart';
 export 'src/data/search/discourse_search_filters.dart';
 export 'src/data/group/discourse_group.dart';
-export 'src/data/user/discourse_badge.dart';
-export 'src/data/user/discourse_directory_item.dart';
 
 // Converters
 export 'src/converter/discourse_user_converter.dart';

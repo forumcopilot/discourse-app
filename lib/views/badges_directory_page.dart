@@ -1,7 +1,7 @@
-import 'package:discourse_core/discourse_core.dart';
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_badge.dart';
 
 import '../theme/design_tokens.dart';
 import 'widgets/empty_state_view.dart';
@@ -28,7 +28,7 @@ class BadgesDirectoryPage extends StatefulWidget {
 }
 
 class _BadgesDirectoryPageState extends State<BadgesDirectoryPage> {
-  List<DiscourseBadge> _badges = const [];
+  List<FCBadge> _badges = const [];
   bool _loading = false;
   String? _error;
 
@@ -44,18 +44,18 @@ class _BadgesDirectoryPageState extends State<BadgesDirectoryPage> {
       _error = null;
     });
     try {
-      final proxy = SiteProxyFactory.getUserProxy();
-      if (proxy is! DiscourseUserProxy) {
-        setState(() {
-          _loading = false;
-          _error = 'Badges require a Discourse forum.';
-        });
-        return;
-      }
-      final badges = await proxy.getAllBadgesAsync();
+      final result =
+          await SiteProxyService.getUserProxy().getAllBadgesAsync();
       if (!mounted) return;
       setState(() {
-        _badges = badges;
+        if (result.result) {
+          _badges = result.badges;
+        } else {
+          _badges = const [];
+          _error = result.resultText?.isNotEmpty == true
+              ? result.resultText
+              : 'Failed to load badges.';
+        }
         _loading = false;
       });
     } catch (e) {
@@ -95,13 +95,13 @@ class _BadgesDirectoryPageState extends State<BadgesDirectoryPage> {
     // section badges stay in the rank order returned by the proxy
     // (grant_count desc).
     final gold = _badges
-        .where((b) => b.tier == DiscourseBadgeTier.gold)
+        .where((b) => b.tier == FCBadgeTier.gold)
         .toList(growable: false);
     final silver = _badges
-        .where((b) => b.tier == DiscourseBadgeTier.silver)
+        .where((b) => b.tier == FCBadgeTier.silver)
         .toList(growable: false);
     final bronze = _badges
-        .where((b) => b.tier == DiscourseBadgeTier.bronze)
+        .where((b) => b.tier == FCBadgeTier.bronze)
         .toList(growable: false);
 
     return RefreshIndicator(
@@ -121,7 +121,7 @@ class _BadgesDirectoryPageState extends State<BadgesDirectoryPage> {
 
 class _BadgeSection extends StatelessWidget {
   final String label;
-  final List<DiscourseBadge> badges;
+  final List<FCBadge> badges;
 
   const _BadgeSection({required this.label, required this.badges});
 
@@ -156,7 +156,7 @@ class _BadgeSection extends StatelessWidget {
 }
 
 class _BadgeRow extends StatelessWidget {
-  final DiscourseBadge badge;
+  final FCBadge badge;
   const _BadgeRow({required this.badge});
 
   @override
@@ -285,14 +285,14 @@ class _BadgeRow extends StatelessWidget {
     );
   }
 
-  static Color _tierColor(DiscourseBadgeTier tier) {
+  static Color _tierColor(FCBadgeTier tier) {
     // Bronze / Silver / Gold using Discourse-web's badge palette.
     switch (tier) {
-      case DiscourseBadgeTier.gold:
+      case FCBadgeTier.gold:
         return const Color(0xFFE5A839); // Discourse gold
-      case DiscourseBadgeTier.silver:
+      case FCBadgeTier.silver:
         return const Color(0xFFB0B0B0);
-      case DiscourseBadgeTier.bronze:
+      case FCBadgeTier.bronze:
         return const Color(0xFFCD7F32);
     }
   }

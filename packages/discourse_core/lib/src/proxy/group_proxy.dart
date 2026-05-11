@@ -1,9 +1,9 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_directory_item.dart';
 
 import '../base_discourse_proxy.dart';
 import '../data/group/discourse_group.dart';
-import '../data/user/discourse_directory_item.dart';
 
 /// Discourse-only proxy for the Groups API.
 ///
@@ -62,14 +62,14 @@ class DiscourseGroupProxy extends BaseDiscourseProxy {
     }
   }
 
-  /// List the members of a group. Reuses `DiscourseDirectoryItem`
-  /// because Discourse returns the same user shape here as in
+  /// List the members of a group. Reuses [FCDirectoryItem] because
+  /// Discourse returns the same user shape here as in
   /// `/directory_items.json` (without the activity stats — those
-  /// fall back to 0 via the `statAt` fallback in `fromJson`).
+  /// fall back to 0).
   ///
   /// [limit] caps the page size; Discourse accepts up to 200 but
   /// defaults to 50 if absent.
-  Future<List<DiscourseDirectoryItem>> getGroupMembersAsync(
+  Future<List<FCDirectoryItem>> getGroupMembersAsync(
     String name, {
     int offset = 0,
     int limit = 50,
@@ -83,19 +83,29 @@ class DiscourseGroupProxy extends BaseDiscourseProxy {
         },
       );
       // The response wraps members in `members: [...]` plus
-      // `owners: [...]` for the group's admins. We merge both into
-      // the same list so the UI shows everyone — owners appear at
-      // the top as the API returns them.
-      final members = <DiscourseDirectoryItem>[];
+      // `owners: [...]` for the group's admins. Merge both so the UI
+      // shows everyone — owners appear at the top as the API returns.
+      final members = <FCDirectoryItem>[];
       for (final key in const ['owners', 'members']) {
         final list = (response[key] as List?) ?? const [];
         for (final raw in list.whereType<Map>()) {
-          // The members endpoint returns user objects directly (not
-          // wrapped in `user: {...}` like /directory_items). Wrap
-          // them so DiscourseDirectoryItem.fromJson can parse.
-          members.add(DiscourseDirectoryItem.fromJson(
-            {'user': raw.cast<String, dynamic>()},
-            siteUrl: siteContext.site.url,
+          final user = raw.cast<String, dynamic>();
+          String avatarUrl = '';
+          final tpl = user['avatar_template'] as String?;
+          if (tpl != null && tpl.isNotEmpty) {
+            final filled = tpl.replaceAll('{size}', '90');
+            avatarUrl = filled.startsWith('http')
+                ? filled
+                : '${siteContext.site.url}$filled';
+          }
+          members.add(FCDirectoryItem(
+            id: (user['id'] as num?)?.toInt() ?? 0,
+            username: (user['username'] ?? '').toString(),
+            name: (user['name'] as String?)?.trim().isNotEmpty == true
+                ? user['name'] as String
+                : null,
+            avatarUrl: avatarUrl,
+            trustLevel: (user['trust_level'] as num?)?.toInt(),
           ));
         }
       }

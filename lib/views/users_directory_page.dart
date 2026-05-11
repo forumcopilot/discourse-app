@@ -1,7 +1,7 @@
-import 'package:discourse_core/discourse_core.dart';
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_directory_item.dart';
 
 import '../theme/design_tokens.dart';
 import 'user_profile_page.dart';
@@ -115,7 +115,7 @@ extension _DirectoryOrderX on _DirectoryOrder {
 
 class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
   final ScrollController _scrollController = ScrollController();
-  final List<DiscourseDirectoryItem> _items = [];
+  final List<FCDirectoryItem> _items = [];
   _DirectoryPeriod _period = _DirectoryPeriod.all;
   _DirectoryOrder _order = _DirectoryOrder.likesReceived;
   int _page = 1;
@@ -155,20 +155,12 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
       if (reset) _error = null;
     });
     try {
-      final proxy = SiteProxyFactory.getUserProxy();
-      if (proxy is! DiscourseUserProxy) {
-        setState(() {
-          _loading = false;
-          _error = 'Users directory requires a Discourse forum.';
-          _hasMore = false;
-        });
-        return;
-      }
       final fetchedPage = reset ? 1 : _page + 1;
-      final result = await proxy.getDirectoryItemsAsync(
-        period: _period.apiName,
-        order: _order.apiName,
-        page: fetchedPage,
+      final result = await SiteProxyService.getUserProxy()
+          .getDirectoryItemsAsync(
+        _period.apiName,
+        _order.apiName,
+        fetchedPage,
       );
       if (!mounted) return;
       setState(() {
@@ -176,14 +168,19 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
           _items.clear();
           _page = 1;
         }
-        if (result.isEmpty) {
+        if (!result.result) {
+          _error = result.resultText?.isNotEmpty == true
+              ? result.resultText
+              : 'Failed to load directory.';
+          _hasMore = false;
+        } else if (result.items.isEmpty) {
           _hasMore = false;
         } else {
-          _items.addAll(result);
+          _items.addAll(result.items);
           _page = fetchedPage;
           // Discourse returns 50 per page by default; anything less
           // is the last page.
-          if (result.length < 50) _hasMore = false;
+          if (result.items.length < 50) _hasMore = false;
         }
         _loading = false;
       });
@@ -329,7 +326,7 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
 }
 
 class _UserRow extends StatelessWidget {
-  final DiscourseDirectoryItem item;
+  final FCDirectoryItem item;
   final _DirectoryOrder order;
   final VoidCallback onTap;
 

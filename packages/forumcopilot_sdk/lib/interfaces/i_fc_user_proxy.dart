@@ -1,3 +1,4 @@
+import '../models/results/fc_directory_result.dart';
 import '../models/results/fc_passkey_result.dart';
 import '../models/results/fc_user_result.dart';
 import '../models/results/fc_private_conversation_result.dart';
@@ -76,4 +77,23 @@ abstract class IFCUserProxy {
   /// Report a user for inappropriate behavior
   /// This function is used to report a problematic user to moderators
   Future<FCReportUserResult> reportUserAsync(String userId, String reason);
+
+  /// Phase 5.38 — browse the community directory (Discourse:
+  /// `GET /directory_items.json`). [period] is one of `daily`,
+  /// `weekly`, `monthly`, `quarterly`, `yearly`, `all`; [order] is a
+  /// stat key (`likes_received`, `posts_read`, etc.).
+  Future<FCDirectoryItemResult> getDirectoryItemsAsync(
+    String period,
+    String order,
+    int page,
+  );
+
+  /// Phase 5.38 — list every badge the forum offers (Discourse:
+  /// `GET /badges.json`). Used by the badges directory page.
+  Future<FCBadgeResult> getAllBadgesAsync();
+
+  /// Phase 5.38 — list the badges awarded to [username] (Discourse:
+  /// `GET /user-badges/{username}.json`). Used by the user-profile
+  /// badges row.
+  Future<FCBadgeResult> getUserBadgesAsync(String username);
 }

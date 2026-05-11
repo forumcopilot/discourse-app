@@ -1,7 +1,6 @@
-import 'package:discourse_core/discourse_core.dart'
-    show DiscourseBadge, DiscourseBadgeTier, DiscourseUserProxy;
 import 'package:flutter/material.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_badge.dart';
 
 import '../../theme/design_tokens.dart';
 
@@ -22,7 +21,7 @@ class UserBadgesRow extends StatefulWidget {
 }
 
 class _UserBadgesRowState extends State<UserBadgesRow> {
-  List<DiscourseBadge>? _badges;
+  List<FCBadge>? _badges;
   bool _loading = false;
 
   @override
@@ -38,20 +37,13 @@ class _UserBadgesRowState extends State<UserBadgesRow> {
   }
 
   Future<void> _load() async {
-    final proxy = SiteProxyFactory.getUserProxy();
-    if (proxy is! DiscourseUserProxy) {
-      setState(() {
-        _badges = const [];
-        _loading = false;
-      });
-      return;
-    }
     setState(() => _loading = true);
     try {
-      final result = await proxy.getUserBadgesAsync(widget.username);
+      final result = await SiteProxyService.getUserProxy()
+          .getUserBadgesAsync(widget.username);
       if (!mounted) return;
       setState(() {
-        _badges = result;
+        _badges = result.result ? result.badges : const [];
         _loading = false;
       });
     } catch (_) {
@@ -63,30 +55,30 @@ class _UserBadgesRowState extends State<UserBadgesRow> {
     }
   }
 
-  Color _bgFor(DiscourseBadgeTier tier, ColorScheme colorScheme) {
+  Color _bgFor(FCBadgeTier tier, ColorScheme colorScheme) {
     switch (tier) {
-      case DiscourseBadgeTier.gold:
+      case FCBadgeTier.gold:
         return const Color(0xFFFFC857).withOpacity(0.18);
-      case DiscourseBadgeTier.silver:
+      case FCBadgeTier.silver:
         return const Color(0xFFC0C0C0).withOpacity(0.18);
-      case DiscourseBadgeTier.bronze:
+      case FCBadgeTier.bronze:
         return const Color(0xFFCD7F32).withOpacity(0.18);
     }
   }
 
-  Color _fgFor(DiscourseBadgeTier tier) {
+  Color _fgFor(FCBadgeTier tier) {
     switch (tier) {
-      case DiscourseBadgeTier.gold:
+      case FCBadgeTier.gold:
         return const Color(0xFFB78700);
-      case DiscourseBadgeTier.silver:
+      case FCBadgeTier.silver:
         return const Color(0xFF707070);
-      case DiscourseBadgeTier.bronze:
+      case FCBadgeTier.bronze:
         return const Color(0xFF8B5A2B);
     }
   }
 
   void _showAll(BuildContext context) {
-    final badges = _badges ?? const <DiscourseBadge>[];
+    final badges = _badges ?? const <FCBadge>[];
     if (badges.isEmpty) return;
     showModalBottomSheet(
       context: context,
@@ -195,7 +187,7 @@ class _UserBadgesRowState extends State<UserBadgesRow> {
 }
 
 class _AllBadgesSheet extends StatelessWidget {
-  final List<DiscourseBadge> badges;
+  final List<FCBadge> badges;
   final ScrollController scrollController;
 
   const _AllBadgesSheet({

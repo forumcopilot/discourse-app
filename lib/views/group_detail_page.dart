@@ -1,6 +1,7 @@
 import 'package:discourse_core/discourse_core.dart';
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_directory_item.dart';
 
 import '../theme/design_tokens.dart';
 import 'user_profile_page.dart';
@@ -34,7 +35,7 @@ class GroupDetailPage extends StatefulWidget {
 class _GroupDetailPageState extends State<GroupDetailPage> {
   final ScrollController _scrollController = ScrollController();
   DiscourseGroup? _group;
-  final List<DiscourseDirectoryItem> _members = [];
+  final List<FCDirectoryItem> _members = [];
   bool _loadingGroup = true;
   bool _loadingMembers = false;
   bool _hasMore = true;
@@ -86,7 +87,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
       ]);
       if (!mounted) return;
       final group = results[0] as DiscourseGroup?;
-      final members = results[1] as List<DiscourseDirectoryItem>;
+      final members = results[1] as List<FCDirectoryItem>;
       setState(() {
         _group = group;
         _members
@@ -264,7 +265,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
 }
 
 class _MemberRow extends StatelessWidget {
-  final DiscourseDirectoryItem item;
+  final FCDirectoryItem item;
   final VoidCallback onTap;
 
   const _MemberRow({required this.item, required this.onTap});
