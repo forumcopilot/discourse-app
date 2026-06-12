@@ -84,7 +84,7 @@ class SubforumHeaderWidget extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityMediumLow),
+              color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
               width: DesignTokens.borderWidthThin,
             ),
           ),
@@ -112,8 +112,7 @@ class SubforumHeaderWidget extends StatelessWidget {
                             (isDarkMode 
                               ? _getDarkModePatternColor(_getBackgroundThemeColor(context))
                               : _getBackgroundThemeColor(context)
-                            ).withOpacity(
-                              isDarkMode ? DesignTokens.opacityHigh : DesignTokens.opacityMediumLow,  // Much higher opacity in dark mode for darker effect
+                            ).withValues(alpha: isDarkMode ? DesignTokens.opacityHigh : DesignTokens.opacityMediumLow,  // Much higher opacity in dark mode for darker effect
                             ),
                             isDarkMode 
                               ? BlendMode.multiply  // Darker blend for dark mode - makes pattern more visible
@@ -129,8 +128,8 @@ class SubforumHeaderWidget extends StatelessWidget {
                         // Text readability overlay - darker in dark mode to make pattern more subtle
                         Container(
                           color: isDarkMode 
-                            ? Colors.black.withOpacity(DesignTokens.opacityMediumLow)
-                            : Colors.white.withOpacity(DesignTokens.opacityMedium),
+                            ? Colors.black.withValues(alpha: DesignTokens.opacityMediumLow)
+                            : Colors.white.withValues(alpha: DesignTokens.opacityMedium),
                         ),
                       ],
                     ),
@@ -155,8 +154,8 @@ class SubforumHeaderWidget extends StatelessWidget {
                               // Color overlay for better text readability
                               Container(
                                 color: isDarkMode 
-                                  ? Colors.black.withOpacity(DesignTokens.opacityMediumLow)
-                                  : Colors.white.withOpacity(DesignTokens.opacityHigh),
+                                  ? Colors.black.withValues(alpha: DesignTokens.opacityMediumLow)
+                                  : Colors.white.withValues(alpha: DesignTokens.opacityHigh),
                               ),
                             ],
                           );

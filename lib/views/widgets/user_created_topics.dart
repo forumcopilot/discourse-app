@@ -125,7 +125,7 @@ class _UserCreatedTopicsState extends State<UserCreatedTopics> {
         indent: DesignTokens.spacingL,
         endIndent: DesignTokens.spacingL,
         color: colorScheme.outlineVariant
-            .withOpacity(DesignTokens.opacityDivider),
+            .withValues(alpha: DesignTokens.opacityDivider),
       ),
       itemBuilder: (_, i) => _TopicRow(
         topic: topics[i],

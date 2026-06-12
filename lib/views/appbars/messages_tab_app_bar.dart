@@ -21,7 +21,7 @@ class MessagesTabAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: colorScheme.surface,
       elevation: 3,
-      shadowColor: colorScheme.shadow.withOpacity(DesignTokens.opacityLow),
+      shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
       surfaceTintColor: colorScheme.surfaceTint,
       // Phase 5.18a — auto-imply true is intentional: when this AppBar
       // is hosted in `SiteHomePage`'s Scaffold (Messages-as-bottom-nav-

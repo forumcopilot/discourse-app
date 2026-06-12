@@ -848,10 +848,10 @@ class _ConversationPageState extends State<ConversationPage> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.7),
               border: Border(
                 bottom: BorderSide(
-                  color: Theme.of(context).colorScheme.outlineVariant.withOpacity(DesignTokens.opacityMediumLow),
+                  color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
                   width: 1,
                 ),
               ),
@@ -1384,10 +1384,10 @@ class _ConversationPageState extends State<ConversationPage> {
       bottom: 0,
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, -2),
             ),

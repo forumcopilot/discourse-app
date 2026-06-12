@@ -123,7 +123,7 @@ class _GroupsListPageState extends State<GroupsListPage> {
           height: 1,
           indent: 72,
           color: colorScheme.outlineVariant
-              .withOpacity(DesignTokens.opacityDivider),
+              .withValues(alpha: DesignTokens.opacityDivider),
         ),
         itemBuilder: (_, i) {
           if (i >= _groups.length) {

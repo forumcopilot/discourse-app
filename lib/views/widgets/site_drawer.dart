@@ -239,7 +239,7 @@ class _Header extends StatelessWidget {
                 : 'Not signed in',
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onPrimaryContainer
-                  .withOpacity(DesignTokens.opacityHigh),
+                  .withValues(alpha: DesignTokens.opacityHigh),
             ),
           ),
         ],
@@ -317,7 +317,7 @@ class _Footer extends StatelessWidget {
         '${AppForumConfig.forumName} · v1',
         style: textTheme.labelSmall?.copyWith(
           color: colorScheme.onSurfaceVariant
-              .withOpacity(DesignTokens.opacityMedium),
+              .withValues(alpha: DesignTokens.opacityMedium),
         ),
       ),
     );

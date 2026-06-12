@@ -135,7 +135,7 @@ class ForumSettingsPage extends StatelessWidget {
                     BorderRadius.circular(DesignTokens.radiusM),
                 border: Border.all(
                   color: colorScheme.outlineVariant
-                      .withOpacity(DesignTokens.opacityDivider),
+                      .withValues(alpha: DesignTokens.opacityDivider),
                   width: DesignTokens.borderWidthThin,
                 ),
               ),

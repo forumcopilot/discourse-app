@@ -79,7 +79,7 @@ class EmptyStateView extends StatelessWidget {
               hint!,
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant
-                    .withOpacity(DesignTokens.opacityHigh),
+                    .withValues(alpha: DesignTokens.opacityHigh),
               ),
               textAlign: TextAlign.center,
             ),

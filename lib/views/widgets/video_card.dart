@@ -117,10 +117,10 @@ class _VideoCardState extends State<VideoCard> with AutomaticKeepAliveClientMixi
         margin: EdgeInsets.only(top: DesignTokens.spacingS),
         padding: DesignTokens.paddingS,
         decoration: BoxDecoration(
-          color: colorScheme.surfaceVariant.withOpacity(DesignTokens.opacityLow),
+          color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
           borderRadius: BorderRadius.circular(DesignTokens.radiusS),
           border: Border.all(
-            color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+            color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
             width: DesignTokens.borderWidthThin,
           ),
         ),
@@ -157,10 +157,10 @@ class _VideoCardState extends State<VideoCard> with AutomaticKeepAliveClientMixi
     return Container(
       margin: EdgeInsets.only(top: DesignTokens.spacingS),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withOpacity(DesignTokens.opacityLow),
+        color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
         borderRadius: BorderRadius.circular(DesignTokens.radiusS),
         border: Border.all(
-          color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+          color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
           width: DesignTokens.borderWidthThin,
         ),
       ),
@@ -220,7 +220,7 @@ class _VideoCardState extends State<VideoCard> with AutomaticKeepAliveClientMixi
                           Text(
                             'youtube.com',
                             style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                             ),
                           ),
                         ],
@@ -246,7 +246,7 @@ class _VideoCardState extends State<VideoCard> with AutomaticKeepAliveClientMixi
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
-                        color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+                        color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
@@ -264,7 +264,7 @@ class _VideoCardState extends State<VideoCard> with AutomaticKeepAliveClientMixi
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.6),
+                                color: Colors.black.withValues(alpha: 0.6),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(

@@ -58,11 +58,11 @@ class _UserBadgesRowState extends State<UserBadgesRow> {
   Color _bgFor(FCBadgeTier tier, ColorScheme colorScheme) {
     switch (tier) {
       case FCBadgeTier.gold:
-        return const Color(0xFFFFC857).withOpacity(0.18);
+        return const Color(0xFFFFC857).withValues(alpha: 0.18);
       case FCBadgeTier.silver:
-        return const Color(0xFFC0C0C0).withOpacity(0.18);
+        return const Color(0xFFC0C0C0).withValues(alpha: 0.18);
       case FCBadgeTier.bronze:
-        return const Color(0xFFCD7F32).withOpacity(0.18);
+        return const Color(0xFFCD7F32).withValues(alpha: 0.18);
     }
   }
 
@@ -148,7 +148,7 @@ class _UserBadgesRowState extends State<UserBadgesRow> {
               decoration: BoxDecoration(
                 color: bg,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: fg.withOpacity(0.4), width: 0.6),
+                border: Border.all(color: fg.withValues(alpha: 0.4), width: 0.6),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

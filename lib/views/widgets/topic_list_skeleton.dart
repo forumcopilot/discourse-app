@@ -35,7 +35,7 @@ class TopicListSkeleton extends StatelessWidget {
           height: 1,
           thickness: 1,
           color: colorScheme.outlineVariant
-              .withOpacity(DesignTokens.opacityLow),
+              .withValues(alpha: DesignTokens.opacityLow),
         ),
         itemBuilder: (context, _) => const _TopicSkeletonRow(),
       ),

@@ -197,12 +197,12 @@ class _ReactionTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected
               ? colorScheme.primaryContainer
-              : colorScheme.surfaceContainerHighest.withOpacity(0.6),
+              : colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(28),
           border: Border.all(
             color: selected
                 ? colorScheme.primary
-                : colorScheme.outlineVariant.withOpacity(DesignTokens.opacityMediumLow),
+                : colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
             width: selected ? 1.5 : 0.5,
           ),
         ),

@@ -235,7 +235,7 @@ class _LinkPreviewCardState extends State<LinkPreviewCard> with AutomaticKeepAli
           color: colorScheme.surfaceVariant,
           borderRadius: BorderRadius.circular(DesignTokens.radiusS),
           border: Border.all(
-            color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+            color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
             width: DesignTokens.borderWidthThin,
           ),
         ),
@@ -265,10 +265,10 @@ class _LinkPreviewCardState extends State<LinkPreviewCard> with AutomaticKeepAli
     return Container(
       margin: EdgeInsets.only(top: DesignTokens.spacingS),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withOpacity(DesignTokens.opacityLow),
+        color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
         borderRadius: BorderRadius.circular(DesignTokens.radiusS),
         border: Border.all(
-          color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+          color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
           width: DesignTokens.borderWidthThin,
         ),
       ),
@@ -323,7 +323,7 @@ class _LinkPreviewCardState extends State<LinkPreviewCard> with AutomaticKeepAli
                         Text(
                           _previewData!.description!,
                           style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant.withOpacity(0.8),
+                            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -335,13 +335,13 @@ class _LinkPreviewCardState extends State<LinkPreviewCard> with AutomaticKeepAli
                           Icon(
                             Icons.link,
                             size: DesignTokens.fontSizeXS,
-                            color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                           ),
                           const SizedBox(width: DesignTokens.spacingXS),
                           Text(
                             _previewData?.domain ?? widget.url,
                             style: textTheme.labelSmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                             ),
                           ),
                         ],
@@ -352,7 +352,7 @@ class _LinkPreviewCardState extends State<LinkPreviewCard> with AutomaticKeepAli
                 Icon(
                   Icons.open_in_new_rounded,
                   size: DesignTokens.iconSizeM,
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                 ),
               ],
             ),

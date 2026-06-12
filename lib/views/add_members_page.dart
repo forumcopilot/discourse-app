@@ -135,7 +135,7 @@ class _AddMembersPageState extends State<AddMembersPage> {
               color: colorScheme.primary,
             ),
           ),
-          backgroundColor: colorScheme.primaryContainer.withOpacity(0.3),
+          backgroundColor: colorScheme.primaryContainer.withValues(alpha: 0.3),
           onPressed: () async {
             final result = await Navigator.push(
               context,
@@ -254,7 +254,7 @@ class _AddMembersPageState extends State<AddMembersPage> {
                 labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                 floatingLabelStyle: TextStyle(color: colorScheme.primary),
                 filled: true,
-                fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
+                fillColor: colorScheme.surfaceVariant.withValues(alpha: 0.3),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,

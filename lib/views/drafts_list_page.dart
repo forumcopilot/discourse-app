@@ -188,7 +188,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
             separatorBuilder: (_, __) => Divider(
               height: 1,
               color: colorScheme.outlineVariant
-                  .withOpacity(DesignTokens.opacityDivider),
+                  .withValues(alpha: DesignTokens.opacityDivider),
             ),
             itemBuilder: (_, i) {
               final d = drafts[i];

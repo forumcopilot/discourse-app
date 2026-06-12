@@ -181,7 +181,7 @@ class ConversationHeaderItem extends StatelessWidget {
       attachments: message.attachments,
     );
     return Material(
-      color: isHighlighted ? colorScheme.primaryContainer.withOpacity(0.3) : (message.isUnread == true ? colorScheme.primaryContainer.withOpacity(0.1) : colorScheme.surface),
+      color: isHighlighted ? colorScheme.primaryContainer.withValues(alpha: 0.3) : (message.isUnread == true ? colorScheme.primaryContainer.withValues(alpha: 0.1) : colorScheme.surface),
       child: InkWell(
         onTap: () {},
         child: Column(
@@ -360,10 +360,10 @@ class ConversationHeaderItem extends StatelessWidget {
                         margin: EdgeInsets.only(top: DesignTokens.spacingS),
                         padding: DesignTokens.paddingS,
                         decoration: BoxDecoration(
-                          color: colorScheme.surfaceVariant.withOpacity(DesignTokens.opacityLow),
+                          color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
                           borderRadius: BorderRadius.circular(DesignTokens.radiusS),
                           border: Border.all(
-                            color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+                            color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
                             width: DesignTokens.borderWidthThin,
                           ),
                         ),
@@ -509,7 +509,7 @@ class ConversationHeaderItem extends StatelessWidget {
     final bool canLike = message.canLike;
     final bool isLiked = message.isLiked;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = colorScheme.onSurfaceVariant.withOpacity(isDarkMode ? 0.4 : 0.5);
+    final iconColor = colorScheme.onSurfaceVariant.withValues(alpha: isDarkMode ? 0.4 : 0.5);
     final likeCount = message.likesInfo.length;
 
     return Padding(
@@ -996,7 +996,7 @@ class ConversationItem extends StatelessWidget {
     );
 
     return Material(
-      color: isHighlighted ? colorScheme.primaryContainer.withOpacity(0.3) : (message.isUnread == true ? colorScheme.primaryContainer.withOpacity(0.1) : colorScheme.surface),
+      color: isHighlighted ? colorScheme.primaryContainer.withValues(alpha: 0.3) : (message.isUnread == true ? colorScheme.primaryContainer.withValues(alpha: 0.1) : colorScheme.surface),
       child: InkWell(
         onTap: () {},
         child: Column(
@@ -1174,10 +1174,10 @@ class ConversationItem extends StatelessWidget {
                         margin: EdgeInsets.only(top: DesignTokens.spacingS),
                         padding: DesignTokens.paddingS,
                         decoration: BoxDecoration(
-                          color: colorScheme.surfaceVariant.withOpacity(DesignTokens.opacityLow),
+                          color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
                           borderRadius: BorderRadius.circular(DesignTokens.radiusS),
                           border: Border.all(
-                            color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+                            color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
                             width: DesignTokens.borderWidthThin,
                           ),
                         ),
@@ -1285,7 +1285,7 @@ class ConversationItem extends StatelessWidget {
     final bool canLike = message.canLike;
     final bool isLiked = message.isLiked;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = colorScheme.onSurfaceVariant.withOpacity(isDarkMode ? 0.4 : 0.5);
+    final iconColor = colorScheme.onSurfaceVariant.withValues(alpha: isDarkMode ? 0.4 : 0.5);
     final likeCount = message.likesInfo.length;
 
     return Padding(

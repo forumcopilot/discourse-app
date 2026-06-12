@@ -299,7 +299,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                   color: colorScheme.primary,
                 ),
               ),
-              backgroundColor: colorScheme.primaryContainer.withOpacity(DesignTokens.opacityLow),
+              backgroundColor: colorScheme.primaryContainer.withValues(alpha: DesignTokens.opacityLow),
               onPressed: () async {
                 final result = await Navigator.push(
                   context,
@@ -348,7 +348,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
         ),
         backgroundColor: colorScheme.surface,
         elevation: 3,
-        shadowColor: colorScheme.shadow.withOpacity(DesignTokens.opacityLow),
+        shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
         surfaceTintColor: colorScheme.surfaceTint,
         iconTheme: IconThemeData(
           color: colorScheme.onSurface,
@@ -456,7 +456,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                               hintText: 'Enter subject',
                               hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                               filled: true,
-                              fillColor: colorScheme.surfaceVariant.withOpacity(DesignTokens.opacityLow),
+                              fillColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                                 borderSide: BorderSide.none,
@@ -503,7 +503,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                               hintText: AppLocalizations.of(context)?.writeYourMessage ?? 'Write your message...',
                               hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                               filled: true,
-                              fillColor: colorScheme.surfaceVariant.withOpacity(DesignTokens.opacityLow),
+                              fillColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                                 borderSide: BorderSide.none,
@@ -556,7 +556,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                             Container(
                               padding: DesignTokens.paddingS,
                               decoration: BoxDecoration(
-                                color: colorScheme.surfaceVariant.withOpacity(DesignTokens.opacityLow),
+                                color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
                                 borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                               ),
                               child: Column(
@@ -579,7 +579,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                                                       width: 48,
                                                       height: 48,
                                                       decoration: BoxDecoration(
-                                                        color: colorScheme.surfaceVariant.withOpacity(DesignTokens.opacityLow),
+                                                        color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
                                                         borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                                                       ),
                                                       child: ClipRRect(
@@ -705,7 +705,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                             SizedBox(height: DesignTokens.spacingS),
                             Container(
                               decoration: BoxDecoration(
-                                color: colorScheme.surfaceVariant.withOpacity(DesignTokens.opacityLow),
+                                color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
                                 borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                               ),
                               child: Column(
@@ -735,7 +735,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                                   Divider(
                                     height: 1,
                                     thickness: 1,
-                                    color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+                                    color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
                                   ),
                                   SwitchListTile(
                                     title: Text(
@@ -1138,7 +1138,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
         color: colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withOpacity(DesignTokens.opacityLow * 0.33),
+            color: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow * 0.33),
             offset: const Offset(0, -1),
             blurRadius: 4,
           ),
@@ -1173,7 +1173,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
               // BBCode button
               PopupMenuButton<String>(
                 enabled: _isMessageFieldFocused,
-                icon: Icon(Icons.format_bold, color: _isMessageFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withOpacity(0.38)),
+                icon: Icon(Icons.format_bold, color: _isMessageFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
                 tooltip: 'Formatting',
                 onSelected: _insertBBCode,
                 itemBuilder: (context) => [
@@ -1350,7 +1350,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
               ),
               // Mention button
               IconButton(
-                icon: Icon(Icons.alternate_email, color: _isMessageFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withOpacity(0.38)),
+                icon: Icon(Icons.alternate_email, color: _isMessageFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
                 tooltip: 'Mention User',
                 onPressed: _isMessageFieldFocused ? _handleMention : null,
               ),

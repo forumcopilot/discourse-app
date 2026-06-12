@@ -247,7 +247,7 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
           Divider(
             height: 1,
             color: colorScheme.outlineVariant
-                .withOpacity(DesignTokens.opacityDivider),
+                .withValues(alpha: DesignTokens.opacityDivider),
           ),
           Expanded(child: _buildList()),
         ],
@@ -295,7 +295,7 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
           height: 1,
           indent: 72,
           color: colorScheme.outlineVariant
-              .withOpacity(DesignTokens.opacityDivider),
+              .withValues(alpha: DesignTokens.opacityDivider),
         ),
         itemBuilder: (_, i) {
           if (i >= _items.length) {

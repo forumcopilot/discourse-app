@@ -21,7 +21,7 @@ class ConversationListItem extends StatelessWidget {
     return Divider(
       height: 1,
       thickness: 1,
-      color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+      color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
     );
   }
 

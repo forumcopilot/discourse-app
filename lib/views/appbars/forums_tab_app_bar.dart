@@ -22,7 +22,7 @@ class ForumsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: colorScheme.surface,
       elevation: 3,
-      shadowColor: colorScheme.shadow.withOpacity(DesignTokens.opacityLow),
+      shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
       surfaceTintColor: colorScheme.surfaceTint,
       // Phase 5.18a — auto-imply true so the parent Scaffold's drawer
       // hamburger renders in the leading slot.

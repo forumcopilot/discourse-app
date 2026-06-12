@@ -179,8 +179,7 @@ class ForumHeaderWidget extends StatelessWidget {
                             (isDarkMode 
                               ? _getDarkModePatternColor(_getBackgroundThemeColor(context, logoUrl, siteName))
                               : _getBackgroundThemeColor(context, logoUrl, siteName)
-                            ).withOpacity(
-                              isDarkMode ? 0.75 : 0.5,  // Much higher opacity in dark mode for darker effect
+                            ).withValues(alpha: isDarkMode ? 0.75 : 0.5,  // Much higher opacity in dark mode for darker effect
                             ),
                             isDarkMode 
                               ? BlendMode.multiply  // Darker blend for dark mode - makes pattern more visible
@@ -196,8 +195,8 @@ class ForumHeaderWidget extends StatelessWidget {
                         // Text readability overlay - darker in dark mode to make pattern more subtle
                         Container(
                           color: isDarkMode 
-                            ? Colors.black.withOpacity(0.5)
-                            : Colors.white.withOpacity(0.6),
+                            ? Colors.black.withValues(alpha: 0.5)
+                            : Colors.white.withValues(alpha: 0.6),
                         ),
                       ],
                     ),
@@ -222,8 +221,8 @@ class ForumHeaderWidget extends StatelessWidget {
                               // Color overlay for better text readability
                               Container(
                                 color: isDarkMode 
-                                  ? Colors.black.withOpacity(0.5)
-                                  : Colors.white.withOpacity(0.7),
+                                  ? Colors.black.withValues(alpha: 0.5)
+                                  : Colors.white.withValues(alpha: 0.7),
                               ),
                             ],
                           );
@@ -261,7 +260,7 @@ class ForumHeaderWidget extends StatelessWidget {
                             color: colorScheme.surface,
                             boxShadow: [
                               BoxShadow(
-                                color: colorScheme.shadow.withOpacity(DesignTokens.opacityLow),
+                                color: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
                                 blurRadius: 6,
                                 offset: const Offset(0, 1),
                               ),
@@ -297,7 +296,7 @@ class ForumHeaderWidget extends StatelessWidget {
                                 Text(
                                   domain,
                                   style: TextStyle(
-                                    color: colorScheme.onSurface.withOpacity(DesignTokens.opacityMedium),
+                                    color: colorScheme.onSurface.withValues(alpha: DesignTokens.opacityMedium),
                                     fontSize: DesignTokens.fontSizeS,
                                     fontWeight: DesignTokens.fontWeightNormal,
                                   ),
@@ -316,7 +315,7 @@ class ForumHeaderWidget extends StatelessWidget {
                     Text(
                       site?.description ?? 'No description available.',
                       style: TextStyle(
-                        color: colorScheme.onSurface.withOpacity(DesignTokens.opacityHigh),
+                        color: colorScheme.onSurface.withValues(alpha: DesignTokens.opacityHigh),
                         fontSize: DesignTokens.fontSizeS,
                         fontWeight: DesignTokens.fontWeightMedium,
                       ),
@@ -334,7 +333,7 @@ class ForumHeaderWidget extends StatelessWidget {
                             Text(
                               '${formatNumber(context, boardStats?.total_posts ?? 0)} Posts',
                               style: TextStyle(
-                                color: colorScheme.onSurface.withOpacity(DesignTokens.opacityHigh),
+                                color: colorScheme.onSurface.withValues(alpha: DesignTokens.opacityHigh),
                                 fontWeight: DesignTokens.fontWeightMedium,
                                 fontSize: DesignTokens.fontSizeXS,
                               ),
@@ -346,7 +345,7 @@ class ForumHeaderWidget extends StatelessWidget {
                             Text(
                               AppLocalizations.of(context)?.membersCount(boardStats?.total_members ?? 0) ?? '${formatNumber(context, boardStats?.total_members ?? 0)} Members',
                               style: TextStyle(
-                                color: colorScheme.onSurface.withOpacity(DesignTokens.opacityHigh),
+                                color: colorScheme.onSurface.withValues(alpha: DesignTokens.opacityHigh),
                                 fontWeight: DesignTokens.fontWeightMedium,
                                 fontSize: DesignTokens.fontSizeXS,
                               ),

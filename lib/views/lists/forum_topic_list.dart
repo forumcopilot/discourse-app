@@ -424,7 +424,7 @@ class _ForumTopicListState extends State<ForumTopicList> {
               Container(
                 height: 8,
                 decoration: BoxDecoration(
-                  color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+                  color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
                 ),
               ),
           ],

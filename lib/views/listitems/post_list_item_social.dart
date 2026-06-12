@@ -118,10 +118,10 @@ class PostListItemSocial extends StatelessWidget {
                   margin: EdgeInsets.only(top: DesignTokens.spacingS),
                   padding: DesignTokens.paddingS,
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceVariant.withOpacity(DesignTokens.opacityLow),
+                    color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
                     borderRadius: BorderRadius.circular(DesignTokens.radiusS),
                     border: Border.all(
-                      color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+                      color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
                       width: DesignTokens.borderWidthThin,
                     ),
                   ),

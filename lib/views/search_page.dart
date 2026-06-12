@@ -395,7 +395,7 @@ class _SearchPageState extends State<SearchPage> {
         ),
         backgroundColor: colorScheme.surface,
         elevation: 3,
-        shadowColor: colorScheme.shadow.withOpacity(0.3),
+        shadowColor: colorScheme.shadow.withValues(alpha: 0.3),
         surfaceTintColor: colorScheme.surfaceTint,
         iconTheme: IconThemeData(color: colorScheme.onSurface),
         centerTitle: true,
@@ -434,7 +434,7 @@ class _SearchPageState extends State<SearchPage> {
               color: colorScheme.surface,
               border: Border(
                 bottom: BorderSide(
-                  color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+                  color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
                   width: 1,
                 ),
               ),
@@ -485,7 +485,7 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 ),
                 filled: true,
-                fillColor: colorScheme.surfaceVariant.withOpacity(DesignTokens.opacityLow),
+                fillColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
                 contentPadding: DesignTokens.paddingInput,
               ),
               style: textTheme.bodyLarge?.copyWith(
@@ -517,7 +517,7 @@ class _SearchPageState extends State<SearchPage> {
             Icon(
               Icons.search_outlined,
               size: 64,
-              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             const SizedBox(height: DesignTokens.spacingL),
             Text(
@@ -532,7 +532,7 @@ class _SearchPageState extends State<SearchPage> {
             Text(
               AppLocalizations.of(context)?.enterKeywordsToFindTopicsAndPosts ?? 'Enter keywords to find topics and posts',
               style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -649,7 +649,7 @@ class _SearchPageState extends State<SearchPage> {
             Icon(
               Icons.topic_outlined,
               size: 48,
-              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             const SizedBox(height: DesignTokens.spacingL),
             Text(
@@ -662,7 +662,7 @@ class _SearchPageState extends State<SearchPage> {
             Text(
               'Try searching with different keywords',
               style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -726,7 +726,7 @@ class _SearchPageState extends State<SearchPage> {
             Icon(
               Icons.message_outlined,
               size: 48,
-              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             const SizedBox(height: DesignTokens.spacingL),
             Text(
@@ -739,7 +739,7 @@ class _SearchPageState extends State<SearchPage> {
             Text(
               'Try searching with different keywords',
               style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -821,7 +821,7 @@ class _SearchPageState extends State<SearchPage> {
             Icon(
               Icons.title_outlined,
               size: 48,
-              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             const SizedBox(height: DesignTokens.spacingL),
             Text(
@@ -834,7 +834,7 @@ class _SearchPageState extends State<SearchPage> {
             Text(
               'Try searching with different keywords',
               style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),

@@ -23,7 +23,7 @@ class ProfileTabAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: colorScheme.surface,
       elevation: 3,
-      shadowColor: colorScheme.shadow.withOpacity(DesignTokens.opacityLow),
+      shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
       surfaceTintColor: colorScheme.surfaceTint,
       // Phase 5.18a — auto-imply true so the drawer hamburger renders.
       // The sign-out action moved into the drawer's Account section

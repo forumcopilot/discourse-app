@@ -134,10 +134,10 @@ class _TwitterCardState extends State<TwitterCard> with AutomaticKeepAliveClient
     return Container(
       margin: EdgeInsets.only(top: DesignTokens.spacingS),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withOpacity(DesignTokens.opacityLow),
+        color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
         borderRadius: BorderRadius.circular(DesignTokens.radiusS),
         border: Border.all(
-          color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+          color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
           width: DesignTokens.borderWidthThin,
         ),
       ),
@@ -185,7 +185,7 @@ class _TwitterCardState extends State<TwitterCard> with AutomaticKeepAliveClient
                             Text(
                               '@${_twitterData!.authorHandle}',
                               style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                               ),
                             ),
                         ],

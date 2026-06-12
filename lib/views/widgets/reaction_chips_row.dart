@@ -58,15 +58,15 @@ class ReactionChipsRow extends StatelessWidget {
                   color: r.viewerReacted
                       ? colorScheme.primaryContainer
                       : colorScheme.surfaceContainerHighest
-                          .withOpacity(DesignTokens.opacityMediumLow),
+                          .withValues(alpha: DesignTokens.opacityMediumLow),
                   borderRadius:
                       BorderRadius.circular(DesignTokens.radiusL - 6),
                   border: Border.all(
                     color: r.viewerReacted
                         ? colorScheme.primary
-                            .withOpacity(DesignTokens.opacityMedium)
+                            .withValues(alpha: DesignTokens.opacityMedium)
                         : colorScheme.outlineVariant
-                            .withOpacity(DesignTokens.opacityDivider),
+                            .withValues(alpha: DesignTokens.opacityDivider),
                     width: r.viewerReacted
                         ? DesignTokens.borderWidthThin
                         : DesignTokens.borderWidthThin / 2,

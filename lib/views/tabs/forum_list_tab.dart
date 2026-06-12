@@ -520,7 +520,7 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
             Container(
               height: 8,
               decoration: BoxDecoration(
-                color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
+                color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
               ),
             ),
           );

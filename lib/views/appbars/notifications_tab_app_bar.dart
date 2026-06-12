@@ -30,7 +30,7 @@ class NotificationsTabAppBar extends StatelessWidget
     return AppBar(
       backgroundColor: colorScheme.surface,
       elevation: 3,
-      shadowColor: colorScheme.shadow.withOpacity(DesignTokens.opacityLow),
+      shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
       surfaceTintColor: colorScheme.surfaceTint,
       // Phase 5.18a — auto-imply true so the drawer hamburger renders.
       title: Text(

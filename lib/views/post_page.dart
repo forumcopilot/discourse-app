@@ -805,10 +805,10 @@ class _PostPageState extends State<PostPage> {
                     width: double.infinity,
                     padding: DesignTokens.paddingInput,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.errorContainer.withOpacity(DesignTokens.opacityHigh),
+                      color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: DesignTokens.opacityHigh),
                       border: Border(
                         bottom: BorderSide(
-                          color: Theme.of(context).colorScheme.outlineVariant.withOpacity(DesignTokens.opacityMediumLow),
+                          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
                           width: DesignTokens.borderWidthThin,
                         ),
                       ),
@@ -854,10 +854,10 @@ class _PostPageState extends State<PostPage> {
                     width: double.infinity,
                     padding: DesignTokens.paddingInput,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.tertiaryContainer.withOpacity(DesignTokens.opacityHigh),
+                      color: Theme.of(context).colorScheme.tertiaryContainer.withValues(alpha: DesignTokens.opacityHigh),
                       border: Border(
                         bottom: BorderSide(
-                          color: Theme.of(context).colorScheme.outlineVariant.withOpacity(DesignTokens.opacityMediumLow),
+                          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
                           width: DesignTokens.borderWidthThin,
                         ),
                       ),
@@ -903,10 +903,10 @@ class _PostPageState extends State<PostPage> {
                     width: double.infinity,
                     padding: DesignTokens.paddingInput,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer.withOpacity(DesignTokens.opacityHigh),
+                      color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: DesignTokens.opacityHigh),
                       border: Border(
                         bottom: BorderSide(
-                          color: Theme.of(context).colorScheme.outlineVariant.withOpacity(DesignTokens.opacityMediumLow),
+                          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
                           width: DesignTokens.borderWidthThin,
                         ),
                       ),
@@ -952,10 +952,10 @@ class _PostPageState extends State<PostPage> {
                     width: double.infinity,
                     padding: DesignTokens.paddingInput,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(DesignTokens.opacityHigh),
+                      color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: DesignTokens.opacityHigh),
                       border: Border(
                         bottom: BorderSide(
-                          color: Theme.of(context).colorScheme.outlineVariant.withOpacity(DesignTokens.opacityMediumLow),
+                          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
                           width: DesignTokens.borderWidthThin,
                         ),
                       ),
@@ -1086,7 +1086,7 @@ class _PostPageState extends State<PostPage> {
           if (_isRefreshing) ...[
             ModalBarrier(
               dismissible: false,
-              color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
             ),
             Center(
               child: Container(
@@ -1096,7 +1096,7 @@ class _PostPageState extends State<PostPage> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).shadowColor.withOpacity(0.1),
+                      color: Theme.of(context).shadowColor.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),

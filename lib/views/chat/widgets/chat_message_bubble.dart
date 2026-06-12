@@ -49,7 +49,7 @@ class ChatMessageBubble extends StatelessWidget {
     final bubbleColor =
         isSelf ? colorScheme.primaryContainer : colorScheme.surfaceContainerHighest;
     final textColor = isSelf ? colorScheme.onPrimaryContainer : colorScheme.onSurface;
-    final mutedTextColor = textColor.withOpacity(0.7);
+    final mutedTextColor = textColor.withValues(alpha: 0.7);
 
     final avatarUrl = message.authorAvatarUrl;
     final avatar = UserAvatar(

@@ -190,7 +190,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
         border: Border(
           bottom: BorderSide(
             color: colorScheme.outlineVariant
-                .withOpacity(DesignTokens.opacityDivider),
+                .withValues(alpha: DesignTokens.opacityDivider),
           ),
         ),
       ),

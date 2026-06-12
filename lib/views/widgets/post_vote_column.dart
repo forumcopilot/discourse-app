@@ -124,7 +124,7 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
               color: upActive
                   ? colorScheme.primary
                   : colorScheme.onSurfaceVariant
-                      .withOpacity(DesignTokens.opacityMediumLow),
+                      .withValues(alpha: DesignTokens.opacityMediumLow),
             ),
             onPressed: _inFlight ? null : () => _vote('up'),
           ),
@@ -151,7 +151,7 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
               color: downActive
                   ? colorScheme.error
                   : colorScheme.onSurfaceVariant
-                      .withOpacity(DesignTokens.opacityMediumLow),
+                      .withValues(alpha: DesignTokens.opacityMediumLow),
             ),
             onPressed: _inFlight ? null : () => _vote('down'),
           ),

@@ -40,7 +40,7 @@ class SimpleListAppBar extends StatelessWidget
     return AppBar(
       backgroundColor: colorScheme.surface,
       elevation: DesignTokens.elevationHigh - 1, // matches existing 3.0
-      shadowColor: colorScheme.shadow.withOpacity(DesignTokens.opacityLow),
+      shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
       surfaceTintColor: colorScheme.surfaceTint,
       title: Text(
         title,

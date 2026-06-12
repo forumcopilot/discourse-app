@@ -200,7 +200,7 @@ class TopTopicsListState extends FCStatefulWidget<TopTopicsList>
               ),
               selectedColor: colorScheme.primaryContainer,
               backgroundColor: colorScheme.surfaceContainerHighest
-                  .withOpacity(DesignTokens.opacityMediumLow),
+                  .withValues(alpha: DesignTokens.opacityMediumLow),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(DesignTokens.radiusL),
               ),

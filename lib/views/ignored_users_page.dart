@@ -150,7 +150,7 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
           height: 1,
           indent: 72,
           color: colorScheme.outlineVariant
-              .withOpacity(DesignTokens.opacityDivider),
+              .withValues(alpha: DesignTokens.opacityDivider),
         ),
         itemBuilder: (_, i) {
           final user = users[i];

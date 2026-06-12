@@ -51,7 +51,7 @@ class ForumListItem extends StatelessWidget {
       height: 1,
       thickness: 1,
       color: colorScheme.outlineVariant
-          .withOpacity(DesignTokens.opacityDivider),
+          .withValues(alpha: DesignTokens.opacityDivider),
     );
   }
 
@@ -153,8 +153,7 @@ class ForumListItem extends StatelessWidget {
                                     colorScheme: colorScheme,
                                     backgroundColor: colorScheme
                                         .surfaceContainerHighest
-                                        .withOpacity(
-                                            DesignTokens.opacityMedium),
+                                        .withValues(alpha: DesignTokens.opacityMedium),
                                     borderRadius: DesignTokens.radiusM,
                                   ),
                                   child: Row(
@@ -189,8 +188,7 @@ class ForumListItem extends StatelessWidget {
                                   decoration: StyleBuilders.badgeDecoration(
                                     colorScheme: colorScheme,
                                     backgroundColor: colorScheme.surfaceVariant
-                                        .withOpacity(
-                                            DesignTokens.opacityMediumLow),
+                                        .withValues(alpha: DesignTokens.opacityMediumLow),
                                     borderRadius: DesignTokens.radiusM,
                                   ),
                                   child: Row(
@@ -224,8 +222,7 @@ class ForumListItem extends StatelessWidget {
                                   decoration: StyleBuilders.badgeDecoration(
                                     colorScheme: colorScheme,
                                     backgroundColor: colorScheme.errorContainer
-                                        .withOpacity(
-                                            DesignTokens.opacityMediumLow),
+                                        .withValues(alpha: DesignTokens.opacityMediumLow),
                                     borderRadius: DesignTokens.radiusM,
                                   ),
                                   child: Row(

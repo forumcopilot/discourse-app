@@ -439,7 +439,7 @@ class _ProfileActionsSection extends StatelessWidget {
           borderRadius: BorderRadius.circular(DesignTokens.radiusM),
           border: Border.all(
             color: colorScheme.outlineVariant
-                .withOpacity(DesignTokens.opacityMediumLow),
+                .withValues(alpha: DesignTokens.opacityMediumLow),
             width: 0.5,
           ),
         ),
@@ -460,7 +460,7 @@ class _ProfileActionsSection extends StatelessWidget {
                 height: 1,
                 indent: 56,
                 color: colorScheme.outlineVariant
-                    .withOpacity(DesignTokens.opacityDivider),
+                    .withValues(alpha: DesignTokens.opacityDivider),
               ),
             ],
             _ActionRow(
@@ -477,7 +477,7 @@ class _ProfileActionsSection extends StatelessWidget {
               height: 1,
               indent: 56,
               color: colorScheme.outlineVariant
-                  .withOpacity(DesignTokens.opacityDivider),
+                  .withValues(alpha: DesignTokens.opacityDivider),
             ),
             _ActionRow(
               icon: Icons.edit_note_outlined,

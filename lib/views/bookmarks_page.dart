@@ -198,7 +198,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
       itemCount: _bookmarks.length + (_hasMore || _isLoading ? 1 : 0),
       separatorBuilder: (_, __) => Divider(
         height: 1,
-        color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityDivider),
+        color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityDivider),
       ),
       itemBuilder: (context, index) {
         if (index == _bookmarks.length) {

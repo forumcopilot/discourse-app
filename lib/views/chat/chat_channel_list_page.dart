@@ -143,7 +143,7 @@ class _ChatChannelListPageState extends State<ChatChannelListPage> {
       separatorBuilder: (_, __) => Divider(
         height: 1,
         color: colorScheme.outlineVariant
-            .withOpacity(DesignTokens.opacityDivider),
+            .withValues(alpha: DesignTokens.opacityDivider),
       ),
       itemBuilder: (_, i) {
         final ch = channels![i];

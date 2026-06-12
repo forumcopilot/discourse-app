@@ -187,7 +187,7 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
                           horizontal: 12, vertical: 10),
                       filled: true,
                       fillColor:
-                          colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                          colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                         borderSide: BorderSide.none,
@@ -297,7 +297,7 @@ class _TagTile extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityDivider),
+              color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityDivider),
               width: 0.5,
             ),
           ),
@@ -342,7 +342,7 @@ class _TagTile extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withOpacity(0.6),
+                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(

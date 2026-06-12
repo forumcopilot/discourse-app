@@ -74,7 +74,7 @@ class _ChatComposerState extends State<ChatComposer> {
         decoration: BoxDecoration(
           color: colorScheme.surface,
           border:
-              Border(top: BorderSide(color: theme.dividerColor.withOpacity(0.5))),
+              Border(top: BorderSide(color: theme.dividerColor.withValues(alpha: 0.5))),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,

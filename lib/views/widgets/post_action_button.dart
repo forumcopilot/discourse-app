@@ -88,7 +88,7 @@ class PostActionButton extends StatelessWidget {
     final color = active
         ? (activeColor ?? colorScheme.primary)
         : colorScheme.onSurfaceVariant
-            .withOpacity(DesignTokens.opacityMediumLow);
+            .withValues(alpha: DesignTokens.opacityMediumLow);
 
     final button = AccessibilityHelpers.accessibleIconButton(
       icon: Icon(

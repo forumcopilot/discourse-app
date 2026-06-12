@@ -511,10 +511,10 @@ class _PostListItemState extends State<PostListItem> {
               ),
               margin: EdgeInsets.only(bottom: DesignTokens.spacingS),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.12),
+                color: Colors.green.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
                 border: Border.all(
-                  color: Colors.green.withOpacity(0.45),
+                  color: Colors.green.withValues(alpha: 0.45),
                   width: 0.75,
                 ),
               ),
@@ -599,8 +599,8 @@ class _PostListItemState extends State<PostListItem> {
               margin: EdgeInsets.only(bottom: DesignTokens.spacingS),
               decoration: BoxDecoration(
                 color: widget.isTranslating && widget.translatedContent == null
-                    ? colorScheme.secondaryContainer.withOpacity(0.5)
-                    : colorScheme.primaryContainer.withOpacity(0.5),
+                    ? colorScheme.secondaryContainer.withValues(alpha: 0.5)
+                    : colorScheme.primaryContainer.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
               ),
               child: Row(
@@ -746,7 +746,7 @@ class _PostListItemState extends State<PostListItem> {
     // Determine background color based on highlight state
     // Use a more visible highlight color
     final backgroundColor = widget.isHighlighted
-        ? colorScheme.primaryContainer.withOpacity(0.4)
+        ? colorScheme.primaryContainer.withValues(alpha: 0.4)
         : colorScheme.surface;
 
     return AnimatedContainer(
