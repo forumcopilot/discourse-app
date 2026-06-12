@@ -11,6 +11,7 @@ import 'package:forumcopilot_flutter/views/lists/posts_list.dart';
 import 'package:forumcopilot_flutter/settings_context.dart';
 import 'package:forumcopilot_flutter/views/widgets/resettable_widget.dart';
 import 'package:forumcopilot_flutter/views/widgets/not_signed_in_view.dart';
+import 'package:forumcopilot_flutter/views/widgets/topic_list_skeleton.dart';
 import 'package:forumcopilot_flutter/views/tabs/topic_list_tab.dart';
 import 'package:forumcopilot_sdk/models/results/fc_subscription_result.dart';
 import 'package:forumcopilot_flutter/controllers/login_controller.dart';
@@ -341,7 +342,7 @@ class SubscribedTopicsListState extends FCStatefulWidget<SubscribedTopicsList> w
   // Get loading widget
   Widget? buildLoadingWidget() {
     if (_subscribedTopicController == null || !_subscribedTopicController!.isInitialized.value) {
-      return const Center(child: CircularProgressIndicator());
+      return const TopicListSkeleton();
     }
     return null;
   }
@@ -379,21 +380,21 @@ class SubscribedTopicsListState extends FCStatefulWidget<SubscribedTopicsList> w
           return null;
         },
         builder: (context) {
-          // Show spinner while controller is not initialized
+          // First-load placeholders: render shimmer rows that mirror
+          // the eventual topic-row layout. Pagination loaders below the
+          // list (the small inline CircularProgressIndicators) stay
+          // as-is since the shimmer would be visually noisy there.
           if (_subscribedTopicController == null) {
-            // If controller doesn't exist and tab is active but not loaded yet, show spinner
-            // This is the default state - spinner while loading
             if ((!_hasLoaded || _isInitialLoading) && widget.isActive) {
-              return const Center(child: CircularProgressIndicator());
+              return const TopicListSkeleton();
             }
-            // Default: show spinner (controller not initialized yet)
-            return const Center(child: CircularProgressIndicator());
+            return const TopicListSkeleton();
           }
           if (_isInitialLoading && widget.isActive) {
-            return const Center(child: CircularProgressIndicator());
+            return const TopicListSkeleton();
           }
           if (!_subscribedTopicController!.isInitialized.value) {
-            return const Center(child: CircularProgressIndicator());
+            return const TopicListSkeleton();
           }
 
           if (_subscribedTopicController != null && _subscribedTopicController!.isInitialized.value) {
@@ -486,7 +487,7 @@ class SubscribedTopicsListState extends FCStatefulWidget<SubscribedTopicsList> w
               ),
             );
           } else {
-            return const Center(child: CircularProgressIndicator());
+            return const TopicListSkeleton();
           }
         });
   }

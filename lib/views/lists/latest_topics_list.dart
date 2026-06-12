@@ -9,6 +9,7 @@ import 'package:forumcopilot_flutter/views/listitems/topic_list_item.dart';
 import 'package:forumcopilot_flutter/views/lists/posts_list.dart';
 import 'package:forumcopilot_flutter/views/widgets/resettable_widget.dart';
 import 'package:forumcopilot_flutter/views/widgets/not_signed_in_view.dart';
+import 'package:forumcopilot_flutter/views/widgets/topic_list_skeleton.dart';
 import 'package:forumcopilot_flutter/views/tabs/topic_list_tab.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart' as forumcopilot_sdk;
 import 'package:forumcopilot_flutter/controllers/login_controller.dart';
@@ -344,7 +345,7 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
   // Get loading widget
   Widget? buildLoadingWidget() {
     if (_latestTopicController == null || !_latestTopicController!.isInitialized.value) {
-      return const Center(child: CircularProgressIndicator());
+      return const TopicListSkeleton();
     }
     return null;
   }
@@ -355,16 +356,15 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
 
     // Check for permission/login errors from API result
     if (_latestTopicController == null) {
-      // If controller doesn't exist and tab is active but not loaded yet, show spinner
-      // This is the default state - spinner while loading
+      // First-load: render shimmer placeholders that mirror the
+      // eventual topic-row layout (perceived perf > centered spinner).
       if ((!_hasLoaded || _isInitialLoading) && widget.isActive) {
-        return const Center(child: CircularProgressIndicator());
+        return const TopicListSkeleton();
       }
-      // Default: show spinner (controller not initialized yet)
-      return const Center(child: CircularProgressIndicator());
+      return const TopicListSkeleton();
     }
     if (_isInitialLoading && widget.isActive) {
-      return const Center(child: CircularProgressIndicator());
+      return const TopicListSkeleton();
     }
     final result = _latestTopicController!.latestTopicsDataOutput.value;
     final resultText = result.resultText;
@@ -499,7 +499,7 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
               ),
             );
           } else {
-            return const Center(child: CircularProgressIndicator());
+            return const TopicListSkeleton();
           }
         });
   }
