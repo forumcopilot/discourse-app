@@ -246,7 +246,7 @@ class _VideoCardState extends State<VideoCard> with AutomaticKeepAliveClientMixi
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
-                        color: colorScheme.outlineVariant.withOpacity(0.2),
+                        color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(DesignTokens.radiusXS),

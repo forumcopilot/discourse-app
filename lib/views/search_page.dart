@@ -434,7 +434,7 @@ class _SearchPageState extends State<SearchPage> {
               color: colorScheme.surface,
               border: Border(
                 bottom: BorderSide(
-                  color: colorScheme.outlineVariant.withOpacity(0.3),
+                  color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
                   width: 1,
                 ),
               ),

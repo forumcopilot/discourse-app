@@ -116,7 +116,7 @@ class _SuggestedTopicsCardState extends State<SuggestedTopicsCard> {
         color: colorScheme.surface,
         border: Border(
           top: BorderSide(
-            color: colorScheme.outlineVariant.withOpacity(0.5),
+            color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityMediumLow),
             width: 0.5,
           ),
         ),
@@ -144,7 +144,7 @@ class _SuggestedTopicsCardState extends State<SuggestedTopicsCard> {
             if (i > 0)
               Divider(
                 height: 1,
-                color: colorScheme.outlineVariant.withOpacity(0.4),
+                color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityDivider),
               ),
             _SuggestedTopicTile(
               siteContext: widget.siteContext,

@@ -356,7 +356,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                           Divider(
                             height: 1,
                             thickness: 1,
-                            color: colorScheme.outlineVariant.withOpacity(0.3),
+                            color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityLow),
                           ),
                           // Conversation Open toggle
                           SwitchListTile(

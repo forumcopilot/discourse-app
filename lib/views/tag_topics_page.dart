@@ -167,7 +167,7 @@ class _TagTopicsPageState extends State<TagTopicsPage> {
       itemCount: _topics.length + (_hasMore || _isLoading ? 1 : 0),
       separatorBuilder: (_, __) => Divider(
         height: 1,
-        color: colorScheme.outlineVariant.withOpacity(0.4),
+        color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityDivider),
       ),
       itemBuilder: (context, index) {
         if (index == _topics.length) {

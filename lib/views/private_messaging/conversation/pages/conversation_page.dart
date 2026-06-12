@@ -851,7 +851,7 @@ class _ConversationPageState extends State<ConversationPage> {
               color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.7),
               border: Border(
                 bottom: BorderSide(
-                  color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5),
+                  color: Theme.of(context).colorScheme.outlineVariant.withOpacity(DesignTokens.opacityMediumLow),
                   width: 1,
                 ),
               ),

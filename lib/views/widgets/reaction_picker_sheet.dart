@@ -202,7 +202,7 @@ class _ReactionTile extends StatelessWidget {
           border: Border.all(
             color: selected
                 ? colorScheme.primary
-                : colorScheme.outlineVariant.withOpacity(0.5),
+                : colorScheme.outlineVariant.withOpacity(DesignTokens.opacityMediumLow),
             width: selected ? 1.5 : 0.5,
           ),
         ),

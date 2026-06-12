@@ -297,7 +297,7 @@ class _TagTile extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: colorScheme.outlineVariant.withOpacity(0.4),
+              color: colorScheme.outlineVariant.withOpacity(DesignTokens.opacityDivider),
               width: 0.5,
             ),
           ),
