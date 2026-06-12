@@ -11,12 +11,16 @@ class AppForumConfig {
   static const int siteId = 1;
 
   /// Human-readable forum name shown in app UI.
-  static const String forumName = 'Local Discourse';
+  static const String forumName = 'Cursor Community';
 
   /// Base forum URL (without trailing slash).
   /// Example: https://forum.example.com
   /// Local dev: http://localhost:3000 (Rails server from /Volumes/CRUCIAL/discourse).
-  static const String forumBaseUrl = 'http://localhost:3000';
+  /// On-device dev: an ngrok tunnel pointing at the local Rails server, e.g.
+  ///   https://<sub>.ngrok-free.dev — Discourse must be launched with
+  ///   `RAILS_DEVELOPMENT_HOSTS=.ngrok-free.dev,localhost` so the Rails
+  ///   `HostAuthorization` middleware lets the tunnel hostname through.
+  static const String forumBaseUrl = 'https://forum.cursor.com';
 
   /// Legacy plugin endpoint path. **Not used in v1** — Discourse
   /// authentication and data fetching go through stock REST endpoints.
@@ -29,14 +33,28 @@ class AppForumConfig {
   /// Display name shown to the user on Discourse's User API Key grant page
   /// (`/user-api-key/new`). Discourse stores this verbatim on the
   /// `UserApiKeyClient` row.
-  static const String userApiApplicationName = 'My Discourse Forum app';
+  static const String userApiApplicationName = 'Cursor Community Mobile';
 
-  /// Custom-scheme redirect Discourse appends `?payload=<base64>` to after
-  /// the user authorizes the User API Key request. Must match the redirect
-  /// the in-app webview intercepts and (for OS-level launches in v2) what
-  /// `Info.plist` / `AndroidManifest.xml` register. Choose any unique
-  /// scheme; the host (`auth-callback`) is just a path segment.
-  static const String userApiAuthRedirect = 'discourseapp://auth-callback';
+  /// Redirect Discourse appends `?payload=<base64>` to after the user
+  /// authorizes the User API Key request. The in-app webview intercepts
+  /// this URL — it never reaches the OS, so no `Info.plist` /
+  /// `AndroidManifest.xml` intent-filter is required.
+  ///
+  /// Set to `discourse://auth_redirect` — this is the universal scheme
+  /// reserved for Discourse's official Hub app and ships in every
+  /// Discourse instance's default `allowed_user_api_auth_redirects`
+  /// site setting (alongside `https://api.discourse.org/api/auth_redirect`).
+  /// Using it means our handshake works against any Discourse forum
+  /// without the admin needing to allowlist a custom scheme. The
+  /// authorize page still shows the requesting app as
+  /// [userApiApplicationName], so the user sees they're authorizing
+  /// our app — only the technical redirect target string is shared.
+  ///
+  /// To use a fork-specific scheme instead (e.g.
+  /// `forumcopilot://auth-callback`), the forum admin must add the
+  /// scheme to `allowed_user_api_auth_redirects` under
+  /// Admin → Settings → Login.
+  static const String userApiAuthRedirect = 'discourse://auth_redirect';
 
   /// Scopes requested during the User API Key handshake.
   /// See `app/models/user_api_key_scope.rb` in the Discourse source for
@@ -52,7 +70,8 @@ class AppForumConfig {
   ];
 
   /// Optional branding metadata.
-  static const String forumDescription = 'Discourse community';
+  static const String forumDescription =
+      'Community forum for Cursor — forum.cursor.com';
   static const String? logoUrl = null;
   static const String? backgroundUrl = null;
 

@@ -56,7 +56,6 @@ class SiteDrawer extends StatelessWidget {
                   _DrawerRow(
                     icon: Icons.label_outline,
                     title: 'Tags',
-                    subtitle: 'Browse every tag on the forum',
                     onTap: () => _push(
                       context,
                       TagsPage(siteContext: siteContext),
@@ -67,7 +66,6 @@ class SiteDrawer extends StatelessWidget {
                   _DrawerRow(
                     icon: Icons.people_outline,
                     title: 'Users',
-                    subtitle: 'Browse the user directory',
                     onTap: () => _push(
                       context,
                       UsersDirectoryPage(siteContext: siteContext),
@@ -76,7 +74,6 @@ class SiteDrawer extends StatelessWidget {
                   _DrawerRow(
                     icon: Icons.groups_outlined,
                     title: 'Groups',
-                    subtitle: 'See community groups',
                     onTap: () => _push(
                       context,
                       GroupsListPage(siteContext: siteContext),
@@ -85,7 +82,6 @@ class SiteDrawer extends StatelessWidget {
                   _DrawerRow(
                     icon: Icons.emoji_events_outlined,
                     title: 'Badges',
-                    subtitle: 'Achievements you can earn',
                     onTap: () => _push(
                       context,
                       BadgesDirectoryPage(siteContext: siteContext),
@@ -96,7 +92,6 @@ class SiteDrawer extends StatelessWidget {
                   _DrawerRow(
                     icon: Icons.settings_outlined,
                     title: 'Notifications',
-                    subtitle: 'Manage notification preferences',
                     onTap: () => _push(
                       context,
                       const NotificationSettingsPage(),
@@ -283,14 +278,12 @@ class _SectionLabel extends StatelessWidget {
 class _DrawerRow extends StatelessWidget {
   final IconData icon;
   final String title;
-  final String? subtitle;
   final Color? iconColor;
   final VoidCallback onTap;
 
   const _DrawerRow({
     required this.icon,
     required this.title,
-    this.subtitle,
     this.iconColor,
     required this.onTap,
   });
@@ -305,14 +298,6 @@ class _DrawerRow extends StatelessWidget {
         title,
         style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
       ),
-      subtitle: subtitle != null
-          ? Text(
-              subtitle!,
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            )
-          : null,
       onTap: onTap,
     );
   }
