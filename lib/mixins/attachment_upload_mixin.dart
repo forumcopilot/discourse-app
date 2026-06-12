@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
+import 'package:forumcopilot_flutter/theme/design_tokens.dart';
 import 'package:forumcopilot_flutter/utils/file_picker_utils.dart';
 import 'package:forumcopilot_flutter/utils/attachment_constraints_utils.dart';
 import 'package:forumcopilot_flutter/utils/attachment_validation_utils.dart';
@@ -127,7 +128,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
             ),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            margin: const EdgeInsets.all(8),
+            margin: const EdgeInsets.all(DesignTokens.spacingS),
           ),
         );
       }
@@ -170,7 +171,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
                 ),
                 behavior: SnackBarBehavior.floating,
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                margin: const EdgeInsets.all(8),
+                margin: const EdgeInsets.all(DesignTokens.spacingS),
               ),
             );
           }
@@ -203,7 +204,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
                   ),
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  margin: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                 ),
               );
             }
@@ -241,7 +242,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
                   ),
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  margin: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                 ),
               );
             }
@@ -260,7 +261,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
                 ),
                 behavior: SnackBarBehavior.floating,
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                margin: const EdgeInsets.all(8),
+                margin: const EdgeInsets.all(DesignTokens.spacingS),
               ),
             );
           }
@@ -299,7 +300,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
                   ),
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  margin: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                 ),
               );
             }
@@ -318,7 +319,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
                 ),
                 behavior: SnackBarBehavior.floating,
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                margin: const EdgeInsets.all(8),
+                margin: const EdgeInsets.all(DesignTokens.spacingS),
               ),
             );
           }
@@ -358,7 +359,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
             ),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            margin: const EdgeInsets.all(8),
+            margin: const EdgeInsets.all(DesignTokens.spacingS),
           ),
         );
       }
@@ -388,7 +389,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
               ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-              margin: const EdgeInsets.all(8),
+              margin: const EdgeInsets.all(DesignTokens.spacingS),
             ),
           );
         }
@@ -425,7 +426,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
                 ),
                 behavior: SnackBarBehavior.floating,
                 backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-                margin: const EdgeInsets.all(8),
+                margin: const EdgeInsets.all(DesignTokens.spacingS),
               ),
             );
           }
@@ -453,7 +454,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
                   ),
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  margin: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                 ),
               );
             }
@@ -486,7 +487,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
                     ),
                     behavior: SnackBarBehavior.floating,
                     backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                    margin: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.all(DesignTokens.spacingS),
                   ),
                 );
               }
@@ -519,7 +520,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
                     ),
                     behavior: SnackBarBehavior.floating,
                     backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                    margin: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.all(DesignTokens.spacingS),
                   ),
                 );
               }
@@ -536,7 +537,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
                   ),
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  margin: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                 ),
               );
             }
@@ -569,7 +570,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
                     ),
                     behavior: SnackBarBehavior.floating,
                     backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                    margin: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.all(DesignTokens.spacingS),
                   ),
                 );
               }
@@ -586,7 +587,7 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
                   ),
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  margin: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                 ),
               );
             }

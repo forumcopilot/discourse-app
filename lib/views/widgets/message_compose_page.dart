@@ -365,7 +365,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
               ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              margin: const EdgeInsets.all(8),
+              margin: const EdgeInsets.all(DesignTokens.spacingS),
             ),
           );
         }
@@ -401,7 +401,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   ),
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  margin: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                 ),
               );
             }
@@ -430,7 +430,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     ),
                     behavior: SnackBarBehavior.floating,
                     backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                    margin: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.all(DesignTokens.spacingS),
                   ),
                 );
               }
@@ -479,7 +479,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   ),
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
                   behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                   duration: const Duration(seconds: 4),
                 ),
               );
@@ -509,7 +509,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                 ),
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
                 behavior: SnackBarBehavior.floating,
-                margin: const EdgeInsets.all(8),
+                margin: const EdgeInsets.all(DesignTokens.spacingS),
                 duration: const Duration(seconds: 4),
               ),
             );
@@ -528,7 +528,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
             behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(8),
+            margin: const EdgeInsets.all(DesignTokens.spacingS),
           ),
         );
       }
@@ -555,7 +555,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
               ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              margin: const EdgeInsets.all(8),
+              margin: const EdgeInsets.all(DesignTokens.spacingS),
             ),
           );
         }
@@ -583,7 +583,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
               ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-              margin: const EdgeInsets.all(8),
+              margin: const EdgeInsets.all(DesignTokens.spacingS),
             ),
           );
         }
@@ -609,7 +609,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   ),
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-                  margin: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                 ),
               );
             }
@@ -638,7 +638,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     ),
                     behavior: SnackBarBehavior.floating,
                     backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                    margin: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.all(DesignTokens.spacingS),
                   ),
                 );
               }
@@ -667,7 +667,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       ),
                       behavior: SnackBarBehavior.floating,
                       backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                      margin: const EdgeInsets.all(8),
+                      margin: const EdgeInsets.all(DesignTokens.spacingS),
                     ),
                   );
                 }
@@ -715,7 +715,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     ),
                     backgroundColor: Theme.of(context).colorScheme.errorContainer,
                     behavior: SnackBarBehavior.floating,
-                    margin: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.all(DesignTokens.spacingS),
                     duration: const Duration(seconds: 4),
                   ),
                 );
@@ -745,7 +745,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   ),
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
                   behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                   duration: const Duration(seconds: 4),
                 ),
               );
@@ -765,7 +765,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
             behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(8),
+            margin: const EdgeInsets.all(DesignTokens.spacingS),
           ),
         );
       }
@@ -859,7 +859,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
             behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(8),
+            margin: const EdgeInsets.all(DesignTokens.spacingS),
           ),
         );
       }
@@ -937,7 +937,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                           return Column(
                             children: [
                               Container(
-                                margin: const EdgeInsets.only(bottom: 4),
+                                margin: const EdgeInsets.only(bottom: DesignTokens.spacingXS),
                                 child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
@@ -951,7 +951,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                       }
                                     },
                                     child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                      padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingS, vertical: 6),
                                       child: Row(
                                         children: [
                                           Container(
@@ -1086,7 +1086,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
     final isLoading = _isRemovingAttachment && _removedExistingAttachmentIds.contains(attachment.id);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 4),
+      margin: const EdgeInsets.only(bottom: DesignTokens.spacingXS),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -1100,7 +1100,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
             }
           },
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingS, vertical: 6),
             child: Row(
               children: [
                 Container(
@@ -1397,7 +1397,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
           ),
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
           behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(8),
+          margin: const EdgeInsets.all(DesignTokens.spacingS),
         ),
       );
       return;
@@ -1414,7 +1414,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
           ),
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
           behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(8),
+          margin: const EdgeInsets.all(DesignTokens.spacingS),
         ),
       );
       return;
