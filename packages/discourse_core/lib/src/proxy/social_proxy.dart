@@ -3,6 +3,7 @@ import 'package:forumcopilot_sdk/interfaces/i_fc_social_proxy.dart';
 import 'package:forumcopilot_sdk/models/results/fc_social_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../util/html_text.dart';
 
 /// Discourse implementation of [IFCSocialProxy].
 ///
@@ -294,9 +295,20 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
   FCAlert _toAlert(Map<String, dynamic> n) {
     final type = (n['notification_type'] as int?) ?? 0;
     final data = (n['data'] as Map<String, dynamic>?) ?? const {};
-    final fromUser = data['display_username']?.toString() ?? '';
-    final topicTitle =
-        (n['fancy_title'] ?? data['topic_title'] ?? '').toString();
+    // Phase 5.47 — the acting user's name lives under different data
+    // keys depending on notification type (mentions/replies use
+    // display_username; invites use invited_by/original_username).
+    final fromUser = (data['display_username'] ??
+            data['username'] ??
+            data['mentioned_by_username'] ??
+            data['invited_by_username'] ??
+            data['original_username'] ??
+            '')
+        .toString();
+    // fancy_title is entity-encoded HTML ("Q&amp;A", "&hellip;") —
+    // flatten before it lands in the alert's plain-text message.
+    final topicTitle = stripHtmlToText(
+        (n['fancy_title'] ?? data['topic_title'] ?? '').toString());
     final topicId = n['topic_id']?.toString();
     final postNumber = n['post_number'] as int?;
     final readableMessage =
@@ -338,6 +350,10 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       actionUrl: actionUrl,
       fromUsername: fromUser,
       action: _alertActionVerb(type),
+      // Phase 5.47 — read flag drives the unread-row styling in the
+      // notifications tab. Treat a missing flag as read so nothing
+      // renders falsely bold.
+      isRead: (n['read'] as bool?) ?? true,
     );
   }
 

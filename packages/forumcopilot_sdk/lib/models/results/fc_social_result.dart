@@ -133,6 +133,12 @@ class FCAlert with FCAlertMappable {
   /// Action type (e.g., "insert", "mention", "reaction", "quote")
   String? action;
 
+  /// Phase 5.47 — whether the user has already seen this alert
+  /// (Discourse: the notification's `read` flag). Drives unread-row
+  /// styling in the notifications tab. Defaults to true so backends
+  /// that don't expose read-state render plainly.
+  bool isRead;
+
   FCAlert({
     required this.userId,
     required this.username,
@@ -148,6 +154,7 @@ class FCAlert with FCAlertMappable {
     this.actionUrl,
     this.fromUsername,
     this.action,
+    this.isRead = true,
   });
 
   // Compatibility properties for snake_case access

@@ -143,6 +143,11 @@ class NotificationListItem extends StatelessWidget {
   /// tell notification types apart at a glance.
   final String? action;
 
+  /// Phase 5.47 — unread rows render with a tinted background, a
+  /// leading primary dot, and a semibold message so they pop against
+  /// already-seen notifications (from `FCAlert.isRead == false`).
+  final bool isUnread;
+
   const NotificationListItem({
     Key? key,
     required this.topic,
@@ -150,6 +155,7 @@ class NotificationListItem extends StatelessWidget {
     this.topicIcon,
     this.contentType,
     this.action,
+    this.isUnread = false,
   }) : super(key: key);
 
   Widget _buildBottomDivider(ColorScheme colorScheme) {
@@ -166,7 +172,12 @@ class NotificationListItem extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Material(
-      color: colorScheme.surface,
+      // Unread rows get a faint primary-container wash; read rows stay
+      // on plain surface (mirrors Discourse web's unread styling).
+      color: isUnread
+          ? colorScheme.primaryContainer
+              .withValues(alpha: DesignTokens.opacityLow / 2)
+          : colorScheme.surface,
       child: InkWell(
         onTap: onTap,
         child: Column(
@@ -193,16 +204,39 @@ class NotificationListItem extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Message text (flexible wrapping)
-                        Text(
-                          topic.title,
-                          style: StyleBuilders.titleTextStyle(
-                            colorScheme: colorScheme,
-                            textTheme: textTheme,
-                            fontSize: DesignTokens.fontSizeS,
-                            fontWeight: DesignTokens.fontWeightMedium,
-                          ),
-                          // No maxLines restriction for flexible wrapping
+                        // Message text (flexible wrapping). Unread
+                        // rows lead with a primary dot + semibold text.
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (isUnread)
+                              Container(
+                                width: 8,
+                                height: 8,
+                                margin: const EdgeInsets.only(
+                                  top: 6,
+                                  right: DesignTokens.spacingS,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primary,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            Expanded(
+                              child: Text(
+                                topic.title,
+                                style: StyleBuilders.titleTextStyle(
+                                  colorScheme: colorScheme,
+                                  textTheme: textTheme,
+                                  fontSize: DesignTokens.fontSizeS,
+                                  fontWeight: isUnread
+                                      ? DesignTokens.fontWeightSemiBold
+                                      : DesignTokens.fontWeightMedium,
+                                ),
+                                // No maxLines restriction — wraps freely
+                              ),
+                            ),
+                          ],
                         ),
                         // Metadata row at the bottom
                         SizedBox(height: DesignTokens.spacingS),

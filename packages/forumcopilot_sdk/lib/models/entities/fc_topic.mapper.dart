@@ -89,6 +89,13 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     opt: true,
     def: false,
   );
+  static int _$unreadCount(FCTopic v) => v.unreadCount;
+  static const Field<FCTopic, int> _f$unreadCount = Field(
+    'unreadCount',
+    _$unreadCount,
+    opt: true,
+    def: 0,
+  );
   static bool _$isClosed(FCTopic v) => v.isClosed;
   static const Field<FCTopic, bool> _f$isClosed = Field(
     'isClosed',
@@ -336,6 +343,7 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     #replyCount: _f$replyCount,
     #viewCount: _f$viewCount,
     #hasNewPosts: _f$hasNewPosts,
+    #unreadCount: _f$unreadCount,
     #isClosed: _f$isClosed,
     #isSubscribed: _f$isSubscribed,
     #canSubscribe: _f$canSubscribe,
@@ -387,6 +395,7 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
       replyCount: data.dec(_f$replyCount),
       viewCount: data.dec(_f$viewCount),
       hasNewPosts: data.dec(_f$hasNewPosts),
+      unreadCount: data.dec(_f$unreadCount),
       isClosed: data.dec(_f$isClosed),
       isSubscribed: data.dec(_f$isSubscribed),
       canSubscribe: data.dec(_f$canSubscribe),
@@ -498,6 +507,7 @@ abstract class FCTopicCopyWith<$R, $In extends FCTopic, $Out>
     int? replyCount,
     int? viewCount,
     bool? hasNewPosts,
+    int? unreadCount,
     bool? isClosed,
     bool? isSubscribed,
     bool? canSubscribe,
@@ -569,6 +579,7 @@ class _FCTopicCopyWithImpl<$R, $Out>
     int? replyCount,
     int? viewCount,
     bool? hasNewPosts,
+    int? unreadCount,
     bool? isClosed,
     bool? isSubscribed,
     bool? canSubscribe,
@@ -618,6 +629,7 @@ class _FCTopicCopyWithImpl<$R, $Out>
       if (replyCount != null) #replyCount: replyCount,
       if (viewCount != null) #viewCount: viewCount,
       if (hasNewPosts != null) #hasNewPosts: hasNewPosts,
+      if (unreadCount != null) #unreadCount: unreadCount,
       if (isClosed != null) #isClosed: isClosed,
       if (isSubscribed != null) #isSubscribed: isSubscribed,
       if (canSubscribe != null) #canSubscribe: canSubscribe,
@@ -670,6 +682,7 @@ class _FCTopicCopyWithImpl<$R, $Out>
     replyCount: data.get(#replyCount, or: $value.replyCount),
     viewCount: data.get(#viewCount, or: $value.viewCount),
     hasNewPosts: data.get(#hasNewPosts, or: $value.hasNewPosts),
+    unreadCount: data.get(#unreadCount, or: $value.unreadCount),
     isClosed: data.get(#isClosed, or: $value.isClosed),
     isSubscribed: data.get(#isSubscribed, or: $value.isSubscribed),
     canSubscribe: data.get(#canSubscribe, or: $value.canSubscribe),

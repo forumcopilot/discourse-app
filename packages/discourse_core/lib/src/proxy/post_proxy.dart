@@ -12,6 +12,7 @@ import 'package:forumcopilot_sdk/models/results/fc_reaction_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../data/post/discourse_suggested_topic.dart';
+import '../util/html_text.dart';
 
 /// Discourse implementation of [IFCPostProxy].
 ///
@@ -860,7 +861,10 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         }
         out.add(DiscourseSuggestedTopic(
           id: (s['id'] as num).toInt(),
-          title: (s['fancy_title'] ?? s['title'] ?? '').toString(),
+          // Prefer the plain `title`; fancy_title is entity-encoded
+          // HTML, so flatten whichever we end up with (Phase 5.47).
+          title: stripHtmlToText(
+              (s['title'] ?? s['fancy_title'] ?? '').toString()),
           slug: s['slug']?.toString(),
           postsCount: (s['posts_count'] as num?)?.toInt(),
           lastActivity:

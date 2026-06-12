@@ -447,7 +447,16 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         location: user['location']?.toString(),
         website: user['website_name']?.toString() ?? user['website']?.toString(),
         signature: null,
-        bio: (user['bio_excerpt'] ?? user['bio_raw'])?.toString(),
+        // Prefer the full markdown bio; the cooked/excerpt fallbacks
+        // are HTML fragments that need flattening (Phase 5.47 —
+        // matches the group-bio treatment).
+        bio: (user['bio_raw']?.toString().trim().isNotEmpty == true)
+            ? user['bio_raw'].toString()
+            : ((user['bio_cooked'] ?? user['bio_excerpt']) == null
+                ? null
+                : stripHtmlToText(
+                    (user['bio_cooked'] ?? user['bio_excerpt'])
+                        .toString())),
         trustLevel: user['trust_level'] as int?,
       );
     } catch (e) {

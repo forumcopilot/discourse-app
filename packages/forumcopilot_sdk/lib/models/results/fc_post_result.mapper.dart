@@ -116,6 +116,13 @@ class FCThreadResultMapper extends ClassMapperBase<FCThreadResult> {
     opt: true,
     def: false,
   );
+  static int _$unreadCount(FCThreadResult v) => v.unreadCount;
+  static const Field<FCThreadResult, int> _f$unreadCount = Field(
+    'unreadCount',
+    _$unreadCount,
+    opt: true,
+    def: 0,
+  );
   static bool _$isClosed(FCThreadResult v) => v.isClosed;
   static const Field<FCThreadResult, bool> _f$isClosed = Field(
     'isClosed',
@@ -359,6 +366,7 @@ class FCThreadResultMapper extends ClassMapperBase<FCThreadResult> {
     #replyCount: _f$replyCount,
     #viewCount: _f$viewCount,
     #hasNewPosts: _f$hasNewPosts,
+    #unreadCount: _f$unreadCount,
     #isClosed: _f$isClosed,
     #isSubscribed: _f$isSubscribed,
     #canSubscribe: _f$canSubscribe,
@@ -412,6 +420,7 @@ class FCThreadResultMapper extends ClassMapperBase<FCThreadResult> {
       replyCount: data.dec(_f$replyCount),
       viewCount: data.dec(_f$viewCount),
       hasNewPosts: data.dec(_f$hasNewPosts),
+      unreadCount: data.dec(_f$unreadCount),
       isClosed: data.dec(_f$isClosed),
       isSubscribed: data.dec(_f$isSubscribed),
       canSubscribe: data.dec(_f$canSubscribe),
@@ -534,6 +543,7 @@ abstract class FCThreadResultCopyWith<$R, $In extends FCThreadResult, $Out>
     int? replyCount,
     int? viewCount,
     bool? hasNewPosts,
+    int? unreadCount,
     bool? isClosed,
     bool? isSubscribed,
     bool? canSubscribe,
@@ -618,6 +628,7 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
     int? replyCount,
     int? viewCount,
     bool? hasNewPosts,
+    int? unreadCount,
     bool? isClosed,
     bool? isSubscribed,
     bool? canSubscribe,
@@ -671,6 +682,7 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
       if (replyCount != null) #replyCount: replyCount,
       if (viewCount != null) #viewCount: viewCount,
       if (hasNewPosts != null) #hasNewPosts: hasNewPosts,
+      if (unreadCount != null) #unreadCount: unreadCount,
       if (isClosed != null) #isClosed: isClosed,
       if (isSubscribed != null) #isSubscribed: isSubscribed,
       if (canSubscribe != null) #canSubscribe: canSubscribe,
@@ -727,6 +739,7 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
     replyCount: data.get(#replyCount, or: $value.replyCount),
     viewCount: data.get(#viewCount, or: $value.viewCount),
     hasNewPosts: data.get(#hasNewPosts, or: $value.hasNewPosts),
+    unreadCount: data.get(#unreadCount, or: $value.unreadCount),
     isClosed: data.get(#isClosed, or: $value.isClosed),
     isSubscribed: data.get(#isSubscribed, or: $value.isSubscribed),
     canSubscribe: data.get(#canSubscribe, or: $value.canSubscribe),
@@ -909,6 +922,13 @@ class FCThreadByUnreadResultMapper
     _$hasNewPosts,
     opt: true,
     def: false,
+  );
+  static int _$unreadCount(FCThreadByUnreadResult v) => v.unreadCount;
+  static const Field<FCThreadByUnreadResult, int> _f$unreadCount = Field(
+    'unreadCount',
+    _$unreadCount,
+    opt: true,
+    def: 0,
   );
   static bool _$isClosed(FCThreadByUnreadResult v) => v.isClosed;
   static const Field<FCThreadByUnreadResult, bool> _f$isClosed = Field(
@@ -1136,6 +1156,7 @@ class FCThreadByUnreadResultMapper
     #replyCount: _f$replyCount,
     #viewCount: _f$viewCount,
     #hasNewPosts: _f$hasNewPosts,
+    #unreadCount: _f$unreadCount,
     #isClosed: _f$isClosed,
     #isSubscribed: _f$isSubscribed,
     #canSubscribe: _f$canSubscribe,
@@ -1190,6 +1211,7 @@ class FCThreadByUnreadResultMapper
       replyCount: data.dec(_f$replyCount),
       viewCount: data.dec(_f$viewCount),
       hasNewPosts: data.dec(_f$hasNewPosts),
+      unreadCount: data.dec(_f$unreadCount),
       isClosed: data.dec(_f$isClosed),
       isSubscribed: data.dec(_f$isSubscribed),
       canSubscribe: data.dec(_f$canSubscribe),
@@ -1321,6 +1343,7 @@ abstract class FCThreadByUnreadResultCopyWith<
     int? replyCount,
     int? viewCount,
     bool? hasNewPosts,
+    int? unreadCount,
     bool? isClosed,
     bool? isSubscribed,
     bool? canSubscribe,
@@ -1407,6 +1430,7 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
     int? replyCount,
     int? viewCount,
     bool? hasNewPosts,
+    int? unreadCount,
     bool? isClosed,
     bool? isSubscribed,
     bool? canSubscribe,
@@ -1461,6 +1485,7 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
       if (replyCount != null) #replyCount: replyCount,
       if (viewCount != null) #viewCount: viewCount,
       if (hasNewPosts != null) #hasNewPosts: hasNewPosts,
+      if (unreadCount != null) #unreadCount: unreadCount,
       if (isClosed != null) #isClosed: isClosed,
       if (isSubscribed != null) #isSubscribed: isSubscribed,
       if (canSubscribe != null) #canSubscribe: canSubscribe,
@@ -1518,6 +1543,7 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
     replyCount: data.get(#replyCount, or: $value.replyCount),
     viewCount: data.get(#viewCount, or: $value.viewCount),
     hasNewPosts: data.get(#hasNewPosts, or: $value.hasNewPosts),
+    unreadCount: data.get(#unreadCount, or: $value.unreadCount),
     isClosed: data.get(#isClosed, or: $value.isClosed),
     isSubscribed: data.get(#isSubscribed, or: $value.isSubscribed),
     canSubscribe: data.get(#canSubscribe, or: $value.canSubscribe),
@@ -1696,6 +1722,13 @@ class FCThreadByPostResultMapper extends ClassMapperBase<FCThreadByPostResult> {
     _$hasNewPosts,
     opt: true,
     def: false,
+  );
+  static int _$unreadCount(FCThreadByPostResult v) => v.unreadCount;
+  static const Field<FCThreadByPostResult, int> _f$unreadCount = Field(
+    'unreadCount',
+    _$unreadCount,
+    opt: true,
+    def: 0,
   );
   static bool _$isClosed(FCThreadByPostResult v) => v.isClosed;
   static const Field<FCThreadByPostResult, bool> _f$isClosed = Field(
@@ -1923,6 +1956,7 @@ class FCThreadByPostResultMapper extends ClassMapperBase<FCThreadByPostResult> {
     #replyCount: _f$replyCount,
     #viewCount: _f$viewCount,
     #hasNewPosts: _f$hasNewPosts,
+    #unreadCount: _f$unreadCount,
     #isClosed: _f$isClosed,
     #isSubscribed: _f$isSubscribed,
     #canSubscribe: _f$canSubscribe,
@@ -1977,6 +2011,7 @@ class FCThreadByPostResultMapper extends ClassMapperBase<FCThreadByPostResult> {
       replyCount: data.dec(_f$replyCount),
       viewCount: data.dec(_f$viewCount),
       hasNewPosts: data.dec(_f$hasNewPosts),
+      unreadCount: data.dec(_f$unreadCount),
       isClosed: data.dec(_f$isClosed),
       isSubscribed: data.dec(_f$isSubscribed),
       canSubscribe: data.dec(_f$canSubscribe),
@@ -2108,6 +2143,7 @@ abstract class FCThreadByPostResultCopyWith<
     int? replyCount,
     int? viewCount,
     bool? hasNewPosts,
+    int? unreadCount,
     bool? isClosed,
     bool? isSubscribed,
     bool? canSubscribe,
@@ -2193,6 +2229,7 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
     int? replyCount,
     int? viewCount,
     bool? hasNewPosts,
+    int? unreadCount,
     bool? isClosed,
     bool? isSubscribed,
     bool? canSubscribe,
@@ -2247,6 +2284,7 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
       if (replyCount != null) #replyCount: replyCount,
       if (viewCount != null) #viewCount: viewCount,
       if (hasNewPosts != null) #hasNewPosts: hasNewPosts,
+      if (unreadCount != null) #unreadCount: unreadCount,
       if (isClosed != null) #isClosed: isClosed,
       if (isSubscribed != null) #isSubscribed: isSubscribed,
       if (canSubscribe != null) #canSubscribe: canSubscribe,
@@ -2304,6 +2342,7 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
     replyCount: data.get(#replyCount, or: $value.replyCount),
     viewCount: data.get(#viewCount, or: $value.viewCount),
     hasNewPosts: data.get(#hasNewPosts, or: $value.hasNewPosts),
+    unreadCount: data.get(#unreadCount, or: $value.unreadCount),
     isClosed: data.get(#isClosed, or: $value.isClosed),
     isSubscribed: data.get(#isSubscribed, or: $value.isSubscribed),
     canSubscribe: data.get(#canSubscribe, or: $value.canSubscribe),
@@ -3586,6 +3625,13 @@ class FCAnnouncementResultMapper extends ClassMapperBase<FCAnnouncementResult> {
     opt: true,
     def: false,
   );
+  static int _$unreadCount(FCAnnouncementResult v) => v.unreadCount;
+  static const Field<FCAnnouncementResult, int> _f$unreadCount = Field(
+    'unreadCount',
+    _$unreadCount,
+    opt: true,
+    def: 0,
+  );
   static bool _$isClosed(FCAnnouncementResult v) => v.isClosed;
   static const Field<FCAnnouncementResult, bool> _f$isClosed = Field(
     'isClosed',
@@ -3831,6 +3877,7 @@ class FCAnnouncementResultMapper extends ClassMapperBase<FCAnnouncementResult> {
     #replyCount: _f$replyCount,
     #viewCount: _f$viewCount,
     #hasNewPosts: _f$hasNewPosts,
+    #unreadCount: _f$unreadCount,
     #isClosed: _f$isClosed,
     #isSubscribed: _f$isSubscribed,
     #canSubscribe: _f$canSubscribe,
@@ -3886,6 +3933,7 @@ class FCAnnouncementResultMapper extends ClassMapperBase<FCAnnouncementResult> {
       replyCount: data.dec(_f$replyCount),
       viewCount: data.dec(_f$viewCount),
       hasNewPosts: data.dec(_f$hasNewPosts),
+      unreadCount: data.dec(_f$unreadCount),
       isClosed: data.dec(_f$isClosed),
       isSubscribed: data.dec(_f$isSubscribed),
       canSubscribe: data.dec(_f$canSubscribe),
@@ -4018,6 +4066,7 @@ abstract class FCAnnouncementResultCopyWith<
     int? replyCount,
     int? viewCount,
     bool? hasNewPosts,
+    int? unreadCount,
     bool? isClosed,
     bool? isSubscribed,
     bool? canSubscribe,
@@ -4104,6 +4153,7 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
     int? replyCount,
     int? viewCount,
     bool? hasNewPosts,
+    int? unreadCount,
     bool? isClosed,
     bool? isSubscribed,
     bool? canSubscribe,
@@ -4160,6 +4210,7 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
       if (replyCount != null) #replyCount: replyCount,
       if (viewCount != null) #viewCount: viewCount,
       if (hasNewPosts != null) #hasNewPosts: hasNewPosts,
+      if (unreadCount != null) #unreadCount: unreadCount,
       if (isClosed != null) #isClosed: isClosed,
       if (isSubscribed != null) #isSubscribed: isSubscribed,
       if (canSubscribe != null) #canSubscribe: canSubscribe,
@@ -4224,6 +4275,7 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
     replyCount: data.get(#replyCount, or: $value.replyCount),
     viewCount: data.get(#viewCount, or: $value.viewCount),
     hasNewPosts: data.get(#hasNewPosts, or: $value.hasNewPosts),
+    unreadCount: data.get(#unreadCount, or: $value.unreadCount),
     isClosed: data.get(#isClosed, or: $value.isClosed),
     isSubscribed: data.get(#isSubscribed, or: $value.isSubscribed),
     canSubscribe: data.get(#canSubscribe, or: $value.canSubscribe),

@@ -578,6 +578,9 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
               // on the avatar (heart for likes, @ for mentions,
               // reply arrow for replies, etc.).
               action: originalAlert.action,
+              // Phase 5.47 — unseen notifications render emphasized
+              // (tinted row + dot + semibold message).
+              isUnread: !originalAlert.isRead,
             );
           } else {
             // Loading indicator for load more

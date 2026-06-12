@@ -48,6 +48,11 @@ class FCTopic with FCTopicMappable {
   /// Indicates if the topic has new/unread posts
   bool hasNewPosts;
 
+  /// Phase 5.47 — how many unread posts the topic has for the current
+  /// user (Discourse: `unread_posts`). 0 when fully read, unknown, or
+  /// the viewer is a guest; [hasNewPosts] stays the boolean signal.
+  int unreadCount;
+
   /// Indicates if the topic is closed/locked
   bool isClosed;
 
@@ -137,6 +142,7 @@ class FCTopic with FCTopicMappable {
     this.replyCount = 0,
     this.viewCount = 0,
     this.hasNewPosts = false,
+    this.unreadCount = 0,
     this.isClosed = false,
     this.isSubscribed = false,
     this.canSubscribe = true,

@@ -103,18 +103,48 @@ class TopicListItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (topic.hasNewPosts) ...[
-                    Container(
-                      width: 8,
-                      height: 8,
-                      margin: EdgeInsets.only(
-                        top: DesignTokens.spacingM - DesignTokens.spacingXS,
-                        right: DesignTokens.spacingS,
+                    // Phase 5.47 — when the server tells us how many
+                    // posts are unread, show the count; otherwise fall
+                    // back to the plain new-posts dot.
+                    if (topic.unreadCount > 0)
+                      Container(
+                        margin: EdgeInsets.only(
+                          top: DesignTokens.spacingXS,
+                          right: DesignTokens.spacingS,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colorScheme.primary,
+                          borderRadius:
+                              BorderRadius.circular(DesignTokens.radiusM),
+                        ),
+                        child: Text(
+                          topic.unreadCount > 99
+                              ? '99+'
+                              : '${topic.unreadCount}',
+                          style: textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onPrimary,
+                            fontWeight: DesignTokens.fontWeightSemiBold,
+                            fontSize: DesignTokens.fontSizeXS - 1,
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        width: 8,
+                        height: 8,
+                        margin: EdgeInsets.only(
+                          top: DesignTokens.spacingM - DesignTokens.spacingXS,
+                          right: DesignTokens.spacingS,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colorScheme.primary,
+                          shape: BoxShape.circle,
+                        ),
                       ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
                   ],
                   if (topic.isDeleted) ...[
                     Container(

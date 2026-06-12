@@ -7,6 +7,7 @@ import 'package:forumcopilot_sdk/models/results/fc_topic_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
+import '../util/html_text.dart';
 
 /// Discourse implementation of [IFCTopicProxy].
 ///
@@ -597,6 +598,11 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       replyCount: (((t['posts_count'] as int?) ?? 1) - 1).clamp(0, 1 << 30),
       viewCount: (t['views'] as int?) ?? 0,
       hasNewPosts: t['unseen'] == true || (t['unread_posts'] as int? ?? 0) > 0,
+      // Phase 5.47 — surface the actual unread count (drives the
+      // "N new" chip on topic rows). `new_posts` covers older
+      // serializer variants.
+      unreadCount:
+          (t['unread_posts'] as int?) ?? (t['new_posts'] as int?) ?? 0,
       isClosed: (t['closed'] as bool?) ?? false,
       isSubscribed: (t['notification_level'] as int? ?? 1) >= 2,
       canSubscribe: true,
@@ -605,7 +611,9 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
           : '${siteContext.site.url}/t/$id',
       // Some inherited UI does `topic.shortContent!.isNotEmpty` (XF assumed
       // non-null); keep this string non-null so we don't trip the null check.
-      shortContent: (t['excerpt'] as String?) ?? '',
+      // Excerpts are entity-encoded ("&hellip;", "&amp;") — flatten
+      // before they reach a Text widget (Phase 5.47).
+      shortContent: stripHtmlToText((t['excerpt'] as String?) ?? ''),
       participatedUserIds: participatedUserIds,
       isPinned: (t['pinned'] as bool?) ?? false,
       isAnnouncement: (t['pinned_globally'] as bool?) ?? false,

@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_bookmark.dart';
 import 'package:forumcopilot_sdk/models/results/fc_bookmark_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../util/html_text.dart';
 
 /// Discourse implementation of [IFCBookmarkProxy] (Phase 5.33 — lifted
 /// off `DiscoursePostProxy`).
@@ -169,16 +170,22 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
       topicId: (json['topic_id'] as num?)?.toInt(),
       postNumber: (json['post_number'] as num?)?.toInt() ??
           (json['linked_post_number'] as num?)?.toInt(),
-      title: json['title']?.toString() ??
+      // fancy_title (and sometimes excerpt) are entity-encoded —
+      // flatten before they land in plain-text fields (Phase 5.47).
+      // stripHtmlToText is a no-op on already-plain `title`.
+      title: _plain(json['title']?.toString() ??
           json['fancy_title']?.toString() ??
-          json['topic_title']?.toString(),
-      excerpt: json['excerpt']?.toString(),
+          json['topic_title']?.toString()),
+      excerpt: _plain(json['excerpt']?.toString()),
       name: json['name']?.toString(),
       username: json['username']?.toString(),
       avatarUrl: _resolveAvatarUrl(avatarTemplate),
       createdAt: DateTime.tryParse(json['created_at']?.toString() ?? ''),
     );
   }
+
+  static String? _plain(String? maybeHtml) =>
+      maybeHtml == null ? null : stripHtmlToText(maybeHtml);
 
   String? _resolveAvatarUrl(String? template, {int size = 90}) {
     if (template == null || template.isEmpty) return null;
