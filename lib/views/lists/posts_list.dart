@@ -16,6 +16,7 @@ import 'package:visibility_detector/visibility_detector.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:forumcopilot_flutter/core/logging/app_logger.dart';
+import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
 import '../../theme/design_tokens.dart';
 import '../../theme/style_builders.dart';
 import '../../utils/error_dialog.dart';
@@ -108,6 +109,12 @@ class _PostsState extends State<PostsList> {
   Timer? _highlightTimer; // Timer to clear highlight after a few seconds
   String? _actualTopicId; // Store the actual topicId resolved from thread_by_post mode
 
+  /// Phase 5.45 — post numbers already reported to the server's
+  /// read-tracker (`POST /topics/timings`) for the current thread.
+  /// Prevents re-reporting the same posts on rebuilds / pagination
+  /// overlaps. Reset when the widget switches to a different thread.
+  final Set<int> _reportedPostNumbers = {};
+
   // Add scroll loading control flag
   bool _isScrollLoadingEnabled = false;
 
@@ -188,6 +195,7 @@ class _PostsState extends State<PostsList> {
         _hasJumpedToInitialPost = false; // Reset to allow jumping to new post
         _pendingInitialScrollIndex = null; // Clear pending scroll
         _actualTopicId = null; // Reset actual topicId when switching threads
+        _reportedPostNumbers.clear(); // New thread → fresh read-tracking
       });
 
       // Reset scroll position using item controller
@@ -303,6 +311,7 @@ class _PostsState extends State<PostsList> {
         widget.onThreadUrlAvailable?.call(data?.topic.url);
       });
       _updateHasMorePosts();
+      _reportPostsRead();
 
       // Determine the target post position to scroll to
       int targetPosition = 0;
@@ -585,6 +594,44 @@ class _PostsState extends State<PostsList> {
     _hasMorePosts = data.currentStartNum + currentCount < data.totalPosts;
   }
 
+  /// Phase 5.45 — report the currently loaded post window to the
+  /// server's read-tracker (`IFCTopicProxy.markPostsReadAsync`, i.e.
+  /// Discourse `POST /topics/timings`). This is what advances
+  /// `last_read_post_number` so unread badges and the Unread tab
+  /// clear after reading in the app.
+  ///
+  /// Called after every successful fetch (initial, paging, refresh).
+  /// Fire-and-forget — read tracking must never disturb reading, so
+  /// failures are only debug-logged. [_reportedPostNumbers] dedupes
+  /// across the thread's lifetime in this widget.
+  void _reportPostsRead() {
+    if (!widget.siteContext.isLoggedIn) return;
+    final data = _postsController.threadDataOutput.value;
+    if (data == null || data.posts.isEmpty) return;
+    final topicId = data.topic.id.isNotEmpty
+        ? data.topic.id
+        : (_actualTopicId ?? widget.topicId);
+    if (topicId.isEmpty) return;
+
+    final fresh = <int>[];
+    for (final post in data.posts) {
+      final n = post.postNumber;
+      if (n != null && _reportedPostNumbers.add(n)) fresh.add(n);
+    }
+    if (fresh.isEmpty) return;
+
+    SiteProxyService.getTopicProxy()
+        .markPostsReadAsync(topicId: topicId, postNumbers: fresh)
+        .then((r) {
+      if (!r.result) {
+        AppLogger.debug(
+            'PostsList: read-tracking report failed: ${r.resultText}');
+      }
+    }).catchError((e) {
+      AppLogger.debug('PostsList: read-tracking report error: $e');
+    });
+  }
+
   /// Loads earlier posts (when user scrolls up near the top).
   ///
   /// Regardless of the initial mode, always uses getThreadAsync for paging.
@@ -637,6 +684,7 @@ class _PostsState extends State<PostsList> {
       await _postsController.getThreadAsync(topicIdToUse, startNum1Based, lastNum1Based, _retriveHtml, mode: LoadMode.earlier);
       // --- End normal paging ---
       _updateHasMorePosts();
+      _reportPostsRead();
 
       // Restore scroll position to the post that was visible before loading
       // Find the post by ID in the new list and scroll to it
@@ -716,6 +764,7 @@ class _PostsState extends State<PostsList> {
       await _postsController.getThreadAsync(topicIdToUse, startNum1Based, lastNum1Based, _retriveHtml, mode: LoadMode.later);
       // --- End normal paging ---
       _updateHasMorePosts();
+      _reportPostsRead();
     } catch (e) {
       rethrow;
     } finally {
@@ -762,6 +811,7 @@ class _PostsState extends State<PostsList> {
       final lastNum1Based = lastNum0Based + 1; // Convert to 1-based
       await _postsController.getThreadAsync(topicIdToUse, startNum1Based, lastNum1Based, _retriveHtml, mode: LoadMode.initial);
       _updateHasMorePosts();
+      _reportPostsRead();
     } catch (e) {
       rethrow;
     } finally {
@@ -812,6 +862,7 @@ class _PostsState extends State<PostsList> {
         _actualTopicId = data.topic.id;
       }
       _updateHasMorePosts();
+      _reportPostsRead();
       // After reply refresh we loaded a page centered on the new post; that page often
       // extends to the end of the thread. If we already have the last post, do not
       // allow "load more later" or the scroll-to-bottom will trigger a merge that

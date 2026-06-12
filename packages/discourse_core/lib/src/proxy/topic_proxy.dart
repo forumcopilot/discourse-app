@@ -250,6 +250,43 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
   }
 
   @override
+  Future<FCMarkTopicReadResult> markPostsReadAsync({
+    required String topicId,
+    required List<int> postNumbers,
+    int msPerPost = 2000,
+  }) async {
+    // Guests have no server-side read state; succeed as a no-op so
+    // callers can fire-and-forget without branching on login.
+    if (!siteContext.isLoggedIn || postNumbers.isEmpty) {
+      return FCMarkTopicReadResult(result: true, resultText: '');
+    }
+    final tid = int.tryParse(topicId);
+    if (tid == null) {
+      return FCMarkTopicReadResult(
+          result: false, resultText: 'Invalid topic id');
+    }
+    try {
+      // POST /topics/timings — Discourse's read-tracking beacon. The
+      // web client sends one entry per post that scrolled into view;
+      // we credit [msPerPost] to each post in the fetched chunk.
+      // Rails parses the nested JSON map into the `timings` params
+      // hash the controller expects.
+      await apiPost('/topics/timings', body: {
+        'topic_id': tid,
+        'topic_time': msPerPost * postNumbers.length,
+        'timings': {
+          for (final n in postNumbers) '$n': msPerPost,
+        },
+      });
+      return FCMarkTopicReadResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCMarkTopicReadResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCMarkTopicReadResult(result: false, resultText: 'Error: $e');
+    }
+  }
+
+  @override
   Future<FCTopicStatusResult> getTopicStatusAsync(
       List<String> topicIds) async {
     final statuses = <FCTopicStatus>[];

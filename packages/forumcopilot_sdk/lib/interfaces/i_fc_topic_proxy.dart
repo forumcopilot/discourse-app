@@ -8,6 +8,22 @@ abstract class IFCTopicProxy {
   /// [topicIds] Array of topic IDs to mark as read
   Future<FCMarkTopicReadResult> markTopicReadAsync(List<String> topicIds);
 
+  /// Phase 5.45 — record that the given [postNumbers] of [topicId]
+  /// were viewed by the current user (Discourse:
+  /// `POST /topics/timings`). This is the mechanism that advances
+  /// server-side read state — `last_read_post_number`, per-topic
+  /// unread counts, and the Unread tab all key off it. Without these
+  /// calls, topics read in the app stay "unread" everywhere.
+  ///
+  /// [msPerPost] is the dwell time (milliseconds) credited to each
+  /// post; the topic-level total is derived from it. Implementations
+  /// should no-op successfully for guests and empty [postNumbers].
+  Future<FCMarkTopicReadResult> markPostsReadAsync({
+    required String topicId,
+    required List<int> postNumbers,
+    int msPerPost = 2000,
+  });
+
   /// Given an array of topic IDs, returns their status including unread status,
   /// number of reply, number of view and so on. A light-weight approach to retrieve
   /// certain information without pulling a list of unwanted data.
