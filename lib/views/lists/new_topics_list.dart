@@ -9,6 +9,7 @@ import '../listitems/topic_list_item.dart';
 import '../post_page.dart';
 import '../widgets/not_signed_in_view.dart';
 import '../widgets/resettable_widget.dart';
+import '../widgets/topic_list_skeleton.dart';
 
 /// Home tab — **New** sub-segment. Backed by `/new.json` (Discourse-
 /// native: topics created since your last visit + haven't dismissed).
@@ -128,7 +129,7 @@ class NewTopicsListState extends FCStatefulWidget<NewTopicsList>
   /// the parent ListView can splice them in alongside the header.
   List<Widget> buildTopicItems() {
     if (!_hasLoaded || (_isLoading && _topics.isEmpty)) {
-      return [const Center(child: CircularProgressIndicator())];
+      return [const TopicListSkeleton(shrinkWrap: true)];
     }
     return [
       ..._topics.map((t) => TopicListItem(

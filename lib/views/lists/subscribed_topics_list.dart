@@ -215,10 +215,10 @@ class SubscribedTopicsListState extends FCStatefulWidget<SubscribedTopicsList> w
   // Get topic items as List<Widget> for use in parent ListView
   List<Widget> buildTopicItems() {
     if (!_hasLoaded || _isInitialLoading) {
-      return [const Center(child: CircularProgressIndicator())];
+      return [const TopicListSkeleton(shrinkWrap: true)];
     }
     if (_subscribedTopicController == null || !_subscribedTopicController!.isInitialized.value) {
-      return [const Center(child: CircularProgressIndicator())];
+      return [const TopicListSkeleton(shrinkWrap: true)];
     }
 
     var topicsList = _subscribedTopicController!.fcTopics;

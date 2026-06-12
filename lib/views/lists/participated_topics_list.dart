@@ -12,6 +12,7 @@ import 'package:forumcopilot_flutter/views/tabs/topic_list_tab.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:forumcopilot_flutter/controllers/login_controller.dart';
 import 'package:forumcopilot_flutter/views/login_page.dart';
+import 'package:forumcopilot_flutter/views/widgets/topic_list_skeleton.dart';
 import '../../theme/design_tokens.dart';
 
 class ParticipatedTopicsList extends StatefulWidget {
@@ -211,10 +212,10 @@ class ParticipatedTopicsListState extends FCStatefulWidget<ParticipatedTopicsLis
   // Get topic items as List<Widget> for use in parent ListView
   List<Widget> buildTopicItems() {
     if (!_hasLoaded || _isInitialLoading) {
-      return [const Center(child: CircularProgressIndicator())];
+      return [const TopicListSkeleton(shrinkWrap: true)];
     }
     if (_participatedTopicController == null || !_participatedTopicController!.isInitialized.value) {
-      return [const Center(child: CircularProgressIndicator())];
+      return [const TopicListSkeleton(shrinkWrap: true)];
     }
 
     var topicsList = _participatedTopicController!.fcTopics;

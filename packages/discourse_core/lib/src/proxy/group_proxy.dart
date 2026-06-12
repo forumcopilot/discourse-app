@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_group.dart';
 import 'package:forumcopilot_sdk/models/results/fc_group_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../util/html_text.dart';
 
 /// Discourse implementation of [IFCGroupProxy] (Phase 5.40 — lifted
 /// off the `DiscourseGroupProxy.forCurrentSite()` sidecar; Phase 5.44
@@ -181,6 +182,19 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
     }
   }
 
+  /// Group bio, flattened to plain text. `bio_raw` (markdown) reads
+  /// fine as-is; the cooked/excerpt fallbacks are HTML and need
+  /// stripping.
+  static String? _plainBio(Map<String, dynamic> json) {
+    final raw = json['bio_raw']?.toString();
+    if (raw != null && raw.trim().isNotEmpty) return raw;
+    final cooked =
+        (json['bio_cooked'] ?? json['bio_excerpt'])?.toString();
+    if (cooked == null || cooked.trim().isEmpty) return null;
+    final text = stripHtmlToText(cooked);
+    return text.isEmpty ? null : text;
+  }
+
   FCGroup _groupFromJson(Map<String, dynamic> json) {
     return FCGroup(
       id: (json['id'] as num?)?.toInt() ?? 0,
@@ -188,8 +202,10 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
       fullName: (json['full_name'] as String?)?.trim().isNotEmpty == true
           ? json['full_name'] as String
           : null,
-      bio: (json['bio_raw'] ?? json['bio_cooked'] ?? json['bio_excerpt'])
-          ?.toString(),
+      // bio_cooked / bio_excerpt arrive as HTML fragments; flatten to
+      // plain text because the UI renders the bio in a Text widget
+      // (Phase 5.46 — literal <p> tags were showing on group pages).
+      bio: _plainBio(json),
       memberCount: (json['user_count'] as num?)?.toInt() ?? 0,
       automatic: (json['automatic'] as bool?) ?? false,
       visible: (json['visible'] as bool?) ?? true,

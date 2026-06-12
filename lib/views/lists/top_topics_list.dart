@@ -8,6 +8,7 @@ import '../../theme/design_tokens.dart';
 import '../listitems/topic_list_item.dart';
 import '../post_page.dart';
 import '../widgets/resettable_widget.dart';
+import '../widgets/topic_list_skeleton.dart';
 
 /// Discourse Top periods. Matches the URL fragments
 /// `/top/{period}.json` accepts. `all` collapses to plain `/top.json`.
@@ -215,7 +216,7 @@ class TopTopicsListState extends FCStatefulWidget<TopTopicsList>
   List<Widget> buildTopicItems() {
     final header = _buildPeriodSelector();
     if (!_hasLoaded || (_isLoading && _topics.isEmpty)) {
-      return [header, const Center(child: CircularProgressIndicator())];
+      return [header, const TopicListSkeleton(shrinkWrap: true)];
     }
     return [
       header,

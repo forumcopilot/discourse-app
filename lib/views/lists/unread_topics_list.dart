@@ -11,6 +11,7 @@ import 'package:forumcopilot_flutter/views/tabs/topic_list_tab.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:forumcopilot_flutter/controllers/login_controller.dart';
 import 'package:forumcopilot_flutter/views/login_page.dart';
+import 'package:forumcopilot_flutter/views/widgets/topic_list_skeleton.dart';
 import '../../theme/design_tokens.dart';
 import '../../core/logging/app_logger.dart';
 
@@ -273,7 +274,7 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
   // Get topic items as List<Widget> for use in parent ListView
   List<Widget> buildTopicItems() {
     if (!_hasLoaded || _isInitialLoading) {
-      return [const Center(child: CircularProgressIndicator())];
+      return [const TopicListSkeleton(shrinkWrap: true)];
     }
     // Try to get controller from local reference first, then from GetX
     UnreadTopicController? controller = _unreadTopicController;
@@ -283,7 +284,7 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
     }
 
     if (controller == null || !controller.isInitialized.value) {
-      return [const Center(child: CircularProgressIndicator())];
+      return [const TopicListSkeleton(shrinkWrap: true)];
     }
 
     var topicsList = controller.fcTopics;

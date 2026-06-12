@@ -52,6 +52,12 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
   bool _membershipBusy = false;
   bool _requestPending = false;
 
+  /// Phase 5.46 — true when the members fetch failed while the group
+  /// itself loaded (Discourse returns 403 when a group's member list
+  /// is restricted, e.g. members_visibility_level > everyone). Renders
+  /// an explanatory row instead of silent dead space below the header.
+  bool _membersRestricted = false;
+
   static const int _pageSize = 50;
 
   @override
@@ -94,8 +100,11 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
         _members
           ..clear()
           ..addAll(membersResult.members);
+        _membersRestricted =
+            groupResult.result && !membersResult.result;
         _offset = membersResult.members.length;
-        _hasMore = membersResult.members.length >= _pageSize;
+        _hasMore = membersResult.result &&
+            membersResult.members.length >= _pageSize;
         _loadingGroup = false;
       });
     } catch (e) {
@@ -303,7 +312,16 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
         controller: _scrollController,
         itemCount: 1 + _members.length + (_hasMore ? 1 : 0),
         itemBuilder: (_, i) {
-          if (i == 0) return _buildHeader();
+          if (i == 0) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildHeader(),
+                if (_membersRestricted && _members.isEmpty)
+                  _buildMembersRestrictedRow(),
+              ],
+            );
+          }
           final idx = i - 1;
           if (idx >= _members.length) {
             return const Padding(
@@ -497,6 +515,34 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
       const SizedBox(height: DesignTokens.spacingL),
       SizedBox(width: double.infinity, child: child),
     ];
+  }
+
+  /// Quiet explanatory row for groups whose member list the server
+  /// refuses to expose (403). Replaces what used to be silent dead
+  /// space below the header.
+  Widget _buildMembersRestrictedRow() {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DesignTokens.spacingL,
+        vertical: DesignTokens.spacingXL,
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.lock_outline_rounded,
+              size: DesignTokens.iconSizeL,
+              color: colorScheme.onSurfaceVariant),
+          const SizedBox(height: DesignTokens.spacingM),
+          Text(
+            'The member list of this group is private.',
+            style: textTheme.bodyMedium
+                ?.copyWith(color: colorScheme.onSurfaceVariant),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _membershipChip(

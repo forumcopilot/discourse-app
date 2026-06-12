@@ -11,6 +11,7 @@ import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
+import '../util/html_text.dart';
 
 /// Discourse implementation of IFCUserProxy
 /// Handles user operations and profile management for Discourse forums
@@ -325,7 +326,12 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     return FCBadge(
       id: (definition['id'] as num).toInt(),
       name: (definition['name'] ?? '').toString(),
-      description: definition['description']?.toString(),
+      // Badge descriptions ship as cooked HTML (e.g. the "Member"
+      // badge embeds an <a href>); flatten for the Text-widget renders
+      // on the badges page (Phase 5.46).
+      description: definition['description'] == null
+          ? null
+          : stripHtmlToText(definition['description'].toString()),
       icon: definition['icon']?.toString(),
       imageUrl: definition['image_url']?.toString(),
       badgeTypeId: (definition['badge_type_id'] as num?)?.toInt() ?? 1,

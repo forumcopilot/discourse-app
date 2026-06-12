@@ -15,7 +15,17 @@ import '../../theme/design_tokens.dart';
 class TopicListSkeleton extends StatelessWidget {
   final int rowCount;
 
-  const TopicListSkeleton({super.key, this.rowCount = 8});
+  /// Set true when the skeleton is embedded as an item inside a parent
+  /// scroll view (e.g. the Home tab renders list items into an outer
+  /// ListView via `buildTopicItems()`); the inner ListView then sizes
+  /// itself to its children instead of demanding unbounded height.
+  final bool shrinkWrap;
+
+  const TopicListSkeleton({
+    super.key,
+    this.rowCount = 8,
+    this.shrinkWrap = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +40,7 @@ class TopicListSkeleton extends StatelessWidget {
       period: const Duration(milliseconds: 1400),
       child: ListView.separated(
         physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: shrinkWrap,
         itemCount: rowCount,
         separatorBuilder: (_, __) => Divider(
           height: 1,

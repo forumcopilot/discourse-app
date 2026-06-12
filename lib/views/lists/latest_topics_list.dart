@@ -217,10 +217,10 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
   // Get topic items as List<Widget> for use in parent ListView
   List<Widget> buildTopicItems() {
     if (!_hasLoaded || _isInitialLoading) {
-      return [const Center(child: CircularProgressIndicator())];
+      return [const TopicListSkeleton(shrinkWrap: true)];
     }
     if (_latestTopicController == null || !_latestTopicController!.isInitialized.value) {
-      return [const Center(child: CircularProgressIndicator())];
+      return [const TopicListSkeleton(shrinkWrap: true)];
     }
 
     var topicsList = _latestTopicController!.fcTopics;
