@@ -45,3 +45,22 @@ class FCGroupMembersResult {
     this.members = const [],
   });
 }
+
+/// Outcome of a membership action — join, leave, or request-to-join
+/// (Phase 5.44). [isMember] reflects the post-action state so the UI
+/// can flip its button without re-fetching the group;
+/// [requestPending] is true after a successful membership request
+/// (the user is not yet a member — an admin still has to approve).
+class FCGroupMembershipResult {
+  final bool result;
+  final String? resultText;
+  final bool isMember;
+  final bool requestPending;
+
+  FCGroupMembershipResult({
+    required this.result,
+    this.resultText,
+    this.isMember = false,
+    this.requestPending = false,
+  });
+}

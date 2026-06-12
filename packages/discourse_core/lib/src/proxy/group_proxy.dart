@@ -8,12 +8,16 @@ import 'package:forumcopilot_sdk/models/results/fc_group_result.dart';
 import '../base_discourse_proxy.dart';
 
 /// Discourse implementation of [IFCGroupProxy] (Phase 5.40 — lifted
-/// off the `DiscourseGroupProxy.forCurrentSite()` sidecar).
+/// off the `DiscourseGroupProxy.forCurrentSite()` sidecar; Phase 5.44
+/// adds membership actions).
 ///
 /// Endpoints used:
-///   * `GET /groups.json`                       — paginated directory
-///   * `GET /groups/{name}.json`                — single-group details
-///   * `GET /groups/{name}/members.json`        — paginated members
+///   * `GET    /groups.json`                       — paginated directory
+///   * `GET    /groups/{name}.json`                — single-group details
+///   * `GET    /groups/{name}/members.json`        — paginated members
+///   * `PUT    /groups/{id}/join.json`             — self-join
+///   * `DELETE /groups/{id}/leave.json`            — self-leave
+///   * `POST   /groups/{name}/request_membership.json` — request to join
 class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
   DiscourseGroupProxy(SiteContext context) : super(context);
 
@@ -109,6 +113,74 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
     }
   }
 
+  @override
+  Future<FCGroupMembershipResult> joinGroupAsync(int groupId) async {
+    if (!siteContext.isLoggedIn) {
+      return FCGroupMembershipResult(
+          result: false, resultText: 'Not signed in');
+    }
+    try {
+      await apiPut('/groups/$groupId/join.json');
+      return FCGroupMembershipResult(result: true, isMember: true);
+    } on DiscourseApiException catch (e) {
+      return FCGroupMembershipResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCGroupMembershipResult(result: false, resultText: 'Error: $e');
+    }
+  }
+
+  @override
+  Future<FCGroupMembershipResult> leaveGroupAsync(int groupId) async {
+    if (!siteContext.isLoggedIn) {
+      return FCGroupMembershipResult(
+          result: false, resultText: 'Not signed in');
+    }
+    try {
+      await apiDelete('/groups/$groupId/leave.json');
+      return FCGroupMembershipResult(result: true, isMember: false);
+    } on DiscourseApiException catch (e) {
+      return FCGroupMembershipResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCGroupMembershipResult(result: false, resultText: 'Error: $e');
+    }
+  }
+
+  @override
+  Future<FCGroupMembershipResult> requestMembershipAsync(
+    String groupName,
+    String reason,
+  ) async {
+    if (!siteContext.isLoggedIn) {
+      return FCGroupMembershipResult(
+          result: false, resultText: 'Not signed in');
+    }
+    if (reason.trim().isEmpty) {
+      return FCGroupMembershipResult(
+          result: false, resultText: 'A reason is required');
+    }
+    try {
+      // Discourse renders "already requested" as HTTP 200 with
+      // success:false + error — surface that text rather than
+      // treating it as a granted request.
+      final response = await apiPost(
+        '/groups/${Uri.encodeComponent(groupName)}/request_membership.json',
+        body: {'reason': reason.trim()},
+      );
+      final error = response['error']?.toString();
+      if (error != null && error.isNotEmpty) {
+        return FCGroupMembershipResult(result: false, resultText: error);
+      }
+      return FCGroupMembershipResult(result: true, requestPending: true);
+    } on DiscourseApiException catch (e) {
+      return FCGroupMembershipResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCGroupMembershipResult(result: false, resultText: 'Error: $e');
+    }
+  }
+
   FCGroup _groupFromJson(Map<String, dynamic> json) {
     return FCGroup(
       id: (json['id'] as num?)?.toInt() ?? 0,
@@ -122,8 +194,11 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
       automatic: (json['automatic'] as bool?) ?? false,
       visible: (json['visible'] as bool?) ?? true,
       publicAdmission: (json['public_admission'] as bool?) ?? false,
+      publicExit: (json['public_exit'] as bool?) ?? false,
       allowMembershipRequests:
           (json['allow_membership_requests'] as bool?) ?? false,
+      isMember: (json['is_group_user'] as bool?) ?? false,
+      isOwner: (json['is_group_owner'] as bool?) ?? false,
       mentionableLevel: (json['mentionable_level'] as num?)?.toInt(),
       messageableLevel: (json['messageable_level'] as num?)?.toInt(),
       flairColor: (json['flair_color'] as String?)?.trim().isNotEmpty == true

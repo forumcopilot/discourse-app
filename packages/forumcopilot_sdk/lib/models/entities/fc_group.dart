@@ -32,8 +32,20 @@ class FCGroup with FCGroupMappable {
   /// Anyone can request membership.
   bool publicAdmission;
 
+  /// Members can leave freely (Discourse: `public_exit`). Gates the
+  /// "Leave group" action — Discourse rejects `DELETE /groups/{id}/leave`
+  /// when false.
+  bool publicExit;
+
   /// Membership has to be approved by group admins.
   bool allowMembershipRequests;
+
+  /// Phase 5.44 — current user's relationship to the group. Both come
+  /// from Discourse's `is_group_user` / `is_group_owner` serializer
+  /// flags, which are only present for signed-in requests; they
+  /// default to false for guests.
+  bool isMember;
+  bool isOwner;
 
   /// Discourse 0–99 levels gating who can @mention / @message the
   /// group as a whole.
@@ -54,7 +66,10 @@ class FCGroup with FCGroupMappable {
     this.automatic = false,
     this.visible = true,
     this.publicAdmission = false,
+    this.publicExit = false,
     this.allowMembershipRequests = false,
+    this.isMember = false,
+    this.isOwner = false,
     this.mentionableLevel,
     this.messageableLevel,
     this.flairColor,

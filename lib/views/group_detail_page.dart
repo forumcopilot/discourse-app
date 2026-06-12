@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
+import 'package:forumcopilot_flutter/utils/snackbar_helper.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_directory_item.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_group.dart';
@@ -42,6 +43,14 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
   bool _hasMore = true;
   int _offset = 0;
   String? _error;
+
+  /// Phase 5.44 — membership-action state. [_membershipBusy] guards
+  /// double-taps while a join/leave/request call is in flight;
+  /// [_requestPending] remembers a successful membership request for
+  /// the rest of the session (Discourse's group JSON doesn't expose
+  /// outstanding requests, so we track it locally after sending one).
+  bool _membershipBusy = false;
+  bool _requestPending = false;
 
   static const int _pageSize = 50;
 
@@ -123,6 +132,149 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
         _loadingMembers = false;
         _hasMore = false;
       });
+    }
+  }
+
+  Future<void> _handleJoin() async {
+    final group = _group;
+    if (group == null || _membershipBusy) return;
+    setState(() => _membershipBusy = true);
+    final result =
+        await SiteProxyService.getGroupProxy().joinGroupAsync(group.id);
+    if (!mounted) return;
+    setState(() {
+      _membershipBusy = false;
+      if (result.result) {
+        _group = group.copyWith(
+          isMember: true,
+          memberCount: group.memberCount + 1,
+        );
+      }
+    });
+    if (result.result) {
+      SnackbarHelper.showSuccess(
+          context, 'You joined ${group.displayName}');
+      // Pull the fresh member list so the user appears in it.
+      _load();
+    } else {
+      SnackbarHelper.showError(
+          context,
+          result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : 'Failed to join group');
+    }
+  }
+
+  Future<void> _handleLeave() async {
+    final group = _group;
+    if (group == null || _membershipBusy) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        final colorScheme = Theme.of(dialogContext).colorScheme;
+        return AlertDialog(
+          title: const Text('Leave group?'),
+          content: Text(
+            'You will no longer be a member of ${group.displayName}. '
+            'You can rejoin at any time.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: TextButton.styleFrom(foregroundColor: colorScheme.error),
+              child: const Text('Leave'),
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _membershipBusy = true);
+    final result =
+        await SiteProxyService.getGroupProxy().leaveGroupAsync(group.id);
+    if (!mounted) return;
+    setState(() {
+      _membershipBusy = false;
+      if (result.result) {
+        _group = group.copyWith(
+          isMember: false,
+          memberCount:
+              group.memberCount > 0 ? group.memberCount - 1 : 0,
+        );
+      }
+    });
+    if (result.result) {
+      SnackbarHelper.showInfo(context, 'You left ${group.displayName}');
+      _load();
+    } else {
+      SnackbarHelper.showError(
+          context,
+          result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : 'Failed to leave group');
+    }
+  }
+
+  Future<void> _handleRequestMembership() async {
+    final group = _group;
+    if (group == null || _membershipBusy) return;
+    final controller = TextEditingController();
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Request to join ${group.displayName}'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLines: 3,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: const InputDecoration(
+            hintText: 'Why do you want to join? '
+                'Group owners see this with your request.',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () =>
+                Navigator.of(dialogContext).pop(controller.text.trim()),
+            child: const Text('Send request'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (reason == null || !mounted) return;
+    if (reason.isEmpty) {
+      SnackbarHelper.showError(
+          context, 'A reason is required to request membership');
+      return;
+    }
+    setState(() => _membershipBusy = true);
+    final result = await SiteProxyService.getGroupProxy()
+        .requestMembershipAsync(group.name, reason);
+    if (!mounted) return;
+    setState(() {
+      _membershipBusy = false;
+      if (result.result) _requestPending = true;
+    });
+    if (result.result) {
+      SnackbarHelper.showSuccess(
+          context, 'Request sent — a group owner has to approve it');
+    } else {
+      SnackbarHelper.showError(
+          context,
+          result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : 'Failed to send membership request');
     }
   }
 
@@ -249,6 +401,135 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
                   ?.copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ],
+          ..._buildMembershipAction(colorScheme, textTheme),
+        ],
+      ),
+    );
+  }
+
+  /// Phase 5.44 — membership affordance under the group bio. Picks
+  /// one action based on the group's flags and the user's current
+  /// relationship to it:
+  ///
+  ///   member + publicExit          → "Leave group" (outlined, error tone)
+  ///   member, no exit              → "Member" chip (no action possible)
+  ///   guest of joinable group      → "Join group" (filled CTA)
+  ///   guest of request-only group  → "Request to join" (tonal)
+  ///   request already sent         → "Request pending" chip
+  ///
+  /// Hidden entirely for signed-out users (consistent with the app's
+  /// other gated affordances) and for automatic groups (trust-level /
+  /// staff groups can't be joined manually).
+  List<Widget> _buildMembershipAction(
+      ColorScheme colorScheme, TextTheme textTheme) {
+    final group = _group;
+    if (group == null ||
+        !widget.siteContext.isLoggedIn ||
+        group.automatic) {
+      return const [];
+    }
+
+    final Widget child;
+    if (group.isMember) {
+      if (group.publicExit) {
+        child = OutlinedButton.icon(
+          onPressed: _membershipBusy ? null : _handleLeave,
+          icon: _membershipBusy
+              ? SizedBox(
+                  width: DesignTokens.iconSizeS,
+                  height: DesignTokens.iconSizeS,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: colorScheme.error,
+                  ),
+                )
+              : const Icon(Icons.logout_rounded),
+          label: const Text('Leave group'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: colorScheme.error,
+            side: BorderSide(
+              color: colorScheme.error
+                  .withValues(alpha: DesignTokens.opacityMediumLow),
+            ),
+          ),
+        );
+      } else {
+        child = _membershipChip(
+          colorScheme,
+          textTheme,
+          icon: Icons.check_rounded,
+          label: 'Member',
+        );
+      }
+    } else if (_requestPending) {
+      child = _membershipChip(
+        colorScheme,
+        textTheme,
+        icon: Icons.hourglass_top_rounded,
+        label: 'Request pending',
+      );
+    } else if (group.publicAdmission) {
+      child = FilledButton.icon(
+        onPressed: _membershipBusy ? null : _handleJoin,
+        icon: _membershipBusy
+            ? SizedBox(
+                width: DesignTokens.iconSizeS,
+                height: DesignTokens.iconSizeS,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: colorScheme.onPrimary,
+                ),
+              )
+            : const Icon(Icons.group_add_rounded),
+        label: Text(_membershipBusy ? 'Joining…' : 'Join group'),
+      );
+    } else if (group.allowMembershipRequests) {
+      child = FilledButton.tonalIcon(
+        onPressed: _membershipBusy ? null : _handleRequestMembership,
+        icon: const Icon(Icons.outgoing_mail),
+        label: const Text('Request to join'),
+      );
+    } else {
+      return const [];
+    }
+
+    return [
+      const SizedBox(height: DesignTokens.spacingL),
+      SizedBox(width: double.infinity, child: child),
+    ];
+  }
+
+  Widget _membershipChip(
+    ColorScheme colorScheme,
+    TextTheme textTheme, {
+    required IconData icon,
+    required String label,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DesignTokens.spacingM,
+        vertical: DesignTokens.spacingS,
+      ),
+      decoration: BoxDecoration(
+        color: colorScheme.secondaryContainer
+            .withValues(alpha: DesignTokens.opacityMediumLow),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon,
+              size: DesignTokens.iconSizeS,
+              color: colorScheme.onSecondaryContainer),
+          const SizedBox(width: DesignTokens.spacingS),
+          Text(
+            label,
+            style: textTheme.labelLarge?.copyWith(
+              color: colorScheme.onSecondaryContainer,
+              fontWeight: DesignTokens.fontWeightMedium,
+            ),
+          ),
         ],
       ),
     );

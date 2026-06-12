@@ -43,6 +43,9 @@ class FCGroupMapper extends ClassMapperBase<FCGroup> {
   static bool _$publicAdmission(FCGroup v) => v.publicAdmission;
   static const Field<FCGroup, bool> _f$publicAdmission =
       Field('publicAdmission', _$publicAdmission, opt: true, def: false);
+  static bool _$publicExit(FCGroup v) => v.publicExit;
+  static const Field<FCGroup, bool> _f$publicExit =
+      Field('publicExit', _$publicExit, opt: true, def: false);
   static bool _$allowMembershipRequests(FCGroup v) =>
       v.allowMembershipRequests;
   static const Field<FCGroup, bool> _f$allowMembershipRequests = Field(
@@ -51,6 +54,12 @@ class FCGroupMapper extends ClassMapperBase<FCGroup> {
     opt: true,
     def: false,
   );
+  static bool _$isMember(FCGroup v) => v.isMember;
+  static const Field<FCGroup, bool> _f$isMember =
+      Field('isMember', _$isMember, opt: true, def: false);
+  static bool _$isOwner(FCGroup v) => v.isOwner;
+  static const Field<FCGroup, bool> _f$isOwner =
+      Field('isOwner', _$isOwner, opt: true, def: false);
   static int? _$mentionableLevel(FCGroup v) => v.mentionableLevel;
   static const Field<FCGroup, int> _f$mentionableLevel =
       Field('mentionableLevel', _$mentionableLevel, opt: true);
@@ -77,7 +86,10 @@ class FCGroupMapper extends ClassMapperBase<FCGroup> {
     #automatic: _f$automatic,
     #visible: _f$visible,
     #publicAdmission: _f$publicAdmission,
+    #publicExit: _f$publicExit,
     #allowMembershipRequests: _f$allowMembershipRequests,
+    #isMember: _f$isMember,
+    #isOwner: _f$isOwner,
     #mentionableLevel: _f$mentionableLevel,
     #messageableLevel: _f$messageableLevel,
     #flairColor: _f$flairColor,
@@ -95,7 +107,10 @@ class FCGroupMapper extends ClassMapperBase<FCGroup> {
       automatic: data.dec(_f$automatic),
       visible: data.dec(_f$visible),
       publicAdmission: data.dec(_f$publicAdmission),
+      publicExit: data.dec(_f$publicExit),
       allowMembershipRequests: data.dec(_f$allowMembershipRequests),
+      isMember: data.dec(_f$isMember),
+      isOwner: data.dec(_f$isOwner),
       mentionableLevel: data.dec(_f$mentionableLevel),
       messageableLevel: data.dec(_f$messageableLevel),
       flairColor: data.dec(_f$flairColor),
@@ -162,7 +177,10 @@ abstract class FCGroupCopyWith<$R, $In extends FCGroup, $Out>
     bool? automatic,
     bool? visible,
     bool? publicAdmission,
+    bool? publicExit,
     bool? allowMembershipRequests,
+    bool? isMember,
+    bool? isOwner,
     int? mentionableLevel,
     int? messageableLevel,
     String? flairColor,
@@ -190,7 +208,10 @@ class _FCGroupCopyWithImpl<$R, $Out>
     bool? automatic,
     bool? visible,
     bool? publicAdmission,
+    bool? publicExit,
     bool? allowMembershipRequests,
+    bool? isMember,
+    bool? isOwner,
     Object? mentionableLevel = $none,
     Object? messageableLevel = $none,
     Object? flairColor = $none,
@@ -207,8 +228,11 @@ class _FCGroupCopyWithImpl<$R, $Out>
           if (automatic != null) #automatic: automatic,
           if (visible != null) #visible: visible,
           if (publicAdmission != null) #publicAdmission: publicAdmission,
+          if (publicExit != null) #publicExit: publicExit,
           if (allowMembershipRequests != null)
             #allowMembershipRequests: allowMembershipRequests,
+          if (isMember != null) #isMember: isMember,
+          if (isOwner != null) #isOwner: isOwner,
           if (mentionableLevel != $none) #mentionableLevel: mentionableLevel,
           if (messageableLevel != $none) #messageableLevel: messageableLevel,
           if (flairColor != $none) #flairColor: flairColor,
@@ -227,10 +251,13 @@ class _FCGroupCopyWithImpl<$R, $Out>
         visible: data.get(#visible, or: $value.visible),
         publicAdmission:
             data.get(#publicAdmission, or: $value.publicAdmission),
+        publicExit: data.get(#publicExit, or: $value.publicExit),
         allowMembershipRequests: data.get(
           #allowMembershipRequests,
           or: $value.allowMembershipRequests,
         ),
+        isMember: data.get(#isMember, or: $value.isMember),
+        isOwner: data.get(#isOwner, or: $value.isOwner),
         mentionableLevel:
             data.get(#mentionableLevel, or: $value.mentionableLevel),
         messageableLevel:
