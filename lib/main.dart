@@ -6,19 +6,19 @@ import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'utils/time_utils.dart';
-import 'services/notification_service.dart';
-import 'controllers/push_notification_controller.dart';
-import 'controllers/notification_settings_controller.dart';
-import 'controllers/global_loader_controller.dart';
-import 'core/errors/error_handling_init.dart';
-import 'core/logging/app_logger.dart';
-import 'core/memory/memory_manager.dart';
-import 'services/user_state_service.dart';
-import 'settings_context.dart';
-import 'utils/locale_support_checker.dart';
+import 'package:discourse_ui/utils/time_utils.dart';
+import 'package:discourse_ui/services/notification_service.dart';
+import 'package:discourse_ui/controllers/push_notification_controller.dart';
+import 'package:discourse_ui/controllers/notification_settings_controller.dart';
+import 'package:discourse_ui/controllers/global_loader_controller.dart';
+import 'package:discourse_ui/core/errors/error_handling_init.dart';
+import 'package:discourse_ui/core/logging/app_logger.dart';
+import 'package:discourse_ui/core/memory/memory_manager.dart';
+import 'package:discourse_ui/services/user_state_service.dart';
+import 'package:discourse_ui/settings_context.dart';
+import 'package:discourse_ui/utils/locale_support_checker.dart';
 
-import 'forumcopilot_app.dart';
+import 'package:discourse_ui/forumcopilot_app.dart';
 
 // Store pending initial message for Android (opened from terminated state)
 RemoteMessage? _pendingInitialMessage;

@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:forumcopilot_flutter/forumcopilot_app.dart';
+import 'package:discourse_ui/forumcopilot_app.dart';
 
 void main() {
   testWidgets('ForumCopilotApp smoke test', (WidgetTester tester) async {
