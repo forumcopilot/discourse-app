@@ -1,6 +1,6 @@
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_reaction.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 
 import '../../theme/design_tokens.dart';
 
@@ -12,7 +12,7 @@ import '../../theme/design_tokens.dart';
 /// Hidden when [reactions] is empty so it doesn't take up space on
 /// forums without the plugin.
 class ReactionChipsRow extends StatelessWidget {
-  final List<FCReaction> reactions;
+  final List<FCPostReaction> reactions;
   final ValueChanged<String> onTap;
 
   const ReactionChipsRow({

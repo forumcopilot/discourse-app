@@ -25,8 +25,10 @@ class FCTagListResultMapper extends ClassMapperBase<FCTagListResult> {
   final String id = 'FCTagListResult';
 
   static bool _$result(FCTagListResult v) => v.result;
-  static const Field<FCTagListResult, bool> _f$result =
-      Field('result', _$result);
+  static const Field<FCTagListResult, bool> _f$result = Field(
+    'result',
+    _$result,
+  );
   static String? _$resultText(FCTagListResult v) => v.resultText;
   static const Field<FCTagListResult, String> _f$resultText = Field(
     'resultText',
@@ -36,8 +38,10 @@ class FCTagListResultMapper extends ClassMapperBase<FCTagListResult> {
   static int _$total(FCTagListResult v) => v.total;
   static const Field<FCTagListResult, int> _f$total = Field('total', _$total);
   static List<FCTag> _$items(FCTagListResult v) => v.items;
-  static const Field<FCTagListResult, List<FCTag>> _f$items =
-      Field('items', _$items);
+  static const Field<FCTagListResult, List<FCTag>> _f$items = Field(
+    'items',
+    _$items,
+  );
 
   @override
   final MappableFields<FCTagListResult> fields = const {
@@ -75,55 +79,55 @@ mixin FCTagListResultMappable {
   }
 
   Map<String, dynamic> toMap() {
-    return FCTagListResultMapper.ensureInitialized()
-        .encodeMap<FCTagListResult>(this as FCTagListResult);
+    return FCTagListResultMapper.ensureInitialized().encodeMap<FCTagListResult>(
+      this as FCTagListResult,
+    );
   }
 
   FCTagListResultCopyWith<FCTagListResult, FCTagListResult, FCTagListResult>
-      get copyWith =>
-          _FCTagListResultCopyWithImpl<FCTagListResult, FCTagListResult>(
-            this as FCTagListResult,
-            $identity,
-            $identity,
-          );
+  get copyWith =>
+      _FCTagListResultCopyWithImpl<FCTagListResult, FCTagListResult>(
+        this as FCTagListResult,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return FCTagListResultMapper.ensureInitialized()
-        .stringifyValue(this as FCTagListResult);
+    return FCTagListResultMapper.ensureInitialized().stringifyValue(
+      this as FCTagListResult,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FCTagListResultMapper.ensureInitialized()
-        .equalsValue(this as FCTagListResult, other);
+    return FCTagListResultMapper.ensureInitialized().equalsValue(
+      this as FCTagListResult,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return FCTagListResultMapper.ensureInitialized()
-        .hashValue(this as FCTagListResult);
+    return FCTagListResultMapper.ensureInitialized().hashValue(
+      this as FCTagListResult,
+    );
   }
 }
 
 extension FCTagListResultValueCopy<$R, $Out>
     on ObjectCopyWith<$R, FCTagListResult, $Out> {
   FCTagListResultCopyWith<$R, FCTagListResult, $Out> get $asFCTagListResult =>
-      $base
-          .as((v, t, t2) => _FCTagListResultCopyWithImpl<$R, $Out>(v, t, t2));
+      $base.as((v, t, t2) => _FCTagListResultCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class FCTagListResultCopyWith<$R, $In extends FCTagListResult, $Out>
     implements FCBaseResultCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, FCTag, FCTagCopyWith<$R, FCTag, FCTag>> get items;
   @override
-  $R call({
-    bool? result,
-    String? resultText,
-    int? total,
-    List<FCTag>? items,
-  });
+  $R call({bool? result, String? resultText, int? total, List<FCTag>? items});
   FCTagListResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _FCTagListResultCopyWithImpl<$R, $Out>
@@ -147,27 +151,26 @@ class _FCTagListResultCopyWithImpl<$R, $Out>
     Object? resultText = $none,
     int? total,
     List<FCTag>? items,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (result != null) #result: result,
-          if (resultText != $none) #resultText: resultText,
-          if (total != null) #total: total,
-          if (items != null) #items: items,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (result != null) #result: result,
+      if (resultText != $none) #resultText: resultText,
+      if (total != null) #total: total,
+      if (items != null) #items: items,
+    }),
+  );
   @override
   FCTagListResult $make(CopyWithData data) => FCTagListResult(
-        result: data.get(#result, or: $value.result),
-        resultText: data.get(#resultText, or: $value.resultText),
-        total: data.get(#total, or: $value.total),
-        items: data.get(#items, or: $value.items),
-      );
+    result: data.get(#result, or: $value.result),
+    resultText: data.get(#resultText, or: $value.resultText),
+    total: data.get(#total, or: $value.total),
+    items: data.get(#items, or: $value.items),
+  );
 
   @override
-  FCTagListResultCopyWith<$R2, FCTagListResult, $Out2>
-      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _FCTagListResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  FCTagListResultCopyWith<$R2, FCTagListResult, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _FCTagListResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class FCTagSearchResultMapper extends ClassMapperBase<FCTagSearchResult> {
@@ -186,8 +189,10 @@ class FCTagSearchResultMapper extends ClassMapperBase<FCTagSearchResult> {
   final String id = 'FCTagSearchResult';
 
   static bool _$result(FCTagSearchResult v) => v.result;
-  static const Field<FCTagSearchResult, bool> _f$result =
-      Field('result', _$result);
+  static const Field<FCTagSearchResult, bool> _f$result = Field(
+    'result',
+    _$result,
+  );
   static String? _$resultText(FCTagSearchResult v) => v.resultText;
   static const Field<FCTagSearchResult, String> _f$resultText = Field(
     'resultText',
@@ -195,8 +200,10 @@ class FCTagSearchResultMapper extends ClassMapperBase<FCTagSearchResult> {
     opt: true,
   );
   static List<String> _$names(FCTagSearchResult v) => v.names;
-  static const Field<FCTagSearchResult, List<String>> _f$names =
-      Field('names', _$names);
+  static const Field<FCTagSearchResult, List<String>> _f$names = Field(
+    'names',
+    _$names,
+  );
 
   @override
   final MappableFields<FCTagSearchResult> fields = const {
@@ -236,46 +243,60 @@ mixin FCTagSearchResultMappable {
         .encodeMap<FCTagSearchResult>(this as FCTagSearchResult);
   }
 
-  FCTagSearchResultCopyWith<FCTagSearchResult, FCTagSearchResult,
-          FCTagSearchResult>
-      get copyWith =>
-          _FCTagSearchResultCopyWithImpl<FCTagSearchResult, FCTagSearchResult>(
-            this as FCTagSearchResult,
-            $identity,
-            $identity,
-          );
+  FCTagSearchResultCopyWith<
+    FCTagSearchResult,
+    FCTagSearchResult,
+    FCTagSearchResult
+  >
+  get copyWith =>
+      _FCTagSearchResultCopyWithImpl<FCTagSearchResult, FCTagSearchResult>(
+        this as FCTagSearchResult,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return FCTagSearchResultMapper.ensureInitialized()
-        .stringifyValue(this as FCTagSearchResult);
+    return FCTagSearchResultMapper.ensureInitialized().stringifyValue(
+      this as FCTagSearchResult,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FCTagSearchResultMapper.ensureInitialized()
-        .equalsValue(this as FCTagSearchResult, other);
+    return FCTagSearchResultMapper.ensureInitialized().equalsValue(
+      this as FCTagSearchResult,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return FCTagSearchResultMapper.ensureInitialized()
-        .hashValue(this as FCTagSearchResult);
+    return FCTagSearchResultMapper.ensureInitialized().hashValue(
+      this as FCTagSearchResult,
+    );
   }
 }
 
 extension FCTagSearchResultValueCopy<$R, $Out>
     on ObjectCopyWith<$R, FCTagSearchResult, $Out> {
   FCTagSearchResultCopyWith<$R, FCTagSearchResult, $Out>
-      get $asFCTagSearchResult => $base.as(
-          (v, t, t2) => _FCTagSearchResultCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asFCTagSearchResult => $base.as(
+    (v, t, t2) => _FCTagSearchResultCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
-abstract class FCTagSearchResultCopyWith<$R, $In extends FCTagSearchResult,
-    $Out> implements FCBaseResultCopyWith<$R, $In, $Out> {
+abstract class FCTagSearchResultCopyWith<
+  $R,
+  $In extends FCTagSearchResult,
+  $Out
+>
+    implements FCBaseResultCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get names;
   @override
   $R call({bool? result, String? resultText, List<String>? names});
   FCTagSearchResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _FCTagSearchResultCopyWithImpl<$R, $Out>
@@ -287,11 +308,14 @@ class _FCTagSearchResultCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FCTagSearchResult> $mapper =
       FCTagSearchResultMapper.ensureInitialized();
   @override
-  $R call({
-    bool? result,
-    Object? resultText = $none,
-    List<String>? names,
-  }) =>
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get names =>
+      ListCopyWith(
+        $value.names,
+        (v, t) => ObjectCopyWith(v, $identity, t),
+        (v) => call(names: v),
+      );
+  @override
+  $R call({bool? result, Object? resultText = $none, List<String>? names}) =>
       $apply(
         FieldCopyWithData({
           if (result != null) #result: result,
@@ -301,13 +325,14 @@ class _FCTagSearchResultCopyWithImpl<$R, $Out>
       );
   @override
   FCTagSearchResult $make(CopyWithData data) => FCTagSearchResult(
-        result: data.get(#result, or: $value.result),
-        resultText: data.get(#resultText, or: $value.resultText),
-        names: data.get(#names, or: $value.names),
-      );
+    result: data.get(#result, or: $value.result),
+    resultText: data.get(#resultText, or: $value.resultText),
+    names: data.get(#names, or: $value.names),
+  );
 
   @override
-  FCTagSearchResultCopyWith<$R2, FCTagSearchResult, $Out2>
-      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _FCTagSearchResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  FCTagSearchResultCopyWith<$R2, FCTagSearchResult, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _FCTagSearchResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

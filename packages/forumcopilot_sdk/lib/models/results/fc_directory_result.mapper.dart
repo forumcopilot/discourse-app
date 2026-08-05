@@ -26,14 +26,21 @@ class FCDirectoryItemResultMapper
   final String id = 'FCDirectoryItemResult';
 
   static bool _$result(FCDirectoryItemResult v) => v.result;
-  static const Field<FCDirectoryItemResult, bool> _f$result =
-      Field('result', _$result);
+  static const Field<FCDirectoryItemResult, bool> _f$result = Field(
+    'result',
+    _$result,
+  );
   static String? _$resultText(FCDirectoryItemResult v) => v.resultText;
-  static const Field<FCDirectoryItemResult, String> _f$resultText =
-      Field('resultText', _$resultText, opt: true);
+  static const Field<FCDirectoryItemResult, String> _f$resultText = Field(
+    'resultText',
+    _$resultText,
+    opt: true,
+  );
   static int _$total(FCDirectoryItemResult v) => v.total;
-  static const Field<FCDirectoryItemResult, int> _f$total =
-      Field('total', _$total);
+  static const Field<FCDirectoryItemResult, int> _f$total = Field(
+    'total',
+    _$total,
+  );
   static List<FCDirectoryItem> _$items(FCDirectoryItemResult v) => v.items;
   static const Field<FCDirectoryItemResult, List<FCDirectoryItem>> _f$items =
       Field('items', _$items);
@@ -78,45 +85,59 @@ mixin FCDirectoryItemResultMappable {
         .encodeMap<FCDirectoryItemResult>(this as FCDirectoryItemResult);
   }
 
-  FCDirectoryItemResultCopyWith<FCDirectoryItemResult, FCDirectoryItemResult,
-          FCDirectoryItemResult>
-      get copyWith => _FCDirectoryItemResultCopyWithImpl<FCDirectoryItemResult,
-          FCDirectoryItemResult>(
-        this as FCDirectoryItemResult,
-        $identity,
-        $identity,
-      );
+  FCDirectoryItemResultCopyWith<
+    FCDirectoryItemResult,
+    FCDirectoryItemResult,
+    FCDirectoryItemResult
+  >
+  get copyWith =>
+      _FCDirectoryItemResultCopyWithImpl<
+        FCDirectoryItemResult,
+        FCDirectoryItemResult
+      >(this as FCDirectoryItemResult, $identity, $identity);
   @override
   String toString() {
-    return FCDirectoryItemResultMapper.ensureInitialized()
-        .stringifyValue(this as FCDirectoryItemResult);
+    return FCDirectoryItemResultMapper.ensureInitialized().stringifyValue(
+      this as FCDirectoryItemResult,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FCDirectoryItemResultMapper.ensureInitialized()
-        .equalsValue(this as FCDirectoryItemResult, other);
+    return FCDirectoryItemResultMapper.ensureInitialized().equalsValue(
+      this as FCDirectoryItemResult,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return FCDirectoryItemResultMapper.ensureInitialized()
-        .hashValue(this as FCDirectoryItemResult);
+    return FCDirectoryItemResultMapper.ensureInitialized().hashValue(
+      this as FCDirectoryItemResult,
+    );
   }
 }
 
 extension FCDirectoryItemResultValueCopy<$R, $Out>
     on ObjectCopyWith<$R, FCDirectoryItemResult, $Out> {
   FCDirectoryItemResultCopyWith<$R, FCDirectoryItemResult, $Out>
-      get $asFCDirectoryItemResult => $base.as(
-          (v, t, t2) => _FCDirectoryItemResultCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asFCDirectoryItemResult => $base.as(
+    (v, t, t2) => _FCDirectoryItemResultCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
-abstract class FCDirectoryItemResultCopyWith<$R,
-    $In extends FCDirectoryItemResult, $Out>
+abstract class FCDirectoryItemResultCopyWith<
+  $R,
+  $In extends FCDirectoryItemResult,
+  $Out
+>
     implements FCBaseResultCopyWith<$R, $In, $Out> {
-  ListCopyWith<$R, FCDirectoryItem,
-      FCDirectoryItemCopyWith<$R, FCDirectoryItem, FCDirectoryItem>> get items;
+  ListCopyWith<
+    $R,
+    FCDirectoryItem,
+    FCDirectoryItemCopyWith<$R, FCDirectoryItem, FCDirectoryItem>
+  >
+  get items;
   @override
   $R call({
     bool? result,
@@ -125,7 +146,8 @@ abstract class FCDirectoryItemResultCopyWith<$R,
     List<FCDirectoryItem>? items,
   });
   FCDirectoryItemResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _FCDirectoryItemResultCopyWithImpl<$R, $Out>
@@ -137,40 +159,42 @@ class _FCDirectoryItemResultCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FCDirectoryItemResult> $mapper =
       FCDirectoryItemResultMapper.ensureInitialized();
   @override
-  ListCopyWith<$R, FCDirectoryItem,
-          FCDirectoryItemCopyWith<$R, FCDirectoryItem, FCDirectoryItem>>
-      get items => ListCopyWith(
-            $value.items,
-            (v, t) => v.copyWith.$chain(t),
-            (v) => call(items: v),
-          );
+  ListCopyWith<
+    $R,
+    FCDirectoryItem,
+    FCDirectoryItemCopyWith<$R, FCDirectoryItem, FCDirectoryItem>
+  >
+  get items => ListCopyWith(
+    $value.items,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(items: v),
+  );
   @override
   $R call({
     bool? result,
     Object? resultText = $none,
     int? total,
     List<FCDirectoryItem>? items,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (result != null) #result: result,
-          if (resultText != $none) #resultText: resultText,
-          if (total != null) #total: total,
-          if (items != null) #items: items,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (result != null) #result: result,
+      if (resultText != $none) #resultText: resultText,
+      if (total != null) #total: total,
+      if (items != null) #items: items,
+    }),
+  );
   @override
   FCDirectoryItemResult $make(CopyWithData data) => FCDirectoryItemResult(
-        result: data.get(#result, or: $value.result),
-        resultText: data.get(#resultText, or: $value.resultText),
-        total: data.get(#total, or: $value.total),
-        items: data.get(#items, or: $value.items),
-      );
+    result: data.get(#result, or: $value.result),
+    resultText: data.get(#resultText, or: $value.resultText),
+    total: data.get(#total, or: $value.total),
+    items: data.get(#items, or: $value.items),
+  );
 
   @override
   FCDirectoryItemResultCopyWith<$R2, FCDirectoryItemResult, $Out2>
-      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _FCDirectoryItemResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _FCDirectoryItemResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class FCBadgeResultMapper extends ClassMapperBase<FCBadgeResult> {
@@ -192,11 +216,18 @@ class FCBadgeResultMapper extends ClassMapperBase<FCBadgeResult> {
   static bool _$result(FCBadgeResult v) => v.result;
   static const Field<FCBadgeResult, bool> _f$result = Field('result', _$result);
   static String? _$resultText(FCBadgeResult v) => v.resultText;
-  static const Field<FCBadgeResult, String> _f$resultText =
-      Field('resultText', _$resultText, opt: true);
+  static const Field<FCBadgeResult, String> _f$resultText = Field(
+    'resultText',
+    _$resultText,
+    opt: true,
+  );
   static List<FCBadge> _$badges(FCBadgeResult v) => v.badges;
-  static const Field<FCBadgeResult, List<FCBadge>> _f$badges =
-      Field('badges', _$badges, opt: true, def: const []);
+  static const Field<FCBadgeResult, List<FCBadge>> _f$badges = Field(
+    'badges',
+    _$badges,
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<FCBadgeResult> fields = const {
@@ -227,35 +258,43 @@ class FCBadgeResultMapper extends ClassMapperBase<FCBadgeResult> {
 
 mixin FCBadgeResultMappable {
   String toJson() {
-    return FCBadgeResultMapper.ensureInitialized()
-        .encodeJson<FCBadgeResult>(this as FCBadgeResult);
+    return FCBadgeResultMapper.ensureInitialized().encodeJson<FCBadgeResult>(
+      this as FCBadgeResult,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return FCBadgeResultMapper.ensureInitialized()
-        .encodeMap<FCBadgeResult>(this as FCBadgeResult);
+    return FCBadgeResultMapper.ensureInitialized().encodeMap<FCBadgeResult>(
+      this as FCBadgeResult,
+    );
   }
 
   FCBadgeResultCopyWith<FCBadgeResult, FCBadgeResult, FCBadgeResult>
-      get copyWith =>
-          _FCBadgeResultCopyWithImpl<FCBadgeResult, FCBadgeResult>(
-              this as FCBadgeResult, $identity, $identity);
+  get copyWith => _FCBadgeResultCopyWithImpl<FCBadgeResult, FCBadgeResult>(
+    this as FCBadgeResult,
+    $identity,
+    $identity,
+  );
   @override
   String toString() {
-    return FCBadgeResultMapper.ensureInitialized()
-        .stringifyValue(this as FCBadgeResult);
+    return FCBadgeResultMapper.ensureInitialized().stringifyValue(
+      this as FCBadgeResult,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FCBadgeResultMapper.ensureInitialized()
-        .equalsValue(this as FCBadgeResult, other);
+    return FCBadgeResultMapper.ensureInitialized().equalsValue(
+      this as FCBadgeResult,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return FCBadgeResultMapper.ensureInitialized()
-        .hashValue(this as FCBadgeResult);
+    return FCBadgeResultMapper.ensureInitialized().hashValue(
+      this as FCBadgeResult,
+    );
   }
 }
 
@@ -270,8 +309,7 @@ abstract class FCBadgeResultCopyWith<$R, $In extends FCBadgeResult, $Out>
   ListCopyWith<$R, FCBadge, FCBadgeCopyWith<$R, FCBadge, FCBadge>> get badges;
   @override
   $R call({bool? result, String? resultText, List<FCBadge>? badges});
-  FCBadgeResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+  FCBadgeResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
 class _FCBadgeResultCopyWithImpl<$R, $Out>
@@ -283,18 +321,14 @@ class _FCBadgeResultCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FCBadgeResult> $mapper =
       FCBadgeResultMapper.ensureInitialized();
   @override
-  ListCopyWith<$R, FCBadge, FCBadgeCopyWith<$R, FCBadge, FCBadge>>
-      get badges => ListCopyWith(
-            $value.badges,
-            (v, t) => v.copyWith.$chain(t),
-            (v) => call(badges: v),
-          );
+  ListCopyWith<$R, FCBadge, FCBadgeCopyWith<$R, FCBadge, FCBadge>> get badges =>
+      ListCopyWith(
+        $value.badges,
+        (v, t) => v.copyWith.$chain(t),
+        (v) => call(badges: v),
+      );
   @override
-  $R call({
-    bool? result,
-    Object? resultText = $none,
-    List<FCBadge>? badges,
-  }) =>
+  $R call({bool? result, Object? resultText = $none, List<FCBadge>? badges}) =>
       $apply(
         FieldCopyWithData({
           if (result != null) #result: result,
@@ -304,13 +338,14 @@ class _FCBadgeResultCopyWithImpl<$R, $Out>
       );
   @override
   FCBadgeResult $make(CopyWithData data) => FCBadgeResult(
-        result: data.get(#result, or: $value.result),
-        resultText: data.get(#resultText, or: $value.resultText),
-        badges: data.get(#badges, or: $value.badges),
-      );
+    result: data.get(#result, or: $value.result),
+    resultText: data.get(#resultText, or: $value.resultText),
+    badges: data.get(#badges, or: $value.badges),
+  );
 
   @override
   FCBadgeResultCopyWith<$R2, FCBadgeResult, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _FCBadgeResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _FCBadgeResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

@@ -17,7 +17,7 @@ class FCToggleReactionResultMapper
     if (_instance == null) {
       MapperContainer.globals.use(_instance = FCToggleReactionResultMapper._());
       FCBaseResultMapper.ensureInitialized();
-      FCReactionMapper.ensureInitialized();
+      FCPostReactionMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -26,17 +26,20 @@ class FCToggleReactionResultMapper
   final String id = 'FCToggleReactionResult';
 
   static bool _$result(FCToggleReactionResult v) => v.result;
-  static const Field<FCToggleReactionResult, bool> _f$result =
-      Field('result', _$result);
+  static const Field<FCToggleReactionResult, bool> _f$result = Field(
+    'result',
+    _$result,
+  );
   static String? _$resultText(FCToggleReactionResult v) => v.resultText;
   static const Field<FCToggleReactionResult, String> _f$resultText = Field(
     'resultText',
     _$resultText,
     opt: true,
   );
-  static List<FCReaction> _$reactions(FCToggleReactionResult v) => v.reactions;
-  static const Field<FCToggleReactionResult, List<FCReaction>> _f$reactions =
-      Field('reactions', _$reactions, opt: true, def: const []);
+  static List<FCPostReaction> _$reactions(FCToggleReactionResult v) =>
+      v.reactions;
+  static const Field<FCToggleReactionResult, List<FCPostReaction>>
+  _f$reactions = Field('reactions', _$reactions, opt: true, def: const []);
 
   @override
   final MappableFields<FCToggleReactionResult> fields = const {
@@ -76,49 +79,64 @@ mixin FCToggleReactionResultMappable {
         .encodeMap<FCToggleReactionResult>(this as FCToggleReactionResult);
   }
 
-  FCToggleReactionResultCopyWith<FCToggleReactionResult, FCToggleReactionResult,
-          FCToggleReactionResult>
-      get copyWith => _FCToggleReactionResultCopyWithImpl<
-          FCToggleReactionResult, FCToggleReactionResult>(
-        this as FCToggleReactionResult,
-        $identity,
-        $identity,
-      );
+  FCToggleReactionResultCopyWith<
+    FCToggleReactionResult,
+    FCToggleReactionResult,
+    FCToggleReactionResult
+  >
+  get copyWith =>
+      _FCToggleReactionResultCopyWithImpl<
+        FCToggleReactionResult,
+        FCToggleReactionResult
+      >(this as FCToggleReactionResult, $identity, $identity);
   @override
   String toString() {
-    return FCToggleReactionResultMapper.ensureInitialized()
-        .stringifyValue(this as FCToggleReactionResult);
+    return FCToggleReactionResultMapper.ensureInitialized().stringifyValue(
+      this as FCToggleReactionResult,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FCToggleReactionResultMapper.ensureInitialized()
-        .equalsValue(this as FCToggleReactionResult, other);
+    return FCToggleReactionResultMapper.ensureInitialized().equalsValue(
+      this as FCToggleReactionResult,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return FCToggleReactionResultMapper.ensureInitialized()
-        .hashValue(this as FCToggleReactionResult);
+    return FCToggleReactionResultMapper.ensureInitialized().hashValue(
+      this as FCToggleReactionResult,
+    );
   }
 }
 
 extension FCToggleReactionResultValueCopy<$R, $Out>
     on ObjectCopyWith<$R, FCToggleReactionResult, $Out> {
   FCToggleReactionResultCopyWith<$R, FCToggleReactionResult, $Out>
-      get $asFCToggleReactionResult => $base.as((v, t, t2) =>
-          _FCToggleReactionResultCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asFCToggleReactionResult => $base.as(
+    (v, t, t2) => _FCToggleReactionResultCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
-abstract class FCToggleReactionResultCopyWith<$R,
-    $In extends FCToggleReactionResult, $Out>
+abstract class FCToggleReactionResultCopyWith<
+  $R,
+  $In extends FCToggleReactionResult,
+  $Out
+>
     implements FCBaseResultCopyWith<$R, $In, $Out> {
-  ListCopyWith<$R, FCReaction,
-      FCReactionCopyWith<$R, FCReaction, FCReaction>> get reactions;
+  ListCopyWith<
+    $R,
+    FCPostReaction,
+    FCPostReactionCopyWith<$R, FCPostReaction, FCPostReaction>
+  >
+  get reactions;
   @override
-  $R call({bool? result, String? resultText, List<FCReaction>? reactions});
+  $R call({bool? result, String? resultText, List<FCPostReaction>? reactions});
   FCToggleReactionResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _FCToggleReactionResultCopyWithImpl<$R, $Out>
@@ -131,37 +149,39 @@ class _FCToggleReactionResultCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FCToggleReactionResult> $mapper =
       FCToggleReactionResultMapper.ensureInitialized();
   @override
-  ListCopyWith<$R, FCReaction,
-          FCReactionCopyWith<$R, FCReaction, FCReaction>>
-      get reactions => ListCopyWith(
-            $value.reactions,
-            (v, t) => v.copyWith.$chain(t),
-            (v) => call(reactions: v),
-          );
+  ListCopyWith<
+    $R,
+    FCPostReaction,
+    FCPostReactionCopyWith<$R, FCPostReaction, FCPostReaction>
+  >
+  get reactions => ListCopyWith(
+    $value.reactions,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(reactions: v),
+  );
   @override
   $R call({
     bool? result,
     Object? resultText = $none,
-    List<FCReaction>? reactions,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (result != null) #result: result,
-          if (resultText != $none) #resultText: resultText,
-          if (reactions != null) #reactions: reactions,
-        }),
-      );
+    List<FCPostReaction>? reactions,
+  }) => $apply(
+    FieldCopyWithData({
+      if (result != null) #result: result,
+      if (resultText != $none) #resultText: resultText,
+      if (reactions != null) #reactions: reactions,
+    }),
+  );
   @override
   FCToggleReactionResult $make(CopyWithData data) => FCToggleReactionResult(
-        result: data.get(#result, or: $value.result),
-        resultText: data.get(#resultText, or: $value.resultText),
-        reactions: data.get(#reactions, or: $value.reactions),
-      );
+    result: data.get(#result, or: $value.result),
+    resultText: data.get(#resultText, or: $value.resultText),
+    reactions: data.get(#reactions, or: $value.reactions),
+  );
 
   @override
   FCToggleReactionResultCopyWith<$R2, FCToggleReactionResult, $Out2>
-      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _FCToggleReactionResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _FCToggleReactionResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class FCAvailableReactionsResultMapper
@@ -171,8 +191,9 @@ class FCAvailableReactionsResultMapper
   static FCAvailableReactionsResultMapper? _instance;
   static FCAvailableReactionsResultMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals
-          .use(_instance = FCAvailableReactionsResultMapper._());
+      MapperContainer.globals.use(
+        _instance = FCAvailableReactionsResultMapper._(),
+      );
       FCBaseResultMapper.ensureInitialized();
     }
     return _instance!;
@@ -182,8 +203,10 @@ class FCAvailableReactionsResultMapper
   final String id = 'FCAvailableReactionsResult';
 
   static bool _$result(FCAvailableReactionsResult v) => v.result;
-  static const Field<FCAvailableReactionsResult, bool> _f$result =
-      Field('result', _$result);
+  static const Field<FCAvailableReactionsResult, bool> _f$result = Field(
+    'result',
+    _$result,
+  );
   static String? _$resultText(FCAvailableReactionsResult v) => v.resultText;
   static const Field<FCAvailableReactionsResult, String> _f$resultText = Field(
     'resultText',
@@ -225,81 +248,104 @@ mixin FCAvailableReactionsResultMappable {
   String toJson() {
     return FCAvailableReactionsResultMapper.ensureInitialized()
         .encodeJson<FCAvailableReactionsResult>(
-            this as FCAvailableReactionsResult);
+          this as FCAvailableReactionsResult,
+        );
   }
 
   Map<String, dynamic> toMap() {
     return FCAvailableReactionsResultMapper.ensureInitialized()
         .encodeMap<FCAvailableReactionsResult>(
-            this as FCAvailableReactionsResult);
+          this as FCAvailableReactionsResult,
+        );
   }
 
-  FCAvailableReactionsResultCopyWith<FCAvailableReactionsResult,
-          FCAvailableReactionsResult, FCAvailableReactionsResult>
-      get copyWith => _FCAvailableReactionsResultCopyWithImpl<
-          FCAvailableReactionsResult, FCAvailableReactionsResult>(
-        this as FCAvailableReactionsResult,
-        $identity,
-        $identity,
-      );
+  FCAvailableReactionsResultCopyWith<
+    FCAvailableReactionsResult,
+    FCAvailableReactionsResult,
+    FCAvailableReactionsResult
+  >
+  get copyWith =>
+      _FCAvailableReactionsResultCopyWithImpl<
+        FCAvailableReactionsResult,
+        FCAvailableReactionsResult
+      >(this as FCAvailableReactionsResult, $identity, $identity);
   @override
   String toString() {
-    return FCAvailableReactionsResultMapper.ensureInitialized()
-        .stringifyValue(this as FCAvailableReactionsResult);
+    return FCAvailableReactionsResultMapper.ensureInitialized().stringifyValue(
+      this as FCAvailableReactionsResult,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FCAvailableReactionsResultMapper.ensureInitialized()
-        .equalsValue(this as FCAvailableReactionsResult, other);
+    return FCAvailableReactionsResultMapper.ensureInitialized().equalsValue(
+      this as FCAvailableReactionsResult,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return FCAvailableReactionsResultMapper.ensureInitialized()
-        .hashValue(this as FCAvailableReactionsResult);
+    return FCAvailableReactionsResultMapper.ensureInitialized().hashValue(
+      this as FCAvailableReactionsResult,
+    );
   }
 }
 
 extension FCAvailableReactionsResultValueCopy<$R, $Out>
     on ObjectCopyWith<$R, FCAvailableReactionsResult, $Out> {
   FCAvailableReactionsResultCopyWith<$R, FCAvailableReactionsResult, $Out>
-      get $asFCAvailableReactionsResult => $base.as((v, t, t2) =>
-          _FCAvailableReactionsResultCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asFCAvailableReactionsResult => $base.as(
+    (v, t, t2) => _FCAvailableReactionsResultCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
-abstract class FCAvailableReactionsResultCopyWith<$R,
-    $In extends FCAvailableReactionsResult, $Out>
+abstract class FCAvailableReactionsResultCopyWith<
+  $R,
+  $In extends FCAvailableReactionsResult,
+  $Out
+>
     implements FCBaseResultCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get reactions;
   @override
   $R call({bool? result, String? resultText, List<String>? reactions});
   FCAvailableReactionsResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _FCAvailableReactionsResultCopyWithImpl<$R, $Out>
     extends ClassCopyWithBase<$R, FCAvailableReactionsResult, $Out>
     implements
-        FCAvailableReactionsResultCopyWith<$R, FCAvailableReactionsResult,
-            $Out> {
+        FCAvailableReactionsResultCopyWith<
+          $R,
+          FCAvailableReactionsResult,
+          $Out
+        > {
   _FCAvailableReactionsResultCopyWithImpl(super.value, super.then, super.then2);
 
   @override
   late final ClassMapperBase<FCAvailableReactionsResult> $mapper =
       FCAvailableReactionsResultMapper.ensureInitialized();
   @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get reactions =>
+      ListCopyWith(
+        $value.reactions,
+        (v, t) => ObjectCopyWith(v, $identity, t),
+        (v) => call(reactions: v),
+      );
+  @override
   $R call({
     bool? result,
     Object? resultText = $none,
     List<String>? reactions,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (result != null) #result: result,
-          if (resultText != $none) #resultText: resultText,
-          if (reactions != null) #reactions: reactions,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (result != null) #result: result,
+      if (resultText != $none) #resultText: resultText,
+      if (reactions != null) #reactions: reactions,
+    }),
+  );
   @override
   FCAvailableReactionsResult $make(CopyWithData data) =>
       FCAvailableReactionsResult(
@@ -310,9 +356,8 @@ class _FCAvailableReactionsResultCopyWithImpl<$R, $Out>
 
   @override
   FCAvailableReactionsResultCopyWith<$R2, FCAvailableReactionsResult, $Out2>
-      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _FCAvailableReactionsResultCopyWithImpl<$R2, $Out2>(
-              $value, $cast, t);
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _FCAvailableReactionsResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class FCPostVoteResultMapper extends ClassMapperBase<FCPostVoteResult> {
@@ -332,8 +377,10 @@ class FCPostVoteResultMapper extends ClassMapperBase<FCPostVoteResult> {
   final String id = 'FCPostVoteResult';
 
   static bool _$result(FCPostVoteResult v) => v.result;
-  static const Field<FCPostVoteResult, bool> _f$result =
-      Field('result', _$result);
+  static const Field<FCPostVoteResult, bool> _f$result = Field(
+    'result',
+    _$result,
+  );
   static String? _$resultText(FCPostVoteResult v) => v.resultText;
   static const Field<FCPostVoteResult, String> _f$resultText = Field(
     'resultText',
@@ -385,38 +432,41 @@ mixin FCPostVoteResultMappable {
         .encodeMap<FCPostVoteResult>(this as FCPostVoteResult);
   }
 
-  FCPostVoteResultCopyWith<FCPostVoteResult, FCPostVoteResult,
-          FCPostVoteResult>
-      get copyWith =>
-          _FCPostVoteResultCopyWithImpl<FCPostVoteResult, FCPostVoteResult>(
-            this as FCPostVoteResult,
-            $identity,
-            $identity,
-          );
+  FCPostVoteResultCopyWith<FCPostVoteResult, FCPostVoteResult, FCPostVoteResult>
+  get copyWith =>
+      _FCPostVoteResultCopyWithImpl<FCPostVoteResult, FCPostVoteResult>(
+        this as FCPostVoteResult,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return FCPostVoteResultMapper.ensureInitialized()
-        .stringifyValue(this as FCPostVoteResult);
+    return FCPostVoteResultMapper.ensureInitialized().stringifyValue(
+      this as FCPostVoteResult,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FCPostVoteResultMapper.ensureInitialized()
-        .equalsValue(this as FCPostVoteResult, other);
+    return FCPostVoteResultMapper.ensureInitialized().equalsValue(
+      this as FCPostVoteResult,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return FCPostVoteResultMapper.ensureInitialized()
-        .hashValue(this as FCPostVoteResult);
+    return FCPostVoteResultMapper.ensureInitialized().hashValue(
+      this as FCPostVoteResult,
+    );
   }
 }
 
 extension FCPostVoteResultValueCopy<$R, $Out>
     on ObjectCopyWith<$R, FCPostVoteResult, $Out> {
   FCPostVoteResultCopyWith<$R, FCPostVoteResult, $Out>
-      get $asFCPostVoteResult => $base
-          .as((v, t, t2) => _FCPostVoteResultCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asFCPostVoteResult =>
+      $base.as((v, t, t2) => _FCPostVoteResultCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class FCPostVoteResultCopyWith<$R, $In extends FCPostVoteResult, $Out>
@@ -425,7 +475,8 @@ abstract class FCPostVoteResultCopyWith<$R, $In extends FCPostVoteResult, $Out>
   @override
   $R call({bool? result, String? resultText, FCPostVote? vote});
   FCPostVoteResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _FCPostVoteResultCopyWithImpl<$R, $Out>
@@ -440,11 +491,7 @@ class _FCPostVoteResultCopyWithImpl<$R, $Out>
   FCPostVoteCopyWith<$R, FCPostVote, FCPostVote>? get vote =>
       $value.vote?.copyWith.$chain((v) => call(vote: v));
   @override
-  $R call({
-    bool? result,
-    Object? resultText = $none,
-    Object? vote = $none,
-  }) =>
+  $R call({bool? result, Object? resultText = $none, Object? vote = $none}) =>
       $apply(
         FieldCopyWithData({
           if (result != null) #result: result,
@@ -454,13 +501,14 @@ class _FCPostVoteResultCopyWithImpl<$R, $Out>
       );
   @override
   FCPostVoteResult $make(CopyWithData data) => FCPostVoteResult(
-        result: data.get(#result, or: $value.result),
-        resultText: data.get(#resultText, or: $value.resultText),
-        vote: data.get(#vote, or: $value.vote),
-      );
+    result: data.get(#result, or: $value.result),
+    resultText: data.get(#resultText, or: $value.resultText),
+    vote: data.get(#vote, or: $value.vote),
+  );
 
   @override
-  FCPostVoteResultCopyWith<$R2, FCPostVoteResult, $Out2>
-      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _FCPostVoteResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  FCPostVoteResultCopyWith<$R2, FCPostVoteResult, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _FCPostVoteResultCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

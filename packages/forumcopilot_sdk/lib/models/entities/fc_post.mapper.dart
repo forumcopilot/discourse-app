@@ -18,6 +18,8 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
       FCAttachmentMapper.ensureInitialized();
       FCThanksMapper.ensureInitialized();
       FCLikeMapper.ensureInitialized();
+      FCPostReactionMapper.ensureInitialized();
+      FCPostVoteMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -229,8 +231,8 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
     opt: true,
     def: false,
   );
-  static List<FCReaction> _$reactions(FCPost v) => v.reactions;
-  static const Field<FCPost, List<FCReaction>> _f$reactions = Field(
+  static List<FCPostReaction> _$reactions(FCPost v) => v.reactions;
+  static const Field<FCPost, List<FCPostReaction>> _f$reactions = Field(
     'reactions',
     _$reactions,
     opt: true,
@@ -383,6 +385,13 @@ abstract class FCPostCopyWith<$R, $In extends FCPost, $Out>
   ListCopyWith<$R, FCThanks, FCThanksCopyWith<$R, FCThanks, FCThanks>>
   get thanksInfo;
   ListCopyWith<$R, FCLike, FCLikeCopyWith<$R, FCLike, FCLike>> get likesInfo;
+  ListCopyWith<
+    $R,
+    FCPostReaction,
+    FCPostReactionCopyWith<$R, FCPostReaction, FCPostReaction>
+  >
+  get reactions;
+  FCPostVoteCopyWith<$R, FCPostVote, FCPostVote>? get vote;
   $R call({
     String? id,
     String? title,
@@ -417,7 +426,7 @@ abstract class FCPostCopyWith<$R, $In extends FCPost, $Out>
     bool? bookmarked,
     bool? isSolution,
     bool? canAcceptAnswer,
-    List<FCReaction>? reactions,
+    List<FCPostReaction>? reactions,
     FCPostVote? vote,
   });
   FCPostCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
@@ -466,6 +475,20 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
         (v) => call(likesInfo: v),
       );
   @override
+  ListCopyWith<
+    $R,
+    FCPostReaction,
+    FCPostReactionCopyWith<$R, FCPostReaction, FCPostReaction>
+  >
+  get reactions => ListCopyWith(
+    $value.reactions,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(reactions: v),
+  );
+  @override
+  FCPostVoteCopyWith<$R, FCPostVote, FCPostVote>? get vote =>
+      $value.vote?.copyWith.$chain((v) => call(vote: v));
+  @override
   $R call({
     String? id,
     String? title,
@@ -500,7 +523,7 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
     bool? bookmarked,
     bool? isSolution,
     bool? canAcceptAnswer,
-    List<FCReaction>? reactions,
+    List<FCPostReaction>? reactions,
     Object? vote = $none,
   }) => $apply(
     FieldCopyWithData({

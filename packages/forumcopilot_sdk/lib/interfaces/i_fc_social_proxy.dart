@@ -1,44 +1,66 @@
 import '../models/results/fc_social_result.dart';
 
-/// Social operations exposed to the app.
+/// Forum Copilot Social Proxy Interface
 ///
-/// Trimmed Discourse-native surface. The XF-flavored `thankPostAsync`
-/// is gone — Discourse has likes + (optionally) emoji reactions, no
-/// separate "thanks" concept. PM-message likes are also dropped:
-/// Discourse PMs don't support likes.
-///
-/// Phase 5.30 — follow/unfollow are now first-class on this
-/// interface (Discourse implementation lives in
-/// `DiscourseSocialProxy`). The earlier
-/// `DiscourseUserProxy.followUserAsync/unfollowUserAsync` sidecar
-/// was deleted because it duplicated the contract.
+/// This interface defines the contract for social operations including:
+/// - Like/unlike posts
+/// - Thank posts
+/// - Follow/unfollow users
+/// - Get alerts and activities
 abstract class IFCSocialProxy {
-  /// Follow the user identified by [username]. Implementations may
-  /// interpret the identifier however their backend requires —
-  /// Discourse uses the username directly against its `/follow/{u}`
-  /// endpoint (the discourse-follow plugin); XF-shaped backends
-  /// would resolve the username to a user id internally.
-  Future<FCFollowResult> followAsync(String username);
+  /// Send Thank You to a specific post
+  ///
+  /// [postId] - Post ID to thank
+  Future<FCThankPostResult> thankPostAsync(String postId);
 
-  /// Stop following the user identified by [username]. Mirrors
-  /// [followAsync] — same identifier conventions.
-  Future<FCUnfollowResult> unfollowAsync(String username);
+  /// Allows user to follow a specific person
+  ///
+  /// [userId] - User ID to follow
+  Future<FCFollowResult> followAsync(String userId);
 
-  /// Like a post.
-  Future<FCLikePostResult> likePostAsync(String postId);
+  /// Allows user to unfollow a specific person
+  ///
+  /// [userId] - User ID to unfollow
+  Future<FCUnfollowResult> unfollowAsync(String userId);
 
-  /// Remove a like from a post.
+  /// React to a specific post.
+  ///
+  /// [postId] - Post ID to react to
+  /// [reactionId] - Reaction to apply (defaults to 1 = Like). The server
+  ///   switches/toggles automatically: reacting with the same id removes it,
+  ///   a different id switches to it.
+  Future<FCLikePostResult> likePostAsync(String postId, {int reactionId = 1});
+
+  /// Remove Like from a specific post
+  ///
+  /// [postId] - Post ID to unlike
   Future<FCUnlikePostResult> unlikePostAsync(String postId);
 
-  /// Get user alerts (notifications).
+  /// Send Like to a specific conversation message
+  ///
+  /// [messageId] - Conversation message ID to like
+  Future<FCLikePostResult> likeConversationMessageAsync(String messageId, {int reactionId = 1});
+
+  /// Remove Like from a specific conversation message
+  ///
+  /// [messageId] - Conversation message ID to unlike
+  Future<FCUnlikePostResult> unlikeConversationMessageAsync(String messageId);
+
+  /// Get user alerts
+  ///
+  /// [page] - Page number for pagination
+  /// [perpage] - Number of items per page
+  /// [forceRefresh] - Whether to force refresh the data
   Future<FCAlertResult> getAlertAsync(int page, int perpage, bool forceRefresh);
 
-  /// Get user activity stream.
+  /// Get user activities
+  ///
+  /// [page] - Page number for pagination
+  /// [perpage] - Number of items per page
   Future<FCActivityResult> getActivityAsync(int page, int perpage);
 
-  /// Mark every unread alert as read in one call. Discourse:
-  /// `PUT /notifications/mark-read`. UI surfaces this as a
-  /// "Mark all read" action in the notifications tab AppBar so
-  /// users can clear an unread badge without tapping each row.
+  /// Mark every unread alert as read in one call (Discourse:
+  /// `PUT /notifications/mark-read`). Backends without bulk
+  /// mark-read stub-fail.
   Future<FCMarkAlertsReadResult> markAllAlertsReadAsync();
 }

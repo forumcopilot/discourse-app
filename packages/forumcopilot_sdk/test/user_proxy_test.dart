@@ -65,7 +65,10 @@ void runUserProxyTests(IFCUserProxy userProxy, TestConfig config) {
       helper.assertResultTrue(result, 'getUserReplyPostAsync');
     });
 
-    // Phase 5.43 — getRecommendedUsersAsync deleted from IFCUserProxy.
+    test('getRecommendedUsersAsync returns result: true', () async {
+      final result = await userProxy.getRecommendedUsersAsync(1, 20, 0);
+      helper.assertResultTrue(result, 'getRecommendedUsersAsync');
+    });
 
     test('searchUserAsync returns result: true', () async {
       final result = await userProxy.searchUserAsync(config.username, 1, 20);

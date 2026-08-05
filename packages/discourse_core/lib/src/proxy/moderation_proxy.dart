@@ -394,11 +394,17 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
   @override
   Future<FCDeleteTopicResult> deleteTopicExtendedAsync(
     String topicId, {
-    bool deleteForReal = false,
+    bool hardDelete = false,
+    String? reason,
+    bool starterAlert = false,
+    String? starterAlertReason,
   }) async {
+    // [hardDelete] maps to Discourse's delete_for_real; [reason] and the
+    // starter-alert fields are XF-flavored and have no Discourse
+    // equivalent, so they are ignored.
     try {
       await apiDelete('/t/$topicId.json',
-          query: deleteForReal ? {'delete_for_real': 'true'} : null);
+          query: hardDelete ? {'delete_for_real': 'true'} : null);
       return FCDeleteTopicResult(
           result: true, resultText: '', isLoginMod: true);
     } on DiscourseApiException catch (e) {
@@ -444,4 +450,72 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
       return null;
     }
   }
+
+  // ===== XF review-queue surface with no Discourse equivalent =====
+  // Discourse moderation queues live in /review, which the app does not
+  // surface; these stub-fail so XF-shaped callers degrade gracefully.
+
+  @override
+  Future<FCLoginModResult> doLoginModAsync(
+          String username, String password) async =>
+      // No separate moderator login on Discourse - the User API Key
+      // already carries the user's role, so this is a no-op success.
+      FCLoginModResult(result: true, resultText: '');
+
+  @override
+  Future<FCModerateTopicResult> getModerateTopicAsync(
+          int startNum, int lastNum) async =>
+      FCModerateTopicResult(
+          result: false,
+          resultText: 'Moderation queues are not supported on Discourse',
+          total: 0,
+          list: const []);
+
+  @override
+  Future<FCModeratePostResult> getModeratePostAsync(
+          int startNum, int lastNum) async =>
+      FCModeratePostResult(
+          result: false,
+          resultText: 'Moderation queues are not supported on Discourse',
+          total: 0,
+          list: const []);
+
+  @override
+  Future<FCDeletedTopicResult> getDeletedTopicAsync(
+          int startNum, int lastNum) async =>
+      FCDeletedTopicResult(
+          result: false,
+          resultText: 'Moderation queues are not supported on Discourse',
+          total: 0,
+          list: const []);
+
+  @override
+  Future<FCDeletedPostResult> getDeletedPostAsync(
+          int startNum, int lastNum) async =>
+      FCDeletedPostResult(
+          result: false,
+          resultText: 'Moderation queues are not supported on Discourse',
+          total: 0,
+          list: const []);
+
+  @override
+  Future<FCReportedPostResult> getReportedPostAsync(
+          int startNum, int lastNum) async =>
+      FCReportedPostResult(
+          result: false,
+          resultText: 'Moderation queues are not supported on Discourse',
+          total: 0,
+          list: const []);
+
+  @override
+  Future<FCApproveTopicResult> approveTopicAsync(String topicId) async =>
+      FCApproveTopicResult(
+          result: false,
+          resultText: 'Moderation queues are not supported on Discourse');
+
+  @override
+  Future<FCApprovePostResult> approvePostAsync(String postId) async =>
+      FCApprovePostResult(
+          result: false,
+          resultText: 'Moderation queues are not supported on Discourse');
 }

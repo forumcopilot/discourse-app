@@ -680,7 +680,7 @@ class _PostPageState extends State<PostPage> {
       // now; no more is-DiscourseModerationProxy cast.
       final deleteResult = await moderationProxy.deleteTopicExtendedAsync(
         widget.topicId,
-        deleteForReal: hardDelete,
+        hardDelete: hardDelete,
       );
       // The XF-shaped `reason` parameter doesn't round-trip on
       // Discourse; preserve it for audit trail in the snackbar only.

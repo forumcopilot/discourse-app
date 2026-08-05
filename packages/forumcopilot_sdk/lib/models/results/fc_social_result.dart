@@ -133,10 +133,9 @@ class FCAlert with FCAlertMappable {
   /// Action type (e.g., "insert", "mention", "reaction", "quote")
   String? action;
 
-  /// Phase 5.47 — whether the user has already seen this alert
-  /// (Discourse: the notification's `read` flag). Drives unread-row
-  /// styling in the notifications tab. Defaults to true so backends
-  /// that don't expose read-state render plainly.
+  /// Whether the user has already seen this alert (Discourse: the
+  /// notification's `read` flag). Drives unread-row styling. Defaults
+  /// to true so backends that don't expose read-state render plainly.
   bool isRead;
 
   FCAlert({
@@ -163,18 +162,6 @@ class FCAlert with FCAlertMappable {
   String? get content_type => contentType;
   String? get content_id => contentId;
   String? get topic_id => topicId;
-}
-
-/// Forum Copilot Mark Alerts Read Result (Discourse:
-/// `PUT /notifications/mark-read` — clears every unread notification
-/// in one shot). Same shape as the other bare-success results.
-@MappableClass()
-class FCMarkAlertsReadResult extends FCBaseResult
-    with FCMarkAlertsReadResultMappable {
-  FCMarkAlertsReadResult({
-    required bool result,
-    String? resultText,
-  }) : super(result: result, resultText: resultText);
 }
 
 /// Forum Copilot Activity Result
@@ -240,4 +227,16 @@ class FCActivity with FCActivityMappable {
   String? get content_type => contentType;
   String? get content_id => contentId;
   String? get topic_id => topicId;
+}
+
+/// Forum Copilot Mark Alerts Read Result (Discourse:
+/// `PUT /notifications/mark-read` - clears every unread notification
+/// in one shot). Same shape as the other bare-success results.
+@MappableClass()
+class FCMarkAlertsReadResult extends FCBaseResult
+    with FCMarkAlertsReadResultMappable {
+  FCMarkAlertsReadResult({
+    required bool result,
+    String? resultText,
+  }) : super(result: result, resultText: resultText);
 }

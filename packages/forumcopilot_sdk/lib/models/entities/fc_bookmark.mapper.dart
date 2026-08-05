@@ -130,28 +130,36 @@ class FCBookmarkMapper extends ClassMapperBase<FCBookmark> {
 
 mixin FCBookmarkMappable {
   String toJson() {
-    return FCBookmarkMapper.ensureInitialized()
-        .encodeJson<FCBookmark>(this as FCBookmark);
+    return FCBookmarkMapper.ensureInitialized().encodeJson<FCBookmark>(
+      this as FCBookmark,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return FCBookmarkMapper.ensureInitialized()
-        .encodeMap<FCBookmark>(this as FCBookmark);
+    return FCBookmarkMapper.ensureInitialized().encodeMap<FCBookmark>(
+      this as FCBookmark,
+    );
   }
 
   FCBookmarkCopyWith<FCBookmark, FCBookmark, FCBookmark> get copyWith =>
       _FCBookmarkCopyWithImpl<FCBookmark, FCBookmark>(
-          this as FCBookmark, $identity, $identity);
+        this as FCBookmark,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return FCBookmarkMapper.ensureInitialized()
-        .stringifyValue(this as FCBookmark);
+    return FCBookmarkMapper.ensureInitialized().stringifyValue(
+      this as FCBookmark,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FCBookmarkMapper.ensureInitialized()
-        .equalsValue(this as FCBookmark, other);
+    return FCBookmarkMapper.ensureInitialized().equalsValue(
+      this as FCBookmark,
+      other,
+    );
   }
 
   @override
@@ -160,7 +168,8 @@ mixin FCBookmarkMappable {
   }
 }
 
-extension FCBookmarkValueCopy<$R, $Out> on ObjectCopyWith<$R, FCBookmark, $Out> {
+extension FCBookmarkValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, FCBookmark, $Out> {
   FCBookmarkCopyWith<$R, FCBookmark, $Out> get $asFCBookmark =>
       $base.as((v, t, t2) => _FCBookmarkCopyWithImpl<$R, $Out>(v, t, t2));
 }
@@ -204,40 +213,39 @@ class _FCBookmarkCopyWithImpl<$R, $Out>
     Object? username = $none,
     Object? avatarUrl = $none,
     Object? createdAt = $none,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (id != null) #id: id,
-          if (bookmarkableType != $none) #bookmarkableType: bookmarkableType,
-          if (bookmarkableId != $none) #bookmarkableId: bookmarkableId,
-          if (topicId != $none) #topicId: topicId,
-          if (postNumber != $none) #postNumber: postNumber,
-          if (title != $none) #title: title,
-          if (excerpt != $none) #excerpt: excerpt,
-          if (name != $none) #name: name,
-          if (username != $none) #username: username,
-          if (avatarUrl != $none) #avatarUrl: avatarUrl,
-          if (createdAt != $none) #createdAt: createdAt,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (bookmarkableType != $none) #bookmarkableType: bookmarkableType,
+      if (bookmarkableId != $none) #bookmarkableId: bookmarkableId,
+      if (topicId != $none) #topicId: topicId,
+      if (postNumber != $none) #postNumber: postNumber,
+      if (title != $none) #title: title,
+      if (excerpt != $none) #excerpt: excerpt,
+      if (name != $none) #name: name,
+      if (username != $none) #username: username,
+      if (avatarUrl != $none) #avatarUrl: avatarUrl,
+      if (createdAt != $none) #createdAt: createdAt,
+    }),
+  );
   @override
   FCBookmark $make(CopyWithData data) => FCBookmark(
-        id: data.get(#id, or: $value.id),
-        bookmarkableType:
-            data.get(#bookmarkableType, or: $value.bookmarkableType),
-        bookmarkableId: data.get(#bookmarkableId, or: $value.bookmarkableId),
-        topicId: data.get(#topicId, or: $value.topicId),
-        postNumber: data.get(#postNumber, or: $value.postNumber),
-        title: data.get(#title, or: $value.title),
-        excerpt: data.get(#excerpt, or: $value.excerpt),
-        name: data.get(#name, or: $value.name),
-        username: data.get(#username, or: $value.username),
-        avatarUrl: data.get(#avatarUrl, or: $value.avatarUrl),
-        createdAt: data.get(#createdAt, or: $value.createdAt),
-      );
+    id: data.get(#id, or: $value.id),
+    bookmarkableType: data.get(#bookmarkableType, or: $value.bookmarkableType),
+    bookmarkableId: data.get(#bookmarkableId, or: $value.bookmarkableId),
+    topicId: data.get(#topicId, or: $value.topicId),
+    postNumber: data.get(#postNumber, or: $value.postNumber),
+    title: data.get(#title, or: $value.title),
+    excerpt: data.get(#excerpt, or: $value.excerpt),
+    name: data.get(#name, or: $value.name),
+    username: data.get(#username, or: $value.username),
+    avatarUrl: data.get(#avatarUrl, or: $value.avatarUrl),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+  );
 
   @override
   FCBookmarkCopyWith<$R2, FCBookmark, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _FCBookmarkCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _FCBookmarkCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

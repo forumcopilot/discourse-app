@@ -150,7 +150,8 @@ abstract class SiteProxyFactory {
     return factory.createConfigProxy(_context!);
   }
 
-  /// Get device proxy (BYO/direct push device registration on the customer's XF server).
+
+  /// Get device proxy
   static IFCDeviceProxy getDeviceProxy() {
     if (_context == null) throw Exception('SiteProxyFactory not initialized');
 
@@ -160,8 +161,7 @@ abstract class SiteProxyFactory {
     return factory.createDeviceProxy(_context!);
   }
 
-  /// Get bookmark proxy (Phase 5.33 — bookmarks lifted off the
-  /// per-forum post proxy onto a first-class IFCBookmarkProxy).
+  /// Get bookmark proxy
   static IFCBookmarkProxy getBookmarkProxy() {
     if (_context == null) throw Exception('SiteProxyFactory not initialized');
 
@@ -171,8 +171,7 @@ abstract class SiteProxyFactory {
     return factory.createBookmarkProxy(_context!);
   }
 
-  /// Get draft proxy (Phase 5.34 — server-side drafts lifted off the
-  /// per-forum post proxy onto a first-class IFCDraftProxy).
+  /// Get draft proxy
   static IFCDraftProxy getDraftProxy() {
     if (_context == null) throw Exception('SiteProxyFactory not initialized');
 
@@ -182,8 +181,7 @@ abstract class SiteProxyFactory {
     return factory.createDraftProxy(_context!);
   }
 
-  /// Get tag proxy (Phase 5.35 — tag listing/search/topic-by-tag lifted
-  /// off the per-forum topic proxy onto a first-class IFCTagProxy).
+  /// Get tag proxy
   static IFCTagProxy getTagProxy() {
     if (_context == null) throw Exception('SiteProxyFactory not initialized');
 
@@ -193,8 +191,7 @@ abstract class SiteProxyFactory {
     return factory.createTagProxy(_context!);
   }
 
-  /// Get chat proxy (Phase 5.39 — chat channels/messages lifted off
-  /// the DiscourseChatProxy.forCurrentSite() sidecar).
+  /// Get chat proxy
   static IFCChatProxy getChatProxy() {
     if (_context == null) throw Exception('SiteProxyFactory not initialized');
 
@@ -204,8 +201,7 @@ abstract class SiteProxyFactory {
     return factory.createChatProxy(_context!);
   }
 
-  /// Get group proxy (Phase 5.40 — groups lifted off the
-  /// DiscourseGroupProxy.forCurrentSite() sidecar).
+  /// Get group proxy
   static IFCGroupProxy getGroupProxy() {
     if (_context == null) throw Exception('SiteProxyFactory not initialized');
 
@@ -229,10 +225,34 @@ abstract class SiteProxyFactory {
   IFCPrivateMessageProxy createPrivateMessageProxy(SiteContext context);
   IFCAttachmentProxy createAttachmentProxy(SiteContext context);
   IFCConfigProxy createConfigProxy(SiteContext context);
-  IFCDeviceProxy createDeviceProxy(SiteContext context);
-  IFCBookmarkProxy createBookmarkProxy(SiteContext context);
-  IFCDraftProxy createDraftProxy(SiteContext context);
-  IFCTagProxy createTagProxy(SiteContext context);
-  IFCChatProxy createChatProxy(SiteContext context);
-  IFCGroupProxy createGroupProxy(SiteContext context);
+
+  /// Concrete default so existing factories keep compiling; platforms
+  /// with device support override this.
+  IFCDeviceProxy createDeviceProxy(SiteContext context) =>
+      throw UnsupportedError('Device proxy not supported by this platform');
+
+  /// Concrete default so existing factories keep compiling; platforms
+  /// with bookmark support override this.
+  IFCBookmarkProxy createBookmarkProxy(SiteContext context) =>
+      throw UnsupportedError('Bookmark proxy not supported by this platform');
+
+  /// Concrete default so existing factories keep compiling; platforms
+  /// with draft support override this.
+  IFCDraftProxy createDraftProxy(SiteContext context) =>
+      throw UnsupportedError('Draft proxy not supported by this platform');
+
+  /// Concrete default so existing factories keep compiling; platforms
+  /// with tag support override this.
+  IFCTagProxy createTagProxy(SiteContext context) =>
+      throw UnsupportedError('Tag proxy not supported by this platform');
+
+  /// Concrete default so existing factories keep compiling; platforms
+  /// with chat support override this.
+  IFCChatProxy createChatProxy(SiteContext context) =>
+      throw UnsupportedError('Chat proxy not supported by this platform');
+
+  /// Concrete default so existing factories keep compiling; platforms
+  /// with group support override this.
+  IFCGroupProxy createGroupProxy(SiteContext context) =>
+      throw UnsupportedError('Group proxy not supported by this platform');
 }

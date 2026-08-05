@@ -25,44 +25,80 @@ class FCChatMessageMapper extends ClassMapperBase<FCChatMessage> {
   static int _$id(FCChatMessage v) => v.id;
   static const Field<FCChatMessage, int> _f$id = Field('id', _$id);
   static int _$channelId(FCChatMessage v) => v.channelId;
-  static const Field<FCChatMessage, int> _f$channelId =
-      Field('channelId', _$channelId);
+  static const Field<FCChatMessage, int> _f$channelId = Field(
+    'channelId',
+    _$channelId,
+  );
   static int? _$threadId(FCChatMessage v) => v.threadId;
-  static const Field<FCChatMessage, int> _f$threadId =
-      Field('threadId', _$threadId, opt: true);
+  static const Field<FCChatMessage, int> _f$threadId = Field(
+    'threadId',
+    _$threadId,
+    opt: true,
+  );
   static String _$message(FCChatMessage v) => v.message;
-  static const Field<FCChatMessage, String> _f$message =
-      Field('message', _$message);
+  static const Field<FCChatMessage, String> _f$message = Field(
+    'message',
+    _$message,
+  );
   static String _$cooked(FCChatMessage v) => v.cooked;
-  static const Field<FCChatMessage, String> _f$cooked =
-      Field('cooked', _$cooked);
+  static const Field<FCChatMessage, String> _f$cooked = Field(
+    'cooked',
+    _$cooked,
+  );
   static String? _$excerpt(FCChatMessage v) => v.excerpt;
-  static const Field<FCChatMessage, String> _f$excerpt =
-      Field('excerpt', _$excerpt, opt: true);
+  static const Field<FCChatMessage, String> _f$excerpt = Field(
+    'excerpt',
+    _$excerpt,
+    opt: true,
+  );
   static int _$authorId(FCChatMessage v) => v.authorId;
-  static const Field<FCChatMessage, int> _f$authorId =
-      Field('authorId', _$authorId);
+  static const Field<FCChatMessage, int> _f$authorId = Field(
+    'authorId',
+    _$authorId,
+  );
   static String _$authorUsername(FCChatMessage v) => v.authorUsername;
-  static const Field<FCChatMessage, String> _f$authorUsername =
-      Field('authorUsername', _$authorUsername);
+  static const Field<FCChatMessage, String> _f$authorUsername = Field(
+    'authorUsername',
+    _$authorUsername,
+  );
   static String? _$authorName(FCChatMessage v) => v.authorName;
-  static const Field<FCChatMessage, String> _f$authorName =
-      Field('authorName', _$authorName, opt: true);
+  static const Field<FCChatMessage, String> _f$authorName = Field(
+    'authorName',
+    _$authorName,
+    opt: true,
+  );
   static String? _$authorAvatarUrl(FCChatMessage v) => v.authorAvatarUrl;
-  static const Field<FCChatMessage, String> _f$authorAvatarUrl =
-      Field('authorAvatarUrl', _$authorAvatarUrl, opt: true);
+  static const Field<FCChatMessage, String> _f$authorAvatarUrl = Field(
+    'authorAvatarUrl',
+    _$authorAvatarUrl,
+    opt: true,
+  );
   static DateTime _$createdAt(FCChatMessage v) => v.createdAt;
-  static const Field<FCChatMessage, DateTime> _f$createdAt =
-      Field('createdAt', _$createdAt);
+  static const Field<FCChatMessage, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+  );
   static bool _$edited(FCChatMessage v) => v.edited;
-  static const Field<FCChatMessage, bool> _f$edited =
-      Field('edited', _$edited, opt: true, def: false);
+  static const Field<FCChatMessage, bool> _f$edited = Field(
+    'edited',
+    _$edited,
+    opt: true,
+    def: false,
+  );
   static bool _$deleted(FCChatMessage v) => v.deleted;
-  static const Field<FCChatMessage, bool> _f$deleted =
-      Field('deleted', _$deleted, opt: true, def: false);
+  static const Field<FCChatMessage, bool> _f$deleted = Field(
+    'deleted',
+    _$deleted,
+    opt: true,
+    def: false,
+  );
   static bool _$streaming(FCChatMessage v) => v.streaming;
-  static const Field<FCChatMessage, bool> _f$streaming =
-      Field('streaming', _$streaming, opt: true, def: false);
+  static const Field<FCChatMessage, bool> _f$streaming = Field(
+    'streaming',
+    _$streaming,
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<FCChatMessage> fields = const {
@@ -115,35 +151,43 @@ class FCChatMessageMapper extends ClassMapperBase<FCChatMessage> {
 
 mixin FCChatMessageMappable {
   String toJson() {
-    return FCChatMessageMapper.ensureInitialized()
-        .encodeJson<FCChatMessage>(this as FCChatMessage);
+    return FCChatMessageMapper.ensureInitialized().encodeJson<FCChatMessage>(
+      this as FCChatMessage,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return FCChatMessageMapper.ensureInitialized()
-        .encodeMap<FCChatMessage>(this as FCChatMessage);
+    return FCChatMessageMapper.ensureInitialized().encodeMap<FCChatMessage>(
+      this as FCChatMessage,
+    );
   }
 
   FCChatMessageCopyWith<FCChatMessage, FCChatMessage, FCChatMessage>
-      get copyWith =>
-          _FCChatMessageCopyWithImpl<FCChatMessage, FCChatMessage>(
-              this as FCChatMessage, $identity, $identity);
+  get copyWith => _FCChatMessageCopyWithImpl<FCChatMessage, FCChatMessage>(
+    this as FCChatMessage,
+    $identity,
+    $identity,
+  );
   @override
   String toString() {
-    return FCChatMessageMapper.ensureInitialized()
-        .stringifyValue(this as FCChatMessage);
+    return FCChatMessageMapper.ensureInitialized().stringifyValue(
+      this as FCChatMessage,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FCChatMessageMapper.ensureInitialized()
-        .equalsValue(this as FCChatMessage, other);
+    return FCChatMessageMapper.ensureInitialized().equalsValue(
+      this as FCChatMessage,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return FCChatMessageMapper.ensureInitialized()
-        .hashValue(this as FCChatMessage);
+    return FCChatMessageMapper.ensureInitialized().hashValue(
+      this as FCChatMessage,
+    );
   }
 }
 
@@ -171,8 +215,7 @@ abstract class FCChatMessageCopyWith<$R, $In extends FCChatMessage, $Out>
     bool? deleted,
     bool? streaming,
   });
-  FCChatMessageCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+  FCChatMessageCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
 class _FCChatMessageCopyWithImpl<$R, $Out>
@@ -199,47 +242,45 @@ class _FCChatMessageCopyWithImpl<$R, $Out>
     bool? edited,
     bool? deleted,
     bool? streaming,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (id != null) #id: id,
-          if (channelId != null) #channelId: channelId,
-          if (threadId != $none) #threadId: threadId,
-          if (message != null) #message: message,
-          if (cooked != null) #cooked: cooked,
-          if (excerpt != $none) #excerpt: excerpt,
-          if (authorId != null) #authorId: authorId,
-          if (authorUsername != null) #authorUsername: authorUsername,
-          if (authorName != $none) #authorName: authorName,
-          if (authorAvatarUrl != $none) #authorAvatarUrl: authorAvatarUrl,
-          if (createdAt != null) #createdAt: createdAt,
-          if (edited != null) #edited: edited,
-          if (deleted != null) #deleted: deleted,
-          if (streaming != null) #streaming: streaming,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (channelId != null) #channelId: channelId,
+      if (threadId != $none) #threadId: threadId,
+      if (message != null) #message: message,
+      if (cooked != null) #cooked: cooked,
+      if (excerpt != $none) #excerpt: excerpt,
+      if (authorId != null) #authorId: authorId,
+      if (authorUsername != null) #authorUsername: authorUsername,
+      if (authorName != $none) #authorName: authorName,
+      if (authorAvatarUrl != $none) #authorAvatarUrl: authorAvatarUrl,
+      if (createdAt != null) #createdAt: createdAt,
+      if (edited != null) #edited: edited,
+      if (deleted != null) #deleted: deleted,
+      if (streaming != null) #streaming: streaming,
+    }),
+  );
   @override
   FCChatMessage $make(CopyWithData data) => FCChatMessage(
-        id: data.get(#id, or: $value.id),
-        channelId: data.get(#channelId, or: $value.channelId),
-        threadId: data.get(#threadId, or: $value.threadId),
-        message: data.get(#message, or: $value.message),
-        cooked: data.get(#cooked, or: $value.cooked),
-        excerpt: data.get(#excerpt, or: $value.excerpt),
-        authorId: data.get(#authorId, or: $value.authorId),
-        authorUsername:
-            data.get(#authorUsername, or: $value.authorUsername),
-        authorName: data.get(#authorName, or: $value.authorName),
-        authorAvatarUrl:
-            data.get(#authorAvatarUrl, or: $value.authorAvatarUrl),
-        createdAt: data.get(#createdAt, or: $value.createdAt),
-        edited: data.get(#edited, or: $value.edited),
-        deleted: data.get(#deleted, or: $value.deleted),
-        streaming: data.get(#streaming, or: $value.streaming),
-      );
+    id: data.get(#id, or: $value.id),
+    channelId: data.get(#channelId, or: $value.channelId),
+    threadId: data.get(#threadId, or: $value.threadId),
+    message: data.get(#message, or: $value.message),
+    cooked: data.get(#cooked, or: $value.cooked),
+    excerpt: data.get(#excerpt, or: $value.excerpt),
+    authorId: data.get(#authorId, or: $value.authorId),
+    authorUsername: data.get(#authorUsername, or: $value.authorUsername),
+    authorName: data.get(#authorName, or: $value.authorName),
+    authorAvatarUrl: data.get(#authorAvatarUrl, or: $value.authorAvatarUrl),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+    edited: data.get(#edited, or: $value.edited),
+    deleted: data.get(#deleted, or: $value.deleted),
+    streaming: data.get(#streaming, or: $value.streaming),
+  );
 
   @override
   FCChatMessageCopyWith<$R2, FCChatMessage, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _FCChatMessageCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _FCChatMessageCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

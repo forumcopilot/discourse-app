@@ -14,7 +14,13 @@ void runSocialProxyTests(IFCSocialProxy socialProxy, IFCPostProxy postProxy, IFC
       helper = ProxyTestHelper(config);
     });
 
-    // thankPostAsync test dropped — Phase 5.10e SDK interface trim.
+    test('thankPostAsync returns result: true', () async {
+      final forumId = await helper.fetchValidForumId(forumProxy) ?? config.forumId;
+      final topicId = await helper.fetchValidTopicId(topicProxy, forumId) ?? config.topicId;
+      final postId = await helper.fetchValidPostId(postProxy, topicId) ?? config.postId;
+      final result = await socialProxy.thankPostAsync(postId);
+      helper.assertResultTrue(result, 'thankPostAsync');
+    });
 
     test('followAsync returns result: true', () async {
       final result = await socialProxy.followAsync(config.userId);

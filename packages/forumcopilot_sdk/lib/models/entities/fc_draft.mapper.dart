@@ -23,13 +23,17 @@ class FCDraftMapper extends ClassMapperBase<FCDraft> {
   final String id = 'FCDraft';
 
   static String _$draftKey(FCDraft v) => v.draftKey;
-  static const Field<FCDraft, String> _f$draftKey =
-      Field('draftKey', _$draftKey);
+  static const Field<FCDraft, String> _f$draftKey = Field(
+    'draftKey',
+    _$draftKey,
+  );
   static int _$sequence(FCDraft v) => v.sequence;
   static const Field<FCDraft, int> _f$sequence = Field('sequence', _$sequence);
   static Map<String, dynamic> _$data(FCDraft v) => v.data;
-  static const Field<FCDraft, Map<String, dynamic>> _f$data =
-      Field('data', _$data);
+  static const Field<FCDraft, Map<String, dynamic>> _f$data = Field(
+    'data',
+    _$data,
+  );
   static int? _$topicId(FCDraft v) => v.topicId;
   static const Field<FCDraft, int> _f$topicId = Field(
     'topicId',
@@ -92,18 +96,23 @@ class FCDraftMapper extends ClassMapperBase<FCDraft> {
 
 mixin FCDraftMappable {
   String toJson() {
-    return FCDraftMapper.ensureInitialized()
-        .encodeJson<FCDraft>(this as FCDraft);
+    return FCDraftMapper.ensureInitialized().encodeJson<FCDraft>(
+      this as FCDraft,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return FCDraftMapper.ensureInitialized()
-        .encodeMap<FCDraft>(this as FCDraft);
+    return FCDraftMapper.ensureInitialized().encodeMap<FCDraft>(
+      this as FCDraft,
+    );
   }
 
   FCDraftCopyWith<FCDraft, FCDraft, FCDraft> get copyWith =>
       _FCDraftCopyWithImpl<FCDraft, FCDraft>(
-          this as FCDraft, $identity, $identity);
+        this as FCDraft,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
     return FCDraftMapper.ensureInitialized().stringifyValue(this as FCDraft);
@@ -111,8 +120,10 @@ mixin FCDraftMappable {
 
   @override
   bool operator ==(Object other) {
-    return FCDraftMapper.ensureInitialized()
-        .equalsValue(this as FCDraft, other);
+    return FCDraftMapper.ensureInitialized().equalsValue(
+      this as FCDraft,
+      other,
+    );
   }
 
   @override
@@ -128,6 +139,8 @@ extension FCDraftValueCopy<$R, $Out> on ObjectCopyWith<$R, FCDraft, $Out> {
 
 abstract class FCDraftCopyWith<$R, $In extends FCDraft, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
+  get data;
   $R call({
     String? draftKey,
     int? sequence,
@@ -149,6 +162,13 @@ class _FCDraftCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FCDraft> $mapper =
       FCDraftMapper.ensureInitialized();
   @override
+  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
+  get data => MapCopyWith(
+    $value.data,
+    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v) => call(data: v),
+  );
+  @override
   $R call({
     String? draftKey,
     int? sequence,
@@ -157,30 +177,30 @@ class _FCDraftCopyWithImpl<$R, $Out>
     Object? title = $none,
     Object? categoryId = $none,
     Object? updatedAt = $none,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (draftKey != null) #draftKey: draftKey,
-          if (sequence != null) #sequence: sequence,
-          if (data != null) #data: data,
-          if (topicId != $none) #topicId: topicId,
-          if (title != $none) #title: title,
-          if (categoryId != $none) #categoryId: categoryId,
-          if (updatedAt != $none) #updatedAt: updatedAt,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (draftKey != null) #draftKey: draftKey,
+      if (sequence != null) #sequence: sequence,
+      if (data != null) #data: data,
+      if (topicId != $none) #topicId: topicId,
+      if (title != $none) #title: title,
+      if (categoryId != $none) #categoryId: categoryId,
+      if (updatedAt != $none) #updatedAt: updatedAt,
+    }),
+  );
   @override
   FCDraft $make(CopyWithData data) => FCDraft(
-        draftKey: data.get(#draftKey, or: $value.draftKey),
-        sequence: data.get(#sequence, or: $value.sequence),
-        data: data.get(#data, or: $value.data),
-        topicId: data.get(#topicId, or: $value.topicId),
-        title: data.get(#title, or: $value.title),
-        categoryId: data.get(#categoryId, or: $value.categoryId),
-        updatedAt: data.get(#updatedAt, or: $value.updatedAt),
-      );
+    draftKey: data.get(#draftKey, or: $value.draftKey),
+    sequence: data.get(#sequence, or: $value.sequence),
+    data: data.get(#data, or: $value.data),
+    topicId: data.get(#topicId, or: $value.topicId),
+    title: data.get(#title, or: $value.title),
+    categoryId: data.get(#categoryId, or: $value.categoryId),
+    updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+  );
 
   @override
   FCDraftCopyWith<$R2, FCDraft, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _FCDraftCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

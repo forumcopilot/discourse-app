@@ -3,7 +3,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_vote.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_reaction.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 import '../widgets/custom_bb_stylesheet.dart' show BBCodeCallbacks;
 import '../widgets/rich_text_content.dart';
 import '../widgets/reaction_chips_row.dart';
@@ -157,7 +157,7 @@ class _PostListItemState extends State<PostListItem> {
   // parse time; mutated locally on toggle so the chips row updates
   // without a full thread refetch. Phase 5.36 — lifted from a
   // DiscoursePostProxy Expando sidecar to a proper FCPost field.
-  late List<FCReaction> _reactions;
+  late List<FCPostReaction> _reactions;
 
   // discourse-post-voting local copy. Null when voting isn't enabled
   // on this topic, in which case the vote column is hidden.
@@ -1102,7 +1102,7 @@ class _PostListItemState extends State<PostListItem> {
     final current = _reactions
         .firstWhere(
           (r) => r.viewerReacted,
-          orElse: () => FCReaction(id: '', count: 0),
+          orElse: () => FCPostReaction(id: '', count: 0),
         )
         .id;
     final updated = await ReactionPickerSheet.show(

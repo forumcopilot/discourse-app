@@ -25,45 +25,83 @@ class FCDirectoryItemMapper extends ClassMapperBase<FCDirectoryItem> {
   static int _$id(FCDirectoryItem v) => v.id;
   static const Field<FCDirectoryItem, int> _f$id = Field('id', _$id);
   static String _$username(FCDirectoryItem v) => v.username;
-  static const Field<FCDirectoryItem, String> _f$username =
-      Field('username', _$username);
-  static String? _$name(FCDirectoryItem v) => v.name;
-  static const Field<FCDirectoryItem, String> _f$name =
-      Field('name', _$name, opt: true);
+  static const Field<FCDirectoryItem, String> _f$username = Field(
+    'username',
+    _$username,
+  );
   static String _$avatarUrl(FCDirectoryItem v) => v.avatarUrl;
-  static const Field<FCDirectoryItem, String> _f$avatarUrl =
-      Field('avatarUrl', _$avatarUrl);
+  static const Field<FCDirectoryItem, String> _f$avatarUrl = Field(
+    'avatarUrl',
+    _$avatarUrl,
+  );
+  static String? _$name(FCDirectoryItem v) => v.name;
+  static const Field<FCDirectoryItem, String> _f$name = Field(
+    'name',
+    _$name,
+    opt: true,
+  );
   static int? _$trustLevel(FCDirectoryItem v) => v.trustLevel;
-  static const Field<FCDirectoryItem, int> _f$trustLevel =
-      Field('trustLevel', _$trustLevel, opt: true);
+  static const Field<FCDirectoryItem, int> _f$trustLevel = Field(
+    'trustLevel',
+    _$trustLevel,
+    opt: true,
+  );
   static int _$likesReceived(FCDirectoryItem v) => v.likesReceived;
-  static const Field<FCDirectoryItem, int> _f$likesReceived =
-      Field('likesReceived', _$likesReceived, opt: true, def: 0);
+  static const Field<FCDirectoryItem, int> _f$likesReceived = Field(
+    'likesReceived',
+    _$likesReceived,
+    opt: true,
+    def: 0,
+  );
   static int _$likesGiven(FCDirectoryItem v) => v.likesGiven;
-  static const Field<FCDirectoryItem, int> _f$likesGiven =
-      Field('likesGiven', _$likesGiven, opt: true, def: 0);
+  static const Field<FCDirectoryItem, int> _f$likesGiven = Field(
+    'likesGiven',
+    _$likesGiven,
+    opt: true,
+    def: 0,
+  );
   static int _$topicsEntered(FCDirectoryItem v) => v.topicsEntered;
-  static const Field<FCDirectoryItem, int> _f$topicsEntered =
-      Field('topicsEntered', _$topicsEntered, opt: true, def: 0);
+  static const Field<FCDirectoryItem, int> _f$topicsEntered = Field(
+    'topicsEntered',
+    _$topicsEntered,
+    opt: true,
+    def: 0,
+  );
   static int _$postsRead(FCDirectoryItem v) => v.postsRead;
-  static const Field<FCDirectoryItem, int> _f$postsRead =
-      Field('postsRead', _$postsRead, opt: true, def: 0);
+  static const Field<FCDirectoryItem, int> _f$postsRead = Field(
+    'postsRead',
+    _$postsRead,
+    opt: true,
+    def: 0,
+  );
   static int _$daysVisited(FCDirectoryItem v) => v.daysVisited;
-  static const Field<FCDirectoryItem, int> _f$daysVisited =
-      Field('daysVisited', _$daysVisited, opt: true, def: 0);
+  static const Field<FCDirectoryItem, int> _f$daysVisited = Field(
+    'daysVisited',
+    _$daysVisited,
+    opt: true,
+    def: 0,
+  );
   static int _$topicCount(FCDirectoryItem v) => v.topicCount;
-  static const Field<FCDirectoryItem, int> _f$topicCount =
-      Field('topicCount', _$topicCount, opt: true, def: 0);
+  static const Field<FCDirectoryItem, int> _f$topicCount = Field(
+    'topicCount',
+    _$topicCount,
+    opt: true,
+    def: 0,
+  );
   static int _$postCount(FCDirectoryItem v) => v.postCount;
-  static const Field<FCDirectoryItem, int> _f$postCount =
-      Field('postCount', _$postCount, opt: true, def: 0);
+  static const Field<FCDirectoryItem, int> _f$postCount = Field(
+    'postCount',
+    _$postCount,
+    opt: true,
+    def: 0,
+  );
 
   @override
   final MappableFields<FCDirectoryItem> fields = const {
     #id: _f$id,
     #username: _f$username,
-    #name: _f$name,
     #avatarUrl: _f$avatarUrl,
+    #name: _f$name,
     #trustLevel: _f$trustLevel,
     #likesReceived: _f$likesReceived,
     #likesGiven: _f$likesGiven,
@@ -78,8 +116,8 @@ class FCDirectoryItemMapper extends ClassMapperBase<FCDirectoryItem> {
     return FCDirectoryItem(
       id: data.dec(_f$id),
       username: data.dec(_f$username),
-      name: data.dec(_f$name),
       avatarUrl: data.dec(_f$avatarUrl),
+      name: data.dec(_f$name),
       trustLevel: data.dec(_f$trustLevel),
       likesReceived: data.dec(_f$likesReceived),
       likesGiven: data.dec(_f$likesGiven),
@@ -110,38 +148,45 @@ mixin FCDirectoryItemMappable {
   }
 
   Map<String, dynamic> toMap() {
-    return FCDirectoryItemMapper.ensureInitialized()
-        .encodeMap<FCDirectoryItem>(this as FCDirectoryItem);
+    return FCDirectoryItemMapper.ensureInitialized().encodeMap<FCDirectoryItem>(
+      this as FCDirectoryItem,
+    );
   }
 
   FCDirectoryItemCopyWith<FCDirectoryItem, FCDirectoryItem, FCDirectoryItem>
-      get copyWith =>
-          _FCDirectoryItemCopyWithImpl<FCDirectoryItem, FCDirectoryItem>(
-              this as FCDirectoryItem, $identity, $identity);
+  get copyWith =>
+      _FCDirectoryItemCopyWithImpl<FCDirectoryItem, FCDirectoryItem>(
+        this as FCDirectoryItem,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return FCDirectoryItemMapper.ensureInitialized()
-        .stringifyValue(this as FCDirectoryItem);
+    return FCDirectoryItemMapper.ensureInitialized().stringifyValue(
+      this as FCDirectoryItem,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FCDirectoryItemMapper.ensureInitialized()
-        .equalsValue(this as FCDirectoryItem, other);
+    return FCDirectoryItemMapper.ensureInitialized().equalsValue(
+      this as FCDirectoryItem,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return FCDirectoryItemMapper.ensureInitialized()
-        .hashValue(this as FCDirectoryItem);
+    return FCDirectoryItemMapper.ensureInitialized().hashValue(
+      this as FCDirectoryItem,
+    );
   }
 }
 
 extension FCDirectoryItemValueCopy<$R, $Out>
     on ObjectCopyWith<$R, FCDirectoryItem, $Out> {
   FCDirectoryItemCopyWith<$R, FCDirectoryItem, $Out> get $asFCDirectoryItem =>
-      $base
-          .as((v, t, t2) => _FCDirectoryItemCopyWithImpl<$R, $Out>(v, t, t2));
+      $base.as((v, t, t2) => _FCDirectoryItemCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class FCDirectoryItemCopyWith<$R, $In extends FCDirectoryItem, $Out>
@@ -149,8 +194,8 @@ abstract class FCDirectoryItemCopyWith<$R, $In extends FCDirectoryItem, $Out>
   $R call({
     int? id,
     String? username,
-    String? name,
     String? avatarUrl,
+    String? name,
     int? trustLevel,
     int? likesReceived,
     int? likesGiven,
@@ -161,7 +206,8 @@ abstract class FCDirectoryItemCopyWith<$R, $In extends FCDirectoryItem, $Out>
     int? postCount,
   });
   FCDirectoryItemCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _FCDirectoryItemCopyWithImpl<$R, $Out>
@@ -176,8 +222,8 @@ class _FCDirectoryItemCopyWithImpl<$R, $Out>
   $R call({
     int? id,
     String? username,
-    Object? name = $none,
     String? avatarUrl,
+    Object? name = $none,
     Object? trustLevel = $none,
     int? likesReceived,
     int? likesGiven,
@@ -186,41 +232,41 @@ class _FCDirectoryItemCopyWithImpl<$R, $Out>
     int? daysVisited,
     int? topicCount,
     int? postCount,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (id != null) #id: id,
-          if (username != null) #username: username,
-          if (name != $none) #name: name,
-          if (avatarUrl != null) #avatarUrl: avatarUrl,
-          if (trustLevel != $none) #trustLevel: trustLevel,
-          if (likesReceived != null) #likesReceived: likesReceived,
-          if (likesGiven != null) #likesGiven: likesGiven,
-          if (topicsEntered != null) #topicsEntered: topicsEntered,
-          if (postsRead != null) #postsRead: postsRead,
-          if (daysVisited != null) #daysVisited: daysVisited,
-          if (topicCount != null) #topicCount: topicCount,
-          if (postCount != null) #postCount: postCount,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (username != null) #username: username,
+      if (avatarUrl != null) #avatarUrl: avatarUrl,
+      if (name != $none) #name: name,
+      if (trustLevel != $none) #trustLevel: trustLevel,
+      if (likesReceived != null) #likesReceived: likesReceived,
+      if (likesGiven != null) #likesGiven: likesGiven,
+      if (topicsEntered != null) #topicsEntered: topicsEntered,
+      if (postsRead != null) #postsRead: postsRead,
+      if (daysVisited != null) #daysVisited: daysVisited,
+      if (topicCount != null) #topicCount: topicCount,
+      if (postCount != null) #postCount: postCount,
+    }),
+  );
   @override
   FCDirectoryItem $make(CopyWithData data) => FCDirectoryItem(
-        id: data.get(#id, or: $value.id),
-        username: data.get(#username, or: $value.username),
-        name: data.get(#name, or: $value.name),
-        avatarUrl: data.get(#avatarUrl, or: $value.avatarUrl),
-        trustLevel: data.get(#trustLevel, or: $value.trustLevel),
-        likesReceived: data.get(#likesReceived, or: $value.likesReceived),
-        likesGiven: data.get(#likesGiven, or: $value.likesGiven),
-        topicsEntered: data.get(#topicsEntered, or: $value.topicsEntered),
-        postsRead: data.get(#postsRead, or: $value.postsRead),
-        daysVisited: data.get(#daysVisited, or: $value.daysVisited),
-        topicCount: data.get(#topicCount, or: $value.topicCount),
-        postCount: data.get(#postCount, or: $value.postCount),
-      );
+    id: data.get(#id, or: $value.id),
+    username: data.get(#username, or: $value.username),
+    avatarUrl: data.get(#avatarUrl, or: $value.avatarUrl),
+    name: data.get(#name, or: $value.name),
+    trustLevel: data.get(#trustLevel, or: $value.trustLevel),
+    likesReceived: data.get(#likesReceived, or: $value.likesReceived),
+    likesGiven: data.get(#likesGiven, or: $value.likesGiven),
+    topicsEntered: data.get(#topicsEntered, or: $value.topicsEntered),
+    postsRead: data.get(#postsRead, or: $value.postsRead),
+    daysVisited: data.get(#daysVisited, or: $value.daysVisited),
+    topicCount: data.get(#topicCount, or: $value.topicCount),
+    postCount: data.get(#postCount, or: $value.postCount),
+  );
 
   @override
   FCDirectoryItemCopyWith<$R2, FCDirectoryItem, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _FCDirectoryItemCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _FCDirectoryItemCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

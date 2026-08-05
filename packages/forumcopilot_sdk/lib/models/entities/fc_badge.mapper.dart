@@ -27,26 +27,50 @@ class FCBadgeMapper extends ClassMapperBase<FCBadge> {
   static String _$name(FCBadge v) => v.name;
   static const Field<FCBadge, String> _f$name = Field('name', _$name);
   static String? _$description(FCBadge v) => v.description;
-  static const Field<FCBadge, String> _f$description =
-      Field('description', _$description, opt: true);
+  static const Field<FCBadge, String> _f$description = Field(
+    'description',
+    _$description,
+    opt: true,
+  );
   static String? _$icon(FCBadge v) => v.icon;
-  static const Field<FCBadge, String> _f$icon =
-      Field('icon', _$icon, opt: true);
+  static const Field<FCBadge, String> _f$icon = Field(
+    'icon',
+    _$icon,
+    opt: true,
+  );
   static String? _$imageUrl(FCBadge v) => v.imageUrl;
-  static const Field<FCBadge, String> _f$imageUrl =
-      Field('imageUrl', _$imageUrl, opt: true);
+  static const Field<FCBadge, String> _f$imageUrl = Field(
+    'imageUrl',
+    _$imageUrl,
+    opt: true,
+  );
   static int _$badgeTypeId(FCBadge v) => v.badgeTypeId;
-  static const Field<FCBadge, int> _f$badgeTypeId =
-      Field('badgeTypeId', _$badgeTypeId, opt: true, def: 1);
+  static const Field<FCBadge, int> _f$badgeTypeId = Field(
+    'badgeTypeId',
+    _$badgeTypeId,
+    opt: true,
+    def: 1,
+  );
   static DateTime? _$grantedAt(FCBadge v) => v.grantedAt;
-  static const Field<FCBadge, DateTime> _f$grantedAt =
-      Field('grantedAt', _$grantedAt, opt: true);
+  static const Field<FCBadge, DateTime> _f$grantedAt = Field(
+    'grantedAt',
+    _$grantedAt,
+    opt: true,
+  );
   static int _$grantCount(FCBadge v) => v.grantCount;
-  static const Field<FCBadge, int> _f$grantCount =
-      Field('grantCount', _$grantCount, opt: true, def: 1);
+  static const Field<FCBadge, int> _f$grantCount = Field(
+    'grantCount',
+    _$grantCount,
+    opt: true,
+    def: 1,
+  );
   static bool _$granted(FCBadge v) => v.granted;
-  static const Field<FCBadge, bool> _f$granted =
-      Field('granted', _$granted, opt: true, def: true);
+  static const Field<FCBadge, bool> _f$granted = Field(
+    'granted',
+    _$granted,
+    opt: true,
+    def: true,
+  );
 
   @override
   final MappableFields<FCBadge> fields = const {
@@ -89,18 +113,23 @@ class FCBadgeMapper extends ClassMapperBase<FCBadge> {
 
 mixin FCBadgeMappable {
   String toJson() {
-    return FCBadgeMapper.ensureInitialized()
-        .encodeJson<FCBadge>(this as FCBadge);
+    return FCBadgeMapper.ensureInitialized().encodeJson<FCBadge>(
+      this as FCBadge,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return FCBadgeMapper.ensureInitialized()
-        .encodeMap<FCBadge>(this as FCBadge);
+    return FCBadgeMapper.ensureInitialized().encodeMap<FCBadge>(
+      this as FCBadge,
+    );
   }
 
   FCBadgeCopyWith<FCBadge, FCBadge, FCBadge> get copyWith =>
       _FCBadgeCopyWithImpl<FCBadge, FCBadge>(
-          this as FCBadge, $identity, $identity);
+        this as FCBadge,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
     return FCBadgeMapper.ensureInitialized().stringifyValue(this as FCBadge);
@@ -108,7 +137,10 @@ mixin FCBadgeMappable {
 
   @override
   bool operator ==(Object other) {
-    return FCBadgeMapper.ensureInitialized().equalsValue(this as FCBadge, other);
+    return FCBadgeMapper.ensureInitialized().equalsValue(
+      this as FCBadge,
+      other,
+    );
   }
 
   @override
@@ -157,35 +189,34 @@ class _FCBadgeCopyWithImpl<$R, $Out>
     Object? grantedAt = $none,
     int? grantCount,
     bool? granted,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (id != null) #id: id,
-          if (name != null) #name: name,
-          if (description != $none) #description: description,
-          if (icon != $none) #icon: icon,
-          if (imageUrl != $none) #imageUrl: imageUrl,
-          if (badgeTypeId != null) #badgeTypeId: badgeTypeId,
-          if (grantedAt != $none) #grantedAt: grantedAt,
-          if (grantCount != null) #grantCount: grantCount,
-          if (granted != null) #granted: granted,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (name != null) #name: name,
+      if (description != $none) #description: description,
+      if (icon != $none) #icon: icon,
+      if (imageUrl != $none) #imageUrl: imageUrl,
+      if (badgeTypeId != null) #badgeTypeId: badgeTypeId,
+      if (grantedAt != $none) #grantedAt: grantedAt,
+      if (grantCount != null) #grantCount: grantCount,
+      if (granted != null) #granted: granted,
+    }),
+  );
   @override
   FCBadge $make(CopyWithData data) => FCBadge(
-        id: data.get(#id, or: $value.id),
-        name: data.get(#name, or: $value.name),
-        description: data.get(#description, or: $value.description),
-        icon: data.get(#icon, or: $value.icon),
-        imageUrl: data.get(#imageUrl, or: $value.imageUrl),
-        badgeTypeId: data.get(#badgeTypeId, or: $value.badgeTypeId),
-        grantedAt: data.get(#grantedAt, or: $value.grantedAt),
-        grantCount: data.get(#grantCount, or: $value.grantCount),
-        granted: data.get(#granted, or: $value.granted),
-      );
+    id: data.get(#id, or: $value.id),
+    name: data.get(#name, or: $value.name),
+    description: data.get(#description, or: $value.description),
+    icon: data.get(#icon, or: $value.icon),
+    imageUrl: data.get(#imageUrl, or: $value.imageUrl),
+    badgeTypeId: data.get(#badgeTypeId, or: $value.badgeTypeId),
+    grantedAt: data.get(#grantedAt, or: $value.grantedAt),
+    grantCount: data.get(#grantCount, or: $value.grantCount),
+    granted: data.get(#granted, or: $value.granted),
+  );
 
   @override
-  FCBadgeCopyWith<$R2, FCBadge, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
+  FCBadgeCopyWith<$R2, FCBadge, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _FCBadgeCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

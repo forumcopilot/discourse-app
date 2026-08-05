@@ -5,7 +5,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_like.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_vote.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_reaction.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_thanks.dart';
 import 'package:forumcopilot_sdk/models/results/fc_post_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_reaction_result.dart';
@@ -968,21 +968,21 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     );
   }
 
-  List<FCReaction> _parseReactions(Map<String, dynamic> p) {
+  List<FCPostReaction> _parseReactions(Map<String, dynamic> p) {
     final raw = (p['reactions'] as List?) ?? const [];
     if (raw.isEmpty) return const [];
     final current =
         (p['current_user_reaction'] as Map?)?.cast<String, dynamic>();
     final viewerId = current?['id']?.toString();
     final canUndo = current?['can_undo'] == true;
-    final out = <FCReaction>[];
+    final out = <FCPostReaction>[];
     for (final raw in raw.whereType<Map>()) {
       final m = raw.cast<String, dynamic>();
       final id = (m['id'] ?? '').toString();
       final isViewer = viewerId != null && viewerId == id;
       final count = (m['count'] as num?)?.toInt() ?? 0;
       if (count <= 0) continue;
-      out.add(FCReaction(
+      out.add(FCPostReaction(
         id: id,
         type: (m['type'] ?? 'emoji').toString(),
         count: count,

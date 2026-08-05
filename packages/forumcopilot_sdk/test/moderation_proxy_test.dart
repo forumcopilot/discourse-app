@@ -14,7 +14,10 @@ void runModerationProxyTests(IFCModerationProxy moderationProxy, IFCForumProxy f
       helper = ProxyTestHelper(config);
     });
 
-    // doLoginModAsync test dropped — Phase 5.10e SDK interface trim.
+    test('doLoginModAsync returns result: true', () async {
+      final result = await moderationProxy.doLoginModAsync(config.moderatorUsername, config.moderatorPassword);
+      helper.assertResultTrue(result, 'doLoginModAsync');
+    });
 
     test('stickTopicAsync returns result: true', () async {
       final forumId = await helper.fetchValidForumId(forumProxy) ?? config.forumId;
@@ -104,7 +107,45 @@ void runModerationProxyTests(IFCModerationProxy moderationProxy, IFCForumProxy f
       helper.assertResultTrue(result, 'mergeTopicAsync');
     });
 
-    // Review-queue + approve tests dropped — Phase 5.10e SDK interface trim.
+    test('getModerateTopicAsync returns result: true', () async {
+      final result = await moderationProxy.getModerateTopicAsync(0, 10);
+      helper.assertResultTrue(result, 'getModerateTopicAsync');
+    });
+
+    test('getModeratePostAsync returns result: true', () async {
+      final result = await moderationProxy.getModeratePostAsync(0, 10);
+      helper.assertResultTrue(result, 'getModeratePostAsync');
+    });
+
+    test('getDeletedTopicAsync returns result: true', () async {
+      final result = await moderationProxy.getDeletedTopicAsync(0, 10);
+      helper.assertResultTrue(result, 'getDeletedTopicAsync');
+    });
+
+    test('getDeletedPostAsync returns result: true', () async {
+      final result = await moderationProxy.getDeletedPostAsync(0, 10);
+      helper.assertResultTrue(result, 'getDeletedPostAsync');
+    });
+
+    test('getReportedPostAsync returns result: true', () async {
+      final result = await moderationProxy.getReportedPostAsync(0, 10);
+      helper.assertResultTrue(result, 'getReportedPostAsync');
+    });
+
+    test('approveTopicAsync returns result: true', () async {
+      final forumId = await helper.fetchValidForumId(forumProxy) ?? config.forumId;
+      final topicId = await helper.fetchValidTopicId(topicProxy, forumId) ?? config.topicId;
+      final result = await moderationProxy.approveTopicAsync(topicId);
+      helper.assertResultTrue(result, 'approveTopicAsync');
+    });
+
+    test('approvePostAsync returns result: true', () async {
+      final forumId = await helper.fetchValidForumId(forumProxy) ?? config.forumId;
+      final topicId = await helper.fetchValidTopicId(topicProxy, forumId) ?? config.topicId;
+      final postId = await helper.fetchValidPostId(postProxy, topicId) ?? config.postId;
+      final result = await moderationProxy.approvePostAsync(postId);
+      helper.assertResultTrue(result, 'approvePostAsync');
+    });
 
     test('banUserAsync returns result: true', () async {
       final result = await moderationProxy.banUserAsync(config.username, 'Test reason', 0, 0, 0);

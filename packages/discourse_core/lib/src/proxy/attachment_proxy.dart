@@ -107,31 +107,6 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
     );
   }
 
-  @override
-  Future<FCTapatalkImageUploadResult> uploadTapatalkImageAsync(
-    String attachmentName,
-    Uint8List attachmentBytes,
-  ) async {
-    // Tapatalk-hosted media is XF/Tapatalk-only. On Discourse there is no
-    // separate "Tapatalk image bucket" — all images live in /uploads. Map
-    // through to the same endpoint and surface the resulting CDN URL.
-    final upload = await _upload(attachmentName, attachmentBytes,
-        uploadType: 'composer');
-    if (!upload.result) {
-      return FCTapatalkImageUploadResult(
-        result: false,
-        resultText: upload.resultText,
-      );
-    }
-    return FCTapatalkImageUploadResult(
-      result: true,
-      resultText: '',
-      imageId: upload.attachmentId,
-      imageUrl: _resolveImageUrl(upload),
-      thumbnailUrl: _resolveImageUrl(upload),
-    );
-  }
-
   // ===== Helpers =====
 
   Future<FCAttachmentUploadResult> _upload(

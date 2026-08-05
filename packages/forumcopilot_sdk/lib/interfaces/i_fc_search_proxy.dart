@@ -83,5 +83,4 @@ abstract class IFCSearchProxy {
     bool startedBy,
     int? searchTime,
   );
-
 }

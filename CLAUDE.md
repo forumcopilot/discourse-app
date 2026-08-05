@@ -14,6 +14,8 @@ Flutter `^3.6.1` / Dart `^3.6.1`. Targets Android, iOS, macOS, Windows, Linux, w
 
 `/Volumes/CRUCIAL/byo/xenforoapp/` is the XenForo equivalent. The two projects are intentionally **fully separate** (no shared path-dependency on `forumcopilot_sdk`) — fixes need to be applied to each. The Discourse server source for reference reading lives at `/Volumes/CRUCIAL/discourse`.
 
+**Canonical SDK**: as of the `canonical-sdk` branch, `packages/forumcopilot_sdk` here is a byte-identical vendored copy of the canonical SDK maintained in `/Volumes/CRUCIAL/tapatalk_flutter/packages/forumcopilot_sdk` (the multi-tenant ForumCopilot app, which will eventually host `discourse_core` as a platform module). Do NOT fork this copy's API surface: make interface/model changes in the canonical copy first (they must keep `xenforo_core` compiling there), then rsync back here. Discourse-specific concepts belong in `discourse_core` or, when promoted, in the canonical SDK under platform-neutral names (e.g. the Discourse emoji reaction entity is `FCPostReaction`; plain `FCReaction` is the XF reaction-type descriptor).
+
 ## Repository layout (the parts that matter)
 
 - `lib/` — the app. Entry point `lib/main.dart` → `ForumCopilotApp` in `lib/forumcopilot_app.dart` → home `views/single_forum_bootstrap_page.dart`.

@@ -1,7 +1,7 @@
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_flutter/services/site_proxy_service.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_reaction.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 
 import '../../theme/design_tokens.dart';
 
@@ -21,12 +21,12 @@ class ReactionPickerSheet extends StatefulWidget {
     this.currentReactionId,
   });
 
-  static Future<List<FCReaction>?> show({
+  static Future<List<FCPostReaction>?> show({
     required BuildContext context,
     required String postId,
     String? currentReactionId,
   }) {
-    return showModalBottomSheet<List<FCReaction>>(
+    return showModalBottomSheet<List<FCPostReaction>>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),

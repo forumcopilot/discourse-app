@@ -1,7 +1,7 @@
-import '../models/results/fc_directory_result.dart';
 import '../models/results/fc_passkey_result.dart';
 import '../models/results/fc_user_result.dart';
 import '../models/results/fc_private_conversation_result.dart';
+import '../models/results/fc_directory_result.dart';
 
 /// Forum Copilot User Proxy Interface
 /// Defines the contract for user-related operations
@@ -60,10 +60,9 @@ abstract class IFCUserProxy {
   /// Returns a list of posts (max. 50) that's a particular user has replied to.
   Future<FCUserReplyResult> getUserReplyPostAsync(int startNum, int lastNum, String? searchId, String? username, String? userId);
 
-  // Phase 5.43 — `getRecommendedUsersAsync` deleted. Discourse has no
-  // "recommended users for messaging" concept and the app's typeahead
-  // PM recipient picker doesn't need it. The XF-shaped flag
-  // `user_recommended` in get_config now has no opt-in surface.
+  /// Return a list of recommended users for conversation or pm. Flag 'user_recommended'
+  /// returned in get_config will indicate the plugin support this function.
+  Future<FCRecommendedUserResult> getRecommendedUsersAsync(int page, int perpage, int mode);
 
   /// Return a list of users by giving key word. Flag 'search_user' returned in get_config
   /// will indicate the plugin support this function.
@@ -79,22 +78,20 @@ abstract class IFCUserProxy {
   /// This function is used to report a problematic user to moderators
   Future<FCReportUserResult> reportUserAsync(String userId, String reason);
 
-  /// Phase 5.38 — browse the community directory (Discourse:
+  /// Browse the community directory (Discourse:
   /// `GET /directory_items.json`). [period] is one of `daily`,
   /// `weekly`, `monthly`, `quarterly`, `yearly`, `all`; [order] is a
-  /// stat key (`likes_received`, `posts_read`, etc.).
+  /// stat key (`likes_received`, `posts_read`, ...).
   Future<FCDirectoryItemResult> getDirectoryItemsAsync(
     String period,
     String order,
     int page,
   );
 
-  /// Phase 5.38 — list every badge the forum offers (Discourse:
-  /// `GET /badges.json`). Used by the badges directory page.
+  /// List every badge the forum offers (Discourse: `GET /badges.json`).
   Future<FCBadgeResult> getAllBadgesAsync();
 
-  /// Phase 5.38 — list the badges awarded to [username] (Discourse:
-  /// `GET /user-badges/{username}.json`). Used by the user-profile
-  /// badges row.
+  /// List the badges awarded to [username]
+  /// (Discourse: `GET /user-badges/{username}.json`).
   Future<FCBadgeResult> getUserBadgesAsync(String username);
 }

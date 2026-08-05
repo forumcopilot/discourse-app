@@ -106,8 +106,16 @@ void runUserProxyTests(IFCUserProxy userProxy, TestConfig config) {
       }
     });
 
-    // Phase 5.43 — getRecommendedUsersAsync was deleted from IFCUserProxy
-    // (Discourse has no equivalent; UI uses typeahead-only PM picker).
+    test('getRecommendedUsersAsync returns result: true', () async {
+      final testName = 'getRecommendedUsersAsync returns result: true';
+      try {
+        final result = await userProxy.getRecommendedUsersAsync(1, 20, 0);
+        helper.assertResultTrue(result, 'getRecommendedUsersAsync', testName: testName);
+      } on UnimplementedError {
+        helper.tracker.recordNotImplemented(testName, proxyName: 'IFCUserProxy', methodName: 'getRecommendedUsersAsync');
+        rethrow;
+      }
+    });
 
     test('searchUserAsync returns result: true', () async {
       final testName = 'searchUserAsync returns result: true';

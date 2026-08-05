@@ -22,12 +22,12 @@ class FCTagMapper extends ClassMapperBase<FCTag> {
   @override
   final String id = 'FCTag';
 
-  static int? _$id(FCTag v) => v.id;
-  static const Field<FCTag, int> _f$id = Field('id', _$id, opt: true);
   static String _$name(FCTag v) => v.name;
   static const Field<FCTag, String> _f$name = Field('name', _$name);
   static String _$text(FCTag v) => v.text;
   static const Field<FCTag, String> _f$text = Field('text', _$text);
+  static int? _$id(FCTag v) => v.id;
+  static const Field<FCTag, int> _f$id = Field('id', _$id, opt: true);
   static int _$count(FCTag v) => v.count;
   static const Field<FCTag, int> _f$count = Field(
     'count',
@@ -51,9 +51,9 @@ class FCTagMapper extends ClassMapperBase<FCTag> {
 
   @override
   final MappableFields<FCTag> fields = const {
-    #id: _f$id,
     #name: _f$name,
     #text: _f$text,
+    #id: _f$id,
     #count: _f$count,
     #description: _f$description,
     #pmOnly: _f$pmOnly,
@@ -61,9 +61,9 @@ class FCTagMapper extends ClassMapperBase<FCTag> {
 
   static FCTag _instantiate(DecodingData data) {
     return FCTag(
-      id: data.dec(_f$id),
       name: data.dec(_f$name),
       text: data.dec(_f$text),
+      id: data.dec(_f$id),
       count: data.dec(_f$count),
       description: data.dec(_f$description),
       pmOnly: data.dec(_f$pmOnly),
@@ -117,9 +117,9 @@ extension FCTagValueCopy<$R, $Out> on ObjectCopyWith<$R, FCTag, $Out> {
 abstract class FCTagCopyWith<$R, $In extends FCTag, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({
-    int? id,
     String? name,
     String? text,
+    int? id,
     int? count,
     String? description,
     bool? pmOnly,
@@ -135,34 +135,34 @@ class _FCTagCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCTag, $Out>
   late final ClassMapperBase<FCTag> $mapper = FCTagMapper.ensureInitialized();
   @override
   $R call({
-    Object? id = $none,
     String? name,
     String? text,
+    Object? id = $none,
     int? count,
     Object? description = $none,
     bool? pmOnly,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (id != $none) #id: id,
-          if (name != null) #name: name,
-          if (text != null) #text: text,
-          if (count != null) #count: count,
-          if (description != $none) #description: description,
-          if (pmOnly != null) #pmOnly: pmOnly,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (name != null) #name: name,
+      if (text != null) #text: text,
+      if (id != $none) #id: id,
+      if (count != null) #count: count,
+      if (description != $none) #description: description,
+      if (pmOnly != null) #pmOnly: pmOnly,
+    }),
+  );
   @override
   FCTag $make(CopyWithData data) => FCTag(
-        id: data.get(#id, or: $value.id),
-        name: data.get(#name, or: $value.name),
-        text: data.get(#text, or: $value.text),
-        count: data.get(#count, or: $value.count),
-        description: data.get(#description, or: $value.description),
-        pmOnly: data.get(#pmOnly, or: $value.pmOnly),
-      );
+    name: data.get(#name, or: $value.name),
+    text: data.get(#text, or: $value.text),
+    id: data.get(#id, or: $value.id),
+    count: data.get(#count, or: $value.count),
+    description: data.get(#description, or: $value.description),
+    pmOnly: data.get(#pmOnly, or: $value.pmOnly),
+  );
 
   @override
   FCTagCopyWith<$R2, FCTag, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _FCTagCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

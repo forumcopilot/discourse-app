@@ -16,8 +16,14 @@ void runSocialProxyTests(IFCSocialProxy socialProxy, IFCPostProxy postProxy, IFC
     return;
   }
 
-  // thankPostAsync test dropped — Discourse has no "Thanks" concept
-    // distinct from likes (Phase 5.10e SDK interface trim).
+  test('thankPostAsync returns result: true', () async {
+      final testName = 'thankPostAsync returns result: true';
+      if (helper.skipIfThankPostIdNotConfigured(testName)) {
+        return;
+      }
+      final result = await socialProxy.thankPostAsync(config.thankPostId);
+      helper.assertResultTrue(result, 'thankPostAsync', testName: testName);
+    });
 
     test('followAsync returns result: true', () async {
       final testName = 'followAsync returns result: true';

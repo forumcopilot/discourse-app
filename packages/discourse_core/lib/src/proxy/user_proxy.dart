@@ -879,4 +879,13 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       return FCBadgeResult(result: false, resultText: 'Error: $e');
     }
   }
+
+  @override
+  Future<FCRecommendedUserResult> getRecommendedUsersAsync(
+          int page, int perpage, int mode) async =>
+      // Discourse has no "recommended users for messaging" concept; the
+      // PM recipient picker uses username typeahead instead.
+      FCRecommendedUserResult(
+          result: false,
+          resultText: 'Recommended users are not supported on Discourse');
 }

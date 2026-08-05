@@ -192,6 +192,7 @@ class FCLoginTwoStepResult extends FCUser with FCLoginTwoStepResultMappable {
     DateTime? lastActivityTime,
     bool isOnline = false,
     String? currentActivity,
+    String? currentActivityUrl,
     String? currentTopicId,
     bool acceptsPM = false,
     bool canSendPM = false,
@@ -238,6 +239,7 @@ class FCLoginTwoStepResult extends FCUser with FCLoginTwoStepResultMappable {
           lastActivityTime: lastActivityTime,
           isOnline: isOnline,
           currentActivity: currentActivity,
+          currentActivityUrl: currentActivityUrl,
           currentTopicId: currentTopicId,
           acceptsPM: acceptsPM,
           canSendPM: canSendPM,
@@ -300,6 +302,7 @@ class FCOnlineUser extends FCUser with FCOnlineUserMappable {
     DateTime? lastActivityTime,
     bool isOnline = false,
     String? currentActivity,
+    String? currentActivityUrl,
     String? currentTopicId,
     bool acceptsPM = false,
     bool canSendPM = false,
@@ -334,6 +337,7 @@ class FCOnlineUser extends FCUser with FCOnlineUserMappable {
           lastActivityTime: lastActivityTime,
           isOnline: isOnline,
           currentActivity: currentActivity,
+          currentActivityUrl: currentActivityUrl,
           currentTopicId: currentTopicId,
           acceptsPM: acceptsPM,
           canSendPM: canSendPM,
@@ -441,13 +445,14 @@ class FCUserInfoResult extends FCUser with FCUserInfoResultMappable {
   /// Is ignored (compatibility)
   bool? infoIsIgnored;
 
-  /// Discourse trust level (0 = new, 1 = basic, 2 = member, 3 = regular,
-  /// 4 = leader). XF-flavored impls leave this null.
+  /// Discourse trust level (0 = new, 1 = basic, 2 = member,
+  /// 3 = regular, 4 = leader). XF-flavored impls leave this null.
   int? trustLevel;
 
   FCUserInfoResult({
     required this.result,
     this.resultText,
+    this.trustLevel,
     // FCUser required fields
     required String id,
     required String username,
@@ -461,6 +466,7 @@ class FCUserInfoResult extends FCUser with FCUserInfoResultMappable {
     DateTime? lastActivityTime,
     bool isOnline = false,
     String? currentActivity,
+    String? currentActivityUrl,
     String? currentTopicId,
     bool acceptsPM = false,
     bool canSendPM = false,
@@ -507,7 +513,6 @@ class FCUserInfoResult extends FCUser with FCUserInfoResultMappable {
     this.isBan,
     this.canMarkSpam,
     this.infoIsIgnored,
-    this.trustLevel,
   }) : super(
           id: id,
           username: username,
@@ -520,6 +525,7 @@ class FCUserInfoResult extends FCUser with FCUserInfoResultMappable {
           lastActivityTime: lastActivityTime,
           isOnline: isOnline,
           currentActivity: currentActivity,
+          currentActivityUrl: currentActivityUrl,
           currentTopicId: currentTopicId,
           acceptsPM: acceptsPM,
           canSendPM: canSendPM,
@@ -737,6 +743,7 @@ class FCRecommendedUser extends FCUser with FCRecommendedUserMappable {
     DateTime? lastActivityTime,
     bool isOnline = false,
     String? currentActivity,
+    String? currentActivityUrl,
     String? currentTopicId,
     bool acceptsPM = false,
     bool canSendPM = false,
@@ -771,6 +778,7 @@ class FCRecommendedUser extends FCUser with FCRecommendedUserMappable {
           lastActivityTime: lastActivityTime,
           isOnline: isOnline,
           currentActivity: currentActivity,
+          currentActivityUrl: currentActivityUrl,
           currentTopicId: currentTopicId,
           acceptsPM: acceptsPM,
           canSendPM: canSendPM,
@@ -833,6 +841,7 @@ class FCSearchUser extends FCUser with FCSearchUserMappable {
     DateTime? lastActivityTime,
     bool isOnline = false,
     String? currentActivity,
+    String? currentActivityUrl,
     String? currentTopicId,
     bool acceptsPM = false,
     bool canSendPM = false,
@@ -867,6 +876,7 @@ class FCSearchUser extends FCUser with FCSearchUserMappable {
           lastActivityTime: lastActivityTime,
           isOnline: isOnline,
           currentActivity: currentActivity,
+          currentActivityUrl: currentActivityUrl,
           currentTopicId: currentTopicId,
           acceptsPM: acceptsPM,
           canSendPM: canSendPM,
@@ -948,6 +958,7 @@ class FCIgnoredUser extends FCUser with FCIgnoredUserMappable {
     DateTime? lastActivityTime,
     bool isOnline = false,
     String? currentActivity,
+    String? currentActivityUrl,
     String? currentTopicId,
     bool acceptsPM = false,
     bool canSendPM = false,
@@ -982,6 +993,7 @@ class FCIgnoredUser extends FCUser with FCIgnoredUserMappable {
           lastActivityTime: lastActivityTime,
           isOnline: isOnline,
           currentActivity: currentActivity,
+          currentActivityUrl: currentActivityUrl,
           currentTopicId: currentTopicId,
           acceptsPM: acceptsPM,
           canSendPM: canSendPM,

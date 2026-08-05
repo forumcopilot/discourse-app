@@ -58,22 +58,20 @@ class FCForum with FCForumMappable {
   /// Child forums, if any
   List<FCForum> childForums;
 
-  /// Phase 5.41 — Discourse category color hex (e.g. `"BF1E2E"`), no
-  /// leading `#`. Empty when not available — UI hides the stripe.
+  /// Category color hex (Discourse, e.g. `"BF1E2E"`), no leading `#`.
+  /// Null/empty when not available - UI hides the stripe.
   String? color;
 
-  /// Phase 5.41 — Discourse category text color hex, no leading `#`.
+  /// Category text color hex, no leading `#`.
   String? textColor;
 
-  /// Phase 5.41 — number of topics in this forum (Discourse:
-  /// `topic_count`). 0 when not available.
+  /// Number of topics in this forum (Discourse: `topic_count`).
   int topicCount;
 
-  /// Phase 5.41 — number of posts in this forum (Discourse:
-  /// `post_count`). 0 when not available.
+  /// Number of posts in this forum (Discourse: `post_count`).
   int postCount;
 
-  /// Phase 5.41 — slug-style identifier for URLs (Discourse: `slug`).
+  /// Slug-style identifier for URLs (Discourse: `slug`).
   String? slug;
 
   FCForum({

@@ -63,15 +63,15 @@ class FCNotificationPrefsMapper extends ClassMapperBase<FCNotificationPrefs> {
       v.likeNotificationFrequency;
   static const Field<FCNotificationPrefs, int> _f$likeNotificationFrequency =
       Field(
-    'likeNotificationFrequency',
-    _$likeNotificationFrequency,
-    opt: true,
-    def: 0,
-  );
+        'likeNotificationFrequency',
+        _$likeNotificationFrequency,
+        opt: true,
+        def: 0,
+      );
   static int _$notificationLevelWhenReplying(FCNotificationPrefs v) =>
       v.notificationLevelWhenReplying;
   static const Field<FCNotificationPrefs, int>
-      _f$notificationLevelWhenReplying = Field(
+  _f$notificationLevelWhenReplying = Field(
     'notificationLevelWhenReplying',
     _$notificationLevelWhenReplying,
     opt: true,
@@ -97,8 +97,7 @@ class FCNotificationPrefsMapper extends ClassMapperBase<FCNotificationPrefs> {
       digestAfterMinutes: data.dec(_f$digestAfterMinutes),
       mailingListMode: data.dec(_f$mailingListMode),
       likeNotificationFrequency: data.dec(_f$likeNotificationFrequency),
-      notificationLevelWhenReplying:
-          data.dec(_f$notificationLevelWhenReplying),
+      notificationLevelWhenReplying: data.dec(_f$notificationLevelWhenReplying),
     );
   }
 
@@ -125,43 +124,53 @@ mixin FCNotificationPrefsMappable {
         .encodeMap<FCNotificationPrefs>(this as FCNotificationPrefs);
   }
 
-  FCNotificationPrefsCopyWith<FCNotificationPrefs, FCNotificationPrefs,
-          FCNotificationPrefs>
-      get copyWith =>
-          _FCNotificationPrefsCopyWithImpl<FCNotificationPrefs,
-              FCNotificationPrefs>(
-            this as FCNotificationPrefs,
-            $identity,
-            $identity,
-          );
+  FCNotificationPrefsCopyWith<
+    FCNotificationPrefs,
+    FCNotificationPrefs,
+    FCNotificationPrefs
+  >
+  get copyWith =>
+      _FCNotificationPrefsCopyWithImpl<
+        FCNotificationPrefs,
+        FCNotificationPrefs
+      >(this as FCNotificationPrefs, $identity, $identity);
   @override
   String toString() {
-    return FCNotificationPrefsMapper.ensureInitialized()
-        .stringifyValue(this as FCNotificationPrefs);
+    return FCNotificationPrefsMapper.ensureInitialized().stringifyValue(
+      this as FCNotificationPrefs,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FCNotificationPrefsMapper.ensureInitialized()
-        .equalsValue(this as FCNotificationPrefs, other);
+    return FCNotificationPrefsMapper.ensureInitialized().equalsValue(
+      this as FCNotificationPrefs,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return FCNotificationPrefsMapper.ensureInitialized()
-        .hashValue(this as FCNotificationPrefs);
+    return FCNotificationPrefsMapper.ensureInitialized().hashValue(
+      this as FCNotificationPrefs,
+    );
   }
 }
 
 extension FCNotificationPrefsValueCopy<$R, $Out>
     on ObjectCopyWith<$R, FCNotificationPrefs, $Out> {
   FCNotificationPrefsCopyWith<$R, FCNotificationPrefs, $Out>
-      get $asFCNotificationPrefs => $base.as(
-          (v, t, t2) => _FCNotificationPrefsCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asFCNotificationPrefs => $base.as(
+    (v, t, t2) => _FCNotificationPrefsCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
-abstract class FCNotificationPrefsCopyWith<$R, $In extends FCNotificationPrefs,
-    $Out> implements ClassCopyWith<$R, $In, $Out> {
+abstract class FCNotificationPrefsCopyWith<
+  $R,
+  $In extends FCNotificationPrefs,
+  $Out
+>
+    implements ClassCopyWith<$R, $In, $Out> {
   $R call({
     int? emailLevel,
     int? emailMessagesLevel,
@@ -172,7 +181,8 @@ abstract class FCNotificationPrefsCopyWith<$R, $In extends FCNotificationPrefs,
     int? notificationLevelWhenReplying,
   });
   FCNotificationPrefsCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+    Then<$Out2, $R2> t,
+  );
 }
 
 class _FCNotificationPrefsCopyWithImpl<$R, $Out>
@@ -192,44 +202,45 @@ class _FCNotificationPrefsCopyWithImpl<$R, $Out>
     bool? mailingListMode,
     int? likeNotificationFrequency,
     int? notificationLevelWhenReplying,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (emailLevel != null) #emailLevel: emailLevel,
-          if (emailMessagesLevel != null)
-            #emailMessagesLevel: emailMessagesLevel,
-          if (emailDigests != null) #emailDigests: emailDigests,
-          if (digestAfterMinutes != null)
-            #digestAfterMinutes: digestAfterMinutes,
-          if (mailingListMode != null) #mailingListMode: mailingListMode,
-          if (likeNotificationFrequency != null)
-            #likeNotificationFrequency: likeNotificationFrequency,
-          if (notificationLevelWhenReplying != null)
-            #notificationLevelWhenReplying: notificationLevelWhenReplying,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (emailLevel != null) #emailLevel: emailLevel,
+      if (emailMessagesLevel != null) #emailMessagesLevel: emailMessagesLevel,
+      if (emailDigests != null) #emailDigests: emailDigests,
+      if (digestAfterMinutes != null) #digestAfterMinutes: digestAfterMinutes,
+      if (mailingListMode != null) #mailingListMode: mailingListMode,
+      if (likeNotificationFrequency != null)
+        #likeNotificationFrequency: likeNotificationFrequency,
+      if (notificationLevelWhenReplying != null)
+        #notificationLevelWhenReplying: notificationLevelWhenReplying,
+    }),
+  );
   @override
   FCNotificationPrefs $make(CopyWithData data) => FCNotificationPrefs(
-        emailLevel: data.get(#emailLevel, or: $value.emailLevel),
-        emailMessagesLevel:
-            data.get(#emailMessagesLevel, or: $value.emailMessagesLevel),
-        emailDigests: data.get(#emailDigests, or: $value.emailDigests),
-        digestAfterMinutes:
-            data.get(#digestAfterMinutes, or: $value.digestAfterMinutes),
-        mailingListMode:
-            data.get(#mailingListMode, or: $value.mailingListMode),
-        likeNotificationFrequency: data.get(
-          #likeNotificationFrequency,
-          or: $value.likeNotificationFrequency,
-        ),
-        notificationLevelWhenReplying: data.get(
-          #notificationLevelWhenReplying,
-          or: $value.notificationLevelWhenReplying,
-        ),
-      );
+    emailLevel: data.get(#emailLevel, or: $value.emailLevel),
+    emailMessagesLevel: data.get(
+      #emailMessagesLevel,
+      or: $value.emailMessagesLevel,
+    ),
+    emailDigests: data.get(#emailDigests, or: $value.emailDigests),
+    digestAfterMinutes: data.get(
+      #digestAfterMinutes,
+      or: $value.digestAfterMinutes,
+    ),
+    mailingListMode: data.get(#mailingListMode, or: $value.mailingListMode),
+    likeNotificationFrequency: data.get(
+      #likeNotificationFrequency,
+      or: $value.likeNotificationFrequency,
+    ),
+    notificationLevelWhenReplying: data.get(
+      #notificationLevelWhenReplying,
+      or: $value.notificationLevelWhenReplying,
+    ),
+  );
 
   @override
   FCNotificationPrefsCopyWith<$R2, FCNotificationPrefs, $Out2>
-      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _FCNotificationPrefsCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _FCNotificationPrefsCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

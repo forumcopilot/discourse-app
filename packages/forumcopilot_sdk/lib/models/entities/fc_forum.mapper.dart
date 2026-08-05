@@ -128,20 +128,37 @@ class FCForumMapper extends ClassMapperBase<FCForum> {
     def: const [],
   );
   static String? _$color(FCForum v) => v.color;
-  static const Field<FCForum, String> _f$color =
-      Field('color', _$color, opt: true);
+  static const Field<FCForum, String> _f$color = Field(
+    'color',
+    _$color,
+    opt: true,
+  );
   static String? _$textColor(FCForum v) => v.textColor;
-  static const Field<FCForum, String> _f$textColor =
-      Field('textColor', _$textColor, opt: true);
+  static const Field<FCForum, String> _f$textColor = Field(
+    'textColor',
+    _$textColor,
+    opt: true,
+  );
   static int _$topicCount(FCForum v) => v.topicCount;
-  static const Field<FCForum, int> _f$topicCount =
-      Field('topicCount', _$topicCount, opt: true, def: 0);
+  static const Field<FCForum, int> _f$topicCount = Field(
+    'topicCount',
+    _$topicCount,
+    opt: true,
+    def: 0,
+  );
   static int _$postCount(FCForum v) => v.postCount;
-  static const Field<FCForum, int> _f$postCount =
-      Field('postCount', _$postCount, opt: true, def: 0);
+  static const Field<FCForum, int> _f$postCount = Field(
+    'postCount',
+    _$postCount,
+    opt: true,
+    def: 0,
+  );
   static String? _$slug(FCForum v) => v.slug;
-  static const Field<FCForum, String> _f$slug =
-      Field('slug', _$slug, opt: true);
+  static const Field<FCForum, String> _f$slug = Field(
+    'slug',
+    _$slug,
+    opt: true,
+  );
 
   @override
   final MappableFields<FCForum> fields = const {

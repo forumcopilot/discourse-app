@@ -1,6 +1,6 @@
 import '../models/entities/fc_poll.dart';
-import '../models/entities/fc_post_vote.dart';
 import '../models/results/fc_post_result.dart';
+import '../models/entities/fc_post_vote.dart';
 import '../models/results/fc_reaction_result.dart';
 
 /// Interface for post management operations
@@ -87,55 +87,37 @@ abstract class IFCPostProxy {
   Future<FCPoll?> votePollAsync(String topicId, List<String> responseIds);
 
   /// Mark a post as the accepted answer for its topic
-  /// (Discourse: discourse-solved plugin; XF-shaped backends would
-  /// surface the equivalent of a "marked solution"). The post's
-  /// `isSolution` flag and the topic's solved state both flip.
-  /// Gated on `FCPost.canAcceptAnswer` — typically the topic OP
-  /// or staff.
-  ///
-  /// [postId] ID of the post to mark.
+  /// (Discourse: discourse-solved plugin). Gated on
+  /// `FCPost.canAcceptAnswer` - typically the topic OP or staff.
   Future<FCAcceptAnswerResult> acceptAnswerAsync(String postId);
 
   /// Reverse of [acceptAnswerAsync]. Clears the solved state.
-  ///
-  /// [postId] ID of the post to unmark.
   Future<FCAcceptAnswerResult> unacceptAnswerAsync(String postId);
 
-  /// Phase 5.36 — toggle an emoji reaction on [postId] (Discourse:
+  /// Toggle an emoji reaction on [postId] (Discourse:
   /// `discourse-reactions` plugin). [reactionId] is the reaction
-  /// shortcode (e.g. `"heart"`, `"tada"`). Toggling the viewer's
-  /// current reaction removes it; toggling any other reaction
-  /// replaces theirs. Returns the post's updated reaction list so
-  /// the UI can swap state in-place. Returns `result:false` on
-  /// 404 (plugin not installed) — UI should hide the picker in that
-  /// case.
+  /// shortcode (e.g. `"heart"`). Returns the post's updated reaction
+  /// list; `result:false` on 404 (plugin not installed).
   Future<FCToggleReactionResult> toggleReactionAsync(
     String postId,
     String reactionId,
   );
 
-  /// Phase 5.36 — fetch the forum's enabled reaction set so the
-  /// picker can show the right emojis (Discourse:
-  /// `GET /discourse-reactions/custom-reactions`). Implementations
-  /// fall back to a built-in default list when the plugin endpoint
-  /// 404s so the picker still works on plugin-less forums.
+  /// Fetch the forum's enabled reaction set for the picker
+  /// (Discourse: `GET /discourse-reactions/custom-reactions`).
   Future<FCAvailableReactionsResult> getAvailableReactionsAsync();
 
-  /// Phase 5.36 — cast a Q&A-style vote on [postId] (Discourse:
+  /// Cast a Q&A-style vote on [postId] (Discourse:
   /// `discourse-post-voting` plugin). [direction] is `"up"` or
-  /// `"down"`. The plugin's response is bare-success so the
-  /// returned `vote` is computed client-side from the previous state
-  /// plus the requested direction — pass the post's current `vote`
-  /// as [previous] so the result reflects the post-cast state.
+  /// `"down"`; pass the post's current `vote` as [previous] so the
+  /// result reflects the post-cast state.
   Future<FCPostVoteResult> castPostVoteAsync(
     String postId,
     String direction, {
     FCPostVote? previous,
   });
 
-  /// Phase 5.36 — remove the viewer's vote on [postId]. Subject to
-  /// the `post_voting_undo_vote_action_window` site setting
-  /// (typically 10 seconds after voting). Same computed-vote
+  /// Remove the viewer's vote on [postId]. Same computed-vote
   /// convention as [castPostVoteAsync].
   Future<FCPostVoteResult> removePostVoteAsync(
     String postId, {

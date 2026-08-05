@@ -76,7 +76,10 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
   static const int _ntLinkedConsolidated = 39;
 
   @override
-  Future<FCLikePostResult> likePostAsync(String postId) =>
+  Future<FCLikePostResult> likePostAsync(String postId,
+          {int reactionId = 1}) =>
+      // [reactionId] is XF-flavored (reaction type id); Discourse likes
+      // are unityped so it is ignored here.
       _toggleLike(postId, like: true,
           buildResult: (result) => FCLikePostResult(
                 result: result.success,
@@ -618,6 +621,28 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         return 'activity';
     }
   }
+
+  // ===== XF-flavored surface with no Discourse equivalent =====
+
+  @override
+  Future<FCThankPostResult> thankPostAsync(String postId) async =>
+      FCThankPostResult(
+          result: false,
+          resultText: 'Thanks are not supported on Discourse');
+
+  @override
+  Future<FCLikePostResult> likeConversationMessageAsync(String messageId,
+          {int reactionId = 1}) async =>
+      FCLikePostResult(
+          result: false,
+          resultText: 'Message likes are not supported on Discourse');
+
+  @override
+  Future<FCUnlikePostResult> unlikeConversationMessageAsync(
+          String messageId) async =>
+      FCUnlikePostResult(
+          result: false,
+          resultText: 'Message likes are not supported on Discourse');
 }
 
 class _LikeOutcome {

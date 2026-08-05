@@ -6,11 +6,7 @@
 
 export 'i_fc_config_proxy.dart';
 export 'i_fc_attachment_proxy.dart';
-export 'i_fc_bookmark_proxy.dart';
-export 'i_fc_chat_proxy.dart';
-export 'i_fc_draft_proxy.dart';
 export 'i_fc_forum_proxy.dart';
-export 'i_fc_group_proxy.dart';
 export 'i_fc_topic_proxy.dart';
 export 'i_fc_post_proxy.dart';
 export 'i_fc_account_proxy.dart';
@@ -19,7 +15,11 @@ export 'i_fc_user_proxy.dart';
 export 'i_fc_moderation_proxy.dart';
 export 'i_fc_search_proxy.dart';
 export 'i_fc_social_proxy.dart';
-export 'i_fc_tag_proxy.dart';
 export 'i_fc_private_conversation_proxy.dart';
 export 'i_fc_private_message_proxy.dart';
+export 'i_fc_bookmark_proxy.dart';
+export 'i_fc_chat_proxy.dart';
 export 'i_fc_device_proxy.dart';
+export 'i_fc_draft_proxy.dart';
+export 'i_fc_group_proxy.dart';
+export 'i_fc_tag_proxy.dart';

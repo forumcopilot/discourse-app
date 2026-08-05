@@ -1,6 +1,6 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_vote.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_reaction.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 import 'package:forumcopilot_sdk/models/results/fc_base_result.dart';
 
 part 'fc_reaction_result.mapper.dart';
@@ -12,7 +12,7 @@ part 'fc_reaction_result.mapper.dart';
 @MappableClass()
 class FCToggleReactionResult extends FCBaseResult
     with FCToggleReactionResultMappable {
-  List<FCReaction> reactions;
+  List<FCPostReaction> reactions;
 
   FCToggleReactionResult({
     required bool result,

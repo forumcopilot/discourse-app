@@ -27,35 +27,71 @@ class FCChatChannelMapper extends ClassMapperBase<FCChatChannel> {
   static String _$title(FCChatChannel v) => v.title;
   static const Field<FCChatChannel, String> _f$title = Field('title', _$title);
   static String? _$description(FCChatChannel v) => v.description;
-  static const Field<FCChatChannel, String> _f$description =
-      Field('description', _$description, opt: true);
+  static const Field<FCChatChannel, String> _f$description = Field(
+    'description',
+    _$description,
+    opt: true,
+  );
   static String? _$slug(FCChatChannel v) => v.slug;
-  static const Field<FCChatChannel, String> _f$slug =
-      Field('slug', _$slug, opt: true);
+  static const Field<FCChatChannel, String> _f$slug = Field(
+    'slug',
+    _$slug,
+    opt: true,
+  );
   static String _$chatableType(FCChatChannel v) => v.chatableType;
-  static const Field<FCChatChannel, String> _f$chatableType =
-      Field('chatableType', _$chatableType, opt: true, def: 'Category');
+  static const Field<FCChatChannel, String> _f$chatableType = Field(
+    'chatableType',
+    _$chatableType,
+    opt: true,
+    def: 'Category',
+  );
   static int _$unreadCount(FCChatChannel v) => v.unreadCount;
-  static const Field<FCChatChannel, int> _f$unreadCount =
-      Field('unreadCount', _$unreadCount, opt: true, def: 0);
+  static const Field<FCChatChannel, int> _f$unreadCount = Field(
+    'unreadCount',
+    _$unreadCount,
+    opt: true,
+    def: 0,
+  );
   static int _$mentionCount(FCChatChannel v) => v.mentionCount;
-  static const Field<FCChatChannel, int> _f$mentionCount =
-      Field('mentionCount', _$mentionCount, opt: true, def: 0);
+  static const Field<FCChatChannel, int> _f$mentionCount = Field(
+    'mentionCount',
+    _$mentionCount,
+    opt: true,
+    def: 0,
+  );
   static int? _$lastReadMessageId(FCChatChannel v) => v.lastReadMessageId;
-  static const Field<FCChatChannel, int> _f$lastReadMessageId =
-      Field('lastReadMessageId', _$lastReadMessageId, opt: true);
+  static const Field<FCChatChannel, int> _f$lastReadMessageId = Field(
+    'lastReadMessageId',
+    _$lastReadMessageId,
+    opt: true,
+  );
   static bool _$isFollowing(FCChatChannel v) => v.isFollowing;
-  static const Field<FCChatChannel, bool> _f$isFollowing =
-      Field('isFollowing', _$isFollowing, opt: true, def: false);
+  static const Field<FCChatChannel, bool> _f$isFollowing = Field(
+    'isFollowing',
+    _$isFollowing,
+    opt: true,
+    def: false,
+  );
   static bool _$canJoin(FCChatChannel v) => v.canJoin;
-  static const Field<FCChatChannel, bool> _f$canJoin =
-      Field('canJoin', _$canJoin, opt: true, def: false);
+  static const Field<FCChatChannel, bool> _f$canJoin = Field(
+    'canJoin',
+    _$canJoin,
+    opt: true,
+    def: false,
+  );
   static String _$status(FCChatChannel v) => v.status;
-  static const Field<FCChatChannel, String> _f$status =
-      Field('status', _$status, opt: true, def: 'open');
+  static const Field<FCChatChannel, String> _f$status = Field(
+    'status',
+    _$status,
+    opt: true,
+    def: 'open',
+  );
   static DateTime? _$lastMessageAt(FCChatChannel v) => v.lastMessageAt;
-  static const Field<FCChatChannel, DateTime> _f$lastMessageAt =
-      Field('lastMessageAt', _$lastMessageAt, opt: true);
+  static const Field<FCChatChannel, DateTime> _f$lastMessageAt = Field(
+    'lastMessageAt',
+    _$lastMessageAt,
+    opt: true,
+  );
 
   @override
   final MappableFields<FCChatChannel> fields = const {
@@ -104,35 +140,43 @@ class FCChatChannelMapper extends ClassMapperBase<FCChatChannel> {
 
 mixin FCChatChannelMappable {
   String toJson() {
-    return FCChatChannelMapper.ensureInitialized()
-        .encodeJson<FCChatChannel>(this as FCChatChannel);
+    return FCChatChannelMapper.ensureInitialized().encodeJson<FCChatChannel>(
+      this as FCChatChannel,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return FCChatChannelMapper.ensureInitialized()
-        .encodeMap<FCChatChannel>(this as FCChatChannel);
+    return FCChatChannelMapper.ensureInitialized().encodeMap<FCChatChannel>(
+      this as FCChatChannel,
+    );
   }
 
   FCChatChannelCopyWith<FCChatChannel, FCChatChannel, FCChatChannel>
-      get copyWith =>
-          _FCChatChannelCopyWithImpl<FCChatChannel, FCChatChannel>(
-              this as FCChatChannel, $identity, $identity);
+  get copyWith => _FCChatChannelCopyWithImpl<FCChatChannel, FCChatChannel>(
+    this as FCChatChannel,
+    $identity,
+    $identity,
+  );
   @override
   String toString() {
-    return FCChatChannelMapper.ensureInitialized()
-        .stringifyValue(this as FCChatChannel);
+    return FCChatChannelMapper.ensureInitialized().stringifyValue(
+      this as FCChatChannel,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FCChatChannelMapper.ensureInitialized()
-        .equalsValue(this as FCChatChannel, other);
+    return FCChatChannelMapper.ensureInitialized().equalsValue(
+      this as FCChatChannel,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return FCChatChannelMapper.ensureInitialized()
-        .hashValue(this as FCChatChannel);
+    return FCChatChannelMapper.ensureInitialized().hashValue(
+      this as FCChatChannel,
+    );
   }
 }
 
@@ -183,43 +227,44 @@ class _FCChatChannelCopyWithImpl<$R, $Out>
     bool? canJoin,
     String? status,
     Object? lastMessageAt = $none,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (id != null) #id: id,
-          if (title != null) #title: title,
-          if (description != $none) #description: description,
-          if (slug != $none) #slug: slug,
-          if (chatableType != null) #chatableType: chatableType,
-          if (unreadCount != null) #unreadCount: unreadCount,
-          if (mentionCount != null) #mentionCount: mentionCount,
-          if (lastReadMessageId != $none)
-            #lastReadMessageId: lastReadMessageId,
-          if (isFollowing != null) #isFollowing: isFollowing,
-          if (canJoin != null) #canJoin: canJoin,
-          if (status != null) #status: status,
-          if (lastMessageAt != $none) #lastMessageAt: lastMessageAt,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (title != null) #title: title,
+      if (description != $none) #description: description,
+      if (slug != $none) #slug: slug,
+      if (chatableType != null) #chatableType: chatableType,
+      if (unreadCount != null) #unreadCount: unreadCount,
+      if (mentionCount != null) #mentionCount: mentionCount,
+      if (lastReadMessageId != $none) #lastReadMessageId: lastReadMessageId,
+      if (isFollowing != null) #isFollowing: isFollowing,
+      if (canJoin != null) #canJoin: canJoin,
+      if (status != null) #status: status,
+      if (lastMessageAt != $none) #lastMessageAt: lastMessageAt,
+    }),
+  );
   @override
   FCChatChannel $make(CopyWithData data) => FCChatChannel(
-        id: data.get(#id, or: $value.id),
-        title: data.get(#title, or: $value.title),
-        description: data.get(#description, or: $value.description),
-        slug: data.get(#slug, or: $value.slug),
-        chatableType: data.get(#chatableType, or: $value.chatableType),
-        unreadCount: data.get(#unreadCount, or: $value.unreadCount),
-        mentionCount: data.get(#mentionCount, or: $value.mentionCount),
-        lastReadMessageId:
-            data.get(#lastReadMessageId, or: $value.lastReadMessageId),
-        isFollowing: data.get(#isFollowing, or: $value.isFollowing),
-        canJoin: data.get(#canJoin, or: $value.canJoin),
-        status: data.get(#status, or: $value.status),
-        lastMessageAt: data.get(#lastMessageAt, or: $value.lastMessageAt),
-      );
+    id: data.get(#id, or: $value.id),
+    title: data.get(#title, or: $value.title),
+    description: data.get(#description, or: $value.description),
+    slug: data.get(#slug, or: $value.slug),
+    chatableType: data.get(#chatableType, or: $value.chatableType),
+    unreadCount: data.get(#unreadCount, or: $value.unreadCount),
+    mentionCount: data.get(#mentionCount, or: $value.mentionCount),
+    lastReadMessageId: data.get(
+      #lastReadMessageId,
+      or: $value.lastReadMessageId,
+    ),
+    isFollowing: data.get(#isFollowing, or: $value.isFollowing),
+    canJoin: data.get(#canJoin, or: $value.canJoin),
+    status: data.get(#status, or: $value.status),
+    lastMessageAt: data.get(#lastMessageAt, or: $value.lastMessageAt),
+  );
 
   @override
   FCChatChannelCopyWith<$R2, FCChatChannel, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _FCChatChannelCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _FCChatChannelCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

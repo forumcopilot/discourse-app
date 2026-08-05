@@ -46,7 +46,6 @@ class FCThreadResult extends FCTopic with FCThreadResultMappable {
     int replyCount = 0,
     int viewCount = 0,
     bool hasNewPosts = false,
-    int unreadCount = 0,
     bool isClosed = false,
     bool isSubscribed = false,
     bool canSubscribe = true,
@@ -83,6 +82,7 @@ class FCThreadResult extends FCTopic with FCThreadResultMappable {
     bool canThank = false,
     bool hasPoll = false,
     FCPoll? poll,
+    int unreadCount = 0,
     List<String> tags = const [],
     bool isSolved = false,
   }) : super(
@@ -99,7 +99,6 @@ class FCThreadResult extends FCTopic with FCThreadResultMappable {
           replyCount: replyCount,
           viewCount: viewCount,
           hasNewPosts: hasNewPosts,
-          unreadCount: unreadCount,
           isClosed: isClosed,
           isSubscribed: isSubscribed,
           canSubscribe: canSubscribe,
@@ -129,11 +128,12 @@ class FCThreadResult extends FCTopic with FCThreadResultMappable {
           canThank: canThank,
           hasPoll: hasPoll,
           poll: poll,
+          unreadCount: unreadCount,
+          tags: tags,
+          isSolved: isSolved,
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
-          tags: tags,
-          isSolved: isSolved,
         );
 }
 
@@ -190,7 +190,6 @@ class FCThreadByUnreadResult extends FCTopic with FCThreadByUnreadResultMappable
     int replyCount = 0,
     int viewCount = 0,
     bool hasNewPosts = false,
-    int unreadCount = 0,
     bool isClosed = false,
     bool isSubscribed = false,
     bool canSubscribe = true,
@@ -223,6 +222,7 @@ class FCThreadByUnreadResult extends FCTopic with FCThreadByUnreadResultMappable
     bool canThank = false,
     bool hasPoll = false,
     FCPoll? poll,
+    int unreadCount = 0,
     List<String> tags = const [],
     bool isSolved = false,
   }) : super(
@@ -239,7 +239,6 @@ class FCThreadByUnreadResult extends FCTopic with FCThreadByUnreadResultMappable
           replyCount: replyCount,
           viewCount: viewCount,
           hasNewPosts: hasNewPosts,
-          unreadCount: unreadCount,
           isClosed: isClosed,
           isSubscribed: isSubscribed,
           canSubscribe: canSubscribe,
@@ -269,11 +268,12 @@ class FCThreadByUnreadResult extends FCTopic with FCThreadByUnreadResultMappable
           canThank: canThank,
           hasPoll: hasPoll,
           poll: poll,
+          unreadCount: unreadCount,
+          tags: tags,
+          isSolved: isSolved,
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
-          tags: tags,
-          isSolved: isSolved,
         );
 }
 
@@ -330,7 +330,6 @@ class FCThreadByPostResult extends FCTopic with FCThreadByPostResultMappable {
     int replyCount = 0,
     int viewCount = 0,
     bool hasNewPosts = false,
-    int unreadCount = 0,
     bool isClosed = false,
     bool isSubscribed = false,
     bool canSubscribe = true,
@@ -363,6 +362,7 @@ class FCThreadByPostResult extends FCTopic with FCThreadByPostResultMappable {
     bool canThank = false,
     bool hasPoll = false,
     FCPoll? poll,
+    int unreadCount = 0,
     List<String> tags = const [],
     bool isSolved = false,
   }) : super(
@@ -379,7 +379,6 @@ class FCThreadByPostResult extends FCTopic with FCThreadByPostResultMappable {
           replyCount: replyCount,
           viewCount: viewCount,
           hasNewPosts: hasNewPosts,
-          unreadCount: unreadCount,
           isClosed: isClosed,
           isSubscribed: isSubscribed,
           canSubscribe: canSubscribe,
@@ -409,11 +408,12 @@ class FCThreadByPostResult extends FCTopic with FCThreadByPostResultMappable {
           canThank: canThank,
           hasPoll: hasPoll,
           poll: poll,
+          unreadCount: unreadCount,
+          tags: tags,
+          isSolved: isSolved,
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
-          tags: tags,
-          isSolved: isSolved,
         );
 }
 
@@ -456,19 +456,6 @@ class FCReplyPostResult extends FCBaseResult with FCReplyPostResultMappable {
 @MappableClass()
 class FCReportPostResult extends FCBaseResult with FCReportPostResultMappable {
   FCReportPostResult({
-    required bool result,
-    String? resultText,
-  }) : super(result: result, resultText: resultText);
-}
-
-/// Forum Copilot Accept Answer Result (discourse-solved). Same
-/// shape on both `acceptAnswerAsync` and `unacceptAnswerAsync` —
-/// the operation either succeeded or it didn't, with optional
-/// human-readable reason on failure.
-@MappableClass()
-class FCAcceptAnswerResult extends FCBaseResult
-    with FCAcceptAnswerResultMappable {
-  FCAcceptAnswerResult({
     required bool result,
     String? resultText,
   }) : super(result: result, resultText: resultText);
@@ -600,7 +587,6 @@ class FCAnnouncementResult extends FCTopic with FCAnnouncementResultMappable {
     int replyCount = 0,
     int viewCount = 0,
     bool hasNewPosts = false,
-    int unreadCount = 0,
     bool isClosed = false,
     bool isSubscribed = false,
     bool canSubscribe = true,
@@ -637,6 +623,7 @@ class FCAnnouncementResult extends FCTopic with FCAnnouncementResultMappable {
     bool canThank = false,
     bool hasPoll = false,
     FCPoll? poll,
+    int unreadCount = 0,
     List<String> tags = const [],
     bool isSolved = false,
   }) : super(
@@ -653,7 +640,6 @@ class FCAnnouncementResult extends FCTopic with FCAnnouncementResultMappable {
           replyCount: replyCount,
           viewCount: viewCount,
           hasNewPosts: hasNewPosts,
-          unreadCount: unreadCount,
           isClosed: isClosed,
           isSubscribed: isSubscribed,
           canSubscribe: canSubscribe,
@@ -683,10 +669,24 @@ class FCAnnouncementResult extends FCTopic with FCAnnouncementResultMappable {
           canThank: canThank,
           hasPoll: hasPoll,
           poll: poll,
+          unreadCount: unreadCount,
+          tags: tags,
+          isSolved: isSolved,
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
-          tags: tags,
-          isSolved: isSolved,
         );
+}
+
+/// Forum Copilot Accept Answer Result (discourse-solved). Same
+/// shape on both `acceptAnswerAsync` and `unacceptAnswerAsync` -
+/// the operation either succeeded or it didn't, with optional
+/// human-readable reason on failure.
+@MappableClass()
+class FCAcceptAnswerResult extends FCBaseResult
+    with FCAcceptAnswerResultMappable {
+  FCAcceptAnswerResult({
+    required bool result,
+    String? resultText,
+  }) : super(result: result, resultText: resultText);
 }

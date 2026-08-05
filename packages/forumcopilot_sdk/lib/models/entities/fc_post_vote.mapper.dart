@@ -72,28 +72,36 @@ class FCPostVoteMapper extends ClassMapperBase<FCPostVote> {
 
 mixin FCPostVoteMappable {
   String toJson() {
-    return FCPostVoteMapper.ensureInitialized()
-        .encodeJson<FCPostVote>(this as FCPostVote);
+    return FCPostVoteMapper.ensureInitialized().encodeJson<FCPostVote>(
+      this as FCPostVote,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return FCPostVoteMapper.ensureInitialized()
-        .encodeMap<FCPostVote>(this as FCPostVote);
+    return FCPostVoteMapper.ensureInitialized().encodeMap<FCPostVote>(
+      this as FCPostVote,
+    );
   }
 
   FCPostVoteCopyWith<FCPostVote, FCPostVote, FCPostVote> get copyWith =>
       _FCPostVoteCopyWithImpl<FCPostVote, FCPostVote>(
-          this as FCPostVote, $identity, $identity);
+        this as FCPostVote,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return FCPostVoteMapper.ensureInitialized()
-        .stringifyValue(this as FCPostVote);
+    return FCPostVoteMapper.ensureInitialized().stringifyValue(
+      this as FCPostVote,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return FCPostVoteMapper.ensureInitialized()
-        .equalsValue(this as FCPostVote, other);
+    return FCPostVoteMapper.ensureInitialized().equalsValue(
+      this as FCPostVote,
+      other,
+    );
   }
 
   @override
@@ -110,11 +118,7 @@ extension FCPostVoteValueCopy<$R, $Out>
 
 abstract class FCPostVoteCopyWith<$R, $In extends FCPostVote, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({
-    int? voteCount,
-    bool? hasVotes,
-    String? viewerDirection,
-  });
+  $R call({int? voteCount, bool? hasVotes, String? viewerDirection});
   FCPostVoteCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -127,11 +131,7 @@ class _FCPostVoteCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FCPostVote> $mapper =
       FCPostVoteMapper.ensureInitialized();
   @override
-  $R call({
-    int? voteCount,
-    bool? hasVotes,
-    Object? viewerDirection = $none,
-  }) =>
+  $R call({int? voteCount, bool? hasVotes, Object? viewerDirection = $none}) =>
       $apply(
         FieldCopyWithData({
           if (voteCount != null) #voteCount: voteCount,
@@ -141,14 +141,14 @@ class _FCPostVoteCopyWithImpl<$R, $Out>
       );
   @override
   FCPostVote $make(CopyWithData data) => FCPostVote(
-        voteCount: data.get(#voteCount, or: $value.voteCount),
-        hasVotes: data.get(#hasVotes, or: $value.hasVotes),
-        viewerDirection:
-            data.get(#viewerDirection, or: $value.viewerDirection),
-      );
+    voteCount: data.get(#voteCount, or: $value.voteCount),
+    hasVotes: data.get(#hasVotes, or: $value.hasVotes),
+    viewerDirection: data.get(#viewerDirection, or: $value.viewerDirection),
+  );
 
   @override
   FCPostVoteCopyWith<$R2, FCPostVote, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _FCPostVoteCopyWithImpl<$R2, $Out2>($value, $cast, t);
+    Then<$Out2, $R2> t,
+  ) => _FCPostVoteCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

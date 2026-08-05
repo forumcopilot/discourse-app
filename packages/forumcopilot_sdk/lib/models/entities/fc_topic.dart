@@ -48,11 +48,6 @@ class FCTopic with FCTopicMappable {
   /// Indicates if the topic has new/unread posts
   bool hasNewPosts;
 
-  /// Phase 5.47 — how many unread posts the topic has for the current
-  /// user (Discourse: `unread_posts`). 0 when fully read, unknown, or
-  /// the viewer is a guest; [hasNewPosts] stays the boolean signal.
-  int unreadCount;
-
   /// Indicates if the topic is closed/locked
   bool isClosed;
 
@@ -118,14 +113,18 @@ class FCTopic with FCTopicMappable {
   /// Full poll data when thread has a poll; null otherwise. Only present in thread responses.
   FCPoll? poll;
 
-  /// Topic tags. First-class on Discourse (`tags:[...]` on every topic JSON);
-  /// XF-flavored implementations leave this empty. UI surfaces these as
-  /// chips below the topic title.
+  /// How many unread posts the topic has for the current user
+  /// (Discourse: `unread_posts`). 0 when fully read, unknown, or the
+  /// viewer is a guest; [hasNewPosts] stays the boolean signal.
+  int unreadCount;
+
+  /// Topic tags. First-class on Discourse (`tags:[...]`); backends
+  /// without tags leave this empty. UI surfaces these as chips.
   List<String> tags;
 
-  /// Whether any post in this topic has been marked as the accepted answer
-  /// (Discourse: `has_accepted_answer:true`, requires the
-  /// discourse-solved plugin). XF-flavored impls leave false.
+  /// Whether any post in this topic has been marked as the accepted
+  /// answer (Discourse: `has_accepted_answer:true`, requires the
+  /// discourse-solved plugin).
   bool isSolved;
 
   FCTopic({
@@ -142,7 +141,6 @@ class FCTopic with FCTopicMappable {
     this.replyCount = 0,
     this.viewCount = 0,
     this.hasNewPosts = false,
-    this.unreadCount = 0,
     this.isClosed = false,
     this.isSubscribed = false,
     this.canSubscribe = true,
@@ -179,6 +177,7 @@ class FCTopic with FCTopicMappable {
     this.canThank = false,
     this.hasPoll = false,
     this.poll,
+    this.unreadCount = 0,
     this.tags = const [],
     this.isSolved = false,
   });

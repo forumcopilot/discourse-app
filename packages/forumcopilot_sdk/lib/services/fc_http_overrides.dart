@@ -102,6 +102,16 @@ class FCDioClient {
     return cookies.length;
   }
 
+  /// Get cookie names only (no values) for a URL. For diagnostics only.
+  Future<List<String>> cookieNamesForUrl(Uri url) async {
+    await initialize();
+    final cookies = await cookieJar?.loadForRequest(url) ?? [];
+    return cookies
+        .where((c) => c.name.isNotEmpty)
+        .map((c) => c.name)
+        .toList();
+  }
+
   /// Get cookies for a specific URL as a Cookie header string
   Future<String> getCookiesForUrl(Uri url) async {
     await initialize();

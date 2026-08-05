@@ -514,7 +514,14 @@ void runBasicProxyTests({
         return;
       }
 
-      // thankPostAsync test dropped — Phase 5.10e SDK interface trim.
+      test('thankPostAsync returns result: true', () async {
+        final testName = 'thankPostAsync returns result: true';
+        if (helper.skipIfThankPostIdNotConfigured(testName)) {
+          return;
+        }
+        final result = await socialProxy.thankPostAsync(config.thankPostId);
+        helper.assertResultTrue(result, 'thankPostAsync', testName: testName);
+      });
 
       test('likePostAsync returns result: true', () async {
         final testName = 'likePostAsync returns result: true';
