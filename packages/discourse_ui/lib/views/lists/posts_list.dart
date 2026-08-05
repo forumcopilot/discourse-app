@@ -1095,6 +1095,8 @@ class _PostsState extends State<PostsList> {
               post.canEdit ? (postId, currentText) => postActionsHandler.handleEdit(context, postId, currentText, widget.topicTitle, widget.topicId, data.topic.forumId, _refreshCurrentPage) : null,
           onDelete: post.canDelete ? (postId) => postActionsHandler.handleDelete(context, postId) : null,
           onReport: post.canReport ? (postId) => postActionsHandler.handleReport(context, postId) : null,
+          onViewHistory: (postId) => postActionsHandler.handleViewHistory(context, postId),
+          onToggleWiki: post.canEdit ? (postId, wiki) => postActionsHandler.handleToggleWiki(context, postId, wiki) : null,
           onShowImage: (imageUrl, context, heroTag) => imageActions.handleShowImage(imageUrl, context, heroTag, post.id),
           onRefresh: _refreshCurrentPage,
           onLoginRequired: (context) => postActionsHandler.showPostLoginPrompt(context, onRefresh: _refreshCurrentPage),

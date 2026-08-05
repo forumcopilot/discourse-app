@@ -7,7 +7,9 @@ import '../../controllers/login_controller.dart';
 import '../../theme/design_tokens.dart';
 import '../badges_directory_page.dart';
 import '../groups_list_page.dart';
+import '../invites_page.dart';
 import '../login_page.dart';
+import '../moderation/reviewables_page.dart';
 import '../settings/notification_settings_page.dart';
 import '../tags_page.dart';
 import '../users_directory_page.dart';
@@ -87,6 +89,35 @@ class SiteDrawer extends StatelessWidget {
                       BadgesDirectoryPage(siteContext: siteContext),
                     ),
                   ),
+                  // Invites — Discourse-native shareable invite links /
+                  // email invites. Whether the user may actually invite is
+                  // decided server-side (invite_allowed_groups); the page
+                  // surfaces the 403 case itself, so the row only gates on
+                  // being signed in.
+                  if (siteContext.isLoggedIn)
+                    _DrawerRow(
+                      icon: Icons.person_add_alt_outlined,
+                      title: 'Invites',
+                      onTap: () => _push(
+                        context,
+                        InvitesPage(siteContext: siteContext),
+                      ),
+                    ),
+                  // Review queue — staff-only surface (flags, queued
+                  // posts). `canModerate` is set at login from the
+                  // current-user payload (`admin || moderator`), which is
+                  // exactly Discourse's "staff" notion.
+                  if (siteContext.isLoggedIn &&
+                      (siteContext.loginDataOutput?.user?.canModerate ??
+                          false))
+                    _DrawerRow(
+                      icon: Icons.fact_check_outlined,
+                      title: 'Review queue',
+                      onTap: () => _push(
+                        context,
+                        ReviewablesPage(siteContext: siteContext),
+                      ),
+                    ),
                   const Divider(height: 1),
                   _SectionLabel(label: 'Account'),
                   _DrawerRow(

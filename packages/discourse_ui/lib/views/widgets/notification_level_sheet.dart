@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseTagProxy;
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
 
 import '../../theme/design_tokens.dart';
 
 /// A bottom-sheet picker that mirrors Discourse's per-topic / per-category
-/// notification-level dropdown. Supports the full 4-level enum:
+/// / per-tag notification-level dropdown. Supports the full 4-level enum:
 ///   * Watching        — get notified for every reply
 ///   * Tracking        — show in unread, no email
 ///   * Normal          — Discourse's default
 ///   * Muted           — hide entirely
 ///
-/// For per-category sheets, [allowWatchingFirstPost] adds a fifth option
-/// which Discourse only honors at the category level.
+/// For per-category and per-tag sheets, [allowWatchingFirstPost] adds a
+/// fifth option which Discourse only honors at those levels (topics have
+/// no "first post" to watch).
 class NotificationLevelSheet extends StatefulWidget {
   final FCNotificationLevel? initialLevel;
   final Future<bool> Function(FCNotificationLevel level) onLevelChanged;
@@ -99,6 +101,48 @@ class NotificationLevelSheet extends StatefulWidget {
     );
   }
 
+  /// Convenience opener for a tag (Discourse-native tag watching/muting).
+  ///
+  /// Same pattern as [showForTopic] / [showForCategory], but backed by
+  /// `DiscourseTagProxy` — a no-op when the registered tag proxy isn't the
+  /// Discourse one. [onChanged] receives the newly-applied level so callers
+  /// can update their bell icon without refetching.
+  static Future<void> showForTag({
+    required BuildContext context,
+    required String tagName,
+    FCNotificationLevel? currentLevel,
+    void Function(FCNotificationLevel level)? onChanged,
+  }) async {
+    final tagProxy = SiteProxyService.getTagProxy();
+    if (tagProxy is! DiscourseTagProxy) return;
+    FCNotificationLevel level =
+        currentLevel ?? FCNotificationLevel.normal;
+    if (currentLevel == null) {
+      final result = await tagProxy.getTagNotificationLevelAsync(tagName);
+      if (result.result) level = result.level;
+    }
+    if (!context.mounted) return;
+    await showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetContext) {
+        return NotificationLevelSheet(
+          initialLevel: level,
+          title: 'Tag notification level',
+          allowWatchingFirstPost: true,
+          onLevelChanged: (newLevel) async {
+            final result =
+                await tagProxy.setTagNotificationLevelAsync(tagName, newLevel);
+            if (result.result && onChanged != null) onChanged(newLevel);
+            return result.result;
+          },
+        );
+      },
+    );
+  }
+
   @override
   State<NotificationLevelSheet> createState() => _NotificationLevelSheetState();
 }
@@ -150,7 +194,7 @@ class _NotificationLevelSheetState extends State<NotificationLevelSheet> {
         const _LevelEntry(
           level: FCNotificationLevel.watchingFirstPost,
           title: 'Watching First Post',
-          description: 'Notified only for new topics in this category.',
+          description: 'Notified only for the first post of each new topic.',
           icon: Icons.fiber_new,
         ),
       const _LevelEntry(

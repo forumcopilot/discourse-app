@@ -3,6 +3,7 @@ import 'package:forumcopilot_sdk/interfaces/i_fc_moderation_proxy.dart';
 import 'package:forumcopilot_sdk/models/results/fc_moderation_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/moderation/discourse_reviewable.dart';
 
 /// Discourse implementation of [IFCModerationProxy].
 ///
@@ -17,11 +18,10 @@ import '../base_discourse_proxy.dart';
 ///   "moderator login" — the User API Key carries the user's role.
 /// - `mode` / `reason` parameters that don't fit Discourse's body shape
 ///   are dropped (the SDK contract is XF-flavored).
-/// - The review-queue listings (`getModerateTopic`, `getDeletedPost`,
-///   `getReportedPost`, …) live behind `/review.json` which has its own
-///   unified shape; for v1 we surface empty lists rather than a half
-///   translation. The dedicated review UI in xenforoapp's inherited code
-///   was XF-specific anyway.
+/// - The XF review-queue listings (`getModerateTopic`, `getDeletedPost`,
+///   `getReportedPost`, …) stub-fail — Discourse's unified queue is
+///   surfaced natively via `getReviewablesAsync` /
+///   `performReviewableActionAsync` (`/review.json`) instead.
 class DiscourseModerationProxy extends BaseDiscourseProxy
     implements IFCModerationProxy {
   DiscourseModerationProxy(SiteContext context) : super(context);
@@ -452,9 +452,188 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
     }
   }
 
-  // ===== XF review-queue surface with no Discourse equivalent =====
-  // Discourse moderation queues live in /review, which the app does not
-  // surface; these stub-fail so XF-shaped callers degrade gracefully.
+  // ===== Discourse-native review queue (no IFC interface methods) =====
+
+  /// Fetches a page of the moderator review queue.
+  ///
+  /// `GET /review.json` (reviewables_controller.rb#index). Requires the
+  /// signed-in user to be able to see the queue (staff, or a reviewer
+  /// group member) — everyone else gets 403.
+  ///
+  /// [type] filters by reviewable class name (`ReviewableFlaggedPost`,
+  /// `ReviewableQueuedPost`, `ReviewableUser`, …); invalid values 400.
+  /// [status] is one of `pending` / `approved` / `rejected` / `ignored`
+  /// / `deleted` / `reviewed` / `all` (controller `allowed_statuses`).
+  /// [offset] is a row offset; the server returns 10 rows per page
+  /// (`PER_PAGE`) and the result's `total` carries
+  /// `meta.total_rows_reviewables` for "load more" logic.
+  Future<DiscourseReviewableListResult> getReviewablesAsync({
+    String? type,
+    String status = 'pending',
+    int offset = 0,
+  }) async {
+    try {
+      final response = await apiGet('/review.json', query: {
+        'status': status,
+        if (type != null && type.isNotEmpty) 'type': type,
+        if (offset > 0) 'offset': offset.toString(),
+      });
+
+      // The index renders with `rest_serializer: true`, so associations
+      // are side-loaded top-level and rows carry `*_ids` references:
+      //   reviewables[].bundled_action_ids → bundled_actions[] (each
+      //   with action_ids) → actions[] (label/icon/confirm details),
+      //   created_by_id / target_created_by_id → users[],
+      //   topic_id → topics[].
+      Map<Object?, Map<String, dynamic>> byId(String key) => {
+            for (final raw
+                in ((response[key] as List?) ?? const []).whereType<Map>())
+              raw['id']: raw.cast<String, dynamic>(),
+          };
+      final users = byId('users');
+      final topics = byId('topics');
+      final bundles = byId('bundled_actions');
+      final actionDetails = byId('actions');
+
+      List<DiscourseReviewableAction> actionsFor(Map<String, dynamic> row) {
+        final out = <DiscourseReviewableAction>[];
+        for (final bundleId
+            in ((row['bundled_action_ids'] as List?) ?? const [])) {
+          final bundle = bundles[bundleId];
+          if (bundle == null) continue;
+          for (final actionId
+              in ((bundle['action_ids'] as List?) ?? const [])) {
+            final a = actionDetails[actionId] ?? const <String, dynamic>{};
+            out.add(DiscourseReviewableAction(
+              id: actionId.toString(),
+              bundleId: bundleId.toString(),
+              label: (a['label'] ?? bundle['label'])?.toString(),
+              icon: (a['icon'] ?? bundle['icon'])?.toString(),
+              buttonClass: a['button_class']?.toString(),
+              description: a['description']?.toString(),
+              confirmMessage: a['confirm_message']?.toString(),
+              requireRejectReason: a['require_reject_reason'] == true,
+            ));
+          }
+        }
+        return out;
+      }
+
+      final reviewables = ((response['reviewables'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((raw) {
+            final r = raw.cast<String, dynamic>();
+            final topic = topics[r['topic_id']];
+            String? usernameOf(Object? userId) =>
+                users[userId]?['username']?.toString();
+            return DiscourseReviewable(
+              id: (r['id'] as num?)?.toInt() ?? 0,
+              type: (r['type'] ?? '').toString(),
+              status: (r['status'] as num?)?.toInt() ?? 0,
+              createdAt:
+                  DateTime.tryParse(r['created_at']?.toString() ?? ''),
+              version: (r['version'] as num?)?.toInt() ?? 0,
+              score: (r['score'] as num?)?.toDouble() ?? 0,
+              topicId: (r['topic_id'] as num?)?.toInt(),
+              topicTitle: topic?['fancy_title']?.toString() ??
+                  topic?['title']?.toString(),
+              categoryId: (r['category_id'] as num?)?.toInt(),
+              targetType: r['target_type']?.toString(),
+              targetId: (r['target_id'] as num?)?.toInt(),
+              targetUrl: r['target_url']?.toString(),
+              createdByUsername: usernameOf(r['created_by_id']),
+              targetCreatedByUsername:
+                  usernameOf(r['target_created_by_id']),
+              payload:
+                  (r['payload'] as Map?)?.cast<String, dynamic>() ?? const {},
+              actions: actionsFor(r),
+            );
+          })
+          .toList(growable: false);
+
+      final meta = (response['meta'] as Map?)?.cast<String, dynamic>();
+      return DiscourseReviewableListResult(
+        result: true,
+        total: (meta?['total_rows_reviewables'] as num?)?.toInt() ??
+            reviewables.length,
+        reviewables: reviewables,
+      );
+    } on DiscourseApiException catch (e) {
+      return DiscourseReviewableListResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return DiscourseReviewableListResult(
+          result: false, resultText: 'Error: $e');
+    }
+  }
+
+  /// Performs a moderator action on a reviewable.
+  ///
+  /// `PUT /review/{id}/perform/{action_id}.json?version=`
+  /// (reviewables_controller.rb#perform). [actionId] is a
+  /// `DiscourseReviewableAction.id` from [getReviewablesAsync].
+  ///
+  /// The server REQUIRES `version` (422 `missing_version` when blank —
+  /// `version_required` before_action) and 409s with a conflict message
+  /// when another moderator changed the reviewable first; the result
+  /// flags that case with `conflict: true` so the UI can re-fetch the
+  /// row. When [version] is null, the current version is looked up via
+  /// `GET /review/{id}.json` first (one extra request).
+  Future<DiscourseReviewablePerformResult> performReviewableActionAsync(
+    int reviewableId,
+    String actionId, {
+    int? version,
+  }) async {
+    try {
+      var v = version;
+      if (v == null) {
+        final show = await apiGet('/review/$reviewableId.json');
+        final row =
+            (show['reviewable'] as Map?)?.cast<String, dynamic>() ?? const {};
+        v = (row['version'] as num?)?.toInt() ?? 0;
+      }
+      final response = await apiPut(
+        '/review/$reviewableId/perform/'
+        '${Uri.encodeComponent(actionId)}.json',
+        query: {'version': v.toString()},
+      );
+      // ReviewablePerformResultSerializer, nested under
+      // `reviewable_perform_result`.
+      final perform = (response['reviewable_perform_result'] as Map?)
+              ?.cast<String, dynamic>() ??
+          response;
+      return DiscourseReviewablePerformResult(
+        result: perform['success'] != false,
+        removeReviewableIds:
+            ((perform['remove_reviewable_ids'] as List?) ?? const [])
+                .whereType<num>()
+                .map((id) => id.toInt())
+                .toList(growable: false),
+        version: (perform['version'] as num?)?.toInt(),
+        reviewableCount: (perform['reviewable_count'] as num?)?.toInt(),
+        unseenReviewableCount:
+            (perform['unseen_reviewable_count'] as num?)?.toInt(),
+        createdPostId: (perform['created_post_id'] as num?)?.toInt(),
+        createdPostTopicId:
+            (perform['created_post_topic_id'] as num?)?.toInt(),
+      );
+    } on DiscourseApiException catch (e) {
+      return DiscourseReviewablePerformResult(
+        result: false,
+        resultText: e.userMessage,
+        conflict: e.statusCode == 409,
+      );
+    } catch (e) {
+      return DiscourseReviewablePerformResult(
+          result: false, resultText: 'Error: $e');
+    }
+  }
+
+  // ===== XF review-queue surface =====
+  // The XF-shaped listing/approve contracts below don't map cleanly onto
+  // Discourse's unified reviewable rows, so they stay stub-failures;
+  // Discourse-native callers should use `getReviewablesAsync` /
+  // `performReviewableActionAsync` above instead.
 
   @override
   Future<FCLoginModResult> doLoginModAsync(

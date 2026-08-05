@@ -14,6 +14,7 @@ import '../user_profile_page.dart';
 import '../../utils/url_utils.dart';
 import 'package:discourse_ui/views/widgets/not_signed_in_view.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseSocialProxy;
 
 class NotificationListTab extends StatefulWidget {
   final SiteContext siteContext;
@@ -259,7 +260,46 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
     await _fetchTopics(reset: true);
   }
 
+  /// Marks [alert] read on the server and flips its local unread state.
+  /// Fire-and-forget: navigation is never blocked on the round-trip and
+  /// a failure is only logged (the row re-syncs on the next refresh).
+  void _markAlertRead(FCAlert alert) {
+    if (alert.isRead) return;
+    final socialProxy = SiteProxyFactory.getSocialProxy();
+    if (socialProxy is DiscourseSocialProxy) {
+      // FCAlert has no field for the notification's own numeric id —
+      // it rides in a Discourse-only sidecar on the proxy.
+      final notificationId = DiscourseSocialProxy.notificationIdOf(alert);
+      if (notificationId != null) {
+        () async {
+          try {
+            final result =
+                await socialProxy.markNotificationReadAsync(notificationId);
+            if (!result.result) {
+              AppLogger.debug(
+                  '📋 [NOTIFICATIONS] Failed to mark notification $notificationId read: ${result.resultText}');
+            }
+          } catch (e) {
+            AppLogger.debug(
+                '📋 [NOTIFICATIONS] Failed to mark notification $notificationId read: $e');
+          }
+        }();
+      } else {
+        AppLogger.debug(
+            '📋 [NOTIFICATIONS] No notification id on tapped alert; skipping mark-read');
+      }
+    }
+    // Optimistic local flip — drives the unread-row styling (tinted
+    // row + dot + semibold). The tab keeps no separate unread counter;
+    // the bottom-nav badge lives in SiteHomePage and re-syncs from the
+    // server via its _fetchInboxStat refreshes.
+    if (mounted) {
+      setState(() => alert.isRead = true);
+    }
+  }
+
   Future<void> _onAlertTap(FCTopic topic, FCAlert alert) async {
+    _markAlertRead(alert);
     AppLogger.debug('=== Alert Tapped ===');
     AppLogger.debug('Topic ID: ${topic.id}');
     AppLogger.debug('Topic Title: ${topic.title}');

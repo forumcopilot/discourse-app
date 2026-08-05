@@ -64,6 +64,14 @@ class MessageComposePage extends StatefulWidget {
   // leave it null.
   final Widget? extraHeader;
 
+  // Discourse whisper support (staff-only reply mode). When
+  // [showWhisperToggle] is true a visibility toggle appears in the
+  // bottom toolbar and a "Whisper" chip is shown next to the send
+  // button while active. The composer only tracks the flag — the parent
+  // (ReplyPage) decides how to submit via [onWhisperChanged].
+  final bool showWhisperToggle;
+  final ValueChanged<bool>? onWhisperChanged;
+
   const MessageComposePage({
     super.key,
     required this.siteContext,
@@ -95,6 +103,8 @@ class MessageComposePage extends StatefulWidget {
     this.submitIcon,
     this.showSignatureToggle = false,
     this.extraHeader,
+    this.showWhisperToggle = false,
+    this.onWhisperChanged,
   });
 
   @override
@@ -116,6 +126,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
   bool _ownsContentController = false;
   bool _isContentFieldFocused = false; // Track if content field has focus
   bool _includeSignature = true; // Default to enabled
+  bool _isWhisper = false; // Discourse staff whisper mode
 
   // Cache the attachment processing future to prevent reprocessing on rebuilds
   Future<List<Widget>>? _cachedAttachmentWidgetsFuture;
@@ -1830,6 +1841,19 @@ class _MessageComposePageState extends State<MessageComposePage> {
                 tooltip: AppLocalizations.of(context)?.mentionUser ?? 'Mention User',
                 onPressed: _isContentFieldFocused ? _handleMention : null,
               ),
+              // Discourse whisper toggle (staff-only reply mode)
+              if (widget.showWhisperToggle)
+                IconButton(
+                  icon: Icon(
+                    _isWhisper ? Icons.visibility_off : Icons.visibility_off_outlined,
+                    color: _isWhisper ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                  ),
+                  tooltip: _isWhisper ? 'Whisper on (staff only)' : 'Whisper (staff only)',
+                  onPressed: () {
+                    setState(() => _isWhisper = !_isWhisper);
+                    widget.onWhisperChanged?.call(_isWhisper);
+                  },
+                ),
             ],
           ),
         ),
@@ -1883,6 +1907,28 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   ),
                 ),
                 actions: [
+                  // Visible whisper-mode indicator next to the send button.
+                  if (widget.showWhisperToggle && _isWhisper)
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: DesignTokens.spacingXS),
+                        child: Chip(
+                          avatar: Icon(
+                            Icons.visibility_off,
+                            size: 16,
+                            color: colorScheme.onSecondaryContainer,
+                          ),
+                          label: const Text('Whisper'),
+                          labelStyle: textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onSecondaryContainer,
+                          ),
+                          backgroundColor: colorScheme.secondaryContainer,
+                          visualDensity: VisualDensity.compact,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          side: BorderSide.none,
+                        ),
+                      ),
+                    ),
                   IconButton(
                     icon: _isSubmitting
                         ? SizedBox(

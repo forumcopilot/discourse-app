@@ -11,7 +11,8 @@ import 'package:discourse_ui/views/widgets/full_screen_image_viewer.dart';
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
 import 'bookmarks_page.dart';
 import 'widgets/user_badges_row.dart';
-import 'package:discourse_core/discourse_core.dart' show DiscourseUserProxy;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseUserProxy, DiscourseSummaryUser, DiscourseUserSummary;
 import 'package:discourse_ui/utils/error_dialog.dart';
 import 'package:discourse_ui/utils/avatar_cache_utils.dart';
 import 'package:discourse_ui/utils/signature_processor.dart';
@@ -844,6 +845,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     ),
                                 ],
                               ),
+                            ),
+                            // Discourse summary stats (`/u/{username}/summary.json`).
+                            // Loaded lazily by the section itself so the
+                            // main profile fetch stays a single request;
+                            // renders nothing while loading, on failure,
+                            // or when the server hides the stats from
+                            // this viewer (`can_see_summary_stats`).
+                            _UserSummarySection(
+                              key: ValueKey(
+                                  'summary_${_userInfo!.username}_$_postsRefreshKey'),
+                              siteContext: widget.siteContext,
+                              username: _userInfo!.username,
                             ),
                             SizedBox(height: DesignTokens.spacingS),
                             // Phase 5.24 — Replies / Topics tab strip
@@ -2151,5 +2164,243 @@ class _UserProfilePageState extends State<UserProfilePage> {
         );
       }
     }
+  }
+}
+
+/// Summary stats block fed by Discourse's
+/// `GET /u/{username}/summary.json` (via
+/// `DiscourseUserProxy.getUserSummaryAsync`). Self-loading so the
+/// profile's main fetch is unaffected; the section stays invisible
+/// while loading, on failure, and when the server withheld the
+/// numeric stats from this viewer (`canSeeSummaryStats` false — the
+/// numbers all come back 0 in that case, so rendering them would be
+/// worse than hiding). Below the stats, a "Most liked by" avatar row
+/// appears when the summary carries any such users.
+class _UserSummarySection extends StatefulWidget {
+  final SiteContext siteContext;
+  final String username;
+
+  const _UserSummarySection({
+    super.key,
+    required this.siteContext,
+    required this.username,
+  });
+
+  @override
+  State<_UserSummarySection> createState() => _UserSummarySectionState();
+}
+
+class _UserSummarySectionState extends State<_UserSummarySection> {
+  DiscourseUserSummary? _summary;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final result = await DiscourseUserProxy(widget.siteContext)
+          .getUserSummaryAsync(widget.username);
+      if (!mounted) return;
+      setState(() {
+        _summary = result.result ? result.summary : null;
+      });
+    } catch (e) {
+      AppLogger.debug('Error fetching user summary: $e');
+      // Section simply stays hidden — the summary is enrichment, not
+      // load-bearing profile data.
+    }
+  }
+
+  /// "3d 4h" / "2h 15m" / "45m" / "< 1m" from a seconds count.
+  String _humanizeDuration(int seconds) {
+    if (seconds < 60) return '< 1m';
+    final minutes = seconds ~/ 60;
+    final hours = minutes ~/ 60;
+    final days = hours ~/ 24;
+    if (days > 0) {
+      final remHours = hours % 24;
+      return remHours > 0 ? '${days}d ${remHours}h' : '${days}d';
+    }
+    if (hours > 0) {
+      final remMinutes = minutes % 60;
+      return remMinutes > 0 ? '${hours}h ${remMinutes}m' : '${hours}h';
+    }
+    return '${minutes}m';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final summary = _summary;
+    if (summary == null) return const SizedBox.shrink();
+
+    final showStats = summary.canSeeSummaryStats;
+    final likedBy = summary.mostLikedByUsers;
+    if (!showStats && likedBy.isEmpty) return const SizedBox.shrink();
+
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final numberFormat = NumberFormat.decimalPattern(
+        Localizations.localeOf(context).toString());
+
+    final stats = <({String value, String label})>[
+      (
+        value: numberFormat.format(summary.daysVisited),
+        label: 'Days visited',
+      ),
+      (
+        value: _humanizeDuration(summary.timeRead),
+        label: 'Time read',
+      ),
+      (
+        value: numberFormat.format(summary.topicsEntered),
+        label: 'Topics entered',
+      ),
+      (
+        value: numberFormat.format(summary.postsReadCount),
+        label: 'Posts read',
+      ),
+      (
+        value: numberFormat.format(summary.likesGiven),
+        label: 'Likes given',
+      ),
+      (
+        value: numberFormat.format(summary.likesReceived),
+        label: 'Likes received',
+      ),
+    ];
+
+    // Mirrors the profile info card above (margin / border / surface).
+    return Card(
+      margin: EdgeInsets.symmetric(
+        horizontal: DesignTokens.spacingL,
+        vertical: DesignTokens.spacingXS,
+      ),
+      elevation: DesignTokens.elevationNone,
+      color: colorScheme.surfaceContainerLowest,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+        side: BorderSide(
+          color: colorScheme.outlineVariant
+              .withValues(alpha: DesignTokens.opacityLow),
+          width: DesignTokens.borderWidthThin,
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: DesignTokens.spacingL,
+          vertical: DesignTokens.spacingM,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (showStats) ...[
+              Text(
+                'STATS',
+                style: textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  letterSpacing: DesignTokens.letterSpacingWide,
+                  fontWeight: DesignTokens.fontWeightSemiBold,
+                ),
+              ),
+              SizedBox(height: DesignTokens.spacingS),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final cellWidth =
+                      (constraints.maxWidth - 2 * DesignTokens.spacingS) / 3;
+                  return Wrap(
+                    spacing: DesignTokens.spacingS,
+                    runSpacing: DesignTokens.spacingM,
+                    children: stats
+                        .map(
+                          (s) => SizedBox(
+                            width: cellWidth,
+                            child: Column(
+                              children: [
+                                Text(
+                                  s.value,
+                                  style: textTheme.titleMedium?.copyWith(
+                                    color: colorScheme.onSurface,
+                                    fontWeight: DesignTokens.fontWeightBold,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: DesignTokens.spacingXS / 2),
+                                Text(
+                                  s.label,
+                                  style: textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  );
+                },
+              ),
+            ],
+            if (likedBy.isNotEmpty) ...[
+              if (showStats) SizedBox(height: DesignTokens.spacingL),
+              Text(
+                'MOST LIKED BY',
+                style: textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  letterSpacing: DesignTokens.letterSpacingWide,
+                  fontWeight: DesignTokens.fontWeightSemiBold,
+                ),
+              ),
+              SizedBox(height: DesignTokens.spacingS),
+              SizedBox(
+                height: 44,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: likedBy.length,
+                  separatorBuilder: (_, __) =>
+                      const SizedBox(width: DesignTokens.spacingS),
+                  itemBuilder: (context, index) {
+                    final DiscourseSummaryUser user = likedBy[index];
+                    return Tooltip(
+                      message: '${user.username} · ${user.count}',
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => UserProfilePage(
+                                siteContext: widget.siteContext,
+                                userId: user.id.toString(),
+                                userName: user.username,
+                                profilePictureUrl: user.avatarUrl.isNotEmpty
+                                    ? user.avatarUrl
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
+                        child: UserAvatar(
+                          username: user.username,
+                          iconUrl: user.avatarUrl.isNotEmpty
+                              ? user.avatarUrl
+                              : null,
+                          radius: 22,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }

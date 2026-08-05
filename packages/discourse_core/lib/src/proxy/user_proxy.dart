@@ -11,6 +11,8 @@ import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
+import '../data/user/discourse_do_not_disturb.dart';
+import '../data/user/discourse_user_summary.dart';
 import '../util/html_text.dart';
 
 /// Discourse implementation of IFCUserProxy
@@ -924,6 +926,233 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     } catch (e) {
       return FCBadgeResult(result: false, resultText: 'Error: $e');
     }
+  }
+
+  // ===== Discourse-native surface (no IFC interface methods) =====
+
+  /// Starts a do-not-disturb window for the current user.
+  ///
+  /// `POST /do-not-disturb.json` (do_not_disturb_controller.rb#create).
+  /// [duration] is either a number of minutes as a string (e.g. `'30'`,
+  /// `'60'`) or the literal `'tomorrow'` (until end of day UTC) — any
+  /// other value is a 400 InvalidParameters. The response carries the
+  /// window's `ends_at`, surfaced on the result.
+  Future<DiscourseDoNotDisturbResult> enterDoNotDisturbAsync(
+      String duration) async {
+    if (!siteContext.isLoggedIn) {
+      return DiscourseDoNotDisturbResult(
+          result: false, resultText: 'Not signed in');
+    }
+    try {
+      final response =
+          await apiPost('/do-not-disturb.json', body: {'duration': duration});
+      return DiscourseDoNotDisturbResult(
+        result: true,
+        endsAt: DateTime.tryParse((response['ends_at'] ?? '').toString()),
+      );
+    } on DiscourseApiException catch (e) {
+      return DiscourseDoNotDisturbResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return DiscourseDoNotDisturbResult(
+          result: false, resultText: 'Error: $e');
+    }
+  }
+
+  /// Ends any active do-not-disturb window (and releases shelved
+  /// notifications server-side).
+  ///
+  /// `DELETE /do-not-disturb.json` (do_not_disturb_controller.rb#destroy).
+  Future<DiscourseDoNotDisturbResult> leaveDoNotDisturbAsync() async {
+    if (!siteContext.isLoggedIn) {
+      return DiscourseDoNotDisturbResult(
+          result: false, resultText: 'Not signed in');
+    }
+    try {
+      await apiDelete('/do-not-disturb.json');
+      return DiscourseDoNotDisturbResult(result: true);
+    } on DiscourseApiException catch (e) {
+      return DiscourseDoNotDisturbResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return DiscourseDoNotDisturbResult(
+          result: false, resultText: 'Error: $e');
+    }
+  }
+
+  /// Reads the current do-not-disturb state.
+  ///
+  /// Discourse has no dedicated status endpoint — the DND deadline is
+  /// only serialized as `do_not_disturb_until` on the current-user
+  /// payload (current_user_serializer.rb), so this helper fetches
+  /// `GET /session/current.json` and reads it from there. Callers that
+  /// already hold a fresh `/session/current.json` payload should read
+  /// `current_user.do_not_disturb_until` directly instead of paying for
+  /// this extra request.
+  Future<DiscourseDoNotDisturbResult> getDoNotDisturbStatusAsync() async {
+    if (!siteContext.isLoggedIn) {
+      return DiscourseDoNotDisturbResult(
+          result: false, resultText: 'Not signed in');
+    }
+    try {
+      final response = await apiGet('/session/current.json');
+      final user =
+          (response['current_user'] as Map?)?.cast<String, dynamic>() ??
+              const {};
+      return DiscourseDoNotDisturbResult(
+        result: true,
+        endsAt: DateTime.tryParse(
+            (user['do_not_disturb_until'] ?? '').toString()),
+      );
+    } on DiscourseApiException catch (e) {
+      return DiscourseDoNotDisturbResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return DiscourseDoNotDisturbResult(
+          result: false, resultText: 'Error: $e');
+    }
+  }
+
+  /// Fetches the profile-summary stats block for [username].
+  ///
+  /// `GET /u/{username}/summary.json` (users_controller.rb#summary,
+  /// user_summary_serializer.rb). Numeric stats are omitted by the
+  /// server when the viewer lacks `can_see_summary_stats` (they come
+  /// back as 0 with `canSeeSummaryStats` false); the top-topics list is
+  /// resolved from `user_summary.topic_ids` against the side-loaded
+  /// top-level `topics` array, which reply/link rows also reference by
+  /// `topic_id`.
+  Future<DiscourseUserSummaryResult> getUserSummaryAsync(
+      String username) async {
+    if (username.isEmpty) {
+      return DiscourseUserSummaryResult(
+          result: false, resultText: 'username required');
+    }
+    try {
+      final response =
+          await apiGet('/u/${Uri.encodeComponent(username)}/summary.json');
+      final summary =
+          (response['user_summary'] as Map?)?.cast<String, dynamic>() ??
+              const {};
+
+      // Side-loaded topic rows, keyed by id, shared by top-topics,
+      // replies and links.
+      final topicsById = <int, DiscourseSummaryTopic>{};
+      for (final raw
+          in ((response['topics'] as List?) ?? const []).whereType<Map>()) {
+        final t = raw.cast<String, dynamic>();
+        final id = (t['id'] as num?)?.toInt();
+        if (id == null) continue;
+        topicsById[id] = DiscourseSummaryTopic(
+          id: id,
+          title: stripHtmlToText(
+              (t['fancy_title'] ?? t['title'] ?? '').toString()),
+          slug: t['slug']?.toString(),
+          categoryId: (t['category_id'] as num?)?.toInt(),
+          likeCount: (t['like_count'] as num?)?.toInt() ?? 0,
+          postsCount: (t['posts_count'] as num?)?.toInt(),
+          createdAt: DateTime.tryParse(t['created_at']?.toString() ?? ''),
+        );
+      }
+
+      int stat(String key) => (summary[key] as num?)?.toInt() ?? 0;
+
+      List<DiscourseSummaryUser> users(String key) =>
+          ((summary[key] as List?) ?? const [])
+              .whereType<Map>()
+              .map((raw) {
+                final u = raw.cast<String, dynamic>();
+                return DiscourseSummaryUser(
+                  id: (u['id'] as num?)?.toInt() ?? 0,
+                  username: (u['username'] ?? '').toString(),
+                  name: u['name']?.toString(),
+                  count: (u['count'] as num?)?.toInt() ?? 0,
+                  avatarUrl:
+                      _resolveAvatar(u['avatar_template'] as String?, 90),
+                  admin: u['admin'] == true,
+                  moderator: u['moderator'] == true,
+                  trustLevel: (u['trust_level'] as num?)?.toInt(),
+                );
+              })
+              .toList(growable: false);
+
+      final topTopics = ((summary['topic_ids'] as List?) ?? const [])
+          .whereType<num>()
+          .map((id) => topicsById[id.toInt()])
+          .whereType<DiscourseSummaryTopic>()
+          .toList(growable: false);
+
+      final topReplies = ((summary['replies'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((raw) {
+            final r = raw.cast<String, dynamic>();
+            final topicId = (r['topic_id'] as num?)?.toInt() ?? 0;
+            final topic = topicsById[topicId];
+            return DiscourseSummaryReply(
+              topicId: topicId,
+              topicTitle: topic?.title ?? '',
+              topicSlug: topic?.slug,
+              postNumber: (r['post_number'] as num?)?.toInt() ?? 0,
+              likeCount: (r['like_count'] as num?)?.toInt() ?? 0,
+              createdAt: DateTime.tryParse(r['created_at']?.toString() ?? ''),
+            );
+          })
+          .toList(growable: false);
+
+      final topLinks = ((summary['links'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((raw) {
+            final l = raw.cast<String, dynamic>();
+            final topicId = (l['topic_id'] as num?)?.toInt();
+            return DiscourseSummaryLink(
+              url: (l['url'] ?? '').toString(),
+              title: stripHtmlToText((l['title'] ?? '').toString()),
+              clicks: (l['clicks'] as num?)?.toInt() ?? 0,
+              topicId: topicId,
+              topicTitle: topicId == null ? null : topicsById[topicId]?.title,
+              postNumber: (l['post_number'] as num?)?.toInt(),
+            );
+          })
+          .toList(growable: false);
+
+      return DiscourseUserSummaryResult(
+        result: true,
+        summary: DiscourseUserSummary(
+          likesGiven: stat('likes_given'),
+          likesReceived: stat('likes_received'),
+          daysVisited: stat('days_visited'),
+          topicsEntered: stat('topics_entered'),
+          postsReadCount: stat('posts_read_count'),
+          postCount: stat('post_count'),
+          topicCount: stat('topic_count'),
+          timeRead: stat('time_read'),
+          recentTimeRead: stat('recent_time_read'),
+          bookmarkCount: (summary['bookmark_count'] as num?)?.toInt(),
+          canSeeSummaryStats: summary['can_see_summary_stats'] == true,
+          badgeCount: ((summary['badges'] as List?) ?? const []).length,
+          topTopics: topTopics,
+          topReplies: topReplies,
+          topLinks: topLinks,
+          mostLikedByUsers: users('most_liked_by_users'),
+          mostLikedUsers: users('most_liked_users'),
+          mostRepliedToUsers: users('most_replied_to_users'),
+        ),
+      );
+    } on DiscourseApiException catch (e) {
+      return DiscourseUserSummaryResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return DiscourseUserSummaryResult(
+          result: false, resultText: 'Error: $e');
+    }
+  }
+
+  String _resolveAvatar(String? tpl, int size) {
+    if (tpl == null || tpl.isEmpty) return '';
+    final filled = tpl.replaceAll('{size}', size.toString());
+    return filled.startsWith('http')
+        ? filled
+        : '${siteContext.site.url}$filled';
   }
 
   @override

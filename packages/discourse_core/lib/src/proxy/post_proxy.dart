@@ -11,6 +11,7 @@ import 'package:forumcopilot_sdk/models/results/fc_post_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_reaction_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/post/discourse_post_revision.dart';
 import '../data/post/discourse_suggested_topic.dart';
 import '../util/html_text.dart';
 
@@ -27,7 +28,9 @@ import '../util/html_text.dart';
 ///   * POST `/post_actions`         — flag/report
 ///   * POST `/solution/accept|unaccept`      — discourse-solved plugin
 ///   * POST/DELETE `/post_voting/vote`       — discourse-post-voting plugin
-///   * PUT  `/polls/vote`                    — poll plugin
+///   * PUT/DELETE `/polls/vote`, GET `/polls/voters.json` — poll plugin
+///   * GET  `/posts/{id}/revisions/latest|{rev}.json` — edit history
+///   * PUT  `/posts/{id}/wiki`      — toggle wiki status
 class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   DiscoursePostProxy(SiteContext context) : super(context);
 
@@ -340,6 +343,47 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     }
   }
 
+  /// Discourse-only: reply to a topic as a staff **whisper** — a post only
+  /// staff (and the whisper-allowed groups) can see.
+  ///
+  /// Same create path as [replyPostAsync] but with `whisper: "true"`, which
+  /// posts_controller boolean-casts and turns into
+  /// `post_type = Post.types[:whisper]` after a `guardian.can_create_whisper?`
+  /// check. Non-staff callers get a 403 `invalid_whisper_access`, surfaced
+  /// here as `result: false` with the server's message.
+  Future<FCReplyPostResult> replyWhisperAsync(
+    String topicId,
+    String textBody, {
+    List<String>? attachmentIds,
+    bool returnHtml = true,
+  }) async {
+    try {
+      final rawWithAttachments =
+          appendAttachmentMarkdown(textBody, attachmentIds);
+      final response = await apiPost('/posts.json', body: {
+        'topic_id': int.tryParse(topicId) ?? topicId,
+        'raw': rawWithAttachments,
+        'archetype': 'regular',
+        'whisper': 'true',
+      });
+      return FCReplyPostResult(
+        result: true,
+        resultText: '',
+        postId: (response['id'] ?? '').toString(),
+        state: 0,
+        postContent: returnHtml
+            ? response['cooked']?.toString()
+            : response['raw']?.toString(),
+        canEdit: response['can_edit'] == true,
+        canDelete: response['can_delete'] == true,
+      );
+    } on DiscourseApiException catch (e) {
+      return FCReplyPostResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCReplyPostResult(result: false, resultText: 'Error: $e');
+    }
+  }
+
   @override
   Future<FCQuotePostResult> getQuotePostAsync(String postId) async {
     try {
@@ -549,6 +593,103 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     } catch (_) {
       return null;
     }
+  }
+
+  /// Discourse-only: retract the current user's vote(s) in a poll.
+  ///
+  /// DELETE `/polls/vote` with `post_id` + `poll_name` (the poll plugin's
+  /// polls_controller#remove_vote requires exactly those two params). The
+  /// server echoes the updated poll (`{ poll: ... }`), returned here as a
+  /// re-parsed [FCPoll] with the viewer's votes cleared — or null on any
+  /// failure (closed poll, not voted, plugin missing).
+  ///
+  /// [topicId] is only carried onto the returned [FCPoll]; pass it when you
+  /// have it so the poll keeps its identity for the UI.
+  Future<FCPoll?> removePollVoteAsync(
+    int postId,
+    String pollName, {
+    String? topicId,
+  }) async {
+    try {
+      // Like removePostVoteAsync: the controller reads params, so send
+      // them as query parameters on the DELETE.
+      final response = await apiDelete('/polls/vote', query: {
+        'post_id': postId,
+        'poll_name': pollName,
+      });
+      final pollJson = (response['poll'] as Map?)?.cast<String, dynamic>();
+      if (pollJson == null) return null;
+      return _pollFromJson(
+        pollJson,
+        topicId: topicId ?? '',
+        postId: postId,
+        viewerVotes: const [],
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Discourse-only: list who voted for what in a **public** poll.
+  ///
+  /// GET `/polls/voters.json` with `post_id` + `poll_name` and optional
+  /// `option_id` (a poll-option digest) + `page` (25 voters per option per
+  /// page). Only works when the poll was created with `public=true`
+  /// (`Poll#can_see_voters?`) — otherwise the server replies 400, surfaced
+  /// as `result: false`.
+  ///
+  /// The response groups voters by option digest
+  /// (`voters[option_id] = [user...]`); number-type polls return one flat
+  /// list instead, which lands under the `''` key here.
+  Future<DiscoursePollVotersResult> getPollVotersAsync(
+    int postId,
+    String pollName, {
+    String? optionId,
+    int page = 1,
+  }) async {
+    try {
+      final response = await apiGet('/polls/voters.json', query: {
+        'post_id': postId,
+        'poll_name': pollName,
+        if (optionId != null && optionId.isNotEmpty) 'option_id': optionId,
+        'page': page,
+      });
+      final voters = response['voters'];
+      final byOption = <String, List<DiscoursePollVoter>>{};
+      if (voters is Map) {
+        voters.forEach((key, value) {
+          byOption[key.toString()] = _parsePollVoters(value);
+        });
+      } else if (voters is List) {
+        byOption[''] = _parsePollVoters(voters);
+      }
+      return DiscoursePollVotersResult(
+        result: true,
+        resultText: '',
+        votersByOption: byOption,
+      );
+    } on DiscourseApiException catch (e) {
+      return DiscoursePollVotersResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return DiscoursePollVotersResult(result: false, resultText: 'Error: $e');
+    }
+  }
+
+  List<DiscoursePollVoter> _parsePollVoters(Object? raw) {
+    return ((raw is List ? raw : const [])
+        .whereType<Map>()
+        .map((m) {
+      final entry = m.cast<String, dynamic>();
+      // Ranked-choice polls nest the user under `user` (with a `rank`);
+      // regular/multiple polls inline the user fields directly.
+      final user =
+          (entry['user'] as Map?)?.cast<String, dynamic>() ?? entry;
+      return DiscoursePollVoter(
+        username: (user['username'] ?? '').toString(),
+        name: user['name']?.toString(),
+        avatarTemplate: user['avatar_template']?.toString(),
+      );
+    }).toList());
   }
 
   /// Reverse-lookup helper: scans recently-parsed polls for one whose
@@ -933,6 +1074,98 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     }
   }
 
+  /// Discourse-only: fetch one revision of a post's edit history.
+  ///
+  /// GET `/posts/{id}/revisions/latest.json` when [revision] is null,
+  /// otherwise `/posts/{id}/revisions/{revision}.json`. Discourse numbers
+  /// revisions from 2 (revision N = diff between version N-1 and N), so
+  /// the server rejects [revision] < 2 — we short-circuit that client-side.
+  ///
+  /// Visibility: the server only shows edit history to everyone when
+  /// `SiteSetting.edit_history_visible_to_public` is on or the post is a
+  /// wiki; otherwise it's the author + staff (`can_view_edit_history?`).
+  /// A 403 comes back as a clean `result: false`; a 404 usually means the
+  /// post has never been edited (no PostRevision rows).
+  Future<DiscoursePostRevisionResult> getPostRevisionAsync(
+    int postId, {
+    int? revision,
+  }) async {
+    if (revision != null && revision < 2) {
+      return DiscoursePostRevisionResult(
+        result: false,
+        resultText: 'Revision numbers start at 2.',
+      );
+    }
+    try {
+      final path = revision == null
+          ? '/posts/$postId/revisions/latest.json'
+          : '/posts/$postId/revisions/$revision.json';
+      final r = await apiGet(path);
+      final body = (r['body_changes'] as Map?)?.cast<String, dynamic>();
+      final title = (r['title_changes'] as Map?)?.cast<String, dynamic>();
+      return DiscoursePostRevisionResult(
+        result: true,
+        resultText: '',
+        revision: DiscoursePostRevision(
+          postId: (r['post_id'] as num?)?.toInt() ?? postId,
+          currentRevision: (r['current_revision'] as num?)?.toInt() ?? 0,
+          firstRevision: (r['first_revision'] as num?)?.toInt() ?? 0,
+          lastRevision: (r['last_revision'] as num?)?.toInt() ?? 0,
+          previousRevision: (r['previous_revision'] as num?)?.toInt(),
+          nextRevision: (r['next_revision'] as num?)?.toInt(),
+          currentVersion: (r['current_version'] as num?)?.toInt() ?? 0,
+          versionCount: (r['version_count'] as num?)?.toInt() ?? 0,
+          username: (r['username'] ?? '').toString(),
+          displayUsername: r['display_username']?.toString(),
+          avatarTemplate: r['avatar_template']?.toString(),
+          createdAt: DateTime.tryParse(r['created_at']?.toString() ?? ''),
+          editReason: r['edit_reason']?.toString(),
+          bodyInlineHtml: body?['inline']?.toString(),
+          bodySideBySideHtml: body?['side_by_side']?.toString(),
+          bodySideBySideMarkdown: body?['side_by_side_markdown']?.toString(),
+          titleInlineHtml: title?['inline']?.toString(),
+          titleSideBySideHtml: title?['side_by_side']?.toString(),
+          diffError: r['diff_error'] == true,
+          canEdit: r['can_edit'] == true,
+        ),
+      );
+    } on DiscourseApiException catch (e) {
+      if (e.statusCode == 403) {
+        return DiscoursePostRevisionResult(
+          result: false,
+          resultText: 'Edit history is not visible for this post.',
+        );
+      }
+      if (e.statusCode == 404) {
+        return DiscoursePostRevisionResult(
+          result: false,
+          resultText: 'This post has no edit history.',
+        );
+      }
+      return DiscoursePostRevisionResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return DiscoursePostRevisionResult(
+          result: false, resultText: 'Error: $e');
+    }
+  }
+
+  /// Discourse-only: toggle a post's **wiki** status (community-editable).
+  ///
+  /// PUT `/posts/{id}/wiki` with a required `wiki` param; the server runs
+  /// `guardian.ensure_can_wiki!` (author at TL3+ or staff) and revises the
+  /// post. Success is an empty 200 body.
+  Future<DiscourseSetWikiResult> setWikiAsync(int postId, bool wiki) async {
+    try {
+      await apiPut('/posts/$postId/wiki.json', body: {'wiki': wiki});
+      return DiscourseSetWikiResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return DiscourseSetWikiResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return DiscourseSetWikiResult(result: false, resultText: 'Error: $e');
+    }
+  }
+
   // ===== Helpers =====
 
   FCPost _postFrom(
@@ -1120,6 +1353,66 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       timestamp: DateTime.now(),
     );
   }
+}
+
+/// One voter row from `/polls/voters.json` (Discourse's
+/// `UserNameSerializer`: id, username, name, avatar_template — we keep
+/// the display-relevant trio).
+class DiscoursePollVoter {
+  final String username;
+
+  /// Full name; null when the site has `enable_names` off or the user
+  /// hasn't set one.
+  final String? name;
+
+  /// Avatar template with a `{size}` placeholder.
+  final String? avatarTemplate;
+
+  const DiscoursePollVoter({
+    required this.username,
+    this.name,
+    this.avatarTemplate,
+  });
+}
+
+/// Result of [DiscoursePostProxy.getPollVotersAsync]. Voters are grouped
+/// by option digest ([FCPollResponse.id]); number-type polls return a
+/// single ungrouped list, stored under the `''` key.
+class DiscoursePollVotersResult {
+  final bool result;
+  final String resultText;
+  final Map<String, List<DiscoursePollVoter>> votersByOption;
+
+  const DiscoursePollVotersResult({
+    required this.result,
+    required this.resultText,
+    this.votersByOption = const {},
+  });
+}
+
+/// Result of [DiscoursePostProxy.getPostRevisionAsync].
+class DiscoursePostRevisionResult {
+  final bool result;
+  final String resultText;
+  final DiscoursePostRevision? revision;
+
+  const DiscoursePostRevisionResult({
+    required this.result,
+    required this.resultText,
+    this.revision,
+  });
+}
+
+/// Result of [DiscoursePostProxy.setWikiAsync] — no payload, the server
+/// replies with an empty body on success.
+class DiscourseSetWikiResult {
+  final bool result;
+  final String resultText;
+
+  const DiscourseSetWikiResult({
+    required this.result,
+    required this.resultText,
+  });
 }
 
 /// Sidecar struct stamped on every parsed [FCPoll] so the vote endpoint

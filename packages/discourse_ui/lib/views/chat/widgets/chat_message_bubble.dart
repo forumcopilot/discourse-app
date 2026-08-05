@@ -1,3 +1,4 @@
+import 'package:discourse_core/discourse_core.dart' show DiscourseChatProxy;
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
@@ -7,6 +8,7 @@ import '../../../utils/time_utils.dart';
 import '../../user_profile_page.dart';
 import '../../widgets/rich_text_content.dart';
 import '../../widgets/user_avatar.dart';
+import 'chat_reaction_chips.dart';
 
 /// One chat message bubble — left-aligned for others, right-aligned for
 /// self. Ported from the qhtt xenforoapp's Siropu bubble; the rendering
@@ -22,12 +24,19 @@ class ChatMessageBubble extends StatelessWidget {
     required this.siteContext,
     required this.isSelf,
     this.onLongPress,
+    this.onToggleReaction,
   });
 
   final FCChatMessage message;
   final SiteContext siteContext;
   final bool isSelf;
   final VoidCallback? onLongPress;
+
+  /// Toggles the current user's emoji reaction on this message; null
+  /// hides the reaction chips' tap affordance (guests). Resolves false
+  /// on failure so the chips can revert their optimistic state.
+  final Future<bool> Function(String emoji, {required bool add})?
+      onToggleReaction;
 
   void _openProfile(BuildContext context) {
     if (message.authorUsername.isEmpty || message.authorId == 0) return;
@@ -114,6 +123,15 @@ class ChatMessageBubble extends StatelessWidget {
                             ? message.cooked
                             : message.message,
                       ),
+                    ),
+                    // Reaction chips — fed from the proxy's side-table,
+                    // which is refreshed whenever the poll cycle
+                    // re-parses this message (the parent Obx rebuilds
+                    // us on every tick via messages.refresh()).
+                    ChatReactionChips(
+                      reactions:
+                          DiscourseChatProxy.reactionsForMessage(message.id),
+                      onToggle: onToggleReaction,
                     ),
                     const SizedBox(height: DesignTokens.spacingXS),
                     Row(

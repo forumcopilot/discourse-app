@@ -32,6 +32,12 @@ import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../user_profile_page.dart';
 import '../forum_topics_page.dart';
 import 'package:get/get.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show
+        DiscourseBookmarkProxy,
+        DiscourseBookmarkEntry,
+        DiscourseBookmarkAutoDelete;
+import '../widgets/bookmark_reminder_sheet.dart';
 import '../../controllers/login_controller.dart';
 import '../login_page.dart';
 import '../post_page.dart';
@@ -73,6 +79,13 @@ class PostActions {
   /// Called when reporting a post
   final Future<void> Function(String postId)? onReport;
 
+  /// Called when viewing a post's Discourse edit history
+  final Future<void> Function(String postId)? onViewHistory;
+
+  /// Called when toggling a post's Discourse wiki status
+  /// (`wiki` = the desired new state)
+  final Future<void> Function(String postId, bool wiki)? onToggleWiki;
+
   /// Called when viewing an image in the post
   final Function(String imageUrl, BuildContext context, String heroTag)?
       onShowImage;
@@ -89,6 +102,8 @@ class PostActions {
     this.onEdit,
     this.onDelete,
     this.onReport,
+    this.onViewHistory,
+    this.onToggleWiki,
     this.onShowImage,
     this.onRefresh,
     this.onLoginRequired,
@@ -766,6 +781,9 @@ class _PostListItemState extends State<PostListItem> {
             onShowLikes: _showLikesBottomSheet,
             isBookmarked: _isBookmarked,
             onBookmark: _handleBookmarkAction,
+            // Long-press opens the Discourse bookmark-reminder sheet
+            // (create with reminder / edit reminder / remove).
+            onLongPressBookmark: _handleBookmarkLongPress,
             // Phase 5.31 — discourse-solved accept/unaccept. Gated
             // inside PostListItemSocial on `post.canAcceptAnswer` or
             // `post.isSolution` so the button only renders when
@@ -899,6 +917,15 @@ class _PostListItemState extends State<PostListItem> {
       case 'report':
         _handleReport();
         break;
+      case 'history':
+        _handleViewHistory();
+        break;
+      case 'make_wiki':
+        _handleToggleWiki(true);
+        break;
+      case 'remove_wiki':
+        _handleToggleWiki(false);
+        break;
       default:
         break;
     }
@@ -955,6 +982,59 @@ class _PostListItemState extends State<PostListItem> {
         ),
       );
     }
+    // Discourse wiki toggle — shown alongside the existing edit
+    // affordance (FCPost carries no wiki flag, so both directions are
+    // offered; the server rejects non-staff/TL3 with a clean message).
+    if (widget.siteContext.isLoggedIn &&
+        widget.post.canEdit &&
+        widget.actions?.onToggleWiki != null) {
+      items.add(
+        PopupMenuItem<String>(
+          value: 'make_wiki',
+          child: Row(
+            children: [
+              Icon(Icons.edit_note,
+                  size: DesignTokens.iconSizeM,
+                  color: Theme.of(context).colorScheme.secondary),
+              const SizedBox(width: DesignTokens.spacingM),
+              const Text('Make wiki'),
+            ],
+          ),
+        ),
+      );
+      items.add(
+        PopupMenuItem<String>(
+          value: 'remove_wiki',
+          child: Row(
+            children: [
+              Icon(Icons.edit_off,
+                  size: DesignTokens.iconSizeM,
+                  color: Theme.of(context).colorScheme.secondary),
+              const SizedBox(width: DesignTokens.spacingM),
+              const Text('Remove wiki'),
+            ],
+          ),
+        ),
+      );
+    }
+    // Edit history — always offered (FCPost has no reliable edited/version
+    // flag); the revision page reports "no edit history" for unedited posts.
+    if (widget.actions?.onViewHistory != null) {
+      items.add(
+        PopupMenuItem<String>(
+          value: 'history',
+          child: Row(
+            children: [
+              Icon(Icons.history,
+                  size: DesignTokens.iconSizeM,
+                  color: Theme.of(context).colorScheme.secondary),
+              const SizedBox(width: DesignTokens.spacingM),
+              const Text('Edit history'),
+            ],
+          ),
+        ),
+      );
+    }
     return items;
   }
 
@@ -991,6 +1071,20 @@ class _PostListItemState extends State<PostListItem> {
     AppLogger.debug('Post Report action: ${widget.post.id}');
     if (widget.actions?.onReport != null) {
       await widget.actions!.onReport!(widget.post.id);
+    }
+  }
+
+  void _handleViewHistory() async {
+    AppLogger.debug('Post View History action: ${widget.post.id}');
+    if (widget.actions?.onViewHistory != null) {
+      await widget.actions!.onViewHistory!(widget.post.id);
+    }
+  }
+
+  void _handleToggleWiki(bool wiki) async {
+    AppLogger.debug('Post Toggle Wiki action: ${widget.post.id} → $wiki');
+    if (widget.actions?.onToggleWiki != null) {
+      await widget.actions!.onToggleWiki!(widget.post.id, wiki);
     }
   }
 
@@ -1060,6 +1154,186 @@ class _PostListItemState extends State<PostListItem> {
         ),
       );
     }
+  }
+
+  /// Long-press on the bookmark button: Discourse-native bookmark
+  /// reminders. Not bookmarked → "Bookmark with reminder" preset sheet
+  /// (create). Already bookmarked → chooser between editing the
+  /// reminder and removing the bookmark. Quick tap keeps the plain
+  /// toggle in [_handleBookmarkAction].
+  Future<void> _handleBookmarkLongPress() async {
+    if (!widget.siteContext.isLoggedIn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to bookmark')),
+      );
+      return;
+    }
+    if (_bookmarkInFlight) return;
+    final proxy = SiteProxyService.getBookmarkProxy();
+    if (proxy is! DiscourseBookmarkProxy) {
+      // Reminders are Discourse-only; fall back to the plain toggle.
+      _handleBookmarkAction();
+      return;
+    }
+    if (!_isBookmarked) {
+      final choice = await BookmarkReminderSheet.show(context);
+      if (choice == null || !mounted) return;
+      await _createBookmarkWithReminder(proxy, choice.reminderAt);
+      return;
+    }
+    // Already bookmarked: offer edit-reminder / remove.
+    final colorScheme = Theme.of(context).colorScheme;
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(DesignTokens.radiusL)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.alarm, color: colorScheme.primary),
+              title: const Text('Edit reminder'),
+              onTap: () => Navigator.pop(sheetContext, 'edit'),
+            ),
+            ListTile(
+              leading: Icon(Icons.bookmark_remove_outlined,
+                  color: colorScheme.error),
+              title: const Text('Remove bookmark'),
+              onTap: () => Navigator.pop(sheetContext, 'remove'),
+            ),
+            const SizedBox(height: DesignTokens.spacingS),
+          ],
+        ),
+      ),
+    );
+    if (!mounted) return;
+    if (action == 'remove') {
+      _handleBookmarkAction(); // existing optimistic un-bookmark path
+    } else if (action == 'edit') {
+      await _editBookmarkReminder(proxy);
+    }
+  }
+
+  /// Create the bookmark with an optional reminder. Same optimistic
+  /// flip + in-flight guard + revert-on-failure shape as
+  /// [_handleBookmarkAction].
+  Future<void> _createBookmarkWithReminder(
+      DiscourseBookmarkProxy proxy, DateTime? reminderAt) async {
+    if (_bookmarkInFlight) return;
+    final postId = int.tryParse(widget.post.id);
+    if (postId == null) return;
+    setState(() {
+      _isBookmarked = true;
+      _bookmarkInFlight = true;
+    });
+    bool ok;
+    String? errText;
+    try {
+      final result = await proxy.createBookmarkAsync(
+        postId: postId,
+        reminderAt: reminderAt,
+        // Discourse's default for reminder bookmarks: keep the
+        // bookmark, clear reminder_at once the reminder fires.
+        autoDeletePreference:
+            reminderAt != null ? DiscourseBookmarkAutoDelete.clearReminder : null,
+      );
+      ok = result.result;
+      errText = result.resultText;
+    } catch (_) {
+      ok = false;
+    }
+    if (!mounted) return;
+    setState(() {
+      if (!ok) {
+        _isBookmarked = false; // revert
+      } else {
+        widget.post.bookmarked = true;
+      }
+      _bookmarkInFlight = false;
+    });
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errText?.isNotEmpty == true
+              ? errText!
+              : 'Failed to bookmark post'),
+        ),
+      );
+    }
+  }
+
+  /// Edit the reminder on an existing bookmark. FCPost only carries the
+  /// `bookmarked` flag, so resolve the bookmark row (id + current
+  /// reminder/note) from the user's bookmark list first. The update
+  /// endpoint overwrites rather than patches, so the existing note is
+  /// passed back through untouched.
+  Future<void> _editBookmarkReminder(DiscourseBookmarkProxy proxy) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final entry = await _findBookmarkEntry(proxy);
+    if (!mounted) return;
+    if (entry == null) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Could not find this bookmark')),
+      );
+      return;
+    }
+    final choice = await BookmarkReminderSheet.show(
+      context,
+      title: 'Edit reminder',
+      currentReminderAt: entry.reminderAt,
+    );
+    if (choice == null || !mounted) return;
+    final result = await proxy.updateBookmarkAsync(
+      entry.bookmark.id,
+      reminderAt: choice.reminderAt, // omitting clears — intended for "No reminder"
+      name: entry.bookmark.name, // overwrite semantics: resend the note
+      autoDeletePreference: choice.reminderAt != null
+          ? DiscourseBookmarkAutoDelete.clearReminder
+          : null,
+    );
+    if (!mounted) return;
+    if (!result.result) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : 'Failed to update reminder'),
+        ),
+      );
+    } else {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(choice.reminderAt != null
+              ? 'Reminder set'
+              : 'Reminder cleared'),
+        ),
+      );
+    }
+  }
+
+  /// Scan the user's bookmark list for this post's bookmark row.
+  /// Page-capped like DiscourseBookmarkProxy.removePostBookmarkAsync's
+  /// lookup so a huge list can't loop forever.
+  Future<DiscourseBookmarkEntry?> _findBookmarkEntry(
+      DiscourseBookmarkProxy proxy) async {
+    final postId = int.tryParse(widget.post.id);
+    if (postId == null) return null;
+    const maxPages = 25;
+    for (var page = 0; page < maxPages; page++) {
+      final result = await proxy.getBookmarksWithRemindersAsync(page: page);
+      if (!result.result || result.entries.isEmpty) return null;
+      for (final entry in result.entries) {
+        if (entry.bookmark.bookmarkableType == 'Post' &&
+            entry.bookmark.bookmarkableId == postId) {
+          return entry;
+        }
+      }
+      if (!result.hasMore) return null;
+    }
+    return null;
   }
 
   /// Phase 5.31 — toggle the topic's accepted-answer state for this

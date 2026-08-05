@@ -6,10 +6,12 @@ import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/post_controller.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscoursePostProxy;
 import 'package:discourse_ui/views/reply_page.dart';
 import 'package:discourse_ui/views/edit_post_page.dart';
 import 'package:discourse_ui/views/login_page.dart';
 import 'package:discourse_ui/views/post_page.dart';
+import 'package:discourse_ui/views/post_revision_page.dart';
 import 'package:discourse_ui/views/lists/posts_list.dart';
 // AuthController functionality now in SiteContext
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -949,22 +951,134 @@ class PostActionsHandler {
     }
   }
 
+  /// Opens the Discourse edit-history viewer for [postId]. Posts that
+  /// were never edited (or whose history isn't visible to the viewer)
+  /// get a friendly message from the page itself, so callers can offer
+  /// this action unconditionally.
   Future<void> handleViewHistory(BuildContext context, String postId) async {
     AppLogger.debug('Handling view history of post: $postId');
-    // TODO: Implement view history functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'View history functionality coming soon',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onInverseSurface,
-              ),
+    final numericPostId = int.tryParse(postId);
+    if (numericPostId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Edit history is not available for this post',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                ),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(8),
         ),
-        backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(8),
+      );
+      return;
+    }
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PostRevisionPage(
+          siteContext: siteContext,
+          postId: numericPostId,
+        ),
       ),
     );
+  }
+
+  /// Toggles the Discourse **wiki** flag on a post (community-editable).
+  /// Server-side permission is `guardian.ensure_can_wiki!` (author at
+  /// TL3+ or staff) — non-privileged callers get the server's rejection
+  /// message in the error snackbar.
+  Future<void> handleToggleWiki(
+      BuildContext context, String postId, bool wiki) async {
+    AppLogger.debug('Handling wiki toggle of post: $postId → $wiki');
+    final numericPostId = int.tryParse(postId);
+    final postProxy = SiteProxyFactory.getPostProxy();
+    if (numericPostId == null || postProxy is! DiscoursePostProxy) {
+      return;
+    }
+
+    bool ok;
+    String errText;
+    try {
+      final result = await postProxy.setWikiAsync(numericPostId, wiki);
+      ok = result.result;
+      errText = result.resultText;
+    } catch (e) {
+      ok = false;
+      errText = e.toString();
+    }
+
+    if (!context.mounted) return;
+    if (ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(
+                Icons.check_circle_outline,
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
+              const SizedBox(width: DesignTokens.spacingM),
+              Text(
+                wiki ? 'Post is now a wiki' : 'Wiki removed from post',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onInverseSurface,
+                    ),
+              ),
+            ],
+          ),
+          backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          margin: const EdgeInsets.all(8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    } else {
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(
+                Icons.error_outline,
+                color: Theme.of(context).colorScheme.onErrorContainer,
+              ),
+              const SizedBox(width: DesignTokens.spacingM),
+              Expanded(
+                child: Text(
+                  errText.isNotEmpty
+                      ? errText
+                      : 'Failed to change wiki status',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                      ),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Theme.of(context).colorScheme.errorContainer,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          margin: const EdgeInsets.all(8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
+            textColor: Theme.of(context).colorScheme.onErrorContainer,
+            onPressed: () {
+              scaffoldMessenger.hideCurrentSnackBar();
+            },
+          ),
+        ),
+      );
+    }
   }
 
   // --- Like/Unlike Post ---

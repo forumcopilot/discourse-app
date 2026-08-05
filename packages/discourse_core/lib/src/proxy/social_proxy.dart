@@ -11,6 +11,8 @@ import '../util/html_text.dart';
 ///   * POST   `/post_actions`           — create a like (post_action_type_id=2)
 ///   * DELETE `/post_actions/{post_id}` — remove a like
 ///   * GET    `/notifications.json`     — alerts feed
+///   * PUT    `/notifications/mark-read` — mark all (no body) or one
+///                                         (`id` in body) notification read
 ///   * GET    `/user_actions.json`      — activity feed
 ///
 /// Notes / gaps:
@@ -259,6 +261,52 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     }
   }
 
+  // Discourse notification-id sidecar. FCAlert (canonical SDK) has no
+  // field for the notification's own numeric id — `contentId` carries
+  // topic/post identifiers — but per-notification mark-read needs it.
+  // Keyed on the FCAlert instances built by [_toAlert]; promote to a
+  // proper FCAlert field via the canonical SDK when it next revs.
+  static final Expando<int> _notificationIds =
+      Expando('discourseNotificationId');
+
+  /// Discourse-only: the numeric `notifications.id` behind [alert]
+  /// (for [markNotificationReadAsync]). Null when [alert] didn't come
+  /// from [getAlertAsync] on this Discourse proxy.
+  static int? notificationIdOf(FCAlert alert) => _notificationIds[alert];
+
+  /// Marks a single notification read.
+  ///
+  /// Discourse-native (no IFC interface method): `PUT
+  /// /notifications/mark-read` with an `id` param marks just that
+  /// notification (notifications_controller.rb#mark_read —
+  /// `Notification.read(current_user, [params[:id].to_i])`); the same
+  /// route without `id` is the mark-ALL path used by
+  /// [markAllAlertsReadAsync].
+  Future<FCMarkAlertsReadResult> markNotificationReadAsync(
+      int notificationId) async {
+    if (!siteContext.isLoggedIn) {
+      return FCMarkAlertsReadResult(
+        result: false,
+        resultText: 'Not signed in',
+      );
+    }
+    try {
+      await apiPut('/notifications/mark-read',
+          body: {'id': notificationId});
+      return FCMarkAlertsReadResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCMarkAlertsReadResult(
+        result: false,
+        resultText: e.userMessage,
+      );
+    } catch (e) {
+      return FCMarkAlertsReadResult(
+        result: false,
+        resultText: 'Error: $e',
+      );
+    }
+  }
+
   // ===== Helpers =====
 
   Future<_LikeOutcome> _toggleLikeRaw(String postId,
@@ -361,7 +409,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
           filled.startsWith('http') ? filled : '${siteContext.site.url}$filled';
     }
 
-    return FCAlert(
+    final alert = FCAlert(
       userId: '',
       username: fromUser,
       iconUrl: actorIconUrl,
@@ -381,6 +429,11 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       // renders falsely bold.
       isRead: (n['read'] as bool?) ?? true,
     );
+    // Stash the notification's own id so the UI can mark it read
+    // individually (see [notificationIdOf]).
+    final notificationId = (n['id'] as num?)?.toInt();
+    if (notificationId != null) _notificationIds[alert] = notificationId;
+    return alert;
   }
 
   FCActivity _toActivity(Map<String, dynamic> a) {

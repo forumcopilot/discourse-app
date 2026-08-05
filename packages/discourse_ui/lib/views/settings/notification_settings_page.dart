@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:discourse_ui/config/app_forum_config.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
+import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_notification_prefs.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../../controllers/site_controller.dart';
 import '../widgets/empty_state_view.dart';
@@ -45,6 +47,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   bool _loading = true;
   bool _saving = false;
   String? _error;
+
+  SiteContext? get _siteContext => Get.isRegistered<DiscourseSiteController>()
+      ? Get.find<DiscourseSiteController>().currentSiteContext.value
+      : null;
 
   @override
   void initState() {
@@ -149,6 +155,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         _Section(label: 'Push'),
         const _PushStatusTile(),
         const Divider(height: 1),
+        // Do not disturb — Discourse-native (`/do-not-disturb.json`).
+        // Only meaningful for a signed-in user; the tile manages its
+        // own status fetch so the prefs load above stays untouched.
+        if (_siteContext?.isLoggedIn ?? false) ...[
+          _Section(label: 'Do not disturb'),
+          _DoNotDisturbTile(siteContext: _siteContext!),
+          const Divider(height: 1),
+        ],
         _Section(label: 'Email'),
         _EnumTile(
           title: 'Email when away',
@@ -325,6 +339,206 @@ class _PushStatusTile extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Do-not-disturb control, backed by Discourse's native
+/// `POST`/`DELETE /do-not-disturb.json` (via `DiscourseUserProxy`).
+///
+/// On mount it reads the current DND deadline (Discourse only exposes it
+/// on `/session/current.json`, so this is one extra request). While a
+/// window is active the tile reports "until <time>" with a Turn off
+/// action; when inactive, tapping it opens a duration picker bottom
+/// sheet matching the `_EnumTile` picker cadence.
+class _DoNotDisturbTile extends StatefulWidget {
+  final SiteContext siteContext;
+
+  const _DoNotDisturbTile({required this.siteContext});
+
+  @override
+  State<_DoNotDisturbTile> createState() => _DoNotDisturbTileState();
+}
+
+class _DoNotDisturbTileState extends State<_DoNotDisturbTile> {
+  bool _loading = true;
+  bool _busy = false;
+  DateTime? _endsAt;
+
+  static const _durations = [
+    _DndDuration(value: '30', label: '30 minutes'),
+    _DndDuration(value: '60', label: '1 hour'),
+    _DndDuration(value: '480', label: '8 hours'),
+    _DndDuration(value: '1440', label: '24 hours'),
+    _DndDuration(value: 'tomorrow', label: 'Until tomorrow'),
+  ];
+
+  bool get _isActive =>
+      _endsAt != null && _endsAt!.isAfter(DateTime.now().toUtc());
+
+  DiscourseUserProxy get _proxy => DiscourseUserProxy(widget.siteContext);
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStatus();
+  }
+
+  Future<void> _loadStatus() async {
+    final result = await _proxy.getDoNotDisturbStatusAsync();
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      if (result.result) {
+        _endsAt = result.endsAt;
+      }
+    });
+  }
+
+  Future<void> _enter(String duration) async {
+    setState(() => _busy = true);
+    final result = await _proxy.enterDoNotDisturbAsync(duration);
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      if (result.result) {
+        _endsAt = result.endsAt;
+      }
+    });
+    if (!result.result) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.resultText.isNotEmpty
+              ? result.resultText
+              : "Couldn't enable do not disturb"),
+        ),
+      );
+    }
+  }
+
+  Future<void> _leave() async {
+    setState(() => _busy = true);
+    final result = await _proxy.leaveDoNotDisturbAsync();
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      if (result.result) {
+        _endsAt = null;
+      }
+    });
+    if (!result.result) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.resultText.isNotEmpty
+              ? result.resultText
+              : "Couldn't turn off do not disturb"),
+        ),
+      );
+    }
+  }
+
+  Future<void> _showDurationPicker() async {
+    final duration = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  DesignTokens.spacingL,
+                  0,
+                  DesignTokens.spacingL,
+                  DesignTokens.spacingS,
+                ),
+                child: Text(
+                  'Pause notifications for…',
+                  style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
+                        fontWeight: DesignTokens.fontWeightSemiBold,
+                      ),
+                ),
+              ),
+              ..._durations.map(
+                (d) => ListTile(
+                  title: Text(d.label),
+                  onTap: () => Navigator.of(sheetContext).pop(d.value),
+                ),
+              ),
+              SizedBox(height: DesignTokens.spacingS),
+            ],
+          ),
+        );
+      },
+    );
+    if (duration != null) {
+      await _enter(duration);
+    }
+  }
+
+  String _untilLabel(BuildContext context, DateTime endsAt) {
+    final local = endsAt.toLocal();
+    final now = DateTime.now();
+    final locale = Localizations.localeOf(context).toString();
+    final sameDay = local.year == now.year &&
+        local.month == now.month &&
+        local.day == now.day;
+    return sameDay
+        ? DateFormat.jm(locale).format(local)
+        : DateFormat.yMMMd(locale).add_jm().format(local);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (_loading) {
+      return const ListTile(
+        leading: Icon(Icons.do_not_disturb_on_outlined),
+        title: Text('Do not disturb'),
+        subtitle: Text('Checking status…'),
+        enabled: false,
+      );
+    }
+
+    if (_isActive) {
+      return ListTile(
+        leading: Icon(
+          Icons.do_not_disturb_on,
+          color: colorScheme.primary,
+        ),
+        title: const Text('Do not disturb'),
+        subtitle: Text('On until ${_untilLabel(context, _endsAt!)}'),
+        trailing: TextButton(
+          onPressed: _busy ? null : _leave,
+          child: const Text('Turn off'),
+        ),
+      );
+    }
+
+    return ListTile(
+      onTap: _busy ? null : _showDurationPicker,
+      leading: Icon(
+        Icons.do_not_disturb_on_outlined,
+        color: colorScheme.onSurfaceVariant,
+      ),
+      title: const Text('Do not disturb'),
+      subtitle: const Text(
+        'Pause notifications for a while — Discourse holds them '
+        'until the window ends',
+      ),
+      trailing: Icon(
+        Icons.chevron_right_rounded,
+        color: colorScheme.onSurfaceVariant,
+      ),
+    );
+  }
+}
+
+class _DndDuration {
+  final String value;
+  final String label;
+  const _DndDuration({required this.value, required this.label});
 }
 
 class _Section extends StatelessWidget {

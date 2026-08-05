@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseTagProxy;
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 
 import '../core/logging/app_logger.dart';
 import '../theme/design_tokens.dart';
 import 'listitems/topic_list_item.dart';
 import 'post_page.dart';
+import 'widgets/notification_level_sheet.dart';
 
 /// Tag-filtered topic list. Reachable from a tappable tag chip in the
 /// Latest tab; hits Discourse's `/tag/{name}.json` endpoint.
@@ -34,11 +37,17 @@ class _TagTopicsPageState extends State<TagTopicsPage> {
   bool _hasMore = true;
   String? _error;
 
+  /// Current user's notification level for this tag (Discourse-native tag
+  /// watching/muting). Null until loaded; the bell only renders when
+  /// logged in against a Discourse tag proxy.
+  FCNotificationLevel? _notificationLevel;
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
     _load(reset: true);
+    _loadNotificationLevel();
   }
 
   @override
@@ -92,6 +101,53 @@ class _TagTopicsPageState extends State<TagTopicsPage> {
 
   Future<void> _refresh() => _load(reset: true);
 
+  Future<void> _loadNotificationLevel() async {
+    if (!widget.siteContext.isLoggedIn) return;
+    final tagProxy = SiteProxyService.getTagProxy();
+    if (tagProxy is! DiscourseTagProxy) return;
+    try {
+      final result = await tagProxy.getTagNotificationLevelAsync(widget.tag);
+      if (!mounted || !result.result) return;
+      setState(() => _notificationLevel = result.level);
+    } catch (e, st) {
+      AppLogger.error('TagTopicsPage notification level load failed',
+          error: e, stackTrace: st);
+    }
+  }
+
+  Future<void> _showNotificationLevelSheet() async {
+    await NotificationLevelSheet.showForTag(
+      context: context,
+      tagName: widget.tag,
+      currentLevel: _notificationLevel,
+      onChanged: (newLevel) {
+        if (!mounted) return;
+        setState(() => _notificationLevel = newLevel);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Notification level for "${widget.tag}" updated'),
+          ),
+        );
+      },
+    );
+  }
+
+  IconData _notificationLevelIcon(FCNotificationLevel level) {
+    switch (level) {
+      case FCNotificationLevel.watching:
+        return Icons.notifications_active;
+      case FCNotificationLevel.watchingFirstPost:
+        return Icons.fiber_new;
+      case FCNotificationLevel.tracking:
+        return Icons.visibility;
+      case FCNotificationLevel.muted:
+        return Icons.notifications_off;
+      case FCNotificationLevel.normal:
+        return Icons.notifications_none;
+    }
+  }
+
   void _openTopic(FCTopic topic) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -119,6 +175,18 @@ class _TagTopicsPageState extends State<TagTopicsPage> {
             Text(widget.tag),
           ],
         ),
+        actions: [
+          if (widget.siteContext.isLoggedIn &&
+              SiteProxyService.getTagProxy() is DiscourseTagProxy)
+            IconButton(
+              icon: Icon(
+                _notificationLevelIcon(
+                    _notificationLevel ?? FCNotificationLevel.normal),
+              ),
+              tooltip: 'Notification level',
+              onPressed: _showNotificationLevelSheet,
+            ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: _refresh,

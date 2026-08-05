@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseTagProxy;
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_tag.dart';
 
 import '../../theme/design_tokens.dart';
 import '../tag_topics_page.dart';
+import '../widgets/notification_level_sheet.dart';
 
 /// Global Tags tab — lists every tag the current user can see, sorted
 /// by topic count (most-used first). Tapping a tag drills into the
@@ -143,6 +145,27 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
     );
   }
 
+  /// Whether the per-row notification bell should render: needs a signed-in
+  /// user and the Discourse tag proxy (tag watching is Discourse-native).
+  bool get _canManageTagNotifications =>
+      widget.siteContext.isLoggedIn &&
+      SiteProxyService.getTagProxy() is DiscourseTagProxy;
+
+  Future<void> _showTagNotificationSheet(FCTag tag) async {
+    await NotificationLevelSheet.showForTag(
+      context: context,
+      tagName: tag.name,
+      onChanged: (_) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Notification level for "${tag.name}" updated'),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -267,7 +290,13 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
             delegate: SliverChildBuilderDelegate(
               (context, i) {
                 final t = filtered[i];
-                return _TagTile(tag: t, onTap: () => _openTag(t));
+                return _TagTile(
+                  tag: t,
+                  onTap: () => _openTag(t),
+                  onBellTap: _canManageTagNotifications
+                      ? () => _showTagNotificationSheet(t)
+                      : null,
+                );
               },
               childCount: filtered.length,
             ),
@@ -283,7 +312,11 @@ class _TagTile extends StatelessWidget {
   final FCTag tag;
   final VoidCallback onTap;
 
-  const _TagTile({required this.tag, required this.onTap});
+  /// When non-null, renders a small trailing bell that opens the tag
+  /// notification-level sheet (logged-in Discourse only).
+  final VoidCallback? onBellTap;
+
+  const _TagTile({required this.tag, required this.onTap, this.onBellTap});
 
   @override
   Widget build(BuildContext context) {
@@ -353,6 +386,16 @@ class _TagTile extends StatelessWidget {
                 ),
               ),
             ),
+            if (onBellTap != null) ...[
+              const SizedBox(width: 2),
+              IconButton(
+                icon: Icon(Icons.notifications_none,
+                    size: 18, color: colorScheme.onSurfaceVariant),
+                tooltip: 'Notification level',
+                visualDensity: VisualDensity.compact,
+                onPressed: onBellTap,
+              ),
+            ],
             const SizedBox(width: 6),
             Icon(Icons.chevron_right,
                 size: 18, color: colorScheme.onSurfaceVariant),

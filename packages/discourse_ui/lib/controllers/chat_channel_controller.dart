@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:discourse_core/discourse_core.dart' show DiscourseChatProxy;
 import 'package:flutter/widgets.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_chat_channel.dart';
@@ -133,33 +134,28 @@ class ChatChannelController extends GetxController
         return;
       }
       final proxy = SiteProxyService.getChatProxy();
-      if (_highWatermark == 0) {
-        // Empty channel: there's no watermark to poll from, so fetch the
-        // latest page — otherwise the first incoming message never shows.
-        final result = await proxy.getMessagesAsync(channelId, pageSize: 50);
-        if (!result.result || result.messages.isEmpty) return;
-        final existing = {for (final m in messages) m.id};
-        final fresh =
-            result.messages.where((m) => !existing.contains(m.id)).toList()
-              ..sort((a, b) => a.id.compareTo(b.id));
-        if (fresh.isEmpty) return;
-        messages.addAll(fresh);
-        _highWatermark = fresh.last.id;
-        return;
-      }
-      final result = await proxy.pollNewerAsync(
-        channelId,
-        lastMessageId: _highWatermark,
-      );
-      if (!result.result || result.messages.isEmpty) return;
+      // Re-fetch the latest page every tick instead of delta-polling
+      // with pollNewerAsync: parsing the page also refreshes the
+      // proxy's reaction side-table for the messages already on
+      // screen, so reaction chips stay in sync with other users. (It
+      // is the same messages endpoint either way — just without the
+      // target_message_id watermark.)
+      final result = await proxy.getMessagesAsync(channelId, pageSize: 50);
+      if (!result.result) return;
       // Drop anything we already have; keep new messages sorted by id.
       final existing = {for (final m in messages) m.id};
       final fresh =
           result.messages.where((m) => !existing.contains(m.id)).toList()
             ..sort((a, b) => a.id.compareTo(b.id));
-      if (fresh.isEmpty) return;
-      messages.addAll(fresh);
-      _highWatermark = fresh.last.id;
+      if (fresh.isNotEmpty) {
+        messages.addAll(fresh);
+        if (fresh.last.id > _highWatermark) _highWatermark = fresh.last.id;
+      } else {
+        // No new messages, but reactions on existing ones may have
+        // changed — nudge observers to re-read the side-table without
+        // mutating the list.
+        messages.refresh();
+      }
       // Don't mark-read on every poll — only when the user is actually
       // looking at the channel. The view marks read in its onResumed
       // hook.
@@ -260,6 +256,42 @@ class ChatChannelController extends GetxController
       return false;
     } finally {
       isSending.value = false;
+    }
+  }
+
+  /// Adds/removes an emoji reaction on [messageId]. [emoji] is the
+  /// Discourse emoji name without colons (e.g. `heart`, `+1`).
+  ///
+  /// Returns false (and sets [lastError]) on failure so the chip
+  /// widget can revert its optimistic state. Either way [messages] is
+  /// poked with `refresh()` so bubbles re-read the proxy's reaction
+  /// side-table (updated on success, unchanged on failure → revert).
+  Future<bool> toggleReaction(int messageId, String emoji,
+      {required bool add}) async {
+    final proxy = SiteProxyService.getChatProxy();
+    if (proxy is! DiscourseChatProxy) {
+      lastError.value = 'Reactions are not supported here.';
+      return false;
+    }
+    try {
+      final result = await proxy.toggleChatMessageReactionAsync(
+        channelId,
+        messageId,
+        emoji,
+        add: add,
+      );
+      if (!result.result) {
+        lastError.value = result.resultText?.isNotEmpty == true
+            ? result.resultText!
+            : 'Failed to update reaction.';
+        return false;
+      }
+      return true;
+    } catch (e) {
+      lastError.value = e.toString();
+      return false;
+    } finally {
+      messages.refresh();
     }
   }
 

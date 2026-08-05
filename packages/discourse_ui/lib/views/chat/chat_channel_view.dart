@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/chat_channel_controller.dart';
 import '../../theme/design_tokens.dart';
 import 'widgets/chat_composer.dart';
 import 'widgets/chat_message_bubble.dart';
+import 'widgets/chat_reaction_chips.dart';
 
 /// Embeds a single Discourse Chat channel — message list + composer —
 /// without its own Scaffold/AppBar so it can plug into a tab body or
@@ -33,6 +35,12 @@ class _ChatChannelViewState extends State<ChatChannelView> {
   late final ChatChannelController _controller;
   final _scroll = ScrollController();
 
+  /// Newest message id we already auto-scrolled for. The controller
+  /// fires the messages listener on every poll tick (it calls
+  /// `messages.refresh()` so reaction chips stay fresh), so only
+  /// scroll when a genuinely newer message arrived.
+  int _lastAutoScrolledId = 0;
+
   String get _tag => 'chatChannel-${widget.channelId}';
 
   @override
@@ -46,7 +54,11 @@ class _ChatChannelViewState extends State<ChatChannelView> {
       _controller.start();
     }
     // Auto-scroll to the bottom whenever new messages arrive.
-    ever<List>(_controller.messages, (_) {
+    ever<List>(_controller.messages, (list) {
+      final lastId =
+          list.isEmpty ? 0 : (list.last as FCChatMessage).id;
+      if (lastId <= _lastAutoScrolledId) return;
+      _lastAutoScrolledId = lastId;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scroll.hasClients) {
           _scroll.animateTo(
@@ -136,12 +148,20 @@ class _ChatChannelViewState extends State<ChatChannelView> {
                     currentUserId != null &&
                     m.authorId.toString() == currentUserId;
                 final canEditOrDelete = isSelf;
+                final loggedIn = widget.siteContext.isLoggedIn;
                 return ChatMessageBubble(
                   message: m,
                   siteContext: widget.siteContext,
                   isSelf: isSelf,
-                  onLongPress: canEditOrDelete
-                      ? () => _showMessageActions(m.id, m.message)
+                  // Long-press opens the reaction picker for everyone
+                  // logged in; edit/delete rows only for own messages.
+                  onLongPress: loggedIn
+                      ? () => _showMessageActions(m,
+                          canEditOrDelete: canEditOrDelete)
+                      : null,
+                  onToggleReaction: loggedIn
+                      ? (emoji, {required bool add}) =>
+                          _controller.toggleReaction(m.id, emoji, add: add)
                       : null,
                 );
               },
@@ -158,11 +178,15 @@ class _ChatChannelViewState extends State<ChatChannelView> {
         Obx(() {
           final ch = _controller.channel.value;
           final readonly = ch != null && !ch.isOpen;
+          final isDm = ch?.chatableType == 'DirectMessage';
           return ChatComposer(
             enabled: !readonly,
             hintText: readonly
                 ? 'Channel is read-only'
-                : 'Type a message in #${ch?.title ?? 'chat'}…',
+                // DM titles are the member usernames — no '#' prefix.
+                : isDm
+                    ? 'Message ${ch!.title.isNotEmpty ? ch.title : 'group'}…'
+                    : 'Type a message in #${ch?.title ?? 'chat'}…',
             onSend: _controller.send,
           );
         }),
@@ -170,30 +194,61 @@ class _ChatChannelViewState extends State<ChatChannelView> {
     );
   }
 
-  void _showMessageActions(int id, String text) {
+  void _showMessageActions(FCChatMessage m, {required bool canEditOrDelete}) {
     showModalBottomSheet(
       context: context,
       builder: (_) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Edit'),
-              onTap: () {
-                Navigator.pop(context);
-                _showEditDialog(id, text);
-              },
+            // Compact reaction picker — Discourse's default reaction set.
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: DesignTokens.spacingM,
+                vertical: DesignTokens.spacingS,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  for (final emoji in kChatDefaultReactions)
+                    InkWell(
+                      borderRadius:
+                          BorderRadius.circular(DesignTokens.radiusM),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _controller.toggleReaction(m.id, emoji, add: true);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(DesignTokens.spacingS),
+                        child: Text(
+                          chatEmojiLabel(emoji),
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.delete_outline),
-              title: const Text('Delete'),
-              onTap: () async {
-                Navigator.pop(context);
-                final ok = await _confirmDelete();
-                if (ok) await _controller.deleteMessage(id);
-              },
-            ),
+            if (canEditOrDelete) ...[
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.edit),
+                title: const Text('Edit'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showEditDialog(m.id, m.message);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete_outline),
+                title: const Text('Delete'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final ok = await _confirmDelete();
+                  if (ok) await _controller.deleteMessage(m.id);
+                },
+              ),
+            ],
           ],
         ),
       ),

@@ -25,6 +25,11 @@ class PostListItemSocial extends StatelessWidget {
   final bool isBookmarked;
   final VoidCallback? onBookmark;
 
+  /// Optional long-press on the bookmark button. Used on Discourse to
+  /// open the "Bookmark with reminder" sheet; plain tap still toggles
+  /// the bookmark.
+  final VoidCallback? onLongPressBookmark;
+
   /// Phase 5.31 — Discourse-solved plugin. When the viewer can
   /// accept this post as the topic's answer (`post.canAcceptAnswer`)
   /// a green check button appears in the action row. Tapping flips
@@ -45,6 +50,7 @@ class PostListItemSocial extends StatelessWidget {
     this.onShowLikes,
     this.isBookmarked = false,
     this.onBookmark,
+    this.onLongPressBookmark,
     this.onToggleAcceptAnswer,
     this.trailing,
   });
@@ -190,6 +196,9 @@ class PostListItemSocial extends StatelessWidget {
                 activeIcon: Icons.bookmark,
                 active: isBookmarked,
                 onTap: onBookmark,
+                // Long-press opens the bookmark-reminder sheet when
+                // wired (Discourse); plain tap still toggles.
+                onLongPress: onLongPressBookmark,
                 semanticLabel: isBookmarked
                     ? 'Remove bookmark'
                     : 'Bookmark post',

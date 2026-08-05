@@ -11,6 +11,7 @@ import '../util/html_text.dart';
 ///
 /// Endpoints used:
 ///   * POST   `/bookmarks.json`              — create on a post (or topic)
+///   * PUT    `/bookmarks/{id}.json`         — edit name/reminder by id
 ///   * DELETE `/bookmarks/{id}.json`         — remove by bookmark id
 ///   * GET    `/u/{username}/bookmarks.json` — list current user's bookmarks
 ///
@@ -174,6 +175,153 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
     }
   }
 
+  // ===== Discourse-native bookmark reminders =====
+  //
+  // `bookmarks#create` / `bookmarks#update` permit `name`, `reminder_at`
+  // and `auto_delete_preference` alongside the bookmarkable columns, and
+  // the user bookmark list serializes `reminder_at` per row — none of
+  // which the XF-era interface methods above can express.
+
+  /// Discourse-only: create a bookmark on a post, optionally with a
+  /// reminder (`POST /bookmarks.json`).
+  ///
+  /// [reminderAt] is sent as UTC ISO-8601 and must be in the future
+  /// (server-validated). [autoDeletePreference] takes the
+  /// [DiscourseBookmarkAutoDelete] values; when omitted the server falls
+  /// back to the user's `bookmark_auto_delete_preference` setting, then
+  /// to clear-reminder. [name] is the user's private note (Discourse
+  /// caps it at 100 chars).
+  ///
+  /// On success [FCAddBookmarkResult.bookmarkId] carries the new
+  /// bookmark id (needed for [updateBookmarkAsync] /
+  /// [removeBookmarkByIdAsync]).
+  Future<FCAddBookmarkResult> createBookmarkAsync({
+    required int postId,
+    DateTime? reminderAt,
+    int? autoDeletePreference,
+    String? name,
+  }) async {
+    if (!siteContext.isLoggedIn) {
+      return FCAddBookmarkResult(result: false, resultText: 'Not signed in');
+    }
+    try {
+      final response = await apiPost('/bookmarks.json', body: {
+        'bookmarkable_type': 'Post',
+        'bookmarkable_id': postId,
+        if (name != null && name.isNotEmpty) 'name': name,
+        if (reminderAt != null)
+          'reminder_at': reminderAt.toUtc().toIso8601String(),
+        if (autoDeletePreference != null)
+          'auto_delete_preference': autoDeletePreference,
+      });
+      return FCAddBookmarkResult(
+        result: true,
+        isBookmarked: true,
+        bookmarkId: (response['id'] as num?)?.toInt(),
+      );
+    } on DiscourseApiException catch (e) {
+      return FCAddBookmarkResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCAddBookmarkResult(result: false, resultText: 'Error: $e');
+    }
+  }
+
+  /// Discourse-only: edit a bookmark's note/reminder
+  /// (`PUT /bookmarks/{id}.json`).
+  ///
+  /// The endpoint overwrites, it does not patch: the server reassigns
+  /// `name` and `reminder_at` from the request on every call, so an
+  /// omitted (null) [reminderAt] **clears** any existing reminder and an
+  /// omitted [name] clears the note — resend the values you want kept.
+  /// An omitted [autoDeletePreference] likewise resets to the user's
+  /// default preference (falling back to clear-reminder).
+  Future<DiscourseBookmarkUpdateResult> updateBookmarkAsync(
+    int bookmarkId, {
+    DateTime? reminderAt,
+    String? name,
+    int? autoDeletePreference,
+  }) async {
+    if (!siteContext.isLoggedIn) {
+      return const DiscourseBookmarkUpdateResult(
+        result: false,
+        resultText: 'Not signed in',
+      );
+    }
+    try {
+      await apiPut('/bookmarks/$bookmarkId.json', body: {
+        if (name != null && name.isNotEmpty) 'name': name,
+        if (reminderAt != null)
+          'reminder_at': reminderAt.toUtc().toIso8601String(),
+        if (autoDeletePreference != null)
+          'auto_delete_preference': autoDeletePreference,
+      });
+      return const DiscourseBookmarkUpdateResult(result: true);
+    } on DiscourseApiException catch (e) {
+      return DiscourseBookmarkUpdateResult(
+        result: false,
+        resultText: e.userMessage,
+      );
+    } catch (e) {
+      return DiscourseBookmarkUpdateResult(
+        result: false,
+        resultText: 'Error: $e',
+      );
+    }
+  }
+
+  /// Discourse-only: list the current user's bookmarks with the
+  /// reminder metadata [FCBookmark] cannot carry.
+  ///
+  /// Same `GET /u/{username}/bookmarks.json` page as
+  /// [getBookmarksAsync]; each entry wraps the mapped [FCBookmark]
+  /// (which already surfaces `id` and the `name` note) and adds the
+  /// row's `reminder_at` / `pinned`. [DiscourseBookmarkListResult
+  /// .hasMore] reflects the server's `more_bookmarks_url`.
+  Future<DiscourseBookmarkListResult> getBookmarksWithRemindersAsync({
+    int page = 0,
+  }) async {
+    final username = siteContext.currentUsername;
+    if (!siteContext.isLoggedIn || username == null || username.isEmpty) {
+      return const DiscourseBookmarkListResult(
+        result: false,
+        resultText: 'Not signed in',
+      );
+    }
+    try {
+      final response = await apiGet(
+        '/u/${Uri.encodeComponent(username)}/bookmarks.json',
+        query: {if (page > 0) 'page': page.toString()},
+      );
+      final ub = (response['user_bookmark_list'] as Map<String, dynamic>?) ??
+          const <String, dynamic>{};
+      final raw = (ub['bookmarks'] as List?) ?? const [];
+      final entries = raw.whereType<Map>().map((b) {
+        final json = b.cast<String, dynamic>();
+        return DiscourseBookmarkEntry(
+          bookmark: _bookmarkFromDiscourseJson(json),
+          reminderAt:
+              DateTime.tryParse(json['reminder_at']?.toString() ?? ''),
+          pinned: json['pinned'] == true,
+        );
+      }).toList();
+      return DiscourseBookmarkListResult(
+        result: true,
+        entries: entries,
+        hasMore: ub['more_bookmarks_url'] != null,
+      );
+    } on DiscourseApiException catch (e) {
+      return DiscourseBookmarkListResult(
+        result: false,
+        resultText: e.userMessage,
+      );
+    } catch (e) {
+      return DiscourseBookmarkListResult(
+        result: false,
+        resultText: 'Error: $e',
+      );
+    }
+  }
+
   FCBookmark _bookmarkFromDiscourseJson(Map<String, dynamic> json) {
     final avatarTemplate = json['avatar_template']?.toString();
     return FCBookmark(
@@ -206,4 +354,65 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
     if (filled.startsWith('http')) return filled;
     return '${siteContext.site.url}$filled';
   }
+}
+
+/// Discourse's `Bookmark.auto_delete_preferences` enum — what happens
+/// to a bookmark after its reminder fires or the owner replies.
+abstract final class DiscourseBookmarkAutoDelete {
+  /// Keep the bookmark (and its reminder timestamp) forever.
+  static const int never = 0;
+
+  /// Delete the bookmark as soon as the reminder notification is sent.
+  static const int whenReminderSent = 1;
+
+  /// Delete the bookmark when its owner replies to the topic.
+  static const int onOwnerReply = 2;
+
+  /// Keep the bookmark but clear `reminder_at` once the reminder fires.
+  static const int clearReminder = 3;
+}
+
+/// Result of [DiscourseBookmarkProxy.updateBookmarkAsync]. The server
+/// returns no payload on success, so this is just success/error.
+class DiscourseBookmarkUpdateResult {
+  final bool result;
+  final String? resultText;
+
+  const DiscourseBookmarkUpdateResult({required this.result, this.resultText});
+}
+
+/// One row of [DiscourseBookmarkProxy.getBookmarksWithRemindersAsync]:
+/// the SDK-level [FCBookmark] plus the reminder fields it can't carry.
+class DiscourseBookmarkEntry {
+  final FCBookmark bookmark;
+
+  /// When the reminder notification will fire; null when no reminder is
+  /// set (or it already fired under the clear-reminder preference).
+  final DateTime? reminderAt;
+
+  /// Pinned to the top of the user's bookmark list.
+  final bool pinned;
+
+  const DiscourseBookmarkEntry({
+    required this.bookmark,
+    this.reminderAt,
+    this.pinned = false,
+  });
+}
+
+/// Result of [DiscourseBookmarkProxy.getBookmarksWithRemindersAsync].
+class DiscourseBookmarkListResult {
+  final bool result;
+  final String? resultText;
+  final List<DiscourseBookmarkEntry> entries;
+
+  /// True when the server reported another page (`more_bookmarks_url`).
+  final bool hasMore;
+
+  const DiscourseBookmarkListResult({
+    required this.result,
+    this.resultText,
+    this.entries = const [],
+    this.hasMore = false,
+  });
 }

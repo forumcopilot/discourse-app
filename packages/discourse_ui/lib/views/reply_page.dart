@@ -4,6 +4,7 @@ import '../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart' as forumcopilot_sdk;
+import 'package:discourse_core/discourse_core.dart' show DiscoursePostProxy;
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
 import 'package:discourse_ui/utils/attachment_constraints_utils.dart';
 import 'package:discourse_ui/utils/attachment_validation_utils.dart';
@@ -49,6 +50,24 @@ class _ReplyPageState extends State<ReplyPage> {
   String? _groupId;
   String? _createdPostId; // Store the created post ID
   Future<forumcopilot_sdk.FCQuotePostResult>? _quoteFuture;
+
+  /// Discourse staff whisper mode — when on, the reply is submitted via
+  /// `replyWhisperAsync` (visible to staff + whisper-allowed groups only).
+  bool _isWhisper = false;
+
+  /// Whether the signed-in user is Discourse staff (admin or moderator).
+  /// `DiscourseLoginService` maps `current_user.admin`/`moderator` onto
+  /// `FCUser.userType` / `canModerate` at login. The whisper toggle is
+  /// only shown to staff; the server still enforces
+  /// `guardian.can_create_whisper?` and rejects anyone else with a clean
+  /// message.
+  bool get _isStaff {
+    final user = widget.siteContext.loginDataOutput?.user;
+    if (user == null) return false;
+    return user.canModerate ||
+        user.userType == 'admin' ||
+        user.userType == 'moderator';
+  }
 
   // Server-side draft persistence. Discourse keys reply drafts as
   // `topic_<topicId>` — same key the web composer uses, so drafts written
@@ -120,23 +139,36 @@ class _ReplyPageState extends State<ReplyPage> {
       var postProxy = SiteProxyFactory.getPostProxy();
       final forumIdParam = widget.forumId ?? "";
       final threadIdParam = widget.threadId;
-      AppLogger.debug('🟢 [REPLY_PAGE] Calling replyPostAsync with:');
+      AppLogger.debug('🟢 [REPLY_PAGE] Calling ${_isWhisper ? 'replyWhisperAsync' : 'replyPostAsync'} with:');
       AppLogger.debug('   - forumId: "$forumIdParam" (empty: ${forumIdParam.isEmpty})');
       AppLogger.debug('   - threadId: "$threadIdParam" (empty: ${threadIdParam.isEmpty})');
       AppLogger.debug('   - subject: ""');
       AppLogger.debug('   - content length: ${content.length}');
       AppLogger.debug('   - attachmentIds: $_attachmentIds');
       AppLogger.debug('   - groupId: $_groupId');
-      
-      var result = await postProxy.replyPostAsync(
-        forumIdParam,
-        threadIdParam,
-        "", // Subject is optional for replies
-        content,
-        _attachmentIds.isNotEmpty ? _attachmentIds : null,
-        _groupId,
-        false, // Don't need HTML return
-      );
+
+      forumcopilot_sdk.FCReplyPostResult result;
+      if (_isWhisper && postProxy is DiscoursePostProxy) {
+        // Discourse staff whisper: same create path, `whisper: "true"`.
+        // Non-staff get the server's `invalid_whisper_access` message
+        // surfaced as result:false below.
+        result = await postProxy.replyWhisperAsync(
+          threadIdParam,
+          content,
+          attachmentIds: _attachmentIds.isNotEmpty ? _attachmentIds : null,
+          returnHtml: false,
+        );
+      } else {
+        result = await postProxy.replyPostAsync(
+          forumIdParam,
+          threadIdParam,
+          "", // Subject is optional for replies
+          content,
+          _attachmentIds.isNotEmpty ? _attachmentIds : null,
+          _groupId,
+          false, // Don't need HTML return
+        );
+      }
       
       AppLogger.debug('🟢 [REPLY_PAGE] replyPostAsync returned:');
       AppLogger.debug('   - result.result: ${result.result}');
@@ -374,6 +406,8 @@ class _ReplyPageState extends State<ReplyPage> {
             onSubmit: _handleSubmitWithDraftDiscard,
             onFileUpload: (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false) ? _handleFileUpload : null,
             topicTitle: widget.topicTitle,
+            showWhisperToggle: _isStaff,
+            onWhisperChanged: (value) => setState(() => _isWhisper = value),
             onRemoveAttachment: (attachmentId) async {
               // Remove the attachment ID from the list and call API to delete from server
               // Call API to remove attachment from server
@@ -435,6 +469,8 @@ class _ReplyPageState extends State<ReplyPage> {
         onSubmit: _handleSubmitWithDraftDiscard,
         onFileUpload: (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false) ? _handleFileUpload : null,
         topicTitle: widget.topicTitle,
+        showWhisperToggle: _isStaff,
+        onWhisperChanged: (value) => setState(() => _isWhisper = value),
         onRemoveAttachment: (attachmentId) async {
           // Remove the attachment ID from the list and call API to delete from server
           // Call API to remove attachment from server

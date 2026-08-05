@@ -1,5 +1,6 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_tag_proxy.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_tag.dart';
 import 'package:forumcopilot_sdk/models/results/fc_tag_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_topic_result.dart';
@@ -14,6 +15,8 @@ import 'topic_proxy.dart';
 ///   * GET `/tags.json`                                  — full tag listing
 ///   * GET `/tags/filter/search.json?q=&limit=`          — autocomplete
 ///   * GET `/tag/{name}.json[?page=P]`                   — topics by tag
+///   * GET `/tag/{name}/notifications.json`              — my watch level
+///   * PUT `/tag/{name}/notifications.json`              — set watch level
 ///
 /// The topics-by-tag query reuses [DiscourseTopicProxy.listTopicsByPathAsync]
 /// so the user-resolution + category-name lookup logic stays in one place.
@@ -131,6 +134,101 @@ class DiscourseTagProxy extends BaseDiscourseProxy implements IFCTagProxy {
     );
   }
 
+  // ===== Discourse-native tag watching/muting =====
+  //
+  // Tags carry the same 0..4 `notification_level` scale as topics and
+  // categories (muted 0, regular 1, tracking 2, watching 3,
+  // watching_first_post 4) — already modelled by [FCNotificationLevel].
+  // Both routes require login on the server.
+
+  /// Discourse-only: the current user's notification level for
+  /// [tagName] (`GET /tag/{name}/notifications.json`).
+  ///
+  /// Users without an explicit per-tag setting read as
+  /// [FCNotificationLevel.normal] — the server's default.
+  Future<DiscourseTagNotificationResult> getTagNotificationLevelAsync(
+    String tagName,
+  ) async {
+    if (tagName.isEmpty) {
+      return const DiscourseTagNotificationResult(
+        result: false,
+        resultText: 'tag required',
+      );
+    }
+    if (!siteContext.isLoggedIn) {
+      return const DiscourseTagNotificationResult(
+        result: false,
+        resultText: 'Not signed in',
+      );
+    }
+    try {
+      final response = await apiGet(
+        '/tag/${Uri.encodeComponent(tagName)}/notifications.json',
+      );
+      final tn = (response['tag_notification'] as Map<String, dynamic>?) ??
+          const <String, dynamic>{};
+      return DiscourseTagNotificationResult(
+        result: true,
+        level: FCNotificationLevel.fromInt(
+          (tn['notification_level'] as num?)?.toInt(),
+        ),
+      );
+    } on DiscourseApiException catch (e) {
+      return DiscourseTagNotificationResult(
+        result: false,
+        resultText: e.userMessage,
+      );
+    } catch (e) {
+      return DiscourseTagNotificationResult(
+        result: false,
+        resultText: 'Error: $e',
+      );
+    }
+  }
+
+  /// Discourse-only: watch/track/mute [tagName] for the current user
+  /// (`PUT /tag/{name}/notifications.json`).
+  ///
+  /// The server reads the nested `tag_notification[notification_level]`
+  /// param. Its response (the user's full tag-notification buckets) is
+  /// ignored; on success the requested [level] is echoed back.
+  Future<DiscourseTagNotificationResult> setTagNotificationLevelAsync(
+    String tagName,
+    FCNotificationLevel level,
+  ) async {
+    if (tagName.isEmpty) {
+      return const DiscourseTagNotificationResult(
+        result: false,
+        resultText: 'tag required',
+      );
+    }
+    if (!siteContext.isLoggedIn) {
+      return const DiscourseTagNotificationResult(
+        result: false,
+        resultText: 'Not signed in',
+      );
+    }
+    try {
+      await apiPut(
+        '/tag/${Uri.encodeComponent(tagName)}/notifications.json',
+        body: {
+          'tag_notification': {'notification_level': level.level},
+        },
+      );
+      return DiscourseTagNotificationResult(result: true, level: level);
+    } on DiscourseApiException catch (e) {
+      return DiscourseTagNotificationResult(
+        result: false,
+        resultText: e.userMessage,
+      );
+    } catch (e) {
+      return DiscourseTagNotificationResult(
+        result: false,
+        resultText: 'Error: $e',
+      );
+    }
+  }
+
   FCTag _tagFromDiscourseJson(Map<String, dynamic> json) {
     final rawId = json['id'];
     return FCTag(
@@ -142,4 +240,23 @@ class DiscourseTagProxy extends BaseDiscourseProxy implements IFCTagProxy {
       pmOnly: json['pm_only'] == true,
     );
   }
+}
+
+/// Result of [DiscourseTagProxy.getTagNotificationLevelAsync] /
+/// [DiscourseTagProxy.setTagNotificationLevelAsync].
+///
+/// [level] uses [FCNotificationLevel], whose integers map 1:1 to
+/// Discourse's `TagUser.notification_levels`: muted 0, regular 1,
+/// tracking 2, watching 3, watching-first-post 4. Only meaningful when
+/// [result] is true (defaults to [FCNotificationLevel.normal]).
+class DiscourseTagNotificationResult {
+  final bool result;
+  final String? resultText;
+  final FCNotificationLevel level;
+
+  const DiscourseTagNotificationResult({
+    required this.result,
+    this.resultText,
+    this.level = FCNotificationLevel.normal,
+  });
 }

@@ -16,8 +16,11 @@ export 'src/proxy/topic_proxy.dart';
 export 'src/proxy/post_proxy.dart';
 
 // Discourse-only proxies
+export 'src/proxy/bookmark_proxy.dart';
 export 'src/proxy/chat_proxy.dart';
 export 'src/proxy/group_proxy.dart';
+export 'src/proxy/invite_proxy.dart';
+export 'src/proxy/tag_proxy.dart';
 
 // Stub proxies
 export 'src/proxy/attachment_proxy.dart';
@@ -44,7 +47,12 @@ export 'src/base_discourse_proxy.dart';
 export 'src/data/auth/oauth_token.dart';
 export 'src/data/auth/auth_request.dart';
 export 'src/data/auth/auth_response.dart';
+export 'src/data/post/discourse_post_revision.dart';
 export 'src/data/post/discourse_suggested_topic.dart';
+export 'src/data/chat/discourse_chat_message_reaction.dart';
+export 'src/data/moderation/discourse_reviewable.dart';
+export 'src/data/user/discourse_do_not_disturb.dart';
+export 'src/data/user/discourse_user_summary.dart';
 
 // Converter layer removed: the XF-shaped Discourse→FC converters had no
 // callers — proxies parse Discourse JSON into FC models directly.
