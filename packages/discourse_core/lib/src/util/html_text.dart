@@ -22,16 +22,33 @@ String stripHtmlToText(String html) {
       // Drop every remaining tag.
       .replaceAll(RegExp(r'<[^>]+>'), '');
   // Decode the entities Discourse actually emits in these fragments.
+  // `&amp;` must be decoded LAST: decoding it first turns double-encoded
+  // input like '&amp;lt;' into '&lt;' which the later passes would then
+  // wrongly decode again into '<'.
   text = text
       .replaceAll('&nbsp;', ' ')
-      .replaceAll('&amp;', '&')
       .replaceAll('&lt;', '<')
       .replaceAll('&gt;', '>')
       .replaceAll('&quot;', '"')
-      .replaceAll('&#39;', "'")
       .replaceAll('&hellip;', '…')
       .replaceAll('&ndash;', '–')
       .replaceAll('&mdash;', '—');
+  // Numeric character references: &#NNNN; and &#xHH;.
+  text = text.replaceAllMapped(RegExp(r'&#(?:[xX]([0-9a-fA-F]+)|([0-9]+));'),
+      (m) {
+    final code = m[1] != null
+        ? int.tryParse(m[1]!, radix: 16)
+        : int.tryParse(m[2]!);
+    // Reject out-of-range values and lone surrogates.
+    if (code == null ||
+        code <= 0 ||
+        code > 0x10FFFF ||
+        (code >= 0xD800 && code <= 0xDFFF)) {
+      return m[0]!;
+    }
+    return String.fromCharCode(code);
+  });
+  text = text.replaceAll('&amp;', '&');
   // Collapse the whitespace the markup left behind: 3+ newlines → 2,
   // runs of spaces/tabs → one space, then trim.
   text = text

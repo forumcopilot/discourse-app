@@ -63,21 +63,33 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
       );
     }
     try {
-      final response = await apiGet(
-          '/u/${Uri.encodeComponent(username)}/bookmarks.json');
-      final ub = (response['user_bookmark_list'] as Map<String, dynamic>?) ??
-          const <String, dynamic>{};
-      final bookmarks = (ub['bookmarks'] as List?) ?? const [];
+      // users#bookmarks paginates via `page` (its `q` search param matches
+      // titles/notes, not post ids, so it can't shortcut this lookup).
+      // Scan pages until the post's bookmark shows up; capped so a huge
+      // bookmark list can't loop forever.
+      const maxPages = 25;
       int? bookmarkId;
-      for (final raw in bookmarks.whereType<Map>()) {
-        final b = raw.cast<String, dynamic>();
-        // Discourse exposes either post_id or bookmarkable_id depending on
-        // version. Match against either.
-        final matchPostId = b['post_id'] == pid ||
-            (b['bookmarkable_type'] == 'Post' && b['bookmarkable_id'] == pid);
-        if (matchPostId) {
-          bookmarkId = (b['id'] as num?)?.toInt();
-          break;
+      for (var page = 0; page < maxPages && bookmarkId == null; page++) {
+        final response = await apiGet(
+          '/u/${Uri.encodeComponent(username)}/bookmarks.json',
+          query: {if (page > 0) 'page': page.toString()},
+        );
+        final ub = (response['user_bookmark_list'] as Map<String, dynamic>?) ??
+            const <String, dynamic>{};
+        // Past the last page the server renders a bare `{bookmarks: []}`
+        // with no user_bookmark_list wrapper — both shapes end the scan.
+        final bookmarks = (ub['bookmarks'] as List?) ?? const [];
+        if (bookmarks.isEmpty) break;
+        for (final raw in bookmarks.whereType<Map>()) {
+          final b = raw.cast<String, dynamic>();
+          // Discourse exposes either post_id or bookmarkable_id depending on
+          // version. Match against either.
+          final matchPostId = b['post_id'] == pid ||
+              (b['bookmarkable_type'] == 'Post' && b['bookmarkable_id'] == pid);
+          if (matchPostId) {
+            bookmarkId = (b['id'] as num?)?.toInt();
+            break;
+          }
         }
       }
       if (bookmarkId == null) {
@@ -129,9 +141,10 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
       );
     }
     try {
-      final qs = page > 0 ? '?page=$page' : '';
       final response = await apiGet(
-          '/u/${Uri.encodeComponent(username)}/bookmarks.json$qs');
+        '/u/${Uri.encodeComponent(username)}/bookmarks.json',
+        query: {if (page > 0) 'page': page.toString()},
+      );
       final ub = (response['user_bookmark_list'] as Map<String, dynamic>?) ??
           const <String, dynamic>{};
       final raw = (ub['bookmarks'] as List?) ?? const [];

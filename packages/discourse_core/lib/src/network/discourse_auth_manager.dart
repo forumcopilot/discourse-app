@@ -4,6 +4,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:asn1lib/asn1lib.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:pointycastle/export.dart' as pc;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,7 +30,8 @@ import 'discourse_client.dart';
 ///      `User-Api-Client-Id` headers (see [DiscourseClient]).
 ///
 /// Notes:
-///   * We always request `padding=oaep` (default in Discourse for Auth-Api-Version 4).
+///   * We request `padding=oaep`, but decrypt with an OAEP→PKCS1 v1.5 fallback
+///     because the server may encrypt PKCS1 v1.5 anyway (see [_padding]).
 ///   * The user must already meet `SiteSetting.user_api_key_allowed_groups` —
 ///     by default that's staff or trust_level_4, which means a stock forum
 ///     blocks regular users from getting a key. Forum admins relax that
@@ -42,9 +44,16 @@ class DiscourseAuthManager {
   static const String _prefHandshakePrivateKey = '_handshake_private_key';
   static const String _prefHandshakeNonce = '_handshake_nonce';
   static const String _prefHandshakeClientId = '_handshake_client_id';
+  static const String _prefInstallClientId = '_install_client_id';
 
-  /// `padding=oaep` matches OpenSSL's RSA-OAEP-MGF1-SHA1 default; pointycastle's
-  /// [pc.OAEPEncoding] without an explicit hash uses SHA-1, so the two agree.
+  /// Requesting `padding=oaep` opts in to RSA-OAEP (OpenSSL's
+  /// RSA-OAEP-MGF1-SHA1; pointycastle's [pc.OAEPEncoding] without an explicit
+  /// hash uses SHA-1, so the two agree). Note that PKCS1 v1.5 — not OAEP — is
+  /// the server-side default even at Auth-Api-Version 4: the `padding` param
+  /// only exists on servers with discourse/discourse#36592 (Dec 2025), older
+  /// servers silently ignore it, and even patched servers can drop it through
+  /// the login-redirect flow (discourse/discourse#36640). Decryption therefore
+  /// tries OAEP first and falls back to PKCS1 v1.5.
   static const String _padding = 'oaep';
 
   final SiteContext siteContext;
@@ -67,8 +76,12 @@ class DiscourseAuthManager {
       throw ArgumentError('At least one scope is required.');
     }
 
+    // A new handshake supersedes any in-flight one — wipe its state (in
+    // particular the stale private key) before generating fresh material.
+    await _clearHandshakeState();
+
     final keypair = _generateRsaKeypair();
-    final clientId = _randomHex(16);
+    final clientId = await _getOrCreateClientId();
     final nonce = _randomHex(16);
 
     await _persistHandshakeState(
@@ -120,7 +133,7 @@ class DiscourseAuthManager {
     }
 
     final ciphertext = base64.decode(_normalizeBase64(payloadBase64));
-    final plaintext = _decryptOaep(ciphertext, state.privateKey);
+    final plaintext = _decryptPayload(ciphertext, state.privateKey);
     final json = jsonDecode(utf8.decode(plaintext)) as Map<String, dynamic>;
 
     final returnedNonce = json['nonce'] as String?;
@@ -156,18 +169,40 @@ class DiscourseAuthManager {
   Future<void> clearKey() => siteContext.clearUserApiCredentials();
 
   /// Best-effort: ask Discourse to revoke the key, then drop it locally.
-  /// Failure to reach the server is logged but does not block local cleanup.
+  /// A failed server revoke is logged but does not block local cleanup.
   Future<void> revokeKey() async {
-    try {
-      await _client.post(siteContext, '/user-api-key/revoke');
-    } catch (e) {
+    final result = await _client.post(siteContext, '/user-api-key/revoke');
+    final status = result.statusCode;
+    if (status < 200 || status >= 300) {
       // ignore: avoid_print
-      print('⚠️ [DISCOURSE_AUTH] revokeKey: server call failed: $e');
+      print('⚠️ [DISCOURSE_AUTH] revokeKey: server revoke failed '
+          '(HTTP $status). Dropping the key locally anyway — it remains '
+          'valid server-side until revoked from the user\'s profile.');
     }
     await clearKey();
   }
 
   // ===== Persistence helpers =====
+
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+
+  /// Per-install `client_id`, stable across handshakes. Discourse revokes a
+  /// user's previous keys only for the SAME `client_id`, and keys push
+  /// registrations attached to it — a fresh random id per handshake would
+  /// strand old keys server-side and stale the push registration.
+  Future<String> _getOrCreateClientId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final p = _prefsPrefix();
+    var clientId = prefs.getString('$p$_prefInstallClientId');
+    // Adopt the id of an already-provisioned key (pre-dating this pref) so a
+    // re-handshake on an existing install replaces the old key server-side.
+    clientId ??= siteContext.userApiClientId;
+    if (clientId == null || clientId.isEmpty) {
+      clientId = _randomHex(16);
+    }
+    await prefs.setString('$p$_prefInstallClientId', clientId);
+    return clientId;
+  }
 
   Future<void> _persistHandshakeState({
     required pc.RSAPrivateKey privateKey,
@@ -176,7 +211,12 @@ class DiscourseAuthManager {
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final p = _prefsPrefix();
-    await prefs.setString('$p$_prefHandshakePrivateKey', _privateKeyToJson(privateKey));
+    // The private key goes to secure storage (Keychain/Keystore), never to
+    // plaintext SharedPreferences.
+    await _secureStorage.write(
+      key: '$p$_prefHandshakePrivateKey',
+      value: _privateKeyToJson(privateKey),
+    );
     await prefs.setString('$p$_prefHandshakeNonce', nonce);
     await prefs.setString('$p$_prefHandshakeClientId', clientId);
   }
@@ -184,7 +224,16 @@ class DiscourseAuthManager {
   Future<_HandshakeState?> _loadHandshakeState() async {
     final prefs = await SharedPreferences.getInstance();
     final p = _prefsPrefix();
-    final pk = prefs.getString('$p$_prefHandshakePrivateKey');
+    var pk = await _secureStorage.read(key: '$p$_prefHandshakePrivateKey');
+    if (pk == null) {
+      // Migrate-on-read: older builds kept the private key in plaintext
+      // SharedPreferences. Move it to secure storage and delete the copy.
+      pk = prefs.getString('$p$_prefHandshakePrivateKey');
+      if (pk != null) {
+        await _secureStorage.write(key: '$p$_prefHandshakePrivateKey', value: pk);
+        await prefs.remove('$p$_prefHandshakePrivateKey');
+      }
+    }
     final nonce = prefs.getString('$p$_prefHandshakeNonce');
     final cid = prefs.getString('$p$_prefHandshakeClientId');
     if (pk == null || nonce == null || cid == null) return null;
@@ -198,6 +247,7 @@ class DiscourseAuthManager {
   Future<void> _clearHandshakeState() async {
     final prefs = await SharedPreferences.getInstance();
     final p = _prefsPrefix();
+    await _secureStorage.delete(key: '$p$_prefHandshakePrivateKey');
     await prefs.remove('$p$_prefHandshakePrivateKey');
     await prefs.remove('$p$_prefHandshakeNonce');
     await prefs.remove('$p$_prefHandshakeClientId');
@@ -226,10 +276,21 @@ class DiscourseAuthManager {
     );
   }
 
-  Uint8List _decryptOaep(Uint8List ciphertext, pc.RSAPrivateKey privateKey) {
-    final cipher = pc.OAEPEncoding(pc.RSAEngine())
+  Uint8List _decryptPayload(Uint8List ciphertext, pc.RSAPrivateKey privateKey) {
+    // We request `padding=oaep`, but the server may still encrypt PKCS1 v1.5:
+    // servers older than Dec 2025 ignore the unknown `padding` param, and even
+    // patched servers drop it through the login-redirect flow
+    // (discourse/discourse#36640). Try OAEP first, then fall back.
+    try {
+      final oaep = pc.OAEPEncoding(pc.RSAEngine())
+        ..init(false, pc.PrivateKeyParameter<pc.RSAPrivateKey>(privateKey));
+      return oaep.process(ciphertext);
+    } catch (_) {
+      // Not OAEP — fall through to PKCS1 v1.5, the server-side default.
+    }
+    final pkcs1 = pc.PKCS1Encoding(pc.RSAEngine())
       ..init(false, pc.PrivateKeyParameter<pc.RSAPrivateKey>(privateKey));
-    return cipher.process(ciphertext);
+    return pkcs1.process(ciphertext);
   }
 
   String _publicKeyToPem(pc.RSAPublicKey publicKey) {
@@ -292,8 +353,9 @@ class DiscourseAuthManager {
   String _normalizeBase64(String s) {
     // Discourse percent-encodes the payload in the redirect URL, but the
     // caller has already URL-decoded by the time this runs. Some webviews
-    // produce URL-safe base64 (- and _) — accept both.
-    var out = s.replaceAll('-', '+').replaceAll('_', '/').replaceAll('\n', '').replaceAll('\r', '').replaceAll(' ', '');
+    // produce URL-safe base64 (- and _) — accept both. A space can only be a
+    // form-decoded '+' (standard base64 never contains spaces), so restore it.
+    var out = s.replaceAll('-', '+').replaceAll('_', '/').replaceAll('\n', '').replaceAll('\r', '').replaceAll(' ', '+');
     final padding = (4 - out.length % 4) % 4;
     return out + ('=' * padding);
   }

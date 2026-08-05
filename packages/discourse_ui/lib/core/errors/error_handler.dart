@@ -30,6 +30,9 @@ class ErrorHandler {
 
     // Setup global error handlers
     FlutterError.onError = (FlutterErrorDetails details) {
+      // Preserve Flutter's default diagnostics (console/structured error
+      // reporting) so uncaught framework errors are never swallowed.
+      FlutterError.presentError(details);
       handleError(details.exception, details.stack);
     };
 

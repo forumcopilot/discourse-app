@@ -18,17 +18,18 @@ import '../util/html_text.dart';
 ///
 /// Endpoints used:
 ///   * `/t/{id}.json`               — topic header + first chunk of posts
-///   * `/t/{id}/{post_number}.json` — post-anchored view (jump to post)
+///   * `/t/{id}/{post_number}.json` — post-anchored window (chunk of posts
+///                                    around that post number)
 ///   * `/posts/{id}.json`           — single post (with `raw` for edit)
 ///   * `/posts/{id}/raw`            — raw markdown
 ///   * POST `/posts.json`           — reply to a topic / new topic
 ///   * PUT  `/posts/{id}.json`      — edit a post
 ///   * POST `/post_actions`         — flag/report
+///   * POST `/solution/accept|unaccept`      — discourse-solved plugin
+///   * POST/DELETE `/post_voting/vote`       — discourse-post-voting plugin
+///   * PUT  `/polls/vote`                    — poll plugin
 class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   DiscoursePostProxy(SiteContext context) : super(context);
-
-  // Discourse default chunk size for /t/{id}.json post_stream is 20.
-  static const int _defaultChunk = 20;
 
   /// Carries the (post_id, poll_name) that a parsed [FCPoll] originated
   /// from. The SDK contract for [votePollAsync] is keyed on topic id, but
@@ -37,6 +38,26 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   /// the vote call doesn't need to refetch the topic.
   static final Expando<_DiscoursePollMeta> _pollMeta = Expando('pollMeta');
 
+  /// Windowed topic fetch.
+  ///
+  /// When [startNum] <= 1 this fetches `/t/{id}.json` (topic header + the
+  /// first chunk of posts, Discourse default chunk size 20). When
+  /// [startNum] > 1 it fetches `/t/{id}/{startNum}.json`, which the server
+  /// resolves via `TopicView#filter_posts_near`: a window of `chunk_size`
+  /// posts with roughly a quarter of the chunk *before* the anchor post
+  /// number and the rest at/after it.
+  ///
+  /// CONTRACT with the UI layer (post_controller.dart):
+  ///   * The returned window is NOT page-aligned. The UI must derive the
+  ///     actually-loaded window from the returned posts' [FCPost.postNumber]
+  ///     values and dedupe merges by [FCPost.id] — both are always populated
+  ///     here from the Discourse payload.
+  ///   * [FCThreadResult.totalPostNum] carries the topic's
+  ///     `highest_post_number` (falling back to `posts_count`) so the UI can
+  ///     compute hasMore in both directions from post numbers. Note post
+  ///     numbers are not gap-free when posts have been deleted, which is why
+  ///     `highest_post_number` is preferred over `posts_count`.
+  ///   * [lastNum] is advisory only; the server decides the window size.
   @override
   Future<FCThreadResult> getThreadAsync(
     String topicId,
@@ -48,21 +69,15 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       return _emptyThread(message: 'topicId required');
     }
     try {
-      final t = await apiGet('/t/$topicId.json');
+      final t = await apiGet(
+          startNum > 1 ? '/t/$topicId/$startNum.json' : '/t/$topicId.json');
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       final rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
           .map((p) => p.cast<String, dynamic>())
           .toList();
-      // Phase 5.31 — discourse-solved exposes topic-level
-      // `can_accept_answer` to the OP and staff. Per-post
-      // canAcceptAnswer in `_postFrom` ANDs this with "not the
-      // first post" so the question itself isn't markable.
-      final topicCanAccept = (t['can_accept_answer'] as bool?) ?? false;
-      final posts = rawPosts
-          .map((p) => _postFrom(p,
-              topicId: topicId, topicCanAcceptAnswer: topicCanAccept))
-          .toList();
+      final posts =
+          rawPosts.map((p) => _postFrom(p, topicId: topicId)).toList();
 
       // Pull a poll out of the first post if present so the topic header
       // can render a Twitter-style poll card.
@@ -94,7 +109,9 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       return FCThreadResult(
         result: true,
         resultText: '',
-        totalPostNum: (t['posts_count'] as int?) ?? posts.length,
+        totalPostNum: (t['highest_post_number'] as int?) ??
+            (t['posts_count'] as int?) ??
+            posts.length,
         posts: posts,
         // FCTopic header
         id: id,
@@ -114,7 +131,12 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         replyCount: (((t['posts_count'] as int?) ?? 1) - 1).clamp(0, 1 << 30),
         viewCount: (t['views'] as int?) ?? 0,
         isClosed: (t['closed'] as bool?) ?? false,
-        isSubscribed: (t['notification_level'] as int? ?? 1) >= 2,
+        // notification_level lives under `details` in the topic-view
+        // serializer; keep a top-level fallback for other payload shapes.
+        isSubscribed: ((details['notification_level'] as int?) ??
+                (t['notification_level'] as int?) ??
+                1) >=
+            2,
         canReply: !(t['closed'] == true || t['archived'] == true),
         canReport: true,
         canUpload: true,
@@ -149,17 +171,16 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         return _emptyThreadByPost(message: 'post has no topic_id');
       }
       final postNumber = (p['post_number'] as int?) ?? 1;
+      // Same windowing mechanism as [getThreadAsync]: /t/{id}/{n}.json
+      // returns the chunk containing post number n (filter_posts_near).
       final t = await apiGet('/t/$topicId/$postNumber.json');
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       final rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
           .map((m) => m.cast<String, dynamic>())
           .toList();
-      final topicCanAccept = (t['can_accept_answer'] as bool?) ?? false;
-      final posts = rawPosts
-          .map((p) => _postFrom(p,
-              topicId: topicId, topicCanAcceptAnswer: topicCanAccept))
-          .toList();
+      final posts =
+          rawPosts.map((p) => _postFrom(p, topicId: topicId)).toList();
       final firstPostJson = rawPosts.firstWhere(
         (p) => (p['post_number'] as int?) == 1,
         orElse: () => const {},
@@ -174,8 +195,12 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       return FCThreadByPostResult(
         result: true,
         resultText: '',
-        totalPostNum: (t['posts_count'] as int?) ?? posts.length,
+        totalPostNum: (t['highest_post_number'] as int?) ??
+            (t['posts_count'] as int?) ??
+            posts.length,
         posts: posts,
+        // The anchor post's number; it is contained in the returned
+        // window (filter_posts_near centers the chunk on it).
         position: postNumber,
         id: topicId,
         title: (t['title'] ?? '').toString(),
@@ -202,25 +227,34 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     int postsPerRequest,
     bool returnHtml,
   ) async {
-    // Use the topic's `last_read_post_number` (when authed) to anchor;
-    // /t/{id}/{n}.json returns posts around that anchor. Discourse handles
-    // "first unread" implicitly when you open /t/{id}.json — for the SDK
-    // contract we just delegate to that and report position=1.
+    // Use the topic's `last_read_post_number` (present when authed) as the
+    // anchor. The plain /t/{id}.json only carries the *first* chunk of
+    // posts, so when the anchor falls outside it we re-fetch
+    // /t/{id}/{anchor}.json, which returns the chunk containing the anchor
+    // (filter_posts_near) — same windowing mechanism as [getThreadAsync].
     if (topicId.isEmpty) {
       return _emptyThreadByUnread(message: 'topicId required');
     }
     try {
-      final t = await apiGet('/t/$topicId.json');
-      final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
-      final rawPosts = ((stream['posts'] as List?) ?? const [])
+      var t = await apiGet('/t/$topicId.json');
+      final unreadAnchor = (t['last_read_post_number'] as int?) ?? 1;
+      var stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
+      var rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
           .map((m) => m.cast<String, dynamic>())
           .toList();
-      final topicCanAccept = (t['can_accept_answer'] as bool?) ?? false;
-      final posts = rawPosts
-          .map((p) => _postFrom(p,
-              topicId: topicId, topicCanAcceptAnswer: topicCanAccept))
-          .toList();
+      final anchorLoaded = unreadAnchor <= 1 ||
+          rawPosts.any((p) => (p['post_number'] as int?) == unreadAnchor);
+      if (!anchorLoaded) {
+        t = await apiGet('/t/$topicId/$unreadAnchor.json');
+        stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
+        rawPosts = ((stream['posts'] as List?) ?? const [])
+            .whereType<Map>()
+            .map((m) => m.cast<String, dynamic>())
+            .toList();
+      }
+      final posts =
+          rawPosts.map((p) => _postFrom(p, topicId: topicId)).toList();
       final firstPostJson = rawPosts.isNotEmpty
           ? rawPosts.firstWhere(
               (p) => (p['post_number'] as int?) == 1,
@@ -233,13 +267,19 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       final details = (t['details'] as Map<String, dynamic>?) ?? const {};
       final createdBy =
           (details['created_by'] as Map<String, dynamic>?) ?? const {};
-      final unreadAnchor = (t['last_read_post_number'] as int?) ?? 1;
 
       return FCThreadByUnreadResult(
         result: true,
         resultText: '',
-        totalPostNum: (t['posts_count'] as int?) ?? posts.length,
+        totalPostNum: (t['highest_post_number'] as int?) ??
+            (t['posts_count'] as int?) ??
+            posts.length,
         posts: posts,
+        // The returned window covers the anchor: either it was already in
+        // the first chunk, or we re-fetched the chunk around it above. (If
+        // the anchor post was deleted, filter_posts_near still returns the
+        // posts nearest to it; the UI derives the real window from the
+        // returned postNumbers.)
         position: unreadAnchor,
         id: (t['id'] ?? topicId).toString(),
         title: (t['title'] ?? '').toString(),
@@ -390,9 +430,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   Future<FCReportPostResult> reportPostAsync(
       String postId, String reason) async {
     try {
-      // post_action_type_id 8 = notify_moderators ("It's something else")
-      // with a free-form message. If empty, we use 4 = inappropriate.
-      final actionTypeId = reason.trim().isEmpty ? 4 : 8;
+      // post_action_type_id 7 = notify_moderators ("It's something else")
+      // with a free-form `message` (permitted by post_actions_controller
+      // for flag types). If empty, we use 4 = inappropriate.
+      // (See db/fixtures/003_post_action_types.rb; 8 is spam.)
+      final actionTypeId = reason.trim().isEmpty ? 4 : 7;
       await apiPost('/post_actions.json', body: {
         'id': int.tryParse(postId) ?? postId,
         'post_action_type_id': actionTypeId,
@@ -406,12 +448,12 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
 
   @override
   Future<FCAcceptAnswerResult> acceptAnswerAsync(String postId) async {
-    // Phase 5.31 — discourse-solved plugin endpoint
-    //   POST /accept-answer { id: <post_id> }
+    // Phase 5.31 — discourse-solved plugin endpoint (engine mounted at
+    // /solution):
+    //   POST /solution/accept { id: <post_id> }
     // Marks the post as the accepted answer for its topic and bumps
-    // the topic's "solved" state. The FCPost.canAcceptAnswer cap is
-    // computed at parse time from the topic-level `can_accept_answer`
-    // flag.
+    // the topic's "solved" state. The FCPost.canAcceptAnswer cap comes
+    // from the plugin's per-post `can_accept_answer` serializer field.
     if (postId.isEmpty) {
       return FCAcceptAnswerResult(
         result: false,
@@ -419,7 +461,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       );
     }
     try {
-      await apiPost('/accept-answer', body: {
+      await apiPost('/solution/accept', body: {
         'id': int.tryParse(postId) ?? postId,
       });
       return FCAcceptAnswerResult(result: true, resultText: '');
@@ -446,7 +488,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       );
     }
     try {
-      await apiPost('/unaccept-answer', body: {
+      await apiPost('/solution/unaccept', body: {
         'id': int.tryParse(postId) ?? postId,
       });
       return FCAcceptAnswerResult(result: true, resultText: '');
@@ -491,7 +533,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       final response = await apiPut('/polls/vote', body: {
         'post_id': postId,
         'poll_name': pollName,
-        'options[]': responseIds,
+        'options': responseIds,
       });
       final pollJson = (response['poll'] as Map?)?.cast<String, dynamic>();
       if (pollJson == null) return null;
@@ -745,7 +787,9 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
           result: false, resultText: 'Invalid post id', vote: previous);
     }
     try {
-      await apiPost('/vote.json', body: {
+      // discourse-post-voting engine is mounted at /post_voting with
+      // `resource :vote` → POST /post_voting/vote.
+      await apiPost('/post_voting/vote.json', body: {
         'post_id': pid,
         'direction': direction,
       });
@@ -775,7 +819,9 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
           result: false, resultText: 'Invalid post id', vote: previous);
     }
     try {
-      await apiDelete('/vote.json?post_id=$pid');
+      // DELETE /post_voting/vote — the controller reads `post_id` from
+      // params, so pass it as a proper query parameter.
+      await apiDelete('/post_voting/vote.json', query: {'post_id': pid});
       return FCPostVoteResult(
         result: true,
         vote: _applyVoteRemove(previous),
@@ -845,10 +891,14 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         Map<String, dynamic>? lastUser;
         final posters = (s['posters'] as List?) ?? const [];
         for (final p in posters.whereType<Map>()) {
-          // The "last poster" entry has 'Most Recent Poster' in
-          // description on stock Discourse.
+          // The "last poster" entry is flagged locale-independently via
+          // `extras` containing 'latest' ("latest" or "latest single",
+          // see TopicPostersSummary). The localized description string
+          // is only a fallback.
+          final extras = (p['extras'] ?? '').toString();
           final desc = (p['description'] ?? '').toString();
-          if (desc.contains('Most Recent Poster')) {
+          if (extras.contains('latest') ||
+              desc.contains('Most Recent Poster')) {
             final uid = p['user_id'] as int?;
             if (uid != null) lastUser = users[uid];
             break;
@@ -888,7 +938,6 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   FCPost _postFrom(
     Map<String, dynamic> p, {
     required String topicId,
-    bool topicCanAcceptAnswer = false,
   }) {
     final tpl = p['avatar_template'] as String?;
     String? avatarUrl;
@@ -941,15 +990,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       isLiked: isLiked,
       bookmarked: (p['bookmarked'] as bool?) ?? false,
       isSolution: (p['accepted_answer'] as bool?) ?? false,
-      // Phase 5.31 — viewer can accept this post as the topic's
-      // answer only when:
-      //   1. The topic's `can_accept_answer` flag is true (the
-      //      discourse-solved plugin grants this to the topic OP
-      //      and staff).
-      //   2. The post isn't the OP's first post — you can't mark
-      //      the question itself as the answer.
-      canAcceptAnswer: topicCanAcceptAnswer &&
-          (p['post_number'] as int?) != 1,
+      // Phase 5.31 — discourse-solved serializes `can_accept_answer`
+      // per POST (plugin.rb add_to_serializer(:post, ...)). The server
+      // guardian already excludes the first post and whispers, so the
+      // field can be trusted as-is.
+      canAcceptAnswer: p['can_accept_answer'] == true,
       // Pass mutable empty lists so optimistic-UI code in post_actions.dart
       // can call `.add()` without tripping "Cannot add to an unmodifiable
       // list" (FCPost defaults these to `const []`). Discourse's

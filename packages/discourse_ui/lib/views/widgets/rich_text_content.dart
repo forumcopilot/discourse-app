@@ -12,9 +12,10 @@ import 'custom_bb_stylesheet.dart' show BBCodeCallbacks;
 /// expanded to HTML.
 ///
 /// This widget accepts the same constructor shape the inherited XF code
-/// has been calling so the swap is a drop-in replacement; the
-/// [BBCodeCallbacks] parameter is now ignored (kept for source compat —
-/// HTML link/image taps go through the default URL launcher).
+/// has been calling so the swap is a drop-in replacement. Link and image
+/// taps route through the provided [BBCodeCallbacks] when available
+/// (mention → user profile, same-forum topic/post URL → in-app post page,
+/// image → viewer), falling back to an external launch otherwise.
 class RichTextContent extends StatelessWidget {
   final SiteContext siteContext;
   final String content;
@@ -26,6 +27,17 @@ class RichTextContent extends StatelessWidget {
     required this.content,
     this.callbacks,
   });
+
+  /// Extracts the username from a Discourse profile href
+  /// (`/u/{username}` or `/users/{username}`), otherwise null.
+  static String? _usernameFromHref(String url) {
+    try {
+      final path = Uri.parse(url.trim()).path;
+      return RegExp(r'^/u(?:sers)?/([^/?#]+)/?$').firstMatch(path)?.group(1);
+    } catch (_) {
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +51,33 @@ class RichTextContent extends StatelessWidget {
 
     return Html(
       data: content,
-      onLinkTap: (url, _, __) {
+      onLinkTap: (url, attributes, _) {
         if (url == null || url.isEmpty) return;
         final resolved = _resolveUrl(url);
+        final classes =
+            (attributes['class'] ?? '').split(RegExp(r'\s+'));
+        // Discourse cooked mentions:
+        // <a class="mention" href="/u/{username}">@user</a>
+        if (classes.contains('mention') &&
+            callbacks?.onMentionTap != null) {
+          final username = _usernameFromHref(url);
+          if (username != null && username.isNotEmpty) {
+            callbacks!.onMentionTap!(username);
+            return;
+          }
+        }
+        // Discourse lightboxed images: the wrapping anchor points at the
+        // full-size upload — open it in the in-app viewer.
+        if (classes.contains('lightbox') && callbacks?.onImageTap != null) {
+          callbacks!.onImageTap!(resolved, context, resolved);
+          return;
+        }
+        // Everything else goes through the URL callback (which handles
+        // same-forum topic/post links in-app and external launch itself).
+        if (callbacks?.onUrlTap != null) {
+          callbacks!.onUrlTap!(resolved);
+          return;
+        }
         // ignore: discarded_futures
         launchUrlString(resolved, mode: LaunchMode.externalApplication);
       },
@@ -183,12 +219,22 @@ class RichTextContent extends StatelessWidget {
             final h = double.tryParse(
                     extensionContext.attributes['height'] ?? '') ??
                 (isEmoji ? 20 : null);
-            return Image.network(
+            final image = Image.network(
               resolved,
               width: w,
               height: h,
               errorBuilder: (_, __, ___) =>
                   Text(alt, style: TextStyle(color: mutedColor)),
+            );
+            // Route content-image taps to the in-app viewer (emoji stay
+            // plain inline glyphs/images).
+            final onImageTap = callbacks?.onImageTap;
+            if (isEmoji || onImageTap == null) return image;
+            return Builder(
+              builder: (imageContext) => GestureDetector(
+                onTap: () => onImageTap(resolved, imageContext, resolved),
+                child: image,
+              ),
             );
           },
         ),
@@ -199,7 +245,11 @@ class RichTextContent extends StatelessWidget {
   String _resolveUrl(String url) {
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
     if (url.startsWith('//')) return 'https:$url';
-    final base = siteContext.site.url;
+    // Join safely: a trailing-slash base must not produce double slashes.
+    var base = siteContext.site.url;
+    while (base.endsWith('/')) {
+      base = base.substring(0, base.length - 1);
+    }
     if (url.startsWith('/')) return '$base$url';
     return '$base/$url';
   }

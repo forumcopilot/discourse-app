@@ -61,6 +61,16 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
   static bool get isIOSPlatform => _passkey_platform.isIOSPlatform;
   static bool get isAndroidPlatform => _passkey_platform.isAndroidPlatform;
 
+  /// Login flows mutate the SiteContext in place, so `ever(...)` watchers on
+  /// DiscourseSiteController.currentSiteContext never fire on their own.
+  /// Refresh the Rx explicitly after login-state changes so watchers
+  /// (e.g. direct push registration) observe the new state.
+  void _refreshSiteContextRx() {
+    if (Get.isRegistered<DiscourseSiteController>()) {
+      Get.find<DiscourseSiteController>().currentSiteContext.refresh();
+    }
+  }
+
   void _showLoginFailureSnackbar(String message) {
     Future.microtask(() {
       final context = Get.context;
@@ -244,6 +254,7 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
 
         // Update auth state - this will trigger the worker in site_home_page.dart
         siteContext.updateLoginState();
+        _refreshSiteContextRx();
 
         // Show result_text as a popup dialog if not empty (e.g., warnings), otherwise show success toast
         // Hide loader before showing dialogs (forceHide in case show() was called more than hide())
@@ -391,6 +402,7 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
 
         // Update auth state - this will trigger the worker in site_home_page.dart
         siteContext.updateLoginState();
+        _refreshSiteContextRx();
 
         // Hide loader before showing dialogs
         if (showLoader) {
@@ -554,6 +566,7 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
 
                 // Update login state from the header (this sets _isLoggedIn based on fc_is_login)
                 siteContext.updateLoginStateFromHeader(isLoggedIn);
+                _refreshSiteContextRx();
 
                 // Session is valid via cookies, no need to login again
                 // The loginDataOutput will be populated on the next API call that returns user data
@@ -819,6 +832,7 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
 
         // Update auth state
         siteContext.updateLoginState();
+        _refreshSiteContextRx();
         final cookieCountAfterLogin = await FCDioClient.instance
             .cookieCountForUrl(Uri.parse(siteContext.site.pluginUrl));
         AppLogger.debug(
@@ -981,6 +995,7 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
           username: loginResult.user!.username,
         );
         siteContext.updateLoginState();
+        _refreshSiteContextRx();
 
         try {
           final siteController = Get.find<DiscourseSiteController>();
@@ -1299,10 +1314,19 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
 
       // Update auth state - this will trigger the worker in site_home_page.dart
       siteContext.updateLoginState();
+      _refreshSiteContextRx();
 
-      // Re-initialize site to refresh permissions and configuration
-      DiscourseSiteController siteController = Get.put(DiscourseSiteController());
-      await siteController.initializeCurrentSite();
+      // Re-initialize site to refresh permissions and configuration.
+      // Use the registered controller (not a throwaway Get.put) and force a
+      // real re-init — otherwise the already-initialized fast path skips the
+      // config refetch and stale permissions stick around after logout.
+      final siteController = Get.isRegistered<DiscourseSiteController>()
+          ? Get.find<DiscourseSiteController>()
+          : Get.put(DiscourseSiteController());
+      final currentSite = siteController.currentSite.value;
+      if (currentSite != null) {
+        await siteController.initializeSite(currentSite, forceReinitialize: true);
+      }
 
       return true;
     } catch (e, stackTrace) {

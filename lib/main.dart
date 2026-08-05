@@ -33,7 +33,9 @@ void main() async {
 
     AppLogger.info('Initializing error handling system...');
     await ErrorHandlingInit.initialize(
-      enableErrorDialogs: true,
+      // Modal error dialogs for uncaught framework errors are a debug aid —
+      // never show them to end users in release builds.
+      enableErrorDialogs: kDebugMode,
       enableDebugLogs: true,
     );
     AppLogger.info('Error handling system initialized successfully');

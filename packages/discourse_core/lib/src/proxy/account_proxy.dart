@@ -20,7 +20,7 @@ import '../base_discourse_proxy.dart';
 ///                            CAPTCHA + ToS + custom field validation
 ///                            that's not worth replicating in v1.
 ///   * `updateEmail`        → `PUT /u/{username}/preferences/email.json`
-///   * `updatePassword`     → `POST /u/{username}/preferences/password.json`
+///   * `updatePassword`     → `POST /session/forgot_password.json`
 ///                            (Discourse triggers a password-reset email
 ///                            rather than accepting an inline password
 ///                            change.)
@@ -186,20 +186,24 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
   Future<FCUpdatePasswordResult> updatePassword(
       String oldPassword, String newPassword) async {
     // Discourse's mobile-friendly password change is "send me a reset
-    // email", reachable via POST /u/{username}/preferences/password.json.
-    // Inline password change requires a webview to /my/preferences/account.
+    // email" via POST /session/forgot_password.json (the same endpoint
+    // forgetPassword uses — /u/{username}/preferences/password.json is
+    // not a route). Inline password change requires a webview to
+    // /my/preferences/account.
     final username = siteContext.currentUsername;
     if (username == null || username.isEmpty) {
       return FCUpdatePasswordResult(
           result: false, resultText: 'Not logged in');
     }
     try {
-      await apiPost(
-        '/u/${Uri.encodeComponent(username)}/preferences/password.json',
-      );
+      await apiPost('/session/forgot_password.json', body: {
+        'login': username,
+      });
       return FCUpdatePasswordResult(
         result: true,
-        resultText: 'A password-reset email has been sent.',
+        resultText:
+            'A password-reset email has been sent to the address on your '
+            'account. Follow the link in it to set a new password.',
       );
     } catch (e) {
       return FCUpdatePasswordResult(result: false, resultText: 'Error: $e');

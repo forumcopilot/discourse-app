@@ -70,6 +70,8 @@ class DiscourseLatestTopicController extends DiscourseGlobalLoaderController wit
         if (result.result) {
           latestTopicsDataOutput.value.topics.addAll(result.topics);
           latestTopicsDataOutput.value.totalLatestNum = result.totalLatestNum;
+          // In-place mutation of the Rx'd result object — notify observers.
+          latestTopicsDataOutput.refresh();
           final convertedTopics = result.topics;
           fcTopics.addAll(convertedTopics);
         } else {
@@ -145,6 +147,8 @@ class DiscourseUnreadTopicController extends GetxController {
     } else {
       unreadTopicsDataOutput.value.topics.addAll(result.topics);
       unreadTopicsDataOutput.value.totalUnreadNum = result.totalUnreadNum;
+      // In-place mutation of the Rx'd result object — notify observers.
+      unreadTopicsDataOutput.refresh();
       fcTopics.addAll(convertedTopics);
     }
     isInitialized.value = true;
@@ -237,6 +241,8 @@ class DiscourseParticipatedTopicController extends GetxController {
     } else {
       participatedTopicsDataOutput.value.topics.addAll(result.topics);
       participatedTopicsDataOutput.value.totalParticipatedNum = result.totalParticipatedNum;
+      // In-place mutation of the Rx'd result object — notify observers.
+      participatedTopicsDataOutput.refresh();
       fcTopics.addAll(convertedTopics);
     }
     isInitialized.value = true;
@@ -280,6 +286,8 @@ class DiscourseSubscribedTopicController extends GetxController {
     } else {
       subscribedTopicsDataOutput.value.topics.addAll(result.topics);
       subscribedTopicsDataOutput.value.totalTopicNum = result.totalTopicNum;
+      // In-place mutation of the Rx'd result object — notify observers.
+      subscribedTopicsDataOutput.refresh();
       fcTopics.addAll(convertedTopics);
     }
     isInitialized.value = true;

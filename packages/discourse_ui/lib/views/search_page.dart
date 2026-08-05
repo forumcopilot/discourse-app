@@ -60,9 +60,23 @@ class _SearchPageState extends State<SearchPage> {
   String? _topicSearchId;
   String? _titlesOnlySearchId;
 
-  /// Discourse-native filter set. When non-empty, results route through
-  /// DiscourseSearchProxy.searchWithFiltersAsync instead of the
-  /// XF-flavored search methods.
+  /// Monotonic token identifying the current query. Every fetch
+  /// captures it at start; responses (and their finally-blocks) that
+  /// come back with a stale token are discarded so an in-flight fetch
+  /// for query "a" can never append into the lists of query "b".
+  int _querySeq = 0;
+
+  // Per-tab error flags so the snackbar's Retry knows what to re-run.
+  bool _topicsError = false;
+  bool _postsError = false;
+  bool _titlesOnlyError = false;
+  int _errorSnackSeq = -1;
+
+  /// Discourse-native filter set. Layered onto every
+  /// DiscourseSearchProxy.searchWithFiltersAsync call (the fetchers
+  /// always take the Discourse-native route when the proxy supports
+  /// it); the XF-flavored search methods are the non-Discourse
+  /// fallback only.
   FCSearchFilters _filters = const FCSearchFilters();
 
   @override
@@ -125,22 +139,38 @@ class _SearchPageState extends State<SearchPage> {
 
   void _clearSearch() {
     setState(() {
+      _querySeq++; // invalidate any in-flight fetches
       _searchController.clear();
       _currentQuery = null;
-      _topics.clear();
-      _posts.clear();
-      _titlesOnlyTopics.clear();
-      _topicPage = 1;
-      _postPage = 1;
-      _titlesOnlyPage = 1;
-      _hasMoreTopics = true;
-      _hasMorePosts = true;
-      _hasMoreTitlesOnly = true;
-      _postSearchId = null;
-      _topicSearchId = null;
-      _titlesOnlySearchId = null;
+      _resetResultState();
     });
     _searchFocusNode.requestFocus();
+  }
+
+  /// Resets all per-query result state. Only call inside setState, and
+  /// after bumping [_querySeq] so stale fetches can't repopulate it.
+  void _resetResultState() {
+    _topics.clear();
+    _posts.clear();
+    _titlesOnlyTopics.clear();
+    _topicPage = 1;
+    _postPage = 1;
+    _titlesOnlyPage = 1;
+    _hasMoreTopics = true;
+    _hasMorePosts = true;
+    _hasMoreTitlesOnly = true;
+    // In-flight fetches belong to the previous query; their stale token
+    // stops them from touching state, so they must not block the new
+    // query's fetches either.
+    _isLoadingTopics = false;
+    _isLoadingPosts = false;
+    _isLoadingTitlesOnly = false;
+    _topicsError = false;
+    _postsError = false;
+    _titlesOnlyError = false;
+    _postSearchId = null;
+    _topicSearchId = null;
+    _titlesOnlySearchId = null;
   }
 
   Future<void> _openFiltersSheet() async {
@@ -171,21 +201,10 @@ class _SearchPageState extends State<SearchPage> {
     setState(() {
       _searchHistory = CacheContext.instance.getSearchHistory();
       _onInputChanged(); // re-filter after adding
+      _querySeq++; // invalidate any in-flight fetches of the old query
       _currentQuery = trimmedQuery;
       _searchController.text = trimmedQuery;
-      // Reset search state
-      _topics.clear();
-      _posts.clear();
-      _titlesOnlyTopics.clear();
-      _topicPage = 1;
-      _postPage = 1;
-      _titlesOnlyPage = 1;
-      _hasMoreTopics = true;
-      _hasMorePosts = true;
-      _hasMoreTitlesOnly = true;
-      _postSearchId = null;
-      _topicSearchId = null;
-      _titlesOnlySearchId = null;
+      _resetResultState();
     });
 
     // Fetch results
@@ -194,188 +213,283 @@ class _SearchPageState extends State<SearchPage> {
     _fetchTitlesOnly();
   }
 
+  /// Surfaces a fetch failure and marks the failed tab(s) so the
+  /// snackbar's Retry (and the scroll listeners — `_hasMoreX` stays
+  /// true on error) can re-run them. One snackbar per query.
+  void _reportSearchError(int seq, String? message,
+      {bool topics = false, bool posts = false, bool titlesOnly = false}) {
+    if (topics) _topicsError = true;
+    if (posts) _postsError = true;
+    if (titlesOnly) _titlesOnlyError = true;
+    if (_errorSnackSeq == seq) return;
+    _errorSnackSeq = seq;
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+      SnackBar(
+        content: Text(
+            message == null || message.isEmpty ? 'Search failed' : message),
+        action: SnackBarAction(
+          label: AppLocalizations.of(context)?.retry ?? 'Retry',
+          onPressed: () {
+            if (!mounted || seq != _querySeq) return;
+            _errorSnackSeq = -1; // re-arm the snackbar if the retry fails
+            if (_topicsError) _fetchTopics();
+            if (_postsError) _fetchPosts();
+            if (_titlesOnlyError) _fetchTitlesOnly();
+          },
+        ),
+      ),
+    );
+  }
+
   Future<void> _fetchTopics() async {
     if (_isLoadingTopics || !_hasMoreTopics || _currentQuery == null) return;
+    final seq = _querySeq;
+    final query = _currentQuery!;
     setState(() {
       _isLoadingTopics = true;
+      _topicsError = false;
     });
     final hasAdvancedSearch = widget.siteContext.ConfigData.advancedSearch == true;
     final proxy = SiteProxyService.getSearchProxy();
 
-    // Discourse-native filter route. When the user has selected filters
-    // we bypass the XF-shaped advance/search APIs and call the
-    // Discourse-specific search method that knows about the operator DSL.
-    if (proxy is DiscourseSearchProxy && !_filters.isEmpty) {
-      final result = await proxy.searchWithFiltersAsync(
-        keywords: _currentQuery!,
-        filters: _filters,
-        page: _topicPage,
-        perPage: _pageSize,
-      );
-      if (!mounted) return;
-      setState(() {
-        _topics.addAll(result.topics);
-        _isLoadingTopics = false;
-        _hasMoreTopics = result.topics.length == _pageSize;
-        if (_hasMoreTopics) _topicPage++;
-      });
-      return;
-    }
-
-    if (!hasAdvancedSearch) {
-      final startNum = (_topicPage - 1) * _pageSize;
-      final lastNum = _topicPage * _pageSize;
-      final result = await proxy.searchTopicAsync(_currentQuery!, startNum, lastNum, null);
-      if (!mounted) return;
-      setState(() {
-        _topics.addAll(result.topics);
-        _isLoadingTopics = false;
-        _hasMoreTopics = result.topics.length == _pageSize;
-        if (_hasMoreTopics) _topicPage++;
-      });
-    } else {
-      // Use advanced search for topics
-      final result = await proxy.advanceSearchTopicAsync(
-        _currentQuery!, // keywords
-        _topicPage, // page
-        _pageSize, // perpage
-        _topicSearchId, // searchId for pagination
-        false, // titleOnly
-        null, // userId
-        null, // searchUser
-        null, // forumId
-        null, // topicId
-        null, // onlyIn
-        null, // notIn
-        false, // startedBy
-        null, // searchTime
-      );
-      // Only update searchId if this is the first page
-      if (_topicSearchId == null && result.search_id != null && result.search_id!.isNotEmpty) {
-        _topicSearchId = result.search_id;
+    try {
+      // Discourse-native route: /search.json pages are 1-based and
+      // server-sized, and has-more comes from the server's
+      // more_full_page_results signal rather than counting rows.
+      // Structured filters ride along when set.
+      if (proxy is DiscourseSearchProxy) {
+        final result = await proxy.searchWithFiltersAsync(
+          keywords: query,
+          filters: _filters,
+          page: _topicPage,
+        );
+        if (!mounted || seq != _querySeq) return;
+        setState(() {
+          _topics.addAll(result.topics);
+          _hasMoreTopics = result.hasMore;
+          if (_hasMoreTopics) _topicPage++;
+        });
+      } else if (!hasAdvancedSearch) {
+        final startNum = (_topicPage - 1) * _pageSize;
+        final lastNum = startNum + _pageSize - 1;
+        final result = await proxy.searchTopicAsync(query, startNum, lastNum, null);
+        if (!mounted || seq != _querySeq) return;
+        if (!result.result) {
+          _reportSearchError(seq, result.resultText, topics: true);
+          return;
+        }
+        setState(() {
+          _topics.addAll(result.topics);
+          _hasMoreTopics = result.topics.length >= _pageSize;
+          if (_hasMoreTopics) _topicPage++;
+        });
+      } else {
+        // Use advanced search for topics
+        final result = await proxy.advanceSearchTopicAsync(
+          query, // keywords
+          _topicPage, // page
+          _pageSize, // perpage
+          _topicSearchId, // searchId for pagination
+          false, // titleOnly
+          null, // userId
+          null, // searchUser
+          null, // forumId
+          null, // topicId
+          null, // onlyIn
+          null, // notIn
+          false, // startedBy
+          null, // searchTime
+        );
+        if (!mounted || seq != _querySeq) return;
+        if (!result.result) {
+          _reportSearchError(seq, result.resultText, topics: true);
+          return;
+        }
+        // Only update searchId if this is the first page
+        if (_topicSearchId == null && result.search_id != null && result.search_id!.isNotEmpty) {
+          _topicSearchId = result.search_id;
+        }
+        setState(() {
+          _topics.addAll(result.topics);
+          _hasMoreTopics = result.topics.length >= _pageSize;
+          if (_hasMoreTopics) _topicPage++;
+        });
       }
-      if (!mounted) return;
-      setState(() {
-        _topics.addAll(result.topics);
-        _isLoadingTopics = false;
-        _hasMoreTopics = result.topics.length == _pageSize;
-        if (_hasMoreTopics) _topicPage++;
-      });
+    } catch (e) {
+      if (!mounted || seq != _querySeq) return;
+      _reportSearchError(seq, 'Search failed: $e', topics: true);
+    } finally {
+      if (mounted && seq == _querySeq) {
+        setState(() {
+          _isLoadingTopics = false;
+        });
+      }
     }
   }
 
   Future<void> _fetchPosts() async {
     if (_isLoadingPosts || !_hasMorePosts || _currentQuery == null) return;
+    final seq = _querySeq;
+    final query = _currentQuery!;
     setState(() {
       _isLoadingPosts = true;
+      _postsError = false;
     });
     final hasAdvancedSearch = widget.siteContext.ConfigData.advancedSearch == true;
     final proxy = SiteProxyService.getSearchProxy();
-    if (proxy is DiscourseSearchProxy && !_filters.isEmpty) {
-      final result = await proxy.searchWithFiltersAsync(
-        keywords: _currentQuery!,
-        filters: _filters,
-        page: _postPage,
-        perPage: _pageSize,
-      );
-      if (!mounted) return;
-      setState(() {
-        _posts.addAll(result.posts);
-        _isLoadingPosts = false;
-        _hasMorePosts = result.posts.length == _pageSize;
-        if (_hasMorePosts) _postPage++;
-      });
-      return;
-    }
-    if (!hasAdvancedSearch) {
-      final startNum = (_postPage - 1) * _pageSize;
-      final lastNum = _postPage * _pageSize;
-      final result = await proxy.searchPostAsync(_currentQuery!, startNum, lastNum, '');
-      if (!mounted) return;
-      setState(() {
-        _posts.addAll(result.posts);
-        _isLoadingPosts = false;
-        _hasMorePosts = result.posts.length == _pageSize;
-        if (_hasMorePosts) _postPage++;
-      });
-    } else {
-      // Use advanced search for posts
-      final result = await proxy.advanceSearchPostAsync(
-        _currentQuery!, // keywords
-        _postPage, // page
-        _pageSize, // perpage
-        _postSearchId, // searchId for pagination
-        false, // titleOnly
-        null, // userId
-        null, // searchUser
-        null, // forumId
-        null, // topicId
-        null, // onlyIn
-        null, // notIn
-        false, // startedBy
-      );
-      // Only update searchId if this is the first page
-      if (_postSearchId == null && result.search_id != null && result.search_id!.isNotEmpty) {
-        _postSearchId = result.search_id;
+
+    try {
+      if (proxy is DiscourseSearchProxy) {
+        final result = await proxy.searchWithFiltersAsync(
+          keywords: query,
+          filters: _filters,
+          page: _postPage,
+        );
+        if (!mounted || seq != _querySeq) return;
+        setState(() {
+          _posts.addAll(result.posts);
+          _hasMorePosts = result.hasMore;
+          if (_hasMorePosts) _postPage++;
+        });
+      } else if (!hasAdvancedSearch) {
+        final startNum = (_postPage - 1) * _pageSize;
+        final lastNum = startNum + _pageSize - 1;
+        final result = await proxy.searchPostAsync(query, startNum, lastNum, '');
+        if (!mounted || seq != _querySeq) return;
+        if (!result.result) {
+          _reportSearchError(seq, result.resultText, posts: true);
+          return;
+        }
+        setState(() {
+          _posts.addAll(result.posts);
+          _hasMorePosts = result.posts.length >= _pageSize;
+          if (_hasMorePosts) _postPage++;
+        });
+      } else {
+        // Use advanced search for posts
+        final result = await proxy.advanceSearchPostAsync(
+          query, // keywords
+          _postPage, // page
+          _pageSize, // perpage
+          _postSearchId, // searchId for pagination
+          false, // titleOnly
+          null, // userId
+          null, // searchUser
+          null, // forumId
+          null, // topicId
+          null, // onlyIn
+          null, // notIn
+          false, // startedBy
+        );
+        if (!mounted || seq != _querySeq) return;
+        if (!result.result) {
+          _reportSearchError(seq, result.resultText, posts: true);
+          return;
+        }
+        // Only update searchId if this is the first page
+        if (_postSearchId == null && result.search_id != null && result.search_id!.isNotEmpty) {
+          _postSearchId = result.search_id;
+        }
+        setState(() {
+          _posts.addAll(result.posts);
+          _hasMorePosts = result.posts.length >= _pageSize;
+          if (_hasMorePosts) _postPage++;
+        });
       }
-      if (!mounted) return;
-      setState(() {
-        _posts.addAll(result.posts);
-        _isLoadingPosts = false;
-        _hasMorePosts = result.posts.length == _pageSize;
-        if (_hasMorePosts) _postPage++;
-      });
+    } catch (e) {
+      if (!mounted || seq != _querySeq) return;
+      _reportSearchError(seq, 'Search failed: $e', posts: true);
+    } finally {
+      if (mounted && seq == _querySeq) {
+        setState(() {
+          _isLoadingPosts = false;
+        });
+      }
     }
   }
 
   Future<void> _fetchTitlesOnly() async {
     if (_isLoadingTitlesOnly || !_hasMoreTitlesOnly || _currentQuery == null) return;
+    final seq = _querySeq;
+    final query = _currentQuery!;
     setState(() {
       _isLoadingTitlesOnly = true;
+      _titlesOnlyError = false;
     });
     final hasAdvancedSearch = widget.siteContext.ConfigData.advancedSearch == true;
     final proxy = SiteProxyService.getSearchProxy();
 
-    if (!hasAdvancedSearch) {
-      // If advanced search is not available, fall back to regular topic search
-      final startNum = (_titlesOnlyPage - 1) * _pageSize;
-      final lastNum = _titlesOnlyPage * _pageSize;
-      final result = await proxy.searchTopicAsync(_currentQuery!, startNum, lastNum, null);
-      if (!mounted) return;
-      setState(() {
-        _titlesOnlyTopics.addAll(result.topics);
-        _isLoadingTitlesOnly = false;
-        _hasMoreTitlesOnly = result.topics.length == _pageSize;
-        if (_hasMoreTitlesOnly) _titlesOnlyPage++;
-      });
-    } else {
-      // Use advanced search with titleOnly = true
-      final result = await proxy.advanceSearchTopicAsync(
-        _currentQuery!, // keywords
-        _titlesOnlyPage, // page
-        _pageSize, // perpage
-        _titlesOnlySearchId, // searchId for pagination
-        true, // titleOnly - this is the key difference
-        null, // userId
-        null, // searchUser
-        null, // forumId
-        null, // topicId
-        null, // onlyIn
-        null, // notIn
-        false, // startedBy
-        null, // searchTime
-      );
-      // Only update searchId if this is the first page
-      if (_titlesOnlySearchId == null && result.search_id != null && result.search_id!.isNotEmpty) {
-        _titlesOnlySearchId = result.search_id;
+    try {
+      if (proxy is DiscourseSearchProxy) {
+        // Discourse-native route with `in:title` layered on top of any
+        // user-selected filters.
+        final result = await proxy.searchWithFiltersAsync(
+          keywords: query,
+          filters: _filters.copyWith(titleOnly: true),
+          page: _titlesOnlyPage,
+        );
+        if (!mounted || seq != _querySeq) return;
+        setState(() {
+          _titlesOnlyTopics.addAll(result.topics);
+          _hasMoreTitlesOnly = result.hasMore;
+          if (_hasMoreTitlesOnly) _titlesOnlyPage++;
+        });
+      } else if (!hasAdvancedSearch) {
+        // If advanced search is not available, fall back to regular topic search
+        final startNum = (_titlesOnlyPage - 1) * _pageSize;
+        final lastNum = startNum + _pageSize - 1;
+        final result = await proxy.searchTopicAsync(query, startNum, lastNum, null);
+        if (!mounted || seq != _querySeq) return;
+        if (!result.result) {
+          _reportSearchError(seq, result.resultText, titlesOnly: true);
+          return;
+        }
+        setState(() {
+          _titlesOnlyTopics.addAll(result.topics);
+          _hasMoreTitlesOnly = result.topics.length >= _pageSize;
+          if (_hasMoreTitlesOnly) _titlesOnlyPage++;
+        });
+      } else {
+        // Use advanced search with titleOnly = true
+        final result = await proxy.advanceSearchTopicAsync(
+          query, // keywords
+          _titlesOnlyPage, // page
+          _pageSize, // perpage
+          _titlesOnlySearchId, // searchId for pagination
+          true, // titleOnly - this is the key difference
+          null, // userId
+          null, // searchUser
+          null, // forumId
+          null, // topicId
+          null, // onlyIn
+          null, // notIn
+          false, // startedBy
+          null, // searchTime
+        );
+        if (!mounted || seq != _querySeq) return;
+        if (!result.result) {
+          _reportSearchError(seq, result.resultText, titlesOnly: true);
+          return;
+        }
+        // Only update searchId if this is the first page
+        if (_titlesOnlySearchId == null && result.search_id != null && result.search_id!.isNotEmpty) {
+          _titlesOnlySearchId = result.search_id;
+        }
+        setState(() {
+          _titlesOnlyTopics.addAll(result.topics);
+          _hasMoreTitlesOnly = result.topics.length >= _pageSize;
+          if (_hasMoreTitlesOnly) _titlesOnlyPage++;
+        });
       }
-      if (!mounted) return;
-      setState(() {
-        _titlesOnlyTopics.addAll(result.topics);
-        _isLoadingTitlesOnly = false;
-        _hasMoreTitlesOnly = result.topics.length == _pageSize;
-        if (_hasMoreTitlesOnly) _titlesOnlyPage++;
-      });
+    } catch (e) {
+      if (!mounted || seq != _querySeq) return;
+      _reportSearchError(seq, 'Search failed: $e', titlesOnly: true);
+    } finally {
+      if (mounted && seq == _querySeq) {
+        setState(() {
+          _isLoadingTitlesOnly = false;
+        });
+      }
     }
   }
 

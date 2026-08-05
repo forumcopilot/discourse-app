@@ -16,7 +16,8 @@ import '../base_discourse_proxy.dart';
 ///   * `POST   /chat/:channel_id`                    — send a message
 ///   * `PUT    /chat/api/channels/:cid/messages/:mid` — edit a message
 ///   * `DELETE /chat/api/channels/:cid/messages/:mid` — delete a message
-///   * `PUT    /chat/api/channels/:cid/read/:mid`    — mark read
+///   * `PUT    /chat/api/channels/:cid/read`          — mark read
+///                                                      (message_id in body)
 ///
 /// Polling: no Discourse-native long-poll for chat (web uses
 /// MessageBus + websockets). For mobile we re-fetch the recent
@@ -32,12 +33,24 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
   Future<FCChatChannelListResult> getMyChannelsAsync() async {
     try {
       final response = await apiGet('/chat/api/me/channels');
-      // Shape: { public_channels: [...], direct_message_channels: [...] }
+      // Shape: { public_channels: [...], direct_message_channels: [...],
+      //          tracking: { channel_tracking: { "<id>": { unread_count,
+      //          mention_count, ... } } } }
+      // Unread/mention counts live in the top-level `tracking` object
+      // (structured_channel_serializer), NOT on
+      // current_user_membership — pass the per-channel entry through.
+      final tracking = (response['tracking'] as Map?)?.cast<String, dynamic>();
+      final channelTracking =
+          (tracking?['channel_tracking'] as Map?)?.cast<String, dynamic>();
       final channels = <FCChatChannel>[];
       for (final key in const ['public_channels', 'direct_message_channels']) {
         final list = (response[key] as List?) ?? const [];
         for (final raw in list.whereType<Map>()) {
-          channels.add(_channelFromJson(raw.cast<String, dynamic>()));
+          final json = raw.cast<String, dynamic>();
+          final trackingInfo =
+              (channelTracking?['${json['id']}'] as Map?)
+                  ?.cast<String, dynamic>();
+          channels.add(_channelFromJson(json, tracking: trackingInfo));
         }
       }
       // Sort: unread first, then by last activity desc.
@@ -79,12 +92,16 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     String direction = 'past',
   }) async {
     try {
+      // Send BOTH params when a target is given: the server treats
+      // `target_message_id` without `direction` as "fetch messages
+      // AROUND the target" (Chat::MessagesQuery#query_around_target),
+      // which re-delivers old messages — with `direction` it paginates
+      // strictly past/future of the target as intended.
       final query = <String, String>{
         'page_size': pageSize.toString(),
+        'direction': direction,
         if (targetMessageId != null)
-          'target_message_id': targetMessageId.toString()
-        else
-          'direction': direction,
+          'target_message_id': targetMessageId.toString(),
       };
       final response = await apiGet(
         '/chat/api/channels/$channelId/messages',
@@ -142,12 +159,13 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       final response = await apiPost('/chat/$channelId', body: {
         'message': message,
       });
-      // Response shape: { chat_message: {...} } or echoes the message
-      // at the top level depending on Discourse version.
-      final raw =
-          (response['chat_message'] as Map?)?.cast<String, dynamic>() ??
-              response.cast<String, dynamic>();
-      if (!raw.containsKey('id')) {
+      // Response shape: success_json.merge(message_id:) — i.e.
+      // { success: "OK", message_id: 123 }
+      // (chat/api/channel_messages_controller.rb#create). The created
+      // message is NOT echoed back, so synthesize a local echo from
+      // what we sent; the next poll replaces it with the server copy.
+      final messageId = (response['message_id'] as num?)?.toInt();
+      if (messageId == null) {
         return FCChatMessageResult(
           result: false,
           resultText: 'Server returned no message id',
@@ -155,7 +173,18 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       }
       return FCChatMessageResult(
         result: true,
-        message: _messageFromJson(raw),
+        message: FCChatMessage(
+          id: messageId,
+          channelId: channelId,
+          message: message,
+          cooked: message,
+          authorId: int.tryParse(siteContext.currentUserId ?? '') ?? 0,
+          authorUsername: siteContext.currentUsername ?? '',
+          createdAt: DateTime.now(),
+          edited: false,
+          deleted: false,
+          streaming: false,
+        ),
       );
     } on DiscourseApiException catch (e) {
       return FCChatMessageResult(result: false, resultText: e.userMessage);
@@ -207,10 +236,25 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     int? messageId,
   }) async {
     try {
-      final path = messageId == null
-          ? '/chat/api/channels/$channelId/read'
-          : '/chat/api/channels/$channelId/read/$messageId';
-      await apiPut(path);
+      // Route: PUT /chat/api/channels/:channel_id/read with message_id
+      // in the body (plugins/chat/config/routes.rb). The
+      // Chat::UpdateUserChannelLastRead service REQUIRES message_id, so
+      // when the caller doesn't know one, resolve the channel's latest
+      // message id first.
+      var targetId = messageId;
+      if (targetId == null) {
+        final channel = await apiGet('/chat/api/channels/$channelId');
+        final ch = (channel['channel'] as Map?)?.cast<String, dynamic>();
+        final lastMessage =
+            (ch?['last_message'] as Map?)?.cast<String, dynamic>();
+        targetId = (lastMessage?['id'] as num?)?.toInt();
+        if (targetId == null) {
+          // Empty channel — nothing to mark as read.
+          return FCChatActionResult(result: true);
+        }
+      }
+      await apiPut('/chat/api/channels/$channelId/read',
+          body: {'message_id': targetId});
       return FCChatActionResult(result: true);
     } on DiscourseApiException catch (e) {
       return FCChatActionResult(result: false, resultText: e.userMessage);
@@ -219,7 +263,10 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     }
   }
 
-  FCChatChannel _channelFromJson(Map<String, dynamic> json) {
+  FCChatChannel _channelFromJson(
+    Map<String, dynamic> json, {
+    Map<String, dynamic>? tracking,
+  }) {
     final membership =
         (json['current_user_membership'] as Map?)?.cast<String, dynamic>();
     final meta = (json['meta'] as Map?)?.cast<String, dynamic>();
@@ -231,8 +278,14 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       description: json['description']?.toString(),
       slug: json['slug']?.toString(),
       chatableType: (json['chatable_type'] ?? 'Category').toString(),
-      unreadCount: (membership?['unread_count'] as num?)?.toInt() ?? 0,
-      mentionCount: (membership?['mention_count'] as num?)?.toInt() ?? 0,
+      // Prefer the response-level tracking entry; the membership fields
+      // are kept as a fallback for older serializer shapes.
+      unreadCount: (tracking?['unread_count'] as num?)?.toInt() ??
+          (membership?['unread_count'] as num?)?.toInt() ??
+          0,
+      mentionCount: (tracking?['mention_count'] as num?)?.toInt() ??
+          (membership?['mention_count'] as num?)?.toInt() ??
+          0,
       lastReadMessageId:
           (membership?['last_read_message_id'] as num?)?.toInt(),
       isFollowing: membership?['following'] == true,

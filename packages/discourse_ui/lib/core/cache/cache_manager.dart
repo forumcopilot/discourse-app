@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:discourse_ui/core/cache/lru_cache.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 
 /// Centralized cache management with memory monitoring
@@ -21,6 +22,9 @@ class CacheManager {
     _caches[cacheName] = cache;
     _maxSizes[cacheName] = maxSize;
 
+    // Cancel any previous cleanup timer for this name so re-registering
+    // doesn't leak a periodic timer.
+    _cleanupTimers.remove(cacheName)?.cancel();
     if (cleanupInterval != null) {
       _cleanupTimers[cacheName] = Timer.periodic(cleanupInterval, (_) {
         _cleanupCache(cacheName);
@@ -28,6 +32,15 @@ class CacheManager {
     }
 
     AppLogger.debug('Registered cache: $cacheName (maxSize: $maxSize)');
+  }
+
+  /// Unregister a cache: cancels its cleanup timer and drops all references.
+  /// Call from the owner's dispose (e.g. SiteManager.dispose).
+  void unregisterCache(String cacheName) {
+    _cleanupTimers.remove(cacheName)?.cancel();
+    _caches.remove(cacheName);
+    _maxSizes.remove(cacheName);
+    AppLogger.debug('Unregistered cache: $cacheName');
   }
 
   /// Get cache by name
@@ -41,6 +54,10 @@ class CacheManager {
     if (cache == null) return;
 
     try {
+      if (cache is LRUCache) {
+        // LRUCache evicts on insert by itself — nothing to do periodically.
+        return;
+      }
       if (cache is Map) {
         // For Map-based caches, remove oldest entries if over limit
         final maxSize = _maxSizes[cacheName] ?? 100;
@@ -62,11 +79,7 @@ class CacheManager {
   void clearCache(String cacheName) {
     final cache = _caches[cacheName];
     if (cache != null) {
-      if (cache is Map) {
-        cache.clear();
-      } else if (cache is List) {
-        cache.clear();
-      }
+      _clearCacheInstance(cache);
       AppLogger.debug('Cleared cache: $cacheName');
     }
   }
@@ -74,13 +87,19 @@ class CacheManager {
   /// Clear all caches
   void clearAllCaches() {
     for (final cache in _caches.values) {
-      if (cache is Map) {
-        cache.clear();
-      } else if (cache is List) {
-        cache.clear();
-      }
+      _clearCacheInstance(cache);
     }
     AppLogger.info('Cleared all caches');
+  }
+
+  void _clearCacheInstance(dynamic cache) {
+    if (cache is LRUCache) {
+      cache.clear();
+    } else if (cache is Map) {
+      cache.clear();
+    } else if (cache is List) {
+      cache.clear();
+    }
   }
 
   /// Get memory usage statistics
@@ -91,7 +110,13 @@ class CacheManager {
       final cacheName = entry.key;
       final cache = entry.value;
 
-      if (cache is Map) {
+      if (cache is LRUCache) {
+        stats[cacheName] = {
+          'type': 'LRUCache',
+          'size': cache.size,
+          'maxSize': _maxSizes[cacheName],
+        };
+      } else if (cache is Map) {
         stats[cacheName] = {
           'type': 'Map',
           'size': cache.length,

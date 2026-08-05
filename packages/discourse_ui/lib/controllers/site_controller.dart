@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
@@ -29,8 +28,13 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
   // Timeout configuration (in seconds)
   static const int _defaultTimeoutSeconds = 30;
 
-  // Stream subscriptions for cleanup
-  StreamSubscription? _settingsSubscription;
+  // Generation counter guarding against a timed-out initialization completing
+  // late and clobbering the state of a newer attempt (Future.any does not
+  // cancel the losing future).
+  int _initGeneration = 0;
+
+  // In-flight initialization, used to serialize concurrent initializeSite calls.
+  Future<SiteContext?>? _inFlightInit;
 
   DiscourseSiteController() {
     // Don't auto-initialize, wait for user to select a site
@@ -76,7 +80,34 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
     return currentSiteContext.value;
   }
 
-  Future<SiteContext?> initializeSite(Site site, {bool showGlobalLoader = true}) async {
+  Future<SiteContext?> initializeSite(Site site, {bool showGlobalLoader = true, bool forceReinitialize = false}) async {
+    // Serialize concurrent calls: wait for any in-flight initialization to
+    // settle before evaluating this request, so two calls can't interleave.
+    while (_inFlightInit != null) {
+      try {
+        await _inFlightInit;
+      } catch (_) {
+        // Errors are handled by the call that owns the future.
+      }
+    }
+    final init = _doInitializeSite(
+      site,
+      showGlobalLoader: showGlobalLoader,
+      forceReinitialize: forceReinitialize,
+    );
+    _inFlightInit = init;
+    try {
+      return await init;
+    } finally {
+      _inFlightInit = null;
+    }
+  }
+
+  Future<SiteContext?> _doInitializeSite(
+    Site site, {
+    required bool showGlobalLoader,
+    required bool forceReinitialize,
+  }) async {
     AppLogger.info('initializeSite called with site: ${site.name} (${site.url})');
     AppLogger.debug('currentSite: ${currentSite.value?.name} (${currentSite.value?.url})');
     AppLogger.debug('isInitialized: ${isInitialized.value}');
@@ -96,11 +127,13 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
     // Compare Site IDs to avoid false positives
     // Also check if the site is actually successfully initialized
     // Must have Site ID for matching
-    bool shouldInitialize = currentSite.value == null || (site.id != null && currentSite.value!.id != site.id) || (site.id == null) || !isInitialized.value;
-    AppLogger.debug('Should initialize: $shouldInitialize (current: ${currentSite.value?.id}, new: ${site.id}, isInitialized: ${isInitialized.value})');
+    bool shouldInitialize =
+        forceReinitialize || currentSite.value == null || (site.id != null && currentSite.value!.id != site.id) || (site.id == null) || !isInitialized.value;
+    AppLogger.debug('Should initialize: $shouldInitialize (current: ${currentSite.value?.id}, new: ${site.id}, isInitialized: ${isInitialized.value}, force: $forceReinitialize)');
 
     if (shouldInitialize) {
       AppLogger.info('Proceeding with site initialization...');
+      final generation = ++_initGeneration;
       if (showGlobalLoader) {
         DiscourseGlobalLoaderController.to.show();
       }
@@ -117,7 +150,7 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
 
       try {
         // Wrap the initialization process with timeout
-        final siteContext = await _initializeSiteWithTimeout(site);
+        final siteContext = await _initializeSiteWithTimeout(site, generation);
         currentSiteContext.value = siteContext;
       } catch (e, stackTrace) {
         // Force hide loader completely - call hide multiple times to ensure counter reaches 0
@@ -189,14 +222,24 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
 
   void _attachReloginHandler(SiteContext siteContext) => attachReloginHandler(siteContext);
 
+  /// Throws when [generation] is no longer the active initialization attempt.
+  /// A timed-out attempt keeps running (Future.any doesn't cancel the loser),
+  /// so its state writes must be discarded once a newer attempt has started.
+  void _ensureCurrentGeneration(int generation, String stage) {
+    if (generation != _initGeneration) {
+      throw StateError(
+          'Site initialization superseded during $stage (generation $generation != $_initGeneration)');
+    }
+  }
+
   /// Initialize site with timeout
-  Future<SiteContext> _initializeSiteWithTimeout(Site site) async {
+  Future<SiteContext> _initializeSiteWithTimeout(Site site, int generation) async {
     AppLogger.info('Starting initialization for ${site.name} with ${_defaultTimeoutSeconds}s timeout');
 
     try {
       // Production code with timeout
       final siteContext = await Future.any([
-        _performSiteInitialization(site),
+        _performSiteInitialization(site, generation),
         Future.delayed(Duration(seconds: _defaultTimeoutSeconds)).then((_) {
           throw NetworkException.timeout();
         }),
@@ -210,7 +253,7 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
   }
 
   /// Perform the actual site initialization
-  Future<SiteContext> _performSiteInitialization(Site site) async {
+  Future<SiteContext> _performSiteInitialization(Site site, int generation) async {
     AppLogger.info('Starting site initialization for ${site.name}');
     AppLogger.debug('Site URL: ${site.url}');
 
@@ -263,6 +306,9 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
     }
     AppLogger.debug('Plugin URL set to: $pluginUrl');
 
+    // Bail out before side-effectful login/UI work if a newer attempt started.
+    _ensureCurrentGeneration(generation, 'config fetch');
+
     // Attempt automatic login if credentials are available
     AppLogger.debug('Setting up DiscourseLoginController...');
     if (!Get.isRegistered<DiscourseLoginController>()) {
@@ -276,6 +322,10 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
 
     final loginController = Get.find<DiscourseLoginController>();
     final loginResult = await loginController.attemptAutomaticLogin(siteContext);
+
+    // Prevents a timed-out attempt from pushing a stray login page after a
+    // newer attempt has taken over.
+    _ensureCurrentGeneration(generation, 'automatic login');
 
     if (loginResult.success) {
       AppLogger.info('Automatic login successful');
@@ -294,6 +344,11 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
     AppLogger.debug('Final login state after auto-login: ${siteContext.isLoginInformationAvailable}');
 
     siteContext.updateLoginState();
+
+    // Only the current attempt may flip the controller's state — a late
+    // success from a timed-out attempt must not set isInitialized=true
+    // while currentSite has already been cleared or replaced.
+    _ensureCurrentGeneration(generation, 'finalization');
     isInitialized.value = true;
 
     AppLogger.debug('Recording visit for site: ${site.name}');
@@ -466,10 +521,6 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
 
   @override
   void onClose() {
-    // Cleanup resources to prevent memory leaks
-    _settingsSubscription?.cancel();
-    _settingsSubscription = null;
-
     // Clear reactive variables
     isInitialized.value = false;
     hasError.value = false;

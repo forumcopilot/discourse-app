@@ -178,56 +178,8 @@ class ErrorHandlingUtils {
   }
 }
 
-/// Mixin for error handling in controllers
-mixin ErrorHandlingMixin {
-  /// Handle errors in controller methods
-  Future<void> handleError(
-    dynamic error,
-    StackTrace? stackTrace, {
-    String? context,
-    bool showToUser = true,
-  }) async {
-    await ErrorHandler.handleError(
-      error,
-      stackTrace,
-      context: context ?? runtimeType.toString(),
-      showToUser: showToUser,
-    );
-  }
-
-  /// Handle errors with retry
-  Future<T?> handleErrorWithRetry<T>(
-    Future<T> Function() operation, {
-    String? context,
-    int maxRetries = 3,
-    Duration retryDelay = const Duration(seconds: 1),
-    T? fallbackValue,
-  }) async {
-    int attempts = 0;
-
-    while (attempts < maxRetries) {
-      try {
-        return await operation();
-      } catch (e, stackTrace) {
-        attempts++;
-
-        if (attempts >= maxRetries) {
-          await handleError(e, stackTrace, context: context);
-          return fallbackValue;
-        }
-
-        AppLogger.warning(
-          'Operation failed, retrying in ${retryDelay.inSeconds}s (attempt $attempts/$maxRetries)',
-          tag: context ?? runtimeType.toString(),
-        );
-
-        await Future.delayed(retryDelay);
-      }
-    }
-
-    return fallbackValue;
-  }
-}
+// NOTE: ErrorHandlingMixin lives in error_handling_mixins.dart (the copy that
+// used to be duplicated here was an import-ambiguity trap and was removed).
 
 /// Extension for easy error handling on Future
 extension FutureErrorHandling<T> on Future<T> {

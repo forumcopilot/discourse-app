@@ -101,7 +101,10 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
   @override
   Future<FCSubscribedForumResult> getSubscribedForumAsync() async {
     try {
-      final response = await apiGet('/categories.json');
+      // include_subcategories=true: without it /categories.json omits
+      // subcategories, hiding any watched/tracked subcategory here.
+      final response = await apiGet('/categories.json',
+          query: {'include_subcategories': 'true'});
       final list = (response['category_list'] as Map<String, dynamic>?) ??
           const <String, dynamic>{};
       final cats = ((list['categories'] as List?) ?? const [])
@@ -225,7 +228,12 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
   ) async {
     try {
       final t = await apiGet('/t/$topicId.json');
-      final raw = t['notification_level'] as int?;
+      // Topic-view payloads carry notification_level under `details`
+      // (app/serializers/topic_view_details_serializer.rb); only list
+      // payloads have it top-level. Read details first, then fall back.
+      final details = t['details'] as Map<String, dynamic>?;
+      final raw = (details?['notification_level'] as int?) ??
+          (t['notification_level'] as int?);
       return FCNotificationLevelResult(
         result: true,
         level: raw != null ? FCNotificationLevel.fromInt(raw) : null,
@@ -243,7 +251,10 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
     String categoryId,
   ) async {
     try {
-      final response = await apiGet('/categories.json');
+      // include_subcategories=true: without it /categories.json omits
+      // subcategories, so their notification level silently reads as null.
+      final response = await apiGet('/categories.json',
+          query: {'include_subcategories': 'true'});
       final list = (response['category_list'] as Map<String, dynamic>?) ??
           const <String, dynamic>{};
       final cats = ((list['categories'] as List?) ?? const [])
@@ -301,16 +312,25 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
     Map<int, Map<String, dynamic>> users = const {},
   }) {
     final posters = (t['posters'] as List?) ?? const [];
-    int? opUserId;
-    for (final p in posters.whereType<Map>()) {
-      final desc = (p['description'] ?? '').toString();
-      if (desc.contains('Original Poster')) {
-        opUserId = p['user_id'] as int?;
-        break;
+    // Server contract (app/models/topic_posters_summary.rb): posters are
+    // ordered topic-creator-first — the latest poster is shuffled to the
+    // back unless they ARE the creator — and only `extras` ('latest' /
+    // 'latest single') is a structured marker; `description` is localized
+    // and must not be matched. So posters[0] is the Original Poster.
+    int? opUserId = posters.isNotEmpty && posters.first is Map
+        ? (posters.first as Map)['user_id'] as int?
+        : null;
+    if (opUserId == null) {
+      // Last-resort fallback for non-standard payloads: the English
+      // description string.
+      for (final p in posters.whereType<Map>()) {
+        final desc = (p['description'] ?? '').toString();
+        if (desc.contains('Original Poster')) {
+          opUserId = p['user_id'] as int?;
+          break;
+        }
       }
     }
-    opUserId ??=
-        posters.isNotEmpty ? (posters.first as Map)['user_id'] as int? : null;
     final opUser = opUserId == null ? null : users[opUserId];
     final tpl = opUser?['avatar_template'] as String?;
     String? avatarUrl;

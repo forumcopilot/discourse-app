@@ -15,9 +15,32 @@ import '../base_discourse_proxy.dart';
 /// Endpoints:
 ///   * GET `/search.json?q=...&page=N` — full-text search across topics + posts.
 ///
+/// Paging contract (verified against the Discourse source):
+///   * `page` is 1-based — `SearchController#show` clamps it with
+///     `[page.to_i, 1].max` and rejects pages above `PAGE_LIMIT` (10)
+///     with a 400.
+///   * The controller itself sets `type_filter: "topic"` for
+///     `/search.json`, so the paging offset
+///     (`(page - 1) * Search.per_filter`) always applies; there is no
+///     client-side `type_filter` parameter (only `q` and `page` are
+///     permitted).
+///   * Page size is fixed server-side by `SiteSetting.search_page_size`
+///     (default 50); there is no per-page parameter — a requested span
+///     is advisory at best.
+///   * With `type_filter: "topic"` the server runs a single aggregate
+///     search (best post per topic): the response's `posts` and
+///     `topics` arrays are two views of the same result set and page in
+///     lockstep with the one `page` param. Users/categories/tags are
+///     only produced by the un-paged header search (`/search/query`),
+///     so a users list cannot be paged via the stock API.
+///   * Has-more is signalled by
+///     `grouped_search_result.more_full_page_results` (true when the
+///     server found a full page plus at least one extra row).
+///
 /// `/search.json` returns `{ posts: [], topics: [], users: [], categories: [],
-/// tags: [], groups: [] }`. We extract topics and posts; the search-topic
-/// endpoint and search-post endpoint share this single Discourse call.
+/// tags: [], groups: [], grouped_search_result: {...} }`. We extract topics
+/// and posts; the search-topic endpoint and search-post endpoint share this
+/// single Discourse call.
 ///
 /// Discourse exposes a rich query DSL (operators concatenated into `q`):
 ///   - `@username`           — by author
@@ -33,6 +56,11 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
   DiscourseSearchProxy(SiteContext context) : super(context);
 
   static const int _defaultPerPage = 20;
+
+  /// `SearchController::PAGE_LIMIT` — `/search.json` rejects `page`
+  /// values above this with a 400, so paging is capped explicitly here
+  /// rather than re-serving (or erroring on) deep pages.
+  static const int _maxPage = 10;
 
   @override
   Future<FCSearchTopicResult> searchTopicAsync(
@@ -50,8 +78,19 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       );
     }
     try {
-      final response = await _searchRaw(searchString,
-          page: _pageOf(startNum), perPage: _spanFromIndices(startNum, lastNum));
+      final page = _pageOf(startNum, lastNum);
+      if (page > _maxPage) {
+        // Beyond the server's 10-page window — stop paging instead of
+        // erroring or silently re-serving the last page.
+        return FCSearchTopicResult(
+          result: true,
+          resultText: '',
+          totalTopicNum: 0,
+          searchId: null,
+          topics: const [],
+        );
+      }
+      final response = await _searchRaw(searchString, page: page);
       final users = _usersById(response);
       final topics = ((response['topics'] as List?) ?? const [])
           .whereType<Map>()
@@ -61,11 +100,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       return FCSearchTopicResult(
         result: true,
         resultText: '',
-        totalTopicNum:
-            (response['grouped_search_result']?['type_filter'] as String?) ==
-                    'topic'
-                ? topics.length
-                : topics.length,
+        totalTopicNum: topics.length,
         searchId: null,
         topics: topics,
       );
@@ -95,8 +130,17 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       );
     }
     try {
-      final response = await _searchRaw(searchString,
-          page: _pageOf(startNum), perPage: _spanFromIndices(startNum, lastNum));
+      final page = _pageOf(startNum, lastNum);
+      if (page > _maxPage) {
+        return FCSearchPostResult(
+          result: true,
+          resultText: '',
+          totalPostNum: 0,
+          searchId: null,
+          posts: const [],
+        );
+      }
+      final response = await _searchRaw(searchString, page: page);
       final posts = ((response['posts'] as List?) ?? const [])
           .whereType<Map>()
           .map((p) => _postFromSearchResult(p.cast<String, dynamic>()))
@@ -146,8 +190,15 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
         startedBy: startedBy,
         searchTimeSeconds: searchTime,
       );
-      final response =
-          await _searchRaw(q, page: page <= 0 ? 0 : page, perPage: perpage);
+      if (page > _maxPage) {
+        return FCSearchDataResultTopic(
+          result: true,
+          resultText: '',
+          totalTopicNum: 0,
+          topics: const [],
+        );
+      }
+      final response = await _searchRaw(q, page: page < 1 ? 1 : page);
       final users = _usersById(response);
       final topics = ((response['topics'] as List?) ?? const [])
           .whereType<Map>()
@@ -196,8 +247,15 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
         notIn: notIn,
         startedBy: startedBy,
       );
-      final response =
-          await _searchRaw(q, page: page <= 0 ? 0 : page, perPage: perpage);
+      if (page > _maxPage) {
+        return FCSearchDataResultPost(
+          result: true,
+          resultText: '',
+          totalPostNum: 0,
+          posts: const [],
+        );
+      }
+      final response = await _searchRaw(q, page: page < 1 ? 1 : page);
       final posts = ((response['posts'] as List?) ?? const [])
           .whereType<Map>()
           .map((p) => _postFromSearchResult(p.cast<String, dynamic>()))
@@ -223,49 +281,62 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
   ///
   /// Returns the raw split { topics, posts } so callers can decide how
   /// to render. Pass [page] to paginate (1-indexed, matching Discourse).
+  /// The page size is fixed server-side (`SiteSetting.search_page_size`)
+  /// and topics/posts page in lockstep — they are two views of the same
+  /// aggregate result set. Check [DiscourseSearchResult.hasMore] for
+  /// whether another page exists; pages beyond the server's 10-page
+  /// window return empty results with `hasMore: false`.
+  ///
+  /// Throws on network/API errors so callers can surface them and
+  /// offer a retry.
   Future<DiscourseSearchResult> searchWithFiltersAsync({
     required String keywords,
     FCSearchFilters filters = const FCSearchFilters(),
     int page = 1,
-    int perPage = _defaultPerPage,
   }) async {
     final fragment = filters.toQueryFragment();
     final q = [keywords.trim(), fragment]
         .where((p) => p.isNotEmpty)
         .join(' ')
         .trim();
-    if (q.isEmpty) {
+    if (q.isEmpty || page > _maxPage) {
       return const DiscourseSearchResult(topics: [], posts: []);
     }
-    try {
-      final response =
-          await _searchRaw(q, page: page <= 1 ? 0 : page - 1, perPage: perPage);
-      final users = _usersById(response);
-      final topics = ((response['topics'] as List?) ?? const [])
-          .whereType<Map>()
-          .map((t) =>
-              _topicFromSearchResult(t.cast<String, dynamic>(), users: users))
-          .toList();
-      final posts = ((response['posts'] as List?) ?? const [])
-          .whereType<Map>()
-          .map((p) => _postFromSearchResult(p.cast<String, dynamic>()))
-          .toList();
-      return DiscourseSearchResult(topics: topics, posts: posts);
-    } catch (_) {
-      return const DiscourseSearchResult(topics: [], posts: []);
-    }
+    final response = await _searchRaw(q, page: page < 1 ? 1 : page);
+    final users = _usersById(response);
+    final topics = ((response['topics'] as List?) ?? const [])
+        .whereType<Map>()
+        .map((t) =>
+            _topicFromSearchResult(t.cast<String, dynamic>(), users: users))
+        .toList();
+    final posts = ((response['posts'] as List?) ?? const [])
+        .whereType<Map>()
+        .map((p) => _postFromSearchResult(p.cast<String, dynamic>()))
+        .toList();
+    final more = (response['grouped_search_result'] as Map?)
+            ?['more_full_page_results'] ==
+        true;
+    return DiscourseSearchResult(
+      topics: topics,
+      posts: posts,
+      hasMore: more && page < _maxPage,
+    );
   }
 
   // ===== Helpers =====
 
+  /// GET `/search.json`. [page] is 1-based; the server clamps missing/low
+  /// values to 1, so page 1 is sent implicitly. Callers must not exceed
+  /// [_maxPage] (the server 400s above it). There is no per-page
+  /// parameter — the server returns `SiteSetting.search_page_size`
+  /// results per page.
   Future<Map<String, dynamic>> _searchRaw(
     String q, {
-    int page = 0,
-    int perPage = _defaultPerPage,
+    int page = 1,
   }) {
     return apiGet('/search.json', query: {
       'q': q,
-      if (page > 0) 'page': page.toString(),
+      if (page > 1) 'page': page.toString(),
     });
   }
 
@@ -401,13 +472,18 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
     );
   }
 
-  int _pageOf(int startNum) => startNum <= 0 ? 0 : (startNum / _defaultPerPage).floor();
-
-  int _spanFromIndices(int startNum, int lastNum) {
-    final s = startNum < 0 ? 0 : startNum;
-    final e = lastNum < s ? s + _defaultPerPage : lastNum;
-    final span = e - s + 1;
-    return span > 0 ? span.clamp(1, 50) : _defaultPerPage;
+  /// Maps the SDK's inclusive item-index span onto a 1-based Discourse
+  /// page: page N covers `startNum = (N-1)*span .. lastNum = N*span - 1`.
+  ///
+  /// Note the server ignores the requested span and returns
+  /// `SiteSetting.search_page_size`-sized pages (default 50), so a
+  /// caller paging with a different span may see gaps or overlap between
+  /// pages — but never the same page served twice for distinct spans.
+  /// Prefer [searchWithFiltersAsync], which pages natively.
+  int _pageOf(int startNum, int lastNum) {
+    final start = startNum < 0 ? 0 : startNum;
+    final span = lastNum >= start ? (lastNum - start + 1) : _defaultPerPage;
+    return (start ~/ span) + 1;
   }
 }
 
@@ -417,8 +493,16 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
 class DiscourseSearchResult {
   final List<FCTopic> topics;
   final List<FCPost> posts;
+
+  /// True when the server reported another full page
+  /// (`grouped_search_result.more_full_page_results`) and the next page
+  /// is still within the server's 10-page window. Topics and posts page
+  /// together, so this signal covers both lists.
+  final bool hasMore;
+
   const DiscourseSearchResult({
     required this.topics,
     required this.posts,
+    this.hasMore = false,
   });
 }

@@ -42,6 +42,8 @@ class ChatChannelController extends GetxController
   Timer? _pollTimer;
   int _highWatermark = 0;
   bool _disposed = false;
+  bool _bootstrapped = false;
+  bool _tickInFlight = false;
 
   // ---- lifecycle -------------------------------------------------------
 
@@ -93,6 +95,7 @@ class ChatChannelController extends GetxController
         unawaited(proxy.markChannelReadAsync(channelId,
             messageId: _highWatermark));
       }
+      _bootstrapped = true;
     } catch (e) {
       AppLogger.error('ChatChannelController bootstrap error: $e');
       lastError.value = e.toString();
@@ -120,9 +123,30 @@ class ChatChannelController extends GetxController
   }
 
   Future<void> _tick() async {
-    if (_disposed || _highWatermark == 0) return;
+    if (_disposed || _tickInFlight) return;
+    _tickInFlight = true;
     try {
+      if (!_bootstrapped) {
+        // Initial load failed — retry it instead of polling from a
+        // watermark we never obtained.
+        await _bootstrap();
+        return;
+      }
       final proxy = SiteProxyService.getChatProxy();
+      if (_highWatermark == 0) {
+        // Empty channel: there's no watermark to poll from, so fetch the
+        // latest page — otherwise the first incoming message never shows.
+        final result = await proxy.getMessagesAsync(channelId, pageSize: 50);
+        if (!result.result || result.messages.isEmpty) return;
+        final existing = {for (final m in messages) m.id};
+        final fresh =
+            result.messages.where((m) => !existing.contains(m.id)).toList()
+              ..sort((a, b) => a.id.compareTo(b.id));
+        if (fresh.isEmpty) return;
+        messages.addAll(fresh);
+        _highWatermark = fresh.last.id;
+        return;
+      }
       final result = await proxy.pollNewerAsync(
         channelId,
         lastMessageId: _highWatermark,
@@ -141,6 +165,8 @@ class ChatChannelController extends GetxController
       // hook.
     } catch (e) {
       AppLogger.warning('ChatChannelController poll error: $e');
+    } finally {
+      _tickInFlight = false;
     }
   }
 

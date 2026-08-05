@@ -145,8 +145,15 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       );
     }
     try {
+      // Non-recent listing: `recent=true` caps at 15 rows and returns no
+      // `total_rows_notifications`, undercounting the unread-PM badge.
+      // The plain listing returns up to 60 rows (INDEX_LIMIT in
+      // notifications_controller.rb) plus the total; `filter=unread`
+      // keeps every returned row (and the total) unread so counts stay
+      // accurate even under a pile of read notifications.
       final response = await apiGet('/notifications.json', query: {
-        'recent': 'true',
+        'limit': '60',
+        'filter': 'unread',
       });
       final notifications =
           ((response['notifications'] as List?) ?? const []).whereType<Map>();
@@ -473,8 +480,12 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       };
     }
     try {
+      // Same fix as getInboxStatAsync: the recent=true listing caps at
+      // 15 rows and omits totals — use the plain listing with the max
+      // limit and unread filter for accurate badge counts.
       final response = await apiGet('/notifications.json', query: {
-        'recent': 'true',
+        'limit': '60',
+        'filter': 'unread',
       });
       final notifications =
           ((response['notifications'] as List?) ?? const []).whereType<Map>();
@@ -612,16 +623,36 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     final participantsField = (t['participants'] as List?) ?? const [];
     int? startUserId;
     int? lastUserId;
+    int? firstPosterId;
     final participantUserIds = <int>[];
     final seen = <int>{};
     for (final p in posters.whereType<Map>()) {
       final id = p['user_id'] as int?;
       if (id == null) continue;
       if (seen.add(id)) participantUserIds.add(id);
+      firstPosterId ??= id;
+      // `extras` is locale-independent (app/models/topic_posters_summary.rb):
+      // the most recent poster is tagged 'latest' ('latest single' when
+      // they are the only poster, i.e. also the OP). The `description`
+      // strings ("Original Poster" / "Most Recent Poster") are localized
+      // server-side, so match them only as a fallback.
+      final extras = (p['extras'] ?? '').toString();
+      if (extras.contains('latest')) {
+        lastUserId = id;
+        if (extras.contains('single')) startUserId ??= id;
+      }
       final desc = (p['description'] ?? '').toString();
-      if (desc.contains('Original Poster')) startUserId = id;
-      if (desc.contains('Most Recent Poster')) lastUserId = id;
+      if (startUserId == null && desc.contains('Original Poster')) {
+        startUserId = id;
+      }
+      if (lastUserId == null && desc.contains('Most Recent Poster')) {
+        lastUserId = id;
+      }
     }
+    // Positional fallback: Discourse orders posters[] OP-first (the
+    // latest poster is shuffled to the back), so when neither signal
+    // resolved, the first entry is the OP.
+    startUserId ??= firstPosterId;
     for (final p in participantsField.whereType<Map>()) {
       final id = p['user_id'] as int?;
       if (id == null) continue;

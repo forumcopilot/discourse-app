@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_vote.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
@@ -29,13 +30,13 @@ import 'post_list_item_attachment.dart';
 import 'post_list_item_social.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../user_profile_page.dart';
+import '../forum_topics_page.dart';
 import 'package:get/get.dart';
 import '../../controllers/login_controller.dart';
 import '../login_page.dart';
 import '../post_page.dart';
 import '../lists/posts_list.dart';
 import '../../services/site_proxy_service.dart';
-import 'package:discourse_core/discourse_core.dart';
 
 class _PostContentData {
   final String processedText;
@@ -178,12 +179,54 @@ class _PostListItemState extends State<PostListItem> {
     _vote = widget.post.vote;
   }
 
+  @override
+  void didUpdateWidget(PostListItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Keyed items survive a refresh, so the state copied in initState goes
+    // stale when the parent hands us a fresh FCPost. Re-sync whenever the
+    // post instance changes (same-instance rebuilds keep local mutations).
+    if (!identical(oldWidget.post, widget.post)) {
+      _isLiked = widget.post.isLiked;
+      _likeCount = widget.post.likesInfo.length;
+      // Don't clobber an in-flight optimistic bookmark toggle.
+      if (!_bookmarkInFlight) {
+        _isBookmarked = widget.post.bookmarked;
+      }
+      _reactions = List.of(widget.post.reactions, growable: false);
+      _vote = widget.post.vote;
+    }
+  }
+
   /// Checks if a URL is a mention link (link text starts with @ and has no spaces)
   bool _isMentionUrl(String? linkText) {
     if (linkText == null || linkText.isEmpty) return false;
     final trimmed = linkText.trim();
     // Check if it starts with @ and has no spaces
     return trimmed.startsWith('@') && !trimmed.contains(' ');
+  }
+
+  /// Returns the username when [url] is a same-forum `/u/{username}` (or
+  /// `/users/{username}`) profile link — i.e. a genuine Discourse mention
+  /// target. Returns null for everything else (mailto:, external hosts like
+  /// medium.com/@author, deeper user sub-paths, ...).
+  String? _mentionUsernameFromUrl(String url) {
+    try {
+      final uri = Uri.parse(url.trim());
+      if (uri.scheme.isNotEmpty &&
+          uri.scheme != 'http' &&
+          uri.scheme != 'https') {
+        return null; // mailto:, tel:, ...
+      }
+      if (uri.hasAuthority) {
+        final forumHost = Uri.parse(widget.siteContext.site.url).host;
+        if (uri.host != forumHost) return null;
+      }
+      final match =
+          RegExp(r'^/u(?:sers)?/([^/?#]+)/?$').firstMatch(uri.path);
+      return match?.group(1);
+    } catch (_) {
+      return null;
+    }
   }
 
   _PostContentData _extractPostContentData() {
@@ -308,25 +351,24 @@ class _PostListItemState extends State<PostListItem> {
     final callbacks = BBCodeCallbacks(
       onUrlTap: (url) {
         AppLogger.debug('BBCode URL tapped: $url');
-        // Check if URL might be a mention link (contains user profile path)
-        // This is a fallback in case CustomUrlTag didn't catch it
-        final mentionMatch = RegExp(r'@(\w+)').firstMatch(url);
-        if (mentionMatch != null) {
-          final username = mentionMatch.group(1);
+        // Only treat the link as a mention when it is a genuine same-forum
+        // /u/{username} profile URL. (A bare `@(\w+)` match on the whole URL
+        // would hijack mailto: links, medium.com/@author, etc. Mention-class
+        // anchors are already routed to onMentionTap by RichTextContent.)
+        final mentionUsername = _mentionUsernameFromUrl(url);
+        if (mentionUsername != null && mentionUsername.isNotEmpty) {
           AppLogger.debug(
-              'BBCode URL contains mention pattern, username: $username');
-          if (username != null && username.isNotEmpty) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => UserProfilePage(
-                  siteContext: widget.siteContext,
-                  userName: username,
-                ),
+              'PostListItem: same-forum profile link, username: $mentionUsername');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserProfilePage(
+                siteContext: widget.siteContext,
+                userName: mentionUsername,
               ),
-            );
-            return;
-          }
+            ),
+          );
+          return;
         }
         final cleanUrl = url.trim().replaceAll('"', '');
         final site = widget.siteContext.site;
@@ -385,6 +427,18 @@ class _PostListItemState extends State<PostListItem> {
                       title: '',
                       mode: PostsListMode.normal,
                       forumId: forumId,
+                    ),
+                  ),
+                );
+              } else if (forumId != null && forumId.isNotEmpty) {
+                // Category link (Discourse /c/{slug}/{id}) — open the
+                // category's topic list. ForumTopicsPage only needs the id.
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ForumTopicsPage(
+                      siteContext: widget.siteContext,
+                      forum: FCForum(id: forumId, name: ''),
                     ),
                   ),
                 );

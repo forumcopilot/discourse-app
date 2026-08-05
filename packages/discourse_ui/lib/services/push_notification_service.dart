@@ -162,6 +162,12 @@ class PushNotificationService with ServiceErrorHandlingMixin {
     required String siteId,
     required String siteUserId,
   }) async {
+    // Hosted backend disabled (BYO/direct builds set pushApiBaseUrl='') —
+    // nothing to unregister against; treat as success so site state clears.
+    if (!AppForumConfig.isPushBackendEnabled) {
+      AppLogger.debug('[PushNotificationService] Hosted backend disabled — skipping unregisterDeviceFromSite');
+      return true;
+    }
     try {
       AppLogger.debug('Unregistering device from site: $siteId, user: $siteUserId');
 
@@ -200,6 +206,7 @@ class PushNotificationService with ServiceErrorHandlingMixin {
 
   /// Get badge count for a device
   Future<int> getBadgeCount(String deviceId) async {
+    if (!AppForumConfig.isPushBackendEnabled) return 0; // hosted backend disabled
     try {
       AppLogger.debug('Getting badge count for device: ${deviceId.substring(0, 8)}...');
 
@@ -237,6 +244,7 @@ class PushNotificationService with ServiceErrorHandlingMixin {
     required String deviceId,
     String? siteId,
   }) async {
+    if (!AppForumConfig.isPushBackendEnabled) return true; // hosted backend disabled — no-op success
     try {
       AppLogger.debug('Resetting badge count for device: ${deviceId.substring(0, 8)}...');
 
@@ -273,6 +281,7 @@ class PushNotificationService with ServiceErrorHandlingMixin {
 
   /// Check service health
   Future<bool> checkHealth() async {
+    if (!AppForumConfig.isPushBackendEnabled) return true; // hosted backend disabled — treat as healthy no-op
     try {
       AppLogger.debug('Checking push service health...');
 
@@ -393,6 +402,7 @@ class PushNotificationService with ServiceErrorHandlingMixin {
 
   /// Get service status information
   Future<Map<String, dynamic>?> getServiceStatus() async {
+    if (!AppForumConfig.isPushBackendEnabled) return null; // hosted backend disabled
     try {
       final response = await _makeRequest('GET', '/health', null);
 

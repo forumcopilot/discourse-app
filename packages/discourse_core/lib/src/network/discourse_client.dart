@@ -77,8 +77,21 @@ class DiscourseClient {
       ...?extraHeaders,
     };
 
+    // Some callers embed a query string in `path` ('/x.json?a=1').
+    // `Uri.replace(path: ...)` percent-encodes an embedded '?' (→ '%3F'),
+    // so split the suffix off and merge it into the query parameters.
+    var effectivePath = path;
+    var effectiveQuery = query;
+    final qIndex = path.indexOf('?');
+    if (qIndex >= 0) {
+      effectivePath = path.substring(0, qIndex);
+      final embedded = Uri.splitQueryString(path.substring(qIndex + 1));
+      // Explicitly-passed query params win over path-embedded ones.
+      effectiveQuery = <String, dynamic>{...embedded, ...?query};
+    }
+
     final base = Uri.parse(context.site.url);
-    final url = base.replace(path: _joinPath(base.path, path));
+    final url = base.replace(path: _joinPath(base.path, effectivePath));
     final encodedBody =
         body is String ? body : (body == null ? null : jsonEncode(body));
 
@@ -88,7 +101,7 @@ class DiscourseClient {
         url,
         headers: headers,
         body: encodedBody,
-        queryParameters: query,
+        queryParameters: effectiveQuery,
         responseType: ResponseType.plain,
       );
       return _toCallResult(response);

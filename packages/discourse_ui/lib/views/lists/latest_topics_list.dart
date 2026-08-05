@@ -188,16 +188,35 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
     _isLoadingMore = true;
     setState(() {});
     try {
-      _currentPage += 1;
-      int startNum = _currentPage * _pageSize;
+      // Compute the next page without committing it — only advance the
+      // counter once the fetch succeeds, so a failed page can be retried
+      // instead of leaving a permanent gap.
+      final nextPage = _currentPage + 1;
+      int startNum = nextPage * _pageSize;
       int lastNum = startNum + _pageSize - 1;
       await _latestTopicController!.getLatestTopicAsync(startNum, lastNum);
+      _currentPage = nextPage;
     } catch (e) {
-      rethrow;
+      // This runs fire-and-forget from the scroll listener — rethrowing
+      // would surface as an unhandled zone exception with no feedback and
+      // silently stop paging. Log, tell the user, and let the next scroll
+      // retry the same page (the counter wasn't advanced).
+      AppLogger.warning('LatestTopicsList load-more failed: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to load more topics. Scroll to retry.'),
+          ),
+        );
+      }
     } finally {
-      setState(() {
+      if (mounted) {
+        setState(() {
+          _isLoadingMore = false;
+        });
+      } else {
         _isLoadingMore = false;
-      });
+      }
     }
   }
 

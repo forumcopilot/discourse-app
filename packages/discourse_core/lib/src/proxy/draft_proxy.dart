@@ -18,7 +18,7 @@ import '../base_discourse_proxy.dart';
 ///   * POST   `/drafts.json`             — save / upsert
 ///   * GET    `/drafts/{key}.json`       — fetch a single draft
 ///   * DELETE `/drafts/{key}.json?sequence=N` — discard
-///   * GET    `/drafts.json[?page=P]`    — list current user's drafts
+///   * GET    `/drafts.json[?offset=N&limit=M]` — list current user's drafts
 class DiscourseDraftProxy extends BaseDiscourseProxy implements IFCDraftProxy {
   DiscourseDraftProxy(SiteContext context) : super(context);
 
@@ -105,7 +105,9 @@ class DiscourseDraftProxy extends BaseDiscourseProxy implements IFCDraftProxy {
     }
     try {
       await apiDelete(
-          '/drafts/${Uri.encodeComponent(draftKey)}.json?sequence=$sequence');
+        '/drafts/${Uri.encodeComponent(draftKey)}.json',
+        query: {'sequence': sequence.toString()},
+      );
       return FCDeleteDraftResult(result: true);
     } on DiscourseApiException catch (e) {
       return FCDeleteDraftResult(result: false, resultText: e.userMessage);
@@ -126,8 +128,14 @@ class DiscourseDraftProxy extends BaseDiscourseProxy implements IFCDraftProxy {
       );
     }
     try {
-      final qs = page > 0 ? '?page=$page' : '';
-      final response = await apiGet('/drafts.json$qs');
+      // drafts#index only permits `offset` / `limit` (no `page`) — see
+      // app/controllers/drafts_controller.rb. Convert the SDK page number;
+      // 50 == the server's INDEX_LIMIT cap.
+      const perPage = 50;
+      final response = await apiGet('/drafts.json', query: {
+        if (page > 0) 'offset': (page * perPage).toString(),
+        'limit': perPage.toString(),
+      });
       final raw = (response['drafts'] as List?) ?? const [];
       final items = raw
           .whereType<Map>()

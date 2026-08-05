@@ -46,9 +46,5 @@ export 'src/data/auth/auth_request.dart';
 export 'src/data/auth/auth_response.dart';
 export 'src/data/post/discourse_suggested_topic.dart';
 
-// Converters
-export 'src/converter/discourse_user_converter.dart';
-export 'src/converter/discourse_forum_converter.dart';
-export 'src/converter/discourse_thread_converter.dart';
-export 'src/converter/discourse_post_converter.dart';
-export 'src/converter/discourse_attachment_converter.dart';
+// Converter layer removed: the XF-shaped Discourse→FC converters had no
+// callers — proxies parse Discourse JSON into FC models directly.

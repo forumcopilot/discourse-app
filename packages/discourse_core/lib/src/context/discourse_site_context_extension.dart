@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,11 +13,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// is then sent on every request via the `User-Api-Key` header (paired with the
 /// app-generated `User-Api-Client-Id`).
 ///
-/// Storage: in-memory (per-context [Expando]) plus an optional SharedPreferences
-/// persistence layer keyed by `site.pluginUrl` so the credentials survive
-/// process restarts.
+/// Storage: in-memory (per-context [Expando]) plus a persistence layer keyed
+/// by `site.pluginUrl` so the credentials survive process restarts. The API
+/// key itself lives in secure storage (Keychain/Keystore); the non-secret
+/// client id and push flag live in SharedPreferences. Keys written to
+/// SharedPreferences by older builds are migrated to secure storage on read.
 extension DiscourseSiteContextExtension on SiteContext {
   static final Expando<Map<String, dynamic>> _store = Expando('discourseStore');
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
   Map<String, dynamic> _data() => _store[this] ??= <String, dynamic>{};
 
@@ -48,7 +52,8 @@ extension DiscourseSiteContextExtension on SiteContext {
   }
 
   /// Persist the credentials produced by a successful handshake. Writes to
-  /// memory and to SharedPreferences (keyed by [SiteContext.site.pluginUrl]).
+  /// memory, the key to secure storage, and the rest to SharedPreferences
+  /// (keyed by [SiteContext.site.pluginUrl]).
   Future<void> setUserApiCredentials({
     required String userApiKey,
     required String userApiClientId,
@@ -61,12 +66,14 @@ extension DiscourseSiteContextExtension on SiteContext {
 
     final prefs = await SharedPreferences.getInstance();
     final prefix = _prefsPrefix();
-    await prefs.setString('${prefix}_user_api_key', userApiKey);
+    await _secureStorage.write(key: '${prefix}_user_api_key', value: userApiKey);
+    // Make sure no plaintext copy from an older build lingers.
+    await prefs.remove('${prefix}_user_api_key');
     await prefs.setString('${prefix}_user_api_client_id', userApiClientId);
     await prefs.setBool('${prefix}_user_api_push_enabled', pushEnabled);
   }
 
-  /// Wipe credentials from memory and SharedPreferences.
+  /// Wipe credentials from memory, secure storage, and SharedPreferences.
   Future<void> clearUserApiCredentials() async {
     final data = _data();
     data.remove('userApiKey');
@@ -75,18 +82,29 @@ extension DiscourseSiteContextExtension on SiteContext {
 
     final prefs = await SharedPreferences.getInstance();
     final prefix = _prefsPrefix();
+    await _secureStorage.delete(key: '${prefix}_user_api_key');
     await prefs.remove('${prefix}_user_api_key');
     await prefs.remove('${prefix}_user_api_client_id');
     await prefs.remove('${prefix}_user_api_push_enabled');
   }
 
-  /// Hydrate in-memory credentials from SharedPreferences. Call once at app
-  /// start (before issuing any authenticated request).
+  /// Hydrate in-memory credentials from storage. Call once at app start
+  /// (before issuing any authenticated request).
   Future<void> loadUserApiCredentials() async {
     final prefs = await SharedPreferences.getInstance();
     final prefix = _prefsPrefix();
     final data = _data();
-    data['userApiKey'] = prefs.getString('${prefix}_user_api_key');
+    var key = await _secureStorage.read(key: '${prefix}_user_api_key');
+    if (key == null) {
+      // Migrate-on-read: older builds stored the key in plaintext
+      // SharedPreferences. Move it to secure storage and delete the copy.
+      key = prefs.getString('${prefix}_user_api_key');
+      if (key != null) {
+        await _secureStorage.write(key: '${prefix}_user_api_key', value: key);
+        await prefs.remove('${prefix}_user_api_key');
+      }
+    }
+    data['userApiKey'] = key;
     data['userApiClientId'] = prefs.getString('${prefix}_user_api_client_id');
     data['userApiPushEnabled'] =
         prefs.getBool('${prefix}_user_api_push_enabled') ?? false;

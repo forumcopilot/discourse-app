@@ -70,34 +70,127 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
       // Get FCM token
       _fcmToken = _notificationService.fcmToken;
 
-      if (_fcmToken == null) {
-        throw Exception('FCM token not available');
-      }
-
-      // Register token refresh callback with NotificationService (consolidated listener)
+      // Register token refresh callback with NotificationService (consolidated listener).
+      // Registered before the token check so a late-arriving token completes
+      // initialization via _handleTokenRefresh instead of leaving push dead.
       _notificationService.setTokenRefreshCallback(_handleTokenRefresh);
 
-      // Load existing site states from storage
-      await _loadExistingStates();
+      if (_fcmToken == null) {
+        AppLogger.debug('FCM token not available yet - initialization will complete when it arrives');
+        // The initial token is fetched by NotificationService via getToken(),
+        // which does NOT fire the refresh callback — poll for it too.
+        _startTokenWaitLoop();
+        update();
+        return;
+      }
 
-      // Re-register sites that were previously registered
-      await _reRegisterPersistedSites();
-
-      // BYO/direct push: register device with the forum's own server.
-      await _tryRegisterDirect();
-
-      // Re-fire when the user logs in later (registration requires an authenticated session).
-      _watchLoginForDirectRegistration();
-
-      _isInitialized = true;
-      AppLogger.debug('DiscoursePushNotificationController initialized successfully');
-      AppLogger.debug('Loaded ${_siteStates.length} site states, ${registeredSites.length} registered');
-      update();
+      await _completeInitialization();
     } catch (e) {
       _lastError = e.toString();
       _hasNetworkError = _isNetworkError(e);
       AppLogger.debug('Error initializing DiscoursePushNotificationController: $e');
       update();
+    }
+  }
+
+  Timer? _tokenWaitTimer;
+  bool _completingInit = false;
+
+  /// Polls NotificationService for the FCM token (bounded) and completes
+  /// initialization when it shows up. Complements the refresh callback, which
+  /// only fires on token rotation.
+  void _startTokenWaitLoop() {
+    _tokenWaitTimer?.cancel();
+    int attempts = 0;
+    const maxAttempts = 120; // 120 × 1s = 2 minutes
+    _tokenWaitTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      attempts++;
+      final token = _notificationService.fcmToken;
+      if (token != null) {
+        timer.cancel();
+        _tokenWaitTimer = null;
+        _fcmToken = token;
+        try {
+          await _completeInitialization();
+        } catch (e) {
+          _lastError = e.toString();
+          _hasNetworkError = _isNetworkError(e);
+          AppLogger.debug('Error completing initialization after token arrival: $e');
+          update();
+        }
+      } else if (attempts >= maxAttempts) {
+        timer.cancel();
+        _tokenWaitTimer = null;
+        AppLogger.debug('FCM token still not available after $maxAttempts attempts - waiting for token refresh event');
+      }
+    });
+  }
+
+  /// Finish initialization once both device ID and FCM token are available.
+  /// Called from [_initialize] when the token is already present, or later
+  /// from the token wait loop / [_handleTokenRefresh] when it arrives.
+  Future<void> _completeInitialization() async {
+    if (_isInitialized || _completingInit) return;
+    _completingInit = true;
+    try {
+      await _doCompleteInitialization();
+    } finally {
+      _completingInit = false;
+    }
+  }
+
+  Future<void> _doCompleteInitialization() async {
+    _tokenWaitTimer?.cancel();
+    _tokenWaitTimer = null;
+
+    // Load existing site states from storage
+    await _loadExistingStates();
+
+    // Re-register sites that were previously registered
+    await _reRegisterPersistedSites();
+
+    // BYO/direct push: register device with the forum's own server.
+    await _tryRegisterDirect();
+
+    // Re-fire when the user logs in later (registration requires an authenticated session).
+    _watchLoginForDirectRegistration();
+
+    _isInitialized = true;
+    AppLogger.debug('DiscoursePushNotificationController initialized successfully');
+    AppLogger.debug('Loaded ${_siteStates.length} site states, ${registeredSites.length} registered');
+
+    // If the user logged in before the token arrived, the login-time
+    // registration attempt was skipped — register the current site now.
+    await _registerCurrentSiteIfNeeded();
+    update();
+  }
+
+  /// Registers the currently logged-in site if it isn't registered yet.
+  /// Covers the login-before-token race: login-time registration bails when
+  /// the controller isn't initialized, so we converge here once it is.
+  Future<void> _registerCurrentSiteIfNeeded() async {
+    try {
+      if (!Get.isRegistered<DiscourseSiteController>()) return;
+      final siteCtrl = Get.find<DiscourseSiteController>();
+      final site = siteCtrl.currentSite.value;
+      final ctx = siteCtrl.currentSiteContext.value;
+      if (site == null || ctx == null || !ctx.isLoggedIn) return;
+
+      final siteId = site.id?.toString() ?? Uri.parse(site.url).host;
+      if (isSiteRegistered(siteId)) return;
+
+      final user = ctx.loginDataOutput?.user;
+      AppLogger.debug('Registering current site after late initialization: ${site.name}');
+      await registerSite(
+        siteId: siteId,
+        siteUrl: site.url,
+        siteName: site.name,
+        userId: user?.id ?? '',
+        username: user?.username ?? ctx.username ?? '',
+        suppressToasts: true,
+      );
+    } catch (e) {
+      AppLogger.debug('Error registering current site after initialization: $e');
     }
   }
 
@@ -183,12 +276,34 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
         await _tryRegisterDirect();
       }
     });
+
+    // The Rx only notifies on reassignment/refresh, so a context that is
+    // already logged in at watcher setup would never fire it — check now.
+    final currentCtx = siteCtrl.currentSiteContext.value;
+    if (currentCtx != null && currentCtx.isLoggedIn && !_hasDirectRegistered) {
+      // Fire-and-forget: registration errors are logged inside.
+      _tryRegisterDirect();
+    }
   }
 
   /// Handle token refresh from NotificationService (consolidated listener)
   Future<void> _handleTokenRefresh(String newToken) async {
     AppLogger.debug('FCM token refreshed, updating all registrations...');
     _fcmToken = newToken;
+
+    // If the token arrived after onInit ran, initialization is still pending —
+    // finish it now (re-registers persisted sites and does direct registration).
+    if (!_isInitialized) {
+      try {
+        await _completeInitialization();
+      } catch (e) {
+        _lastError = e.toString();
+        _hasNetworkError = _isNetworkError(e);
+        AppLogger.debug('Error completing initialization after token arrival: $e');
+        update();
+      }
+      return;
+    }
 
     // BYO/direct: re-register with the new token.
     if (AppForumConfig.pushSource == 'direct' && _hasDirectRegistered) {
@@ -259,11 +374,14 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
   /// Save site states to storage
   Future<void> _saveSiteStates() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      // Serialize BEFORE the first await so callers that clear _siteStates
+      // right after an un-awaited call (e.g. onClose) don't wipe the
+      // persisted registrations.
       final statesList = _siteStates.values.map((state) => state.toJson()).toList();
       final statesJson = jsonEncode(statesList);
+      final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_storageKey, statesJson);
-      AppLogger.debug('Saved ${_siteStates.length} site states to storage');
+      AppLogger.debug('Saved ${statesList.length} site states to storage');
     } catch (e) {
       AppLogger.debug('Error saving site states: $e');
     }
@@ -766,8 +884,14 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
 
   @override
   void onClose() {
-    // Save states before closing
+    // Save states before closing. onClose can't await, but _saveSiteStates
+    // serializes synchronously before its first await, so the snapshot is
+    // captured before _siteStates is cleared below.
     _saveSiteStates();
+
+    // Stop waiting for a late FCM token
+    _tokenWaitTimer?.cancel();
+    _tokenWaitTimer = null;
 
     // Stop watching login state
     _loginWatcher?.dispose();

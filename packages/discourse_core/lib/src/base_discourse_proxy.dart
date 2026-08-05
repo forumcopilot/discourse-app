@@ -78,7 +78,24 @@ abstract class BaseDiscourseProxy {
     }
     final body = result.body;
     if (body.isEmpty) return const {};
-    final decoded = jsonDecode(body);
+    final dynamic decoded;
+    try {
+      decoded = jsonDecode(body);
+    } on FormatException {
+      // 2xx with a non-JSON body (e.g. an HTML page from a proxy/CDN).
+      // Surface as DiscourseApiException so the proxies' existing
+      // `on DiscourseApiException` handlers catch it instead of a raw
+      // FormatException escaping to the generic catch-all.
+      final snippet = body.length > 200 ? '${body.substring(0, 200)}…' : body;
+      throw DiscourseApiException(
+        statusCode: result.statusCode,
+        method: method,
+        path: path,
+        body: jsonEncode({
+          'errors': ['Server returned a non-JSON response: $snippet'],
+        }),
+      );
+    }
     if (decoded is Map<String, dynamic>) return decoded;
     // A few endpoints (e.g. /categories.json's `category_list`) return objects
     // at the top level. List-returning endpoints are rare; wrap them so the

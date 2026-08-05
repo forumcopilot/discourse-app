@@ -24,8 +24,11 @@ dependencies:
   # OAuth2 support (legacy, scheduled for removal once User API Key flow is wired into login UI)
   oauth2: ^2.0.2
 
-  # Shared preferences for User API Key storage
+  # Shared preferences for non-secret User API Key metadata (client id, push flag)
   shared_preferences: ^2.5.1
+
+  # Keychain/Keystore storage for the User API Key + handshake private key
+  flutter_secure_storage: ^9.2.4
 
   # Crypto for hashing
   crypto: ^3.0.3

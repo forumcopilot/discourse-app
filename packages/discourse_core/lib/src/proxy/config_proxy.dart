@@ -7,8 +7,8 @@ import '../context/discourse_site_context_extension.dart';
 
 /// Discourse implementation of [IFCConfigProxy].
 ///
-/// Hits `/site.json` (https://docs.discourse.org/#tag/Site/operation/getSite)
-/// and maps a small set of fields onto the XenForo-shaped [FCConfigResult].
+/// Hits `/about.json` and maps a small set of fields onto the
+/// XenForo-shaped [FCConfigResult].
 /// The SDK's `FCConfigResult` was modeled on the XenForo plugin's
 /// `getConfig` response and carries ~100 capability flags that don't have a
 /// 1:1 in Discourse — for those we return sensible defaults (Discourse's REST
@@ -18,8 +18,6 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
 
   @override
   Future<FCConfigResult> getConfig(String url, {bool forceRefresh = false}) async {
-    // /site.json is the canonical capability dump but doesn't expose the
-    // Discourse version or read-only state. /about.json gives us both.
     String version = 'discourse';
     bool isOpen = true;
     try {
@@ -27,16 +25,18 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       final aboutInner = (about['about'] as Map<String, dynamic>?) ?? const {};
       final v = aboutInner['version'] as String?;
       if (v != null && v.isNotEmpty) version = v;
+      // Read-only mode is not a /site.json or /about.json body field —
+      // Discourse signals it with a `Discourse-Readonly: true` response
+      // header on every request (lib/read_only_mixin.rb). Check the
+      // response we just received.
+      final headers =
+          siteContext.lastCallResponse?.headers ?? const <String, String>{};
+      isOpen = !headers.entries.any((h) =>
+          h.key.toLowerCase() == 'discourse-readonly' &&
+          h.value.toLowerCase() == 'true');
     } catch (e) {
       // ignore: avoid_print
       print('⚠️ [DISCOURSE_CONFIG] /about.json failed (continuing): $e');
-    }
-    try {
-      final site = await apiGet('/site.json');
-      isOpen = !(site['is_readonly'] as bool? ?? false);
-    } catch (e) {
-      // ignore: avoid_print
-      print('⚠️ [DISCOURSE_CONFIG] /site.json failed (continuing): $e');
     }
     // Phase 5.18a — probe the chat plugin via its `/chat/api/me/channels`
     // route. Discourse's `/site.json` doesn't expose `enabled_plugins`
@@ -48,7 +48,16 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       await apiGet('/chat/api/me/channels');
       siteContext.setChatEnabled(true);
     } on DiscourseApiException catch (e) {
-      siteContext.setChatEnabled(e.statusCode != 404);
+      if (e.statusCode == 404) {
+        // Route not registered → chat plugin absent.
+        siteContext.setChatEnabled(false);
+      } else if (e.statusCode != 0) {
+        // Any real HTTP status other than 404 (401/403/…) means the
+        // route exists → chat installed.
+        siteContext.setChatEnabled(true);
+      }
+      // statusCode 0 == transport/network failure (the client maps those
+      // to 0) — no signal either way; keep the cached/default value.
     } catch (_) {
       // Network error or unknown — leave the existing cached value
       // (defaults to false on a fresh install, true if a previous

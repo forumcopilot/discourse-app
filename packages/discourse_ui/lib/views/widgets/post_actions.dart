@@ -22,6 +22,11 @@ class PostActionsHandler {
   VoidCallback? _defaultRefreshCallback;
   final String? fallbackForumId;
 
+  /// Ids of posts/messages with a like/unlike request in flight — guards
+  /// against a double-tap racing two requests (same pattern as
+  /// `_handleBookmarkAction` in post_list_item.dart).
+  final Set<String> _likeInFlight = {};
+
   PostActionsHandler(this._postsController, this.siteContext, {this.fallbackForumId});
 
   /// Set the default refresh callback for this handler
@@ -976,6 +981,9 @@ class PostActionsHandler {
       showPostLoginPrompt(context, onRefresh: onRefresh);
       return;
     }
+    // In-flight guard: ignore taps while a request for this post is pending.
+    if (_likeInFlight.contains(post.id)) return;
+    _likeInFlight.add(post.id);
     // Optimistically update UI
     final wasLiked = isLiked;
     setIsLiked(!isLiked);
@@ -993,17 +1001,29 @@ class PostActionsHandler {
     }
     setLikeCount(post.likesInfo.length);
     // Removed onRefresh() call - local state updates are sufficient for like actions
+    bool ok;
+    String? errText;
     try {
       final socialProxy = SiteProxyFactory.getSocialProxy();
       if (wasLiked) {
         // Unlike the post
-        await socialProxy.unlikePostAsync(post.id);
+        final result = await socialProxy.unlikePostAsync(post.id);
+        ok = result.result;
+        errText = result.resultText;
       } else {
         // Like the post
-        await socialProxy.likePostAsync(post.id);
+        final result = await socialProxy.likePostAsync(post.id);
+        ok = result.result;
+        errText = result.resultText;
       }
     } catch (e) {
-      // Revert UI if failed
+      ok = false;
+      errText = e.toString();
+    } finally {
+      _likeInFlight.remove(post.id);
+    }
+    if (!ok) {
+      // Revert UI if the request threw OR the server said result=false
       setIsLiked(wasLiked);
       if (wasLiked) {
         // Re-add like
@@ -1020,10 +1040,11 @@ class PostActionsHandler {
       setLikeCount(post.likesInfo.length);
       // Removed onRefresh() call - local state updates are sufficient for like actions
       if (context.mounted) {
+        final reason = errText?.isNotEmpty == true ? errText! : '';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(wasLiked 
-            ? (AppLocalizations.of(context)?.failedToUnlikePost(e.toString()) ?? 'Failed to unlike post: $e')
-            : (AppLocalizations.of(context)?.failedToLikePost(e.toString()) ?? 'Failed to like post: $e'))),
+          SnackBar(content: Text(wasLiked
+            ? (AppLocalizations.of(context)?.failedToUnlikePost(reason) ?? 'Failed to unlike post: $reason')
+            : (AppLocalizations.of(context)?.failedToLikePost(reason) ?? 'Failed to like post: $reason'))),
         );
       }
     }
@@ -1043,6 +1064,9 @@ class PostActionsHandler {
       showPostLoginPrompt(context, onRefresh: onRefresh);
       return;
     }
+    // In-flight guard: ignore taps while a request for this message is pending.
+    if (_likeInFlight.contains(message.messageId)) return;
+    _likeInFlight.add(message.messageId);
     // Optimistically update UI
     final wasLiked = isLiked;
     setIsLiked(!isLiked);
@@ -1059,6 +1083,8 @@ class PostActionsHandler {
       message.likesInfo.removeWhere((like) => like.username == siteContext.currentUsername);
     }
     setLikeCount(message.likesInfo.length);
+    bool ok;
+    String? errText;
     try {
       final socialProxy = SiteProxyFactory.getSocialProxy();
       // Discourse PM messages are just posts under the hood, so the same
@@ -1066,12 +1092,22 @@ class PostActionsHandler {
       // support likes — this only fires on forums where the host has
       // enabled likes in PMs.)
       if (wasLiked) {
-        await socialProxy.unlikePostAsync(message.messageId);
+        final result = await socialProxy.unlikePostAsync(message.messageId);
+        ok = result.result;
+        errText = result.resultText;
       } else {
-        await socialProxy.likePostAsync(message.messageId);
+        final result = await socialProxy.likePostAsync(message.messageId);
+        ok = result.result;
+        errText = result.resultText;
       }
     } catch (e) {
-      // Revert UI if failed
+      ok = false;
+      errText = e.toString();
+    } finally {
+      _likeInFlight.remove(message.messageId);
+    }
+    if (!ok) {
+      // Revert UI if the request threw OR the server said result=false
       setIsLiked(wasLiked);
       if (wasLiked) {
         // Re-add like
@@ -1087,10 +1123,11 @@ class PostActionsHandler {
       }
       setLikeCount(message.likesInfo.length);
       if (context.mounted) {
+        final reason = errText?.isNotEmpty == true ? errText! : '';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(wasLiked 
-            ? (AppLocalizations.of(context)?.failedToUnlikePost(e.toString()) ?? 'Failed to unlike message: $e')
-            : (AppLocalizations.of(context)?.failedToLikePost(e.toString()) ?? 'Failed to like message: $e'))),
+          SnackBar(content: Text(wasLiked
+            ? (AppLocalizations.of(context)?.failedToUnlikePost(reason) ?? 'Failed to unlike message: $reason')
+            : (AppLocalizations.of(context)?.failedToLikePost(reason) ?? 'Failed to like message: $reason'))),
         );
       }
     }

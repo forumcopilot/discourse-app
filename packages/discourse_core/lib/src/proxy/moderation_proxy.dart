@@ -399,12 +399,13 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
     bool starterAlert = false,
     String? starterAlertReason,
   }) async {
-    // [hardDelete] maps to Discourse's delete_for_real; [reason] and the
-    // starter-alert fields are XF-flavored and have no Discourse
-    // equivalent, so they are ignored.
+    // [hardDelete] maps to Discourse's `force_destroy` param
+    // (topics_controller.rb#destroy); [reason] and the starter-alert
+    // fields are XF-flavored and have no Discourse equivalent, so they
+    // are ignored.
     try {
       await apiDelete('/t/$topicId.json',
-          query: hardDelete ? {'delete_for_real': 'true'} : null);
+          query: hardDelete ? {'force_destroy': 'true'} : null);
       return FCDeleteTopicResult(
           result: true, resultText: '', isLoginMod: true);
     } on DiscourseApiException catch (e) {

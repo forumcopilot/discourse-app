@@ -89,7 +89,11 @@ class _ReplyPageState extends State<ReplyPage> {
 
   String? _getInitialContent() {
     if (widget.quoteText != null && widget.quoteAuthor != null) {
-      return '[QUOTE="${widget.quoteAuthor}"]${widget.quoteText}[/QUOTE]\n\n';
+      // Discourse-native quote block. The post number / topic id aren't
+      // available on this path (the isQuote path fetches a fully-attributed
+      // quote from the server instead); a plain username attribution is
+      // valid Discourse markup and renders fine.
+      return '[quote="${widget.quoteAuthor}"]\n${widget.quoteText}\n[/quote]\n\n';
     }
     return null;
   }

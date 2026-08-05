@@ -239,10 +239,22 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
   @override
   Future<FCMarkTopicReadResult> markTopicReadAsync(
       List<String> topicIds) async {
+    // PUT /topics/bulk requires `topic_ids` (or filter=='unread') and an
+    // operation type from TopicsBulkAction.operations — 'dismiss' is not
+    // one (topics_controller#bulk / lib/topics_bulk_action.rb). Marking a
+    // topic read == 'dismiss_posts' (sets last_read_post_number to the
+    // topic's highest post, which also clears its "new" state).
+    final ids = topicIds
+        .map(int.tryParse)
+        .whereType<int>()
+        .toList(growable: false);
+    if (ids.isEmpty) {
+      return FCMarkTopicReadResult(result: true, resultText: '');
+    }
     try {
       await apiPut('/topics/bulk', body: {
-        'filter': 'new',
-        'operation': {'type': 'dismiss'},
+        'topic_ids': ids,
+        'operation': {'type': 'dismiss_posts'},
       });
       return FCMarkTopicReadResult(result: true, resultText: '');
     } catch (e) {
@@ -360,10 +372,11 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         'category': int.tryParse(forumId) ?? forumId,
         'archetype': 'regular',
       };
-      // Discourse-native: pass tags as `tags[]`. Dio handles the array
-      // encoding correctly when given a List value.
+      // Discourse-native: in a JSON body Rails wants the plain `tags` key
+      // with an array value ('tags[]' is form-encoding syntax only — in
+      // JSON it would create a literal "tags[]" param the server ignores).
       if (tags != null && tags.isNotEmpty) {
-        body['tags[]'] = tags;
+        body['tags'] = tags;
       }
       final response = await apiPost('/posts.json', body: body);
       return FCNewTopicResult(
@@ -514,7 +527,10 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     final completer = Completer<Map<int, String>>();
     _catNamesLoading = completer.future;
     try {
-      final response = await apiGet('/categories.json');
+      // include_subcategories=true: without it /categories.json omits
+      // subcategories, leaving their names unresolvable (blank labels).
+      final response = await apiGet('/categories.json',
+          query: {'include_subcategories': 'true'});
       final list = (response['category_list'] as Map<String, dynamic>?) ??
           const <String, dynamic>{};
       final cats = (list['categories'] as List?) ?? const [];
@@ -545,16 +561,25 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     Map<int, String> catNames = const {},
   }) {
     final posters = (t['posters'] as List?) ?? const [];
-    int? opUserId;
-    for (final p in posters.whereType<Map>()) {
-      final desc = (p['description'] ?? '').toString();
-      if (desc.contains('Original Poster')) {
-        opUserId = p['user_id'] as int?;
-        break;
+    // Server contract (app/models/topic_posters_summary.rb): posters are
+    // ordered topic-creator-first — the latest poster is shuffled to the
+    // back unless they ARE the creator — and only `extras` ('latest' /
+    // 'latest single') is a structured marker; `description` is localized
+    // and must not be matched. So posters[0] is the Original Poster.
+    int? opUserId = posters.isNotEmpty && posters.first is Map
+        ? (posters.first as Map)['user_id'] as int?
+        : null;
+    if (opUserId == null) {
+      // Last-resort fallback for non-standard payloads: the English
+      // description string.
+      for (final p in posters.whereType<Map>()) {
+        final desc = (p['description'] ?? '').toString();
+        if (desc.contains('Original Poster')) {
+          opUserId = p['user_id'] as int?;
+          break;
+        }
       }
     }
-    opUserId ??=
-        posters.isNotEmpty ? (posters.first as Map)['user_id'] as int? : null;
     final opUser = opUserId == null ? null : users[opUserId];
 
     // /t/{id}.json inlines details.created_by as the canonical author.

@@ -80,13 +80,18 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
         },
       );
       // Discourse returns `members: [...]` plus `owners: [...]` for
-      // group admins. Merge both — owners appear at the top as
-      // returned.
+      // group admins — and `members` already INCLUDES the owners, so a
+      // plain concat duplicates every owner row. Dedupe by user id while
+      // iterating owners first, which keeps owners at the top (their
+      // owner entry wins over the duplicate member entry).
       final members = <FCDirectoryItem>[];
+      final seenIds = <int>{};
       for (final key in const ['owners', 'members']) {
         final list = (response[key] as List?) ?? const [];
         for (final raw in list.whereType<Map>()) {
           final user = raw.cast<String, dynamic>();
+          final id = (user['id'] as num?)?.toInt() ?? 0;
+          if (id != 0 && !seenIds.add(id)) continue;
           String avatarUrl = '';
           final tpl = user['avatar_template'] as String?;
           if (tpl != null && tpl.isNotEmpty) {

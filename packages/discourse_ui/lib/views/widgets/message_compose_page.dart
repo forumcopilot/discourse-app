@@ -174,10 +174,13 @@ class _MessageComposePageState extends State<MessageComposePage> {
   void didUpdateWidget(MessageComposePage oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Update content if initialContent changed from null to a value (quote loaded)
-    // Only update if controller is empty or contains the old initialContent
+    // Only update if the composer is effectively empty or still shows the
+    // previous initialContent. Never clobber other non-empty content — a
+    // server-side draft may have hydrated (or the user may have typed)
+    // while the quote future was still resolving, and the restored
+    // draft/user input wins over the late-arriving quote.
     if (widget.initialContent != null && widget.initialContent != oldWidget.initialContent) {
-      // If old widget had no initialContent and new one does, or content matches old initialContent
-      if (oldWidget.initialContent == null || _contentController.text == oldWidget.initialContent || _contentController.text.isEmpty) {
+      if (_contentController.text.isEmpty || _contentController.text == oldWidget.initialContent) {
         _contentController.text = widget.initialContent!;
         _contentController.selection = TextSelection.fromPosition(
           TextPosition(offset: _contentController.text.length),
@@ -200,6 +203,16 @@ class _MessageComposePageState extends State<MessageComposePage> {
     super.dispose();
   }
 
+  /// Inserts the markup for a formatting-toolbar action at the cursor
+  /// (wrapping the selection when there is one).
+  ///
+  /// Previously emitted XenForo BBCode (`[B]`, `[LIST]`, …), which
+  /// Discourse renders as literal text. Now emits what the server
+  /// actually cooks: Markdown where it exists, plus the BBCode subset
+  /// Discourse's markdown-it parses natively (`[u]` — see
+  /// bbcode-inline.js — `[quote]`, and `[spoiler]` from the bundled
+  /// spoiler-alert plugin). The method keeps its historical name since
+  /// the toolbar wiring refers to it.
   void _insertBBCode(String tag) {
     // Ensure the content field has focus before modifying
     if (!_contentFocusNode.hasFocus) {
@@ -209,14 +222,92 @@ class _MessageComposePageState extends State<MessageComposePage> {
     final TextEditingValue value = _contentController.value;
     final int start = value.selection.start;
     final int end = value.selection.end;
+    final String selectedText =
+        (start >= 0 && end > start) ? value.text.substring(start, end) : '';
+
+    // Lists: Markdown has per-line markers, not wrapping tags — turn each
+    // selected line into an item, or insert a starter item on its own line.
+    if (tag == 'LIST' || tag == 'LIST=1' || tag == '*') {
+      final bool numbered = tag == 'LIST=1';
+      final int insertAt = start < 0 ? value.text.length : start;
+      String replacement;
+      if (selectedText.isNotEmpty) {
+        final buffer = StringBuffer();
+        var itemNo = 1;
+        for (final line in selectedText.split('\n')) {
+          if (line.trim().isEmpty) continue;
+          buffer.writeln(numbered ? '${itemNo++}. ${line.trim()}' : '- ${line.trim()}');
+        }
+        replacement = buffer.toString();
+      } else {
+        replacement = numbered ? '1. ' : '- ';
+      }
+      // List items must start at the beginning of a line.
+      if (insertAt > 0 && value.text[insertAt - 1] != '\n') {
+        replacement = '\n$replacement';
+      }
+      final newText = value.text.replaceRange(insertAt, start < 0 ? insertAt : end, replacement);
+      _contentController.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: insertAt + replacement.length),
+      );
+      _contentFocusNode.requestFocus();
+      return;
+    }
+
+    String prefix;
+    String suffix;
+    switch (tag) {
+      case 'B':
+        prefix = '**';
+        suffix = '**';
+      case 'I':
+        prefix = '*';
+        suffix = '*';
+      case 'U':
+        // Markdown has no underline; Discourse renders [u] natively.
+        prefix = '[u]';
+        suffix = '[/u]';
+      case 'S':
+        prefix = '~~';
+        suffix = '~~';
+      case 'URL':
+        prefix = '[';
+        suffix = '](url)';
+      case 'IMG':
+        prefix = '![](';
+        suffix = ')';
+      case 'VIDEO':
+        // Discourse has no [video] markup — a media URL on its own
+        // line oneboxes into a player.
+        prefix = '\n';
+        suffix = '\n';
+      case 'QUOTE':
+        prefix = '[quote]\n';
+        suffix = '\n[/quote]';
+      case 'CODE':
+        if (selectedText.contains('\n')) {
+          prefix = '```\n';
+          suffix = '\n```';
+        } else {
+          prefix = '`';
+          suffix = '`';
+        }
+      case 'SPOILER':
+        // spoiler-alert ships as a bundled Discourse plugin.
+        prefix = '[spoiler]';
+        suffix = '[/spoiler]';
+      default:
+        return;
+    }
 
     // If start is -1, it means there's no valid cursor position
     if (start < 0) {
       // Append to the end if no cursor position
-      final newText = '${value.text}[$tag][/$tag]';
+      final newText = '${value.text}$prefix$suffix';
       _contentController.value = TextEditingValue(
         text: newText,
-        selection: TextSelection.collapsed(offset: newText.length - (tag.length + 3)),
+        selection: TextSelection.collapsed(offset: newText.length - suffix.length),
       );
       return;
     }
@@ -225,16 +316,14 @@ class _MessageComposePageState extends State<MessageComposePage> {
     int cursorPosition;
 
     if (start == end) {
-      // No text selected, just insert empty tags at cursor position
-      newText = value.text.replaceRange(start, start, '[$tag][/$tag]');
-      cursorPosition = start + tag.length + 2; // Position cursor between tags
+      // No text selected, just insert the empty markers at cursor position
+      newText = value.text.replaceRange(start, start, '$prefix$suffix');
+      cursorPosition = start + prefix.length; // Position cursor between markers
     } else {
-      // Text is selected, wrap it with tags
-      final String selectedText = value.text.substring(start, end);
-      newText = value.text.replaceRange(start, end, '[$tag]$selectedText[/$tag]');
-      // Position cursor at the end of the inserted tag structure
-      // start + opening tag length + selected text length + closing tag length
-      cursorPosition = start + tag.length + 2 + selectedText.length + tag.length + 3;
+      // Text is selected, wrap it with the markers
+      newText = value.text.replaceRange(start, end, '$prefix$selectedText$suffix');
+      // Position cursor at the end of the inserted structure
+      cursorPosition = start + prefix.length + selectedText.length + suffix.length;
     }
 
     // Ensure cursor position is within bounds
@@ -486,10 +575,12 @@ class _MessageComposePageState extends State<MessageComposePage> {
             }
           }
         } catch (e) {
-          // Remove file on error
+          // Remove file on error. Use fileToUpload.path — that's the key the
+          // row was added under (optimization may have produced a file whose
+          // path differs from the originally picked one).
           setState(() {
-            _attachments.removeWhere((f) => f.path == file.path);
-            _uploadingFiles.remove(file.path);
+            _attachments.removeWhere((f) => f.path == fileToUpload.path);
+            _uploadingFiles.remove(fileToUpload.path);
             _cachedAttachmentWidgetsFuture = null;
             _cachedAttachmentsKey = '';
           });
@@ -1420,6 +1511,26 @@ class _MessageComposePageState extends State<MessageComposePage> {
       return;
     }
 
+    // Don't post while an attachment upload is still in flight — the
+    // upload's short_url wouldn't be included yet and the attachment
+    // would silently be dropped from the post.
+    if (_uploadingFiles.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Please wait for attachments to finish uploading',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                ),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(DesignTokens.spacingS),
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
 
     try {
@@ -1706,38 +1817,10 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       ],
                     ),
                   ),
-                  const PopupMenuDivider(),
-                  // Alignment
-                  PopupMenuItem(
-                    value: 'LEFT',
-                    child: Row(
-                      children: [
-                        Icon(Icons.format_align_left, size: 20, color: colorScheme.onSurface),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.alignLeft ?? 'Align Left', style: textTheme.bodyMedium),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'CENTER',
-                    child: Row(
-                      children: [
-                        Icon(Icons.format_align_center, size: 20, color: colorScheme.onSurface),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.alignCenter ?? 'Align Center', style: textTheme.bodyMedium),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'RIGHT',
-                    child: Row(
-                      children: [
-                        Icon(Icons.format_align_right, size: 20, color: colorScheme.onSurface),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.alignRight ?? 'Align Right', style: textTheme.bodyMedium),
-                      ],
-                    ),
-                  ),
+                  // Alignment options removed — stock Discourse has no
+                  // markup for text alignment (its markdown-it only
+                  // parses b/i/u/s/code/url/email/img inline BBCode),
+                  // so [LEFT]/[CENTER]/[RIGHT] would post as literal text.
                 ],
                 ),
               ),

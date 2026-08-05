@@ -31,6 +31,40 @@ class PostController extends DiscourseGlobalLoaderController with ErrorHandlingM
     await completer.future;
   }
 
+  /// Merges [existing] and [incoming] posts, deduping by post id and keeping
+  /// the result sorted by postNumber. The server does not guarantee
+  /// page-aligned windows, so overlap between fetches is expected — incoming
+  /// posts win on conflict (fresher data).
+  static List<FCPost> _mergePosts(List<FCPost> existing, List<FCPost> incoming) {
+    final byId = <String, FCPost>{};
+    for (final p in existing) {
+      byId[p.id] = p;
+    }
+    for (final p in incoming) {
+      byId[p.id] = p;
+    }
+    final merged = byId.values.toList()
+      ..sort((a, b) => (a.postNumber ?? 0).compareTo(b.postNumber ?? 0));
+    return merged;
+  }
+
+  /// 0-based index of the first loaded post, derived from the ACTUAL returned
+  /// posts' postNumber (1-based) rather than assuming the server honored the
+  /// requested window exactly. [fallback] is used when no postNumber is
+  /// available (should not happen for Discourse).
+  static int _startNumFromPosts(List<FCPost> posts, int fallback) {
+    if (posts.isEmpty) return fallback;
+    final minPn = posts.first.postNumber;
+    if (minPn == null || minPn < 1) return fallback;
+    return minPn - 1;
+  }
+
+  /// 1-based post number of the last loaded post (used for [ThreadViewData.position]).
+  static int _lastPostNumber(List<FCPost> posts, int startNum0Based) {
+    if (posts.isEmpty) return startNum0Based;
+    return posts.last.postNumber ?? (startNum0Based + posts.length);
+  }
+
   Future<void> getThreadAsync(String topicId, int startNum, int lastNum, bool returnHtml, {LoadMode mode = LoadMode.initial}) async {
     try {
       // Note: startNum and lastNum here are in the format expected by the proxy/API.
@@ -55,36 +89,29 @@ class PostController extends DiscourseGlobalLoaderController with ErrorHandlingM
         AppLogger.warning('   Result: ${threadsResult.result}, Result Text: ${threadsResult.resultText}');
       }
 
-      // Convert 1-based startNum (from API) to 0-based for internal storage
-      // startNum from API is 1-based: position 1 = first post
-      // currentStartNum should be 0-based: index 0 = first post
-      final currentStartNum0Based = startNum - 1;
-      final position = currentStartNum0Based + fcPosts.length; // 0-based after last loaded post, but we need 1-based for position
+      // Derive the loaded window from the ACTUAL returned posts (sorted,
+      // deduped by id) — the server's window is not guaranteed to match the
+      // requested [startNum, lastNum] or be page-aligned.
+      final sortedNew = _mergePosts(const [], fcPosts);
 
       final ThreadViewData newData;
       if (mode == LoadMode.initial || threadDataOutput.value == null) {
+        final newStartNum = _startNumFromPosts(sortedNew, startNum - 1);
         newData = ThreadViewData(
           topic: threadsResult,
-          posts: fcPosts,
-          currentStartNum: currentStartNum0Based, // Store as 0-based
-          position: position + 1, // Convert to 1-based for position field
+          posts: sortedNew,
+          currentStartNum: newStartNum, // 0-based, derived from min postNumber
+          position: _lastPostNumber(sortedNew, newStartNum),
         );
       } else {
         final existing = threadDataOutput.value!;
-        List<FCPost> mergedPosts;
-        int newStartNum;
-        if (mode == LoadMode.earlier) {
-          mergedPosts = [...fcPosts, ...existing.posts];
-          newStartNum = currentStartNum0Based; // Use 0-based
-        } else {
-          mergedPosts = [...existing.posts, ...fcPosts];
-          newStartNum = existing.currentStartNum; // Already 0-based
-        }
+        final mergedPosts = _mergePosts(existing.posts, sortedNew);
+        final newStartNum = _startNumFromPosts(mergedPosts, existing.currentStartNum);
         newData = ThreadViewData(
           topic: threadsResult,
           posts: mergedPosts,
-          currentStartNum: newStartNum,
-          position: newStartNum + mergedPosts.length + 1, // Convert to 1-based
+          currentStartNum: newStartNum, // 0-based, derived from min postNumber
+          position: _lastPostNumber(mergedPosts, newStartNum),
         );
       }
 
@@ -103,15 +130,13 @@ class PostController extends DiscourseGlobalLoaderController with ErrorHandlingM
 
       // Set post_level for each post
       final position = threadsResult.position; // 1-based index of first unread post
-      // Convert 1-based position to 0-based index for calculation
-      // Position 1 -> index 0, Position 25 -> index 24
-      // To show post 25 in a page of 20, we want posts 20-39 (0-based: 19-38), so startNum = 19
-      // Calculation: ((25 - 1) ~/ 20) * 20 = (24 ~/ 20) * 20 = 1 * 20 = 20
-      // But we need 0-based, so: ((position - 1) ~/ postsPerRequest) * postsPerRequest
-      final currentStartNum = ((position - 1) ~/ postsPerRequest) * postsPerRequest;
 
-      // The proxy now returns FCPost objects directly, no conversion needed
-      final fcPosts = threadsResult.posts;
+      // The proxy now returns FCPost objects directly, no conversion needed.
+      // Sort/dedupe and derive the window start from the actual returned
+      // posts — the server window around the anchor is not page-aligned.
+      final fcPosts = _mergePosts(const [], threadsResult.posts);
+      final currentStartNum =
+          _startNumFromPosts(fcPosts, (position - 1).clamp(0, 1 << 30));
       
       // Log warning if posts are empty
       if (fcPosts.isEmpty) {
@@ -147,16 +172,13 @@ class PostController extends DiscourseGlobalLoaderController with ErrorHandlingM
       final position = threadsResult.position; // 1-based index of anchor post
       AppLogger.debug('🔍 [PostController] Position from API (1-based): $position');
 
-      // Convert 1-based position to 0-based index for calculation
-      // Position 1 -> index 0, Position 25 -> index 24
-      // To show post 25 in a page of 20, we want posts 20-39 (0-based: 19-38), so startNum = 19
-      // Calculation: ((25 - 1) ~/ 20) * 20 = (24 ~/ 20) * 20 = 1 * 20 = 20
-      // But we need 0-based, so: ((position - 1) ~/ postsPerRequest) * postsPerRequest
-      final currentStartNum = ((position - 1) ~/ postsPerRequest) * postsPerRequest;
-      AppLogger.debug('🔍 [PostController] Calculated currentStartNum (0-based): $currentStartNum from position $position');
-
-      // The proxy now returns FCPost objects directly, no conversion needed
-      final fcPosts = threadsResult.posts;
+      // The proxy now returns FCPost objects directly, no conversion needed.
+      // Sort/dedupe and derive the window start from the actual returned
+      // posts — the server window around the anchor is not page-aligned.
+      final fcPosts = _mergePosts(const [], threadsResult.posts);
+      final currentStartNum =
+          _startNumFromPosts(fcPosts, (position - 1).clamp(0, 1 << 30));
+      AppLogger.debug('🔍 [PostController] Derived currentStartNum (0-based): $currentStartNum from loaded window (anchor position $position)');
       AppLogger.debug('🔍 [PostController] Received ${fcPosts.length} posts');
       
       // Log warning if posts are empty

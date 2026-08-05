@@ -140,11 +140,15 @@ class SiteManager with ErrorHandlingMixin {
     _forumCache.clear();
     _forumStructure = null;
     _lastLoadTime = null;
-    _loadingCompleter?.complete();
+    final completer = _loadingCompleter;
+    if (completer != null && !completer.isCompleted) {
+      completer.complete();
+    }
     _loadingCompleter = null;
+    _isLoading = false;
 
-    // Unregister from cache manager
-    CacheManager().clearCache('forum_cache_${_siteContext.siteKey}');
+    // Unregister from cache manager (cancels its cleanup timer and drops the reference)
+    CacheManager().unregisterCache('forum_cache_${_siteContext.siteKey}');
   }
 
   /// Checks if the cached data is still valid
@@ -157,7 +161,9 @@ class SiteManager with ErrorHandlingMixin {
 
   /// Ensures the forum structure is loaded, handling concurrent requests
   Future<void> _ensureForumStructureLoaded({bool forceRefresh = false}) async {
-    // If already loading, wait for the existing load to complete
+    // If already loading, wait for the existing load to complete.
+    // Awaiting the completer propagates a load failure to concurrent waiters
+    // instead of silently handing them empty data.
     if (_isLoading) {
       await _loadingCompleter?.future;
       return;
@@ -170,16 +176,22 @@ class SiteManager with ErrorHandlingMixin {
 
     // Start loading
     _isLoading = true;
-    _loadingCompleter = Completer<void>();
+    final completer = Completer<void>();
+    // Avoid an unhandled async error when the load fails with no waiters.
+    completer.future.ignore();
+    _loadingCompleter = completer;
 
     try {
       await _loadForumStructure(forceRefresh);
+      completer.complete();
     } catch (e) {
       AppLogger.debug('ForumManager: Error loading forum structure: $e');
+      completer.completeError(e);
       rethrow;
     } finally {
+      // Reset so a later call retries the load instead of reusing a
+      // completed (possibly failed) completer.
       _isLoading = false;
-      _loadingCompleter?.complete();
       _loadingCompleter = null;
     }
   }

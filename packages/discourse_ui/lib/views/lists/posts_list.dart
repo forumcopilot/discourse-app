@@ -168,17 +168,23 @@ class _PostsState extends State<PostsList> {
   void didUpdateWidget(PostsList oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Check if topicId changed OR if anchorPostId changed (for same topic navigation)
+    // Check if topicId changed OR if anchorPostId/gotoPage changed (for same topic navigation)
     final topicIdChanged = oldWidget.topicId != widget.topicId;
     final anchorPostIdChanged = oldWidget.anchorPostId != widget.anchorPostId;
+    final gotoPageChanged = oldWidget.gotoPage != widget.gotoPage;
     final modeChanged = oldWidget.mode != widget.mode;
 
-    if (topicIdChanged || anchorPostIdChanged || modeChanged) {
+    if (topicIdChanged || anchorPostIdChanged || gotoPageChanged || modeChanged) {
       if (!mounted) return;
 
       // Update internal state for anchorPostId
       if (anchorPostIdChanged) {
         _anchorPostId = widget.anchorPostId;
+      }
+
+      // Keep _gotoPage in sync so a gotoPage-only change is honored
+      if (gotoPageChanged) {
+        _gotoPage = widget.gotoPage;
       }
 
       // Disable scroll loading when switching threads or posts
@@ -470,59 +476,63 @@ class _PostsState extends State<PostsList> {
         _isScrollLoadingEnabled = true;
       }
 
-      // Show user-friendly error message
-      if (mounted) {
-        final errorMessage = extractErrorMessage(e);
-        // Capture ScaffoldMessengerState and theme to avoid using context after unmount
-        final scaffoldMessenger = ScaffoldMessenger.of(context);
-        final theme = Theme.of(context);
-        final errorContainerColor = theme.colorScheme.errorContainer;
-        final onErrorContainerColor = theme.colorScheme.onErrorContainer;
+      // This method is typically called fire-and-forget (initState, jump
+      // dialogs), so don't rethrow — surface the error to the user instead.
+      AppLogger.error('PostsList: initial load failed: $e');
+      _showErrorSnackBar(e);
+    }
+  }
 
-        scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  Icons.error_outline,
+  /// Shows the list's floating error snackbar (initial load and paging
+  /// failures). Safe to call from fire-and-forget loaders.
+  void _showErrorSnackBar(Object e) {
+    if (!mounted) return;
+    final errorMessage = extractErrorMessage(e);
+    // Capture ScaffoldMessengerState and theme to avoid using context after unmount
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final theme = Theme.of(context);
+    final errorContainerColor = theme.colorScheme.errorContainer;
+    final onErrorContainerColor = theme.colorScheme.onErrorContainer;
+
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: onErrorContainerColor,
+            ),
+            const SizedBox(width: DesignTokens.spacingM),
+            Expanded(
+              child: Text(
+                errorMessage,
+                style: theme.textTheme.bodyMedium?.copyWith(
                   color: onErrorContainerColor,
                 ),
-                const SizedBox(width: DesignTokens.spacingM),
-                Expanded(
-                  child: Text(
-                    errorMessage,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: onErrorContainerColor,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-            backgroundColor: errorContainerColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
-            margin: DesignTokens.paddingS,
-            padding: EdgeInsets.symmetric(
-              horizontal: DesignTokens.spacingL,
-              vertical: DesignTokens.spacingL - DesignTokens.spacingXS,
-            ),
-            duration: const Duration(seconds: 4),
-            action: SnackBarAction(
-              label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-              textColor: onErrorContainerColor,
-              onPressed: () {
-                scaffoldMessenger.hideCurrentSnackBar();
-              },
-            ),
-          ),
-        );
-      }
-
-      // Still rethrow to allow upper layers to handle if needed
-      rethrow;
-    }
+          ],
+        ),
+        backgroundColor: errorContainerColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+        ),
+        margin: DesignTokens.paddingS,
+        padding: EdgeInsets.symmetric(
+          horizontal: DesignTokens.spacingL,
+          vertical: DesignTokens.spacingL - DesignTokens.spacingXS,
+        ),
+        duration: const Duration(seconds: 4),
+        action: SnackBarAction(
+          label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
+          textColor: onErrorContainerColor,
+          onPressed: () {
+            scaffoldMessenger.hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
   }
 
   void _onScroll() {
@@ -536,19 +546,17 @@ class _PostsState extends State<PostsList> {
       // Get the last visible item
       final lastVisibleItem = itemPositions.reduce((a, b) => a.index > b.index ? a : b);
 
-      // Load earlier posts if we're near the top
-      // Only trigger if:
-      // 1. The first visible item is at index 0 (at the very top of the list)
-      // 2. AND it's within 200px threshold (for smoother triggering)
-      // 3. AND we haven't loaded earlier posts in the last 500ms (cooldown to prevent endless loading)
-      if (firstVisibleItem.index == 0 && _hasMoreEarlier()) {
-        final firstItemTop = firstVisibleItem.itemLeadingEdge;
+      // Load earlier posts if we're near the top.
+      // Note: itemLeadingEdge is a viewport FRACTION (0..1), not pixels, and
+      // with clamping physics (Android) it never goes positive at the top —
+      // so trigger on the first visible item's index instead. In-flight is
+      // guarded by _isLoadingMore/_isScrollLoadingEnabled at the top of this
+      // method plus a 500ms cooldown to avoid re-triggering right after the
+      // post-load scroll restoration.
+      if (firstVisibleItem.index <= 2 && _hasMoreEarlier()) {
         final now = DateTime.now();
         final canLoad = _lastEarlierLoadTime == null || now.difference(_lastEarlierLoadTime!) > const Duration(milliseconds: 500);
-
-        // Only trigger if within threshold AND cooldown period has passed
-        // This prevents re-triggering immediately after scroll restoration
-        if (firstItemTop > 0 && firstItemTop <= 200 && canLoad) {
+        if (canLoad) {
           _loadMoreEarlier();
         }
       }
@@ -578,20 +586,26 @@ class _PostsState extends State<PostsList> {
     }
   }
 
+  /// True when posts earlier than the loaded window exist. Derived from the
+  /// ACTUAL loaded posts (min postNumber) — the server's windows are not
+  /// guaranteed to be page-aligned.
   bool _hasMoreEarlier() {
     final data = _postsController.threadDataOutput.value;
-    if (data == null) return false;
-    return data.currentStartNum > 0;
+    if (data == null || data.posts.isEmpty) return false;
+    final minLoaded = data.posts.first.postNumber ?? (data.currentStartNum + 1);
+    return minLoaded > 1;
   }
 
+  /// Recomputes [_hasMorePosts] from the ACTUAL loaded posts (max postNumber
+  /// vs the topic's highest post number).
   void _updateHasMorePosts() {
     var data = _postsController.threadDataOutput.value;
-    if (data == null) {
+    if (data == null || data.posts.isEmpty) {
       _hasMorePosts = false;
       return;
     }
-    int currentCount = data.loadedCount;
-    _hasMorePosts = data.currentStartNum + currentCount < data.totalPosts;
+    final maxLoaded = data.posts.last.postNumber ?? (data.currentStartNum + data.loadedCount);
+    _hasMorePosts = maxLoaded < data.totalPosts;
   }
 
   /// Phase 5.45 — report the currently loaded post window to the
@@ -671,11 +685,14 @@ class _PostsState extends State<PostsList> {
     });
     try {
       final data = _postsController.threadDataOutput.value;
-      if (data == null) return;
-      final range = data.earlierRange(_pageSize);
-      // earlierRange returns 0-based values, but getThreadAsync expects 1-based for the API
-      final startNum1Based = range['startNum']! + 1; // Convert 0-based to 1-based
-      final lastNum1Based = range['lastNum']! + 1; // Convert 0-based to 1-based
+      if (data == null || data.posts.isEmpty) return;
+      // Request the window right before the actual lowest loaded postNumber
+      // (1-based). The controller dedupes on merge, so a server window that
+      // overlaps ours is harmless.
+      final minLoaded = data.posts.first.postNumber ?? (data.currentStartNum + 1);
+      final lastNum1Based = minLoaded - 1;
+      if (lastNum1Based < 1) return;
+      final startNum1Based = (minLoaded - _pageSize).clamp(1, lastNum1Based);
 
       // --- Always use normal loading for paging (earlier) ---
       // Even if initial load was unread or anchor, paging uses getThreadAsync for correct merging.
@@ -716,7 +733,11 @@ class _PostsState extends State<PostsList> {
         });
       }
     } catch (e) {
-      rethrow;
+      // Fire-and-forget loader: don't rethrow (would be an unhandled-zone
+      // exception). Log + snackbar; the finally block re-enables scroll
+      // loading so the next scroll retries.
+      AppLogger.error('PostsList: failed to load earlier posts: $e');
+      _showErrorSnackBar(e);
     } finally {
       if (mounted) {
         setState(() {
@@ -751,11 +772,12 @@ class _PostsState extends State<PostsList> {
     });
     try {
       final data = _postsController.threadDataOutput.value;
-      if (data == null) return;
-      final range = data.laterRange(_pageSize);
-      // laterRange returns 0-based values, but getThreadAsync expects 1-based for the API
-      final startNum1Based = range['startNum']! + 1; // Convert 0-based to 1-based
-      final lastNum1Based = range['lastNum']! + 1; // Convert 0-based to 1-based
+      if (data == null || data.posts.isEmpty) return;
+      // Request the window right after the actual highest loaded postNumber
+      // (1-based). The controller dedupes on merge, so overlap is harmless.
+      final maxLoaded = data.posts.last.postNumber ?? data.loadedEnd;
+      final startNum1Based = maxLoaded + 1;
+      final lastNum1Based = maxLoaded + _pageSize;
 
       // --- Always use normal loading for paging (later) ---
       // Even if initial load was unread or anchor, paging uses getThreadAsync for correct merging.
@@ -766,7 +788,11 @@ class _PostsState extends State<PostsList> {
       _updateHasMorePosts();
       _reportPostsRead();
     } catch (e) {
-      rethrow;
+      // Fire-and-forget loader: don't rethrow (would be an unhandled-zone
+      // exception). Log + snackbar; the finally block re-enables scroll
+      // loading so the next scroll retries.
+      AppLogger.error('PostsList: failed to load later posts: $e');
+      _showErrorSnackBar(e);
     } finally {
       if (mounted) {
         setState(() {
@@ -813,7 +839,9 @@ class _PostsState extends State<PostsList> {
       _updateHasMorePosts();
       _reportPostsRead();
     } catch (e) {
-      rethrow;
+      // Also called fire-and-forget (refresh callbacks): don't rethrow.
+      AppLogger.error('PostsList: refresh failed: $e');
+      _showErrorSnackBar(e);
     } finally {
       if (mounted) {
         setState(() {
@@ -863,16 +891,6 @@ class _PostsState extends State<PostsList> {
       }
       _updateHasMorePosts();
       _reportPostsRead();
-      // After reply refresh we loaded a page centered on the new post; that page often
-      // extends to the end of the thread. If we already have the last post, do not
-      // allow "load more later" or the scroll-to-bottom will trigger a merge that
-      // duplicates posts (existing 8-18 + "later" 12-18 = duplicates).
-      if (data != null && data.posts.isNotEmpty && data.totalPosts > 0) {
-        final lastPostNumber = data.posts.last.postNumber ?? 0;
-        if (lastPostNumber >= data.totalPosts) {
-          _hasMorePosts = false;
-        }
-      }
       if (data != null && data.posts.isNotEmpty) {
         final index = data.posts.indexWhere((p) => p.id == postId);
         if (index >= 0) {
@@ -886,7 +904,9 @@ class _PostsState extends State<PostsList> {
         }
       }
     } catch (e) {
-      rethrow;
+      // Also called fire-and-forget (post-reply refresh): don't rethrow.
+      AppLogger.error('PostsList: refresh-and-scroll failed: $e');
+      _showErrorSnackBar(e);
     } finally {
       if (mounted) {
         setState(() {
@@ -1217,14 +1237,13 @@ class _PostsState extends State<PostsList> {
                   _gotoPage = gotoPage;
                   _postsController.threadDataOutput.value = null;
                 });
-                // Reset scroll position before loading new page
-                final currentData = _postsController.threadDataOutput.value;
-                if (currentData != null && currentData.posts.isNotEmpty) {
-                  try {
-                    _itemScrollController.jumpTo(index: 0);
-                  } catch (e) {
-                    AppLogger.debug('PostsList: Failed to reset scroll position in dialog: $e');
-                  }
+                // Reset scroll position before loading the new page
+                // (threadDataOutput was just cleared above, so there is no
+                // data to check — jumpTo is safe-guarded by the try/catch).
+                try {
+                  _itemScrollController.jumpTo(index: 0);
+                } catch (e) {
+                  AppLogger.debug('PostsList: Failed to reset scroll position in dialog: $e');
                 }
                 // startNum and lastNum are ignored for goto_page mode, but we pass them anyway
                 // They should be 0-based, but _loadInitialPosts will convert when needed
@@ -1516,8 +1535,10 @@ class _PostsState extends State<PostsList> {
     int lastPage = ((totalPosts - 1) ~/ _pageSize) + 1;
     int lastPageStartNum = (lastPage - 1) * _pageSize;
 
-    // Check if already at the last page
-    if (data.currentStartNum == lastPageStartNum) {
+    // Check if the last post is already loaded (windows are not
+    // page-aligned, so compare actual postNumbers instead of page starts)
+    final maxLoaded = data.posts.last.postNumber ?? 0;
+    if (maxLoaded >= totalPosts) {
       if (data.posts.isNotEmpty) {
         try {
           final lastIndex = data.loadedCount - 1;

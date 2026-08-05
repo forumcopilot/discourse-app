@@ -59,6 +59,21 @@ class SiteInitializationService {
 
       SiteProxyService.initialize(siteContext);
 
+      // Hydrate the persisted Discourse User API Key onto THIS SiteContext
+      // instance BEFORE any fetches — the credential store is an
+      // identity-keyed Expando, and getConfig/category fetches must run
+      // authenticated so restricted categories are visible from first load.
+      if (siteContext.siteType == 'discourse') {
+        try {
+          await siteContext.loadUserApiCredentials();
+          if (siteContext.hasUserApiKey) {
+            AppLogger.info('SiteInitializationService: Hydrated persisted User API Key before initial fetches');
+          }
+        } catch (e) {
+          AppLogger.warning('SiteInitializationService: Could not hydrate persisted User API Key: $e');
+        }
+      }
+
       // Step 1: Get config with 10-second timeout
       // This MUST succeed - if it fails, we cannot proceed
       AppLogger.info('Fetching forum configuration...');

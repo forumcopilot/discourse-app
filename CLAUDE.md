@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Flutter app template for a **single-forum** Discourse client. The app is hard-bound to one forum at build time via `lib/config/app_forum_config.dart`. It targets Discourse's stock REST/JSON API + User API Keys directly — there is **no server-side plugin** in v1 (a custom Discourse plugin may be added later if concrete gaps justify it).
 
-This project was scaffolded by copying `byo/xenforoapp/` (Phase 0). At Phase 0, every `Discourse*Proxy` is a sed-renamed copy of its `XenForo*Proxy` counterpart and still calls a non-existent plugin endpoint at runtime — Phase 1 replaces network/auth/converters with real Discourse REST calls. See `PHASE0_NOTES.md` (TODO) for status.
+This project was scaffolded by copying `byo/xenforoapp/` (Phase 0), but is now **well past Phase 0**: all `Discourse*Proxy` classes call real Discourse REST endpoints (zero plugin-endpoint calls remain), auth uses the User API Key handshake, and the UI lives in the extracted `discourse_ui` package. Remaining XenForo inheritance is tracked per-file, not per-phase.
 
 Flutter `^3.6.1` / Dart `^3.6.1`. Targets Android, iOS, macOS, Windows, Linux, web.
 
@@ -18,28 +18,23 @@ Flutter `^3.6.1` / Dart `^3.6.1`. Targets Android, iOS, macOS, Windows, Linux, w
 
 ## Repository layout (the parts that matter)
 
-- `lib/` — the app. Entry point `lib/main.dart` → `ForumCopilotApp` in `lib/forumcopilot_app.dart` → home `views/single_forum_bootstrap_page.dart`.
-- `lib/config/app_forum_config.dart` — **the only file a fork normally edits**: forum name, base URL, optional push backend, Android passkey identifiers. `AppForumConfig.buildSite()` constructs the singleton `Site` used throughout. (Phase 1 will remove `pluginEndpoint` and add User API Key client identifiers.)
-- `lib/controllers/` — GetX controllers (`SiteController`, `SiteManager`, `LoginController`, `TopicController`, `PostController`, `PushNotificationController`, `NotificationSettingsController`, `GlobalLoaderController`).
-- `lib/services/` — initialization, push, user state, site proxy wiring, notification prefs.
-- `lib/views/` — pages and widgets (forum list, topics, threads, posting, PMs, settings, profile, search). Posting flow is BBCode in the XenForo template; Phase 1 converts the composer to Markdown for Discourse.
-- `lib/core/` — cross-cutting: `errors/` (with Crashlytics init), `logging/AppLogger`, `memory/MemoryManager`, `cache/`, `async/`.
-- `lib/l10n/` — ARB files; generated output in `lib/l10n/generated/` via `flutter gen-l10n` (config in `l10n.yaml`).
+- `lib/` — thin app runner: just `lib/main.dart` (init + push bootstrap), which hands off to `ForumCopilotApp` in `discourse_ui`.
+- `packages/discourse_ui/` — the whole UI layer: `config/app_forum_config.dart` (**the file a fork normally edits**: forum name, base URL, optional push backend, passkey identifiers), `controllers/` (GetX), `services/`, `views/`, `core/` (errors/logging/memory/cache/async), `l10n/`, `theme/`.
 - `packages/forumcopilot_sdk/` — local package. Forum-agnostic abstractions: `IFC*Proxy` interfaces, `FC*Result` response wrappers, `SiteContext`, `SiteProxyFactory`, networking (Dio with persistent cookies, Cloudflare hooks). Uses `dart_mappable` + `json_annotation` codegen.
-- `packages/discourse_core/` — local package. Discourse implementation of the SDK proxies (`DiscourseProxyFactory` + per-area proxies + Discourse→FC converters). **Phase 0**: contains sed-renamed XenForo code that compiles but fails at runtime. **Phase 1+**: real implementation against stock Discourse REST + User API Keys.
+- `packages/discourse_core/` — local package. Discourse implementation of the SDK proxies (`DiscourseProxyFactory` + per-area proxies) against stock Discourse REST + User API Keys (`network/discourse_client.dart`, `network/discourse_auth_manager.dart`).
 - `docs/guides/` — platform-specific setup notes (macOS file picker entitlements, splash, icons, reset).
 
 ## Architecture in one paragraph
 
 `main.dart` runs critical init (error handling, `MemoryManager`, `ForumcopilotSdk.ensureInitialized`, `UserStateService`, `SettingsContext.loadFromDevice`) then `runApp(ForumCopilotApp())`. Firebase + push init runs **in the background after `runApp`** so the UI does not block on it; `PushNotificationController` is created lazily once an FCM token arrives. `ForumCopilotApp` registers `GlobalLoaderController` and `SiteController`, then renders `GetMaterialApp` with a global loader overlay and `UserStateBanner`. The home is `SingleForumBootstrapPage`, which builds the forum's `Site` from `AppForumConfig` and drives the rest of the app. State is managed with **GetX** (`Get.put` / `Obx`); navigation uses `globalNavigatorKey` (defined in `forumcopilot_sdk`) so SDK code can show dialogs (e.g. Cloudflare challenge UI) without a `BuildContext`. All forum I/O goes through `SiteProxyFactory.get*Proxy()` returning the `discourse_core` implementations registered at startup; results follow a uniform `FC*Result { result, resultText, ...payload }` shape.
 
-## Phase plan (current status: Phase 0)
+## Phase plan (current status: Phases 0–2 done, Phase 4 mostly done)
 
-- **Phase 0** — scaffolding complete: project copied from xenforoapp, packages renamed, app code references `discourse_core` and `Discourse*Proxy` classes. Compiles, but every API call still tries to POST to a non-existent plugin endpoint — runtime failure expected.
-- **Phase 1** — auth + read path: `DiscourseClient` (Dio + User API Key headers), User API Key handshake (`/user-api-key/new` + RSA decryption + in-app webview for grant), real implementations of `IFCConfigProxy`, `IFCAccountProxy`, `IFCUserProxy`, `IFCForumProxy`, `IFCTopicProxy`, `IFCPostProxy`, `IFCSearchProxy`. Live-test against the local Discourse install at `/Volumes/CRUCIAL/discourse`.
-- **Phase 2** — write path + PMs: `replyPost`, `newTopic`, edit/delete via `/posts`. PM flows via `archetype: 'private_message'`. Attachments via `/uploads`. Subscriptions with `notification_level` (Watching/Tracking/Normal/Muted).
-- **Phase 3** — push + social: wire Discourse's `push_url` → existing FCM relay backend (same one xenforoapp uses). `IFCSocialProxy`, `IFCDeviceProxy`, `IFCModerationProxy`.
-- **Phase 4** — composer Markdown conversion + polish + decide on optional `FC_Discourse` plugin if real gaps emerge.
+- **Phase 0** — ✅ scaffolding (copy from xenforoapp, rename).
+- **Phase 1** — ✅ auth + read path: `DiscourseClient`, User API Key handshake (`/user-api-key/new` + RSA decryption + in-app webview grant), real config/account/user/forum/topic/post/search proxies. Live-tested against the local Discourse install at `/Volumes/CRUCIAL/discourse`.
+- **Phase 2** — ✅ write path + PMs: reply/new topic/edit/delete via `/posts`, PMs via `archetype: 'private_message'`, attachments via `/uploads`, native 4-level `notification_level` subscriptions. Also landed beyond plan: reactions, bookmarks, server-side drafts, tags, groups, badges, user directory, chat (partial), moderation, `/topics/timings` read tracking.
+- **Phase 3** — ⏳ push: wire Discourse's `push_url` → existing FCM relay backend (same one xenforoapp uses). `IFCDeviceProxy` is still a stub; `push` scope not yet requested in the handshake.
+- **Phase 4** — mostly done (UI polish, spacing tokens, skeleton loaders); composer Markdown conversion in progress; optional `FC_Discourse` plugin still not needed.
 
 ## API/SDK strategy (load-bearing)
 

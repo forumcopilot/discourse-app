@@ -17,6 +17,7 @@ import '../../../../theme/style_builders.dart';
 import '../../../../utils/accessibility_helpers.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
+import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../../../login_page.dart';
 
 class ConversationPage extends StatefulWidget {
@@ -74,6 +75,7 @@ class _ConversationPageState extends State<ConversationPage> {
         }
         final loginController = Get.find<DiscourseLoginController>();
         final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
+        if (!mounted) return;
         if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
           await Navigator.of(context).push(
             MaterialPageRoute(
@@ -160,6 +162,34 @@ class _ConversationPageState extends State<ConversationPage> {
     await _loadConversation(loadMore: true, loadOlder: true);
   }
 
+  /// Merges two message lists preserving order and dropping duplicate ids
+  /// (page boundaries can overlap when the server re-centers a window).
+  List<FCConversationMessage> _mergeMessages(
+      List<FCConversationMessage> first, List<FCConversationMessage> second) {
+    final seen = <String>{};
+    final merged = <FCConversationMessage>[];
+    for (final msg in [...first, ...second]) {
+      if (seen.add(msg.messageId)) merged.add(msg);
+    }
+    return merged;
+  }
+
+  /// Derives the loaded window bounds from the positions the server
+  /// actually returned rather than mirroring its paging formula. Falls
+  /// back to the computed bounds when messages carry no position.
+  void _updateWindowFromMessages(List<FCConversationMessage> loaded,
+      {required int fallbackStart, required int fallbackLast}) {
+    final positions =
+        loaded.map((m) => m.messageNumber).whereType<int>().toList();
+    if (positions.isNotEmpty) {
+      _currentStartNum = positions.reduce(math.min);
+      _currentLastNum = positions.reduce(math.max);
+    } else {
+      _currentStartNum = fallbackStart;
+      _currentLastNum = fallbackLast;
+    }
+  }
+
   Future<void> _loadConversation({bool loadMore = false, bool loadOlder = false}) async {
     if (loadMore && (_isLoadingMore || !_hasMoreMessages)) {
       return;
@@ -201,13 +231,19 @@ class _ConversationPageState extends State<ConversationPage> {
         if (mounted) {
           setState(() {
             _conversation = conversation;
-            // Calculate current startNum and lastNum based on position
-            // Server calculates: startNum = max(1, position - floor(messagesPerRequest / 2))
-            // This centers the messages around the anchor message
+            // Derive the loaded window from the positions the server
+            // actually returned. Fall back to mirroring the server's
+            // centering formula (startNum = max(1, position -
+            // floor(messagesPerRequest / 2))) only when the messages
+            // carry no positions.
             final position = conversation.position ?? 1;
             // Use floor() to match server calculation exactly (not ~/ which truncates)
-            _currentStartNum = math.max(1, position - (_pageSize / 2).floor());
-            _currentLastNum = _currentStartNum + conversation.messages.length - 1;
+            final estimatedStart = math.max(1, position - (_pageSize / 2).floor());
+            _updateWindowFromMessages(
+              conversation.messages,
+              fallbackStart: estimatedStart,
+              fallbackLast: estimatedStart + conversation.messages.length - 1,
+            );
 
             // Check if there are more messages to load
             final totalMessages = conversation.totalMessageNum ?? conversation.messages.length;
@@ -246,6 +282,22 @@ class _ConversationPageState extends State<ConversationPage> {
             1, // Load just the first message to get totalMessageNum
             false,
           );
+
+          // Surface a failed metadata call instead of continuing with a
+          // bogus totalMessages of 0 (which would produce a nonsense
+          // startNum=1, lastNum=0 request).
+          if (!metadataConversation.result) {
+            if (mounted) {
+              setState(() {
+                _error = metadataConversation.resultText?.isNotEmpty == true
+                    ? metadataConversation.resultText
+                    : 'Failed to load conversation';
+                _isLoading = false;
+                _isLoadingMore = false;
+              });
+            }
+            return;
+          }
 
           final totalMessages = metadataConversation.totalMessageNum ?? metadataConversation.messages.length;
 
@@ -308,14 +360,17 @@ class _ConversationPageState extends State<ConversationPage> {
                 // Save current scroll position before prepending messages
                 final previousScrollPosition = _scrollController.hasClients ? _scrollController.position.pixels : 0.0;
 
-                // Prepend older messages to existing list (since we're loading backwards)
+                // Prepend older messages to existing list (since we're loading
+                // backwards), deduping by id in case the pages overlap
+                final previousCount = _conversation!.messages.length;
+                final mergedMessages = _mergeMessages(conversation.messages, _conversation!.messages);
                 _conversation = FCConversationResult(
                   result: conversation.result,
                   resultText: conversation.resultText,
                   convId: conversation.convId,
                   subject: conversation.subject,
                   convTitle: conversation.convTitle,
-                  messages: [...conversation.messages, ..._conversation!.messages],
+                  messages: mergedMessages,
                   participants: conversation.participants,
                   participantCount: conversation.participantCount,
                   canReply: conversation.canReply,
@@ -327,16 +382,21 @@ class _ConversationPageState extends State<ConversationPage> {
                   canUpload: conversation.canUpload,
                   position: conversation.position,
                 );
-                _currentStartNum = startNum;
-                // Keep _currentLastNum the same since we're prepending
+                // Derive the loaded window from the returned positions
+                // (falling back to the requested range when absent)
+                _updateWindowFromMessages(
+                  mergedMessages,
+                  fallbackStart: startNum,
+                  fallbackLast: _currentLastNum,
+                );
                 // Check if there are more older messages to load
-                final hasOlderMessages = startNum > 1;
+                final hasOlderMessages = _currentStartNum > 1;
                 final hasNewerMessages = _currentLastNum < (conversation.totalMessageNum ?? _conversation!.totalMessageNum ?? 0);
                 _hasMoreMessages = hasOlderMessages || hasNewerMessages;
 
                 // Maintain scroll position after prepending older messages
                 // Estimate the height of newly loaded messages and adjust scroll
-                final newMessageCount = conversation.messages.length;
+                final newMessageCount = mergedMessages.length - previousCount;
                 if (_scrollController.hasClients && previousScrollPosition > 0 && newMessageCount > 0) {
                   // Estimate average message height (this is approximate)
                   // In a real scenario, you might want to measure actual heights
@@ -355,14 +415,16 @@ class _ConversationPageState extends State<ConversationPage> {
                   });
                 }
               } else if (isLoadingNewer) {
-                // Append newer messages to existing list
+                // Append newer messages to existing list, deduping by id
+                // in case the pages overlap
+                final mergedMessages = _mergeMessages(_conversation!.messages, conversation.messages);
                 _conversation = FCConversationResult(
                   result: conversation.result,
                   resultText: conversation.resultText,
                   convId: conversation.convId,
                   subject: conversation.subject,
                   convTitle: conversation.convTitle,
-                  messages: [..._conversation!.messages, ...conversation.messages],
+                  messages: mergedMessages,
                   participants: conversation.participants,
                   participantCount: conversation.participantCount,
                   canReply: conversation.canReply,
@@ -374,19 +436,27 @@ class _ConversationPageState extends State<ConversationPage> {
                   canUpload: conversation.canUpload,
                   position: conversation.position,
                 );
-                _currentLastNum = lastNum;
-                // Keep _currentStartNum the same since we're appending
+                // Derive the loaded window from the returned positions
+                // (falling back to the requested range when absent)
+                _updateWindowFromMessages(
+                  mergedMessages,
+                  fallbackStart: _currentStartNum,
+                  fallbackLast: lastNum,
+                );
                 // Check if there are more newer messages to load
                 final totalMessages = conversation.totalMessageNum ?? _conversation!.totalMessageNum ?? 0;
                 final hasOlderMessages = _currentStartNum > 1;
                 final hasNewerMessages = _currentLastNum < totalMessages;
                 _hasMoreMessages = hasOlderMessages || hasNewerMessages;
               } else {
-                // Should not happen, but handle gracefully
-                _conversation = conversation;
-                _currentStartNum = startNum;
-                _currentLastNum = lastNum;
-                _hasMoreMessages = false;
+                // Requested window is neither older nor newer than what's
+                // loaded (e.g. an overlapping/re-centered response). Keep
+                // the current list and pagination state — replacing them
+                // here would drop loaded messages and kill pagination.
+                AppLogger.warning(
+                    'ConversationPage: unexpected loadMore window startNum=$startNum '
+                    'lastNum=$lastNum within [$_currentStartNum, $_currentLastNum]; '
+                    'keeping current state');
               }
             } else {
               _conversation = conversation;

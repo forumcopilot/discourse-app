@@ -227,7 +227,10 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
           _isLoading = false;
           _isLoadingMore = false;
           _error = null;
-          _hasMore = topics.length >= _perPage;
+          // Judge "more pages?" on the UNfiltered page size — blank-message
+          // alerts are filtered out above, so a full server page can shrink
+          // locally and must not end pagination prematurely.
+          _hasMore = alertData.items.length >= _perPage;
           if (_hasMore) _page += 1;
         });
         _hasLoaded = true; // Mark as loaded after successful load

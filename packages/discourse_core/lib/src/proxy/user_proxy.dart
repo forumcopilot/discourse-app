@@ -97,7 +97,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     // Drives the home-tab unread badge. We approximate the FC inbox stat
     // shape from /notifications.json: unread PMs (notification_type=6 or 7)
     // map to unread conversations/messages; totalConversations is the
-    // grand-total count of notifications (Discourse doesn't expose a
+    // total count of unread notifications (Discourse doesn't expose a
     // separate "all conversations ever" number).
     if (!siteContext.hasUserApiKey) {
       return FCInboxStatResult(
@@ -109,8 +109,17 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       );
     }
     try {
+      // Use the non-recent listing: `recent=true` caps at 15 rows and
+      // omits `total_rows_notifications`, undercounting unread badges.
+      // The plain listing returns up to 60 rows (INDEX_LIMIT in
+      // notifications_controller.rb) plus the grand total, and doesn't
+      // bump the server-side "seen" watermark as a side effect.
+      // `filter=unread` makes every returned row (and the total) an
+      // unread notification, so the counts stay accurate even when many
+      // read notifications sit on top of the feed.
       final response = await apiGet('/notifications.json', query: {
-        'recent': 'true',
+        'limit': '60',
+        'filter': 'unread',
       });
       final notifications =
           ((response['notifications'] as List?) ?? const []).whereType<Map>();
@@ -231,10 +240,13 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     int page,
   ) async {
     try {
+      // Server-side `page` is 0-based (directory_items_controller.rb
+      // offsets by limit * page), while this method's [page] is
+      // 1-indexed — translate here.
       final response = await apiGet('/directory_items.json', query: {
         'period': period,
         'order': order,
-        if (page > 1) 'page': page.toString(),
+        if (page > 1) 'page': (page - 1).toString(),
       });
       final raw = ((response['directory_items'] as List?) ?? const [])
           .whereType<Map>()
@@ -243,8 +255,10 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       final items = raw
           .map((j) => _directoryItemFromJson(j))
           .toList(growable: false);
-      final total = (response['total_rows_directory_items'] as num?)
-              ?.toInt() ??
+      // `total_rows_directory_items` lives under `meta:` in the
+      // response, not at the top level.
+      final meta = (response['meta'] as Map<String, dynamic>?) ?? const {};
+      final total = (meta['total_rows_directory_items'] as num?)?.toInt() ??
           items.length;
       return FCDirectoryItemResult(
         result: true,
@@ -406,6 +420,25 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       final fiveMinAgo = DateTime.now().subtract(const Duration(minutes: 5));
       final isOnline = lastSeenAt != null && lastSeenAt.isAfter(fiveMinAgo);
 
+      // `post_count` on UserSerializer is a staff-only attribute, so for
+      // non-staff viewers it is simply absent and profiles would show 0.
+      // When missing, fall back to /u/{username}/summary.json, whose
+      // `post_count` (user_summary_serializer.rb) is visible to anyone
+      // who can see the profile's summary stats. One extra request, only
+      // when needed.
+      var postCount = user['post_count'] as int?;
+      if (postCount == null) {
+        try {
+          final summary = await apiGet(
+              '/u/${Uri.encodeComponent(username)}/summary.json');
+          final userSummary =
+              (summary['user_summary'] as Map<String, dynamic>?) ?? const {};
+          postCount = (userSummary['post_count'] as num?)?.toInt();
+        } catch (_) {
+          // Best-effort; keep the profile usable without a post count.
+        }
+      }
+
       return FCUserInfoResult(
         result: true,
         resultText: '',
@@ -416,7 +449,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
             ? 'admin'
             : ((user['moderator'] == true) ? 'moderator' : 'normal'),
         iconUrl: avatarUrl,
-        postCount: (user['post_count'] as int?) ?? 0,
+        postCount: postCount ?? 0,
         registrationTime: parseTs(user['created_at']),
         lastActivityTime: lastSeenAt,
         isOnline: isOnline,
@@ -428,7 +461,10 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         // `can_follow` is true when the user permits being followed.
         isFollowing: user['is_followed'] == true,
         isFollowingMe: user['is_following_me'] == true,
-        acceptsFollowers: user['can_follow'] != false,
+        // Only report true when the follow plugin actually surfaced the
+        // field — on stock Discourse `can_follow` is absent and
+        // `!= false` would falsely light up the follow UI.
+        acceptsFollowers: user['can_follow'] == true,
         followingCount: (user['total_following'] as int?) ?? 0,
         followerCount: (user['total_followers'] as int?) ?? 0,
         canBan: false,
@@ -611,34 +647,33 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
 
   @override
   Future<FCIgnoreUserResult> ignoreUserAsync(String userId, int mode) async {
-    // The SDK contract takes `userId` but Discourse's notification-level
-    // endpoint expects a username. We accept either: numeric → look up via
-    // /admin/users/{id}.json (admin only) or assume the caller actually
-    // passed a username.
-    String username = userId;
-    final asInt = int.tryParse(userId);
-    if (asInt != null) {
-      // userId looks numeric — try resolving via the public /u path. If
-      // that fails (Discourse returns 404 for id-based lookups by
-      // default), fall through and pass it as-is.
-      try {
-        final user = await apiGet('/u/by-external-or-id/$asInt.json',
-                query: {'external': 'false'})
-            .catchError((_) => <String, dynamic>{});
-        final u = user['user'] as Map<String, dynamic>?;
-        final name = u?['username']?.toString();
-        if (name != null && name.isNotEmpty) username = name;
-      } catch (_) {
-        // Best-effort; fall back to the raw value.
-      }
-    }
-    // Discourse user notification levels:
-    //   0 = muted, 1 = normal, 2 = ignored
-    // SDK contract: mode 1 = ignore, 0 = unignore.
-    final level = mode == 1 ? 2 : 1;
+    // The SDK contract calls this `userId`, but Discourse's
+    // notification-level endpoint is keyed by username and every caller
+    // (ignored_users_page, user_profile_page) passes a username. There is
+    // no public Discourse route that resolves a numeric user id to a
+    // username, so the value is used as a username verbatim — a stale
+    // numeric id simply 404s into a clean failure result.
+    final username = userId;
+    // Discourse matches `notification_level` as the strings
+    // "ignore" / "mute" / "normal" (app/controllers/users_controller.rb,
+    // users#notification_level). SDK contract: mode 1 = ignore,
+    // 0 = unignore.
+    //
+    // "ignore" additionally REQUIRES `expiring_at` (the server
+    // Time.parse()s it unconditionally). The SDK interface has no
+    // duration parameter, so mirror the longest option Discourse's own
+    // UI offers: 4 months from now.
+    final body = <String, dynamic>{
+      'notification_level': mode == 1 ? 'ignore' : 'normal',
+      if (mode == 1)
+        'expiring_at': DateTime.now()
+            .add(const Duration(days: 120))
+            .toUtc()
+            .toIso8601String(),
+    };
     try {
       await apiPut('/u/${Uri.encodeComponent(username)}/notification_level.json',
-          body: {'notification_level': level});
+          body: body);
       return FCIgnoreUserResult(result: true, resultText: '');
     } on DiscourseApiException catch (e) {
       return FCIgnoreUserResult(result: false, resultText: e.userMessage);
@@ -715,10 +750,21 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     );
   }
 
+  /// Discourse 2FA happens inside the User API Key handshake webview
+  /// (same as passkeys) — there is no separate two-step endpoint for the
+  /// app to call. Soft-fail like the sibling login stubs instead of
+  /// throwing.
   @override
-  Future<FCLoginTwoStepResult> loginTwoStepAsync(String codeTwoStep, bool trust) {
-    // TODO: implement loginTwoStepAsync
-    throw UnimplementedError();
+  Future<FCLoginTwoStepResult> loginTwoStepAsync(
+      String codeTwoStep, bool trust) async {
+    return FCLoginTwoStepResult(
+      result: false,
+      resultText:
+          'Discourse two-factor auth happens inside the User API Key '
+          'handshake webview. See DiscourseAuthManager.beginHandshake.',
+      id: '',
+      username: '',
+    );
   }
 
   @override

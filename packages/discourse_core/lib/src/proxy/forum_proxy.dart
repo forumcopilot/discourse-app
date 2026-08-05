@@ -69,7 +69,10 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
     // Tracking (2). Phase 2 follow-up: hit /user-actions to compute real
     // participation history.
     try {
-      final response = await apiGet('/categories.json');
+      // include_subcategories=true: without it /categories.json omits
+      // subcategories, hiding any tracked subcategory here.
+      final response = await apiGet('/categories.json',
+          query: {'include_subcategories': 'true'});
       final list = (response['category_list'] as Map<String, dynamic>?) ??
           const <String, dynamic>{};
       final cats = ((list['categories'] as List?) ?? const [])
@@ -93,11 +96,14 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
 
   @override
   Future<FCMarkAllAsReadResult> markAllAsRead(String forumId) async {
-    // Discourse: PUT /topics/bulk { filter:'unread', operation:{type:'dismiss'}, [category_id] }.
+    // Discourse: PUT /topics/bulk with filter=='unread' selects the user's
+    // unread topics server-side; the operation type must come from
+    // TopicsBulkAction.operations ('dismiss' is invalid) — 'dismiss_posts'
+    // marks every post in each selected topic as read.
     try {
       final body = <String, dynamic>{
         'filter': 'unread',
-        'operation': {'type': 'dismiss'},
+        'operation': {'type': 'dismiss_posts'},
       };
       if (forumId.isNotEmpty) {
         body['category_id'] = int.tryParse(forumId) ?? forumId;
@@ -132,11 +138,37 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
     }
     final segments = uri.pathSegments.where((s) => s.isNotEmpty).toList();
     if (segments.length >= 3 && segments[0] == 't') {
+      final topicId = segments[2];
+      String? postId;
+      if (segments.length >= 4) {
+        // The URL's 4th segment is a post_number (position in the topic),
+        // NOT a post id. Resolve the real id via the topic view, which
+        // centers its post_stream chunk on the requested post_number.
+        final postNumber = int.tryParse(segments[3]);
+        if (postNumber != null) {
+          try {
+            final t = await apiGet('/t/$topicId/$postNumber.json');
+            final stream =
+                (t['post_stream'] as Map<String, dynamic>?) ?? const {};
+            final posts = (stream['posts'] as List?) ?? const [];
+            for (final raw in posts.whereType<Map>()) {
+              if (raw['post_number'] == postNumber) {
+                postId = raw['id']?.toString();
+                break;
+              }
+            }
+          } catch (_) {
+            // Topic still resolved; leave postId null rather than
+            // returning a post_number that callers would mistake for
+            // a post id.
+          }
+        }
+      }
       return FCIdByUrlResult(
         result: true,
         resultText: '',
-        topicId: segments[2],
-        postId: segments.length >= 4 ? segments[3] : null,
+        topicId: topicId,
+        postId: postId,
       );
     }
     if (segments.length >= 3 && segments[0] == 'c') {
@@ -189,7 +221,10 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
   @override
   Future<FCForumStatusResult> getForumStatusAsync(List<String> forumIds) async {
     try {
-      final response = await apiGet('/categories.json');
+      // include_subcategories=true: without it /categories.json omits
+      // subcategories, so status lookups for them silently return nothing.
+      final response = await apiGet('/categories.json',
+          query: {'include_subcategories': 'true'});
       final list = (response['category_list'] as Map<String, dynamic>?) ??
           const <String, dynamic>{};
       final cats = (list['categories'] as List?) ?? const [];

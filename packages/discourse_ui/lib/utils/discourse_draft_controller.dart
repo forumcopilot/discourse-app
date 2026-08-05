@@ -34,6 +34,8 @@ class DiscourseDraftController {
 
   Timer? _debounce;
   bool _saving = false;
+  bool _pendingFlush = false;
+  Future<void>? _inFlightSave;
   bool _disposed = false;
   bool _loaded = false;
   int _sequence = 0;
@@ -90,19 +92,44 @@ class DiscourseDraftController {
   void _onChanged() {
     if (!_loaded || _disposed) return;
     _debounce?.cancel();
-    _debounce = Timer(debounceDuration, _flush);
+    // The timer fires into the void, so swallow save failures here —
+    // otherwise a failed saveDraftAsync becomes an unhandled async
+    // exception in the root zone.
+    _debounce = Timer(debounceDuration, () {
+      _flush().catchError((Object e) {
+        AppLogger.debug('DiscourseDraftController debounced flush failed: $e');
+      });
+    });
   }
 
   Future<void> _flush() async {
-    if (_disposed || _saving) return;
-    final reply = contentController.text;
-    final title = titleController.text;
-    if (reply == _lastSavedReply && title == _lastSavedTitle) return;
-    // Discourse auto-deletes drafts whose reply text is empty/whitespace,
-    // so only POST when we have something worth saving.
-    if (reply.trim().isEmpty && title.trim().isEmpty) return;
+    if (_disposed) return;
+    if (_saving) {
+      // A save is already in flight — remember to re-flush when it
+      // completes so edits made meanwhile aren't dropped.
+      _pendingFlush = true;
+      return;
+    }
     _saving = true;
+    final save = _saveLoop();
+    _inFlightSave = save;
     try {
+      await save;
+    } finally {
+      _saving = false;
+      _inFlightSave = null;
+    }
+  }
+
+  Future<void> _saveLoop() async {
+    do {
+      _pendingFlush = false;
+      final reply = contentController.text;
+      final title = titleController.text;
+      if (reply == _lastSavedReply && title == _lastSavedTitle) return;
+      // Discourse auto-deletes drafts whose reply text is empty/whitespace,
+      // so only POST when we have something worth saving.
+      if (reply.trim().isEmpty && title.trim().isEmpty) return;
       final result = await SiteProxyService.getDraftProxy().saveDraftAsync(
         draftKey: draftKey,
         sequence: _sequence,
@@ -117,15 +144,24 @@ class DiscourseDraftController {
         _lastSavedTitle = title;
         if (result.sequence != null) _sequence = result.sequence!;
       }
-    } finally {
-      _saving = false;
-    }
+      // Re-run when a flush was requested while this save was in flight.
+    } while (_pendingFlush && !_disposed);
   }
 
   /// Force a save right now (skipping the debounce). Useful when the
   /// user backgrounds the app or the page is about to be popped.
   Future<void> flushNow() async {
     _debounce?.cancel();
+    // Wait out any in-flight save first so we don't silently no-op,
+    // then flush whatever is still unsaved.
+    final inFlight = _inFlightSave;
+    if (inFlight != null) {
+      try {
+        await inFlight;
+      } catch (_) {
+        // The retry below is the recovery path.
+      }
+    }
     await _flush();
   }
 

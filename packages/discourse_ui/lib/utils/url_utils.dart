@@ -26,6 +26,7 @@ enum ForumTemplate {
   yuku,
   wbb,
   vanilla,
+  discourse,
   unknown,
 }
 
@@ -227,13 +228,26 @@ class UrlUtils {
         postUrl = '${cleanForumUrl}discussion/$threadId/#Item_$postId';
         break;
 
+      case ForumTemplate.discourse:
+        // Discourse post short-link route: /p/{post_id} (config/routes.rb).
+        postUrl = '${_stripTrailingSlash(cleanForumUrl)}/p/$postId';
+        break;
+
       case ForumTemplate.unknown:
-      default:
         postUrl = cleanForumUrl;
         break;
     }
 
     return postUrl;
+  }
+
+  /// Removes any trailing slashes so path joins can't produce `//`.
+  static String _stripTrailingSlash(String url) {
+    var result = url;
+    while (result.endsWith('/')) {
+      result = result.substring(0, result.length - 1);
+    }
+    return result;
   }
 
   /// Generate a topic URL for different forum types when postId is empty
@@ -331,8 +345,12 @@ class UrlUtils {
         topicUrl = '${cleanForumUrl}discussion/$threadId/';
         break;
 
+      case ForumTemplate.discourse:
+        // Slugless topic route: /t/{topic_id} (config/routes.rb).
+        topicUrl = '${_stripTrailingSlash(cleanForumUrl)}/t/$threadId';
+        break;
+
       case ForumTemplate.unknown:
-      default:
         topicUrl = cleanForumUrl;
         break;
     }
@@ -373,7 +391,9 @@ class UrlUtils {
     if (type.startsWith('vb')) return ForumTemplate.vb;
 
     // Discourse
-    if (type.startsWith('discourse')) return ForumTemplate.xf;
+    if (type.startsWith('discourse')) return ForumTemplate.discourse;
+
+    // XenForo
     if (type.startsWith('xf')) return ForumTemplate.xf;
 
     // MyBB
@@ -982,6 +1002,38 @@ class UrlUtils {
           final msgMatch = RegExp(r'msg(\d+)').firstMatch(url);
           topicId = topicMatch?.group(1);
           postId = msgMatch?.group(1);
+          break;
+
+        case ForumTemplate.discourse:
+          // Stock Discourse routes (see /Volumes/CRUCIAL/discourse
+          // config/routes.rb):
+          //   /t/{slug}/{topic_id}(/{post_number})
+          //   /t/{topic_id}(/{post_number})   (slugless; topic_id is numeric)
+          //   /p/{post_id}(/{user_id})        (post short-link)
+          //   /c/{slug...}/{category_id}      (category; id is last segment)
+          // Note: the post NUMBER in /t/ URLs is not a post id, so it cannot
+          // feed thread_by_post navigation — those resolve to the topic.
+          // /u/{username} profile links are handled as mentions upstream
+          // (PostListItem/RichTextContent) and intentionally not claimed here.
+          final Uri dUri = Uri.parse(url);
+          final numeric = RegExp(r'^\d+$');
+          final segs =
+              dUri.pathSegments.where((s) => s.isNotEmpty).toList();
+          if (segs.length >= 2) {
+            if (segs.first == 't') {
+              // Topic id is the first numeric segment after /t/ (segment 1
+              // when slugless, segment 2 when a slug is present).
+              if (numeric.hasMatch(segs[1])) {
+                topicId = segs[1];
+              } else if (segs.length >= 3 && numeric.hasMatch(segs[2])) {
+                topicId = segs[2];
+              }
+            } else if (segs.first == 'p' && numeric.hasMatch(segs[1])) {
+              postId = segs[1];
+            } else if (segs.first == 'c' && numeric.hasMatch(segs.last)) {
+              forumId = segs.last;
+            }
+          }
           break;
 
         default:

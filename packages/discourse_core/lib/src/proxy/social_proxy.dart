@@ -154,12 +154,17 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     }
   }
 
+  /// Fetches a page of the notifications feed.
+  ///
+  /// [page] is **1-based** (the notification list tab starts at page 1):
+  /// page 1 maps to offset 0 on `/notifications.json`, page 2 to
+  /// offset `perpage`, and so on.
   @override
   Future<FCAlertResult> getAlertAsync(int page, int perpage, bool forceRefresh) async {
     try {
       final perPage = perpage <= 0 ? 30 : perpage;
       final response = await apiGet('/notifications.json', query: {
-        if (page > 0) 'offset': (page * perPage).toString(),
+        if (page > 1) 'offset': ((page - 1) * perPage).toString(),
         'limit': perPage.toString(),
       });
       final items = ((response['notifications'] as List?) ?? const [])
@@ -182,6 +187,10 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     }
   }
 
+  /// Fetches a page of the user's activity feed.
+  ///
+  /// [page] is **1-based**, matching [getAlertAsync]: page 1 maps to
+  /// offset 0 on `/user_actions.json`.
   @override
   Future<FCActivityResult> getActivityAsync(int page, int perpage) async {
     final username = siteContext.currentUsername;
@@ -201,7 +210,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         // 5=Reply, 6=Response, 7=Mention, 9=Quote, 11=Edit, 12=Message,
         // 13=GotPrivateMessage, 14=Pending. We surface user-driven ones.
         'filter': '4,5,9,12',
-        if (page > 0) 'offset': (page * perPage).toString(),
+        if (page > 1) 'offset': ((page - 1) * perPage).toString(),
       });
       final actions = ((response['user_actions'] as List?) ?? const [])
           .whereType<Map>()
@@ -338,10 +347,24 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         : (DateTime.tryParse(createdAtRaw)?.millisecondsSinceEpoch ??
             DateTime.now().millisecondsSinceEpoch);
 
+    // Discourse's `user_id` on a notification is the RECIPIENT (the
+    // current user), not the actor. The serializer exposes no acting-user
+    // id — only `acting_user_avatar_template` / `acting_user_name`
+    // (app/serializers/notification_serializer.rb) plus the username in
+    // the data blob — so userId is left empty and the actor is identified
+    // by username.
+    String actorIconUrl = '';
+    final actingTpl = (n['acting_user_avatar_template'] ?? '').toString();
+    if (actingTpl.isNotEmpty) {
+      final filled = actingTpl.replaceAll('{size}', '120');
+      actorIconUrl =
+          filled.startsWith('http') ? filled : '${siteContext.site.url}$filled';
+    }
+
     return FCAlert(
-      userId: (n['user_id'] ?? '').toString(),
+      userId: '',
       username: fromUser,
-      iconUrl: '',
+      iconUrl: actorIconUrl,
       message: readableMessage,
       timestamp: timestampMs.toString(),
       contentType: contentType,

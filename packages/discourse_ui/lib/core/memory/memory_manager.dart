@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 
@@ -13,9 +14,10 @@ class MemoryManager {
   final Map<String, Timer> _cleanupTimers = {};
   Timer? _memoryMonitorTimer;
 
-  // Memory thresholds
-  static const int _warningThresholdMB = 100;
-  static const int _criticalThresholdMB = 200;
+  // Memory thresholds (resident set size). Flutter apps commonly idle in the
+  // 150-300MB RSS range, so these are set well above normal operating levels.
+  static const int _warningThresholdMB = 500;
+  static const int _criticalThresholdMB = 1024;
 
   bool _isMonitoring = false;
 
@@ -89,11 +91,9 @@ class MemoryManager {
 
   /// Check memory usage and trigger cleanup if needed
   void _checkMemoryUsage() {
-    if (!kDebugMode) return; // Only monitor in debug mode
-
     try {
-      // Get memory usage (this is a simplified check)
       final memoryUsage = _getMemoryUsage();
+      if (memoryUsage <= 0) return; // Reading unavailable on this platform
 
       if (memoryUsage > _criticalThresholdMB) {
         AppLogger.warning('Critical memory usage detected: ${memoryUsage}MB');
@@ -107,11 +107,16 @@ class MemoryManager {
     }
   }
 
-  /// Get current memory usage (simplified implementation)
+  /// Get current memory usage in MB (resident set size).
+  /// Uses dart:io's ProcessInfo, available on all dart:io platforms this app
+  /// targets. Returns 0 when the reading is unavailable.
   int _getMemoryUsage() {
-    // This is a simplified implementation
-    // In a real app, you'd use platform-specific APIs
-    return 50; // Placeholder
+    try {
+      return ProcessInfo.currentRss ~/ (1024 * 1024);
+    } catch (e) {
+      AppLogger.debug('Memory usage reading unavailable: $e');
+      return 0;
+    }
   }
 
   /// Trigger emergency cleanup
