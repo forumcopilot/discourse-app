@@ -138,6 +138,12 @@ class FCAlert with FCAlertMappable {
   /// to true so backends that don't expose read-state render plainly.
   bool isRead;
 
+  /// The platform's native notification id (Discourse: notification
+  /// `id`; XenForo: alert id). Enables per-alert operations such as
+  /// marking a single alert read. Null when the backend doesn't
+  /// expose one.
+  int? alertId;
+
   FCAlert({
     required this.userId,
     required this.username,
@@ -154,6 +160,7 @@ class FCAlert with FCAlertMappable {
     this.fromUsername,
     this.action,
     this.isRead = true,
+    this.alertId,
   });
 
   // Compatibility properties for snake_case access

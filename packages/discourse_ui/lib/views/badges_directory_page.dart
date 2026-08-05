@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_badge.dart';
 
 import '../theme/design_tokens.dart';
+import 'widgets/badge_detail_sheet.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
 
@@ -164,7 +165,7 @@ class _BadgeRow extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return ListTile(
-      onTap: () => _showDetail(context),
+      onTap: () => showBadgeDetailSheet(context, badge),
       leading: CircleAvatar(
         radius: DesignTokens.avatarRadiusS,
         backgroundColor: _tierColor(badge.tier),
@@ -211,91 +212,11 @@ class _BadgeRow extends StatelessWidget {
     );
   }
 
-  void _showDetail(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (sheetContext) {
-        final colorScheme = Theme.of(sheetContext).colorScheme;
-        final textTheme = Theme.of(sheetContext).textTheme;
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              DesignTokens.spacingL,
-              0,
-              DesignTokens.spacingL,
-              DesignTokens.spacingL,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: DesignTokens.avatarRadiusL,
-                      backgroundColor: _tierColor(badge.tier),
-                      backgroundImage: (badge.imageUrl != null &&
-                              badge.imageUrl!.isNotEmpty)
-                          ? NetworkImage(badge.imageUrl!)
-                          : null,
-                      child: (badge.imageUrl == null ||
-                              badge.imageUrl!.isEmpty)
-                          ? const Icon(Icons.emoji_events_outlined,
-                              color: Colors.white)
-                          : null,
-                    ),
-                    const SizedBox(width: DesignTokens.spacingM),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            badge.name,
-                            style: textTheme.titleMedium?.copyWith(
-                              color: colorScheme.onSurface,
-                              fontWeight: DesignTokens.fontWeightSemiBold,
-                            ),
-                          ),
-                          Text(
-                            '${badge.grantCount} granted',
-                            style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                if (badge.description != null &&
-                    badge.description!.isNotEmpty) ...[
-                  const SizedBox(height: DesignTokens.spacingL),
-                  Text(
-                    badge.description!,
-                    style: textTheme.bodyMedium
-                        ?.copyWith(color: colorScheme.onSurfaceVariant),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
+  // Detail bottom sheet lives in the shared `showBadgeDetailSheet`
+  // (badge_detail_sheet.dart), same as badge chips on profiles.
 
-  static Color _tierColor(FCBadgeTier tier) {
-    // Bronze / Silver / Gold using Discourse-web's badge palette.
-    switch (tier) {
-      case FCBadgeTier.gold:
-        return const Color(0xFFE5A839); // Discourse gold
-      case FCBadgeTier.silver:
-        return const Color(0xFFB0B0B0);
-      case FCBadgeTier.bronze:
-        return const Color(0xFFCD7F32);
-    }
-  }
+  static Color _tierColor(FCBadgeTier tier) =>
+      BadgeDetailSheet.tierColor(tier);
 
   String _formatCount(int n) {
     if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';

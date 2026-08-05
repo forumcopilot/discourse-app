@@ -178,9 +178,9 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
   // ===== Discourse-native bookmark reminders =====
   //
   // `bookmarks#create` / `bookmarks#update` permit `name`, `reminder_at`
-  // and `auto_delete_preference` alongside the bookmarkable columns, and
-  // the user bookmark list serializes `reminder_at` per row — none of
-  // which the XF-era interface methods above can express.
+  // and `auto_delete_preference` alongside the bookmarkable columns —
+  // which the XF-era interface methods above can't express. The listed
+  // rows' `reminder_at` / `pinned` land directly on [FCBookmark].
 
   /// Discourse-only: create a bookmark on a post, optionally with a
   /// reminder (`POST /bookmarks.json`).
@@ -270,12 +270,11 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
   }
 
   /// Discourse-only: list the current user's bookmarks with the
-  /// reminder metadata [FCBookmark] cannot carry.
+  /// server's own pagination signal.
   ///
   /// Same `GET /u/{username}/bookmarks.json` page as
-  /// [getBookmarksAsync]; each entry wraps the mapped [FCBookmark]
-  /// (which already surfaces `id` and the `name` note) and adds the
-  /// row's `reminder_at` / `pinned`. [DiscourseBookmarkListResult
+  /// [getBookmarksAsync] (each mapped [FCBookmark] carries the row's
+  /// `reminder_at` / `pinned` directly); [DiscourseBookmarkListResult
   /// .hasMore] reflects the server's `more_bookmarks_url`.
   Future<DiscourseBookmarkListResult> getBookmarksWithRemindersAsync({
     int page = 0,
@@ -295,15 +294,10 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
       final ub = (response['user_bookmark_list'] as Map<String, dynamic>?) ??
           const <String, dynamic>{};
       final raw = (ub['bookmarks'] as List?) ?? const [];
-      final entries = raw.whereType<Map>().map((b) {
-        final json = b.cast<String, dynamic>();
-        return DiscourseBookmarkEntry(
-          bookmark: _bookmarkFromDiscourseJson(json),
-          reminderAt:
-              DateTime.tryParse(json['reminder_at']?.toString() ?? ''),
-          pinned: json['pinned'] == true,
-        );
-      }).toList();
+      final entries = raw
+          .whereType<Map>()
+          .map((b) => _bookmarkFromDiscourseJson(b.cast<String, dynamic>()))
+          .toList();
       return DiscourseBookmarkListResult(
         result: true,
         entries: entries,
@@ -342,6 +336,12 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
       username: json['username']?.toString(),
       avatarUrl: _resolveAvatarUrl(avatarTemplate),
       createdAt: DateTime.tryParse(json['created_at']?.toString() ?? ''),
+      // Reminder metadata (user_bookmark_base_serializer.rb): when the
+      // reminder notification will fire (null when none is set, or it
+      // already fired under the clear-reminder preference), and whether
+      // the row is pinned to the top of the user's list.
+      reminderAt: DateTime.tryParse(json['reminder_at']?.toString() ?? ''),
+      pinned: json['pinned'] == true,
     );
   }
 
@@ -381,30 +381,11 @@ class DiscourseBookmarkUpdateResult {
   const DiscourseBookmarkUpdateResult({required this.result, this.resultText});
 }
 
-/// One row of [DiscourseBookmarkProxy.getBookmarksWithRemindersAsync]:
-/// the SDK-level [FCBookmark] plus the reminder fields it can't carry.
-class DiscourseBookmarkEntry {
-  final FCBookmark bookmark;
-
-  /// When the reminder notification will fire; null when no reminder is
-  /// set (or it already fired under the clear-reminder preference).
-  final DateTime? reminderAt;
-
-  /// Pinned to the top of the user's bookmark list.
-  final bool pinned;
-
-  const DiscourseBookmarkEntry({
-    required this.bookmark,
-    this.reminderAt,
-    this.pinned = false,
-  });
-}
-
 /// Result of [DiscourseBookmarkProxy.getBookmarksWithRemindersAsync].
 class DiscourseBookmarkListResult {
   final bool result;
   final String? resultText;
-  final List<DiscourseBookmarkEntry> entries;
+  final List<FCBookmark> entries;
 
   /// True when the server reported another page (`more_bookmarks_url`).
   final bool hasMore;

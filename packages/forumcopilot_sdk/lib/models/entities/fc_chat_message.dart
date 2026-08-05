@@ -40,6 +40,10 @@ class FCChatMessage with FCChatMessageMappable {
   /// token); UI should debounce updates and not allow edits.
   bool streaming;
 
+  /// Emoji reactions on this message. Empty when the backend doesn't
+  /// support message reactions or no one has reacted.
+  List<FCChatMessageReaction> reactions;
+
   FCChatMessage({
     required this.id,
     required this.channelId,
@@ -55,5 +59,34 @@ class FCChatMessage with FCChatMessageMappable {
     this.edited = false,
     this.deleted = false,
     this.streaming = false,
+    this.reactions = const [],
+  });
+}
+
+/// One aggregated emoji reaction on a chat message: the emoji, how
+/// many users applied it, and whether the current viewer is among
+/// them.
+@MappableClass()
+class FCChatMessageReaction with FCChatMessageReactionMappable {
+  /// Emoji identifier — typically the shortcode without colons
+  /// (e.g. "heart", "tada"). The toggle API consumes the same
+  /// identifier.
+  String emoji;
+
+  /// Number of users who reacted with this emoji.
+  int count;
+
+  /// True when the current viewer has applied this reaction.
+  bool reacted;
+
+  /// Usernames of (some of) the users who reacted, for tooltip-style
+  /// display. May be a truncated subset on backends that cap the list.
+  List<String> usernames;
+
+  FCChatMessageReaction({
+    required this.emoji,
+    required this.count,
+    this.reacted = false,
+    this.usernames = const [],
   });
 }

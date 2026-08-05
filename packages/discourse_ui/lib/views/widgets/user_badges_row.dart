@@ -3,6 +3,7 @@ import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_badge.dart';
 
 import '../../theme/design_tokens.dart';
+import 'badge_detail_sheet.dart';
 
 /// Horizontal scrolling row of Discourse badge chips, sized to slot
 /// under the trust-level chip on the user profile page.
@@ -142,41 +143,49 @@ class _UserBadgesRowState extends State<UserBadgesRow> {
           final fg = _fgFor(b.tier);
           return Tooltip(
             message: b.description ?? b.name,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingS, vertical: 4),
-              decoration: BoxDecoration(
-                color: bg,
+            child: Material(
+              color: bg,
+              borderRadius: BorderRadius.circular(16),
+              child: InkWell(
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: fg.withValues(alpha: 0.4), width: 0.6),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.workspace_premium,
-                    size: 14,
-                    color: fg,
+                onTap: () => showBadgeDetailSheet(context, b),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: DesignTokens.spacingS, vertical: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                        color: fg.withValues(alpha: 0.4), width: 0.6),
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    b.name,
-                    style: textTheme.labelSmall?.copyWith(
-                      color: fg,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  if (b.grantCount > 1) ...[
-                    const SizedBox(width: 3),
-                    Text(
-                      '×${b.grantCount}',
-                      style: textTheme.labelSmall?.copyWith(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.workspace_premium,
+                        size: 14,
                         color: fg,
-                        fontWeight: FontWeight.w400,
                       ),
-                    ),
-                  ],
-                ],
+                      const SizedBox(width: 4),
+                      Text(
+                        b.name,
+                        style: textTheme.labelSmall?.copyWith(
+                          color: fg,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      if (b.grantCount > 1) ...[
+                        const SizedBox(width: 3),
+                        Text(
+                          '×${b.grantCount}',
+                          style: textTheme.labelSmall?.copyWith(
+                            color: fg,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
           );
@@ -222,6 +231,7 @@ class _AllBadgesSheet extends StatelessWidget {
                   subtitle:
                       b.description != null ? Text(b.description!) : null,
                   trailing: b.grantCount > 1 ? Text('×${b.grantCount}') : null,
+                  onTap: () => showBadgeDetailSheet(context, b),
                 );
               },
             ),

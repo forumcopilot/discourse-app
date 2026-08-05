@@ -244,6 +244,19 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
     _$vote,
     opt: true,
   );
+  static int? _$editVersion(FCPost v) => v.editVersion;
+  static const Field<FCPost, int> _f$editVersion = Field(
+    'editVersion',
+    _$editVersion,
+    opt: true,
+  );
+  static bool _$isWiki(FCPost v) => v.isWiki;
+  static const Field<FCPost, bool> _f$isWiki = Field(
+    'isWiki',
+    _$isWiki,
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<FCPost> fields = const {
@@ -282,6 +295,8 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
     #canAcceptAnswer: _f$canAcceptAnswer,
     #reactions: _f$reactions,
     #vote: _f$vote,
+    #editVersion: _f$editVersion,
+    #isWiki: _f$isWiki,
   };
 
   static FCPost _instantiate(DecodingData data) {
@@ -321,6 +336,8 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
       canAcceptAnswer: data.dec(_f$canAcceptAnswer),
       reactions: data.dec(_f$reactions),
       vote: data.dec(_f$vote),
+      editVersion: data.dec(_f$editVersion),
+      isWiki: data.dec(_f$isWiki),
     );
   }
 
@@ -428,6 +445,8 @@ abstract class FCPostCopyWith<$R, $In extends FCPost, $Out>
     bool? canAcceptAnswer,
     List<FCPostReaction>? reactions,
     FCPostVote? vote,
+    int? editVersion,
+    bool? isWiki,
   });
   FCPostCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -525,6 +544,8 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
     bool? canAcceptAnswer,
     List<FCPostReaction>? reactions,
     Object? vote = $none,
+    Object? editVersion = $none,
+    bool? isWiki,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -562,6 +583,8 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
       if (canAcceptAnswer != null) #canAcceptAnswer: canAcceptAnswer,
       if (reactions != null) #reactions: reactions,
       if (vote != $none) #vote: vote,
+      if (editVersion != $none) #editVersion: editVersion,
+      if (isWiki != null) #isWiki: isWiki,
     }),
   );
   @override
@@ -604,6 +627,8 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
     canAcceptAnswer: data.get(#canAcceptAnswer, or: $value.canAcceptAnswer),
     reactions: data.get(#reactions, or: $value.reactions),
     vote: data.get(#vote, or: $value.vote),
+    editVersion: data.get(#editVersion, or: $value.editVersion),
+    isWiki: data.get(#isWiki, or: $value.isWiki),
   );
 
   @override

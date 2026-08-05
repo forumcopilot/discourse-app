@@ -107,6 +107,16 @@ class FCPost with FCPostMappable {
   /// null to hide the vote arrows entirely.
   FCPostVote? vote;
 
+  /// Revision count of this post (Discourse: `version`). A value
+  /// greater than 1 means the post has been edited. Null when the
+  /// backend doesn't expose revision counts.
+  int? editVersion;
+
+  /// Whether this post is a wiki post that any sufficiently trusted
+  /// user may edit (Discourse: `wiki`). Backends without a wiki
+  /// concept leave false.
+  bool isWiki;
+
   FCPost(
       {required this.id,
       required this.title,
@@ -146,5 +156,7 @@ class FCPost with FCPostMappable {
       this.isSolution = false,
       this.canAcceptAnswer = false,
       this.reactions = const [],
-      this.vote});
+      this.vote,
+      this.editVersion,
+      this.isWiki = false});
 }

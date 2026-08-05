@@ -261,19 +261,6 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     }
   }
 
-  // Discourse notification-id sidecar. FCAlert (canonical SDK) has no
-  // field for the notification's own numeric id — `contentId` carries
-  // topic/post identifiers — but per-notification mark-read needs it.
-  // Keyed on the FCAlert instances built by [_toAlert]; promote to a
-  // proper FCAlert field via the canonical SDK when it next revs.
-  static final Expando<int> _notificationIds =
-      Expando('discourseNotificationId');
-
-  /// Discourse-only: the numeric `notifications.id` behind [alert]
-  /// (for [markNotificationReadAsync]). Null when [alert] didn't come
-  /// from [getAlertAsync] on this Discourse proxy.
-  static int? notificationIdOf(FCAlert alert) => _notificationIds[alert];
-
   /// Marks a single notification read.
   ///
   /// Discourse-native (no IFC interface method): `PUT
@@ -409,7 +396,10 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
           filled.startsWith('http') ? filled : '${siteContext.site.url}$filled';
     }
 
-    final alert = FCAlert(
+    return FCAlert(
+      // The notification's own numeric `notifications.id` — needed for
+      // per-notification mark-read (see [markNotificationReadAsync]).
+      alertId: (n['id'] as num?)?.toInt(),
       userId: '',
       username: fromUser,
       iconUrl: actorIconUrl,
@@ -429,11 +419,6 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       // renders falsely bold.
       isRead: (n['read'] as bool?) ?? true,
     );
-    // Stash the notification's own id so the UI can mark it read
-    // individually (see [notificationIdOf]).
-    final notificationId = (n['id'] as num?)?.toInt();
-    if (notificationId != null) _notificationIds[alert] = notificationId;
-    return alert;
   }
 
   FCActivity _toActivity(Map<String, dynamic> a) {

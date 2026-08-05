@@ -53,6 +53,16 @@ class FCBookmark with FCBookmarkMappable {
   /// When the bookmark was created on the server.
   DateTime? createdAt;
 
+  /// When the user asked to be reminded about this bookmark
+  /// (Discourse: `reminder_at`). Null when no reminder is set or the
+  /// backend has no reminder concept.
+  DateTime? reminderAt;
+
+  /// Whether the user pinned this bookmark so it sorts to the top of
+  /// their bookmark list (Discourse: `pinned`). Backends without
+  /// pinnable bookmarks leave false.
+  bool pinned;
+
   FCBookmark({
     required this.id,
     this.bookmarkableType,
@@ -65,5 +75,7 @@ class FCBookmark with FCBookmarkMappable {
     this.username,
     this.avatarUrl,
     this.createdAt,
+    this.reminderAt,
+    this.pinned = false,
   });
 }

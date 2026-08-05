@@ -15,6 +15,7 @@ class FCChatMessageMapper extends ClassMapperBase<FCChatMessage> {
   static FCChatMessageMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = FCChatMessageMapper._());
+      FCChatMessageReactionMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -99,6 +100,10 @@ class FCChatMessageMapper extends ClassMapperBase<FCChatMessage> {
     opt: true,
     def: false,
   );
+  static List<FCChatMessageReaction> _$reactions(FCChatMessage v) =>
+      v.reactions;
+  static const Field<FCChatMessage, List<FCChatMessageReaction>> _f$reactions =
+      Field('reactions', _$reactions, opt: true, def: const []);
 
   @override
   final MappableFields<FCChatMessage> fields = const {
@@ -116,6 +121,7 @@ class FCChatMessageMapper extends ClassMapperBase<FCChatMessage> {
     #edited: _f$edited,
     #deleted: _f$deleted,
     #streaming: _f$streaming,
+    #reactions: _f$reactions,
   };
 
   static FCChatMessage _instantiate(DecodingData data) {
@@ -134,6 +140,7 @@ class FCChatMessageMapper extends ClassMapperBase<FCChatMessage> {
       edited: data.dec(_f$edited),
       deleted: data.dec(_f$deleted),
       streaming: data.dec(_f$streaming),
+      reactions: data.dec(_f$reactions),
     );
   }
 
@@ -199,6 +206,16 @@ extension FCChatMessageValueCopy<$R, $Out>
 
 abstract class FCChatMessageCopyWith<$R, $In extends FCChatMessage, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<
+    $R,
+    FCChatMessageReaction,
+    FCChatMessageReactionCopyWith<
+      $R,
+      FCChatMessageReaction,
+      FCChatMessageReaction
+    >
+  >
+  get reactions;
   $R call({
     int? id,
     int? channelId,
@@ -214,6 +231,7 @@ abstract class FCChatMessageCopyWith<$R, $In extends FCChatMessage, $Out>
     bool? edited,
     bool? deleted,
     bool? streaming,
+    List<FCChatMessageReaction>? reactions,
   });
   FCChatMessageCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -226,6 +244,21 @@ class _FCChatMessageCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<FCChatMessage> $mapper =
       FCChatMessageMapper.ensureInitialized();
+  @override
+  ListCopyWith<
+    $R,
+    FCChatMessageReaction,
+    FCChatMessageReactionCopyWith<
+      $R,
+      FCChatMessageReaction,
+      FCChatMessageReaction
+    >
+  >
+  get reactions => ListCopyWith(
+    $value.reactions,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(reactions: v),
+  );
   @override
   $R call({
     int? id,
@@ -242,6 +275,7 @@ class _FCChatMessageCopyWithImpl<$R, $Out>
     bool? edited,
     bool? deleted,
     bool? streaming,
+    List<FCChatMessageReaction>? reactions,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -258,6 +292,7 @@ class _FCChatMessageCopyWithImpl<$R, $Out>
       if (edited != null) #edited: edited,
       if (deleted != null) #deleted: deleted,
       if (streaming != null) #streaming: streaming,
+      if (reactions != null) #reactions: reactions,
     }),
   );
   @override
@@ -276,11 +311,189 @@ class _FCChatMessageCopyWithImpl<$R, $Out>
     edited: data.get(#edited, or: $value.edited),
     deleted: data.get(#deleted, or: $value.deleted),
     streaming: data.get(#streaming, or: $value.streaming),
+    reactions: data.get(#reactions, or: $value.reactions),
   );
 
   @override
   FCChatMessageCopyWith<$R2, FCChatMessage, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   ) => _FCChatMessageCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class FCChatMessageReactionMapper
+    extends ClassMapperBase<FCChatMessageReaction> {
+  FCChatMessageReactionMapper._();
+
+  static FCChatMessageReactionMapper? _instance;
+  static FCChatMessageReactionMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = FCChatMessageReactionMapper._());
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'FCChatMessageReaction';
+
+  static String _$emoji(FCChatMessageReaction v) => v.emoji;
+  static const Field<FCChatMessageReaction, String> _f$emoji = Field(
+    'emoji',
+    _$emoji,
+  );
+  static int _$count(FCChatMessageReaction v) => v.count;
+  static const Field<FCChatMessageReaction, int> _f$count = Field(
+    'count',
+    _$count,
+  );
+  static bool _$reacted(FCChatMessageReaction v) => v.reacted;
+  static const Field<FCChatMessageReaction, bool> _f$reacted = Field(
+    'reacted',
+    _$reacted,
+    opt: true,
+    def: false,
+  );
+  static List<String> _$usernames(FCChatMessageReaction v) => v.usernames;
+  static const Field<FCChatMessageReaction, List<String>> _f$usernames = Field(
+    'usernames',
+    _$usernames,
+    opt: true,
+    def: const [],
+  );
+
+  @override
+  final MappableFields<FCChatMessageReaction> fields = const {
+    #emoji: _f$emoji,
+    #count: _f$count,
+    #reacted: _f$reacted,
+    #usernames: _f$usernames,
+  };
+
+  static FCChatMessageReaction _instantiate(DecodingData data) {
+    return FCChatMessageReaction(
+      emoji: data.dec(_f$emoji),
+      count: data.dec(_f$count),
+      reacted: data.dec(_f$reacted),
+      usernames: data.dec(_f$usernames),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static FCChatMessageReaction fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<FCChatMessageReaction>(map);
+  }
+
+  static FCChatMessageReaction fromJson(String json) {
+    return ensureInitialized().decodeJson<FCChatMessageReaction>(json);
+  }
+}
+
+mixin FCChatMessageReactionMappable {
+  String toJson() {
+    return FCChatMessageReactionMapper.ensureInitialized()
+        .encodeJson<FCChatMessageReaction>(this as FCChatMessageReaction);
+  }
+
+  Map<String, dynamic> toMap() {
+    return FCChatMessageReactionMapper.ensureInitialized()
+        .encodeMap<FCChatMessageReaction>(this as FCChatMessageReaction);
+  }
+
+  FCChatMessageReactionCopyWith<
+    FCChatMessageReaction,
+    FCChatMessageReaction,
+    FCChatMessageReaction
+  >
+  get copyWith =>
+      _FCChatMessageReactionCopyWithImpl<
+        FCChatMessageReaction,
+        FCChatMessageReaction
+      >(this as FCChatMessageReaction, $identity, $identity);
+  @override
+  String toString() {
+    return FCChatMessageReactionMapper.ensureInitialized().stringifyValue(
+      this as FCChatMessageReaction,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return FCChatMessageReactionMapper.ensureInitialized().equalsValue(
+      this as FCChatMessageReaction,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return FCChatMessageReactionMapper.ensureInitialized().hashValue(
+      this as FCChatMessageReaction,
+    );
+  }
+}
+
+extension FCChatMessageReactionValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, FCChatMessageReaction, $Out> {
+  FCChatMessageReactionCopyWith<$R, FCChatMessageReaction, $Out>
+  get $asFCChatMessageReaction => $base.as(
+    (v, t, t2) => _FCChatMessageReactionCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class FCChatMessageReactionCopyWith<
+  $R,
+  $In extends FCChatMessageReaction,
+  $Out
+>
+    implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get usernames;
+  $R call({String? emoji, int? count, bool? reacted, List<String>? usernames});
+  FCChatMessageReactionCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _FCChatMessageReactionCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, FCChatMessageReaction, $Out>
+    implements FCChatMessageReactionCopyWith<$R, FCChatMessageReaction, $Out> {
+  _FCChatMessageReactionCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<FCChatMessageReaction> $mapper =
+      FCChatMessageReactionMapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get usernames =>
+      ListCopyWith(
+        $value.usernames,
+        (v, t) => ObjectCopyWith(v, $identity, t),
+        (v) => call(usernames: v),
+      );
+  @override
+  $R call({
+    String? emoji,
+    int? count,
+    bool? reacted,
+    List<String>? usernames,
+  }) => $apply(
+    FieldCopyWithData({
+      if (emoji != null) #emoji: emoji,
+      if (count != null) #count: count,
+      if (reacted != null) #reacted: reacted,
+      if (usernames != null) #usernames: usernames,
+    }),
+  );
+  @override
+  FCChatMessageReaction $make(CopyWithData data) => FCChatMessageReaction(
+    emoji: data.get(#emoji, or: $value.emoji),
+    count: data.get(#count, or: $value.count),
+    reacted: data.get(#reacted, or: $value.reacted),
+    usernames: data.get(#usernames, or: $value.usernames),
+  );
+
+  @override
+  FCChatMessageReactionCopyWith<$R2, FCChatMessageReaction, $Out2>
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _FCChatMessageReactionCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 

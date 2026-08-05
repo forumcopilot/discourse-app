@@ -5,7 +5,6 @@ import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
 import 'package:forumcopilot_sdk/models/results/fc_chat_result.dart';
 
 import '../base_discourse_proxy.dart';
-import '../data/chat/discourse_chat_message_reaction.dart';
 
 /// Discourse implementation of [IFCChatProxy] (Phase 5.39 — lifted
 /// off the `DiscourseChatProxy.forCurrentSite()` sidecar).
@@ -32,26 +31,6 @@ import '../data/chat/discourse_chat_message_reaction.dart';
 /// installed (404) so UI degrades gracefully.
 class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
   DiscourseChatProxy(SiteContext context) : super(context);
-
-  /// Reactions per message id, refreshed by every message fetch.
-  ///
-  /// `FCChatMessage` is a canonical-SDK entity and can't grow a
-  /// Discourse-only `reactions` field here, and `SiteProxyFactory`
-  /// hands out a fresh proxy per `getChatProxy()` call — so the parsed
-  /// `reactions` payloads (message_serializer.rb, only present when a
-  /// message has any) are kept in this class-level side table. UI reads
-  /// [reactionsForMessage] after any `getMessagesAsync` /
-  /// `pollNewerAsync` to render chips. Insertion-ordered and capped so
-  /// long chat sessions don't grow it unbounded.
-  static final Map<int, List<DiscourseChatMessageReaction>>
-      _reactionsByMessageId = {};
-  static const int _reactionsCacheCap = 1000;
-
-  /// Reactions last seen on message [messageId] (empty when the message
-  /// has none, or hasn't been fetched by this session yet).
-  static List<DiscourseChatMessageReaction> reactionsForMessage(
-          int messageId) =>
-      _reactionsByMessageId[messageId] ?? const [];
 
   @override
   Future<FCChatChannelListResult> getMyChannelsAsync() async {
@@ -340,9 +319,10 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
   /// react_action `add` / `remove`). [emoji] is the Discourse emoji
   /// name WITHOUT colons (e.g. `heart`, `tada`); unknown names 400.
   ///
-  /// On success the cached [reactionsForMessage] entry is updated
-  /// optimistically so chips re-render without waiting for the next
-  /// poll (the server does not echo the new reaction state).
+  /// The server does not echo the new reaction state — callers keep
+  /// their optimistic update on [FCChatMessage.reactions] client-side
+  /// (reverting on `result:false`); the next message fetch re-parses
+  /// the authoritative state.
   Future<FCChatActionResult> toggleChatMessageReactionAsync(
     int channelId,
     int messageId,
@@ -357,62 +337,11 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
         'emoji': emoji,
         'react_action': add ? 'add' : 'remove',
       });
-      _applyLocalReaction(messageId, emoji, add: add);
       return FCChatActionResult(result: true);
     } on DiscourseApiException catch (e) {
       return FCChatActionResult(result: false, resultText: e.userMessage);
     } catch (e) {
       return FCChatActionResult(result: false, resultText: 'Error: $e');
-    }
-  }
-
-  void _applyLocalReaction(int messageId, String emoji,
-      {required bool add}) {
-    final current = List<DiscourseChatMessageReaction>.of(
-        _reactionsByMessageId[messageId] ?? const []);
-    final index = current.indexWhere((r) => r.emoji == emoji);
-    if (add) {
-      if (index >= 0) {
-        final r = current[index];
-        if (r.reacted) return; // already counted
-        current[index] = DiscourseChatMessageReaction(
-          emoji: emoji,
-          count: r.count + 1,
-          reacted: true,
-          usernames: r.usernames,
-        );
-      } else {
-        current.add(DiscourseChatMessageReaction(
-          emoji: emoji,
-          count: 1,
-          reacted: true,
-          usernames: [siteContext.currentUsername ?? ''],
-        ));
-      }
-    } else {
-      if (index < 0) return;
-      final r = current[index];
-      if (r.count <= 1) {
-        current.removeAt(index);
-      } else {
-        current[index] = DiscourseChatMessageReaction(
-          emoji: emoji,
-          count: r.count - 1,
-          reacted: false,
-          usernames: r.usernames,
-        );
-      }
-    }
-    _storeReactions(messageId, current);
-  }
-
-  static void _storeReactions(
-      int messageId, List<DiscourseChatMessageReaction> reactions) {
-    // Refresh insertion order so the cap evicts the stalest entries.
-    _reactionsByMessageId.remove(messageId);
-    _reactionsByMessageId[messageId] = reactions;
-    while (_reactionsByMessageId.length > _reactionsCacheCap) {
-      _reactionsByMessageId.remove(_reactionsByMessageId.keys.first);
     }
   }
 
@@ -452,29 +381,25 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
   }
 
   FCChatMessage _messageFromJson(Map<String, dynamic> json) {
-    // Side-table the message's reactions (serializer omits the field
-    // entirely when there are none — store an empty list then, so a
-    // removed last reaction clears the stale chips).
-    final messageId = (json['id'] as num?)?.toInt();
-    if (messageId != null) {
-      final reactions = ((json['reactions'] as List?) ?? const [])
-          .whereType<Map>()
-          .map((raw) {
-            final r = raw.cast<String, dynamic>();
-            return DiscourseChatMessageReaction(
-              emoji: (r['emoji'] ?? '').toString(),
-              count: (r['count'] as num?)?.toInt() ?? 0,
-              reacted: r['reacted'] == true,
-              usernames: ((r['users'] as List?) ?? const [])
-                  .whereType<Map>()
-                  .map((u) => (u['username'] ?? '').toString())
-                  .where((u) => u.isNotEmpty)
-                  .toList(growable: false),
-            );
-          })
-          .toList(growable: false);
-      _storeReactions(messageId, reactions);
-    }
+    // The message serializer omits `reactions` entirely when there are
+    // none — mapping the absent field to an empty list means a removed
+    // last reaction clears stale chips on the next fetch.
+    final reactions = ((json['reactions'] as List?) ?? const [])
+        .whereType<Map>()
+        .map((raw) {
+          final r = raw.cast<String, dynamic>();
+          return FCChatMessageReaction(
+            emoji: (r['emoji'] ?? '').toString(),
+            count: (r['count'] as num?)?.toInt() ?? 0,
+            reacted: r['reacted'] == true,
+            usernames: ((r['users'] as List?) ?? const [])
+                .whereType<Map>()
+                .map((u) => (u['username'] ?? '').toString())
+                .where((u) => u.isNotEmpty)
+                .toList(growable: false),
+          );
+        })
+        .toList(growable: false);
     final user = (json['user'] as Map?)?.cast<String, dynamic>() ?? const {};
     final tpl = user['avatar_template']?.toString();
     String? avatarUrl;
@@ -499,6 +424,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       edited: json['edited'] == true,
       deleted: json['deleted_at'] != null,
       streaming: json['streaming'] == true,
+      reactions: reactions,
     );
   }
 }

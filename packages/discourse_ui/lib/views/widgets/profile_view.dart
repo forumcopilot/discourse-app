@@ -26,6 +26,7 @@ import 'package:discourse_ui/utils/file_picker_utils.dart';
 import 'package:discourse_ui/utils/signature_processor.dart';
 
 import 'full_screen_image_viewer.dart';
+import 'trust_level_sheet.dart';
 import 'user_avatar.dart';
 import 'user_badges_row.dart';
 import 'user_activity_tabs.dart';
@@ -416,24 +417,35 @@ class _ProfileViewState extends State<ProfileView> {
         if (_userInfo.trustLevel != null) ...[
           SizedBox(height: DesignTokens.spacingS),
           Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 4,
-              ),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
+            // Tappable — opens the trust-level explainer sheet.
+            child: Material(
+              color: colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+              child: InkWell(
                 borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                border: Border.all(
-                  color: colorScheme.outlineVariant,
-                  width: 0.5,
+                onTap: () => TrustLevelSheet.show(
+                  context: context,
+                  currentLevel: _userInfo.trustLevel!,
                 ),
-              ),
-              child: Text(
-                _trustLevelLabel(_userInfo.trustLevel!),
-                style: textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  letterSpacing: DesignTokens.letterSpacingWide,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant,
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Text(
+                    _trustLevelLabel(_userInfo.trustLevel!),
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      letterSpacing: DesignTokens.letterSpacingWide,
+                    ),
+                  ),
                 ),
               ),
             ),

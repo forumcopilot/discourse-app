@@ -84,6 +84,19 @@ class FCBookmarkMapper extends ClassMapperBase<FCBookmark> {
     _$createdAt,
     opt: true,
   );
+  static DateTime? _$reminderAt(FCBookmark v) => v.reminderAt;
+  static const Field<FCBookmark, DateTime> _f$reminderAt = Field(
+    'reminderAt',
+    _$reminderAt,
+    opt: true,
+  );
+  static bool _$pinned(FCBookmark v) => v.pinned;
+  static const Field<FCBookmark, bool> _f$pinned = Field(
+    'pinned',
+    _$pinned,
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<FCBookmark> fields = const {
@@ -98,6 +111,8 @@ class FCBookmarkMapper extends ClassMapperBase<FCBookmark> {
     #username: _f$username,
     #avatarUrl: _f$avatarUrl,
     #createdAt: _f$createdAt,
+    #reminderAt: _f$reminderAt,
+    #pinned: _f$pinned,
   };
 
   static FCBookmark _instantiate(DecodingData data) {
@@ -113,6 +128,8 @@ class FCBookmarkMapper extends ClassMapperBase<FCBookmark> {
       username: data.dec(_f$username),
       avatarUrl: data.dec(_f$avatarUrl),
       createdAt: data.dec(_f$createdAt),
+      reminderAt: data.dec(_f$reminderAt),
+      pinned: data.dec(_f$pinned),
     );
   }
 
@@ -188,6 +205,8 @@ abstract class FCBookmarkCopyWith<$R, $In extends FCBookmark, $Out>
     String? username,
     String? avatarUrl,
     DateTime? createdAt,
+    DateTime? reminderAt,
+    bool? pinned,
   });
   FCBookmarkCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -213,6 +232,8 @@ class _FCBookmarkCopyWithImpl<$R, $Out>
     Object? username = $none,
     Object? avatarUrl = $none,
     Object? createdAt = $none,
+    Object? reminderAt = $none,
+    bool? pinned,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -226,6 +247,8 @@ class _FCBookmarkCopyWithImpl<$R, $Out>
       if (username != $none) #username: username,
       if (avatarUrl != $none) #avatarUrl: avatarUrl,
       if (createdAt != $none) #createdAt: createdAt,
+      if (reminderAt != $none) #reminderAt: reminderAt,
+      if (pinned != null) #pinned: pinned,
     }),
   );
   @override
@@ -241,6 +264,8 @@ class _FCBookmarkCopyWithImpl<$R, $Out>
     username: data.get(#username, or: $value.username),
     avatarUrl: data.get(#avatarUrl, or: $value.avatarUrl),
     createdAt: data.get(#createdAt, or: $value.createdAt),
+    reminderAt: data.get(#reminderAt, or: $value.reminderAt),
+    pinned: data.get(#pinned, or: $value.pinned),
   );
 
   @override

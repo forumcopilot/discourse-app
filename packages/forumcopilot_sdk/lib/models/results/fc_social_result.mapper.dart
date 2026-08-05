@@ -1009,6 +1009,12 @@ class FCAlertMapper extends ClassMapperBase<FCAlert> {
     opt: true,
     def: true,
   );
+  static int? _$alertId(FCAlert v) => v.alertId;
+  static const Field<FCAlert, int> _f$alertId = Field(
+    'alertId',
+    _$alertId,
+    opt: true,
+  );
 
   @override
   final MappableFields<FCAlert> fields = const {
@@ -1027,6 +1033,7 @@ class FCAlertMapper extends ClassMapperBase<FCAlert> {
     #fromUsername: _f$fromUsername,
     #action: _f$action,
     #isRead: _f$isRead,
+    #alertId: _f$alertId,
   };
 
   static FCAlert _instantiate(DecodingData data) {
@@ -1046,6 +1053,7 @@ class FCAlertMapper extends ClassMapperBase<FCAlert> {
       fromUsername: data.dec(_f$fromUsername),
       action: data.dec(_f$action),
       isRead: data.dec(_f$isRead),
+      alertId: data.dec(_f$alertId),
     );
   }
 
@@ -1122,6 +1130,7 @@ abstract class FCAlertCopyWith<$R, $In extends FCAlert, $Out>
     String? fromUsername,
     String? action,
     bool? isRead,
+    int? alertId,
   });
   FCAlertCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -1151,6 +1160,7 @@ class _FCAlertCopyWithImpl<$R, $Out>
     Object? fromUsername = $none,
     Object? action = $none,
     bool? isRead,
+    Object? alertId = $none,
   }) => $apply(
     FieldCopyWithData({
       if (userId != null) #userId: userId,
@@ -1168,6 +1178,7 @@ class _FCAlertCopyWithImpl<$R, $Out>
       if (fromUsername != $none) #fromUsername: fromUsername,
       if (action != $none) #action: action,
       if (isRead != null) #isRead: isRead,
+      if (alertId != $none) #alertId: alertId,
     }),
   );
   @override
@@ -1187,6 +1198,7 @@ class _FCAlertCopyWithImpl<$R, $Out>
     fromUsername: data.get(#fromUsername, or: $value.fromUsername),
     action: data.get(#action, or: $value.action),
     isRead: data.get(#isRead, or: $value.isRead),
+    alertId: data.get(#alertId, or: $value.alertId),
   );
 
   @override

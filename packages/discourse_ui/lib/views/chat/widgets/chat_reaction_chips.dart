@@ -1,6 +1,6 @@
-import 'package:discourse_core/discourse_core.dart'
-    show DiscourseChatMessageReaction;
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart'
+    show FCChatMessageReaction;
 
 import '../../../theme/design_tokens.dart';
 
@@ -66,12 +66,13 @@ String chatEmojiLabel(String name) => _emojiUnicode[name] ?? ':$name:';
 
 /// The row of reaction chips under a chat message.
 ///
-/// [reactions] is the proxy's side-table snapshot for this message
+/// [reactions] is the message's own [FCChatMessageReaction] list
 /// (re-read by the parent on every poll tick / toggle). Tapping a chip
 /// toggles the current user's reaction with an optimistic override
-/// held locally: on success the side-table already reflects the change
-/// so the override is redundant; on failure dropping the override
-/// reverts the chip (the parent surfaces the error).
+/// held locally: on success the controller has already applied the
+/// change to `message.reactions` so the override is redundant; on
+/// failure dropping the override reverts the chip (the parent surfaces
+/// the error).
 class ChatReactionChips extends StatefulWidget {
   const ChatReactionChips({
     super.key,
@@ -79,7 +80,7 @@ class ChatReactionChips extends StatefulWidget {
     required this.onToggle,
   });
 
-  final List<DiscourseChatMessageReaction> reactions;
+  final List<FCChatMessageReaction> reactions;
 
   /// Performs the toggle; resolves false on failure (revert). Null
   /// renders the chips read-only (guests).
@@ -111,7 +112,7 @@ class _ChatReactionChipsState extends State<ChatReactionChips> {
     });
   }
 
-  /// Side-table reactions with the optimistic overrides applied.
+  /// The message's reactions with the optimistic overrides applied.
   List<(String, int, bool, List<String>)> _effective() {
     final out = <(String, int, bool, List<String>)>[];
     final seen = <String>{};

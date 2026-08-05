@@ -33,26 +33,11 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
   bool _isSubmitting = false;
   bool _isRemovingVote = false;
 
-  /// Id of the post hosting the poll (Discourse's `/polls/*` endpoints are
-  /// keyed on post_id + poll_name, not topic id). Resolved lazily from the
-  /// topic's first post and cached for the widget's lifetime.
-  int? _hostPostId;
-
-  Future<int?> _resolveHostPostId() async {
-    if (_hostPostId != null) return _hostPostId;
-    try {
-      final thread = await SiteProxyService.getPostProxy()
-          .getThreadAsync(widget.topicId, 1, 1, true);
-      if (thread.result && thread.posts.isNotEmpty) {
-        final first = thread.posts.firstWhere(
-          (p) => p.postNumber == 1,
-          orElse: () => thread.posts.first,
-        );
-        _hostPostId = int.tryParse(first.id);
-      }
-    } catch (_) {}
-    return _hostPostId;
-  }
+  /// Id of the post hosting the poll (Discourse's `/polls/*` endpoints
+  /// are keyed on post_id + poll_name, not topic id). Carried on the
+  /// parsed poll itself ([FCPoll.postId]); null means the backend didn't
+  /// provide it and the vote-removal / voters affordances are hidden.
+  int? get _hostPostId => int.tryParse(widget.poll.postId ?? '');
 
   int get _maxSelections => widget.poll.maxVotes == 0 ? widget.poll.responses.length : widget.poll.maxVotes;
 
@@ -119,7 +104,7 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
 
     setState(() => _isRemovingVote = true);
     try {
-      final postId = await _resolveHostPostId();
+      final postId = _hostPostId;
       final updated = postId == null
           ? null
           : await proxy.removePollVoteAsync(
@@ -161,8 +146,7 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
   Future<void> _showVoters() async {
     final proxy = SiteProxyService.getPostProxy();
     if (proxy is! DiscoursePostProxy) return;
-    final postId = await _resolveHostPostId();
-    if (!mounted) return;
+    final postId = _hostPostId;
     if (postId == null) {
       _showError('Could not load voters.');
       return;
@@ -215,8 +199,11 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
     final voterCount = widget.poll.voterCount;
     // Discourse-native poll extras: retracting a vote and listing voters
     // both hit the poll plugin's endpoints via DiscoursePostProxy.
+    // Both affordances need the hosting post id (FCPoll.postId); a poll
+    // without one can't address the plugin endpoints, so hide them.
     final isDiscoursePolls =
-        SiteProxyService.getPostProxy() is DiscoursePostProxy;
+        SiteProxyService.getPostProxy() is DiscoursePostProxy &&
+            _hostPostId != null;
     final showRemoveVote =
         isDiscoursePolls && widget.poll.hasVoted && !widget.poll.isClosed;
     // Voters are only visible for PUBLIC polls; the server 400s otherwise.

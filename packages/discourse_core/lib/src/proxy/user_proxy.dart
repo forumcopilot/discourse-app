@@ -352,7 +352,13 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       imageUrl: definition['image_url']?.toString(),
       badgeTypeId: (definition['badge_type_id'] as num?)?.toInt() ?? 1,
       grantedAt: DateTime.tryParse(grant?['granted_at']?.toString() ?? ''),
-      grantCount: (grant?['count'] as num?)?.toInt() ?? 1,
+      // With a grant, count is the user's own stack count (grouped
+      // user-badges). Catalog rows (no grant) reuse the field for the
+      // definition's forum-wide `grant_count` — the badges directory
+      // ranks and labels by it ("Earned by N users").
+      grantCount: grant != null
+          ? (grant['count'] as num?)?.toInt() ?? 1
+          : (definition['grant_count'] as num?)?.toInt() ?? 1,
       granted: grant != null,
     );
   }
@@ -493,6 +499,11 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         // the key IS the suspended signal.
         isBanned: user['suspended_till'] != null,
         isIgnored: user['ignored'] == true,
+        // `can_ignore_user` (user_card_serializer.rb, inherited by
+        // UserSerializer) is the per-target guardian check
+        // `scope.can_ignore_user?(object)` — false for guests, self,
+        // and staff targets. Gates the Ignore/Unignore menu item.
+        canIgnore: user['can_ignore_user'] == true,
         canSpamClean: canModerateTarget,
         // Discourse has no per-user report action (reportUserAsync
         // intentionally returns guidance to flag posts instead), so

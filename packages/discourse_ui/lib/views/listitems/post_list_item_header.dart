@@ -215,6 +215,21 @@ class PostListItemHeader extends StatelessWidget {
                         letterSpacing: DesignTokens.letterSpacingWide,
                       ),
                     ),
+                    // Edited indicator — Discourse's `version` starts at
+                    // 1 and bumps on each public revision, so > 1 means
+                    // the post was edited. Tapping routes to the same
+                    // edit-history action as the overflow menu.
+                    if ((post.editVersion ?? 1) > 1) ...[
+                      SizedBox(width: DesignTokens.spacingS),
+                      GestureDetector(
+                        onTap: () => onMenuSelected('history'),
+                        child: Icon(
+                          Icons.edit_outlined,
+                          size: DesignTokens.iconSizeXS,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ],

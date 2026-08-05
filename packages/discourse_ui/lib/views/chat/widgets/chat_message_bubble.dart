@@ -1,4 +1,3 @@
-import 'package:discourse_core/discourse_core.dart' show DiscourseChatProxy;
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
@@ -124,13 +123,12 @@ class ChatMessageBubble extends StatelessWidget {
                             : message.message,
                       ),
                     ),
-                    // Reaction chips — fed from the proxy's side-table,
-                    // which is refreshed whenever the poll cycle
-                    // re-parses this message (the parent Obx rebuilds
-                    // us on every tick via messages.refresh()).
+                    // Reaction chips — fed straight from the message's
+                    // own reactions list, refreshed whenever the poll
+                    // cycle re-parses this message (the parent Obx
+                    // rebuilds us on every tick via messages.refresh()).
                     ChatReactionChips(
-                      reactions:
-                          DiscourseChatProxy.reactionsForMessage(message.id),
+                      reactions: message.reactions,
                       onToggle: onToggleReaction,
                     ),
                     const SizedBox(height: DesignTokens.spacingXS),

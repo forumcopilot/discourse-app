@@ -449,10 +449,16 @@ class FCUserInfoResult extends FCUser with FCUserInfoResultMappable {
   /// 3 = regular, 4 = leader). XF-flavored impls leave this null.
   int? trustLevel;
 
+  /// Whether the current viewer may ignore this user (Discourse: the
+  /// user serializer's `can_ignore_user`; XenForo: the analogous
+  /// ignore permission). False when unknown or not permitted.
+  bool canIgnore;
+
   FCUserInfoResult({
     required this.result,
     this.resultText,
     this.trustLevel,
+    this.canIgnore = false,
     // FCUser required fields
     required String id,
     required String username,

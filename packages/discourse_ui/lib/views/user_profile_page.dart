@@ -165,7 +165,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 : Text(AppLocalizations.of(context)?.userProfile ?? 'User Profile'),
         centerTitle: true,
         actions: [
-          if (_userInfo != null && widget.siteContext.loginDataOutput != null && widget.siteContext.loginDataOutput?.user?.id != _userInfo!.id)
+          if (_userInfo != null &&
+              widget.siteContext.loginDataOutput != null &&
+              widget.siteContext.loginDataOutput?.user?.id != _userInfo!.id &&
+              // Don't render an empty overflow menu when the viewer has
+              // no per-user actions available.
+              (_userInfo!.canIgnore ||
+                  _userInfo!.canBan ||
+                  _userInfo!.canSpamClean))
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),
               onSelected: (value) {
@@ -199,28 +206,31 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 // Phase 5.25 — Ignore / Unignore. Wires
                 // `userProxy.ignoreUserAsync` which PUTs the user's
                 // notification level to 2 (ignored) or 1 (normal).
-                PopupMenuItem<String>(
-                  value: 'ignore',
-                  child: Row(
-                    children: [
-                      Icon(
-                        _userInfo!.isIgnored
-                            ? Icons.notifications_active_outlined
-                            : Icons.notifications_off_outlined,
-                        color: colorScheme.onSurface,
-                      ),
-                      const SizedBox(width: DesignTokens.spacingM),
-                      Text(
-                        _userInfo!.isIgnored
-                            ? 'Unignore user'
-                            : 'Ignore user',
-                        style: textTheme.titleMedium?.copyWith(
+                // Gated on the server's `can_ignore_user` guardian
+                // check (false for guests, self, and staff targets).
+                if (_userInfo!.canIgnore)
+                  PopupMenuItem<String>(
+                    value: 'ignore',
+                    child: Row(
+                      children: [
+                        Icon(
+                          _userInfo!.isIgnored
+                              ? Icons.notifications_active_outlined
+                              : Icons.notifications_off_outlined,
                           color: colorScheme.onSurface,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: DesignTokens.spacingM),
+                        Text(
+                          _userInfo!.isIgnored
+                              ? 'Unignore user'
+                              : 'Ignore user',
+                          style: textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
                 // Ban/Unban User - only show if user has permission
                 if (_userInfo!.canBan)
                   PopupMenuItem<String>(

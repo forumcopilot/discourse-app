@@ -32,11 +32,9 @@ import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../user_profile_page.dart';
 import '../forum_topics_page.dart';
 import 'package:get/get.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_bookmark.dart';
 import 'package:discourse_core/discourse_core.dart'
-    show
-        DiscourseBookmarkProxy,
-        DiscourseBookmarkEntry,
-        DiscourseBookmarkAutoDelete;
+    show DiscourseBookmarkProxy, DiscourseBookmarkAutoDelete;
 import '../widgets/bookmark_reminder_sheet.dart';
 import '../../controllers/login_controller.dart';
 import '../login_page.dart';
@@ -982,44 +980,33 @@ class _PostListItemState extends State<PostListItem> {
         ),
       );
     }
-    // Discourse wiki toggle — shown alongside the existing edit
-    // affordance (FCPost carries no wiki flag, so both directions are
-    // offered; the server rejects non-staff/TL3 with a clean message).
+    // Discourse wiki toggle — a single direction-aware item driven by
+    // FCPost.isWiki (the server still rejects non-staff/TL3 with a
+    // clean message).
     if (widget.siteContext.isLoggedIn &&
         widget.post.canEdit &&
         widget.actions?.onToggleWiki != null) {
+      final isWiki = widget.post.isWiki;
       items.add(
         PopupMenuItem<String>(
-          value: 'make_wiki',
+          value: isWiki ? 'remove_wiki' : 'make_wiki',
           child: Row(
             children: [
-              Icon(Icons.edit_note,
+              Icon(isWiki ? Icons.edit_off : Icons.edit_note,
                   size: DesignTokens.iconSizeM,
                   color: Theme.of(context).colorScheme.secondary),
               const SizedBox(width: DesignTokens.spacingM),
-              const Text('Make wiki'),
-            ],
-          ),
-        ),
-      );
-      items.add(
-        PopupMenuItem<String>(
-          value: 'remove_wiki',
-          child: Row(
-            children: [
-              Icon(Icons.edit_off,
-                  size: DesignTokens.iconSizeM,
-                  color: Theme.of(context).colorScheme.secondary),
-              const SizedBox(width: DesignTokens.spacingM),
-              const Text('Remove wiki'),
+              Text(isWiki ? 'Remove wiki' : 'Make wiki'),
             ],
           ),
         ),
       );
     }
-    // Edit history — always offered (FCPost has no reliable edited/version
-    // flag); the revision page reports "no edit history" for unedited posts.
-    if (widget.actions?.onViewHistory != null) {
+    // Edit history — only for posts that were actually edited
+    // (FCPost.editVersion > 1; Discourse's `version` starts at 1 and
+    // bumps on each public revision).
+    if (widget.actions?.onViewHistory != null &&
+        (widget.post.editVersion ?? 1) > 1) {
       items.add(
         PopupMenuItem<String>(
           value: 'history',
@@ -1287,9 +1274,9 @@ class _PostListItemState extends State<PostListItem> {
     );
     if (choice == null || !mounted) return;
     final result = await proxy.updateBookmarkAsync(
-      entry.bookmark.id,
+      entry.id,
       reminderAt: choice.reminderAt, // omitting clears — intended for "No reminder"
-      name: entry.bookmark.name, // overwrite semantics: resend the note
+      name: entry.name, // overwrite semantics: resend the note
       autoDeletePreference: choice.reminderAt != null
           ? DiscourseBookmarkAutoDelete.clearReminder
           : null,
@@ -1317,7 +1304,7 @@ class _PostListItemState extends State<PostListItem> {
   /// Scan the user's bookmark list for this post's bookmark row.
   /// Page-capped like DiscourseBookmarkProxy.removePostBookmarkAsync's
   /// lookup so a huge list can't loop forever.
-  Future<DiscourseBookmarkEntry?> _findBookmarkEntry(
+  Future<FCBookmark?> _findBookmarkEntry(
       DiscourseBookmarkProxy proxy) async {
     final postId = int.tryParse(widget.post.id);
     if (postId == null) return null;
@@ -1326,8 +1313,8 @@ class _PostListItemState extends State<PostListItem> {
       final result = await proxy.getBookmarksWithRemindersAsync(page: page);
       if (!result.result || result.entries.isEmpty) return null;
       for (final entry in result.entries) {
-        if (entry.bookmark.bookmarkableType == 'Post' &&
-            entry.bookmark.bookmarkableId == postId) {
+        if (entry.bookmarkableType == 'Post' &&
+            entry.bookmarkableId == postId) {
           return entry;
         }
       }

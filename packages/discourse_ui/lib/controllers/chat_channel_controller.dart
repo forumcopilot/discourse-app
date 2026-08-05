@@ -263,9 +263,12 @@ class ChatChannelController extends GetxController
   /// Discourse emoji name without colons (e.g. `heart`, `+1`).
   ///
   /// Returns false (and sets [lastError]) on failure so the chip
-  /// widget can revert its optimistic state. Either way [messages] is
-  /// poked with `refresh()` so bubbles re-read the proxy's reaction
-  /// side-table (updated on success, unchanged on failure → revert).
+  /// widget can revert its optimistic state. The server does not echo
+  /// the new reaction state, so on success the change is applied
+  /// locally to the message's own `reactions` list (the next poll's
+  /// re-parse replaces it with the authoritative state); on failure
+  /// the list is left untouched → revert. Either way [messages] is
+  /// poked with `refresh()` so bubbles rebuild.
   Future<bool> toggleReaction(int messageId, String emoji,
       {required bool add}) async {
     final proxy = SiteProxyService.getChatProxy();
@@ -286,6 +289,7 @@ class ChatChannelController extends GetxController
             : 'Failed to update reaction.';
         return false;
       }
+      _applyLocalReaction(messageId, emoji, add: add);
       return true;
     } catch (e) {
       lastError.value = e.toString();
@@ -293,6 +297,50 @@ class ChatChannelController extends GetxController
     } finally {
       messages.refresh();
     }
+  }
+
+  /// Client-side optimistic update after a successful reaction toggle:
+  /// bump/decrement the emoji's chip on the message's `reactions` list
+  /// (replacing the list — it may be the unmodifiable default).
+  void _applyLocalReaction(int messageId, String emoji,
+      {required bool add}) {
+    final index = messages.indexWhere((m) => m.id == messageId);
+    if (index < 0) return;
+    final message = messages[index];
+    final current = List<FCChatMessageReaction>.of(message.reactions);
+    final i = current.indexWhere((r) => r.emoji == emoji);
+    if (add) {
+      if (i >= 0) {
+        final r = current[i];
+        if (r.reacted) return; // already counted
+        current[i] = FCChatMessageReaction(
+          emoji: emoji,
+          count: r.count + 1,
+          reacted: true,
+          usernames: r.usernames,
+        );
+      } else {
+        current.add(FCChatMessageReaction(
+          emoji: emoji,
+          count: 1,
+          reacted: true,
+        ));
+      }
+    } else {
+      if (i < 0) return;
+      final r = current[i];
+      if (r.count <= 1) {
+        current.removeAt(i);
+      } else {
+        current[i] = FCChatMessageReaction(
+          emoji: emoji,
+          count: r.count - 1,
+          reacted: false,
+          usernames: r.usernames,
+        );
+      }
+    }
+    message.reactions = current;
   }
 
   Future<void> loadOlder({int pageSize = 50}) async {

@@ -267,9 +267,9 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
     if (alert.isRead) return;
     final socialProxy = SiteProxyFactory.getSocialProxy();
     if (socialProxy is DiscourseSocialProxy) {
-      // FCAlert has no field for the notification's own numeric id —
-      // it rides in a Discourse-only sidecar on the proxy.
-      final notificationId = DiscourseSocialProxy.notificationIdOf(alert);
+      // The notification's own numeric id rides on FCAlert.alertId
+      // (contentId carries topic/post identifiers instead).
+      final notificationId = alert.alertId;
       if (notificationId != null) {
         () async {
           try {
