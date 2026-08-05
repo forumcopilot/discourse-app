@@ -264,7 +264,11 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
   @override
   Future<FCConversationResult> getConversationAsync(
       String conversationId, int startNum, int lastNum, bool returnHtml) async {
-    return _loadConversation(conversationId);
+    // startNum is a 0-based message offset; anchor the topic-view chunk at
+    // the matching post number so windows beyond the first ~20-post chunk
+    // are reachable (plain /t/{id}.json only returns the first chunk).
+    return _loadConversation(conversationId,
+        anchorPostNumber: startNum > 0 ? startNum + 1 : null);
   }
 
   @override
@@ -703,7 +707,12 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       canEdit: false,
       canClose: false,
       isClosed: (t['closed'] as bool?) ?? false,
-      messageId: (t['highest_post_number'] ?? '').toString(),
+      // Deliberately empty: the PM topic-list payload only carries post
+      // NUMBERS (highest_post_number), never post ids, and consumers treat
+      // messageId as a post id for /posts/{id}.json — a number here anchors
+      // into a random foreign topic (403). Open-at-position uses
+      // initialStartNum instead.
+      messageId: '',
       unreadMessageCount: (t['unread_posts'] as int?) ?? 0,
     );
   }

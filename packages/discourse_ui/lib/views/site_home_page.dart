@@ -58,6 +58,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
   final GlobalKey<PrivateMessageListTabState> _pmListKey = GlobalKey();
   final GlobalKey<NotificationListTabState> _notificationTabKey = GlobalKey();
   final GlobalKey<ProfileTabState> _profileTabKey = GlobalKey();
+  final GlobalKey<ChatChannelListPageState> _chatListKey = GlobalKey();
 
   // Add workers to listen for auth or forum changes
   Worker? _siteWorker;
@@ -515,10 +516,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
         case _messagesTab:
           return _pmListKey.currentState;
         case _chatTab:
-          // ChatChannelListPage doesn't implement FCTabStatefulWidget;
-          // it pulls fresh data on each tab activation via its own
-          // RefreshIndicator. No reset key needed.
-          return null;
+          return _chatListKey.currentState;
         case _notificationsTab:
           return _notificationTabKey.currentState;
         case _profileTab:
@@ -816,6 +814,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           // Scaffold so our SiteHomePage Scaffold + ChatTabAppBar +
           // drawer hamburger stay in charge.
           return ChatChannelListPage(
+            key: _chatListKey,
             siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
             embedded: true,
           );

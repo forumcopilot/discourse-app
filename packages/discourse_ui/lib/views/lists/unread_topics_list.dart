@@ -245,13 +245,25 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
     _isLoadingMore = true;
     if (mounted) setState(() {});
     try {
-      _currentPage += 1;
-      int startNum = _currentPage * _pageSize;
+      // startNum is the number of items already loaded (an item offset) —
+      // the proxy maps it to a server page (Discourse pages by 30, not
+      // _pageSize). On failure the count is unchanged, so the next scroll
+      // retries the same window.
+      int startNum = currentCount;
       int lastNum = startNum + _pageSize - 1;
       await _unreadTopicController!.getUnreadTopicAsync(startNum, lastNum);
       if (mounted) setState(() {});
     } catch (e) {
-      rethrow;
+      // Fire-and-forget from the scroll listener: rethrowing would be an
+      // unhandled zone error with no user feedback.
+      debugPrint('UnreadTopicsList load-more failed: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to load more topics. Scroll to retry.'),
+          ),
+        );
+      }
     } finally {
       _isLoadingMore = false;
       if (mounted) setState(() {});

@@ -53,6 +53,10 @@ class _ConversationPageState extends State<ConversationPage> {
   bool _hasMoreMessages = true;
   int _currentStartNum = 0;
   int _currentLastNum = 0; // Track the end of loaded range for proper pagination
+  // Set when a newer-window fetch added zero new messages; guards the tail
+  // auto-load so we never re-request the same window endlessly. Reset on any
+  // fresh (non-merge) load.
+  bool _newerFetchStalled = false;
   final int _pageSize = 20;
   String? _highlightedMessageId; // ID of message to highlight
   Timer? _highlightTimer; // Timer to clear highlight after a few seconds
@@ -190,6 +194,27 @@ class _ConversationPageState extends State<ConversationPage> {
     }
   }
 
+  /// Fetches the missing newer window (post-frame) when the loaded window
+  /// stops short of the end of the conversation. Needed because a list that
+  /// is already clamped at max scroll extent emits no scroll notifications,
+  /// so the scroll listener alone can never load the tail. Guarded by
+  /// [_newerFetchStalled] so a server that returns nothing new stops the
+  /// loop instead of re-requesting the same window forever.
+  void _scheduleTailFillIfNeeded() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _isLoading || _isLoadingMore || _newerFetchStalled) {
+        return;
+      }
+      final conversation = _conversation;
+      if (conversation == null) return;
+      final totalMessages =
+          conversation.totalMessageNum ?? conversation.messages.length;
+      if (_currentLastNum < totalMessages) {
+        _loadConversation(loadMore: true);
+      }
+    });
+  }
+
   Future<void> _loadConversation({bool loadMore = false, bool loadOlder = false}) async {
     if (loadMore && (_isLoadingMore || !_hasMoreMessages)) {
       return;
@@ -253,6 +278,7 @@ class _ConversationPageState extends State<ConversationPage> {
             final hasOlderMessages = _currentStartNum > 1;
             final hasNewerMessages = _currentLastNum < totalMessages;
             _hasMoreMessages = hasOlderMessages || hasNewerMessages;
+            _newerFetchStalled = false;
 
             _isLoading = false;
 
@@ -268,6 +294,11 @@ class _ConversationPageState extends State<ConversationPage> {
         // Normal conversation loading logic
         int startNum;
         int lastNum;
+        // Explicit direction of a loadMore request; the server re-centers
+        // windows, so inferring direction from the requested range vs the
+        // bookkeeping is unreliable.
+        bool requestedOlder = false;
+        bool requestedNewer = false;
 
         // Always calculate the last page when initially loading (not loading more)
         // This ensures we always show the most recent messages, even if initialStartNum was provided
@@ -301,18 +332,14 @@ class _ConversationPageState extends State<ConversationPage> {
 
           final totalMessages = metadataConversation.totalMessageNum ?? metadataConversation.messages.length;
 
-          // Calculate the last page startNum (1-based indexing)
-          // Messages are numbered 1 to totalMessages
-          // If totalMessages <= pageSize, start from 1, otherwise start from the last page
-          if (totalMessages <= _pageSize) {
-            startNum = 1; // Start from first message
-            lastNum = totalMessages; // End at last message
-          } else {
-            // Calculate startNum for the last page
-            // For 49 messages with pageSize=20: startNum = 49 - 20 + 1 = 30
-            startNum = totalMessages - _pageSize + 1;
-            lastNum = totalMessages; // End at last message
-          }
+          // Request the tail window. The proxy treats startNum as a 0-based
+          // offset and anchors the server's ~20-post chunk at startNum + 1,
+          // so anchoring at the last message (totalMessages - 1 -> anchor
+          // totalMessages) makes the server return the final chunk.
+          // startNum = 0 means "first chunk", which already covers short
+          // conversations.
+          startNum = math.max(0, totalMessages - 1);
+          lastNum = totalMessages;
         } else {
           // When loading more messages, determine if we're loading older or newer messages
           final totalMessages = _conversation?.totalMessageNum ?? _conversation?.messages.length ?? 0;
@@ -321,21 +348,22 @@ class _ConversationPageState extends State<ConversationPage> {
             // Explicitly loading older messages (button click)
             startNum = math.max(1, _currentStartNum - _pageSize);
             lastNum = _currentStartNum - 1; // End just before the current start
+            requestedOlder = true;
+          } else if (_currentLastNum < totalMessages && !_newerFetchStalled) {
+            // Loading newer messages (after the loaded window). The proxy
+            // treats startNum as a 0-based offset (anchor = startNum + 1),
+            // so pass the highest loaded messageNumber to anchor the server
+            // window at the first missing message.
+            startNum = _currentLastNum;
+            lastNum = math.min(totalMessages, _currentLastNum + _pageSize);
+            requestedNewer = true;
           } else {
-            // Auto-loading: check scroll position to determine direction
-            final scrollPosition = _scrollController.hasClients ? _scrollController.position.pixels : 0;
-            final maxScroll = _scrollController.hasClients ? _scrollController.position.maxScrollExtent : 0;
-            final isNearBottom = scrollPosition >= maxScroll - 200;
-
-            if (isNearBottom && _currentLastNum < totalMessages) {
-              // Loading newer messages (after current range)
-              startNum = _currentLastNum + 1; // Start just after the current end
-              lastNum = math.min(totalMessages, startNum + _pageSize - 1);
-            } else {
-              // No more messages to load in this direction
-              startNum = _currentStartNum;
-              lastNum = _currentLastNum;
-            }
+            // Nothing to load in either direction; don't re-request the
+            // window we already have.
+            setState(() {
+              _isLoadingMore = false;
+            });
+            return;
           }
         }
 
@@ -352,9 +380,11 @@ class _ConversationPageState extends State<ConversationPage> {
         if (mounted) {
           setState(() {
             if (loadMore && _conversation != null) {
-              // Determine if we're loading older or newer messages based on startNum
-              final isLoadingOlder = startNum < _currentStartNum;
-              final isLoadingNewer = startNum > _currentLastNum;
+              // Use the direction the request was made with; the server
+              // re-centers windows so the returned/requested range can't be
+              // compared against the bookkeeping reliably.
+              final isLoadingOlder = requestedOlder;
+              final isLoadingNewer = requestedNewer;
 
               if (isLoadingOlder) {
                 // Save current scroll position before prepending messages
@@ -417,7 +447,12 @@ class _ConversationPageState extends State<ConversationPage> {
               } else if (isLoadingNewer) {
                 // Append newer messages to existing list, deduping by id
                 // in case the pages overlap
+                final previousCount = _conversation!.messages.length;
                 final mergedMessages = _mergeMessages(_conversation!.messages, conversation.messages);
+                // Bail out of the tail-load loop when the fetch added zero
+                // new messages, so we never re-request the same window
+                // endlessly.
+                _newerFetchStalled = mergedMessages.length == previousCount;
                 _conversation = FCConversationResult(
                   result: conversation.result,
                   resultText: conversation.resultText,
@@ -460,10 +495,18 @@ class _ConversationPageState extends State<ConversationPage> {
               }
             } else {
               _conversation = conversation;
-              _currentStartNum = startNum;
-              _currentLastNum = lastNum;
+              // Derive the loaded window from the messageNumbers the server
+              // actually returned — the server re-centers windows and does
+              // NOT honor the requested range, so mirroring the request here
+              // would corrupt all downstream pagination logic.
               final totalMessages = conversation.totalMessageNum ?? conversation.messages.length;
-              _hasMoreMessages = startNum > 1 || lastNum < totalMessages;
+              _updateWindowFromMessages(
+                conversation.messages,
+                fallbackStart: math.max(1, totalMessages - conversation.messages.length + 1),
+                fallbackLast: totalMessages,
+              );
+              _hasMoreMessages = _currentStartNum > 1 || _currentLastNum < totalMessages;
+              _newerFetchStalled = false;
 
               // Always scroll to bottom when initially loading (since we always load the last page)
               if (!loadMore) {
@@ -481,6 +524,14 @@ class _ConversationPageState extends State<ConversationPage> {
             _isLoading = false;
             _isLoadingMore = false;
           });
+
+          // When the list is already clamped at max scroll extent no scroll
+          // notifications fire, so the scroll listener can never trigger the
+          // newer-window load. Explicitly follow up (post-frame) whenever the
+          // loaded window still stops short of the end of the conversation.
+          if (!loadMore || requestedNewer) {
+            _scheduleTailFillIfNeeded();
+          }
         }
       }
     } catch (e) {
@@ -1055,7 +1106,16 @@ class _ConversationPageState extends State<ConversationPage> {
                         Builder(
                           builder: (context) {
                             final totalMessages = _conversation!.totalMessageNum ?? _conversation!.list.length;
-                            final isAtEnd = _currentLastNum >= totalMessages;
+                            // Only claim the end has been reached when the
+                            // highest actually-loaded messageNumber covers
+                            // the conversation total (falling back to the
+                            // derived window bound when messages carry no
+                            // positions).
+                            final highestLoaded = _conversation!.list
+                                .map((m) => m.messageNumber)
+                                .whereType<int>()
+                                .fold<int>(0, math.max);
+                            final isAtEnd = (highestLoaded > 0 ? highestLoaded : _currentLastNum) >= totalMessages;
 
                             if (isAtEnd) {
                               return Padding(
@@ -1097,7 +1157,7 @@ class _ConversationPageState extends State<ConversationPage> {
     // Older messages require manual button click
     if (_hasMoreMessages && !_isLoadingMore) {
       final totalMessages = _conversation!.totalMessageNum ?? _conversation!.messages.length;
-      final hasNewerMessages = _currentLastNum < totalMessages;
+      final hasNewerMessages = _currentLastNum < totalMessages && !_newerFetchStalled;
 
       if (isNearBottom && hasNewerMessages) {
         // Load newer messages when scrolling to the bottom
@@ -1162,10 +1222,16 @@ class _ConversationPageState extends State<ConversationPage> {
         setState(() {
           // Replace current conversation with first page (discard previous messages)
           _conversation = conversation;
-          _currentStartNum = startNum;
-          _currentLastNum = lastNum;
+          // Derive the loaded window from the returned messageNumbers (the
+          // server re-centers windows and does not honor the request).
+          _updateWindowFromMessages(
+            conversation.messages,
+            fallbackStart: startNum,
+            fallbackLast: conversation.messages.length,
+          );
           final totalMessages = conversation.totalMessageNum ?? conversation.messages.length;
-          _hasMoreMessages = lastNum < totalMessages;
+          _hasMoreMessages = _currentStartNum > 1 || _currentLastNum < totalMessages;
+          _newerFetchStalled = false;
           _isLoading = false;
         });
 
@@ -1213,17 +1279,13 @@ class _ConversationPageState extends State<ConversationPage> {
 
       final totalMessages = metadataConversation.totalMessageNum ?? metadataConversation.messages.length;
 
-      // Calculate last page
-      int startNum;
-      int lastNum;
-      if (totalMessages <= _pageSize) {
-        startNum = 1;
-        lastNum = totalMessages;
-      } else {
-        // Calculate startNum for the last page
-        startNum = totalMessages - _pageSize + 1;
-        lastNum = totalMessages;
-      }
+      // Request the tail window. The proxy treats startNum as a 0-based
+      // offset and anchors the server chunk at startNum + 1, so anchoring at
+      // the last message (totalMessages - 1 -> anchor totalMessages) makes
+      // the server return the final chunk. startNum = 0 means "first chunk",
+      // which already covers short conversations.
+      final startNum = math.max(0, totalMessages - 1);
+      final lastNum = totalMessages;
 
       final conversation = await conversationProxy.getConversationAsync(
         conversationIdToUse,
@@ -1236,11 +1298,22 @@ class _ConversationPageState extends State<ConversationPage> {
         setState(() {
           // Replace current conversation with last page (discard previous messages)
           _conversation = conversation;
-          _currentStartNum = startNum;
-          _currentLastNum = lastNum;
-          _hasMoreMessages = startNum > 1; // There are more messages if we're not at the first page
+          // Derive the loaded window from the returned messageNumbers (the
+          // server re-centers windows and does not honor the request).
+          _updateWindowFromMessages(
+            conversation.messages,
+            fallbackStart: math.max(1, totalMessages - conversation.messages.length + 1),
+            fallbackLast: totalMessages,
+          );
+          final total = conversation.totalMessageNum ?? totalMessages;
+          _hasMoreMessages = _currentStartNum > 1 || _currentLastNum < total;
+          _newerFetchStalled = false;
           _isLoading = false;
         });
+
+        // If the returned window somehow still stops short of the end,
+        // fetch the missing tail.
+        _scheduleTailFillIfNeeded();
 
         // Scroll to bottom after loading
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1397,10 +1470,16 @@ class _ConversationPageState extends State<ConversationPage> {
       if (mounted) {
         setState(() {
           _conversation = conversation;
-          _currentStartNum = targetStartNum;
-          _currentLastNum = targetLastNum;
+          // Derive the loaded window from the returned messageNumbers (the
+          // server re-centers windows and does not honor the request).
+          _updateWindowFromMessages(
+            conversation.messages,
+            fallbackStart: targetStartNum,
+            fallbackLast: targetLastNum,
+          );
           final totalMessages = conversation.totalMessageNum ?? conversation.messages.length;
-          _hasMoreMessages = targetStartNum > 1 || targetLastNum < totalMessages;
+          _hasMoreMessages = _currentStartNum > 1 || _currentLastNum < totalMessages;
+          _newerFetchStalled = false;
         });
 
         // Find and scroll to the target message

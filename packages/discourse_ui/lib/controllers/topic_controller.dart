@@ -8,6 +8,15 @@ import 'global_loader_controller.dart';
 import 'package:discourse_ui/core/errors/error_handling_mixins.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 
+
+/// Appends [incoming] to [existing], skipping topics whose id is already
+/// present. Server pages shift as topics get bumped between fetches, so
+/// overlap between consecutive pages is normal, not exceptional.
+List<T> _dedupedAppend<T extends dynamic>(List<T> existing, List<T> incoming) {
+  final seen = existing.map((t) => t.id.toString()).toSet();
+  return incoming.where((t) => seen.add(t.id.toString())).toList();
+}
+
 class DiscourseLatestTopicController extends DiscourseGlobalLoaderController with ErrorHandlingMixin {
   var isInitialized = false.obs;
   final latestTopicsDataOutput = FCLatestTopicResult(
@@ -68,12 +77,13 @@ class DiscourseLatestTopicController extends DiscourseGlobalLoaderController wit
       } else {
         AppLogger.debug('Appending to existing topics list');
         if (result.result) {
-          latestTopicsDataOutput.value.topics.addAll(result.topics);
+          final freshTopics =
+          _dedupedAppend(latestTopicsDataOutput.value.topics, result.topics);
+      latestTopicsDataOutput.value.topics.addAll(freshTopics);
           latestTopicsDataOutput.value.totalLatestNum = result.totalLatestNum;
           // In-place mutation of the Rx'd result object — notify observers.
           latestTopicsDataOutput.refresh();
-          final convertedTopics = result.topics;
-          fcTopics.addAll(convertedTopics);
+          fcTopics.addAll(freshTopics);
         } else {
           AppLogger.warning('API call failed: ${result.resultText}');
         }
@@ -145,11 +155,13 @@ class DiscourseUnreadTopicController extends GetxController {
         );
       }
     } else {
-      unreadTopicsDataOutput.value.topics.addAll(result.topics);
+      final freshTopics =
+          _dedupedAppend(unreadTopicsDataOutput.value.topics, result.topics);
+      unreadTopicsDataOutput.value.topics.addAll(freshTopics);
       unreadTopicsDataOutput.value.totalUnreadNum = result.totalUnreadNum;
       // In-place mutation of the Rx'd result object — notify observers.
       unreadTopicsDataOutput.refresh();
-      fcTopics.addAll(convertedTopics);
+      fcTopics.addAll(freshTopics);
     }
     isInitialized.value = true;
   }
@@ -239,11 +251,13 @@ class DiscourseParticipatedTopicController extends GetxController {
         );
       }
     } else {
-      participatedTopicsDataOutput.value.topics.addAll(result.topics);
+      final freshTopics =
+          _dedupedAppend(participatedTopicsDataOutput.value.topics, result.topics);
+      participatedTopicsDataOutput.value.topics.addAll(freshTopics);
       participatedTopicsDataOutput.value.totalParticipatedNum = result.totalParticipatedNum;
       // In-place mutation of the Rx'd result object — notify observers.
       participatedTopicsDataOutput.refresh();
-      fcTopics.addAll(convertedTopics);
+      fcTopics.addAll(freshTopics);
     }
     isInitialized.value = true;
   }
@@ -284,11 +298,13 @@ class DiscourseSubscribedTopicController extends GetxController {
         );
       }
     } else {
-      subscribedTopicsDataOutput.value.topics.addAll(result.topics);
+      final freshTopics =
+          _dedupedAppend(subscribedTopicsDataOutput.value.topics, result.topics);
+      subscribedTopicsDataOutput.value.topics.addAll(freshTopics);
       subscribedTopicsDataOutput.value.totalTopicNum = result.totalTopicNum;
       // In-place mutation of the Rx'd result object — notify observers.
       subscribedTopicsDataOutput.refresh();
-      fcTopics.addAll(convertedTopics);
+      fcTopics.addAll(_convertFCSubscribedTopicsToFCTopics(freshTopics));
     }
     isInitialized.value = true;
   }

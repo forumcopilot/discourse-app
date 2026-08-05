@@ -34,7 +34,6 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
   final int _pageSize = 20;
-  int _currentPage = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -112,7 +111,6 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
   void clearList() {
     _hasLoaded = false;
     _isInitialLoading = false;
-    _currentPage = 0;
     _isLoadingMore = false;
     clearError();
     if (_latestTopicController != null) {
@@ -144,7 +142,6 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
         setState(() {});
       }
       try {
-        _currentPage = 0;
         int startNum = 0;
         int lastNum = _pageSize - 1;
         await _latestTopicController!.getLatestTopicAsync(startNum, lastNum);
@@ -188,14 +185,14 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
     _isLoadingMore = true;
     setState(() {});
     try {
-      // Compute the next page without committing it — only advance the
-      // counter once the fetch succeeds, so a failed page can be retried
-      // instead of leaving a permanent gap.
-      final nextPage = _currentPage + 1;
-      int startNum = nextPage * _pageSize;
+      // startNum is the number of items already loaded (an item offset) —
+      // the proxy maps it to a server page. Discourse pages by its own size
+      // (30), not this widget's _pageSize, so deriving startNum from a local
+      // page counter would re-request already-loaded pages. On failure the
+      // count is unchanged, so the next scroll naturally retries.
+      int startNum = currentCount;
       int lastNum = startNum + _pageSize - 1;
       await _latestTopicController!.getLatestTopicAsync(startNum, lastNum);
-      _currentPage = nextPage;
     } catch (e) {
       // This runs fire-and-forget from the scroll listener — rethrowing
       // would surface as an unhandled zone exception with no feedback and

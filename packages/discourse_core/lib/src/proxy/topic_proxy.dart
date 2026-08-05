@@ -42,11 +42,12 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     List<String>? filters,
   }) async {
     try {
-      final list = await _listTopics('/latest.json', page: _pageOf(startNum));
+      final page = _pageOf(startNum);
+      final list = await _listTopics('/latest.json', page: page);
       return FCLatestTopicResult(
         result: true,
         resultText: '',
-        totalLatestNum: list.topics.length,
+        totalLatestNum: _totalFor(page, list),
         topics: list.topics,
       );
     } catch (e) {
@@ -67,11 +68,12 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
   }) async {
     final path = siteContext.hasUserApiKey ? '/new.json' : '/latest.json';
     try {
-      final list = await _listTopics(path, page: _pageOf(startNum));
+      final page = _pageOf(startNum);
+      final list = await _listTopics(path, page: page);
       return FCLatestTopicResult(
         result: true,
         resultText: '',
-        totalLatestNum: list.topics.length,
+        totalLatestNum: _totalFor(page, list),
         topics: list.topics,
       );
     } catch (e) {
@@ -112,7 +114,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       return FCLatestTopicResult(
         result: true,
         resultText: '',
-        totalLatestNum: list.topics.length,
+        totalLatestNum: _totalFor(page, list),
         topics: list.topics,
       );
     } catch (e) {
@@ -165,11 +167,12 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
   }) async {
     final path = siteContext.hasUserApiKey ? '/unread.json' : '/latest.json';
     try {
-      final list = await _listTopics(path, page: _pageOf(startNum));
+      final page = _pageOf(startNum);
+      final list = await _listTopics(path, page: page);
       return FCUnreadTopicResult(
         result: true,
         resultText: '',
-        totalUnreadNum: list.topics.length,
+        totalUnreadNum: _totalFor(page, list),
         topics: list.topics,
       );
     } catch (e) {
@@ -458,9 +461,10 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
           forumId: forumId, message: 'forumId required');
     }
     try {
+      final page = _pageOf(startNum);
       final list = await _listTopics(
         '/c/$forumId/l/$filter.json',
-        page: _pageOf(startNum),
+        page: page,
       );
       final catId = int.tryParse(forumId);
       final forumName =
@@ -478,7 +482,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         isSubscribed: false,
         requirePrefix: false,
         prefixes: const [],
-        totalTopicNum: list.topics.length,
+        totalTopicNum: _totalFor(page, list),
         topics: list.topics,
       );
     } catch (e) {
@@ -516,8 +520,18 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     return _TopicListResponse(
       topics: topics,
       canPost: (list['can_create_topic'] as bool?) ?? false,
+      // Topic lists carry no total count; `more_topics_url` is the server's
+      // only has-more signal.
+      hasMore: list['more_topics_url'] != null,
     );
   }
+
+  /// Total to report for a windowed list page. Discourse never sends a real
+  /// total, so callers get "items before this page + this page + 1 sentinel
+  /// when more pages exist" — enough for `loadedCount < total` has-more
+  /// checks without ever claiming a count the server didn't back.
+  int _totalFor(int page, _TopicListResponse list) =>
+      page * _perPage + list.topics.length + (list.hasMore ? 1 : 0);
 
   /// Warm-once cache of category id → name. Resolves [FCTopic.forumName]
   /// on topic listings without paying for /categories.json on every call.
@@ -692,5 +706,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
 class _TopicListResponse {
   final List<FCTopic> topics;
   final bool canPost;
-  const _TopicListResponse({required this.topics, required this.canPost});
+  final bool hasMore;
+  const _TopicListResponse(
+      {required this.topics, required this.canPost, this.hasMore = false});
 }

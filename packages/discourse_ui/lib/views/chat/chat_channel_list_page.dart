@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_chat_channel.dart';
 
 import '../../theme/design_tokens.dart';
 import '../widgets/empty_state_view.dart';
+import '../widgets/resettable_widget.dart';
 import 'chat_channel_view.dart';
 
 /// Top-level Chat surface: lists the user's joined channels and opens
@@ -32,17 +33,56 @@ class ChatChannelListPage extends StatefulWidget {
   });
 
   @override
-  State<ChatChannelListPage> createState() => _ChatChannelListPageState();
+  State<ChatChannelListPage> createState() => ChatChannelListPageState();
 }
 
-class _ChatChannelListPageState extends State<ChatChannelListPage> {
+class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
+    with FCTabStatefulWidget<ChatChannelListPage> {
   List<FCChatChannel>? _channels;
   bool _loading = false;
   String? _error;
 
+  // Track login state so the channel list reloads after an in-session
+  // login/logout (same pattern as NotificationListTab). Without this
+  // the page keeps the guest-time "You need to be logged in" error
+  // until the app is restarted — it lives inside SiteHomePage's
+  // IndexedStack, so initState only ever runs once.
+  bool _wasLoggedIn = false;
+  String? _lastLoadedUsername;
+  late final VoidCallback _authStateListener;
+
   @override
   void initState() {
     super.initState();
+    _wasLoggedIn = widget.siteContext.isLoggedIn;
+    _lastLoadedUsername = widget.siteContext.loginDataOutput?.user?.username;
+    _load();
+
+    _authStateListener = () {
+      if (!mounted) return;
+      final isLoggedIn = widget.siteContext.isLoggedIn;
+      final username = widget.siteContext.loginDataOutput?.user?.username;
+      if (isLoggedIn != _wasLoggedIn || username != _lastLoadedUsername) {
+        _wasLoggedIn = isLoggedIn;
+        _lastLoadedUsername = username;
+        _load();
+      }
+    };
+    widget.siteContext.isLoggedInNotifier.addListener(_authStateListener);
+  }
+
+  @override
+  void dispose() {
+    widget.siteContext.isLoggedInNotifier.removeListener(_authStateListener);
+    super.dispose();
+  }
+
+  /// Called by SiteHomePage._resetAllTabs on login/logout and site
+  /// re-initialization, mirroring the other bottom-nav tabs.
+  @override
+  void resetTab() {
+    _wasLoggedIn = widget.siteContext.isLoggedIn;
+    _lastLoadedUsername = widget.siteContext.loginDataOutput?.user?.username;
     _load();
   }
 
