@@ -1198,7 +1198,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
 
     return SwitchListTile(
       title: Text(
-        'Sent from ${AppForumConfig.forumName} mobile app',
+        'Sent from ${widget.siteContext.site.name} mobile app',
         style: textTheme.bodyMedium?.copyWith(
           color: colorScheme.onSurface,
         ),
@@ -1427,7 +1427,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
       
       // Append signature if enabled
       if (widget.showSignatureToggle && _includeSignature) {
-        final signature = 'Sent from ${AppForumConfig.forumName} mobile app';
+        final signature = 'Sent from ${widget.siteContext.site.name} mobile app';
         // Add two line breaks before signature
         content = '$content\n\n$signature';
       }

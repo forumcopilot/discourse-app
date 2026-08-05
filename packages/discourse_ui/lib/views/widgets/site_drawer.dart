@@ -139,7 +139,7 @@ class SiteDrawer extends StatelessWidget {
             ),
             // Build / version footer so users can identify which app
             // build they're on when filing issues. Quiet, low-contrast.
-            _Footer(),
+            _Footer(siteName: siteContext.site.name),
           ],
         ),
       ),
@@ -173,7 +173,7 @@ class SiteDrawer extends StatelessWidget {
         return AlertDialog(
           title: const Text('Sign out?'),
           content: Text(
-            'You will be signed out of ${AppForumConfig.forumName}. You can sign back in any time.',
+            'You will be signed out of ${siteContext.site.name}. You can sign back in any time.',
           ),
           actions: [
             TextButton(
@@ -238,7 +238,7 @@ class _Header extends StatelessWidget {
               const SizedBox(width: DesignTokens.spacingM),
               Expanded(
                 child: Text(
-                  AppForumConfig.forumName,
+                  siteContext.site.name,
                   style: textTheme.titleMedium?.copyWith(
                     color: colorScheme.onPrimaryContainer,
                     fontWeight: DesignTokens.fontWeightSemiBold,
@@ -320,6 +320,9 @@ class _DrawerRow extends StatelessWidget {
 }
 
 class _Footer extends StatelessWidget {
+  final String? siteName;
+  const _Footer({this.siteName});
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -330,7 +333,7 @@ class _Footer extends StatelessWidget {
         vertical: DesignTokens.spacingS,
       ),
       child: Text(
-        '${AppForumConfig.forumName} · v1',
+        '${siteName ?? AppForumConfig.forumName} · v1',
         style: textTheme.labelSmall?.copyWith(
           color: colorScheme.onSurfaceVariant
               .withValues(alpha: DesignTokens.opacityMedium),
