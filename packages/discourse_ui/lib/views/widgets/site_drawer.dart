@@ -118,6 +118,22 @@ class SiteDrawer extends StatelessWidget {
                         LoginPage(siteContext: siteContext),
                       ),
                     ),
+                  // When hosted inside a multi-forum app the site shell is
+                  // pushed on top of the host's forum chooser; offer a way
+                  // back. Standalone builds have no route below the shell,
+                  // so this row stays hidden there.
+                  if (Navigator.of(context).canPop()) ...[
+                    const Divider(height: 1),
+                    _DrawerRow(
+                      icon: Icons.swap_horiz,
+                      title: 'Switch forum',
+                      onTap: () {
+                        Navigator.of(context).pop(); // close drawer
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
+                      },
+                    ),
+                  ],
                 ],
               ),
             ),

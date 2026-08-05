@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/models/domain/site.dart';
+import 'package:get/get.dart';
 import 'package:discourse_ui/config/app_forum_config.dart';
+import 'package:discourse_ui/controllers/global_loader_controller.dart';
+import 'package:discourse_ui/controllers/site_controller.dart';
+import 'package:discourse_ui/services/user_state_service.dart';
 import 'package:discourse_ui/views/site_home_page.dart';
 import 'package:discourse_ui/services/site_initialization_service.dart';
 import 'package:discourse_ui/views/widgets/progress_dialog.dart';
@@ -26,9 +30,25 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
   @override
   void initState() {
     super.initState();
+    _ensureModuleSingletons();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeForum();
     });
+  }
+
+  /// The standalone app registers these in its own main/root widget; a
+  /// host app enters the Discourse module here, so make registration
+  /// idempotent at the module boundary.
+  void _ensureModuleSingletons() {
+    if (!Get.isRegistered<DiscourseUserStateService>()) {
+      Get.put(DiscourseUserStateService());
+    }
+    if (!Get.isRegistered<DiscourseGlobalLoaderController>()) {
+      Get.put(DiscourseGlobalLoaderController());
+    }
+    if (!Get.isRegistered<DiscourseSiteController>()) {
+      Get.put(DiscourseSiteController());
+    }
   }
 
   Future<void> _initializeForum() async {
