@@ -90,6 +90,11 @@ class DiscourseLoginService {
       result: true,
       resultText: '',
       user: user,
+      // Discourse allows uploaded avatars for everyone by default
+      // (uploaded_avatars_allowed_groups). /session/current.json exposes no
+      // per-user flag for it, so enable the affordance and let the server
+      // 422 in the rare locked-down/SSO-override case.
+      canUploadAvatar: true,
     );
 
     siteContext.setLoginData(result);
@@ -124,6 +129,8 @@ class DiscourseLoginService {
         result: true,
         resultText: '',
         user: _userFromCurrentUser(cu),
+        // See beginLogin: no server flag exists; server-side enforcement.
+        canUploadAvatar: true,
       ));
       return true;
     } catch (_) {

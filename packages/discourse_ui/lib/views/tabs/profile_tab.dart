@@ -1,4 +1,3 @@
-import 'package:discourse_core/discourse_core.dart';
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/views/widgets/resettable_widget.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -7,19 +6,10 @@ import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'dart:async';
 import 'package:discourse_ui/utils/error_dialog.dart';
 import '../../theme/design_tokens.dart';
-import '../../theme/style_builders.dart';
 
 // Import the new component widgets
-import '../widgets/profile_picture_section.dart';
-import '../widgets/profile_info_section.dart';
-import '../widgets/recent_posts_section.dart';
-import '../widgets/user_activity_tabs.dart';
+import '../widgets/profile_view.dart';
 import '../widgets/not_signed_in_view.dart';
-import '../bookmarks_page.dart';
-import '../drafts_list_page.dart';
-import '../edit_profile_page.dart';
-import '../messages_page.dart';
-import '../settings_page.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
@@ -253,130 +243,61 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
     return _recentPosts!.length < _totalPosts;
   }
 
+  /// Pull-to-refresh: same reset semantics as an edit-save — null the
+  /// cached userInfo AND reset `_hasLoaded` (fetch no-ops while it's
+  /// true), then refetch.
+  Future<void> _handleRefresh() async {
+    setState(() {
+      _userInfo = null;
+      _hasLoaded = false;
+    });
+    clearError();
+    await _fetchUserInfo();
+  }
+
   Widget _buildLoggedInContent() {
-    final username = widget.siteContext.loginDataOutput?.user?.username ?? 'User';
-    final imageUrl = widget.siteContext.loginDataOutput?.user?.iconUrl ?? '';
-
-    return Builder(
-      builder: (context) {
-        final colorScheme = Theme.of(context).colorScheme;
-        final textTheme = Theme.of(context).textTheme;
-
-        return ListView(
-          controller: _scrollController,
-          children: [
-            // No forum header when user is logged in - focus on profile content
-            Padding(
-              padding: DesignTokens.paddingL,
-              child: Column(
-                children: [
-                  // Profile Picture Section
-                  ProfilePictureSection(
-                    siteContext: widget.siteContext,
-                    username: username,
-                    imageUrl: imageUrl,
-                    onProfileUpdated: () {
-                      // Refresh user info and recent posts when profile is updated
-                      _hasLoaded = false;
-                      _fetchUserInfo();
-                    },
-                  ),
-
-                  // Profile Information Section (includes Edit profile +
-                  // Settings buttons after the displayText). Phase 5.22
-                  // promoted the lone Settings button into a side-by-
-                  // side row with the new Edit profile entry — the
-                  // EditProfilePage pops with `true` on a successful
-                  // save so we re-fetch user info and surface the
-                  // new values without a full tab reset.
-                  if (_userInfo != null)
-                    ProfileInfoSection(
-                      userInfo: _userInfo!,
-                      settingsButton: Padding(
-                        padding: DesignTokens.paddingScreenHorizontal,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: FilledButton.tonalIcon(
-                                onPressed: () async {
-                                  final saved = await Navigator.push<bool>(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => EditProfilePage(
-                                        siteContext: widget.siteContext,
-                                        userInfo: _userInfo!,
-                                      ),
-                                    ),
-                                  );
-                                  if (saved == true && mounted) {
-                                    // Force a fresh fetch so name /
-                                    // bio / location / website re-
-                                    // render with the saved values.
-                                    setState(() {
-                                      _userInfo = null;
-                                    });
-                                    _fetchUserInfo();
-                                  }
-                                },
-                                icon: Icon(Icons.edit_outlined,
-                                    size: DesignTokens.iconSizeM),
-                                label: const Text('Edit profile'),
-                              ),
-                            ),
-                            SizedBox(width: DesignTokens.spacingS),
-                            Expanded(
-                              child: FilledButton.tonalIcon(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ForumSettingsPage(
-                                        siteContext: widget.siteContext,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                icon: Icon(Icons.settings_outlined,
-                                    size: DesignTokens.iconSizeM),
-                                label: const Text('Settings'),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                  SizedBox(height: DesignTokens.spacingL),
-
-                  // Phase 5.17d — Discourse-native "Your stuff"
-                  // section. Aggregates Messages / Bookmarks / Drafts
-                  // under the Profile tab, matching how Discourse web
-                  // exposes them under the user menu. Replaces what
-                  // was a dedicated Messages bottom-nav tab.
-                  _ProfileActionsSection(siteContext: widget.siteContext),
-
-                  SizedBox(height: DesignTokens.spacingL),
-
-                  // Phase 5.24 — Replies / Topics tab strip replaces
-                  // the standalone RecentPostsSection. The old
-                  // ProfileTab fetch state (_recentPosts /
-                  // _isLoadingRecentPosts / _hasMorePosts / etc.)
-                  // remains as harmless dead code; a later cleanup
-                  // pass can excise it once we've confirmed nothing
-                  // else reads from it.
-                  UserActivityTabs(
-                    siteContext: widget.siteContext,
-                    userId: widget.siteContext.loginDataOutput?.user?.id,
-                    userName:
-                        widget.siteContext.loginDataOutput?.user?.username,
-                  ),
-                ],
-              ),
+    // The whole logged-in body is the shared ProfileView (subtraction
+    // model — one profile experience for the tab and the avatar-tap
+    // page). The tab keeps owning: NotSignedInView, resetTab/auth-
+    // listener wiring, and the _userInfo/_hasLoaded fetch mechanics.
+    return RefreshIndicator(
+      onRefresh: _handleRefresh,
+      child: ListView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          if (_userInfo == null)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingXXL),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else
+            ProfileView(
+              siteContext: widget.siteContext,
+              userInfo: _userInfo!,
+              isSelf: true,
+              onEdited: () {
+                // Force a fresh fetch so name / bio / location /
+                // website re-render with the saved values.
+                // _hasLoaded must be reset too: _fetchUserInfo()
+                // no-ops while it is true, and the profile body only
+                // renders when _userInfo is non-null — without the
+                // reset the section vanished after an edit.
+                setState(() {
+                  _userInfo = null;
+                  _hasLoaded = false;
+                });
+                _fetchUserInfo();
+              },
+              onAvatarUploaded: () {
+                // Refresh user info when the avatar changes (login
+                // context already carries the new iconUrl).
+                _hasLoaded = false;
+                _fetchUserInfo();
+              },
             ),
-          ],
-        );
-      },
+        ],
+      ),
     );
   }
 
@@ -410,143 +331,6 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
   }
 }
 
-/// Compact list of links to the current user's stuff — Messages,
-/// Bookmarks, Drafts. Each row navigates to a dedicated page. Pre-
-/// Phase-5.17d the Messages slot lived as a top-level bottom-nav tab;
-/// the badge moved into Profile so the bottom nav can stay at 5 items
-/// (Home / Categories / Tags / Notifications / Profile).
-class _ProfileActionsSection extends StatelessWidget {
-  final SiteContext siteContext;
-  const _ProfileActionsSection({required this.siteContext});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    // Phase 5.18a — Messages lives in the bottom nav when Chat isn't
-    // enabled (we took its slot). To avoid surfacing Messages twice,
-    // hide the Profile row in that case. When Chat is enabled, the
-    // bottom-nav slot is Chat and Messages needs this row as its
-    // entry point (Discourse web nests PMs under the user menu the
-    // same way).
-    final showMessagesRow = siteContext.chatEnabled;
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: DesignTokens.spacingL,
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-          border: Border.all(
-            color: colorScheme.outlineVariant
-                .withValues(alpha: DesignTokens.opacityMediumLow),
-            width: 0.5,
-          ),
-        ),
-        child: Column(
-          children: [
-            if (showMessagesRow) ...[
-              _ActionRow(
-                icon: Icons.mail_outline,
-                title: 'Messages',
-                subtitle: 'Private messages and conversations',
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => MessagesPage(siteContext: siteContext),
-                  ),
-                ),
-              ),
-              Divider(
-                height: 1,
-                indent: 56,
-                color: colorScheme.outlineVariant
-                    .withValues(alpha: DesignTokens.opacityDivider),
-              ),
-            ],
-            _ActionRow(
-              icon: Icons.bookmark_outline,
-              title: 'Bookmarks',
-              subtitle: "Posts you've saved for later",
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => BookmarksPage(siteContext: siteContext),
-                ),
-              ),
-            ),
-            Divider(
-              height: 1,
-              indent: 56,
-              color: colorScheme.outlineVariant
-                  .withValues(alpha: DesignTokens.opacityDivider),
-            ),
-            _ActionRow(
-              icon: Icons.edit_note_outlined,
-              title: 'Drafts',
-              subtitle: 'Unfinished topics and replies',
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => DraftsListPage(siteContext: siteContext),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ActionRow extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-  const _ActionRow({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: DesignTokens.spacingL,
-          vertical: DesignTokens.spacingM,
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: colorScheme.onSurfaceVariant),
-            const SizedBox(width: DesignTokens.spacingM),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: textTheme.titleSmall
-                        ?.copyWith(
-                            fontWeight: DesignTokens.fontWeightSemiBold),
-                  ),
-                  Text(
-                    subtitle,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right,
-                size: 20, color: colorScheme.onSurfaceVariant),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// _ProfileActionsSection / _ActionRow moved into the shared
+// ProfileView (views/widgets/profile_view.dart) as part of the
+// profile unification.
