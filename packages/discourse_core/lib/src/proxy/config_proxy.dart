@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/models/results/fc_config_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
+import '../data/attachment/discourse_upload_limits.dart';
 
 /// Discourse implementation of [IFCConfigProxy].
 ///
@@ -62,6 +63,25 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       // Network error or unknown — leave the existing cached value
       // (defaults to false on a fresh install, true if a previous
       // probe succeeded).
+    }
+    // Upload limits — Discourse publishes every `client: true` site setting
+    // at `/site/settings.json` (SiteController#settings →
+    // SiteSetting.client_settings_json). That's where the upload caps live:
+    // authorized_extensions / authorized_extensions_for_staff /
+    // max_image_size_kb / max_attachment_size_kb. The XF-shaped
+    // FCConfigResult has no fields for these, so they're cached on the
+    // site context (same pattern as the chat probe above) and consumed by
+    // DiscourseAttachmentProxy and the composer's pre-upload validation.
+    // Fail soft: on any error the cache stays null and uploads fall back
+    // to server-side validation only.
+    try {
+      final settings = await apiGet('/site/settings.json');
+      siteContext
+          .setUploadLimits(DiscourseUploadLimits.fromClientSettings(settings));
+    } catch (e) {
+      // ignore: avoid_print
+      print('⚠️ [DISCOURSE_CONFIG] /site/settings.json failed '
+          '(upload limits unavailable, uploads fail open): $e');
     }
     return _buildResult(url, version: version, isOpen: isOpen);
   }

@@ -1,11 +1,14 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:discourse_core/discourse_core.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_user.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
+import 'package:forumcopilot_sdk/network/fc_call_result.dart';
 
 import '../config/app_forum_config.dart';
+import '../core/logging/app_logger.dart';
 
 /// Drives the Discourse User API Key login flow from the app side.
 ///
@@ -85,21 +88,13 @@ class DiscourseLoginService {
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     final cu = (data['current_user'] as Map<String, dynamic>?) ?? const {};
 
-    final user = _userFromCurrentUser(cu);
-    final result = FCLoginResult(
-      result: true,
-      resultText: '',
-      user: user,
-      // Discourse allows uploaded avatars for everyone by default
-      // (uploaded_avatars_allowed_groups). /session/current.json exposes no
-      // per-user flag for it, so enable the affordance and let the server
-      // 422 in the rare locked-down/SSO-override case.
-      canUploadAvatar: true,
-    );
+    final result = _loginResultFromCurrentUser(cu);
 
     siteContext.setLoginData(result);
     siteContext.resetOnLogin();
     await siteContext.saveToDevice();
+    // Cache the identity so future launches can restore it offline.
+    await siteContext.saveLoginSnapshot(result.toJson());
 
     return result;
   }
@@ -108,35 +103,210 @@ class DiscourseLoginService {
   /// hydrates the [SiteContext] with the persisted User API Key and pulls
   /// the current user. Call once during init so subsequent screens see the
   /// app as logged in. Returns `true` when a session was restored.
+  ///
+  /// Cache-first: `/session/current.json` failing **transiently** (rate
+  /// limit, 5xx, server down, airplane mode, timeout) must not sign the user
+  /// out — a valid User API Key plus the cached [FCLoginResult] snapshot from
+  /// the last successful fetch restore the session locally, and a background
+  /// revalidation retries the server later. Only a definitive 401/403 (key
+  /// revoked server-side) drops credentials.
   Future<bool> restorePersistedSession() async {
     await siteContext.loadUserApiCredentials();
     if (!siteContext.hasUserApiKey) return false;
 
+    String failureReason;
+    Duration? retryHint;
     try {
       final response = await _client.get(siteContext, '/session/current.json');
       if (response.statusCode == 401 || response.statusCode == 403) {
-        // Key revoked server-side. Drop locally.
+        // Key revoked server-side. Drop locally (this also deletes the
+        // cached login snapshot).
         await siteContext.clearUserApiCredentials();
         return false;
       }
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        return false;
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final cu = (data['current_user'] as Map<String, dynamic>?) ?? const {};
+        if (cu.isEmpty) return false;
+        final result = _loginResultFromCurrentUser(cu);
+        siteContext.setLoginData(result);
+        // Refresh the cached identity for future offline launches.
+        await siteContext.saveLoginSnapshot(result.toJson());
+        return true;
       }
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      final cu = (data['current_user'] as Map<String, dynamic>?) ?? const {};
-      if (cu.isEmpty) return false;
-      siteContext.setLoginData(FCLoginResult(
-        result: true,
-        resultText: '',
-        user: _userFromCurrentUser(cu),
-        // See beginLogin: no server flag exists; server-side enforcement.
-        canUploadAvatar: true,
-      ));
-      return true;
-    } catch (_) {
+      // Transient failure: 429 / 5xx / statusCode 0 (DiscourseClient maps
+      // network exceptions and timeouts to statusCode 0).
+      failureReason = _describeTransientFailure(response);
+      retryHint = _retryDelayFromResponse(response);
+    } catch (e) {
+      failureReason = e.toString();
+    }
+    return _restoreFromSnapshot(failureReason, retryHint);
+  }
+
+  /// Fall back to the cached login snapshot when the server could not be
+  /// reached. Returns `true` (and schedules a background revalidation) when
+  /// a usable snapshot exists; `false` otherwise (pre-fix behavior).
+  Future<bool> _restoreFromSnapshot(String reason, Duration? retryHint) async {
+    String? snapshotJson;
+    try {
+      snapshotJson = await siteContext.readLoginSnapshot();
+    } catch (e) {
+      AppLogger.warning(
+          'DiscourseLoginService: Could not read cached login snapshot: $e');
+    }
+    if (snapshotJson == null || snapshotJson.isEmpty) {
+      AppLogger.warning(
+          'DiscourseLoginService: Session restore failed ($reason) and no '
+          'cached login snapshot exists — starting signed out');
       return false;
     }
+
+    FCLoginResult cached;
+    try {
+      cached = FCLoginResultMapper.fromJson(snapshotJson);
+    } catch (e) {
+      AppLogger.warning(
+          'DiscourseLoginService: Cached login snapshot is unreadable ($e) — '
+          'starting signed out');
+      return false;
+    }
+    if (cached.user == null) return false;
+
+    siteContext.setLoginData(cached);
+    AppLogger.info(
+        'DiscourseLoginService: Restored session from cache (server '
+        'unreachable: $reason); will revalidate in background');
+    _scheduleRevalidation(
+        initialDelay: retryHint ?? const Duration(seconds: 30));
+    return true;
   }
+
+  /// True while a background revalidation loop is running. Static because
+  /// the service is constructed per-call sites; a single loop is enough for
+  /// this single-forum app.
+  static bool _revalidationInProgress = false;
+
+  /// Kick off a background retry of `/session/current.json` after restoring
+  /// from cache. Single guarded loop: up to [_maxRevalidationAttempts]
+  /// attempts with doubling backoff capped at [_maxRevalidationDelay]. Stops
+  /// on success (fresh login data + snapshot refresh) or on 401/403 (key
+  /// revoked: credentials + snapshot cleared and login state flipped so the
+  /// UI updates).
+  void _scheduleRevalidation({required Duration initialDelay}) {
+    if (_revalidationInProgress) return;
+    _revalidationInProgress = true;
+    unawaited(_revalidationLoop(initialDelay).whenComplete(() {
+      _revalidationInProgress = false;
+    }));
+  }
+
+  static const int _maxRevalidationAttempts = 5;
+  static const Duration _maxRevalidationDelay = Duration(minutes: 2);
+
+  Future<void> _revalidationLoop(Duration initialDelay) async {
+    var delay = _capDelay(initialDelay);
+    for (var attempt = 1; attempt <= _maxRevalidationAttempts; attempt++) {
+      await Future.delayed(delay);
+      if (!siteContext.hasUserApiKey) return; // logged out meanwhile
+      try {
+        final response =
+            await _client.get(siteContext, '/session/current.json');
+        if (response.statusCode == 401 || response.statusCode == 403) {
+          AppLogger.info(
+              'DiscourseLoginService: Background revalidation found the User '
+              'API Key revoked (HTTP ${response.statusCode}) — signing out');
+          await siteContext.clearUserApiCredentials();
+          // Flip login state so the UI (profile, badges) updates live.
+          siteContext.clearLoginData();
+          return;
+        }
+        if (response.statusCode >= 200 && response.statusCode < 300) {
+          final data = jsonDecode(response.body) as Map<String, dynamic>;
+          final cu =
+              (data['current_user'] as Map<String, dynamic>?) ?? const {};
+          if (cu.isNotEmpty) {
+            final result = _loginResultFromCurrentUser(cu);
+            siteContext.setLoginData(result);
+            await siteContext.saveLoginSnapshot(result.toJson());
+            AppLogger.info(
+                'DiscourseLoginService: Background revalidation confirmed '
+                'cached session (attempt $attempt)');
+          }
+          return;
+        }
+        // Still transient — back off (honoring a fresh 429 hint) and retry.
+        delay = _capDelay(_retryDelayFromResponse(response) ?? delay * 2);
+      } catch (_) {
+        delay = _capDelay(delay * 2);
+      }
+    }
+    AppLogger.warning(
+        'DiscourseLoginService: Background revalidation gave up after '
+        '$_maxRevalidationAttempts attempts; keeping cached session');
+  }
+
+  Duration _capDelay(Duration d) =>
+      d > _maxRevalidationDelay ? _maxRevalidationDelay : d;
+
+  /// Delay hint for a 429: `Retry-After` header first, then Discourse's
+  /// `extras.wait_seconds` body field. `null` for anything else.
+  Duration? _retryDelayFromResponse(FCCallResult response) {
+    if (response.statusCode != 429) return null;
+    final headerSecs = int.tryParse(response.headers['retry-after'] ?? '');
+    if (headerSecs != null && headerSecs > 0) {
+      return Duration(seconds: headerSecs);
+    }
+    try {
+      final body = jsonDecode(response.body);
+      final extras = (body is Map) ? body['extras'] : null;
+      final wait = (extras is Map) ? extras['wait_seconds'] : null;
+      if (wait is num && wait > 0) return Duration(seconds: wait.ceil());
+    } catch (_) {
+      // Not JSON — no hint.
+    }
+    return null;
+  }
+
+  String _describeTransientFailure(FCCallResult response) {
+    if (response.statusCode == 0) {
+      // DiscourseClient encodes the underlying exception in the body.
+      try {
+        final body = jsonDecode(response.body);
+        final error = (body is Map) ? body['error'] : null;
+        if (error is String && error.isNotEmpty) return error;
+      } catch (_) {}
+      return 'network error';
+    }
+    return 'HTTP ${response.statusCode}';
+  }
+
+  /// Build the [FCLoginResult] stored on the [SiteContext] (and cached as
+  /// the offline login snapshot) from a `/session/current.json`
+  /// `current_user` map.
+  FCLoginResult _loginResultFromCurrentUser(Map<String, dynamic> cu) {
+    return FCLoginResult(
+      result: true,
+      resultText: '',
+      user: _userFromCurrentUser(cu),
+      canUploadAvatar: _canUploadAvatar(cu),
+      // Composer/PM attachment buttons gate on these; Discourse has no
+      // per-user "can upload" signal (limits are authorized_extensions /
+      // max_*_size_kb, enforced pre-upload via DiscourseUploadLimits and
+      // server-side) — so any logged-in user may attach.
+      canUploadAttachment: true,
+      canUploadConversationAttachment: true,
+    );
+  }
+
+  /// `/session/current.json` exposes a real per-user avatar-upload signal:
+  /// current_user_serializer.rb serializes `can_upload_avatar`
+  /// (false when in anonymous mode or outside
+  /// `uploaded_avatars_allowed_groups`). Map it when present; on older
+  /// cores that predate the attribute stay permissive (`!= false`) and let
+  /// the server 422 the rare locked-down/SSO-override case.
+  bool _canUploadAvatar(Map<String, dynamic> cu) =>
+      cu['can_upload_avatar'] != false;
 
   FCUser _userFromCurrentUser(Map<String, dynamic> cu) {
     String? avatarUrl;

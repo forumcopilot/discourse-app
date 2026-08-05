@@ -422,6 +422,22 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       final fiveMinAgo = DateTime.now().subtract(const Duration(minutes: 5));
       final isOnline = lastSeenAt != null && lastSeenAt.isAfter(fiveMinAgo);
 
+      // Moderation affordances. The user JSON carries no can_suspend /
+      // can_silence flags, so mirror the server's guardian rules
+      // (lib/guardian.rb#can_suspend?, user_guardian.rb#can_silence_user?):
+      // viewer must be staff and the target must not be staff. Both
+      // actions are wired through DiscourseModerationProxy
+      // (/admin/users/{id}/suspend|silence.json), which moderators can
+      // call, so lighting the menu up for staff is honest.
+      final viewerIsStaff =
+          siteContext.loginDataOutput?.user?.canModerate == true;
+      final targetIsStaff =
+          user['admin'] == true || user['moderator'] == true;
+      final targetUsername = (user['username'] ?? '').toString();
+      final isSelf = targetUsername.toLowerCase() ==
+          (siteContext.currentUsername ?? '').toLowerCase();
+      final canModerateTarget = viewerIsStaff && !targetIsStaff && !isSelf;
+
       // `post_count` on UserSerializer is a staff-only attribute, so for
       // non-staff viewers it is simply absent and profiles would show 0.
       // When missing, fall back to /u/{username}/summary.json, whose
@@ -469,11 +485,19 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         acceptsFollowers: user['can_follow'] == true,
         followingCount: (user['total_following'] as int?) ?? 0,
         followerCount: (user['total_followers'] as int?) ?? 0,
-        canBan: false,
-        isBanned: user['suspended'] == true,
+        canBan: canModerateTarget,
+        // The serializer has no `suspended` boolean — it includes
+        // `suspended_till` (and `suspend_reason`) only while the
+        // suspension is active (user_card_serializer.rb
+        // include_suspended_till? => object.suspended?), so presence of
+        // the key IS the suspended signal.
+        isBanned: user['suspended_till'] != null,
         isIgnored: user['ignored'] == true,
-        canSpamClean: false,
-        canBeReported: true,
+        canSpamClean: canModerateTarget,
+        // Discourse has no per-user report action (reportUserAsync
+        // intentionally returns guidance to flag posts instead), so
+        // don't advertise one. Post-level flagging stays fully wired.
+        canBeReported: false,
         userGroups: groups,
         customFields: customFields,
         canModerate: user['moderator'] == true,

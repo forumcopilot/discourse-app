@@ -74,6 +74,8 @@ extension DiscourseSiteContextExtension on SiteContext {
   }
 
   /// Wipe credentials from memory, secure storage, and SharedPreferences.
+  /// Also drops the cached login snapshot ([saveLoginSnapshot]) — a cleared
+  /// key must never leave a stale "logged in" identity behind.
   Future<void> clearUserApiCredentials() async {
     final data = _data();
     data.remove('userApiKey');
@@ -86,6 +88,32 @@ extension DiscourseSiteContextExtension on SiteContext {
     await prefs.remove('${prefix}_user_api_key');
     await prefs.remove('${prefix}_user_api_client_id');
     await prefs.remove('${prefix}_user_api_push_enabled');
+    await prefs.remove('${prefix}_login_snapshot');
+  }
+
+  // ===== Cached login snapshot (offline session restore) =====
+  //
+  // `/session/current.json` is re-fetched at every launch to hydrate the
+  // login state. When that call fails transiently (rate limit, server down,
+  // airplane mode) the app must still boot logged-in with the identity from
+  // the last successful fetch. The snapshot is the serialized FCLoginResult
+  // JSON (dart_mappable `toJson()` string), stored alongside the other
+  // `discourse:<pluginUrl>` prefs. It contains no secrets — the User API Key
+  // itself stays in secure storage.
+
+  /// Persist the serialized [FCLoginResult] of a successful login/session
+  /// fetch so future launches can restore identity while offline.
+  Future<void> saveLoginSnapshot(String loginResultJson) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('${_prefsPrefix()}_login_snapshot', loginResultJson);
+  }
+
+  /// The serialized [FCLoginResult] from the last successful login/session
+  /// fetch, or `null` when none was stored (never logged in, or logged out —
+  /// [clearUserApiCredentials] deletes it).
+  Future<String?> readLoginSnapshot() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('${_prefsPrefix()}_login_snapshot');
   }
 
   /// Hydrate in-memory credentials from storage. Call once at app start

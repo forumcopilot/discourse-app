@@ -448,17 +448,18 @@ class _MessageComposePageState extends State<MessageComposePage> {
   void _handleFileUpload() async {
     if (widget.onFileUpload == null) return;
     try {
-      // Get constraints from SiteContext
+      // Get constraints from SiteContext (generic/attachment-sized;
+      // re-derived below once we know whether the picked file is an image).
       final siteContext = getCurrentSiteContext();
-      final constraints = getAttachmentConstraintsFromSiteContext(siteContext);
+      final pickConstraints = getAttachmentConstraintsFromSiteContext(siteContext);
 
       // Check attachment count limit before file selection
-      if (!canAddMoreAttachments(_attachments.length, constraints)) {
+      if (!canAddMoreAttachments(_attachments.length, pickConstraints)) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Maximum of ${constraints!.count} attachment(s) allowed',
+                'Maximum of ${pickConstraints!.count} attachment(s) allowed',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onErrorContainer,
                     ),
@@ -472,16 +473,25 @@ class _MessageComposePageState extends State<MessageComposePage> {
         return;
       }
 
-      final XFile? file = await FilePickerUtils.pickFile();
+      // Restrict the picker to the forum's authorized extensions when known.
+      final XFile? file = await FilePickerUtils.pickFile(
+        allowedExtensions: pickConstraints?.extensions,
+      );
 
       if (file != null && mounted) {
         // Hide keyboard when file is selected to focus on upload progress
         FocusScope.of(context).unfocus();
-        
-        // Validate file
+
+        // Validate file — re-derive constraints now that we know whether
+        // it's an image (Discourse caps images at max_image_size_kb and
+        // everything else at max_attachment_size_kb).
         XFile fileToUpload = file;
+        final isImage = isImageFile(file.name);
+        final constraints = getAttachmentConstraintsFromSiteContext(
+          siteContext,
+          isImage: isImage,
+        );
         if (constraints != null) {
-          final isImage = isImageFile(file.name);
           final validation = await validateFile(
             file,
             constraints,
@@ -640,9 +650,11 @@ class _MessageComposePageState extends State<MessageComposePage> {
   void _handleImageUpload() async {
     if (widget.onFileUpload == null) return;
     try {
-      // Get constraints from SiteContext
+      // Get constraints from SiteContext (image-sized: Discourse caps
+      // images at max_image_size_kb rather than max_attachment_size_kb).
       final siteContext = getCurrentSiteContext();
-      final constraints = getAttachmentConstraintsFromSiteContext(siteContext);
+      final constraints =
+          getAttachmentConstraintsFromSiteContext(siteContext, isImage: true);
 
       // Check attachment count limit before file selection
       if (!canAddMoreAttachments(_attachments.length, constraints)) {

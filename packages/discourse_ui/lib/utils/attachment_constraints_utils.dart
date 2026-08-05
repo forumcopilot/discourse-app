@@ -1,3 +1,5 @@
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseUploadLimitsContext;
 import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -38,10 +40,41 @@ FCAttachmentConstraints? getAttachmentConstraintsFromLogin(FCLoginResult loginRe
   );
 }
 
-/// Gets attachment constraints from current SiteContext
-FCAttachmentConstraints? getAttachmentConstraintsFromSiteContext(SiteContext? siteContext) {
+/// Gets attachment constraints from current SiteContext.
+///
+/// Prefers the Discourse-native upload limits cached on the context by
+/// `DiscourseConfigProxy` (from `/site/settings.json`:
+/// authorized_extensions / max_image_size_kb / max_attachment_size_kb);
+/// falls back to the XF-era login-result fields when the fetch hasn't
+/// happened, and returns null (no restrictions — fail open) when neither
+/// source is available.
+///
+/// [isImage] selects which Discourse size cap applies: true →
+/// max_image_size_kb, false/null → max_attachment_size_kb. Callers that
+/// pick generic files should re-derive constraints once they know whether
+/// the chosen file is an image.
+FCAttachmentConstraints? getAttachmentConstraintsFromSiteContext(
+  SiteContext? siteContext, {
+  bool? isImage,
+}) {
   if (siteContext == null) {
     return null;
+  }
+
+  final limits = siteContext.uploadLimits;
+  if (limits != null) {
+    final userType = siteContext.loginDataOutput?.user?.userType;
+    final isStaff = userType == 'admin' || userType == 'moderator';
+    final sizeKb =
+        (isImage ?? false) ? limits.maxImageSizeKb : limits.maxAttachmentSizeKb;
+    return FCAttachmentConstraints(
+      // null when the wildcard '*' authorizes everything (fail open).
+      extensions: limits.effectiveExtensions(staff: isStaff),
+      size: sizeKb == null ? null : sizeKb * 1024,
+      // Discourse's max_image_width/height are display dimensions, not
+      // upload limits, and there is no per-post attachment cap — leave
+      // width/height/count unset.
+    );
   }
 
   final loginResult = siteContext.loginDataOutput;

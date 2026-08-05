@@ -10,6 +10,7 @@ import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
+import '../data/attachment/discourse_upload_limits.dart';
 
 /// Discourse implementation of [IFCAttachmentProxy].
 ///
@@ -115,6 +116,17 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
     required String uploadType,
     bool forPrivateMessage = false,
   }) async {
+    // Pre-flight validation against the site's published upload limits
+    // (`/site/settings.json`, cached on the context by
+    // DiscourseConfigProxy). Catching violations here — for every caller:
+    // composer attachments, PM attachments, avatars — turns a guaranteed
+    // server 422 into an immediate, friendly message. When the limits were
+    // never fetched (uploadLimits == null) we fail open and let the server
+    // decide.
+    final rejection = _validateAgainstLimits(filename, bytes.length);
+    if (rejection != null) {
+      return FCAttachmentUploadResult(result: false, resultText: rejection);
+    }
     try {
       await FCDioClient.instance.initialize();
       final base = Uri.parse(siteContext.site.url);
@@ -178,6 +190,40 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
         resultText: 'Upload error: $e',
       );
     }
+  }
+
+  /// Returns a user-facing rejection message when [filename]/[sizeBytes]
+  /// violate the cached [DiscourseUploadLimits], or null when the upload
+  /// may proceed (including when limits are unknown — fail open).
+  String? _validateAgainstLimits(String filename, int sizeBytes) {
+    final limits = siteContext.uploadLimits;
+    if (limits == null) return null;
+
+    // Staff (admins/moderators) get the additive staff extension list —
+    // mirrors authorized_extensions_for_staff semantics in
+    // lib/validators/upload_validator.rb.
+    final userType = siteContext.loginDataOutput?.user?.userType;
+    final isStaff = userType == 'admin' || userType == 'moderator';
+
+    if (!limits.allowsFilename(filename, staff: isStaff)) {
+      final allowed = limits.effectiveExtensions(staff: isStaff);
+      final ext = DiscourseUploadLimits.extensionOf(filename);
+      final label = ext.isEmpty ? 'This file type' : '.$ext files are';
+      final list = (allowed == null || allowed.isEmpty)
+          ? ''
+          : ' Allowed types: ${allowed.map((e) => e.toUpperCase()).join(', ')}.';
+      return '$label not allowed on this forum.$list';
+    }
+
+    final maxBytes = limits.maxSizeBytesFor(filename);
+    if (maxBytes != null && sizeBytes > maxBytes) {
+      final isImage = DiscourseUploadLimits.isImageFilename(filename);
+      final kb = isImage ? limits.maxImageSizeKb! : limits.maxAttachmentSizeKb!;
+      final kind = isImage ? 'Images' : 'Files';
+      return '$kind can be up to ${DiscourseUploadLimits.formatKb(kb)} '
+          '(this one is ${DiscourseUploadLimits.formatKb((sizeBytes / 1024).ceil())}).';
+    }
+    return null;
   }
 
   String? _resolveImageUrl(FCAttachmentUploadResult upload) {

@@ -112,20 +112,24 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
       return;
     }
 
-    // Get constraints from SiteContext
+    // Get constraints from SiteContext (generic/attachment-sized; re-derived
+    // below once we know whether the picked file is an image).
     final siteContext = getCurrentSiteContext();
-    final constraints = getAttachmentConstraintsFromSiteContext(siteContext);
+    final pickConstraints = getAttachmentConstraintsFromSiteContext(siteContext);
 
     // Check attachment count limit before file selection
-    if (!canAddMoreAttachments(attachments.length, constraints)) {
+    if (!canAddMoreAttachments(attachments.length, pickConstraints)) {
       if (mounted) {
-        SnackbarHelper.showError(context, 'Maximum of ${constraints!.count} attachment(s) allowed');
+        SnackbarHelper.showError(context, 'Maximum of ${pickConstraints!.count} attachment(s) allowed');
       }
       return;
     }
 
     debugPrint('🔍 [HANDLE_FILE] Calling FilePickerUtils.pickFile()...');
-    final XFile? file = await FilePickerUtils.pickFile();
+    // Restrict the picker to the forum's authorized extensions when known.
+    final XFile? file = await FilePickerUtils.pickFile(
+      allowedExtensions: pickConstraints?.extensions,
+    );
 
     debugPrint('🔍 [HANDLE_FILE] File picker returned: ${file != null ? "not null" : "null"}');
     if (file != null) {
@@ -138,9 +142,13 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
         FocusScope.of(context).unfocus();
       }
 
-      // Validate file
+      // Validate file — re-derive constraints now that we know whether it's
+      // an image (Discourse caps images at max_image_size_kb and everything
+      // else at max_attachment_size_kb).
+      final isImage = isImageFile(file.name);
+      final constraints =
+          getAttachmentConstraintsFromSiteContext(siteContext, isImage: isImage);
       if (constraints != null) {
-        final isImage = isImageFile(file.name);
         final validation = await validateFile(
           file,
           constraints,
@@ -259,9 +267,11 @@ mixin AttachmentUploadMixin<T extends StatefulWidget> on State<T> {
   Future<void> handleImageAttachment(String type, String forumId, {bool allowMultiple = false}) async {
     if (isUploading) return;
 
-    // Get constraints from SiteContext
+    // Get constraints from SiteContext (image-sized: Discourse caps images
+    // at max_image_size_kb rather than max_attachment_size_kb).
     final siteContext = getCurrentSiteContext();
-    final constraints = getAttachmentConstraintsFromSiteContext(siteContext);
+    final constraints =
+        getAttachmentConstraintsFromSiteContext(siteContext, isImage: true);
 
     // Check attachment count limit before file selection
     if (!canAddMoreAttachments(attachments.length, constraints)) {

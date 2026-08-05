@@ -10,12 +10,17 @@ import 'package:path/path.dart' as path;
 class FilePickerUtils {
   /// Pick a file (any type) - uses file_picker on all platforms
   /// This allows iOS/Android users to select non-image files via the paperclip icon
+  ///
+  /// [allowedExtensions] (lowercase, no dots) restricts the picker to the
+  /// forum's authorized upload types. Null/empty means no restriction.
   /// Returns null if user cancels or an error occurs
-  static Future<XFile?> pickFile() async {
+  static Future<XFile?> pickFile({List<String>? allowedExtensions}) async {
     try {
       debugPrint('🔍 [FILE_PICKER] Starting file picker...');
+      final hasFilter = allowedExtensions != null && allowedExtensions.isNotEmpty;
       final result = await FilePicker.platform.pickFiles(
-        type: FileType.any,
+        type: hasFilter ? FileType.custom : FileType.any,
+        allowedExtensions: hasFilter ? allowedExtensions : null,
         allowMultiple: false,
       );
 
@@ -272,11 +277,19 @@ class FilePickerUtils {
   }
 
   /// Pick multiple files - uses file_picker on all platforms
+  ///
+  /// [allowedExtensions] (lowercase, no dots) restricts the picker to the
+  /// forum's authorized upload types. Null/empty means no restriction.
   /// Returns empty list if user cancels or an error occurs
-  static Future<List<XFile>> pickFiles({bool allowMultiple = true}) async {
+  static Future<List<XFile>> pickFiles({
+    bool allowMultiple = true,
+    List<String>? allowedExtensions,
+  }) async {
     try {
+      final hasFilter = allowedExtensions != null && allowedExtensions.isNotEmpty;
       final result = await FilePicker.platform.pickFiles(
-        type: FileType.any,
+        type: hasFilter ? FileType.custom : FileType.any,
+        allowedExtensions: hasFilter ? allowedExtensions : null,
         allowMultiple: allowMultiple,
       );
 
