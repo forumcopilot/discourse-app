@@ -30,7 +30,7 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
   bool _hasLoaded = false;
   bool _isInitialLoading = false;
 
-  LatestTopicController? _latestTopicController;
+  DiscourseLatestTopicController? _latestTopicController;
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
   final int _pageSize = 20;
@@ -50,10 +50,10 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
       if (mounted) {
         setState(() {});
       }
-      if (!Get.isRegistered<LatestTopicController>()) {
+      if (!Get.isRegistered<DiscourseLatestTopicController>()) {
         _initializeController();
       } else {
-        _latestTopicController = Get.find<LatestTopicController>();
+        _latestTopicController = Get.find<DiscourseLatestTopicController>();
         if (!_hasLoaded) {
           _initializeData();
         }
@@ -85,10 +85,10 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
   }
 
   Future<void> _initializeController() async {
-    if (Get.isRegistered<LatestTopicController>()) {
-      Get.delete<LatestTopicController>();
+    if (Get.isRegistered<DiscourseLatestTopicController>()) {
+      Get.delete<DiscourseLatestTopicController>();
     }
-    _latestTopicController = Get.put(LatestTopicController());
+    _latestTopicController = Get.put(DiscourseLatestTopicController());
     // Don't call _initializeData() here - let didUpdateWidget() or initState() handle it
     if (widget.isActive && !_hasLoaded) {
       await _initializeData();
@@ -124,8 +124,8 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
       );
       _latestTopicController!.fcTopics.clear();
     }
-    if (Get.isRegistered<LatestTopicController>()) {
-      Get.delete<LatestTopicController>();
+    if (Get.isRegistered<DiscourseLatestTopicController>()) {
+      Get.delete<DiscourseLatestTopicController>();
     }
     _latestTopicController = null;
   }
@@ -233,10 +233,10 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
           topic: topic,
           onTap: () async {
             if (!widget.siteContext.isLoggedIn) {
-              if (!Get.isRegistered<LoginController>()) {
-                Get.put(LoginController());
+              if (!Get.isRegistered<DiscourseLoginController>()) {
+                Get.put(DiscourseLoginController());
               }
-              final loginController = Get.find<LoginController>();
+              final loginController = Get.find<DiscourseLoginController>();
               final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
               if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
                 await Get.to(() => LoginPage(siteContext: widget.siteContext));
@@ -466,10 +466,10 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
                       topic: topic,
                       onTap: () async {
                         if (!widget.siteContext.isLoggedIn) {
-                          if (!Get.isRegistered<LoginController>()) {
-                            Get.put(LoginController());
+                          if (!Get.isRegistered<DiscourseLoginController>()) {
+                            Get.put(DiscourseLoginController());
                           }
-                          final loginController = Get.find<LoginController>();
+                          final loginController = Get.find<DiscourseLoginController>();
                           final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
                           if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
                             await Get.to(() => LoginPage(siteContext: widget.siteContext));

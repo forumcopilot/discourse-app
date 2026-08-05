@@ -7,15 +7,15 @@ import 'package:discourse_ui/core/errors/error_handling_mixins.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 
 /// Controller for managing notification settings UI
-class NotificationSettingsController extends GetxController with ErrorHandlingMixin {
-  static NotificationSettingsController get to => Get.find();
+class DiscourseNotificationSettingsController extends GetxController with ErrorHandlingMixin {
+  static DiscourseNotificationSettingsController get to => Get.find();
 
   final NotificationPreferencesService _preferencesService = NotificationPreferencesService();
   
   /// Get push notification controller, returns null if not registered
-  PushNotificationController? get _pushController {
-    if (Get.isRegistered<PushNotificationController>()) {
-      return Get.find<PushNotificationController>();
+  DiscoursePushNotificationController? get _pushController {
+    if (Get.isRegistered<DiscoursePushNotificationController>()) {
+      return Get.find<DiscoursePushNotificationController>();
     }
     return null;
   }
@@ -352,6 +352,6 @@ class NotificationSettingsController extends GetxController with ErrorHandlingMi
 
   /// Get summary for logging
   String getSummary() {
-    return 'NotificationSettingsController(loading: $_isLoading, selectedForum: $_selectedForumId, cachedPreferences: ${_preferencesCache.length})';
+    return 'DiscourseNotificationSettingsController(loading: $_isLoading, selectedForum: $_selectedForumId, cachedPreferences: ${_preferencesCache.length})';
   }
 }

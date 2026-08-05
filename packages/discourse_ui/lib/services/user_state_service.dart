@@ -6,8 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../controllers/site_controller.dart';
 
 /// Service to manage user state logic and provide UI information
-class UserStateService extends GetxService {
-  static UserStateService get to => Get.find<UserStateService>();
+class DiscourseUserStateService extends GetxService {
+  static DiscourseUserStateService get to => Get.find<DiscourseUserStateService>();
 
   // Observable to track dismissed banners (public so banner can observe it)
   final RxSet<String> dismissedBanners = <String>{}.obs;
@@ -17,7 +17,7 @@ class UserStateService extends GetxService {
 
   /// Get the current user state from the active site
   String? getCurrentUserState() {
-    final siteController = Get.find<SiteController>();
+    final siteController = Get.find<DiscourseSiteController>();
     final currentSiteContext = siteController.currentSiteContext.value;
     if (currentSiteContext == null) return null;
 
@@ -114,7 +114,7 @@ class UserStateService extends GetxService {
 
   /// Check if banner should be shown for the current user state
   bool shouldShowBanner() {
-    final siteController = Get.find<SiteController>();
+    final siteController = Get.find<DiscourseSiteController>();
     final currentSiteContext = siteController.currentSiteContext.value;
     if (currentSiteContext == null) return false;
 

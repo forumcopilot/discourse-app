@@ -58,7 +58,7 @@ class _ForumCopilotAppState extends State<ForumCopilotApp> {
   void initState() {
     super.initState();
     // Initialize controllers
-    Get.put(GlobalLoaderController());
+    Get.put(DiscourseGlobalLoaderController());
     setupErrorHandling();
     // Load settings including locale
     SettingsContext.instance.loadFromDevice();
@@ -66,7 +66,7 @@ class _ForumCopilotAppState extends State<ForumCopilotApp> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(SiteController());
+    Get.put(DiscourseSiteController());
 
     return Obx(() {
       // Get locale from settings, or use null for system default
@@ -113,7 +113,7 @@ class _ForumCopilotAppState extends State<ForumCopilotApp> {
                   children: [
                     child ?? const SizedBox.shrink(),
                     Obx(() {
-                      return GlobalLoaderController.to.isLoading
+                      return DiscourseGlobalLoaderController.to.isLoading
                           ? Container(
                               color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
                               child: Center(

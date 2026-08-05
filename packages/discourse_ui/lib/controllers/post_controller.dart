@@ -11,7 +11,7 @@ import 'package:discourse_ui/core/logging/app_logger.dart';
 
 enum LoadMode { initial, earlier, later }
 
-class PostController extends GlobalLoaderController with ErrorHandlingMixin {
+class PostController extends DiscourseGlobalLoaderController with ErrorHandlingMixin {
   // Observable state to track initialization
   var isInitialized = false.obs;
   final Rx<ThreadViewData?> threadDataOutput = Rx<ThreadViewData?>(null);

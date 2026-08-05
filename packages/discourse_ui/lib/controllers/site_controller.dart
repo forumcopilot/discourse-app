@@ -16,8 +16,8 @@ import 'package:discourse_ui/core/async/async_utils.dart';
 import 'global_loader_controller.dart';
 import '../models/site_visit_history.dart';
 
-/// SiteController manages site initialization with timeout support
-class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
+/// DiscourseSiteController manages site initialization with timeout support
+class DiscourseSiteController extends DiscourseGlobalLoaderController with ErrorHandlingMixin {
   // Observable state to track initialization
   var isInitialized = false.obs;
   var hasError = false.obs;
@@ -32,7 +32,7 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
   // Stream subscriptions for cleanup
   StreamSubscription? _settingsSubscription;
 
-  SiteController() {
+  DiscourseSiteController() {
     // Don't auto-initialize, wait for user to select a site
   }
 
@@ -46,7 +46,7 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
   }
 
   Future<void> _initializeApp() async {
-    GlobalLoaderController.to.show();
+    DiscourseGlobalLoaderController.to.show();
     try {
       // Initialize settings first - run in background to avoid blocking UI
       AppLogger.info('Initializing settings...');
@@ -61,11 +61,11 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
       AppLogger.info('App initialized - waiting for site selection');
       isInitialized.value = false;
     } catch (e, stackTrace) {
-      await handleError(e, stackTrace, context: 'SiteController._initializeApp');
+      await handleError(e, stackTrace, context: 'DiscourseSiteController._initializeApp');
       // On error, reset to uninitialized state
       isInitialized.value = false;
     } finally {
-      GlobalLoaderController.to.hide();
+      DiscourseGlobalLoaderController.to.hide();
     }
   }
 
@@ -86,7 +86,7 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
       await handleError(
         ValidationException.invalidInput('site URL'),
         StackTrace.current,
-        context: 'SiteController.initializeSite',
+        context: 'DiscourseSiteController.initializeSite',
       );
       hasError.value = true;
       errorMessage.value = 'Invalid site: URL is empty';
@@ -102,7 +102,7 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
     if (shouldInitialize) {
       AppLogger.info('Proceeding with site initialization...');
       if (showGlobalLoader) {
-        GlobalLoaderController.to.show();
+        DiscourseGlobalLoaderController.to.show();
       }
       currentSite.value = site;
       AppLogger.debug('Setting currentSite: ${site.name}, backgroundUrl: ${site.backgroundUrl}, logoUrl: ${site.logoUrl}');
@@ -122,12 +122,12 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
       } catch (e, stackTrace) {
         // Force hide loader completely - call hide multiple times to ensure counter reaches 0
         // This is necessary because show() might have been called multiple times
-        if (showGlobalLoader && Get.isRegistered<GlobalLoaderController>()) {
-          GlobalLoaderController.to.forceHide();
+        if (showGlobalLoader && Get.isRegistered<DiscourseGlobalLoaderController>()) {
+          DiscourseGlobalLoaderController.to.forceHide();
         }
 
         // Log error but don't show dialog (we'll show our custom dialog instead)
-        await handleError(e, stackTrace, context: 'SiteController.initializeSite', showToUser: false);
+        await handleError(e, stackTrace, context: 'DiscourseSiteController.initializeSite', showToUser: false);
         // Set error state
         hasError.value = true;
         errorMessage.value = 'Failed to connect to ${site.name}';
@@ -152,8 +152,8 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
         _showErrorDialog(site, userFriendlyMessage);
       } finally {
         // Ensure loader is hidden (safe to call even if already hidden)
-        if (showGlobalLoader && Get.isRegistered<GlobalLoaderController>()) {
-          GlobalLoaderController.to.forceHide();
+        if (showGlobalLoader && Get.isRegistered<DiscourseGlobalLoaderController>()) {
+          DiscourseGlobalLoaderController.to.forceHide();
         }
       }
     } else {
@@ -175,10 +175,10 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
   /// Uses silentRelogin so we only try cookies + password (no passkey UI) when session expires.
   void attachReloginHandler(SiteContext siteContext) {
     siteContext.reloginHandler = (context) async {
-      if (!Get.isRegistered<LoginController>()) {
-        Get.put(LoginController());
+      if (!Get.isRegistered<DiscourseLoginController>()) {
+        Get.put(DiscourseLoginController());
       }
-      final loginController = Get.find<LoginController>();
+      final loginController = Get.find<DiscourseLoginController>();
       final result = await loginController.attemptAutomaticLogin(
         context,
         silentRelogin: true,
@@ -204,7 +204,7 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
       return siteContext;
     } catch (e, stackTrace) {
       // Log error but don't show dialog (dialog will be shown by initializeSite catch block)
-      await handleError(e, stackTrace, context: 'SiteController._initializeSiteWithTimeout', showToUser: false);
+      await handleError(e, stackTrace, context: 'DiscourseSiteController._initializeSiteWithTimeout', showToUser: false);
       rethrow;
     }
   }
@@ -264,9 +264,9 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
     AppLogger.debug('Plugin URL set to: $pluginUrl');
 
     // Attempt automatic login if credentials are available
-    AppLogger.debug('Setting up LoginController...');
-    if (!Get.isRegistered<LoginController>()) {
-      Get.put(LoginController());
+    AppLogger.debug('Setting up DiscourseLoginController...');
+    if (!Get.isRegistered<DiscourseLoginController>()) {
+      Get.put(DiscourseLoginController());
     }
 
     AppLogger.info('Attempting automatic login...');
@@ -274,7 +274,7 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
     AppLogger.debug('Username before auto-login: ${siteContext.username}');
     AppLogger.debug('Password before auto-login: ${siteContext.password != null ? "[PRESENT]" : "[NULL]"}');
 
-    final loginController = Get.find<LoginController>();
+    final loginController = Get.find<DiscourseLoginController>();
     final loginResult = await loginController.attemptAutomaticLogin(siteContext);
 
     if (loginResult.success) {
@@ -315,15 +315,15 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
     try {
       AppLogger.info('Setting up controllers for automatic login...');
 
-      if (!Get.isRegistered<LoginController>()) {
-        Get.put(LoginController());
+      if (!Get.isRegistered<DiscourseLoginController>()) {
+        Get.put(DiscourseLoginController());
       }
 
       AppLogger.debug('Current login state before auto-login: ${siteContext.isLoginInformationAvailable}');
       AppLogger.debug('Username before auto-login: ${siteContext.username}');
       AppLogger.debug('Password before auto-login: ${siteContext.password != null ? "[PRESENT]" : "[NULL]"}');
 
-      final loginController = Get.find<LoginController>();
+      final loginController = Get.find<DiscourseLoginController>();
       final loginResult = await loginController.attemptAutomaticLogin(siteContext);
 
       if (loginResult.success) {
@@ -341,24 +341,24 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
       }
       AppLogger.debug('Final login state after auto-login: ${siteContext.isLoginInformationAvailable}');
     } catch (e, stackTrace) {
-      await handleError(e, stackTrace, context: 'SiteController._attemptAutomaticLoginForInitializedSite');
+      await handleError(e, stackTrace, context: 'DiscourseSiteController._attemptAutomaticLoginForInitializedSite');
     }
   }
 
   void _showErrorDialog(Site site, String error) {
     // Force hide any active loader before showing error dialog
     try {
-      if (Get.isRegistered<GlobalLoaderController>()) {
+      if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
         // Call hide multiple times to ensure counter reaches 0
         int hideAttempts = 0;
         const maxHideAttempts = 10; // Safety limit
-        while (GlobalLoaderController.to.isLoading && hideAttempts < maxHideAttempts) {
-          GlobalLoaderController.to.hide();
+        while (DiscourseGlobalLoaderController.to.isLoading && hideAttempts < maxHideAttempts) {
+          DiscourseGlobalLoaderController.to.hide();
           hideAttempts++;
         }
       }
     } catch (e) {
-      // Ignore if GlobalLoaderController is not available
+      // Ignore if DiscourseGlobalLoaderController is not available
     }
 
     final context = Get.context;
@@ -379,11 +379,11 @@ class SiteController extends GlobalLoaderController with ErrorHandlingMixin {
           if (!context.mounted) return;
 
           // Double-check loader is still hidden
-          if (Get.isRegistered<GlobalLoaderController>() && GlobalLoaderController.to.isLoading) {
+          if (Get.isRegistered<DiscourseGlobalLoaderController>() && DiscourseGlobalLoaderController.to.isLoading) {
             int hideAttempts = 0;
             const maxHideAttempts = 10; // Safety limit
-            while (GlobalLoaderController.to.isLoading && hideAttempts < maxHideAttempts) {
-              GlobalLoaderController.to.hide();
+            while (DiscourseGlobalLoaderController.to.isLoading && hideAttempts < maxHideAttempts) {
+              DiscourseGlobalLoaderController.to.hide();
               hideAttempts++;
             }
             // Wait one more frame if loader was still showing

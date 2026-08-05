@@ -758,7 +758,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
 
   /// Extract domain name from forum URL
   String _getSiteDomain() {
-    final siteController = Get.put(SiteController());
+    final siteController = Get.put(DiscourseSiteController());
     final siteUrl = siteController.currentSite.value?.url;
 
     if (siteUrl == null || siteUrl.isEmpty) {
@@ -1133,7 +1133,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
 
     // Account is valid, attempt automatic login
     try {
-      final loginController = Get.put(LoginController());
+      final loginController = Get.put(DiscourseLoginController());
       debugPrint('[RegisterPage] Attempting automatic login after registration');
 
       final loginSuccess = await loginController.handleLogin(

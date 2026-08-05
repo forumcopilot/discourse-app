@@ -52,8 +52,8 @@ class AutoLoginResult {
   });
 }
 
-class LoginController extends GetxController with ErrorHandlingMixin {
-  static LoginController get to => Get.find();
+class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
+  static DiscourseLoginController get to => Get.find();
 
   /// True on iOS/Android where passkey APIs are available; false on web/desktop.
   static bool get isPasskeySupportedByPlatform =>
@@ -89,7 +89,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
     bool showSuccessMessage = false,
   }) async {
     if (showLoader) {
-      GlobalLoaderController.to.show();
+      DiscourseGlobalLoaderController.to.show();
     }
 
     try {
@@ -122,7 +122,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       if (loginResult.tfaRequired == true) {
         // Hide loader before showing TFA dialog
         if (showLoader) {
-          GlobalLoaderController.to.hide();
+          DiscourseGlobalLoaderController.to.hide();
         }
 
         // Show TFA input dialog
@@ -145,7 +145,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
 
           // Show loader for TFA verification
           if (showLoader) {
-            GlobalLoaderController.to.show();
+            DiscourseGlobalLoaderController.to.show();
           }
 
           try {
@@ -207,13 +207,13 @@ class LoginController extends GetxController with ErrorHandlingMixin {
               errorMessage =
                   tfaLoginResult.resultText ?? 'Invalid authentication code';
               if (showLoader) {
-                GlobalLoaderController.to.hide();
+                DiscourseGlobalLoaderController.to.hide();
               }
               // Loop will continue to show dialog again with error message
             }
           } catch (e) {
             if (showLoader) {
-              GlobalLoaderController.to.hide();
+              DiscourseGlobalLoaderController.to.hide();
             }
             errorMessage =
                 'An error occurred during verification. Please try again.';
@@ -247,8 +247,8 @@ class LoginController extends GetxController with ErrorHandlingMixin {
 
         // Show result_text as a popup dialog if not empty (e.g., warnings), otherwise show success toast
         // Hide loader before showing dialogs (forceHide in case show() was called more than hide())
-        if (showLoader && Get.isRegistered<GlobalLoaderController>()) {
-          GlobalLoaderController.to.forceHide();
+        if (showLoader && Get.isRegistered<DiscourseGlobalLoaderController>()) {
+          DiscourseGlobalLoaderController.to.forceHide();
         }
 
         // Register for push notifications asynchronously (don't await to avoid blocking navigation)
@@ -257,7 +257,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
         Future.microtask(() async {
           AppLogger.debug(
               '🔔 [LOGIN] Attempting to register for push notifications...');
-          final siteController = Get.find<SiteController>();
+          final siteController = Get.find<DiscourseSiteController>();
           if (siteController.currentSite.value != null) {
             AppLogger.debug(
                 '🔔 [LOGIN] Current forum found: ${siteController.currentSite.value!.name}');
@@ -279,7 +279,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       } else {
         // Handle login failure - hide loader first, then show API's resultText if available
         if (showLoader) {
-          GlobalLoaderController.to.hide();
+          DiscourseGlobalLoaderController.to.hide();
         }
 
         String errorMessage = 'Login failed';
@@ -292,32 +292,32 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       }
     } on FCApiException catch (e) {
       if (showLoader) {
-        GlobalLoaderController.to.hide();
+        DiscourseGlobalLoaderController.to.hide();
       }
-      await handleAuthError(e, context: 'LoginController.handleLogin');
+      await handleAuthError(e, context: 'DiscourseLoginController.handleLogin');
       return false;
     } on ValidationException catch (e) {
       if (showLoader) {
-        GlobalLoaderController.to.hide();
+        DiscourseGlobalLoaderController.to.hide();
       }
-      await handleAppException(e, context: 'LoginController.handleLogin');
+      await handleAppException(e, context: 'DiscourseLoginController.handleLogin');
       return false;
     } on AuthenticationException catch (e) {
       if (showLoader) {
-        GlobalLoaderController.to.hide();
+        DiscourseGlobalLoaderController.to.hide();
       }
-      await handleAppException(e, context: 'LoginController.handleLogin');
+      await handleAppException(e, context: 'DiscourseLoginController.handleLogin');
       return false;
     } catch (e, stackTrace) {
       if (showLoader) {
-        GlobalLoaderController.to.hide();
+        DiscourseGlobalLoaderController.to.hide();
       }
-      await handleError(e, stackTrace, context: 'LoginController.handleLogin');
+      await handleError(e, stackTrace, context: 'DiscourseLoginController.handleLogin');
       return false;
     } finally {
       // Hide loader if it's still showing (might have been hidden already in success/error handling)
-      if (showLoader && GlobalLoaderController.to.isLoading) {
-        GlobalLoaderController.to.hide();
+      if (showLoader && DiscourseGlobalLoaderController.to.isLoading) {
+        DiscourseGlobalLoaderController.to.hide();
       }
     }
   }
@@ -333,7 +333,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
     }
 
     if (showLoader) {
-      GlobalLoaderController.to.show();
+      DiscourseGlobalLoaderController.to.show();
     }
 
     siteContext.passkeyLoginInProgress = true;
@@ -345,7 +345,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
           challengeResult.challenge == null ||
           challengeResult.rpId == null) {
         if (showLoader) {
-          GlobalLoaderController.to.hide();
+          DiscourseGlobalLoaderController.to.hide();
         }
         final message = challengeResult.resultText?.trim().isNotEmpty == true
             ? challengeResult.resultText!
@@ -394,14 +394,14 @@ class LoginController extends GetxController with ErrorHandlingMixin {
 
         // Hide loader before showing dialogs
         if (showLoader) {
-          GlobalLoaderController.to.hide();
+          DiscourseGlobalLoaderController.to.hide();
         }
 
         // Register for push notifications asynchronously (don't await to avoid blocking navigation)
         Future.microtask(() async {
           AppLogger.debug(
               '🔔 [LOGIN] Attempting to register for push notifications (passkey)...');
-          final siteController = Get.find<SiteController>();
+          final siteController = Get.find<DiscourseSiteController>();
           if (siteController.currentSite.value != null) {
             AppLogger.debug(
                 '🔔 [LOGIN] Current forum found: ${siteController.currentSite.value!.name}');
@@ -422,7 +422,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
         return true;
       } else {
         if (showLoader) {
-          GlobalLoaderController.to.hide();
+          DiscourseGlobalLoaderController.to.hide();
         }
         String errorMessage = 'Login failed';
         if (loginResult.resultText != null &&
@@ -434,27 +434,27 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       }
     } on FCApiException catch (e) {
       if (showLoader) {
-        GlobalLoaderController.to.hide();
+        DiscourseGlobalLoaderController.to.hide();
       }
-      await handleAuthError(e, context: 'LoginController.handlePasskeyLogin');
+      await handleAuthError(e, context: 'DiscourseLoginController.handlePasskeyLogin');
       return false;
     } on PermissionException catch (e) {
       if (showLoader) {
-        GlobalLoaderController.to.hide();
+        DiscourseGlobalLoaderController.to.hide();
       }
       await handleAppException(e,
-          context: 'LoginController.handlePasskeyLogin');
+          context: 'DiscourseLoginController.handlePasskeyLogin');
       return false;
     } on AuthenticationException catch (e) {
       if (showLoader) {
-        GlobalLoaderController.to.hide();
+        DiscourseGlobalLoaderController.to.hide();
       }
       await handleAppException(e,
-          context: 'LoginController.handlePasskeyLogin');
+          context: 'DiscourseLoginController.handlePasskeyLogin');
       return false;
     } on DomainNotAssociatedException catch (_) {
       if (showLoader) {
-        GlobalLoaderController.to.hide();
+        DiscourseGlobalLoaderController.to.hide();
       }
       await _showLoginErrorDialog(
         'This forum is not yet set up for passkey access on this app. Please sign in with your username and password.',
@@ -463,7 +463,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       return false;
     } on NoCredentialsAvailableException catch (_) {
       if (showLoader) {
-        GlobalLoaderController.to.hide();
+        DiscourseGlobalLoaderController.to.hide();
       }
       await _showLoginErrorDialog(
         'No passkey found for this forum. Sign in with your password, or create a passkey on the forum website first.',
@@ -472,7 +472,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       return false;
     } catch (e, stackTrace) {
       if (showLoader) {
-        GlobalLoaderController.to.hide();
+        DiscourseGlobalLoaderController.to.hide();
       }
       // iOS may report AASA/webcredentials failure as PlatformException with code "failed"
       if (e is PlatformException) {
@@ -498,12 +498,12 @@ class LoginController extends GetxController with ErrorHandlingMixin {
         return false;
       }
       await handleError(e, stackTrace,
-          context: 'LoginController.handlePasskeyLogin');
+          context: 'DiscourseLoginController.handlePasskeyLogin');
       return false;
     } finally {
       siteContext.passkeyLoginInProgress = false;
-      if (showLoader && GlobalLoaderController.to.isLoading) {
-        GlobalLoaderController.to.hide();
+      if (showLoader && DiscourseGlobalLoaderController.to.isLoading) {
+        DiscourseGlobalLoaderController.to.hide();
       }
     }
   }
@@ -619,7 +619,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
           siteContext.password!.isEmpty) {
         // Try to load credentials from SiteVisitTracker
         try {
-          final siteController = Get.find<SiteController>();
+          final siteController = Get.find<DiscourseSiteController>();
           if (siteController.currentSite.value != null) {
             final credentials = await SiteVisitTracker.instance
                 .getCredentials(siteController.currentSite.value!);
@@ -694,8 +694,8 @@ class LoginController extends GetxController with ErrorHandlingMixin {
         while (tfaLoginResult == null ||
             (tfaLoginResult.result == false &&
                 tfaLoginResult.tfaRequired == true)) {
-          if (Get.isRegistered<GlobalLoaderController>()) {
-            GlobalLoaderController.to.forceHide();
+          if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
+            DiscourseGlobalLoaderController.to.forceHide();
           }
           final tfaResult = await TFAInputDialog.show(
             providers: loginResult.providers,
@@ -803,7 +803,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
 
         // Record visit with credentials to ensure they're saved
         try {
-          final siteController = Get.find<SiteController>();
+          final siteController = Get.find<DiscourseSiteController>();
           if (siteController.currentSite.value != null) {
             await SiteVisitTracker.instance.recordVisit(
               siteController.currentSite.value!,
@@ -826,7 +826,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
 
         // Register for push notifications
         try {
-          final siteController = Get.find<SiteController>();
+          final siteController = Get.find<DiscourseSiteController>();
           if (siteController.currentSite.value != null) {
             await _registerForPushNotifications(
                 siteController.currentSite.value!, loginResult);
@@ -856,7 +856,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
           AppLogger.warning(
               '🔐 [AUTO_LOGIN] Keeping credentials after non-auth login failure: $errorMessage');
         }
-        // Don't show toast here - let SiteController show dialog instead
+        // Don't show toast here - let DiscourseSiteController show dialog instead
         final reasonCode = _isExplicitAuthInvalidError(errorMessage)
             ? PushLoginReasonCode.apiAuthInvalid
             : PushLoginReasonCode.transientError;
@@ -883,7 +883,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       await handleError(
         e,
         stackTrace,
-        context: 'LoginController.attemptAutomaticLogin',
+        context: 'DiscourseLoginController.attemptAutomaticLogin',
         showToUser: false,
       );
 
@@ -913,7 +913,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       );
     } catch (e, stackTrace) {
       await handleError(e, stackTrace,
-          context: 'LoginController.attemptAutomaticLogin', showToUser: false);
+          context: 'DiscourseLoginController.attemptAutomaticLogin', showToUser: false);
       AppLogger.warning(
           '🔐 [AUTO_LOGIN] Keeping credentials after transient/generic error: $e');
       return AutoLoginResult(
@@ -983,7 +983,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
         siteContext.updateLoginState();
 
         try {
-          final siteController = Get.find<SiteController>();
+          final siteController = Get.find<DiscourseSiteController>();
           final currentSite =
               siteController.currentSite.value ?? siteContext.site;
           await _registerForPushNotifications(currentSite, loginResult);
@@ -1056,7 +1056,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       await handleError(
         e,
         stackTrace,
-        context: 'LoginController._attemptAutomaticPasskeyLogin',
+        context: 'DiscourseLoginController._attemptAutomaticPasskeyLogin',
         showToUser: false,
       );
       siteContext.loginDataOutput = null;
@@ -1076,7 +1076,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       await handleError(
         e,
         stackTrace,
-        context: 'LoginController._attemptAutomaticPasskeyLogin',
+        context: 'DiscourseLoginController._attemptAutomaticPasskeyLogin',
         showToUser: false,
       );
       if (e is PlatformException) {
@@ -1117,14 +1117,14 @@ class LoginController extends GetxController with ErrorHandlingMixin {
           '🔐 [AUTO_LOGIN] Clearing saved credentials. reason=$reason detail=${detail ?? ''}');
       // Remove credentials from SiteVisitTracker by Site ID only
       try {
-        final siteController = Get.find<SiteController>();
+        final siteController = Get.find<DiscourseSiteController>();
         final currentSite = siteController.currentSite.value;
         if (currentSite != null) {
           await SiteVisitTracker.instance.removeCredentials(currentSite);
         }
       } catch (e, stackTrace) {
         await handleError(e, stackTrace,
-            context: 'LoginController._handleInvalidCredentials',
+            context: 'DiscourseLoginController._handleInvalidCredentials',
             showToUser: false);
       }
 
@@ -1143,7 +1143,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       AppLogger.info('Successfully demoted forum to guest access');
     } catch (e, stackTrace) {
       await handleError(e, stackTrace,
-          context: 'LoginController._handleInvalidCredentials',
+          context: 'DiscourseLoginController._handleInvalidCredentials',
           showToUser: false);
     }
   }
@@ -1169,9 +1169,9 @@ class LoginController extends GetxController with ErrorHandlingMixin {
         siteContext.username = username;
         siteContext.password = password;
 
-        // Get the current forum from SiteController
+        // Get the current forum from DiscourseSiteController
         try {
-          final siteController = Get.find<SiteController>();
+          final siteController = Get.find<DiscourseSiteController>();
 
           if (siteController.currentSite.value != null) {
             final currentSite = siteController.currentSite.value!;
@@ -1185,13 +1185,13 @@ class LoginController extends GetxController with ErrorHandlingMixin {
           }
         } catch (controllerError, stackTrace) {
           await handleError(controllerError, stackTrace,
-              context: 'LoginController._recordVisitWithCredentials',
+              context: 'DiscourseLoginController._recordVisitWithCredentials',
               showToUser: false);
         }
       }
     } catch (e, stackTrace) {
       await handleError(e, stackTrace,
-          context: 'LoginController._recordVisitWithCredentials',
+          context: 'DiscourseLoginController._recordVisitWithCredentials',
           showToUser: false);
     }
   }
@@ -1201,7 +1201,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
     String? username,
   }) async {
     try {
-      final siteController = Get.find<SiteController>();
+      final siteController = Get.find<DiscourseSiteController>();
       final currentSite = siteController.currentSite.value ?? siteContext.site;
 
       await SiteVisitTracker.instance.recordVisit(
@@ -1213,7 +1213,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       await handleError(
         e,
         stackTrace,
-        context: 'LoginController._recordVisitForPasskeyLogin',
+        context: 'DiscourseLoginController._recordVisitForPasskeyLogin',
         showToUser: false,
       );
     }
@@ -1230,14 +1230,14 @@ class LoginController extends GetxController with ErrorHandlingMixin {
 
       // Remove credentials from SiteVisitTracker when user logs out
       try {
-        final siteController = Get.find<SiteController>();
+        final siteController = Get.find<DiscourseSiteController>();
         final currentSite = siteController.currentSite.value;
         if (currentSite != null) {
           await SiteVisitTracker.instance.removeCredentials(currentSite);
         }
       } catch (e, stackTrace) {
         await handleError(e, stackTrace,
-            context: 'LoginController.handleLogout', showToUser: false);
+            context: 'DiscourseLoginController.handleLogout', showToUser: false);
         // Don't fail logout if credential removal fails
       }
 
@@ -1246,24 +1246,24 @@ class LoginController extends GetxController with ErrorHandlingMixin {
         // Get forum identifier for deregistration
         String? siteId;
         try {
-          final forumController = Get.find<SiteController>();
+          final forumController = Get.find<DiscourseSiteController>();
           final currentForum = forumController.currentSite.value;
           if (currentForum?.id != null) {
             siteId = currentForum!.id.toString();
           }
         } catch (e, stackTrace) {
           await handleError(e, stackTrace,
-              context: 'LoginController.handleLogout', showToUser: false);
+              context: 'DiscourseLoginController.handleLogout', showToUser: false);
         }
 
         if (siteId != null) {
           // Get push notification controller
-          PushNotificationController? pushController;
+          DiscoursePushNotificationController? pushController;
           try {
-            pushController = Get.find<PushNotificationController>();
+            pushController = Get.find<DiscoursePushNotificationController>();
           } catch (e, stackTrace) {
             await handleError(e, stackTrace,
-                context: 'LoginController.handleLogout', showToUser: false);
+                context: 'DiscourseLoginController.handleLogout', showToUser: false);
           }
 
           if (pushController != null && pushController.isInitialized) {
@@ -1286,7 +1286,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
         }
       } catch (e, stackTrace) {
         await handleError(e, stackTrace,
-            context: 'LoginController.handleLogout', showToUser: false);
+            context: 'DiscourseLoginController.handleLogout', showToUser: false);
         // Don't fail logout if push notification deregistration fails
       }
 
@@ -1301,12 +1301,12 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       siteContext.updateLoginState();
 
       // Re-initialize site to refresh permissions and configuration
-      SiteController siteController = Get.put(SiteController());
+      DiscourseSiteController siteController = Get.put(DiscourseSiteController());
       await siteController.initializeCurrentSite();
 
       return true;
     } catch (e, stackTrace) {
-      await handleError(e, stackTrace, context: 'LoginController.handleLogout');
+      await handleError(e, stackTrace, context: 'DiscourseLoginController.handleLogout');
       return false;
     }
   }
@@ -1548,13 +1548,13 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       AppLogger.info('Starting push notification registration...');
 
       // Get push notification controller
-      PushNotificationController? pushController;
+      DiscoursePushNotificationController? pushController;
       try {
-        pushController = Get.find<PushNotificationController>();
+        pushController = Get.find<DiscoursePushNotificationController>();
       } catch (e) {
         AppLogger.info(
-            'PushNotificationController not found, attempting to create...');
-        pushController = PushNotificationController();
+            'DiscoursePushNotificationController not found, attempting to create...');
+        pushController = DiscoursePushNotificationController();
         Get.put(pushController);
       }
 
@@ -1564,7 +1564,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
         await Future.delayed(const Duration(milliseconds: 250));
         attempts++;
         AppLogger.debug(
-            'Waiting for PushNotificationController... attempt $attempts');
+            'Waiting for DiscoursePushNotificationController... attempt $attempts');
       }
 
       if (!pushController.isInitialized) {
@@ -1574,7 +1574,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       }
 
       AppLogger.info(
-          'PushNotificationController is ready, proceeding with registration...');
+          'DiscoursePushNotificationController is ready, proceeding with registration...');
 
       // Get site identifier
       String siteId;
@@ -1613,7 +1613,7 @@ class LoginController extends GetxController with ErrorHandlingMixin {
       }
     } catch (e, stackTrace) {
       await handleError(e, stackTrace,
-          context: 'LoginController._registerForPushNotifications',
+          context: 'DiscourseLoginController._registerForPushNotifications',
           showToUser: false);
       // Don't fail login if push notification registration fails
     }

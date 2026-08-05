@@ -48,11 +48,11 @@ class SiteInitializationService {
       final domainName = Uri.tryParse(site.url)?.host ?? site.url;
       onProgress('Connecting to $domainName...');
 
-      // Get SiteController
-      if (!Get.isRegistered<SiteController>()) {
-        throw Exception('SiteController not available');
+      // Get DiscourseSiteController
+      if (!Get.isRegistered<DiscourseSiteController>()) {
+        throw Exception('DiscourseSiteController not available');
       }
-      final siteController = Get.find<SiteController>();
+      final siteController = Get.find<DiscourseSiteController>();
 
       // Create SiteContext
       final siteContext = SiteContext(siteType: site.siteType, site: site);
@@ -149,10 +149,10 @@ class SiteInitializationService {
         AppLogger.info('🔍 [INIT_SERVICE] Attempting automatic login...');
         onProgress(localize?.call('loggingIn', 'Logging in...') ?? 'Logging in...');
 
-        if (!Get.isRegistered<LoginController>()) {
-          Get.put(LoginController());
+        if (!Get.isRegistered<DiscourseLoginController>()) {
+          Get.put(DiscourseLoginController());
         }
-        final loginController = Get.find<LoginController>();
+        final loginController = Get.find<DiscourseLoginController>();
         final loginResult = await loginController.attemptAutomaticLogin(siteContext);
 
         if (loginResult.success) {

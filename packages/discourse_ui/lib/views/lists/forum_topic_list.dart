@@ -435,10 +435,10 @@ class _ForumTopicListState extends State<ForumTopicList> {
                   topicIcon: Icons.campaign_outlined,
                   onTap: () async {
                     if (!widget.siteContext.isLoggedIn) {
-                      if (!Get.isRegistered<LoginController>()) {
-                        Get.put(LoginController());
+                      if (!Get.isRegistered<DiscourseLoginController>()) {
+                        Get.put(DiscourseLoginController());
                       }
-                      final loginController = Get.find<LoginController>();
+                      final loginController = Get.find<DiscourseLoginController>();
                       final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
                       if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
                         await Get.to(() => LoginPage(siteContext: widget.siteContext));
@@ -459,10 +459,10 @@ class _ForumTopicListState extends State<ForumTopicList> {
                   topic: topic,
                   onTap: () async {
                     if (!widget.siteContext.isLoggedIn) {
-                      if (!Get.isRegistered<LoginController>()) {
-                        Get.put(LoginController());
+                      if (!Get.isRegistered<DiscourseLoginController>()) {
+                        Get.put(DiscourseLoginController());
                       }
-                      final loginController = Get.find<LoginController>();
+                      final loginController = Get.find<DiscourseLoginController>();
                       final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
                       if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
                         await Get.to(() => LoginPage(siteContext: widget.siteContext));
@@ -479,10 +479,10 @@ class _ForumTopicListState extends State<ForumTopicList> {
                   topicIcon: null,
                   onTap: () async {
                     if (!widget.siteContext.isLoggedIn) {
-                      if (!Get.isRegistered<LoginController>()) {
-                        Get.put(LoginController());
+                      if (!Get.isRegistered<DiscourseLoginController>()) {
+                        Get.put(DiscourseLoginController());
                       }
-                      final loginController = Get.find<LoginController>();
+                      final loginController = Get.find<DiscourseLoginController>();
                       final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
                       if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
                         await Get.to(() => LoginPage(siteContext: widget.siteContext));

@@ -47,15 +47,15 @@ void main() async {
       buildContext: globalNavigatorKey.currentContext,
       onCloudflareStart: () {
         // Reset any active global loader before showing the Cloudflare webview.
-        if (Get.isRegistered<GlobalLoaderController>()) {
-          GlobalLoaderController.to.forceHide();
+        if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
+          DiscourseGlobalLoaderController.to.forceHide();
         }
         AppLogger.debug('Cloudflare challenge detected - disabling global spinner');
       },
       onCloudflareEnd: () {
         // Ensure the Cloudflare flow cannot leave the global loader stuck on.
-        if (Get.isRegistered<GlobalLoaderController>()) {
-          GlobalLoaderController.to.forceHide();
+        if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
+          DiscourseGlobalLoaderController.to.forceHide();
         }
         AppLogger.debug('Cloudflare challenge finished - reset global spinner');
       },
@@ -63,7 +63,7 @@ void main() async {
     AppLogger.info('ForumcopilotSdk initialized successfully');
 
     AppLogger.info('Initializing user state service...');
-    Get.put(UserStateService());
+    Get.put(DiscourseUserStateService());
     AppLogger.info('User state service initialized successfully');
 
     AppLogger.info('Loading app settings...');
@@ -263,23 +263,23 @@ void _initializePushNotificationControllerWhenReady(NotificationService notifica
 void _createPushNotificationController() {
   try {
     // Check if controller already exists
-    if (Get.isRegistered<PushNotificationController>()) {
-      AppLogger.info('PushNotificationController already exists, skipping creation');
+    if (Get.isRegistered<DiscoursePushNotificationController>()) {
+      AppLogger.info('DiscoursePushNotificationController already exists, skipping creation');
       return;
     }
 
-    AppLogger.info('Creating PushNotificationController...');
-    final pushController = PushNotificationController();
+    AppLogger.info('Creating DiscoursePushNotificationController...');
+    final pushController = DiscoursePushNotificationController();
     Get.put(pushController);
-    AppLogger.info('PushNotificationController created and added to GetX');
+    AppLogger.info('DiscoursePushNotificationController created and added to GetX');
 
     // Controller will initialize itself in onInit() and get token from NotificationService
     // No need to poll - it will be ready when token is available
 
     // Initialize notification settings controller
-    if (!Get.isRegistered<NotificationSettingsController>()) {
-      Get.put(NotificationSettingsController());
-      AppLogger.info('NotificationSettingsController initialized');
+    if (!Get.isRegistered<DiscourseNotificationSettingsController>()) {
+      Get.put(DiscourseNotificationSettingsController());
+      AppLogger.info('DiscourseNotificationSettingsController initialized');
     }
 
     AppLogger.info('Push notification controllers initialized successfully');

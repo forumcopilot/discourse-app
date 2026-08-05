@@ -97,7 +97,7 @@ class ProfileTabAppBar extends StatelessWidget implements PreferredSizeWidget {
             TextButton(
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
-                final loginController = Get.isRegistered<LoginController>() ? Get.find<LoginController>() : Get.put(LoginController());
+                final loginController = Get.isRegistered<DiscourseLoginController>() ? Get.find<DiscourseLoginController>() : Get.put(DiscourseLoginController());
                 await loginController.handleLogout(siteContext);
               },
               child: Text(

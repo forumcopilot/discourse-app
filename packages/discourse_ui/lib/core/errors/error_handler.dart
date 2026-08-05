@@ -246,11 +246,11 @@ class ErrorHandler {
     try {
       // Hide any active loader before showing error dialog
       try {
-        if (Get.isRegistered<GlobalLoaderController>()) {
-          GlobalLoaderController.to.hide();
+        if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
+          DiscourseGlobalLoaderController.to.hide();
         }
       } catch (e) {
-        // Ignore if GlobalLoaderController is not available
+        // Ignore if DiscourseGlobalLoaderController is not available
       }
 
       await Get.dialog(

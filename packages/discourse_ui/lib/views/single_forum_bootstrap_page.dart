@@ -95,7 +95,7 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final configuredSite = AppForumConfig.buildSite();
+    final configuredSite = widget.site ?? AppForumConfig.buildSite();
     final configuredDomain =
         Uri.tryParse(configuredSite.url)?.host ?? configuredSite.url;
 

@@ -24,16 +24,16 @@ class _UserStateBannerState extends State<UserStateBanner> {
 
   @override
   Widget build(BuildContext context) {
-    if (!Get.isRegistered<UserStateService>()) {
+    if (!Get.isRegistered<DiscourseUserStateService>()) {
       return const SizedBox.shrink();
     }
 
-    if (!Get.isRegistered<SiteController>()) {
+    if (!Get.isRegistered<DiscourseSiteController>()) {
       return const SizedBox.shrink();
     }
 
-    final userStateService = Get.find<UserStateService>();
-    final siteController = Get.find<SiteController>();
+    final userStateService = Get.find<DiscourseUserStateService>();
+    final siteController = Get.find<DiscourseSiteController>();
 
     return Obx(() {
       // Observe dismissed banners to react to dismissals

@@ -53,15 +53,15 @@ FCAttachmentConstraints? getAttachmentConstraintsFromSiteContext(SiteContext? si
 }
 
 /// Helper to get current SiteContext
-/// Uses Get.find<SiteController>() pattern
+/// Uses Get.find<DiscourseSiteController>() pattern
 SiteContext? getCurrentSiteContext() {
   try {
-    if (Get.isRegistered<SiteController>()) {
-      final siteController = Get.find<SiteController>();
+    if (Get.isRegistered<DiscourseSiteController>()) {
+      final siteController = Get.find<DiscourseSiteController>();
       return siteController.currentSiteContext.value;
     }
   } catch (e) {
-    // SiteController not registered, return null
+    // DiscourseSiteController not registered, return null
   }
   return null;
 }

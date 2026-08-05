@@ -35,7 +35,7 @@ class _ProfileLoginFormState extends State<ProfileLoginForm> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      final loginController = Get.put(LoginController());
+      final loginController = Get.put(DiscourseLoginController());
       final success = await loginController.handleLogin(siteContext: widget.siteContext, username: _usernameController.text, password: _passwordController.text, showSuccessMessage: true);
 
       if (success) {
@@ -47,7 +47,7 @@ class _ProfileLoginFormState extends State<ProfileLoginForm> {
   }
 
   Future<void> _handlePasskeyLogin() async {
-    final loginController = Get.put(LoginController());
+    final loginController = Get.put(DiscourseLoginController());
     final success = await loginController.handlePasskeyLogin(
       siteContext: widget.siteContext,
       showSuccessMessage: true,
@@ -61,7 +61,7 @@ class _ProfileLoginFormState extends State<ProfileLoginForm> {
 
   /// Extract domain name from forum URL
   String _getSiteDomain() {
-    final siteController = Get.put(SiteController());
+    final siteController = Get.put(DiscourseSiteController());
     final siteUrl = siteController.currentSite.value?.url;
 
     if (siteUrl == null || siteUrl.isEmpty) {
@@ -196,7 +196,7 @@ class _ProfileLoginFormState extends State<ProfileLoginForm> {
                       ),
                     ),
                   ),
-                  if (widget.siteContext.siteType == 'discourse' && LoginController.isPasskeySupportedByPlatform) ...[
+                  if (widget.siteContext.siteType == 'discourse' && DiscourseLoginController.isPasskeySupportedByPlatform) ...[
                     const SizedBox(height: DesignTokens.spacingM),
                     OutlinedButton.icon(
                       onPressed: _handlePasskeyLogin,

@@ -69,10 +69,10 @@ class _ConversationPageState extends State<ConversationPage> {
         return;
       }
       if (!widget.siteContext.isLoggedIn) {
-        if (!Get.isRegistered<LoginController>()) {
-          Get.put(LoginController());
+        if (!Get.isRegistered<DiscourseLoginController>()) {
+          Get.put(DiscourseLoginController());
         }
-        final loginController = Get.find<LoginController>();
+        final loginController = Get.find<DiscourseLoginController>();
         final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
         if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
           await Navigator.of(context).push(

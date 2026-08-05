@@ -28,7 +28,7 @@ import 'package:discourse_ui/views/site_home_page.dart';
 /// so they return to wherever they triggered the login from instead
 /// of getting stranded on an empty loading screen.
 ///
-/// The legacy `LoginController.handleLogin` / `handlePasskeyLogin`
+/// The legacy `DiscourseLoginController.handleLogin` / `handlePasskeyLogin`
 /// entry points still exist on the controller for now — they are
 /// not invoked from this page anymore. A future cleanup phase will
 /// delete them from the controller once we confirm nothing else
@@ -118,16 +118,16 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     if (!mounted) return;
-    if (Get.isRegistered<GlobalLoaderController>()) {
-      GlobalLoaderController.to.forceHide();
+    if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
+      DiscourseGlobalLoaderController.to.forceHide();
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       try {
-        if (Get.isRegistered<GlobalLoaderController>()) {
-          GlobalLoaderController.to.forceHide();
+        if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
+          DiscourseGlobalLoaderController.to.forceHide();
         }
-        final siteController = Get.find<SiteController>();
+        final siteController = Get.find<DiscourseSiteController>();
         final isSiteInitialized = siteController.isInitialized.value;
         final navigator = Navigator.of(context, rootNavigator: true);
         final canPop = navigator.canPop();
@@ -138,8 +138,8 @@ class _LoginPageState extends State<LoginPage> {
           Get.offAll(() => const SiteHomePage());
         }
       } catch (_) {
-        if (Get.isRegistered<GlobalLoaderController>()) {
-          GlobalLoaderController.to.forceHide();
+        if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
+          DiscourseGlobalLoaderController.to.forceHide();
         }
         Get.offAll(() => const SiteHomePage());
       }
@@ -164,7 +164,7 @@ class _LoginPageState extends State<LoginPage> {
   /// AppBar title. Falls back to "this forum" when the URL is
   /// missing or unparseable.
   String _getSiteDomain() {
-    final siteController = Get.put(SiteController());
+    final siteController = Get.put(DiscourseSiteController());
     final siteUrl = siteController.currentSite.value?.url;
     if (siteUrl == null || siteUrl.isEmpty) return 'this forum';
     try {

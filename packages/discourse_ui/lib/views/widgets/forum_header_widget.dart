@@ -139,7 +139,7 @@ class ForumHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final siteController = Get.put(SiteController());
+    final siteController = Get.put(DiscourseSiteController());
 
     return Obx(() {
       final site = siteController.currentSite.value;

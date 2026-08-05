@@ -32,8 +32,8 @@ class ForumActions {
 
       if (result.result) {
         // Mark all as read was successful - reset the Unread page topic list
-        if (Get.isRegistered<UnreadTopicController>()) {
-          final unreadController = Get.find<UnreadTopicController>();
+        if (Get.isRegistered<DiscourseUnreadTopicController>()) {
+          final unreadController = Get.find<DiscourseUnreadTopicController>();
           await unreadController.resetAndReload();
         }
 
@@ -130,11 +130,11 @@ class ForumActions {
   void _showErrorDialog(BuildContext context, String message) {
     // Hide any active loader before showing error dialog
     try {
-      if (Get.isRegistered<GlobalLoaderController>()) {
-        GlobalLoaderController.to.hide();
+      if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
+        DiscourseGlobalLoaderController.to.hide();
       }
     } catch (e) {
-      // Ignore if GlobalLoaderController is not available
+      // Ignore if DiscourseGlobalLoaderController is not available
     }
 
     final colorScheme = Theme.of(context).colorScheme;

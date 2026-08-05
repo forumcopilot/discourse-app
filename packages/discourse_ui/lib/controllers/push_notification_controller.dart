@@ -16,8 +16,8 @@ import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'site_controller.dart';
 
 /// Main controller for managing push notifications across multiple sites
-class PushNotificationController extends GetxController with ErrorHandlingMixin {
-  static PushNotificationController get to => Get.find();
+class DiscoursePushNotificationController extends GetxController with ErrorHandlingMixin {
+  static DiscoursePushNotificationController get to => Get.find();
 
   // Services
   final DeviceService _deviceService = DeviceService();
@@ -60,7 +60,7 @@ class PushNotificationController extends GetxController with ErrorHandlingMixin 
   /// Initialize the push notification system
   Future<void> _initialize() async {
     try {
-      AppLogger.debug('Initializing PushNotificationController...');
+      AppLogger.debug('Initializing DiscoursePushNotificationController...');
       _lastError = null;
       _hasNetworkError = false;
 
@@ -90,13 +90,13 @@ class PushNotificationController extends GetxController with ErrorHandlingMixin 
       _watchLoginForDirectRegistration();
 
       _isInitialized = true;
-      AppLogger.debug('PushNotificationController initialized successfully');
+      AppLogger.debug('DiscoursePushNotificationController initialized successfully');
       AppLogger.debug('Loaded ${_siteStates.length} site states, ${registeredSites.length} registered');
       update();
     } catch (e) {
       _lastError = e.toString();
       _hasNetworkError = _isNetworkError(e);
-      AppLogger.debug('Error initializing PushNotificationController: $e');
+      AppLogger.debug('Error initializing DiscoursePushNotificationController: $e');
       update();
     }
   }
@@ -115,8 +115,8 @@ class PushNotificationController extends GetxController with ErrorHandlingMixin 
     final token = overrideToken ?? _fcmToken;
     if (token == null || token.isEmpty) return;
 
-    final ctx = Get.isRegistered<SiteController>()
-        ? Get.find<SiteController>().currentSiteContext.value
+    final ctx = Get.isRegistered<DiscourseSiteController>()
+        ? Get.find<DiscourseSiteController>().currentSiteContext.value
         : null;
     if (ctx == null || !ctx.isLoggedIn) {
       AppLogger.debug('[DirectPush] Skipping register — not logged in yet');
@@ -174,9 +174,9 @@ class PushNotificationController extends GetxController with ErrorHandlingMixin 
   void _watchLoginForDirectRegistration() {
     if (AppForumConfig.pushSource != 'direct') return;
     if (_loginWatcher != null) return;
-    if (!Get.isRegistered<SiteController>()) return;
+    if (!Get.isRegistered<DiscourseSiteController>()) return;
 
-    final siteCtrl = Get.find<SiteController>();
+    final siteCtrl = Get.find<DiscourseSiteController>();
     _loginWatcher = ever<dynamic>(siteCtrl.currentSiteContext, (_) async {
       final ctx = siteCtrl.currentSiteContext.value;
       if (ctx != null && ctx.isLoggedIn && !_hasDirectRegistered) {
@@ -755,7 +755,7 @@ class PushNotificationController extends GetxController with ErrorHandlingMixin 
 
   /// Get summary for logging
   String getSummary() {
-    return 'PushNotificationController(initialized: $_isInitialized, deviceId: ${_deviceId?.substring(0, 8)}..., sites: ${_siteStates.length}, registered: $totalRegisteredSites)';
+    return 'DiscoursePushNotificationController(initialized: $_isInitialized, deviceId: ${_deviceId?.substring(0, 8)}..., sites: ${_siteStates.length}, registered: $totalRegisteredSites)';
   }
 
   /// Show toast notification (disabled - toasts were too noisy during login/logout)

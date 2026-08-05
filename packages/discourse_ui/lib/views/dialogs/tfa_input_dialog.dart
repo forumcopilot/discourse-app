@@ -89,7 +89,7 @@ class _TFAInputDialogState extends State<TFAInputDialog> {
   List<FCTFAProvider>? get _effectiveProviders {
     final list = widget.providers;
     if (list == null || list.isEmpty) return list;
-    if (LoginController.isPasskeySupportedByPlatform) return list;
+    if (DiscourseLoginController.isPasskeySupportedByPlatform) return list;
     final filtered =
         list.where((p) => p.type != 'passkey' && p.id != 'passkey').toList();
     return filtered.isEmpty ? list : filtered;

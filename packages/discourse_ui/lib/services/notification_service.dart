@@ -461,7 +461,7 @@ class NotificationService with ServiceErrorHandlingMixin {
         return;
       }
 
-      final siteController = Get.isRegistered<SiteController>() ? Get.find<SiteController>() : null;
+      final siteController = Get.isRegistered<DiscourseSiteController>() ? Get.find<DiscourseSiteController>() : null;
       final currentSite = siteController?.currentSite.value;
       final isSameSite = currentSite?.id != null && currentSite!.id == siteId;
       final isAlreadyInitialized = siteController?.isInitialized.value == true && siteController?.currentSiteContext.value != null;
@@ -530,11 +530,11 @@ class NotificationService with ServiceErrorHandlingMixin {
   }
 
   /// Initialize site and wait for it to be ready
-  /// Returns the initialized SiteController, or null if initialization failed
-  Future<SiteController?> _initializeSiteAndWait(Site targetForum) async {
+  /// Returns the initialized DiscourseSiteController, or null if initialization failed
+  Future<DiscourseSiteController?> _initializeSiteAndWait(Site targetForum) async {
     try {
       // Ensure ForumSiteController is available
-      final siteController = Get.isRegistered<SiteController>() ? Get.find<SiteController>() : Get.put(SiteController());
+      final siteController = Get.isRegistered<DiscourseSiteController>() ? Get.find<DiscourseSiteController>() : Get.put(DiscourseSiteController());
 
       final currentSite = siteController.currentSite.value;
       // Ensure we only short-circuit when the initialized context matches the target forum.
@@ -589,11 +589,11 @@ class NotificationService with ServiceErrorHandlingMixin {
   }
 
   Future<void> _resetToHomeIfNeeded() async {
-    if (!Get.isRegistered<SiteController>()) {
+    if (!Get.isRegistered<DiscourseSiteController>()) {
       return;
     }
 
-    final siteController = Get.find<SiteController>();
+    final siteController = Get.find<DiscourseSiteController>();
     final hasActiveSite = siteController.isInitialized.value && siteController.currentSiteContext.value != null;
     if (!hasActiveSite) {
       return;
@@ -652,10 +652,10 @@ class NotificationService with ServiceErrorHandlingMixin {
 
       final siteContext = siteController.currentSiteContext.value!;
       if (!siteContext.isLoggedIn) {
-        if (!Get.isRegistered<LoginController>()) {
-          Get.put(LoginController());
+        if (!Get.isRegistered<DiscourseLoginController>()) {
+          Get.put(DiscourseLoginController());
         }
-        final loginController = Get.find<LoginController>();
+        final loginController = Get.find<DiscourseLoginController>();
         final loginResult = await loginController.attemptAutomaticLogin(siteContext);
         if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
           await Get.to(() => LoginPage(siteContext: siteContext));
@@ -909,7 +909,7 @@ class NotificationService with ServiceErrorHandlingMixin {
       AppLogger.debug('FCM token refreshed: ${newToken.substring(0, 8)}...');
       _fcmToken = newToken;
 
-      // Notify registered callback (e.g., PushNotificationController)
+      // Notify registered callback (e.g., DiscoursePushNotificationController)
       if (_onTokenRefreshCallback != null) {
         _onTokenRefreshCallback!(newToken);
       }

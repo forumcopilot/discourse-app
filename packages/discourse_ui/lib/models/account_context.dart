@@ -238,7 +238,7 @@ class AccountContext {
 
       // First, try to get the site ID from the current site context
       try {
-        final siteController = Get.find<SiteController>();
+        final siteController = Get.find<DiscourseSiteController>();
         final currentSite = siteController.currentSite.value;
 
         if (currentSite?.id != null) {
@@ -336,7 +336,7 @@ class AccountContext {
 
     // First, try to get the site ID from the current site context
     try {
-      final siteController = Get.find<SiteController>();
+      final siteController = Get.find<DiscourseSiteController>();
       final currentSite = siteController.currentSite.value;
 
       if (currentSite?.id != null) {
@@ -665,10 +665,10 @@ class AccountContext {
       }
 
       if (siteId != null) {
-        // Note: Push notification deregistration is primarily handled by LoginController during logout
+        // Note: Push notification deregistration is primarily handled by DiscourseLoginController during logout
         // This method serves as a backup cleanup mechanism
         AppLogger.debug('🔔 [ACCOUNT_CONTEXT] Site removed: ${account.site.name} (ID: $siteId)');
-        AppLogger.debug('🔔 [ACCOUNT_CONTEXT] Push notification cleanup should be handled by LoginController during logout flow');
+        AppLogger.debug('🔔 [ACCOUNT_CONTEXT] Push notification cleanup should be handled by DiscourseLoginController during logout flow');
         AppLogger.debug('🔔 [ACCOUNT_CONTEXT] If this is called outside logout, manual cleanup may be needed');
       } else {
         AppLogger.debug('🔔 [ACCOUNT_CONTEXT] No site ID available for push notification cleanup');

@@ -174,9 +174,9 @@ class SiteDrawer extends StatelessWidget {
       },
     );
     if (confirmed != true) return;
-    final loginController = Get.isRegistered<LoginController>()
-        ? Get.find<LoginController>()
-        : Get.put(LoginController());
+    final loginController = Get.isRegistered<DiscourseLoginController>()
+        ? Get.find<DiscourseLoginController>()
+        : Get.put(DiscourseLoginController());
     await loginController.handleLogout(siteContext);
   }
 }

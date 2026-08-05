@@ -240,10 +240,10 @@ class RecentPostsSection extends StatelessWidget {
   Future<void> _navigateToPost(BuildContext context, FCUserReply post) async {
     try {
       if (!siteContext.isLoggedIn) {
-        if (!Get.isRegistered<LoginController>()) {
-          Get.put(LoginController());
+        if (!Get.isRegistered<DiscourseLoginController>()) {
+          Get.put(DiscourseLoginController());
         }
-        final loginController = Get.find<LoginController>();
+        final loginController = Get.find<DiscourseLoginController>();
         final loginResult = await loginController.attemptAutomaticLogin(siteContext);
         if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
           await Get.to(() => LoginPage(siteContext: siteContext));

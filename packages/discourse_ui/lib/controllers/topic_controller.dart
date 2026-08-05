@@ -8,7 +8,7 @@ import 'global_loader_controller.dart';
 import 'package:discourse_ui/core/errors/error_handling_mixins.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 
-class LatestTopicController extends GlobalLoaderController with ErrorHandlingMixin {
+class DiscourseLatestTopicController extends DiscourseGlobalLoaderController with ErrorHandlingMixin {
   var isInitialized = false.obs;
   final latestTopicsDataOutput = FCLatestTopicResult(
     result: false,
@@ -79,7 +79,7 @@ class LatestTopicController extends GlobalLoaderController with ErrorHandlingMix
       // Always mark as initialized so UI can display error state instead of loading
       isInitialized.value = true;
     } catch (e, stackTrace) {
-      await handleError(e, stackTrace, context: 'LatestTopicController.getLatestTopicAsync');
+      await handleError(e, stackTrace, context: 'DiscourseLatestTopicController.getLatestTopicAsync');
       rethrow;
     }
   }
@@ -109,7 +109,7 @@ class LatestTopicController extends GlobalLoaderController with ErrorHandlingMix
   }
 }
 
-class UnreadTopicController extends GetxController {
+class DiscourseUnreadTopicController extends GetxController {
   final isInitialized = false.obs;
   final unreadTopicsDataOutput = FCUnreadTopicResult(
     result: false,
@@ -192,7 +192,7 @@ class UnreadTopicController extends GetxController {
   }
 }
 
-class ParticipatedTopicController extends GetxController {
+class DiscourseParticipatedTopicController extends GetxController {
   final isInitialized = false.obs;
   final participatedTopicsDataOutput = FCParticipatedTopicResult(
     result: false,
@@ -243,7 +243,7 @@ class ParticipatedTopicController extends GetxController {
   }
 }
 
-class SubscribedTopicController extends GetxController {
+class DiscourseSubscribedTopicController extends GetxController {
   final isInitialized = false.obs;
   // TODO: Update this when SubscriptionProxy is refactored to use new interface
   final subscribedTopicsDataOutput = FCSubscribedTopicResult(

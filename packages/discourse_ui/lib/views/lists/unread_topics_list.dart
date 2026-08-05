@@ -27,7 +27,7 @@ class UnreadTopicsList extends StatefulWidget {
 class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCListStatefulWidget<UnreadTopicsList>, AutomaticKeepAliveClientMixin {
   bool _hasLoaded = false;
   bool _isInitialLoading = false;
-  UnreadTopicController? _unreadTopicController;
+  DiscourseUnreadTopicController? _unreadTopicController;
 
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
@@ -46,7 +46,7 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
     AppLogger.debug('  - widget.isActive: ${widget.isActive}');
     AppLogger.debug('  - _hasLoaded: $_hasLoaded');
     AppLogger.debug('  - _unreadTopicController: ${_unreadTopicController != null ? "exists" : "null"}');
-    AppLogger.debug('  - Get.isRegistered: ${Get.isRegistered<UnreadTopicController>()}');
+    AppLogger.debug('  - Get.isRegistered: ${Get.isRegistered<DiscourseUnreadTopicController>()}');
 
     // Initialize controller when tab becomes active
     final tabJustBecameActive = !oldWidget.isActive && widget.isActive;
@@ -58,12 +58,12 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
         setState(() {});
       }
       AppLogger.debug('✅ [UNREAD_TOPICS] Tab just became active!');
-      if (!Get.isRegistered<UnreadTopicController>()) {
+      if (!Get.isRegistered<DiscourseUnreadTopicController>()) {
         AppLogger.debug('  → Controller not registered, initializing...');
         _initializeController();
       } else {
         AppLogger.debug('  → Controller already registered, getting it...');
-        _unreadTopicController = Get.find<UnreadTopicController>();
+        _unreadTopicController = Get.find<DiscourseUnreadTopicController>();
         AppLogger.debug('  → Controller state:');
         AppLogger.debug('    - isInitialized: ${_unreadTopicController?.isInitialized.value}');
         AppLogger.debug('    - fcTopics.length: ${_unreadTopicController?.fcTopics.length}');
@@ -107,15 +107,15 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
 
   Future<void> _initializeController() async {
     AppLogger.debug('🔧 [UNREAD_TOPICS] _initializeController called');
-    if (Get.isRegistered<UnreadTopicController>()) {
+    if (Get.isRegistered<DiscourseUnreadTopicController>()) {
       AppLogger.debug('  → Deleting existing controller');
-      Get.delete<UnreadTopicController>();
+      Get.delete<DiscourseUnreadTopicController>();
     }
 
-    _unreadTopicController = Get.put(UnreadTopicController());
+    _unreadTopicController = Get.put(DiscourseUnreadTopicController());
     AppLogger.debug('  → Controller created and registered in GetX');
     AppLogger.debug('    - isInitialized: ${_unreadTopicController?.isInitialized.value}');
-    AppLogger.debug('    - Get.isRegistered: ${Get.isRegistered<UnreadTopicController>()}');
+    AppLogger.debug('    - Get.isRegistered: ${Get.isRegistered<DiscourseUnreadTopicController>()}');
 
     // Force a rebuild to ensure parent's Obx can observe the controller
     if (mounted) {
@@ -161,8 +161,8 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
       );
       _unreadTopicController!.fcTopics.clear();
     }
-    if (Get.isRegistered<UnreadTopicController>()) {
-      Get.delete<UnreadTopicController>();
+    if (Get.isRegistered<DiscourseUnreadTopicController>()) {
+      Get.delete<DiscourseUnreadTopicController>();
     }
     _unreadTopicController = null;
   }
@@ -277,9 +277,9 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
       return [const TopicListSkeleton(shrinkWrap: true)];
     }
     // Try to get controller from local reference first, then from GetX
-    UnreadTopicController? controller = _unreadTopicController;
-    if (controller == null && Get.isRegistered<UnreadTopicController>()) {
-      controller = Get.find<UnreadTopicController>();
+    DiscourseUnreadTopicController? controller = _unreadTopicController;
+    if (controller == null && Get.isRegistered<DiscourseUnreadTopicController>()) {
+      controller = Get.find<DiscourseUnreadTopicController>();
       _unreadTopicController = controller; // Update local reference
     }
 
@@ -297,10 +297,10 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
           topic: topic,
           onTap: () async {
             if (!widget.siteContext.isLoggedIn) {
-              if (!Get.isRegistered<LoginController>()) {
-                Get.put(LoginController());
+              if (!Get.isRegistered<DiscourseLoginController>()) {
+                Get.put(DiscourseLoginController());
               }
-              final loginController = Get.find<LoginController>();
+              final loginController = Get.find<DiscourseLoginController>();
               final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
               if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
                 await Get.to(() => LoginPage(siteContext: widget.siteContext));
@@ -324,9 +324,9 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
   Widget? buildEmptyState() {
     if (!_hasLoaded || _isInitialLoading) return null;
     // Try to get controller from local reference first, then from GetX
-    UnreadTopicController? controller = _unreadTopicController;
-    if (controller == null && Get.isRegistered<UnreadTopicController>()) {
-      controller = Get.find<UnreadTopicController>();
+    DiscourseUnreadTopicController? controller = _unreadTopicController;
+    if (controller == null && Get.isRegistered<DiscourseUnreadTopicController>()) {
+      controller = Get.find<DiscourseUnreadTopicController>();
       _unreadTopicController = controller; // Update local reference
     }
 
@@ -445,7 +445,7 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
     AppLogger.debug('  - isLoggedIn: ${widget.siteContext.isLoggedIn}');
     AppLogger.debug('  - _hasLoaded: $_hasLoaded');
     AppLogger.debug('  - _unreadTopicController: ${_unreadTopicController != null ? "exists" : "null"}');
-    AppLogger.debug('  - Get.isRegistered: ${Get.isRegistered<UnreadTopicController>()}');
+    AppLogger.debug('  - Get.isRegistered: ${Get.isRegistered<DiscourseUnreadTopicController>()}');
 
     // Not logged in
     if (!widget.siteContext.isLoggedIn) {
@@ -487,9 +487,9 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
     // Check controller - prioritize local reference over Get.isRegistered check
     // The local reference is more reliable since GetX might have unregistered it
     if (_unreadTopicController == null) {
-      if (Get.isRegistered<UnreadTopicController>()) {
+      if (Get.isRegistered<DiscourseUnreadTopicController>()) {
         AppLogger.debug('  → Controller registered in GetX but local reference is null, getting it...');
-        _unreadTopicController = Get.find<UnreadTopicController>();
+        _unreadTopicController = Get.find<DiscourseUnreadTopicController>();
       } else {
         // If controller doesn't exist and we haven't loaded yet, show spinner
         // Only show empty state if we've already tried to load and there's nothing
@@ -544,10 +544,10 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
               topic: topic,
               onTap: () async {
                 if (!widget.siteContext.isLoggedIn) {
-                  if (!Get.isRegistered<LoginController>()) {
-                    Get.put(LoginController());
+                  if (!Get.isRegistered<DiscourseLoginController>()) {
+                    Get.put(DiscourseLoginController());
                   }
-                  final loginController = Get.find<LoginController>();
+                  final loginController = Get.find<DiscourseLoginController>();
                   final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
                   if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
                     await Get.to(() => LoginPage(siteContext: widget.siteContext));

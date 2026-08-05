@@ -30,7 +30,7 @@ class SubscribedTopicsList extends StatefulWidget {
 class SubscribedTopicsListState extends FCStatefulWidget<SubscribedTopicsList> with FCListStatefulWidget<SubscribedTopicsList>, AutomaticKeepAliveClientMixin {
   bool _hasLoaded = false;
   bool _isInitialLoading = false;
-  SubscribedTopicController? _subscribedTopicController;
+  DiscourseSubscribedTopicController? _subscribedTopicController;
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
   final int _pageSize = 20;
@@ -50,10 +50,10 @@ class SubscribedTopicsListState extends FCStatefulWidget<SubscribedTopicsList> w
       if (mounted) {
         setState(() {});
       }
-      if (!Get.isRegistered<SubscribedTopicController>()) {
+      if (!Get.isRegistered<DiscourseSubscribedTopicController>()) {
         _initializeController();
       } else {
-        _subscribedTopicController = Get.find<SubscribedTopicController>();
+        _subscribedTopicController = Get.find<DiscourseSubscribedTopicController>();
         if (!_hasLoaded) {
           _initializeData();
         }
@@ -85,11 +85,11 @@ class SubscribedTopicsListState extends FCStatefulWidget<SubscribedTopicsList> w
   }
 
   Future<void> _initializeController() async {
-    if (Get.isRegistered<SubscribedTopicController>()) {
-      Get.delete<SubscribedTopicController>();
+    if (Get.isRegistered<DiscourseSubscribedTopicController>()) {
+      Get.delete<DiscourseSubscribedTopicController>();
     }
 
-    _subscribedTopicController = Get.put(SubscribedTopicController());
+    _subscribedTopicController = Get.put(DiscourseSubscribedTopicController());
     // Don't call _initializeData() here - let didUpdateWidget() or initState() handle it
     if (widget.isActive && widget.siteContext.isLoggedIn && !_hasLoaded) {
       await _initializeData();
@@ -125,8 +125,8 @@ class SubscribedTopicsListState extends FCStatefulWidget<SubscribedTopicsList> w
       );
       _subscribedTopicController!.fcTopics.clear();
     }
-    if (Get.isRegistered<SubscribedTopicController>()) {
-      Get.delete<SubscribedTopicController>();
+    if (Get.isRegistered<DiscourseSubscribedTopicController>()) {
+      Get.delete<DiscourseSubscribedTopicController>();
     }
     _subscribedTopicController = null;
   }
@@ -231,10 +231,10 @@ class SubscribedTopicsListState extends FCStatefulWidget<SubscribedTopicsList> w
           topic: topic,
           onTap: () async {
             if (!widget.siteContext.isLoggedIn) {
-              if (!Get.isRegistered<LoginController>()) {
-                Get.put(LoginController());
+              if (!Get.isRegistered<DiscourseLoginController>()) {
+                Get.put(DiscourseLoginController());
               }
-              final loginController = Get.find<LoginController>();
+              final loginController = Get.find<DiscourseLoginController>();
               final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
               if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
                 await Get.to(() => LoginPage(siteContext: widget.siteContext));
@@ -450,10 +450,10 @@ class SubscribedTopicsListState extends FCStatefulWidget<SubscribedTopicsList> w
                       topic: topic,
                       onTap: () async {
                         if (!widget.siteContext.isLoggedIn) {
-                          if (!Get.isRegistered<LoginController>()) {
-                            Get.put(LoginController());
+                          if (!Get.isRegistered<DiscourseLoginController>()) {
+                            Get.put(DiscourseLoginController());
                           }
-                          final loginController = Get.find<LoginController>();
+                          final loginController = Get.find<DiscourseLoginController>();
                           final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
                           if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
                             await Get.to(() => LoginPage(siteContext: widget.siteContext));

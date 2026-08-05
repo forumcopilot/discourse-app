@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 
-class GlobalLoaderController extends GetxController {
+class DiscourseGlobalLoaderController extends GetxController {
   final RxInt _loadingCount = 0.obs;
 
-  static GlobalLoaderController get to => Get.find<GlobalLoaderController>();
+  static DiscourseGlobalLoaderController get to => Get.find<DiscourseGlobalLoaderController>();
 
   void show() {
     _loadingCount.value++;

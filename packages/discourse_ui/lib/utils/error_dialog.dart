@@ -30,20 +30,20 @@ void showErrorDialog(String errorMessage) {
   // Show error dialog in both debug and production mode
   // Hide any active loader before showing error dialog
   try {
-    if (Get.isRegistered<GlobalLoaderController>()) {
-      GlobalLoaderController.to.hide();
+    if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
+      DiscourseGlobalLoaderController.to.hide();
     }
   } catch (e) {
-    // Ignore if GlobalLoaderController is not available
+    // Ignore if DiscourseGlobalLoaderController is not available
   }
 
   // Hide any active loader before showing error dialog
   try {
-    if (Get.isRegistered<GlobalLoaderController>()) {
-      GlobalLoaderController.to.hide();
+    if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
+      DiscourseGlobalLoaderController.to.hide();
     }
   } catch (e) {
-    // Ignore if GlobalLoaderController is not available
+    // Ignore if DiscourseGlobalLoaderController is not available
   }
   // Defer dialog presentation to avoid Navigator lock assertion during transitions
   WidgetsBinding.instance.addPostFrameCallback((_) {

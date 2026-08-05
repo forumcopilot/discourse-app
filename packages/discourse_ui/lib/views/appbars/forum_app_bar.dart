@@ -24,7 +24,7 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final siteController = Get.isRegistered<SiteController>() ? Get.find<SiteController>() : Get.put(SiteController());
+    final siteController = Get.isRegistered<DiscourseSiteController>() ? Get.find<DiscourseSiteController>() : Get.put(DiscourseSiteController());
 
     return AppBar(
       backgroundColor: colorScheme.surface,
@@ -164,7 +164,7 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
         ForumActions().markAllAsRead(context, '0');
         break;
       case 'logout':
-        final loginController = Get.isRegistered<LoginController>() ? Get.find<LoginController>() : Get.put(LoginController());
+        final loginController = Get.isRegistered<DiscourseLoginController>() ? Get.find<DiscourseLoginController>() : Get.put(DiscourseLoginController());
         await loginController.handleLogout(siteContext);
         break;
     }

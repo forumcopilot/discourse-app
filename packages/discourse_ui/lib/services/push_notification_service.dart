@@ -60,7 +60,7 @@ class PushNotificationService with ServiceErrorHandlingMixin {
   }) async {
     // Skip the hosted-backend registration entirely when no backend URL is set.
     // BYO/direct builds set pushApiBaseUrl='' — there's nothing to register against.
-    // The direct-mode registration happens separately via PushNotificationController._tryRegisterDirect.
+    // The direct-mode registration happens separately via DiscoursePushNotificationController._tryRegisterDirect.
     if (!AppForumConfig.isPushBackendEnabled) {
       AppLogger.debug('[PushNotificationService] Hosted backend disabled — skipping registerDeviceForSite');
       return true; // Treat as success so the controller's retry chain doesn't fire.

@@ -105,8 +105,8 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     // always validate session with getConfig before any other API calls.
     if (widget.siteToInitialize == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (Get.isRegistered<SiteController>()) {
-          final siteController = Get.find<SiteController>();
+        if (Get.isRegistered<DiscourseSiteController>()) {
+          final siteController = Get.find<DiscourseSiteController>();
           final alreadyInitialized = siteController.isInitialized.value &&
               siteController.currentSiteContext.value != null;
           if (alreadyInitialized) {
@@ -142,8 +142,8 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
 
     // Set up listeners for auth and site changes
 
-    if (Get.isRegistered<SiteController>()) {
-      final siteController = Get.find<SiteController>();
+    if (Get.isRegistered<DiscourseSiteController>()) {
+      final siteController = Get.find<DiscourseSiteController>();
 
       // Check if site is already initialized when page loads (re-entering forum)
       // This handles the case when user navigates back to an already initialized forum
@@ -333,13 +333,13 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     SiteContext? siteContext;
     try {
       AppLogger.debug('🏁 [SITE_HOME] Starting site initialization for ${site.name}');
-      final siteController = Get.find<SiteController>();
+      final siteController = Get.find<DiscourseSiteController>();
 
       // Create SiteContext
       final context = SiteContext(siteType: site.siteType, site: site);
 
       SiteProxyService.initialize(context);
-      // Initialize the site (GlobalLoaderController will handle the loading UI)
+      // Initialize the site (DiscourseGlobalLoaderController will handle the loading UI)
       // getConfig and all initialization must complete successfully before proceeding
       // Auto-login failures will show the Login screen before continuing as guest
       siteContext = await siteController.initializeSite(
@@ -360,7 +360,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           setState(() {
             _waitingForInitialization = false;
           });
-          // Error dialog should have been shown by SiteController, just navigate back
+          // Error dialog should have been shown by DiscourseSiteController, just navigate back
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
               Navigator.of(this.context).pop();
@@ -395,7 +395,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           _waitingForInitialization = false;
         });
         AppLogger.debug('🏁 [SITE_HOME] Site initialization failed with exception: $e');
-        // Show error dialog and go back (in case SiteController didn't show one)
+        // Show error dialog and go back (in case DiscourseSiteController didn't show one)
         _showErrorAndGoBack(site, e.toString());
       }
     }
@@ -688,7 +688,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     // Don't build the main UI until initialization is complete
     if (_waitingForInitialization) {
       // Show a minimal scaffold with just the app bar while waiting
-      // The GlobalLoaderController will show the loading overlay
+      // The DiscourseGlobalLoaderController will show the loading overlay
       return Scaffold(
         appBar: TopicsTabAppBar(
           siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
@@ -703,7 +703,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     if (_siteContext == null && !_waitingForInitialization) {
       // If we have a site to initialize but failed, show error dialog and go back
       if (widget.siteToInitialize != null) {
-        // Error dialog should have already been shown by _initializeSite or SiteController
+        // Error dialog should have already been shown by _initializeSite or DiscourseSiteController
         // But ensure we navigate back after a delay to allow dialog to be shown
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted && _siteContext == null) {

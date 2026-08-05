@@ -26,7 +26,7 @@ class ParticipatedTopicsList extends StatefulWidget {
 class ParticipatedTopicsListState extends FCStatefulWidget<ParticipatedTopicsList> with FCListStatefulWidget<ParticipatedTopicsList>, AutomaticKeepAliveClientMixin {
   bool _hasLoaded = false;
   bool _isInitialLoading = false;
-  ParticipatedTopicController? _participatedTopicController;
+  DiscourseParticipatedTopicController? _participatedTopicController;
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
   final int _pageSize = 20;
@@ -46,10 +46,10 @@ class ParticipatedTopicsListState extends FCStatefulWidget<ParticipatedTopicsLis
       if (mounted) {
         setState(() {});
       }
-      if (!Get.isRegistered<ParticipatedTopicController>()) {
+      if (!Get.isRegistered<DiscourseParticipatedTopicController>()) {
         _initializeController();
       } else {
-        _participatedTopicController = Get.find<ParticipatedTopicController>();
+        _participatedTopicController = Get.find<DiscourseParticipatedTopicController>();
         if (!_hasLoaded) {
           _initializeData();
         }
@@ -82,11 +82,11 @@ class ParticipatedTopicsListState extends FCStatefulWidget<ParticipatedTopicsLis
 
   Future<void> _initializeController() async {
     // Check if controller already exists and delete it
-    if (Get.isRegistered<ParticipatedTopicController>()) {
-      Get.delete<ParticipatedTopicController>();
+    if (Get.isRegistered<DiscourseParticipatedTopicController>()) {
+      Get.delete<DiscourseParticipatedTopicController>();
     }
 
-    _participatedTopicController = Get.put(ParticipatedTopicController());
+    _participatedTopicController = Get.put(DiscourseParticipatedTopicController());
     // Don't call _initializeData() here - let didUpdateWidget() or initState() handle it
     if (widget.isActive && widget.siteContext.isLoggedIn && !_hasLoaded) {
       await _initializeData();
@@ -122,8 +122,8 @@ class ParticipatedTopicsListState extends FCStatefulWidget<ParticipatedTopicsLis
       );
       _participatedTopicController!.fcTopics.clear();
     }
-    if (Get.isRegistered<ParticipatedTopicController>()) {
-      Get.delete<ParticipatedTopicController>();
+    if (Get.isRegistered<DiscourseParticipatedTopicController>()) {
+      Get.delete<DiscourseParticipatedTopicController>();
     }
     _participatedTopicController = null;
   }
@@ -228,10 +228,10 @@ class ParticipatedTopicsListState extends FCStatefulWidget<ParticipatedTopicsLis
           topic: topic,
           onTap: () async {
             if (!widget.siteContext.isLoggedIn) {
-              if (!Get.isRegistered<LoginController>()) {
-                Get.put(LoginController());
+              if (!Get.isRegistered<DiscourseLoginController>()) {
+                Get.put(DiscourseLoginController());
               }
-              final loginController = Get.find<LoginController>();
+              final loginController = Get.find<DiscourseLoginController>();
               final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
               if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
                 await Get.to(() => LoginPage(siteContext: widget.siteContext));
@@ -437,10 +437,10 @@ class ParticipatedTopicsListState extends FCStatefulWidget<ParticipatedTopicsLis
                       topic: topic,
                       onTap: () async {
                         if (!widget.siteContext.isLoggedIn) {
-                          if (!Get.isRegistered<LoginController>()) {
-                            Get.put(LoginController());
+                          if (!Get.isRegistered<DiscourseLoginController>()) {
+                            Get.put(DiscourseLoginController());
                           }
-                          final loginController = Get.find<LoginController>();
+                          final loginController = Get.find<DiscourseLoginController>();
                           final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
                           if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
                             await Get.to(() => LoginPage(siteContext: widget.siteContext));
