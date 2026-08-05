@@ -1,5 +1,6 @@
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:discourse_core/discourse_core.dart';
+import 'package:discourse_ui/config/app_forum_config.dart';
 import 'package:discourse_ui/core/errors/error_handling_mixins.dart';
 
 /// Service for managing forum operations
@@ -12,6 +13,11 @@ class SiteProxyService with ServiceErrorHandlingMixin {
   static void initialize(SiteContext context) {
     // Register Discourse implementation
     SiteProxyFactory.register('discourse', DiscourseProxyFactory());
+
+    // Tell the context whether this build has a push relay configured, so
+    // discourse_core (which cannot see AppForumConfig) can distinguish
+    // "push unconfigured" from "key predates push" in DiscourseDeviceProxy.
+    context.setConfiguredPushUrl(AppForumConfig.discoursePushUrl);
 
     // Initialize the factory
     SiteProxyFactory.initialize(context);

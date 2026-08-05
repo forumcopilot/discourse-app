@@ -18,11 +18,18 @@ class NewTopicPage extends StatefulWidget {
   final String forumId;
   final String forumName;
 
+  /// Fired the moment the server confirms the topic was created. More
+  /// reliable than the pop result: it still reaches the opener when a
+  /// post-creation step throws and the page is later popped without a
+  /// result.
+  final VoidCallback? onTopicCreated;
+
   const NewTopicPage({
     super.key,
     required this.siteContext,
     required this.forumId,
     required this.forumName,
+    this.onTopicCreated,
   });
 
   @override
@@ -178,6 +185,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
       debugPrint('   - groupId passed: "$_groupId"');
 
       if (result.result) {
+        widget.onTopicCreated?.call();
         return true;
       } else {
         // Server returned result=false with a message - throw it directly without wrapping

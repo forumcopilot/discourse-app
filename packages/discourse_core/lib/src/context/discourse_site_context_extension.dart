@@ -110,6 +110,25 @@ extension DiscourseSiteContextExtension on SiteContext {
         prefs.getBool('${prefix}_user_api_push_enabled') ?? false;
   }
 
+  // ===== Push configuration (Phase 3) =====
+
+  /// The static `push_url` this build registers on its User API Key, or
+  /// `null` when the app has no push relay configured. Set once at startup
+  /// by the app layer (`SiteProxyService.initialize` reads it from
+  /// `AppForumConfig.discoursePushUrl`); in-memory only, because the value
+  /// is compile-time app config, not per-site state.
+  ///
+  /// `DiscourseDeviceProxy` uses this to distinguish "push not configured
+  /// in this build" (no-op) from "configured but the current key predates
+  /// the push grant" (re-login required, see [userApiPushEnabled]).
+  String? get configuredPushUrl => _data()['configuredPushUrl'] as String?;
+
+  void setConfiguredPushUrl(String? url) {
+    _data()['configuredPushUrl'] = (url != null && url.isNotEmpty) ? url : null;
+  }
+
+  bool get isPushConfigured => configuredPushUrl != null;
+
   // ===== Discourse plugin availability =====
   //
   // Discourse's `/site.json` payload doesn't expose `enabled_plugins` for

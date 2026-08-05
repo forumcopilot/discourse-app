@@ -42,6 +42,15 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
 
   // Track when we last became visible to refresh on return
   bool _wasVisible = false;
+
+  // Cold-start: the persisted User API Key is restored before the user
+  // record (/session/current.json) is hydrated, so the username the PM
+  // listing endpoints need may not be available yet. Instead of issuing a
+  // doomed request (which would render as an empty inbox), stay in the
+  // loading state and retry until the username arrives.
+  int _usernameRetryCount = 0;
+  bool _usernameRetryScheduled = false;
+  static const int _maxUsernameRetries = 10;
   
   // Track last logged values to reduce debug noise
   int? _lastLoggedConversationsCount;
@@ -131,6 +140,35 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
       return;
     }
 
+    if (currentUsername == null || currentUsername.isEmpty) {
+      // Logged in (User API Key restored) but the user record hasn't
+      // hydrated yet — the PM endpoints are built from the username, so
+      // requesting now can only fail. Keep the spinner and retry shortly.
+      if (_usernameRetryCount < _maxUsernameRetries) {
+        AppLogger.debug(
+            '[ConversationList] Username not hydrated yet - deferring load (attempt ${_usernameRetryCount + 1}/$_maxUsernameRetries)');
+        if (mounted) {
+          setState(() {
+            _isLoading = true;
+            _error = null;
+          });
+        }
+        if (!_usernameRetryScheduled) {
+          _usernameRetryScheduled = true;
+          _usernameRetryCount++;
+          Future.delayed(const Duration(seconds: 2), () {
+            _usernameRetryScheduled = false;
+            if (mounted) loadConversations();
+          });
+        }
+        return;
+      }
+      // Retries exhausted — fall through; the proxy returns result:false
+      // and the error state below offers a manual Retry.
+    } else {
+      _usernameRetryCount = 0;
+    }
+
     _wasLoggedIn = widget.siteContext.isLoggedIn;
     _lastLoadedUsername = currentUsername;
 
@@ -169,6 +207,14 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
 
     final conversationsData = await conversationProxy.getConversationsAsync(startNum, lastNum);
     AppLogger.debug('[ConversationList] Conversations received: ${conversationsData.list.length} conversations');
+
+    if (!conversationsData.result) {
+      // A failed fetch must not render as an empty inbox — surface the
+      // error state (with Retry) via loadConversations' catch instead.
+      throw Exception(conversationsData.resultText?.isNotEmpty == true
+          ? conversationsData.resultText
+          : 'Failed to load conversations');
+    }
 
     if (mounted) {
       AppLogger.debug('   - Setting state with ${conversationsData.list.length} conversations');
@@ -482,6 +528,14 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
     final lastNum = startNum + _itemsPerPage - 1;
     final conversationsData = await conversationProxy.getConversationsAsync(startNum, lastNum);
     AppLogger.debug('[ConversationList] More conversations received: ${conversationsData.list.length} conversations');
+
+    if (!conversationsData.result) {
+      // Surface the failure via _loadMoreData's snackbar instead of
+      // silently ending pagination.
+      throw Exception(conversationsData.resultText?.isNotEmpty == true
+          ? conversationsData.resultText
+          : 'Failed to load more conversations');
+    }
 
     if (mounted) {
       setState(() {

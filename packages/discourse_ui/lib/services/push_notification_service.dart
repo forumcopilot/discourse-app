@@ -47,7 +47,15 @@ class PushNotificationService with ServiceErrorHandlingMixin {
     return {};
   }
 
-  /// Register device for a specific site
+  /// Register device for a specific site.
+  ///
+  /// [discourseClientId] is the `User-Api-Client-Id` this install used in the
+  /// Discourse User API Key handshake. It is REQUIRED for Discourse push to
+  /// work end-to-end: Discourse POSTs notifications to the static relay URL
+  /// (`<pushApiBaseUrl>/discourse/push`, see
+  /// `AppForumConfig.discoursePushUrl`) tagged only with that `client_id` —
+  /// the relay uses this registration to map `client_id` → FCM token.
+  /// Sent as `discourse_client_id`; omitted for non-Discourse registrations.
   Future<bool> registerDeviceForSite({
     required String deviceId,
     required String firebaseToken,
@@ -57,6 +65,7 @@ class PushNotificationService with ServiceErrorHandlingMixin {
     required String siteUserId,
     required String siteUsername,
     required NotificationPreferences preferences,
+    String? discourseClientId,
   }) async {
     // Skip the hosted-backend registration entirely when no backend URL is set.
     // BYO/direct builds set pushApiBaseUrl='' — there's nothing to register against.
@@ -80,6 +89,8 @@ class PushNotificationService with ServiceErrorHandlingMixin {
           'site_user_id': siteUserId,
           'site_username': siteUsername,
           'notification_preferences': preferences.toJson(),
+          if (discourseClientId != null && discourseClientId.isNotEmpty)
+            'discourse_client_id': discourseClientId,
         },
       );
 

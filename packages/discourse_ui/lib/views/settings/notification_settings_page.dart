@@ -1,8 +1,12 @@
+import 'package:discourse_core/discourse_core.dart';
 import 'package:flutter/material.dart';
+import 'package:discourse_ui/config/app_forum_config.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_notification_prefs.dart';
+import 'package:get/get.dart';
 
+import '../../controllers/site_controller.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/simple_list_app_bar.dart';
 
@@ -142,6 +146,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       padding: EdgeInsets.only(bottom: DesignTokens.spacingXL),
       children: [
         if (_saving) const LinearProgressIndicator(minHeight: 2),
+        _Section(label: 'Push'),
+        const _PushStatusTile(),
+        const Divider(height: 1),
         _Section(label: 'Email'),
         _EnumTile(
           title: 'Email when away',
@@ -254,6 +261,68 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Read-only status row for push notifications. Push state is not a
+/// user-flippable preference in the Discourse model — it is decided by
+/// build config ([AppForumConfig.pushApiBaseUrl]) plus whether the current
+/// User API Key was granted the `push` scope + `push_url` at login — so
+/// this tile only reports which of the three states applies:
+///
+///   * unconfigured — this build ships without a push relay;
+///   * enabled — the key carries the push grant, Discourse pushes to the relay;
+///   * re-login required — push was configured after this login; a User API
+///     Key's scopes/push_url can't be amended, only a fresh handshake helps.
+///
+/// Everything here is guarded — no [PushNotificationService] call is made,
+/// so the page is safe to open with the push backend disabled.
+class _PushStatusTile extends StatelessWidget {
+  const _PushStatusTile();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (!AppForumConfig.isPushBackendEnabled) {
+      return ListTile(
+        leading: Icon(
+          Icons.notifications_off_outlined,
+          color: colorScheme.onSurfaceVariant,
+        ),
+        title: const Text('Push notifications'),
+        subtitle: const Text('Not available in this build'),
+        enabled: false,
+      );
+    }
+
+    final ctx = Get.isRegistered<DiscourseSiteController>()
+        ? Get.find<DiscourseSiteController>().currentSiteContext.value
+        : null;
+    final pushGranted = ctx?.userApiPushEnabled ?? false;
+
+    if (pushGranted) {
+      return ListTile(
+        leading: Icon(
+          Icons.notifications_active_outlined,
+          color: colorScheme.primary,
+        ),
+        title: const Text('Push notifications'),
+        subtitle: const Text('Enabled for this login'),
+      );
+    }
+
+    return ListTile(
+      leading: Icon(
+        Icons.notification_important_outlined,
+        color: colorScheme.error,
+      ),
+      title: const Text('Push notifications'),
+      subtitle: const Text(
+        'Not active for this login — log out and log back in to '
+        'authorize push notifications',
+      ),
     );
   }
 }

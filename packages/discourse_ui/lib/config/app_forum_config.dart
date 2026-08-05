@@ -109,6 +109,49 @@ class AppForumConfig {
   ///      dashboard. See https://forumcopilot.com for sign-up and pricing.
   static const String pushApiBaseUrl = '';
 
+  /// The `push_url` this app registers on its Discourse User API Key, or
+  /// `null` when push is not configured ([pushApiBaseUrl] empty).
+  ///
+  /// **RELAY PATH CONTRACT — must match the relay backend.** Discourse POSTs
+  /// notification payloads (JSON, see `HubPushNotificationPusher` in the
+  /// Discourse source) to exactly this URL. We define the route as:
+  ///
+  ///     <pushApiBaseUrl>/discourse/push
+  ///
+  /// The relay must serve `POST /discourse/push` under its base URL and
+  /// answer 200. Nothing in this repo enforces the path — if the relay
+  /// exposes a different route, change this getter to match.
+  ///
+  /// **The URL is deliberately static — no per-device FCM token in the
+  /// path.** Discourse validates `push_url` with *substring* matching
+  /// against the `allowed_user_api_push_urls` site setting
+  /// (`SiteSetting.allowed_user_api_push_urls.include?(push_url)` in
+  /// `app/models/user_api_key.rb`, and `position(push_url IN ?)` in
+  /// `push_clients_for`), so a unique per-device URL could never be
+  /// allowlisted. Device identity instead travels as the `client_id` field
+  /// Discourse merges into every notification it POSTs — the relay maps
+  /// `client_id` → FCM token from the registration the app sends to
+  /// `POST <pushApiBaseUrl>/devices/register` (see
+  /// `PushNotificationService.registerDeviceForSite`, which includes
+  /// `discourse_client_id`).
+  ///
+  /// Server-side prerequisites (forum admin):
+  ///   * add this exact URL to `allowed_user_api_push_urls`;
+  ///   * include `push` in `allow_user_api_key_scopes` (default: on).
+  static String? get discoursePushUrl {
+    if (!isPushBackendEnabled) return null;
+    final base = pushApiBaseUrl.trim().replaceAll(RegExp(r'/+$'), '');
+    return '$base/discourse/push';
+  }
+
+  /// Scopes actually sent in the handshake: [userApiRequestedScopes], plus
+  /// `push` when a push relay is configured ([discoursePushUrl] non-null).
+  /// With no relay configured this is identical to [userApiRequestedScopes].
+  static List<String> get userApiEffectiveScopes => <String>[
+        ...userApiRequestedScopes,
+        if (discoursePushUrl != null) 'push',
+      ];
+
   /// Android package name used for passkey assetlinks validation.
   static const String androidPackageName = 'com.example.forumapp';
 

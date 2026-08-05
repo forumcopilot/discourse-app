@@ -21,6 +21,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  # Used by test/widget_test.dart to mock preference storage
+  # (SharedPreferences.setMockInitialValues). Already a transitive
+  # dependency via discourse_ui; declared here so the test may import it.
+  shared_preferences: ^2.5.5
   flutter_launcher_icons: ^0.14.4
   flutter_native_splash: ^2.4.0
 

@@ -15,9 +15,12 @@ class MemoryManager {
   Timer? _memoryMonitorTimer;
 
   // Memory thresholds (resident set size). Flutter apps commonly idle in the
-  // 150-300MB RSS range, so these are set well above normal operating levels.
-  static const int _warningThresholdMB = 500;
-  static const int _criticalThresholdMB = 1024;
+  // 150-300MB RSS range in release, but DEBUG builds carry the VM service,
+  // JIT artifacts, and unshrunk assets — 700-900MB RSS is normal there and
+  // release-level thresholds just spam warnings (observed 770MB idle on a
+  // Pixel debug build).
+  static const int _warningThresholdMB = kDebugMode ? 1200 : 500;
+  static const int _criticalThresholdMB = kDebugMode ? 1600 : 1024;
 
   bool _isMonitoring = false;
 

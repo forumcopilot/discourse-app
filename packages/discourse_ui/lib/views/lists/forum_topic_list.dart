@@ -132,8 +132,15 @@ class _ForumTopicListState extends State<ForumTopicList> {
           final forumTopicData = await topicProxy.getTopicAsync(widget.forum.id, 0, _pageSize);
           if (forumTopicData.topics.isNotEmpty) {
             AppLogger.debug('[ForumTopicList] Adding ${forumTopicData.topics.length} regular topics');
-            var topicsList = forumTopicData.topics;
+            // Dedupe by topic id: pinned topics also appear in the regular
+            // list — the sticky/announcement section above wins.
+            final pinnedIds = allItems.map((t) => t.id).toSet();
+            var topicsList = forumTopicData.topics
+                .where((t) => !pinnedIds.contains(t.id))
+                .toList();
             allItems.addAll(topicsList);
+            // Pagination offset tracks the server-side list, so count the
+            // raw (pre-dedupe) page length.
             _currentTopicCount = forumTopicData.topics.length;
           }
           hasMoreTopics = forumTopicData.topics.length >= _pageSize;
@@ -203,8 +210,14 @@ class _ForumTopicListState extends State<ForumTopicList> {
         setState(() {
           // Add new topics to the _allItems list
           if (moreTopics.topics.isNotEmpty) {
-            var topicsList = moreTopics.topics;
+            // Dedupe by topic id against what's already shown (pinned
+            // topics resurface in paginated regular pages).
+            final existingIds = _allItems.map((t) => t.id).toSet();
+            var topicsList = moreTopics.topics
+                .where((t) => !existingIds.contains(t.id))
+                .toList();
             _allItems.addAll(topicsList);
+            // Offset tracks the server-side list: count the raw page length.
             _currentTopicCount += moreTopics.topics.length;
           }
 
@@ -246,17 +259,19 @@ class _ForumTopicListState extends State<ForumTopicList> {
       return;
     }
 
+    var topicCreated = false;
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => NewTopicPage(
           siteContext: widget.siteContext,
           forumId: widget.forum.id,
           forumName: widget.forum.name,
+          onTopicCreated: () => topicCreated = true,
         ),
       ),
     );
 
-    if (result == true) {
+    if (result == true || topicCreated) {
       _loadTopics();
     }
   }

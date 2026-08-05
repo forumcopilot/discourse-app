@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:discourse_core/discourse_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -192,6 +193,19 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
     } catch (e) {
       AppLogger.debug('Error registering current site after initialization: $e');
     }
+  }
+
+  /// The `User-Api-Client-Id` of the current Discourse login, or null when
+  /// not logged in. Sent with relay registrations so the relay can map the
+  /// `client_id` Discourse tags onto each pushed notification back to this
+  /// device's FCM token (Discourse identifies push targets ONLY by
+  /// client_id — see `HubPushNotificationPusher` in the Discourse source).
+  String? get _discourseClientId {
+    if (!Get.isRegistered<DiscourseSiteController>()) return null;
+    return Get.find<DiscourseSiteController>()
+        .currentSiteContext
+        .value
+        ?.userApiClientId;
   }
 
   // ----- BYO/direct mode device registration ---------------------------
@@ -417,6 +431,7 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
             siteUserId: state.userId,
             siteUsername: state.username,
             preferences: state.preferences,
+            discourseClientId: _discourseClientId,
           );
 
           if (success) {
@@ -522,6 +537,7 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
             siteUserId: userId,
             siteUsername: username,
             preferences: sitePreferences,
+            discourseClientId: _discourseClientId,
           );
 
           if (success) {
@@ -712,6 +728,7 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
               siteUserId: _siteStates[siteId]!.userId,
               siteUsername: _siteStates[siteId]!.username,
               preferences: preferences,
+              discourseClientId: _discourseClientId,
             );
             if (success) {
               AppLogger.debug('Updated preferences on backend for site $siteId');

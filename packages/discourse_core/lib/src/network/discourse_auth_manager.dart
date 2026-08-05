@@ -44,6 +44,7 @@ class DiscourseAuthManager {
   static const String _prefHandshakePrivateKey = '_handshake_private_key';
   static const String _prefHandshakeNonce = '_handshake_nonce';
   static const String _prefHandshakeClientId = '_handshake_client_id';
+  static const String _prefHandshakePushRequested = '_handshake_push_requested';
   static const String _prefInstallClientId = '_install_client_id';
 
   /// Requesting `padding=oaep` opts in to RSA-OAEP (OpenSSL's
@@ -66,6 +67,14 @@ class DiscourseAuthManager {
 
   /// Generate keypair + nonce, persist the in-flight state, and build the URL
   /// to open in a webview.
+  ///
+  /// [pushUrl], when non-empty, is sent as the `push_url` param and stored by
+  /// Discourse on the resulting User API Key (`user_api_keys.push_url`) —
+  /// Discourse later POSTs notification payloads to it (see
+  /// `HubPushNotificationPusher`). For the key to actually push, the caller
+  /// must ALSO include `push` in [scopes], and the forum admin must list the
+  /// exact URL in the `allowed_user_api_push_urls` site setting (substring
+  /// match — so use a static URL, never a per-device one).
   Future<DiscourseUserApiHandshakeRequest> beginHandshake({
     required String applicationName,
     required List<String> scopes,
@@ -84,10 +93,18 @@ class DiscourseAuthManager {
     final clientId = await _getOrCreateClientId();
     final nonce = _randomHex(16);
 
+    // Only treat the handshake as a push request when both halves were sent:
+    // the `push` scope AND a push_url. (The server's `has_push?` also counts
+    // the `notifications` scope, so its `push: true` echo alone is not proof
+    // that we deliberately wired push — see completeHandshake.)
+    final pushRequested =
+        pushUrl != null && pushUrl.isNotEmpty && scopes.contains('push');
+
     await _persistHandshakeState(
       privateKey: keypair.privateKey,
       nonce: nonce,
       clientId: clientId,
+      pushRequested: pushRequested,
     );
 
     final pubPem = _publicKeyToPem(keypair.publicKey);
@@ -148,7 +165,13 @@ class DiscourseAuthManager {
       throw StateError('User API Key handshake returned no key.');
     }
 
-    final pushEnabled = json['push'] as bool? ?? false;
+    // The server echoes `push: key.has_push?` (scope + push_url present +
+    // push_url allowlisted in `allowed_user_api_push_urls`). `has_push?`
+    // also returns true for the `notifications` scope alone, so gate on
+    // whether WE actually sent `push` scope + push_url in this handshake —
+    // userApiPushEnabled must only record deliberate, complete push wiring.
+    final pushEnabled =
+        state.pushRequested && (json['push'] as bool? ?? false);
 
     await siteContext.setUserApiCredentials(
       userApiKey: key,
@@ -208,6 +231,7 @@ class DiscourseAuthManager {
     required pc.RSAPrivateKey privateKey,
     required String nonce,
     required String clientId,
+    required bool pushRequested,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final p = _prefsPrefix();
@@ -219,6 +243,7 @@ class DiscourseAuthManager {
     );
     await prefs.setString('$p$_prefHandshakeNonce', nonce);
     await prefs.setString('$p$_prefHandshakeClientId', clientId);
+    await prefs.setBool('$p$_prefHandshakePushRequested', pushRequested);
   }
 
   Future<_HandshakeState?> _loadHandshakeState() async {
@@ -241,6 +266,8 @@ class DiscourseAuthManager {
       privateKey: _privateKeyFromJson(pk),
       nonce: nonce,
       clientId: cid,
+      pushRequested:
+          prefs.getBool('$p$_prefHandshakePushRequested') ?? false,
     );
   }
 
@@ -251,6 +278,7 @@ class DiscourseAuthManager {
     await prefs.remove('$p$_prefHandshakePrivateKey');
     await prefs.remove('$p$_prefHandshakeNonce');
     await prefs.remove('$p$_prefHandshakeClientId');
+    await prefs.remove('$p$_prefHandshakePushRequested');
   }
 
   String _prefsPrefix() => 'discourse:${siteContext.site.pluginUrl}';
@@ -404,9 +432,13 @@ class _HandshakeState {
   final String nonce;
   final String clientId;
 
+  /// True when this handshake sent both the `push` scope and a `push_url`.
+  final bool pushRequested;
+
   const _HandshakeState({
     required this.privateKey,
     required this.nonce,
     required this.clientId,
+    required this.pushRequested,
   });
 }

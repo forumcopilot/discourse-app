@@ -53,17 +53,19 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
       return;
     }
 
+    var topicCreated = false;
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => NewTopicPage(
           siteContext: widget.siteContext,
           forumId: widget.forum.id,
           forumName: widget.forum.name,
+          onTopicCreated: () => topicCreated = true,
         ),
       ),
     );
 
-    if (result == true && _refreshCallback != null) {
+    if ((result == true || topicCreated) && _refreshCallback != null) {
       _refreshCallback!();
     }
   }

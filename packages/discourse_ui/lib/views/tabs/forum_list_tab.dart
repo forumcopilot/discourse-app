@@ -34,6 +34,10 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
   // Track last logged forum count to reduce debug noise
   int? _lastLoggedForumCount;
 
+  // One automatic retry after a transient first-load failure, so a cold
+  // start with a not-yet-ready network recovers without user action.
+  bool _didAutoRetryForums = false;
+
   @override
   void initState() {
     super.initState();
@@ -187,9 +191,31 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
       AppLogger.debug('   - resultText: ${getForumsResult.resultText}');
       AppLogger.debug('   - forums count: ${getForumsResult.forums?.length ?? 'null'}');
 
-      if (!getForumsResult.result && (getForumsResult.resultText?.isNotEmpty ?? false)) {
-        AppLogger.debug('[ForumList] ⚠️ API call returned result=false: ${getForumsResult.resultText}');
+      if (!getForumsResult.result) {
+        // A failed fetch must not render as "No Forums Available" (which
+        // reads as a permissions problem) — show the error state with
+        // Retry, and retry once automatically after a short delay.
+        final message = (getForumsResult.resultText?.isNotEmpty ?? false)
+            ? getForumsResult.resultText!
+            : 'Unable to load forums';
+        AppLogger.debug('[ForumList] ⚠️ API call returned result=false: $message');
+        if (mounted) {
+          setState(() {
+            _error = message;
+            _isLoading = false;
+          });
+          if (!_didAutoRetryForums) {
+            _didAutoRetryForums = true;
+            Future.delayed(const Duration(seconds: 3), () {
+              if (mounted && _error != null) {
+                _loadForums();
+              }
+            });
+          }
+        }
+        return;
       }
+      _didAutoRetryForums = false;
 
       final allForums = getForumsResult.forums;
       AppLogger.debug('[ForumList] All forums loaded: ${allForums?.length ?? 0} forums');

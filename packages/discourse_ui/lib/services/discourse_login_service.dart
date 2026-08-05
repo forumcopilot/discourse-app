@@ -36,13 +36,19 @@ class DiscourseLoginService {
         _client = client ?? DiscourseClient();
 
   /// Generate the handshake URL the webview should open.
+  ///
+  /// When a push relay is configured ([AppForumConfig.pushApiBaseUrl]
+  /// non-empty) the handshake additionally requests the `push` scope and
+  /// registers [AppForumConfig.discoursePushUrl] as the key's `push_url` —
+  /// Discourse then POSTs this user's notifications to that relay URL
+  /// (tagged with our `client_id`) for forwarding to FCM/APNs. When push is
+  /// not configured, scopes and params are exactly the pre-push ones.
   Future<DiscourseUserApiHandshakeRequest> beginLogin() {
     return _authManager.beginHandshake(
       applicationName: AppForumConfig.userApiApplicationName,
-      scopes: AppForumConfig.userApiRequestedScopes,
+      scopes: AppForumConfig.userApiEffectiveScopes,
       authRedirect: authRedirect,
-      pushUrl:
-          AppForumConfig.isPushBackendEnabled ? AppForumConfig.pushApiBaseUrl : null,
+      pushUrl: AppForumConfig.discoursePushUrl,
     );
   }
 
