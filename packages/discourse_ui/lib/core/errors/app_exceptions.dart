@@ -296,7 +296,9 @@ class UnknownException extends AppException {
   /// Create from any error
   static UnknownException fromError(dynamic error, [StackTrace? stackTrace]) {
     return UnknownException(
-      message: 'An unexpected error occurred: ${error.toString()}',
+      // The raw error is kept in `originalError` for logging; it must not
+      // be pasted into `message`, which is shown to the user.
+      message: 'An unexpected error occurred. Please try again.',
       code: 'UNKNOWN_ERROR',
       originalError: error,
       stackTrace: stackTrace,

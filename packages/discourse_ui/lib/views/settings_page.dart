@@ -8,6 +8,7 @@ import 'change_email_page.dart';
 import 'ignored_users_page.dart';
 import 'settings/notification_settings_page.dart';
 import 'widgets/simple_list_app_bar.dart';
+import '../utils/error_message.dart';
 
 /// Phase 5.20d — Forum Settings page rebuilt as a curated Discourse-
 /// native section list.
@@ -275,7 +276,7 @@ class ForumSettingsPage extends StatelessWidget {
     } catch (e) {
       if (!context.mounted) return;
       messenger.showSnackBar(
-        SnackBar(content: Text('Request failed: $e')),
+        SnackBar(content: Text(describeError(e, fallback: 'Request failed.'))),
       );
     }
   }

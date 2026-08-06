@@ -33,12 +33,36 @@ class EmptyStateView extends StatelessWidget {
   /// Use the named constructor for clarity in callers.
   final bool _scrollable;
 
+  /// When true the state is a *failure*, not an absence: the icon takes the
+  /// error tone and a Retry button is offered. Screens used to render both
+  /// cases through the plain constructor with the same icon, so "the request
+  /// failed" was indistinguishable from "you have none of these" — and there
+  /// was no way to retry without leaving the screen.
+  final bool _isError;
+
+  /// Invoked by the Retry button. Only shown on the error variant.
+  final VoidCallback? onRetry;
+
   const EmptyStateView({
     super.key,
     required this.icon,
     required this.message,
     this.hint,
-  }) : _scrollable = false;
+  })  : _scrollable = false,
+        _isError = false,
+        onRetry = null;
+
+  /// Failure state: distinct icon tone plus an optional Retry action.
+  /// Pair with `describeError` so the message is human-readable.
+  const EmptyStateView.error({
+    super.key,
+    required this.message,
+    this.icon = Icons.error_outline,
+    this.hint,
+    this.onRetry,
+    bool scrollable = false,
+  })  : _scrollable = scrollable,
+        _isError = true;
 
   /// Use this when the empty view sits inside a `RefreshIndicator`
   /// — the underlying scrollable lets the user pull-to-refresh even
@@ -48,7 +72,9 @@ class EmptyStateView extends StatelessWidget {
     required this.icon,
     required this.message,
     this.hint,
-  }) : _scrollable = true;
+  })  : _scrollable = true,
+        _isError = false,
+        onRetry = null;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +89,7 @@ class EmptyStateView extends StatelessWidget {
           Icon(
             icon,
             size: DesignTokens.iconSizeXXL,
-            color: colorScheme.onSurfaceVariant,
+            color: _isError ? colorScheme.error : colorScheme.onSurfaceVariant,
           ),
           const SizedBox(height: DesignTokens.spacingM),
           Text(
@@ -82,6 +108,14 @@ class EmptyStateView extends StatelessWidget {
                     .withValues(alpha: DesignTokens.opacityHigh),
               ),
               textAlign: TextAlign.center,
+            ),
+          ],
+          if (_isError && onRetry != null) ...[
+            const SizedBox(height: DesignTokens.spacingL),
+            OutlinedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh, size: DesignTokens.iconSizeM),
+              label: const Text('Try again'),
             ),
           ],
         ],

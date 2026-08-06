@@ -58,7 +58,7 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
     } on DiscourseApiException catch (e) {
       return FCGroupListResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCGroupListResult(result: false, resultText: 'Error: $e');
+      return FCGroupListResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -73,7 +73,7 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
     } on DiscourseApiException catch (e) {
       return FCGroupResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCGroupResult(result: false, resultText: 'Error: $e');
+      return FCGroupResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -141,7 +141,7 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
     } on DiscourseApiException catch (e) {
       return FCGroupMembersResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCGroupMembersResult(result: false, resultText: 'Error: $e');
+      return FCGroupMembersResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -158,7 +158,7 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
       return FCGroupMembershipResult(
           result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCGroupMembershipResult(result: false, resultText: 'Error: $e');
+      return FCGroupMembershipResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -175,7 +175,7 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
       return FCGroupMembershipResult(
           result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCGroupMembershipResult(result: false, resultText: 'Error: $e');
+      return FCGroupMembershipResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -209,7 +209,7 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
       return FCGroupMembershipResult(
           result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCGroupMembershipResult(result: false, resultText: 'Error: $e');
+      return FCGroupMembershipResult(result: false, resultText: describeApiError(e));
     }
   }
 

@@ -14,6 +14,7 @@ import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
 import '../login_page.dart';
+import '../widgets/empty_state_view.dart';
 
 class ProfileTab extends StatefulWidget {
   final SiteContext siteContext;
@@ -33,6 +34,10 @@ class ProfileTab extends StatefulWidget {
 class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWidget<ProfileTab> {
   bool _hasLoaded = false;
   FCUserInfoResult? _userInfo;
+
+  /// Set when the profile fetch failed. Without this the null
+  /// `_userInfo` branch below spins forever on a failed load.
+  String? _userInfoError;
   List<FCUserReply>? _recentPosts;
   bool _isLoadingMorePosts = false;
   int _totalPosts = 0;
@@ -80,6 +85,7 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
         if (mounted) {
           setState(() {
             _userInfo = null;
+      _userInfoError = null;
             _hasLoaded = false;
           });
         }
@@ -156,6 +162,24 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
         final proxy = SiteProxyFactory.getUserProxy();
         final info = await proxy.getUserInfoAsync(username, null);
 
+        // The proxy reports most failures by returning `result: false`
+        // rather than throwing, so the catch below never sees them. Assigning
+        // regardless left the page rendering a default-constructed profile —
+        // "?" avatar, no username, no trust level, empty stats — with no hint
+        // that anything had gone wrong. Rate limiting made this easy to hit.
+        if (!info.result) {
+          AppLogger.debug(
+              '👤 [PROFILE_TAB] ❌ getUserInfo reported failure: ${info.resultText}');
+          if (mounted) {
+            setState(() {
+              _userInfoError = info.resultText?.isNotEmpty == true
+                  ? info.resultText!
+                  : 'Could not load your profile.';
+            });
+          }
+          return;
+        }
+
         AppLogger.debug('👤 [PROFILE_TAB] ✅ getUserInfo API call completed successfully');
         // Debug logging for display text
         AppLogger.debug('=== Profile Tab Debug Info ===');
@@ -166,6 +190,7 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
         if (mounted) {
           setState(() {
             _userInfo = info;
+            _userInfoError = null;
           });
           _fetchRecentPosts(username); // Fetch recent posts after user info
         }
@@ -240,6 +265,7 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
   Future<void> _handleRefresh() async {
     setState(() {
       _userInfo = null;
+      _userInfoError = null;
       _hasLoaded = false;
     });
     clearError();
@@ -257,7 +283,22 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
-          if (_userInfo == null)
+          if (_userInfo == null && _userInfoError != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  vertical: DesignTokens.spacingXXL),
+              child: EmptyStateView.error(
+                message: _userInfoError!,
+                onRetry: () {
+                  setState(() {
+                    _userInfoError = null;
+                    _hasLoaded = false;
+                  });
+                  _fetchUserInfo();
+                },
+              ),
+            )
+          else if (_userInfo == null)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingXXL),
               child: Center(child: CircularProgressIndicator()),
@@ -276,6 +317,7 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
                 // reset the section vanished after an edit.
                 setState(() {
                   _userInfo = null;
+      _userInfoError = null;
                   _hasLoaded = false;
                 });
                 _fetchUserInfo();

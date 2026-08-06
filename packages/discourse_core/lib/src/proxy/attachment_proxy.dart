@@ -76,7 +76,7 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
       } catch (e) {
         return FCAttachmentUploadResult(
           result: false,
-          resultText: 'Uploaded but could not set avatar: $e',
+          resultText: 'Uploaded but could not set avatar: ${describeApiError(e)}',
           attachmentId: upload.attachmentId,
           fileName: upload.fileName,
           groupId: upload.groupId,
@@ -195,7 +195,7 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
     } catch (e) {
       return FCAttachmentUploadResult(
         result: false,
-        resultText: 'Upload error: $e',
+        resultText: 'Upload error: ${describeApiError(e)}',
       );
     }
   }

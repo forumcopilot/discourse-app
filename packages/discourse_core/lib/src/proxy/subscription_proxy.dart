@@ -58,7 +58,7 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       });
       return FCSubscribeTopicResult(result: true, resultText: '');
     } catch (e) {
-      return FCSubscribeTopicResult(result: false, resultText: 'Error: $e');
+      return FCSubscribeTopicResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -70,7 +70,7 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       });
       return FCUnsubscribeTopicResult(result: true, resultText: '');
     } catch (e) {
-      return FCUnsubscribeTopicResult(result: false, resultText: 'Error: $e');
+      return FCUnsubscribeTopicResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -84,7 +84,7 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       });
       return FCSubscribeForumResult(result: true, resultText: '');
     } catch (e) {
-      return FCSubscribeForumResult(result: false, resultText: 'Error: $e');
+      return FCSubscribeForumResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -96,7 +96,7 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       });
       return FCUnsubscribeForumResult(result: true, resultText: '');
     } catch (e) {
-      return FCUnsubscribeForumResult(result: false, resultText: 'Error: $e');
+      return FCUnsubscribeForumResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -151,7 +151,7 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
     } catch (e) {
       return FCSubscribedForumResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         totalForumsNum: 0,
       );
     }
@@ -204,7 +204,7 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
     } catch (e) {
       return FCSubscribedTopicResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         totalTopicNum: 0,
       );
     }
@@ -224,7 +224,7 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       return FCNotificationLevelResult(
           result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCNotificationLevelResult(result: false, resultText: 'Error: $e');
+      return FCNotificationLevelResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -242,7 +242,7 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       return FCNotificationLevelResult(
           result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCNotificationLevelResult(result: false, resultText: 'Error: $e');
+      return FCNotificationLevelResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -266,7 +266,7 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       return FCNotificationLevelResult(
           result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCNotificationLevelResult(result: false, resultText: 'Error: $e');
+      return FCNotificationLevelResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -298,7 +298,7 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       return FCNotificationLevelResult(
           result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCNotificationLevelResult(result: false, resultText: 'Error: $e');
+      return FCNotificationLevelResult(result: false, resultText: describeApiError(e));
     }
   }
 

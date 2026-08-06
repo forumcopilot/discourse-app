@@ -43,7 +43,7 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
     } on DiscourseApiException catch (e) {
       return FCAddBookmarkResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCAddBookmarkResult(result: false, resultText: 'Error: $e');
+      return FCAddBookmarkResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -103,7 +103,7 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
     } on DiscourseApiException catch (e) {
       return FCRemoveBookmarkResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCRemoveBookmarkResult(result: false, resultText: 'Error: $e');
+      return FCRemoveBookmarkResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -118,7 +118,7 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
     } on DiscourseApiException catch (e) {
       return FCRemoveBookmarkResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCRemoveBookmarkResult(result: false, resultText: 'Error: $e');
+      return FCRemoveBookmarkResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -176,7 +176,7 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
     } catch (e) {
       return FCBookmarkListResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         total: 0,
         items: const [],
       );
@@ -230,7 +230,7 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
     } on DiscourseApiException catch (e) {
       return FCAddBookmarkResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCAddBookmarkResult(result: false, resultText: 'Error: $e');
+      return FCAddBookmarkResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -272,7 +272,7 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
     } catch (e) {
       return DiscourseBookmarkUpdateResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
       );
     }
   }
@@ -319,7 +319,7 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
     } catch (e) {
       return DiscourseBookmarkListResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
       );
     }
   }

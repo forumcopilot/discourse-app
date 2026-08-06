@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import '../theme/design_tokens.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
+import '../utils/error_message.dart';
 
 /// Invites screen — Discourse-native shareable invite links and email
 /// invites (`DiscourseInviteProxy`, no XenForo-shaped SDK counterpart).
@@ -101,7 +102,7 @@ class _InvitesPageState extends State<InvitesPage> {
       setState(() {
         _loading = false;
         _invites = const [];
-        _error = '$e';
+        _error = describeError(e);
       });
     }
   }
@@ -450,9 +451,10 @@ class _InvitesPageState extends State<InvitesPage> {
 
   Widget _buildList() {
     if (_error != null && (_invites?.isEmpty ?? true)) {
-      return EmptyStateView.scrollable(
-        icon: Icons.error_outline_rounded,
+      return EmptyStateView.error(
         message: _error!,
+        onRetry: _load,
+        scrollable: true,
       );
     }
     final invites = _invites ?? const <DiscourseInvite>[];

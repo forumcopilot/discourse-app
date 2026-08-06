@@ -79,7 +79,7 @@ class DiscourseTagProxy extends BaseDiscourseProxy implements IFCTagProxy {
     } catch (e) {
       return FCTagListResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         total: 0,
         items: const [],
       );
@@ -115,7 +115,7 @@ class DiscourseTagProxy extends BaseDiscourseProxy implements IFCTagProxy {
     } catch (e) {
       return FCTagSearchResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         names: const [],
       );
     }
@@ -198,7 +198,7 @@ class DiscourseTagProxy extends BaseDiscourseProxy implements IFCTagProxy {
     } catch (e) {
       return DiscourseTagNotificationResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
       );
     }
   }
@@ -241,7 +241,7 @@ class DiscourseTagProxy extends BaseDiscourseProxy implements IFCTagProxy {
     } catch (e) {
       return DiscourseTagNotificationResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
       );
     }
   }

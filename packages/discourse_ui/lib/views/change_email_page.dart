@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 
 import '../theme/design_tokens.dart';
 import 'widgets/simple_list_app_bar.dart';
+import '../utils/error_message.dart';
 
 /// Phase 5.23 — change-email flow.
 ///
@@ -69,7 +70,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       if (!mounted) return;
       setState(() => _submitting = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Request failed: $e')),
+        SnackBar(content: Text(describeError(e, fallback: 'Request failed.'))),
       );
     }
   }

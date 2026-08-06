@@ -7,6 +7,7 @@ import '../theme/design_tokens.dart';
 import 'user_profile_page.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
+import '../utils/error_message.dart';
 
 /// Phase 5.25 — list users you've ignored (Discourse notification
 /// level 2), with a per-row "Unignore" action.
@@ -63,7 +64,7 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
       if (!mounted) return;
       setState(() {
         _loading = false;
-        _error = '$e';
+        _error = describeError(e);
       });
     }
   }
@@ -109,7 +110,7 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
         _busy.remove(user.username);
       });
       messenger.showSnackBar(
-        SnackBar(content: Text('Unignore failed: $e')),
+        SnackBar(content: Text(describeError(e, fallback: 'Unignore failed.'))),
       );
     }
   }
@@ -128,9 +129,9 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_error != null && (_users == null || _users!.isEmpty)) {
-      return EmptyStateView(
-        icon: Icons.notifications_off_outlined,
+      return EmptyStateView.error(
         message: _error!,
+        onRetry: _load,
       );
     }
     final users = _users ?? const <FCIgnoredUser>[];

@@ -63,7 +63,7 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
     } catch (e) {
       return FCForgetPasswordResult(
         result: false,
-        resultText: 'Error requesting password reset: $e',
+        resultText: 'Error requesting password reset: ${describeApiError(e)}',
         verified: false,
       );
     }
@@ -183,7 +183,7 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
             'A confirmation email has been sent to the new address.',
       );
     } catch (e) {
-      return FCUpdateEmailResult(result: false, resultText: 'Error: $e');
+      return FCUpdateEmailResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -211,7 +211,7 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
             'account. Follow the link in it to set a new password.',
       );
     } catch (e) {
-      return FCUpdatePasswordResult(result: false, resultText: 'Error: $e');
+      return FCUpdatePasswordResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -239,7 +239,7 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
       );
       return FCUpdateProfileResult(result: true, resultText: '');
     } catch (e) {
-      return FCUpdateProfileResult(result: false, resultText: 'Error: $e');
+      return FCUpdateProfileResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -337,7 +337,7 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage);
     } catch (e) {
       return FCNotificationPrefsResult(
-          result: false, resultText: 'Error: $e');
+          result: false, resultText: describeApiError(e));
     }
   }
 
@@ -376,7 +376,7 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage);
     } catch (e) {
       return FCNotificationPrefsResult(
-          result: false, resultText: 'Error: $e');
+          result: false, resultText: describeApiError(e));
     }
   }
 

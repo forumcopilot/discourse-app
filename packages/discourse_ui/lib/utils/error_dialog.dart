@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import '../controllers/global_loader_controller.dart';
 import '../theme/design_tokens.dart';
+import 'error_message.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseApiException;
 
 /// Extracts a user-friendly error message from an exception
 /// For FCApiException, returns the message property
@@ -13,6 +15,13 @@ import '../theme/design_tokens.dart';
 String extractErrorMessage(dynamic error) {
   if (error is FCApiException) {
     return error.message;
+  }
+  // A DiscourseApiException knows how to describe itself. Without this the
+  // split-on-colon below returned everything after the first colon of its
+  // `toString()` — i.e. the entire response body, which for a CDN or reverse
+  // proxy error is a full HTML document, rendered verbatim in the dialog.
+  if (error is DiscourseApiException) {
+    return describeError(error);
   }
   // For other exceptions, try to extract a meaningful message
   final errorString = error.toString();
@@ -23,7 +32,7 @@ String extractErrorMessage(dynamic error) {
       return parts.sublist(1).join(':').trim();
     }
   }
-  return errorString;
+  return describeError(error);
 }
 
 void showErrorDialog(String errorMessage) {

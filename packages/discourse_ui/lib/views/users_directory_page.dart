@@ -8,6 +8,7 @@ import 'user_profile_page.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
 import 'widgets/trust_level_chip.dart';
+import '../utils/error_message.dart';
 
 /// Phase 5.18c-1 — the Discourse Users directory.
 ///
@@ -188,7 +189,7 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
       if (!mounted) return;
       setState(() {
         _loading = false;
-        _error = '$e';
+        _error = describeError(e);
         _hasMore = false;
       });
     }
@@ -275,9 +276,9 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_items.isEmpty && _error != null) {
-      return EmptyStateView(
-        icon: Icons.people_outline,
+      return EmptyStateView.error(
         message: _error!,
+        onRetry: () => _load(reset: true),
       );
     }
     if (_items.isEmpty) {

@@ -114,7 +114,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
     } catch (e) {
       return FCSearchTopicResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         totalTopicNum: 0,
         topics: const [],
       );
@@ -164,7 +164,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
     } catch (e) {
       return FCSearchPostResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         totalPostNum: 0,
         posts: const [],
       );
@@ -224,7 +224,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
     } catch (e) {
       return FCSearchDataResultTopic(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         totalTopicNum: 0,
         topics: const [],
       );
@@ -282,7 +282,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
     } catch (e) {
       return FCSearchDataResultPost(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         totalPostNum: 0,
         posts: const [],
       );
