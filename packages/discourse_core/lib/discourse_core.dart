@@ -22,7 +22,10 @@ export 'src/proxy/group_proxy.dart';
 export 'src/proxy/invite_proxy.dart';
 export 'src/proxy/tag_proxy.dart';
 
-// Stub proxies
+// Remaining XF-shaped surface: `private_message_proxy` is the only real
+// stub left (Discourse has no separate PM-inbox model — PMs are topics,
+// served by `private_conversation_proxy`). The rest below are full REST
+// implementations.
 export 'src/proxy/attachment_proxy.dart';
 export 'src/proxy/search_proxy.dart';
 export 'src/proxy/social_proxy.dart';
@@ -38,15 +41,17 @@ export 'src/network/discourse_auth_manager.dart';
 // Context extensions
 export 'src/context/discourse_site_context_extension.dart';
 
-// Plugin API - No longer uses REST API layer (converted to plugin-only)
-
 // Base proxy
 export 'src/base_discourse_proxy.dart';
 
-// Data models
-export 'src/data/auth/oauth_token.dart';
-export 'src/data/auth/auth_request.dart';
-export 'src/data/auth/auth_response.dart';
+// Data models. The XenForo-era `dart_mappable` models that used to live
+// under src/data/ (user, post, thread, node, conversation, poll, page,
+// link_forum, thread_prefix, profile_post, alert, search, config,
+// attachment, and the OAuth2 password-login request/response pair) were
+// deleted: they parsed XF JSON keys stock Discourse never emits
+// (`thread_id`, `post_date`, `message_parsed`, `node_id`, `prefix_id`)
+// and were referenced by nothing. Proxies parse Discourse JSON straight
+// into the FC models. What remains mirrors a real Discourse serializer.
 export 'src/data/post/discourse_post_revision.dart';
 export 'src/data/post/discourse_suggested_topic.dart';
 export 'src/data/moderation/discourse_reviewable.dart';

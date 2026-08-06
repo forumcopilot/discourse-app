@@ -159,21 +159,6 @@ class ConversationHeaderItem extends StatelessWidget {
           ),
         );
       },
-      onUserTap: (username, userId) {
-        AppLogger.debug('ConversationHeaderItem: BBCode User tapped: $username (userId: $userId)');
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserProfilePage(
-              siteContext: siteContext,
-              userId: userId,
-              userName: username,
-            ),
-          ),
-        );
-      },
-      inlineAttachments: message.attachments,
-      attachments: message.attachments,
     );
     return Material(
       color: isHighlighted ? colorScheme.primaryContainer.withValues(alpha: 0.3) : (message.isUnread == true ? colorScheme.primaryContainer.withValues(alpha: 0.1) : colorScheme.surface),
@@ -374,53 +359,6 @@ class ConversationHeaderItem extends StatelessWidget {
     );
   }
 
-  List<PopupMenuEntry<String>> _buildPopupMenuItemsHeader(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final items = <PopupMenuEntry<String>>[];
-    
-    // Edit button (only for Discourse and if canEdit is true)
-    if ((message.canEdit ?? false) && siteContext.siteType == 'discourse' && onEdit != null) {
-      items.add(
-        PopupMenuItem<String>(
-          value: 'edit',
-          child: Row(
-            children: [
-              Icon(
-                Icons.edit_outlined,
-                size: DesignTokens.iconSizeM,
-                color: colorScheme.primary,
-              ),
-              const SizedBox(width: DesignTokens.spacingM),
-              Text(AppLocalizations.of(context)?.edit ?? 'Edit'),
-            ],
-          ),
-        ),
-      );
-    }
-    
-    // Report button (if canReport is true)
-    if (message.canReport == true) {
-      items.add(
-        PopupMenuItem<String>(
-          value: 'report',
-          child: Row(
-            children: [
-              Icon(
-                Icons.flag_outlined,
-                size: DesignTokens.iconSizeM,
-                color: colorScheme.secondary,
-              ),
-              const SizedBox(width: DesignTokens.spacingM),
-              Text(AppLocalizations.of(context)?.report ?? 'Report'),
-            ],
-          ),
-        ),
-      );
-    }
-    
-    return items;
-  }
-
   List<PopupMenuEntry<String>> _buildPopupMenuItems(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final items = <PopupMenuEntry<String>>[];
@@ -601,14 +539,6 @@ class _ConversationAttachmentActions {
     );
   }
 
-  /// Build attachment actions for conversation messages
-  dynamic _buildAttachmentActions(BuildContext context) {
-    return _ConversationAttachmentActions(
-      message: message,
-      context: context,
-      siteContext: siteContext,
-    );
-  }
 }
 
 class ConversationItem extends StatelessWidget {
@@ -748,21 +678,6 @@ class ConversationItem extends StatelessWidget {
           ),
         );
       },
-      onUserTap: (username, userId) {
-        AppLogger.debug('ConversationItem: BBCode User tapped: $username (userId: $userId)');
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserProfilePage(
-              siteContext: siteContext,
-              userId: userId,
-              userName: username,
-            ),
-          ),
-        );
-      },
-      inlineAttachments: message.attachments,
-      attachments: message.attachments,
     );
 
     return Material(

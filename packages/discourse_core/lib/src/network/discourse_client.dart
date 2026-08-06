@@ -127,9 +127,13 @@ class DiscourseClient {
       statusCode: response.statusCode ?? 0,
       body: body,
       headers: headers,
-      // Discourse's User API Key auth doesn't speak fc_is_login. Treat any
-      // 2xx with the User-Api-Key header set as "logged in"; the proxy layer
-      // owns the higher-level interpretation (e.g. 403 → key revoked).
+      // `fcIsLogin` is the XenForo plugin's per-response "this call was
+      // authenticated" echo. Discourse has no equivalent — a 2xx says
+      // nothing about whether the User-Api-Key was honoured or the route
+      // is simply public. Always false, deliberately: session state lives
+      // on SiteContext (set by the handshake) and the proxy layer reads
+      // the real signals (401/403 → key revoked). The old comment here
+      // claimed we set it from the header, which the code never did.
       fcIsLogin: false,
     );
   }

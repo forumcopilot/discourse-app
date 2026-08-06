@@ -870,9 +870,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get website => 'Website';
 
   @override
-  String get signature => 'Handtekening';
-
-  @override
   String get next => 'Volgende';
 
   @override
@@ -1378,9 +1375,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get noForumsFound => 'Geen forums gevonden.';
-
-  @override
-  String get pleaseSelectPrefix => 'Selecteer een voorvoegsel';
 
   @override
   String get pleaseLoginToAccessContent =>

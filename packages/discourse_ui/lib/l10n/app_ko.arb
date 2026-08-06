@@ -471,7 +471,6 @@
   "about": "소개",
   "location": "위치",
   "website": "웹사이트",
-  "signature": "서명",
   "next": "다음",
   "permanent": "영구",
   "temporary": "임시",
@@ -787,7 +786,6 @@
   "forward": "전달",
   
   "noForumsFound": "포럼을 찾을 수 없습니다.",
-  "pleaseSelectPrefix": "접두사를 선택하세요",
   "pleaseLoginToAccessContent": "이 콘텐츠에 액세스하고 게시물과 상호 작용하려면 로그인하세요.",
   
   "searchUsers": "사용자 검색...",

@@ -11,9 +11,10 @@ import 'network/discourse_client.dart';
 /// [apiPost] / [apiPut] / [apiDelete] and parse the JSON response into the
 /// matching `FC*Result` type yourself.
 ///
-/// The legacy [callPluginApi] / [callPluginApiTyped] entry points throw at
-/// runtime; they remain on the class only so Phase 0 stub proxies (sed-renamed
-/// XenForo code) still compile while we replace them one at a time.
+/// There is no plugin-call escape hatch: the XenForo-era
+/// `callPluginApi`/`callPluginApiTyped` pair (which only ever threw) was
+/// removed once the last Phase 0 stub was rewritten. Discourse v1 talks
+/// stock REST, full stop.
 abstract class BaseDiscourseProxy {
   final SiteContext siteContext;
   final DiscourseClient _client;
@@ -97,52 +98,11 @@ abstract class BaseDiscourseProxy {
       );
     }
     if (decoded is Map<String, dynamic>) return decoded;
-    // A few endpoints (e.g. /categories.json's `category_list`) return objects
-    // at the top level. List-returning endpoints are rare; wrap them so the
-    // caller still gets a Map to drill into.
+    // Non-object top level — i.e. the endpoint returned a bare JSON ARRAY
+    // (Discourse does this for e.g. /tag_groups filter lists). Every
+    // proxy signature returns a Map, so wrap it under `_value` rather
+    // than lose it.
     return {'_value': decoded};
-  }
-
-  // ===== Pagination / filter helpers (used by SDK-shaped proxies) =====
-
-  Map<String, String> buildPaginationParams({
-    int? page,
-    int? perPage,
-    int? startNum,
-    int? lastNum,
-  }) {
-    final params = <String, String>{};
-    if (page != null) {
-      params['page'] = page.toString();
-    } else if (startNum != null && lastNum != null) {
-      final perPageValue = perPage ?? 20;
-      final startPage = (startNum / perPageValue).floor() + 1;
-      params['page'] = startPage.toString();
-    }
-    if (perPage != null) {
-      params['per_page'] = perPage.toString();
-    }
-    return params;
-  }
-
-  Map<String, String> buildFilterParams({
-    String? order,
-    String? direction,
-    bool? unread,
-    String? threadType,
-    int? prefixId,
-    int? starterId,
-    int? lastDays,
-  }) {
-    final params = <String, String>{};
-    if (order != null) params['order'] = order;
-    if (direction != null) params['direction'] = direction;
-    if (unread != null) params['unread'] = unread.toString();
-    if (threadType != null) params['thread_type'] = threadType;
-    if (prefixId != null) params['prefix_id'] = prefixId.toString();
-    if (starterId != null) params['starter_id'] = starterId.toString();
-    if (lastDays != null) params['last_days'] = lastDays.toString();
-    return params;
   }
 
   // ===== Convenience accessors =====
@@ -216,31 +176,6 @@ abstract class BaseDiscourseProxy {
         : '[file|attachment]($shortUrl)';
   }
 
-  // ===== Legacy plugin-call (deprecated, throws) =====
-
-  /// Throws. Phase 0 stub proxies still call this; replace each with
-  /// [apiGet]/[apiPost]/etc. against the appropriate Discourse endpoint as
-  /// part of the per-proxy Phase 1+ work.
-  @Deprecated(
-    'Discourse has no plugin endpoint in v1. Use apiGet/apiPost/apiPut/apiDelete instead.',
-  )
-  Future<Map<String, dynamic>> callPluginApi(
-      String method, Map<String, dynamic> params) {
-    throw UnimplementedError(
-      'callPluginApi is not implemented on Discourse — replace this proxy '
-      "method with apiGet/apiPost. method='$method'",
-    );
-  }
-
-  @Deprecated('See callPluginApi.')
-  Future<T> callPluginApiTyped<T>(
-    String method,
-    Map<String, dynamic> params,
-    T Function(Map<String, dynamic> json) parse,
-  ) async {
-    final response = await callPluginApi(method, params);
-    return parse(response);
-  }
 }
 
 /// Thrown by [BaseDiscourseProxy] when Discourse returns a non-2xx response.

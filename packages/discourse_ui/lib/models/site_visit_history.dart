@@ -383,11 +383,6 @@ class SiteVisitTracker {
     return allSites;
   }
 
-  // Legacy method for compatibility
-  Future<List<Site>> getMySites() async {
-    return await getSitesWithCredentials();
-  }
-
   Future<bool> isInMySites(Site site) async {
     await loadFromDevice();
 
@@ -400,8 +395,8 @@ class SiteVisitTracker {
         .any((visit) => visit.site.id == site.id && visit.hasSavedCredentials);
   }
 
-  /// In single-forum mode, site metadata is configured locally and does not
-  /// need remote refresh from ForumCopilot APIs.
+  /// In single-forum mode, site metadata comes from `AppForumConfig` at
+  /// build time, so there is nothing to refresh remotely.
   Future<void> refreshSiteInformation() async {
     await loadFromDevice();
     AppLogger.debug(

@@ -3,7 +3,6 @@ import '../l10n/generated/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
-import 'package:forumcopilot_sdk/models/results/fc_topic_result.dart';
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
 import 'package:discourse_ui/utils/attachment_constraints_utils.dart';
 import 'package:discourse_ui/utils/attachment_validation_utils.dart';
@@ -39,16 +38,8 @@ class NewTopicPage extends StatefulWidget {
 class _NewTopicPageState extends State<NewTopicPage> {
   final List<String> _attachmentIds = [];
   String? _groupId;
-  String? _selectedPrefixId;
 
-  // Prefix-related state
-  List<FCPrefix> _availablePrefixes = [];
-  bool _requirePrefix = false;
-  bool _isLoadingPrefixes = true;
-  String? _prefixError;
-
-  // Discourse-native: tags attached to the new topic. Replaces the
-  // XF-flavored prefix dropdown for forums that support tagging.
+  // Discourse-native: tags attached to the new topic.
   List<String> _tags = const [];
 
   // Server-side draft. Discourse uses 'new_topic' as a global key for the
@@ -61,7 +52,6 @@ class _NewTopicPageState extends State<NewTopicPage> {
   @override
   void initState() {
     super.initState();
-    _loadPrefixes();
     _titleController = TextEditingController();
     _contentController = TextEditingController();
     _draftController = DiscourseDraftController(
@@ -84,43 +74,6 @@ class _NewTopicPageState extends State<NewTopicPage> {
     super.dispose();
   }
 
-  Future<void> _loadPrefixes() async {
-    try {
-      setState(() {
-        _isLoadingPrefixes = true;
-        _prefixError = null;
-      });
-
-      final topicProxy = SiteProxyFactory.getTopicProxy();
-      // Fetch minimal data just to get prefix information
-      final topicData = await topicProxy.getTopicAsync(widget.forumId, 0, 1);
-
-      if (mounted) {
-        setState(() {
-          _availablePrefixes = topicData.prefixes;
-          _requirePrefix = topicData.requirePrefix;
-          _isLoadingPrefixes = false;
-        });
-
-        debugPrint('🔍 [NEW_TOPIC] Prefixes loaded:');
-        debugPrint('   - Available prefixes: ${_availablePrefixes.length}');
-        debugPrint('   - Require prefix: $_requirePrefix');
-        if (_availablePrefixes.isNotEmpty) {
-          final prefixSummary = _availablePrefixes.map((p) => '${p.prefixId}:${p.prefixDisplayName}').join(', ');
-          debugPrint('   - Prefixes: $prefixSummary');
-        }
-      }
-    } catch (e) {
-      debugPrint('❌ [NEW_TOPIC] Error loading prefixes: $e');
-      if (mounted) {
-        setState(() {
-          _prefixError = e.toString();
-          _isLoadingPrefixes = false;
-        });
-      }
-    }
-  }
-
   /// Wraps the underlying submit so we can clean up the server-side draft
   /// when the new topic lands successfully.
   Future<bool> _handleSubmitWithDraftDiscard(String title, String content) async {
@@ -132,45 +85,12 @@ class _NewTopicPageState extends State<NewTopicPage> {
   }
 
   Future<bool> _handleSubmit(String title, String content) async {
-    // Validate required prefix before submission
-    if (_requirePrefix && (_selectedPrefixId == null || _selectedPrefixId!.isEmpty)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(
-                Icons.error_outline,
-                color: Theme.of(context).colorScheme.onErrorContainer,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  AppLocalizations.of(context)?.pleaseSelectPrefix ?? 'Please select a prefix',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onErrorContainer,
-                      ),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-          ),
-          margin: DesignTokens.paddingS,
-        ),
-      );
-      return false;
-    }
-
     try {
       final topicProxy = SiteProxyFactory.getTopicProxy();
       final result = await topicProxy.newTopic(
         widget.forumId,
         title,
         content,
-        prefixId: _selectedPrefixId, // Pass the selected prefix
         attachmentIds: _attachmentIds.isNotEmpty ? _attachmentIds : null,
         groupId: _groupId,
         tags: _tags.isNotEmpty ? _tags : null,
@@ -180,7 +100,6 @@ class _NewTopicPageState extends State<NewTopicPage> {
       debugPrint('   - result: ${result.result}');
       debugPrint('   - resultText: "${result.resultText}"');
       debugPrint('   - topicId: "${result.topicId}"');
-      debugPrint('   - prefixId passed: "$_selectedPrefixId"');
       debugPrint('   - attachmentIds passed: $_attachmentIds');
       debugPrint('   - groupId passed: "$_groupId"');
 
@@ -364,13 +283,6 @@ class _NewTopicPageState extends State<NewTopicPage> {
     }
   }
 
-  void _handlePrefixChanged(String? prefixId) {
-    setState(() {
-      _selectedPrefixId = prefixId;
-    });
-    debugPrint('🔍 [NEW_TOPIC] Prefix changed: "$prefixId"');
-  }
-
   @override
   Widget build(BuildContext context) {
     return MessageComposePage(
@@ -388,10 +300,6 @@ class _NewTopicPageState extends State<NewTopicPage> {
       ),
       onFileUpload: (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false) ? _handleFileUpload : null,
       forumName: widget.forumName,
-      prefixes: _availablePrefixes,
-      requirePrefix: _requirePrefix,
-      selectedPrefixId: _selectedPrefixId,
-      isLoadingPrefixes: _isLoadingPrefixes,
       onRemoveAttachment: (attachmentId) async {
         // Remove the attachment ID from the list and call API to delete from server
         // Call API to remove attachment from server
@@ -416,8 +324,6 @@ class _NewTopicPageState extends State<NewTopicPage> {
           });
         }
       },
-      prefixError: _prefixError,
-      onPrefixChanged: _handlePrefixChanged,
       showSignatureToggle: true,
       onError: (error) {
         if (context.mounted) {

@@ -876,9 +876,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get website => 'Site';
 
   @override
-  String get signature => 'Assinatura';
-
-  @override
   String get next => 'Próximo';
 
   @override
@@ -1387,9 +1384,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get noForumsFound => 'Nenhum fórum encontrado.';
-
-  @override
-  String get pleaseSelectPrefix => 'Por favor, selecione um prefixo';
 
   @override
   String get pleaseLoginToAccessContent =>

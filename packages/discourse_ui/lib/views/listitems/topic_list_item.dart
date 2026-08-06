@@ -196,8 +196,8 @@ class TopicListItem extends StatelessWidget {
                 ],
               ),
             ),
-            // Topic tags (chips below the title). Empty list on
-            // non-Discourse forums or topics without tags hides the row.
+            // Topic tags (chips below the title). Topics without tags
+            // hide the row entirely.
             Builder(
               builder: (context) {
                 final tags = topic.tags;
@@ -291,26 +291,6 @@ class TopicListItem extends StatelessWidget {
                     spacing: DesignTokens.spacingL,
                     runSpacing: DesignTokens.spacingXS,
                     children: [
-                      if (topic.prefix != null && topic.prefix!.isNotEmpty) ...[
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.tag,
-                              size: textTheme.bodySmall?.fontSize ?? 12,
-                              color: metaColor,
-                            ),
-                            SizedBox(width: DesignTokens.spacingXS),
-                            Text(
-                              topic.prefix!,
-                              style: textTheme.bodySmall?.copyWith(
-                                color: metaColor,
-                                letterSpacing: DesignTokens.letterSpacingWide,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
                       if (topic.replyCount > 0) ...[
                         Row(
                           mainAxisSize: MainAxisSize.min,

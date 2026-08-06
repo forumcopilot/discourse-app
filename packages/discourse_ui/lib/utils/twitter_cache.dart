@@ -89,7 +89,8 @@ class TwitterCache {
         return cachedData;
       }
 
-      // No valid cache found, fetch from ForumCopilot API
+      // No valid cache found — remote enrichment is disabled in this
+      // standalone template, so this always comes back null.
       debugPrint('TwitterCache: Fetching fresh data for tweet $tweetId');
       final freshData = await _fetchFromApi(cleanUrl, tweetId);
 
@@ -113,42 +114,14 @@ class TwitterCache {
     }
   }
 
-  /// Fetches Twitter data from the ForumCopilot API
+  /// Remote tweet metadata came from the ForumCopilot cloud service in the
+  /// multi-tenant app. This standalone template has no such backend, so this
+  /// is a permanent no-op and cards fall back to rendering a plain link.
   static Future<TwitterPreviewData?> _fetchFromApi(String url, String tweetId) async {
     debugPrint(
       'TwitterCache: Remote metadata disabled in standalone mode for tweet $tweetId',
     );
     return null;
-  }
-
-  /// Extracts Twitter handle from tweet content
-  static String? _extractHandleFromContent(String? content) {
-    if (content == null) return null;
-
-    // Extract handle from content like "— Crypto Briefing (@Crypto_Briefing) July 7, 2025"
-    final handleRegex = RegExp(r'@([a-zA-Z0-9_]+)');
-    final match = handleRegex.firstMatch(content);
-    return match?.group(1);
-  }
-
-  /// Cleans the tweet content by removing attribution and decoding HTML entities
-  static String _cleanTweetContent(String? content) {
-    if (content == null) return '';
-
-    // Remove the author attribution part at the end
-    // Pattern: "— Author Name (@handle) Date"
-    final attributionRegex = RegExp(r'\s*—\s*[^@]+\(@[^)]+\)\s+\w+\s+\d+,\s+\d+$');
-    String cleaned = content.replaceAll(attributionRegex, '');
-
-    // Decode HTML entities
-    cleaned = cleaned.replaceAll('&mdash;', '—');
-    cleaned = cleaned.replaceAll('&amp;', '&');
-    cleaned = cleaned.replaceAll('&lt;', '<');
-    cleaned = cleaned.replaceAll('&gt;', '>');
-    cleaned = cleaned.replaceAll('&quot;', '"');
-    cleaned = cleaned.replaceAll('&#39;', "'");
-
-    return cleaned.trim();
   }
 
   /// Gets cached data from local storage
@@ -217,8 +190,8 @@ class TwitterCache {
   /// Gets cache statistics for debugging
   static Future<Map<String, dynamic>> getCacheStats() async {
     try {
-      final cacheInfo = await _cacheManager.getFileFromCache('dummy');
-      // This is a simple way to check cache status
+      await _cacheManager.getFileFromCache('dummy');
+      // Probing the cache manager is enough to tell whether it is usable.
       return {
         'cacheAvailable': true,
         'maxAge': '24 hours',

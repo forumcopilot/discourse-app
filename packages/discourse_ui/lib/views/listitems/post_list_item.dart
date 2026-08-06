@@ -14,7 +14,6 @@ import '../widgets/post_action_button.dart';
 import '../widgets/post_vote_column.dart';
 import '../widgets/link_preview_card.dart';
 import '../widgets/video_card.dart';
-import '../widgets/full_screen_video_viewer.dart';
 import '../widgets/twitter_card.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../widgets/post_actions.dart';
@@ -116,7 +115,6 @@ class PostListItem extends StatefulWidget {
   final String threadId;
   final String? forumId;
   final String topicTitle;
-  final String? topicPrefix;
   final PostActions? actions;
   final void Function(String userId, String userName)? onAvatarTap;
   final PostController postController;
@@ -134,8 +132,6 @@ class PostListItem extends StatefulWidget {
 
   /// Whether translation is currently in progress for this thread.
   final bool isTranslating;
-  // Note: postDateString is not currently used, but if needed, use formatTimeAgo with context
-  // String postDateString(BuildContext context) => post.timestamp != null ? formatTimeAgo(post.timestamp!, context) : "";
 
   const PostListItem({
     super.key,
@@ -145,7 +141,6 @@ class PostListItem extends StatefulWidget {
     required this.topicTitle,
     required this.postController,
     this.forumId,
-    this.topicPrefix,
     this.actions,
     this.onAvatarTap,
     this.isHighlighted = false,
@@ -470,10 +465,6 @@ class _PostListItemState extends State<PostListItem> {
           AppLogger.debug('No onShowImage action defined');
         }
       },
-      onVideoTap: (videoUrl) {
-        AppLogger.debug('BBCode Video tapped: $videoUrl');
-        UrlUtils.handleUrlTap(videoUrl, context);
-      },
       onMentionTap: (username) {
         AppLogger.debug('BBCode Mention tapped: $username');
         Navigator.push(
@@ -486,45 +477,6 @@ class _PostListItemState extends State<PostListItem> {
           ),
         );
       },
-      onUserTap: (username, userId) {
-        AppLogger.debug('BBCode User tapped: $username (userId: $userId)');
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserProfilePage(
-              siteContext: widget.siteContext,
-              userId: userId,
-              userName: username,
-            ),
-          ),
-        );
-      },
-      onAttachmentTap: (String url, bool isImage, bool canView) {
-        if (canView) {
-          if (isImage) {
-            if (widget.actions?.onShowImage != null) {
-              widget.actions!.onShowImage!(
-                  url, context, url.hashCode.toString());
-            } else {
-              AppLogger.debug('No onShowImage action defined');
-            }
-          } else if (isVideoFile(url)) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FullScreenVideoViewer(videoUrl: url),
-              ),
-            );
-          } else {
-            UrlUtils.handleUrlTap(url, context);
-          }
-        } else {
-          AppLogger.debug('BBCode Attachment tapped - login required');
-          _postActionsHandler.showPostLoginPrompt(context);
-        }
-      },
-      inlineAttachments: widget.post.inlineAttachments,
-      attachments: widget.post.attachments,
     );
     // Check if attachments/images are the last items - if so, reduce bottom padding
     // to avoid excessive white space between images and social buttons
@@ -619,34 +571,9 @@ class _PostListItemState extends State<PostListItem> {
                 fontWeight: DesignTokens.fontWeightBold,
               ),
             ),
-            // Show prefix badge below the topic title if available
-            if (widget.topicPrefix != null &&
-                widget.topicPrefix!.isNotEmpty) ...[
-              const SizedBox(height: DesignTokens.spacingS),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingS,
-                  vertical: DesignTokens.spacingXS / 2,
-                ),
-                decoration: StyleBuilders.badgeDecoration(
-                  colorScheme: colorScheme,
-                  backgroundColor: colorScheme.primaryContainer,
-                  borderRadius: DesignTokens.radiusXS,
-                ),
-                child: Text(
-                  widget.topicPrefix!,
-                  style: StyleBuilders.smallTextStyle(
-                    colorScheme: colorScheme,
-                    textTheme: textTheme,
-                    color: colorScheme.onPrimaryContainer,
-                    fontWeight: DesignTokens.fontWeightMedium,
-                  ),
-                ),
-              ),
-            ],
             const SizedBox(height: DesignTokens.spacingM),
           ],
-          // Poll card (first post only): below title/prefix, above body. onVoteSuccess updates
+          // Poll card (first post only): below the title, above body. onVoteSuccess updates
           // the thread's poll in PostController so the UI reflects the new vote without reloading.
           if (widget.post.postNumber == 1 &&
               widget.poll != null &&

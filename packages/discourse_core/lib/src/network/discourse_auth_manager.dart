@@ -39,8 +39,6 @@ import 'discourse_client.dart';
 ///   * Key generation is CPU-bound (~1-2s). Phase 2 should move it to an
 ///     isolate; Phase 1.0 keeps it on the main isolate for simplicity.
 class DiscourseAuthManager {
-  static const String _authApiVersion = '4';
-
   static const String _prefHandshakePrivateKey = '_handshake_private_key';
   static const String _prefHandshakeNonce = '_handshake_nonce';
   static const String _prefHandshakeClientId = '_handshake_client_id';
@@ -394,8 +392,6 @@ class DiscourseAuthManager {
     return suffix.startsWith('/') ? '$left$suffix' : '$left/$suffix';
   }
 
-  /// Auth-Api-Version we negotiate against. Exposed for tests.
-  static String get authApiVersion => _authApiVersion;
 }
 
 /// State returned from [DiscourseAuthManager.beginHandshake]. The webview must

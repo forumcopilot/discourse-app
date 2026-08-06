@@ -1082,7 +1082,6 @@ class _PostsState extends State<PostsList> {
         post: post,
         threadId: widget.topicId,
         topicTitle: widget.topicTitle,
-        topicPrefix: data.topic.prefix,
         postController: _postsController,
         forumId: data.topic.forumId,
         isHighlighted: isHighlighted,

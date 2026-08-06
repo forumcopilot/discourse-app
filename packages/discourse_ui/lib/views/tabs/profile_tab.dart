@@ -34,9 +34,7 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
   bool _hasLoaded = false;
   FCUserInfoResult? _userInfo;
   List<FCUserReply>? _recentPosts;
-  bool _isLoadingRecentPosts = false;
   bool _isLoadingMorePosts = false;
-  String? _recentPostsError;
   int _totalPosts = 0;
   static const int _pageSize = 20;
   final ScrollController _scrollController = ScrollController();
@@ -188,12 +186,9 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
       if (_isLoadingMorePosts || _recentPosts == null) return;
       setState(() {
         _isLoadingMorePosts = true;
-        _recentPostsError = null;
       });
     } else {
       setState(() {
-        _isLoadingRecentPosts = true;
-        _recentPostsError = null;
         _recentPosts = null;
         _totalPosts = 0;
       });
@@ -215,7 +210,6 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
             _recentPosts = result.posts;
             _totalPosts = result.total;
           }
-          _isLoadingRecentPosts = false;
           _isLoadingMorePosts = false;
           // Update total if we got a new value
           if (result.total > _totalPosts) {
@@ -226,12 +220,9 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
     } catch (e, stack) {
       AppLogger.debug('Error in _fetchRecentPosts: ' + e.toString());
       AppLogger.debug('Stack trace: $stack');
-      final errorMessage = extractErrorMessage(e);
       showErrorDialogFromException(e);
       if (mounted) {
         setState(() {
-          _recentPostsError = errorMessage;
-          _isLoadingRecentPosts = false;
           _isLoadingMorePosts = false;
         });
       }

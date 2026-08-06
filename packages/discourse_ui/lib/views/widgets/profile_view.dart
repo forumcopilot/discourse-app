@@ -23,7 +23,6 @@ import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/utils/avatar_cache_utils.dart';
 import 'package:discourse_ui/utils/file_picker_utils.dart';
-import 'package:discourse_ui/utils/signature_processor.dart';
 
 import 'full_screen_image_viewer.dart';
 import 'trust_level_sheet.dart';
@@ -790,49 +789,6 @@ class _ProfileViewState extends State<ProfileView> {
                       Localizations.localeOf(context).toString())
                   .format(_userInfo.postCount),
             ),
-          if (_userInfo.customFieldsList != null)
-            ...(() {
-              final likesReceivedField = _userInfo.customFieldsList!
-                  .where((f) =>
-                      (f.name.toLowerCase() == 'likes' ||
-                          f.name.toLowerCase() == 'likes_received') &&
-                      f.value.trim().isNotEmpty &&
-                      f.value != '0')
-                  .cast<FCCustomField?>()
-                  .toList();
-              final likesGivenField = _userInfo.customFieldsList!
-                  .where((f) =>
-                      f.name.toLowerCase() == 'liked' &&
-                      f.value.trim().isNotEmpty &&
-                      f.value != '0')
-                  .cast<FCCustomField?>()
-                  .toList();
-              final List<Widget> fields = [];
-              if (likesReceivedField.isNotEmpty) {
-                fields.add(_buildInfoTile(
-                  context,
-                  icon: Icons.thumb_up,
-                  title: AppLocalizations.of(context)?.likesReceived ??
-                      'Likes Received',
-                  subtitle: NumberFormat.decimalPattern(
-                          Localizations.localeOf(context).toString())
-                      .format(
-                          int.tryParse(likesReceivedField.first!.value) ?? 0),
-                ));
-              }
-              if (likesGivenField.isNotEmpty) {
-                fields.add(_buildInfoTile(
-                  context,
-                  icon: Icons.thumb_up_outlined,
-                  title: AppLocalizations.of(context)?.likesGiven ??
-                      'Likes Given',
-                  subtitle: NumberFormat.decimalPattern(
-                          Localizations.localeOf(context).toString())
-                      .format(int.tryParse(likesGivenField.first!.value) ?? 0),
-                ));
-              }
-              return fields;
-            })(),
           if (_userInfo.followingCount != null &&
               _userInfo.followingCount != 0)
             _buildInfoTile(
@@ -841,12 +797,12 @@ class _ProfileViewState extends State<ProfileView> {
               title: AppLocalizations.of(context)?.following ?? 'Following',
               subtitle: _userInfo.followingCount.toString(),
             ),
-          if (_userInfo.follower != null && _userInfo.follower != 0)
+          if (_userInfo.followerCount != null && _userInfo.followerCount != 0)
             _buildInfoTile(
               context,
               icon: Icons.people,
               title: AppLocalizations.of(context)?.followers ?? 'Followers',
-              subtitle: _userInfo.follower.toString(),
+              subtitle: _userInfo.followerCount.toString(),
             ),
           // About field (from direct API field)
           if (_userInfo.bio != null && _userInfo.bio!.isNotEmpty)
@@ -882,14 +838,6 @@ class _ProfileViewState extends State<ProfileView> {
                 }
               },
             ),
-          // Signature field (from direct API field)
-          if (_userInfo.signature != null && _userInfo.signature!.isNotEmpty)
-            _buildSignatureTile(
-              context,
-              icon: Icons.edit_note,
-              title: AppLocalizations.of(context)?.signature ?? 'Signature',
-              signature: _userInfo.signature!,
-            ),
           // Location field from customFields (fallback for older data)
           if (_userInfo.location == null && _userInfo.customFieldsList != null)
             ...(() {
@@ -909,27 +857,6 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
               ];
             })(),
-          // Signature field from customFields (fallback for older data)
-          if (_userInfo.signature == null &&
-              _userInfo.customFieldsList != null)
-            ...(() {
-              final signatureField = _userInfo.customFieldsList!
-                  .where((f) =>
-                      f.name.toLowerCase() == 'signature' &&
-                      f.value.trim().isNotEmpty &&
-                      f.value != '0')
-                  .toList();
-              if (signatureField.isEmpty) return <Widget>[];
-              return [
-                _buildSignatureTile(
-                  context,
-                  icon: Icons.edit_note,
-                  title:
-                      AppLocalizations.of(context)?.signature ?? 'Signature',
-                  signature: signatureField.first.value,
-                ),
-              ];
-            })(),
           // Additional Information Section (Expandable)
           if (_userInfo.customFieldsList != null &&
               _userInfo.customFieldsList!.isNotEmpty &&
@@ -937,9 +864,6 @@ class _ProfileViewState extends State<ProfileView> {
                   f.value.trim().isNotEmpty &&
                   f.value != "0" &&
                   f.name.toLowerCase() != 'birthday' &&
-                  f.name.toLowerCase() != 'likes' &&
-                  f.name.toLowerCase() != 'liked' &&
-                  f.name.toLowerCase() != 'signature' &&
                   !f.name.toLowerCase().contains('location')))
             Theme(
               data: Theme.of(context)
@@ -960,9 +884,6 @@ class _ProfileViewState extends State<ProfileView> {
                       .where((f) =>
                           f.value.trim().isNotEmpty &&
                           f.value != "0" &&
-                          f.name.toLowerCase() != 'likes' &&
-                          f.name.toLowerCase() != 'liked' &&
-                          f.name.toLowerCase() != 'signature' &&
                           !f.name.toLowerCase().contains('location'))
                       .map((f) => _buildInfoTile(
                             context,
@@ -1017,39 +938,6 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  Widget _buildSignatureTile(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String signature,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    final spans = SignatureProcessor.processSignature(signature, context);
-
-    return ListTile(
-      dense: true,
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: DesignTokens.spacingL,
-        vertical: DesignTokens.spacingXS,
-      ),
-      leading: Icon(
-        icon,
-        size: DesignTokens.iconSizeM,
-        color: colorScheme.primary,
-      ),
-      title: Text(
-        title,
-        style: textTheme.bodySmall?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-        ),
-      ),
-      subtitle: RichText(
-        text: TextSpan(children: spans),
-      ),
-    );
-  }
 }
 
 /// Compact list of links to the current user's stuff — Messages,

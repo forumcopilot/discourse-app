@@ -730,7 +730,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       // Otherwise, continue loop to show first dialog again
     }
 
-    if (banConfigResult != null && context.mounted) {
+    if (context.mounted) {
       // Show loading indicator
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

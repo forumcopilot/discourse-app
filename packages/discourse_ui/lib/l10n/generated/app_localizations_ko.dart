@@ -831,9 +831,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get website => '웹사이트';
 
   @override
-  String get signature => '서명';
-
-  @override
   String get next => '다음';
 
   @override
@@ -1329,9 +1326,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get noForumsFound => '포럼을 찾을 수 없습니다.';
-
-  @override
-  String get pleaseSelectPrefix => '접두사를 선택하세요';
 
   @override
   String get pleaseLoginToAccessContent => '이 콘텐츠에 액세스하고 게시물과 상호 작용하려면 로그인하세요.';

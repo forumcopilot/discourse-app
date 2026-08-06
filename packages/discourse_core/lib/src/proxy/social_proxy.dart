@@ -221,6 +221,10 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       return FCActivityResult(
         result: true,
         resultText: '',
+        // Page length, not a grand total: `UserActionsController#index`
+        // (app/controllers/user_actions_controller.rb:35-43) renders only
+        // `{ user_actions: [...] }` (plus lazy-loaded categories) — there
+        // is no total-rows field to report.
         total: actions.length,
         items: actions,
       );
@@ -325,6 +329,10 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         success: false,
         resultText: 'Error: $e',
         isLiked: !like, // best-effort: keep prior state on failure
+        // NOT a real count — the request failed, so we know nothing.
+        // `FCLikePostResult.likeCount` is a non-nullable int with no
+        // "unknown" value, so callers MUST gate on `result == false`
+        // and keep whatever count they already had.
         likeCount: 0,
       );
     }
@@ -431,10 +439,26 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         ? DateTime.now().millisecondsSinceEpoch
         : (DateTime.tryParse(createdAtRaw)?.millisecondsSinceEpoch ??
             DateTime.now().millisecondsSinceEpoch);
+    // `UserActionSerializer` (app/serializers/user_action_serializer.rb:8-34)
+    // carries BOTH the stream owner (`user_id`/`username`/`avatar_template`)
+    // and the actor (`acting_user_id`/`acting_username`/
+    // `acting_avatar_template`, the latter only when `acting_username` is
+    // present — :45). Prefer the actor, fall back to the owner. The avatar
+    // used to be hardcoded empty even though the payload always has one.
+    final avatarTpl = (a['acting_avatar_template'] ?? a['avatar_template'] ?? '')
+        .toString();
+    final iconUrl = avatarTpl.isEmpty
+        ? ''
+        : (() {
+            final filled = avatarTpl.replaceAll('{size}', '120');
+            return filled.startsWith('http')
+                ? filled
+                : '${siteContext.site.url}$filled';
+          })();
     return FCActivity(
-      userId: (a['user_id'] ?? '').toString(),
-      username: (a['username'] ?? '').toString(),
-      iconUrl: '',
+      userId: (a['acting_user_id'] ?? a['user_id'] ?? '').toString(),
+      username: (a['acting_username'] ?? a['username'] ?? '').toString(),
+      iconUrl: iconUrl,
       message: _readableActivity(actionType, a),
       timestamp: timestampMs.toString(),
       contentType: 'topic',
@@ -691,19 +715,36 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
           result: false,
           resultText: 'Thanks are not supported on Discourse');
 
+  /// PM messages ARE ordinary posts on Discourse (a private message is a
+  /// topic with `archetype: 'private_message'`), and
+  /// `DiscoursePrivateConversationProxy` puts the post id in
+  /// [FCConversationMessage.messageId]. So `/post_actions` accepts a
+  /// message id verbatim and this is a real like, not a stub — the
+  /// previous "Message likes are not supported on Discourse" reply was
+  /// simply wrong (the same payload's `actions_summary.can_act` is what
+  /// drives the message's like button).
   @override
   Future<FCLikePostResult> likeConversationMessageAsync(String messageId,
-          {int reactionId = 1}) async =>
-      FCLikePostResult(
-          result: false,
-          resultText: 'Message likes are not supported on Discourse');
+          {int reactionId = 1}) =>
+      _toggleLike(messageId, like: true,
+          buildResult: (result) => FCLikePostResult(
+                result: result.success,
+                resultText: result.resultText,
+                isLiked: result.isLiked,
+                likeCount: result.likeCount,
+              ));
 
+  /// See [likeConversationMessageAsync] — same endpoint, DELETE side.
   @override
   Future<FCUnlikePostResult> unlikeConversationMessageAsync(
-          String messageId) async =>
-      FCUnlikePostResult(
-          result: false,
-          resultText: 'Message likes are not supported on Discourse');
+          String messageId) =>
+      _toggleLike(messageId, like: false,
+          buildResult: (result) => FCUnlikePostResult(
+                result: result.success,
+                resultText: result.resultText,
+                isLiked: result.isLiked,
+                likeCount: result.likeCount,
+              ));
 }
 
 class _LikeOutcome {

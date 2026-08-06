@@ -473,7 +473,6 @@
   "about": "Acerca de",
   "location": "Ubicación",
   "website": "Sitio web",
-  "signature": "Firma",
   "next": "Siguiente",
   "permanent": "Permanente",
   "temporary": "Temporal",
@@ -789,7 +788,6 @@
   "forward": "Reenviar",
   
   "noForumsFound": "No se encontraron foros.",
-  "pleaseSelectPrefix": "Por favor selecciona un prefijo",
   "pleaseLoginToAccessContent": "Por favor inicia sesión para acceder a este contenido e interactuar con las publicaciones.",
   
   "searchUsers": "Buscar usuarios...",

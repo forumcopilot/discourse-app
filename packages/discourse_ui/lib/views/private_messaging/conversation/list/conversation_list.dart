@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:discourse_ui/views/widgets/resettable_widget.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:discourse_ui/views/widgets/not_signed_in_view.dart';
-import '../../../../utils/time_utils.dart';
 import '../../../../theme/design_tokens.dart';
-import '../../../../theme/style_builders.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../pages/conversation_page.dart';
@@ -39,9 +36,6 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
   int _currentPage = 0;
   final int _itemsPerPage = 20;
   final ScrollController _scrollController = ScrollController();
-
-  // Track when we last became visible to refresh on return
-  bool _wasVisible = false;
 
   // Cold-start: the persisted User API Key is restored before the user
   // record (/session/current.json) is hydrated, so the username the PM
@@ -340,8 +334,6 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
       key: const Key('conversation_list'),
       onVisibilityChanged: (VisibilityInfo info) {
         final isVisible = info.visibleFraction > 0.5;
-
-        _wasVisible = isVisible;
 
         // Only load conversations if they haven't been loaded yet (initial load)
         // Don't auto-refresh when returning from navigation - user can pull to refresh

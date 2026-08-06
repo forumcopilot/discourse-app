@@ -473,7 +473,6 @@
   "about": "About",
   "location": "Location",
   "website": "Website",
-  "signature": "Signature",
   "next": "Next",
   "permanent": "Permanent",
   "temporary": "Temporary",
@@ -1150,10 +1149,6 @@
   "noForumsFound": "No forums found.",
   "@noForumsFound": {
     "description": "Message when no forums are found"
-  },
-  "pleaseSelectPrefix": "Please select a prefix",
-  "@pleaseSelectPrefix": {
-    "description": "Validation message when prefix is required but not selected"
   },
   "pleaseLoginToAccessContent": "Please login to access this content and interact with posts.",
   "@pleaseLoginToAccessContent": {

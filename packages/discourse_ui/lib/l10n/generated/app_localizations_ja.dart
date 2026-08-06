@@ -836,9 +836,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get website => 'ウェブサイト';
 
   @override
-  String get signature => '署名';
-
-  @override
   String get next => '次へ';
 
   @override
@@ -1335,9 +1332,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get noForumsFound => 'フォーラムが見つかりません。';
-
-  @override
-  String get pleaseSelectPrefix => 'プレフィックスを選択してください';
 
   @override
   String get pleaseLoginToAccessContent =>

@@ -183,6 +183,10 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
           cooked: message,
           authorId: int.tryParse(siteContext.currentUserId ?? '') ?? 0,
           authorUsername: siteContext.currentUsername ?? '',
+          // CLIENT clock, not a server timestamp: the create response
+          // carries only `message_id` (see above), so this is the local
+          // echo's own send time. Replaced by the server's `created_at`
+          // on the next poll.
           createdAt: DateTime.now(),
           edited: false,
           deleted: false,
@@ -419,8 +423,11 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       authorUsername: (user['username'] ?? '').toString(),
       authorName: user['name']?.toString(),
       authorAvatarUrl: avatarUrl,
+      // `created_at` is always serialized on a chat message; epoch is a
+      // visible sentinel for a malformed row rather than a plausible
+      // "just now".
       createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
-          DateTime.now(),
+          DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
       edited: json['edited'] == true,
       deleted: json['deleted_at'] != null,
       streaming: json['streaming'] == true,

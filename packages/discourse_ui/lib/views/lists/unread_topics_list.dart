@@ -32,7 +32,6 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
   final int _pageSize = 20;
-  int _currentPage = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -149,7 +148,6 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
   void clearList() {
     _hasLoaded = false;
     _isInitialLoading = false;
-    _currentPage = 0;
     _isLoadingMore = false;
     clearError();
     if (_unreadTopicController != null) {
@@ -187,7 +185,6 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
       }
       try {
         AppLogger.debug('  → Starting API call...');
-        _currentPage = 0;
         int startNum = 0;
         int lastNum = _pageSize - 1;
         await _unreadTopicController!.getUnreadTopicAsync(startNum, lastNum);

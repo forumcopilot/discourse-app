@@ -280,8 +280,11 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           isLoginMod: true);
     }
     // banExpires semantics: SDK passes seconds-from-now or 0 for
-    // permanent. Discourse expects an absolute ISO-8601 timestamp;
-    // permanent suspension uses a far-future date.
+    // permanent. Discourse expects an absolute ISO-8601 timestamp, so
+    // the DateTime.now() below is a legitimate relative→absolute
+    // conversion, not an invented server value. Discourse has no
+    // "forever" sentinel for suspend_until, so permanent bans use the
+    // year-3000 convention Discourse's own admin UI uses.
     final until = banExpires > 0
         ? DateTime.now().add(Duration(seconds: banExpires)).toUtc()
         : DateTime.utc(3000, 1, 1);

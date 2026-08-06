@@ -141,12 +141,18 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         forumName: '',
         canPost: false,
         canUpload: false,
+        // Discourse reports no per-category unread breakdown by
+        // pinned/announcement; these are "unknown", not "none".
         unreadStickyCount: 0,
         unreadAnnounceCount: 0,
-        canSubscribe: true,
+        // Subscribing writes CategoryUser/TopicUser state — needs a session.
+        canSubscribe: siteContext.isLoggedIn,
         isSubscribed: false,
         requirePrefix: false,
         prefixes: const [],
+        // Page length, not a grand total: Discourse's `topic_list` block
+        // exposes `per_page` and `more_topics_url` but never a count of
+        // all matching topics.
         totalTopicNum: list.topics.length,
         topics: list.topics,
       );
@@ -216,11 +222,14 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
           id: id,
           title: (m['title'] ?? '').toString(),
           forumId: (m['category_id'] ?? '').toString(),
+          // /user_actions.json rows carry `category_id` but no category
+          // NAME and no side-loaded category list. Left empty rather
+          // than synthesised.
           forumName: '',
           authorId: (m['user_id'] ?? '').toString(),
           authorName: (m['username'] ?? '').toString(),
           timestamp: DateTime.tryParse(m['created_at']?.toString() ?? '') ??
-              DateTime.now(),
+              DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
           shortContent: (m['excerpt'] as String?) ?? '',
         ));
       }
@@ -316,7 +325,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
           viewNumber: (t['views'] as int?) ?? 0,
           isClosed: (t['closed'] as bool?) ?? false,
           isSubscribed: (t['notification_level'] as int? ?? 1) >= 2,
-          canSubscribe: true,
+          canSubscribe: siteContext.isLoggedIn,
           lastReplyTime:
               DateTime.tryParse(t['last_posted_at']?.toString() ?? ''),
           timestamp: t['created_at']?.toString(),
@@ -433,12 +442,18 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         forumName: forumName,
         canPost: list.canPost,
         canUpload: list.canPost,
+        // Discourse reports no per-category unread breakdown by
+        // pinned/announcement; these are "unknown", not "none".
         unreadStickyCount: 0,
         unreadAnnounceCount: 0,
-        canSubscribe: true,
+        // Subscribing writes CategoryUser/TopicUser state — needs a session.
+        canSubscribe: siteContext.isLoggedIn,
         isSubscribed: false,
         requirePrefix: false,
         prefixes: const [],
+        // Page length, not a grand total: Discourse's `topic_list` block
+        // exposes `per_page` and `more_topics_url` but never a count of
+        // all matching topics.
         totalTopicNum: list.topics.length,
         topics: list.topics,
       );
@@ -476,9 +491,12 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         forumName: forumName,
         canPost: list.canPost,
         canUpload: list.canPost,
+        // Discourse reports no per-category unread breakdown by
+        // pinned/announcement; these are "unknown", not "none".
         unreadStickyCount: 0,
         unreadAnnounceCount: 0,
-        canSubscribe: true,
+        // Subscribing writes CategoryUser/TopicUser state — needs a session.
+        canSubscribe: siteContext.isLoggedIn,
         isSubscribed: false,
         requirePrefix: false,
         prefixes: const [],
@@ -657,6 +675,10 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       isPinned: (t['pinned'] as bool?) ?? false,
       isAnnouncement: (t['pinned_globally'] as bool?) ?? false,
       canReply: !(t['closed'] == true || t['archived'] == true),
+      // Optimistic: any signed-in user can flag/like a topic's first
+      // post on a stock Discourse. Topic-list rows carry no
+      // `actions_summary`, so there is no per-row signal to read — the
+      // server is the real gate and will 403 if it disagrees.
       canReport: true,
       canLike: true,
       isLiked: (t['liked'] as bool?) ?? false,

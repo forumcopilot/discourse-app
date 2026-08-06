@@ -34,11 +34,25 @@ class DiscourseTagProxy extends BaseDiscourseProxy implements IFCTagProxy {
   }) async {
     try {
       final response = await apiGet('/tags.json');
-      final list = (response['tags'] as List?) ?? const [];
-      final tags = list
-          .whereType<Map>()
-          .map((t) => _tagFromDiscourseJson(t.cast<String, dynamic>()))
+      // When `SiteSetting.tags_listed_by_group` is on, TagsController#index
+      // (app/controllers/tags_controller.rb:53-77) puts only UNGROUPED
+      // tags in `tags` and moves every grouped tag into
+      // `extras.tag_groups[].tags`. Reading `tags` alone silently
+      // returned a small subset of the forum's tags while calling itself
+      // "all tags", so merge both sources and dedupe by name.
+      final rows = <Map<String, dynamic>>[
+        ...((response['tags'] as List?) ?? const []).whereType<Map>().map(
+            (t) => t.cast<String, dynamic>()),
+        ...(((response['extras'] as Map?)?['tag_groups'] as List?) ?? const [])
+            .whereType<Map>()
+            .expand((g) => ((g['tags'] as List?) ?? const []).whereType<Map>())
+            .map((t) => t.cast<String, dynamic>()),
+      ];
+      final seen = <String>{};
+      final tags = rows
+          .map((t) => _tagFromDiscourseJson(t))
           .where((t) => includePmOnly || !t.pmOnly)
+          .where((t) => t.name.isNotEmpty && seen.add(t.name.toLowerCase()))
           .toList();
       // Sort by topic count desc, then alphabetical for ties — matches
       // the Discourse web /tags page.
@@ -49,6 +63,9 @@ class DiscourseTagProxy extends BaseDiscourseProxy implements IFCTagProxy {
       });
       return FCTagListResult(
         result: true,
+        // Exact: /tags.json is unpaginated, and with the tag_groups merge
+        // above this really is every tag the viewer can see (minus the
+        // pmOnly filter when [includePmOnly] is false).
         total: tags.length,
         items: tags,
       );

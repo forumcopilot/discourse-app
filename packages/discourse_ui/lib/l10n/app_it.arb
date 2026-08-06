@@ -472,7 +472,6 @@
   "about": "Informazioni",
   "location": "Posizione",
   "website": "Sito web",
-  "signature": "Firma",
   "next": "Avanti",
   "permanent": "Permanente",
   "temporary": "Temporaneo",
@@ -788,7 +787,6 @@
   "forward": "Inoltra",
   
   "noForumsFound": "Nessun forum trovato.",
-  "pleaseSelectPrefix": "Seleziona un prefisso",
   "pleaseLoginToAccessContent": "Accedi per accedere a questo contenuto e interagire con i post.",
   
   "searchUsers": "Cerca utenti...",

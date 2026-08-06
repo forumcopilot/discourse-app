@@ -175,7 +175,12 @@ class DiscourseInviteProxy extends BaseDiscourseProxy {
 
 /// One invite, as serialized by Discourse (`InviteSerializer` for
 /// pending/expired invites and fresh creates; `InvitedUserSerializer` for
-/// redeemed rows, which only fill [id], [redeemedAt] and [redeemedUsername]).
+/// redeemed rows, which only fill [id], [redeemedAt], [redeemedUsername]
+/// and [inviteSource]).
+///
+/// Beware the asymmetry: on a redeemed row [emailed], [expired] and
+/// [canDelete] read `false` because the serializer omits those keys, NOT
+/// because the server said no. Don't render them as definite negatives.
 class DiscourseInvite {
   final int id;
 
@@ -207,6 +212,13 @@ class DiscourseInvite {
   final DateTime? redeemedAt;
   final String? redeemedUsername;
 
+  /// The server's own classification of the invite: `"link"` or
+  /// `"email"` (`InvitedUserSerializer#invite_source`,
+  /// app/serializers/invited_user_serializer.rb:16-18 —
+  /// `object.invite.is_invite_link? ? "link" : "email"`). Null on rows
+  /// served by `InviteSerializer`, which doesn't emit it.
+  final String? inviteSource;
+
   DiscourseInvite({
     required this.id,
     required this.link,
@@ -221,6 +233,7 @@ class DiscourseInvite {
     this.canDelete = false,
     this.redeemedAt,
     this.redeemedUsername,
+    this.inviteSource,
   });
 
   factory DiscourseInvite.fromJson(Map<String, dynamic> json) {
@@ -240,11 +253,20 @@ class DiscourseInvite {
       canDelete: json['can_delete_invite'] == true,
       redeemedAt: _parseDate(json['redeemed_at']),
       redeemedUsername: user?['username']?.toString(),
+      inviteSource: json['invite_source']?.toString(),
     );
   }
 
-  /// True for shareable link invites (no email attached).
-  bool get isLinkInvite => email == null || email!.isEmpty;
+  /// True for shareable link invites.
+  ///
+  /// Prefer the server's own [inviteSource]. The email heuristic below is
+  /// only a fallback for `InviteSerializer` rows (which have `email` but
+  /// no `invite_source`) — on its own it misclassified EVERY redeemed
+  /// invite as a link invite, because `InvitedUserSerializer` never
+  /// includes `email`.
+  bool get isLinkInvite => inviteSource != null
+      ? inviteSource == 'link'
+      : (email == null || email!.isEmpty);
 
   static DateTime? _parseDate(dynamic value) =>
       value is String && value.isNotEmpty ? DateTime.tryParse(value) : null;

@@ -817,9 +817,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get website => '网站';
 
   @override
-  String get signature => '签名';
-
-  @override
   String get next => '下一步';
 
   @override
@@ -1312,9 +1309,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noForumsFound => '未找到论坛。';
-
-  @override
-  String get pleaseSelectPrefix => '请选择前缀';
 
   @override
   String get pleaseLoginToAccessContent => '请登录以访问此内容并与帖子互动。';

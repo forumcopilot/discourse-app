@@ -101,7 +101,8 @@ class YouTubeCache {
         return cachedData;
       }
 
-      // No valid cache found, fetch from ForumCopilot API
+      // No valid cache found — remote enrichment is disabled in this
+      // standalone template, so this always comes back null.
       debugPrint('YouTubeCache: Fetching fresh data for video $videoId');
       final freshData = await _fetchFromApi(cleanUrl, videoId);
 
@@ -125,7 +126,9 @@ class YouTubeCache {
     }
   }
 
-  /// Fetches YouTube data from the ForumCopilot API
+  /// Remote video metadata came from the ForumCopilot cloud service in the
+  /// multi-tenant app. This standalone template has no such backend, so this
+  /// is a permanent no-op and cards fall back to rendering a plain link.
   static Future<YouTubePreviewData?> _fetchFromApi(String url, String videoId) async {
     debugPrint(
       'YouTubeCache: Remote metadata disabled in standalone mode for video $videoId',
@@ -199,8 +202,8 @@ class YouTubeCache {
   /// Gets cache statistics for debugging
   static Future<Map<String, dynamic>> getCacheStats() async {
     try {
-      final cacheInfo = await _cacheManager.getFileFromCache('dummy');
-      // This is a simple way to check cache status
+      await _cacheManager.getFileFromCache('dummy');
+      // Probing the cache manager is enough to tell whether it is usable.
       return {
         'cacheAvailable': true,
         'maxAge': '24 hours',

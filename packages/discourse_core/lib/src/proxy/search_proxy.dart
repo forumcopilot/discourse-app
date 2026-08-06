@@ -36,6 +36,13 @@ import '../base_discourse_proxy.dart';
 ///   * Has-more is signalled by
 ///     `grouped_search_result.more_full_page_results` (true when the
 ///     server found a full page plus at least one extra row).
+///   * There is NO grand total. `GroupedSearchResultSerializer`
+///     (app/serializers/grouped_search_result_serializer.rb:8-17)
+///     exposes only `more_posts` / `more_users` / `more_categories` /
+///     `more_full_page_results` — booleans, not counts. The SDK's
+///     `totalTopicNum` / `totalPostNum` therefore carry the number of
+///     rows in THIS page, which is all the server tells us. Callers
+///     must not treat them as a result total.
 ///
 /// `/search.json` returns `{ posts: [], topics: [], users: [], categories: [],
 /// tags: [], groups: [], grouped_search_result: {...} }`. We extract topics
@@ -91,15 +98,14 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
         );
       }
       final response = await _searchRaw(searchString, page: page);
-      final users = _usersById(response);
       final topics = ((response['topics'] as List?) ?? const [])
           .whereType<Map>()
-          .map((t) =>
-              _topicFromSearchResult(t.cast<String, dynamic>(), users: users))
+          .map((t) => _topicFromSearchResult(t.cast<String, dynamic>()))
           .toList();
       return FCSearchTopicResult(
         result: true,
         resultText: '',
+        // Page length, not a grand total — see the class doc.
         totalTopicNum: topics.length,
         searchId: null,
         topics: topics,
@@ -148,6 +154,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       return FCSearchPostResult(
         result: true,
         resultText: '',
+        // Page length, not a grand total — see the class doc.
         totalPostNum: posts.length,
         searchId: null,
         posts: posts,
@@ -199,15 +206,14 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
         );
       }
       final response = await _searchRaw(q, page: page < 1 ? 1 : page);
-      final users = _usersById(response);
       final topics = ((response['topics'] as List?) ?? const [])
           .whereType<Map>()
-          .map((t) =>
-              _topicFromSearchResult(t.cast<String, dynamic>(), users: users))
+          .map((t) => _topicFromSearchResult(t.cast<String, dynamic>()))
           .toList();
       return FCSearchDataResultTopic(
         result: true,
         resultText: '',
+        // Page length, not a grand total — see the class doc.
         totalTopicNum: topics.length,
         topics: topics,
       );
@@ -263,6 +269,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       return FCSearchDataResultPost(
         result: true,
         resultText: '',
+        // Page length, not a grand total — see the class doc.
         totalPostNum: posts.length,
         posts: posts,
       );
@@ -303,11 +310,9 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       return const DiscourseSearchResult(topics: [], posts: []);
     }
     final response = await _searchRaw(q, page: page < 1 ? 1 : page);
-    final users = _usersById(response);
     final topics = ((response['topics'] as List?) ?? const [])
         .whereType<Map>()
-        .map((t) =>
-            _topicFromSearchResult(t.cast<String, dynamic>(), users: users))
+        .map((t) => _topicFromSearchResult(t.cast<String, dynamic>()))
         .toList();
     final posts = ((response['posts'] as List?) ?? const [])
         .whereType<Map>()
@@ -389,19 +394,24 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
     return parts.join(' ');
   }
 
-  Map<int, Map<String, dynamic>> _usersById(Map<String, dynamic> response) {
-    final users = <int, Map<String, dynamic>>{};
-    for (final u in ((response['users'] as List?) ?? const []).whereType<Map>()) {
-      final id = u['id'];
-      if (id is int) users[id] = u.cast<String, dynamic>();
-    }
-    return users;
-  }
-
-  FCTopic _topicFromSearchResult(
-    Map<String, dynamic> t, {
-    Map<int, Map<String, dynamic>> users = const {},
-  }) {
+  /// Maps one row of the response's side-loaded `topics` array
+  /// (`SearchTopicListItemSerializer < ListableTopicSerializer`, see
+  /// `app/serializers/search_topic_list_item_serializer.rb:4`).
+  ///
+  /// Fields that serializer deliberately does NOT emit, and therefore
+  /// cannot be filled here (they stay at their neutral value rather
+  /// than being invented):
+  ///   * author (`ListableTopicSerializer` only side-loads
+  ///     `last_poster`, and only when `include_last_poster` is set by
+  ///     the topic list — search never sets it) → author id/name empty.
+  ///   * `views` → [FCTopic.viewCount] is a non-nullable int, so it
+  ///     stays 0; it is NOT a real view count. `views` is only on
+  ///     `TopicListItemSerializer`.
+  ///   * `like_count` → same, stays 0.
+  ///   * `pinned_globally` → [FCTopic.isAnnouncement] stays false.
+  ///   * category name → only `category_id` is serialized
+  ///     (`search_topic_list_item_serializer.rb:7`).
+  FCTopic _topicFromSearchResult(Map<String, dynamic> t) {
     final id = (t['id'] ?? '').toString();
     final slug = t['slug']?.toString();
     final categoryId = (t['category_id'] ?? '').toString();
@@ -414,11 +424,18 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       authorName: '',
       timestamp:
           DateTime.tryParse(t['created_at']?.toString() ?? '') ?? DateTime.now(),
+      // `reply_count` on Discourse counts cross-thread replies, so total
+      // replies is `posts_count - 1` (matches DiscourseTopicProxy).
       replyCount: (((t['posts_count'] as int?) ?? 1) - 1).clamp(0, 1 << 30),
-      viewCount: (t['views'] as int?) ?? 0,
-      hasNewPosts: false,
+      viewCount: 0,
+      // `unseen` / `unread_posts` are serialized whenever the topic has
+      // user_data (i.e. the viewer is logged in) — listable_topic_serializer.rb:8-13.
+      hasNewPosts: t['unseen'] == true || (t['unread_posts'] as int? ?? 0) > 0,
+      unreadCount: (t['unread_posts'] as int?) ?? (t['new_posts'] as int?) ?? 0,
       isClosed: (t['closed'] as bool?) ?? false,
-      isSubscribed: false,
+      // `notification_level` is serialized when user_data is present
+      // (listable_topic_serializer.rb:25); >= 2 is tracking/watching.
+      isSubscribed: (t['notification_level'] as int? ?? 1) >= 2,
       canSubscribe: true,
       url: slug != null && slug.isNotEmpty
           ? '${siteContext.site.url}/t/$slug/$id'
@@ -432,6 +449,16 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       isLiked: (t['liked'] as bool?) ?? false,
       likeCount: 0,
       hasPoll: false,
+      // TopicTagsMixin is included by SearchTopicListItemSerializer, so
+      // `tags` is present when tagging is enabled.
+      tags: ((t['tags'] as List?) ?? const [])
+          .map<String>((entry) {
+            if (entry is String) return entry;
+            if (entry is Map) return (entry['name'] ?? '').toString();
+            return '';
+          })
+          .where((s) => s.isNotEmpty)
+          .toList(growable: false),
     );
   }
 
@@ -451,6 +478,12 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       // cooked HTML. That's actually nicer for the UI here.
       content: (p['blurb'] ?? '').toString(),
       topicId: (p['topic_id'] ?? '').toString(),
+      // `SearchPostSerializer < BasicPostSerializer` serializes
+      // name/username/avatar_template but NOT `user_id`
+      // (app/serializers/basic_post_serializer.rb:5), so there is no
+      // numeric author id to hand the UI. Left empty rather than
+      // guessed; profile navigation from a search row has to go by
+      // username.
       authorId: '',
       authorName: (p['username'] ?? '').toString(),
       authorIconUrl: avatarUrl,
@@ -461,14 +494,19 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       canReport: true,
       canLike: true,
       isLiked: false,
+      // `SearchPostSerializer` emits `like_count` but never the actors
+      // (app/serializers/search_post_serializer.rb:6). Carry the real
+      // count and leave the actor list empty — the sheet fetches actors
+      // on demand via `DiscoursePostProxy.getReactionUsersAsync`. We do
+      // NOT pad the list with blank FCLike placeholders to make
+      // `likesInfo.length` read right (that rendered blank avatars and
+      // dead-end profile links).
+      likeCount: (p['like_count'] as int?) ?? 0,
       // Mutable lists so optimistic-UI in post_actions.dart can call .add().
       attachments: <FCAttachment>[],
       inlineAttachments: <FCAttachment>[],
       thanksInfo: <FCThanks>[],
-      likesInfo: List<FCLike>.generate(
-        (p['like_count'] as int?) ?? 0,
-        (_) => FCLike(userId: '', username: '', avatarUrl: ''),
-      ),
+      likesInfo: <FCLike>[],
     );
   }
 

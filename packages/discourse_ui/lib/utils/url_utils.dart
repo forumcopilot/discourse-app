@@ -940,7 +940,7 @@ class UrlUtils {
           break;
 
         case ForumTemplate.xf:
-          // Discourse URL parsing rules:
+          // XenForo URL parsing rules:
           // 1) /threads/{thread}/post-{post_id}
           // 2) /posts/{post_id}
           // 3) /threads/{thread}#post-{post_id}

@@ -28,11 +28,12 @@ import 'package:discourse_ui/views/site_home_page.dart';
 /// so they return to wherever they triggered the login from instead
 /// of getting stranded on an empty loading screen.
 ///
-/// The legacy `DiscourseLoginController.handleLogin` / `handlePasskeyLogin`
-/// entry points still exist on the controller for now — they are
-/// not invoked from this page anymore. A future cleanup phase will
-/// delete them from the controller once we confirm nothing else
-/// reaches into them.
+/// `DiscourseLoginController.handlePasskeyLogin` had no callers left
+/// once this page stopped driving login and has been deleted; the
+/// passkey machinery survives only behind `attemptAutomaticLogin`.
+/// `DiscourseLoginController.handleLogin` is not invoked from this
+/// page anymore either, but `RegisterPage` still calls it to sign the
+/// user in right after account creation.
 class LoginPage extends StatefulWidget {
   final SiteContext siteContext;
   const LoginPage({Key? key, required this.siteContext}) : super(key: key);

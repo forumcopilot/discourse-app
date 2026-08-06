@@ -246,6 +246,8 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
         resultText: '',
         conversationCount: summaries.length,
         unreadCount: unread,
+        // See _loadConversation: no per-conversation upload permission
+        // exists on Discourse; the real gate is DiscourseUploadLimits.
         canUpload: true,
         list: summaries,
       );
@@ -586,14 +588,30 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
         messages: messages,
         participants: participants,
         participantCount: participants.length,
-        canReply: !((t['closed'] as bool?) ?? false) &&
-            !((t['archived'] as bool?) ?? false),
-        canInvite: true,
+        // `TopicViewDetailsSerializer` emits `can_create_post` and
+        // `can_invite_to` only when the guardian grants them
+        // (app/serializers/topic_view_details_serializer.rb:11-13,
+        // :127-128, :135-137), so presence IS the permission and absence
+        // is a real "no". Prefer them over the closed/archived guess;
+        // fall back to the guess only if `details` came back without the
+        // key at all.
+        canReply: details.containsKey('can_create_post')
+            ? details['can_create_post'] == true
+            : (!((t['closed'] as bool?) ?? false) &&
+                !((t['archived'] as bool?) ?? false)),
+        // Was hardcoded true, which offered an "add participant" action
+        // to people the server would reject.
+        canInvite: details['can_invite_to'] == true,
         canEdit: canEdit,
         canClose: canEdit,
         isClosed: (t['closed'] as bool?) ?? false,
         totalMessageNum: (t['posts_count'] as int?) ?? messages.length,
         lastRead: (t['last_read_post_number'] as int?) ?? 0,
+        // Optimistic: Discourse gates uploads globally (trust level +
+        // authorized_extensions / max_*_size_kb, cached on the site
+        // context as DiscourseUploadLimits), never per topic, so there
+        // is no per-conversation signal to read. The composer validates
+        // against those cached limits before sending.
         canUpload: true,
         position: anchorPostNumber,
       );

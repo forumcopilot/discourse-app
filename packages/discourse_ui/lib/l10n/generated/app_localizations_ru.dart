@@ -877,9 +877,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get website => 'Веб-сайт';
 
   @override
-  String get signature => 'Подпись';
-
-  @override
   String get next => 'Далее';
 
   @override
@@ -1386,9 +1383,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get noForumsFound => 'Форумы не найдены.';
-
-  @override
-  String get pleaseSelectPrefix => 'Пожалуйста, выберите префикс';
 
   @override
   String get pleaseLoginToAccessContent =>

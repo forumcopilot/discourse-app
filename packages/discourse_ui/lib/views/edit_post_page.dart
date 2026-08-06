@@ -39,13 +39,6 @@ class _EditPostPageState extends State<EditPostPage> {
   late final TextEditingController _contentController;
   bool _controllersInitialized = false;
 
-  // Prefix-related state
-  String? _selectedPrefixId;
-  String? _initialPrefixId; // Store initial prefix ID to detect changes
-  bool _requirePrefix = false;
-  List<FCPrefix> _availablePrefixes = [];
-  bool _prefixDataInitialized = false; // Track if prefix data has been initialized
-
   // Cache the future to prevent FutureBuilder from recreating it on every build
   late final Future<FCRawPostResult> _rawPostFuture;
 
@@ -67,41 +60,6 @@ class _EditPostPageState extends State<EditPostPage> {
   }
 
   Future<bool> _handleSubmit(String title, String content) async {
-    // Validate required prefix before submission
-    // Handle case where topic had no prefix but now prefix is required
-    if (_requirePrefix && _availablePrefixes.isNotEmpty && (_selectedPrefixId == null || _selectedPrefixId!.isEmpty)) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  color: Theme.of(context).colorScheme.onErrorContainer,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    AppLocalizations.of(context)?.pleaseSelectPrefix ?? 'Please select a prefix',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onErrorContainer,
-                        ),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
-            margin: DesignTokens.paddingS,
-          ),
-        );
-      }
-      return false;
-    }
-
     try {
       var postProxy = SiteProxyFactory.getPostProxy();
 
@@ -116,30 +74,6 @@ class _EditPostPageState extends State<EditPostPage> {
       // If we send null, the server might associate all attachments in the groupId
       final attachmentIdsToSend = _attachmentIds.isNotEmpty ? _attachmentIds : <String>[];
 
-      // Determine prefix value to send
-      // Send prefix parameter if editing first post and prefix is available
-      // Send "0" to clear prefix, or the prefix ID string to set it
-      // Only send if prefixes are available (indicating we're editing first post) and prefix changed
-      // OR if prefix is required and was not previously set (edge case: topic had no prefix, now required)
-      String? prefixToSend;
-      if (_availablePrefixes.isNotEmpty) {
-        // We're editing first post with prefix support
-        // Send prefix if:
-        // 1. It changed from the initial value, OR
-        // 2. Prefix is required and was not previously set (initial was null/empty)
-        final prefixChanged = _selectedPrefixId != _initialPrefixId;
-        final prefixRequiredButNotSet = _requirePrefix && (_initialPrefixId == null || _initialPrefixId!.isEmpty) && (_selectedPrefixId != null && _selectedPrefixId!.isNotEmpty);
-
-        if (prefixChanged || prefixRequiredButNotSet) {
-          // Prefix was changed or needs to be set for the first time - convert null to "0" to clear prefix, or send prefix ID to set it
-          // Backend expects "0" (not null) to clear the prefix
-          // Note: UI should prevent clearing if requirePrefix is true, but backend will also validate
-          prefixToSend = _selectedPrefixId ?? "0";
-        }
-        // If prefix didn't change and it's not required, omit the parameter (prefix remains unchanged)
-      }
-      // If no prefixes available, omit the parameter (not editing first post or no permission)
-
       var result = await postProxy.saveRawPostAsync(
         widget.postId,
         finalTitle, // Use the processed title
@@ -148,7 +82,7 @@ class _EditPostPageState extends State<EditPostPage> {
         null, // No edit reason for now
         attachmentIdsToSend, // Send empty array instead of null
         _groupId,
-        prefixToSend, // Include prefix if it changed
+        null, // prefix: XenForo-only concept, unused on Discourse
       );
 
       if (result.result) {
@@ -380,25 +314,6 @@ class _EditPostPageState extends State<EditPostPage> {
             _groupId = data.attachmentData!.hash;
           }
 
-          // Initialize prefix data from API response (only once)
-          if (!_prefixDataInitialized) {
-            _initialPrefixId = data.prefixId;
-            _selectedPrefixId = data.prefixId;
-            _requirePrefix = data.requirePrefix;
-            _availablePrefixes = data.prefixes;
-            _prefixDataInitialized = true;
-
-            // Print debug info only once when prefix data is first initialized
-            debugPrint('🔍 [EDIT_POST] Prefix data initialized:');
-            debugPrint('   - prefixId: $_selectedPrefixId');
-            debugPrint('   - requirePrefix: $_requirePrefix');
-            debugPrint('   - availablePrefixes: ${_availablePrefixes.length}');
-            if (_availablePrefixes.isNotEmpty) {
-              final prefixSummary = _availablePrefixes.map((p) => '${p.prefixId}:${p.prefixDisplayName}').join(', ');
-              debugPrint('   - prefixes: $prefixSummary');
-            }
-          }
-
           // Store existing attachments and initialize attachment IDs (only once, when data first arrives)
           // We initialize synchronously since we pass snapshot.data?.attachments directly to MessageComposePage
           // _existingAttachments is used for tracking removals, not for UI display
@@ -460,26 +375,6 @@ class _EditPostPageState extends State<EditPostPage> {
           existingAttachments: snapshot.data?.attachments ?? _existingAttachments,
           onRemoveExistingAttachment: _handleRemoveExistingAttachment,
           submitIcon: Icons.save_rounded,
-          // Prefix-related parameters
-          prefixes: _availablePrefixes.isNotEmpty ? _availablePrefixes : null,
-          requirePrefix: _requirePrefix,
-          selectedPrefixId: _selectedPrefixId,
-          onPrefixChanged: (String? newPrefixId) {
-            debugPrint('🔍 [EDIT_POST] Prefix changed callback called: $_selectedPrefixId -> $newPrefixId');
-            if (mounted) {
-              // If prefix is required, ensure we don't set it to null
-              // (UI should prevent this, but add safeguard)
-              if (_requirePrefix && (newPrefixId == null || newPrefixId.isEmpty)) {
-                // Prefix is required, don't allow clearing - keep current selection
-                debugPrint('⚠️ [EDIT_POST] Attempted to clear required prefix, keeping current selection');
-                return;
-              }
-              setState(() {
-                _selectedPrefixId = newPrefixId;
-              });
-              debugPrint('🔍 [EDIT_POST] Prefix state updated to: $_selectedPrefixId');
-            }
-          },
           onRemoveAttachment: (attachmentId) async {
             if (_attachmentIds.contains(attachmentId)) {
               // For newly uploaded attachments (temporary), we need to call removeAttachment API

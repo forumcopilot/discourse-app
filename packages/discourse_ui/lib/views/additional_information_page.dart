@@ -171,9 +171,7 @@ class _AdditionalInformationPageState extends State<AdditionalInformationPage> {
 
     // Date of Birth field
     if (req.dateOfBirth != null && (req.dateOfBirth!.required || req.dateOfBirth!.requireDob == true)) {
-      if (!isFirstField) {
-        widgets.add(_buildFieldSeparator(colorScheme));
-      }
+      // First field in the form — no separator above it.
       widgets.add(
         Padding(
           padding: DesignTokens.paddingScreen,

@@ -471,7 +471,6 @@
   "about": "关于",
   "location": "位置",
   "website": "网站",
-  "signature": "签名",
   "next": "下一步",
   "permanent": "永久",
   "temporary": "临时",
@@ -787,7 +786,6 @@
   "forward": "转发",
   
   "noForumsFound": "未找到论坛。",
-  "pleaseSelectPrefix": "请选择前缀",
   "pleaseLoginToAccessContent": "请登录以访问此内容并与帖子互动。",
   
   "searchUsers": "搜索用户...",

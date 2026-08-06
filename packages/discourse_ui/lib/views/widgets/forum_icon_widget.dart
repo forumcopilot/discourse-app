@@ -167,29 +167,6 @@ class ForumIconWidget extends StatelessWidget {
 
 }
 
-// Specialized widget for forum headers with larger size
-class ForumHeaderIconWidget extends StatelessWidget {
-  final String? logoUrl;
-  final IconData? fallbackIcon;
-
-  const ForumHeaderIconWidget({
-    super.key,
-    this.logoUrl,
-    this.fallbackIcon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ForumIconWidget(
-      logoUrl: logoUrl,
-      fallbackIcon: fallbackIcon,
-      size: 80,
-      borderRadius: BorderRadius.circular(16),
-      context: 'header',
-    );
-  }
-}
-
 // Specialized widget for forum list items
 class ForumListItemIconWidget extends StatelessWidget {
   final String? logoUrl;
@@ -212,55 +189,6 @@ class ForumListItemIconWidget extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       context: 'subforum',
       siteName: forumName,
-    );
-  }
-}
-
-// Specialized widget for app bar icons
-class AppBarIconWidget extends StatelessWidget {
-  final String? logoUrl;
-  final IconData? fallbackIcon;
-  final String? siteName;
-
-  const AppBarIconWidget({
-    super.key,
-    this.logoUrl,
-    this.fallbackIcon,
-    this.siteName,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ForumIconWidget(
-      logoUrl: logoUrl,
-      fallbackIcon: fallbackIcon,
-      size: 32,
-      borderRadius: BorderRadius.circular(8),
-      context: 'header',
-      siteName: siteName,
-    );
-  }
-}
-
-// Specialized widget for bottom sheet icons
-class BottomSheetIconWidget extends StatelessWidget {
-  final String? logoUrl;
-  final IconData? fallbackIcon;
-
-  const BottomSheetIconWidget({
-    super.key,
-    this.logoUrl,
-    this.fallbackIcon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ForumIconWidget(
-      logoUrl: logoUrl,
-      fallbackIcon: fallbackIcon,
-      size: 48,
-      borderRadius: BorderRadius.circular(10),
-      context: 'subforum',
     );
   }
 }

@@ -143,16 +143,6 @@ class AccessibilityHelpers {
     return localizations?.image ?? 'Image';
   }
 
-  /// Creates an accessibility hint for showing likes.
-  static String getShowLikesHint(BuildContext context, int count) {
-    return 'Show $count likes';
-  }
-
-  /// Creates an accessibility hint for showing thanks.
-  static String getShowThanksHint(BuildContext context, int count) {
-    return 'Show $count thanks';
-  }
-
   /// Ensures minimum touch target size for interactive elements.
   /// 
   /// Returns a Container with minimum 48x48dp constraints.

@@ -13,8 +13,9 @@ import '../base_discourse_proxy.dart';
 /// Endpoint mapping vs the XF-flavored SDK contract:
 ///
 ///   * `forgetPassword`     → `POST /session/forgot_password.json`
-///   * `prefetchAccount`    → `GET /about.json` (just to read site flags;
-///                            mobile registration is web-only on Discourse)
+///   * `prefetchAccount`    → `GET /site/settings.json` for
+///                            `allow_new_registrations`; mobile
+///                            registration itself is web-only on Discourse
 ///   * `register`           → reported failure with a link to the web
 ///                            signup page. Discourse's signup has
 ///                            CAPTCHA + ToS + custom field validation
@@ -27,9 +28,12 @@ import '../base_discourse_proxy.dart';
 ///   * `updateProfile`      → `PUT /u/{username}.json`
 ///   * `signinLogin*`       → not used; 2FA / passkey flows on Discourse
 ///                            go through the User API Key handshake.
-///   * `getUserSettings*`   → empty results (Discourse exposes preferences
-///                            as a flat structure under user_option, not
-///                            as XF-style categories).
+///   * `getUserSettings*`   → honestly empty (Discourse exposes
+///                            preferences as a flat structure under
+///                            `user_option`, not as XF-style categories).
+///                            `updateUserSettings` reports FAILURE — it
+///                            writes nothing, and claiming success for a
+///                            no-op write is worse than saying so.
 class DiscourseAccountProxy extends BaseDiscourseProxy
     implements IFCAccountProxy {
   DiscourseAccountProxy(SiteContext context) : super(context);
@@ -72,36 +76,37 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
     // verification) is web-only. We probe /about.json so the register
     // page can route the user to the web signup form with a real URL.
     final webUrl = '${siteContext.site.url}/signup';
+    // `allow_new_registrations` is a `client: true` site setting
+    // (config/site_settings.yml:660-662, default true), so it ships in
+    // /site/settings.json — the same payload DiscourseConfigProxy reads
+    // for upload limits. /about.json carries no registration signal at
+    // all, so the previous version fetched it, threw the body away, and
+    // hardcoded registrationOpen: true.
+    bool registrationOpen = true;
     try {
-      final response = await apiGet('/about.json');
-      final about = (response['about'] as Map<String, dynamic>?) ?? const {};
-      // SiteSetting `allow_new_registrations` ungated here would require
-      // admin scope. /about.json doesn't surface it, so we just report
-      // canRegisterViaAPI=false unconditionally and let the UI redirect.
-      return FCPrefetchAccountResult(
-        result: true,
-        resultText: '',
-        accountExists: false,
-        username: null,
-        email: null,
-        registrationOpen: true,
-        canRegisterViaAPI: false,
-        registerViaWebUrl: webUrl,
-        registrationRequirements: null,
-      );
+      final settings = await apiGet('/site/settings.json');
+      final raw = settings['allow_new_registrations'];
+      if (raw is bool) {
+        registrationOpen = raw;
+      } else if (raw is String) {
+        registrationOpen = raw.toLowerCase() != 'false';
+      }
     } catch (_) {
-      // Fall back to the web URL even when /about.json is unreachable
-      // — better than crashing the register page.
-      return FCPrefetchAccountResult(
-        result: true,
-        resultText: '',
-        accountExists: false,
-        registrationOpen: true,
-        canRegisterViaAPI: false,
-        registerViaWebUrl: webUrl,
-        registrationRequirements: null,
-      );
+      // Unreachable settings endpoint: keep the server default (true) and
+      // let the UI hand the user to the web signup form, which will show
+      // the real "registrations closed" message if they are.
     }
+    return FCPrefetchAccountResult(
+      result: true,
+      resultText: '',
+      accountExists: false,
+      username: null,
+      email: null,
+      registrationOpen: registrationOpen,
+      canRegisterViaAPI: false,
+      registerViaWebUrl: webUrl,
+      registrationRequirements: null,
+    );
   }
 
   @override
@@ -249,7 +254,11 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
   // empty data so any future caller that goes through the typed
   // interface gets a clean response rather than a crash.
 
+  @override
   Future<FCUserSettingsCategoriesResult> getUserSettingsCategories() async {
+    // Honestly empty: Discourse has no settings-category concept, so
+    // there is nothing to enumerate. `result: true` + empty list is the
+    // accurate answer, not a placeholder.
     return FCUserSettingsCategoriesResult(
       result: true,
       resultText: '',
@@ -257,6 +266,7 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
     );
   }
 
+  @override
   Future<FCUserSettingsResult> getUserSettings(String category) async {
     return FCUserSettingsResult(
       result: true,
@@ -267,13 +277,20 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
     );
   }
 
+  @override
   Future<FCUserSettingsResult> updateUserSettings(
     String category,
     Map<String, dynamic> settings,
   ) async {
+    // This method has no Discourse implementation and writes NOTHING.
+    // It used to return `result: true`, i.e. it reported a successful
+    // save for a write that never happened. Fail loudly instead and
+    // point callers at the real path.
     return FCUserSettingsResult(
-      result: true,
-      resultText: '',
+      result: false,
+      resultText: 'Discourse has no XF-style settings categories. Use '
+          'updateNotificationPrefsAsync (user_option) or PUT '
+          '/u/{username}.json via updateProfile.',
       category: category,
       enabled: false,
       settings: const <FCUserSetting>[],
@@ -336,11 +353,24 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
       );
     }
     try {
-      await apiPut(
+      final response = await apiPut(
         '/u/${Uri.encodeComponent(username)}.json',
         body: _prefsToUpdateBody(prefs),
       );
-      return FCNotificationPrefsResult(result: true, prefs: prefs);
+      // `UsersController#update` renders through `json_result(user,
+      // serializer: UserSerializer)` (app/controllers/users_controller.rb:262-266
+      // → app/controllers/application_controller.rb:671-683), so the
+      // 200 body is `{ success: "OK", user: {... user_option ...} }`
+      // carrying the server's POST-UPDATE state. Report that rather than
+      // echoing the caller's own request back as if it were confirmed:
+      // UserUpdater clamps/rejects values (e.g. digest_after_minutes must
+      // be one of its allowed steps) and the caller would never know.
+      final user = (response['user'] as Map<String, dynamic>?);
+      final userOption = (user?['user_option'] as Map<String, dynamic>?);
+      return FCNotificationPrefsResult(
+        result: true,
+        prefs: userOption == null ? prefs : _prefsFromUserOption(userOption),
+      );
     } on DiscourseApiException catch (e) {
       return FCNotificationPrefsResult(
           result: false, resultText: e.userMessage);
@@ -369,6 +399,13 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
       return fallback;
     }
 
+    // The fallbacks below are Discourse's OWN defaults for each
+    // `user_option` column, used only when the key is absent (which on
+    // `/u/{username}.json` means the viewer isn't the account owner —
+    // UserSerializer gates user_option on `can_edit`). They are NOT
+    // reported preferences; FCNotificationPrefs has no per-field
+    // "unknown", so a caller cannot tell the two apart. Callers that
+    // care should only read prefs for the signed-in user.
     return FCNotificationPrefs(
       emailLevel: asInt('email_level', 1),
       emailMessagesLevel: asInt('email_messages_level', 1),
@@ -394,6 +431,4 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
   }
 }
 
-// `FCRegistrationRequirements` parsing helpers were removed alongside
-// the in-app registration path. If the SDK ever grows a Discourse-shaped
-// signup contract, they can be reintroduced here.
+

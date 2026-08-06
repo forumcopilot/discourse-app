@@ -74,30 +74,52 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
     // DiscourseAttachmentProxy and the composer's pre-upload validation.
     // Fail soft: on any error the cache stays null and uploads fall back
     // to server-side validation only.
+    int? minSearchLength;
     try {
       final settings = await apiGet('/site/settings.json');
       siteContext
           .setUploadLimits(DiscourseUploadLimits.fromClientSettings(settings));
+      // `min_search_term_length` is `client: true`
+      // (config/site_settings.yml:3465-3467, default 3, locale-dependent —
+      // 1 for zh_CN/zh_TW), so the real value ships in this same payload.
+      // Read it rather than hardcoding the English default.
+      final raw = settings['min_search_term_length'];
+      final parsed = raw is num ? raw.toInt() : int.tryParse(raw?.toString() ?? '');
+      if (parsed != null && parsed > 0) minSearchLength = parsed;
     } catch (e) {
       // ignore: avoid_print
       print('⚠️ [DISCOURSE_CONFIG] /site/settings.json failed '
           '(upload limits unavailable, uploads fail open): $e');
     }
-    return _buildResult(url, version: version, isOpen: isOpen);
+    return _buildResult(
+      url,
+      version: version,
+      isOpen: isOpen,
+      minSearchLength: minSearchLength,
+    );
   }
 
   FCConfigResult _buildResult(
     String url, {
     required String version,
     required bool isOpen,
+    int? minSearchLength,
   }) {
     return FCConfigResult(
       jsonSupport: true,
       systemVersion: version,
       version: version,
+      // hookVersion/apiLevel are XenForo-plugin protocol constants. There
+      // is no Discourse analogue; they are OUR client-side protocol
+      // markers, not anything the server reported.
       hookVersion: '1.0',
       apiLevel: '4',
-      releaseTimestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+      // Discourse publishes no build/release timestamp. `/about.json`
+      // carries `version` only (which we map above). This used to be
+      // `DateTime.now()`, i.e. a different "release date" on every call —
+      // an empty string is the honest answer for "unknown". No consumer
+      // reads it today.
+      releaseTimestamp: '',
       pushSlug: 'discourse',
       smartBannerInfo: '',
       setForumInfo: true,
@@ -132,12 +154,15 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       pmLoad: false,
       subscribeLoad: true,
       // Discourse uses `notification_level` (Watching/Tracking/Normal/Muted),
-      // not the XF-style email/notification toggle. The 'level' literal is
-      // a v1 placeholder; Phase 2 wires real notification-level controls
-      // through a Discourse-specific extension to IFCSubscriptionProxy.
+      // not the XF-style email/notification toggle. 'level' tells the UI to
+      // use the 4-level control; the real levels are driven through
+      // `DiscourseSubscriptionProxy`'s Discourse-native methods (landed in
+      // Phase 2 — this is no longer a placeholder).
       subscribeTopicMode: 'level',
       subscribeForumMode: 'level',
-      minSearchLength: 3,
+      // Real `min_search_term_length` when /site/settings.json answered;
+      // otherwise Discourse's own default (3) as a stated fallback.
+      minSearchLength: minSearchLength ?? 3,
       inboxStat: true,
       multiQuote: true,
       defaultSmilies: false,
@@ -189,6 +214,12 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       bannerControl: true,
       allowTrending: true,
       pushType: 'fcm',
+      // Client-side protocol constant, NOT a per-forum capability the
+      // server reported. Whether push actually works depends on
+      // `AppForumConfig.pushApiBaseUrl` + the forum's
+      // `allowed_user_api_push_urls` / `allow_user_api_key_scopes`, which
+      // this proxy cannot see. `SiteContext.userApiPushEnabled` (set
+      // during the User API Key handshake) is the real signal.
       push: 'enabled',
       disableHtml: false,
       contentEncoding: 'gzip',

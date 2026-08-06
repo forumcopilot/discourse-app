@@ -2,33 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/cached_redirect_image.dart';
 import '../../utils/file_utils.dart';
 
-/// Mock attachment class to bridge BBCode attributes with AttachmentItemWidget
-class MockAttachment {
-  final String id;
-  final String filename;
-  final String contentType;
-  final int fileSize;
-  final String url;
-  final String? thumbnailUrl;
-  final bool isImage;
-  final bool canViewUrl;
-  final bool canViewThumbnailUrl;
-
-  MockAttachment({
-    required this.id,
-    required this.filename,
-    required this.contentType,
-    required this.fileSize,
-    required this.url,
-    this.thumbnailUrl,
-    required this.isImage,
-    required this.canViewUrl,
-    required this.canViewThumbnailUrl,
-  });
-}
-
-/// A reusable widget for rendering individual attachment items
-/// This can be used by both PostListItemAttachment and InlineAttachmentTag
+/// A reusable widget for rendering individual attachment items.
 class AttachmentItemWidget extends StatelessWidget {
   final dynamic attachment;
   final VoidCallback? onTap;

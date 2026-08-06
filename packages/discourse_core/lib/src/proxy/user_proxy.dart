@@ -3,12 +3,10 @@ import 'package:forumcopilot_sdk/interfaces/i_fc_user_proxy.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_badge.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_directory_item.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_user.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_tfa_provider.dart';
 import 'package:forumcopilot_sdk/models/results/fc_directory_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_passkey_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
-import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../data/user/discourse_do_not_disturb.dart';
@@ -64,6 +62,10 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       final user = (response['user'] as Map<String, dynamic>?) ?? const {};
       final names =
           ((user['ignored_usernames'] as List?) ?? const []).whereType<String>();
+      // `ignored_usernames` is a bare array of usernames on the user
+      // preferences payload — Discourse attaches no user ids to it, so
+      // the id stays empty rather than being faked. Every ignore/unignore
+      // route is keyed by username anyway.
       final list = names
           .map((name) => FCIgnoredUser(
                 id: '',
@@ -424,6 +426,11 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         });
       }
 
+      // Discourse publishes NO presence flag on UserSerializer — there is
+      // no `is_online`. This is a client-side inference from the real
+      // `last_seen_at` timestamp against a 5-minute window (the same
+      // convention Discourse's own "seen recently" copy uses). It is a
+      // heuristic, not something the server asserted.
       final lastSeenAt = parseTs(user['last_seen_at']);
       final fiveMinAgo = DateTime.now().subtract(const Duration(minutes: 5));
       final isOnline = lastSeenAt != null && lastSeenAt.isAfter(fiveMinAgo);
@@ -586,12 +593,15 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           topicId: (a['topic_id'] ?? '').toString(),
           topicTitle: (a['title'] ?? '').toString(),
           forumId: (a['category_id'] ?? '').toString(),
+          // UserActionSerializer emits `category_id` but no category
+          // name, and /user_actions.json side-loads categories only when
+          // `can_lazy_load_categories` is on. Left empty, not invented.
           forumName: '',
           authorId: (a['user_id'] ?? '').toString(),
           authorName: (a['username'] ?? '').toString(),
           authorIconUrl: avatarUrl,
           postTime: DateTime.tryParse(a['created_at']?.toString() ?? '') ??
-              DateTime.now(),
+              DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
           replyNumber: (a['post_number'] as int?) ?? 0,
           postContent: a['excerpt']?.toString(),
           shortContent: a['excerpt']?.toString(),
@@ -600,6 +610,8 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       return FCUserReplyResult(
         result: true,
         resultText: '',
+        // Page length, not a grand total — UserActionsController#index
+        // returns no count (app/controllers/user_actions_controller.rb:35-43).
         total: replyList.length,
         list: replyList,
       );
@@ -650,18 +662,21 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           topicId: topicId,
           topicTitle: (a['title'] ?? '').toString(),
           forumId: (a['category_id'] ?? '').toString(),
+          // See getUserReplyAsync: no category name in this payload.
           forumName: '',
           authorId: (a['user_id'] ?? '').toString(),
           authorName: (a['username'] ?? '').toString(),
           postTime:
               DateTime.tryParse(a['created_at']?.toString() ?? '') ??
-                  DateTime.now(),
+                  DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
           shortContent: a['excerpt']?.toString(),
         ));
       }
       return FCUserTopicResult(
         result: true,
         resultText: '',
+        // Page length after topic-dedupe, not a grand total — see
+        // getUserReplyAsync.
         total: topics.length,
         list: topics,
       );
@@ -855,6 +870,11 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           id: (m['id'] ?? '').toString(),
           username: (m['username'] ?? '').toString(),
           iconUrl: avatarUrl,
+          // The user-search payload carries only id/username/name/
+          // avatar_template. postCount 0 / isOnline false are NOT
+          // reported values — they are the non-nullable fields' neutral
+          // state, and the row is not a claim that this user has zero
+          // posts. Fetch the profile for real numbers.
           postCount: 0,
           registrationTime: null,
           isOnline: false,

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/notification_preferences.dart';
 import 'package:discourse_ui/core/errors/error_handling_mixins.dart';
-import 'package:discourse_ui/core/errors/app_exceptions.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/core/cache/lru_cache.dart';
 import 'package:discourse_ui/core/cache/cache_manager.dart';

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import '../../config/app_forum_config.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import 'package:forumcopilot_sdk/models/results/fc_topic_result.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:discourse_ui/views/user_search_page.dart';
@@ -37,14 +35,6 @@ class MessageComposePage extends StatefulWidget {
   final TextEditingController? contentController;
   final dynamic Function(bool success)? onSuccess; // Optional callback to return custom value
 
-  // Prefix-related parameters
-  final List<FCPrefix>? prefixes;
-  final bool requirePrefix;
-  final String? selectedPrefixId;
-  final bool isLoadingPrefixes;
-  final String? prefixError;
-  final ValueChanged<String?>? onPrefixChanged;
-
   // Existing attachments (from API)
   final List<FCAttachment>? existingAttachments;
   final Future<bool> Function(String attachmentId)? onRemoveExistingAttachment;
@@ -59,9 +49,8 @@ class MessageComposePage extends StatefulWidget {
   // Show signature toggle for new topic editor
   final bool showSignatureToggle;
 
-  // Optional widget slot rendered between the prefix selector and the
-  // title field. Discourse uses this for the tag-input row; XF builds
-  // leave it null.
+  // Optional widget slot rendered above the title field. Discourse uses
+  // this for the tag-input row.
   final Widget? extraHeader;
 
   // Discourse whisper support (staff-only reply mode). When
@@ -91,12 +80,6 @@ class MessageComposePage extends StatefulWidget {
     this.titleController,
     this.contentController,
     this.onSuccess,
-    this.prefixes,
-    this.requirePrefix = false,
-    this.selectedPrefixId,
-    this.isLoadingPrefixes = false,
-    this.prefixError,
-    this.onPrefixChanged,
     this.existingAttachments,
     this.onRemoveExistingAttachment,
     this.onRemoveAttachment,
@@ -1327,153 +1310,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
     );
   }
 
-  Widget _buildPrefixSelector() {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    // Don't show if no prefixes available and not loading
-    if ((widget.prefixes == null || widget.prefixes!.isEmpty) && !widget.isLoadingPrefixes && widget.prefixError == null) {
-      return const SizedBox.shrink();
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              'Prefix',
-              style: textTheme.titleSmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                fontWeight: DesignTokens.fontWeightMedium,
-              ),
-            ),
-            if (widget.requirePrefix) ...[
-              SizedBox(width: DesignTokens.spacingXS),
-              Text(
-                '*',
-                style: textTheme.titleSmall?.copyWith(
-                  color: colorScheme.error,
-                ),
-              ),
-            ],
-          ],
-        ),
-        SizedBox(height: DesignTokens.spacingS),
-        if (widget.isLoadingPrefixes)
-          SizedBox(
-            height: 40,
-            child: Center(
-              child: SizedBox(
-                width: DesignTokens.iconSizeM,
-                height: DesignTokens.iconSizeM,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: colorScheme.primary,
-                ),
-              ),
-            ),
-          )
-        else if (widget.prefixError != null)
-          Container(
-            padding: DesignTokens.paddingM,
-            decoration: BoxDecoration(
-              color: colorScheme.errorContainer.withValues(alpha: DesignTokens.opacityLow),
-              borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 20,
-                  color: colorScheme.onErrorContainer,
-                ),
-                SizedBox(width: DesignTokens.spacingS),
-                Expanded(
-                  child: Text(
-                    'Failed to load prefixes',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onErrorContainer,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
-        else if (widget.prefixes != null && widget.prefixes!.isNotEmpty)
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              // "None" option if prefix is not required
-              if (!widget.requirePrefix)
-                FilterChip(
-                  label: Text(AppLocalizations.of(context)?.none ?? 'None'),
-                  selected: widget.selectedPrefixId == null,
-                  onSelected: (selected) {
-                    if (widget.onPrefixChanged != null) {
-                      // Always clear selection when "None" is clicked
-                      if (selected) {
-                        widget.onPrefixChanged!(null);
-                      }
-                    }
-                  },
-                  selectedColor: colorScheme.primaryContainer,
-                  checkmarkColor: colorScheme.onPrimaryContainer,
-                  labelStyle: textTheme.bodyMedium?.copyWith(
-                    color: widget.selectedPrefixId == null ? colorScheme.onPrimaryContainer : colorScheme.onSurface,
-                  ),
-                  backgroundColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
-                  side: BorderSide(
-                    color: widget.selectedPrefixId == null ? colorScheme.primary : colorScheme.outlineVariant,
-                    width: widget.selectedPrefixId == null ? DesignTokens.borderWidthThinMedium : DesignTokens.borderWidthThin,
-                  ),
-                ),
-              // Available prefixes
-              ...widget.prefixes!.map((prefix) {
-                // Normalize prefix IDs for comparison (handle null, empty string, and whitespace)
-                // Convert to string and trim for reliable comparison
-                final currentPrefixId = widget.selectedPrefixId?.toString().trim();
-                final prefixId = prefix.prefixId.toString().trim();
-                final isSelected = currentPrefixId != null && currentPrefixId.isNotEmpty && currentPrefixId != 'null' && currentPrefixId == prefixId;
-                return FilterChip(
-                  label: Text(prefix.prefixDisplayName),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    // Always call the callback when a prefix chip is clicked
-                    // FilterChip's onSelected receives the new state (true = selected, false = deselected)
-                    if (widget.onPrefixChanged != null) {
-                      if (selected) {
-                        // Chip is being selected - set this prefix
-                        // This allows users to change between prefixes even when required
-                        widget.onPrefixChanged!(prefix.prefixId);
-                      } else if (!widget.requirePrefix) {
-                        // Chip is being deselected - clear selection (only if not required)
-                        widget.onPrefixChanged!(null);
-                      } else {
-                        // Prefix is required, can't deselect - re-select it to maintain required state
-                        widget.onPrefixChanged!(prefix.prefixId);
-                      }
-                    }
-                  },
-                  selectedColor: colorScheme.primaryContainer,
-                  checkmarkColor: colorScheme.onPrimaryContainer,
-                  labelStyle: textTheme.bodyMedium?.copyWith(
-                    color: isSelected ? colorScheme.onPrimaryContainer : colorScheme.onSurface,
-                  ),
-                  backgroundColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
-                  side: BorderSide(
-                    color: isSelected ? colorScheme.primary : colorScheme.outlineVariant,
-                    width: isSelected ? DesignTokens.borderWidthThinMedium : DesignTokens.borderWidthThin,
-                  ),
-                );
-              }),
-            ],
-          ),
-      ],
-    );
-  }
-
   void _handleMention() {
     Navigator.push(
       context,
@@ -2015,9 +1851,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                               ),
                               SizedBox(height: DesignTokens.spacingL),
                             ],
-                            // Add prefix selector here
-                            _buildPrefixSelector(),
-                            if (widget.prefixes != null && widget.prefixes!.isNotEmpty) SizedBox(height: DesignTokens.spacingL),
                             // Discourse tag input slot.
                             if (widget.extraHeader != null) ...[
                               widget.extraHeader!,

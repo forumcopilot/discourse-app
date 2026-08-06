@@ -174,6 +174,16 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
         fileName: body['original_filename']?.toString() ?? filename,
         // Discourse has no "group" concept on uploads — surface the
         // short_url so the caller can embed it in markdown.
+        //
+        // NEEDS SDK FIELD: the same body also carries an absolute `url`
+        // (UploadSerializer, app/serializers/upload_serializer.rb:5 —
+        // cooked through UrlHelper, CDN- and secure-upload-aware), which
+        // is what a local preview thumbnail actually needs.
+        // FCAttachmentUploadResult models only id/fileName/groupId/
+        // fileSize, so `url` is dropped. A dead `_resolveImageUrl` helper
+        // used to paper over this by returning the un-renderable
+        // `upload://...` short_url; it was removed rather than left
+        // looking like a real URL resolver.
         groupId: body['short_url']?.toString(),
         fileSize: (body['filesize'] as int?) ?? bytes.length,
       );
@@ -224,21 +234,6 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
           '(this one is ${DiscourseUploadLimits.formatKb((sizeBytes / 1024).ceil())}).';
     }
     return null;
-  }
-
-  String? _resolveImageUrl(FCAttachmentUploadResult upload) {
-    final short = upload.groupId; // we stashed short_url here
-    if (short == null || short.isEmpty) return null;
-    if (short.startsWith('http')) return short;
-    if (short.startsWith('upload://')) {
-      // The short_url won't render directly; the markdown post-render
-      // resolves it. For preview UI we need the absolute URL — Discourse
-      // doesn't return that from the upload response in older versions,
-      // so we fall back to the short_url as-is. Phase 2.x can chase the
-      // `url` field when present.
-      return short;
-    }
-    return '${siteContext.site.url}$short';
   }
 
   String _joinPath(String basePath, String suffix) {

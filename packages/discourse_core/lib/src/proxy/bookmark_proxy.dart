@@ -155,6 +155,12 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
           .toList();
       return FCBookmarkListResult(
         result: true,
+        // Page length, not a grand total. `UserBookmarkListSerializer`
+        // reports no count — only `more_bookmarks_url`, which says
+        // whether ANOTHER page exists (see getBookmarksWithRemindersAsync,
+        // which reads it). FCBookmarkListResult has no has-more field, so
+        // that signal is dropped here rather than folded into a fake
+        // total. NEEDS SDK FIELD.
         total: items.length,
         items: items,
       );

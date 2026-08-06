@@ -25,8 +25,10 @@ import '../base_discourse_proxy.dart';
 ///   * subscribe   → POST notification_level=3 (Watching)
 ///   * unsubscribe → POST notification_level=1 (Regular = no email/notif)
 ///
-/// Phase 2.x will extend the SDK with a Discourse-native enum so the UI
-/// can offer all four levels.
+/// The Discourse-native path landed in Phase 2 and is preferred over the
+/// XF-shaped subscribe/unsubscribe pair above: see
+/// [setTopicNotificationLevelAsync] / [setCategoryNotificationLevelAsync]
+/// and their getters, which speak [FCNotificationLevel] directly.
 class DiscourseSubscriptionProxy extends BaseDiscourseProxy
     implements IFCSubscriptionProxy {
   DiscourseSubscriptionProxy(SiteContext context) : super(context);
@@ -36,9 +38,9 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
   static const int _levelTracking = 2;
   static const int _levelWatching = 3;
 
-  /// Public level constants. UI uses these instead of magic numbers when
-  /// calling [setTopicNotificationLevelAsync] /
-  /// [setCategoryNotificationLevelAsync].
+  /// Public level constants, exported so callers can avoid magic numbers.
+  /// (The UI currently still passes literal ints to the XF-shaped
+  /// subscribe methods; prefer [FCNotificationLevel] for new code.)
   static const int levelMuted = _levelMuted;
   static const int levelRegular = _levelRegular;
   static const int levelTracking = _levelTracking;
@@ -115,14 +117,25 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
         if (level < _levelTracking) continue;
         final logo =
             (c['uploaded_logo'] as Map<String, dynamic>?)?['url'] as String?;
+        // Same `permission` semantics as DiscourseForumProxy._toForum:
+        // full:1 / create_post:2 (app/models/category_group.rb:10), and
+        // NIL on /categories.json means "may not start topics here"
+        // (Category.preload_user_fields!, app/models/category.rb:279-280).
+        // Was hardcoded true, which advertised posting in read-only
+        // categories.
+        final permission = c['permission'];
         forums.add(FCSubscribedForum(
           forumId: (c['id'] ?? '').toString(),
           forumName: (c['name'] ?? '').toString(),
           iconUrl: _absoluteUrl(logo),
           isProtected: c['read_restricted'] as bool? ?? false,
+          // No per-category unread signal exists on Discourse (unread is
+          // tracked per topic), so this is "unknown", not "nothing new".
           newPost: false,
-          canPost: true,
+          canPost: permission == 1 || permission == 2,
           subscribeMode: _discourseLevelToXfSubscribeMode(level),
+          // Both true by construction: we only reach here for rows whose
+          // notification_level is already >= Tracking.
           isSubscribed: true,
           canSubscribe: true,
         ));
@@ -130,6 +143,8 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       return FCSubscribedForumResult(
         result: true,
         resultText: '',
+        // Exact: /categories.json is not paginated, so this really is
+        // every tracked/watched category, not a page of them.
         totalForumsNum: forums.length,
         forums: forums,
       );
@@ -150,9 +165,15 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
     // /latest.json and filter to topics with notification_level >= Tracking.
     //
     // Caveat: this is best-effort. /latest.json is paginated and only
-    // includes topics the user can see — the user's _watched topic outside
-    // their normal feed_ won't appear. Phase 2.x can swap in a
-    // /u/{username}/messages-tracked-style endpoint when we identify one.
+    // includes topics the user can see — a watched topic that has fallen
+    // off the user's latest feed won't appear at all, so the list is a
+    // SUBSET of what the user actually watches, never a complete one.
+    //
+    // [lastNum] is unused: /latest.json takes a page number, not an item
+    // span, and its page size is fixed server-side
+    // (`SiteSetting.topics_per_page`, 30 by default — the constant below
+    // mirrors that default because we must pick a page before we can read
+    // the response's real `topic_list.per_page`).
     try {
       final response = await apiGet('/latest.json', query: {
         if (startNum > 0) 'page': (startNum / 30).floor().toString(),
@@ -174,6 +195,9 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       return FCSubscribedTopicResult(
         result: true,
         resultText: '',
+        // Rows kept from THIS page after the notification_level filter —
+        // not a total. Discourse reports no count of watched topics, and
+        // the source list is itself only one page of /latest.json.
         totalTopicNum: topics.length,
         topics: topics,
       );
@@ -294,6 +318,13 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
     }
   }
 
+  /// Lossy by construction: Muted(0), Regular(1) and Tracking(2) all
+  /// collapse to XF mode 0 ("no email"), so a MUTED item is
+  /// indistinguishable from a tracked one at this boundary. Callers that
+  /// need the real state must use [getTopicNotificationLevelAsync] /
+  /// [getCategoryNotificationLevelAsync]. Both list methods above filter
+  /// to level >= Tracking before mapping, so muted rows can't leak
+  /// through today.
   int _discourseLevelToXfSubscribeMode(int level) {
     switch (level) {
       case _levelMuted:
@@ -343,6 +374,9 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
 
     return FCSubscribedTopic(
       forumId: (t['category_id'] ?? '').toString(),
+      // /latest.json's topic rows carry `category_id` but no category
+      // NAME, and the response has no side-loaded category list to join
+      // against. Left empty rather than synthesised ("Category 5").
       forumName: '',
       topicId: (t['id'] ?? '').toString(),
       topicTitle: (t['title'] ?? '').toString(),
@@ -350,8 +384,12 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       postAuthorId: (opUserId ?? '').toString(),
       isClosed: (t['closed'] as bool?) ?? false,
       iconUrl: avatarUrl,
+      // `created_at` is always present on a topic-list row; the epoch
+      // fallback is a last resort that is obviously wrong on screen
+      // rather than silently plausible (DateTime.now() made undated
+      // topics sort and read as brand new).
       postTime: DateTime.tryParse(t['created_at']?.toString() ?? '') ??
-          DateTime.now(),
+          DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
       replyNumber: (((t['posts_count'] as int?) ?? 1) - 1).clamp(0, 1 << 30),
       newPost: t['unseen'] == true || (t['unread_posts'] as int? ?? 0) > 0,
       subscribeMode: _discourseLevelToXfSubscribeMode(

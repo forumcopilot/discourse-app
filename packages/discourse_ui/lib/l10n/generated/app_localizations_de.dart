@@ -882,9 +882,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get website => 'Website';
 
   @override
-  String get signature => 'Signatur';
-
-  @override
   String get next => 'Weiter';
 
   @override
@@ -1395,9 +1392,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get noForumsFound => 'Keine Foren gefunden.';
-
-  @override
-  String get pleaseSelectPrefix => 'Bitte wählen Sie ein Präfix';
 
   @override
   String get pleaseLoginToAccessContent =>

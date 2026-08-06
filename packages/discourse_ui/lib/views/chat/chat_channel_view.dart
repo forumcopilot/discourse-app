@@ -13,8 +13,8 @@ import 'widgets/chat_reaction_chips.dart';
 /// without its own Scaffold/AppBar so it can plug into a tab body or
 /// a full-page route equally. Polling pauses when [isActive] is false.
 ///
-/// Ported from /Volumes/CRUCIAL/qhtt/xenforoapp/lib/views/chat/chat_room_view.dart
-/// with the Siropu API swapped out for Discourse Chat.
+/// Ported from the XenForo app's Siropu chat room view, with the Siropu
+/// API swapped out for Discourse Chat.
 class ChatChannelView extends StatefulWidget {
   const ChatChannelView({
     super.key,

@@ -96,22 +96,6 @@ class _ForumTopicListState extends State<ForumTopicList> {
         AppLogger.debug('[ForumTopicList] canViewContent: $canViewContent');
 
         if (!widget.forum.isSubForumContainer && canViewContent) {
-          // TEMPORARILY DISABLED: Load announcement topics
-          // final annTopicData = await topicProxy.getAnnTopicAsync(widget.forum.id, 0, 19);
-          // if (annTopicData.topics.isNotEmpty) {
-          //   AppLogger.debug('[ForumTopicList] Adding ${annTopicData.topics.length} announcement topics');
-          //   // Mark as announcement and convert to FCTopic
-          //   for (final t in annTopicData.topics) {
-          //     t.isAnnouncement = true;
-          //   }
-          //   var annTopicsList = annTopicData.topics;
-          //   // Mark FCTopics as announcements
-          //   for (final topic in annTopicsList) {
-          //     topic.isAnnouncement = true;
-          //   }
-          //   allItems.addAll(annTopicsList);
-          // }
-
           // Load sticky topics
           final topTopicData = await topicProxy.getTopTopicAsync(widget.forum.id, 0, 19);
           if (topTopicData.topics.isNotEmpty) {

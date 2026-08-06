@@ -367,7 +367,6 @@
   "about": "À propos",
   "location": "Localisation",
   "website": "Site web",
-  "signature": "Signature",
   "next": "Suivant",
   "permanent": "Permanent",
   "temporary": "Temporaire",
@@ -763,7 +762,6 @@
   "forward": "Transférer",
   
   "noForumsFound": "Aucun forum trouvé.",
-  "pleaseSelectPrefix": "Veuillez sélectionner un préfixe",
   "pleaseLoginToAccessContent": "Veuillez vous connecter pour accéder à ce contenu et interagir avec les publications.",
   
   "searchUsers": "Rechercher des utilisateurs...",

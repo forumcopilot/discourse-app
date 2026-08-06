@@ -160,36 +160,3 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
     );
   }
 }
-
-/// Compact horizontal variant for cases where vertical real-estate is
-/// tight (e.g. inside a list item header). Renders as `▲ 42 ▼` on one
-/// line.
-class PostVoteRow extends StatelessWidget {
-  final String postId;
-  final FCPostVote vote;
-  final bool isLoggedIn;
-  final ValueChanged<FCPostVote> onVoteChanged;
-
-  const PostVoteRow({
-    super.key,
-    required this.postId,
-    required this.vote,
-    required this.onVoteChanged,
-    this.isLoggedIn = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Reuse PostVoteColumn but constrain it to a single line via a
-    // wrapping row. The arrows are big enough to tap on touch.
-    return SizedBox(
-      height: 30,
-      child: PostVoteColumn(
-        postId: postId,
-        vote: vote,
-        isLoggedIn: isLoggedIn,
-        onVoteChanged: onVoteChanged,
-      ),
-    );
-  }
-}

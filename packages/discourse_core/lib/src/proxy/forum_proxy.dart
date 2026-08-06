@@ -13,10 +13,8 @@ import '../base_discourse_proxy.dart';
 class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
   DiscourseForumProxy(SiteContext context) : super(context);
 
-  // Phase 5.41 — the per-FCForum DiscourseCategoryMeta Expando sidecar
-  // is gone. Hex color, text color, topic/post counts and slug now live
-  // on FCForum itself so they survive the tree rebuild in [_buildTree]
-  // (which used to drop the sidecar on the floor).
+  // Phase 5.41 — hex color, text color, topic/post counts and slug live
+  // on FCForum itself so they survive the tree rebuild in [_buildTree].
 
   @override
   Future<FCForumDataResult> getForumAsync(
@@ -64,10 +62,11 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
 
   @override
   Future<FCParticipatedForumResult> getParticipatedForumAsync() async {
-    // Discourse doesn't track per-category "user has participated here";
-    // approximate by surfacing categories with notification_level >=
-    // Tracking (2). Phase 2 follow-up: hit /user-actions to compute real
-    // participation history.
+    // Discourse doesn't track per-category "user has participated here".
+    // This is an APPROXIMATION: categories the user tracks or watches
+    // (notification_level >= 2). It is not participation history — a
+    // real one would need /user_actions.json aggregated by category,
+    // which is several round-trips and is not attempted here.
     try {
       // include_subcategories=true: without it /categories.json omits
       // subcategories, hiding any tracked subcategory here.
@@ -204,7 +203,19 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
     try {
       final about = await apiGet('/about.json');
       final inner = (about['about'] as Map<String, dynamic>?) ?? const {};
-      final stats = (inner['stats'] as Map<String, dynamic>?) ?? const {};
+      final stats = (inner['stats'] as Map<String, dynamic>?);
+      // `AboutSerializer#include_stats?` is gated on `can_see_about_stats`
+      // (app/serializers/about_serializer.rb:34-36, :60-61), so the whole
+      // `stats` block is absent for viewers the forum withholds it from.
+      // Report that as a failed fetch instead of a forum with 0 topics,
+      // 0 posts and 0 members — those zeros would be indistinguishable
+      // from a genuinely empty forum.
+      if (stats == null) {
+        return FCBoardStatResult(
+          result: false,
+          resultText: 'Forum statistics are not visible to this account',
+        );
+      }
       return FCBoardStatResult(
         result: true,
         resultText: '',
@@ -314,8 +325,19 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
   }) {
     final notificationLevel = (c['notification_level'] as int?) ?? 1;
     final readRestricted = c['read_restricted'] as bool? ?? false;
+    // `permission` (BasicCategorySerializer, basic_category_serializer.rb:21)
+    // is `CategoryGroup.permission_types` — full:1, create_post:2, readonly:3
+    // (app/models/category_group.rb:10). On the category-LIST paths
+    // Discourse fills it in `Category.preload_user_fields!`
+    // (app/models/category.rb:279-280), which sets it to `:full` ONLY for
+    // admins and users in `topic_create_allowed`, and otherwise leaves it
+    // NIL. `Category.set_permission!` (the method that can also emit 2/3)
+    // is reached only from lib/group_manager.rb:123. So on /categories.json
+    // nil means "you may NOT start topics here", not "unknown" — treating
+    // nil as postable (as this did) made every read-only category look
+    // postable to every visitor, anonymous included.
     final permission = c['permission'];
-    final canPost = permission == null || permission == 1 || permission == 2;
+    final canPost = permission == 1 || permission == 2;
     final logo =
         (c['uploaded_logo'] as Map<String, dynamic>?)?['url'] as String?;
     final bg =
@@ -329,15 +351,35 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
       logoUrl: _absoluteUrl(logo),
       backgroundUrl: _absoluteUrl(bg),
       parentId: c['parent_category_id']?.toString(),
+      // BasicCategorySerializer carries no per-category unread signal —
+      // Discourse tracks new/unread per TOPIC, not per category. Always
+      // false here; it is not a claim that the category has been read.
       hasNewPosts: false,
       isProtected: readRestricted,
       isSubscribed: notificationLevel >= 2,
-      canSubscribe: true,
+      // Subscribing writes CategoryUser state, which requires a session.
+      canSubscribe: siteContext.isLoggedIn,
       canPost: canPost,
+      // Discourse has NO per-category upload permission — uploading is
+      // gated globally by trust level and the `authorized_extensions` /
+      // `max_*_size_kb` site settings (see DiscourseUploadLimits, cached
+      // on the site context by DiscourseConfigProxy). Aliasing canPost is
+      // the closest honest approximation: if you can't post here you
+      // can't attach anything here either.
       canUpload: canPost,
-      canViewContent: !readRestricted || permission != null,
+      // Everything /categories.json returns has already passed through
+      // `Category.secured(guardian)`, so the viewer can see it by
+      // construction. This used to be `!readRestricted || permission != null`,
+      // which hid the topic list of any restricted category the viewer
+      // could read but not post in (permission nil — see above).
+      canViewContent: true,
       externalUrl: null,
       isLinkForum: false,
+      // Heuristic, NOT a server field: Discourse has no "container
+      // category" concept. `has_children` + `subcategory_count` are real
+      // (basic_category_serializer.rb:27-28); the `topic_count == 0` half
+      // is our own rule for "show the subcategory list instead of a topic
+      // list". Note _buildTree widens this to any parent with children.
       isSubForumContainer: (c['has_children'] as bool? ?? false) &&
           (c['topic_count'] as int? ?? 0) == 0,
       childForums: const [],
@@ -346,6 +388,9 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
       // color is empty (e.g. when fetched via an endpoint that doesn't
       // include them).
       color: (c['color'] as String?) ?? '',
+      // `text_color` is unconditionally serialized alongside `color`, so
+      // this fallback is unreachable on a real response; it only guards a
+      // hand-built map.
       textColor: (c['text_color'] as String?) ?? 'FFFFFF',
       topicCount: (c['topic_count'] as int?) ?? 0,
       postCount: (c['post_count'] as int?) ?? 0,

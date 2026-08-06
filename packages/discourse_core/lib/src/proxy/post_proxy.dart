@@ -138,6 +138,12 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
                 1) >=
             2,
         canReply: !(t['closed'] == true || t['archived'] == true),
+        // Optimistic, with no per-topic signal in the payload: the topic
+        // view serializer's `details` has can_edit/can_delete/etc. for
+        // MODERATION, but nothing for flag/upload/like at topic level
+        // (like state is per-POST, in each post's actions_summary — see
+        // _postFrom, which reads the real flags). The server enforces
+        // these regardless; a 403 surfaces as a normal failure result.
         canReport: true,
         canUpload: true,
         canLike: true,
@@ -212,6 +218,8 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         timestamp:
             DateTime.tryParse(t['created_at']?.toString() ?? '') ?? DateTime.now(),
         canReply: !(t['closed'] == true || t['archived'] == true),
+        // Optimistic — see the sibling mapper above; no per-topic
+        // flag/upload signal exists in this payload.
         canReport: true,
         canUpload: true,
         poll: poll,
@@ -291,6 +299,8 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         timestamp:
             DateTime.tryParse(t['created_at']?.toString() ?? '') ?? DateTime.now(),
         canReply: !(t['closed'] == true || t['archived'] == true),
+        // Optimistic — see the sibling mapper above; no per-topic
+        // flag/upload signal exists in this payload.
         canReport: true,
         canUpload: true,
         poll: poll,
@@ -1477,6 +1487,10 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     );
   }
 
+  /// Sentinel timestamp for failed/empty results (see [_emptyThread]).
+  static final DateTime _noTimestamp =
+      DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
+
   FCThreadResult _emptyThread({required String message}) {
     return FCThreadResult(
       result: false,
@@ -1489,7 +1503,10 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       authorId: '',
       authorName: '',
       authorUserType: '',
-      timestamp: DateTime.now(),
+      // Sentinel on a `result: false` object — there is no thread and
+      // therefore no timestamp. Epoch rather than DateTime.now(), which
+      // read as a real "just now" thread if anything rendered it.
+      timestamp: _noTimestamp,
     );
   }
 
@@ -1506,7 +1523,10 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       authorId: '',
       authorName: '',
       authorUserType: '',
-      timestamp: DateTime.now(),
+      // Sentinel on a `result: false` object — there is no thread and
+      // therefore no timestamp. Epoch rather than DateTime.now(), which
+      // read as a real "just now" thread if anything rendered it.
+      timestamp: _noTimestamp,
     );
   }
 
@@ -1523,7 +1543,10 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       authorId: '',
       authorName: '',
       authorUserType: '',
-      timestamp: DateTime.now(),
+      // Sentinel on a `result: false` object — there is no thread and
+      // therefore no timestamp. Epoch rather than DateTime.now(), which
+      // read as a real "just now" thread if anything rendered it.
+      timestamp: _noTimestamp,
     );
   }
 }

@@ -143,6 +143,8 @@ class DiscourseDraftProxy extends BaseDiscourseProxy implements IFCDraftProxy {
           .toList(growable: false);
       return FCDraftListResult(
         result: true,
+        // Page length, not a grand total: `DraftsController#index`
+        // returns `{ drafts: [...] }` with no count field.
         total: items.length,
         items: items,
       );
@@ -187,7 +189,17 @@ class DiscourseDraftProxy extends BaseDiscourseProxy implements IFCDraftProxy {
       data: parsed,
       topicId: (json['topic_id'] as num?)?.toInt(),
       title: (json['title'] ?? json['topic_title'])?.toString(),
-      categoryId: (parsed['categoryId'] as num?)?.toInt(),
+      // Prefer the SERVER's category (DraftSerializer emits a top-level
+      // `category_id` resolved from the draft's topic —
+      // app/serializers/draft_serializer.rb:21, :58-59, :86-87); the
+      // client-authored inner blob only has it for new-topic drafts, so
+      // reply drafts used to report null despite the server saying
+      // otherwise.
+      categoryId: (json['category_id'] as num?)?.toInt() ??
+          (parsed['categoryId'] as num?)?.toInt(),
+      // DraftSerializer has no `updated_at` — `created_at` is the only
+      // timestamp Discourse exposes for a draft, and Discourse bumps it
+      // on each save. Mapped onto the SDK's updatedAt for that reason.
       updatedAt: DateTime.tryParse(json['created_at']?.toString() ?? ''),
     );
   }

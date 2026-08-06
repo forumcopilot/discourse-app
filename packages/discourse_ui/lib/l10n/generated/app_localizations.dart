@@ -1634,12 +1634,6 @@ abstract class AppLocalizations {
   /// **'Website'**
   String get website;
 
-  /// No description provided for @signature.
-  ///
-  /// In en, this message translates to:
-  /// **'Signature'**
-  String get signature;
-
   /// No description provided for @next.
   ///
   /// In en, this message translates to:
@@ -2539,12 +2533,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No forums found.'**
   String get noForumsFound;
-
-  /// Validation message when prefix is required but not selected
-  ///
-  /// In en, this message translates to:
-  /// **'Please select a prefix'**
-  String get pleaseSelectPrefix;
 
   /// Message asking user to login to access content
   ///
