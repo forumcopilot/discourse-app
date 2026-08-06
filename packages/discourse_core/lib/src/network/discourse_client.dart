@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
+
 import 'package:dio/dio.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/network/fc_call_result.dart';
@@ -95,6 +97,101 @@ class DiscourseClient {
     final encodedBody =
         body is String ? body : (body == null ? null : jsonEncode(body));
 
+    // Any write invalidates the read cache below — a reply, vote or edit is
+    // usually followed immediately by a refetch of the thing that changed,
+    // and that refetch must see the server's new state.
+    if (method != 'GET') {
+      _readCache.clear();
+      _inFlight.clear();
+    }
+
+    final cacheKey = method == 'GET' ? '$url|${jsonEncode(effectiveQuery)}' : null;
+    if (cacheKey != null) {
+      // Identical GET already in flight → share its result instead of
+      // issuing a second one. Two widgets mounting in the same frame ask
+      // for the same URL microseconds apart; the second request could only
+      // ever return the same bytes.
+      final pending = _inFlight[cacheKey];
+      if (pending != null) {
+        if (kDebugMode) debugPrint('🌐 [HTTP coalesced] $method ${url.path}');
+        return pending;
+      }
+      final cached = _readCache[cacheKey];
+      if (cached != null && !cached.isStale) {
+        if (kDebugMode) debugPrint('🌐 [HTTP cache-hit] $method ${url.path}');
+        return cached.result;
+      }
+      _readCache.remove(cacheKey);
+    }
+
+    if (kDebugMode) {
+      _requestCount++;
+      debugPrint('🌐 [HTTP #$_requestCount] $method ${url.path}');
+    }
+
+    if (cacheKey != null) {
+      final future = _send(
+        method,
+        url,
+        headers: headers,
+        encodedBody: encodedBody,
+        effectiveQuery: effectiveQuery,
+      );
+      _inFlight[cacheKey] = future;
+      try {
+        final result = await future;
+        // Only successful reads are worth repeating; an error must not be
+        // pinned for the next few seconds.
+        if (result.statusCode >= 200 && result.statusCode < 300) {
+          _readCache[cacheKey] = _CachedResponse(result);
+        }
+        return result;
+      } finally {
+        _inFlight.remove(cacheKey);
+      }
+    }
+
+    return _send(
+      method,
+      url,
+      headers: headers,
+      encodedBody: encodedBody,
+      effectiveQuery: effectiveQuery,
+    );
+  }
+
+  /// Concurrent identical GETs, keyed by URL + query.
+  static final Map<String, Future<FCCallResult>> _inFlight =
+      <String, Future<FCCallResult>>{};
+
+  /// Very short-lived GET results. This exists to absorb *redundant* reads —
+  /// the bootstrap sequence re-verifying the site, and every tab resetting
+  /// when the login state settles — not to be a real cache. A cold launch
+  /// issued 15 requests for 7 distinct URLs before this; `/about.json`,
+  /// `/categories.json` and `/chat/api/me/channels` were each fetched three
+  /// times within 350ms. Discourse rate-limits at 50 requests / 10s per IP,
+  /// so that waste is what pushes an ordinary session into a 429.
+  ///
+  /// Deliberately shorter than any human refresh gesture, and dropped
+  /// wholesale on any write, so a user-initiated refresh always hits the
+  /// network.
+  static final Map<String, _CachedResponse> _readCache =
+      <String, _CachedResponse>{};
+
+  /// Clears cached reads. Call when the session changes — a different user
+  /// may see entirely different content at the same URLs.
+  static void invalidateReadCache() {
+    _readCache.clear();
+    _inFlight.clear();
+  }
+
+  Future<FCCallResult> _send(
+    String method,
+    Uri url, {
+    required Map<String, String> headers,
+    required String? encodedBody,
+    required Map<String, dynamic>? effectiveQuery,
+  }) async {
     // Discourse rate-limits per IP (50 req/10s, 200 req/min by default) and
     // per action. Both limits say exactly how long to wait — the middleware
     // via `Retry-After`, the app-level limiter via `extras.wait_seconds` —
@@ -132,6 +229,14 @@ class DiscourseClient {
       await Future<void>.delayed(wait);
     }
   }
+
+  /// A cached GET plus the moment it landed.
+  static const Duration _readCacheTtl = Duration(seconds: 3);
+
+  /// Debug-only counter so request volume is visible in logcat. Discourse
+  /// rate-limits at 50 requests / 10s per IP, which is easy to trip when a
+  /// screen fans out on mount.
+  static int _requestCount = 0;
 
   /// Longest 429 cooldown we will absorb silently. Beyond this the caller
   /// gets the error so the UI can say how long to wait rather than appear
@@ -283,4 +388,15 @@ class DiscourseClient {
         basePath.endsWith('/') ? basePath.substring(0, basePath.length - 1) : basePath;
     return suffix.startsWith('/') ? '$left$suffix' : '$left/$suffix';
   }
+}
+
+
+class _CachedResponse {
+  final FCCallResult result;
+  final DateTime storedAt;
+
+  _CachedResponse(this.result) : storedAt = DateTime.now();
+
+  bool get isStale =>
+      DateTime.now().difference(storedAt) > DiscourseClient._readCacheTtl;
 }

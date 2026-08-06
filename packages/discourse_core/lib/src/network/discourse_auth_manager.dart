@@ -187,7 +187,13 @@ class DiscourseAuthManager {
 
   /// Forget the locally stored User API Key. Does NOT call
   /// `/user-api-key/revoke` — for that, use [revokeKey].
-  Future<void> clearKey() => siteContext.clearUserApiCredentials();
+  /// Drops the stored key. Also clears the client's short-lived read cache:
+  /// the same URLs return different content for a different (or absent)
+  /// session, so a cached anonymous read must not survive a sign-in.
+  Future<void> clearKey() {
+    DiscourseClient.invalidateReadCache();
+    return siteContext.clearUserApiCredentials();
+  }
 
   /// Best-effort: ask Discourse to revoke the key, then drop it locally.
   /// A failed server revoke is logged but does not block local cleanup.
