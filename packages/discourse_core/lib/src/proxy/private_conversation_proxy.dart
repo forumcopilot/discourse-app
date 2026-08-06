@@ -748,20 +748,18 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       isFromCurrentUser: isMine,
       canLike: canLike,
       isLiked: isLiked,
+      // `actions_summary` gives a COUNT and an acted flag, never the
+      // actors — [likeCount] is the number the UI should render. We no
+      // longer pre-seed blank FCLike placeholders to make
+      // `likesInfo.length` read correctly (they rendered as blank avatars
+      // and dead-end profiles). The actor list is fetched on demand via
+      // `DiscoursePostProxy.getReactionUsersAsync(messageId)` — PM posts
+      // are ordinary posts, so both that endpoint and its
+      // /post_action_users.json fallback accept the message id.
       likeCount: likeCount,
-      // See post_proxy._buildLikesInfo for why we pre-seed entries.
-      likesInfo: List<FCLike>.generate(
-        likeCount,
-        (i) => i == 0 && isLiked
-            ? FCLike(
-                userId: siteContext.currentUserId ?? '',
-                username: siteContext.currentUsername ?? '',
-                avatarUrl:
-                    siteContext.loginDataOutput?.user?.iconUrl ?? '',
-                timestamp: DateTime.now(),
-              )
-            : FCLike(userId: '', username: '', avatarUrl: ''),
-      ),
+      // Growable: optimistic-UI code calls `.add()` / `.removeWhere()`
+      // on this list (FCConversationMessage defaults it to `const []`).
+      likesInfo: <FCLike>[],
       attachments: <FCAttachment>[],
       isUnread: false,
       isFirstMessage: (p['post_number'] as int?) == 1,

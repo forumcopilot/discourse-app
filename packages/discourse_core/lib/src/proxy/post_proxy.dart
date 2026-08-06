@@ -31,6 +31,10 @@ import '../util/html_text.dart';
 ///   * PUT/DELETE `/polls/vote`, GET `/polls/voters.json` — poll plugin
 ///   * GET  `/posts/{id}/revisions/latest|{rev}.json` — edit history
 ///   * PUT  `/posts/{id}/wiki`      — toggle wiki status
+///   * GET  `/discourse-reactions/posts/{id}/reactions-users-list.json`
+///                                  — reaction/like actors (plugin), with
+///                                    GET `/post_action_users.json` as the
+///                                    plugin-less fallback
 class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   DiscoursePostProxy(SiteContext context) : super(context);
 
@@ -910,6 +914,149 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     'eyes',
   ];
 
+  /// Discourse-native: the people behind a post's reaction/like counts,
+  /// paged. **Not** on [IFCPostProxy] — the SDK's XenForo-shaped contract
+  /// ships actors inline with the post; Discourse never does, so the list
+  /// is fetched on demand when the user opens the reactions sheet.
+  ///
+  /// Primary source, discourse-reactions:
+  /// `GET /discourse-reactions/posts/{id}/reactions-users-list.json`
+  /// (plugin `config/routes.rb:17-19` → `custom_reactions#reactions_users_list`,
+  /// `app/controllers/discourse_reactions/custom_reactions_controller.rb:166-192`).
+  ///   * `reaction_value` — emoji shortcode; OMIT it for "everyone", which
+  ///     unions reaction rows with plain likes
+  ///     (`lib/post_reactions_query.rb:38-63`).
+  ///   * `page` — 0-based, server does `.to_i.clamp(0..)`.
+  ///   * `limit` — server clamps to 1..50, defaulting to 30.
+  /// Response: `{ users: [{id, username, name, avatar_template, reaction}],
+  /// total_rows: n }`. The rows carry no timestamp (the controller drops
+  /// the query's `created_at`), so [FCLike.timestamp] stays null; `reaction`
+  /// lands in [FCLike.reactionEmoji]. The endpoint is readable while
+  /// logged out (`before_action :ensure_logged_in, except: ...:166`).
+  ///
+  /// Fallback when the plugin is absent/disabled (both 404 — the route is
+  /// unmounted, or `requires_plugin` rejects it): stock
+  /// `GET /post_action_users.json?id={postId}&post_action_type_id=2`
+  /// (`config/routes.rb:1333` →
+  /// `app/controllers/post_action_users_controller.rb:6-54`), which pages
+  /// with `page` + `limit` (max 200) and returns
+  /// `{ post_action_users: [...], total_rows_post_action_users: n }`
+  /// serialized by `PostActionUserSerializer` (id/username/avatar_template
+  /// — no reaction, no timestamp). `total_rows_post_action_users` is only
+  /// emitted when the total EXCEEDS the page size (:51), so we fall back to
+  /// the row count.
+  ///
+  /// Never throws: failures come back as `result: false` with the server's
+  /// message and an empty user list.
+  Future<FCReactionUsersResult> getReactionUsersAsync(
+    String postId, {
+    String? reactionId,
+    int page = 0,
+    int limit = 30,
+  }) async {
+    final pid = int.tryParse(postId);
+    if (pid == null) {
+      return FCReactionUsersResult(
+        result: false,
+        resultText: 'Invalid post id',
+        users: <FCLike>[],
+      );
+    }
+    final safePage = page < 0 ? 0 : page;
+    final safeLimit = limit.clamp(1, 50);
+
+    try {
+      final query = <String, dynamic>{
+        'page': safePage,
+        'limit': safeLimit,
+      };
+      if (reactionId != null && reactionId.isNotEmpty) {
+        query['reaction_value'] = reactionId;
+      }
+      final response = await apiGet(
+        '/discourse-reactions/posts/$pid/reactions-users-list.json',
+        query: query,
+      );
+      final users = ((response['users'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((u) => _likeFromReactionRow(u.cast<String, dynamic>()))
+          .toList();
+      return FCReactionUsersResult(
+        result: true,
+        users: users,
+        total: (response['total_rows'] as num?)?.toInt() ?? users.length,
+      );
+    } on DiscourseApiException catch (e) {
+      if (e.statusCode == 404) {
+        return _postActionLikeUsers(pid, page: safePage, limit: safeLimit);
+      }
+      return FCReactionUsersResult(
+        result: false,
+        resultText: e.userMessage,
+        users: <FCLike>[],
+      );
+    } catch (e) {
+      return FCReactionUsersResult(
+        result: false,
+        resultText: 'Error: $e',
+        users: <FCLike>[],
+      );
+    }
+  }
+
+  /// Plugin-less fallback for [getReactionUsersAsync] — stock Discourse's
+  /// like actors (`post_action_type_id: 2`).
+  Future<FCReactionUsersResult> _postActionLikeUsers(
+    int postId, {
+    required int page,
+    required int limit,
+  }) async {
+    try {
+      final response = await apiGet('/post_action_users.json', query: {
+        'id': postId,
+        'post_action_type_id': 2,
+        'page': page,
+        'limit': limit,
+      });
+      final users = ((response['post_action_users'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((u) => _likeFromReactionRow(u.cast<String, dynamic>()))
+          .toList();
+      return FCReactionUsersResult(
+        result: true,
+        users: users,
+        total: (response['total_rows_post_action_users'] as num?)?.toInt() ??
+            (page * limit + users.length),
+      );
+    } on DiscourseApiException catch (e) {
+      return FCReactionUsersResult(
+        result: false,
+        resultText: e.userMessage,
+        users: <FCLike>[],
+      );
+    } catch (e) {
+      return FCReactionUsersResult(
+        result: false,
+        resultText: 'Error: $e',
+        users: <FCLike>[],
+      );
+    }
+  }
+
+  /// Map one actor row (either endpoint) to [FCLike]. `reaction` is only
+  /// present on the discourse-reactions payload.
+  FCLike _likeFromReactionRow(Map<String, dynamic> u) {
+    final reaction = u['reaction']?.toString();
+    return FCLike(
+      userId: (u['id'] ?? '').toString(),
+      username: (u['username'] ?? '').toString(),
+      avatarUrl: _avatarFromTemplate(u['avatar_template'] as String?) ?? '',
+      // Discourse identifies reactions by emoji shortcode ('heart',
+      // 'laughing', …) — the same token toggleReactionAsync consumes.
+      reactionEmoji: (reaction != null && reaction.isNotEmpty) ? reaction : null,
+    );
+  }
+
   @override
   Future<FCPostVoteResult> castPostVoteAsync(
     String postId,
@@ -1166,22 +1313,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     Map<String, dynamic> p, {
     required String topicId,
   }) {
-    final tpl = p['avatar_template'] as String?;
-    String? avatarUrl;
-    if (tpl != null && tpl.isNotEmpty) {
-      final filled = tpl.replaceAll('{size}', '90');
-      avatarUrl = filled.startsWith('http')
-          ? filled
-          : '${siteContext.site.url}$filled';
-    }
-    final actions = (p['actions_summary'] as List?) ?? const [];
-    final like = actions.whereType<Map>().firstWhere(
-          (a) => a['id'] == 2,
-          orElse: () => <String, dynamic>{},
-        );
-    final isLiked = like['acted'] == true;
-    final canLike = like['can_act'] == true;
-    final likeCount = (like['count'] as int?) ?? 0;
+    final avatarUrl = _avatarFromTemplate(p['avatar_template'] as String?);
+    final like = _likeSummary(p);
+    final isLiked = like.isLiked;
+    final canLike = like.canLike;
+    final likeCount = like.count;
 
     // Phase 5.36 — reactions and Q&A votes now live as proper FCPost
     // fields (was an Expando sidecar). Empty list / null when the
@@ -1228,16 +1364,17 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // gating in the UI.
       editVersion: (p['version'] as num?)?.toInt(),
       isWiki: p['wiki'] == true,
-      // Pass mutable empty lists so optimistic-UI code in post_actions.dart
-      // can call `.add()` without tripping "Cannot add to an unmodifiable
-      // list" (FCPost defaults these to `const []`). Discourse's
-      // `actions_summary` only gives us a count + acted flag — we don't
-      // know individual likers without /post_actions/users — so we
-      // pre-seed `likeCount` placeholder entries so the UI's
-      // `likesInfo.length` reads correctly. The current user is placed
-      // first when they've liked, so `removeWhere(username==me)` works
-      // for un-like.
-      likesInfo: _buildLikesInfo(isLiked: isLiked, likeCount: likeCount),
+      // Discourse's `actions_summary` carries a COUNT and an acted flag,
+      // never the actors. The count now lives in its own field and the
+      // actor list is fetched on demand via [getReactionUsersAsync] when
+      // the user opens the likes/reactions sheet — we no longer fabricate
+      // blank FCLike placeholders just to make `likesInfo.length` read
+      // correctly (that produced blank avatars and dead-end profiles).
+      likeCount: likeCount,
+      // Mutable (growable) empty lists: optimistic-UI code in
+      // post_actions.dart calls `.add()` / `.removeWhere()` on these, and
+      // FCPost defaults them to `const []`.
+      likesInfo: <FCLike>[],
       attachments: <FCAttachment>[],
       inlineAttachments: <FCAttachment>[],
       thanksInfo: <FCThanks>[],
@@ -1246,7 +1383,68 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     );
   }
 
+  /// Resolve an `avatar_template` into an absolute avatar URL.
+  ///
+  /// Discourse serializes `/user_avatar/.../{size}/123_2.png` (relative on
+  /// most installs, absolute when a CDN is configured).
+  String? _avatarFromTemplate(String? tpl) {
+    if (tpl == null || tpl.isEmpty) return null;
+    final filled = tpl.replaceAll('{size}', '90');
+    return filled.startsWith('http') ? filled : '${siteContext.site.url}$filled';
+  }
+
+  /// The `actions_summary` row for the like action
+  /// (`PostActionType::LIKE_POST_ACTION_ID == 2`).
+  ///
+  /// `count` is dropped by the serializer when zero, `can_act` is absent
+  /// once the viewer has acted, and `can_undo` only appears while the
+  /// undo window is open (post_serializer.rb:331-393).
+  ({bool isLiked, bool canLike, bool canUndo, int count}) _likeSummary(
+      Map<String, dynamic> p) {
+    final actions = (p['actions_summary'] as List?) ?? const [];
+    final like = actions.whereType<Map>().firstWhere(
+          (a) => a['id'] == 2,
+          orElse: () => <String, dynamic>{},
+        );
+    return (
+      isLiked: like['acted'] == true,
+      canLike: like['can_act'] == true,
+      canUndo: like['can_undo'] == true,
+      count: (like['count'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  /// Build the emoji-chip row for a post.
+  ///
+  /// With discourse-reactions installed the serializer emits `reactions`
+  /// and folds plain likes into its `heart` entry — so the chips are the
+  /// complete picture and `actions_summary[id==2].count` is already
+  /// counted there.
+  ///
+  /// WITHOUT the plugin there is no `reactions` key at all. We synthesize
+  /// a single `heart` chip from the like count so the chips row is the
+  /// one and only like/reaction surface on BOTH server configurations.
+  /// Note the synthetic chip must be toggled through the like path
+  /// (`POST/DELETE /post_actions`), not `toggleReactionAsync` — the
+  /// plugin's toggle route does not exist on these forums.
   List<FCPostReaction> _parseReactions(Map<String, dynamic> p) {
+    if (!p.containsKey('reactions')) {
+      final like = _likeSummary(p);
+      if (like.count <= 0) return const [];
+      return [
+        FCPostReaction(
+          // `heart` is discourse-reactions' default main reaction id
+          // (SiteSetting.discourse_reactions_reaction_for_like,
+          // settings.yml:9-13) — using it keeps the chip identity
+          // stable across the two server configurations.
+          id: 'heart',
+          type: 'emoji',
+          count: like.count,
+          viewerReacted: like.isLiked,
+          canUndo: like.isLiked && like.canUndo,
+        ),
+      ];
+    }
     final raw = (p['reactions'] as List?) ?? const [];
     if (raw.isEmpty) return const [];
     final current =
@@ -1277,31 +1475,6 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       hasVotes: p['post_voting_has_votes'] == true,
       viewerDirection: p['post_voting_user_voted_direction']?.toString(),
     );
-  }
-
-  List<FCLike> _buildLikesInfo({
-    required bool isLiked,
-    required int likeCount,
-  }) {
-    final likers = <FCLike>[];
-    if (isLiked) {
-      likers.add(FCLike(
-        userId: siteContext.currentUserId ?? '',
-        username: siteContext.currentUsername ?? '',
-        avatarUrl: siteContext.loginDataOutput?.user?.iconUrl ?? '',
-        timestamp: DateTime.now(),
-      ));
-    }
-    final remaining = (likeCount - likers.length).clamp(0, 1 << 30);
-    for (var i = 0; i < remaining; i++) {
-      likers.add(FCLike(
-        userId: '',
-        username: '',
-        avatarUrl: '',
-        timestamp: null,
-      ));
-    }
-    return likers;
   }
 
   FCThreadResult _emptyThread({required String message}) {

@@ -9,6 +9,7 @@ import '../widgets/custom_bb_stylesheet.dart' show BBCodeCallbacks;
 import '../widgets/rich_text_content.dart';
 import '../widgets/reaction_chips_row.dart';
 import '../widgets/reaction_picker_sheet.dart';
+import '../widgets/reaction_users_sheet.dart';
 import '../widgets/post_action_button.dart';
 import '../widgets/post_vote_column.dart';
 import '../widgets/link_preview_card.dart';
@@ -186,7 +187,9 @@ class _PostListItemState extends State<PostListItem> {
     // Set the default refresh callback for attachment login prompts
     _postActionsHandler.setDefaultRefreshCallback(widget.actions?.onRefresh);
     _isLiked = widget.post.isLiked;
-    _likeCount = widget.post.likesInfo.length;
+    // `likesInfo` is intentionally empty (the proxy no longer pads it
+    // with placeholder actors) — `likeCount` is the count of record.
+    _likeCount = widget.post.likeCount;
     _isBookmarked = widget.post.bookmarked;
     _reactions = List.of(widget.post.reactions, growable: false);
     _vote = widget.post.vote;
@@ -200,7 +203,7 @@ class _PostListItemState extends State<PostListItem> {
     // post instance changes (same-instance rebuilds keep local mutations).
     if (!identical(oldWidget.post, widget.post)) {
       _isLiked = widget.post.isLiked;
-      _likeCount = widget.post.likesInfo.length;
+      _likeCount = widget.post.likeCount;
       // Don't clobber an in-flight optimistic bookmark toggle.
       if (!_bookmarkInFlight) {
         _isBookmarked = widget.post.bookmarked;
@@ -717,14 +720,20 @@ class _PostListItemState extends State<PostListItem> {
             content: widget.translatedContent ?? widget.post.content,
             callbacks: callbacks,
           ),
-          // discourse-reactions chips (hidden when the plugin isn't
-          // installed or no reactions exist on this post). Tap toggles
-          // the viewer's reaction; long-press on the like button opens
-          // the full picker for other emojis.
+          // Reaction chips — the single like/reaction surface. On
+          // plugin-less forums the proxy synthesizes one heart entry
+          // here, so a plain like renders as a chip too. Tap toggles,
+          // long-press lists the real reactors, trailing "+" opens the
+          // full picker. Hidden only in the zero state, where the
+          // heart button in the action row takes over.
           if (_reactions.isNotEmpty)
             ReactionChipsRow(
               reactions: _reactions,
               onTap: _toggleReaction,
+              onLongPress: _showReactionUsers,
+              onAddReaction: widget.siteContext.isLoggedIn
+                  ? _openReactionPicker
+                  : null,
             ),
           if (data.limitedYoutubeUrls.isNotEmpty) ...[
             const SizedBox(height: DesignTokens.spacingM),
@@ -776,7 +785,6 @@ class _PostListItemState extends State<PostListItem> {
             isLoggedIn: widget.siteContext.isLoggedIn,
             onLike: _handleLikeAction,
             onLongPressLike: _openReactionPicker,
-            onShowLikes: _showLikesBottomSheet,
             isBookmarked: _isBookmarked,
             onBookmark: _handleBookmarkAction,
             // Long-press opens the Discourse bookmark-reminder sheet
@@ -1075,12 +1083,7 @@ class _PostListItemState extends State<PostListItem> {
     }
   }
 
-  void _showLikesBottomSheet() {
-    PostListItemSocial.showLikesBottomSheet(
-        context, widget.post, widget.siteContext);
-  }
-
-  void _handleLikeAction() async {
+  Future<void> _handleLikeAction() async {
     await _postActionsHandler.handleLike(
       context: context,
       siteContext: widget.siteContext,
@@ -1090,6 +1093,12 @@ class _PostListItemState extends State<PostListItem> {
       setLikeCount: (val) => setState(() => _likeCount = val),
       isLiked: _isLiked,
     );
+    // A like IS the heart reaction on Discourse (the plugin folds plain
+    // likes into `heart`, and the proxy synthesizes the same chip on
+    // plugin-less forums). Mirror the new count into the chips row so
+    // the zero-state heart button hands off to a chip immediately
+    // instead of waiting for a thread refetch.
+    _syncHeartChipFromLike();
   }
 
   /// Toggle bookmark on the current post via IFCBookmarkProxy
@@ -1389,6 +1398,13 @@ class _PostListItemState extends State<PostListItem> {
         .toggleReactionAsync(widget.post.id, reactionId);
     if (!mounted) return;
     if (!result.result) {
+      // Forums without discourse-reactions have no custom-reactions
+      // route, but they still have likes — and the `heart` chip there
+      // is the synthesized like chip. Toggle it through the like path.
+      if (reactionId == 'heart') {
+        await _handleLikeAction();
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.resultText?.isNotEmpty == true
@@ -1401,11 +1417,55 @@ class _PostListItemState extends State<PostListItem> {
     setState(() {
       _reactions = result.reactions;
       widget.post.reactions = result.reactions;
+      // Keep the like state/count (used by the zero-state heart button
+      // and its a11y label) consistent with the heart chip.
+      final heart = result.reactions
+          .where((r) => r.id == 'heart')
+          .fold<int>(0, (sum, r) => sum + r.count);
+      _likeCount = heart;
+      widget.post.likeCount = heart;
+      _isLiked = result.reactions.any((r) => r.id == 'heart' && r.viewerReacted);
+      widget.post.isLiked = _isLiked;
     });
   }
 
-  /// Open the full reaction picker. Reachable from a long-press on the
-  /// like button (added below) so users can pick any of the forum's
+  /// Rebuild the synthesized `heart` chip after a like/unlike so the
+  /// chips row and the zero-state heart button never disagree. Only
+  /// touches the heart entry; other emoji chips are left alone.
+  void _syncHeartChipFromLike() {
+    if (!mounted) return;
+    final others =
+        _reactions.where((r) => r.id != 'heart').toList(growable: true);
+    final next = <FCPostReaction>[
+      if (_likeCount > 0)
+        FCPostReaction(
+          id: 'heart',
+          count: _likeCount,
+          viewerReacted: _isLiked,
+          canUndo: _isLiked,
+        ),
+      ...others,
+    ];
+    setState(() {
+      _reactions = next;
+      widget.post.reactions = next;
+    });
+  }
+
+  /// Long-press on a reaction chip: list the users behind that count,
+  /// fetched live from the server (never from `post.likesInfo`).
+  void _showReactionUsers(String reactionId) {
+    ReactionUsersSheet.show(
+      context: context,
+      siteContext: widget.siteContext,
+      postId: widget.post.id,
+      reactionId: reactionId.isEmpty ? null : reactionId,
+    );
+  }
+
+  /// Open the full reaction picker. Reachable from the trailing "+"
+  /// chip when reactions exist, and from a long-press on the like
+  /// button in the zero state, so users can pick any of the forum's
   /// enabled emojis, not just the ones already showing.
   Future<void> _openReactionPicker() async {
     if (!widget.siteContext.isLoggedIn) {

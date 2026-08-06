@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_like.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:get/get.dart';
@@ -1098,22 +1097,17 @@ class PostActionsHandler {
     // In-flight guard: ignore taps while a request for this post is pending.
     if (_likeInFlight.contains(post.id)) return;
     _likeInFlight.add(post.id);
-    // Optimistically update UI
+    // Optimistically update UI. `likesInfo` is no longer the source of
+    // truth for the count (the proxy leaves it empty rather than
+    // padding it with placeholder actors), so move `likeCount` itself
+    // and mirror it onto the post so rebuilds keep the new value.
     final wasLiked = isLiked;
+    final previousCount = post.likeCount;
     setIsLiked(!isLiked);
-    if (!isLiked) {
-      // Optimistically add like
-      post.likesInfo.add(FCLike(
-        userId: siteContext.currentUserId ?? '',
-        username: siteContext.currentUsername ?? '',
-        avatarUrl: siteContext.currentAvatarUrl ?? '',
-        timestamp: DateTime.now(),
-      ));
-    } else {
-      // Optimistically remove like
-      post.likesInfo.removeWhere((like) => like.username == siteContext.currentUsername);
-    }
-    setLikeCount(post.likesInfo.length);
+    final optimisticCount =
+        wasLiked ? (previousCount > 0 ? previousCount - 1 : 0) : previousCount + 1;
+    post.likeCount = optimisticCount;
+    setLikeCount(optimisticCount);
     // Removed onRefresh() call - local state updates are sufficient for like actions
     bool ok;
     String? errText;
@@ -1139,19 +1133,8 @@ class PostActionsHandler {
     if (!ok) {
       // Revert UI if the request threw OR the server said result=false
       setIsLiked(wasLiked);
-      if (wasLiked) {
-        // Re-add like
-        post.likesInfo.add(FCLike(
-          userId: siteContext.currentUserId ?? '',
-          username: siteContext.currentUsername ?? '',
-          avatarUrl: siteContext.currentAvatarUrl ?? '',
-          timestamp: DateTime.now(),
-        ));
-      } else {
-        // Remove like
-        post.likesInfo.removeWhere((like) => like.username == siteContext.currentUsername);
-      }
-      setLikeCount(post.likesInfo.length);
+      post.likeCount = previousCount;
+      setLikeCount(previousCount);
       // Removed onRefresh() call - local state updates are sufficient for like actions
       if (context.mounted) {
         final reason = errText?.isNotEmpty == true ? errText! : '';
@@ -1181,22 +1164,14 @@ class PostActionsHandler {
     // In-flight guard: ignore taps while a request for this message is pending.
     if (_likeInFlight.contains(message.messageId)) return;
     _likeInFlight.add(message.messageId);
-    // Optimistically update UI
+    // Optimistically update UI — count-driven, same as posts.
     final wasLiked = isLiked;
+    final previousCount = message.likeCount;
     setIsLiked(!isLiked);
-    if (!isLiked) {
-      // Optimistically add like
-      message.likesInfo.add(FCLike(
-        userId: siteContext.currentUserId ?? '',
-        username: siteContext.currentUsername ?? '',
-        avatarUrl: siteContext.currentAvatarUrl ?? '',
-        timestamp: DateTime.now(),
-      ));
-    } else {
-      // Optimistically remove like
-      message.likesInfo.removeWhere((like) => like.username == siteContext.currentUsername);
-    }
-    setLikeCount(message.likesInfo.length);
+    final optimisticCount =
+        wasLiked ? (previousCount > 0 ? previousCount - 1 : 0) : previousCount + 1;
+    message.likeCount = optimisticCount;
+    setLikeCount(optimisticCount);
     bool ok;
     String? errText;
     try {
@@ -1223,19 +1198,8 @@ class PostActionsHandler {
     if (!ok) {
       // Revert UI if the request threw OR the server said result=false
       setIsLiked(wasLiked);
-      if (wasLiked) {
-        // Re-add like
-        message.likesInfo.add(FCLike(
-          userId: siteContext.currentUserId ?? '',
-          username: siteContext.currentUsername ?? '',
-          avatarUrl: siteContext.currentAvatarUrl ?? '',
-          timestamp: DateTime.now(),
-        ));
-      } else {
-        // Remove like
-        message.likesInfo.removeWhere((like) => like.username == siteContext.currentUsername);
-      }
-      setLikeCount(message.likesInfo.length);
+      message.likeCount = previousCount;
+      setLikeCount(previousCount);
       if (context.mounted) {
         final reason = errText?.isNotEmpty == true ? errText! : '';
         ScaffoldMessenger.of(context).showSnackBar(
