@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import '../../controllers/site_controller.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/simple_list_app_bar.dart';
+import '../../utils/error_message.dart';
 
 /// Phase 5.20b — notification preferences screen, rebuilt to sync
 /// against Discourse's user_option API.
@@ -81,7 +82,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       if (!mounted) return;
       setState(() {
         _loading = false;
-        _error = '$e';
+        _error = describeError(e);
       });
     }
   }

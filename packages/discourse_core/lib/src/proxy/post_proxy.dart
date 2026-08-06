@@ -156,7 +156,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         poll: poll,
       );
     } catch (e) {
-      return _emptyThread(message: 'Error: $e');
+      return _emptyThread(message: describeApiError(e));
     }
   }
 
@@ -225,7 +225,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         poll: poll,
       );
     } catch (e) {
-      return _emptyThreadByPost(message: 'Error: $e');
+      return _emptyThreadByPost(message: describeApiError(e));
     }
   }
 
@@ -306,7 +306,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         poll: poll,
       );
     } catch (e) {
-      return _emptyThreadByUnread(message: 'Error: $e');
+      return _emptyThreadByUnread(message: describeApiError(e));
     }
   }
 
@@ -346,7 +346,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     } on DiscourseApiException catch (e) {
       return FCReplyPostResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCReplyPostResult(result: false, resultText: 'Error: $e');
+      return FCReplyPostResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -387,7 +387,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     } on DiscourseApiException catch (e) {
       return FCReplyPostResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCReplyPostResult(result: false, resultText: 'Error: $e');
+      return FCReplyPostResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -406,7 +406,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         quoteContent: quote,
       );
     } catch (e) {
-      return FCQuotePostResult(result: false, resultText: 'Error: $e');
+      return FCQuotePostResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -434,7 +434,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         forumId: response['category_id']?.toString(),
       );
     } catch (e) {
-      return FCRawPostResult(result: false, resultText: 'Error: $e');
+      return FCRawPostResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -473,7 +473,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
             : response['raw']?.toString(),
       );
     } catch (e) {
-      return FCSaveRawPostResult(result: false, resultText: 'Error: $e');
+      return FCSaveRawPostResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -493,7 +493,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       });
       return FCReportPostResult(result: true, resultText: '');
     } catch (e) {
-      return FCReportPostResult(result: false, resultText: 'Error: $e');
+      return FCReportPostResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -526,7 +526,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       }
       return FCAcceptAnswerResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCAcceptAnswerResult(result: false, resultText: 'Error: $e');
+      return FCAcceptAnswerResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -553,7 +553,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       }
       return FCAcceptAnswerResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCAcceptAnswerResult(result: false, resultText: 'Error: $e');
+      return FCAcceptAnswerResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -678,7 +678,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     } on DiscourseApiException catch (e) {
       return DiscoursePollVotersResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return DiscoursePollVotersResult(result: false, resultText: 'Error: $e');
+      return DiscoursePollVotersResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -869,7 +869,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     } on DiscourseApiException catch (e) {
       return FCToggleReactionResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCToggleReactionResult(result: false, resultText: 'Error: $e');
+      return FCToggleReactionResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -904,7 +904,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     } catch (e) {
       return FCAvailableReactionsResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         reactions: _defaultReactions,
       );
     }
@@ -1008,7 +1008,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     } catch (e) {
       return FCReactionUsersResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         users: <FCLike>[],
       );
     }
@@ -1047,7 +1047,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     } catch (e) {
       return FCReactionUsersResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         users: <FCLike>[],
       );
     }
@@ -1096,7 +1096,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
           result: false, resultText: e.userMessage, vote: previous);
     } catch (e) {
       return FCPostVoteResult(
-          result: false, resultText: 'Error: $e', vote: previous);
+          result: false, resultText: describeApiError(e), vote: previous);
     }
   }
 
@@ -1123,7 +1123,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
           result: false, resultText: e.userMessage, vote: previous);
     } catch (e) {
       return FCPostVoteResult(
-          result: false, resultText: 'Error: $e', vote: previous);
+          result: false, resultText: describeApiError(e), vote: previous);
     }
   }
 
@@ -1297,7 +1297,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
           result: false, resultText: e.userMessage);
     } catch (e) {
       return DiscoursePostRevisionResult(
-          result: false, resultText: 'Error: $e');
+          result: false, resultText: describeApiError(e));
     }
   }
 
@@ -1313,7 +1313,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     } on DiscourseApiException catch (e) {
       return DiscourseSetWikiResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return DiscourseSetWikiResult(result: false, resultText: 'Error: $e');
+      return DiscourseSetWikiResult(result: false, resultText: describeApiError(e));
     }
   }
 

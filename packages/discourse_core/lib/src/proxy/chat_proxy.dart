@@ -69,7 +69,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     } on DiscourseApiException catch (e) {
       return FCChatChannelListResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCChatChannelListResult(result: false, resultText: 'Error: $e');
+      return FCChatChannelListResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -83,7 +83,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     } on DiscourseApiException catch (e) {
       return FCChatChannelResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCChatChannelResult(result: false, resultText: 'Error: $e');
+      return FCChatChannelResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -120,7 +120,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     } on DiscourseApiException catch (e) {
       return FCChatMessageListResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCChatMessageListResult(result: false, resultText: 'Error: $e');
+      return FCChatMessageListResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -196,7 +196,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     } on DiscourseApiException catch (e) {
       return FCChatMessageResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCChatMessageResult(result: false, resultText: 'Error: $e');
+      return FCChatMessageResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -218,7 +218,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     } on DiscourseApiException catch (e) {
       return FCChatActionResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCChatActionResult(result: false, resultText: 'Error: $e');
+      return FCChatActionResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -233,7 +233,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     } on DiscourseApiException catch (e) {
       return FCChatActionResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCChatActionResult(result: false, resultText: 'Error: $e');
+      return FCChatActionResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -266,7 +266,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     } on DiscourseApiException catch (e) {
       return FCChatActionResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCChatActionResult(result: false, resultText: 'Error: $e');
+      return FCChatActionResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -310,7 +310,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     } on DiscourseApiException catch (e) {
       return FCChatChannelResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCChatChannelResult(result: false, resultText: 'Error: $e');
+      return FCChatChannelResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -345,7 +345,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     } on DiscourseApiException catch (e) {
       return FCChatActionResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCChatActionResult(result: false, resultText: 'Error: $e');
+      return FCChatActionResult(result: false, resultText: describeApiError(e));
     }
   }
 

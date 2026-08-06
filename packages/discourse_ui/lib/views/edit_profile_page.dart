@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 
 import '../theme/design_tokens.dart';
 import 'widgets/simple_list_app_bar.dart';
+import '../utils/error_message.dart';
 
 /// Phase 5.22 — inline profile editing.
 ///
@@ -109,7 +110,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (!mounted) return;
       setState(() => _saving = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Save failed: $e')),
+        SnackBar(content: Text(describeError(e, fallback: 'Save failed.'))),
       );
     }
   }

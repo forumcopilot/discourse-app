@@ -12,6 +12,7 @@ import 'lists/posts_list.dart';
 import 'post_page.dart';
 import 'widgets/bookmark_reminder_sheet.dart';
 import 'widgets/user_avatar.dart';
+import '../utils/error_message.dart';
 
 /// Discourse-native bookmarks list. Backed by `/u/{me}/bookmarks.json`,
 /// reachable from the user profile page (own profile only). Tapping an
@@ -106,7 +107,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
       AppLogger.error('BookmarksPage load failed', error: e, stackTrace: st);
       if (!mounted) return;
       setState(() {
-        _error = '$e';
+        _error = describeError(e);
         _isLoading = false;
         _hasMore = false;
       });

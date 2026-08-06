@@ -7,6 +7,7 @@ import '../theme/design_tokens.dart';
 import 'group_detail_page.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
+import '../utils/error_message.dart';
 
 /// Phase 5.18c-2 — Groups directory, the second drawer destination
 /// under **Community**. Lists every visible group on the forum
@@ -89,7 +90,7 @@ class _GroupsListPageState extends State<GroupsListPage> {
       if (!mounted) return;
       setState(() {
         _loading = false;
-        _error = '$e';
+        _error = describeError(e);
         _hasMore = false;
       });
     }
@@ -109,9 +110,9 @@ class _GroupsListPageState extends State<GroupsListPage> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_groups.isEmpty && _error != null) {
-      return EmptyStateView(
-        icon: Icons.groups_outlined,
+      return EmptyStateView.error(
         message: _error!,
+        onRetry: () => _load(reset: true),
       );
     }
     return RefreshIndicator(

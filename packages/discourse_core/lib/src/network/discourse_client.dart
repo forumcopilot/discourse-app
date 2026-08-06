@@ -95,36 +95,93 @@ class DiscourseClient {
     final encodedBody =
         body is String ? body : (body == null ? null : jsonEncode(body));
 
-    try {
-      final response = await FCHttpClient.request<String>(
-        method,
-        url,
-        headers: headers,
-        body: encodedBody,
-        queryParameters: effectiveQuery,
-        responseType: ResponseType.plain,
-      );
-      return _toCallResult(response);
-    } on DioException catch (e) {
-      return _toCallResultFromException(e);
-    } catch (e) {
-      return FCCallResult(
-        statusCode: 0,
-        body: jsonEncode({'error': e.toString()}),
-        headers: const {},
-        fcIsLogin: false,
-      );
+    // Discourse rate-limits per IP (50 req/10s, 200 req/min by default) and
+    // per action. Both limits say exactly how long to wait — the middleware
+    // via `Retry-After`, the app-level limiter via `extras.wait_seconds` —
+    // so a burst on a tab switch should cost a short pause, not an error
+    // screen. One retry only: a second 429 means we are genuinely over
+    // budget and the caller should surface it.
+    var attempt = 0;
+    while (true) {
+      FCCallResult result;
+      try {
+        final response = await FCHttpClient.request<String>(
+          method,
+          url,
+          headers: headers,
+          body: encodedBody,
+          queryParameters: effectiveQuery,
+          responseType: ResponseType.plain,
+        );
+        result = _toCallResult(response, method: method, url: url);
+      } on DioException catch (e) {
+        result = _toCallResultFromException(e, method: method, url: url);
+      } catch (e) {
+        return FCCallResult(
+          statusCode: 0,
+          body: jsonEncode({'error': e.toString()}),
+          headers: const {},
+          fcIsLogin: false,
+        );
+      }
+
+      if (result.statusCode != 429 || attempt >= 1) return result;
+      final wait = _retryAfter(result);
+      if (wait == null || wait > _maxAutoRetryDelay) return result;
+      attempt++;
+      await Future<void>.delayed(wait);
     }
   }
 
-  FCCallResult _toCallResult(Response<dynamic> response) {
+  /// Longest 429 cooldown we will absorb silently. Beyond this the caller
+  /// gets the error so the UI can say how long to wait rather than appear
+  /// to hang.
+  static const Duration _maxAutoRetryDelay = Duration(seconds: 10);
+
+  /// How long Discourse asked us to wait, from either 429 shape:
+  /// the middleware's `Retry-After` header (plain-text body) or the
+  /// app-level limiter's `extras.wait_seconds` (JSON body).
+  static Duration? _retryAfter(FCCallResult result) {
+    final header = result.headers['retry-after'] ?? result.headers['Retry-After'];
+    final headerSeconds = header == null ? null : int.tryParse(header.trim());
+    if (headerSeconds != null && headerSeconds >= 0) {
+      return Duration(seconds: headerSeconds);
+    }
+    try {
+      final decoded = jsonDecode(result.body);
+      if (decoded is Map) {
+        final extras = decoded['extras'];
+        if (extras is Map) {
+          final wait = extras['wait_seconds'];
+          final seconds = wait is num
+              ? wait.ceil()
+              : (wait is String ? int.tryParse(wait) : null);
+          if (seconds != null && seconds >= 0) {
+            return Duration(seconds: seconds);
+          }
+        }
+      }
+    } catch (_) {
+      // Middleware 429s are text/plain — the header above is the signal.
+    }
+    return null;
+  }
+
+  FCCallResult _toCallResult(
+    Response<dynamic> response, {
+    required String method,
+    required Uri url,
+  }) {
     final headers = <String, String>{};
     response.headers.forEach((k, v) {
       if (v.isNotEmpty) headers[k] = v.first;
     });
-    final body = response.data?.toString() ?? '';
+    final status = response.statusCode ?? 0;
+    final body = status >= 300 && status < 400
+        ? _redirectDiagnostic(status, headers, method: method, url: url)
+        : (response.data?.toString() ?? '');
     return FCCallResult(
-      statusCode: response.statusCode ?? 0,
+      statusCode: status,
       body: body,
       headers: headers,
       // `fcIsLogin` is the XenForo plugin's per-response "this call was
@@ -138,12 +195,68 @@ class DiscourseClient {
     );
   }
 
-  FCCallResult _toCallResultFromException(DioException e) {
+  /// Turns a redirect into an actionable message instead of letting an edge
+  /// server's HTML error page reach the user as "HTTP 302".
+  ///
+  /// A 3xx surfacing here means the redirect was **not** followed, which in
+  /// practice only happens for requests with a body — so reads keep working
+  /// (Dart follows those transparently) while every write fails. That
+  /// asymmetry makes a wrong [SiteContext.site.url] look like a bug in the
+  /// app rather than a misconfiguration: the fix is almost always to point
+  /// `AppForumConfig.forumBaseUrl` at the origin the forum actually serves.
+  String _redirectDiagnostic(
+    int status,
+    Map<String, String> headers, {
+    required String method,
+    required Uri url,
+  }) {
+    final location = headers['location'] ?? headers['Location'] ?? '';
+    final target = location.isEmpty ? null : Uri.tryParse(location);
+    final sameOrigin = target != null &&
+        target.host.toLowerCase() == url.host.toLowerCase() &&
+        target.scheme == url.scheme;
+
+    final String message;
+    if (target == null) {
+      message = 'The forum redirected $method ${url.path} (HTTP $status) '
+          'without saying where. Check that the forum URL is correct.';
+    } else if (sameOrigin) {
+      message = 'The forum redirected $method ${url.path} to '
+          '${target.path} (HTTP $status). The request was not retried.';
+    } else {
+      // The common case, and the one worth spelling out: the configured
+      // host is not the forum's canonical origin.
+      message = 'This forum is served from ${target.origin}, but the app is '
+          'configured for ${url.origin}. Reads still work because redirects '
+          'are followed automatically, but posting, replying and other '
+          'writes fail. Set AppForumConfig.forumBaseUrl to ${target.origin}.';
+    }
+    return jsonEncode({
+      'errors': [message],
+      'error_type': 'redirect',
+      if (location.isNotEmpty) 'location': location,
+    });
+  }
+
+  FCCallResult _toCallResultFromException(
+    DioException e, {
+    required String method,
+    required Uri url,
+  }) {
     final headers = <String, String>{};
     e.response?.headers.forEach((k, v) {
       if (v.isNotEmpty) headers[k] = v.first;
     });
     String body = '';
+    final status = e.response?.statusCode ?? 0;
+    if (status >= 300 && status < 400) {
+      return FCCallResult(
+        statusCode: status,
+        body: _redirectDiagnostic(status, headers, method: method, url: url),
+        headers: headers,
+        fcIsLogin: false,
+      );
+    }
     final data = e.response?.data;
     if (data is String) {
       body = data;

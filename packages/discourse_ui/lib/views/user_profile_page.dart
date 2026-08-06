@@ -11,6 +11,7 @@ import 'package:discourse_ui/controllers/login_controller.dart';
 import 'login_page.dart';
 import '../theme/design_tokens.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import '../utils/error_message.dart';
 
 class UserProfilePage extends StatefulWidget {
   final SiteContext siteContext;
@@ -112,7 +113,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       AppLogger.debug('Error fetching user info: $e');
       showErrorDialog('Failed to load user info: $e');
       setState(() {
-        _error = 'Failed to load user info. $e';
+        _error = describeError(e, fallback: 'Failed to load user info.');
         _isLoading = false;
       });
     }
@@ -408,7 +409,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         _userInfo!.isIgnored = !wantIgnore;
       });
       messenger.showSnackBar(
-        SnackBar(content: Text('Ignore toggle failed: $e')),
+        SnackBar(content: Text(describeError(e, fallback: 'Ignore toggle failed.'))),
       );
     }
   }

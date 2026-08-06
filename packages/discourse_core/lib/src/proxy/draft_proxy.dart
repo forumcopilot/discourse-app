@@ -46,7 +46,7 @@ class DiscourseDraftProxy extends BaseDiscourseProxy implements IFCDraftProxy {
     } on DiscourseApiException catch (e) {
       return FCSaveDraftResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCSaveDraftResult(result: false, resultText: 'Error: $e');
+      return FCSaveDraftResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -91,7 +91,7 @@ class DiscourseDraftProxy extends BaseDiscourseProxy implements IFCDraftProxy {
       }
       return FCLoadDraftResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCLoadDraftResult(result: false, resultText: 'Error: $e');
+      return FCLoadDraftResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -112,7 +112,7 @@ class DiscourseDraftProxy extends BaseDiscourseProxy implements IFCDraftProxy {
     } on DiscourseApiException catch (e) {
       return FCDeleteDraftResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCDeleteDraftResult(result: false, resultText: 'Error: $e');
+      return FCDeleteDraftResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -158,7 +158,7 @@ class DiscourseDraftProxy extends BaseDiscourseProxy implements IFCDraftProxy {
     } catch (e) {
       return FCDraftListResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         total: 0,
         items: const [],
       );

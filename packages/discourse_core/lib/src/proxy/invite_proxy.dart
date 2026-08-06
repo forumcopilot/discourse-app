@@ -57,7 +57,7 @@ class DiscourseInviteProxy extends BaseDiscourseProxy {
     } on DiscourseApiException catch (e) {
       return DiscourseInviteResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return DiscourseInviteResult(result: false, resultText: 'Error: $e');
+      return DiscourseInviteResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -94,7 +94,7 @@ class DiscourseInviteProxy extends BaseDiscourseProxy {
     } on DiscourseApiException catch (e) {
       return DiscourseInviteResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return DiscourseInviteResult(result: false, resultText: 'Error: $e');
+      return DiscourseInviteResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -139,7 +139,7 @@ class DiscourseInviteProxy extends BaseDiscourseProxy {
     } on DiscourseApiException catch (e) {
       return DiscourseInviteListResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return DiscourseInviteListResult(result: false, resultText: 'Error: $e');
+      return DiscourseInviteListResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -167,7 +167,7 @@ class DiscourseInviteProxy extends BaseDiscourseProxy {
     } catch (e) {
       return DiscourseInviteActionResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
       );
     }
   }

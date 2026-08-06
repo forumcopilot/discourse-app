@@ -54,7 +54,7 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
     } catch (e) {
       return FCForumDataResult(
         result: false,
-        resultText: 'Error loading categories: $e',
+        resultText: 'Error loading categories: ${describeApiError(e)}',
         forums: const [],
       );
     }
@@ -87,7 +87,7 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
     } catch (e) {
       return FCParticipatedForumResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         forums: const [],
       );
     }
@@ -112,7 +112,7 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
     } catch (e) {
       return FCMarkAllAsReadResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
       );
     }
   }
@@ -225,7 +225,7 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
         activeMembers: (stats['active_users_30_days'] as int?) ?? 0,
       );
     } catch (e) {
-      return FCBoardStatResult(result: false, resultText: 'Error: $e');
+      return FCBoardStatResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -253,7 +253,7 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
     } catch (e) {
       return FCForumStatusResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         forums: const [],
       );
     }

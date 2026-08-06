@@ -11,7 +11,7 @@ class AppForumConfig {
   static const int siteId = 1;
 
   /// Human-readable forum name shown in app UI.
-  static const String forumName = 'Cursor Community';
+  static const String forumName = 'Discourse';
 
   /// Base forum URL (without trailing slash).
   /// Example: https://forum.example.com
@@ -20,7 +20,7 @@ class AppForumConfig {
   ///   https://<sub>.ngrok-free.dev — Discourse must be launched with
   ///   `RAILS_DEVELOPMENT_HOSTS=.ngrok-free.dev,localhost` so the Rails
   ///   `HostAuthorization` middleware lets the tunnel hostname through.
-  static const String forumBaseUrl = 'https://forum.cursor.com';
+  static const String forumBaseUrl = 'https://try.discourse.org';
 
   /// Legacy plugin endpoint path. **Not used in v1** — Discourse
   /// authentication and data fetching go through stock REST endpoints.
@@ -33,7 +33,7 @@ class AppForumConfig {
   /// Display name shown to the user on Discourse's User API Key grant page
   /// (`/user-api-key/new`). Discourse stores this verbatim on the
   /// `UserApiKeyClient` row.
-  static const String userApiApplicationName = 'Cursor Community Mobile';
+  static const String userApiApplicationName = 'Discourse Mobile';
 
   /// Redirect Discourse appends `?payload=<base64>` to after the user
   /// authorizes the User API Key request. The in-app webview intercepts
@@ -71,7 +71,7 @@ class AppForumConfig {
 
   /// Optional branding metadata.
   static const String forumDescription =
-      'Community forum for Cursor — forum.cursor.com';
+      'Discourse demo forum — try.discourse.org';
   static const String? logoUrl = null;
   static const String? backgroundUrl = null;
 

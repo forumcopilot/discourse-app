@@ -53,7 +53,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     } catch (e) {
       return FCLatestTopicResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         totalLatestNum: 0,
       );
     }
@@ -79,7 +79,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     } catch (e) {
       return FCLatestTopicResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         totalLatestNum: 0,
       );
     }
@@ -120,7 +120,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     } catch (e) {
       return FCLatestTopicResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         totalLatestNum: 0,
       );
     }
@@ -159,7 +159,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     } catch (e) {
       return _emptyTopicData(
         forumId: forumId,
-        message: 'Error: $e',
+        message: describeApiError(e),
       );
     }
   }
@@ -184,7 +184,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     } catch (e) {
       return FCUnreadTopicResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         totalUnreadNum: 0,
       );
     }
@@ -242,7 +242,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     } catch (e) {
       return FCParticipatedTopicResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         totalParticipatedNum: 0,
       );
     }
@@ -270,7 +270,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       });
       return FCMarkTopicReadResult(result: true, resultText: '');
     } catch (e) {
-      return FCMarkTopicReadResult(result: false, resultText: 'Error: $e');
+      return FCMarkTopicReadResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -307,7 +307,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     } on DiscourseApiException catch (e) {
       return FCMarkTopicReadResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCMarkTopicReadResult(result: false, resultText: 'Error: $e');
+      return FCMarkTopicReadResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -407,7 +407,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     } catch (e) {
       return FCNewTopicResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         topicId: '',
         state: 0,
       );
@@ -460,7 +460,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     } on DiscourseApiException catch (e) {
       return _emptyTopicData(forumId: '', message: e.userMessage);
     } catch (e) {
-      return _emptyTopicData(forumId: '', message: 'Error: $e');
+      return _emptyTopicData(forumId: '', message: describeApiError(e));
     }
   }
 
@@ -504,7 +504,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         topics: list.topics,
       );
     } catch (e) {
-      return _emptyTopicData(forumId: forumId, message: 'Error: $e');
+      return _emptyTopicData(forumId: forumId, message: describeApiError(e));
     }
   }
 

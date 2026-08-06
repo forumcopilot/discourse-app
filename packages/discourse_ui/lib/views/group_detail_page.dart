@@ -10,6 +10,7 @@ import 'user_profile_page.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
 import 'widgets/trust_level_chip.dart';
+import '../utils/error_message.dart';
 
 /// Phase 5.18c-2 — single-group screen. Fetches the group's metadata
 /// (`/groups/{name}.json`) and the first page of members
@@ -111,7 +112,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
       if (!mounted) return;
       setState(() {
         _loadingGroup = false;
-        _error = '$e';
+        _error = describeError(e);
       });
     }
   }
@@ -301,9 +302,9 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_error != null && _members.isEmpty) {
-      return EmptyStateView(
-        icon: Icons.error_outline,
+      return EmptyStateView.error(
         message: _error!,
+        onRetry: _load,
       );
     }
     return RefreshIndicator(

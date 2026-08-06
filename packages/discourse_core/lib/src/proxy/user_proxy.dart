@@ -88,7 +88,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     } catch (e) {
       return FCIgnoredUserResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         total: 0,
         list: const [],
       );
@@ -151,7 +151,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       // Failure shouldn't crash the home tab — just report zero unreads.
       return FCInboxStatResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         totalConversations: 0,
         unreadConversations: 0,
         unreadMessages: 0,
@@ -212,7 +212,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       print('❌ [DISCOURSE_USER] getOnlineUsersAsync error: $e');
       return FCOnlineUserResult(
         result: false,
-        resultText: 'Error getting online users: $e',
+        resultText: 'Error getting online users: ${describeApiError(e)}',
         total: 0,
         list: [],
       );
@@ -279,7 +279,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     } catch (e) {
       return FCDirectoryItemResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         total: 0,
         items: const [],
       );
@@ -300,7 +300,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     } on DiscourseApiException catch (e) {
       return FCBadgeResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCBadgeResult(result: false, resultText: 'Error: $e');
+      return FCBadgeResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -542,7 +542,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     } catch (e) {
       return FCUserInfoResult(
         result: false,
-        resultText: 'Error getting user info: $e',
+        resultText: 'Error getting user info: ${describeApiError(e)}',
         id: '',
         username: '',
       );
@@ -625,7 +625,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     } catch (e) {
       return FCUserReplyResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         total: 0,
         list: const [],
       );
@@ -690,7 +690,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     } catch (e) {
       return FCUserTopicResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         total: 0,
         list: const [],
       );
@@ -730,7 +730,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     } on DiscourseApiException catch (e) {
       return FCIgnoreUserResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCIgnoreUserResult(result: false, resultText: 'Error: $e');
+      return FCIgnoreUserResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -896,7 +896,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     } catch (e) {
       return FCSearchUserResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         total: 0,
         list: const [],
       );
@@ -929,7 +929,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     } catch (e) {
       return FCReportUserResult(
         result: false,
-        resultText: 'Error reporting user: $e',
+        resultText: 'Error reporting user: ${describeApiError(e)}',
       );
     }
   }
@@ -979,7 +979,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     } on DiscourseApiException catch (e) {
       return FCBadgeResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCBadgeResult(result: false, resultText: 'Error: $e');
+      return FCBadgeResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -1010,7 +1010,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           result: false, resultText: e.userMessage);
     } catch (e) {
       return DiscourseDoNotDisturbResult(
-          result: false, resultText: 'Error: $e');
+          result: false, resultText: describeApiError(e));
     }
   }
 
@@ -1031,7 +1031,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           result: false, resultText: e.userMessage);
     } catch (e) {
       return DiscourseDoNotDisturbResult(
-          result: false, resultText: 'Error: $e');
+          result: false, resultText: describeApiError(e));
     }
   }
 
@@ -1064,7 +1064,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           result: false, resultText: e.userMessage);
     } catch (e) {
       return DiscourseDoNotDisturbResult(
-          result: false, resultText: 'Error: $e');
+          result: false, resultText: describeApiError(e));
     }
   }
 
@@ -1198,7 +1198,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           result: false, resultText: e.userMessage);
     } catch (e) {
       return DiscourseUserSummaryResult(
-          result: false, resultText: 'Error: $e');
+          result: false, resultText: describeApiError(e));
     }
   }
 

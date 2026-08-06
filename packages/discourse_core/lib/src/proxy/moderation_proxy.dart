@@ -116,7 +116,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage, isLoginMod: true);
     } catch (e) {
       return FCDeleteTopicResult(
-          result: false, resultText: 'Error: $e', isLoginMod: true);
+          result: false, resultText: describeApiError(e), isLoginMod: true);
     }
   }
 
@@ -132,7 +132,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage, isLoginMod: true);
     } catch (e) {
       return FCUndeleteTopicResult(
-          result: false, resultText: 'Error: $e', isLoginMod: true);
+          result: false, resultText: describeApiError(e), isLoginMod: true);
     }
   }
 
@@ -150,7 +150,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage, isLoginMod: true);
     } catch (e) {
       return FCDeletePostResult(
-          result: false, resultText: 'Error: $e', isLoginMod: true);
+          result: false, resultText: describeApiError(e), isLoginMod: true);
     }
   }
 
@@ -166,7 +166,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage, isLoginMod: true);
     } catch (e) {
       return FCUndeletePostResult(
-          result: false, resultText: 'Error: $e', isLoginMod: true);
+          result: false, resultText: describeApiError(e), isLoginMod: true);
     }
   }
 
@@ -188,7 +188,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage, isLoginMod: true);
     } catch (e) {
       return FCMoveTopicResult(
-          result: false, resultText: 'Error: $e', isLoginMod: true);
+          result: false, resultText: describeApiError(e), isLoginMod: true);
     }
   }
 
@@ -204,7 +204,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage, isLoginMod: true);
     } catch (e) {
       return FCRenameTopicResult(
-          result: false, resultText: 'Error: $e', isLoginMod: true);
+          result: false, resultText: describeApiError(e), isLoginMod: true);
     }
   }
 
@@ -243,7 +243,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage, isLoginMod: true);
     } catch (e) {
       return FCMovePostResult(
-          result: false, resultText: 'Error: $e', isLoginMod: true);
+          result: false, resultText: describeApiError(e), isLoginMod: true);
     }
   }
 
@@ -262,7 +262,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage, isLoginMod: true);
     } catch (e) {
       return FCMergeTopicResult(
-          result: false, resultText: 'Error: $e', isLoginMod: true);
+          result: false, resultText: describeApiError(e), isLoginMod: true);
     }
   }
 
@@ -299,7 +299,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage, isLoginMod: true);
     } catch (e) {
       return FCBanUserResult(
-          result: false, resultText: 'Error: $e', isLoginMod: true);
+          result: false, resultText: describeApiError(e), isLoginMod: true);
     }
   }
 
@@ -320,7 +320,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage, isLoginMod: true);
     } catch (e) {
       return FCUnbanUserResult(
-          result: false, resultText: 'Error: $e', isLoginMod: true);
+          result: false, resultText: describeApiError(e), isLoginMod: true);
     }
   }
 
@@ -347,7 +347,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage, isLoginMod: true);
     } catch (e) {
       return FCMarkAsSpamResult(
-          result: false, resultText: 'Error: $e', isLoginMod: true);
+          result: false, resultText: describeApiError(e), isLoginMod: true);
     }
   }
 
@@ -390,7 +390,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
     } on DiscourseApiException catch (e) {
       return FCSpamCleanUserResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCSpamCleanUserResult(result: false, resultText: 'Error: $e');
+      return FCSpamCleanUserResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -416,7 +416,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage, isLoginMod: true);
     } catch (e) {
       return FCDeleteTopicResult(
-          result: false, resultText: 'Error: $e', isLoginMod: true);
+          result: false, resultText: describeApiError(e), isLoginMod: true);
     }
   }
 
@@ -438,7 +438,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
     } on DiscourseApiException catch (e) {
       return errorResult(e.userMessage);
     } catch (e) {
-      return errorResult('Error: $e');
+      return errorResult(describeApiError(e));
     }
   }
 
@@ -566,7 +566,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage);
     } catch (e) {
       return DiscourseReviewableListResult(
-          result: false, resultText: 'Error: $e');
+          result: false, resultText: describeApiError(e));
     }
   }
 
@@ -628,7 +628,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
       );
     } catch (e) {
       return DiscourseReviewablePerformResult(
-          result: false, resultText: 'Error: $e');
+          result: false, resultText: describeApiError(e));
     }
   }
 

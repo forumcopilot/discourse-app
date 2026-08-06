@@ -7,6 +7,7 @@ import '../theme/design_tokens.dart';
 import 'widgets/badge_detail_sheet.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
+import '../utils/error_message.dart';
 
 /// Phase 5.18c-3 — Badges directory, third drawer destination under
 /// **Community**. Lists every visible badge on the forum, grouped
@@ -63,7 +64,7 @@ class _BadgesDirectoryPageState extends State<BadgesDirectoryPage> {
       if (!mounted) return;
       setState(() {
         _loading = false;
-        _error = '$e';
+        _error = describeError(e);
       });
     }
   }
@@ -81,9 +82,9 @@ class _BadgesDirectoryPageState extends State<BadgesDirectoryPage> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_badges.isEmpty && _error != null) {
-      return EmptyStateView(
-        icon: Icons.emoji_events_outlined,
+      return EmptyStateView.error(
         message: _error!,
+        onRetry: _load,
       );
     }
     if (_badges.isEmpty) {

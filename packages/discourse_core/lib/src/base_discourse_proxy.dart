@@ -183,6 +183,24 @@ abstract class BaseDiscourseProxy {
 /// each proxy. Use [userMessage] when surfacing to the UI — that pulls just
 /// the human-readable bit out of Discourse's `{ "errors": [...] }` envelope
 /// instead of the framing wrapper.
+/// Renders a caught error as the `resultText` of an `FC*Result`.
+///
+/// `resultText` is user-facing — the UI puts it in snackbars, error states
+/// and dialogs — but every proxy used to build it as `'Error: ' + e`. For a
+/// [DiscourseApiException] that interpolated the whole response body, so a
+/// rate-limit JSON blob or an entire CDN HTML error page ended up on screen.
+/// Discourse's own sentence ("You've performed this action too many
+/// times…") is right there in the payload; this surfaces that instead.
+String describeApiError(Object? error) {
+  if (error is DiscourseApiException) return error.userMessage;
+  if (error == null) return 'Something went wrong. Please try again.';
+  final text = error.toString().replaceFirst(RegExp(r'^Exception:\s*'), '');
+  if (text.isEmpty || text.length > 200 || text.contains('<')) {
+    return 'Something went wrong. Please try again.';
+  }
+  return text;
+}
+
 class DiscourseApiException implements Exception {
   final int statusCode;
   final String method;
@@ -229,11 +247,73 @@ class DiscourseApiException implements Exception {
     }
     if (statusCode == 404) return 'Not found';
     if (statusCode == 422) return 'Request rejected (HTTP 422)';
+    // Discourse's middleware rate limiter answers text/plain, so there is no
+    // `errors` array to read above — only the header tells us how long.
+    if (statusCode == 429) {
+      final wait = retryAfterSeconds;
+      return wait == null
+          ? "You're doing that too often. Please wait a moment and try again."
+          : "You're doing that too often. Please wait $wait "
+              "second${wait == 1 ? '' : 's'} and try again.";
+    }
     if (statusCode >= 500) return 'Server error (HTTP $statusCode)';
+    if (statusCode >= 300 && statusCode < 400) {
+      return 'The forum redirected this request (HTTP $statusCode).';
+    }
     return 'HTTP $statusCode';
   }
 
+  /// True when Discourse throttled us. Callers that can wait should retry
+  /// after [retryAfterSeconds] rather than showing an error.
+  bool get isRateLimited => statusCode == 429;
+
+  /// Seconds Discourse asked us to wait, when it said. Reads the app-level
+  /// limiter's `extras.wait_seconds`; the middleware limiter's `Retry-After`
+  /// header is handled in `DiscourseClient`, which retries before we get here.
+  int? get retryAfterSeconds {
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map) {
+        final wait = decoded['extras'] is Map
+            ? (decoded['extras'] as Map)['wait_seconds']
+            : null;
+        if (wait is num) return wait.ceil();
+        if (wait is String) return int.tryParse(wait);
+      }
+    } catch (_) {
+      // text/plain 429 — no structured hint available.
+    }
+    return null;
+  }
+
+  /// Diagnostic form, for logs. Deliberately bounded: [body] can be an
+  /// entire HTML error page from a CDN or reverse proxy, and this string
+  /// used to be interpolated straight into user-facing widgets. Anything
+  /// shown to a user should use [userMessage] (or `describeError`) instead.
   @override
   String toString() =>
-      'DiscourseApiException($method $path → $statusCode): $body';
+      'DiscourseApiException($method $path → $statusCode): ${_bodySnippet()}';
+
+  /// Bounded, markup-free rendering of [body].
+  ///
+  /// A body that isn't JSON did not come from Discourse — it is an edge
+  /// server, proxy or captive portal answering instead. The bytes are noise
+  /// in a log and were actively harmful when this string reached a dialog,
+  /// so we report the shape rather than the content.
+  String _bodySnippet() {
+    final flattened = body.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (flattened.isEmpty) return '<empty body>';
+    final looksLikeMarkup = flattened.startsWith('<');
+    if (looksLikeMarkup) {
+      final title = RegExp(r'<title[^>]*>(.*?)</title>', caseSensitive: false)
+          .firstMatch(flattened)
+          ?.group(1)
+          ?.trim();
+      final label = title != null && title.isNotEmpty ? ' "$title"' : '';
+      return '<non-JSON response$label, ${body.length} bytes>';
+    }
+    return flattened.length > 160
+        ? '${flattened.substring(0, 160)}…'
+        : flattened;
+  }
 }

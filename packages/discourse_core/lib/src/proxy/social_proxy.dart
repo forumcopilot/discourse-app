@@ -127,7 +127,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       }
       return FCFollowResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCFollowResult(result: false, resultText: 'Error: $e');
+      return FCFollowResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -152,7 +152,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       }
       return FCUnfollowResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCUnfollowResult(result: false, resultText: 'Error: $e');
+      return FCUnfollowResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -182,7 +182,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     } catch (e) {
       return FCAlertResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         total: 0,
         items: const [],
       );
@@ -231,7 +231,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     } catch (e) {
       return FCActivityResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         total: 0,
         items: const [],
       );
@@ -260,7 +260,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     } catch (e) {
       return FCMarkAlertsReadResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
       );
     }
   }
@@ -293,7 +293,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     } catch (e) {
       return FCMarkAlertsReadResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
       );
     }
   }
@@ -327,7 +327,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     } catch (e) {
       return _LikeOutcome(
         success: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         isLiked: !like, // best-effort: keep prior state on failure
         // NOT a real count — the request failed, so we know nothing.
         // `FCLikePostResult.likeCount` is a non-nullable int with no

@@ -9,6 +9,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/number_utils.dart';
+import '../utils/error_message.dart';
 
 class UserSearchPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -105,7 +106,7 @@ class _UserSearchPageState extends State<UserSearchPage> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        _error = describeError(e);
         _isLoading = false;
       });
     }

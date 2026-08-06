@@ -63,7 +63,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     } catch (e) {
       return FCNewConversationResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         convId: '',
       );
     }
@@ -95,7 +95,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     } catch (e) {
       return FCReplyConversationResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
       );
     }
   }
@@ -126,7 +126,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       } catch (e) {
         return FCInviteParticipantResult(
           result: false,
-          resultText: 'Error inviting $u: $e',
+          resultText: 'Error inviting $u: ${describeApiError(e)}',
         );
       }
     }
@@ -177,7 +177,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     } catch (e) {
       return FCInboxStatResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         totalConversations: 0,
         unreadConversations: 0,
         unreadMessages: 0,
@@ -254,7 +254,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     } catch (e) {
       return FCConversationsResult(
         result: false,
-        resultText: 'Error: $e',
+        resultText: describeApiError(e),
         conversationCount: 0,
         unreadCount: 0,
         canUpload: false,
@@ -289,7 +289,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     } on DiscourseApiException catch (e) {
       return _emptyConversation(e.userMessage);
     } catch (e) {
-      return _emptyConversation('Error: $e');
+      return _emptyConversation(describeApiError(e));
     }
   }
 
@@ -311,7 +311,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     } on DiscourseApiException catch (e) {
       return FCQuoteConversationResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCQuoteConversationResult(result: false, resultText: 'Error: $e');
+      return FCQuoteConversationResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -332,7 +332,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       return FCLeaveConversationResult(
           result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCLeaveConversationResult(result: false, resultText: 'Error: $e');
+      return FCLeaveConversationResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -392,7 +392,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       return FCRawConversationResult(
           result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCRawConversationResult(result: false, resultText: 'Error: $e');
+      return FCRawConversationResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -424,7 +424,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage);
     } catch (e) {
       return FCSaveRawConversationResult(
-          result: false, resultText: 'Error: $e');
+          result: false, resultText: describeApiError(e));
     }
   }
 
@@ -441,7 +441,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     } on DiscourseApiException catch (e) {
       return FCRawMessageResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCRawMessageResult(result: false, resultText: 'Error: $e');
+      return FCRawMessageResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -465,7 +465,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       return FCSaveRawMessageResult(
           result: false, resultText: e.userMessage);
     } catch (e) {
-      return FCSaveRawMessageResult(result: false, resultText: 'Error: $e');
+      return FCSaveRawMessageResult(result: false, resultText: describeApiError(e));
     }
   }
 
@@ -522,7 +522,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       return {
         'inboxStat': FCInboxStatResult(
           result: false,
-          resultText: 'Error: $e',
+          resultText: describeApiError(e),
           totalConversations: 0,
           unreadConversations: 0,
           unreadMessages: 0,
@@ -550,7 +550,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage, isLoginMod: false);
     } catch (e) {
       return FCCloseConversationResult(
-          result: false, resultText: 'Error: $e', isLoginMod: false);
+          result: false, resultText: describeApiError(e), isLoginMod: false);
     }
   }
 
@@ -618,7 +618,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     } on DiscourseApiException catch (e) {
       return _emptyConversation(e.userMessage);
     } catch (e) {
-      return _emptyConversation('Error: $e');
+      return _emptyConversation(describeApiError(e));
     }
   }
 
