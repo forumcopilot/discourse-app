@@ -107,7 +107,33 @@ class AppForumConfig {
   ///      `GoogleService-Info.plist` / `google-services.json` your build
   ///      needs. Set this URL to the endpoint shown in your ForumCopilot
   ///      dashboard. See https://forumcopilot.com for sign-up and pricing.
-  static const String pushApiBaseUrl = '';
+  ///
+  /// A fork edits [defaultPushApiBaseUrl] below. A **host app** that embeds
+  /// this package for several forums (the multi-tenant ForumCopilot app
+  /// mounts `SingleForumBootstrapPage` per site) cannot use a compile-time
+  /// value, because this package is shared with the open-source template —
+  /// so it calls [setPushApiBaseUrl] once at startup instead. Read
+  /// [pushApiBaseUrl] everywhere; it honours the override.
+  static const String defaultPushApiBaseUrl = '';
+
+  static String? _pushApiBaseUrlOverride;
+
+  /// Push backend base URL in effect: the host app's override when set,
+  /// otherwise the compile-time [defaultPushApiBaseUrl].
+  static String get pushApiBaseUrl =>
+      _pushApiBaseUrlOverride ?? defaultPushApiBaseUrl;
+
+  /// Points this build's push registration at [baseUrl]. Call before the
+  /// first login — the User API Key handshake bakes `push_url` and the
+  /// `push` scope into the issued key, and Discourse treats both as
+  /// immutable, so a key minted before this is set can never receive push.
+  ///
+  /// Pass null or an empty string to fall back to the compile-time default.
+  static void setPushApiBaseUrl(String? baseUrl) {
+    final trimmed = baseUrl?.trim();
+    _pushApiBaseUrlOverride =
+        (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+  }
 
   /// The `push_url` this app registers on its Discourse User API Key, or
   /// `null` when push is not configured ([pushApiBaseUrl] empty).
