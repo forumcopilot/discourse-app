@@ -109,6 +109,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
         totalTopicNum: topics.length,
         searchId: null,
         topics: topics,
+        hasMore: _hasMoreFrom(response, page),
       );
     } catch (e) {
       return FCSearchTopicResult(
@@ -158,6 +159,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
         totalPostNum: posts.length,
         searchId: null,
         posts: posts,
+        hasMore: _hasMoreFrom(response, page),
       );
     } catch (e) {
       return FCSearchPostResult(
@@ -205,7 +207,8 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
           topics: const [],
         );
       }
-      final response = await _searchRaw(q, page: page < 1 ? 1 : page);
+      final effectivePage = page < 1 ? 1 : page;
+      final response = await _searchRaw(q, page: effectivePage);
       final topics = ((response['topics'] as List?) ?? const [])
           .whereType<Map>()
           .map((t) => _topicFromSearchResult(t.cast<String, dynamic>()))
@@ -216,6 +219,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
         // Page length, not a grand total — see the class doc.
         totalTopicNum: topics.length,
         topics: topics,
+        hasMore: _hasMoreFrom(response, effectivePage),
       );
     } catch (e) {
       return FCSearchDataResultTopic(
@@ -261,7 +265,8 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
           posts: const [],
         );
       }
-      final response = await _searchRaw(q, page: page < 1 ? 1 : page);
+      final effectivePage = page < 1 ? 1 : page;
+      final response = await _searchRaw(q, page: effectivePage);
       final posts = ((response['posts'] as List?) ?? const [])
           .whereType<Map>()
           .map((p) => _postFromSearchResult(p.cast<String, dynamic>()))
@@ -272,6 +277,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
         // Page length, not a grand total — see the class doc.
         totalPostNum: posts.length,
         posts: posts,
+        hasMore: _hasMoreFrom(response, effectivePage),
       );
     } catch (e) {
       return FCSearchDataResultPost(
@@ -318,17 +324,32 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
         .whereType<Map>()
         .map((p) => _postFromSearchResult(p.cast<String, dynamic>()))
         .toList();
-    final more = (response['grouped_search_result'] as Map?)
-            ?['more_full_page_results'] ==
-        true;
     return DiscourseSearchResult(
       topics: topics,
       posts: posts,
-      hasMore: more && page < _maxPage,
+      hasMore: _hasMoreFrom(response, page),
     );
   }
 
   // ===== Helpers =====
+
+  /// Whether the server signalled another full page of results.
+  ///
+  /// `/search.json` runs with `type_filter: "topic"` (a full-page
+  /// search), so the authoritative signal is
+  /// `grouped_search_result.more_full_page_results`
+  /// (grouped_search_result_serializer.rb:14) — a boolean, not a count.
+  /// The per-type `more_posts` / `more_users` / `more_categories`
+  /// booleans are only meaningful for the un-paged header search, so we
+  /// do not consult them here. Topics and posts page in lockstep, so
+  /// this one signal covers both lists. Also gated on the server's
+  /// 10-page window ([_maxPage]) beyond which paging is refused.
+  bool _hasMoreFrom(Map<String, dynamic> response, int page) {
+    final more = (response['grouped_search_result'] as Map?)
+            ?['more_full_page_results'] ==
+        true;
+    return more && page < _maxPage;
+  }
 
   /// GET `/search.json`. [page] is 1-based; the server clamps missing/low
   /// values to 1, so page 1 is sent implicitly. Callers must not exceed

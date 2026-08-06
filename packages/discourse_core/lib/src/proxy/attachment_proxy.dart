@@ -173,19 +173,17 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
         attachmentId: body['id']?.toString(),
         fileName: body['original_filename']?.toString() ?? filename,
         // Discourse has no "group" concept on uploads — surface the
-        // short_url so the caller can embed it in markdown.
-        //
-        // NEEDS SDK FIELD: the same body also carries an absolute `url`
-        // (UploadSerializer, app/serializers/upload_serializer.rb:5 —
-        // cooked through UrlHelper, CDN- and secure-upload-aware), which
-        // is what a local preview thumbnail actually needs.
-        // FCAttachmentUploadResult models only id/fileName/groupId/
-        // fileSize, so `url` is dropped. A dead `_resolveImageUrl` helper
-        // used to paper over this by returning the un-renderable
-        // `upload://...` short_url; it was removed rather than left
-        // looking like a real URL resolver.
+        // short_url so the caller can embed it in markdown (it is the
+        // `upload://...` markdown reference, not a displayable URL).
         groupId: body['short_url']?.toString(),
         fileSize: (body['filesize'] as int?) ?? bytes.length,
+        // The same body also carries an absolute, resolvable `url`
+        // (UploadSerializer, app/serializers/upload_serializer.rb:5 —
+        // cooked through UrlHelper, CDN- and secure-upload-aware), which
+        // is what a local preview thumbnail actually needs. Now that
+        // FCAttachmentUploadResult.url exists, populate it instead of
+        // dropping it.
+        url: body['url']?.toString(),
       );
     } on DioException catch (e) {
       final body = e.response?.data;

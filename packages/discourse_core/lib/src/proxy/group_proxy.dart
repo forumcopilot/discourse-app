@@ -33,11 +33,28 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
           .whereType<Map>()
           .map((g) => _groupFromJson(g.cast<String, dynamic>()))
           .toList(growable: false);
-      // NOTE: `GroupsController#index` also returns `total_rows_groups`
-      // and `load_more_groups`; FCGroupListResult models neither, so
-      // paged callers get no end-of-list signal. Deliberately NOT
-      // synthesised from `groups.length`. Needs an SDK field.
-      return FCGroupListResult(result: true, groups: groups);
+      // `GroupsController#index` returns the real grand total in
+      // `total_rows_groups` (groups_controller.rb:111) and a next-page
+      // URL in `load_more_groups` (groups_controller.rb:112). Populate
+      // `total` from total_rows_groups (authoritative, not page length).
+      //
+      // `load_more_groups` is emitted UNCONDITIONALLY (always a
+      // groups_path string), so its presence alone can't mean "more" —
+      // Discourse's own client loads it and stops when a page comes back
+      // empty. Derive hasMore precisely from the authoritative total
+      // instead: there is more when the total exceeds what we've paged
+      // through so far. `page` is 1-based here; the server pages 0-based
+      // at 36/page (15 on mobile UAs — we send a desktop UA).
+      final total = (response['total_rows_groups'] as num?)?.toInt() ?? 0;
+      const pageSize = 36;
+      final loadedThrough = page * pageSize;
+      final hasMore = groups.isNotEmpty && total > loadedThrough;
+      return FCGroupListResult(
+        result: true,
+        groups: groups,
+        total: total,
+        hasMore: hasMore,
+      );
     } on DiscourseApiException catch (e) {
       return FCGroupListResult(result: false, resultText: e.userMessage);
     } catch (e) {
@@ -110,11 +127,17 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
           ));
         }
       }
-      // NOTE: `GroupsController#members` also returns
-      // `meta: { total, limit, offset }`; FCGroupMembersResult has no
-      // total field, so the real member total is dropped rather than
-      // guessed from `members.length`. Needs an SDK field to surface.
-      return FCGroupMembersResult(result: true, members: members);
+      // `GroupsController#members` returns the real member count in
+      // `meta.total` (groups_controller.rb:94). Populate `total` from it
+      // rather than guessing from `members.length` (which is one page,
+      // and further shrinks after owner dedupe above).
+      final meta = (response['meta'] as Map?)?.cast<String, dynamic>();
+      final total = (meta?['total'] as num?)?.toInt() ?? 0;
+      return FCGroupMembersResult(
+        result: true,
+        members: members,
+        total: total,
+      );
     } on DiscourseApiException catch (e) {
       return FCGroupMembersResult(result: false, resultText: e.userMessage);
     } catch (e) {

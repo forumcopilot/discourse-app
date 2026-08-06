@@ -11,7 +11,7 @@ class AppForumConfig {
   static const int siteId = 1;
 
   /// Human-readable forum name shown in app UI.
-  static const String forumName = 'Cursor Community';
+  static const String forumName = 'Copilot Dev Forum';
 
   /// Base forum URL (without trailing slash).
   /// Example: https://forum.example.com
@@ -20,7 +20,7 @@ class AppForumConfig {
   ///   https://<sub>.ngrok-free.dev — Discourse must be launched with
   ///   `RAILS_DEVELOPMENT_HOSTS=.ngrok-free.dev,localhost` so the Rails
   ///   `HostAuthorization` middleware lets the tunnel hostname through.
-  static const String forumBaseUrl = 'https://forum.cursor.com';
+  static const String forumBaseUrl = 'http://localhost:4200';
 
   /// Legacy plugin endpoint path. **Not used in v1** — Discourse
   /// authentication and data fetching go through stock REST endpoints.

@@ -156,13 +156,15 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
       return FCBookmarkListResult(
         result: true,
         // Page length, not a grand total. `UserBookmarkListSerializer`
-        // reports no count — only `more_bookmarks_url`, which says
-        // whether ANOTHER page exists (see getBookmarksWithRemindersAsync,
-        // which reads it). FCBookmarkListResult has no has-more field, so
-        // that signal is dropped here rather than folded into a fake
-        // total. NEEDS SDK FIELD.
+        // (user_bookmark_list_serializer.rb:4) reports no count — only
+        // `more_bookmarks_url`, which is present iff ANOTHER page exists
+        // (guarded by `include_more_bookmarks_url? => object.has_more`,
+        // user_bookmark_list_serializer.rb:16). Carry the real paging
+        // signal on hasMore now that the SDK models it; total stays the
+        // page length since the server exposes no grand total.
         total: items.length,
         items: items,
+        hasMore: ub['more_bookmarks_url'] != null,
       );
     } on DiscourseApiException catch (e) {
       return FCBookmarkListResult(
