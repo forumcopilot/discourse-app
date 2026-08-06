@@ -298,7 +298,7 @@ class _ProfileViewState extends State<ProfileView> {
       return;
     }
     final proxy = SiteProxyService.getSocialProxy();
-    final wasFollowing = _userInfo.isFollowing ?? false;
+    final wasFollowing = _userInfo.isFollowing;
     setState(() {
       _isTogglingFollow = true;
       _userInfo.isFollowing = !wasFollowing;
@@ -533,7 +533,7 @@ class _ProfileViewState extends State<ProfileView> {
                   iconUrl: avatarUrl,
                   radius: 50,
                   showOnlineIndicator: true,
-                  isOnline: _userInfo.isOnline ?? false,
+                  isOnline: _userInfo.isOnline,
                   cacheKey: () {
                     if (avatarUrl != null && avatarUrl.isNotEmpty) {
                       return AvatarCacheUtils.generateAvatarCacheKey(
@@ -658,21 +658,21 @@ class _ProfileViewState extends State<ProfileView> {
         // Follow / Unfollow toggle (Discourse 3.x). acceptsFollowers
         // is wired off `can_follow` — we only show the button when
         // the target permits follows.
-        if (_userInfo.acceptsFollowers ?? false) ...[
+        if (_userInfo.acceptsFollowers) ...[
           OutlinedButton.icon(
             onPressed: _isTogglingFollow ? null : _handleToggleFollow,
             icon: Icon(
-              (_userInfo.isFollowing ?? false)
+              _userInfo.isFollowing
                   ? Icons.person_remove
                   : Icons.person_add,
               size: DesignTokens.iconSizeM,
             ),
             label: Text(
-              (_userInfo.isFollowing ?? false) ? 'Unfollow' : 'Follow',
+              _userInfo.isFollowing ? 'Unfollow' : 'Follow',
             ),
           ),
         ],
-        if (_userInfo.acceptsPM ?? false) ...[
+        if (_userInfo.acceptsPM) ...[
           SizedBox(width: DesignTokens.spacingM),
           FilledButton.icon(
             onPressed: () {
@@ -780,7 +780,7 @@ class _ProfileViewState extends State<ProfileView> {
                   .add_jm()
                   .format(_userInfo.lastActivityTime!.toLocal()),
             ),
-          if (_userInfo.postCount != null && _userInfo.postCount != 0)
+          if (_userInfo.postCount != 0)
             _buildInfoTile(
               context,
               icon: Icons.post_add,
@@ -789,15 +789,14 @@ class _ProfileViewState extends State<ProfileView> {
                       Localizations.localeOf(context).toString())
                   .format(_userInfo.postCount),
             ),
-          if (_userInfo.followingCount != null &&
-              _userInfo.followingCount != 0)
+          if (_userInfo.followingCount != 0)
             _buildInfoTile(
               context,
               icon: Icons.people_outline,
               title: AppLocalizations.of(context)?.following ?? 'Following',
               subtitle: _userInfo.followingCount.toString(),
             ),
-          if (_userInfo.followerCount != null && _userInfo.followerCount != 0)
+          if (_userInfo.followerCount != 0)
             _buildInfoTile(
               context,
               icon: Icons.people,

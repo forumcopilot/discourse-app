@@ -5,7 +5,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_vote.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
-import '../widgets/custom_bb_stylesheet.dart' show BBCodeCallbacks;
+import '../widgets/post_content_callbacks.dart' show PostContentCallbacks;
 import '../widgets/rich_text_content.dart';
 import '../widgets/reaction_chips_row.dart';
 import '../widgets/reaction_picker_sheet.dart';
@@ -20,7 +20,8 @@ import '../widgets/post_actions.dart';
 import '../widgets/thread_poll_card.dart';
 import '../../controllers/post_controller.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
-import '../../utils/bbcode_processor.dart';
+import '../../utils/cooked_content.dart';
+import '../../utils/media_url_utils.dart';
 import '../../utils/url_utils.dart';
 import '../../utils/file_utils.dart';
 import '../../theme/design_tokens.dart';
@@ -43,19 +44,21 @@ import '../lists/posts_list.dart';
 import '../../services/site_proxy_service.dart';
 
 class _PostContentData {
-  final String processedText;
+  /// Cooked HTML with natively-carded embeds removed, ready for
+  /// `RichTextContent`.
+  final String html;
   final List<String> limitedUrls;
   final List<String> limitedYoutubeUrls;
   final List<String> limitedTwitterUrls;
   final List<FCAttachment> attachments;
-  final List<FCAttachment> filteredInlineAttachments;
+  final List<FCAttachment> inlineAttachments;
   _PostContentData({
-    required this.processedText,
+    required this.html,
     required this.limitedUrls,
     required this.limitedYoutubeUrls,
     required this.limitedTwitterUrls,
     required this.attachments,
-    required this.filteredInlineAttachments,
+    required this.inlineAttachments,
   });
 }
 
@@ -208,14 +211,6 @@ class _PostListItemState extends State<PostListItem> {
     }
   }
 
-  /// Checks if a URL is a mention link (link text starts with @ and has no spaces)
-  bool _isMentionUrl(String? linkText) {
-    if (linkText == null || linkText.isEmpty) return false;
-    final trimmed = linkText.trim();
-    // Check if it starts with @ and has no spaces
-    return trimmed.startsWith('@') && !trimmed.contains(' ');
-  }
-
   /// Returns the username when [url] is a same-forum `/u/{username}` (or
   /// `/users/{username}`) profile link — i.e. a genuine Discourse mention
   /// target. Returns null for everything else (mailto:, external hosts like
@@ -240,107 +235,38 @@ class _PostListItemState extends State<PostListItem> {
     }
   }
 
+  /// Pulls the renderable HTML and the embedded media out of the post's
+  /// cooked content.
+  ///
+  /// Discourse serves server-rendered HTML in `cooked`, so everything here
+  /// reads the DOM. The previous implementation ran the HTML through the
+  /// inherited XenForo `BBCodeProcessor`: the BBCode tag regexes never
+  /// matched anything (cooked HTML contains no BBCode) and the fallback
+  /// `findPlainUrls` swept the markup with a bare URL regex, so every
+  /// `href`, onebox thumbnail, favicon and avatar `src` came back as a
+  /// link in the post and got its own preview card.
   _PostContentData _extractPostContentData() {
-    // Use translated content if available, otherwise use original
-    final originalText = widget.translatedContent ?? widget.post.content;
-    String processedText = BBCodeProcessor.processText(originalText,
-            siteContext: widget.siteContext)
-        .trimRight();
-    final urls = <String>{};
-    final youtubeUrls = <String>{};
-    final twitterUrls = <String>{};
-    final inlineTwitterUrls = <String>{};
-    final inlineYoutubeUrls = <String>{};
-
-    // First, extract URLs from the original text before processing
-    final originalPlainUrls = BBCodeProcessor.findPlainUrls(originalText);
-    for (final match in originalPlainUrls) {
-      final url = originalText.substring(match.start, match.end);
-      if (url.toLowerCase().startsWith('mailto:')) continue;
-      if (BBCodeProcessor.isYoutubeUrl(url)) {
-        youtubeUrls.add(url);
-      } else if (BBCodeProcessor.isTwitterUrl(url)) {
-        twitterUrls.add(url);
-      } else {
-        urls.add(url);
-      }
-    }
-
-    // Then extract from BBCode tags in processed text
-    // Inline YouTube
-    final youtubeTagRegex =
-        RegExp(r'\[youtube\](.*?)\[/youtube\]', caseSensitive: false);
-    for (final match in youtubeTagRegex.allMatches(processedText)) {
-      final url = match.group(1)!;
-      inlineYoutubeUrls.add(url);
-      // Remove from youtubeUrls if it's there (to avoid duplicates)
-      youtubeUrls.remove(url);
-    }
-    // Inline Twitter
-    final twitterTagRegex =
-        RegExp(r'\[twitter\](.*?)\[/twitter\]', caseSensitive: false);
-    for (final match in twitterTagRegex.allMatches(processedText)) {
-      final url = match.group(1)!;
-      inlineTwitterUrls.add(url);
-      // Remove from twitterUrls if it's there (to avoid duplicates)
-      twitterUrls.remove(url);
-    }
-    // [url] tags
-    final bbCodeRegex =
-        RegExp(r'\[url(?:=([^\]]+))?\](.*?)\[/url\]', caseSensitive: false);
-    for (final match in bbCodeRegex.allMatches(processedText)) {
-      final url = match.group(1) ?? match.group(2)!;
-      final linkText = match.group(2); // The visible text inside [url]...[/url]
-
-      // Skip mention URLs (link text starts with @ and has no spaces)
-      if (_isMentionUrl(linkText)) {
-        AppLogger.debug(
-            'PostListItem: Skipping mention URL from preview: url=$url, linkText=$linkText');
-        continue;
-      }
-
-      if (url.toLowerCase().startsWith('mailto:')) continue;
-      if (match.group(1) != null && match.group(1) != match.group(2)) continue;
-      if (inlineYoutubeUrls.contains(url) || inlineTwitterUrls.contains(url))
-        continue;
-      if (BBCodeProcessor.isYoutubeUrl(url)) {
-        youtubeUrls.add(url);
-      } else if (BBCodeProcessor.isTwitterUrl(url)) {
-        twitterUrls.add(url);
-      } else {
-        urls.add(url);
-      }
-    }
-
-    // Inline attachments
-    final inlineAttachmentResult =
-        BBCodeProcessor.replaceInlineAttachmentUrlsAndFilter(
-      processedText,
-      widget.post.inlineAttachments,
+    // Use translated content if available, otherwise use original.
+    final cooked = widget.translatedContent ?? widget.post.content;
+    final content = CookedContent.parse(
+      cooked,
+      forumBaseUrl: widget.siteContext.site.url,
     );
-    processedText = inlineAttachmentResult.text;
-    final filteredInlineAttachments =
-        inlineAttachmentResult.remainingInlineAttachments;
-    // Limit
-    final limitedUrls = urls.take(10).toList();
-    final limitedYoutubeUrls = youtubeUrls.take(10).toList();
-    final limitedTwitterUrls = twitterUrls.take(10).toList();
-    // Filter out attachments that are already displayed inline
-    // The isInline flag is set by the backend to indicate the attachment is embedded inline in the post content
-    final nonInlineAttachments = widget.post.attachments.where((att) {
-      // Check if attachment has isInline property - now directly accessible from the model
-      final isInline = att.isInline ?? false;
-      // Return true if NOT inline (i.e., should be shown in attachment list)
-      return !isInline;
-    }).toList();
+
+    // Filter out attachments that are already displayed inline.
+    // The isInline flag is set by the backend to indicate the attachment
+    // is embedded inline in the post content.
+    final nonInlineAttachments = widget.post.attachments
+        .where((att) => !(att.isInline ?? false))
+        .toList();
 
     return _PostContentData(
-      processedText: processedText,
-      limitedUrls: limitedUrls,
-      limitedYoutubeUrls: limitedYoutubeUrls,
-      limitedTwitterUrls: limitedTwitterUrls,
+      html: content.html,
+      limitedUrls: content.linkUrls.take(10).toList(),
+      limitedYoutubeUrls: content.youtubeUrls.take(10).toList(),
+      limitedTwitterUrls: content.twitterUrls.take(10).toList(),
       attachments: nonInlineAttachments,
-      filteredInlineAttachments: filteredInlineAttachments,
+      inlineAttachments: widget.post.inlineAttachments,
     );
   }
 
@@ -359,7 +285,7 @@ class _PostListItemState extends State<PostListItem> {
 
   Widget _buildPostContent(BuildContext context, _PostContentData data,
       ColorScheme colorScheme, TextTheme textTheme) {
-    final callbacks = BBCodeCallbacks(
+    final callbacks = PostContentCallbacks(
       onUrlTap: (url) {
         AppLogger.debug('BBCode URL tapped: $url');
         // Only treat the link as a mention when it is a genuine same-forum
@@ -481,15 +407,14 @@ class _PostListItemState extends State<PostListItem> {
     // Check if attachments/images are the last items - if so, reduce bottom padding
     // to avoid excessive white space between images and social buttons
     // Attachments and filteredInlineAttachments always come last (after text, videos, links)
-    final bool hasAttachments = data.attachments.isNotEmpty ||
-        data.filteredInlineAttachments.isNotEmpty;
+    final bool hasAttachments =
+        data.attachments.isNotEmpty || data.inlineAttachments.isNotEmpty;
     // Check if attachments are all images (using same logic as PostListItemAttachment)
     final bool allAttachmentsAreImages = hasAttachments &&
         (data.attachments.isEmpty ||
             data.attachments.every((att) => isImageFile(att.filename))) &&
-        (data.filteredInlineAttachments.isEmpty ||
-            data.filteredInlineAttachments
-                .every((att) => isImageFile(att.filename)));
+        (data.inlineAttachments.isEmpty ||
+            data.inlineAttachments.every((att) => isImageFile(att.filename)));
     // Reduce bottom padding when images are the last items since PostListItemSocial
     // already adds spacingM (12px) before the social buttons
     final double bottomPadding = allAttachmentsAreImages
@@ -641,10 +566,12 @@ class _PostListItemState extends State<PostListItem> {
           ],
           // Discourse posts arrive as server-rendered HTML in the
           // `cooked` field, so we render it directly with flutter_html
-          // via RichTextContent — the BBCode pipeline is XF-only.
+          // via RichTextContent. `data.html` is that cooked HTML minus the
+          // embeds we render as native cards below (YouTube, Twitter/X),
+          // so neither is shown twice.
           RichTextContent(
             siteContext: widget.siteContext,
-            content: widget.translatedContent ?? widget.post.content,
+            content: data.html,
             callbacks: callbacks,
           ),
           // Reaction chips — the single like/reaction surface. On
@@ -680,9 +607,7 @@ class _PostListItemState extends State<PostListItem> {
             const SizedBox(height: DesignTokens.spacingS),
             ...data.limitedUrls
                 .where((url) =>
-                    !BBCodeProcessor.isEmail(url) &&
-                    !BBCodeProcessor.isYoutubeUrl(url) &&
-                    !BBCodeProcessor.isTwitterUrl(url) &&
+                    !MediaUrlUtils.isEmail(url) &&
                     !UrlUtils.isSameDomain(widget.siteContext, url))
                 .map((url) =>
                     LinkPreviewCard(url: url, siteContext: widget.siteContext)),
@@ -697,10 +622,10 @@ class _PostListItemState extends State<PostListItem> {
               title: AppLocalizations.of(context)?.attachments ?? 'Attachments',
             ),
           ],
-          if (data.filteredInlineAttachments.isNotEmpty) ...[
+          if (data.inlineAttachments.isNotEmpty) ...[
             const SizedBox(height: DesignTokens.spacingS),
             PostListItemAttachment(
-              attachments: data.filteredInlineAttachments,
+              attachments: data.inlineAttachments,
               actions: widget.actions,
               context: context,
             ),

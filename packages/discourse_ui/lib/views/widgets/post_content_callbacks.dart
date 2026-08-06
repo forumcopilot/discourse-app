@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 /// [onUrlTap] (falling back to an external launch when unset). The
 /// class keeps its historical name and will go away once every callsite
 /// has migrated to direct flutter_html tap handlers.
-class BBCodeCallbacks {
+class PostContentCallbacks {
   /// Called when a URL is tapped
   final Function(String url)? onUrlTap;
 
@@ -21,7 +21,7 @@ class BBCodeCallbacks {
   /// Called when a mention is tapped
   final Function(String username)? onMentionTap;
 
-  const BBCodeCallbacks({
+  const PostContentCallbacks({
     this.onUrlTap,
     this.onImageTap,
     this.onMentionTap,

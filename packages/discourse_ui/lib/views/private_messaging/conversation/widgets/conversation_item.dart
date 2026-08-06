@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:discourse_ui/views/widgets/user_avatar.dart';
-import '../../../widgets/custom_bb_stylesheet.dart' show BBCodeCallbacks;
+import '../../../widgets/post_content_callbacks.dart' show PostContentCallbacks;
 import '../../../widgets/rich_text_content.dart';
 import 'package:discourse_ui/views/user_profile_page.dart';
 import '../../../../utils/time_utils.dart';
@@ -20,6 +20,15 @@ import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/views/login_page.dart';
 import 'package:discourse_ui/views/post_page.dart';
 import 'package:discourse_ui/views/lists/posts_list.dart';
+
+/// The sender's name for display.
+///
+/// `FCConversationMessage.username` is non-nullable, so the `?? 'Unknown'`
+/// fallbacks these callsites used to carry were dead code — but a blank
+/// username would still render as an empty line, which is what the
+/// fallback was there to prevent. Keep the intent, drop the dead operator.
+String _senderName(FCConversationMessage message) =>
+    message.username.isNotEmpty ? message.username : 'Unknown';
 
 class ConversationHeaderItem extends StatelessWidget {
   final SiteContext siteContext;
@@ -67,7 +76,7 @@ class ConversationHeaderItem extends StatelessWidget {
       return !isInline;
     }).toList();
 
-    final callbacks = BBCodeCallbacks(
+    final callbacks = PostContentCallbacks(
       onUrlTap: (url) async {
         AppLogger.debug('ConversationHeaderItem: BBCode URL tapped: $url');
         // Check if URL might be a mention link (contains @username pattern)
@@ -183,21 +192,21 @@ class ConversationHeaderItem extends StatelessWidget {
                             MaterialPageRoute(
                               builder: (context) => UserProfilePage(
                                 siteContext: siteContext,
-                                userId: message.userId ?? '',
-                                userName: message.username ?? 'Unknown',
+                                userId: message.userId,
+                                userName: _senderName(message),
                                 profilePictureUrl: message.iconUrl,
                               ),
                             ),
                           );
                         },
                         child: UserAvatar(
-                          username: message.username ?? 'Unknown',
+                          username: _senderName(message),
                           iconUrl: message.iconUrl,
                           radius: DesignTokens.avatarRadiusM,
                           cacheKey: message.iconUrl != null && message.iconUrl!.isNotEmpty
                               ? AvatarCacheUtils.generateAvatarCacheKey(
-                                  userId: message.userId ?? '',
-                                  username: message.username ?? 'Unknown',
+                                  userId: message.userId,
+                                  username: _senderName(message),
                                   avatarUrl: message.iconUrl!,
                                 )
                               : null,
@@ -234,15 +243,15 @@ class ConversationHeaderItem extends StatelessWidget {
                               MaterialPageRoute(
                                 builder: (context) => UserProfilePage(
                                   siteContext: siteContext,
-                                  userId: message.userId ?? '',
-                                  userName: message.username ?? 'Unknown',
+                                  userId: message.userId,
+                                  userName: _senderName(message),
                                   profilePictureUrl: message.iconUrl,
                                 ),
                               ),
                             );
                           },
                           child: Text(
-                            message.username ?? 'Unknown',
+                            _senderName(message),
                             style: textTheme.titleMedium?.copyWith(
                               color: colorScheme.onSurface,
                               fontWeight: DesignTokens.fontWeightMedium,
@@ -306,7 +315,7 @@ class ConversationHeaderItem extends StatelessWidget {
                   // Discourse PMs come as cooked HTML in textBody.
                   RichTextContent(
                     siteContext: siteContext,
-                    content: message.textBody ?? '',
+                    content: message.textBody,
                     callbacks: callbacks,
                   ),
                 ],
@@ -587,7 +596,7 @@ class ConversationItem extends StatelessWidget {
       return !isInline;
     }).toList();
 
-    final callbacks = BBCodeCallbacks(
+    final callbacks = PostContentCallbacks(
       onUrlTap: (url) async {
         AppLogger.debug('ConversationItem: BBCode URL tapped: $url');
         // Check if URL might be a mention link (contains @username pattern)
@@ -703,21 +712,21 @@ class ConversationItem extends StatelessWidget {
                             MaterialPageRoute(
                               builder: (context) => UserProfilePage(
                                 siteContext: siteContext,
-                                userId: message.userId ?? '',
-                                userName: message.username ?? 'Unknown',
+                                userId: message.userId,
+                                userName: _senderName(message),
                                 profilePictureUrl: message.iconUrl,
                               ),
                             ),
                           );
                         },
                         child: UserAvatar(
-                          username: message.username ?? 'Unknown',
+                          username: _senderName(message),
                           iconUrl: message.iconUrl,
                           radius: DesignTokens.avatarRadiusM,
                           cacheKey: message.iconUrl != null && message.iconUrl!.isNotEmpty
                               ? AvatarCacheUtils.generateAvatarCacheKey(
-                                  userId: message.userId ?? '',
-                                  username: message.username ?? 'Unknown',
+                                  userId: message.userId,
+                                  username: _senderName(message),
                                   avatarUrl: message.iconUrl!,
                                 )
                               : null,
@@ -754,15 +763,15 @@ class ConversationItem extends StatelessWidget {
                               MaterialPageRoute(
                                 builder: (context) => UserProfilePage(
                                   siteContext: siteContext,
-                                  userId: message.userId ?? '',
-                                  userName: message.username ?? 'Unknown',
+                                  userId: message.userId,
+                                  userName: _senderName(message),
                                   profilePictureUrl: message.iconUrl,
                                 ),
                               ),
                             );
                           },
                           child: Text(
-                            message.username ?? 'Unknown',
+                            _senderName(message),
                             style: textTheme.titleMedium?.copyWith(
                               color: colorScheme.onSurface,
                               fontWeight: DesignTokens.fontWeightMedium,
@@ -826,7 +835,7 @@ class ConversationItem extends StatelessWidget {
                   // Discourse PMs come as cooked HTML in textBody.
                   RichTextContent(
                     siteContext: siteContext,
-                    content: message.textBody ?? '',
+                    content: message.textBody,
                     callbacks: callbacks,
                   ),
                 ],

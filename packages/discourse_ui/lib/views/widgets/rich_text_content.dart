@@ -4,7 +4,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import 'custom_bb_stylesheet.dart' show BBCodeCallbacks;
+import 'post_content_callbacks.dart' show PostContentCallbacks;
 
 /// Renders post content. The data we get from Discourse's `/t/{id}.json`
 /// post stream is the `cooked` HTML field — i.e. server-rendered Markdown
@@ -13,13 +13,13 @@ import 'custom_bb_stylesheet.dart' show BBCodeCallbacks;
 ///
 /// This widget accepts the same constructor shape the inherited XF code
 /// has been calling so the swap is a drop-in replacement. Link and image
-/// taps route through the provided [BBCodeCallbacks] when available
+/// taps route through the provided [PostContentCallbacks] when available
 /// (mention → user profile, same-forum topic/post URL → in-app post page,
 /// image → viewer), falling back to an external launch otherwise.
 class RichTextContent extends StatelessWidget {
   final SiteContext siteContext;
   final String content;
-  final BBCodeCallbacks? callbacks;
+  final PostContentCallbacks? callbacks;
 
   const RichTextContent({
     super.key,

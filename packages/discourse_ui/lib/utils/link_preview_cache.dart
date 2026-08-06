@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:html/parser.dart' as parser;
 import 'package:html/dom.dart' as dom;
-import 'bbcode_processor.dart';
+import 'media_url_utils.dart';
 
 /// Container for link preview metadata
 class LinkPreviewData {
@@ -69,13 +69,13 @@ class LinkPreviewCache {
       final cleanUrl = url.trim().replaceAll('"', '');
 
       // Exclude Twitter URLs from link preview processing
-      if (BBCodeProcessor.isTwitterUrl(cleanUrl)) {
+      if (MediaUrlUtils.isTwitterUrl(cleanUrl)) {
         debugPrint('LinkPreviewCache: Excluding Twitter URL from link preview: $cleanUrl');
         return null;
       }
 
       // Exclude YouTube URLs from link preview processing
-      if (BBCodeProcessor.isYoutubeUrl(cleanUrl)) {
+      if (MediaUrlUtils.isYoutubeUrl(cleanUrl)) {
         debugPrint('LinkPreviewCache: Excluding YouTube URL from link preview: $cleanUrl');
         return null;
       }

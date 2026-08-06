@@ -34,7 +34,7 @@ Flutter `^3.6.1` / Dart `^3.6.1`. Targets Android, iOS, macOS, Windows, Linux, w
 - **Phase 1** — ✅ auth + read path: `DiscourseClient`, User API Key handshake (`/user-api-key/new` + RSA decryption + in-app webview grant), real config/account/user/forum/topic/post/search proxies. Live-tested against the local Discourse install at `/Volumes/CRUCIAL/discourse`.
 - **Phase 2** — ✅ write path + PMs: reply/new topic/edit/delete via `/posts`, PMs via `archetype: 'private_message'`, attachments via `/uploads`, native 4-level `notification_level` subscriptions. Also landed beyond plan: reactions, bookmarks, server-side drafts, tags, groups, badges, user directory, chat (partial), moderation, `/topics/timings` read tracking.
 - **Phase 3** — ⏳ push: **client side done**, relay side pending. When `AppForumConfig.pushApiBaseUrl` is set, the handshake requests the `push` scope and registers `push_url = <pushApiBaseUrl>/discourse/push` (static — Discourse substring-matches `push_url` against `allowed_user_api_push_urls`, so no per-device URLs); `userApiPushEnabled` is recorded only when scope+push_url were sent AND the server echoed `push: true`. Device identity is the handshake `client_id`, which Discourse tags onto every payload it POSTs to `push_url` (`HubPushNotificationPusher`); the app sends `discourse_client_id` in the relay's `/devices/register` body so the relay can map client_id → FCM token. `DiscourseDeviceProxy` reflects the model honestly (no Discourse device endpoints exist; unregister = key revoke on logout). **Remaining, all server-side:** (1) the relay backend must actually serve `POST /discourse/push` and forward by `client_id` (path contract defined in `AppForumConfig.discoursePushUrl` — change there if the relay differs, and store the `discourse_client_id` field from `/devices/register`); (2) the forum admin must add the exact push_url to `allowed_user_api_push_urls` and keep `push` in `allow_user_api_key_scopes`; (3) unauthenticated relay ingestion should be verified/hardened (Discourse sends `push_api_secret_key` in the payload). With `pushApiBaseUrl` empty, everything is byte-identical to pre-push behavior.
-- **Phase 4** — mostly done (UI polish, spacing tokens, skeleton loaders); composer Markdown conversion in progress; optional `FC_Discourse` plugin still not needed.
+- **Phase 4** — ✅ done. UI polish, spacing tokens, skeleton loaders; composer emits Discourse Markdown; the BBCode pipeline is deleted and post content is parsed as cooked HTML (`utils/cooked_content.dart`, mirroring `PrettyText.extract_links` in the Discourse source). Optional `FC_Discourse` plugin still not needed.
 
 ## API/SDK strategy (load-bearing)
 
@@ -83,13 +83,20 @@ macOS-only utilities:
 ## Editing notes
 
 - **Forum config is compile-time.** Changes to `lib/config/app_forum_config.dart` require a rebuild; there is no runtime override. `siteId = 1` is the stable local-storage key — don't change it unless you intend to invalidate persisted state.
-- **Adding a UI string.** Edit `lib/l10n/app_en.arb` (template) plus the per-locale ARBs you want translated, then `flutter gen-l10n` (or rerun `buildlib.sh`). Supported locales are declared in `main.dart`.
+- **Adding a UI string.** Edit `packages/discourse_ui/lib/l10n/app_en.arb` (template) plus the per-locale ARBs you want translated, then `flutter gen-l10n` (or rerun `buildlib.sh`). Supported locales are declared in `main.dart`.
 - **Adding/changing an SDK model or proxy.** Update the interface in `packages/forumcopilot_sdk/lib/interfaces/`, the result/entity in `models/`, then implement on the Discourse side in `packages/discourse_core/lib/` (proxy + converter). Re-run `build_runner` in whichever package(s) you touched.
 - **Push.** Disabled by default (`AppForumConfig.pushApiBaseUrl = ''`). Client wiring is complete (see Phase 3 above): setting `pushApiBaseUrl` makes the next login request the `push` scope with `push_url = <pushApiBaseUrl>/discourse/push`; Discourse POSTs notifications there and the relay forwards to FCM/APNs keyed by the `client_id` in each payload. Existing logins predate the grant and must re-login (a key's scopes/push_url are immutable) — the notification settings page surfaces this. Contract docs live on `AppForumConfig.discoursePushUrl`.
 - **Cloudflare interceptor.** `ForumcopilotSdk.ensureInitialized` takes `onCloudflareStart`/`onCloudflareEnd` callbacks; the app uses them to hide/show the global spinner so the Cloudflare challenge UI is visible. Preserve this when refactoring init.
 - **Linting.** `analysis_options.yaml` extends `package:flutter_lints/flutter.yaml` and excludes `Original/**`.
 
-## Known issues (inherited from xenforoapp)
+## Remaining XenForo inheritance
 
-- All `Discourse*Proxy` methods in `packages/discourse_core/lib/src/proxy/*` still call a XenForo-style `callPluginApi(method, params)` — this will fail against Discourse at runtime. Fix per-proxy in Phase 1+.
-- BBCode utilities (`lib/utils/bbcode_processor.dart`, `lib/views/widgets/custom_bb_stylesheet.dart`, BBCode buttons in posting flows) are XenForo-flavored. To be replaced with Markdown rendering in Phase 4 (or earlier if posting needs to work for testing).
+Both entries that used to live here are resolved: every `Discourse*Proxy` calls real Discourse REST (zero `callPluginApi` remain, Phase 5.12), and the BBCode pipeline is gone — `bbcode_processor.dart` and `attachment_utils.dart` are deleted, and post content is read as cooked HTML by `packages/discourse_ui/lib/utils/cooked_content.dart`.
+
+What's left is naming and shape, not behavior:
+
+- **`forumcopilot_sdk` is XenForo-shaped by origin.** Interface names, `FC*Result` wrappers and some field semantics still reflect XF. Follow the API/SDK strategy above rather than working around the shape.
+- **Composer helper names.** `MessageComposePage._insertBBCode` / `_insertAttachmentBBCode` (and the PM composer equivalents) emit Discourse **Markdown** despite their names — the bodies are correct, the identifiers are stale.
+- **`DiscoursePrivateMessageProxy`** is a deliberate loud shim (Phase 5.20e): Discourse models PMs as topics, so the XF inbox/sent-box contract fails fast with a pointer to `IFCPrivateConversationProxy`.
+- **`FCPost.inlineAttachments`** is always empty on Discourse — uploads are embedded directly in the cooked HTML. The field and its render branch are kept only for SDK compatibility.
+- **`deploy_plugin.sh`** deploys a plugin that does not exist in v1. Ignore it.

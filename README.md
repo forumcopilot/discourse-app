@@ -1,342 +1,339 @@
 # Discourse App
 
-An open-source Flutter mobile app template for a **single Discourse forum**. Hard-bound to one community at build time via `lib/config/app_forum_config.dart`; talks to Discourse's stock REST/JSON API + User API Keys directly — **no server-side plugin required**.
+An open-source Flutter mobile app for a **single Discourse community**.
 
-Targets Android, iOS, macOS, Windows, Linux, and the web. Built on Flutter `^3.6.1` / Dart `^3.6.1`.
+Point it at your forum's URL, build it, ship it. It talks to Discourse's **stock REST/JSON API** using **User API Keys** — the same mechanism Discourse's own official app uses. There is **no server-side plugin to install**, no admin API key to hand out, and nothing to run alongside your forum.
+
+Targets Android, iOS, macOS, Windows, Linux, and web. Flutter `^3.6.1` / Dart `^3.6.1`. MIT licensed.
 
 ---
 
-## Project family
+## Part of Forum Copilot
 
-This app is part of a small family of forum mobile apps:
+This app comes out of **[Forum Copilot](https://forumcopilot.com)**, a service that builds and ships white-label mobile apps for forum communities — branding, app-store releases, and push delivery handled for you.
 
 | Project | Backend | Source |
 |---|---|---|
-| **discourseapp** *(this repo)* | Discourse | [github.com/forumcopilot/discourse-app](https://github.com/forumcopilot/discourse-app) |
+| **discourse-app** *(this repo)* | Discourse | [github.com/forumcopilot/discourse-app](https://github.com/forumcopilot/discourse-app) |
 | **xenforoapp** | XenForo (via the Forum Copilot add-on) | [github.com/forumcopilot/xenforoapp](https://github.com/forumcopilot/xenforoapp) |
-| **ForumCopilot.com** | Hosted SaaS (multi-forum, push relay, white-label apps) | [forumcopilot.com](https://forumcopilot.com) |
+| **ForumCopilot.com** | Hosted SaaS — multi-forum, push relay, white-label builds | [forumcopilot.com](https://forumcopilot.com) |
 
-The lineage:
+This repo is the Discourse-native sibling of `xenforoapp`: same UI shell, same SDK shape, but the data layer speaks Discourse REST instead of an XF plugin.
 
-- **[ForumCopilot.com](https://forumcopilot.com)** is the original product — a hosted service that builds white-label mobile apps for forum communities and handles push delivery, app-store releases, and per-forum branding.
-- **[xenforoapp](https://github.com/forumcopilot/xenforoapp)** is the open-source single-forum template extracted from ForumCopilot for XenForo communities, paired with a server-side `FC_XenForo2` PHP add-on that exposes a unified forum API.
-- **discourseapp** *(you are here)* is the Discourse-native sibling: same UI shell, same SDK shape (`forumcopilot_sdk`), but the proxy layer talks to Discourse's stock REST endpoints + User API Keys instead of an XF plugin. No server-side plugin in v1 — the app is a pure REST client.
+### 💼 We welcome customization work
+
+Want this app tailored to your community — custom branding, extra screens, a plugin integration we haven't built yet, or the whole thing published to the App Store and Play Store under your name? **We do that.**
+
+**Get in touch: [forumcopilot@gmail.com](mailto:forumcopilot@gmail.com)**
+
+Fork it and go it alone under the MIT license, or hand it to us — both are fine.
+
+---
+
+## How it works
+
+Three layers, each replaceable:
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  lib/main.dart          thin runner: init, then runApp()      │
+├──────────────────────────────────────────────────────────────┤
+│  packages/discourse_ui  every screen, controller and widget   │
+│                         + app_forum_config.dart  ← you edit   │
+├──────────────────────────────────────────────────────────────┤
+│  packages/forumcopilot_sdk    forum-agnostic contracts        │
+│                         IFC*Proxy interfaces, FC* entities    │
+├──────────────────────────────────────────────────────────────┤
+│  packages/discourse_core      the Discourse implementation    │
+│                         REST calls + JSON → FC* converters    │
+└──────────────────────────────────────────────────────────────┘
+                              ↕ HTTPS
+                        your Discourse forum
+```
+
+**Configuration is compile-time.** `AppForumConfig` in `packages/discourse_ui/lib/config/app_forum_config.dart` holds the forum URL, display name, and branding. There is no runtime forum picker — that is the point of a single-forum app.
+
+**Authentication is Discourse's User API Key handshake.** On first sign-in the app generates an RSA-2048 keypair, opens your forum's own `/user-api-key/new` page in an in-app webview, and the user signs in there — with their password, 2FA, passkey, or SSO, whatever your forum already uses. Discourse returns an encrypted payload; the app decrypts it with its private key and stores the resulting API key. **The app never sees the user's password.** No plugin, no OAuth app registration, no admin token.
+
+**Data flows through a proxy layer.** UI code never calls HTTP directly — it asks `SiteProxyFactory` for a typed proxy (`getTopicProxy()`, `getPostProxy()`, …) and gets back the `discourse_core` implementation. Each proxy calls stock Discourse endpoints and converts the JSON into the SDK's `FC*` entities. Responses share one shape: `FC*Result { result, resultText, …payload }`.
+
+**Posts render as Discourse renders them.** Discourse cooks Markdown to HTML server-side and serves it in the post stream's `cooked` field. The app renders that HTML directly with `flutter_html` — so oneboxes, quotes, code blocks, mentions and emoji look the way your forum's own theme produces them. Embedded YouTube and Twitter/X links are lifted out and given native cards, since a mobile app can't run an iframe.
+
+**State is GetX** (`Get.put` / `Obx`), navigation goes through a `globalNavigatorKey` so SDK code can raise dialogs (e.g. a Cloudflare challenge) without a `BuildContext`.
 
 ---
 
 ## What works today
 
-The app is past the bootstrap phase and exercises most of Discourse's read + write surface natively.
+<details open>
+<summary><b>Browsing &amp; reading</b></summary>
 
-### Browsing & reading
-- **Home** is a Discourse-native TabBar of **Latest / New / Unread / Top**. The Top tab has a period selector (All / Yearly / Quarterly / Monthly / Weekly / Daily) that maps to `/top/{period}.json`.
-- **Categories** browser with native Discourse styling — coloured stripe on each tile (parsed from the category's `color`/`text_color`) plus topic-count badge. Sub-categories and category-filtered topic lists.
-- **Topic view** — rendered from Discourse's `cooked` HTML via `flutter_html` (Markdown, oneboxes, quoted posts, syntax-highlighted code, mentions, native emoji).
-- **Tags** — chips on topic rows; tap a chip to see all topics with that tag (`/tag/{name}.json`); global Tags directory (`/tags.json`) reachable from the hamburger drawer with search + popularity/alphabetical sort.
-- **Polls** — voting widget at the top of a topic backed by `PUT /polls/vote` with full chart/result rendering.
-- **Suggested Topics** footer card at the bottom of every topic, mirroring Discourse's web client.
-- **Solution indicator** — green banner on accepted-answer posts (requires `discourse-solved`).
+- **Home** — Discourse-native tabs: **Latest / New / Unread / Top**, with a period selector on Top (All / Yearly / Quarterly / Monthly / Weekly / Daily).
+- **Categories** — coloured stripe per category (from its own `color` / `text_color`), topic-count badges, sub-categories, category-filtered lists.
+- **Topic view** — rendered from Discourse's `cooked` HTML: Markdown, oneboxes, quoted posts, code blocks, mentions, native Unicode emoji, lightboxed images.
+- **Tags** — chips on topic rows, tag-filtered lists, and a global Tags directory with search and popularity/alphabetical sort.
+- **Polls** — full voting widget with result charts.
+- **Suggested Topics** footer, mirroring Discourse web.
+- **Solution banner** on accepted answers (`discourse-solved`).
+</details>
 
-### Authentication
-- **User API Key handshake** — RSA-2048 keypair, OAEP decryption, in-app webview for grant. No plugin needed; lands a stock User API Key with `read/write/session_info/notifications/message_bus/one_time_password` scopes.
-- Custom URL scheme `discourseapp://auth-callback` for the grant redirect.
+<details>
+<summary><b>Writing</b></summary>
 
-### Writing
-- **Markdown composer** — first-party Discourse-flavored Markdown (the BBCode pipeline inherited from XF was removed in Phase 5.10).
-- **New topic** with category + tag selection.
-- **Reply / quote / edit / delete**.
-- **Attachments** — image and file uploads via `/uploads`.
-- **Server-side drafts** — composer state round-trips through `/drafts.json` so a draft written in the app appears in the web composer and vice versa (`new_topic` / `topic_{id}` keys).
+- **Markdown composer** — Discourse-flavored Markdown, the only markup Discourse actually cooks.
+- New topic with category + tag selection; reply, quote, edit, delete.
+- **Attachments** — image and file uploads via `/uploads`, inserted as real Discourse upload refs.
+- **Server-side drafts** — composer state round-trips through `/drafts.json`, so a draft started in the app appears in the web composer and vice versa.
+- **Post revisions** — view a post's edit history.
+- **Whisper / wiki** — staff whispers and wiki-editable posts.
+</details>
 
-### Social
-- **Like / unlike** posts (`/post_actions`).
-- **Emoji reactions** (`discourse-reactions`) — long-press a like to open the emoji picker; chips render under the post body with viewer-reacted highlighting; tap a chip to toggle.
-- **Bookmarks** — toggle on any post; full bookmarks list reachable from your profile (`/u/{me}/bookmarks.json`).
-- **Follow / unfollow** users (requires `discourse-follow` plugin).
-- **Notifications** — `/notifications.json` feed with type-aware rendering; badge count + list both read from the same endpoint.
+<details>
+<summary><b>Social &amp; account</b></summary>
 
-### Plugin integrations
-- **`discourse-solved`** — green Solution banner on accepted answers + `status:solved` / `status:unsolved` search filters.
-- **`discourse-reactions`** — emoji reactions picker + chips (see Social).
-- **`discourse-post-voting`** — Stack-Overflow-style up/down vote arrows on Q&A topics (topics with `subtype: 'question_answer'`).
-- **Discourse Chat** — full channel browser + channel view + composer + DM support. Channels list (`/chat/api/me/channels`) sorted unread-first with mention/unread badges; channel view polls `/chat/api/channels/:id/messages` every 4s for new messages; send / edit / delete / mark-read all wired. UI is ported from the [qhtt xenforoapp](https://github.com/forumcopilot/xenforoapp/) Siropu chat — generic enough that the API swap was clean.
-- **`discourse-follow`** — Follow/Unfollow button on user profiles (when the plugin is installed).
+- **Likes and emoji reactions** (`discourse-reactions`) behind one canonical affordance — tap to like, long-press for the emoji picker, chips below the post.
+- **Bookmarks** with reminders, **follow/unfollow** (`discourse-follow`), **ignore user**.
+- **Notifications** — the full `/notifications.json` feed with type-aware rendering and per-type icon badges across all 39 Discourse notification types.
+- **Notification levels** — Watching / Tracking / Normal / Muted on topics, categories and tags.
+- **Profile** — trust-level chip with explainer, badges, activity tabs (Replies / Topics), inline bio/location/website editing, avatar upload.
+- **Account** — change email, change password, notification preferences, do-not-disturb, ignored users, invites.
+- **Private messages** — conversation-style, with attachments and likes.
+</details>
 
-### Notification levels
-- Tap the bell on any topic or category for the full **Watching / Tracking / Normal / Muted** picker (plus *Watching First Post* on categories) — `POST /t/{id}/notifications`, `POST /category/{id}/notifications`.
+<details>
+<summary><b>Search, chat &amp; moderation</b></summary>
 
-### User profile
-- Trust level chip (TL0–TL4), badge row, follow button, send-message button, bookmarks button.
-- Recent replies feed.
+- **Search** — free text plus a structured filter sheet: status (`open` / `closed` / `solved` / `unsolved` / `noreplies` / `archived`), personal scopes (`in:bookmarks` / `in:liked` / `in:posted` / `in:watching` / …), tags, and sort order.
+- **Chat** (`discourse-chat`) — channel browser, channel view, composer, DMs, and message reactions. Currently polls; see *Not yet implemented*.
+- **Moderation** (staff only) — pin, close, archive, unlist, rename, delete, move topic, merge topics, ban/silence, and the reviewables queue.
+</details>
 
-### Search
-- Free-text search with a structured filter sheet: status (`open` / `closed` / `solved` / `unsolved` / `noreplies` / `public` / `archived`), personal (`in:bookmarks` / `in:liked` / `in:posted` / `in:watching` / `in:tracking` / `in:seen` / `in:unseen`), tags, sort order (relevance / latest / likes / views / latest_topic).
+<details>
+<summary><b>Localisation</b></summary>
 
-### Moderation (visible to staff users)
-- Pin / unpin · Close / reopen · Archive / unarchive · List / unlist · Rename · Soft and hard delete · Move topic · Split posts · Merge topics · Ban / silence users.
-
-### Localisation
-- ARB-based; English template at `lib/l10n/app_en.arb`; per-locale files for de/es/fr/it/ja/ko/nl/pt/ru/zh. Discourse-native terminology — *Topic* / *Category* / *Watching* / *Solution*, not the XF-flavored equivalents.
+ARB-based, English template at `packages/discourse_ui/lib/l10n/app_en.arb`, with de / es / fr / it / ja / ko / nl / pt / ru / zh. Terminology is Discourse-native — *Topic*, *Category*, *Watching*, *Solution*.
+</details>
 
 ---
 
 ## Not yet implemented
 
-- **Push notifications** — disabled by default. Discourse's `push_url` registration is wired on the User API Key, but the relay backend that converts those POSTs into FCM/APNs deliveries is shared with [xenforoapp's push setup](https://github.com/forumcopilot/xenforoapp#push-notifications-optional) and is the Phase 3 deliverable. Until then the app starts cleanly without Firebase config files.
-- **Chat over MessageBus** — Chat currently polls every 4s. The Discourse web client subscribes to `/chat/:channel_id` over MessageBus + websockets for sub-second latency. A follow-up phase could swap polling for MessageBus subscription (would also benefit topic live-updates and the notifications badge).
-- **Chat reactions + threads + uploads** — Chat messages don't yet support emoji reactions, threaded replies, or file uploads. Each is a separate plugin endpoint (`/chat/api/channels/:cid/messages/:mid/reactions`, `/chat/api/channels/:cid/threads/...`).
-- **Account-settings page** — Email + password updates land via the proxy (Phase 5.12), but inline username change, 2FA setup, and avatar upload are still stubbed out.
-- **Other Discourse plugins** — Calendar, Cakeday, Assign, Templates aren't surfaced yet. Each follows the reactions / post-voting / chat pattern (typed model + proxy method + small UI).
-- **Markdown preview in the composer** — text-only editor for now; rendered preview is a planned follow-up.
-
-The Phase 5.x history at the bottom of this README has the full feature timeline.
+- **Push notifications** — the client side is done: with a relay configured, the User API Key handshake requests the `push` scope and registers a `push_url`, and Discourse POSTs notifications there. What's missing is **the relay backend** that forwards those to FCM/APNs. With no relay configured the app runs exactly as before and needs no Firebase files. (Forum Copilot runs a hosted relay — [get in touch](mailto:forumcopilot@gmail.com).)
+- **Chat over MessageBus** — chat polls every 4s today; Discourse web subscribes over MessageBus for sub-second latency. The same swap would speed up topic live-updates and the notification badge.
+- **Chat threads and uploads** — reactions work; threaded replies and file uploads don't yet.
+- **Markdown preview in the composer** — the editor is text-only for now.
+- **Other Discourse plugins** — Calendar, Cakeday, Assign, Templates. Each follows the same recipe as reactions/post-voting: typed model, proxy method, small UI.
 
 ---
 
-## Prerequisites
+## Quick start
 
-- **Flutter SDK** `^3.6.1`
-- **Dart SDK** `^3.6.1`
-- **Xcode** (for iOS and macOS builds)
-- **Android Studio / Android SDK** (for Android builds)
-
----
-
-## Build and run
-
-### 1. Install Flutter
-
-Install the [Flutter SDK](https://docs.flutter.dev/get-started/install) and confirm `flutter doctor` is happy.
-
-### 2. Clone
+**Prerequisites:** Flutter `^3.6.1`, plus Xcode (iOS/macOS) and/or Android Studio for the platforms you target.
 
 ```bash
 git clone https://github.com/forumcopilot/discourse-app.git
 cd discourse-app
+flutter pub get
+./buildlib.sh          # codegen + gen-l10n   (Windows: buildlib.bat)
+flutter run -d macos   # or -d chrome, -d <ios-device>, -d <android-id>
 ```
 
-### 3. Configure your forum
+### Point it at your forum
 
-Edit `lib/config/app_forum_config.dart` and set the forum URL, name, and User API Key client identifiers:
+Edit `packages/discourse_ui/lib/config/app_forum_config.dart`:
 
 ```dart
-static const String forumName = 'My Discourse Forum';
+static const String forumName    = 'My Community';
 static const String forumBaseUrl = 'https://forum.example.com';
-// User API Key client identifiers (registered once per app build):
-static const String userApiKeyClientId = 'com.example.discourseapp';
-static const String userApiKeyApplicationName = 'My Discourse App';
+
+/// Shown to the user on your forum's User API Key grant page.
+static const String userApiApplicationName = 'My Community Mobile';
 ```
 
-Optionally set `forumDescription`, `logoUrl`, push-relay endpoint, and Android passkey identifiers.
+That's the minimum. Optional: `forumDescription`, `logoUrl`, `pushApiBaseUrl` (push relay), and the Android passkey identifiers.
 
-### 4. Install dependencies
+The grant redirect defaults to `discourse://auth_redirect` — the universal scheme every Discourse instance already allowlists, so the handshake works against any forum without an admin changing settings. To use your own scheme instead, set `userApiAuthRedirect` and have the forum admin add it to `allowed_user_api_auth_redirects`.
 
-```bash
-flutter pub get
-```
+### Codegen
 
-### 5. Generate SDK and localisations
+`buildlib.sh` runs `build_runner` inside `packages/forumcopilot_sdk` and `packages/discourse_core`, then `flutter gen-l10n`. **Re-run it after** editing an ARB file or any `dart_mappable` / `json_annotation` annotated class.
 
-```bash
-./buildlib.sh          # codegen for forumcopilot_sdk + flutter gen-l10n
-                       # Windows: buildlib.bat
-```
+> ⚠ On Dart 3.10 the `dart_mappable` build hook fails with `'dart compile' does not support build hooks`. Until that's fixed upstream, hand-edit the affected `.mapper.dart` — recent commits show the pattern.
 
-`buildlib.sh` runs `dart run build_runner build --delete-conflicting-outputs` inside `packages/forumcopilot_sdk` and `packages/discourse_core`, then `flutter gen-l10n`. **Re-run it whenever** you change an ARB file or a `dart_mappable`-annotated class.
-
-> ⚠ On Dart 3.10 the `dart_mappable` build hook is currently broken (`'dart compile' does not support build hooks, use 'dart build' instead`). When you hit this, hand-edit the affected `.mapper.dart` file — see the recent commits for `acceptedAnswer → isSolution` or the `trustLevel` addition for the pattern.
-
-### 6. Run
+### Release build
 
 ```bash
-flutter run -d macos     # or -d chrome, -d <ios-device>, -d <android-id>
-```
-
-### 7. Release build
-
-```bash
-flutter build macos      # or ios, android, web
+flutter build apk       # or ios, macos, web, windows, linux
 ```
 
 ---
 
 ## Local development against Discourse
 
-The simplest setup is to clone Discourse locally and seed it with demo data.
+Clone Discourse locally and seed it with demo content:
 
 ```bash
 git clone https://github.com/discourse/discourse.git /path/to/discourse
 cd /path/to/discourse
-bin/dev                                                 # boots Discourse at localhost:4200
+bin/dev                                    # boots Discourse on localhost:4200
 
-# in another shell, populate demo content (idempotent):
-cd /path/to/discourseapp
-./scripts/seed_demo.sh                                  # wraps bin/rails runner
-
-# … or point at a different Discourse install:
-DISCOURSE_DIR=/elsewhere ./scripts/seed_demo.sh
+# in another shell — idempotent, safe to re-run:
+cd /path/to/discourse-app
+./scripts/seed_demo.sh                     # or: DISCOURSE_DIR=/elsewhere ./scripts/seed_demo.sh
 ```
 
-The seed script (`scripts/seed_discourse_demo.rb`) creates:
+`scripts/seed_discourse_demo.rb` creates 10 users across every trust level (`alice` TL3, `bob` TL2, `carol` TL1, `dave` TL0, `eve` TL4, `mallory` moderator, plus four more; password `demo-password-1234!` for all), 3 categories, 13 tags, ~16 topics covering every state (open, closed, archived, unlisted, pinned, solved, polls, Q&A), ~90 posts, likes, reactions, votes, bookmarks, drafts, badges, 6 PMs, and 5 chat channels. Sign in as `alice` for the fullest view.
 
-- **10 users** spread across trust levels: `alice` TL3, `bob` TL2, `carol` TL1, `dave` TL0, `eve` TL4 (Leader), `mallory` (moderator), plus `frank` / `grace` / `henry` / `ivy` for diversity in chat + topics. Password for all: `demo-password-1234!`.
-- **3 categories** (General / Support / Announcements) + **13 tags**.
-- **~16 topics** in a variety of states — open, closed-and-archived, unlisted, globally pinned, solved (via `discourse-solved`), with embedded polls, with Q&A subtype (`discourse-post-voting`), with reply chains. Timestamps are spread from 8 min ago through 2 weeks ago so the Latest feed feels real.
-- **~90 posts**, **80+ likes**, **~25 emoji reactions** (via `discourse-reactions`), **6 post-voting up/down votes**.
-- **10 bookmarks**, **2 server-side drafts**, **~10 badge grants**, per-topic and per-category notification levels.
-- **6 PMs (conversation-style)** covering every demo user — 1:1, 3-person group, mod-question. These populate the Messages tab.
-- **5 chat channels**:
-  - `#demo-watercooler` — 35 messages, 10 members, with one synthetically-edited message so the *(edited)* indicator renders.
-  - `#mobile-dev` — 13 messages, focused tech thread.
-  - `alice ↔ bob` DM — 6 messages.
-  - (plus older test channels from previous runs)
-
-Re-running is idempotent throughout. Use this to exercise every Phase 5 feature in the app — log in as `alice` for the most-populated view (PMs, drafts, bookmarks, badges).
+Set `forumBaseUrl = 'http://localhost:4200'` to point the app at it. For a physical Android device over USB, `adb reverse tcp:4200 tcp:4200` first.
 
 ---
 
 ## Repository layout
 
 ```
-lib/                                       # the app
-├─ config/app_forum_config.dart            # the only file a fork normally edits
-├─ controllers/                            # GetX controllers
-├─ services/                               # init, push, site proxy wiring
-├─ views/                                  # pages + widgets
-├─ core/                                   # logging, error handling, cache
-├─ l10n/                                   # ARB files + generated output
-└─ utils/                                  # url helpers, time formatting, drafts
+lib/
+├─ main.dart                              # init + push bootstrap, then ForumCopilotApp
+└─ l10n/                                  # app-level ARB
 
-packages/forumcopilot_sdk/                 # forum-agnostic abstractions
-├─ lib/interfaces/                         # IFC*Proxy contracts
-├─ lib/models/                             # FC*Result wrappers + entities
-└─ lib/factory/                            # SiteProxyFactory
+packages/discourse_ui/                    # the entire UI layer
+├─ lib/config/app_forum_config.dart       # ← the file a fork normally edits
+├─ lib/controllers/                       # GetX controllers
+├─ lib/views/                             # pages + widgets
+├─ lib/services/                          # init, push, site proxy wiring
+├─ lib/utils/                             # cooked-HTML extraction, URLs, time, files
+├─ lib/core/                              # logging, errors, cache, memory
+├─ lib/theme/                             # design tokens + theme
+└─ lib/l10n/                              # ARB files + generated localisations
 
-packages/discourse_core/                   # Discourse implementation
-├─ lib/factory/                            # DiscourseProxyFactory
-├─ lib/src/proxy/                          # Per-area proxies (Account, Topic, Post, Search, ...)
-├─ lib/src/data/                           # Typed Discourse models (bookmark, badge, suggested topic, ...)
-├─ lib/src/network/                        # Dio + User API Key handshake
-└─ lib/src/converter/                      # Discourse JSON → FC* entities
+packages/forumcopilot_sdk/                # forum-agnostic contracts
+├─ lib/interfaces/                        # IFC*Proxy
+├─ lib/models/                            # FC* entities + FC*Result wrappers
+└─ lib/factory/                           # SiteProxyFactory
 
-scripts/                                   # Local dev helpers
-├─ seed_discourse_demo.rb                  # Rails-runner seed (idempotent)
-└─ seed_demo.sh                            # Wrapper for local discourse install
+packages/discourse_core/                  # the Discourse implementation
+├─ lib/factory/                           # DiscourseProxyFactory
+├─ lib/src/proxy/                         # per-area proxies (Topic, Post, Search, Chat, …)
+├─ lib/src/data/                          # typed Discourse models
+├─ lib/src/network/                       # Dio client + User API Key handshake
+└─ lib/src/converter/                     # Discourse JSON → FC* entities
 
-docs/guides/                               # Platform-specific setup notes
-CLAUDE.md                                  # Codebase guide for Claude Code / AI tooling
+scripts/                                  # local dev helpers (demo seeding)
+docs/guides/                              # platform setup notes (icons, splash, macOS picker)
+CLAUDE.md                                 # codebase guide for AI coding tools
 ```
 
 ---
 
-## Architecture
+## Extending it
 
-`main.dart` runs critical init (error handling, `MemoryManager`, `ForumcopilotSdk.ensureInitialized`, `UserStateService`, `SettingsContext.loadFromDevice`) then `runApp(ForumCopilotApp())`. Firebase + push init runs **in the background after `runApp`** so the UI doesn't block on it; `PushNotificationController` is created lazily once an FCM token arrives.
+The `forumcopilot_sdk` interface was originally shaped around XenForo. Where Discourse has a concept that doesn't map cleanly, the rule is: **extend the SDK to express the Discourse concept** — don't bend Discourse to fit the old shape, and don't reach for a server plugin to paper over the gap.
 
-`ForumCopilotApp` registers `GlobalLoaderController` and `SiteController`, then renders `GetMaterialApp` with a global loader overlay and a `UserStateBanner`. The home is `SingleForumBootstrapPage`, which builds the forum's `Site` from `AppForumConfig` and drives the rest of the app.
+Order of preference:
 
-State is managed with **GetX** (`Get.put` / `Obx`). Navigation uses `globalNavigatorKey` (defined in `forumcopilot_sdk`) so SDK code can show dialogs (e.g. Cloudflare challenge UI) without a `BuildContext`. All forum I/O goes through `SiteProxyFactory.get*Proxy()` returning the `discourse_core` implementations registered at startup; results follow a uniform `FC*Result { result, resultText, ...payload }` shape.
+1. Extend the SDK interface to express the Discourse concept directly.
+2. Surface it as a Discourse-specific feature in the app.
+3. Lossy-map at the converter layer — last resort only.
 
-### Discourse-native escape hatches
+Concepts that took route 1 and are now first-class: tags, polls, bookmarks, four-level notification levels, structured search filters, server-side drafts, emoji reactions, post voting, suggested topics, badges, trust levels, accepted answers, and chat.
 
-The `forumcopilot_sdk` interface was originally XenForo-shaped. Where Discourse has a concept that doesn't map cleanly, we **extend the SDK** rather than coerce Discourse to fit:
-
-- **Tags** — first-class field on `FCTopic`; `newTopic(..., tags: [...])` on `IFCTopicProxy`; `searchTagsAsync` for composer autocomplete.
-- **Polls** — `FCPoll` populated from the first post's `polls` field; `votePollAsync` routes to `PUT /polls/vote`.
-- **Bookmarks** — `DiscoursePostProxy.bookmarkPostAsync` / `getBookmarksAsync` / `unbookmarkPostAsync`.
-- **Notification levels** — `DiscourseSubscriptionProxy.setTopicNotificationLevelAsync` / `setCategoryNotificationLevelAsync` (the XF-style `subscribeTopicAsync(id, int subscribeMode)` is still on the interface but its int gets translated to a Discourse level).
-- **Search filters** — `DiscourseSearchFilters` + `DiscourseSearchProxy.searchWithFiltersAsync` exposing the full `/search.json` operator DSL.
-- **Drafts** — `DiscourseDraftController` (`saveDraftAsync` / `loadDraftAsync` / `deleteDraftAsync`), keys cross-compatible with the web composer.
-- **Reactions** — `DiscourseReaction` + `toggleReactionAsync(postId, value)` / `getAvailableReactionsAsync`. Sidecar Expando on `FCPost` so the model stays untouched.
-- **Post voting** — `DiscoursePostVote` + `castPostVoteAsync(postId, 'up'|'down')` / `removePostVoteAsync`. Same Expando pattern.
-- **Suggested Topics** — `DiscourseSuggestedTopic` + `getSuggestedTopicsAsync(topicId)`.
-- **Chat** — full `DiscourseChatProxy` (channels list, channel meta, history with `target_message_id + direction`, polling helper, send/edit/delete, mark-read). Static `forCurrentSite()` factory.
-- **Badges / trust level / solved / follow** — all surfaced as native Discourse fields rather than lossy mappings to XF concepts.
-
-Callsites that use these features cast `proxy is DiscoursePostProxy` (or similar) at the boundary, falling back to the XF-shaped interface when the proxy is a different implementation.
+**To add a feature:** update the interface in `packages/forumcopilot_sdk/lib/interfaces/`, add or extend the entity in `models/`, implement it in `packages/discourse_core/lib/` (proxy + converter), re-run codegen, then build the UI in `packages/discourse_ui/`.
 
 ---
 
-## Editing notes
+## Changelog
 
-- **Forum config is compile-time.** Changes to `lib/config/app_forum_config.dart` require a rebuild; there is no runtime override. `siteId = 1` is the stable local-storage key — don't change it unless you intend to invalidate persisted state.
-- **Adding a UI string.** Edit `lib/l10n/app_en.arb` (template) plus the per-locale ARBs you want translated, then `flutter gen-l10n` (or rerun `buildlib.sh`).
-- **Adding/changing an SDK model or proxy.** Update the interface in `packages/forumcopilot_sdk/lib/interfaces/`, the result/entity in `models/`, then implement on the Discourse side in `packages/discourse_core/lib/` (proxy + converter). Re-run `build_runner` in whichever package(s) you touched.
-- **Cloudflare interceptor.** `ForumcopilotSdk.ensureInitialized` takes `onCloudflareStart`/`onCloudflareEnd` callbacks; the app uses them to hide/show the global spinner so the Cloudflare challenge UI is visible. Preserve this when refactoring init.
-- **Linting.** `analysis_options.yaml` extends `package:flutter_lints/flutter.yaml`.
+Full history is in [CHANGELOG.md](CHANGELOG.md); the phase-by-phase build log is collapsed at the bottom of this file.
 
----
+### Unreleased
 
-## Phase history
+**Cooked-HTML content pipeline** *(replaces the last of the XenForo BBCode code)*
+- Post link previews, video cards and the image gallery now read Discourse's cooked HTML as a DOM, mirroring the server's own `PrettyText.extract_links` rules. Previously this ran through the inherited XenForo `BBCodeProcessor`, whose URL regex swept the raw markup — so favicons, onebox thumbnails and avatar `src`s each came back as a "link in this post" and got their own preview card.
+- Tapping an inline image now opens the right image. The gallery used to scan for `[IMG]` BBCode tags, which never appear in cooked HTML, so images embedded in a post were invisible to it.
+- Oneboxes stay server-rendered instead of being duplicated by an app-side preview card; YouTube and Twitter/X embeds are lifted into native cards and removed from the HTML so nothing renders twice.
+- `bbcode_processor.dart` (1,183 lines) and `attachment_utils.dart` deleted; `BBCodeCallbacks` renamed `PostContentCallbacks`. New `CookedContent` extractor covered by unit tests against real Discourse markup.
+- Analyzer warnings down from 34 to 1 — dead null-aware operators and redundant null checks left over from the SDK's nullability tightening.
+
+### 2026-08-05
+
+- **Honest-shape SDK fields.** Attachment upload URLs, group totals, bookmark and search pagination now carry real server signals instead of being dropped or synthesised.
+- **Purged fabricated data** (−7,700 lines). Search results, category permissions, group visibility, invite classification and account settings now report what the server actually said — including reporting failure rather than inventing a plausible zero.
+- **One canonical like/reaction affordance** on posts, replacing two overlapping controls.
+- **First-class fields replace all sidecars** — reactions and Q&A votes moved from `Expando` sidecars onto `FCPost` proper. Clickable badges and a trust-level explainer added.
+- **Discourse-native feature wave** — bookmark reminders, tag watching, polls, post revisions, whisper/wiki, reviewables, invites, do-not-disturb, topic summary, chat DMs and chat reactions.
+- **Unified profile experience**, avatar upload enabled, Discourse upload limits respected, cache-first session restore.
+- **Client-side push (Phase 3)** — User API Key `push` scope and `push_url` registration; relay backend still pending.
+- Fixes from a live on-device test pass and a full defect review.
+
+### 2026-08-04
+
+- **`discourse_ui` package extracted** — the app becomes a thin runner, so the whole UI can be hosted inside a multi-forum shell.
+- **Canonical `forumcopilot_sdk` adopted**; `discourse_core` repointed at it.
+- GetX singletons namespaced per site; a "Switch forum" drawer entry appears when hosted in a multi-forum app.
+
+<details>
+<summary><b>Earlier: phase-by-phase build log (Phases 0 – 5.31)</b></summary>
 
 | Phase | What |
 |---|---|
 | **0** | Scaffolding — forked from xenforoapp, packages renamed, app compiles. |
-| **1** | Auth + read path. Real `DiscourseClient`, User API Key handshake, all read-side proxies against stock Discourse REST. |
+| **1** | Auth + read path. `DiscourseClient`, User API Key handshake, all read-side proxies against stock Discourse REST. |
 | **2** | Write path + PMs. Replies, new topics, edit/delete, attachments, conversation-style PMs via `archetype: 'private_message'`. |
 | **4** | Composer Markdown swap + `flutter_html` post renderer + native Unicode emoji. |
 | **5.0–5.1** | Tags as first-class chips + tag-filtered topic lists. |
 | **5.2** | Solved indicator + bookmark proxy. |
-| **5.3** | Bookmark button + bookmarks list, trust levels, server-side drafts, polls voting. |
-| **5.4** | 4-level notification picker (Watching / Tracking / Normal / Muted). |
+| **5.3** | Bookmark button + bookmarks list, trust levels, server-side drafts, poll voting. |
+| **5.4** | Four-level notification picker (Watching / Tracking / Normal / Muted). |
 | **5.5a** | Suggested Topics footer. |
-| **5.6** | Search filters (status / in: / tags / sort). |
+| **5.6** | Search filters (status / `in:` / tags / sort). |
 | **5.7** | User badges row on profile. |
 | **5.8** | Follow / unfollow toggle. |
-| **5.9** | Moderator surface — archive / unlist / rename in topic menu. |
-| **5.10** | XF cruft removal — drop dead thanks UI, BBCode renderer, lossy `subscribeMode`, retire unreachable interface methods, rename `acceptedAnswer → isSolution`, native terminology in ARB. |
-| **5.11** | `discourse-reactions` plugin — typed model + Expando sidecar on FCPost + toggle API + ReactionPickerSheet (long-press the like button) + chips row below post body. |
-| **5.12** | Replaced every remaining `callPluginApi` stub with real Discourse REST or graceful no-ops — forgot password / register / email update / password update / profile update / device push / passkey / report-user. First commit where `flutter analyze` returns **zero errors**. |
-| **5.13** | Native tag input on new topics — chip field with `/tags/filter/search.json` autocomplete, configurable maxTags cap, `extraHeader` slot on the composer. `IFCTopicProxy.newTopic` grew an optional `tags: List<String>?` parameter. |
-| **5.14** | `discourse-post-voting` plugin — typed `DiscoursePostVote` model, `POST/DELETE /vote.json`, vertical up/down arrow column on Q&A topics with optimistic flip + revert. |
-| **5.15** | **Discourse Chat support** — channels + messages + send/edit/delete + polling lifecycle. ChatChannelListPage (sorted unread-first, mention badges, DM/TopicChat/Category icons), ChatChannelView (auto-scroll, load-older on scroll-up, long-press → edit/delete sheet), ChatComposer (rounded input + send button). UI ported from the qhtt xenforoapp's Siropu chat. Static `DiscourseChatProxy.forCurrentSite()` accessor avoids touching the typed IFC*Proxy registry. |
-| **5.16** | Fix: notifications list silently empty because `_toAlert` wrote ISO 8601 into `FCAlert.timestamp` while the consumer did `int.parse`. Convert to millisecond-epoch string in the proxy. |
-| **5.17b** | **Tags tab** — new primary bottom-nav surface (`Home / Categories / Tags / Messages / Notifications / Profile`). `DiscourseTag` model + `DiscourseTopicProxy.getAllTagsAsync` (sorted by topic count desc, PM-only hidden by default). `TagsTab` widget with search input + sort-mode toggle (popularity ↔ alphabetical); rows show name + description + count badge. Drills into the existing `TagTopicsPage` from Phase 5.1. First step of the wider home/forums reorganization — see commit history for the staged plan (5.17a Categories rename, 5.17c Home sub-tabs Latest/New/Unread/Top, 5.17d Profile consolidation). |
-| **5.17a** | **Discourse-native Categories** — the "Forums" tab is now Categories everywhere it surfaces. Each tile gets a coloured stripe down its left edge (parsed from the category's `color` / `text_color` hex) and a topic-count badge in the chip row. `DiscourseForumProxy` stamps a `DiscourseCategoryMeta` Expando sidecar (color / text-color / topic-count / post-count / slug) so the SDK's `FCForum` stays untouched — the rendering layer reads the sidecar via a public `metaFor(FCForum)` accessor. |
-| **5.17c** | **Home as TabBar** — replace the XF-flavoured Latest/Unread/Subscribed/Participated sub-tabs with Discourse-native Latest / New / Unread / Top. New `NewTopicsList` widget (setState-based, no GetX, ~210 LOC) backed by `/new.json` via the existing `getNewTopicAsync`. New `TopTopicsList` widget plus `DiscourseTopicProxy.getTopTopicsGlobalAsync({period})` mapping to `/top/{period}.json`; ChoiceChip strip lets the user flip between All / Yearly / Quarterly / Monthly / Weekly / Daily. Both lists mirror the public surface of `LatestTopicsList` (`buildTopicItems` / `buildEmptyState` / `buildErrorOrNotSignedInWidget` / `resetList` / `refreshList` / `loadMore` / `hasMoreItems`) so `TopicListTab`'s IndexedStack hidden state-holder pattern just slots them in. |
-| **5.17d** | **Profile consolidation + bottom nav back to 5 items** — Messages moves out of the primary bottom nav and into Profile (Discourse web nests PMs in the user menu the same way). Bottom nav becomes `Home / Categories / Tags / Notifications / Profile`. New `_ProfileActionsSection` on the Profile tab with three rows — **Messages** (opens the existing `PrivateMessageListTab` via a new `MessagesPage` Scaffold wrapper), **Bookmarks**, and **Drafts**. Drafts is brand-new: `DiscourseDraft` model + `DiscoursePostProxy.getMyDraftsAsync` against `/drafts.json`, `DraftsListPage` renders each draft (icon / topic title / body excerpt / time-ago / delete button) and resumes into the right composer surface (`topic_*` → ReplyPage, `new_topic` → NewTopicPage, fallback → PostPage). Closes the entire Phase 5.17 reorganization — the app's primary IA now matches Discourse's web client. |
-| **5.18a** | **Hamburger drawer + Chat-or-Messages bottom-nav slot** — adds a leading drawer ("More" menu) following Discourse web's mobile IA. Bottom nav becomes `Home / Categories / {Chat or Messages} / Notifications / Profile`: the third slot is **Chat** when the `discourse-chat` plugin is installed, otherwise **Messages** (PMs). Detection uses a route probe on `/chat/api/me/channels` (404 ⇒ plugin missing, anything else ⇒ installed) — `/site.json`'s `enabled_plugins` field isn't exposed to anonymous viewers, so probing is the most portable signal. `SiteDrawer` widget hosts Tags (moved here from bottom nav), placeholder rows for Users / Groups / Badges (real screens land in 5.18c), Notification settings, Privacy & Terms (5.18b), and Sign in / Sign out. New `ChatTabAppBar` + an `embedded` mode on `ChatChannelListPage` so the channels list renders cleanly inside the parent Scaffold. Profile Messages row hides automatically when Messages is the bottom-nav slot to avoid duplication. |
-| **5.18c** | **Community directories — Users / Groups / Badges.** Three new screens reachable from the drawer's Community section, replacing the 5.18a placeholder rows. **Users**: `DiscourseDirectoryItem` model (username + avatar + 7 activity stats) + `DiscourseUserProxy.getDirectoryItemsAsync({period, order, page})` against `/directory_items.json`. `UsersDirectoryPage` exposes both selectors (Sort: Likes / Posts / Topics / Active; Period: All / Year / Quarter / Month / Week / Day) as horizontal ChoiceChip strips with infinite scroll. Rows tap into the existing `UserProfilePage`. **Groups**: new `DiscourseGroup` model + Discourse-only `DiscourseGroupProxy` (mirrors `DiscourseChatProxy`'s `forCurrentSite()` factory) with `getGroupsAsync` / `getGroupAsync` / `getGroupMembersAsync` against `/groups.json` and `/groups/{name}/members.json`. `GroupsListPage` shows every visible group with built-in groups (admins, staff, trust_level_*) muted. `GroupDetailPage` shows header (name + bio + member count) plus paginated members list. **Badges**: `DiscourseUserProxy.getAllBadgesAsync` against `/badges.json`, sorted by grant_count desc. `BadgesDirectoryPage` groups by tier (Gold / Silver / Bronze sections) with a bottom-sheet detail view on tap (description + grant count). |
-| **5.18d** | **UI consistency sweep across Phase 5.17 / 5.18 surfaces.** Audit found isolated divergences in the new screens — hardcoded `withOpacity(0.3)` / `withOpacity(0.4)` instead of design tokens, ad-hoc `radius: 18 / 20 / 24` instead of a single avatar scale, `letterSpacing: 0.8` magic number on uppercase section labels, duplicated `AppBar` + empty-state boilerplate across 7+ files. Fixes: (1) four new tokens — `opacityDivider` (0.4), `avatarRadiusS/L` (18 / 24, joining the existing `avatarRadiusM` 20), `letterSpacingExtraWide` (0.8); (2) three new shared widgets — `SimpleListAppBar` (replaces per-screen AppBar literals on every drawer-pushed destination + Chat tab), `EmptyStateView` (icon + message + optional hint column with a `.scrollable` variant for `RefreshIndicator` use), `TrustLevelChip` (used in Users directory + group members); (3) full sweep of every Phase 5.17 / 5.18 file replacing magic numbers with tokens and ad-hoc widgets with the new shared ones. No behavioural change — purely visual / structural consistency. |
-| **5.19** | **Fix end-to-end image-attachment flow against Discourse.** The XF→Discourse port left attachments completely broken: upload to `/uploads.json` succeeded and the app captured the upload's numeric id, but every post-proxy method (`newTopic` / `replyPostAsync` / `saveRawPostAsync` / `createMessageAsync`) accepted `attachmentIds` and **ignored them** — POSTing to `/posts.json` with `raw: textBody` and no reference to the upload. Discourse stored the orphaned upload for 7 days then garbage-collected it. The composer's "tap to insert" also emitted XenForo `[ATTACH=42][/ATTACH]` BBCode that Discourse's Markdown engine doesn't parse. Fixes: (1) `DiscourseAttachmentProxy` now passes `upload_type` correctly (stops hardcoding `'composer'`), drops the no-op `synchronous=true` param, and sends `for_private_message=true` for PM uploads so the upload's access is scoped to sender + recipient (without that flag, PM attachment URLs are public to anyone who knows them — a real privacy leak); (2) new `BaseDiscourseProxy.appendAttachmentMarkdown(raw, attachmentRefs)` helper builds Discourse Markdown image refs (`![image](upload://abc.png)`) or file refs (`[file\|attachment](upload://abc.zip)`) from each upload's `short_url` and appends them to the post body before submission, with dedup against refs already inline; (3) all four composer pages (new-topic / reply / new-PM / reply-PM) plus the two edit pages (edit-post / edit-PM-message) now store the upload's `short_url` (carried via `FCAttachmentUploadResult.groupId` because the XF-shaped SDK has no dedicated short_url field) in `_attachmentIds` instead of the useless numeric id; (4) `MessageComposePage._insertAttachmentBBCode` rewritten to emit Discourse Markdown at the cursor instead of XF BBCode, with the proxy's append helper deduping against inline refs so attachments aren't doubled. End-to-end: attach photo → upload → on send, body gets `\n\n![image](upload://...)` appended → Discourse renders inline. |
-| **5.20a** | **Trim dead-end UI surfaces.** A static audit of every proxy method showed two UIs that visibly failed on Discourse: the **legacy username/password login form** (form fields captured but ignored — `_handleLogin` immediately opens the User API Key webview, which is what handles credentials / 2FA / passkeys / SSO) and the **"Report user" menu item** on user profiles (`userProxy.reportUserAsync` returns guidance text saying "open one of their posts and use the flag action" — net-negative UX vs just hiding the button). Fixes: (1) `login_page.dart` rebuilt as a single "Sign in with {domain}" CTA — explanation copy ("you'll be taken to {domain} to sign in"), forgot-password link kept, reassurance footer ("your password is never seen by this app"), passkey OutlinedButton removed (passkey login happens inside the webview on Discourse's own login screen). Drops ~250 LOC and four passkey-validation imports; (2) `user_profile_page.dart` "Report user" PopupMenuItem + `_handleReportUser` (286-line dialog flow) deleted. Per-post flagging via `reportPostAsync` remains fully wired in `post_actions.dart`. Adjacent Ban / Spam Cleaner menu items left untouched. |
-| **5.20b** | **Notification preferences sync server-side.** The legacy notification settings page had nine XF-shaped per-type toggles (newPosts / replies / mentions / quotes / likes / subscriptions / PMs / system) that persisted to SharedPreferences only — flipping anything did nothing the server could see. Discourse doesn't model notifications as per-type opt-out: it decides what is a notification, and the user controls *delivery cadence* (email frequency, like aggregation, etc.). Fix: rebuild the page against Discourse's real preference surface (`user_option.*` on `PUT /u/{u}.json`, with the field set from `UserUpdater::OPTION_ATTR`). New typed model `DiscourseUserNotificationPrefs` + two proxy methods (`DiscourseAccountProxy.getNotificationPrefsAsync` / `updateNotificationPrefsAsync`). New `NotificationSettingsPage` surfaces six controls that genuinely round-trip: **Email when away** (`email_level`: Always / Only when away / Never), **Email for messages** (`email_messages_level`, same enum), **Send activity digest** (`email_digests` toggle + Daily/Weekly/Monthly picker via `digest_after_minutes`), **Mailing list mode** (`mailing_list_mode` toggle, auto-disables digest), **When someone likes my post** (`like_notification_frequency`: Always / First-time-then-daily / First-time-only / Never), **When I reply** (`notification_level_when_replying`: Watching / Tracking / Normal). Each control PUTs immediately on change with optimistic UI + revert on network failure. Drops ~780 LOC of dead toggle code. |
-| **5.20c** | **Full notification type coverage + per-type icon badges.** Discourse documents 39 notification types in `app/models/notification.rb`; the proxy's `_readableNotification` and `_alertActionVerb` only knew 12 — the other 27 (reactions, all five chat-plugin types, bookmark/event/topic reminders, post-approval, badge grants with name, group mentions, membership requests, consolidated digests, watching-first-post, code-review approval, assignment, votes-released, new-features, admin-problems, linked-consolidated, custom plugin notifications) silently fell through to a generic "New activity in '{topic}'". The render layer also never set a per-type icon — every row looked identical. Fix: (1) `social_proxy.dart` extended with constants for every documented type and a friendly-text branch each, reading supplementary fields (`group_name`, `chat_channel_title`, `badge_name`, `count`, etc.) out of the notification's `data` blob; (2) `_alertActionVerb` extended to emit a verb for each new type (`reaction`, `chat`, `reminder`, `approved`, `assigned`, etc.); (3) new `NotificationBadgeStyle.forAction` helper in `notification_list_item.dart` maps each verb to an `IconData` + a theme-colour role; (4) avatar wrapped in a `Stack` so a small overlay badge — Material-rounded icon on the right tint (primary for replies/mentions, error for likes, tertiary for reactions/reminders/badges, etc.) — renders bottom-right with a surface-coloured ring so it punches out of the avatar in both light + dark themes. Notifications now scan visually like Discourse web: you can tell a like from a chat mention from a badge grant at a glance. |
-| **5.20d** | **Forum Settings page rebuilt as a curated Discourse-native section list.** Previously the page called `getUserSettingsCategories` (STUB returns `[]` on Discourse — Discourse exposes preferences as a flat `user_option.*` block, not as XF-style nested categories) and rendered a permanent "No settings available" empty state with just a Delete Account block at the bottom. Rebuilt with three real entries: **Notifications** (deep-links to the `NotificationSettingsPage` we shipped in 5.20b), **Manage account on web** (opens `/my/preferences` in the system browser for everything we don't model in-app — themes, sidebar tags, watched categories, security, group memberships), **Delete account** (existing dialog + external launch to forum's contact / staff flow; Discourse handles deletion per its own policy). The standalone `settings_category_page.dart` (per-category sub-screen for the XF categories model) is now unreachable and deleted. The three STUB methods on `DiscourseAccountProxy` (`getUserSettingsCategories` / `getUserSettings` / `updateUserSettings`) stay as no-op IFC contract fulfilment but no longer drive any UI. |
-| **5.20e** | **Dormant-shim the XF-shape PM box proxy.** `DiscoursePrivateMessageProxy` was 433 LOC of working Discourse REST calls that mapped the XF traditional "inbox / sent boxes with single messages" contract onto Discourse's topic-shaped reality (`/topics/private-messages-{inbox,sent}/{u}.json`). Every method was WIRED but **0 UI callsites** reached any of them — the app's live PM flow uses `IFCPrivateConversationProxy` (conversation-style) exclusively. The 433 LOC was a trap: anyone wiring future PM UI to it would get a half-broken XF-shape view of Discourse PMs (the lossy `markPmReadAsync` / `markPmUnreadAsync` were no-ops). Replaced with a thin 130-LOC shim where every method fails loudly with `"Use IFCPrivateConversationProxy on Discourse — discourseapp models PMs as conversations, not as XF-style inbox / sent boxes."` IFC contract still satisfied so the typed factory registry compiles; future contributors get a clear pointer instead of stumbling into the shape mismatch. The pre-5.20e implementation is recoverable from git history at commit `83ca240` if a real XF-shape use case ever emerges. |
-| **5.22** | **Inline profile editing (Bio / Location / Website).** The user's own profile (Profile tab → `ProfileInfoSection`) was previously read-only; editing bio / location / website meant leaving the app. New `EditProfilePage` (~250 LOC) wires `DiscourseAccountProxy.updateProfile` against `PUT /u/{me}.json` with the three top-level user-profile fields Discourse's `UserUpdater` recognises (`bio_raw`, `location`, `website`). Multiline About field with 3000-char counter; URL field with basic spaces-rejection; AppBar Save button with loading spinner; pops with `true` on success and ProfileTab re-fetches user info to re-render with the new values. Side-by-side **Edit profile / Settings** row replaces the lone Settings tonal button in the Profile tab header. Avatar upload was already wired in `profile_picture_section.dart` from earlier work (camera-badge overlay calls `uploadAvatarAsync` two-step against `/uploads.json` + `/u/{me}/preferences/avatar/pick.json`). Display Name editing intentionally deferred — `user.name` isn't surfaced through the `FCUser` converter today, so we can't seed the field with the existing value. The web-prefs link in Settings covers it. |
-| **5.23** | **Account: change email + change password from the app.** Settings → Account gains two new entries above the existing Delete account block. **Change email** opens a new `ChangeEmailPage` (single-field form: new email + Send button); on submit, wires `DiscourseAccountProxy.updateEmail` against `PUT /u/{me}/preferences/email.json` — Discourse sends a verification link to the new address and the change is live once the user clicks it. Pops with `true` on success so the settings list can show a "Verification email sent — click the link to confirm" snackbar. **Change password** shows a confirmation dialog (since it triggers an email immediately) and on confirm calls `DiscourseAccountProxy.updatePassword` which POSTs to `/u/{me}/preferences/password.json` — Discourse's mobile pattern is "send me a reset link" rather than inline password change (the latter requires session-cookie + CSRF, which the User API Key auth surface doesn't carry). Both proxy methods were already WIRED but had zero UI callsites; this phase plumbs them in. |
-| **5.24** | **User profile: Replies / Topics tab strip.** Both `UserProfilePage` (viewing other users) and `ProfileTab` (viewing your own) used to show only a "Recent posts" list backed by `getUserReplyPostAsync` (`/user_actions.json?filter=5`). The sibling proxy method `getUserTopicAsync` (`filter=4`, topics the user *created*) was WIRED but had zero UI callsites. New `UserCreatedTopics` widget renders FCUserTopic rows (title + excerpt + post time + reply/view counts; taps into PostPage). New `UserActivityTabs` wrapper holds a ChoiceChip selector with **Replies / Topics**; the unselected tab unmounts so we only pay the network round-trip for the tab the user actually opens. Both `UserProfilePage` and `ProfileTab` swap their single-list widget for `UserActivityTabs` — the ProfileTab's parallel `_recentPosts` / `_isLoadingRecentPosts` / `_hasMorePosts` fetch state stays as harmless dead code, slated for cleanup in a follow-up. |
-| **5.25** | **Ignore user + ignored-users management.** Discourse's "ignore" notification level (`level=2`) hides a user's posts and PMs from your view. The proxy methods `ignoreUserAsync` (`PUT /u/{username}/notification_level.json`) and `getIgnoredUsersAsync` (reads `user.ignored_usernames` from `/u/{me}.json`) were WIRED but had zero UI callsites. **UserProfilePage** overflow menu gains an `Ignore user` / `Unignore user` entry above the existing mod actions; tap fires `ignoreUserAsync` with mode=1/0, optimistic flip of `isIgnored` state with revert on failure. **Settings → Account** gains an "Ignored users" tile that pushes the new `IgnoredUsersPage` — a list of ignored users with per-row "Unignore" TextButton, optimistic removal on success, pull-to-refresh, empty state directing users back to the profile-menu entry. |
-| **5.30** | **SDK alignment — follow / unfollow.** First in the Phase 5.30–5.43 series that lifts Discourse-only sidecars onto proper SDK interfaces. Previously `IFCSocialProxy.followAsync` / `unfollowAsync` returned `"requires the discourse-follow plugin — not implemented yet"` stubs, while a parallel `DiscourseUserProxy.followUserAsync` / `unfollowUserAsync` sidecar carried the real implementation — UI called the sidecar directly, bypassing the SDK contract. Phase 5.30: (1) IFC interface signature changes to take `username` (matches Discourse's `/follow/{u}` endpoint shape; XF-shaped backends interpret the identifier internally); (2) `DiscourseSocialProxy.followAsync` / `unfollowAsync` get real `PUT/DELETE /follow/{u}.json` impls with richer `FCFollowResult` error surfacing — the plugin-not-installed case returns "Follow requires the discourse-follow plugin on this forum" instead of a silent boolean false; (3) `DiscourseUserProxy.followUserAsync` / `unfollowUserAsync` sidecar deleted (replaced by interface comment pointing at the social proxy); (4) `user_profile_page.dart` routes through `SiteProxyService.getSocialProxy()` and surfaces the resultText in the snackbar on failure. Net: 4 files, +63 / −58 — small but structurally meaningful. |
-| **5.31** | **SDK extension — accepted answer (discourse-solved).** Second in the 5.30–5.43 SDK alignment series. Adds first-class accept-answer methods to `IFCPostProxy` (`acceptAnswerAsync(postId)` / `unacceptAnswerAsync(postId)`) returning a new `FCAcceptAnswerResult`; adds a `canAcceptAnswer` field to `FCPost` (computed at parse time from topic-level `can_accept_answer` AND post not being the OP's first post). Discourse impl POSTs to `/accept-answer` and `/unaccept-answer`; surfaces "Accepting answers requires the discourse-solved plugin" on 404 instead of a silent failure. UI: green check button (`Icons.check_circle_outline` ↔ `Icons.check_circle`) joins the post-level action row from `PostListItemSocial`, gated on `canAcceptAnswer || isSolution` so it appears for the OP/staff who can flip the state and stays visible (filled) when the post is the accepted answer. Optimistic UI flip with revert on failure. Codegen mappers hand-edited because dart_mappable's build hook is broken on Dart 3.10. |
-| **5.29** | **Post-level action button style guide.** Audit of the post action surface found drift between buttons added across different phases: Like and Bookmark used `AccessibilityHelpers.accessibleIconButton` (48×48 touch target via wrapper), but Reply was a bare `GestureDetector` + Icon with no minimum target. Vote arrows hardcoded `iconSize: 22` and dark/light opacity branching (0.4 ↔ 0.5) instead of the `iconSizeMedium` + `opacityMediumLow` tokens. Reaction chips used raw `8/3` padding and 0.45 / 0.55 / 0.6 opacity literals. Header overflow menu had no explicit icon size. Fix: (1) new shared widget `PostActionButton` (`lib/views/widgets/post_action_button.dart`) wraps `accessibleIconButton` with the canonical recipe — 48×48 target, `iconSizeMedium` (22px) icon, `opacityMediumLow` inactive tint, caller-supplied semantic role for active, optional long-press for the Like → reaction-picker path, filled / outline icon swap based on `active`. (2) Like / Bookmark / Reply all migrate to it — Reply gains a proper 48×48 touch target for the first time. (3) `post_vote_column.dart` swaps `22` → `DesignTokens.iconSizeMedium`, the inactive arrow color picks up `opacityMediumLow`, score font weight uses `fontWeightSemiBold` token. (4) `reaction_chips_row.dart` replaces `8/3` chip padding with `spacingS` / `spacingXS - 1`, replaces three hardcoded opacity literals with `opacityMediumLow` / `opacityMedium` / `opacityDivider`, font weight tokenized, emoji size tokenized. (5) Header overflow `more_vert_rounded` icon explicitly sized to `iconSizeL` (24px) so it reads as primary affordance distinct from the 22px button row. End-to-end: every interactive element on a post now follows one published recipe; the next button added to the row inherits it for free. |
-| **5.26** | **Mod actions: Move to category + Merge into topic.** Two more `moderation_proxy` methods that were WIRED but had zero UI callsites — `moveTopicAsync` (`PUT /t/{id}.json` with new `category_id`) and `mergeTopicAsync` (`POST /t/{src}/merge-topic.json` with `destination_topic_id`). Surface in the topic-page overflow menu next to the existing Rename / Archive / Unlist mod cluster, gated on the same `canClose` mod cap. **Move to category** opens a `DraggableScrollableSheet` with a scrollable list of categories from `getForumAsync`; tapping a row PUTs and snackbars the result. **Merge into topic** shows an AlertDialog with a numeric topic-id field + warning copy ("All posts will be moved into the target topic. This can't be undone via the app — recover via web admin if needed."); confirm POSTs and pops the page on success. Split-posts (`movePostAsync`) intentionally deferred — needs a multi-select UI on the posts list that's a bigger surface change. |
-| **5.25** | **Ignore user + ignored-users management.** Discourse's "ignore" notification level (`level=2`) hides a user's posts and PMs from your view. The proxy method `ignoreUserAsync(userId, mode)` was WIRED (`PUT /u/{username}/notification_level.json`) and `getIgnoredUsersAsync` was wired too (reads `user.ignored_usernames` from `/u/{me}.json`), but neither surfaced anywhere. **UserProfilePage**: overflow menu gains an `Ignore user` / `Unignore user` entry (gated only on "is not yourself"). Tap fires `ignoreUserAsync` with mode=1/0; optimistic flip of the local `isIgnored` state with revert on failure; result snackbar. **Settings → Account**: new `Ignored users` tile pushes `IgnoredUsersPage` — list of ignored users with a per-row `Unignore` button. Each unignore call removes the row immediately from local state (no refetch); shared loading state via a `_busy` set so multiple unignore taps don't race. Empty state walks the user back to the profile-menu entry: "Open a user profile and use 'Ignore user' in the overflow menu". |
+| **5.9** | Moderator surface — archive / unlist / rename in the topic menu. |
+| **5.10** | XF cruft removal — dead thanks UI, lossy `subscribeMode`, unreachable interface methods; `acceptedAnswer` → `isSolution`; native terminology in ARB. |
+| **5.11** | `discourse-reactions` — typed model, toggle API, picker sheet, chips row. |
+| **5.12** | Every remaining `callPluginApi` stub replaced with real Discourse REST or a graceful no-op. First commit with **zero analyzer errors**. |
+| **5.13** | Native tag input on new topics — chip field with `/tags/filter/search.json` autocomplete. |
+| **5.14** | `discourse-post-voting` — vertical up/down arrows on Q&A topics with optimistic flip. |
+| **5.15** | **Discourse Chat** — channels, messages, send/edit/delete, polling lifecycle. |
+| **5.16** | Fix: notifications list silently empty — ISO 8601 written where the consumer did `int.parse`. |
+| **5.17a–d** | IA reorganization to match Discourse web: Categories (coloured stripes), Home as Latest/New/Unread/Top, Tags tab, Profile consolidation with Messages / Bookmarks / Drafts. |
+| **5.18a,c,d** | Hamburger drawer; Chat-or-Messages bottom-nav slot with plugin probe; Users / Groups / Badges directories; UI consistency sweep with shared tokens and widgets. |
+| **5.19** | **Fixed the end-to-end attachment flow** — uploads were succeeding then being ignored at post time and garbage-collected after 7 days. Also scopes PM uploads with `for_private_message` (they were publicly reachable by URL). |
+| **5.20a–e** | Trimmed dead-end UI (legacy login form, report-user); notification preferences that actually round-trip to `user_option.*`; all 39 notification types with per-type icon badges; Forum Settings rebuilt; XF-shape PM box proxy reduced to a loud shim. |
+| **5.22–5.26** | Inline profile editing; change email / password; Replies / Topics activity tabs; ignore user + ignored-users page; move-to-category and merge-topic mod actions. |
+| **5.29** | Post-action button style guide — one shared `PostActionButton` recipe, 48×48 targets everywhere. |
+| **5.30–5.31** | SDK alignment — follow/unfollow lifted onto `IFCSocialProxy`; accepted-answer methods and `canAcceptAnswer` added to `IFCPostProxy` / `FCPost`. |
+| **5.45–5.47** | Server-side read tracking via `/topics/timings`; converter-fidelity audit; on-device bug-fix passes. |
+
+</details>
 
 ---
 
-## Open-source safety checklist
+## Before you publish a fork
 
-Before publishing your own fork:
-
-1. Set forum URL, name, and branding values in `app_forum_config.dart`.
-2. Register your own User API Key client identifiers (one per app build).
-3. Set your own bundle/application IDs for Android/iOS/macOS.
-4. Set your Apple Development Team in Xcode project settings before signing.
-5. Configure passkey association files (`assetlinks.json`, `apple-app-site-association`) with your package/team IDs and certificate fingerprints.
-6. If wiring push later: add your own Firebase config files; never commit a service-account JSON.
+1. Set the forum URL, name and branding in `app_forum_config.dart`.
+2. Set your own bundle / application IDs for Android, iOS and macOS.
+3. Set your Apple Development Team in the Xcode project before signing.
+4. Configure passkey association files (`assetlinks.json`, `apple-app-site-association`) with your package / team IDs and certificate fingerprints.
+5. If wiring push: add your own Firebase config files, and **never commit a service-account JSON**.
 
 ---
 
 ## Contributing
 
-Issues and pull requests welcome. For larger Discourse-native features, please open an issue first so we can discuss whether the SDK interface needs an extension (`DiscourseFooProxy` method) versus a lossy XF mapping.
+Issues and pull requests are welcome. For a larger Discourse-native feature, please open an issue first so we can agree on whether the SDK interface should be extended rather than lossily mapped — see *Extending it* above.
 
-When working with Claude Code or another AI coding tool, `CLAUDE.md` documents the codebase conventions and phase plan — point your agent at it first.
+Working with Claude Code or another AI coding tool? Point it at `CLAUDE.md` first; it documents the conventions and the current state of each layer.
+
+---
+
+## Need it built for you?
+
+Custom branding, new screens, a plugin integration, or a full App Store / Play Store release under your community's name — we take on that work.
+
+**[forumcopilot@gmail.com](mailto:forumcopilot@gmail.com)** · [forumcopilot.com](https://forumcopilot.com)
 
 ---
 
 ## License
 
-This project is licensed under the MIT License — see [LICENSE](LICENSE) for the full text.
+MIT — see [LICENSE](LICENSE).

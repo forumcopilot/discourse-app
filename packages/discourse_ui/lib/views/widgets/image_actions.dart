@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:discourse_ui/views/widgets/full_screen_image_viewer.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/post_controller.dart';
-import 'package:discourse_ui/utils/bbcode_processor.dart';
+import 'package:discourse_ui/utils/cooked_content.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 
@@ -55,9 +55,7 @@ class ImageActions {
   void handleShowImage(String imageUrl, BuildContext context, String heroTag, String postId) {
     AppLogger.debug('Handling show image: $imageUrl');
 
-    // Extract all images from the specified post only
-    // Handle [IMG] tags with or without attributes: [IMG]...[/IMG] or [IMG size="1280x720"]...[/IMG]
-    final RegExp imgRegex = RegExp(r'\[IMG(?:[^\]]*)?\](.*?)\[/IMG\]', caseSensitive: false, multiLine: true);
+    // Extract all images from the specified post only.
     final List<String> allImageUrls = [];
     final List<String> allHeroTags = [];
     int tappedIndex = 0;
@@ -84,18 +82,26 @@ class ImageActions {
         return;
       }
       AppLogger.debug('\nCollecting all images from post $postId:');
-      // 1. [IMG] tags
-      final matches = imgRegex.allMatches(post.content);
-      for (var match in matches) {
-        final url = match.group(1)!.trim();
+      // 1. Images embedded in the post body.
+      //
+      // Discourse serves cooked HTML, so the images live in <img> tags —
+      // lightboxed uploads additionally wrap the full-size original in an
+      // `a.lightbox` href, which CookedContent prefers over the resized
+      // <img src>. This used to scan for `[IMG]` BBCode tags, which never
+      // appear in cooked HTML: inline images were silently absent from the
+      // gallery, so tapping one opened the wrong image (or reported "no
+      // images found" on a post with no attachments).
+      final clickedAbsoluteUrl = _makeAbsoluteUrl(imageUrl);
+      final bodyImages = CookedContent.parse(
+        post.content,
+        forumBaseUrl: siteContext?.site.url ?? '',
+      ).imageUrls;
+      for (var url in bodyImages) {
         // Convert relative URLs to absolute URLs for consistent comparison
         final absoluteUrl = _makeAbsoluteUrl(url);
         allImageUrls.add(absoluteUrl);
         allHeroTags.add('${post.id}_image_$currentIndex');
-        AppLogger.debug('  - IMG tag: $url -> $absoluteUrl');
-        // Compare both the original URL and absolute URL with the clicked imageUrl
-        // Also convert imageUrl to absolute if needed for comparison
-        final clickedAbsoluteUrl = _makeAbsoluteUrl(imageUrl);
+        AppLogger.debug('  - Body image: $url -> $absoluteUrl');
         if (url == imageUrl || absoluteUrl == imageUrl || url == clickedAbsoluteUrl || absoluteUrl == clickedAbsoluteUrl) {
           tappedIndex = currentIndex;
         }
@@ -117,13 +123,12 @@ class ImageActions {
           currentIndex++;
         }
       }
-      // 3. Inlineattachments (isImage or contentType starts with 'image/'), but filter out those referenced in [url] or [img] tags
-      final inlineAttachmentResult = BBCodeProcessor.replaceInlineAttachmentUrlsAndFilter(
-        post.content,
-        post.inlineAttachments,
-      );
-      final filteredInlineAttachments = inlineAttachmentResult.remainingInlineAttachments;
-      for (var att in filteredInlineAttachments) {
+      // 3. Inline attachments (isImage or contentType starts with 'image/').
+      // Discourse has no separate inline-attachment concept — uploads are
+      // embedded directly in the cooked HTML and are already collected in
+      // step 1 — so this list is empty on Discourse forums and the loop is
+      // a no-op. Kept so the gallery still works if the SDK ever populates it.
+      for (var att in post.inlineAttachments) {
         final isImage = att.isImage || (att.contentType?.startsWith('image/') ?? false);
         final hasUrl = att.url.isNotEmpty || (att.thumbnailUrl?.isNotEmpty ?? false);
         if (isImage && hasUrl) {

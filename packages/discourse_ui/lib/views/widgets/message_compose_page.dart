@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/discourse_markup.dart';
 import 'package:flutter/foundation.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -200,134 +201,16 @@ class _MessageComposePageState extends State<MessageComposePage> {
   /// Inserts the markup for a formatting-toolbar action at the cursor
   /// (wrapping the selection when there is one).
   ///
-  /// Previously emitted XenForo BBCode (`[B]`, `[LIST]`, …), which
-  /// Discourse renders as literal text. Now emits what the server
-  /// actually cooks: Markdown where it exists, plus the BBCode subset
-  /// Discourse's markdown-it parses natively (`[u]` — see
-  /// bbcode-inline.js — `[quote]`, and `[spoiler]` from the bundled
-  /// spoiler-alert plugin). The method keeps its historical name since
-  /// the toolbar wiring refers to it.
-  void _insertBBCode(String tag) {
+  /// The mapping lives in [DiscourseMarkup] so this composer and the
+  /// new-conversation composer stay in step — see that class for why a
+  /// few actions emit BBCode rather than Markdown.
+  void _insertMarkup(String tag) {
     // Ensure the content field has focus before modifying
     if (!_contentFocusNode.hasFocus) {
       _contentFocusNode.requestFocus();
     }
-
-    final TextEditingValue value = _contentController.value;
-    final int start = value.selection.start;
-    final int end = value.selection.end;
-    final String selectedText =
-        (start >= 0 && end > start) ? value.text.substring(start, end) : '';
-
-    // Lists: Markdown has per-line markers, not wrapping tags — turn each
-    // selected line into an item, or insert a starter item on its own line.
-    if (tag == 'LIST' || tag == 'LIST=1' || tag == '*') {
-      final bool numbered = tag == 'LIST=1';
-      final int insertAt = start < 0 ? value.text.length : start;
-      String replacement;
-      if (selectedText.isNotEmpty) {
-        final buffer = StringBuffer();
-        var itemNo = 1;
-        for (final line in selectedText.split('\n')) {
-          if (line.trim().isEmpty) continue;
-          buffer.writeln(numbered ? '${itemNo++}. ${line.trim()}' : '- ${line.trim()}');
-        }
-        replacement = buffer.toString();
-      } else {
-        replacement = numbered ? '1. ' : '- ';
-      }
-      // List items must start at the beginning of a line.
-      if (insertAt > 0 && value.text[insertAt - 1] != '\n') {
-        replacement = '\n$replacement';
-      }
-      final newText = value.text.replaceRange(insertAt, start < 0 ? insertAt : end, replacement);
-      _contentController.value = TextEditingValue(
-        text: newText,
-        selection: TextSelection.collapsed(offset: insertAt + replacement.length),
-      );
-      _contentFocusNode.requestFocus();
-      return;
-    }
-
-    String prefix;
-    String suffix;
-    switch (tag) {
-      case 'B':
-        prefix = '**';
-        suffix = '**';
-      case 'I':
-        prefix = '*';
-        suffix = '*';
-      case 'U':
-        // Markdown has no underline; Discourse renders [u] natively.
-        prefix = '[u]';
-        suffix = '[/u]';
-      case 'S':
-        prefix = '~~';
-        suffix = '~~';
-      case 'URL':
-        prefix = '[';
-        suffix = '](url)';
-      case 'IMG':
-        prefix = '![](';
-        suffix = ')';
-      case 'VIDEO':
-        // Discourse has no [video] markup — a media URL on its own
-        // line oneboxes into a player.
-        prefix = '\n';
-        suffix = '\n';
-      case 'QUOTE':
-        prefix = '[quote]\n';
-        suffix = '\n[/quote]';
-      case 'CODE':
-        if (selectedText.contains('\n')) {
-          prefix = '```\n';
-          suffix = '\n```';
-        } else {
-          prefix = '`';
-          suffix = '`';
-        }
-      case 'SPOILER':
-        // spoiler-alert ships as a bundled Discourse plugin.
-        prefix = '[spoiler]';
-        suffix = '[/spoiler]';
-      default:
-        return;
-    }
-
-    // If start is -1, it means there's no valid cursor position
-    if (start < 0) {
-      // Append to the end if no cursor position
-      final newText = '${value.text}$prefix$suffix';
-      _contentController.value = TextEditingValue(
-        text: newText,
-        selection: TextSelection.collapsed(offset: newText.length - suffix.length),
-      );
-      return;
-    }
-
-    String newText;
-    int cursorPosition;
-
-    if (start == end) {
-      // No text selected, just insert the empty markers at cursor position
-      newText = value.text.replaceRange(start, start, '$prefix$suffix');
-      cursorPosition = start + prefix.length; // Position cursor between markers
-    } else {
-      // Text is selected, wrap it with the markers
-      newText = value.text.replaceRange(start, end, '$prefix$selectedText$suffix');
-      // Position cursor at the end of the inserted structure
-      cursorPosition = start + prefix.length + selectedText.length + suffix.length;
-    }
-
-    // Ensure cursor position is within bounds
-    cursorPosition = cursorPosition.clamp(0, newText.length);
-
-    _contentController.value = TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: cursorPosition),
-    );
-
+    _contentController.value =
+        DiscourseMarkup.apply(_contentController.value, tag);
     // Ensure the field maintains focus after insertion
     _contentFocusNode.requestFocus();
   }
@@ -384,7 +267,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
   /// branches on `full` vs `thumb` — Discourse Markdown doesn't have
   /// that distinction; the rendered size is governed by the post's
   /// site/category settings.
-  void _insertAttachmentBBCode(String attachmentRef, String insertType) {
+  void _insertAttachmentRef(String attachmentRef, String insertType) {
     // Ensure content field has focus
     if (!_contentFocusNode.hasFocus) {
       _contentFocusNode.requestFocus();
@@ -401,9 +284,8 @@ class _MessageComposePageState extends State<MessageComposePage> {
       '.png', '.jpg', '.jpeg', '.gif', '.webp', '.heic', '.bmp', '.svg',
     ];
     final isImage = imageExts.any(lower.endsWith);
-    final String markdown = isImage
-        ? '![image]($attachmentRef)'
-        : '[file|attachment]($attachmentRef)';
+    final String markdown =
+        DiscourseMarkup.attachmentRef(attachmentRef, isImage: isImage);
 
     String newText;
     int cursorPosition;
@@ -1043,7 +925,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                       if (attachmentId != null && _isInsertableImage(attachment.name)) {
                                         final result = await _showInsertImageDialog();
                                         if (result != null) {
-                                          _insertAttachmentBBCode(attachmentId, result);
+                                          _insertAttachmentRef(attachmentId, result);
                                         }
                                       }
                                     },
@@ -1192,7 +1074,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
             if (_isInsertableImage(attachment.filename)) {
               final result = await _showInsertImageDialog();
               if (result != null) {
-                _insertAttachmentBBCode(attachment.id, result);
+                _insertAttachmentRef(attachment.id, result);
               }
             }
           },
@@ -1527,7 +1409,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     onPressed: _handleImageUpload,
                   ),
                 ),
-              // BBCode button
+              // Formatting button
               Semantics(
                 label: AppLocalizations.of(context)?.formatting ?? 'Formatting',
                 hint: 'Open formatting options',
@@ -1537,7 +1419,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   enabled: _isContentFieldFocused,
                   icon: Icon(Icons.format_bold, color: _isContentFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
                   tooltip: AppLocalizations.of(context)?.formatting ?? 'Formatting',
-                  onSelected: _insertBBCode,
+                  onSelected: _insertMarkup,
                 itemBuilder: (context) => [
                   // Text formatting
                   PopupMenuItem(

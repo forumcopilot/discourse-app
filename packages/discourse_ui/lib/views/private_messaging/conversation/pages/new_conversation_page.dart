@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../utils/discourse_markup.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -1051,52 +1052,19 @@ class _NewConversationPageState extends State<NewConversationPage> {
     }
   }
 
-  void _insertBBCode(String tag) {
+  /// Inserts the markup for a formatting-toolbar action at the cursor.
+  ///
+  /// This used to emit raw `[TAG]…[/TAG]` XenForo BBCode. Discourse only
+  /// parses a subset of BBCode, so `[LIST]`, `[*]`, `[VIDEO]`, `[LEFT]`
+  /// and `[CENTER]` were being posted into PMs as literal bracketed text.
+  /// Shares the mapping with the main composer via [DiscourseMarkup].
+  void _insertMarkup(String tag) {
     // Ensure the message field has focus before modifying
     if (!_messageFocusNode.hasFocus) {
       _messageFocusNode.requestFocus();
     }
-
-    final TextEditingValue value = _messageController.value;
-    final int start = value.selection.start;
-    final int end = value.selection.end;
-
-    // If start is -1, it means there's no valid cursor position
-    if (start < 0) {
-      // Append to the end if no cursor position
-      final newText = '${value.text}[$tag][/$tag]';
-      _messageController.value = TextEditingValue(
-        text: newText,
-        selection: TextSelection.collapsed(offset: newText.length - (tag.length + 3)),
-      );
-      return;
-    }
-
-    String newText;
-    int cursorPosition;
-
-    if (start == end) {
-      // No text selected, just insert empty tags at cursor position
-      newText = value.text.replaceRange(start, start, '[$tag][/$tag]');
-      cursorPosition = start + tag.length + 2; // Position cursor between tags
-    } else {
-      // Text is selected, wrap it with tags
-      final String selectedText = value.text.substring(start, end);
-      newText = value.text.replaceRange(start, end, '[$tag]$selectedText[/$tag]');
-      // Position cursor at the end of the inserted tag structure
-      // start + opening tag length + selected text length + closing tag length
-      cursorPosition = start + tag.length + 2 + selectedText.length + tag.length + 3;
-    }
-
-    // Ensure cursor position is within bounds
-    cursorPosition = cursorPosition.clamp(0, newText.length);
-
-    _messageController.value = TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: cursorPosition),
-    );
-
-    // Ensure the field maintains focus after insertion
+    _messageController.value =
+        DiscourseMarkup.apply(_messageController.value, tag);
     _messageFocusNode.requestFocus();
   }
 
@@ -1170,12 +1138,12 @@ class _NewConversationPageState extends State<NewConversationPage> {
                   tooltip: 'Upload Image',
                   onPressed: _handleImageAttachment,
                 ),
-              // BBCode button
+              // Formatting button
               PopupMenuButton<String>(
                 enabled: _isMessageFieldFocused,
                 icon: Icon(Icons.format_bold, color: _isMessageFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
                 tooltip: 'Formatting',
-                onSelected: _insertBBCode,
+                onSelected: _insertMarkup,
                 itemBuilder: (context) => [
                   // Text formatting
                   PopupMenuItem(
@@ -1315,37 +1283,9 @@ class _NewConversationPageState extends State<NewConversationPage> {
                     ),
                   ),
                   const PopupMenuDivider(),
-                  // Alignment
-                  PopupMenuItem(
-                    value: 'LEFT',
-                    child: Row(
-                      children: [
-                        Icon(Icons.format_align_left, size: 20, color: colorScheme.onSurface),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.alignLeft ?? 'Align Left', style: textTheme.bodyMedium),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'CENTER',
-                    child: Row(
-                      children: [
-                        Icon(Icons.format_align_center, size: 20, color: colorScheme.onSurface),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.alignCenter ?? 'Align Center', style: textTheme.bodyMedium),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'RIGHT',
-                    child: Row(
-                      children: [
-                        Icon(Icons.format_align_right, size: 20, color: colorScheme.onSurface),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.alignRight ?? 'Align Right', style: textTheme.bodyMedium),
-                      ],
-                    ),
-                  ),
+                  // Alignment actions removed: Discourse has no
+                  // [left]/[center]/[right] markup, so these posted
+                  // literal bracketed text into the message.
                 ],
               ),
               // Mention button
