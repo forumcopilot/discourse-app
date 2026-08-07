@@ -7,7 +7,19 @@ import '../network/fc_call_result.dart';
 
 /// Centralized service for all ForumCopilot API calls
 class ForumCopilotApiService {
-  static const String _baseUrl = 'https://forumcopilot.com/api';
+  /// Production by default. Override for local development without editing this
+  /// file, so the pointer cannot be committed or shipped by accident:
+  ///
+  ///   flutter run --dart-define=FC_API_BASE_URL=http://localhost:8082/api
+  ///   flutter build apk --debug --dart-define=FC_API_BASE_URL=http://localhost:8082/api
+  ///
+  /// Reaching a host-machine backend from a device needs `adb reverse tcp:8082 tcp:8082`
+  /// (emulators can use http://10.0.2.2:8082/api instead). Cleartext HTTP to loopback is
+  /// permitted in debug builds only — see android/app/src/debug/res/xml/network_security_config.xml.
+  static const String _baseUrl = String.fromEnvironment(
+    'FC_API_BASE_URL',
+    defaultValue: 'https://forumcopilot.com/api',
+  );
 
   /// Fetches updated site information from the server by IDs
   static Future<List<Site>> getSitesByIds(List<int> ids) async {
