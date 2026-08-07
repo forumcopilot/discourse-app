@@ -10,6 +10,7 @@ import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import '../../theme/design_tokens.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/not_signed_in_view.dart';
+import '../widgets/user_list_row.dart';
 import '../widgets/resettable_widget.dart';
 import '../widgets/user_avatar.dart';
 import 'chat_channel_view.dart';
@@ -598,19 +599,17 @@ class _NewDmSheetState extends State<_NewDmSheet> {
           ),
           if (_suggestions.isNotEmpty) ...[
             const SizedBox(height: DesignTokens.spacingXS),
-            for (final u in _suggestions.take(5))
-              ListTile(
-                dense: true,
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: DesignTokens.spacingS),
-                leading: UserAvatar(
+              // Same row the user directory and the message recipient picker
+              // use, so a person looks identical wherever you pick them.
+              for (final u in _suggestions.take(5))
+                UserListRow(
                   username: u.username,
-                  iconUrl: u.iconUrl,
-                  radius: 14,
+                  subtitle: u.displayText,
+                  avatarUrl: u.iconUrl,
+                  leadingIcon:
+                      u.userType == 'group' ? Icons.groups_rounded : null,
+                  onTap: () => _pick(u),
                 ),
-                title: Text(u.username),
-                onTap: () => _pick(u),
-              ),
           ],
           if (_error != null) ...[
             const SizedBox(height: DesignTokens.spacingS),
