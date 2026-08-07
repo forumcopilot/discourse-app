@@ -1200,13 +1200,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                     CheckboxListTile(
                       title: Text(
-                        AppLocalizations.of(context)?.deleteConversations ?? 'Delete Conversations',
+                        AppLocalizations.of(context)?.deleteConversations ?? 'Delete Messages',
                         style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurface,
                         ),
                       ),
                       subtitle: Text(
-                        AppLocalizations.of(context)?.deletePrivateConversations ?? 'Delete private conversations',
+                        AppLocalizations.of(context)?.deletePrivateConversations ?? 'Delete personal messages',
                         style: textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -1447,7 +1447,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               actionsPerformed.add(l10n?.deletedMessages ?? 'Deleted messages');
             }
             if (spamCleanResult.actions!['delete_conversations'] == true) {
-              actionsPerformed.add(l10n?.deletedConversations ?? 'Deleted conversations');
+              actionsPerformed.add(l10n?.deletedConversations ?? 'Deleted messages');
             }
             if (spamCleanResult.actions!['ban_user'] == true) {
               actionsPerformed.add(l10n?.bannedUser ?? 'Banned user');

@@ -83,7 +83,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(errorMessage ?? AppLocalizations.of(context)?.failedToSaveConversation ?? 'Failed to save conversation'),
+              content: Text(errorMessage ?? AppLocalizations.of(context)?.failedToSaveConversation ?? 'Failed to save message'),
               backgroundColor: Theme.of(context).colorScheme.error,
               behavior: SnackBarBehavior.floating,
             ),
@@ -95,7 +95,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)?.conversationUpdatedSuccessfully ?? 'Conversation updated successfully'),
+            content: Text(AppLocalizations.of(context)?.conversationUpdatedSuccessfully ?? 'Message updated successfully'),
             backgroundColor: Theme.of(context).colorScheme.primary,
             behavior: SnackBarBehavior.floating,
           ),
@@ -183,7 +183,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                     ),
                     SizedBox(height: DesignTokens.spacingM),
                     Text(
-                      'Failed to load conversation',
+                      'Failed to load message',
                       style: textTheme.titleMedium?.copyWith(
                         color: colorScheme.error,
                       ),
@@ -286,7 +286,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                 TextField(
                   controller: _titleController,
                   decoration: InputDecoration(
-                    hintText: AppLocalizations.of(context)?.enterConversationTitle ?? 'Enter conversation title',
+                    hintText: AppLocalizations.of(context)?.enterConversationTitle ?? 'Enter message title',
                     hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                     filled: true,
                     fillColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),

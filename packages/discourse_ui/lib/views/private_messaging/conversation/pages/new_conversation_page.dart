@@ -341,7 +341,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'New Conversation',
+          'New Message',
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
             fontWeight: DesignTokens.fontWeightSemiBold,
@@ -382,7 +382,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                       if (success && mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(AppLocalizations.of(context)?.conversationCreatedSuccessfully ?? 'Conversation created successfully'),
+                            content: Text(AppLocalizations.of(context)?.conversationCreatedSuccessfully ?? 'Message created successfully'),
                             backgroundColor: colorScheme.primary,
                             behavior: SnackBarBehavior.floating,
                           ),

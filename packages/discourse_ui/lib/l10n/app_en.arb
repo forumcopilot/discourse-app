@@ -4,7 +4,6 @@
   "@appTitle": {
     "description": "The application title"
   },
-  
   "loginTitle": "Login",
   "usernameLabel": "Username",
   "passwordLabel": "Password",
@@ -24,7 +23,6 @@
       }
     }
   },
-  
   "createAccount": "Create Account",
   "alreadyHaveAccount": "Already have an account? ",
   "logIn": "Log In",
@@ -61,7 +59,6 @@
   "welcome": "Welcome!",
   "registrationSuccessful": "Registration Successful",
   "pleaseLoginWithNewAccount": "Please log in with your new account.",
-  
   "forgotPasswordTitle": "Forgot Password",
   "usernameOrEmailLabel": "Username or Email",
   "pleaseEnterUsernameOrEmail": "Please enter your username or email",
@@ -71,7 +68,6 @@
   "resetFailed": "Reset Failed",
   "unableToSendResetLink": "Unable to send reset link. Please try again.",
   "errorSendingResetLink": "An error occurred while sending the reset link. Please check your connection and try again.",
-  
   "errorTitle": "Error",
   "okButton": "OK",
   "retryButton": "Retry",
@@ -90,7 +86,6 @@
   "pleaseLoginToContinue": "Please log in to continue.",
   "forumError": "Forum Error",
   "anErrorOccurred": "An error occurred",
-  
   "accountPendingApproval": "Your account is pending approval. You can browse the forum but cannot post until a moderator approves your account.",
   "checkEmailToConfirm": "Please check your email to confirm your account. Click the confirmation link in the email we sent you.",
   "checkNewEmailToConfirm": "Please check your new email address to confirm the change. Your old email will remain active until you confirm the new one.",
@@ -102,33 +97,27 @@
   "accountStatusRequiresAttention": "Your account status requires attention. Please contact an administrator if you have questions.",
   "updateEmail": "Update Email",
   "resend": "Resend",
-  
   "noLatestTopics": "No Latest Topics",
   "noRecentTopicsToDisplay": "There are no recent topics to display. Check back later for new discussions.",
   "signInToViewLatestTopics": "Sign in to view latest topics",
-  "youNeedToBeSignedInToViewLatestTopics": "You need to be signed in to view latest topics",
-  
+  "youNeedToBeSignedInToViewLatestTopics": "You need to be signed in to view latest topics.",
   "noUnreadTopics": "No Unread Topics",
   "thereAreNoUnreadTopics": "There are no unread topics. Check back later for new discussions.",
   "youAreAllCaughtUp": "You're all caught up!",
   "signInToViewUnreadTopics": "Sign in to view unread topics",
-  "youNeedToBeSignedInToViewUnreadTopics": "You need to be signed in to view your unread topics",
-  
+  "youNeedToBeSignedInToViewUnreadTopics": "You need to be signed in to view your unread topics.",
   "noSubscribedTopics": "No watched topics",
   "noSubscribedTopicsMessage": "You aren't watching or tracking any topics. Open the bell menu on a topic to change its notification level.",
-  "signInToViewSubscribedTopics": "Sign in to view watched topics",
-  "youNeedToBeSignedInToViewSubscribedTopics": "You need to be signed in to view your watched topics",
-
+  "signInToViewSubscribedTopics": "Sign in to view subscribed topics",
+  "youNeedToBeSignedInToViewSubscribedTopics": "You need to be signed in to view your subscribed topics.",
   "noParticipatedTopics": "No participated topics",
   "topicsYouParticipatedIn": "Topics that you have participated in will be shown here.",
   "signInToViewParticipatedTopics": "Sign in to view participated topics",
-  "youNeedToBeSignedInToViewParticipatedTopics": "You need to be signed in to view topics you have participated in",
-
+  "youNeedToBeSignedInToViewParticipatedTopics": "You need to be signed in to view topics you have participated in.",
   "latest": "Latest",
   "unread": "Unread",
   "subscribed": "Watched",
   "participated": "Participated",
-  
   "connectionTimedOut": "Connection timed out. The site may be down or unreachable.",
   "failedToConnectToSite": "Failed to connect to site. The site may be down or unreachable.",
   "connectionFailed": "Connection Failed",
@@ -142,19 +131,16 @@
     }
   },
   "loading": "Loading...",
-  "newConversation": "New Conversation",
+  "newConversation": "New Message",
   "newMessage": "New Message",
-  
   "appSettings": "App Settings",
   "searchSites": "Search Sites",
   "language": "Language",
   "systemDefault": "System Default",
   "followSystemLanguage": "Follow system language",
-  
   "all": "All",
   "topicsOnly": "Topics Only",
   "titlesOnly": "Titles Only",
-  
   "failedToShareTopic": "Failed to share topic: {error}",
   "@failedToShareTopic": {
     "description": "Error message when sharing topic fails",
@@ -174,10 +160,8 @@
   "@failedToSubscribeToThread": {
     "description": "Error message when changing notification level fails"
   },
-  
   "youCannotReplyToThisThread": "You cannot reply to this topic",
   "pleaseWaitForThreadToLoad": "Please wait for the topic to load",
-  
   "softDelete": "Soft Delete",
   "postCanBeRestoredLater": "Post can be restored later",
   "hardDelete": "Hard Delete",
@@ -185,22 +169,19 @@
   "reasonForDeletion": "Reason for deletion",
   "enterReasonForDeletingPost": "Enter the reason for deleting this post",
   "pleaseEnterReasonForDeletion": "Please enter a reason for deletion",
-  
   "reportPost": "Report Post",
   "pleaseProvideReasonForReporting": "Please provide a reason for reporting this post.",
   "reason": "Reason",
   "enterReasonForReportingPost": "Enter the reason for reporting this post",
   "pleaseEnterReason": "Please enter a reason",
   "submitReport": "Submit Report",
-  
   "selectedActions": "Selected actions:",
   "thisActionCannotBeUndone": "This action cannot be undone.",
-  
   "participantsLabel": "Participants",
   "@participantsLabel": {
     "description": "Label for participants (without count)"
   },
-  "usernameHasBeenInvited": "{username} has been invited to the conversation",
+  "usernameHasBeenInvited": "{username} has been invited to the message",
   "@usernameHasBeenInvited": {
     "description": "Message when user is invited to conversation",
     "placeholders": {
@@ -220,7 +201,6 @@
   },
   "newTopic": "New Topic",
   "markRead": "Mark Read",
-  
   "reportUser": "Report User",
   "pleaseSelectReasonForReportingUser": "Please select a reason for reporting this user.",
   "spamOrAdvertising": "Spam or advertising",
@@ -231,8 +211,6 @@
   "pleaseSpecifyReason": "Please specify the reason",
   "enterReasonForReportingUser": "Enter the reason for reporting this user",
   "pleaseSelectReason": "Please select a reason",
-  "submitReport": "Submit Report",
-  
   "banUser": "Ban User",
   "unbanUser": "Unban User",
   "pleaseSelectReasonForBanningUser": "Please select a reason for banning {username}",
@@ -251,17 +229,13 @@
   "enterReasonForBanningUser": "Enter the reason for banning this user",
   "banUntil": "Ban until",
   "selectDate": "Select date",
-  "unbanUser": "Unban User",
-  
   "moreOptions": "More options",
-  "leaveConversation": "Leave conversation",
-  "reportConversation": "Report conversation",
-  
+  "leaveConversation": "Leave message",
+  "reportConversation": "Report message",
   "topicClosed": "Topic closed",
   "topicOpened": "Topic opened",
   "topicStickied": "Topic stickied",
   "topicUnstickied": "Topic unstickied",
-  
   "cannotEditMessage": "Cannot edit this message: {error}",
   "@cannotEditMessage": {
     "description": "Error message when cannot edit message",
@@ -274,16 +248,13 @@
   "confirmSpamClean": "Confirm Spam Clean",
   "handleThreads": "Handle topics",
   "deleteMessages": "Delete Messages",
-  "deleteConversations": "Delete Conversations",
-  
+  "deleteConversations": "Delete Messages",
   "myForums": "My Forums",
   "recentlyVisited": "Recently Visited",
   "explore": "Explore",
   "forumCopilot": "Forum Copilot",
-  
-  "noConversations": "No conversations",
-  "noConversationsMessage": "You have no conversations yet. Start a new conversation to begin messaging.",
-  
+  "noConversations": "No messages",
+  "noConversationsMessage": "You have no messages yet. Start a new message to begin.",
   "imageSavedToGallery": "Image saved to gallery!",
   "failedToSaveImage": "Failed to save image: {error}",
   "@failedToSaveImage": {
@@ -294,13 +265,10 @@
       }
     }
   },
-  
   "userProfile": "User Profile",
   "deletePost": "Delete Post",
   "loginRequired": "Login Required",
-  
   "spamCleaner": "Spam Cleaner",
-  "tryAgain": "Try Again",
   "sendMessage": "Send Message",
   "memberSince": "Member Since",
   "lastActivity": "Last Activity",
@@ -308,9 +276,8 @@
   "likesGiven": "Likes Given",
   "showMore": "Show More",
   "cleanSpam": "Clean Spam",
-  
   "failedToSaveMessage": "Failed to save message",
-  "failedToSaveConversation": "Failed to save conversation",
+  "failedToSaveConversation": "Failed to save message",
   "failedToSaveSetting": "Failed to save setting",
   "failedToSavePost": "Failed to save post",
   "errorLoadingSites": "Error loading sites: {error}",
@@ -322,7 +289,6 @@
       }
     }
   },
-  
   "connectingTo": "Connecting to {domainName}...",
   "@connectingTo": {
     "description": "Message shown when connecting to a site",
@@ -332,7 +298,6 @@
       }
     }
   },
-  
   "members": "Members",
   "allMembers": "All Members",
   "online": "Online",
@@ -366,9 +331,7 @@
     }
   },
   "noSubject": "No subject",
-  
   "search": "Search",
-  "moreOptions": "More options",
   "logout": "Logout",
   "areYouSureYouWantToLogout": "Are you sure you want to logout?",
   "register": "Register",
@@ -379,7 +342,6 @@
   "profile": "Profile",
   "messages": "Messages",
   "add": "Add",
-  "dismiss": "Dismiss",
   "retry": "Retry",
   "delete": "Delete",
   "deleteMessage": "Delete Message",
@@ -422,8 +384,8 @@
     }
   },
   "signInToViewMessages": "Sign in to view messages",
-  "youNeedToBeSignedInToViewConversations": "You need to be signed in to view your conversations.",
-  "errorLoadingConversations": "Error loading conversations: {error}",
+  "youNeedToBeSignedInToViewConversations": "You need to be signed in to view your messages.",
+  "errorLoadingConversations": "Error loading messages: {error}",
   "@errorLoadingConversations": {
     "description": "Error message when loading conversations fails",
     "placeholders": {
@@ -432,7 +394,7 @@
       }
     }
   },
-  "failedToLeaveConversation": "Failed to leave conversation: {error}",
+  "failedToLeaveConversation": "Failed to leave message: {error}",
   "@failedToLeaveConversation": {
     "description": "Error message when leaving conversation fails",
     "placeholders": {
@@ -441,7 +403,7 @@
       }
     }
   },
-  "errorLoadingMoreConversations": "Error loading more conversations: {error}",
+  "errorLoadingMoreConversations": "Error loading more messages: {error}",
   "errorLoadingMoreMessages": "Error loading more messages: {error}",
   "@errorLoadingMoreMessages": {
     "description": "Error message when loading more messages fails",
@@ -460,10 +422,9 @@
     }
   },
   "inviteMessageOptional": "Invite Message (optional)",
-  "iWouldLikeToAddYouToThisConversation": "I would like to add you to this conversation.",
+  "iWouldLikeToAddYouToThisConversation": "I would like to add you to this message.",
   "searchFailed": "Search failed",
   "trySearchingWithDifferentUsername": "Try searching with a different username",
-  "enterUsernameToSearch": "Enter username to search...",
   "noSitesFound": "No sites found.",
   "userInformationNotAvailable": "User information not available",
   "birthday": "Birthday",
@@ -499,10 +460,7 @@
     }
   },
   "selectActionsToPerform": "Select the actions to perform:",
-  "handleThreads": "Handle topics",
   "moveOrDeleteThreadsBasedOnAdminSettings": "Move or delete topics based on admin settings",
-  "deleteMessages": "Delete Messages",
-  "deleteConversations": "Delete Conversations",
   "messageUpdatedSuccessfully": "Message updated successfully",
   "error": "Error: {error}",
   "@error": {
@@ -535,8 +493,8 @@
   "removeAttachment": "Remove Attachment",
   "areYouSureYouWantToRemoveThisAttachment": "Are you sure you want to remove this attachment?",
   "none": "None",
-  "attachFile": "Attach File",
-  "uploadImage": "Upload Image",
+  "attachFile": "Attach file",
+  "uploadImage": "Upload image",
   "formatting": "Formatting",
   "bold": "Bold",
   "italic": "Italic",
@@ -570,22 +528,6 @@
   "enterKeywordsToSearchTopics": "Enter keywords to search topics...",
   "pleaseFillInAllRequiredFields": "Please fill in all required fields",
   "undelete": "Undelete",
-  
-  "signInToViewUnreadTopics": "Sign in to view unread topics",
-  "youNeedToBeSignedInToViewUnreadTopics": "You need to be signed in to view your unread topics.",
-  "signInToViewSubscribedTopics": "Sign in to view subscribed topics",
-  "youNeedToBeSignedInToViewSubscribedTopics": "You need to be signed in to view your subscribed topics.",
-  "signInToViewParticipatedTopics": "Sign in to view participated topics",
-  "youNeedToBeSignedInToViewParticipatedTopics": "You need to be signed in to view topics you have participated in.",
-  "signInToViewLatestTopics": "Sign in to view latest topics",
-  "youNeedToBeSignedInToViewLatestTopics": "You need to be signed in to view latest topics.",
-  "markAsUnread": "Mark as unread",
-  "invite": "Invite",
-  "welcomeBack": "Welcome Back",
-  "signInToAccessYourProfile": "Sign in to access your profile and manage your account",
-  "enterYourUsername": "Enter your username",
-  "enterYourPassword": "Enter your password",
-  "dontHaveAnAccount": "Don't have an account?",
   "refresh": "Refresh",
   "@refresh": {
     "description": "Menu item to refresh content"
@@ -677,15 +619,12 @@
   "@enterKeywordsOrDomainNamesToFindForums": {
     "description": "Description text for searching forums"
   },
-  "language": "Language",
   "@language": {
     "description": "Settings section title for language selection"
   },
-  "systemDefault": "System Default",
   "@systemDefault": {
     "description": "Option to use system default settings"
   },
-  "followSystemLanguage": "Follow system language",
   "@followSystemLanguage": {
     "description": "Description for system default language option"
   },
@@ -729,7 +668,6 @@
   "@settingsCategoriesWillAppearHere": {
     "description": "Message explaining when settings categories will appear"
   },
-  "spamCleaner": "Spam Cleaner",
   "@spamCleaner": {
     "description": "Menu item for spam cleaner tool"
   },
@@ -741,19 +679,15 @@
   "@banned": {
     "description": "Badge text for banned users"
   },
-  "sendMessage": "Send Message",
   "@sendMessage": {
     "description": "Button to send a message to a user"
   },
-  "showMore": "Show More",
   "@showMore": {
     "description": "Button to show more content"
   },
-  "reportUser": "Report User",
   "@reportUser": {
     "description": "Title for report user dialog"
   },
-  "submitReport": "Submit Report",
   "@submitReport": {
     "description": "Button to submit a report"
   },
@@ -777,7 +711,6 @@
   "@deleteTopic": {
     "description": "Title for delete topic dialog"
   },
-  "softDelete": "Soft Delete",
   "@softDelete": {
     "description": "Option for soft delete (can be restored)"
   },
@@ -785,7 +718,6 @@
   "@topicCanBeRestoredLater": {
     "description": "Description for soft delete option"
   },
-  "hardDelete": "Hard Delete",
   "@hardDelete": {
     "description": "Option for hard delete (permanent)"
   },
@@ -793,7 +725,6 @@
   "@topicWillBePermanentlyDeleted": {
     "description": "Description for hard delete option"
   },
-  "reasonForDeletion": "Reason for deletion",
   "@reasonForDeletion": {
     "description": "Label for deletion reason field"
   },
@@ -801,7 +732,6 @@
   "@enterReasonForDeletingTopic": {
     "description": "Hint text for deletion reason field"
   },
-  "pleaseEnterReasonForDeletion": "Please enter a reason for deletion",
   "@pleaseEnterReasonForDeletion": {
     "description": "Validation message for deletion reason"
   },
@@ -809,7 +739,6 @@
   "@pleaseSelectEndDate": {
     "description": "Error message when end date is not selected"
   },
-  "banUser": "Ban User",
   "@banUser": {
     "description": "Button to ban a user"
   },
@@ -833,7 +762,7 @@
   "@spamCleanUser": {
     "description": "Title for spam clean user dialog"
   },
-  "deletePrivateConversations": "Delete private conversations",
+  "deletePrivateConversations": "Delete personal messages",
   "@deletePrivateConversations": {
     "description": "Option to delete private conversations in spam clean"
   },
@@ -841,7 +770,6 @@
   "@banTheUserAccount": {
     "description": "Option to ban user account in spam clean"
   },
-  "cleanSpam": "Clean Spam",
   "@cleanSpam": {
     "description": "Button to execute spam clean"
   },
@@ -853,7 +781,7 @@
   "@deletedMessages": {
     "description": "Action performed: deleted messages"
   },
-  "deletedConversations": "Deleted conversations",
+  "deletedConversations": "Deleted messages",
   "@deletedConversations": {
     "description": "Action performed: deleted conversations"
   },
@@ -886,7 +814,6 @@
   "@messageNotFound": {
     "description": "Message when message is not found"
   },
-  
   "home": "Home",
   "@home": {
     "description": "Home tab title"
@@ -911,7 +838,6 @@
   "@markAsRead": {
     "description": "Button text to mark as read"
   },
-  
   "content": "Content",
   "@content": {
     "description": "Content label for message compose"
@@ -964,7 +890,6 @@
   "@mentionUser": {
     "description": "Tooltip for mention user button"
   },
-  
   "loggingIn": "Logging in...",
   "@loggingIn": {
     "description": "Status message when logging in"
@@ -985,7 +910,6 @@
   "@cleaningSpam": {
     "description": "Status message when cleaning spam"
   },
-  
   "enterSubject": "Enter subject",
   "@enterSubject": {
     "description": "Hint text for subject field"
@@ -1010,11 +934,11 @@
   "@replySentSuccessfully": {
     "description": "Success message after sending reply"
   },
-  "conversationCreatedSuccessfully": "Conversation created successfully",
+  "conversationCreatedSuccessfully": "Message created successfully",
   "@conversationCreatedSuccessfully": {
     "description": "Success message after creating conversation"
   },
-  "conversationMarkedAsUnread": "Conversation marked as unread",
+  "conversationMarkedAsUnread": "Message marked as unread",
   "@conversationMarkedAsUnread": {
     "description": "Success message when marking conversation as unread"
   },
@@ -1022,11 +946,11 @@
   "@messageMarkedAsUnread": {
     "description": "Success message when marking message as unread"
   },
-  "conversationClosed": "Conversation closed",
+  "conversationClosed": "Message closed",
   "@conversationClosed": {
     "description": "Success message when closing conversation"
   },
-  "conversationOpened": "Conversation opened",
+  "conversationOpened": "Message opened",
   "@conversationOpened": {
     "description": "Success message when opening conversation"
   },
@@ -1092,7 +1016,7 @@
       }
     }
   },
-  "failedToMarkConversationAsUnread": "Failed to mark conversation as unread: {error}",
+  "failedToMarkConversationAsUnread": "Failed to mark message as unread: {error}",
   "@failedToMarkConversationAsUnread": {
     "description": "Error message when marking conversation as unread fails",
     "placeholders": {
@@ -1101,7 +1025,7 @@
       }
     }
   },
-  "failedToCloseConversation": "Failed to close conversation: {error}",
+  "failedToCloseConversation": "Failed to close message: {error}",
   "@failedToCloseConversation": {
     "description": "Error message when closing conversation fails",
     "placeholders": {
@@ -1110,7 +1034,7 @@
       }
     }
   },
-  "failedToOpenConversation": "Failed to open conversation: {error}",
+  "failedToOpenConversation": "Failed to open message: {error}",
   "@failedToOpenConversation": {
     "description": "Error message when opening conversation fails",
     "placeholders": {
@@ -1128,7 +1052,6 @@
       }
     }
   },
-  
   "goToTop": "Go to top",
   "@goToTop": {
     "description": "Tooltip for go to top button"
@@ -1145,7 +1068,6 @@
   "@forward": {
     "description": "Tooltip for forward button"
   },
-  
   "noForumsFound": "No forums found.",
   "@noForumsFound": {
     "description": "Message when no forums are found"
@@ -1154,7 +1076,6 @@
   "@pleaseLoginToAccessContent": {
     "description": "Message asking user to login to access content"
   },
-  
   "searchUsers": "Search users...",
   "@searchUsers": {
     "description": "Hint text for searching users"
@@ -1171,7 +1092,7 @@
   "@selectAnOption": {
     "description": "Hint text for select field"
   },
-  "enterConversationTitle": "Enter conversation title",
+  "enterConversationTitle": "Enter message title",
   "@enterConversationTitle": {
     "description": "Hint text for conversation title field"
   },
@@ -1184,7 +1105,6 @@
       }
     }
   },
-  
   "edit": "Edit",
   "@edit": {
     "description": "Button text to edit"
@@ -1201,7 +1121,6 @@
   "@follow": {
     "description": "Button text to follow"
   },
-  
   "goToForums": "Go to Forums",
   "@goToForums": {
     "description": "Button text to go to forums"
@@ -1210,7 +1129,6 @@
   "@remove": {
     "description": "Button text to remove"
   },
-  
   "subject": "Subject",
   "@subject": {
     "description": "Label for subject field"
@@ -1223,7 +1141,7 @@
   "@titleCannotBeEmpty": {
     "description": "Validation message when title is empty"
   },
-  "conversationUpdatedSuccessfully": "Conversation updated successfully",
+  "conversationUpdatedSuccessfully": "Message updated successfully",
   "@conversationUpdatedSuccessfully": {
     "description": "Success message when conversation is updated"
   },
@@ -1231,7 +1149,6 @@
   "@goBack": {
     "description": "Button text to go back"
   },
-  "signInToViewMessages": "Sign in to view messages",
   "@signInToViewMessages": {
     "description": "Message asking user to sign in to view messages"
   },
@@ -1310,7 +1227,6 @@
   "@enterANumber": {
     "description": "Hint text for number input field"
   },
-  
   "failedToNavigateToForum": "Failed to navigate to category",
   "@failedToNavigateToForum": {
     "description": "Error message when navigation to category fails"
@@ -1324,11 +1240,9 @@
       }
     }
   },
-  "failedToSaveConversation": "Failed to save conversation",
   "@failedToSaveConversation": {
     "description": "Error message when saving conversation fails"
   },
-  
   "forumNotFound": "Category not found: {forumName}",
   "@forumNotFound": {
     "description": "Error message when category is not found",
@@ -1356,7 +1270,6 @@
       }
     }
   },
-  
   "likePost": "Like post",
   "@likePost": {
     "description": "Accessibility label for like button"
@@ -1381,15 +1294,12 @@
   "@quotePost": {
     "description": "Accessibility label for quote button"
   },
-  "attachFile": "Attach file",
   "@attachFile": {
     "description": "Accessibility label for attach file button"
   },
-  "uploadImage": "Upload image",
   "@uploadImage": {
     "description": "Accessibility label for upload image button"
   },
-  
   "translate": "Translate",
   "@translate": {
     "description": "Menu item to translate thread content"
@@ -1446,7 +1356,9 @@
   "@codeMustBeDigits": {
     "description": "Validation message when code does not match required digits",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "codeMustContainOnlyNumbers": "Code must contain only numbers",
@@ -1473,14 +1385,18 @@
   "@fileSavedToDownloads": {
     "description": "Success message when file is saved to Downloads",
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "fileSavedToDocuments": "File saved to Documents: {filename}",
   "@fileSavedToDocuments": {
     "description": "Success message when file is saved to Documents",
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   }
 }

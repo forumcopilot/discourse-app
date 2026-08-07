@@ -363,7 +363,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loading => 'Loading...';
 
   @override
-  String get newConversation => 'New Conversation';
+  String get newConversation => 'New Message';
 
   @override
   String get newMessage => 'New Message';
@@ -470,7 +470,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String usernameHasBeenInvited(String username) {
-    return '$username has been invited to the conversation';
+    return '$username has been invited to the message';
   }
 
   @override
@@ -555,10 +555,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreOptions => 'More options';
 
   @override
-  String get leaveConversation => 'Leave conversation';
+  String get leaveConversation => 'Leave message';
 
   @override
-  String get reportConversation => 'Report conversation';
+  String get reportConversation => 'Report message';
 
   @override
   String get topicClosed => 'Topic closed';
@@ -587,7 +587,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteMessages => 'Delete Messages';
 
   @override
-  String get deleteConversations => 'Delete Conversations';
+  String get deleteConversations => 'Delete Messages';
 
   @override
   String get myForums => 'My Forums';
@@ -602,11 +602,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forumCopilot => 'Forum Copilot';
 
   @override
-  String get noConversations => 'No conversations';
+  String get noConversations => 'No messages';
 
   @override
   String get noConversationsMessage =>
-      'You have no conversations yet. Start a new conversation to begin messaging.';
+      'You have no messages yet. Start a new message to begin.';
 
   @override
   String get imageSavedToGallery => 'Image saved to gallery!';
@@ -653,7 +653,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedToSaveMessage => 'Failed to save message';
 
   @override
-  String get failedToSaveConversation => 'Failed to save conversation';
+  String get failedToSaveConversation => 'Failed to save message';
 
   @override
   String get failedToSaveSetting => 'Failed to save setting';
@@ -803,21 +803,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get youNeedToBeSignedInToViewConversations =>
-      'You need to be signed in to view your conversations.';
+      'You need to be signed in to view your messages.';
 
   @override
   String errorLoadingConversations(String error) {
-    return 'Error loading conversations: $error';
+    return 'Error loading messages: $error';
   }
 
   @override
   String failedToLeaveConversation(String error) {
-    return 'Failed to leave conversation: $error';
+    return 'Failed to leave message: $error';
   }
 
   @override
   String errorLoadingMoreConversations(String error) {
-    return 'Error loading more conversations: $error';
+    return 'Error loading more messages: $error';
   }
 
   @override
@@ -830,7 +830,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get iWouldLikeToAddYouToThisConversation =>
-      'I would like to add you to this conversation.';
+      'I would like to add you to this message.';
 
   @override
   String get searchFailed => 'Search failed';
@@ -1166,7 +1166,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spamCleanUser => 'Spam Clean User';
 
   @override
-  String get deletePrivateConversations => 'Delete private conversations';
+  String get deletePrivateConversations => 'Delete personal messages';
 
   @override
   String get banTheUserAccount => 'Ban the user account';
@@ -1178,7 +1178,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deletedMessages => 'Deleted messages';
 
   @override
-  String get deletedConversations => 'Deleted conversations';
+  String get deletedConversations => 'Deleted messages';
 
   @override
   String get bannedUser => 'Banned user';
@@ -1289,20 +1289,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get replySentSuccessfully => 'Reply sent successfully';
 
   @override
-  String get conversationCreatedSuccessfully =>
-      'Conversation created successfully';
+  String get conversationCreatedSuccessfully => 'Message created successfully';
 
   @override
-  String get conversationMarkedAsUnread => 'Conversation marked as unread';
+  String get conversationMarkedAsUnread => 'Message marked as unread';
 
   @override
   String get messageMarkedAsUnread => 'Message marked as unread';
 
   @override
-  String get conversationClosed => 'Conversation closed';
+  String get conversationClosed => 'Message closed';
 
   @override
-  String get conversationOpened => 'Conversation opened';
+  String get conversationOpened => 'Message opened';
 
   @override
   String get pleaseLoginToLikeMessages => 'Please login to like messages';
@@ -1342,17 +1341,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String failedToMarkConversationAsUnread(String error) {
-    return 'Failed to mark conversation as unread: $error';
+    return 'Failed to mark message as unread: $error';
   }
 
   @override
   String failedToCloseConversation(String error) {
-    return 'Failed to close conversation: $error';
+    return 'Failed to close message: $error';
   }
 
   @override
   String failedToOpenConversation(String error) {
-    return 'Failed to open conversation: $error';
+    return 'Failed to open message: $error';
   }
 
   @override
@@ -1392,7 +1391,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectAnOption => 'Select an option';
 
   @override
-  String get enterConversationTitle => 'Enter conversation title';
+  String get enterConversationTitle => 'Enter message title';
 
   @override
   String enterCode(int count) {
@@ -1427,8 +1426,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get titleCannotBeEmpty => 'Title cannot be empty';
 
   @override
-  String get conversationUpdatedSuccessfully =>
-      'Conversation updated successfully';
+  String get conversationUpdatedSuccessfully => 'Message updated successfully';
 
   @override
   String get goBack => 'Go Back';

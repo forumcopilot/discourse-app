@@ -126,7 +126,7 @@ class _ConversationPageState extends State<ConversationPage> {
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)?.conversationMarkedAsUnread ?? 'Conversation marked as unread'),
+              content: Text(AppLocalizations.of(context)?.conversationMarkedAsUnread ?? 'Message marked as unread'),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );
@@ -135,7 +135,7 @@ class _ConversationPageState extends State<ConversationPage> {
         } else {
           // API call returned false - show error message
           final errorMessage =
-              result.resultText?.isNotEmpty == true ? result.resultText! : AppLocalizations.of(context)?.failedToMarkConversationAsUnread('') ?? 'Failed to mark conversation as unread';
+              result.resultText?.isNotEmpty == true ? result.resultText! : AppLocalizations.of(context)?.failedToMarkConversationAsUnread('') ?? 'Failed to mark message as unread';
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(errorMessage),
@@ -148,7 +148,7 @@ class _ConversationPageState extends State<ConversationPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)?.failedToMarkConversationAsUnread(e.toString()) ?? 'Failed to mark conversation as unread: $e'),
+            content: Text(AppLocalizations.of(context)?.failedToMarkConversationAsUnread(e.toString()) ?? 'Failed to mark message as unread: $e'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -246,7 +246,7 @@ class _ConversationPageState extends State<ConversationPage> {
         if (!conversation.result) {
           if (mounted) {
             setState(() {
-              _error = conversation.resultText ?? 'Failed to load conversation';
+              _error = conversation.resultText ?? 'Failed to load message';
               _isLoading = false;
             });
           }
@@ -322,7 +322,7 @@ class _ConversationPageState extends State<ConversationPage> {
               setState(() {
                 _error = metadataConversation.resultText?.isNotEmpty == true
                     ? metadataConversation.resultText
-                    : 'Failed to load conversation';
+                    : 'Failed to load message';
                 _isLoading = false;
                 _isLoadingMore = false;
               });
@@ -726,7 +726,7 @@ class _ConversationPageState extends State<ConversationPage> {
         if (result.result) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)?.conversationClosed ?? 'Conversation closed'),
+              content: Text(AppLocalizations.of(context)?.conversationClosed ?? 'Message closed'),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );
@@ -735,7 +735,7 @@ class _ConversationPageState extends State<ConversationPage> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(result.resultText ?? AppLocalizations.of(context)?.failedToCloseConversation('') ?? 'Failed to close conversation'),
+              content: Text(result.resultText ?? AppLocalizations.of(context)?.failedToCloseConversation('') ?? 'Failed to close message'),
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
@@ -745,7 +745,7 @@ class _ConversationPageState extends State<ConversationPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)?.failedToCloseConversation(e.toString()) ?? 'Failed to close conversation: $e'),
+            content: Text(AppLocalizations.of(context)?.failedToCloseConversation(e.toString()) ?? 'Failed to close message: $e'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -800,7 +800,7 @@ class _ConversationPageState extends State<ConversationPage> {
         if (result.result) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)?.conversationOpened ?? 'Conversation opened'),
+              content: Text(AppLocalizations.of(context)?.conversationOpened ?? 'Message opened'),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );
@@ -809,7 +809,7 @@ class _ConversationPageState extends State<ConversationPage> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(result.resultText ?? 'Failed to open conversation'),
+              content: Text(result.resultText ?? 'Failed to open message'),
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
@@ -819,7 +819,7 @@ class _ConversationPageState extends State<ConversationPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)?.failedToOpenConversation(e.toString()) ?? 'Failed to open conversation: $e'),
+            content: Text(AppLocalizations.of(context)?.failedToOpenConversation(e.toString()) ?? 'Failed to open message: $e'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -876,7 +876,7 @@ class _ConversationPageState extends State<ConversationPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)?.failedToLeaveConversation(e.toString()) ?? 'Failed to leave conversation: $e'),
+            content: Text(AppLocalizations.of(context)?.failedToLeaveConversation(e.toString()) ?? 'Failed to leave message: $e'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
