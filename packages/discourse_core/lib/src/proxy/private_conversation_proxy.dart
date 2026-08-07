@@ -32,6 +32,12 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     String textBody, {
     List<String>? attachmentIds,
     String? groupId,
+    // openInvite and conversationLocked exist on the shared interface for XenForo,
+    // which has both as conversation options. Discourse has neither: participant
+    // permissions come from trust level and site settings rather than a per-message
+    // flag, and closing is a separate action on an existing topic
+    // (PUT /t/{id}/status) that a regular user cannot perform at creation time.
+    // They are accepted and ignored here; the compose UI no longer offers them.
     bool? openInvite,
     bool? conversationLocked,
   }) async {
