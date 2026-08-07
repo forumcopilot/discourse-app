@@ -9,6 +9,7 @@ import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 
 import '../../theme/design_tokens.dart';
 import '../widgets/empty_state_view.dart';
+import '../widgets/not_signed_in_view.dart';
 import '../widgets/resettable_widget.dart';
 import '../widgets/user_avatar.dart';
 import 'chat_channel_view.dart';
@@ -172,6 +173,21 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
 
   @override
   Widget build(BuildContext context) {
+    // Signed-out users got whatever `/chat/api/me/channels` replied with, rendered
+    // raw as the empty state — on a French forum that read "Vous devez être
+    // connecté(e) pour effectuer cette opération": the server's message, in the
+    // forum's locale rather than the app's, as plain text with no way to sign in.
+    // Messages already had a proper NotSignedInView for exactly this; use the same
+    // one so the two halves of this tab match, and skip a request that can only fail.
+    if (!widget.siteContext.isLoggedIn) {
+      return NotSignedInView(
+        siteContext: widget.siteContext,
+        title: 'Sign in to use chat',
+        message: 'You need to be signed in to view and join chat channels.',
+        icon: Icons.chat_bubble_outline_rounded,
+      );
+    }
+
     final body = RefreshIndicator(
       onRefresh: _load,
       child: _buildBody(),
