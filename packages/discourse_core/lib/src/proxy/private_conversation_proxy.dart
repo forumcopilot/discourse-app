@@ -378,6 +378,52 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
   }
 
   @override
+  Future<FCArchiveConversationResult> archiveConversationAsync(
+      String conversationId) async {
+    return _setConversationArchived(conversationId, archived: true);
+  }
+
+  @override
+  Future<FCArchiveConversationResult> unarchiveConversationAsync(
+      String conversationId) async {
+    return _setConversationArchived(conversationId, archived: false);
+  }
+
+  /// Archiving is not a topic status like closed/pinned — it is a per-user
+  /// filing action with its own pair of routes, so there is no single endpoint
+  /// taking a boolean.
+  Future<FCArchiveConversationResult> _setConversationArchived(
+    String conversationId, {
+    required bool archived,
+  }) async {
+    try {
+      await apiPut(
+        archived
+            ? '/t/$conversationId/archive-message.json'
+            : '/t/$conversationId/move-to-inbox.json',
+        body: const {},
+      );
+      return FCArchiveConversationResult(
+        result: true,
+        resultText: '',
+        isArchived: archived,
+      );
+    } on DiscourseApiException catch (e) {
+      return FCArchiveConversationResult(
+        result: false,
+        resultText: e.userMessage,
+        isArchived: !archived,
+      );
+    } catch (e) {
+      return FCArchiveConversationResult(
+        result: false,
+        resultText: describeApiError(e),
+        isArchived: !archived,
+      );
+    }
+  }
+
+  @override
   Future<FCRawConversationResult> getRawConversationAsync(
       String conversationId) async {
     try {
