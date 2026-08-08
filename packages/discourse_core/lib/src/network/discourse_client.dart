@@ -198,9 +198,14 @@ class DiscourseClient {
   /// `/topics/timings` is Discourse's read-tracking beacon: the app posts it
   /// automatically on viewing a topic, and it alters only per-user read state.
   /// Because clear-on-write is indiscriminate, it was wiping the whole cache
-  /// mid-navigation — which is what produced the duplicate `/t/{id}.json` on
-  /// every topic open. The topic loaded, the beacon fired, the cache emptied,
+  /// mid-navigation: the topic loaded, the beacon fired, the cache emptied,
   /// and the very next read of the same topic went back to the network.
+  ///
+  /// Logged-in sessions only. `DiscourseTopicProxy.markTopicReadAsync` returns
+  /// early for guests, so an anonymous session never posts the beacon and this
+  /// path is unreachable — which is why an anonymous A/B of a cold launch
+  /// shows no change. Verified instead in
+  /// `test/discourse_client_measurement_test.dart`.
   static bool _isInertWrite(String path) => path.startsWith('/topics/timings');
 
   /// Stable string for a query map, so the same request always produces the
@@ -208,13 +213,18 @@ class DiscourseClient {
   ///
   /// This was `jsonEncode(query)`, which made two callers asking for the
   /// identical URL miss each other: one passing no query encoded to `"null"`
-  /// and one passing an empty map to `"{}"`. Measured against try.discourse.org,
-  /// a single launch fetched `/about.json` three times and `/categories.json`
-  /// three times with a 30-minute TTL in force and no intervening write —
-  /// every one of them a key mismatch rather than a real cache miss.
+  /// and one passing an empty map to `"{}"`. It also preserved Dart's
+  /// insertion order, so the same parameters passed in a different order
+  /// keyed apart. Both are demonstrated in
+  /// `test/discourse_client_measurement_test.dart`.
   ///
-  /// Also sorts the keys: Dart preserves insertion order, so two callers
-  /// passing the same parameters in a different order previously keyed apart.
+  /// Latent, not observed: an A/B of a real cold launch against
+  /// try.discourse.org showed no difference — the bootstrap's callers happen
+  /// to agree on spelling, so `/about.json` went out once and hit the cache
+  /// three times either way. This guards a mismatch the current call sites
+  /// don't have rather than fixing one they do; the sorted, encoded key costs
+  /// nothing and stops it becoming a live bug the next time a caller passes
+  /// `{}` or reorders a map.
   ///
   /// Keys and values are percent-encoded, matching what Dio puts on the wire.
   /// Without that, a VALUE containing '&' or '=' (a search term, say) aliases
