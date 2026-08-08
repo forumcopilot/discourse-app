@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:discourse_core/discourse_core.dart' show DiscourseAcceptedAnswers;
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/models/thread_view_data.dart';
@@ -859,6 +860,58 @@ class _PostsState extends State<PostsList> {
   }
 
   /// Refresh callback that optionally scrolls to a post after load.
+  /// Jump to a post by its number within the topic — used by the accepted-answer panel.
+  ///
+  /// Discourse's `accepted_answer` payload carries a post NUMBER, not a post id, so this
+  /// cannot reuse the existing scroll-to-post-id path. When the answer is already in the
+  /// loaded window it scrolls in place; otherwise it reloads the thread anchored at that
+  /// post, which is what tapping the web's "Post #N" link effectively does.
+  void _jumpToPostNumber(int postNumber) {
+    final data = _postsController.threadDataOutput.value;
+    final index =
+        data?.posts.indexWhere((p) => p.postNumber == postNumber) ?? -1;
+
+    if (index >= 0) {
+      final target = data!.posts[index];
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        try {
+          _itemScrollController.scrollTo(
+            index: index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+          _highlightPost(target.id);
+        } catch (_) {}
+      });
+      return;
+    }
+
+    // Not in the loaded window — reload anchored at the answer.
+    final topicId = _actualTopicId ?? widget.topicId;
+    _postsController
+        .getThreadByPageAsync(
+      topicId,
+      ((postNumber - 1) ~/ _pageSize) + 1,
+      _pageSize,
+      false,
+    )
+        .then((_) {
+      if (!mounted) return;
+      final reloaded = _postsController.threadDataOutput.value;
+      final i =
+          reloaded?.posts.indexWhere((p) => p.postNumber == postNumber) ?? -1;
+      if (i < 0) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        try {
+          _itemScrollController.jumpTo(index: i);
+          _highlightPost(reloaded!.posts[i].id);
+        } catch (_) {}
+      });
+    });
+  }
+
   /// When [scrollToPostId] is provided (e.g. after reply), loads thread at that post and scrolls to it in place.
   void _refreshWithOptionalScrollToPost([String? scrollToPostId]) {
     if (scrollToPostId != null && scrollToPostId.isNotEmpty) {
@@ -1086,6 +1139,13 @@ class _PostsState extends State<PostsList> {
         forumId: data.topic.forumId,
         isHighlighted: isHighlighted,
         poll: post.postNumber == 1 ? data.topic.poll : null,
+        // Solved topics show the accepted answer under the first post, as Discourse's
+        // web UI does. Read from the Discourse-only side table rather than a field on
+        // the shared topic model — see DiscourseAcceptedAnswers.
+        acceptedAnswer: post.postNumber == 1
+            ? DiscourseAcceptedAnswers.forTopic(data.topic.id)
+            : null,
+        onJumpToAcceptedAnswer: _jumpToPostNumber,
         onVoteSuccess: (p) => _postsController.updateThreadPoll(p),
         actions: PostActions(
           onReply: (postId) => postActionsHandler.handleReply(context, postId, widget.topicId, widget.topicTitle, _refreshWithOptionalScrollToPost),

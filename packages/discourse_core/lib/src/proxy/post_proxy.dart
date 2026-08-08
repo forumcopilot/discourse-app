@@ -11,6 +11,7 @@ import 'package:forumcopilot_sdk/models/results/fc_post_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_reaction_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/post/discourse_accepted_answer.dart';
 import '../data/post/discourse_post_revision.dart';
 import '../data/post/discourse_suggested_topic.dart';
 import '../util/html_text.dart';
@@ -71,6 +72,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     try {
       final t = await apiGet(
           startNum > 1 ? '/t/$topicId/$startNum.json' : '/t/$topicId.json');
+      // Record the topic's accepted answer (discourse-solved) so the first-post solution
+      // panel can render it. Kept beside the thread result rather than on it, because
+      // the result type is shared SDK surface — see DiscourseAcceptedAnswers.
+      DiscourseAcceptedAnswers.store(
+          topicId, DiscourseAcceptedAnswer.fromTopicJson(t));
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       final rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
@@ -180,6 +186,10 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // Same windowing mechanism as [getThreadAsync]: /t/{id}/{n}.json
       // returns the chunk containing post number n (filter_posts_near).
       final t = await apiGet('/t/$topicId/$postNumber.json');
+      // Same as getThreadAsync — entering a topic at a specific post must surface the
+      // solution panel too, since that is a common arrival route from notifications.
+      DiscourseAcceptedAnswers.store(
+          topicId, DiscourseAcceptedAnswer.fromTopicJson(t));
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       final rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
@@ -245,6 +255,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     }
     try {
       var t = await apiGet('/t/$topicId.json');
+      // Stored from the FIRST payload: the follow-up fetch below (when the unread anchor
+      // is not in this chunk) returns the same topic-level fields, so re-storing would
+      // be redundant.
+      DiscourseAcceptedAnswers.store(
+          topicId, DiscourseAcceptedAnswer.fromTopicJson(t));
       final unreadAnchor = (t['last_read_post_number'] as int?) ?? 1;
       var stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       var rawPosts = ((stream['posts'] as List?) ?? const [])
@@ -492,6 +507,46 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         if (reason.trim().isNotEmpty) 'message': reason,
       });
       return FCReportPostResult(result: true, resultText: '');
+    } catch (e) {
+      return FCReportPostResult(result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Discourse flag types, from the `post_action_types` table. Verified against a live
+  /// server rather than taken from the fixtures file, which also contains `like` (2) and
+  /// omits nothing useful here.
+  static const int flagOffTopic = 3;
+  static const int flagInappropriate = 4;
+  static const int flagNotifyUser = 6;
+  static const int flagNotifyModerators = 7;
+  static const int flagSpam = 8;
+
+  /// Flag a post with a SPECIFIC Discourse flag type.
+  ///
+  /// Deliberately not part of [IFCPostProxy]: flag types are Discourse's vocabulary, and
+  /// putting them on the shared interface would drag XenForo into a taxonomy it does not
+  /// have. The cross-platform [reportPostAsync] stays as it is; Discourse UI calls this
+  /// after casting the proxy.
+  ///
+  /// [message] is required by Discourse for the two "notify" types (7 notify_moderators
+  /// and 6 notify_user) and ignored for the rest.
+  Future<FCReportPostResult> flagPostAsync(
+    String postId,
+    int postActionTypeId, {
+    String? message,
+  }) async {
+    if (postId.isEmpty) {
+      return FCReportPostResult(result: false, resultText: 'No post id supplied');
+    }
+    try {
+      await apiPost('/post_actions.json', body: {
+        'id': int.tryParse(postId) ?? postId,
+        'post_action_type_id': postActionTypeId,
+        if (message != null && message.trim().isNotEmpty) 'message': message.trim(),
+      });
+      return FCReportPostResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCReportPostResult(result: false, resultText: e.userMessage);
     } catch (e) {
       return FCReportPostResult(result: false, resultText: describeApiError(e));
     }

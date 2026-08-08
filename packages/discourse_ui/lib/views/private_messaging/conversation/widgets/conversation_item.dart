@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_ui/views/widgets/discourse_report_dialog.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:discourse_ui/views/widgets/user_avatar.dart';
@@ -297,7 +298,14 @@ class ConversationHeaderItem extends StatelessWidget {
                             if (onEdit != null) onEdit!();
                             break;
                           case 'report':
-                            // TODO: Implement report functionality if needed
+                            // A Discourse PM message IS a post, so the same flag
+                            // endpoint and type ids apply. This case previously fell
+                            // straight through to `break`, so the menu item rendered
+                            // and tapping it did nothing at all.
+                            showDiscourseReportDialog(
+                              context,
+                              postId: message.messageId,
+                            );
                             break;
                         }
                       },
@@ -817,7 +825,14 @@ class ConversationItem extends StatelessWidget {
                             if (onEdit != null) onEdit!();
                             break;
                           case 'report':
-                            // TODO: Implement report functionality if needed
+                            // A Discourse PM message IS a post, so the same flag
+                            // endpoint and type ids apply. This case previously fell
+                            // straight through to `break`, so the menu item rendered
+                            // and tapping it did nothing at all.
+                            showDiscourseReportDialog(
+                              context,
+                              postId: message.messageId,
+                            );
                             break;
                         }
                       },

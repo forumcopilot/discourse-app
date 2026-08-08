@@ -16,6 +16,7 @@ import 'package:discourse_ui/views/lists/posts_list.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../../theme/design_tokens.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import 'package:discourse_ui/views/widgets/discourse_report_dialog.dart';
 
 class PostActionsHandler {
   final SiteContext siteContext;
@@ -725,6 +726,15 @@ class PostActionsHandler {
 
   Future<void> handleReport(BuildContext context, String postId) async {
     AppLogger.debug('Handling report of post: $postId');
+
+    // Discourse has a real flag taxonomy (off-topic / inappropriate / spam / notify
+    // moderators / message the author) and its own modal for it. The free-text dialog
+    // below can only ever file "Something Else", so Discourse gets its own.
+    // XenForo keeps this path unchanged — flag types are not its vocabulary.
+    if (siteContext.siteType == 'discourse') {
+      await showDiscourseReportDialog(context, postId: postId);
+      return;
+    }
 
     final TextEditingController reasonController = TextEditingController();
     final formKey = GlobalKey<FormState>();

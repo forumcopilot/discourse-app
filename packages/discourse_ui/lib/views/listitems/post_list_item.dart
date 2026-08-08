@@ -1,4 +1,6 @@
+import 'package:discourse_core/discourse_core.dart' show DiscourseAcceptedAnswer;
 import 'package:flutter/material.dart';
+import 'package:discourse_ui/views/widgets/solution_summary_card.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
@@ -126,6 +128,14 @@ class PostListItem extends StatefulWidget {
   /// Poll for the thread. When non-null and this is the first post, the poll card is shown above the body.
   final FCPoll? poll;
 
+  /// discourse-solved's accepted answer for this TOPIC. Rendered under the first
+  /// post only, matching Discourse's own web placement. Null on XenForo and on
+  /// unsolved topics.
+  final DiscourseAcceptedAnswer? acceptedAnswer;
+
+  /// Jumps to the accepted answer's post.
+  final void Function(int postNumber)? onJumpToAcceptedAnswer;
+
   /// Called after a successful vote to update the thread's poll in state.
   final void Function(FCPoll updatedPoll)? onVoteSuccess;
 
@@ -148,6 +158,8 @@ class PostListItem extends StatefulWidget {
     this.onAvatarTap,
     this.isHighlighted = false,
     this.poll,
+    this.acceptedAnswer,
+    this.onJumpToAcceptedAnswer,
     this.onVoteSuccess,
     this.translatedContent,
     this.isTranslating = false,
@@ -690,6 +702,22 @@ class _PostListItemState extends State<PostListItem> {
           children: [
             _buildPostHeader(context),
             _buildPostContent(context, data, colorScheme, textTheme),
+            // Accepted answer panel, first post only — the same condition Discourse's
+            // own plugin uses (post_number === 1 && topic.accepted_answer) and the same
+            // position (immediately after the cooked content).
+            if (widget.post.postNumber == 1 && widget.acceptedAnswer != null)
+              Padding(
+                padding:
+                    EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+                child: SolutionSummaryCard(
+                  siteContext: widget.siteContext,
+                  answer: widget.acceptedAnswer!,
+                  onJumpToAnswer: widget.onJumpToAcceptedAnswer == null
+                      ? null
+                      : () => widget.onJumpToAcceptedAnswer!(
+                          widget.acceptedAnswer!.postNumber),
+                ),
+              ),
             _buildBottomDivider(colorScheme),
           ],
         ),

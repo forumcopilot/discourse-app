@@ -83,10 +83,19 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     String? groupId,
   ) async {
     try {
+      // Deliberately NO `archetype` here. It belongs only to CREATING a private
+      // message. Sending it alongside a topic_id makes Discourse read the request as
+      // "create a PM on a topic that already exists" and reject the whole thing:
+      //
+      //   if @topic.present? && @opts[:archetype] == Archetype.private_message
+      //     errors.add(:base, I18n.t(:create_pm_on_existing_topic))
+      //
+      // (lib/post_creator.rb) — surfacing as "Sorry, you can't create a PM on an
+      // existing topic." The topic's archetype is already private_message; replying to
+      // it does not need to restate that.
       final response = await apiPost('/posts.json', body: {
         'topic_id': int.tryParse(conversationId) ?? conversationId,
         'raw': textBody,
-        'archetype': 'private_message',
       });
       return FCReplyConversationResult(
         result: true,
