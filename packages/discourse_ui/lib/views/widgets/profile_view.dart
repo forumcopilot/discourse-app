@@ -1144,19 +1144,6 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
     }
   }
 
-  Widget _summaryHeading(BuildContext context, String text) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Text(
-      text,
-      style: textTheme.labelSmall?.copyWith(
-        color: colorScheme.onSurfaceVariant,
-        letterSpacing: DesignTokens.letterSpacingWide,
-        fontWeight: DesignTokens.fontWeightSemiBold,
-      ),
-    );
-  }
-
   /// "3d 4h" / "2h 15m" / "45m" / "< 1m" from a seconds count.
   String _humanizeDuration(int seconds) {
     if (seconds < 60) return '< 1m';
@@ -1240,7 +1227,63 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
       ),
     ];
 
-    // Mirrors the profile info card above (margin / border / surface).
+    // Stats stay in a card (mirroring the info card above); the two lists
+    // below are full-width sections in the same shape as "Recent Posts",
+    // because that is how this app presents a list of topics.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _statsCard(context, colorScheme, textTheme, stats, showStats, likedBy),
+        if (topReplies.isNotEmpty)
+          _SummaryTopicSection(
+            title: 'Top Replies',
+            rows: [
+              for (final r in topReplies.take(5))
+                _SummaryTopicRowData(
+                  title: r.topicTitle,
+                  likeCount: r.likeCount,
+                  // Opens the topic, not the exact post: the summary gives a
+                  // post_number, while anchoring needs a post id, and
+                  // `gotoPage` is a page index — not the same thing.
+                  onTap: () => Get.to(() => PostPage(
+                        siteContext: widget.siteContext,
+                        topicId: r.topicId.toString(),
+                        title: r.topicTitle,
+                      )),
+                ),
+            ],
+          ),
+        if (topTopics.isNotEmpty)
+          _SummaryTopicSection(
+            title: 'Top Topics',
+            rows: [
+              for (final t in topTopics.take(5))
+                _SummaryTopicRowData(
+                  title: t.title,
+                  likeCount: t.likeCount,
+                  replyCount:
+                      t.postsCount == null ? null : (t.postsCount! - 1),
+                  onTap: () => Get.to(() => PostPage(
+                        siteContext: widget.siteContext,
+                        topicId: t.id.toString(),
+                        title: t.title,
+                      )),
+                ),
+            ],
+          ),
+      ],
+    );
+  }
+
+  Widget _statsCard(
+    BuildContext context,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+    List<({String value, String label})> stats,
+    bool showStats,
+    List<DiscourseSummaryUser> likedBy,
+  ) {
+    if (!showStats && likedBy.isEmpty) return const SizedBox.shrink();
     return Card(
       margin: EdgeInsets.symmetric(
         horizontal: DesignTokens.spacingL,
@@ -1315,49 +1358,6 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
                 },
               ),
             ],
-            // Top topics / top replies — the two lists Discourse web
-            // shows under the stats grid. Both come from the same
-            // summary payload that was already being fetched.
-            if (topReplies.isNotEmpty) ...[
-              SizedBox(height: DesignTokens.spacingL),
-              _summaryHeading(context, 'TOP REPLIES'),
-              SizedBox(height: DesignTokens.spacingS),
-              ...topReplies.take(5).map(
-                    (r) => _SummaryLinkRow(
-                      title: r.topicTitle,
-                      likeCount: r.likeCount,
-                      // Opens the topic, not the exact post: the summary
-                      // gives a post_number, while anchoring needs a post
-                      // id, and `gotoPage` is a page index — not the same
-                      // thing.
-                      onTap: () => Get.to(
-                        () => PostPage(
-                          siteContext: widget.siteContext,
-                          topicId: r.topicId.toString(),
-                          title: r.topicTitle,
-                        ),
-                      ),
-                    ),
-                  ),
-            ],
-            if (topTopics.isNotEmpty) ...[
-              SizedBox(height: DesignTokens.spacingL),
-              _summaryHeading(context, 'TOP TOPICS'),
-              SizedBox(height: DesignTokens.spacingS),
-              ...topTopics.take(5).map(
-                    (t) => _SummaryLinkRow(
-                      title: t.title,
-                      likeCount: t.likeCount,
-                      onTap: () => Get.to(
-                        () => PostPage(
-                          siteContext: widget.siteContext,
-                          topicId: t.id.toString(),
-                          title: t.title,
-                        ),
-                      ),
-                    ),
-                  ),
-            ],
             if (likedBy.isNotEmpty) ...[
               SizedBox(height: DesignTokens.spacingL),
               Text(
@@ -1416,56 +1416,103 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
   }
 }
 
-/// One row of the TOP REPLIES / TOP TOPICS lists: a topic title plus its
-/// like count, tappable through to the topic.
-class _SummaryLinkRow extends StatelessWidget {
+/// A profile list section — heading plus rows — in the same shape as
+/// "Recent Posts" further down the page: a `titleLarge` bold heading in
+/// `paddingL`, then full-bleed tappable rows. The summary block used a
+/// card with uppercase micro-labels, which read as a different component
+/// from the rest of the profile.
+class _SummaryTopicSection extends StatelessWidget {
   final String title;
-  final int likeCount;
-  final VoidCallback onTap;
+  final List<_SummaryTopicRowData> rows;
 
-  const _SummaryLinkRow({
-    required this.title,
-    required this.likeCount,
-    required this.onTap,
-  });
+  const _SummaryTopicSection({required this.title, required this.rows});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                title,
-                style: textTheme.bodyMedium?.copyWith(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: DesignTokens.paddingL,
+          child: Text(
+            title,
+            style: textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: DesignTokens.fontWeightBold,
+            ),
+          ),
+        ),
+        for (final row in rows) _SummaryTopicRow(data: row),
+      ],
+    );
+  }
+}
+
+class _SummaryTopicRowData {
+  final String title;
+  final int likeCount;
+  final int? replyCount;
+  final VoidCallback onTap;
+
+  const _SummaryTopicRowData({
+    required this.title,
+    required this.likeCount,
+    this.replyCount,
+    required this.onTap,
+  });
+}
+
+/// One topic row. Mirrors the "Recent Posts" item: Material + InkWell,
+/// full-bleed, `spacingL` padding, title over a muted metadata line.
+class _SummaryTopicRow extends StatelessWidget {
+  final _SummaryTopicRowData data;
+
+  const _SummaryTopicRow({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final meta = <String>[
+      if (data.likeCount > 0)
+        '${data.likeCount} ${data.likeCount == 1 ? 'like' : 'likes'}',
+      if (data.replyCount != null && data.replyCount! > 0)
+        '${data.replyCount} ${data.replyCount == 1 ? 'reply' : 'replies'}',
+    ];
+    return Material(
+      color: colorScheme.surface,
+      child: InkWell(
+        onTap: data.onTap,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: DesignTokens.spacingL,
+            vertical: DesignTokens.spacingM,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                data.title,
+                style: textTheme.titleSmall?.copyWith(
                   color: colorScheme.onSurface,
+                  fontWeight: DesignTokens.fontWeightSemiBold,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-            ),
-            if (likeCount > 0) ...[
-              SizedBox(width: DesignTokens.spacingS),
-              Icon(
-                Icons.favorite,
-                size: DesignTokens.iconSizeXS,
-                color: colorScheme.onSurfaceVariant,
-              ),
-              SizedBox(width: DesignTokens.spacingXS),
-              Text(
-                '$likeCount',
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+              if (meta.isNotEmpty) ...[
+                SizedBox(height: DesignTokens.spacingXS),
+                Text(
+                  meta.join(' · '),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
