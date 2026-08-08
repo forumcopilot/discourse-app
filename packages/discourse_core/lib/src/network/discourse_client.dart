@@ -201,11 +201,16 @@ class DiscourseClient {
   /// mid-navigation: the topic loaded, the beacon fired, the cache emptied,
   /// and the very next read of the same topic went back to the network.
   ///
-  /// Logged-in sessions only. `DiscourseTopicProxy.markTopicReadAsync` returns
-  /// early for guests, so an anonymous session never posts the beacon and this
-  /// path is unreachable — which is why an anonymous A/B of a cold launch
-  /// shows no change. Verified instead in
-  /// `test/discourse_client_measurement_test.dart`.
+  /// Logged-in sessions only, and that qualifier is the whole story:
+  /// `DiscourseTopicProxy.markTopicReadAsync` returns early for guests, so an
+  /// anonymous session never posts the beacon and an anonymous A/B shows no
+  /// change at all. Measured on a signed-in Pixel against try.discourse.org,
+  /// opening one topic:
+  ///
+  ///   before: GET /t/57.json → POST /topics/timings → GET /t/57.json
+  ///   after:  GET /t/57.json → POST /topics/timings → (cache hit ×2)
+  ///
+  /// — one topic fetch instead of two, on every topic open.
   static bool _isInertWrite(String path) => path.startsWith('/topics/timings');
 
   /// Stable string for a query map, so the same request always produces the
