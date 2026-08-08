@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:discourse_ui/services/discourse_login_service.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
+import 'package:forumcopilot_sdk/services/forumcopilot_api_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/network/fc_api_exception.dart';
 import 'package:get/get.dart';
@@ -1047,10 +1049,34 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
     }
   }
 
+  /// Tell our backend to stop polling notifications for this install on this
+  /// forum. Never throws — a failure here must not block signing out.
+  Future<void> _revokeNotificationsKey(SiteContext siteContext) async {
+    try {
+      final siteId = siteContext.site.id;
+      if (siteId == null) return;
+      final clientId =
+          await DiscourseLoginService(siteContext).notificationsClientId();
+      await ForumCopilotApiService.revokeDiscourseNotificationKey(
+        siteId: siteId,
+        clientId: clientId,
+      );
+    } catch (e) {
+      AppLogger.debug(
+          '🔔 [LOGOUT] Could not revoke the notifications key (continuing): $e');
+    }
+  }
+
   /// Handles logout process
   Future<bool> handleLogout(SiteContext siteContext) async {
     try {
       // Get site context before clearing login data
+
+      // Stop our backend polling this user's notifications. Must run BEFORE
+      // logoutUserAsync, which clears the credentials the client id is derived
+      // from. Best-effort: the key is scoped to notifications only, and the
+      // poller drops it on its own once Discourse starts rejecting it.
+      await _revokeNotificationsKey(siteContext);
 
       // Call server logout
       final userProxy = SiteProxyService.getUserProxy();

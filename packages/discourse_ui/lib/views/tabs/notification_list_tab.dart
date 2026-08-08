@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_badge.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 import 'package:forumcopilot_sdk/models/results/fc_social_result.dart';
 import '../../theme/design_tokens.dart';
@@ -11,6 +12,10 @@ import '../post_page.dart';
 import '../lists/posts_list.dart';
 import '../private_messaging/conversation/pages/conversation_page.dart';
 import '../user_profile_page.dart';
+import '../chat/chat_channel_view.dart';
+import '../group_detail_page.dart';
+import '../widgets/badge_detail_sheet.dart';
+import 'package:discourse_ui/services/site_proxy_service.dart';
 import '../../utils/url_utils.dart';
 import 'package:discourse_ui/views/widgets/not_signed_in_view.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -405,8 +410,51 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
           ),
         ),
       );
+    } else if (contentType == 'badge') {
+      await _openBadge(alert);
+    } else if (contentType == 'chat_channel') {
+      final channelId = int.tryParse(alert.content_id ?? '');
+      if (channelId == null) {
+        _showErrorDialog(context, 'Channel ID is missing. Cannot open the chat.');
+        return;
+      }
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Scaffold(
+            appBar: AppBar(title: Text(alert.message)),
+            body: ChatChannelView(
+              siteContext: widget.siteContext,
+              channelId: channelId,
+            ),
+          ),
+        ),
+      );
+    } else if (contentType == 'group') {
+      final groupName = alert.content_id ?? '';
+      if (groupName.isEmpty) {
+        _showErrorDialog(context, 'Group name is missing. Cannot open the group.');
+        return;
+      }
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GroupDetailPage(
+            siteContext: widget.siteContext,
+            groupName: groupName,
+          ),
+        ),
+      );
+    } else if (contentType == 'notice') {
+      // Staff notices (new features, admin problems) and any Discourse type we do not
+      // recognise yet. There is no in-app screen for these, so show what the
+      // notification says instead of pretending navigation failed.
+      _showNoticeDialog(context, alert.message);
     } else {
-      // For all other types: use actionUrl to open in external browser
+      // Legacy fallback, retained for non-Discourse platforms. Every Discourse
+      // notification now resolves to one of the in-app branches above.
       final actionUrl = alert.actionUrl;
       if (actionUrl == null || actionUrl.isEmpty) {
         AppLogger.debug('Content type "${alert.content_type}" has no actionUrl. Cannot navigate.');
@@ -414,9 +462,61 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
         return;
       }
 
-      // Open URL in external browser
       await UrlUtils.openUrl(actionUrl);
     }
+  }
+
+  /// Opens the badge detail sheet for a "you earned a badge" notification.
+  ///
+  /// The notification carries only the badge id, so the badge itself is looked up in
+  /// the user's own badge list — the same data the badges directory renders, which
+  /// means the sheet shows a real description and icon rather than a bare name.
+  Future<void> _openBadge(FCAlert alert) async {
+    final badgeId = int.tryParse(alert.content_id ?? '');
+    final username = widget.siteContext.currentUsername;
+    if (badgeId == null || username == null || username.isEmpty) {
+      _showErrorDialog(context, 'Badge details are unavailable.');
+      return;
+    }
+
+    FCBadge? badge;
+    try {
+      final result =
+          await SiteProxyService.getUserProxy().getUserBadgesAsync(username);
+      for (final b in result.badges) {
+        if (b.id == badgeId) {
+          badge = b;
+          break;
+        }
+      }
+    } catch (e) {
+      AppLogger.debug('Could not load badge $badgeId: $e');
+    }
+
+    if (!mounted) return;
+    if (badge == null) {
+      _showErrorDialog(context, 'Could not load this badge.');
+      return;
+    }
+
+    await showBadgeDetailSheet(context, badge);
+  }
+
+  /// Informational, not an error — these notifications are real, they simply have no
+  /// screen to open.
+  void _showNoticeDialog(BuildContext context, String message) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   String _extractSubjectFromMessage(String message) {

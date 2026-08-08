@@ -69,6 +69,25 @@ class AppForumConfig {
     'one_time_password',
   ];
 
+  /// Scopes for the SECOND handshake — the key handed to our backend so it can
+  /// poll this user's notifications and deliver them as push.
+  ///
+  /// `notifications` alone, deliberately. It grants exactly four routes
+  /// (notifications#index, #totals, #mark_read, and message_bus) — enough to
+  /// see what arrived and mark it read, and nothing else. `read` would have
+  /// been far worse: it matches every GET on the site, so a stored key would
+  /// expose the user's private messages, drafts and preferences.
+  ///
+  /// There is no narrower option; Discourse's scopes are fixed named sets, so
+  /// "just #totals" is not requestable — and totals alone returns counts with
+  /// no content to build a notification from.
+  static const List<String> userApiNotificationsScopes = <String>['notifications'];
+
+  /// Suffix that derives this key's client id from the install's, keeping it
+  /// distinct from the login key. Discourse destroys existing keys for the same
+  /// (client_id, user) on each grant, so sharing an id would sign the user out.
+  static const String userApiNotificationsClientIdSuffix = 'notify';
+
   /// Optional branding metadata.
   static const String forumDescription =
       'Discourse demo forum — try.discourse.org';
