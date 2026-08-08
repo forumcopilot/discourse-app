@@ -24,6 +24,7 @@ import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/utils/avatar_cache_utils.dart';
 import 'package:discourse_ui/utils/error_message.dart';
 import 'package:discourse_ui/utils/file_picker_utils.dart';
+import 'package:discourse_ui/utils/time_utils.dart';
 import 'package:discourse_ui/views/post_page.dart';
 import 'package:get/get.dart';
 
@@ -1242,6 +1243,9 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
                 _SummaryTopicRowData(
                   title: r.topicTitle,
                   likeCount: r.likeCount,
+                  // The topic title is the same for every reply in a topic,
+                  // so without the date three rows read identically.
+                  createdAt: r.createdAt,
                   // Opens the topic, not the exact post: the summary gives a
                   // post_number, while anchoring needs a post id, and
                   // `gotoPage` is a page index — not the same thing.
@@ -1261,6 +1265,7 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
                 _SummaryTopicRowData(
                   title: t.title,
                   likeCount: t.likeCount,
+                  createdAt: t.createdAt,
                   replyCount:
                       t.postsCount == null ? null : (t.postsCount! - 1),
                   onTap: () => Get.to(() => PostPage(
@@ -1454,12 +1459,14 @@ class _SummaryTopicRowData {
   final String title;
   final int likeCount;
   final int? replyCount;
+  final DateTime? createdAt;
   final VoidCallback onTap;
 
   const _SummaryTopicRowData({
     required this.title,
     required this.likeCount,
     this.replyCount,
+    this.createdAt,
     required this.onTap,
   });
 }
@@ -1476,6 +1483,7 @@ class _SummaryTopicRow extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final meta = <String>[
+      if (data.createdAt != null) formatTimeAgo(data.createdAt!, context),
       if (data.likeCount > 0)
         '${data.likeCount} ${data.likeCount == 1 ? 'like' : 'likes'}',
       if (data.replyCount != null && data.replyCount! > 0)
