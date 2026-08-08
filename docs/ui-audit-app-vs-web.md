@@ -85,7 +85,26 @@ signal of the two.
   Web scrolls the block horizontally. This is the highest-severity
   content bug found.
 
-## 6. Cross-cutting
+## 6. Categories — one fixed, rest open
+
+- **HTML entities were not decoded — fixed.** The general category read
+  "If you&#39;re not sure what to pick" in the app and "If you're not
+  sure" on web. Discourse returns both `description_text` (tag-free but
+  entity-ESCAPED) and `description` (clean); the proxy took the former
+  verbatim. Now run through `stripHtmlToText`, which already decodes
+  numeric character references. Verified on device.
+- **Open: no subcategory nesting shown.** Web groups subcategories under
+  their parent; the app renders one flat list.
+- The app shows a topic count per category, which web's box layout does
+  not — a point in the app's favour, worth keeping.
+
+## 7. Notifications / auth state — open, needs a signed-in device
+
+The Notifications and Profile tabs both render "Sign in to view…". That
+is *correct* for the current device state — the session really is gone —
+but it blocked auditing these screens. See "Session lost" below.
+
+## 8. Cross-cutting
 
 - **Anonymous chat fetch.** `GET /chat/api/me/channels` fires three times
   per anonymous launch and 403s every time — a guest cannot use chat.
@@ -98,9 +117,25 @@ signal of the two.
 
 ---
 
+## Session lost on the test device
+
+Part-way through this audit the Pixel stopped being signed in: no
+`GET /session/current.json` on cold start, and the anonymous
+`/chat/api/me/channels` double-fetch signature returned. The stored User
+API Key appears to be gone from secure storage rather than rejected.
+
+Cause not established. It is NOT the demo forum resetting — the post
+count kept climbing (3,907 → 3,909) instead of returning to a baseline.
+The plausible candidate is the repeated `flutter run` reinstalls during
+this session dropping the Keystore-backed entry. Worth confirming
+deliberately, because a real app *update* must not sign users out.
+
+Re-authenticating needs the account password, so it has to be done by
+hand on the device; the remaining screens can be audited after that.
+
 ## Not covered
 
-Ran out of session before auditing: categories page, notifications,
+Still to audit, all of which need a signed-in session: notifications,
 search, messages/PMs, bookmarks, chat, drafts, settings, composer. The
 method above is cheap to repeat — `flutter run -d <device>` plus the same
 page in Chrome.
