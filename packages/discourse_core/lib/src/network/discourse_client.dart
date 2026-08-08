@@ -338,13 +338,19 @@ class DiscourseClient {
 
       if (result.statusCode != 429) return result;
 
-      // Hold EVERY request, not just this one. The limiter is per User API Key
-      // and the whole app shares one key, so a screen that fans out on mount
-      // would otherwise send its remaining calls straight into the same wall
-      // and turn one 429 into several. Recording the cooldown here makes the
-      // next caller wait instead of spending budget it does not have.
+      // Hold every request, but ONLY for a limit that actually governs every
+      // request. A global limit (per IP, or per User API Key — the app shares
+      // one key) means the next caller would spend budget it does not have,
+      // so make it wait. An action-scoped limit governs one post's like
+      // button and nothing else; freezing reads and navigation over it would
+      // be a self-inflicted outage. See [_isGlobalRateLimit].
       final wait = _retryAfter(result);
-      if (wait != null) {
+      final isGlobal = _isGlobalRateLimit(result);
+      if (kDebugMode) {
+        debugPrint('🌐 [HTTP 429 ${isGlobal ? 'GLOBAL' : 'action-scoped'}] '
+            '$method ${url.path} wait=${wait?.inSeconds ?? '?'}s');
+      }
+      if (wait != null && isGlobal) {
         final until = DateTime.now().add(wait);
         if (_rateLimitedUntil == null || until.isAfter(_rateLimitedUntil!)) {
           _rateLimitedUntil = until;
@@ -401,6 +407,30 @@ class DiscourseClient {
   /// gets the error so the UI can say how long to wait rather than appear
   /// to hang.
   static const Duration _maxAutoRetryDelay = Duration(seconds: 10);
+
+  /// Whether a 429 governs the whole client or just the action that tripped it.
+  ///
+  /// Discourse sets `Discourse-Rate-Limit-Error-Code` on exactly the limits
+  /// that apply to every request we make:
+  ///   * `lib/middleware/request_tracker.rb` — per-IP (`*_10_secs_limit`,
+  ///     `*_60_secs_limit`, `*_assets_10_secs_limit`)
+  ///   * `lib/auth/default_current_user_provider.rb` — per key
+  ///     (`user_api_key_limiter_60_secs`, `user_api_key_limiter_1_day`)
+  ///
+  /// Action-scoped limiters construct `RateLimiter` without an `error_code`,
+  /// so the header is absent. The one users hit constantly is
+  /// `PostAction.limit_action!` (`app/models/post_action.rb`): four actions
+  /// per minute on a `post_action-<post_id>_<type>` key, shared by liking and
+  /// unliking, so a like/unlike/like/unlike cycle exhausts it on one post.
+  /// That must not stall the rest of the app.
+  ///
+  /// Both shapes carry `Retry-After`, so the header — not the presence of a
+  /// wait — is the discriminator.
+  static bool _isGlobalRateLimit(FCCallResult result) {
+    final code = result.headers['discourse-rate-limit-error-code'] ??
+        result.headers['Discourse-Rate-Limit-Error-Code'];
+    return code != null && code.trim().isNotEmpty;
+  }
 
   /// How long Discourse asked us to wait, from either 429 shape:
   /// the middleware's `Retry-After` header (plain-text body) or the

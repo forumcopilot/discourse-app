@@ -18,6 +18,7 @@
 library;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:discourse_core/src/network/discourse_client.dart';
@@ -254,10 +255,44 @@ void main() {
           reason: 'the retry must actually wait the advertised second');
     });
 
+    test('an action-scoped 429 does NOT hold other requests', () async {
+      // What Discourse sends for PostAction.limit_action! — 4 likes/minute on
+      // one post. Note the Retry-After IS present; only the error-code header
+      // is missing, because the limiter carries no error_code.
+      server.routes['/post_actions.json'] = (req) {
+        req.response.statusCode = 429;
+        req.response.headers.set('Retry-After', '30');
+        req.response.headers.contentType = ContentType.json;
+        req.response.write(jsonEncode({
+          'errors': ['You’ve performed this action too many times.'],
+          'error_type': 'rate_limit',
+          'extras': {'wait_seconds': 30},
+        }));
+      };
+      final liked = await client.post(ctx, '/post_actions.json',
+          body: {'id': 1, 'post_action_type_id': 2});
+      expect(liked.statusCode, 429);
+
+      final sw = Stopwatch()..start();
+      await client.get(ctx, '/t/46.json');
+      sw.stop();
+      // ignore: avoid_print
+      print('[measure] action-scoped: unrelated GET delayed '
+          '${sw.elapsedMilliseconds}ms');
+      expect(sw.elapsedMilliseconds, lessThan(1000),
+          reason: 'a per-post like limit must not freeze reads app-wide');
+      expect(server.count(method: 'GET', path: '/t/46.json'), 1);
+    });
+
     test('a 429 holds subsequent requests to OTHER paths', () async {
+      // A GLOBAL limit — what the per-IP middleware and the per-User-API-Key
+      // limiter send. The error-code header is what marks it as governing
+      // every request, and is the reason this one may stall the client.
       server.routes['/limited.json'] = (req) {
         req.response.statusCode = 429;
         req.response.headers.set('Retry-After', '2');
+        req.response.headers
+            .set('Discourse-Rate-Limit-Error-Code', 'user_api_key_limiter_60_secs');
         req.response.headers.contentType = ContentType.text;
         req.response.write('Slow down!');
       };
