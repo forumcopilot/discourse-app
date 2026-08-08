@@ -904,9 +904,29 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   // `SiteProxyService.getDraftProxy().saveDraftAsync` /
   // `loadDraftAsync` / `deleteDraftAsync` / `getMyDraftsAsync` instead.
 
+  /// The reaction id Discourse uses for a plain like. On forums running
+  /// discourse-reactions this is the plugin's default main reaction; on
+  /// forums without it, it is the chip [_parseReactions] synthesizes from
+  /// the like count. Either way it is the one reaction that can also be
+  /// applied through `/post_actions`.
+  static const String likeReactionId = 'heart';
+
+  /// The single entry point for reacting to a post.
+  ///
+  /// Discourse has two ways to do this and the app must not have to know
+  /// which one this forum supports: the discourse-reactions plugin route,
+  /// and plain likes via `/post_actions`. Both answer with a post
+  /// serializer, so [_parseReactions] normalizes either into the same
+  /// list — empty meaning "no reactions", on both paths.
+  ///
+  /// [viewerReacted] is only consulted on the `/post_actions` fallback,
+  /// which needs to know whether to add or remove the like (the plugin
+  /// route is a true toggle). It is an added optional parameter, which
+  /// Dart permits on an override, so the SDK interface is untouched.
   @override
   Future<FCToggleReactionResult> toggleReactionAsync(
-      String postId, String reactionId) async {
+      String postId, String reactionId,
+      {bool? viewerReacted}) async {
     final pid = int.tryParse(postId);
     if (pid == null) {
       return FCToggleReactionResult(
@@ -922,11 +942,47 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       final reactions = _parseReactions(response.cast<String, dynamic>());
       return FCToggleReactionResult(result: true, reactions: reactions);
     } on DiscourseApiException catch (e) {
+      // ONLY a missing route justifies falling back to the like path.
+      // This used to happen in the UI on *any* failure, so a 429 spent a
+      // second request on the same exhausted per-post budget and turned
+      // one blocked tap into two rejections.
+      if (e.statusCode == 404 && reactionId == likeReactionId) {
+        return _toggleLikeAsReaction(pid, viewerReacted: viewerReacted ?? false);
+      }
       return FCToggleReactionResult(result: false, resultText: e.userMessage);
     } catch (e) {
       return FCToggleReactionResult(result: false, resultText: describeApiError(e));
     }
   }
+
+  /// Like path for forums without discourse-reactions, shaped to look
+  /// exactly like the plugin path to the caller.
+  Future<FCToggleReactionResult> _toggleLikeAsReaction(
+    int postId, {
+    required bool viewerReacted,
+  }) async {
+    try {
+      final response = viewerReacted
+          ? await apiDelete('/post_actions/$postId.json',
+              body: {'post_action_type_id': _likePostActionTypeId})
+          : await apiPost('/post_actions.json', body: {
+              'id': postId,
+              'post_action_type_id': _likePostActionTypeId,
+            });
+      return FCToggleReactionResult(
+        result: true,
+        reactions: _parseReactions(response.cast<String, dynamic>()),
+      );
+    } on DiscourseApiException catch (e) {
+      return FCToggleReactionResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCToggleReactionResult(
+          result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// `PostActionType` id for "like" (app/models/post_action_type.rb).
+  static const int _likePostActionTypeId = 2;
 
   @override
   Future<FCAvailableReactionsResult> getAvailableReactionsAsync() async {
@@ -936,19 +992,24 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
           .whereType<String>()
           .toList(growable: false);
       if (reactions.isEmpty) {
-        // Plugin returned an empty list — fall back so the picker still
-        // works. Mark result:true since the fallback set is intentional.
+        // The plugin IS installed but named no reactions; its routes will
+        // accept the standard set, so guessing is safe here (unlike the
+        // 404 case above, where nothing but a like can succeed).
         return FCAvailableReactionsResult(
             result: true, reactions: _defaultReactions);
       }
       return FCAvailableReactionsResult(result: true, reactions: reactions);
     } on DiscourseApiException catch (e) {
-      // 404 means plugin isn't installed — degrade to the built-in set
-      // so the picker stays usable.
+      // 404 means discourse-reactions is not installed. Offering the
+      // built-in set here was actively wrong: without the plugin the only
+      // reaction the server can record is a like, so the picker showed
+      // eight emoji of which seven always failed — and the failure was
+      // invisible, because a snackbar raised from inside the sheet paints
+      // behind it. Offer the one that works.
       if (e.statusCode == 404) {
         return FCAvailableReactionsResult(
           result: true,
-          reactions: _defaultReactions,
+          reactions: const [likeReactionId],
         );
       }
       return FCAvailableReactionsResult(

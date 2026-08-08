@@ -1,9 +1,10 @@
-import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 
 import '../../theme/design_tokens.dart';
+import 'reaction_glyph.dart';
 
 /// Bottom-sheet picker for the `discourse-reactions` plugin. Loads the
 /// forum's enabled emoji set from `/discourse-reactions/custom-reactions`
@@ -15,16 +16,22 @@ class ReactionPickerSheet extends StatefulWidget {
   final String postId;
   final String? currentReactionId;
 
+  /// Resolves custom-emoji images in [ReactionGlyph]. Optional so callers
+  /// without a context still get unicode reactions.
+  final SiteContext? siteContext;
+
   const ReactionPickerSheet({
     super.key,
     required this.postId,
     this.currentReactionId,
+    this.siteContext,
   });
 
   static Future<List<FCPostReaction>?> show({
     required BuildContext context,
     required String postId,
     String? currentReactionId,
+    SiteContext? siteContext,
   }) {
     return showModalBottomSheet<List<FCPostReaction>>(
       context: context,
@@ -33,6 +40,7 @@ class ReactionPickerSheet extends StatefulWidget {
       ),
       builder: (sheetContext) {
         return ReactionPickerSheet(
+          siteContext: siteContext,
           postId: postId,
           currentReactionId: currentReactionId,
         );
@@ -65,36 +73,32 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
     });
   }
 
+  String? _error;
+
   Future<void> _toggle(String reaction) async {
-    setState(() => _toggling = reaction);
+    setState(() {
+      _toggling = reaction;
+      _error = null;
+    });
     final result = await SiteProxyService.getPostProxy()
         .toggleReactionAsync(widget.postId, reaction);
     if (!mounted) return;
     if (result.result) {
       Navigator.of(context).pop(result.reactions);
     } else {
-      setState(() => _toggling = null);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.resultText?.isNotEmpty == true
-              ? result.resultText!
-              : 'Could not update reaction. The plugin may not be installed.'),
-        ),
-      );
+      // Inline, not a snackbar: this sheet covers the bottom of the
+      // screen, so a snackbar raised from here paints behind it and the
+      // user sees the sheet simply not respond.
+      setState(() {
+        _toggling = null;
+        _error = result.resultText?.isNotEmpty == true
+            ? result.resultText!
+            : 'Could not update reaction.';
+      });
     }
   }
 
   /// Convert a Discourse reaction shortcode (e.g. "heart", "+1") to its
-  /// Unicode glyph. Falls back to the literal shortcode (wrapped in
-  /// colons) when no Unicode match exists — that signals a forum-custom
-  /// emoji that the picker can't render natively.
-  String _glyphFor(String shortcode) {
-    final clean = shortcode.replaceAll(':', '').trim();
-    final emoji = Emoji.byShortName(clean);
-    if (emoji != null && emoji.char.isNotEmpty) return emoji.char;
-    return ':$clean:';
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -153,7 +157,7 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
                     for (final r in available)
                       _ReactionTile(
                         reaction: r,
-                        glyph: _glyphFor(r),
+                        siteContext: widget.siteContext,
                         selected: r == widget.currentReactionId,
                         busy: _toggling == r,
                         onTap: _toggling == null ? () => _toggle(r) : null,
@@ -161,6 +165,29 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
                   ],
                 ),
               ),
+            if (_error != null) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: DesignTokens.spacingM,
+                  vertical: DesignTokens.spacingS,
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.error_outline,
+                        size: DesignTokens.iconSizeS,
+                        color: colorScheme.error),
+                    const SizedBox(width: DesignTokens.spacingS),
+                    Expanded(
+                      child: Text(
+                        _error!,
+                        style: textTheme.bodySmall
+                            ?.copyWith(color: colorScheme.error),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: DesignTokens.spacingS),
           ],
         ),
@@ -171,14 +198,14 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
 
 class _ReactionTile extends StatelessWidget {
   final String reaction;
-  final String glyph;
+  final SiteContext? siteContext;
   final bool selected;
   final bool busy;
   final VoidCallback? onTap;
 
   const _ReactionTile({
     required this.reaction,
-    required this.glyph,
+    required this.siteContext,
     required this.selected,
     required this.busy,
     required this.onTap,
@@ -215,7 +242,11 @@ class _ReactionTile extends StatelessWidget {
                   color: colorScheme.primary,
                 ),
               )
-            : Text(glyph, style: const TextStyle(fontSize: 26)),
+            : ReactionGlyph(
+                reactionId: reaction,
+                size: 26,
+                siteContext: siteContext,
+              ),
       ),
     );
   }

@@ -1,8 +1,9 @@
-import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 
 import '../../theme/design_tokens.dart';
+import 'reaction_glyph.dart';
 
 /// Horizontal chip row showing emoji reactions on a Discourse post:
 /// `❤️ 5`, `🚀 2`, etc. Tapping a chip the viewer already reacted with
@@ -11,11 +12,10 @@ import '../../theme/design_tokens.dart';
 /// that count ([onLongPress]); the trailing `+` chip opens the full
 /// emoji picker ([onAddReaction]).
 ///
-/// This is the *only* like/reaction surface on a post: the proxy
-/// synthesizes a single heart entry on forums without the
+/// The proxy synthesizes a single heart entry on forums without the
 /// `discourse-reactions` plugin, so a plain like shows up here too.
-/// Hidden when [reactions] is empty (nobody has reacted yet) — the
-/// heart button in the action row is the zero-state affordance.
+/// Hidden when [reactions] is empty — with nothing to count there is
+/// nothing to show, and the react button carries the affordance.
 class ReactionChipsRow extends StatelessWidget {
   final List<FCPostReaction> reactions;
   final ValueChanged<String> onTap;
@@ -24,24 +24,16 @@ class ReactionChipsRow extends StatelessWidget {
   /// open the reactor list filtered to that emoji.
   final ValueChanged<String>? onLongPress;
 
-  /// Tapped the trailing `+` chip. Opens the full reaction picker.
-  /// When null the `+` chip is not rendered (e.g. logged-out viewers).
-  final VoidCallback? onAddReaction;
+  /// Used to resolve custom-emoji images in [ReactionGlyph].
+  final SiteContext? siteContext;
 
   const ReactionChipsRow({
     super.key,
     required this.reactions,
     required this.onTap,
     this.onLongPress,
-    this.onAddReaction,
+    this.siteContext,
   });
-
-  String _glyphFor(String shortcode) {
-    final clean = shortcode.replaceAll(':', '').trim();
-    final emoji = Emoji.byShortName(clean);
-    if (emoji != null && emoji.char.isNotEmpty) return emoji.char;
-    return ':$clean:';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,10 +65,10 @@ class ReactionChipsRow extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    _glyphFor(r.id),
-                    style:
-                        const TextStyle(fontSize: DesignTokens.fontSizeS - 1),
+                  ReactionGlyph(
+                    reactionId: r.id,
+                    size: DesignTokens.fontSizeS - 1,
+                    siteContext: siteContext,
                   ),
                   const SizedBox(width: DesignTokens.spacingXS),
                   Text(
@@ -89,20 +81,6 @@ class ReactionChipsRow extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-            ),
-          // Trailing "+" chip — the picker used to be reachable only by
-          // long-pressing the heart button, which is hidden once chips
-          // exist. This keeps "react with another emoji" one tap away.
-          if (onAddReaction != null)
-            _Chip(
-              onTap: onAddReaction,
-              semanticLabel: 'Add a reaction',
-              selected: false,
-              child: Icon(
-                Icons.add,
-                size: DesignTokens.fontSizeS + 3,
-                color: colorScheme.onSurfaceVariant,
               ),
             ),
         ],

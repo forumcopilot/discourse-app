@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import '../../utils/accessibility_helpers.dart';
 import 'package:discourse_ui/views/widgets/post_action_button.dart';
 import '../../theme/design_tokens.dart';
+import '../widgets/reaction_glyph.dart';
 
 /// Action row under a post: reply / like / bookmark / accept-answer.
 ///
@@ -16,6 +18,16 @@ class PostListItemSocial extends StatelessWidget {
   final FCPost post;
   final bool isLiked;
   final int likeCount;
+
+  /// The reaction id the viewer has on this post, or null when they have
+  /// not reacted. When set, the react button renders that reaction's glyph
+  /// in place of the outline heart, so "did I react, and with what?" is
+  /// answerable from the action row instead of by hunting for the
+  /// highlighted chip.
+  final String? viewerReactionId;
+
+  /// Resolves custom-emoji images for [viewerReactionId].
+  final SiteContext? reactionSiteContext;
 
   /// Seconds until this post's like budget frees up, or 0 when it is
   /// available. Discourse caps post actions at 4/minute per post, counting
@@ -50,6 +62,8 @@ class PostListItemSocial extends StatelessWidget {
     required this.post,
     required this.isLiked,
     required this.likeCount,
+    this.viewerReactionId,
+    this.reactionSiteContext,
     this.likeCooldownSeconds = 0,
     this.isLoggedIn = false,
     this.onLike,
@@ -66,7 +80,10 @@ class PostListItemSocial extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     // The heart is the zero-state affordance only — see the class doc.
-    final showLike = isLoggedIn && post.canLike && post.reactions.isEmpty;
+    // Always present when the viewer may react at all. It used to be
+    // hidden the moment any chip existed, which left the action row with
+    // no reaction control and no indication of the viewer's own reaction.
+    final showLike = isLoggedIn && post.canLike;
     final showBookmark = isLoggedIn && onBookmark != null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,19 +106,28 @@ class PostListItemSocial extends StatelessWidget {
               if (trailing != null) SizedBox(width: DesignTokens.spacingXL),
               Opacity(
                 opacity: likeCooldownSeconds > 0 ? 0.5 : 1.0,
-                child: PostActionButton(
-                  icon: Icons.favorite_border,
-                  activeIcon: Icons.favorite,
-                  active: isLiked,
-                  activeColor: colorScheme.error,
-                  onTap: onLike,
-                  // Long-press opens the reaction picker when wired
-                  // (discourse-reactions plugin); plain tap still
-                  // toggles like.
-                  onLongPress: onLongPressLike,
-                  semanticLabel: AccessibilityHelpers.getLikeButtonLabel(
-                      context, isLiked, likeCount),
-                ),
+                child: viewerReactionId != null
+                    // Reacted: show the actual reaction, not a generic
+                    // heart. Tap opens the picker, where tapping the
+                    // current reaction removes it.
+                    ? _ReactedButton(
+                        reactionId: viewerReactionId!,
+                        siteContext: reactionSiteContext,
+                        onTap: onLike,
+                        semanticLabel:
+                            'You reacted with $viewerReactionId. Change or remove it.',
+                      )
+                    : PostActionButton(
+                        icon: Icons.favorite_border,
+                        activeIcon: Icons.favorite,
+                        active: isLiked,
+                        activeColor: colorScheme.error,
+                        onTap: onLike,
+                        onLongPress: onLongPressLike,
+                        semanticLabel:
+                            AccessibilityHelpers.getLikeButtonLabel(
+                                context, isLiked, likeCount),
+                      ),
               ),
               if (likeCooldownSeconds > 0) ...[
                 SizedBox(width: DesignTokens.spacingXS),
@@ -160,4 +186,42 @@ class PostListItemSocial extends StatelessWidget {
   }
 
 
+}
+
+
+/// The react button when the viewer HAS reacted: their reaction's glyph
+/// on the same footprint as the other action buttons.
+class _ReactedButton extends StatelessWidget {
+  final String reactionId;
+  final SiteContext? siteContext;
+  final VoidCallback? onTap;
+  final String semanticLabel;
+
+  const _ReactedButton({
+    required this.reactionId,
+    required this.siteContext,
+    required this.onTap,
+    required this.semanticLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: semanticLabel,
+      button: true,
+      selected: true,
+      child: InkResponse(
+        onTap: onTap,
+        radius: DesignTokens.iconSizeL,
+        child: Padding(
+          padding: EdgeInsets.all(DesignTokens.spacingXS),
+          child: ReactionGlyph(
+            reactionId: reactionId,
+            size: DesignTokens.iconSizeM,
+            siteContext: siteContext,
+          ),
+        ),
+      ),
+    );
+  }
 }

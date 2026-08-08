@@ -40,7 +40,7 @@ import '../forum_topics_page.dart';
 import 'package:get/get.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_bookmark.dart';
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseBookmarkProxy, DiscourseBookmarkAutoDelete;
+    show DiscourseBookmarkProxy, DiscourseBookmarkAutoDelete, DiscoursePostProxy;
 import '../widgets/bookmark_reminder_sheet.dart';
 import '../../controllers/login_controller.dart';
 import '../login_page.dart';
@@ -190,6 +190,15 @@ class _PostListItemState extends State<PostListItem> {
   // discourse-post-voting local copy. Null when voting isn't enabled
   // on this topic, in which case the vote column is hidden.
   FCPostVote? _vote;
+
+  /// The reaction the viewer currently has on this post, if any. Single
+  /// source of truth for the react button's glyph.
+  String? get _viewerReactionId {
+    for (final r in _reactions) {
+      if (r.viewerReacted) return r.id;
+    }
+    return null;
+  }
 
   /// Ticks once a second while this post's like/reaction budget is spent,
   /// so the chips row can count down instead of looking tappable.
@@ -612,9 +621,7 @@ class _PostListItemState extends State<PostListItem> {
                 reactions: _reactions,
                 onTap: _toggleReaction,
                 onLongPress: _showReactionUsers,
-                onAddReaction: widget.siteContext.isLoggedIn
-                    ? _openReactionPicker
-                    : null,
+                siteContext: widget.siteContext,
               );
               if (secondsLeft <= 0) return row;
               // Discourse is refusing further actions on this post for a
@@ -685,8 +692,13 @@ class _PostListItemState extends State<PostListItem> {
             isLiked: _isLiked,
             likeCount: _likeCount,
             likeCooldownSeconds: LikeCooldown.secondsLeft(widget.post.id),
+            viewerReactionId: _viewerReactionId,
+            reactionSiteContext: widget.siteContext,
             isLoggedIn: widget.siteContext.isLoggedIn,
-            onLike: _handleLikeAction,
+            // One home for "react": the picker. Removing your reaction is
+            // tapping it again inside the picker, so there is no hidden
+            // long-press to discover.
+            onLike: _openReactionPicker,
             onLongPressLike: _openReactionPicker,
             isBookmarked: _isBookmarked,
             onBookmark: _handleBookmarkAction,
@@ -1353,24 +1365,21 @@ class _PostListItemState extends State<PostListItem> {
       _showReactionCooldown();
       return;
     }
-    final result = await SiteProxyService.getPostProxy()
-        .toggleReactionAsync(widget.post.id, reactionId);
+    // One call, whichever way this forum supports reacting: the proxy
+    // picks the plugin route or /post_actions and normalizes both. The
+    // UI used to run that fallback itself, on any failure, which spent a
+    // second request against the same exhausted budget on a 429.
+    final proxy = SiteProxyService.getPostProxy();
+    final result = proxy is DiscoursePostProxy
+        ? await proxy.toggleReactionAsync(widget.post.id, reactionId,
+            viewerReacted: _viewerReactionId == reactionId)
+        : await proxy.toggleReactionAsync(widget.post.id, reactionId);
     if (!mounted) return;
     if (!result.result) {
       final cooldown = LikeCooldown.noteFromLastResponse(
           widget.siteContext, widget.post.id);
       if (cooldown != null) {
-        // Rate limited, not missing. The fallback below would spend a
-        // second request on the like route, which shares the very budget
-        // that just ran out — that is how one blocked tap became two 429s.
         _showReactionCooldown();
-        return;
-      }
-      // Forums without discourse-reactions have no custom-reactions
-      // route, but they still have likes — and the `heart` chip there
-      // is the synthesized like chip. Toggle it through the like path.
-      if (reactionId == 'heart') {
-        await _handleLikeAction();
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1450,6 +1459,7 @@ class _PostListItemState extends State<PostListItem> {
         .id;
     final updated = await ReactionPickerSheet.show(
       context: context,
+      siteContext: widget.siteContext,
       postId: widget.post.id,
       currentReactionId: current.isEmpty ? null : current,
     );
