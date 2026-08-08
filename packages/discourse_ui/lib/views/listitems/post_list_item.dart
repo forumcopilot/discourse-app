@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:discourse_core/discourse_core.dart' show DiscourseAcceptedAnswer;
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/views/widgets/solution_summary_card.dart';
@@ -18,6 +20,7 @@ import '../widgets/link_preview_card.dart';
 import '../widgets/video_card.dart';
 import '../widgets/twitter_card.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../utils/like_cooldown.dart';
 import '../widgets/post_actions.dart';
 import '../widgets/thread_poll_card.dart';
 import '../../controllers/post_controller.dart';
@@ -188,6 +191,10 @@ class _PostListItemState extends State<PostListItem> {
   // on this topic, in which case the vote column is hidden.
   FCPostVote? _vote;
 
+  /// Ticks once a second while this post's like/reaction budget is spent,
+  /// so the chips row can count down instead of looking tappable.
+  Timer? _cooldownTicker;
+
   @override
   void initState() {
     super.initState();
@@ -203,6 +210,12 @@ class _PostListItemState extends State<PostListItem> {
     _isBookmarked = widget.post.bookmarked;
     _reactions = List.of(widget.post.reactions, growable: false);
     _vote = widget.post.vote;
+  }
+
+  @override
+  void dispose() {
+    _cooldownTicker?.cancel();
+    super.dispose();
   }
 
   @override
@@ -593,14 +606,39 @@ class _PostListItemState extends State<PostListItem> {
           // full picker. Hidden only in the zero state, where the
           // heart button in the action row takes over.
           if (_reactions.isNotEmpty)
-            ReactionChipsRow(
-              reactions: _reactions,
-              onTap: _toggleReaction,
-              onLongPress: _showReactionUsers,
-              onAddReaction: widget.siteContext.isLoggedIn
-                  ? _openReactionPicker
-                  : null,
-            ),
+            Builder(builder: (context) {
+              final secondsLeft = LikeCooldown.secondsLeft(widget.post.id);
+              final row = ReactionChipsRow(
+                reactions: _reactions,
+                onTap: _toggleReaction,
+                onLongPress: _showReactionUsers,
+                onAddReaction: widget.siteContext.isLoggedIn
+                    ? _openReactionPicker
+                    : null,
+              );
+              if (secondsLeft <= 0) return row;
+              // Discourse is refusing further actions on this post for a
+              // known number of seconds. Show that instead of leaving a
+              // live-looking button that can only fail.
+              return Row(
+                children: [
+                  Flexible(child: Opacity(opacity: 0.5, child: row)),
+                  const SizedBox(width: DesignTokens.spacingS),
+                  Icon(
+                    Icons.timer_outlined,
+                    size: DesignTokens.iconSizeXS,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: DesignTokens.spacingXS),
+                  Text(
+                    '${secondsLeft}s',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              );
+            }),
           if (data.limitedYoutubeUrls.isNotEmpty) ...[
             const SizedBox(height: DesignTokens.spacingM),
             StyleBuilders.divider(colorScheme: colorScheme),
@@ -646,6 +684,7 @@ class _PostListItemState extends State<PostListItem> {
             post: widget.post,
             isLiked: _isLiked,
             likeCount: _likeCount,
+            likeCooldownSeconds: LikeCooldown.secondsLeft(widget.post.id),
             isLoggedIn: widget.siteContext.isLoggedIn,
             onLike: _handleLikeAction,
             onLongPressLike: _openReactionPicker,
@@ -979,6 +1018,11 @@ class _PostListItemState extends State<PostListItem> {
     // the zero-state heart button hands off to a chip immediately
     // instead of waiting for a thread refetch.
     _syncHeartChipFromLike();
+    // The heart and the chips row share one server budget, so a limit hit
+    // through the heart has to put the chips row into the same countdown.
+    if (mounted && LikeCooldown.isCoolingDown(widget.post.id)) {
+      _startCooldownTicker();
+    }
   }
 
   /// Toggle bookmark on the current post via IFCBookmarkProxy
@@ -1263,6 +1307,35 @@ class _PostListItemState extends State<PostListItem> {
     }
   }
 
+  /// Tells the user how long is left, and keeps the chips row counting
+  /// down until the budget frees up.
+  void _showReactionCooldown() {
+    final seconds = LikeCooldown.secondsLeft(widget.post.id);
+    if (seconds <= 0) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('You can react to this post again in ${seconds}s'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+    _startCooldownTicker();
+  }
+
+  void _startCooldownTicker() {
+    _cooldownTicker?.cancel();
+    _cooldownTicker = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (!LikeCooldown.isCoolingDown(widget.post.id)) {
+        timer.cancel();
+        _cooldownTicker = null;
+      }
+      setState(() {});
+    });
+  }
+
   /// Toggle a specific reaction by id (called from the chips row when
   /// the user taps an existing chip). When [reactionId] is the
   /// viewer's current reaction, the server removes it; otherwise it
@@ -1274,10 +1347,25 @@ class _PostListItemState extends State<PostListItem> {
       );
       return;
     }
+    // Reacting and liking share one server-side budget (4 per minute on a
+    // post). If it is already spent, don't send a request that cannot win.
+    if (LikeCooldown.isCoolingDown(widget.post.id)) {
+      _showReactionCooldown();
+      return;
+    }
     final result = await SiteProxyService.getPostProxy()
         .toggleReactionAsync(widget.post.id, reactionId);
     if (!mounted) return;
     if (!result.result) {
+      final cooldown = LikeCooldown.noteFromLastResponse(
+          widget.siteContext, widget.post.id);
+      if (cooldown != null) {
+        // Rate limited, not missing. The fallback below would spend a
+        // second request on the like route, which shares the very budget
+        // that just ran out — that is how one blocked tap became two 429s.
+        _showReactionCooldown();
+        return;
+      }
       // Forums without discourse-reactions have no custom-reactions
       // route, but they still have likes — and the `heart` chip there
       // is the synthesized like chip. Toggle it through the like path.

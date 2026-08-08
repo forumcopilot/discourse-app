@@ -16,6 +16,12 @@ class PostListItemSocial extends StatelessWidget {
   final FCPost post;
   final bool isLiked;
   final int likeCount;
+
+  /// Seconds until this post's like budget frees up, or 0 when it is
+  /// available. Discourse caps post actions at 4/minute per post, counting
+  /// likes and unlikes together, so a live-looking heart during the cooldown
+  /// only invites taps that cannot succeed.
+  final int likeCooldownSeconds;
   final bool isLoggedIn;
   final VoidCallback? onLike;
   /// Optional long-press on the like button. Used on Discourse to open
@@ -44,6 +50,7 @@ class PostListItemSocial extends StatelessWidget {
     required this.post,
     required this.isLiked,
     required this.likeCount,
+    this.likeCooldownSeconds = 0,
     this.isLoggedIn = false,
     this.onLike,
     this.onLongPressLike,
@@ -57,6 +64,7 @@ class PostListItemSocial extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     // The heart is the zero-state affordance only — see the class doc.
     final showLike = isLoggedIn && post.canLike && post.reactions.isEmpty;
     final showBookmark = isLoggedIn && onBookmark != null;
@@ -79,19 +87,31 @@ class PostListItemSocial extends StatelessWidget {
             // would be a second control for the same thing.
             if (showLike) ...[
               if (trailing != null) SizedBox(width: DesignTokens.spacingXL),
-              PostActionButton(
-                icon: Icons.favorite_border,
-                activeIcon: Icons.favorite,
-                active: isLiked,
-                activeColor: colorScheme.error,
-                onTap: onLike,
-                // Long-press opens the reaction picker when wired
-                // (discourse-reactions plugin); plain tap still
-                // toggles like.
-                onLongPress: onLongPressLike,
-                semanticLabel: AccessibilityHelpers.getLikeButtonLabel(
-                    context, isLiked, likeCount),
+              Opacity(
+                opacity: likeCooldownSeconds > 0 ? 0.5 : 1.0,
+                child: PostActionButton(
+                  icon: Icons.favorite_border,
+                  activeIcon: Icons.favorite,
+                  active: isLiked,
+                  activeColor: colorScheme.error,
+                  onTap: onLike,
+                  // Long-press opens the reaction picker when wired
+                  // (discourse-reactions plugin); plain tap still
+                  // toggles like.
+                  onLongPress: onLongPressLike,
+                  semanticLabel: AccessibilityHelpers.getLikeButtonLabel(
+                      context, isLiked, likeCount),
+                ),
               ),
+              if (likeCooldownSeconds > 0) ...[
+                SizedBox(width: DesignTokens.spacingXS),
+                Text(
+                  '${likeCooldownSeconds}s',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ],
             if (showBookmark) ...[
               // Only pad when something precedes this button, otherwise
