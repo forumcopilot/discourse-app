@@ -68,10 +68,12 @@ Still open: last-reply attribution ("X replied 3 hours ago") and the
 
 ## 4. Topic view — open
 
-- **Reaction display model differs.** Web renders one combined cluster
-  with a single total (`❤️😮 5`); the app renders a separate counted chip
-  per reaction (`❤️ 1` `😮 1`). Web's reads better once a post has several
-  reactions. Worth a decision rather than drift.
+- **Reaction display — resolved, web's combined style.** The app used a
+  separate counted chip per reaction on its own line above the action row.
+  It now renders one cluster (`❤️😮 5`) in the action row, where the heart
+  used to be, so a post costs one line instead of two. Tap opens the
+  picker, long-press lists who reacted, and the viewer's own participation
+  is carried in the count's colour. `ReactionChipsRow` is deleted.
 - **No topic stats bar.** Web has `793 views · 7 likes · 4 links ·
   6 users` plus participant avatars under the first post. The app has
   nothing equivalent.
@@ -185,8 +187,8 @@ page in Chrome.
 
 ## Suggested order
 
-1. Code-block scrolling (correctness; content is currently wrong).
-2. Category badge on topic rows and in the topic view (IA gap).
+1. ~~Code-block scrolling~~ — done.
+2. ~~Category badge on topic rows~~ — done (topic view still open).
 3. Topic stats bar + last-reply attribution (density parity).
 4. Profile: chat button, notification level.
-5. Reaction cluster vs. per-emoji chips (decide, then align).
+5. ~~Reaction cluster vs. per-emoji chips~~ — done, combined style.

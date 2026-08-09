@@ -3,6 +3,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 
+import '../../utils/like_cooldown.dart';
 import '../../theme/design_tokens.dart';
 import 'reaction_glyph.dart';
 
@@ -86,14 +87,25 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
     if (result.result) {
       Navigator.of(context).pop(result.reactions);
     } else {
+      // The per-post budget (4 actions/minute, likes and unlikes sharing
+      // the counter) is now spent through this sheet, so this is where the
+      // cooldown has to be recorded — it used to be captured by the chips
+      // row, which no longer exists.
+      final cooldown = widget.siteContext == null
+          ? null
+          : LikeCooldown.noteFromLastResponse(
+              widget.siteContext!, widget.postId);
       // Inline, not a snackbar: this sheet covers the bottom of the
       // screen, so a snackbar raised from here paints behind it and the
       // user sees the sheet simply not respond.
       setState(() {
         _toggling = null;
-        _error = result.resultText?.isNotEmpty == true
-            ? result.resultText!
-            : 'Could not update reaction.';
+        _error = cooldown != null
+            ? 'You can react to this post again in '
+                '${LikeCooldown.secondsLeft(widget.postId)}s'
+            : (result.resultText?.isNotEmpty == true
+                ? result.resultText!
+                : 'Could not update reaction.');
       });
     }
   }
