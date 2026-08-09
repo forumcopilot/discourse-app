@@ -379,6 +379,27 @@ class FCThreadResultMapper extends ClassMapperBase<FCThreadResult> {
     opt: true,
     hook: MillisOrIsoDateHook(),
   );
+  static bool _$isHot(FCThreadResult v) => v.isHot;
+  static const Field<FCThreadResult, bool> _f$isHot = Field(
+    'isHot',
+    _$isHot,
+    opt: true,
+    def: false,
+  );
+  static int _$participantCount(FCThreadResult v) => v.participantCount;
+  static const Field<FCThreadResult, int> _f$participantCount = Field(
+    'participantCount',
+    _$participantCount,
+    opt: true,
+    def: 0,
+  );
+  static int _$linkCount(FCThreadResult v) => v.linkCount;
+  static const Field<FCThreadResult, int> _f$linkCount = Field(
+    'linkCount',
+    _$linkCount,
+    opt: true,
+    def: 0,
+  );
 
   @override
   final MappableFields<FCThreadResult> fields = const {
@@ -437,6 +458,9 @@ class FCThreadResultMapper extends ClassMapperBase<FCThreadResult> {
     #lastPosterName: _f$lastPosterName,
     #lastPosterIconUrl: _f$lastPosterIconUrl,
     #lastPostedAt: _f$lastPostedAt,
+    #isHot: _f$isHot,
+    #participantCount: _f$participantCount,
+    #linkCount: _f$linkCount,
   };
 
   static FCThreadResult _instantiate(DecodingData data) {
@@ -496,6 +520,9 @@ class FCThreadResultMapper extends ClassMapperBase<FCThreadResult> {
       lastPosterName: data.dec(_f$lastPosterName),
       lastPosterIconUrl: data.dec(_f$lastPosterIconUrl),
       lastPostedAt: data.dec(_f$lastPostedAt),
+      isHot: data.dec(_f$isHot),
+      participantCount: data.dec(_f$participantCount),
+      linkCount: data.dec(_f$linkCount),
     );
   }
 
@@ -626,6 +653,9 @@ abstract class FCThreadResultCopyWith<$R, $In extends FCThreadResult, $Out>
     String? lastPosterName,
     String? lastPosterIconUrl,
     DateTime? lastPostedAt,
+    bool? isHot,
+    int? participantCount,
+    int? linkCount,
   });
   FCThreadResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -721,6 +751,9 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
     Object? lastPosterName = $none,
     Object? lastPosterIconUrl = $none,
     Object? lastPostedAt = $none,
+    bool? isHot,
+    int? participantCount,
+    int? linkCount,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -779,6 +812,9 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
       if (lastPosterName != $none) #lastPosterName: lastPosterName,
       if (lastPosterIconUrl != $none) #lastPosterIconUrl: lastPosterIconUrl,
       if (lastPostedAt != $none) #lastPostedAt: lastPostedAt,
+      if (isHot != null) #isHot: isHot,
+      if (participantCount != null) #participantCount: participantCount,
+      if (linkCount != null) #linkCount: linkCount,
     }),
   );
   @override
@@ -844,6 +880,9 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
       or: $value.lastPosterIconUrl,
     ),
     lastPostedAt: data.get(#lastPostedAt, or: $value.lastPostedAt),
+    isHot: data.get(#isHot, or: $value.isHot),
+    participantCount: data.get(#participantCount, or: $value.participantCount),
+    linkCount: data.get(#linkCount, or: $value.linkCount),
   );
 
   @override
@@ -1230,6 +1269,27 @@ class FCThreadByUnreadResultMapper
     opt: true,
     hook: MillisOrIsoDateHook(),
   );
+  static bool _$isHot(FCThreadByUnreadResult v) => v.isHot;
+  static const Field<FCThreadByUnreadResult, bool> _f$isHot = Field(
+    'isHot',
+    _$isHot,
+    opt: true,
+    def: false,
+  );
+  static int _$participantCount(FCThreadByUnreadResult v) => v.participantCount;
+  static const Field<FCThreadByUnreadResult, int> _f$participantCount = Field(
+    'participantCount',
+    _$participantCount,
+    opt: true,
+    def: 0,
+  );
+  static int _$linkCount(FCThreadByUnreadResult v) => v.linkCount;
+  static const Field<FCThreadByUnreadResult, int> _f$linkCount = Field(
+    'linkCount',
+    _$linkCount,
+    opt: true,
+    def: 0,
+  );
 
   @override
   final MappableFields<FCThreadByUnreadResult> fields = const {
@@ -1289,6 +1349,9 @@ class FCThreadByUnreadResultMapper
     #lastPosterName: _f$lastPosterName,
     #lastPosterIconUrl: _f$lastPosterIconUrl,
     #lastPostedAt: _f$lastPostedAt,
+    #isHot: _f$isHot,
+    #participantCount: _f$participantCount,
+    #linkCount: _f$linkCount,
   };
 
   static FCThreadByUnreadResult _instantiate(DecodingData data) {
@@ -1349,6 +1412,9 @@ class FCThreadByUnreadResultMapper
       lastPosterName: data.dec(_f$lastPosterName),
       lastPosterIconUrl: data.dec(_f$lastPosterIconUrl),
       lastPostedAt: data.dec(_f$lastPostedAt),
+      isHot: data.dec(_f$isHot),
+      participantCount: data.dec(_f$participantCount),
+      linkCount: data.dec(_f$linkCount),
     );
   }
 
@@ -1488,6 +1554,9 @@ abstract class FCThreadByUnreadResultCopyWith<
     String? lastPosterName,
     String? lastPosterIconUrl,
     DateTime? lastPostedAt,
+    bool? isHot,
+    int? participantCount,
+    int? linkCount,
   });
   FCThreadByUnreadResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -1585,6 +1654,9 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
     Object? lastPosterName = $none,
     Object? lastPosterIconUrl = $none,
     Object? lastPostedAt = $none,
+    bool? isHot,
+    int? participantCount,
+    int? linkCount,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -1644,6 +1716,9 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
       if (lastPosterName != $none) #lastPosterName: lastPosterName,
       if (lastPosterIconUrl != $none) #lastPosterIconUrl: lastPosterIconUrl,
       if (lastPostedAt != $none) #lastPostedAt: lastPostedAt,
+      if (isHot != null) #isHot: isHot,
+      if (participantCount != null) #participantCount: participantCount,
+      if (linkCount != null) #linkCount: linkCount,
     }),
   );
   @override
@@ -1710,6 +1785,9 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
       or: $value.lastPosterIconUrl,
     ),
     lastPostedAt: data.get(#lastPostedAt, or: $value.lastPostedAt),
+    isHot: data.get(#isHot, or: $value.isHot),
+    participantCount: data.get(#participantCount, or: $value.participantCount),
+    linkCount: data.get(#linkCount, or: $value.linkCount),
   );
 
   @override
@@ -2098,6 +2176,27 @@ class FCThreadByPostResultMapper extends ClassMapperBase<FCThreadByPostResult> {
     opt: true,
     hook: MillisOrIsoDateHook(),
   );
+  static bool _$isHot(FCThreadByPostResult v) => v.isHot;
+  static const Field<FCThreadByPostResult, bool> _f$isHot = Field(
+    'isHot',
+    _$isHot,
+    opt: true,
+    def: false,
+  );
+  static int _$participantCount(FCThreadByPostResult v) => v.participantCount;
+  static const Field<FCThreadByPostResult, int> _f$participantCount = Field(
+    'participantCount',
+    _$participantCount,
+    opt: true,
+    def: 0,
+  );
+  static int _$linkCount(FCThreadByPostResult v) => v.linkCount;
+  static const Field<FCThreadByPostResult, int> _f$linkCount = Field(
+    'linkCount',
+    _$linkCount,
+    opt: true,
+    def: 0,
+  );
 
   @override
   final MappableFields<FCThreadByPostResult> fields = const {
@@ -2157,6 +2256,9 @@ class FCThreadByPostResultMapper extends ClassMapperBase<FCThreadByPostResult> {
     #lastPosterName: _f$lastPosterName,
     #lastPosterIconUrl: _f$lastPosterIconUrl,
     #lastPostedAt: _f$lastPostedAt,
+    #isHot: _f$isHot,
+    #participantCount: _f$participantCount,
+    #linkCount: _f$linkCount,
   };
 
   static FCThreadByPostResult _instantiate(DecodingData data) {
@@ -2217,6 +2319,9 @@ class FCThreadByPostResultMapper extends ClassMapperBase<FCThreadByPostResult> {
       lastPosterName: data.dec(_f$lastPosterName),
       lastPosterIconUrl: data.dec(_f$lastPosterIconUrl),
       lastPostedAt: data.dec(_f$lastPostedAt),
+      isHot: data.dec(_f$isHot),
+      participantCount: data.dec(_f$participantCount),
+      linkCount: data.dec(_f$linkCount),
     );
   }
 
@@ -2356,6 +2461,9 @@ abstract class FCThreadByPostResultCopyWith<
     String? lastPosterName,
     String? lastPosterIconUrl,
     DateTime? lastPostedAt,
+    bool? isHot,
+    int? participantCount,
+    int? linkCount,
   });
   FCThreadByPostResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -2452,6 +2560,9 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
     Object? lastPosterName = $none,
     Object? lastPosterIconUrl = $none,
     Object? lastPostedAt = $none,
+    bool? isHot,
+    int? participantCount,
+    int? linkCount,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -2511,6 +2622,9 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
       if (lastPosterName != $none) #lastPosterName: lastPosterName,
       if (lastPosterIconUrl != $none) #lastPosterIconUrl: lastPosterIconUrl,
       if (lastPostedAt != $none) #lastPostedAt: lastPostedAt,
+      if (isHot != null) #isHot: isHot,
+      if (participantCount != null) #participantCount: participantCount,
+      if (linkCount != null) #linkCount: linkCount,
     }),
   );
   @override
@@ -2577,6 +2691,9 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
       or: $value.lastPosterIconUrl,
     ),
     lastPostedAt: data.get(#lastPostedAt, or: $value.lastPostedAt),
+    isHot: data.get(#isHot, or: $value.isHot),
+    participantCount: data.get(#participantCount, or: $value.participantCount),
+    linkCount: data.get(#linkCount, or: $value.linkCount),
   );
 
   @override
@@ -3944,6 +4061,27 @@ class FCAnnouncementResultMapper extends ClassMapperBase<FCAnnouncementResult> {
     opt: true,
     hook: MillisOrIsoDateHook(),
   );
+  static bool _$isHot(FCAnnouncementResult v) => v.isHot;
+  static const Field<FCAnnouncementResult, bool> _f$isHot = Field(
+    'isHot',
+    _$isHot,
+    opt: true,
+    def: false,
+  );
+  static int _$participantCount(FCAnnouncementResult v) => v.participantCount;
+  static const Field<FCAnnouncementResult, int> _f$participantCount = Field(
+    'participantCount',
+    _$participantCount,
+    opt: true,
+    def: 0,
+  );
+  static int _$linkCount(FCAnnouncementResult v) => v.linkCount;
+  static const Field<FCAnnouncementResult, int> _f$linkCount = Field(
+    'linkCount',
+    _$linkCount,
+    opt: true,
+    def: 0,
+  );
 
   @override
   final MappableFields<FCAnnouncementResult> fields = const {
@@ -4004,6 +4142,9 @@ class FCAnnouncementResultMapper extends ClassMapperBase<FCAnnouncementResult> {
     #lastPosterName: _f$lastPosterName,
     #lastPosterIconUrl: _f$lastPosterIconUrl,
     #lastPostedAt: _f$lastPostedAt,
+    #isHot: _f$isHot,
+    #participantCount: _f$participantCount,
+    #linkCount: _f$linkCount,
   };
 
   static FCAnnouncementResult _instantiate(DecodingData data) {
@@ -4065,6 +4206,9 @@ class FCAnnouncementResultMapper extends ClassMapperBase<FCAnnouncementResult> {
       lastPosterName: data.dec(_f$lastPosterName),
       lastPosterIconUrl: data.dec(_f$lastPosterIconUrl),
       lastPostedAt: data.dec(_f$lastPostedAt),
+      isHot: data.dec(_f$isHot),
+      participantCount: data.dec(_f$participantCount),
+      linkCount: data.dec(_f$linkCount),
     );
   }
 
@@ -4205,6 +4349,9 @@ abstract class FCAnnouncementResultCopyWith<
     String? lastPosterName,
     String? lastPosterIconUrl,
     DateTime? lastPostedAt,
+    bool? isHot,
+    int? participantCount,
+    int? linkCount,
   });
   FCAnnouncementResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -4302,6 +4449,9 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
     Object? lastPosterName = $none,
     Object? lastPosterIconUrl = $none,
     Object? lastPostedAt = $none,
+    bool? isHot,
+    int? participantCount,
+    int? linkCount,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -4363,6 +4513,9 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
       if (lastPosterName != $none) #lastPosterName: lastPosterName,
       if (lastPosterIconUrl != $none) #lastPosterIconUrl: lastPosterIconUrl,
       if (lastPostedAt != $none) #lastPostedAt: lastPostedAt,
+      if (isHot != null) #isHot: isHot,
+      if (participantCount != null) #participantCount: participantCount,
+      if (linkCount != null) #linkCount: linkCount,
     }),
   );
   @override
@@ -4436,6 +4589,9 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
       or: $value.lastPosterIconUrl,
     ),
     lastPostedAt: data.get(#lastPostedAt, or: $value.lastPostedAt),
+    isHot: data.get(#isHot, or: $value.isHot),
+    participantCount: data.get(#participantCount, or: $value.participantCount),
+    linkCount: data.get(#linkCount, or: $value.linkCount),
   );
 
   @override

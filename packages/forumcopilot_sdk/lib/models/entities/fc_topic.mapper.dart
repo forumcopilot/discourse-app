@@ -346,6 +346,27 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     opt: true,
     hook: MillisOrIsoDateHook(),
   );
+  static bool _$isHot(FCTopic v) => v.isHot;
+  static const Field<FCTopic, bool> _f$isHot = Field(
+    'isHot',
+    _$isHot,
+    opt: true,
+    def: false,
+  );
+  static int _$participantCount(FCTopic v) => v.participantCount;
+  static const Field<FCTopic, int> _f$participantCount = Field(
+    'participantCount',
+    _$participantCount,
+    opt: true,
+    def: 0,
+  );
+  static int _$linkCount(FCTopic v) => v.linkCount;
+  static const Field<FCTopic, int> _f$linkCount = Field(
+    'linkCount',
+    _$linkCount,
+    opt: true,
+    def: 0,
+  );
 
   @override
   final MappableFields<FCTopic> fields = const {
@@ -400,6 +421,9 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     #lastPosterName: _f$lastPosterName,
     #lastPosterIconUrl: _f$lastPosterIconUrl,
     #lastPostedAt: _f$lastPostedAt,
+    #isHot: _f$isHot,
+    #participantCount: _f$participantCount,
+    #linkCount: _f$linkCount,
   };
 
   static FCTopic _instantiate(DecodingData data) {
@@ -455,6 +479,9 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
       lastPosterName: data.dec(_f$lastPosterName),
       lastPosterIconUrl: data.dec(_f$lastPosterIconUrl),
       lastPostedAt: data.dec(_f$lastPostedAt),
+      isHot: data.dec(_f$isHot),
+      participantCount: data.dec(_f$participantCount),
+      linkCount: data.dec(_f$linkCount),
     );
   }
 
@@ -571,6 +598,9 @@ abstract class FCTopicCopyWith<$R, $In extends FCTopic, $Out>
     String? lastPosterName,
     String? lastPosterIconUrl,
     DateTime? lastPostedAt,
+    bool? isHot,
+    int? participantCount,
+    int? linkCount,
   });
   FCTopicCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -653,6 +683,9 @@ class _FCTopicCopyWithImpl<$R, $Out>
     Object? lastPosterName = $none,
     Object? lastPosterIconUrl = $none,
     Object? lastPostedAt = $none,
+    bool? isHot,
+    int? participantCount,
+    int? linkCount,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -707,6 +740,9 @@ class _FCTopicCopyWithImpl<$R, $Out>
       if (lastPosterName != $none) #lastPosterName: lastPosterName,
       if (lastPosterIconUrl != $none) #lastPosterIconUrl: lastPosterIconUrl,
       if (lastPostedAt != $none) #lastPostedAt: lastPostedAt,
+      if (isHot != null) #isHot: isHot,
+      if (participantCount != null) #participantCount: participantCount,
+      if (linkCount != null) #linkCount: linkCount,
     }),
   );
   @override
@@ -768,6 +804,9 @@ class _FCTopicCopyWithImpl<$R, $Out>
       or: $value.lastPosterIconUrl,
     ),
     lastPostedAt: data.get(#lastPostedAt, or: $value.lastPostedAt),
+    isHot: data.get(#isHot, or: $value.isHot),
+    participantCount: data.get(#participantCount, or: $value.participantCount),
+    linkCount: data.get(#linkCount, or: $value.linkCount),
   );
 
   @override

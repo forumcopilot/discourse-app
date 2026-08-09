@@ -95,15 +95,16 @@ a payload the app fetches.
 |---|---|---|
 | §2 profile "No Chat button" | `can_chat_user` | `/u/{name}.json` |
 | §2 header strip missing "Views" | `profile_view_count` | `/u/{name}.json` |
-| §3 topic row "Hot" badge | `is_hot` | `/latest.json` |
-| §4 stats bar missing "4 links" | `details.links` | `/t/{id}.json` |
-| §4 stats bar users count | `participant_count` | `/t/{id}.json` |
+| §3 topic row "Hot" badge — **done** | `is_hot` | `/latest.json` |
+| §4 stats bar missing "4 links" — **done** | `details.links` | `/t/{id}.json` |
+| §4 stats bar users count — **done** | `participant_count` | `/t/{id}.json` |
 
-Note on the last one: `TopicStatsBar` currently derives its user count from
-`participatedUserIds.length`, which happens to agree (6 = 6) because the
-posters summary and participant count coincide on this topic. They are not
-the same number in general — the posters summary is capped. Prefer the
-server's own `participant_count`.
+The last three landed together via canonical SDK `40b5d0b` (`isHot`,
+`participantCount`, `linkCount`). Worth keeping the reasoning: the stats
+bar had been deriving its user count from `participatedUserIds.length`,
+which agreed (6 = 6) only because the posters summary and the participant
+count coincide on a small topic. The summary is capped, so they diverge on
+busy ones — the list length is now only a fallback.
 
 ---
 
@@ -195,8 +196,9 @@ Judged on user-visible impact per unit of work, not payload size.
 
 1. **`reply_to_post_number` threading** — the single largest read-experience
    gap, and the most Discourse-specific thing missing.
-2. **The five §2 cheap wins** in the table above — known gaps, data already
-   in hand, no new endpoints.
+2. ~~The five §2 cheap wins~~ — three done (`is_hot`, `participant_count`,
+   `details.links`). Remaining: `can_chat_user` (profile Chat button) and
+   `profile_view_count` (profile header "Views"), both `FCUser`-side.
 3. **`post_type` small actions** — removes noise from every long topic.
 4. **`/site.json` capability reads** — `auth_providers` first (login is a
    dead end without it), then tag permissions and watched words.

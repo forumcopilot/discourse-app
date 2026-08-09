@@ -161,6 +161,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         isLiked: (t['liked'] as bool?) ?? false,
         likeCount: (t['like_count'] as int?) ?? 0,
         participatedUserIds: _participantIds(details),
+        participantCount: (t['participant_count'] as int?) ?? 0,
+        // The topic summary bar's link count. Only the topic-view payload
+        // carries details.links; list rows do not.
+        linkCount: ((details['links'] as List?) ?? const []).length,
+        isHot: (t['is_hot'] as bool?) ?? false,
         isPinned: (t['pinned'] as bool?) ?? false,
         isAnnouncement: (t['pinned_globally'] as bool?) ?? false,
         url: '${siteContext.site.url}/t/$id',
@@ -249,6 +254,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         viewCount: (t['views'] as int?) ?? 0,
         likeCount: (t['like_count'] as int?) ?? 0,
         participatedUserIds: _participantIds(details),
+        participantCount: (t['participant_count'] as int?) ?? 0,
+        // The topic summary bar's link count. Only the topic-view payload
+        // carries details.links; list rows do not.
+        linkCount: ((details['links'] as List?) ?? const []).length,
+        isHot: (t['is_hot'] as bool?) ?? false,
         poll: poll,
       );
     } catch (e) {
@@ -345,6 +355,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         viewCount: (t['views'] as int?) ?? 0,
         likeCount: (t['like_count'] as int?) ?? 0,
         participatedUserIds: _participantIds(details),
+        participantCount: (t['participant_count'] as int?) ?? 0,
+        // The topic summary bar's link count. Only the topic-view payload
+        // carries details.links; list rows do not.
+        linkCount: ((details['links'] as List?) ?? const []).length,
+        isHot: (t['is_hot'] as bool?) ?? false,
         poll: poll,
       );
     } catch (e) {

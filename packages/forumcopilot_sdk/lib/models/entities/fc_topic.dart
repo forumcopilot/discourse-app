@@ -60,6 +60,23 @@ class FCTopic with FCTopicMappable {
   @MappableField(hook: MillisOrIsoDateHook())
   DateTime? lastPostedAt;
 
+  /// Whether the platform flags this topic as currently hot / trending
+  /// (Discourse: `is_hot`, its own popularity heuristic — not a count the
+  /// client can derive). False when unreported.
+  bool isHot;
+
+  /// How many distinct people have posted in the topic, as the server
+  /// counts them (Discourse: `participant_count`).
+  ///
+  /// Not the same as `participatedUserIds.length`: that list is a capped
+  /// *summary* of posters, so on a busy topic it under-reports. Prefer this
+  /// when showing a number; use the id list when you need the identities.
+  int participantCount;
+
+  /// How many outbound links the topic contains (Discourse:
+  /// `details.links`). 0 when unreported.
+  int linkCount;
+
   /// Number of replies in the topic
   int replyCount;
 
@@ -207,5 +224,8 @@ class FCTopic with FCTopicMappable {
     this.lastPosterName,
     this.lastPosterIconUrl,
     this.lastPostedAt,
+    this.isHot = false,
+    this.participantCount = 0,
+    this.linkCount = 0,
   });
 }

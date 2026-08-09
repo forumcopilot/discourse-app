@@ -56,7 +56,7 @@ Per-row, web shows and the app does not:
 | Tags | chips (`code`, `python`) | already present (audit was wrong) |
 | Like count | `♥ 7` | **added** |
 | Last reply attribution | "kodit4h1c7022 replied 3 hours ago" with avatar | **added** |
-| "Hot" badge | shown | absent |
+| "Hot" badge | shown | **added** |
 | View count | absent | shown (`👁 792`) |
 
 Category badge and like count are now rendered (`FCTopic` already carried
@@ -82,8 +82,10 @@ author, and "X replied" would be a false statement about the opening
 post), and it reads `last_posted_at` rather than `bumped_at`, because a
 topic bumps on edits and moves too.
 
-Still open: the "Hot" badge — and `is_hot` is right there in
-`/latest.json`, see the gap audit.
+The "Hot" badge now renders too (`is_hot`, flame-tinted since it is the
+one badge on the row that is an invitation rather than a status). Verified
+on device: it appears on the two topics try.discourse.org flags and on no
+others.
 
 ## 4. Topic view — open
 
@@ -112,11 +114,23 @@ Still open: the "Hot" badge — and `is_hot` is right there in
   hand. Verified on the Pixel against try.discourse.org: the bar reads
   `798 · 7 · 6`, matching the server exactly.
 
-  Still absent, deliberately rather than faked: **links** (`details.links`
-  is in the payload but not on `FCTopic`, so carrying it is a canonical-SDK
-  model change) and **participant avatars** (`participatedUserIds` gives
-  ids but no avatar URLs; Discourse builds those from a per-user
-  template, so it would cost a second fetch per topic).
+  **Now complete.** Links and the user count landed with a second
+  canonical-SDK change (`40b5d0b`: `isHot`, `participantCount`,
+  `linkCount`), so the bar reads views · likes · links · users exactly as
+  web does — verified on device at `805 · 7 · 4 · 6`, matching
+  `/t/57.json`.
+
+  The user count is now the server's `participantCount`, not
+  `participatedUserIds.length`. Those agreed on the topic first measured,
+  which is why the substitution looked safe: the posters summary is
+  **capped**, so on a busy topic the list under-reports and the two
+  diverge. The list length survives only as a fallback when the payload
+  reports no count.
+
+  Still absent, deliberately: **participant avatars**.
+  `participatedUserIds` gives ids but no avatar URLs, and Discourse builds
+  those from a per-user template, so it would cost a second fetch per
+  topic.
 - **No time-gap dividers.** Web inserts "3 years later" between posts far
   apart in time. Long topics in the app read as one flat run.
 - **No category badge under the title.**

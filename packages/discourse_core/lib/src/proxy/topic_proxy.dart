@@ -726,6 +726,15 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
           .where((s) => s.isNotEmpty)
           .toList(growable: false),
       isSolved: (t['has_accepted_answer'] as bool?) ?? false,
+      // Discourse's own trending heuristic, not anything derivable from
+      // the counts on this row.
+      isHot: (t['is_hot'] as bool?) ?? false,
+      // The server's count, not participatedUserIds.length — the posters
+      // summary is capped, so the list under-reports on busy topics.
+      participantCount: (t['participant_count'] as int?) ?? 0,
+      linkCount: ((t['details'] as Map<String, dynamic>?)?['links'] as List?)
+              ?.length ??
+          0,
       lastPosterName: lastPosterName,
       // Avatar and time only make sense alongside the name; without it the
       // row has nothing to attribute them to.
