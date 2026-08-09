@@ -382,6 +382,56 @@ chips.
   `can_permanently_delete?`. `DiscourseModerationProxy` covers all three,
   and deleted posts render a badge.
 
+## 9f. Category, subcategory and tag views vs web
+
+### Categories list
+
+| | App | Web |
+|---|---|---|
+| Layout | vertical list, colour tile + name + description | 3-across card grid, colour swatch + name + description |
+| Topic count per category | **shown** | not shown in this box style |
+| Subcategory nesting | grouped under parent (fixed earlier) | grouped under parent |
+| Forum header | banner: logo, name, description, post/member counts | no equivalent — site identity lives in the nav bar |
+
+Different shapes, and the difference is defensible: a card grid needs
+width the phone does not have. The app carries *more* here (topic counts,
+a forum header), not less.
+
+### Category (subforum) view
+
+| | App | Web |
+|---|---|---|
+| Header | banner: icon, name, description, **New Topic** button | title in nav; New Topic is the global sidebar button |
+| Notification level | overflow → full Watching / Watching First Post / Tracking / Normal / Muted sheet | bell icon, same five levels |
+| Latest / New / Hot tabs | **missing — one list only** | present |
+| Tag filter within category | **missing** | `tags >` dropdown chip |
+
+**The one real gap is the per-category Latest / New / Hot tabs.** The
+plumbing is already there: `DiscourseTopicProxy._topicListInForum` takes a
+`filter` and builds `/c/{id}/l/{filter}.json`, and the app already calls
+`/c/{id}/l/top.json` and `/c/{id}/l/latest.json` after posting. What is
+missing is a public entry point for arbitrary filters and a tab strip on
+the category page — the same shape as the Home sub-tabs, which are now a
+named `_HomeFilter` list rather than positional indices, so it can be
+copied rather than reinvented.
+
+### Tags
+
+| | App | Web |
+|---|---|---|
+| Sort by count / name | present | present |
+| Search tags | **present** | absent |
+| Layout | list | multi-column `tag × count` |
+| Reachable from | hamburger drawer | sidebar + `/tags` |
+
+At parity or better; the app adds a search box web has no equivalent for.
+
+### Not verified
+
+Whether a category page lists its *subcategories* at the top, as web
+does. try.discourse.org has no subcategories at all, and meta does but is
+where the app is not currently pointed.
+
 ## 10. Cross-cutting
 
 - **Anonymous chat fetch — fixed** (`bf73875`). `GET /chat/api/me/channels`
