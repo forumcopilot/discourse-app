@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/models/results/fc_config_result.dart';
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../data/attachment/discourse_upload_limits.dart';
+import '../data/site/discourse_site_capabilities.dart';
 
 /// Discourse implementation of [IFCConfigProxy].
 ///
@@ -82,6 +83,22 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
         // Network error or unknown — same reasoning: record nothing, so
         // this stays retryable rather than freezing a guess for the
         // lifetime of the process.
+      }
+    }
+    // Site capabilities (`/site.json`). Resolved once per forum for the
+    // same reason as the chat probe above: these describe the forum, not
+    // the session, so re-asking on every getConfig would spend rate-limit
+    // budget on a settled question. Fail soft — an unresolved capability
+    // reads as "not offered", which hides optional UI rather than
+    // showing something that 404s.
+    if (!DiscourseSiteCapabilities.isResolved(siteContext.site.pluginUrl)) {
+      try {
+        final site = await apiGet('/site.json');
+        DiscourseSiteCapabilities.store(siteContext.site.pluginUrl, site);
+      } catch (e) {
+        // ignore: avoid_print
+        print('⚠️ [DISCOURSE_CONFIG] /site.json failed '
+            '(optional capabilities unavailable): $e');
       }
     }
     // Upload limits — Discourse publishes every `client: true` site setting

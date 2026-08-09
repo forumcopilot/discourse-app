@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseTopicProxy;
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 
-import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
 import '../listitems/topic_list_item.dart';
 import '../tabs/topic_list_tab.dart';
 import '../post_page.dart';
-import '../widgets/not_signed_in_view.dart';
 import '../widgets/resettable_widget.dart';
 import '../widgets/topic_list_skeleton.dart';
 
-/// Home tab — **New** sub-segment. Backed by `/new.json` (Discourse-
-/// native: topics created since your last visit + haven't dismissed).
+/// Home tab — **Hot** sub-segment. Backed by `/hot.json` (Discourse-
+/// native: a recency-weighted activity ranking, distinct from Top's
+/// per-period like count).
+///
+/// Only mounted when `/site.json`'s `top_menu_items` lists "hot" — a
+/// forum can turn the route off, and it 404s when it has.
 ///
 /// Built with the same external surface as `LatestTopicsList` /
 /// `UnreadTopicsList` so `TopicListTab` can wire it in without
@@ -21,19 +24,19 @@ import '../widgets/topic_list_skeleton.dart';
 /// plain setState — no GetX controller — because the New feed is
 /// simpler than Latest (no participated/subscribed cross-cuts) and
 /// not shared across other screens.
-class NewTopicsList extends StatefulWidget {
+class HotTopicsList extends StatefulWidget {
   final SiteContext siteContext;
   final bool isActive;
-  const NewTopicsList(
+  const HotTopicsList(
       {Key? key, required this.siteContext, required this.isActive})
       : super(key: key);
 
   @override
-  NewTopicsListState createState() => NewTopicsListState();
+  HotTopicsListState createState() => HotTopicsListState();
 }
 
-class NewTopicsListState extends FCStatefulWidget<NewTopicsList>
-    with FCListStatefulWidget<NewTopicsList>, AutomaticKeepAliveClientMixin {
+class HotTopicsListState extends FCStatefulWidget<HotTopicsList>
+    with FCListStatefulWidget<HotTopicsList>, AutomaticKeepAliveClientMixin {
   final List<FCTopic> _topics = [];
   int _page = 0;
   bool _hasLoaded = false;
@@ -55,7 +58,7 @@ class NewTopicsListState extends FCStatefulWidget<NewTopicsList>
   }
 
   @override
-  void didUpdateWidget(covariant NewTopicsList oldWidget) {
+  void didUpdateWidget(covariant HotTopicsList oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.isActive && !oldWidget.isActive && !_hasLoaded) {
       _load(reset: true);
@@ -69,11 +72,12 @@ class NewTopicsListState extends FCStatefulWidget<NewTopicsList>
       if (reset) _error = null;
     });
     try {
-      final proxy = SiteProxyFactory.getTopicProxy();
-      final result = await proxy.getNewTopicAsync(
-        reset ? 0 : _page * _pageSize,
-        (reset ? 1 : _page + 1) * _pageSize - 1,
-      );
+      // Discourse-only route, so the concrete proxy rather than the
+      // SDK interface — see DiscourseTopicProxy.getHotTopicsAsync for why
+      // Hot is not folded into Top.
+      final proxy = SiteProxyFactory.getTopicProxy() as DiscourseTopicProxy;
+      final result =
+          await proxy.getHotTopicsAsync(reset ? 0 : _page * _pageSize);
       if (!mounted) return;
       setState(() {
         if (reset) {
@@ -95,7 +99,8 @@ class NewTopicsListState extends FCStatefulWidget<NewTopicsList>
       });
       // TopicListTab renders our rows via buildTopicItems(), so our own
       // setState is not enough — the parent has to rebuild too, or the
-      // skeleton stays up until something unrelated rebuilds it.
+      // skeleton stays up until something else happens to rebuild it.
+      // Same hand-off LatestTopicsList and UnreadTopicsList use.
       if (mounted) {
         context
             .findAncestorStateOfType<TopicListTabState>()
@@ -169,17 +174,8 @@ class NewTopicsListState extends FCStatefulWidget<NewTopicsList>
   /// not-signed-in / generic-error widget that's swapped in instead
   /// of the list.
   Widget? buildErrorOrNotSignedInWidget() {
-    if (!widget.siteContext.isLoggedIn) {
-      return NotSignedInView(
-        siteContext: widget.siteContext,
-        title:
-            AppLocalizations.of(context)?.signInToViewUnreadTopics ??
-                'Sign in to view new topics',
-        message:
-            'New topics show what was created since your last visit.',
-        icon: Icons.fiber_new,
-      );
-    }
+    // No sign-in gate, unlike New/Unread: /hot.json is a public ranking
+    // and a guest can read it, so gating would hide a working list.
     return null;
   }
 

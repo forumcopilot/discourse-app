@@ -585,6 +585,36 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
   }
 
   /// Build an [FCTopic] from a Discourse topic object — works for the
+  /// Discourse-native **Hot** list (`/hot.json`).
+  ///
+  /// Not on [IFCTopicProxy]: the SDK's XenForo-shaped contract has no
+  /// "hot" concept, and coercing it into Top would lose the distinction —
+  /// Top ranks by a period's likes, Hot is Discourse's own recency-weighted
+  /// activity heuristic, and a forum can offer either, both, or neither
+  /// (`top_menu_items` on /site.json says which).
+  ///
+  /// Callers should check `DiscourseSiteCapabilities.offersRoute(url,
+  /// 'hot')` first; a forum without the route answers 404 here.
+  Future<FCLatestTopicResult> getHotTopicsAsync(int startNum) async {
+    try {
+      final page = _pageOf(startNum);
+      final list = await _listTopics('/hot.json', page: page);
+      return FCLatestTopicResult(
+        result: true,
+        resultText: '',
+        totalLatestNum: _totalFor(page, list),
+        topics: list.topics,
+      );
+    } catch (e) {
+      return FCLatestTopicResult(
+        result: false,
+        resultText: describeApiError(e),
+        totalLatestNum: 0,
+        topics: const [],
+      );
+    }
+  }
+
   /// Absolute avatar URL from a Discourse `avatar_template`.
   ///
   /// Templates carry a literal `{size}` placeholder and are usually

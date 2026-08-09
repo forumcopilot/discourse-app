@@ -163,9 +163,10 @@ differences rather than payload inferences:
   post and expands them inline. `replyCount` is now on `FCPost` (unused so
   far), and `/posts/{id}/replies` returns the children — this is the other
   half of threading.
-- **A "Hot" tab.** Web's list nav is Latest / Hot / New / Top /
-  Categories; the app has Latest / New / Unread / Top. `/hot.json` is a
-  real route, and `is_hot` already renders on rows.
+- ~~**A "Hot" tab.**~~ **Done.** The Home sub-tabs are now Latest / Hot /
+  New / Unread / Top, matching web's order, with Hot backed by
+  `/hot.json` and shown only when `/site.json`'s `top_menu_items` lists
+  it — a forum can turn the route off, and it 404s when it has.
 - **Topic vote count.** Web shows "2 votes" on rows in voting categories
   (`can_vote` / `vote_count`).
 - **Unread position dot** beside topic titles and post timestamps.
@@ -211,10 +212,19 @@ differences rather than payload inferences:
 - `topics_day` / `week` / `month` / `year` / `all_time`,
   `uploaded_logo_dark` / `uploaded_background_dark`, `description_excerpt`.
 
-### Site-wide (`/site.json` — nothing is read today)
+### Site-wide (`/site.json`)
 
-- **`auth_providers`** — social/SSO login buttons. The login page cannot
-  currently offer what the forum actually supports; it has to guess.
+The app now reads a narrow slice — `top_menu_items` (drives the Hot tab),
+`can_tag_topics`, `uncategorized_category_id`, `tos_url`,
+`privacy_policy_url` — resolved once per forum, for the same reason as the
+chat probe. The rest below is still unread.
+
+- ~~**`auth_providers`**~~ — **withdrawn, and this document was wrong to
+  recommend it.** Discourse login in this app is a single CTA that opens
+  Discourse's own login page in the User API Key handshake webview, so the
+  forum already renders every provider it supports, inside that webview.
+  Native buttons would duplicate it and could drift out of sync. Left
+  unread deliberately.
 - **`can_tag_topics`, `can_create_tag`, `can_tag_pms`** — tag permissions.
   The composer offers tagging without knowing whether it is allowed.
 - **`censored_regexp`, `watched_words_replace`, `watched_words_link`** —

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/views/widgets/resettable_widget.dart';
 import 'package:discourse_ui/views/lists/latest_topics_list.dart';
+import 'package:discourse_ui/views/lists/hot_topics_list.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseSiteCapabilities;
 import 'package:discourse_ui/views/lists/new_topics_list.dart';
 import 'package:discourse_ui/views/lists/top_topics_list.dart';
 import 'package:discourse_ui/views/lists/unread_topics_list.dart';
@@ -91,6 +93,37 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   final GlobalKey<NewTopicsListState> _newTopicsKey = GlobalKey();
   final GlobalKey<UnreadTopicsListState> _unreadTopicsKey = GlobalKey();
   final GlobalKey<TopTopicsListState> _topTopicsKey = GlobalKey();
+  final GlobalKey<HotTopicsListState> _hotTopicsKey = GlobalKey();
+
+  /// Whether this forum offers `/hot.json`. Appended LAST rather than
+  /// placed in web's Latest/Hot/New/Top order on purpose: every index in
+  /// this widget is positional — six switch statements and the
+  /// IndexedStack children — so inserting mid-list would renumber the
+  /// existing tabs. Appending keeps their indices fixed, and the Hot
+  /// index only exists when the tab does.
+  bool get _offersHot => DiscourseSiteCapabilities.offersRoute(
+      widget.siteContext.site.pluginUrl, 'hot');
+
+  /// The sub-tabs, in Discourse's own order (web: Latest, Hot, New, Top).
+  /// Unread sits before Top because this app surfaces it here rather than
+  /// in a sidebar as web does.
+  ///
+  /// Everything index-driven below reads through this list rather than
+  /// hardcoding positions, so a forum without `/hot.json` simply has a
+  /// shorter list instead of renumbering every branch.
+  List<_HomeFilter> get _filters => [
+        _HomeFilter.latest,
+        if (_offersHot) _HomeFilter.hot,
+        _HomeFilter.newTopics,
+        _HomeFilter.unread,
+        _HomeFilter.top,
+      ];
+
+  _HomeFilter get _activeFilter {
+    final filters = _filters;
+    final i = _selectedFilterIndex;
+    return i >= 0 && i < filters.length ? filters[i] : _HomeFilter.latest;
+  }
 
   // Scroll controller for the main ListView
   final ScrollController _scrollController = ScrollController();
@@ -106,12 +139,20 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
     // this tab in Phase 5.17c; they'll resurface under the Profile
     // tab as Watching / Posted-in in Phase 5.17d.
     final l10n = AppLocalizations.of(context)!;
-    return [
-      l10n.latest,
-      'New',     // Discourse's /new.json
-      l10n.unread,
-      'Top',     // Discourse's /top.json with period selector
-    ];
+    return _filters.map((f) {
+      switch (f) {
+        case _HomeFilter.latest:
+          return l10n.latest;
+        case _HomeFilter.hot:
+          return 'Hot'; // Discourse's /hot.json
+        case _HomeFilter.newTopics:
+          return 'New'; // Discourse's /new.json
+        case _HomeFilter.unread:
+          return l10n.unread;
+        case _HomeFilter.top:
+          return 'Top'; // Discourse's /top.json with period selector
+      }
+    }).toList(growable: false);
   }
 
   @override
@@ -141,6 +182,7 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
         _newTopicsKey.currentState?.resetList();
         _unreadTopicsKey.currentState?.resetList();
         _topTopicsKey.currentState?.resetList();
+        _hotTopicsKey.currentState?.resetList();
       }
     };
 
@@ -157,18 +199,21 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
       AppLogger.debug('📋 [TOPIC_LIST_TAB] Tab just became active - refreshing active list');
       // Trigger refresh on the active topic list. Index map: 0=Latest,
       // 1=New, 2=Unread, 3=Top.
-      switch (_selectedFilterIndex) {
-        case 0:
+      switch (_activeFilter) {
+        case _HomeFilter.latest:
           _latestTopicsKey.currentState?.refreshList();
           break;
-        case 1:
+        case _HomeFilter.newTopics:
           _newTopicsKey.currentState?.refreshList();
           break;
-        case 2:
+        case _HomeFilter.unread:
           _unreadTopicsKey.currentState?.refreshList();
           break;
-        case 3:
+        case _HomeFilter.top:
           _topTopicsKey.currentState?.refreshList();
+          break;
+        case _HomeFilter.hot:
+          _hotTopicsKey.currentState?.refreshList();
           break;
       }
       // Force rebuild to show updated content
@@ -200,29 +245,35 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
 
     try {
       // Call loadMore on the active topic list
-      switch (_selectedFilterIndex) {
-        case 0:
+      switch (_activeFilter) {
+        case _HomeFilter.latest:
           final state = _latestTopicsKey.currentState;
           if (state != null && state.hasMoreItems) {
             await state.loadMore();
           }
           break;
-        case 1:
+        case _HomeFilter.newTopics:
           final state = _newTopicsKey.currentState;
           if (state != null && state.hasMoreItems) {
             await state.loadMore();
           }
           break;
-        case 2:
-          final state = _unreadTopicsKey.currentState;
-          if (state != null && state.hasMoreItems) {
-            await state.loadMore();
+        case _HomeFilter.unread:
+          final unreadState = _unreadTopicsKey.currentState;
+          if (unreadState != null && unreadState.hasMoreItems) {
+            await unreadState.loadMore();
           }
           break;
-        case 3:
-          final state = _topTopicsKey.currentState;
-          if (state != null && state.hasMoreItems) {
-            await state.loadMore();
+        case _HomeFilter.top:
+          final topState = _topTopicsKey.currentState;
+          if (topState != null && topState.hasMoreItems) {
+            await topState.loadMore();
+          }
+          break;
+        case _HomeFilter.hot:
+          final hotState = _hotTopicsKey.currentState;
+          if (hotState != null && hotState.hasMoreItems) {
+            await hotState.loadMore();
           }
           break;
       }
@@ -311,15 +362,17 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
 
   // Build topic list items from the active list
   List<Widget> _buildTopicItems() {
-    switch (_selectedFilterIndex) {
-      case 0:
+    switch (_activeFilter) {
+      case _HomeFilter.latest:
         return _latestTopicsKey.currentState?.buildTopicItems() ?? [];
-      case 1:
+      case _HomeFilter.newTopics:
         return _newTopicsKey.currentState?.buildTopicItems() ?? [];
-      case 2:
+      case _HomeFilter.unread:
         return _unreadTopicsKey.currentState?.buildTopicItems() ?? [];
-      case 3:
+      case _HomeFilter.top:
         return _topTopicsKey.currentState?.buildTopicItems() ?? [];
+      case _HomeFilter.hot:
+        return _hotTopicsKey.currentState?.buildTopicItems() ?? [];
       default:
         return _latestTopicsKey.currentState?.buildTopicItems() ?? [];
     }
@@ -327,15 +380,17 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
 
   // Build error/not signed in widget
   Widget? _buildErrorOrNotSignedInWidget() {
-    switch (_selectedFilterIndex) {
-      case 0:
+    switch (_activeFilter) {
+      case _HomeFilter.latest:
         return _latestTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
-      case 1:
+      case _HomeFilter.newTopics:
         return _newTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
-      case 2:
+      case _HomeFilter.unread:
         return _unreadTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
-      case 3:
+      case _HomeFilter.top:
         return _topTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
+      case _HomeFilter.hot:
+        return _hotTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
       default:
         return _latestTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
     }
@@ -343,15 +398,17 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
 
   // Build empty state widget
   Widget? _buildEmptyState() {
-    switch (_selectedFilterIndex) {
-      case 0:
+    switch (_activeFilter) {
+      case _HomeFilter.latest:
         return _latestTopicsKey.currentState?.buildEmptyState();
-      case 1:
+      case _HomeFilter.newTopics:
         return _newTopicsKey.currentState?.buildEmptyState();
-      case 2:
+      case _HomeFilter.unread:
         return _unreadTopicsKey.currentState?.buildEmptyState();
-      case 3:
+      case _HomeFilter.top:
         return _topTopicsKey.currentState?.buildEmptyState();
+      case _HomeFilter.hot:
+        return _hotTopicsKey.currentState?.buildEmptyState();
       default:
         return _latestTopicsKey.currentState?.buildEmptyState();
     }
@@ -375,26 +432,39 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
               child: IndexedStack(
                 index: _selectedFilterIndex,
                 children: [
-                  LatestTopicsList(
-                    key: _latestTopicsKey,
-                    isActive: widget.isActive && _selectedFilterIndex == 0,
-                    siteContext: widget.siteContext,
-                  ),
-                  NewTopicsList(
-                    key: _newTopicsKey,
-                    isActive: widget.isActive && _selectedFilterIndex == 1,
-                    siteContext: widget.siteContext,
-                  ),
-                  UnreadTopicsList(
-                    key: _unreadTopicsKey,
-                    isActive: widget.isActive && _selectedFilterIndex == 2,
-                    siteContext: widget.siteContext,
-                  ),
-                  TopTopicsList(
-                    key: _topTopicsKey,
-                    isActive: widget.isActive && _selectedFilterIndex == 3,
-                    siteContext: widget.siteContext,
-                  ),
+                  for (final f in _filters)
+                    switch (f) {
+                      _HomeFilter.latest => LatestTopicsList(
+                          key: _latestTopicsKey,
+                          isActive: widget.isActive &&
+                              _activeFilter == _HomeFilter.latest,
+                          siteContext: widget.siteContext,
+                        ),
+                      _HomeFilter.hot => HotTopicsList(
+                          key: _hotTopicsKey,
+                          isActive: widget.isActive &&
+                              _activeFilter == _HomeFilter.hot,
+                          siteContext: widget.siteContext,
+                        ),
+                      _HomeFilter.newTopics => NewTopicsList(
+                          key: _newTopicsKey,
+                          isActive: widget.isActive &&
+                              _activeFilter == _HomeFilter.newTopics,
+                          siteContext: widget.siteContext,
+                        ),
+                      _HomeFilter.unread => UnreadTopicsList(
+                          key: _unreadTopicsKey,
+                          isActive: widget.isActive &&
+                              _activeFilter == _HomeFilter.unread,
+                          siteContext: widget.siteContext,
+                        ),
+                      _HomeFilter.top => TopTopicsList(
+                          key: _topTopicsKey,
+                          isActive: widget.isActive &&
+                              _activeFilter == _HomeFilter.top,
+                          siteContext: widget.siteContext,
+                        ),
+                    },
                 ],
               ),
             ),
@@ -406,18 +476,21 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
 
   Future<void> _handleRefresh() async {
     // Trigger refresh on the active topic list
-    switch (_selectedFilterIndex) {
-      case 0:
+    switch (_activeFilter) {
+      case _HomeFilter.latest:
         await _latestTopicsKey.currentState?.refreshList();
         break;
-      case 1:
+      case _HomeFilter.newTopics:
         await _newTopicsKey.currentState?.refreshList();
         break;
-      case 2:
+      case _HomeFilter.unread:
         await _unreadTopicsKey.currentState?.refreshList();
         break;
-      case 3:
+      case _HomeFilter.top:
         await _topTopicsKey.currentState?.refreshList();
+        break;
+      case _HomeFilter.hot:
+        await _hotTopicsKey.currentState?.refreshList();
         break;
     }
   }
@@ -490,3 +563,9 @@ class TopicList extends StatelessWidget {
     );
   }
 }
+
+
+/// The Home tab's sub-filters. Named rather than positional because a
+/// forum can turn `/hot.json` off, and with indices that made every
+/// branch below depend on which tabs happened to exist.
+enum _HomeFilter { latest, hot, newTopics, unread, top }

@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 
 import '../../theme/design_tokens.dart';
 import '../listitems/topic_list_item.dart';
+import '../tabs/topic_list_tab.dart';
 import '../post_page.dart';
 import '../widgets/resettable_widget.dart';
 import '../widgets/topic_list_skeleton.dart';
@@ -121,6 +122,14 @@ class TopTopicsListState extends FCStatefulWidget<TopTopicsList>
         _hasLoaded = true;
         _isLoading = false;
       });
+      // TopicListTab renders our rows via buildTopicItems(), so our own
+      // setState is not enough — the parent has to rebuild too, or the
+      // skeleton stays up until something unrelated rebuilds it.
+      if (mounted) {
+        context
+            .findAncestorStateOfType<TopicListTabState>()
+            ?.notifyDataLoaded();
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {
