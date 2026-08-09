@@ -1,5 +1,10 @@
 # UI audit: app vs. Discourse web
 
+> Companion document: `sdk-gap-audit-discourse.md` compares *payloads*
+> rather than screens — what Discourse sends versus what the connector
+> reads. It supplies the data for several items still open here, and
+> corrects two claims below (see its "Corrections to the UI audit").
+
 Method: the app on a signed-in Pixel against `https://try.discourse.org`, the
 same forum and account open in Chrome, screen by screen. Findings are only
 listed when observed on both sides.
@@ -50,7 +55,7 @@ Per-row, web shows and the app does not:
 | Category badge | coloured chip (`discourse`, `general`, `tech`) | **added** |
 | Tags | chips (`code`, `python`) | already present (audit was wrong) |
 | Like count | `♥ 7` | **added** |
-| Last reply attribution | "kodit4h1c7022 replied 3 hours ago" with avatar | absent |
+| Last reply attribution | "kodit4h1c7022 replied 3 hours ago" with avatar | **added** |
 | "Hot" badge | shown | absent |
 | View count | absent | shown (`👁 792`) |
 
@@ -63,8 +68,22 @@ Correction to an earlier claim in this document: **tags were already
 rendered** — the topics visible in the first screenshots simply had none.
 Verified on the Leetcode topic, which shows `tech` `code` `python`.
 
-Still open: last-reply attribution ("X replied 3 hours ago") and the
-"Hot" badge.
+Last-reply attribution now renders ("alice replied 3 hours ago", with the
+last poster's avatar). It needed a canonical-SDK change first — `FCTopic`
+described only whoever *opened* a topic — so `lastPosterName` /
+`lastPosterIconUrl` / `lastPostedAt` landed in tapatalk_flutter
+(`83a8264`) and were synced here. `xenforo_core` is untouched and still
+compiles; XenForo shows last-reply attribution too, so when its thread
+model grows the field, that app gets the same row.
+
+Two things the implementation refuses to guess: it stays hidden until
+`posts_count > 1` (on a single-post topic the latest poster IS the
+author, and "X replied" would be a false statement about the opening
+post), and it reads `last_posted_at` rather than `bumped_at`, because a
+topic bumps on edits and moves too.
+
+Still open: the "Hot" badge — and `is_hot` is right there in
+`/latest.json`, see the gap audit.
 
 ## 4. Topic view — open
 
