@@ -104,7 +104,41 @@ The Notifications and Profile tabs both render "Sign in to view…". That
 is *correct* for the current device state — the session really is gone —
 but it blocked auditing these screens. See "Session lost" below.
 
-## 8. Cross-cutting
+## 8. Notifications — one fixed, one open
+
+- **Compound timestamps — fixed.** Rows read "a day ago 4:09 PM", a
+  relative phrase and a wall-clock time concatenated. Beyond reading as a
+  broken sentence it was misleading: timeago renders ~1–2 days as "a day
+  ago", so a two-day-old notification showed yesterday's phrasing beside a
+  clock time from another day. Web shows a bare `1d` / `2d`. The 1–7 day
+  bucket in `formatSmartDateTime` now uses the relative form alone.
+- **Open: no filters.** Web has All / Replies / Likes / Mentions / Edits /
+  Links / Reactions plus a Filter By dropdown. The app has one flat list.
+  Fine for this test account's three notifications, unusable on a busy
+  one. The app does have a mark-all-read action, equivalent to web's
+  Dismiss All.
+
+## 9. Notification grant screen — one fixed, rest open
+
+- **Stranded the user when our backend was down — fixed** (`b824830`).
+  Approving with ForumCopilot unreachable left the user on the screen with
+  a snackbar and no way forward, even though the forum-side grant had
+  already succeeded and re-tapping Continue would only mint another key.
+- **Open: shown after every login, unconditionally.** `login_page`
+  prompts on each successful sign-in; "Not now" is not remembered, and
+  nothing checks whether a push backend is even configured
+  (`defaultPushApiBaseUrl` is empty by default) or whether a grant already
+  exists. Re-granting is *cheap* — the notifications client id is derived
+  from a stable per-install id in SharedPreferences, so a new key replaces
+  the old one server-side rather than accumulating — so this is a UX nag,
+  not a leak. Worth gating on a configured backend regardless.
+- **Not a bug: logout already revokes the server key.**
+  `DiscourseLoginController._revokeNotificationsKey` calls
+  `ForumCopilotApiService.revokeDiscourseNotificationKey` and is correctly
+  sequenced BEFORE `logoutUserAsync`, which clears the credentials the
+  client id is derived from.
+
+## 10. Cross-cutting
 
 - **Anonymous chat fetch.** `GET /chat/api/me/channels` fires three times
   per anonymous launch and 403s every time — a guest cannot use chat.
