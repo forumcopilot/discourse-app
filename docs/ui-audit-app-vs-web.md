@@ -348,13 +348,19 @@ chips.
 
 ### Findings
 
-- **New topic does not open what you created.** After posting, the app
-  returns to the category list; the new topic is not surfaced. Sending a
-  PM *does* navigate into the conversation, so the two write paths
-  disagree with each other, and web opens both.
-- **"No users found" shows before you have searched.** The PM recipient
-  picker renders its empty state on open, so a blank search field is
-  paired with "Try searching with a different username".
+- **New topic does not open what you created — fixed.** After posting,
+  the app returned to the category list, leaving the author no
+  confirmation beyond the composer closing and no way to their own topic
+  except hunting for it below the pinned ones. It now opens the created
+  topic, as web does and as this app already did after sending a PM. The
+  composer route is *replaced* rather than stacked, so Back goes to the
+  list and not to an empty composer.
+- **"No users found" before searching — fixed.** The recipient picker
+  fires a default "most active users" load on open with an empty query,
+  which set the has-searched flag; on a forum where that returns nothing
+  the user met "No users found — try a different username" before typing.
+  Only a non-empty query counts as a search now. An empty default list is
+  not a failed search.
 - **Attachments could not be driven end to end.** The system photo picker
   does not accept synthetic taps on its confirm button, so the upload was
   not exercised. A harness limitation, not a defect — the composer's

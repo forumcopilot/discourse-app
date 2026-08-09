@@ -78,7 +78,12 @@ class _UserSearchPageState extends State<UserSearchPage> {
     setState(() {
       _isLoading = true;
       _error = null;
-      _hasSearched = true;
+      // Only a real query counts as having searched. initState kicks off a
+      // default "most active users" load with an empty query, and on a
+      // forum where that returns nothing the user was met with "No users
+      // found — try a different username" before they had typed anything.
+      // An empty default list is not a failed search.
+      _hasSearched = _hasSearched || query.isNotEmpty;
     });
 
     try {
