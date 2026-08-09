@@ -54,6 +54,22 @@ absent.
 
 ---
 
+## 0. A recurring trap: capability payloads are per-viewer
+
+Six findings in this document came from checking the server rather than
+reading the client, and most shared one root cause: a capability was read
+**anonymously** and treated as the forum's answer. It is the viewer's
+answer.
+
+`can_tag_topics` is false to a guest and true to a signed-in TL1 user.
+`/chat/api/me/channels` 403s a guest on a forum where chat is fully
+enabled, and returns 200 the moment you are signed in. Inferring either
+from a status code produced the wrong conclusion twice.
+
+Where Discourse publishes an explicit field, read it. `current_user` has
+`can_chat` / `has_chat_enabled`; `/site.json` answers tag permissions per
+viewer. Status codes are the last resort, not the first.
+
 ## 1. Corrections to the UI audit
 
 Two items in `ui-audit-app-vs-web.md` should be revised in light of the

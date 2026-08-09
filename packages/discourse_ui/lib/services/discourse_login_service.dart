@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:discourse_core/discourse_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseSiteContextExtension;
 import 'package:forumcopilot_sdk/services/forumcopilot_api_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_user.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
@@ -200,6 +202,18 @@ class DiscourseLoginService {
     final cu = (data['current_user'] as Map<String, dynamic>?) ?? const {};
 
     final result = _loginResultFromCurrentUser(cu);
+
+    // Authoritative chat availability, straight from the current-user
+    // record. `has_chat_enabled` is what Discourse's own client reads;
+    // the route probe in DiscourseConfigProxy has to infer it from a
+    // status code, and infers wrong in both directions — meta answers 403
+    // to a guest on a forum where chat IS enabled, and a 403 can equally
+    // mean the plugin is absent. When we are signed in we do not have to
+    // guess, so don't.
+    if (cu.containsKey('has_chat_enabled') || cu.containsKey('can_chat')) {
+      siteContext.setChatEnabled(
+          cu['has_chat_enabled'] == true || cu['can_chat'] == true);
+    }
 
     siteContext.setLoginData(result);
     siteContext.resetOnLogin();
