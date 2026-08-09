@@ -1527,6 +1527,17 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
           : (p['moderator'] == true ? 'moderator' : 'normal'),
       timestamp: DateTime.tryParse(p['created_at']?.toString() ?? ''),
       postNumber: p['post_number'] as int?,
+      // In-topic threading. `reply_to_user` is absent when the target is
+      // the opening post — Discourse counts that as replying to the topic,
+      // not to a person — so the number is the reliable signal and the
+      // name is the nicety.
+      replyToPostNumber: p['reply_to_post_number'] as int?,
+      replyToUsername:
+          (p['reply_to_user'] as Map<String, dynamic>?)?['username'] as String?,
+      replyToIconUrl: _avatarFromTemplate(
+          (p['reply_to_user'] as Map<String, dynamic>?)?['avatar_template']
+              as String?),
+      replyCount: (p['reply_count'] as int?) ?? 0,
       canEdit: p['can_edit'] == true,
       canDelete: p['can_delete'] == true,
       canReport: true,

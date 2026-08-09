@@ -1147,6 +1147,7 @@ class _PostsState extends State<PostsList> {
             ? DiscourseAcceptedAnswers.forTopic(data.topic.id)
             : null,
         onJumpToAcceptedAnswer: _jumpToPostNumber,
+        onJumpToPost: _jumpToPostNumber,
         onVoteSuccess: (p) => _postsController.updateThreadPoll(p),
         actions: PostActions(
           onReply: (postId) => postActionsHandler.handleReply(context, postId, widget.topicId, widget.topicTitle, _refreshWithOptionalScrollToPost),

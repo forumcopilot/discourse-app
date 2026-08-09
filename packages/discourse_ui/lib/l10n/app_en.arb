@@ -1410,5 +1410,23 @@
         "type": "String"
       }
     }
+  },
+  "inReplyToUser": "in reply to {username}",
+  "@inReplyToUser": {
+    "description": "Threading indicator above a post that replies to another post",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "inReplyToPost": "in reply to post #{number}",
+  "@inReplyToPost": {
+    "description": "Threading indicator when the replied-to author is not named",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
   }
 }

@@ -2905,6 +2905,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{username} replied {time}'**
   String topicLastReplyBy(String username, String time);
+
+  /// Threading indicator above a post that replies to another post
+  ///
+  /// In en, this message translates to:
+  /// **'in reply to {username}'**
+  String inReplyToUser(String username);
+
+  /// Threading indicator when the replied-to author is not named
+  ///
+  /// In en, this message translates to:
+  /// **'in reply to post #{number}'**
+  String inReplyToPost(int number);
 }
 
 class _AppLocalizationsDelegate

@@ -1611,4 +1611,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String topicLastReplyBy(String username, String time) {
     return '$username replied $time';
   }
+
+  @override
+  String inReplyToUser(String username) {
+    return 'in reply to $username';
+  }
+
+  @override
+  String inReplyToPost(int number) {
+    return 'in reply to post #$number';
+  }
 }

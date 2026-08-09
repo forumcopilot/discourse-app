@@ -26,6 +26,13 @@ starting point for reading, not a backlog.
 
 Measured 2026-08-08 against try.discourse.org, signed out.
 
+**Test forum note.** The app now points at `meta.discourse.org`, because
+try.discourse.org is a shallow daily-resetting sandbox: zero threaded
+replies, zero small-action posts, no user titles or flair, no
+subcategories. Several items below were unverifiable there — not wrong,
+just untestable. meta has real threading and flair. It is a **production
+forum**, so it is read-only for us: never post from a dev build.
+
 ---
 
 ## Raw counts
@@ -115,11 +122,23 @@ makes the app read as a Discourse client rather than a generic forum app.
 
 ### Post-level identity and threading
 
-- **`reply_to_post_number` + `reply_count`** — in-topic reply threading.
-  Discourse's defining reading affordance: "↳ in reply to X", expandable
-  inline. The app renders a flat run of posts, so a branching conversation
-  reads as if everyone is talking past each other. Highest-value item in
-  this document.
+- ~~**`reply_to_post_number` + `reply_count`** — in-topic reply
+  threading.~~ **Done.** Posts now carry replyToPostNumber /
+  replyToUsername / replyToIconUrl / replyCount (canonical SDK
+  `edee5b9`), and a tappable "↳ in reply to X" row renders above the body,
+  scrolling to the parent.
+
+  Two behaviours worth keeping: it is **suppressed when the parent is the
+  post directly above**, mirroring Discourse's own
+  `suppress_reply_directly_above` — otherwise it fires on nearly every row
+  and becomes noise. And a null `reply_to_user` is *not* "no parent":
+  Discourse omits it when the target is the opening post, so the row falls
+  back to "in reply to post #N".
+
+  Verified on meta.discourse.org (try.discourse.org has no threaded
+  replies at all, which is why this waited): named case renders "in reply
+  to Stephen" with avatar, unnamed renders "in reply to post #2", the
+  directly-above case renders nothing, and tapping jumps to the parent.
 - **`post_type`** — small-action posts (user joined, topic closed, tags
   changed). Web renders these as thin grey lines; the app almost certainly
   renders them as ordinary posts, which pads topics with noise.
@@ -194,8 +213,7 @@ makes the app read as a Discourse client rather than a generic forum app.
 
 Judged on user-visible impact per unit of work, not payload size.
 
-1. **`reply_to_post_number` threading** — the single largest read-experience
-   gap, and the most Discourse-specific thing missing.
+1. ~~`reply_to_post_number` threading~~ — done.
 2. ~~The five §2 cheap wins~~ — three done (`is_hot`, `participant_count`,
    `details.links`). Remaining: `can_chat_user` (profile Chat button) and
    `profile_view_count` (profile header "Views"), both `FCUser`-side.

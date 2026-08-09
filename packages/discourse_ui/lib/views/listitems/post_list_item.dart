@@ -11,6 +11,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_post_vote.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 import '../widgets/post_content_callbacks.dart' show PostContentCallbacks;
 import '../widgets/rich_text_content.dart';
+import '../widgets/user_avatar.dart';
 import '../widgets/reaction_picker_sheet.dart';
 import '../widgets/reaction_users_sheet.dart';
 import '../widgets/post_action_button.dart';
@@ -138,6 +139,10 @@ class PostListItem extends StatefulWidget {
   /// Jumps to the accepted answer's post.
   final void Function(int postNumber)? onJumpToAcceptedAnswer;
 
+  /// Jumps to an arbitrary post number in this topic. Used by the
+  /// "in reply to" indicator so a reader can follow a thread upwards.
+  final void Function(int postNumber)? onJumpToPost;
+
   /// Called after a successful vote to update the thread's poll in state.
   final void Function(FCPoll updatedPoll)? onVoteSuccess;
 
@@ -162,6 +167,7 @@ class PostListItem extends StatefulWidget {
     this.poll,
     this.acceptedAnswer,
     this.onJumpToAcceptedAnswer,
+    this.onJumpToPost,
     this.onVoteSuccess,
     this.translatedContent,
     this.isTranslating = false,
@@ -291,6 +297,62 @@ class _PostListItemState extends State<PostListItem> {
       limitedTwitterUrls: content.twitterUrls.take(10).toList(),
       attachments: nonInlineAttachments,
       inlineAttachments: widget.post.inlineAttachments,
+    );
+  }
+
+  /// The "↩ in reply to alice" row above a threaded post's body.
+  ///
+  /// Tapping scrolls to the parent. Falls back to the post number when the
+  /// payload names no user — Discourse omits `reply_to_user` when the target
+  /// is the opening post, so a missing name is not a missing parent.
+  Widget _buildReplyToIndicator(
+      BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
+    final target = widget.post.replyToPostNumber!;
+    final username = widget.post.replyToUsername;
+    final l10n = AppLocalizations.of(context);
+    final label = username != null && username.isNotEmpty
+        ? (l10n?.inReplyToUser(username) ?? 'in reply to $username')
+        : (l10n?.inReplyToPost(target) ?? 'in reply to post #$target');
+    final color = colorScheme.onSurfaceVariant;
+
+    return InkWell(
+      onTap: widget.onJumpToPost == null
+          ? null
+          : () => widget.onJumpToPost!(target),
+      borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: DesignTokens.spacingXS,
+          horizontal: DesignTokens.spacingXS,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.subdirectory_arrow_right,
+                size: textTheme.bodySmall?.fontSize ?? 12, color: color),
+            SizedBox(width: DesignTokens.spacingXS),
+            if (username != null && username.isNotEmpty) ...[
+              UserAvatar(
+                username: username,
+                iconUrl: widget.post.replyToIconUrl,
+                radius: 8,
+              ),
+              SizedBox(width: DesignTokens.spacingXS),
+            ],
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.bodySmall?.copyWith(
+                  color: color,
+                  letterSpacing: DesignTokens.letterSpacingWide,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -521,6 +583,19 @@ class _PostListItemState extends State<PostListItem> {
               ),
             ),
             const SizedBox(height: DesignTokens.spacingM),
+          ],
+          // "in reply to X" — Discourse's defining reading affordance. Without
+          // it a branching topic renders as one flat run and a reader cannot
+          // tell who is answering whom.
+          //
+          // Suppressed when the target is the post directly above, mirroring
+          // Discourse's own `suppress_reply_directly_above`: in that case the
+          // parent is already on screen and the label is noise on every row.
+          if (widget.post.replyToPostNumber != null &&
+              widget.post.replyToPostNumber !=
+                  (widget.post.postNumber ?? 0) - 1) ...[
+            _buildReplyToIndicator(context, colorScheme, textTheme),
+            const SizedBox(height: DesignTokens.spacingS),
           ],
           // Poll card (first post only): below the title, above body. onVoteSuccess updates
           // the thread's poll in PostController so the UI reflects the new vote without reloading.
