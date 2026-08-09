@@ -437,6 +437,44 @@ keeps a `_childForums` list and a subforum header. The earlier "not
 verified" note was answered by reading the widget rather than hunting for
 a forum that has them.
 
+## 9g. Profile page vs web
+
+Compared signed in on try.discourse.org, own profile and others'.
+
+### Already at parity — more than expected
+
+- **Summary stats match web exactly**, all eight: Days visited, Time
+  read, Topics entered, Posts read, Likes given, Likes received, Topics
+  created, Posts created.
+- **Top Replies and Top Topics** both render.
+- **Info card** carries Member Since · Last Activity · Posts · Seen ·
+  Views · Badges · Following · Followers · bio — web's header strip has
+  no Following/Followers.
+- **Badges row**, trust-level chip, avatar upload, Follow/Unfollow, Send
+  Message, and the self-only nav rows (Messages / Bookmarks / Drafts).
+
+### Gaps
+
+| Web | App |
+|---|---|
+| Activity sub-tabs: All · Topics · Replies · Read · Drafts · Likes · Bookmarks · Reactions · Solved · Votes | **Replies · Topics only** |
+| Summary: Top Links | absent |
+| Summary: Most Replied To | absent |
+| Badges as a full page | badges *row* only |
+| Profile tabs: Summary / Activity / Notifications / Messages / Badges / Preferences | flat page + nav rows |
+| "Expand" (user card) | absent |
+
+**The activity sub-tabs are the substantive gap.** Web offers ten ways
+into a person's history; the app offers two. Drafts and Bookmarks exist
+in the app but as separate nav rows rather than as activity filters, so
+the real additions would be **Read, Likes, Reactions, Solved and Votes** —
+all of which are `/user_actions.json` filters, the same endpoint the
+Replies tab already uses, so this is filter plumbing rather than new
+surface.
+
+Top Links and Most Replied To come from the same `/u/{name}/summary.json`
+the stats already read.
+
 ## 10. Cross-cutting
 
 - **Anonymous chat fetch — fixed** (`bf73875`). `GET /chat/api/me/channels`
