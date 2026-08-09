@@ -84,12 +84,14 @@ load correct it. Verified on the Pixel: the sheet now offers
 ❤️ 👍 😆 😮 👏 🎊 🤗, exactly the seven the server names, where before it
 offered 👍 alone.
 
-**Subcategory nesting (§6) — not verifiable on this forum.** Zero
-categories on try.discourse.org currently declare `subcategory_ids`, so
-"the app renders one flat list" cannot be confirmed or denied here. The
-fields to drive it (`subcategory_ids`, `subcategory_count`,
-`show_subcategory_list`, `subcategory_list_style`) all exist in the
-payload. Needs a forum that actually has subcategories.
+**Subcategory nesting (§6) — confirmed on meta, and fixed.** It was
+unverifiable on try.discourse.org (zero categories there declare
+`subcategory_ids`). meta has 33 subcategories, which showed the real
+cause: `/categories.json` returns top-level categories only, even with
+`include_subcategories=true`, while `/site.json` carries the lot. The app
+had the whole nesting path already — model, converter, tree builder,
+renderer — and simply never received children. Now merged from the cached
+site payload, at no extra request.
 
 ---
 
@@ -211,7 +213,9 @@ differences rather than payload inferences:
 
 ### Category
 
-- `subcategory_ids` and friends — see the §6 correction above.
+- ~~`subcategory_ids` and friends~~ — **done**; see the §6 correction
+  above. `subcategory_list_style` / `show_subcategory_list` (web's box vs
+  list rendering) remain unread.
 - **`topic_template`** — prefills the composer for categories that define
   one. A category expecting a bug-report template currently gets a blank
   box, which is a quietly bad experience.

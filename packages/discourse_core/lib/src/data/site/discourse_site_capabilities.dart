@@ -33,6 +33,15 @@ class DiscourseSiteCapabilities {
   String? tosUrl;
   String? privacyPolicyUrl;
 
+  /// Every category the forum publishes, subcategories included.
+  ///
+  /// `/categories.json` returns only top-level categories — even with
+  /// `include_subcategories=true`, which meta.discourse.org ignores — so
+  /// the category tree cannot be built from it alone. `/site.json` carries
+  /// all of them with `parent_category_id`, and this app already fetches
+  /// it once per forum, so the children come for free.
+  List<Map<String, dynamic>> categories = const [];
+
   /// True once a real payload has been parsed for this forum. Distinguishes
   /// "asked, offers nothing" from "never asked".
   bool resolved = false;
@@ -62,6 +71,10 @@ class DiscourseSiteCapabilities {
     caps.topMenuItems = menu;
     caps.canTagTopics = site['can_tag_topics'] == true;
     caps.uncategorizedCategoryId = site['uncategorized_category_id'] as int?;
+    caps.categories = ((site['categories'] as List?) ?? const [])
+        .whereType<Map>()
+        .map((c) => c.cast<String, dynamic>())
+        .toList(growable: false);
     caps.tosUrl = (site['tos_url'] as String?)?.trim();
     caps.privacyPolicyUrl = (site['privacy_policy_url'] as String?)?.trim();
     caps.resolved = true;

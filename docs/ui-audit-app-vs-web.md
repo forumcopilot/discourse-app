@@ -186,8 +186,20 @@ others.
   entity-ESCAPED) and `description` (clean); the proxy took the former
   verbatim. Now run through `stripHtmlToText`, which already decodes
   numeric character references. Verified on device.
-- **Open: no subcategory nesting shown.** Web groups subcategories under
-  their parent; the app renders one flat list.
+- **Subcategory nesting — fixed.** Web groups subcategories under their
+  parent; the app rendered one flat list.
+
+  It was never a missing feature. `FCForum` already carried
+  `parentId`/`childForums`, the converter already read
+  `parent_category_id`, `_buildTree` already assembled the tree, and the
+  categories tab already rendered children. The whole path existed and was
+  starved of data: `/categories.json` returns **top-level categories
+  only** — meta answers 12 with zero children even though the proxy passes
+  `include_subcategories=true` — while `/site.json` lists all 45 including
+  33 subcategories. Merging the cached site payload in was the entire fix.
+
+  Verified on meta: "News and Events" now groups Announcements (595),
+  Blog (246) and Forum summaries (5), matching `/site.json`.
 - The app shows a topic count per category, which web's box layout does
   not — a point in the app's favour, worth keeping.
 

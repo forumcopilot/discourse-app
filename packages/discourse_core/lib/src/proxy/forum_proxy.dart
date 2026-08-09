@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
 import 'package:forumcopilot_sdk/models/results/fc_forum_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/site/discourse_site_capabilities.dart';
 import '../util/html_text.dart';
 
 /// Discourse implementation of [IFCForumProxy].
@@ -29,8 +30,8 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
       final list = (response['category_list'] as Map<String, dynamic>?) ??
           const <String, dynamic>{};
       final raw = (list['categories'] as List?) ?? const [];
-      final cats =
-          raw.whereType<Map<String, dynamic>>().toList(growable: false);
+      final cats = _withSubcategories(
+          raw.whereType<Map<String, dynamic>>().toList(growable: false));
 
       List<FCForum> forums;
       if (forumId.isNotEmpty) {
@@ -261,6 +262,34 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
   }
 
   // ===== Helpers =====
+
+
+  /// Adds the subcategories `/categories.json` leaves out.
+  ///
+  /// That endpoint returns top-level categories only. It accepts
+  /// `include_subcategories=true` — which this proxy passes — but forums do
+  /// not all honour it: meta.discourse.org answers 12 categories and zero
+  /// children either way, while its `/site.json` lists 45 including 33
+  /// subcategories. So the tree was always flat there, which is exactly the
+  /// "no subcategory nesting" the UI audit recorded.
+  ///
+  /// The site payload is already cached per forum, so this costs no extra
+  /// request. Entries `/categories.json` also returned win: that response
+  /// is the richer one, and this is only here to supply what it omitted.
+  List<Map<String, dynamic>> _withSubcategories(
+      List<Map<String, dynamic>> cats) {
+    final fromSite =
+        DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
+            .categories;
+    if (fromSite.isEmpty) return cats;
+    final seen = cats.map((c) => c['id']).whereType<int>().toSet();
+    final merged = [...cats];
+    for (final c in fromSite) {
+      final id = c['id'];
+      if (id is int && !seen.contains(id)) merged.add(c);
+    }
+    return merged;
+  }
 
   List<FCForum> _buildTree(
     List<Map<String, dynamic>> cats, {
