@@ -403,17 +403,21 @@ a forum header), not less.
 |---|---|---|
 | Header | banner: icon, name, description, **New Topic** button | title in nav; New Topic is the global sidebar button |
 | Notification level | overflow → full Watching / Watching First Post / Tracking / Normal / Muted sheet | bell icon, same five levels |
-| Latest / New / Hot tabs | **missing — one list only** | present |
+| Latest / New / Hot tabs | **added** | present |
 | Tag filter within category | **missing** | `tags >` dropdown chip |
 
-**The one real gap is the per-category Latest / New / Hot tabs.** The
-plumbing is already there: `DiscourseTopicProxy._topicListInForum` takes a
-`filter` and builds `/c/{id}/l/{filter}.json`, and the app already calls
-`/c/{id}/l/top.json` and `/c/{id}/l/latest.json` after posting. What is
-missing is a public entry point for arbitrary filters and a tab strip on
-the category page — the same shape as the Home sub-tabs, which are now a
-named `_HomeFilter` list rather than positional indices, so it can be
-copied rather than reinvented.
+**Per-category tabs — done.** Latest / Hot / New now sit above the
+category list, in web's order, backed by
+`DiscourseTopicProxy.getCategoryTopicsAsync` (`/c/{id}/l/{filter}.json`).
+Named rather than positional, like the Home sub-tabs: Hot only appears
+when `top_menu_items` offers the route, and New only when signed in
+(`/c/{id}/l/new.json` answers 403 to a guest), so which tabs exist varies.
+
+Pinned topics head the list on **Latest only**. On Hot or New that feed
+has its own ordering, so prepending the pinned-by-top section both masked
+it and cost an extra `/c/{id}/l/top.json` — web does not do it either.
+Verified on device: Hot is a visibly different ordering and now costs one
+request instead of two.
 
 ### Tags
 
@@ -426,11 +430,12 @@ copied rather than reinvented.
 
 At parity or better; the app adds a search box web has no equivalent for.
 
-### Not verified
+### Resolved while implementing
 
-Whether a category page lists its *subcategories* at the top, as web
-does. try.discourse.org has no subcategories at all, and meta does but is
-where the app is not currently pointed.
+The category page **does** render its subcategories — `ForumTopicList`
+keeps a `_childForums` list and a subforum header. The earlier "not
+verified" note was answered by reading the widget rather than hunting for
+a forum that has them.
 
 ## 10. Cross-cutting
 

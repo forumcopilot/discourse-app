@@ -4,6 +4,8 @@ import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
+import 'package:forumcopilot_sdk/models/results/fc_topic_result.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseTopicProxy;
 import 'package:get/get.dart';
 import 'package:discourse_ui/utils/forum_navigation.dart';
 import 'package:discourse_ui/views/post_page.dart';
@@ -22,12 +24,18 @@ class ForumTopicList extends StatefulWidget {
   final bool showSubforumHeader;
   final void Function(VoidCallback)? onRefreshAvailable;
 
+  /// Which Discourse category feed to show: `latest`, `new`, `hot`, …
+  /// (`/c/{id}/l/{filter}.json`). Web puts these on tabs; the page above
+  /// owns the tab strip and passes the choice down.
+  final String filter;
+
   const ForumTopicList({
     super.key,
     required this.siteContext,
     required this.forum,
     this.showSubforumHeader = false,
     this.onRefreshAvailable,
+    this.filter = 'latest',
   });
 
   @override
@@ -44,6 +52,32 @@ class _ForumTopicListState extends State<ForumTopicList> {
   bool _hasMoreTopics = true;
   bool _isLoadingMore = false;
   final ScrollController _scrollController = ScrollController();
+
+  /// Fetches the category feed for [ForumTopicList.filter].
+  ///
+  /// `latest` goes through the SDK contract; anything else is
+  /// Discourse-only, so it needs the concrete proxy — the SDK offers a
+  /// category list and a category *top* list and nothing between.
+  Future<FCTopicDataResult> _fetch(
+      dynamic topicProxy, int startNum, int lastNum) async {
+    if (widget.filter != 'latest' && topicProxy is DiscourseTopicProxy) {
+      return topicProxy.getCategoryTopicsAsync(widget.forum.id, startNum,
+          filter: widget.filter);
+    }
+    return topicProxy.getTopicAsync(widget.forum.id, startNum, lastNum);
+  }
+
+  @override
+  void didUpdateWidget(covariant ForumTopicList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Switching tabs must refetch — the widget is reused, so without this
+    // the new tab would keep showing the previous feed's topics.
+    if (oldWidget.filter != widget.filter) {
+      _currentTopicCount = 0;
+      _hasMoreTopics = true;
+      _loadTopics();
+    }
+  }
 
   @override
   void initState() {
@@ -96,9 +130,15 @@ class _ForumTopicListState extends State<ForumTopicList> {
         AppLogger.debug('[ForumTopicList] canViewContent: $canViewContent');
 
         if (!widget.forum.isSubForumContainer && canViewContent) {
-          // Load sticky topics
-          final topTopicData = await topicProxy.getTopTopicAsync(widget.forum.id, 0, 19);
-          if (topTopicData.topics.isNotEmpty) {
+          // Pinned topics head the list on Latest only. On Hot or New the
+          // feed has its own ordering, so prepending pinned-by-top both
+          // masks it and costs an extra /c/{id}/l/top.json — web does not
+          // do it either. Only this section is skipped; the feed itself
+          // below is always fetched.
+          final topTopicData = widget.filter == 'latest'
+              ? await topicProxy.getTopTopicAsync(widget.forum.id, 0, 19)
+              : null;
+          if (topTopicData != null && topTopicData.topics.isNotEmpty) {
             AppLogger.debug('[ForumTopicList] Adding ${topTopicData.topics.length} sticky topics');
             // Mark as sticky and convert to FCTopic
             for (final t in topTopicData.topics) {
@@ -113,7 +153,7 @@ class _ForumTopicListState extends State<ForumTopicList> {
           }
 
           // Load regular topics
-          final forumTopicData = await topicProxy.getTopicAsync(widget.forum.id, 0, _pageSize);
+          final forumTopicData = await _fetch(topicProxy, 0, _pageSize);
           if (forumTopicData.topics.isNotEmpty) {
             AppLogger.debug('[ForumTopicList] Adding ${forumTopicData.topics.length} regular topics');
             // Dedupe by topic id: pinned topics also appear in the regular
@@ -188,7 +228,8 @@ class _ForumTopicListState extends State<ForumTopicList> {
       AppLogger.debug('  - Start num: $_currentTopicCount');
       AppLogger.debug('  - Last num: ${_currentTopicCount + _pageSize}');
 
-      final moreTopics = await topicProxy.getTopicAsync(widget.forum.id, _currentTopicCount, _currentTopicCount + _pageSize);
+      final moreTopics = await _fetch(
+          topicProxy, _currentTopicCount, _currentTopicCount + _pageSize);
 
       if (mounted) {
         setState(() {

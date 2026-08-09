@@ -97,6 +97,24 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     return _topicListInForum(forumId, startNum, filter: 'top');
   }
 
+  /// Discourse-only: a category's topic list under an arbitrary filter
+  /// (`/c/{id}/l/{filter}.json` — latest, new, unread, top, hot).
+  ///
+  /// Not on [IFCTopicProxy]: the SDK's contract offers a category list and
+  /// a category *top* list and nothing between, because XenForo has no
+  /// equivalent of Discourse's per-category feeds. Web puts Latest / New /
+  /// Hot tabs on every category page, so the app needs the general form.
+  ///
+  /// `new` and `unread` require a session and answer 403 without one;
+  /// `hot` requires the forum to offer the route (`top_menu_items`).
+  /// Callers should not offer a filter the viewer cannot use.
+  Future<FCTopicDataResult> getCategoryTopicsAsync(
+    String forumId,
+    int startNum, {
+    required String filter,
+  }) =>
+      _topicListInForum(forumId, startNum, filter: filter);
+
   /// Discourse-only: site-wide Top feed, optionally scoped to a time
   /// [period]. Maps to `/top.json` (all-time) or `/top/{period}.json`
   /// (`all` / `yearly` / `quarterly` / `monthly` / `weekly` / `daily`).

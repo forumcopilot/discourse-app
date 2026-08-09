@@ -5,6 +5,9 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:discourse_ui/views/appbars/forum_topics_app_bar.dart';
 import 'package:discourse_ui/views/lists/forum_topic_list.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseSiteCapabilities;
+import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:discourse_ui/views/new_topic_page.dart';
 import 'package:discourse_ui/views/widgets/forum_actions.dart';
 import 'package:discourse_core/discourse_core.dart'
@@ -145,6 +148,58 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
     });
   }
 
+
+  /// Web puts Latest / New / Hot on every category page; the app showed a
+  /// single list. Named rather than positional, like the Home sub-tabs —
+  /// New needs a session and Hot needs the forum to offer the route, so
+  /// which tabs exist varies and indices would drift.
+  List<_CategoryFilter> get _filters => [
+        _CategoryFilter.latest,
+        if (DiscourseSiteCapabilities.offersRoute(
+            widget.siteContext.site.pluginUrl, 'hot'))
+          _CategoryFilter.hot,
+        // `/c/{id}/l/new.json` answers 403 to a guest, so it is only
+        // offered to someone who can actually use it.
+        if (widget.siteContext.isLoggedIn) _CategoryFilter.newTopics,
+      ];
+
+  _CategoryFilter _activeFilter = _CategoryFilter.latest;
+
+  Widget _buildFilterTabs(BuildContext context) {
+    final filters = _filters;
+    // A lone tab is a label, not a choice.
+    if (filters.length < 2) return const SizedBox.shrink();
+    final colorScheme = Theme.of(context).colorScheme;
+    return SizedBox(
+      height: 48,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+        itemCount: filters.length,
+        separatorBuilder: (_, __) => SizedBox(width: DesignTokens.spacingS),
+        itemBuilder: (context, i) {
+          final f = filters[i];
+          final selected = f == _activeFilter;
+          return Center(
+            child: ChoiceChip(
+              label: Text(f.label),
+              selected: selected,
+              onSelected: (_) {
+                if (selected) return;
+                setState(() => _activeFilter = f);
+              },
+              labelStyle: TextStyle(
+                color: selected
+                    ? colorScheme.onSecondaryContainer
+                    : colorScheme.onSurfaceVariant,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -160,12 +215,34 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
         canPost: widget.forum.canPost,
         canSubscribe: widget.forum.canSubscribe,
       ),
-      body: ForumTopicList(
-        siteContext: widget.siteContext,
-        forum: widget.forum,
-        showSubforumHeader: true,
-        onRefreshAvailable: _onRefreshAvailable,
+      body: Column(
+        children: [
+          _buildFilterTabs(context),
+          Expanded(
+            child: ForumTopicList(
+              siteContext: widget.siteContext,
+              forum: widget.forum,
+              showSubforumHeader: true,
+              onRefreshAvailable: _onRefreshAvailable,
+              filter: _activeFilter.route,
+            ),
+          ),
+        ],
       ),
     );
   }
+}
+
+
+/// A category's topic feeds, mirroring web's tabs.
+enum _CategoryFilter {
+  latest('latest', 'Latest'),
+  hot('hot', 'Hot'),
+  newTopics('new', 'New');
+
+  const _CategoryFilter(this.route, this.label);
+
+  /// The `/c/{id}/l/{route}.json` segment.
+  final String route;
+  final String label;
 }
