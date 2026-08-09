@@ -41,24 +41,30 @@ Still open on this screen:
   Views · Trust Level. App: Member Since · Last Activity · Posts, plus a
   trust-level chip. "Seen" and "Views" are absent.
 
-## 3. Topic list (home) — open
+## 3. Topic list (home) — partly fixed
 
 Per-row, web shows and the app does not:
 
 | Element | Web | App |
 |---|---|---|
-| Category badge | coloured chip (`discourse`, `general`, `tech`) | absent |
-| Tags | chips (`code`, `python`) | absent |
-| Like count | `♥ 7` | absent |
+| Category badge | coloured chip (`discourse`, `general`, `tech`) | **added** |
+| Tags | chips (`code`, `python`) | already present (audit was wrong) |
+| Like count | `♥ 7` | **added** |
 | Last reply attribution | "kodit4h1c7022 replied 3 hours ago" with avatar | absent |
 | "Hot" badge | shown | absent |
 | View count | absent | shown (`👁 792`) |
 
-The category badge is the significant one: Discourse's information
-architecture is category-first, and the app's list drops it entirely, so
-there is no way to tell which category a topic is in without opening it.
-The app also shows views where web shows likes — views are the weaker
-signal of the two.
+Category badge and like count are now rendered (`FCTopic` already carried
+`forumName` and `likeCount`; the row simply ignored them). The category
+chip leads the tag row, filled where tags are outlined, so the hierarchy
+reads the way web's does.
+
+Correction to an earlier claim in this document: **tags were already
+rendered** — the topics visible in the first screenshots simply had none.
+Verified on the Leetcode topic, which shows `tech` `code` `python`.
+
+Still open: last-reply attribution ("X replied 3 hours ago") and the
+"Hot" badge.
 
 ## 4. Topic view — open
 
@@ -76,14 +82,17 @@ signal of the two.
   Reply a labelled button; the app left-aligns icons and floats Reply as
   a FAB. Not wrong, but it is the kind of drift worth deciding once.
 
-## 5. Post content — open
+## 5. Post content — fixed
 
-- **Code blocks wrap instead of scrolling.** Observed on "My Python
-  solution for 238…": lines break mid-expression
-  (`arr = [i for i in nums if i !=` / `0]`), which makes indentation-
-  sensitive code unreadable and is actively misleading for Python.
-  Web scrolls the block horizontally. This is the highest-severity
-  content bug found.
+- **Code blocks wrapped instead of scrolling — fixed.** Lines broke
+  mid-expression (`arr = [i for i in nums if i !=` / `0]`) with the
+  continuation landing at column 0, so indentation-sensitive code read as
+  a different program. `<pre>` now renders through a TagExtension into a
+  horizontally scrolling block, matching web. Verified on device: the
+  expression is on one line and the block scrolls to reveal the rest.
+  Note the block uses plain `Text`, not `SelectableText` — the latter
+  claims horizontal drags for selection and swallows the scroll, which
+  would have left the block clipped with no way to reach the line ends.
 
 ## 6. Categories — one fixed, rest open
 

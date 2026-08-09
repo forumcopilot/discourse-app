@@ -201,7 +201,14 @@ class TopicListItem extends StatelessWidget {
             Builder(
               builder: (context) {
                 final tags = topic.tags;
-                if (tags.isEmpty) return const SizedBox.shrink();
+                // Discourse's information architecture is category-first,
+                // and the row showed no category at all — you could not
+                // tell where a topic lived without opening it. Web puts the
+                // category badge on every row, ahead of the tags.
+                final category = topic.forumName.trim();
+                if (tags.isEmpty && category.isEmpty) {
+                  return const SizedBox.shrink();
+                }
                 return Padding(
                   padding: EdgeInsets.fromLTRB(
                     DesignTokens.spacingL,
@@ -212,7 +219,31 @@ class TopicListItem extends StatelessWidget {
                   child: Wrap(
                     spacing: DesignTokens.spacingXS,
                     runSpacing: DesignTokens.spacingXS,
-                    children: tags.map((tag) {
+                    children: [
+                      if (category.isNotEmpty)
+                        Material(
+                          color: colorScheme.secondaryContainer,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(DesignTokens.radiusS),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            child: Text(
+                              category,
+                              style: textTheme.labelSmall?.copyWith(
+                                color: colorScheme.onSecondaryContainer,
+                                fontWeight: DesignTokens.fontWeightSemiBold,
+                                letterSpacing: DesignTokens.letterSpacingWide,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ...tags.map((tag) {
                       final chipShape = RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.circular(DesignTokens.radiusS),
@@ -251,7 +282,8 @@ class TopicListItem extends StatelessWidget {
                           ),
                         ),
                       );
-                    }).toList(),
+                    }),
+                    ],
                   ),
                 );
               },
@@ -303,6 +335,28 @@ class TopicListItem extends StatelessWidget {
                             SizedBox(width: DesignTokens.spacingXS),
                             Text(
                               formatNumber(context, topic.replyCount),
+                              style: textTheme.bodySmall?.copyWith(
+                                color: metaColor,
+                                letterSpacing: DesignTokens.letterSpacingWide,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                      // Likes — web shows these on every row and they are a
+                      // better signal of a topic worth opening than views.
+                      if (topic.likeCount > 0) ...[
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.favorite_border,
+                              size: textTheme.bodySmall?.fontSize ?? 12,
+                              color: metaColor,
+                            ),
+                            SizedBox(width: DesignTokens.spacingXS),
+                            Text(
+                              formatNumber(context, topic.likeCount),
                               style: textTheme.bodySmall?.copyWith(
                                 color: metaColor,
                                 letterSpacing: DesignTokens.letterSpacingWide,
