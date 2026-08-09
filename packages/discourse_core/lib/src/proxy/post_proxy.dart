@@ -13,6 +13,7 @@ import 'package:forumcopilot_sdk/models/results/fc_reaction_result.dart';
 import '../base_discourse_proxy.dart';
 import '../data/post/discourse_accepted_answer.dart';
 import '../data/post/discourse_valid_reactions.dart';
+import '../util/quote_markup.dart';
 import '../data/post/discourse_post_revision.dart';
 import '../data/post/discourse_suggested_topic.dart';
 import '../util/html_text.dart';
@@ -463,9 +464,20 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       final response = await apiGet('/posts/$postId.json');
       final raw = (response['raw'] as String?) ?? '';
       final username = (response['username'] as String?) ?? '';
-      // Discourse's quote markdown: [quote="user, post:N, topic:T"]raw[/quote]
+      // Discourse's quote markdown: [quote="user, post:N, topic:T"]body[/quote]
+      //
+      // `body` is the post's own words, not its raw verbatim. Web's quote is
+      // selection-driven and so never picks up quote markup from the post
+      // being quoted; this app quotes the whole post, so it has to strip
+      // what web never collects — see DiscourseQuoteMarkup.
+      // When the post is nothing but a quote, there is no raw worth
+      // quoting — fall back to its rendered text, which is what web
+      // inserts anyway.
+      final cookedText = stripHtmlToText((response['cooked'] as String?) ?? '');
+      final body = DiscourseQuoteMarkup.quotableBody(raw) ??
+          (cookedText.isNotEmpty ? cookedText : raw.trim());
       final quote = '[quote="${username}, post:${response['post_number']}, '
-          'topic:${response['topic_id']}"]\n$raw\n[/quote]\n\n';
+          'topic:${response['topic_id']}"]\n$body\n[/quote]\n\n';
       return FCQuotePostResult(
         result: true,
         resultText: '',

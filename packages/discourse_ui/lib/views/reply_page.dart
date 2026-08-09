@@ -51,6 +51,10 @@ class _ReplyPageState extends State<ReplyPage> {
   String? _createdPostId; // Store the created post ID
   Future<forumcopilot_sdk.FCQuotePostResult>? _quoteFuture;
 
+  /// Guards against inserting the same quote twice — `initialContent` and
+  /// the future's callback can both fire.
+  bool _quoteApplied = false;
+
   /// Discourse staff whisper mode — when on, the reply is submitted via
   /// `replyWhisperAsync` (visible to staff + whisper-allowed groups only).
   bool _isWhisper = false;
@@ -82,6 +86,28 @@ class _ReplyPageState extends State<ReplyPage> {
     // Cache the future so it's only called once
     if (widget.isQuote && widget.postId != null) {
       _quoteFuture = SiteProxyFactory.getPostProxy().getQuotePostAsync(widget.postId!);
+      // Apply the quote to the field ourselves rather than leaving it to
+      // `initialContent`. Both the quote fetch and the draft restore are
+      // async, and the draft only seeds an *empty* field — so whichever
+      // lost the race was silently dropped. In practice the draft won, and
+      // asking to quote a post produced last week's draft instead.
+      //
+      // Web inserts a quote *into* the open composer rather than replacing
+      // it, so the quote goes on top and any draft text stays below it.
+      _quoteFuture!.then((result) {
+        if (!mounted || _quoteApplied) return;
+        final quote = result.quoteContent;
+        if (quote == null || quote.trim().isEmpty) return;
+        _quoteApplied = true;
+        final existing = _contentController.text;
+        // The compose page may already have seeded it from initialContent.
+        if (existing.contains(quote.trim())) return;
+        final merged = existing.isEmpty ? quote : '$quote$existing';
+        _contentController.value = TextEditingValue(
+          text: merged,
+          selection: TextSelection.collapsed(offset: quote.length),
+        );
+      });
     }
     _titleController = TextEditingController();
     _contentController = TextEditingController();

@@ -287,6 +287,44 @@ Still open on the composer:
 - **No explicit Discard.** Back exits; drafts are saved server-side, so
   nothing is lost — but the exit is less obvious than web's button.
 
+## 9d. Signed-in write flows on try.discourse.org — audited
+
+Reply, quote, edit and draft round-trip, exercised for real.
+
+**Working:** plain reply posts and lands; the draft is deleted on
+success; edit loads the post's raw and saves; `--` renders as an en-dash,
+which is Discourse's own typographer, not a client quirk; the post
+overflow menu (Edit / Delete / Report / Make wiki) matches web's for your
+own posts.
+
+**Two bugs found and fixed:**
+
+- **Quote inserted the post's raw source.** Quoting a post that itself
+  contained a quote produced a wall of markup — channel ids, thread
+  titles, an `onmouseover=` attribute — where the words should be. Web
+  never shows this because its quote is *selection-driven*: it copies
+  rendered text, so quote markup from the original is never collected.
+  The app quotes whole posts, so it now strips what web never picks up,
+  and falls back to the post's rendered text when the post is *only* a
+  quote and stripping leaves nothing.
+- **A stale draft silently ate a fresh quote.** Both the quote fetch and
+  the draft restore are async, and the draft only seeds an empty field —
+  so whichever lost the race was dropped. In practice the draft won, and
+  asking to quote a post produced last week's draft instead. The quote is
+  now applied explicitly, on top, with any draft text kept below it —
+  which is also what web does, inserting into the open composer rather
+  than replacing it.
+
+**Still open:**
+
+- **No edit indicator.** Web marks an edited post with a pencil and
+  revision count, tappable for the history. The app has "View history" in
+  the overflow menu but shows nothing on the post itself, so an edited
+  post is indistinguishable from an untouched one.
+- **A reply costs four follow-up requests** — `GET /posts/{id}`,
+  `GET /t/{id}/{n}`, `POST /topics/timings`, `GET /t/{id}` — to display
+  one new post. Worth a look given the rate-limit work elsewhere.
+
 ## 10. Cross-cutting
 
 - **Anonymous chat fetch — fixed** (`bf73875`). `GET /chat/api/me/channels`

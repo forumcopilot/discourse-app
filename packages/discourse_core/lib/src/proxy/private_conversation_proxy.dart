@@ -1,4 +1,6 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import '../util/html_text.dart';
+import '../util/quote_markup.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_private_conversation_proxy.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_like.dart';
@@ -316,7 +318,8 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       final raw = (p['raw'] as String?) ?? '';
       final username = (p['username'] as String?) ?? '';
       final quote =
-          '[quote="${username}, post:${p['post_number']}, topic:${p['topic_id']}"]\n$raw\n[/quote]\n\n';
+          '[quote="${username}, post:${p['post_number']}, topic:${p['topic_id']}"]\n'
+          '${DiscourseQuoteMarkup.quotableBody(raw) ?? stripHtmlToText((p['cooked'] as String?) ?? '')}\n[/quote]\n\n';
       return FCQuoteConversationResult(
         result: true,
         resultText: '',
