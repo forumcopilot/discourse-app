@@ -45,24 +45,44 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
     // signal. We treat anything other than 404 (including 401/403 for
     // unauth'd requests against installed plugins) as "chat installed";
     // 404 means the chat plugin's routes aren't registered.
-    try {
-      await apiGet('/chat/api/me/channels');
-      siteContext.setChatEnabled(true);
-    } on DiscourseApiException catch (e) {
-      if (e.statusCode == 404) {
-        // Route not registered → chat plugin absent.
-        siteContext.setChatEnabled(false);
-      } else if (e.statusCode != 0) {
-        // Any real HTTP status other than 404 (401/403/…) means the
-        // route exists → chat installed.
+    //
+    // Asked once per forum, not once per getConfig. A cold launch calls
+    // getConfig three times in ~600ms (SiteInitializationService,
+    // SiteController._performSiteInitialization, and SiteHomePage's
+    // post-frame "is the site still up?" check). The other two reads here
+    // answer 2xx and so collapse into DiscourseClient's read cache, but a
+    // signed-out visitor gets 403 from this route, and that cache
+    // deliberately stores only 2xx — pinning an error would outlive
+    // whatever caused it. That left the probe as the one request in the
+    // launch sequence that repeated per caller: three 403s spent against
+    // the per-IP rate limit on a question whose answer cannot change.
+    // Skipping the call is better than caching its failure, and the
+    // answer is not session-dependent — 403 and 200 both mean "installed".
+    if (!siteContext.chatProbeResolved) {
+      try {
+        await apiGet('/chat/api/me/channels');
         siteContext.setChatEnabled(true);
+      } on DiscourseApiException catch (e) {
+        if (e.statusCode == 404) {
+          // Route not registered → chat plugin absent.
+          siteContext.setChatEnabled(false);
+        } else if (e.statusCode == 401 || e.statusCode == 403) {
+          // The route exists and answered; it just refused us because we
+          // are signed out. That is a positive signal → chat installed.
+          siteContext.setChatEnabled(true);
+        }
+        // Everything else is the server failing to answer the question
+        // rather than answering it: 0 (transport failure), 429 (rate
+        // limited), 5xx. Those must stay unresolved. This used to say
+        // "any status but 404 means installed", which was harmless while
+        // the probe re-ran on every getConfig and could correct itself —
+        // but now that one answer is kept, a 429 during a burst launch
+        // would pin the wrong nav layout for the rest of the process.
+      } catch (_) {
+        // Network error or unknown — same reasoning: record nothing, so
+        // this stays retryable rather than freezing a guess for the
+        // lifetime of the process.
       }
-      // statusCode 0 == transport/network failure (the client maps those
-      // to 0) — no signal either way; keep the cached/default value.
-    } catch (_) {
-      // Network error or unknown — leave the existing cached value
-      // (defaults to false on a fresh install, true if a previous
-      // probe succeeded).
     }
     // Upload limits — Discourse publishes every `client: true` site setting
     // at `/site/settings.json` (SiteController#settings →

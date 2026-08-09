@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -168,17 +169,41 @@ extension DiscourseSiteContextExtension on SiteContext {
   // for the lifetime of the session so the bottom-nav slot decision is
   // synchronous from `_enabledTabs`.
 
+  /// Resolved chat-route probes, keyed by `site.pluginUrl`.
+  ///
+  /// Deliberately *not* the per-instance [_store]: a cold launch builds more
+  /// than one [SiteContext] for the same forum (SiteController rebuilds one
+  /// from disk while SiteInitializationService holds another), so an
+  /// instance-scoped memo would let each of them re-probe. Whether the chat
+  /// plugin is mounted is a property of the forum, not of a context object
+  /// or a session — a guest's 403 and a member's 200 are the same answer —
+  /// so one probe per process is the honest scope.
+  static final Map<String, bool> _chatProbe = <String, bool>{};
+
   /// Phase 5.18a — true when the `discourse-chat` plugin is installed and
   /// reachable. Drives the bottom-nav third slot (Chat when true, PMs
   /// when false). Defaults to false before the first probe so the
   /// fallback (Messages) renders during cold start.
-  bool get chatEnabled => (_data()['chatEnabled'] as bool?) ?? false;
+  bool get chatEnabled => _chatProbe[_prefsPrefix()] ?? false;
+
+  /// True once a probe produced a real answer for this forum.
+  ///
+  /// Needed because `false` is two different states: "asked, and the plugin
+  /// is absent" and "never asked". Without the distinction a chat-less forum
+  /// would re-probe its 404 on every `getConfig`, which is the same waste
+  /// the 403 case caused.
+  bool get chatProbeResolved => _chatProbe.containsKey(_prefsPrefix());
 
   /// Cache the result of a chat-route probe. Called by
-  /// `DiscourseConfigProxy.getConfig` once per site init.
+  /// `DiscourseConfigProxy.getConfig` the first time it resolves.
   void setChatEnabled(bool enabled) {
-    _data()['chatEnabled'] = enabled;
+    _chatProbe[_prefsPrefix()] = enabled;
   }
+
+  /// Drops memoized probe results. Process-lifetime state, so tests that
+  /// measure request volume must be able to start from a clean slate.
+  @visibleForTesting
+  static void resetChatProbeCache() => _chatProbe.clear();
 
   String _prefsPrefix() => 'discourse:${site.pluginUrl}';
 }

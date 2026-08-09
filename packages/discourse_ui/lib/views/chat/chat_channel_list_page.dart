@@ -104,6 +104,20 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
   }
 
   Future<void> _load() async {
+    // `/chat/api/me/channels` is "my channels" — it needs a session, and
+    // answers 403 without one. Same gate as
+    // DiscourseTopicProxy.markTopicReadAsync puts on the timings beacon:
+    // don't spend a request (or a slice of the per-IP rate limit) on a
+    // call whose answer is already known. The auth listener re-runs
+    // _load() on sign-in, so the real fetch happens then.
+    if (!widget.siteContext.isLoggedIn) {
+      setState(() {
+        _loading = false;
+        _channels = const [];
+        _error = 'Sign in to use chat.';
+      });
+      return;
+    }
     setState(() {
       _loading = true;
       _error = null;
