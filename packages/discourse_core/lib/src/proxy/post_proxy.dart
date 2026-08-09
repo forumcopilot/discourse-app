@@ -12,6 +12,7 @@ import 'package:forumcopilot_sdk/models/results/fc_reaction_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../data/post/discourse_accepted_answer.dart';
+import '../data/post/discourse_valid_reactions.dart';
 import '../data/post/discourse_post_revision.dart';
 import '../data/post/discourse_suggested_topic.dart';
 import '../util/html_text.dart';
@@ -77,6 +78,10 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // the result type is shared SDK surface — see DiscourseAcceptedAnswers.
       DiscourseAcceptedAnswers.store(
           topicId, DiscourseAcceptedAnswer.fromTopicJson(t));
+      // The forum's enabled reaction set rides along on every topic payload.
+      // It is site-level, not topic-level, so any topic load teaches the
+      // picker what this forum accepts — see DiscourseValidReactions.
+      DiscourseValidReactions.store(t['valid_reactions']);
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       final rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
@@ -191,6 +196,10 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // solution panel too, since that is a common arrival route from notifications.
       DiscourseAcceptedAnswers.store(
           topicId, DiscourseAcceptedAnswer.fromTopicJson(t));
+      // The forum's enabled reaction set rides along on every topic payload.
+      // It is site-level, not topic-level, so any topic load teaches the
+      // picker what this forum accepts — see DiscourseValidReactions.
+      DiscourseValidReactions.store(t['valid_reactions']);
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       final rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
@@ -268,6 +277,10 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // be redundant.
       DiscourseAcceptedAnswers.store(
           topicId, DiscourseAcceptedAnswer.fromTopicJson(t));
+      // The forum's enabled reaction set rides along on every topic payload.
+      // It is site-level, not topic-level, so any topic load teaches the
+      // picker what this forum accepts — see DiscourseValidReactions.
+      DiscourseValidReactions.store(t['valid_reactions']);
       final unreadAnchor = (t['last_read_post_number'] as int?) ?? 1;
       var stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       var rawPosts = ((stream['posts'] as List?) ?? const [])
@@ -1000,6 +1013,14 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
 
   @override
   Future<FCAvailableReactionsResult> getAvailableReactionsAsync() async {
+    // The topic payload already told us. `valid_reactions` is the
+    // `discourse_reactions_enabled_reactions` site setting serialized
+    // verbatim, so it is both authoritative and free — no request at all,
+    // and no guessing from the shape of a 404 (see below).
+    final known = DiscourseValidReactions.current;
+    if (known != null && known.isNotEmpty) {
+      return FCAvailableReactionsResult(result: true, reactions: known);
+    }
     try {
       final response = await apiGet('/discourse-reactions/custom-reactions');
       final reactions = ((response['reactions'] as List?) ?? const [])
@@ -1014,12 +1035,17 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       }
       return FCAvailableReactionsResult(result: true, reactions: reactions);
     } on DiscourseApiException catch (e) {
-      // 404 means discourse-reactions is not installed. Offering the
-      // built-in set here was actively wrong: without the plugin the only
-      // reaction the server can record is a like, so the picker showed
-      // eight emoji of which seven always failed — and the failure was
-      // invisible, because a snackbar raised from inside the sheet paints
-      // behind it. Offer the one that works.
+      // A 404 here does NOT mean reactions are unavailable, and reading it
+      // that way was a bug: try.discourse.org 404s this route while
+      // serializing seven `valid_reactions`, and its posts visibly carry
+      // heart and open_mouth. The route's absence describes the route, not
+      // the plugin — so narrowing the picker to a bare like left users on
+      // such a forum unable to pick any of the reactions it accepts.
+      //
+      // Reaching here means the route 404'd AND no topic payload has been
+      // seen yet this session, so we genuinely do not know. Offer the like,
+      // which every Discourse accepts, and let the first topic load correct
+      // us through DiscourseValidReactions.
       if (e.statusCode == 404) {
         return FCAvailableReactionsResult(
           result: true,

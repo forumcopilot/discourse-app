@@ -65,10 +65,17 @@ valid_reactions = [heart, +1, laughing, open_mouth, clap, confetti_ball, hugs]
 Seven reactions are valid, and the app's own topic view shows ❤️ and 😮
 already applied to post #1 — so multiple reactions demonstrably work on
 this forum. The 404 was on the *reaction-list route*, which is a different
-question from which reactions are accepted. Whatever the picker was
-narrowed to, `valid_reactions` is the field it should be driven by, and it
-costs one read of a payload the topic view already fetches. Worth
-re-testing before trusting the current picker contents.
+question from which reactions are accepted.
+
+**Fixed.** The picker is now driven by `valid_reactions`, captured into
+`DiscourseValidReactions` from every topic payload (it is the
+`discourse_reactions_enabled_reactions` site setting, so any topic load
+answers it, and it costs no extra request). The 404 branch survives only
+as the genuinely-unknown case — route absent *and* no topic loaded yet —
+where it offers the like every Discourse accepts and lets the first topic
+load correct it. Verified on the Pixel: the sheet now offers
+❤️ 👍 😆 😮 👏 🎊 🤗, exactly the seven the server names, where before it
+offered 👍 alone.
 
 **Subcategory nesting (§6) — not verifiable on this forum.** Zero
 categories on try.discourse.org currently declare `subcategory_ids`, so
