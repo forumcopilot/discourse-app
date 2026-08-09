@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:discourse_core/discourse_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import 'package:forumcopilot_sdk/services/forumcopilot_api_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_user.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'package:forumcopilot_sdk/network/fc_call_result.dart';
@@ -53,6 +56,114 @@ class DiscourseLoginService {
       authRedirect: authRedirect,
       pushUrl: AppForumConfig.discoursePushUrl,
     );
+  }
+
+  /// Start the SECOND handshake: a notifications-only key for our backend to
+  /// poll with, so the user gets push even on forums whose owner has not set up
+  /// the app's push relay.
+  ///
+  /// Separate from [beginLogin] in three ways that all matter:
+  ///   * `notifications` scope only — four routes, no posting, no reading PMs;
+  ///   * its own client id, so Discourse does not destroy the login key;
+  ///   * no `push_url`, since this key is polled rather than pushed to.
+  Future<DiscourseUserApiHandshakeRequest> beginNotificationsGrant() {
+    return _authManager.beginHandshake(
+      applicationName: AppForumConfig.userApiApplicationName,
+      scopes: AppForumConfig.userApiNotificationsScopes,
+      authRedirect: authRedirect,
+      clientIdSuffix: AppForumConfig.userApiNotificationsClientIdSuffix,
+    );
+  }
+
+  /// The client id the notifications key is stored under on our backend. Needed
+  /// to revoke it at sign-out, when the key itself is already gone.
+  Future<String> notificationsClientId() {
+    return _authManager.clientIdFor(
+      suffix: AppForumConfig.userApiNotificationsClientIdSuffix,
+    );
+  }
+
+  /// Point any stored notifications grant for THIS forum at [token].
+  ///
+  /// Called from two places, because neither alone is sufficient: entering a
+  /// forum (the token is usually ready by then, and the grant may pre-date it —
+  /// the very first real grant we captured stored a null token because FCM was
+  /// still initializing), and FCM token rotation (which invalidates whatever was
+  /// stored). Idempotent and cheap; the server no-ops when no grant exists,
+  /// which is the case for most forums a user opens.
+  ///
+  /// With no [token], the current one is read from FirebaseMessaging directly.
+  /// That is deliberate: this package is consumed both by the single-forum
+  /// template and by the multi-forum host app, and the host app has its OWN
+  /// NotificationService class — so this package's NotificationService singleton
+  /// is never initialized there and its `fcmToken` is always null.
+  /// FirebaseMessaging is the one source of truth in both.
+  Future<void> syncNotificationDeviceToken({String? token, String? platform}) async {
+    final siteId = siteContext.site.id;
+    if (siteId == null) return;
+
+    try {
+      final effective = token ?? await FirebaseMessaging.instance.getToken();
+      if (effective == null || effective.isEmpty) return;
+
+      final clientId = await notificationsClientId();
+      await ForumCopilotApiService.updateDiscourseNotificationDevice(
+        siteId: siteId,
+        clientId: clientId,
+        deviceToken: effective,
+        devicePlatform: platform ?? (Platform.isIOS ? 'ios' : 'android'),
+      );
+    } catch (e) {
+      AppLogger.debug(
+          'DiscourseLoginService: Could not sync notification device token: $e');
+    }
+  }
+
+  /// Attach this device to the stored grant as soon as an FCM token exists.
+  ///
+  /// A fresh sign-in fires neither of the other two sync points: [restorePersistedSession]
+  /// only runs when an EXISTING session is restored on entering a forum, and the push
+  /// controller's one-shot init has usually already run at launch. So without this, a
+  /// user who grants notifications during their first login has a row with a null device
+  /// token — the grant is real, but nothing can ever be delivered to it.
+  ///
+  /// Polls instead of firing once because FCM initialization commonly finishes seconds
+  /// AFTER the grant is approved. Deliberately not awaited by the UI: the user should not
+  /// watch a spinner while Firebase warms up.
+  ///
+  /// Reads FirebaseMessaging directly for the same reason [syncNotificationDeviceToken]
+  /// does — this package's NotificationService singleton is never initialized in the
+  /// multi-forum host app, which has its own.
+  Future<void> syncNotificationDeviceTokenWhenReady({
+    Duration timeout = const Duration(minutes: 2),
+    Duration interval = const Duration(seconds: 2),
+  }) async {
+    final deadline = DateTime.now().add(timeout);
+    while (DateTime.now().isBefore(deadline)) {
+      String? token;
+      try {
+        token = await FirebaseMessaging.instance.getToken();
+      } catch (e) {
+        AppLogger.debug('DiscourseLoginService: getToken failed, retrying: $e');
+      }
+      if (token != null && token.isNotEmpty) {
+        await syncNotificationDeviceToken(token: token);
+        return;
+      }
+      await Future<void>.delayed(interval);
+    }
+    AppLogger.debug(
+        'DiscourseLoginService: no FCM token within $timeout — device not attached to '
+        'the notifications grant. It will attach on the next forum open or token refresh.');
+  }
+
+  /// Decrypt the notifications-grant payload WITHOUT touching the session
+  /// credential, and return the key for upload to our backend.
+  ///
+  /// `persist: false` is the important part — persisting would swap the login
+  /// key for one limited to four routes and break the rest of the app.
+  Future<DiscourseUserApiKey> finishNotificationsGrant(String payload) {
+    return _authManager.completeHandshake(payload, persist: false);
   }
 
   /// True when the given URL is the redirect we asked Discourse to send the

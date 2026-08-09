@@ -4,6 +4,7 @@ import 'package:discourse_core/discourse_core.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/app_forum_config.dart';
+import '../services/discourse_login_service.dart';
 import '../models/site_notification_state.dart';
 import '../models/notification_preferences.dart';
 import '../services/device_service.dart';
@@ -152,6 +153,16 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
     // BYO/direct push: register device with the forum's own server.
     await _tryRegisterDirect();
 
+    // Polled Discourse notifications: the token has just become available, so
+    // attach it to any grant for the forum that is open.
+    //
+    // This is the mirror of the sync in SiteInitializationService, and both are
+    // needed — they cover opposite orderings. Opening a forum before FCM
+    // finishes initializing hits this one; opening one afterwards hits that one.
+    // Neither is reliably first: FCM initialization takes seconds, and a user
+    // who taps straight into a forum beats it.
+    await _syncNotificationDeviceTokenForCurrentSite();
+
     // Re-fire when the user logs in later (registration requires an authenticated session).
     _watchLoginForDirectRegistration();
 
@@ -299,10 +310,28 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
     }
   }
 
+  /// Point the currently open forum's notifications grant at [token], or at the
+  /// current FCM token when none is given. No-ops when no forum is open, which
+  /// is the normal state at app launch.
+  Future<void> _syncNotificationDeviceTokenForCurrentSite([String? token]) async {
+    if (!Get.isRegistered<DiscourseSiteController>()) return;
+
+    final ctx = Get.find<DiscourseSiteController>().currentSiteContext.value;
+    if (ctx == null) return;
+
+    // A null token here is fine — the service falls back to FirebaseMessaging.
+    await DiscourseLoginService(ctx)
+        .syncNotificationDeviceToken(token: token ?? _fcmToken);
+  }
+
   /// Handle token refresh from NotificationService (consolidated listener)
   Future<void> _handleTokenRefresh(String newToken) async {
     AppLogger.debug('FCM token refreshed, updating all registrations...');
     _fcmToken = newToken;
+
+    // A rotated token invalidates whatever the server has stored for polled
+    // Discourse notifications; re-point it at the new one.
+    await _syncNotificationDeviceTokenForCurrentSite(newToken);
 
     // If the token arrived after onInit ran, initialization is still pending —
     // finish it now (re-registers persisted sites and does direct registration).

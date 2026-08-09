@@ -853,7 +853,11 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       final response = await apiGet('/u/search/users.json', query: {
         'term': keywords.trim(),
         'topic_allowed_users': 'true',
-        'include_groups': 'false',
+        // Discourse messages can be addressed to a group, not just to people —
+        // `target_recipients` on POST /posts.json accepts group names alongside
+        // usernames. This was 'false', so messaging a group was impossible from
+        // the app even though the platform supports it.
+        'include_groups': 'true',
       });
       final users = (response['users'] as List?) ?? const [];
       final list = users.whereType<Map>().map((u) {
@@ -880,6 +884,34 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           isOnline: false,
         );
       }).toList();
+
+      // Groups come back in their own array. They address a message exactly like
+      // a username does, so they join the same recipient list rather than needing
+      // a parallel one — FCSearchUser.username carries the group name, which is
+      // what target_recipients expects. `id` is prefixed so a group can never
+      // collide with a user id in a picker keyed on it.
+      final groups = (response['groups'] as List?) ?? const [];
+      list.addAll(groups.whereType<Map>().map((g) {
+        final m = g.cast<String, dynamic>();
+        final name = (m['name'] ?? '').toString();
+        return FCSearchUser(
+          id: 'group:${m['id'] ?? name}',
+          username: name,
+          // Lets a picker tell a group apart from a person without a new model
+          // field — FCSearchUser already carries userType.
+          userType: 'group',
+          // full_name is the human label ("Site Moderators"); fall back to the
+          // handle when a group has none set.
+          displayText: (m['full_name'] as String?)?.isNotEmpty == true
+              ? m['full_name'] as String
+              : name,
+          iconUrl: null,
+          postCount: 0,
+          registrationTime: null,
+          isOnline: false,
+        );
+      }).where((g) => g.username.isNotEmpty));
+
       return FCSearchUserResult(
         result: true,
         resultText: '',

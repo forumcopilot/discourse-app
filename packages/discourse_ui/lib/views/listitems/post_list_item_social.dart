@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 import '../../utils/accessibility_helpers.dart';
 import 'package:discourse_ui/views/widgets/post_action_button.dart';
 import '../../theme/design_tokens.dart';
+import '../widgets/reaction_glyph.dart';
 
 /// Action row under a post: reply / like / bookmark / accept-answer.
 ///
@@ -16,8 +19,30 @@ class PostListItemSocial extends StatelessWidget {
   final FCPost post;
   final bool isLiked;
   final int likeCount;
+
+  /// The reaction id the viewer has on this post, or null when they have
+  /// not reacted. When set, the react button renders that reaction's glyph
+  /// in place of the outline heart, so "did I react, and with what?" is
+  /// answerable from the action row instead of by hunting for the
+  /// highlighted chip.
+  /// Every reaction on the post, so the react control can show the same
+  /// combined cluster the web page does (`❤️😮 5`) instead of a separate
+  /// chips row stacked above the action row.
+  final List<FCPostReaction> reactions;
+
+  /// Resolves custom-emoji images for the cluster.
+  final SiteContext? reactionSiteContext;
+
+  /// Seconds until this post's like budget frees up, or 0 when it is
+  /// available. Discourse caps post actions at 4/minute per post, counting
+  /// likes and unlikes together, so a live-looking heart during the cooldown
+  /// only invites taps that cannot succeed.
+  final int likeCooldownSeconds;
   final bool isLoggedIn;
   final VoidCallback? onLike;
+
+  /// Long-press on the reaction cluster: who reacted.
+  final VoidCallback? onShowReactors;
   /// Optional long-press on the like button. Used on Discourse to open
   /// the discourse-reactions picker so the user can pick any emoji
   /// instead of just like.
@@ -44,8 +69,12 @@ class PostListItemSocial extends StatelessWidget {
     required this.post,
     required this.isLiked,
     required this.likeCount,
+    this.reactions = const [],
+    this.reactionSiteContext,
+    this.likeCooldownSeconds = 0,
     this.isLoggedIn = false,
     this.onLike,
+    this.onShowReactors,
     this.onLongPressLike,
     this.isBookmarked = false,
     this.onBookmark,
@@ -57,8 +86,12 @@ class PostListItemSocial extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     // The heart is the zero-state affordance only — see the class doc.
-    final showLike = isLoggedIn && post.canLike && post.reactions.isEmpty;
+    // Always present when the viewer may react at all. It used to be
+    // hidden the moment any chip existed, which left the action row with
+    // no reaction control and no indication of the viewer's own reaction.
+    final showLike = isLoggedIn && post.canLike;
     final showBookmark = isLoggedIn && onBookmark != null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,19 +112,36 @@ class PostListItemSocial extends StatelessWidget {
             // would be a second control for the same thing.
             if (showLike) ...[
               if (trailing != null) SizedBox(width: DesignTokens.spacingXL),
-              PostActionButton(
-                icon: Icons.favorite_border,
-                activeIcon: Icons.favorite,
-                active: isLiked,
-                activeColor: colorScheme.error,
-                onTap: onLike,
-                // Long-press opens the reaction picker when wired
-                // (discourse-reactions plugin); plain tap still
-                // toggles like.
-                onLongPress: onLongPressLike,
-                semanticLabel: AccessibilityHelpers.getLikeButtonLabel(
-                    context, isLiked, likeCount),
+              Opacity(
+                opacity: likeCooldownSeconds > 0 ? 0.5 : 1.0,
+                child: reactions.isEmpty
+                    ? PostActionButton(
+                        icon: Icons.favorite_border,
+                        activeIcon: Icons.favorite,
+                        active: isLiked,
+                        activeColor: colorScheme.error,
+                        onTap: onLike,
+                        onLongPress: onLongPressLike,
+                        semanticLabel:
+                            AccessibilityHelpers.getLikeButtonLabel(
+                                context, isLiked, likeCount),
+                      )
+                    : _ReactionClusterButton(
+                        reactions: reactions,
+                        siteContext: reactionSiteContext,
+                        onTap: onLike,
+                        onLongPress: onShowReactors,
+                      ),
               ),
+              if (likeCooldownSeconds > 0) ...[
+                SizedBox(width: DesignTokens.spacingXS),
+                Text(
+                  '${likeCooldownSeconds}s',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ],
             if (showBookmark) ...[
               // Only pad when something precedes this button, otherwise
@@ -140,4 +190,86 @@ class PostListItemSocial extends StatelessWidget {
   }
 
 
+}
+
+
+/// The react button when the viewer HAS reacted: their reaction's glyph
+/// on the same footprint as the other action buttons.
+/// The react control once a post HAS reactions: the distinct emoji in a
+/// row followed by the total, the way Discourse web renders it.
+///
+/// This replaces a separate chips row that sat on its own line above the
+/// action row. Same information, one line, and the control lives where
+/// every other post action already is.
+class _ReactionClusterButton extends StatelessWidget {
+  final List<FCPostReaction> reactions;
+  final SiteContext? siteContext;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+
+  const _ReactionClusterButton({
+    required this.reactions,
+    required this.siteContext,
+    required this.onTap,
+    required this.onLongPress,
+  });
+
+  /// Cap the glyphs so a heavily-reacted post cannot push the rest of the
+  /// action row off screen; the total still counts every reaction.
+  static const int _maxGlyphs = 3;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final total = reactions.fold<int>(0, (sum, r) => sum + r.count);
+    final viewerReacted = reactions.any((r) => r.viewerReacted);
+    final shown = reactions.take(_maxGlyphs).toList();
+
+    return Semantics(
+      label: viewerReacted
+          ? 'You reacted. $total reactions. Tap to change, long press to see who.'
+          : '$total reactions. Tap to react, long press to see who.',
+      button: true,
+      selected: viewerReacted,
+      child: InkWell(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: DesignTokens.spacingXS,
+            vertical: DesignTokens.spacingXS,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final r in shown) ...[
+                ReactionGlyph(
+                  reactionId: r.id,
+                  size: DesignTokens.iconSizeS,
+                  siteContext: siteContext,
+                ),
+                SizedBox(width: DesignTokens.spacingXS / 2),
+              ],
+              SizedBox(width: DesignTokens.spacingXS / 2),
+              Text(
+                '$total',
+                style: textTheme.bodySmall?.copyWith(
+                  // The viewer's own participation is the one thing a bare
+                  // count cannot convey, so carry it in the colour.
+                  color: viewerReacted
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
+                  fontWeight: viewerReacted
+                      ? DesignTokens.fontWeightBold
+                      : DesignTokens.fontWeightSemiBold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

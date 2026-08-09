@@ -137,9 +137,15 @@ String formatSmartDateTime(DateTime dateTime, BuildContext context) {
     return timeago.format(localDateTime, clock: now, locale: timeAgoLocale);
   }
 
-  // For this week (last 7 days) use timeago with the time
+  // For this week (last 7 days), the relative form ALONE.
+  //
+  // This used to append the clock time, producing "a day ago 4:09 PM" —
+  // which reads as a broken sentence and is actively misleading: timeago
+  // renders anything from ~1 to ~2 days as "a day ago", so a two-day-old
+  // item showed yesterday's phrasing next to a wall-clock time belonging
+  // to a different day. Discourse web shows a bare "1d" / "2d" here.
   if (difference.inDays < 7) {
-    return '${timeago.format(localDateTime, clock: now, locale: timeAgoLocale)} ${_formatUserTimeInternal(localDateTime, context)}';
+    return timeago.format(localDateTime, clock: now, locale: timeAgoLocale);
   }
 
   // For this year, show date without year + time

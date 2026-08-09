@@ -207,7 +207,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
       // error state (with Retry) via loadConversations' catch instead.
       throw Exception(conversationsData.resultText?.isNotEmpty == true
           ? conversationsData.resultText
-          : 'Failed to load conversations');
+          : 'Failed to load messages');
     }
 
     if (mounted) {
@@ -249,7 +249,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)?.failedToLeaveConversation(e.toString()) ?? 'Failed to leave conversation: $e'),
+            content: Text(AppLocalizations.of(context)?.failedToLeaveConversation(e.toString()) ?? 'Failed to leave message: $e'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -353,7 +353,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
           return NotSignedInView(
             siteContext: widget.siteContext,
             title: AppLocalizations.of(context)?.signInToViewMessages ?? 'Sign in to view messages',
-            message: AppLocalizations.of(context)?.youNeedToBeSignedInToViewConversations ?? 'You need to be signed in to view your conversations.',
+            message: AppLocalizations.of(context)?.youNeedToBeSignedInToViewConversations ?? 'You need to be signed in to view your messages.',
             icon: Icons.mail_outline_rounded,
           );
         }
@@ -374,7 +374,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              AppLocalizations.of(context)?.errorLoadingConversations(_error ?? 'Unknown error') ?? 'Error loading conversations: $_error',
+              AppLocalizations.of(context)?.errorLoadingConversations(_error ?? 'Unknown error') ?? 'Error loading messages: $_error',
               textAlign: TextAlign.center,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
@@ -426,7 +426,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
                         ),
                         const SizedBox(height: DesignTokens.spacingS),
                         Text(
-                          AppLocalizations.of(context)?.noConversationsMessage ?? 'You have no conversations yet. Start a new conversation to begin messaging.',
+                          AppLocalizations.of(context)?.noConversationsMessage ?? 'You have no messages yet. Start a new message to begin.',
                           style: textTheme.bodyLarge?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -497,7 +497,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)?.errorLoadingMoreConversations(e.toString()) ?? 'Error loading more conversations: $e'),
+            content: Text(AppLocalizations.of(context)?.errorLoadingMoreConversations(e.toString()) ?? 'Error loading more messages: $e'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

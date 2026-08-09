@@ -207,6 +207,12 @@ class SiteInitializationService {
           if (restored) {
             AppLogger.info(
                 'SiteInitializationService: Restored persisted Discourse session');
+            // Attach this device to any notifications grant stored for this
+            // forum. Done here because it is the first point where a signed-in
+            // context and (usually) an FCM token both exist — the grant itself
+            // is often made while FCM is still initializing.
+            await DiscourseLoginService(siteContext)
+                .syncNotificationDeviceToken();
           }
         } catch (e) {
           AppLogger.warning(

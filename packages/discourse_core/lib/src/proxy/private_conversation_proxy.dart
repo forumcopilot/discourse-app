@@ -32,6 +32,12 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     String textBody, {
     List<String>? attachmentIds,
     String? groupId,
+    // openInvite and conversationLocked exist on the shared interface for XenForo,
+    // which has both as conversation options. Discourse has neither: participant
+    // permissions come from trust level and site settings rather than a per-message
+    // flag, and closing is a separate action on an existing topic
+    // (PUT /t/{id}/status) that a regular user cannot perform at creation time.
+    // They are accepted and ignored here; the compose UI no longer offers them.
     bool? openInvite,
     bool? conversationLocked,
   }) async {
@@ -77,10 +83,19 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     String? groupId,
   ) async {
     try {
+      // Deliberately NO `archetype` here. It belongs only to CREATING a private
+      // message. Sending it alongside a topic_id makes Discourse read the request as
+      // "create a PM on a topic that already exists" and reject the whole thing:
+      //
+      //   if @topic.present? && @opts[:archetype] == Archetype.private_message
+      //     errors.add(:base, I18n.t(:create_pm_on_existing_topic))
+      //
+      // (lib/post_creator.rb) — surfacing as "Sorry, you can't create a PM on an
+      // existing topic." The topic's archetype is already private_message; replying to
+      // it does not need to restate that.
       final response = await apiPost('/posts.json', body: {
         'topic_id': int.tryParse(conversationId) ?? conversationId,
         'raw': textBody,
-        'archetype': 'private_message',
       });
       return FCReplyConversationResult(
         result: true,
@@ -369,6 +384,52 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
   Future<FCCloseConversationResult> uncloseConversationAsync(
       String conversationId) async {
     return _setConversationClosed(conversationId, closed: false);
+  }
+
+  @override
+  Future<FCArchiveConversationResult> archiveConversationAsync(
+      String conversationId) async {
+    return _setConversationArchived(conversationId, archived: true);
+  }
+
+  @override
+  Future<FCArchiveConversationResult> unarchiveConversationAsync(
+      String conversationId) async {
+    return _setConversationArchived(conversationId, archived: false);
+  }
+
+  /// Archiving is not a topic status like closed/pinned — it is a per-user
+  /// filing action with its own pair of routes, so there is no single endpoint
+  /// taking a boolean.
+  Future<FCArchiveConversationResult> _setConversationArchived(
+    String conversationId, {
+    required bool archived,
+  }) async {
+    try {
+      await apiPut(
+        archived
+            ? '/t/$conversationId/archive-message.json'
+            : '/t/$conversationId/move-to-inbox.json',
+        body: const {},
+      );
+      return FCArchiveConversationResult(
+        result: true,
+        resultText: '',
+        isArchived: archived,
+      );
+    } on DiscourseApiException catch (e) {
+      return FCArchiveConversationResult(
+        result: false,
+        resultText: e.userMessage,
+        isArchived: !archived,
+      );
+    } catch (e) {
+      return FCArchiveConversationResult(
+        result: false,
+        resultText: describeApiError(e),
+        isArchived: !archived,
+      );
+    }
   }
 
   @override

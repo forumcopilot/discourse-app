@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import '../members_page.dart';
+import '../users_directory_page.dart';
 import '../../theme/design_tokens.dart';
 
 class MessagesTabAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -48,10 +48,10 @@ class MessagesTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildMembersButton(BuildContext context, ColorScheme colorScheme) {
     return IconButton(
       icon: const Icon(Icons.people_alt_rounded),
-      tooltip: AppLocalizations.of(context)?.members ?? 'Members',
+      tooltip: 'Users',
       onPressed: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => MembersPage(siteContext: siteContext)),
+        MaterialPageRoute(builder: (_) => UsersDirectoryPage(siteContext: siteContext)),
       ),
     );
   }

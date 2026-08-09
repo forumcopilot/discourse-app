@@ -368,10 +368,15 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     final postNumber = n['post_number'] as int?;
     final readableMessage =
         _readableNotification(type, fromUser, topicTitle, data);
-    final contentType = _alertContentType(type);
-    final contentId =
-        contentType == 'topic' ? (topicId ?? '') : (postNumber?.toString() ?? '');
+    // contentId carries whatever the destination needs: topic id, badge id, chat
+    // channel id, or group name. Left empty for conversations on purpose — the tab
+    // would otherwise read it as an anchor MESSAGE id, and a post_number is not one.
+    final target = _alertTarget(type, topicId: topicId, data: data);
+    final contentType = target.type;
+    final contentId = target.id;
 
+    // Kept populated for the web link, but no longer the navigation path: every
+    // Discourse notification now resolves to an in-app destination above.
     String? actionUrl;
     if (topicId != null && (n['slug'] ?? '').toString().isNotEmpty) {
       actionUrl = '${siteContext.site.url}/t/${n['slug']}/$topicId'
@@ -418,7 +423,9 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       topicId: topicId,
       position: postNumber,
       postId: null,
-      conversationId: type == _ntPrivateMessage ? topicId : null,
+      // Whatever _alertTarget decided is a conversation — so an invite-to-PM
+      // routes the same as the PM itself, rather than only type 6 doing so.
+      conversationId: contentType == 'conversation_message' ? topicId : null,
       actionUrl: actionUrl,
       fromUsername: fromUser,
       action: _alertActionVerb(type),
@@ -625,16 +632,75 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     }
   }
 
-  String _alertContentType(int type) {
+  /// Maps a Discourse notification onto the content type + id that
+  /// `NotificationListTab._onAlertTap` dispatches on, so every notification opens
+  /// somewhere INSIDE the app.
+  ///
+  /// This has to speak the tab's vocabulary, not Discourse's. Returning Discourse's own
+  /// 'topic' / 'message' / 'badge' matched no branch at all, so everything fell to the
+  /// tab's fallback: notifications with a topic bounced the user out to an external
+  /// browser, and those without (badges, chat, membership grants) raised
+  /// "No action URL available for this notification type."
+  ///
+  /// [topicId] matters because the same Discourse type can arrive with or without a
+  /// topic, and the destination differs.
+  ({String type, String id}) _alertTarget(
+    int type, {
+    String? topicId,
+    required Map<String, dynamic> data,
+  }) {
+    final hasTopic = topicId != null && topicId.isNotEmpty;
+
     switch (type) {
       case _ntPrivateMessage:
       case _ntInvitedToPm:
-        return 'message';
+        // A Discourse PM *is* a topic; the app models it as a conversation.
+        if (hasTopic) return (type: 'conversation_message', id: '');
+        break;
+
       case _ntGrantedBadge:
-        return 'badge';
-      default:
-        return 'topic';
+        // The app has a badge detail sheet — the natural destination.
+        final badgeId = data['badge_id'];
+        if (badgeId != null) return (type: 'badge', id: badgeId.toString());
+        break;
+
+      case _ntChatMention:
+      case _ntChatMessage:
+      case _ntChatInvitation:
+      case _ntChatGroupMention:
+      case _ntChatQuoted:
+        // Chat lives outside the topic tree, addressed by channel.
+        final channelId = data['chat_channel_id'];
+        if (channelId != null) {
+          return (type: 'chat_channel', id: channelId.toString());
+        }
+        break;
+
+      case _ntGroupMessageSummary:
+      case _ntMembershipRequestConsolidated:
+        final groupName = (data['group_name'] ?? '').toString();
+        if (groupName.isNotEmpty) return (type: 'group', id: groupName);
+        break;
+
+      case _ntInviteeAccepted:
+      case _ntMembershipRequestAccepted:
+      case _ntLikedConsolidated:
+      case _ntLinkedConsolidated:
+        // About a person rather than a place. Consolidated likes/links name no single
+        // post by design, so the acting user's profile is the closest real destination
+        // (Discourse's own web UI uses a likes-received page the app has no equivalent
+        // for).
+        return (type: 'user', id: '');
     }
+
+    // Everything else is about a topic whenever it has one: mentions, replies, quotes,
+    // likes, edits, links, watched topics, assignments, reactions.
+    if (hasTopic) return (type: 'thread', id: topicId);
+
+    // Anything left has no destination — staff notices, and any future Discourse type
+    // we do not know yet. 'notice' shows the notification's own text rather than an
+    // error, so an unrecognised type degrades quietly instead of looking broken.
+    return (type: 'notice', id: '');
   }
 
   String _alertActionVerb(int type) {

@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 import 'package:discourse_core/discourse_core.dart';
 import '../theme/design_tokens.dart';
 import '../theme/style_builders.dart';
-import 'appbars/chat_tab_app_bar.dart';
+import 'appbars/inbox_tab_app_bar.dart';
 import 'appbars/forum_app_bar.dart';
 import 'appbars/topics_tab_app_bar.dart';
 import 'appbars/forums_tab_app_bar.dart';
@@ -19,6 +19,7 @@ import 'appbars/messages_tab_app_bar.dart';
 import 'appbars/notifications_tab_app_bar.dart';
 import 'appbars/profile_tab_app_bar.dart';
 import 'chat/chat_channel_list_page.dart';
+import 'chat_messages_tab.dart';
 import 'tabs/forum_list_tab.dart';
 import 'tabs/topic_list_tab.dart';
 import 'tabs/notification_list_tab.dart';
@@ -51,6 +52,18 @@ class SiteHomePage extends StatefulWidget {
 class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMixin {
   late TabController _tabController;
   int _previousTabIndex = 0;
+
+  /// Which sub-tab of the shared Chat/Messages slot is showing:
+  /// 0 = Chat, 1 = Messages. Only meaningful when [_isChatEnabled].
+  int _chatMessagesSubTab = 0;
+
+  /// True when the user is looking at private messages — either the Messages
+  /// sub-tab of the shared slot, or the standalone Messages tab on forums with
+  /// no chat plugin. The app bar and new-conversation FAB both key off this.
+  bool get _isViewingMessages => _isChatEnabled
+      ? (_isCurrentTab(_chatTab) &&
+          _chatMessagesSubTab == ChatMessagesTab.messagesIndex)
+      : _isCurrentTab(_messagesTab);
 
   // Add keys for each tab
   final GlobalKey<TopicListTabState> _topicListKey = GlobalKey();
@@ -613,11 +626,16 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
 
   // Get the list of enabled tabs based on user permissions
   List<String> get _enabledTabs {
-    // Phase 5.18a bottom nav: Home / Categories / {Chat or Messages}
+    // Phase 5.18a bottom nav: Home / Categories / {Chat + Messages}
     // / Notifications / Profile. Tags moved out into the hamburger
-    // drawer (Discourse web's mobile IA buries Tags there too). The
-    // third slot follows plugin availability: Chat when the
-    // discourse-chat plugin is installed, otherwise Messages (PMs).
+    // drawer (Discourse web's mobile IA buries Tags there too).
+    //
+    // The third slot used to be Chat *or* Messages depending on plugin
+    // availability, which meant private messages had no place in the main nav
+    // whenever chat was installed — and the compose FAB, gated on being on the
+    // Messages tab, could then never show. Chat now hosts both behind a sub-tab
+    // bar (see ChatMessagesTab); without the plugin it is Messages alone, where
+    // a two-item sub-tab bar would be noise.
     final tabs = <String>[_topicsTab, _forumsTab];
     tabs.add(_isChatEnabled ? _chatTab : _messagesTab);
     if (_siteContext?.configDataOutput?.alert ?? false) tabs.add(_notificationsTab);
@@ -652,7 +670,11 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           isLoggedIn: isLoggedIn,
         );
       case _chatTab:
-        return ChatTabAppBar(
+        // One title for the whole slot rather than echoing the selected sub-tab:
+        // an app bar reading "Chat" directly above a "Chat | Messages" tab bar is
+        // pure repetition, and it left the header changing under the user as they
+        // switched. "Inbox" names the section both halves belong to.
+        return InboxTabAppBar(
           siteContext: _siteContext!,
           isLoggedIn: isLoggedIn,
         );
@@ -741,7 +763,11 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
 
     final isLoggedIn = _siteContext!.isLoggedIn;
     final canSendPM = isLoggedIn && (_siteContext?.loginDataOutput?.user?.canSendPM ?? false);
-    final isOnMessagesTab = _isCurrentTab(_messagesTab);
+    // Keyed off the messages *view*, not the tab index: on forums with chat the
+    // Messages tab does not exist, so the old `_isCurrentTab(_messagesTab)` was
+    // permanently false (_getTabIndex returns -1) and the compose button never
+    // appeared anywhere in the app.
+    final isOnMessagesTab = _isViewingMessages;
     final shouldShowFAB = isLoggedIn && isOnMessagesTab && canSendPM;
 
     // Only log FAB visibility when it changes to reduce noise
@@ -809,14 +835,20 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
               siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
               boardStats: _boardStats);
         case _chatTab:
-          // Phase 5.18a — Chat is the bottom-nav slot when the
-          // plugin is installed. Embed mode strips the page's own
-          // Scaffold so our SiteHomePage Scaffold + ChatTabAppBar +
-          // drawer hamburger stay in charge.
-          return ChatChannelListPage(
-            key: _chatListKey,
+          // Chat and Messages share this slot behind a sub-tab bar. Both lists
+          // are embedded, so our SiteHomePage Scaffold + app bar + drawer
+          // hamburger stay in charge.
+          return ChatMessagesTab(
+            isActive: _isCurrentTab(_chatTab),
+            chatListKey: _chatListKey,
+            messageListKey: _pmListKey,
             siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
-            embedded: true,
+            onSubTabChanged: (index) {
+              if (!mounted || _chatMessagesSubTab == index) return;
+              // Rebuild so the app bar and the new-conversation FAB follow the
+              // sub-tab the user just moved to.
+              setState(() => _chatMessagesSubTab = index);
+            },
           );
         case _messagesTab:
           return PrivateMessageListTab(

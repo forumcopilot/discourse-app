@@ -184,6 +184,48 @@ class RichTextContent extends StatelessWidget {
       // the OS, works offline, no network round-trips. Falls back to the
       // PNG for forum-custom emoji that aren't in standard Unicode.
       extensions: [
+        // Code blocks scroll sideways; they must never wrap. flutter_html
+        // wraps by default, which broke shared code rather than merely
+        // squashing it: a Python post rendered
+        //   arr = [i for i in nums if i !=
+        //   0]
+        // — the continuation lands at column 0, so indentation-sensitive
+        // code reads as a different program. Discourse web scrolls the
+        // block horizontally; so do we.
+        TagExtension(
+          tagsToExtend: {'pre'},
+          builder: (extensionContext) {
+            final code = extensionContext.element?.text ?? '';
+            if (code.isEmpty) return const SizedBox.shrink();
+            return Container(
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.all(12),
+                // Plain Text, not SelectableText: SelectableText claims
+                // horizontal drags for text selection, which swallows the
+                // scroll gesture and leaves the block clipped with no way
+                // to reach the rest of the line. Scrolling matters more
+                // here than selecting.
+                child: Text(
+                  // Trailing newlines are common in cooked <pre> and would
+                  // otherwise leave a blank band inside the block.
+                  code.replaceAll(RegExp(r'\n+$'), ''),
+                  style: body.copyWith(
+                    fontFamily: 'monospace',
+                    fontSize: (body.fontSize ?? 14) * 0.92,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
         TagExtension(
           tagsToExtend: {'img'},
           builder: (extensionContext) {

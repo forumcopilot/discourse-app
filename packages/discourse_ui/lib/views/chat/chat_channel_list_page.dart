@@ -9,6 +9,8 @@ import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 
 import '../../theme/design_tokens.dart';
 import '../widgets/empty_state_view.dart';
+import '../widgets/not_signed_in_view.dart';
+import '../widgets/user_list_row.dart';
 import '../widgets/resettable_widget.dart';
 import '../widgets/user_avatar.dart';
 import 'chat_channel_view.dart';
@@ -186,6 +188,21 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
 
   @override
   Widget build(BuildContext context) {
+    // Signed-out users got whatever `/chat/api/me/channels` replied with, rendered
+    // raw as the empty state — on a French forum that read "Vous devez être
+    // connecté(e) pour effectuer cette opération": the server's message, in the
+    // forum's locale rather than the app's, as plain text with no way to sign in.
+    // Messages already had a proper NotSignedInView for exactly this; use the same
+    // one so the two halves of this tab match, and skip a request that can only fail.
+    if (!widget.siteContext.isLoggedIn) {
+      return NotSignedInView(
+        siteContext: widget.siteContext,
+        title: 'Sign in to use chat',
+        message: 'You need to be signed in to view and join chat channels.',
+        icon: Icons.chat_bubble_outline_rounded,
+      );
+    }
+
     final body = RefreshIndicator(
       onRefresh: _load,
       child: _buildBody(),
@@ -596,19 +613,17 @@ class _NewDmSheetState extends State<_NewDmSheet> {
           ),
           if (_suggestions.isNotEmpty) ...[
             const SizedBox(height: DesignTokens.spacingXS),
-            for (final u in _suggestions.take(5))
-              ListTile(
-                dense: true,
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: DesignTokens.spacingS),
-                leading: UserAvatar(
+              // Same row the user directory and the message recipient picker
+              // use, so a person looks identical wherever you pick them.
+              for (final u in _suggestions.take(5))
+                UserListRow(
                   username: u.username,
-                  iconUrl: u.iconUrl,
-                  radius: 14,
+                  subtitle: u.displayText,
+                  avatarUrl: u.iconUrl,
+                  leadingIcon:
+                      u.userType == 'group' ? Icons.groups_rounded : null,
+                  onTap: () => _pick(u),
                 ),
-                title: Text(u.username),
-                onTap: () => _pick(u),
-              ),
           ],
           if (_error != null) ...[
             const SizedBox(height: DesignTokens.spacingS),

@@ -53,6 +53,7 @@ export 'src/base_discourse_proxy.dart';
 // and were referenced by nothing. Proxies parse Discourse JSON straight
 // into the FC models. What remains mirrors a real Discourse serializer.
 export 'src/data/post/discourse_post_revision.dart';
+export 'src/data/post/discourse_accepted_answer.dart';
 export 'src/data/post/discourse_suggested_topic.dart';
 export 'src/data/moderation/discourse_reviewable.dart';
 export 'src/data/user/discourse_do_not_disturb.dart';

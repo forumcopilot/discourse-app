@@ -73,11 +73,20 @@ class DiscourseAuthManager {
   /// must ALSO include `push` in [scopes], and the forum admin must list the
   /// exact URL in the `allowed_user_api_push_urls` site setting (substring
   /// match — so use a static URL, never a per-device one).
+  /// [clientIdSuffix] derives a SEPARATE client id from this install's, so the
+  /// resulting key coexists with the login key instead of replacing it.
+  /// Discourse scopes keys per (client_id, user) and destroys the old one on
+  /// every grant — `@client.keys.where(user_id:).destroy_all` in
+  /// UserApiKeysController — so a second handshake reusing the login client id
+  /// would silently sign the user out. Pass a stable suffix (not random): the
+  /// id must survive restarts, or each grant strands the previous key
+  /// server-side.
   Future<DiscourseUserApiHandshakeRequest> beginHandshake({
     required String applicationName,
     required List<String> scopes,
     required String authRedirect,
     String? pushUrl,
+    String? clientIdSuffix,
   }) async {
     if (scopes.isEmpty) {
       throw ArgumentError('At least one scope is required.');
@@ -88,7 +97,7 @@ class DiscourseAuthManager {
     await _clearHandshakeState();
 
     final keypair = _generateRsaKeypair();
-    final clientId = await _getOrCreateClientId();
+    final clientId = await clientIdFor(suffix: clientIdSuffix);
     final nonce = _randomHex(16);
 
     // Only treat the handshake as a push request when both halves were sent:
@@ -139,7 +148,16 @@ class DiscourseAuthManager {
   /// On success, the User API Key is stored on the [SiteContext] via
   /// [DiscourseSiteContextExtension.setUserApiCredentials] and the in-flight
   /// handshake state is cleared.
-  Future<DiscourseUserApiKey> completeHandshake(String payloadBase64) async {
+  ///
+  /// Set [persist] to false for a key that is NOT this session's credential —
+  /// the notifications-scope key handed to our backend for polling, for
+  /// instance. Storing that one would replace the login key with a key limited
+  /// to four routes, breaking every other request. The key is still decrypted,
+  /// nonce-checked and returned; only the SiteContext write is skipped.
+  Future<DiscourseUserApiKey> completeHandshake(
+    String payloadBase64, {
+    bool persist = true,
+  }) async {
     final state = await _loadHandshakeState();
     if (state == null) {
       throw StateError(
@@ -171,11 +189,13 @@ class DiscourseAuthManager {
     final pushEnabled =
         state.pushRequested && (json['push'] as bool? ?? false);
 
-    await siteContext.setUserApiCredentials(
-      userApiKey: key,
-      userApiClientId: state.clientId,
-      pushEnabled: pushEnabled,
-    );
+    if (persist) {
+      await siteContext.setUserApiCredentials(
+        userApiKey: key,
+        userApiClientId: state.clientId,
+        pushEnabled: pushEnabled,
+      );
+    }
     await _clearHandshakeState();
 
     return DiscourseUserApiKey(
@@ -217,6 +237,21 @@ class DiscourseAuthManager {
   /// user's previous keys only for the SAME `client_id`, and keys push
   /// registrations attached to it — a fresh random id per handshake would
   /// strand old keys server-side and stale the push registration.
+  /// The client id [beginHandshake] would use for the given [suffix] — this
+  /// install's id, or `<id>:<suffix>` for a derived key.
+  ///
+  /// Public because a derived key is identified by its client id everywhere it
+  /// is referred to *outside* a handshake: our backend keys the stored
+  /// notifications key on (site, client_id), so signing out has to name it
+  /// without running another grant.
+  Future<String> clientIdFor({String? suffix}) async {
+    final baseClientId = await _getOrCreateClientId();
+
+    return suffix == null || suffix.isEmpty
+        ? baseClientId
+        : '$baseClientId:$suffix';
+  }
+
   Future<String> _getOrCreateClientId() async {
     final prefs = await SharedPreferences.getInstance();
     final p = _prefsPrefix();

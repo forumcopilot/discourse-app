@@ -46,8 +46,6 @@ class _NewConversationPageState extends State<NewConversationPage> {
   String? _createdConversationId; // Store created conversation ID
   String? _createdConversationTitle; // Store created conversation title
   bool _canUpload = false; // Whether user can upload attachments
-  bool _openInvite = false; // Whether any participant can invite others (Discourse only)
-  bool _conversationLocked = false; // Whether conversation is created as closed (Discourse only)
   bool _isMessageFieldFocused = false; // Track if message field has focus
 
   @override
@@ -115,8 +113,6 @@ class _NewConversationPageState extends State<NewConversationPage> {
         content,
         attachmentIds: _attachmentIds.isNotEmpty ? _attachmentIds : null,
         groupId: _groupId,
-        openInvite: _openInvite,
-        conversationLocked: _conversationLocked,
       );
 
       print('🐛 [NewConversationPage] Conversation creation result: result=${result.result}, resultText=${result.resultText}, convId=${result.convId}');
@@ -341,7 +337,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'New Conversation',
+          'New Message',
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
             fontWeight: DesignTokens.fontWeightSemiBold,
@@ -382,7 +378,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                       if (success && mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(AppLocalizations.of(context)?.conversationCreatedSuccessfully ?? 'Conversation created successfully'),
+                            content: Text(AppLocalizations.of(context)?.conversationCreatedSuccessfully ?? 'Message created successfully'),
                             backgroundColor: colorScheme.primary,
                             behavior: SnackBarBehavior.floating,
                           ),
@@ -691,81 +687,6 @@ class _NewConversationPageState extends State<NewConversationPage> {
                         ),
                       ],
                       // Discourse-only options
-                      if (widget.siteContext.siteType == 'discourse') ...[
-                        SizedBox(height: DesignTokens.spacingL),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Options',
-                              style: textTheme.titleSmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                                fontWeight: DesignTokens.fontWeightMedium,
-                              ),
-                            ),
-                            SizedBox(height: DesignTokens.spacingS),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
-                                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                              ),
-                              child: Column(
-                                children: [
-                                  SwitchListTile(
-                                    title: Text(
-                                      'Open Invite',
-                                      style: textTheme.titleSmall?.copyWith(
-                                        color: colorScheme.onSurfaceVariant,
-                                        fontWeight: DesignTokens.fontWeightMedium,
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      'Allow any participant to invite others',
-                                      style: textTheme.bodySmall?.copyWith(
-                                        color: colorScheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                    value: _openInvite,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _openInvite = value;
-                                      });
-                                    },
-                                    activeColor: colorScheme.primary,
-                                  ),
-                                  Divider(
-                                    height: 1,
-                                    thickness: 1,
-                                    color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
-                                  ),
-                                  SwitchListTile(
-                                    title: Text(
-                                      'Lock Conversation',
-                                      style: textTheme.titleSmall?.copyWith(
-                                        color: colorScheme.onSurfaceVariant,
-                                        fontWeight: DesignTokens.fontWeightMedium,
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      'Create conversation as closed (no replies allowed)',
-                                      style: textTheme.bodySmall?.copyWith(
-                                        color: colorScheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                    value: _conversationLocked,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _conversationLocked = value;
-                                      });
-                                    },
-                                    activeColor: colorScheme.primary,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
                     ],
                   ),
                 ),

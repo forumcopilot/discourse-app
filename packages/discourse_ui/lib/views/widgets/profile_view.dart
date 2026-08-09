@@ -22,7 +22,11 @@ import '../../theme/style_builders.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/utils/avatar_cache_utils.dart';
+import 'package:discourse_ui/utils/error_message.dart';
 import 'package:discourse_ui/utils/file_picker_utils.dart';
+import 'package:discourse_ui/utils/time_utils.dart';
+import 'package:discourse_ui/views/post_page.dart';
+import 'package:get/get.dart';
 
 import 'full_screen_image_viewer.dart';
 import 'trust_level_sheet.dart';
@@ -1104,6 +1108,8 @@ class _UserSummarySection extends StatefulWidget {
 
 class _UserSummarySectionState extends State<_UserSummarySection> {
   DiscourseUserSummary? _summary;
+  bool _loading = true;
+  String? _error;
 
   @override
   void initState() {
@@ -1112,17 +1118,30 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
   }
 
   Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final result = await DiscourseUserProxy(widget.siteContext)
           .getUserSummaryAsync(widget.username);
       if (!mounted) return;
       setState(() {
         _summary = result.result ? result.summary : null;
+        _error = result.result
+            ? null
+            : (result.resultText.isNotEmpty
+                ? result.resultText
+                : 'Could not load stats.');
+        _loading = false;
       });
     } catch (e) {
       AppLogger.debug('Error fetching user summary: $e');
-      // Section simply stays hidden — the summary is enrichment, not
-      // load-bearing profile data.
+      if (!mounted) return;
+      setState(() {
+        _error = describeError(e, fallback: 'Could not load stats.');
+        _loading = false;
+      });
     }
   }
 
@@ -1146,11 +1165,26 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
   @override
   Widget build(BuildContext context) {
     final summary = _summary;
-    if (summary == null) return const SizedBox.shrink();
+    // A failed summary used to render nothing at all, which is
+    // indistinguishable from "this user has no stats" — and because a
+    // rate-limited app fails exactly here, the profile appeared to lose
+    // its whole lower half with no explanation. Say so, and offer a retry.
+    if (_loading) return const SizedBox.shrink();
+    if (summary == null) {
+      if (_error == null) return const SizedBox.shrink();
+      return _SummaryUnavailable(message: _error!, onRetry: _load);
+    }
 
     final showStats = summary.canSeeSummaryStats;
     final likedBy = summary.mostLikedByUsers;
-    if (!showStats && likedBy.isEmpty) return const SizedBox.shrink();
+    final topTopics = summary.topTopics;
+    final topReplies = summary.topReplies;
+    if (!showStats &&
+        likedBy.isEmpty &&
+        topTopics.isEmpty &&
+        topReplies.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -1182,9 +1216,79 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
         value: numberFormat.format(summary.likesReceived),
         label: 'Likes received',
       ),
+      // Discourse web shows these two alongside the rest; without them
+      // the app's grid read as a truncated version of the same block.
+      (
+        value: numberFormat.format(summary.topicCount),
+        label: 'Topics created',
+      ),
+      (
+        value: numberFormat.format(summary.postCount),
+        label: 'Posts created',
+      ),
     ];
 
-    // Mirrors the profile info card above (margin / border / surface).
+    // Stats stay in a card (mirroring the info card above); the two lists
+    // below are full-width sections in the same shape as "Recent Posts",
+    // because that is how this app presents a list of topics.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _statsCard(context, colorScheme, textTheme, stats, showStats, likedBy),
+        if (topReplies.isNotEmpty)
+          _SummaryTopicSection(
+            title: 'Top Replies',
+            rows: [
+              for (final r in topReplies.take(5))
+                _SummaryTopicRowData(
+                  title: r.topicTitle,
+                  likeCount: r.likeCount,
+                  // The topic title is the same for every reply in a topic,
+                  // so without the date three rows read identically.
+                  createdAt: r.createdAt,
+                  // Opens the topic, not the exact post: the summary gives a
+                  // post_number, while anchoring needs a post id, and
+                  // `gotoPage` is a page index — not the same thing.
+                  onTap: () => Get.to(() => PostPage(
+                        siteContext: widget.siteContext,
+                        topicId: r.topicId.toString(),
+                        title: r.topicTitle,
+                      )),
+                ),
+            ],
+          ),
+        if (topTopics.isNotEmpty)
+          _SummaryTopicSection(
+            title: 'Top Topics',
+            rows: [
+              for (final t in topTopics.take(5))
+                _SummaryTopicRowData(
+                  title: t.title,
+                  likeCount: t.likeCount,
+                  createdAt: t.createdAt,
+                  replyCount:
+                      t.postsCount == null ? null : (t.postsCount! - 1),
+                  onTap: () => Get.to(() => PostPage(
+                        siteContext: widget.siteContext,
+                        topicId: t.id.toString(),
+                        title: t.title,
+                      )),
+                ),
+            ],
+          ),
+      ],
+    );
+  }
+
+  Widget _statsCard(
+    BuildContext context,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+    List<({String value, String label})> stats,
+    bool showStats,
+    List<DiscourseSummaryUser> likedBy,
+  ) {
+    if (!showStats && likedBy.isEmpty) return const SizedBox.shrink();
     return Card(
       margin: EdgeInsets.symmetric(
         horizontal: DesignTokens.spacingL,
@@ -1260,7 +1364,7 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
               ),
             ],
             if (likedBy.isNotEmpty) ...[
-              if (showStats) SizedBox(height: DesignTokens.spacingL),
+              SizedBox(height: DesignTokens.spacingL),
               Text(
                 'MOST LIKED BY',
                 style: textTheme.labelSmall?.copyWith(
@@ -1310,6 +1414,172 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
                 ),
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A profile list section — heading plus rows — in the same shape as
+/// "Recent Posts" further down the page: a `titleLarge` bold heading in
+/// `paddingL`, then full-bleed tappable rows. The summary block used a
+/// card with uppercase micro-labels, which read as a different component
+/// from the rest of the profile.
+class _SummaryTopicSection extends StatelessWidget {
+  final String title;
+  final List<_SummaryTopicRowData> rows;
+
+  const _SummaryTopicSection({required this.title, required this.rows});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: DesignTokens.paddingL,
+          child: Text(
+            title,
+            style: textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: DesignTokens.fontWeightBold,
+            ),
+          ),
+        ),
+        for (final row in rows) _SummaryTopicRow(data: row),
+      ],
+    );
+  }
+}
+
+class _SummaryTopicRowData {
+  final String title;
+  final int likeCount;
+  final int? replyCount;
+  final DateTime? createdAt;
+  final VoidCallback onTap;
+
+  const _SummaryTopicRowData({
+    required this.title,
+    required this.likeCount,
+    this.replyCount,
+    this.createdAt,
+    required this.onTap,
+  });
+}
+
+/// One topic row. Mirrors the "Recent Posts" item: Material + InkWell,
+/// full-bleed, `spacingL` padding, title over a muted metadata line.
+class _SummaryTopicRow extends StatelessWidget {
+  final _SummaryTopicRowData data;
+
+  const _SummaryTopicRow({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final meta = <String>[
+      if (data.createdAt != null) formatTimeAgo(data.createdAt!, context),
+      if (data.likeCount > 0)
+        '${data.likeCount} ${data.likeCount == 1 ? 'like' : 'likes'}',
+      if (data.replyCount != null && data.replyCount! > 0)
+        '${data.replyCount} ${data.replyCount == 1 ? 'reply' : 'replies'}',
+    ];
+    return Material(
+      color: colorScheme.surface,
+      child: InkWell(
+        onTap: data.onTap,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: DesignTokens.spacingL,
+            vertical: DesignTokens.spacingM,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                data.title,
+                style: textTheme.titleSmall?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: DesignTokens.fontWeightSemiBold,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (meta.isNotEmpty) ...[
+                SizedBox(height: DesignTokens.spacingXS),
+                Text(
+                  meta.join(' · '),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Shown when the summary fetch failed. The section used to disappear
+/// silently, which made a transient failure — a 429 in particular — look
+/// like the profile simply had no lower half.
+class _SummaryUnavailable extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _SummaryUnavailable({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Card(
+      margin: EdgeInsets.symmetric(
+        horizontal: DesignTokens.spacingL,
+        vertical: DesignTokens.spacingXS,
+      ),
+      elevation: DesignTokens.elevationNone,
+      color: colorScheme.surfaceContainerLowest,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+        side: BorderSide(
+          color: colorScheme.outlineVariant
+              .withValues(alpha: DesignTokens.opacityLow),
+          width: DesignTokens.borderWidthThin,
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: DesignTokens.spacingL,
+          vertical: DesignTokens.spacingM,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.bar_chart_rounded,
+              size: DesignTokens.iconSizeM,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            SizedBox(width: DesignTokens.spacingM),
+            Expanded(
+              child: Text(
+                message,
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: onRetry,
+              child: Text(AppLocalizations.of(context)?.tryAgain ?? 'Retry'),
+            ),
           ],
         ),
       ),

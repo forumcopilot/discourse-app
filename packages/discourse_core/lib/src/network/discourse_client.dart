@@ -100,12 +100,12 @@ class DiscourseClient {
     // Any write invalidates the read cache below — a reply, vote or edit is
     // usually followed immediately by a refetch of the thing that changed,
     // and that refetch must see the server's new state.
-    if (method != 'GET') {
+    if (method != 'GET' && !_isInertWrite(effectivePath)) {
       _readCache.clear();
       _inFlight.clear();
     }
 
-    final cacheKey = method == 'GET' ? '$url|${jsonEncode(effectiveQuery)}' : null;
+    final cacheKey = method == 'GET' ? '$url|${_canonicalQuery(effectiveQuery)}' : null;
     if (cacheKey != null) {
       // Identical GET already in flight → share its result instead of
       // issuing a second one. Two widgets mounting in the same frame ask
@@ -124,13 +124,12 @@ class DiscourseClient {
       _readCache.remove(cacheKey);
     }
 
-    if (kDebugMode) {
-      _requestCount++;
-      debugPrint('🌐 [HTTP #$_requestCount] $method ${url.path}');
-    }
-
     if (cacheKey != null) {
-      final future = _send(
+      // Registered synchronously: nothing may suspend between the pending
+      // check above and this assignment, or two same-frame callers would both
+      // miss and both hit the network. The rate-limit clearance await lives
+      // INSIDE the registered future for exactly that reason.
+      final future = _sendAfterClearance(
         method,
         url,
         headers: headers,
@@ -143,12 +142,41 @@ class DiscourseClient {
         // Only successful reads are worth repeating; an error must not be
         // pinned for the next few seconds.
         if (result.statusCode >= 200 && result.statusCode < 300) {
-          _readCache[cacheKey] = _CachedResponse(result);
+          _readCache[cacheKey] = _CachedResponse(result, _ttlForPath(url.path));
         }
         return result;
       } finally {
         _inFlight.remove(cacheKey);
       }
+    }
+
+    return _sendAfterClearance(
+      method,
+      url,
+      headers: headers,
+      encodedBody: encodedBody,
+      effectiveQuery: effectiveQuery,
+    );
+  }
+
+  /// [_send], gated on any active rate-limit cooldown.
+  ///
+  /// A 429 anywhere puts the whole client on hold until the server's stated
+  /// cooldown expires — see the handler in [_send]. Cache and in-flight hits
+  /// are served before this gate, so a rate-limited app still renders what
+  /// it has.
+  Future<FCCallResult> _sendAfterClearance(
+    String method,
+    Uri url, {
+    required Map<String, String> headers,
+    required String? encodedBody,
+    required Map<String, dynamic>? effectiveQuery,
+  }) async {
+    await _awaitRateLimitClearance();
+
+    if (kDebugMode) {
+      _requestCount++;
+      debugPrint('🌐 [HTTP #$_requestCount] $method ${url.path}');
     }
 
     return _send(
@@ -163,6 +191,59 @@ class DiscourseClient {
   /// Concurrent identical GETs, keyed by URL + query.
   static final Map<String, Future<FCCallResult>> _inFlight =
       <String, Future<FCCallResult>>{};
+
+  /// Writes that change nothing the app subsequently reads, and so must not
+  /// drop the read cache.
+  ///
+  /// `/topics/timings` is Discourse's read-tracking beacon: the app posts it
+  /// automatically on viewing a topic, and it alters only per-user read state.
+  /// Because clear-on-write is indiscriminate, it was wiping the whole cache
+  /// mid-navigation: the topic loaded, the beacon fired, the cache emptied,
+  /// and the very next read of the same topic went back to the network.
+  ///
+  /// Logged-in sessions only, and that qualifier is the whole story:
+  /// `DiscourseTopicProxy.markTopicReadAsync` returns early for guests, so an
+  /// anonymous session never posts the beacon and an anonymous A/B shows no
+  /// change at all. Measured on a signed-in Pixel against try.discourse.org,
+  /// opening one topic:
+  ///
+  ///   before: GET /t/57.json → POST /topics/timings → GET /t/57.json
+  ///   after:  GET /t/57.json → POST /topics/timings → (cache hit ×2)
+  ///
+  /// — one topic fetch instead of two, on every topic open.
+  static bool _isInertWrite(String path) => path.startsWith('/topics/timings');
+
+  /// Stable string for a query map, so the same request always produces the
+  /// same cache key.
+  ///
+  /// This was `jsonEncode(query)`, which made two callers asking for the
+  /// identical URL miss each other: one passing no query encoded to `"null"`
+  /// and one passing an empty map to `"{}"`. It also preserved Dart's
+  /// insertion order, so the same parameters passed in a different order
+  /// keyed apart. Both are demonstrated in
+  /// `test/discourse_client_measurement_test.dart`.
+  ///
+  /// Latent, not observed: an A/B of a real cold launch against
+  /// try.discourse.org showed no difference — the bootstrap's callers happen
+  /// to agree on spelling, so `/about.json` went out once and hit the cache
+  /// three times either way. This guards a mismatch the current call sites
+  /// don't have rather than fixing one they do; the sorted, encoded key costs
+  /// nothing and stops it becoming a live bug the next time a caller passes
+  /// `{}` or reorders a map.
+  ///
+  /// Keys and values are percent-encoded, matching what Dio puts on the wire.
+  /// Without that, a VALUE containing '&' or '=' (a search term, say) aliases
+  /// a structurally different query — `{q: '1&safe=2'}` and
+  /// `{q: '1', safe: '2'}` are different requests but would share a key, and
+  /// the second caller would be served the first one's bytes.
+  static String _canonicalQuery(Map<String, dynamic>? query) {
+    if (query == null || query.isEmpty) return '';
+    final keys = query.keys.toList()..sort();
+    return keys
+        .map((k) => '${Uri.encodeQueryComponent(k)}='
+            '${Uri.encodeQueryComponent('${query[k]}')}')
+        .join('&');
+  }
 
   /// Very short-lived GET results. This exists to absorb *redundant* reads —
   /// the bootstrap sequence re-verifying the site, and every tab resetting
@@ -183,6 +264,39 @@ class DiscourseClient {
   static void invalidateReadCache() {
     _readCache.clear();
     _inFlight.clear();
+  }
+
+  /// When the server last told us to back off, and until when.
+  ///
+  /// Shared across every request because Discourse's limiter is per User API
+  /// Key and the app has exactly one — so "this request was rate limited"
+  /// really means "the app is rate limited".
+  static DateTime? _rateLimitedUntil;
+
+  /// Blocks until any server-imposed cooldown has elapsed.
+  ///
+  /// Capped by [_maxAutoRetryDelay] so a hostile or nonsensical `Retry-After`
+  /// cannot wedge the app; past that the request goes out and is allowed to
+  /// fail honestly.
+  static Future<void> _awaitRateLimitClearance() async {
+    final until = _rateLimitedUntil;
+    if (until == null) return;
+
+    final remaining = until.difference(DateTime.now());
+    if (remaining <= Duration.zero) {
+      _rateLimitedUntil = null;
+      return;
+    }
+    if (remaining > _maxAutoRetryDelay) {
+      _rateLimitedUntil = null;
+      return;
+    }
+
+    if (kDebugMode) {
+      debugPrint('🌐 [HTTP holding ${remaining.inSeconds}s] rate limited');
+    }
+    await Future<void>.delayed(remaining);
+    _rateLimitedUntil = null;
   }
 
   Future<FCCallResult> _send(
@@ -222,16 +336,67 @@ class DiscourseClient {
         );
       }
 
-      if (result.statusCode != 429 || attempt >= 1) return result;
+      if (result.statusCode != 429) return result;
+
+      // Hold every request, but ONLY for a limit that actually governs every
+      // request. A global limit (per IP, or per User API Key — the app shares
+      // one key) means the next caller would spend budget it does not have,
+      // so make it wait. An action-scoped limit governs one post's like
+      // button and nothing else; freezing reads and navigation over it would
+      // be a self-inflicted outage. See [_isGlobalRateLimit].
       final wait = _retryAfter(result);
+      final isGlobal = _isGlobalRateLimit(result);
+      if (kDebugMode) {
+        debugPrint('🌐 [HTTP 429 ${isGlobal ? 'GLOBAL' : 'action-scoped'}] '
+            '$method ${url.path} wait=${wait?.inSeconds ?? '?'}s');
+      }
+      if (wait != null && isGlobal) {
+        final until = DateTime.now().add(wait);
+        if (_rateLimitedUntil == null || until.isAfter(_rateLimitedUntil!)) {
+          _rateLimitedUntil = until;
+        }
+      }
+
+      if (attempt >= 1) return result;
       if (wait == null || wait > _maxAutoRetryDelay) return result;
       attempt++;
       await Future<void>.delayed(wait);
     }
   }
 
-  /// A cached GET plus the moment it landed.
+  /// Default lifetime for a cached GET: shorter than any human refresh gesture,
+  /// so a deliberate pull-to-refresh always reaches the network.
   static const Duration _readCacheTtl = Duration(seconds: 3);
+
+  /// Longer lifetimes for endpoints whose content does not meaningfully change
+  /// within a session.
+  ///
+  /// Three seconds does not survive a screen transition, so returning to the
+  /// forum home refetched `/categories.json` and `/latest.json` every time.
+  /// Measured against try.discourse.org, an ordinary minute of browsing —
+  /// open forum, read a topic, check profile, come back — cost ~17 requests
+  /// against Discourse's per-User-API-Key ceiling of 20/minute
+  /// (`max_user_api_reqs_per_minute`). Repeat fetches of static configuration
+  /// were a large share of that.
+  ///
+  /// Matched on the URL path, longest prefix first. Any write still drops the
+  /// whole cache, so these never mask the user's own changes.
+  static const Map<String, Duration> _readCacheTtlByPath = {
+    // Forum configuration. Fixed for the life of a session in practice; a
+    // restart or a write picks up any change.
+    '/about.json': Duration(minutes: 30),
+    '/site/settings.json': Duration(minutes: 30),
+    '/site/basic-info.json': Duration(minutes: 30),
+    // Category tree changes rarely, and is refetched on every return to home.
+    '/categories.json': Duration(minutes: 5),
+  };
+
+  /// TTL for [path], falling back to [_readCacheTtl].
+  static Duration _ttlForPath(String path) {
+    final exact = _readCacheTtlByPath[path];
+    if (exact != null) return exact;
+    return _readCacheTtl;
+  }
 
   /// Debug-only counter so request volume is visible in logcat. Discourse
   /// rate-limits at 50 requests / 10s per IP, which is easy to trip when a
@@ -242,6 +407,30 @@ class DiscourseClient {
   /// gets the error so the UI can say how long to wait rather than appear
   /// to hang.
   static const Duration _maxAutoRetryDelay = Duration(seconds: 10);
+
+  /// Whether a 429 governs the whole client or just the action that tripped it.
+  ///
+  /// Discourse sets `Discourse-Rate-Limit-Error-Code` on exactly the limits
+  /// that apply to every request we make:
+  ///   * `lib/middleware/request_tracker.rb` — per-IP (`*_10_secs_limit`,
+  ///     `*_60_secs_limit`, `*_assets_10_secs_limit`)
+  ///   * `lib/auth/default_current_user_provider.rb` — per key
+  ///     (`user_api_key_limiter_60_secs`, `user_api_key_limiter_1_day`)
+  ///
+  /// Action-scoped limiters construct `RateLimiter` without an `error_code`,
+  /// so the header is absent. The one users hit constantly is
+  /// `PostAction.limit_action!` (`app/models/post_action.rb`): four actions
+  /// per minute on a `post_action-<post_id>_<type>` key, shared by liking and
+  /// unliking, so a like/unlike/like/unlike cycle exhausts it on one post.
+  /// That must not stall the rest of the app.
+  ///
+  /// Both shapes carry `Retry-After`, so the header — not the presence of a
+  /// wait — is the discriminator.
+  static bool _isGlobalRateLimit(FCCallResult result) {
+    final code = result.headers['discourse-rate-limit-error-code'] ??
+        result.headers['Discourse-Rate-Limit-Error-Code'];
+    return code != null && code.trim().isNotEmpty;
+  }
 
   /// How long Discourse asked us to wait, from either 429 shape:
   /// the middleware's `Retry-After` header (plain-text body) or the
@@ -395,8 +584,11 @@ class _CachedResponse {
   final FCCallResult result;
   final DateTime storedAt;
 
-  _CachedResponse(this.result) : storedAt = DateTime.now();
+  /// Per-entry rather than a single global constant, so configuration endpoints
+  /// can outlive a screen transition while feeds stay near-live.
+  final Duration ttl;
 
-  bool get isStale =>
-      DateTime.now().difference(storedAt) > DiscourseClient._readCacheTtl;
+  _CachedResponse(this.result, this.ttl) : storedAt = DateTime.now();
+
+  bool get isStale => DateTime.now().difference(storedAt) > ttl;
 }

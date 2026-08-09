@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_ui/utils/like_cooldown.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
@@ -16,6 +17,7 @@ import 'package:discourse_ui/views/lists/posts_list.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../../theme/design_tokens.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import 'package:discourse_ui/views/widgets/discourse_report_dialog.dart';
 
 class PostActionsHandler {
   final SiteContext siteContext;
@@ -726,6 +728,15 @@ class PostActionsHandler {
   Future<void> handleReport(BuildContext context, String postId) async {
     AppLogger.debug('Handling report of post: $postId');
 
+    // Discourse has a real flag taxonomy (off-topic / inappropriate / spam / notify
+    // moderators / message the author) and its own modal for it. The free-text dialog
+    // below can only ever file "Something Else", so Discourse gets its own.
+    // XenForo keeps this path unchanged — flag types are not its vocabulary.
+    if (siteContext.siteType == 'discourse') {
+      await showDiscourseReportDialog(context, postId: postId);
+      return;
+    }
+
     final TextEditingController reasonController = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
@@ -1098,6 +1109,14 @@ class PostActionsHandler {
     }
     // In-flight guard: ignore taps while a request for this post is pending.
     if (_likeInFlight.contains(post.id)) return;
+    // Discourse allows 4 actions per minute on one post, counting likes and
+    // unlikes together. Once it has said no, further taps cannot succeed —
+    // send nothing and say how long is left instead of spending requests on
+    // a guaranteed 429.
+    if (LikeCooldown.isCoolingDown(post.id)) {
+      if (context.mounted) _showCooldownSnack(context, post.id);
+      return;
+    }
     _likeInFlight.add(post.id);
     // Optimistically update UI. `likesInfo` is no longer the source of
     // truth for the count (the proxy leaves it empty rather than
@@ -1138,15 +1157,37 @@ class PostActionsHandler {
       post.likeCount = previousCount;
       setLikeCount(previousCount);
       // Removed onRefresh() call - local state updates are sufficient for like actions
+      // A rate-limited failure is not a generic error: it is temporary and
+      // has a known duration, so record it and say how long rather than
+      // showing Discourse's bare "too many times" sentence.
+      final cooldown =
+          LikeCooldown.noteFromLastResponse(siteContext, post.id);
       if (context.mounted) {
-        final reason = errText?.isNotEmpty == true ? errText! : '';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(wasLiked
-            ? (AppLocalizations.of(context)?.failedToUnlikePost(reason) ?? 'Failed to unlike post: $reason')
-            : (AppLocalizations.of(context)?.failedToLikePost(reason) ?? 'Failed to like post: $reason'))),
-        );
+        if (cooldown != null) {
+          _showCooldownSnack(context, post.id);
+        } else {
+          final reason = errText?.isNotEmpty == true ? errText! : '';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(wasLiked
+              ? (AppLocalizations.of(context)?.failedToUnlikePost(reason) ?? 'Failed to unlike post: $reason')
+              : (AppLocalizations.of(context)?.failedToLikePost(reason) ?? 'Failed to like post: $reason'))),
+          );
+        }
       }
     }
+  }
+
+  /// "You can like this post again in 42s" — Discourse tells us the wait, so
+  /// show it instead of an open-ended "try again later".
+  void _showCooldownSnack(BuildContext context, String postId) {
+    final seconds = LikeCooldown.secondsLeft(postId);
+    if (seconds <= 0) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('You can like this post again in ${seconds}s'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   // --- Like/Unlike Conversation Message ---

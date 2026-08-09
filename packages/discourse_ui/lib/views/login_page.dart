@@ -7,6 +7,7 @@ import 'package:discourse_ui/controllers/global_loader_controller.dart';
 import 'package:discourse_ui/controllers/site_controller.dart';
 import 'package:discourse_ui/services/discourse_login_service.dart';
 import 'package:discourse_ui/views/discourse_login_webview_page.dart';
+import 'package:discourse_ui/views/enable_notifications_page.dart';
 import 'package:discourse_ui/views/site_home_page.dart';
 
 /// Phase 5.20a — the login page on Discourse is a single
@@ -122,6 +123,15 @@ class _LoginPageState extends State<LoginPage> {
     if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
       DiscourseGlobalLoaderController.to.forceHide();
     }
+
+    // Second handshake — a notifications-only key our backend can poll on the
+    // user's behalf. It has to be a separate grant: Discourse issues one key
+    // per authorization, and this one leaves the device, so it must not be the
+    // session credential. Awaited (not fire-and-forget) so it runs while the
+    // sign-in is still on screen; declining just falls through to the forum.
+    await _promptEnableNotifications();
+    if (!mounted) return;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       try {
@@ -145,6 +155,21 @@ class _LoginPageState extends State<LoginPage> {
         Get.offAll(() => const SiteHomePage());
       }
     });
+  }
+
+  /// Offers the notifications grant. Never rethrows: the user is signed in
+  /// either way, and a failure here must not strand them on the login page.
+  Future<void> _promptEnableNotifications() async {
+    try {
+      await Navigator.of(context).push<bool>(
+        MaterialPageRoute<bool>(
+          builder: (_) =>
+              EnableNotificationsPage(siteContext: widget.siteContext),
+        ),
+      );
+    } catch (_) {
+      // Swallowed deliberately — see above.
+    }
   }
 
   /// Pop this page back to the caller, returning `false` so anything

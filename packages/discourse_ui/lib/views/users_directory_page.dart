@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_directory_item.dart';
+import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 
 import '../theme/design_tokens.dart';
 import 'user_profile_page.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
-import 'widgets/trust_level_chip.dart';
+import 'widgets/search_text_field.dart';
+import 'widgets/user_list_row.dart';
 import '../utils/error_message.dart';
 
 /// Phase 5.18c-1 — the Discourse Users directory.
@@ -124,6 +126,18 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
   bool _hasMore = true;
   String? _error;
 
+  // Search folded in from the old Members page. The two screens both listed
+  // users and both reached /directory_items.json — Members' "online users" was
+  // just period=daily&order=days_visited — so search was the only thing it had
+  // that this page did not.
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+  List<FCSearchUser> _searchResults = const [];
+  bool _searching = false;
+  String _query = '';
+
+  bool get _isSearchMode => _query.isNotEmpty;
+
   @override
   void initState() {
     super.initState();
@@ -146,6 +160,35 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 400) {
       _load(reset: false);
+    }
+  }
+
+  Future<void> _runSearch(String term) async {
+    final q = term.trim();
+    setState(() {
+      _query = q;
+      if (q.isEmpty) {
+        _searchResults = const [];
+        _searching = false;
+      }
+    });
+    if (q.isEmpty) return;
+
+    setState(() => _searching = true);
+    try {
+      final result =
+          await SiteProxyService.getUserProxy().searchUserAsync(q, 1, 20);
+      if (!mounted || q != _query) return;
+      setState(() {
+        _searchResults = result.list;
+        _searching = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _searchResults = const [];
+        _searching = false;
+      });
     }
   }
 
@@ -220,6 +263,24 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
       appBar: const SimpleListAppBar(title: 'Users'),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: DesignTokens.spacingL,
+              vertical: DesignTokens.spacingS,
+            ),
+            child: SearchTextField(
+              controller: _searchController,
+              focusNode: _searchFocusNode,
+              hintText: 'Search users...',
+              onSearch: _runSearch,
+              autoSearch: true,
+              onClear: () => _runSearch(''),
+            ),
+          ),
+          // Order and period rank the directory; neither applies to a name
+          // search, so they step aside while searching rather than sitting
+          // there looking like they filter the results.
+          if (!_isSearchMode) ...[
           _buildSelector(
             children: _DirectoryOrder.values.map((o) {
               return Padding(
@@ -245,6 +306,7 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
               );
             }).toList(),
           ),
+          ],
           Divider(
             height: 1,
             color: colorScheme.outlineVariant
@@ -253,6 +315,44 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
           Expanded(child: _buildList()),
         ],
       ),
+    );
+  }
+
+  /// Search results reuse the directory's row, so a person looks the same
+  /// whether you browse to them or search for them. /u/search/users.json carries
+  /// no trust level or stats, so those slots stay empty rather than costing a
+  /// profile request per result.
+  Widget _buildSearchResults() {
+    if (_searching && _searchResults.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_searchResults.isEmpty) {
+      return const EmptyStateView(
+        icon: Icons.search_off_rounded,
+        message: 'No users match that name.',
+      );
+    }
+    return ListView.builder(
+      itemCount: _searchResults.length,
+      itemBuilder: (_, i) {
+        final u = _searchResults[i];
+        return UserListRow(
+          username: u.username,
+          subtitle: u.displayText,
+          avatarUrl: u.iconUrl,
+          leadingIcon: u.userType == 'group' ? Icons.groups_rounded : null,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => UserProfilePage(
+                siteContext: widget.siteContext,
+                userId: u.id,
+                userName: u.username,
+                profilePictureUrl: u.iconUrl,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -271,6 +371,7 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
 
   Widget _buildList() {
     final colorScheme = Theme.of(context).colorScheme;
+    if (_isSearchMode) return _buildSearchResults();
 
     if (_items.isEmpty && _loading) {
       return const Center(child: CircularProgressIndicator());
@@ -306,9 +407,13 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
             );
           }
           final item = _items[i];
-          return _UserRow(
-            item: item,
-            order: _order,
+          return UserListRow(
+            username: item.username,
+            subtitle: item.name,
+            avatarUrl: item.avatarUrl,
+            trustLevel: item.trustLevel,
+            statLabel: _formatCount(item.statFor(_order.apiName)),
+            statIcon: _order.icon,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => UserProfilePage(
@@ -326,84 +431,10 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
   }
 }
 
-class _UserRow extends StatelessWidget {
-  final FCDirectoryItem item;
-  final _DirectoryOrder order;
-  final VoidCallback onTap;
 
-  const _UserRow({
-    required this.item,
-    required this.order,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final stat = item.statFor(order.apiName);
-    return ListTile(
-      onTap: onTap,
-      leading: CircleAvatar(
-        radius: DesignTokens.avatarRadiusM,
-        backgroundColor: colorScheme.surfaceContainerHighest,
-        backgroundImage: item.avatarUrl.isNotEmpty
-            ? NetworkImage(item.avatarUrl)
-            : null,
-        child: item.avatarUrl.isEmpty
-            ? Icon(Icons.person, color: colorScheme.onSurfaceVariant)
-            : null,
-      ),
-      title: Row(
-        children: [
-          Expanded(
-            child: Text(
-              item.username,
-              style: textTheme.titleSmall?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: DesignTokens.fontWeightSemiBold,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          if (item.trustLevel != null) ...[
-            const SizedBox(width: DesignTokens.spacingS),
-            TrustLevelChip(level: item.trustLevel!),
-          ],
-        ],
-      ),
-      subtitle: item.name != null
-          ? Text(
-              item.name!,
-              style: textTheme.bodySmall
-                  ?.copyWith(color: colorScheme.onSurfaceVariant),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            )
-          : null,
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(order.icon,
-              size: DesignTokens.iconSizeXS,
-              color: colorScheme.onSurfaceVariant),
-          const SizedBox(width: DesignTokens.spacingXS),
-          Text(
-            _formatCount(stat),
-            style: textTheme.labelMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: DesignTokens.fontWeightSemiBold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatCount(int n) {
-    if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
-    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}k';
-    return n.toString();
-  }
+/// Compact stat label for a directory row (1200 -> "1.2k").
+String _formatCount(int value) {
+  if (value >= 1000000) return '${(value / 1000000).toStringAsFixed(1)}M';
+  if (value >= 1000) return '${(value / 1000).toStringAsFixed(1)}k';
+  return value.toString();
 }

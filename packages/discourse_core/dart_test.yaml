@@ -1,0 +1,6 @@
+# Tests tagged `live` hit a real forum over the network. They are excluded
+# from a plain `flutter test` so the default suite stays hermetic and offline;
+# run them deliberately with `flutter test --tags live`.
+tags:
+  live:
+    skip: "network test — run with --tags live"

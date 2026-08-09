@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
-import 'package:discourse_ui/views/widgets/user_avatar.dart';
 import 'package:discourse_ui/views/widgets/search_text_field.dart';
 import 'package:discourse_ui/views/widgets/empty_state_widget.dart';
 import 'package:discourse_ui/views/widgets/error_state_widget.dart';
@@ -10,6 +9,7 @@ import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/number_utils.dart';
 import '../utils/error_message.dart';
+import 'widgets/user_list_row.dart';
 
 class UserSearchPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -225,62 +225,35 @@ class _UserSearchPageState extends State<UserSearchPage> {
 
         final user = _users[index];
         final isSelected = widget.selectedUsers.contains(user.username);
+        final isGroup = user.userType == 'group';
 
-        return ListTile(
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: DesignTokens.spacingL,
-            vertical: DesignTokens.spacingS,
-          ),
-          leading: UserAvatar(
+        // Same row as the user directory, so a person looks the same whether you
+        // find them by browsing or by searching. /u/search/users.json does not
+        // return trust level or post counts, so those slots stay empty here
+        // rather than costing a profile request per result.
+        return Opacity(
+          opacity: isSelected ? DesignTokens.opacityDisabled : 1.0,
+          child: UserListRow(
             username: user.username,
-            iconUrl: user.iconUrl,
-            radius: DesignTokens.avatarRadiusM,
-            showOnlineIndicator: true,
-            isOnline: user.isOnline,
+            subtitle: user.displayText,
+            avatarUrl: user.iconUrl,
+            // Groups have no avatar; give them their own glyph so they are not
+            // mistaken for a person with a missing picture.
+            leadingIcon: isGroup ? Icons.groups_rounded : null,
+            statLabel: user.postCount > 0
+                ? formatNumber(context, user.postCount)
+                : null,
+            statIcon: user.postCount > 0 ? Icons.comment_outlined : null,
+            onTap: isSelected
+                ? null
+                : () {
+                    widget.onUserSelected(user.username, user.iconUrl);
+                    Navigator.of(context).pop({
+                      'username': user.username,
+                      'iconUrl': user.iconUrl,
+                    });
+                  },
           ),
-          title: Text(
-            user.username,
-            style: textTheme.titleMedium?.copyWith(
-              color: isSelected ? colorScheme.onSurface.withValues(alpha: DesignTokens.opacityDisabled) : colorScheme.onSurface,
-              fontWeight: DesignTokens.fontWeightMedium,
-            ),
-          ),
-          subtitle: user.postCount > 0
-              ? Padding(
-                  padding: EdgeInsets.only(top: DesignTokens.spacingXS / 2),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.comment_outlined,
-                        size: textTheme.bodySmall?.fontSize ?? DesignTokens.fontSizeXS,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      SizedBox(width: DesignTokens.spacingXS),
-                      Text(
-                        formatNumber(context, user.postCount),
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          letterSpacing: DesignTokens.letterSpacingWide,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : null,
-          enabled: !isSelected,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-          ),
-          onTap: isSelected
-              ? null
-              : () {
-                  widget.onUserSelected(user.username, user.iconUrl);
-                  Navigator.of(context).pop({
-                    'username': user.username,
-                    'iconUrl': user.iconUrl,
-                  });
-                },
         );
       },
     );

@@ -1,4 +1,8 @@
+import 'dart:async';
+
+import 'package:discourse_core/discourse_core.dart' show DiscourseAcceptedAnswer;
 import 'package:flutter/material.dart';
+import 'package:discourse_ui/views/widgets/solution_summary_card.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
@@ -7,7 +11,6 @@ import 'package:forumcopilot_sdk/models/entities/fc_post_vote.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 import '../widgets/post_content_callbacks.dart' show PostContentCallbacks;
 import '../widgets/rich_text_content.dart';
-import '../widgets/reaction_chips_row.dart';
 import '../widgets/reaction_picker_sheet.dart';
 import '../widgets/reaction_users_sheet.dart';
 import '../widgets/post_action_button.dart';
@@ -16,6 +19,7 @@ import '../widgets/link_preview_card.dart';
 import '../widgets/video_card.dart';
 import '../widgets/twitter_card.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../utils/like_cooldown.dart';
 import '../widgets/post_actions.dart';
 import '../widgets/thread_poll_card.dart';
 import '../../controllers/post_controller.dart';
@@ -126,6 +130,14 @@ class PostListItem extends StatefulWidget {
   /// Poll for the thread. When non-null and this is the first post, the poll card is shown above the body.
   final FCPoll? poll;
 
+  /// discourse-solved's accepted answer for this TOPIC. Rendered under the first
+  /// post only, matching Discourse's own web placement. Null on XenForo and on
+  /// unsolved topics.
+  final DiscourseAcceptedAnswer? acceptedAnswer;
+
+  /// Jumps to the accepted answer's post.
+  final void Function(int postNumber)? onJumpToAcceptedAnswer;
+
   /// Called after a successful vote to update the thread's poll in state.
   final void Function(FCPoll updatedPoll)? onVoteSuccess;
 
@@ -148,6 +160,8 @@ class PostListItem extends StatefulWidget {
     this.onAvatarTap,
     this.isHighlighted = false,
     this.poll,
+    this.acceptedAnswer,
+    this.onJumpToAcceptedAnswer,
     this.onVoteSuccess,
     this.translatedContent,
     this.isTranslating = false,
@@ -176,6 +190,10 @@ class _PostListItemState extends State<PostListItem> {
   // on this topic, in which case the vote column is hidden.
   FCPostVote? _vote;
 
+  /// Ticks once a second while this post's like/reaction budget is spent,
+  /// so the chips row can count down instead of looking tappable.
+  Timer? _cooldownTicker;
+
   @override
   void initState() {
     super.initState();
@@ -191,6 +209,12 @@ class _PostListItemState extends State<PostListItem> {
     _isBookmarked = widget.post.bookmarked;
     _reactions = List.of(widget.post.reactions, growable: false);
     _vote = widget.post.vote;
+  }
+
+  @override
+  void dispose() {
+    _cooldownTicker?.cancel();
+    super.dispose();
   }
 
   @override
@@ -580,15 +604,6 @@ class _PostListItemState extends State<PostListItem> {
           // long-press lists the real reactors, trailing "+" opens the
           // full picker. Hidden only in the zero state, where the
           // heart button in the action row takes over.
-          if (_reactions.isNotEmpty)
-            ReactionChipsRow(
-              reactions: _reactions,
-              onTap: _toggleReaction,
-              onLongPress: _showReactionUsers,
-              onAddReaction: widget.siteContext.isLoggedIn
-                  ? _openReactionPicker
-                  : null,
-            ),
           if (data.limitedYoutubeUrls.isNotEmpty) ...[
             const SizedBox(height: DesignTokens.spacingM),
             StyleBuilders.divider(colorScheme: colorScheme),
@@ -634,8 +649,15 @@ class _PostListItemState extends State<PostListItem> {
             post: widget.post,
             isLiked: _isLiked,
             likeCount: _likeCount,
+            likeCooldownSeconds: LikeCooldown.secondsLeft(widget.post.id),
+            reactions: _reactions,
+            reactionSiteContext: widget.siteContext,
+            onShowReactors: () => _showReactionUsers(''),
             isLoggedIn: widget.siteContext.isLoggedIn,
-            onLike: _handleLikeAction,
+            // One home for "react": the picker. Removing your reaction is
+            // tapping it again inside the picker, so there is no hidden
+            // long-press to discover.
+            onLike: _openReactionPicker,
             onLongPressLike: _openReactionPicker,
             isBookmarked: _isBookmarked,
             onBookmark: _handleBookmarkAction,
@@ -690,6 +712,22 @@ class _PostListItemState extends State<PostListItem> {
           children: [
             _buildPostHeader(context),
             _buildPostContent(context, data, colorScheme, textTheme),
+            // Accepted answer panel, first post only — the same condition Discourse's
+            // own plugin uses (post_number === 1 && topic.accepted_answer) and the same
+            // position (immediately after the cooked content).
+            if (widget.post.postNumber == 1 && widget.acceptedAnswer != null)
+              Padding(
+                padding:
+                    EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+                child: SolutionSummaryCard(
+                  siteContext: widget.siteContext,
+                  answer: widget.acceptedAnswer!,
+                  onJumpToAnswer: widget.onJumpToAcceptedAnswer == null
+                      ? null
+                      : () => widget.onJumpToAcceptedAnswer!(
+                          widget.acceptedAnswer!.postNumber),
+                ),
+              ),
             _buildBottomDivider(colorScheme),
           ],
         ),
@@ -933,24 +971,6 @@ class _PostListItemState extends State<PostListItem> {
     if (widget.actions?.onToggleWiki != null) {
       await widget.actions!.onToggleWiki!(widget.post.id, wiki);
     }
-  }
-
-  Future<void> _handleLikeAction() async {
-    await _postActionsHandler.handleLike(
-      context: context,
-      siteContext: widget.siteContext,
-      post: widget.post,
-      onRefresh: widget.actions?.onRefresh ?? () {},
-      setIsLiked: (val) => setState(() => _isLiked = val),
-      setLikeCount: (val) => setState(() => _likeCount = val),
-      isLiked: _isLiked,
-    );
-    // A like IS the heart reaction on Discourse (the plugin folds plain
-    // likes into `heart`, and the proxy synthesizes the same chip on
-    // plugin-less forums). Mirror the new count into the chips row so
-    // the zero-state heart button hands off to a chip immediately
-    // instead of waiting for a thread refetch.
-    _syncHeartChipFromLike();
   }
 
   /// Toggle bookmark on the current post via IFCBookmarkProxy
@@ -1235,72 +1255,18 @@ class _PostListItemState extends State<PostListItem> {
     }
   }
 
-  /// Toggle a specific reaction by id (called from the chips row when
-  /// the user taps an existing chip). When [reactionId] is the
-  /// viewer's current reaction, the server removes it; otherwise it
-  /// becomes the viewer's reaction (replacing any previous one).
-  Future<void> _toggleReaction(String reactionId) async {
-    if (!widget.siteContext.isLoggedIn) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to react')),
-      );
-      return;
-    }
-    final result = await SiteProxyService.getPostProxy()
-        .toggleReactionAsync(widget.post.id, reactionId);
-    if (!mounted) return;
-    if (!result.result) {
-      // Forums without discourse-reactions have no custom-reactions
-      // route, but they still have likes — and the `heart` chip there
-      // is the synthesized like chip. Toggle it through the like path.
-      if (reactionId == 'heart') {
-        await _handleLikeAction();
+  void _startCooldownTicker() {
+    _cooldownTicker?.cancel();
+    _cooldownTicker = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.resultText?.isNotEmpty == true
-              ? result.resultText!
-              : 'Could not update reaction.'),
-        ),
-      );
-      return;
-    }
-    setState(() {
-      _reactions = result.reactions;
-      widget.post.reactions = result.reactions;
-      // Keep the like state/count (used by the zero-state heart button
-      // and its a11y label) consistent with the heart chip.
-      final heart = result.reactions
-          .where((r) => r.id == 'heart')
-          .fold<int>(0, (sum, r) => sum + r.count);
-      _likeCount = heart;
-      widget.post.likeCount = heart;
-      _isLiked = result.reactions.any((r) => r.id == 'heart' && r.viewerReacted);
-      widget.post.isLiked = _isLiked;
-    });
-  }
-
-  /// Rebuild the synthesized `heart` chip after a like/unlike so the
-  /// chips row and the zero-state heart button never disagree. Only
-  /// touches the heart entry; other emoji chips are left alone.
-  void _syncHeartChipFromLike() {
-    if (!mounted) return;
-    final others =
-        _reactions.where((r) => r.id != 'heart').toList(growable: true);
-    final next = <FCPostReaction>[
-      if (_likeCount > 0)
-        FCPostReaction(
-          id: 'heart',
-          count: _likeCount,
-          viewerReacted: _isLiked,
-          canUndo: _isLiked,
-        ),
-      ...others,
-    ];
-    setState(() {
-      _reactions = next;
-      widget.post.reactions = next;
+      if (!LikeCooldown.isCoolingDown(widget.post.id)) {
+        timer.cancel();
+        _cooldownTicker = null;
+      }
+      setState(() {});
     });
   }
 
@@ -1334,10 +1300,15 @@ class _PostListItemState extends State<PostListItem> {
         .id;
     final updated = await ReactionPickerSheet.show(
       context: context,
+      siteContext: widget.siteContext,
       postId: widget.post.id,
       currentReactionId: current.isEmpty ? null : current,
     );
-    if (updated == null || !mounted) return;
+    if (!mounted) return;
+    // The sheet records the cooldown when the server refuses; keep the
+    // cluster ticking so it stays dimmed with a live countdown.
+    if (LikeCooldown.isCoolingDown(widget.post.id)) _startCooldownTicker();
+    if (updated == null) return;
     setState(() {
       _reactions = updated;
       widget.post.reactions = updated;

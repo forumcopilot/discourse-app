@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
 import 'package:forumcopilot_sdk/models/results/fc_forum_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../util/html_text.dart';
 
 /// Discourse implementation of [IFCForumProxy].
 ///
@@ -346,8 +347,13 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
     return FCForum(
       id: (c['id'] ?? '').toString(),
       name: (c['name'] ?? '').toString(),
-      description:
-          returnDescription ? (c['description_text'] as String?) : null,
+      // `description_text` is tag-free but still entity-ESCAPED — a
+      // category description containing an apostrophe rendered as
+      // "If you&#39;re not sure" in the app while the web page showed it
+      // correctly. stripHtmlToText decodes those references.
+      description: returnDescription
+          ? _decodedDescription(c['description_text'] as String?)
+          : null,
       logoUrl: _absoluteUrl(logo),
       backgroundUrl: _absoluteUrl(bg),
       parentId: c['parent_category_id']?.toString(),
@@ -396,6 +402,11 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
       postCount: (c['post_count'] as int?) ?? 0,
       slug: c['slug']?.toString(),
     );
+  }
+
+  static String? _decodedDescription(String? raw) {
+    if (raw == null || raw.isEmpty) return raw;
+    return stripHtmlToText(raw);
   }
 
   String? _absoluteUrl(String? maybeRelative) {

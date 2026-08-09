@@ -743,7 +743,7 @@ abstract class AppLocalizations {
   /// No description provided for @newConversation.
   ///
   /// In en, this message translates to:
-  /// **'New Conversation'**
+  /// **'New Message'**
   String get newConversation;
 
   /// No description provided for @newMessage.
@@ -941,7 +941,7 @@ abstract class AppLocalizations {
   /// Message when user is invited to conversation
   ///
   /// In en, this message translates to:
-  /// **'{username} has been invited to the conversation'**
+  /// **'{username} has been invited to the message'**
   String usernameHasBeenInvited(String username);
 
   /// Error message when inviting user fails
@@ -1091,13 +1091,13 @@ abstract class AppLocalizations {
   /// No description provided for @leaveConversation.
   ///
   /// In en, this message translates to:
-  /// **'Leave conversation'**
+  /// **'Leave message'**
   String get leaveConversation;
 
   /// No description provided for @reportConversation.
   ///
   /// In en, this message translates to:
-  /// **'Report conversation'**
+  /// **'Report message'**
   String get reportConversation;
 
   /// No description provided for @topicClosed.
@@ -1151,7 +1151,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteConversations.
   ///
   /// In en, this message translates to:
-  /// **'Delete Conversations'**
+  /// **'Delete Messages'**
   String get deleteConversations;
 
   /// No description provided for @myForums.
@@ -1181,13 +1181,13 @@ abstract class AppLocalizations {
   /// No description provided for @noConversations.
   ///
   /// In en, this message translates to:
-  /// **'No conversations'**
+  /// **'No messages'**
   String get noConversations;
 
   /// No description provided for @noConversationsMessage.
   ///
   /// In en, this message translates to:
-  /// **'You have no conversations yet. Start a new conversation to begin messaging.'**
+  /// **'You have no messages yet. Start a new message to begin.'**
   String get noConversationsMessage;
 
   /// No description provided for @imageSavedToGallery.
@@ -1277,7 +1277,7 @@ abstract class AppLocalizations {
   /// Error message when saving conversation fails
   ///
   /// In en, this message translates to:
-  /// **'Failed to save conversation'**
+  /// **'Failed to save message'**
   String get failedToSaveConversation;
 
   /// No description provided for @failedToSaveSetting.
@@ -1529,25 +1529,25 @@ abstract class AppLocalizations {
   /// No description provided for @youNeedToBeSignedInToViewConversations.
   ///
   /// In en, this message translates to:
-  /// **'You need to be signed in to view your conversations.'**
+  /// **'You need to be signed in to view your messages.'**
   String get youNeedToBeSignedInToViewConversations;
 
   /// Error message when loading conversations fails
   ///
   /// In en, this message translates to:
-  /// **'Error loading conversations: {error}'**
+  /// **'Error loading messages: {error}'**
   String errorLoadingConversations(String error);
 
   /// Error message when leaving conversation fails
   ///
   /// In en, this message translates to:
-  /// **'Failed to leave conversation: {error}'**
+  /// **'Failed to leave message: {error}'**
   String failedToLeaveConversation(String error);
 
   /// Error message when loading more conversations fails
   ///
   /// In en, this message translates to:
-  /// **'Error loading more conversations: {error}'**
+  /// **'Error loading more messages: {error}'**
   String errorLoadingMoreConversations(String error);
 
   /// Error message when loading more messages fails
@@ -1565,7 +1565,7 @@ abstract class AppLocalizations {
   /// No description provided for @iWouldLikeToAddYouToThisConversation.
   ///
   /// In en, this message translates to:
-  /// **'I would like to add you to this conversation.'**
+  /// **'I would like to add you to this message.'**
   String get iWouldLikeToAddYouToThisConversation;
 
   /// No description provided for @searchFailed.
@@ -2171,7 +2171,7 @@ abstract class AppLocalizations {
   /// Option to delete private conversations in spam clean
   ///
   /// In en, this message translates to:
-  /// **'Delete private conversations'**
+  /// **'Delete personal messages'**
   String get deletePrivateConversations;
 
   /// Option to ban user account in spam clean
@@ -2195,7 +2195,7 @@ abstract class AppLocalizations {
   /// Action performed: deleted conversations
   ///
   /// In en, this message translates to:
-  /// **'Deleted conversations'**
+  /// **'Deleted messages'**
   String get deletedConversations;
 
   /// Action performed: banned user
@@ -2405,13 +2405,13 @@ abstract class AppLocalizations {
   /// Success message after creating conversation
   ///
   /// In en, this message translates to:
-  /// **'Conversation created successfully'**
+  /// **'Message created successfully'**
   String get conversationCreatedSuccessfully;
 
   /// Success message when marking conversation as unread
   ///
   /// In en, this message translates to:
-  /// **'Conversation marked as unread'**
+  /// **'Message marked as unread'**
   String get conversationMarkedAsUnread;
 
   /// Success message when marking message as unread
@@ -2423,13 +2423,13 @@ abstract class AppLocalizations {
   /// Success message when closing conversation
   ///
   /// In en, this message translates to:
-  /// **'Conversation closed'**
+  /// **'Message closed'**
   String get conversationClosed;
 
   /// Success message when opening conversation
   ///
   /// In en, this message translates to:
-  /// **'Conversation opened'**
+  /// **'Message opened'**
   String get conversationOpened;
 
   /// Message asking user to login to like messages
@@ -2483,19 +2483,19 @@ abstract class AppLocalizations {
   /// Error message when marking conversation as unread fails
   ///
   /// In en, this message translates to:
-  /// **'Failed to mark conversation as unread: {error}'**
+  /// **'Failed to mark message as unread: {error}'**
   String failedToMarkConversationAsUnread(String error);
 
   /// Error message when closing conversation fails
   ///
   /// In en, this message translates to:
-  /// **'Failed to close conversation: {error}'**
+  /// **'Failed to close message: {error}'**
   String failedToCloseConversation(String error);
 
   /// Error message when opening conversation fails
   ///
   /// In en, this message translates to:
-  /// **'Failed to open conversation: {error}'**
+  /// **'Failed to open message: {error}'**
   String failedToOpenConversation(String error);
 
   /// Error message when jumping to message fails
@@ -2567,7 +2567,7 @@ abstract class AppLocalizations {
   /// Hint text for conversation title field
   ///
   /// In en, this message translates to:
-  /// **'Enter conversation title'**
+  /// **'Enter message title'**
   String get enterConversationTitle;
 
   /// Hint text for code input field
@@ -2633,7 +2633,7 @@ abstract class AppLocalizations {
   /// Success message when conversation is updated
   ///
   /// In en, this message translates to:
-  /// **'Conversation updated successfully'**
+  /// **'Message updated successfully'**
   String get conversationUpdatedSuccessfully;
 
   /// Button text to go back

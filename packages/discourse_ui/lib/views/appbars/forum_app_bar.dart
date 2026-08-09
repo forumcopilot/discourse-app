@@ -5,7 +5,7 @@ import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:get/get.dart';
 import '../search_page.dart';
-import '../members_page.dart';
+import '../users_directory_page.dart';
 import '../login_page.dart';
 import '../register_page.dart';
 import '../widgets/forum_actions.dart';
@@ -99,10 +99,10 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildMembersButton(BuildContext context, ColorScheme colorScheme) {
     return IconButton(
       icon: const Icon(Icons.people_alt_rounded),
-      tooltip: AppLocalizations.of(context)?.members ?? 'Members',
+      tooltip: 'Users',
       onPressed: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => MembersPage(siteContext: siteContext)),
+        MaterialPageRoute(builder: (_) => UsersDirectoryPage(siteContext: siteContext)),
       ),
     );
   }

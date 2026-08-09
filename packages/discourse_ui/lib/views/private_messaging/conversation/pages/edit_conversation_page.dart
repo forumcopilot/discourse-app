@@ -19,7 +19,6 @@ class EditConversationPage extends StatefulWidget {
 
 class _EditConversationPageState extends State<EditConversationPage> {
   late final TextEditingController _titleController;
-  bool? _openInvite;
   bool? _conversationOpen;
   bool _isSubmitting = false;
   bool _hasChanges = false;
@@ -74,7 +73,6 @@ class _EditConversationPageState extends State<EditConversationPage> {
       final result = await SiteProxyFactory.getPrivateConversationProxy().saveRawConversationAsync(
         widget.conversationId,
         conversationTitle: _titleController.text.trim(),
-        openInvite: _openInvite,
         conversationOpen: _conversationOpen,
       );
 
@@ -83,7 +81,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(errorMessage ?? AppLocalizations.of(context)?.failedToSaveConversation ?? 'Failed to save conversation'),
+              content: Text(errorMessage ?? AppLocalizations.of(context)?.failedToSaveConversation ?? 'Failed to save message'),
               backgroundColor: Theme.of(context).colorScheme.error,
               behavior: SnackBarBehavior.floating,
             ),
@@ -95,7 +93,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)?.conversationUpdatedSuccessfully ?? 'Conversation updated successfully'),
+            content: Text(AppLocalizations.of(context)?.conversationUpdatedSuccessfully ?? 'Message updated successfully'),
             backgroundColor: Theme.of(context).colorScheme.primary,
             behavior: SnackBarBehavior.floating,
           ),
@@ -183,7 +181,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                     ),
                     SizedBox(height: DesignTokens.spacingM),
                     Text(
-                      'Failed to load conversation',
+                      'Failed to load message',
                       style: textTheme.titleMedium?.copyWith(
                         color: colorScheme.error,
                       ),
@@ -262,9 +260,6 @@ class _EditConversationPageState extends State<EditConversationPage> {
               }
             });
           }
-          if (_openInvite == null) {
-            _openInvite = data.openInvite ?? false;
-          }
           if (_conversationOpen == null) {
             _conversationOpen = data.conversationOpen ?? true;
           }
@@ -286,7 +281,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                 TextField(
                   controller: _titleController,
                   decoration: InputDecoration(
-                    hintText: AppLocalizations.of(context)?.enterConversationTitle ?? 'Enter conversation title',
+                    hintText: AppLocalizations.of(context)?.enterConversationTitle ?? 'Enter message title',
                     hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                     filled: true,
                     fillColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
@@ -330,29 +325,6 @@ class _EditConversationPageState extends State<EditConversationPage> {
                       child: Column(
                         children: [
                           // Open Invite toggle
-                          SwitchListTile(
-                            title: Text(
-                              'Open Invite',
-                              style: textTheme.titleSmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                                fontWeight: DesignTokens.fontWeightMedium,
-                              ),
-                            ),
-                            subtitle: Text(
-                              'Allow any participant to invite others',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            value: _openInvite ?? false,
-                            onChanged: (value) {
-                              setState(() {
-                                _openInvite = value;
-                                _hasChanges = true;
-                              });
-                            },
-                            activeColor: colorScheme.primary,
-                          ),
                           Divider(
                             height: 1,
                             thickness: 1,
