@@ -306,6 +306,9 @@ class _NewTopicPageState extends State<NewTopicPage> {
           ? TagInputField(
               initial: _tags,
               onChanged: (tags) => _tags = tags,
+              allowCreate: DiscourseSiteCapabilities.forSite(
+                      widget.siteContext.site.pluginUrl)
+                  .canCreateTag,
             )
           : null,
       onFileUpload: (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false) ? _handleFileUpload : null,

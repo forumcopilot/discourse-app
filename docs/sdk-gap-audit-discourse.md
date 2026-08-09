@@ -243,9 +243,18 @@ chat probe. The rest below is still unread.
   the tag field when the forum says this user may tag. Before, the field
   was always shown and the server refused the tags on submit: the user
   typed them, lost them, and learned why only after the round trip.
-  Verified by data (meta answers `can_tag_topics: false`), not visually —
-  the compose entry point is not on the Home screen.
-  `can_create_tag` / `can_tag_pms` remain unread.
+  **Now verified on device**, and the earlier note here was misleading:
+  meta answers `can_tag_topics: false` to a *guest* but `true` to the
+  signed-in TL1 account, so the field correctly appears. Confirmed by
+  reading `/site.json` from the logged-in browser session rather than
+  anonymously — worth remembering that every capability on that payload is
+  per-viewer.
+
+  `can_create_tag` is now read too, and it is the sharper case: meta lets
+  that same TL1 user *apply* existing tags but not *invent* new ones. The
+  field accepted free text on Enter, which the server would then reject on
+  submit — losing every tag on the post. Typing an unknown tag now simply
+  does not commit; suggestions still do. `can_tag_pms` remains unread.
 - ~~**`censored_regexp`, `watched_words_replace`, `watched_words_link`**~~
   — **withdrawn; this entry was wrong.** Discourse feeds these into
   `PrettyText.cook` on the *server* (`lib/pretty_text.rb`), so the

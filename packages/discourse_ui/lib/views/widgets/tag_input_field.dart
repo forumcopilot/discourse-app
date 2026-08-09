@@ -33,6 +33,13 @@ class TagInputField extends StatefulWidget {
   /// will reject if exceeded).
   final int? maxTags;
 
+  /// Whether the user may invent tags that do not exist yet
+  /// (`can_create_tag`). When false, only tags picked from the suggestion
+  /// list commit — typing a new one and pressing Enter does nothing here
+  /// rather than being accepted and then rejected by the server on submit,
+  /// which loses the whole post's tags.
+  final bool allowCreate;
+
   /// Label shown above the chips when the user hasn't entered any
   /// tags yet.
   final String label;
@@ -43,6 +50,7 @@ class TagInputField extends StatefulWidget {
     this.onChanged,
     this.maxTags = 5,
     this.label = 'Tags',
+    this.allowCreate = true,
   });
 
   @override
@@ -105,6 +113,13 @@ class _TagInputFieldState extends State<TagInputField> {
   }
 
   void _commit(String raw) {
+    // Refuse to invent a tag the forum will not accept. Suggestions are
+    // existing tags, so committing one of those is always fine.
+    if (!widget.allowCreate) {
+      final candidate = raw.trim().toLowerCase();
+      final known = _suggestions.map((s) => s.toLowerCase()).toSet();
+      if (candidate.isEmpty || !known.contains(candidate)) return;
+    }
     final candidates = raw
         .split(RegExp(r'[\s,]+'))
         .map((t) => t.trim().toLowerCase())

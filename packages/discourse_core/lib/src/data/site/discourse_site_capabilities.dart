@@ -25,6 +25,12 @@ class DiscourseSiteCapabilities {
   /// composer offers tagging without this and lets the server refuse.
   bool canTagTopics = false;
 
+  /// Whether the user may create tags that do not exist yet
+  /// (`can_create_tag`). Distinct from [canTagTopics]: meta lets a TL1 user
+  /// apply existing tags but not invent new ones, so a composer that
+  /// accepts free text there loses whatever the user typed.
+  bool canCreateTag = false;
+
   /// The forum's uncategorized category id, or null. Rows in it should not
   /// wear a category badge — web hides it.
   int? uncategorizedCategoryId;
@@ -70,6 +76,7 @@ class DiscourseSiteCapabilities {
     final caps = _bySite.putIfAbsent(pluginUrl, DiscourseSiteCapabilities._);
     caps.topMenuItems = menu;
     caps.canTagTopics = site['can_tag_topics'] == true;
+    caps.canCreateTag = site['can_create_tag'] == true;
     caps.uncategorizedCategoryId = site['uncategorized_category_id'] as int?;
     caps.categories = ((site['categories'] as List?) ?? const [])
         .whereType<Map>()
