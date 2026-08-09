@@ -230,6 +230,13 @@ but it blocked auditing these screens. See "Session lost" below.
   sequenced BEFORE `logoutUserAsync`, which clears the credentials the
   client id is derived from.
 
+## 9b. Threading — done
+
+Both halves now render: "in reply to X" walks a conversation upwards
+(tappable, scrolls to the parent), and an "N replies" disclosure walks it
+down (fetched on expand). Verified on meta against topics with real
+branching.
+
 ## 10. Cross-cutting
 
 - **Anonymous chat fetch — fixed** (`bf73875`). `GET /chat/api/me/channels`

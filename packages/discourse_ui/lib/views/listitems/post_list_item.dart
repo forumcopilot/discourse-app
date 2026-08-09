@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:discourse_core/discourse_core.dart' show DiscourseAcceptedAnswer;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseAcceptedAnswer, DiscoursePostProxy, stripHtmlToText;
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/views/widgets/solution_summary_card.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -182,6 +183,10 @@ class _PostListItemState extends State<PostListItem> {
   late bool _isLiked;
   late bool _isBookmarked;
   bool _bookmarkInFlight = false;
+  bool _repliesExpanded = false;
+  bool _isLoadingReplies = false;
+  List<FCPost>? _replies;
+  String? _repliesError;
   late final PostController _postsController;
   late int _likeCount; // Add local state for like count
   late final PostActionsHandler _postActionsHandler;
@@ -305,6 +310,169 @@ class _PostListItemState extends State<PostListItem> {
   /// Tapping scrolls to the parent. Falls back to the post number when the
   /// payload names no user — Discourse omits `reply_to_user` when the target
   /// is the opening post, so a missing name is not a missing parent.
+
+  /// "2 Replies" disclosure, as web shows under a post that was answered.
+  ///
+  /// The counterpart to the "in reply to" row above: that one walks a
+  /// conversation upwards, this one walks it down. Together they are what
+  /// makes a Discourse topic navigable as a conversation rather than a
+  /// list.
+  ///
+  /// Collapsed by default and fetched only on expand — a topic can have
+  /// dozens of answered posts, and pre-loading every child would cost a
+  /// request each for replies most readers never open.
+  Widget _buildRepliesDisclosure(
+      BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
+    if (widget.post.replyCount <= 0) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context);
+    final count = widget.post.replyCount;
+    final label = l10n?.nReplies(count) ?? (count == 1 ? '1 reply' : '$count replies');
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0,
+          DesignTokens.spacingL, DesignTokens.spacingS),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: _isLoadingReplies ? null : _toggleReplies,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingXS),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    _repliesExpanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    size: 18,
+                    color: colorScheme.primary,
+                  ),
+                  SizedBox(width: DesignTokens.spacingXS),
+                  Text(
+                    label,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: DesignTokens.fontWeightMedium,
+                    ),
+                  ),
+                  if (_isLoadingReplies) ...[
+                    SizedBox(width: DesignTokens.spacingS),
+                    SizedBox(
+                      width: 12,
+                      height: 12,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          if (_repliesExpanded && _repliesError != null)
+            Padding(
+              padding: EdgeInsets.only(top: DesignTokens.spacingXS),
+              child: Text(
+                _repliesError!,
+                style: textTheme.bodySmall
+                    ?.copyWith(color: colorScheme.error),
+              ),
+            ),
+          if (_repliesExpanded && _replies != null)
+            for (final reply in _replies!)
+              _buildReplyPreview(reply, colorScheme, textTheme),
+        ],
+      ),
+    );
+  }
+
+  /// A compact rendering of a child post. Deliberately not a full
+  /// PostListItem: these are nested inside another post, and a second set
+  /// of avatars, action rows and dividers would read as the topic having
+  /// restarted.
+  Widget _buildReplyPreview(
+      FCPost reply, ColorScheme colorScheme, TextTheme textTheme) {
+    return Container(
+      margin: EdgeInsets.only(top: DesignTokens.spacingS),
+      padding: EdgeInsets.all(DesignTokens.spacingM),
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(color: colorScheme.outlineVariant, width: 2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              UserAvatar(
+                username: reply.authorName,
+                iconUrl: reply.authorIconUrl,
+                radius: 10,
+              ),
+              SizedBox(width: DesignTokens.spacingS),
+              Flexible(
+                child: Text(
+                  reply.authorName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: DesignTokens.fontWeightMedium,
+                  ),
+                ),
+              ),
+              if (reply.postNumber != null) ...[
+                SizedBox(width: DesignTokens.spacingS),
+                Text(
+                  '#${reply.postNumber}',
+                  style: textTheme.bodySmall
+                      ?.copyWith(color: colorScheme.onSurfaceVariant),
+                ),
+              ],
+            ],
+          ),
+          SizedBox(height: DesignTokens.spacingXS),
+          Text(
+            stripHtmlToText(reply.content),
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+            style: textTheme.bodyMedium
+                ?.copyWith(color: colorScheme.onSurfaceVariant),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _toggleReplies() async {
+    if (_repliesExpanded) {
+      setState(() => _repliesExpanded = false);
+      return;
+    }
+    // Fetched once and kept — collapsing and reopening should not re-ask.
+    if (_replies != null) {
+      setState(() => _repliesExpanded = true);
+      return;
+    }
+    setState(() {
+      _isLoadingReplies = true;
+      _repliesError = null;
+    });
+    final proxy = SiteProxyService.getPostProxy();
+    final replies = proxy is DiscoursePostProxy
+        ? await proxy.getPostRepliesAsync(widget.post.id,
+            topicId: widget.threadId)
+        : null;
+    if (!mounted) return;
+    setState(() {
+      _isLoadingReplies = false;
+      _repliesExpanded = true;
+      _replies = replies;
+      _repliesError = replies == null ? "Couldn't load replies." : null;
+    });
+  }
+
   Widget _buildReplyToIndicator(
       BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
     final target = widget.post.replyToPostNumber!;
@@ -803,6 +971,7 @@ class _PostListItemState extends State<PostListItem> {
                           widget.acceptedAnswer!.postNumber),
                 ),
               ),
+            _buildRepliesDisclosure(context, colorScheme, textTheme),
             _buildBottomDivider(colorScheme),
           ],
         ),

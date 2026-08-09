@@ -1467,5 +1467,14 @@
   "chatWithUser": "Chat",
   "@chatWithUser": {
     "description": "Button opening a chat with the profile owner"
+  },
+  "nReplies": "{count, plural, =1{1 reply} other{{count} replies}}",
+  "@nReplies": {
+    "description": "Disclosure under a post listing its direct replies",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

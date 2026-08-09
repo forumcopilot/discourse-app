@@ -2953,6 +2953,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Chat'**
   String get chatWithUser;
+
+  /// Disclosure under a post listing its direct replies
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 reply} other{{count} replies}}'**
+  String nReplies(int count);
 }
 
 class _AppLocalizationsDelegate

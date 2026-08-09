@@ -159,10 +159,16 @@ differences rather than payload inferences:
   `ddee877`). Up to five overlapping faces per row, "+N" beyond that,
   skipped when a topic has a single voice. Built from `posters[]` joined
   against the `users[]` the same payload ships, so no extra request.
-- **"N Replies" expander under a post.** Web summarises replies *to* a
-  post and expands them inline. `replyCount` is now on `FCPost` (unused so
-  far), and `/posts/{id}/replies` returns the children — this is the other
-  half of threading.
+- ~~**"N Replies" expander under a post.**~~ **Done.** Renders when
+  `replyCount > 0`, fetching `/posts/{id}/replies` only on expand — a
+  topic can have dozens of answered posts, and pre-loading every child
+  would cost a request each for replies most readers never open. Children
+  render compactly (avatar, name, post number, excerpt) rather than as
+  full posts, which would read as the topic having restarted. Fetched once
+  and kept, so collapsing and reopening does not re-ask.
+
+  With the "in reply to" row above it, a topic is now navigable as a
+  conversation in both directions.
 - ~~**A "Hot" tab.**~~ **Done.** The Home sub-tabs are now Latest / Hot /
   New / Unread / Top, matching web's order, with Hot backed by
   `/hot.json` and shown only when `/site.json`'s `top_menu_items` lists

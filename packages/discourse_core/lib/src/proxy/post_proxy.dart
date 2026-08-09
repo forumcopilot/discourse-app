@@ -1678,6 +1678,36 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   static final DateTime _noTimestamp =
       DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
 
+  /// The posts that reply directly to [postId] (`GET /posts/{id}/replies`).
+  ///
+  /// Discourse-only: the SDK's XenForo-shaped contract has no notion of a
+  /// post's children, so this is not on [IFCPostProxy]. The endpoint
+  /// returns bare post objects in the same shape as the topic's
+  /// post_stream, so they parse through the same mapper.
+  ///
+  /// Returns null when the request fails, so a caller can tell "no replies"
+  /// (empty list) from "could not load" and say so.
+  Future<List<FCPost>?> getPostRepliesAsync(
+    String postId, {
+    required String topicId,
+  }) async {
+    if (postId.isEmpty) return null;
+    try {
+      // The endpoint answers a bare JSON array; BaseDiscourseProxy wraps a
+      // non-object top level under `_value` so every proxy can keep a Map
+      // signature.
+      final response = await apiGet('/posts/$postId/replies');
+      final raw = response['_value'];
+      if (raw is! List) return null;
+      return raw
+          .whereType<Map>()
+          .map((e) => _postFrom(e.cast<String, dynamic>(), topicId: topicId))
+          .toList(growable: false);
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Ids of everyone who posted in the topic, from the topic-view
   /// serializer's `details.participants`.
   ///

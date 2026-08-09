@@ -1643,4 +1643,15 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get chatWithUser => 'Chat';
+
+  @override
+  String nReplies(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count replies',
+      one: '1 reply',
+    );
+    return '$_temp0';
+  }
 }
