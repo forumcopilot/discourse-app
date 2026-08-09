@@ -420,6 +420,32 @@ class TopicListItem extends StatelessWidget {
                           ],
                         ),
                       ],
+                      // Vote count, where the forum runs topic voting.
+                      // Web puts it on the row beside the other counts, and
+                      // on a feature-request list it is the number that
+                      // matters most.
+                      if (topic.voteCount > 0) ...[
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.arrow_upward,
+                              size: textTheme.bodySmall?.fontSize ?? 12,
+                              color: metaColor,
+                            ),
+                            SizedBox(width: DesignTokens.spacingXS),
+                            Text(
+                              AppLocalizations.of(context)
+                                      ?.nVotes(topic.voteCount) ??
+                                  '${topic.voteCount} votes',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: metaColor,
+                                letterSpacing: DesignTokens.letterSpacingWide,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                       if (topic.viewCount > 0) ...[
                         Row(
                           mainAxisSize: MainAxisSize.min,

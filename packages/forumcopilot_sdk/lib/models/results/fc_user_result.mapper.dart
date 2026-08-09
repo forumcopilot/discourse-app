@@ -608,6 +608,12 @@ class FCLoginTwoStepResultMapper extends ClassMapperBase<FCLoginTwoStepResult> {
     opt: true,
     def: 0,
   );
+  static DateTime? _$lastSeenAt(FCLoginTwoStepResult v) => v.lastSeenAt;
+  static const Field<FCLoginTwoStepResult, DateTime> _f$lastSeenAt = Field(
+    'lastSeenAt',
+    _$lastSeenAt,
+    opt: true,
+  );
   static String? _$loginName(FCLoginTwoStepResult v) => v.loginName;
   static const Field<FCLoginTwoStepResult, String> _f$loginName = Field(
     'loginName',
@@ -902,6 +908,7 @@ class FCLoginTwoStepResultMapper extends ClassMapperBase<FCLoginTwoStepResult> {
     #profileViewCount: _f$profileViewCount,
     #canChatUser: _f$canChatUser,
     #badgeCount: _f$badgeCount,
+    #lastSeenAt: _f$lastSeenAt,
     #loginName: _f$loginName,
     #email: _f$email,
     #userType: _f$userType,
@@ -956,6 +963,7 @@ class FCLoginTwoStepResultMapper extends ClassMapperBase<FCLoginTwoStepResult> {
       profileViewCount: data.dec(_f$profileViewCount),
       canChatUser: data.dec(_f$canChatUser),
       badgeCount: data.dec(_f$badgeCount),
+      lastSeenAt: data.dec(_f$lastSeenAt),
       loginName: data.dec(_f$loginName),
       email: data.dec(_f$email),
       userType: data.dec(_f$userType),
@@ -1090,6 +1098,7 @@ abstract class FCLoginTwoStepResultCopyWith<
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    DateTime? lastSeenAt,
     String? loginName,
     String? email,
     String? userType,
@@ -1174,6 +1183,7 @@ class _FCLoginTwoStepResultCopyWithImpl<$R, $Out>
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    Object? lastSeenAt = $none,
     Object? loginName = $none,
     Object? email = $none,
     Object? userType = $none,
@@ -1226,6 +1236,7 @@ class _FCLoginTwoStepResultCopyWithImpl<$R, $Out>
       if (profileViewCount != null) #profileViewCount: profileViewCount,
       if (canChatUser != null) #canChatUser: canChatUser,
       if (badgeCount != null) #badgeCount: badgeCount,
+      if (lastSeenAt != $none) #lastSeenAt: lastSeenAt,
       if (loginName != $none) #loginName: loginName,
       if (email != $none) #email: email,
       if (userType != $none) #userType: userType,
@@ -1280,6 +1291,7 @@ class _FCLoginTwoStepResultCopyWithImpl<$R, $Out>
     profileViewCount: data.get(#profileViewCount, or: $value.profileViewCount),
     canChatUser: data.get(#canChatUser, or: $value.canChatUser),
     badgeCount: data.get(#badgeCount, or: $value.badgeCount),
+    lastSeenAt: data.get(#lastSeenAt, or: $value.lastSeenAt),
     loginName: data.get(#loginName, or: $value.loginName),
     email: data.get(#email, or: $value.email),
     userType: data.get(#userType, or: $value.userType),
@@ -1576,6 +1588,12 @@ class FCOnlineUserMapper extends ClassMapperBase<FCOnlineUser> {
     opt: true,
     def: 0,
   );
+  static DateTime? _$lastSeenAt(FCOnlineUser v) => v.lastSeenAt;
+  static const Field<FCOnlineUser, DateTime> _f$lastSeenAt = Field(
+    'lastSeenAt',
+    _$lastSeenAt,
+    opt: true,
+  );
   static String? _$loginName(FCOnlineUser v) => v.loginName;
   static const Field<FCOnlineUser, String> _f$loginName = Field(
     'loginName',
@@ -1787,6 +1805,7 @@ class FCOnlineUserMapper extends ClassMapperBase<FCOnlineUser> {
     #profileViewCount: _f$profileViewCount,
     #canChatUser: _f$canChatUser,
     #badgeCount: _f$badgeCount,
+    #lastSeenAt: _f$lastSeenAt,
     #loginName: _f$loginName,
     #email: _f$email,
     #userType: _f$userType,
@@ -1827,6 +1846,7 @@ class FCOnlineUserMapper extends ClassMapperBase<FCOnlineUser> {
       profileViewCount: data.dec(_f$profileViewCount),
       canChatUser: data.dec(_f$canChatUser),
       badgeCount: data.dec(_f$badgeCount),
+      lastSeenAt: data.dec(_f$lastSeenAt),
       loginName: data.dec(_f$loginName),
       email: data.dec(_f$email),
       userType: data.dec(_f$userType),
@@ -1939,6 +1959,7 @@ abstract class FCOnlineUserCopyWith<$R, $In extends FCOnlineUser, $Out>
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    DateTime? lastSeenAt,
     String? loginName,
     String? email,
     String? userType,
@@ -2007,6 +2028,7 @@ class _FCOnlineUserCopyWithImpl<$R, $Out>
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    Object? lastSeenAt = $none,
     Object? loginName = $none,
     Object? email = $none,
     Object? userType = $none,
@@ -2045,6 +2067,7 @@ class _FCOnlineUserCopyWithImpl<$R, $Out>
       if (profileViewCount != null) #profileViewCount: profileViewCount,
       if (canChatUser != null) #canChatUser: canChatUser,
       if (badgeCount != null) #badgeCount: badgeCount,
+      if (lastSeenAt != $none) #lastSeenAt: lastSeenAt,
       if (loginName != $none) #loginName: loginName,
       if (email != $none) #email: email,
       if (userType != $none) #userType: userType,
@@ -2085,6 +2108,7 @@ class _FCOnlineUserCopyWithImpl<$R, $Out>
     profileViewCount: data.get(#profileViewCount, or: $value.profileViewCount),
     canChatUser: data.get(#canChatUser, or: $value.canChatUser),
     badgeCount: data.get(#badgeCount, or: $value.badgeCount),
+    lastSeenAt: data.get(#lastSeenAt, or: $value.lastSeenAt),
     loginName: data.get(#loginName, or: $value.loginName),
     email: data.get(#email, or: $value.email),
     userType: data.get(#userType, or: $value.userType),
@@ -2194,6 +2218,12 @@ class FCUserInfoResultMapper extends ClassMapperBase<FCUserInfoResult> {
     _$badgeCount,
     opt: true,
     def: 0,
+  );
+  static DateTime? _$lastSeenAt(FCUserInfoResult v) => v.lastSeenAt;
+  static const Field<FCUserInfoResult, DateTime> _f$lastSeenAt = Field(
+    'lastSeenAt',
+    _$lastSeenAt,
+    opt: true,
   );
   static String? _$loginName(FCUserInfoResult v) => v.loginName;
   static const Field<FCUserInfoResult, String> _f$loginName = Field(
@@ -2559,6 +2589,7 @@ class FCUserInfoResultMapper extends ClassMapperBase<FCUserInfoResult> {
     #profileViewCount: _f$profileViewCount,
     #canChatUser: _f$canChatUser,
     #badgeCount: _f$badgeCount,
+    #lastSeenAt: _f$lastSeenAt,
     #loginName: _f$loginName,
     #email: _f$email,
     #userType: _f$userType,
@@ -2627,6 +2658,7 @@ class FCUserInfoResultMapper extends ClassMapperBase<FCUserInfoResult> {
       profileViewCount: data.dec(_f$profileViewCount),
       canChatUser: data.dec(_f$canChatUser),
       badgeCount: data.dec(_f$badgeCount),
+      lastSeenAt: data.dec(_f$lastSeenAt),
       loginName: data.dec(_f$loginName),
       email: data.dec(_f$email),
       userType: data.dec(_f$userType),
@@ -2769,6 +2801,7 @@ abstract class FCUserInfoResultCopyWith<$R, $In extends FCUserInfoResult, $Out>
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    DateTime? lastSeenAt,
     String? loginName,
     String? email,
     String? userType,
@@ -2876,6 +2909,7 @@ class _FCUserInfoResultCopyWithImpl<$R, $Out>
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    Object? lastSeenAt = $none,
     Object? loginName = $none,
     Object? email = $none,
     Object? userType = $none,
@@ -2942,6 +2976,7 @@ class _FCUserInfoResultCopyWithImpl<$R, $Out>
       if (profileViewCount != null) #profileViewCount: profileViewCount,
       if (canChatUser != null) #canChatUser: canChatUser,
       if (badgeCount != null) #badgeCount: badgeCount,
+      if (lastSeenAt != $none) #lastSeenAt: lastSeenAt,
       if (loginName != $none) #loginName: loginName,
       if (email != $none) #email: email,
       if (userType != $none) #userType: userType,
@@ -3011,6 +3046,7 @@ class _FCUserInfoResultCopyWithImpl<$R, $Out>
     profileViewCount: data.get(#profileViewCount, or: $value.profileViewCount),
     canChatUser: data.get(#canChatUser, or: $value.canChatUser),
     badgeCount: data.get(#badgeCount, or: $value.badgeCount),
+    lastSeenAt: data.get(#lastSeenAt, or: $value.lastSeenAt),
     loginName: data.get(#loginName, or: $value.loginName),
     email: data.get(#email, or: $value.email),
     userType: data.get(#userType, or: $value.userType),
@@ -4224,6 +4260,12 @@ class FCRecommendedUserMapper extends ClassMapperBase<FCRecommendedUser> {
     opt: true,
     def: 0,
   );
+  static DateTime? _$lastSeenAt(FCRecommendedUser v) => v.lastSeenAt;
+  static const Field<FCRecommendedUser, DateTime> _f$lastSeenAt = Field(
+    'lastSeenAt',
+    _$lastSeenAt,
+    opt: true,
+  );
   static String? _$loginName(FCRecommendedUser v) => v.loginName;
   static const Field<FCRecommendedUser, String> _f$loginName = Field(
     'loginName',
@@ -4443,6 +4485,7 @@ class FCRecommendedUserMapper extends ClassMapperBase<FCRecommendedUser> {
     #profileViewCount: _f$profileViewCount,
     #canChatUser: _f$canChatUser,
     #badgeCount: _f$badgeCount,
+    #lastSeenAt: _f$lastSeenAt,
     #loginName: _f$loginName,
     #email: _f$email,
     #userType: _f$userType,
@@ -4483,6 +4526,7 @@ class FCRecommendedUserMapper extends ClassMapperBase<FCRecommendedUser> {
       profileViewCount: data.dec(_f$profileViewCount),
       canChatUser: data.dec(_f$canChatUser),
       badgeCount: data.dec(_f$badgeCount),
+      lastSeenAt: data.dec(_f$lastSeenAt),
       loginName: data.dec(_f$loginName),
       email: data.dec(_f$email),
       userType: data.dec(_f$userType),
@@ -4604,6 +4648,7 @@ abstract class FCRecommendedUserCopyWith<
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    DateTime? lastSeenAt,
     String? loginName,
     String? email,
     String? userType,
@@ -4674,6 +4719,7 @@ class _FCRecommendedUserCopyWithImpl<$R, $Out>
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    Object? lastSeenAt = $none,
     Object? loginName = $none,
     Object? email = $none,
     Object? userType = $none,
@@ -4712,6 +4758,7 @@ class _FCRecommendedUserCopyWithImpl<$R, $Out>
       if (profileViewCount != null) #profileViewCount: profileViewCount,
       if (canChatUser != null) #canChatUser: canChatUser,
       if (badgeCount != null) #badgeCount: badgeCount,
+      if (lastSeenAt != $none) #lastSeenAt: lastSeenAt,
       if (loginName != $none) #loginName: loginName,
       if (email != $none) #email: email,
       if (userType != $none) #userType: userType,
@@ -4752,6 +4799,7 @@ class _FCRecommendedUserCopyWithImpl<$R, $Out>
     profileViewCount: data.get(#profileViewCount, or: $value.profileViewCount),
     canChatUser: data.get(#canChatUser, or: $value.canChatUser),
     badgeCount: data.get(#badgeCount, or: $value.badgeCount),
+    lastSeenAt: data.get(#lastSeenAt, or: $value.lastSeenAt),
     loginName: data.get(#loginName, or: $value.loginName),
     email: data.get(#email, or: $value.email),
     userType: data.get(#userType, or: $value.userType),
@@ -5046,6 +5094,12 @@ class FCSearchUserMapper extends ClassMapperBase<FCSearchUser> {
     opt: true,
     def: 0,
   );
+  static DateTime? _$lastSeenAt(FCSearchUser v) => v.lastSeenAt;
+  static const Field<FCSearchUser, DateTime> _f$lastSeenAt = Field(
+    'lastSeenAt',
+    _$lastSeenAt,
+    opt: true,
+  );
   static String? _$loginName(FCSearchUser v) => v.loginName;
   static const Field<FCSearchUser, String> _f$loginName = Field(
     'loginName',
@@ -5257,6 +5311,7 @@ class FCSearchUserMapper extends ClassMapperBase<FCSearchUser> {
     #profileViewCount: _f$profileViewCount,
     #canChatUser: _f$canChatUser,
     #badgeCount: _f$badgeCount,
+    #lastSeenAt: _f$lastSeenAt,
     #loginName: _f$loginName,
     #email: _f$email,
     #userType: _f$userType,
@@ -5297,6 +5352,7 @@ class FCSearchUserMapper extends ClassMapperBase<FCSearchUser> {
       profileViewCount: data.dec(_f$profileViewCount),
       canChatUser: data.dec(_f$canChatUser),
       badgeCount: data.dec(_f$badgeCount),
+      lastSeenAt: data.dec(_f$lastSeenAt),
       loginName: data.dec(_f$loginName),
       email: data.dec(_f$email),
       userType: data.dec(_f$userType),
@@ -5409,6 +5465,7 @@ abstract class FCSearchUserCopyWith<$R, $In extends FCSearchUser, $Out>
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    DateTime? lastSeenAt,
     String? loginName,
     String? email,
     String? userType,
@@ -5477,6 +5534,7 @@ class _FCSearchUserCopyWithImpl<$R, $Out>
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    Object? lastSeenAt = $none,
     Object? loginName = $none,
     Object? email = $none,
     Object? userType = $none,
@@ -5515,6 +5573,7 @@ class _FCSearchUserCopyWithImpl<$R, $Out>
       if (profileViewCount != null) #profileViewCount: profileViewCount,
       if (canChatUser != null) #canChatUser: canChatUser,
       if (badgeCount != null) #badgeCount: badgeCount,
+      if (lastSeenAt != $none) #lastSeenAt: lastSeenAt,
       if (loginName != $none) #loginName: loginName,
       if (email != $none) #email: email,
       if (userType != $none) #userType: userType,
@@ -5555,6 +5614,7 @@ class _FCSearchUserCopyWithImpl<$R, $Out>
     profileViewCount: data.get(#profileViewCount, or: $value.profileViewCount),
     canChatUser: data.get(#canChatUser, or: $value.canChatUser),
     badgeCount: data.get(#badgeCount, or: $value.badgeCount),
+    lastSeenAt: data.get(#lastSeenAt, or: $value.lastSeenAt),
     loginName: data.get(#loginName, or: $value.loginName),
     email: data.get(#email, or: $value.email),
     userType: data.get(#userType, or: $value.userType),
@@ -6125,6 +6185,12 @@ class FCIgnoredUserMapper extends ClassMapperBase<FCIgnoredUser> {
     opt: true,
     def: 0,
   );
+  static DateTime? _$lastSeenAt(FCIgnoredUser v) => v.lastSeenAt;
+  static const Field<FCIgnoredUser, DateTime> _f$lastSeenAt = Field(
+    'lastSeenAt',
+    _$lastSeenAt,
+    opt: true,
+  );
   static String? _$loginName(FCIgnoredUser v) => v.loginName;
   static const Field<FCIgnoredUser, String> _f$loginName = Field(
     'loginName',
@@ -6336,6 +6402,7 @@ class FCIgnoredUserMapper extends ClassMapperBase<FCIgnoredUser> {
     #profileViewCount: _f$profileViewCount,
     #canChatUser: _f$canChatUser,
     #badgeCount: _f$badgeCount,
+    #lastSeenAt: _f$lastSeenAt,
     #loginName: _f$loginName,
     #email: _f$email,
     #userType: _f$userType,
@@ -6376,6 +6443,7 @@ class FCIgnoredUserMapper extends ClassMapperBase<FCIgnoredUser> {
       profileViewCount: data.dec(_f$profileViewCount),
       canChatUser: data.dec(_f$canChatUser),
       badgeCount: data.dec(_f$badgeCount),
+      lastSeenAt: data.dec(_f$lastSeenAt),
       loginName: data.dec(_f$loginName),
       email: data.dec(_f$email),
       userType: data.dec(_f$userType),
@@ -6488,6 +6556,7 @@ abstract class FCIgnoredUserCopyWith<$R, $In extends FCIgnoredUser, $Out>
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    DateTime? lastSeenAt,
     String? loginName,
     String? email,
     String? userType,
@@ -6556,6 +6625,7 @@ class _FCIgnoredUserCopyWithImpl<$R, $Out>
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    Object? lastSeenAt = $none,
     Object? loginName = $none,
     Object? email = $none,
     Object? userType = $none,
@@ -6594,6 +6664,7 @@ class _FCIgnoredUserCopyWithImpl<$R, $Out>
       if (profileViewCount != null) #profileViewCount: profileViewCount,
       if (canChatUser != null) #canChatUser: canChatUser,
       if (badgeCount != null) #badgeCount: badgeCount,
+      if (lastSeenAt != $none) #lastSeenAt: lastSeenAt,
       if (loginName != $none) #loginName: loginName,
       if (email != $none) #email: email,
       if (userType != $none) #userType: userType,
@@ -6634,6 +6705,7 @@ class _FCIgnoredUserCopyWithImpl<$R, $Out>
     profileViewCount: data.get(#profileViewCount, or: $value.profileViewCount),
     canChatUser: data.get(#canChatUser, or: $value.canChatUser),
     badgeCount: data.get(#badgeCount, or: $value.badgeCount),
+    lastSeenAt: data.get(#lastSeenAt, or: $value.lastSeenAt),
     loginName: data.get(#loginName, or: $value.loginName),
     email: data.get(#email, or: $value.email),
     userType: data.get(#userType, or: $value.userType),

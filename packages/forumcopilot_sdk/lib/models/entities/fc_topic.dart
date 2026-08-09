@@ -77,6 +77,19 @@ class FCTopic with FCTopicMappable {
   /// `details.links`). 0 when unreported.
   int linkCount;
 
+  /// How many people have voted for this topic, where the platform has a
+  /// voting concept (Discourse: the `discourse-topic-voting` plugin's
+  /// `vote_count`). 0 when voting is off or unreported.
+  int voteCount;
+
+  /// Whether the current viewer may cast a vote here (`can_vote`). False
+  /// for guests, for forums without voting, and in categories where it is
+  /// not enabled — the server's answer, not a guess from vote_count.
+  bool canVote;
+
+  /// Whether the viewer has already voted (`user_voted`).
+  bool userVoted;
+
   /// Number of replies in the topic
   int replyCount;
 
@@ -238,5 +251,8 @@ class FCTopic with FCTopicMappable {
     this.participantCount = 0,
     this.linkCount = 0,
     this.participantIconUrls = const [],
+    this.voteCount = 0,
+    this.canVote = false,
+    this.userVoted = false,
   });
 }

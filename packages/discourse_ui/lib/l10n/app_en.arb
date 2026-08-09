@@ -1476,5 +1476,18 @@
         "type": "int"
       }
     }
+  },
+  "nVotes": "{count, plural, =1{1 vote} other{{count} votes}}",
+  "@nVotes": {
+    "description": "Vote count on a topic row",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lastSeen": "Seen",
+  "@lastSeen": {
+    "description": "Profile stat: when the user was last online"
   }
 }

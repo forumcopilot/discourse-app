@@ -192,9 +192,10 @@ differences rather than payload inferences:
   topic summary. Strongly identified with modern Discourse.
 - **`related_topics`** — distinct from the suggested-topics footer the app
   already renders.
-- `can_vote` / `vote_count` / `user_voted` (topic voting), `thumbnails`
-  (list-row images), `featured_link`, `word_count`, `pinned_until` /
-  `unpinned` (per-user unpin, distinct from the app's `isPinned`).
+- ~~`can_vote` / `vote_count` / `user_voted`~~ — **done.** Topic rows show
+  "N votes" where the forum runs topic voting. `thumbnails` (list-row
+  images), `featured_link`, `word_count`, `pinned_until` / `unpinned`
+  (per-user unpin, distinct from the app's `isPinned`) remain.
 
 ### User / profile
 
@@ -202,6 +203,9 @@ differences rather than payload inferences:
   density the audit §2 already calls thin.
 - `can_send_private_messages` — the app decides whether to show Send
   Message without asking the server.
+- ~~`last_seen_at`~~ — **done**; the profile shows Seen beside Last
+  Activity. They are different facts: a lurker reads daily and posts
+  rarely.
 - `muted`, `invited_by`, `pending_count`, `can_edit_name` /
   `can_edit_username` / `can_edit_email`.
 
@@ -238,9 +242,13 @@ chat probe. The rest below is still unread.
   Verified by data (meta answers `can_tag_topics: false`), not visually —
   the compose entry point is not on the Home screen.
   `can_create_tag` / `can_tag_pms` remain unread.
-- **`censored_regexp`, `watched_words_replace`, `watched_words_link`** —
-  watched words. Web applies these client-side; the app does not, so
-  moderated text can render raw.
+- ~~**`censored_regexp`, `watched_words_replace`, `watched_words_link`**~~
+  — **withdrawn; this entry was wrong.** Discourse feeds these into
+  `PrettyText.cook` on the *server* (`lib/pretty_text.rb`), so the
+  `cooked` HTML the app renders is already censored and replaced. They
+  matter only to a client that cooks markdown itself for a live composer
+  preview, which this app does not — it posts markdown and lets the server
+  cook. Applying them to cooked content would be redundant.
 - `hashtag_configurations` / `hashtag_icons` — `#hashtag` rendering inside
   cooked content.
 - ~~`tos_url`, `privacy_policy_url`~~ — **done.** Both render in Settings

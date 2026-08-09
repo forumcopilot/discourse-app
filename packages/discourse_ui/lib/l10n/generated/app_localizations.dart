@@ -2959,6 +2959,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 reply} other{{count} replies}}'**
   String nReplies(int count);
+
+  /// Vote count on a topic row
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 vote} other{{count} votes}}'**
+  String nVotes(int count);
+
+  /// Profile stat: when the user was last online
+  ///
+  /// In en, this message translates to:
+  /// **'Seen'**
+  String get lastSeen;
 }
 
 class _AppLocalizationsDelegate

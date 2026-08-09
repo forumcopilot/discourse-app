@@ -166,6 +166,9 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         // carries details.links; list rows do not.
         linkCount: ((details['links'] as List?) ?? const []).length,
         isHot: (t['is_hot'] as bool?) ?? false,
+        voteCount: (t['vote_count'] as int?) ?? 0,
+        canVote: t['can_vote'] == true,
+        userVoted: t['user_voted'] == true,
         isPinned: (t['pinned'] as bool?) ?? false,
         isAnnouncement: (t['pinned_globally'] as bool?) ?? false,
         url: '${siteContext.site.url}/t/$id',
@@ -259,6 +262,9 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         // carries details.links; list rows do not.
         linkCount: ((details['links'] as List?) ?? const []).length,
         isHot: (t['is_hot'] as bool?) ?? false,
+        voteCount: (t['vote_count'] as int?) ?? 0,
+        canVote: t['can_vote'] == true,
+        userVoted: t['user_voted'] == true,
         poll: poll,
       );
     } catch (e) {
@@ -360,6 +366,9 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         // carries details.links; list rows do not.
         linkCount: ((details['links'] as List?) ?? const []).length,
         isHot: (t['is_hot'] as bool?) ?? false,
+        voteCount: (t['vote_count'] as int?) ?? 0,
+        canVote: t['can_vote'] == true,
+        userVoted: t['user_voted'] == true,
         poll: poll,
       );
     } catch (e) {

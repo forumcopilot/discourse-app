@@ -527,6 +527,11 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         profileViewCount: (user['profile_view_count'] as int?) ?? 0,
         canChatUser: user['can_chat_user'] == true,
         badgeCount: (user['badge_count'] as int?) ?? 0,
+        // Last seen online, which forum profiles show beside last post —
+        // a lurker reads daily and posts rarely, and the two dates say
+        // very different things about them.
+        lastSeenAt:
+            DateTime.tryParse(user['last_seen_at']?.toString() ?? ''),
         canSearch: false,
         currentActivity: null,
         currentTopicId: null,

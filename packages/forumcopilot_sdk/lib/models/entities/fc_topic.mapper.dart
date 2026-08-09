@@ -374,6 +374,27 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     opt: true,
     def: const [],
   );
+  static int _$voteCount(FCTopic v) => v.voteCount;
+  static const Field<FCTopic, int> _f$voteCount = Field(
+    'voteCount',
+    _$voteCount,
+    opt: true,
+    def: 0,
+  );
+  static bool _$canVote(FCTopic v) => v.canVote;
+  static const Field<FCTopic, bool> _f$canVote = Field(
+    'canVote',
+    _$canVote,
+    opt: true,
+    def: false,
+  );
+  static bool _$userVoted(FCTopic v) => v.userVoted;
+  static const Field<FCTopic, bool> _f$userVoted = Field(
+    'userVoted',
+    _$userVoted,
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<FCTopic> fields = const {
@@ -432,6 +453,9 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     #participantCount: _f$participantCount,
     #linkCount: _f$linkCount,
     #participantIconUrls: _f$participantIconUrls,
+    #voteCount: _f$voteCount,
+    #canVote: _f$canVote,
+    #userVoted: _f$userVoted,
   };
 
   static FCTopic _instantiate(DecodingData data) {
@@ -491,6 +515,9 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
       participantCount: data.dec(_f$participantCount),
       linkCount: data.dec(_f$linkCount),
       participantIconUrls: data.dec(_f$participantIconUrls),
+      voteCount: data.dec(_f$voteCount),
+      canVote: data.dec(_f$canVote),
+      userVoted: data.dec(_f$userVoted),
     );
   }
 
@@ -613,6 +640,9 @@ abstract class FCTopicCopyWith<$R, $In extends FCTopic, $Out>
     int? participantCount,
     int? linkCount,
     List<String>? participantIconUrls,
+    int? voteCount,
+    bool? canVote,
+    bool? userVoted,
   });
   FCTopicCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -706,6 +736,9 @@ class _FCTopicCopyWithImpl<$R, $Out>
     int? participantCount,
     int? linkCount,
     List<String>? participantIconUrls,
+    int? voteCount,
+    bool? canVote,
+    bool? userVoted,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -765,6 +798,9 @@ class _FCTopicCopyWithImpl<$R, $Out>
       if (linkCount != null) #linkCount: linkCount,
       if (participantIconUrls != null)
         #participantIconUrls: participantIconUrls,
+      if (voteCount != null) #voteCount: voteCount,
+      if (canVote != null) #canVote: canVote,
+      if (userVoted != null) #userVoted: userVoted,
     }),
   );
   @override
@@ -833,6 +869,9 @@ class _FCTopicCopyWithImpl<$R, $Out>
       #participantIconUrls,
       or: $value.participantIconUrls,
     ),
+    voteCount: data.get(#voteCount, or: $value.voteCount),
+    canVote: data.get(#canVote, or: $value.canVote),
+    userVoted: data.get(#userVoted, or: $value.userVoted),
   );
 
   @override

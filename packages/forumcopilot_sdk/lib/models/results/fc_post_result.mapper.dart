@@ -409,6 +409,27 @@ class FCThreadResultMapper extends ClassMapperBase<FCThreadResult> {
         opt: true,
         def: const [],
       );
+  static int _$voteCount(FCThreadResult v) => v.voteCount;
+  static const Field<FCThreadResult, int> _f$voteCount = Field(
+    'voteCount',
+    _$voteCount,
+    opt: true,
+    def: 0,
+  );
+  static bool _$canVote(FCThreadResult v) => v.canVote;
+  static const Field<FCThreadResult, bool> _f$canVote = Field(
+    'canVote',
+    _$canVote,
+    opt: true,
+    def: false,
+  );
+  static bool _$userVoted(FCThreadResult v) => v.userVoted;
+  static const Field<FCThreadResult, bool> _f$userVoted = Field(
+    'userVoted',
+    _$userVoted,
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<FCThreadResult> fields = const {
@@ -471,6 +492,9 @@ class FCThreadResultMapper extends ClassMapperBase<FCThreadResult> {
     #participantCount: _f$participantCount,
     #linkCount: _f$linkCount,
     #participantIconUrls: _f$participantIconUrls,
+    #voteCount: _f$voteCount,
+    #canVote: _f$canVote,
+    #userVoted: _f$userVoted,
   };
 
   static FCThreadResult _instantiate(DecodingData data) {
@@ -534,6 +558,9 @@ class FCThreadResultMapper extends ClassMapperBase<FCThreadResult> {
       participantCount: data.dec(_f$participantCount),
       linkCount: data.dec(_f$linkCount),
       participantIconUrls: data.dec(_f$participantIconUrls),
+      voteCount: data.dec(_f$voteCount),
+      canVote: data.dec(_f$canVote),
+      userVoted: data.dec(_f$userVoted),
     );
   }
 
@@ -671,6 +698,9 @@ abstract class FCThreadResultCopyWith<$R, $In extends FCThreadResult, $Out>
     int? participantCount,
     int? linkCount,
     List<String>? participantIconUrls,
+    int? voteCount,
+    bool? canVote,
+    bool? userVoted,
   });
   FCThreadResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -777,6 +807,9 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
     int? participantCount,
     int? linkCount,
     List<String>? participantIconUrls,
+    int? voteCount,
+    bool? canVote,
+    bool? userVoted,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -840,6 +873,9 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
       if (linkCount != null) #linkCount: linkCount,
       if (participantIconUrls != null)
         #participantIconUrls: participantIconUrls,
+      if (voteCount != null) #voteCount: voteCount,
+      if (canVote != null) #canVote: canVote,
+      if (userVoted != null) #userVoted: userVoted,
     }),
   );
   @override
@@ -912,6 +948,9 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
       #participantIconUrls,
       or: $value.participantIconUrls,
     ),
+    voteCount: data.get(#voteCount, or: $value.voteCount),
+    canVote: data.get(#canVote, or: $value.canVote),
+    userVoted: data.get(#userVoted, or: $value.userVoted),
   );
 
   @override
@@ -1328,6 +1367,27 @@ class FCThreadByUnreadResultMapper
     opt: true,
     def: const [],
   );
+  static int _$voteCount(FCThreadByUnreadResult v) => v.voteCount;
+  static const Field<FCThreadByUnreadResult, int> _f$voteCount = Field(
+    'voteCount',
+    _$voteCount,
+    opt: true,
+    def: 0,
+  );
+  static bool _$canVote(FCThreadByUnreadResult v) => v.canVote;
+  static const Field<FCThreadByUnreadResult, bool> _f$canVote = Field(
+    'canVote',
+    _$canVote,
+    opt: true,
+    def: false,
+  );
+  static bool _$userVoted(FCThreadByUnreadResult v) => v.userVoted;
+  static const Field<FCThreadByUnreadResult, bool> _f$userVoted = Field(
+    'userVoted',
+    _$userVoted,
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<FCThreadByUnreadResult> fields = const {
@@ -1391,6 +1451,9 @@ class FCThreadByUnreadResultMapper
     #participantCount: _f$participantCount,
     #linkCount: _f$linkCount,
     #participantIconUrls: _f$participantIconUrls,
+    #voteCount: _f$voteCount,
+    #canVote: _f$canVote,
+    #userVoted: _f$userVoted,
   };
 
   static FCThreadByUnreadResult _instantiate(DecodingData data) {
@@ -1455,6 +1518,9 @@ class FCThreadByUnreadResultMapper
       participantCount: data.dec(_f$participantCount),
       linkCount: data.dec(_f$linkCount),
       participantIconUrls: data.dec(_f$participantIconUrls),
+      voteCount: data.dec(_f$voteCount),
+      canVote: data.dec(_f$canVote),
+      userVoted: data.dec(_f$userVoted),
     );
   }
 
@@ -1601,6 +1667,9 @@ abstract class FCThreadByUnreadResultCopyWith<
     int? participantCount,
     int? linkCount,
     List<String>? participantIconUrls,
+    int? voteCount,
+    bool? canVote,
+    bool? userVoted,
   });
   FCThreadByUnreadResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -1709,6 +1778,9 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
     int? participantCount,
     int? linkCount,
     List<String>? participantIconUrls,
+    int? voteCount,
+    bool? canVote,
+    bool? userVoted,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -1773,6 +1845,9 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
       if (linkCount != null) #linkCount: linkCount,
       if (participantIconUrls != null)
         #participantIconUrls: participantIconUrls,
+      if (voteCount != null) #voteCount: voteCount,
+      if (canVote != null) #canVote: canVote,
+      if (userVoted != null) #userVoted: userVoted,
     }),
   );
   @override
@@ -1846,6 +1921,9 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
       #participantIconUrls,
       or: $value.participantIconUrls,
     ),
+    voteCount: data.get(#voteCount, or: $value.voteCount),
+    canVote: data.get(#canVote, or: $value.canVote),
+    userVoted: data.get(#userVoted, or: $value.userVoted),
   );
 
   @override
@@ -2264,6 +2342,27 @@ class FCThreadByPostResultMapper extends ClassMapperBase<FCThreadByPostResult> {
     opt: true,
     def: const [],
   );
+  static int _$voteCount(FCThreadByPostResult v) => v.voteCount;
+  static const Field<FCThreadByPostResult, int> _f$voteCount = Field(
+    'voteCount',
+    _$voteCount,
+    opt: true,
+    def: 0,
+  );
+  static bool _$canVote(FCThreadByPostResult v) => v.canVote;
+  static const Field<FCThreadByPostResult, bool> _f$canVote = Field(
+    'canVote',
+    _$canVote,
+    opt: true,
+    def: false,
+  );
+  static bool _$userVoted(FCThreadByPostResult v) => v.userVoted;
+  static const Field<FCThreadByPostResult, bool> _f$userVoted = Field(
+    'userVoted',
+    _$userVoted,
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<FCThreadByPostResult> fields = const {
@@ -2327,6 +2426,9 @@ class FCThreadByPostResultMapper extends ClassMapperBase<FCThreadByPostResult> {
     #participantCount: _f$participantCount,
     #linkCount: _f$linkCount,
     #participantIconUrls: _f$participantIconUrls,
+    #voteCount: _f$voteCount,
+    #canVote: _f$canVote,
+    #userVoted: _f$userVoted,
   };
 
   static FCThreadByPostResult _instantiate(DecodingData data) {
@@ -2391,6 +2493,9 @@ class FCThreadByPostResultMapper extends ClassMapperBase<FCThreadByPostResult> {
       participantCount: data.dec(_f$participantCount),
       linkCount: data.dec(_f$linkCount),
       participantIconUrls: data.dec(_f$participantIconUrls),
+      voteCount: data.dec(_f$voteCount),
+      canVote: data.dec(_f$canVote),
+      userVoted: data.dec(_f$userVoted),
     );
   }
 
@@ -2537,6 +2642,9 @@ abstract class FCThreadByPostResultCopyWith<
     int? participantCount,
     int? linkCount,
     List<String>? participantIconUrls,
+    int? voteCount,
+    bool? canVote,
+    bool? userVoted,
   });
   FCThreadByPostResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -2644,6 +2752,9 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
     int? participantCount,
     int? linkCount,
     List<String>? participantIconUrls,
+    int? voteCount,
+    bool? canVote,
+    bool? userVoted,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -2708,6 +2819,9 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
       if (linkCount != null) #linkCount: linkCount,
       if (participantIconUrls != null)
         #participantIconUrls: participantIconUrls,
+      if (voteCount != null) #voteCount: voteCount,
+      if (canVote != null) #canVote: canVote,
+      if (userVoted != null) #userVoted: userVoted,
     }),
   );
   @override
@@ -2781,6 +2895,9 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
       #participantIconUrls,
       or: $value.participantIconUrls,
     ),
+    voteCount: data.get(#voteCount, or: $value.voteCount),
+    canVote: data.get(#canVote, or: $value.canVote),
+    userVoted: data.get(#userVoted, or: $value.userVoted),
   );
 
   @override
@@ -4178,6 +4295,27 @@ class FCAnnouncementResultMapper extends ClassMapperBase<FCAnnouncementResult> {
     opt: true,
     def: const [],
   );
+  static int _$voteCount(FCAnnouncementResult v) => v.voteCount;
+  static const Field<FCAnnouncementResult, int> _f$voteCount = Field(
+    'voteCount',
+    _$voteCount,
+    opt: true,
+    def: 0,
+  );
+  static bool _$canVote(FCAnnouncementResult v) => v.canVote;
+  static const Field<FCAnnouncementResult, bool> _f$canVote = Field(
+    'canVote',
+    _$canVote,
+    opt: true,
+    def: false,
+  );
+  static bool _$userVoted(FCAnnouncementResult v) => v.userVoted;
+  static const Field<FCAnnouncementResult, bool> _f$userVoted = Field(
+    'userVoted',
+    _$userVoted,
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<FCAnnouncementResult> fields = const {
@@ -4242,6 +4380,9 @@ class FCAnnouncementResultMapper extends ClassMapperBase<FCAnnouncementResult> {
     #participantCount: _f$participantCount,
     #linkCount: _f$linkCount,
     #participantIconUrls: _f$participantIconUrls,
+    #voteCount: _f$voteCount,
+    #canVote: _f$canVote,
+    #userVoted: _f$userVoted,
   };
 
   static FCAnnouncementResult _instantiate(DecodingData data) {
@@ -4307,6 +4448,9 @@ class FCAnnouncementResultMapper extends ClassMapperBase<FCAnnouncementResult> {
       participantCount: data.dec(_f$participantCount),
       linkCount: data.dec(_f$linkCount),
       participantIconUrls: data.dec(_f$participantIconUrls),
+      voteCount: data.dec(_f$voteCount),
+      canVote: data.dec(_f$canVote),
+      userVoted: data.dec(_f$userVoted),
     );
   }
 
@@ -4454,6 +4598,9 @@ abstract class FCAnnouncementResultCopyWith<
     int? participantCount,
     int? linkCount,
     List<String>? participantIconUrls,
+    int? voteCount,
+    bool? canVote,
+    bool? userVoted,
   });
   FCAnnouncementResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -4562,6 +4709,9 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
     int? participantCount,
     int? linkCount,
     List<String>? participantIconUrls,
+    int? voteCount,
+    bool? canVote,
+    bool? userVoted,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -4628,6 +4778,9 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
       if (linkCount != null) #linkCount: linkCount,
       if (participantIconUrls != null)
         #participantIconUrls: participantIconUrls,
+      if (voteCount != null) #voteCount: voteCount,
+      if (canVote != null) #canVote: canVote,
+      if (userVoted != null) #userVoted: userVoted,
     }),
   );
   @override
@@ -4708,6 +4861,9 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
       #participantIconUrls,
       or: $value.participantIconUrls,
     ),
+    voteCount: data.get(#voteCount, or: $value.voteCount),
+    canVote: data.get(#canVote, or: $value.canVote),
+    userVoted: data.get(#userVoted, or: $value.userVoted),
   );
 
   @override

@@ -104,6 +104,12 @@ class FCUser with FCUserMappable {
   /// User account state (valid, moderated, email_confirm, email_confirm_edit, email_bounce, rejected, disabled)
   String? userState;
 
+  /// When the platform last saw this user online (Discourse:
+  /// `last_seen_at`). Distinct from [lastActivityTime], which is their
+  /// last *post* — someone can read daily without posting for months, and
+  /// forum profiles show both.
+  DateTime? lastSeenAt;
+
   /// How many times this profile has been viewed (Discourse:
   /// `profile_view_count`). 0 when the platform does not report it.
   int profileViewCount;
@@ -153,6 +159,7 @@ class FCUser with FCUserMappable {
     this.profileViewCount = 0,
     this.canChatUser = false,
     this.badgeCount = 0,
+    this.lastSeenAt,
   });
 }
 

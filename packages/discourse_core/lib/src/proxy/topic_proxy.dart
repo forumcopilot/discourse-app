@@ -759,6 +759,12 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       // Discourse's own trending heuristic, not anything derivable from
       // the counts on this row.
       isHot: (t['is_hot'] as bool?) ?? false,
+      // discourse-topic-voting. Absent on forums without the plugin, and
+      // on categories where it is off, so all three default to "no voting"
+      // rather than to zero-votes-but-votable.
+      voteCount: (t['vote_count'] as int?) ?? 0,
+      canVote: t['can_vote'] == true,
+      userVoted: t['user_voted'] == true,
       // The server's count, not participatedUserIds.length — the posters
       // summary is capped, so the list under-reports on busy topics.
       participantCount: (t['participant_count'] as int?) ?? 0,

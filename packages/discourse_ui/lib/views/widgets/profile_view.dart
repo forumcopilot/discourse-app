@@ -853,6 +853,19 @@ class _ProfileViewState extends State<ProfileView> {
             ),
           // Web's profile header carries these two and the app's did not.
           // Both come from the same /u/{name}.json the page already fetches.
+          if (_userInfo.lastSeenAt != null)
+            _buildInfoTile(
+              context,
+              // Not an eye: Views sits directly below with one, and two
+              // eyes side by side read as the same statistic twice. Seen
+              // is a timestamp, so it takes a clock.
+              icon: Icons.schedule,
+              title: AppLocalizations.of(context)?.lastSeen ?? 'Seen',
+              subtitle: DateFormat.yMMMMd(
+                      Localizations.localeOf(context).toString())
+                  .add_jm()
+                  .format(_userInfo.lastSeenAt!.toLocal()),
+            ),
           if (_userInfo.profileViewCount != 0)
             _buildInfoTile(
               context,

@@ -251,6 +251,12 @@ class FCUserMapper extends ClassMapperBase<FCUser> {
     opt: true,
     def: 0,
   );
+  static DateTime? _$lastSeenAt(FCUser v) => v.lastSeenAt;
+  static const Field<FCUser, DateTime> _f$lastSeenAt = Field(
+    'lastSeenAt',
+    _$lastSeenAt,
+    opt: true,
+  );
 
   @override
   final MappableFields<FCUser> fields = const {
@@ -289,6 +295,7 @@ class FCUserMapper extends ClassMapperBase<FCUser> {
     #profileViewCount: _f$profileViewCount,
     #canChatUser: _f$canChatUser,
     #badgeCount: _f$badgeCount,
+    #lastSeenAt: _f$lastSeenAt,
   };
 
   static FCUser _instantiate(DecodingData data) {
@@ -328,6 +335,7 @@ class FCUserMapper extends ClassMapperBase<FCUser> {
       profileViewCount: data.dec(_f$profileViewCount),
       canChatUser: data.dec(_f$canChatUser),
       badgeCount: data.dec(_f$badgeCount),
+      lastSeenAt: data.dec(_f$lastSeenAt),
     );
   }
 
@@ -420,6 +428,7 @@ abstract class FCUserCopyWith<$R, $In extends FCUser, $Out>
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    DateTime? lastSeenAt,
   });
   FCUserCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -485,6 +494,7 @@ class _FCUserCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCUser, $Out>
     int? profileViewCount,
     bool? canChatUser,
     int? badgeCount,
+    Object? lastSeenAt = $none,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -522,6 +532,7 @@ class _FCUserCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCUser, $Out>
       if (profileViewCount != null) #profileViewCount: profileViewCount,
       if (canChatUser != null) #canChatUser: canChatUser,
       if (badgeCount != null) #badgeCount: badgeCount,
+      if (lastSeenAt != $none) #lastSeenAt: lastSeenAt,
     }),
   );
   @override
@@ -564,6 +575,7 @@ class _FCUserCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCUser, $Out>
     profileViewCount: data.get(#profileViewCount, or: $value.profileViewCount),
     canChatUser: data.get(#canChatUser, or: $value.canChatUser),
     badgeCount: data.get(#badgeCount, or: $value.badgeCount),
+    lastSeenAt: data.get(#lastSeenAt, or: $value.lastSeenAt),
   );
 
   @override

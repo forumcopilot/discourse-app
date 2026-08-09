@@ -53,7 +53,8 @@ Still open on this screen:
   Seen · Views · Trust Level. The app now shows Member Since · Last
   Activity · Posts · Views · Badges, plus the trust-level chip. Verified
   on meta: Views 2,250 and Badges 17 for Oniel, matching
-  `/u/Oniel.json`. **"Seen" (last_seen_at) is still absent.**
+  `/u/Oniel.json`. "Seen" now renders too (`last_seen_at`), on a clock rather than an eye —
+  Views sits beside it, and two eyes read as the same statistic twice.
 
 ## 3. Topic list (home) — partly fixed
 
