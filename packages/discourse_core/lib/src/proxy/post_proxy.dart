@@ -1538,6 +1538,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
           (p['reply_to_user'] as Map<String, dynamic>?)?['avatar_template']
               as String?),
       replyCount: (p['reply_count'] as int?) ?? 0,
+      // Shown beside the username, as web does. Two different things:
+      // `user_title` is free text the forum grants a person, `flair_name`
+      // is the badge of their primary group.
+      authorTitle: (p['user_title'] as String?)?.trim(),
+      authorFlairName: (p['flair_name'] as String?)?.trim(),
       canEdit: p['can_edit'] == true,
       canDelete: p['can_delete'] == true,
       canReport: true,

@@ -106,6 +106,11 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       final raw = settings['min_search_term_length'];
       final parsed = raw is num ? raw.toInt() : int.tryParse(raw?.toString() ?? '');
       if (parsed != null && parsed > 0) minSearchLength = parsed;
+      // Same payload carries the topic time-gap threshold (default 7).
+      final gapRaw = settings['show_time_gap_days'];
+      siteContext.setShowTimeGapDays(gapRaw is num
+          ? gapRaw.toInt()
+          : int.tryParse(gapRaw?.toString() ?? ''));
     } catch (e) {
       // ignore: avoid_print
       print('⚠️ [DISCOURSE_CONFIG] /site/settings.json failed '

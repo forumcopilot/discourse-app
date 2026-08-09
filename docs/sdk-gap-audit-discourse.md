@@ -142,12 +142,36 @@ makes the app read as a Discourse client rather than a generic forum app.
 - **`post_type`** — small-action posts (user joined, topic closed, tags
   changed). Web renders these as thin grey lines; the app almost certainly
   renders them as ordinary posts, which pads topics with noise.
-- **`user_title`, `flair_name`, `flair_group_id`, `primary_group_name`** —
-  titles and group flair beside a username. Very visible on Discourse, and
-  entirely absent here.
+- ~~**`user_title`, `flair_name`**~~ — **done** (canonical SDK `9c0c359`).
+  Rendered beside the username, title preferred over flair when both
+  exist. `flair_group_id` / `primary_group_name` remain unread; they would
+  only add the flair *colour*, which needs the group's palette.
 - `hidden`, `user_deleted`, `can_recover` — moderation states.
 - `badges_granted`, `topic_accepted_answer`, `mentioned_users`,
   `link_counts`, `quote_count`, `readers_count` / `reads`.
+
+### From the side-by-side web comparison (meta, signed in)
+
+Read against the same forum in a browser, so these are confirmed
+differences rather than payload inferences:
+
+- **Poster avatar cluster on topic rows.** Web shows up to five
+  participant avatars per row; the app shows the author plus the last
+  poster. `posters[]` already carries the rest.
+- **"N Replies" expander under a post.** Web summarises replies *to* a
+  post and expands them inline. `replyCount` is now on `FCPost` (unused so
+  far), and `/posts/{id}/replies` returns the children — this is the other
+  half of threading.
+- **A "Hot" tab.** Web's list nav is Latest / Hot / New / Top /
+  Categories; the app has Latest / New / Unread / Top. `/hot.json` is a
+  real route, and `is_hot` already renders on rows.
+- **Topic vote count.** Web shows "2 votes" on rows in voting categories
+  (`can_vote` / `vote_count`).
+- **Unread position dot** beside topic titles and post timestamps.
+- **In-reply-to placement.** Web puts it compactly at a post's top-right;
+  the app uses a left-aligned row above the body. A deliberate divergence
+  for narrow screens, not a defect — noted so it is not "fixed" by
+  accident.
 
 ### Topic behaviour
 

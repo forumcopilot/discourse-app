@@ -131,9 +131,26 @@ others.
   `participatedUserIds` gives ids but no avatar URLs, and Discourse builds
   those from a per-user template, so it would cost a second fetch per
   topic.
-- **No time-gap dividers.** Web inserts "3 years later" between posts far
-  apart in time. Long topics in the app read as one flat run.
+- **Time-gap dividers — fixed.** Web inserts "3 years later" between posts
+  far apart in time; long topics in the app read as one flat run. Now
+  rendered, following Discourse's own component exactly
+  (`post/time-gap.gjs`): shown when `daysSince > show_time_gap_days`, a
+  strict comparison, with the threshold read from `/site/settings.json`
+  (`client: true`, default 7) rather than hardcoded — a forum may have
+  changed it. Wording thresholds match too: `<30` days → days, `<365` →
+  months rounded, else years rounded.
+
+  Verified on meta: `/t/261798.json` predicts exactly one divider in the
+  loaded window, 437 days between #17 and #18, and the app renders
+  "1 year later" there — singular, via ICU plurals.
 - **No category badge under the title.**
+- **Author title / group flair — fixed.** Web shows both beside a
+  username ("simon Great Contributor", "awesomerobot Kris team") and they
+  are different things: a title is free text the forum grants a person,
+  flair is the badge of their primary group. The app showed a bare
+  username regardless of standing. Now rendered, preferring the title when
+  both exist, as Discourse does.
+
 - **Action row placement diverges.** Web right-aligns the row and gives
   Reply a labelled button; the app left-aligns icons and floats Reply as
   a FAB. Not wrong, but it is the kind of drift worth deciding once.

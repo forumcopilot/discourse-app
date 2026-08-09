@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:discourse_core/discourse_core.dart' show DiscourseAcceptedAnswers;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseAcceptedAnswers, DiscourseSiteContextExtension;
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/models/thread_view_data.dart';
@@ -14,6 +15,7 @@ import 'package:discourse_ui/views/widgets/avatar_actions.dart';
 import 'package:discourse_ui/views/widgets/thread_poll_mini_card.dart';
 import 'package:discourse_ui/views/widgets/suggested_topics_card.dart';
 import 'package:discourse_ui/views/widgets/topic_stats_bar.dart';
+import 'package:discourse_ui/views/widgets/post_time_gap.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -1461,7 +1463,19 @@ class _PostsState extends State<PostsList> {
                   if (postIndex < postsList.length) {
                     final post = postsList[postIndex];
                     final isHighlighted = _highlightedPostId == post.id;
-                    return _buildPostItem(context, post, postIndex, postsList.length, data, isHighlighted: isHighlighted);
+                    final item = _buildPostItem(context, post, postIndex, postsList.length, data, isHighlighted: isHighlighted);
+                    // "3 months later" between posts far apart in time, so a
+                    // topic revived after a long silence does not read as one
+                    // continuous conversation. Compared against the post
+                    // actually above in the rendered list, not post_number:
+                    // the loaded window can start mid-topic.
+                    final gap = _timeGapBefore(postsList, postIndex);
+                    if (gap == null) return item;
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [PostTimeGap(daysSince: gap), item],
+                    );
                   }
                   return const SizedBox.shrink();
                 },
@@ -1493,6 +1507,22 @@ class _PostsState extends State<PostsList> {
         return _buildInitialShimmerList(context);
       }
     });
+  }
+
+
+  /// Whole days between the post at [index] and the one rendered above it,
+  /// or null when no divider belongs there.
+  ///
+  /// Returns null for the first rendered post: a gap needs two sides, and the
+  /// post above may simply not be loaded yet.
+  int? _timeGapBefore(List<FCPost> posts, int index) {
+    if (index <= 0 || index >= posts.length) return null;
+    final previous = posts[index - 1].timestamp;
+    final current = posts[index].timestamp;
+    if (previous == null || current == null) return null;
+    final days = PostTimeGap.daysBetween(previous, current);
+    final threshold = widget.siteContext.showTimeGapDays;
+    return PostTimeGap.shouldShow(days, threshold) ? days : null;
   }
 
   /// Setup scroll listener for item positions

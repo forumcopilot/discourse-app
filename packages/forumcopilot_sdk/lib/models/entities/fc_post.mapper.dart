@@ -289,6 +289,18 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
     opt: true,
     def: 0,
   );
+  static String? _$authorTitle(FCPost v) => v.authorTitle;
+  static const Field<FCPost, String> _f$authorTitle = Field(
+    'authorTitle',
+    _$authorTitle,
+    opt: true,
+  );
+  static String? _$authorFlairName(FCPost v) => v.authorFlairName;
+  static const Field<FCPost, String> _f$authorFlairName = Field(
+    'authorFlairName',
+    _$authorFlairName,
+    opt: true,
+  );
 
   @override
   final MappableFields<FCPost> fields = const {
@@ -334,6 +346,8 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
     #replyToUsername: _f$replyToUsername,
     #replyToIconUrl: _f$replyToIconUrl,
     #replyCount: _f$replyCount,
+    #authorTitle: _f$authorTitle,
+    #authorFlairName: _f$authorFlairName,
   };
 
   static FCPost _instantiate(DecodingData data) {
@@ -380,6 +394,8 @@ class FCPostMapper extends ClassMapperBase<FCPost> {
       replyToUsername: data.dec(_f$replyToUsername),
       replyToIconUrl: data.dec(_f$replyToIconUrl),
       replyCount: data.dec(_f$replyCount),
+      authorTitle: data.dec(_f$authorTitle),
+      authorFlairName: data.dec(_f$authorFlairName),
     );
   }
 
@@ -494,6 +510,8 @@ abstract class FCPostCopyWith<$R, $In extends FCPost, $Out>
     String? replyToUsername,
     String? replyToIconUrl,
     int? replyCount,
+    String? authorTitle,
+    String? authorFlairName,
   });
   FCPostCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -598,6 +616,8 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
     Object? replyToUsername = $none,
     Object? replyToIconUrl = $none,
     int? replyCount,
+    Object? authorTitle = $none,
+    Object? authorFlairName = $none,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -642,6 +662,8 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
       if (replyToUsername != $none) #replyToUsername: replyToUsername,
       if (replyToIconUrl != $none) #replyToIconUrl: replyToIconUrl,
       if (replyCount != null) #replyCount: replyCount,
+      if (authorTitle != $none) #authorTitle: authorTitle,
+      if (authorFlairName != $none) #authorFlairName: authorFlairName,
     }),
   );
   @override
@@ -694,6 +716,8 @@ class _FCPostCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FCPost, $Out>
     replyToUsername: data.get(#replyToUsername, or: $value.replyToUsername),
     replyToIconUrl: data.get(#replyToIconUrl, or: $value.replyToIconUrl),
     replyCount: data.get(#replyCount, or: $value.replyCount),
+    authorTitle: data.get(#authorTitle, or: $value.authorTitle),
+    authorFlairName: data.get(#authorFlairName, or: $value.authorFlairName),
   );
 
   @override

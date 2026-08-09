@@ -200,6 +200,20 @@ extension DiscourseSiteContextExtension on SiteContext {
     _chatProbe[_prefsPrefix()] = enabled;
   }
 
+  /// `show_time_gap_days` from `/site/settings.json`.
+  ///
+  /// Discourse inserts a "3 months later" divider between consecutive posts
+  /// more than this many days apart (`post-stream.gjs`:
+  /// `daysSince > siteSettings.show_time_gap_days`). It is a per-forum
+  /// setting, `client: true`, so the real value ships in the same payload
+  /// the upload limits come from — read it rather than hardcoding the
+  /// default, which a forum may well have changed.
+  int get showTimeGapDays => (_data()['showTimeGapDays'] as int?) ?? 7;
+
+  void setShowTimeGapDays(int? days) {
+    if (days != null && days > 0) _data()['showTimeGapDays'] = days;
+  }
+
   /// Drops memoized probe results. Process-lifetime state, so tests that
   /// measure request volume must be able to start from a clean slate.
   @visibleForTesting

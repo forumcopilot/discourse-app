@@ -79,6 +79,19 @@ class FCPost with FCPostMappable {
   /// This is what makes a topic a conversation rather than a list. Without
   /// it a branching discussion renders as one flat run and readers cannot
   /// tell who is answering whom.
+  /// The author's title as the forum displays it beside their name
+  /// (Discourse: `user_title`, e.g. "Contributor"). Null when they have
+  /// none.
+  ///
+  /// Distinct from a group flair: a title is free text the forum grants a
+  /// person, flair is the badge of a group they belong to. Discourse shows
+  /// both, and they are frequently different.
+  String? authorTitle;
+
+  /// The author's primary-group flair name (Discourse: `flair_name`, e.g.
+  /// "team"). Null when they have no flair group.
+  String? authorFlairName;
+
   int? replyToPostNumber;
 
   /// Display name of the author of [replyToPostNumber], when the platform
@@ -192,5 +205,7 @@ class FCPost with FCPostMappable {
       this.replyToPostNumber,
       this.replyToUsername,
       this.replyToIconUrl,
-      this.replyCount = 0});
+      this.replyCount = 0,
+      this.authorTitle,
+      this.authorFlairName});
 }

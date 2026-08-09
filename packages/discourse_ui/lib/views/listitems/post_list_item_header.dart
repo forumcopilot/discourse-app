@@ -128,6 +128,29 @@ class PostListItemHeader extends StatelessWidget {
                         ),
                       ),
                     ),
+                    // Title / group flair beside the name, as web does.
+                    // Preferring the title when both exist matches
+                    // Discourse: the title is the more specific statement
+                    // about the person, flair only says which group they
+                    // are in. Flexible so a long title truncates rather
+                    // than pushing the timestamp off the row.
+                    if ((post.authorTitle?.isNotEmpty ?? false) ||
+                        (post.authorFlairName?.isNotEmpty ?? false)) ...[
+                      SizedBox(width: DesignTokens.spacingS),
+                      Flexible(
+                        child: Text(
+                          (post.authorTitle?.isNotEmpty ?? false)
+                              ? post.authorTitle!
+                              : post.authorFlairName!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            letterSpacing: DesignTokens.letterSpacingWide,
+                          ),
+                        ),
+                      ),
+                    ],
                     // Status badges for banned and deleted posts
                     if (post.isBanned) ...[
                       SizedBox(width: DesignTokens.spacingS),

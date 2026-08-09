@@ -1617,4 +1617,37 @@ class AppLocalizationsEs extends AppLocalizations {
   String inReplyToPost(int number) {
     return 'in reply to post #$number';
   }
+
+  @override
+  String timeGapDaysLater(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days later',
+      one: '1 day later',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeGapMonthsLater(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count months later',
+      one: '1 month later',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeGapYearsLater(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count years later',
+      one: '1 year later',
+    );
+    return '$_temp0';
+  }
 }

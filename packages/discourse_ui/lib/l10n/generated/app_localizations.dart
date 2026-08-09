@@ -2917,6 +2917,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'in reply to post #{number}'**
   String inReplyToPost(int number);
+
+  /// Divider between posts far apart in time
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day later} other{{count} days later}}'**
+  String timeGapDaysLater(int count);
+
+  /// Divider between posts far apart in time
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 month later} other{{count} months later}}'**
+  String timeGapMonthsLater(int count);
+
+  /// Divider between posts far apart in time
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 year later} other{{count} years later}}'**
+  String timeGapYearsLater(int count);
 }
 
 class _AppLocalizationsDelegate

@@ -1428,5 +1428,32 @@
         "type": "int"
       }
     }
+  },
+  "timeGapDaysLater": "{count, plural, =1{1 day later} other{{count} days later}}",
+  "@timeGapDaysLater": {
+    "description": "Divider between posts far apart in time",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeGapMonthsLater": "{count, plural, =1{1 month later} other{{count} months later}}",
+  "@timeGapMonthsLater": {
+    "description": "Divider between posts far apart in time",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeGapYearsLater": "{count, plural, =1{1 year later} other{{count} years later}}",
+  "@timeGapYearsLater": {
+    "description": "Divider between posts far apart in time",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }
