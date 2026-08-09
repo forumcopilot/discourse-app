@@ -327,6 +327,25 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     opt: true,
     def: false,
   );
+  static String? _$lastPosterName(FCTopic v) => v.lastPosterName;
+  static const Field<FCTopic, String> _f$lastPosterName = Field(
+    'lastPosterName',
+    _$lastPosterName,
+    opt: true,
+  );
+  static String? _$lastPosterIconUrl(FCTopic v) => v.lastPosterIconUrl;
+  static const Field<FCTopic, String> _f$lastPosterIconUrl = Field(
+    'lastPosterIconUrl',
+    _$lastPosterIconUrl,
+    opt: true,
+  );
+  static DateTime? _$lastPostedAt(FCTopic v) => v.lastPostedAt;
+  static const Field<FCTopic, DateTime> _f$lastPostedAt = Field(
+    'lastPostedAt',
+    _$lastPostedAt,
+    opt: true,
+    hook: MillisOrIsoDateHook(),
+  );
 
   @override
   final MappableFields<FCTopic> fields = const {
@@ -378,6 +397,9 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     #unreadCount: _f$unreadCount,
     #tags: _f$tags,
     #isSolved: _f$isSolved,
+    #lastPosterName: _f$lastPosterName,
+    #lastPosterIconUrl: _f$lastPosterIconUrl,
+    #lastPostedAt: _f$lastPostedAt,
   };
 
   static FCTopic _instantiate(DecodingData data) {
@@ -430,6 +452,9 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
       unreadCount: data.dec(_f$unreadCount),
       tags: data.dec(_f$tags),
       isSolved: data.dec(_f$isSolved),
+      lastPosterName: data.dec(_f$lastPosterName),
+      lastPosterIconUrl: data.dec(_f$lastPosterIconUrl),
+      lastPostedAt: data.dec(_f$lastPostedAt),
     );
   }
 
@@ -543,6 +568,9 @@ abstract class FCTopicCopyWith<$R, $In extends FCTopic, $Out>
     int? unreadCount,
     List<String>? tags,
     bool? isSolved,
+    String? lastPosterName,
+    String? lastPosterIconUrl,
+    DateTime? lastPostedAt,
   });
   FCTopicCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -622,6 +650,9 @@ class _FCTopicCopyWithImpl<$R, $Out>
     int? unreadCount,
     List<String>? tags,
     bool? isSolved,
+    Object? lastPosterName = $none,
+    Object? lastPosterIconUrl = $none,
+    Object? lastPostedAt = $none,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -673,6 +704,9 @@ class _FCTopicCopyWithImpl<$R, $Out>
       if (unreadCount != null) #unreadCount: unreadCount,
       if (tags != null) #tags: tags,
       if (isSolved != null) #isSolved: isSolved,
+      if (lastPosterName != $none) #lastPosterName: lastPosterName,
+      if (lastPosterIconUrl != $none) #lastPosterIconUrl: lastPosterIconUrl,
+      if (lastPostedAt != $none) #lastPostedAt: lastPostedAt,
     }),
   );
   @override
@@ -728,6 +762,12 @@ class _FCTopicCopyWithImpl<$R, $Out>
     unreadCount: data.get(#unreadCount, or: $value.unreadCount),
     tags: data.get(#tags, or: $value.tags),
     isSolved: data.get(#isSolved, or: $value.isSolved),
+    lastPosterName: data.get(#lastPosterName, or: $value.lastPosterName),
+    lastPosterIconUrl: data.get(
+      #lastPosterIconUrl,
+      or: $value.lastPosterIconUrl,
+    ),
+    lastPostedAt: data.get(#lastPostedAt, or: $value.lastPostedAt),
   );
 
   @override

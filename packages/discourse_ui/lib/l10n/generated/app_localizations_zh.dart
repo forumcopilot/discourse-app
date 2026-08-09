@@ -1518,4 +1518,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String fileSavedToDocuments(String filename) {
     return '文件已保存到文档：$filename';
   }
+
+  @override
+  String topicLastReplyBy(String username, String time) {
+    return '$username replied $time';
+  }
 }

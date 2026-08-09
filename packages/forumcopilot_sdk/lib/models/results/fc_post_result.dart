@@ -85,6 +85,13 @@ class FCThreadResult extends FCTopic with FCThreadResultMappable {
     int unreadCount = 0,
     List<String> tags = const [],
     bool isSolved = false,
+    // Inherited from FCTopic. These subclasses re-declare every base field
+    // and forward it, so a new field on FCTopic that is not repeated here
+    // is simply unreachable through them — and dart_mappable's generated
+    // copyWith stops matching the base signature.
+    String? lastPosterName,
+    String? lastPosterIconUrl,
+    DateTime? lastPostedAt,
   }) : super(
           id: id,
           title: title,
@@ -131,6 +138,9 @@ class FCThreadResult extends FCTopic with FCThreadResultMappable {
           unreadCount: unreadCount,
           tags: tags,
           isSolved: isSolved,
+          lastPosterName: lastPosterName,
+          lastPosterIconUrl: lastPosterIconUrl,
+          lastPostedAt: lastPostedAt,
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
@@ -225,6 +235,13 @@ class FCThreadByUnreadResult extends FCTopic with FCThreadByUnreadResultMappable
     int unreadCount = 0,
     List<String> tags = const [],
     bool isSolved = false,
+    // Inherited from FCTopic. These subclasses re-declare every base field
+    // and forward it, so a new field on FCTopic that is not repeated here
+    // is simply unreachable through them — and dart_mappable's generated
+    // copyWith stops matching the base signature.
+    String? lastPosterName,
+    String? lastPosterIconUrl,
+    DateTime? lastPostedAt,
   }) : super(
           id: id,
           title: title,
@@ -271,6 +288,9 @@ class FCThreadByUnreadResult extends FCTopic with FCThreadByUnreadResultMappable
           unreadCount: unreadCount,
           tags: tags,
           isSolved: isSolved,
+          lastPosterName: lastPosterName,
+          lastPosterIconUrl: lastPosterIconUrl,
+          lastPostedAt: lastPostedAt,
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
@@ -365,6 +385,13 @@ class FCThreadByPostResult extends FCTopic with FCThreadByPostResultMappable {
     int unreadCount = 0,
     List<String> tags = const [],
     bool isSolved = false,
+    // Inherited from FCTopic. These subclasses re-declare every base field
+    // and forward it, so a new field on FCTopic that is not repeated here
+    // is simply unreachable through them — and dart_mappable's generated
+    // copyWith stops matching the base signature.
+    String? lastPosterName,
+    String? lastPosterIconUrl,
+    DateTime? lastPostedAt,
   }) : super(
           id: id,
           title: title,
@@ -411,6 +438,9 @@ class FCThreadByPostResult extends FCTopic with FCThreadByPostResultMappable {
           unreadCount: unreadCount,
           tags: tags,
           isSolved: isSolved,
+          lastPosterName: lastPosterName,
+          lastPosterIconUrl: lastPosterIconUrl,
+          lastPostedAt: lastPostedAt,
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
@@ -626,6 +656,13 @@ class FCAnnouncementResult extends FCTopic with FCAnnouncementResultMappable {
     int unreadCount = 0,
     List<String> tags = const [],
     bool isSolved = false,
+    // Inherited from FCTopic. These subclasses re-declare every base field
+    // and forward it, so a new field on FCTopic that is not repeated here
+    // is simply unreachable through them — and dart_mappable's generated
+    // copyWith stops matching the base signature.
+    String? lastPosterName,
+    String? lastPosterIconUrl,
+    DateTime? lastPostedAt,
   }) : super(
           id: id,
           title: title,
@@ -672,6 +709,9 @@ class FCAnnouncementResult extends FCTopic with FCAnnouncementResultMappable {
           unreadCount: unreadCount,
           tags: tags,
           isSolved: isSolved,
+          lastPosterName: lastPosterName,
+          lastPosterIconUrl: lastPosterIconUrl,
+          lastPostedAt: lastPostedAt,
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,

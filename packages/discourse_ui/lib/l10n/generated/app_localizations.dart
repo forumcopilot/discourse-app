@@ -2899,6 +2899,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'File saved to Documents: {filename}'**
   String fileSavedToDocuments(String filename);
+
+  /// Last-reply attribution on a topic row, e.g. 'alice replied 3 hours ago'
+  ///
+  /// In en, this message translates to:
+  /// **'{username} replied {time}'**
+  String topicLastReplyBy(String username, String time);
 }
 
 class _AppLocalizationsDelegate

@@ -1542,4 +1542,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String fileSavedToDocuments(String filename) {
     return 'ファイルをドキュメントに保存しました: $filename';
   }
+
+  @override
+  String topicLastReplyBy(String username, String time) {
+    return '$username replied $time';
+  }
 }

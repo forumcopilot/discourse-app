@@ -1398,5 +1398,17 @@
         "type": "String"
       }
     }
+  },
+  "topicLastReplyBy": "{username} replied {time}",
+  "@topicLastReplyBy": {
+    "description": "Last-reply attribution on a topic row, e.g. 'alice replied 3 hours ago'",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
   }
 }

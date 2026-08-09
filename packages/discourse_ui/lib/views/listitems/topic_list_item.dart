@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 import 'package:discourse_ui/utils/time_utils.dart';
@@ -88,6 +89,46 @@ class TopicListItem extends StatelessWidget {
                               color: colorScheme.onSurfaceVariant,
                               letterSpacing: DesignTokens.letterSpacingWide,
                             ),
+                          ),
+                        ],
+                        // "alice replied 3 hours ago" — web leads its rows
+                        // with this because on a busy list the last voice is
+                        // the reason to open a topic, and the person who
+                        // started it usually is not. Null until someone has
+                        // actually replied, so the opening post is never
+                        // described as a reply to itself.
+                        if (topic.lastPosterName != null &&
+                            topic.lastPostedAt != null) ...[
+                          SizedBox(height: DesignTokens.spacingXS),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              UserAvatar(
+                                username: topic.lastPosterName!,
+                                iconUrl: topic.lastPosterIconUrl,
+                                radius: 8,
+                              ),
+                              SizedBox(width: DesignTokens.spacingXS),
+                              Flexible(
+                                child: Text(
+                                  AppLocalizations.of(context)
+                                          ?.topicLastReplyBy(
+                                        topic.lastPosterName!,
+                                        formatSmartDateTime(
+                                            topic.lastPostedAt!, context),
+                                      ) ??
+                                      '${topic.lastPosterName} replied '
+                                          '${formatSmartDateTime(topic.lastPostedAt!, context)}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                    letterSpacing:
+                                        DesignTokens.letterSpacingWide,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ],

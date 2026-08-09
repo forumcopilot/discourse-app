@@ -1606,4 +1606,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String fileSavedToDocuments(String filename) {
     return 'Datei in Dokumente gespeichert: $filename';
   }
+
+  @override
+  String topicLastReplyBy(String username, String time) {
+    return '$username replied $time';
+  }
 }

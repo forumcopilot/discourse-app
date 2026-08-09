@@ -39,6 +39,27 @@ class FCTopic with FCTopicMappable {
   @MappableField(hook: MillisOrIsoDateHook())
   DateTime timestamp;
 
+  /// Display name of whoever posted most recently in the topic.
+  ///
+  /// Distinct from [authorName], which is whoever *started* it. Forum web
+  /// UIs lead their topic rows with "X replied 2 hours ago", because on a
+  /// busy list the last voice is the reason to open a topic and the
+  /// original author usually is not.
+  ///
+  /// Null when the platform does not report it, or when nobody has replied
+  /// yet — a topic whose only post is the opening one has no last *poster*
+  /// distinct from its author, and callers should fall back to [timestamp].
+  String? lastPosterName;
+
+  /// Avatar for [lastPosterName], ready to load. Null when unavailable.
+  String? lastPosterIconUrl;
+
+  /// When the most recent post landed, for the "replied 2 hours ago" half
+  /// of the line. Null when unreported; [timestamp] (topic creation) is the
+  /// fallback, but the two mean different things — do not conflate them.
+  @MappableField(hook: MillisOrIsoDateHook())
+  DateTime? lastPostedAt;
+
   /// Number of replies in the topic
   int replyCount;
 
@@ -180,5 +201,11 @@ class FCTopic with FCTopicMappable {
     this.unreadCount = 0,
     this.tags = const [],
     this.isSolved = false,
+    // Optional with no default beyond null: a platform that cannot report
+    // the last poster leaves these unset, and the UI falls back to the
+    // topic's own author/timestamp rather than rendering a wrong name.
+    this.lastPosterName,
+    this.lastPosterIconUrl,
+    this.lastPostedAt,
   });
 }

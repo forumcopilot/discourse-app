@@ -585,6 +585,20 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
   }
 
   /// Build an [FCTopic] from a Discourse topic object — works for the
+  /// Absolute avatar URL from a Discourse `avatar_template`.
+  ///
+  /// Templates carry a literal `{size}` placeholder and are usually
+  /// site-relative (`/user_avatar/.../{size}/12_2.png`), so they are not
+  /// loadable until both are resolved.
+  String? _avatarUrlFrom(Object? avatarTemplate) {
+    final template = avatarTemplate as String?;
+    if (template == null || template.isEmpty) return null;
+    final filled = template.replaceAll('{size}', '120');
+    return filled.startsWith('http')
+        ? filled
+        : '${siteContext.site.url}$filled';
+  }
+
   /// summary form returned in /latest.json (and friends) and for the fuller
   /// form returned by /t/{id}.json.
   FCTopic _topicFromTopicJson(
@@ -620,14 +634,29 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     final authorMap = opUser ?? createdBy;
     final authorId = (authorMap?['id'] ?? opUserId ?? '').toString();
     final authorName = (authorMap?['username'] ?? '').toString();
-    final avatarTemplate = authorMap?['avatar_template'] as String?;
-    String? authorIconUrl;
-    if (avatarTemplate != null && avatarTemplate.isNotEmpty) {
-      final filled = avatarTemplate.replaceAll('{size}', '120');
-      authorIconUrl = filled.startsWith('http')
-          ? filled
-          : '${siteContext.site.url}$filled';
+    final authorIconUrl = _avatarUrlFrom(authorMap?['avatar_template']);
+
+    // Last poster — the "X replied 2 hours ago" half of a web topic row.
+    //
+    // Same contract as the OP lookup above, read from the other end: the
+    // latest poster is marked with `extras` ('latest', or 'latest single'
+    // when they are the only poster). `extras` is the structured marker;
+    // `description` is localized, so matching that would work in English
+    // and quietly fail on every other locale.
+    Map<String, dynamic>? latestPoster;
+    for (final p in posters.whereType<Map>()) {
+      if ((p['extras'] ?? '').toString().contains('latest')) {
+        latestPoster = users[p['user_id'] as int?];
+        break;
+      }
     }
+    // Only meaningful once someone has actually replied. On a topic with a
+    // single post the latest poster IS the author, and "X replied" would
+    // be a false statement about the opening post — leave it null so the
+    // UI falls back to the topic's own author and timestamp.
+    final hasReplies = ((t['posts_count'] as int?) ?? 1) > 1;
+    final lastPosterName =
+        hasReplies ? (latestPoster?['username'] as String?) : null;
 
     final id = (t['id'] ?? '').toString();
     final slug = t['slug']?.toString();
@@ -697,6 +726,18 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
           .where((s) => s.isNotEmpty)
           .toList(growable: false),
       isSolved: (t['has_accepted_answer'] as bool?) ?? false,
+      lastPosterName: lastPosterName,
+      // Avatar and time only make sense alongside the name; without it the
+      // row has nothing to attribute them to.
+      lastPosterIconUrl: lastPosterName == null
+          ? null
+          : _avatarUrlFrom(latestPoster?['avatar_template']),
+      // `last_posted_at` is when the newest post landed. `bumped_at` is
+      // not a substitute — a topic bumps on edits and moves too, so it
+      // would date a reply that never happened.
+      lastPostedAt: lastPosterName == null
+          ? null
+          : DateTime.tryParse(t['last_posted_at']?.toString() ?? ''),
     );
   }
 

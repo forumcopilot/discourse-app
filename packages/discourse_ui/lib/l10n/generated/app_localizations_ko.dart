@@ -1535,4 +1535,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String fileSavedToDocuments(String filename) {
     return '파일이 문서에 저장되었습니다: $filename';
   }
+
+  @override
+  String topicLastReplyBy(String username, String time) {
+    return '$username replied $time';
+  }
 }
