@@ -43,9 +43,12 @@ Still open on this screen:
   questions, and only the server knows whether *this* viewer may chat with
   *this* person. It opens (or reuses, via `upsert`) a DM channel.
 
-  Not verifiable on meta: `can_chat_user` is false for every user tested
-  there, so the button correctly never appears. The gating is confirmed;
-  the button's behaviour is not.
+  **Not verifiable on meta at all** — and now we know why rather than
+  guessing. Signed in as the test account, `can_chat_user` is false for
+  every user, and `/site.json` carries no chat keys whatsoever: the chat
+  plugin is simply not enabled on meta. The button correctly never
+  appears. Confirming its behaviour needs a forum that runs chat —
+  try.discourse.org does.
 - **No notification-level control.** Web has a "Normal" dropdown
   (Watching / Tracking / Normal / Muted) on the profile; the app has none.
 - **No profile banner.** Web renders the user's card background image.

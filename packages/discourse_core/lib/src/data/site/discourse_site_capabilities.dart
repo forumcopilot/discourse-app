@@ -87,6 +87,25 @@ class DiscourseSiteCapabilities {
     caps.resolved = true;
   }
 
+  /// The composer template a category defines, or null.
+  ///
+  /// Discourse lets a category ship a skeleton — a bug-report form, a
+  /// theme's summary table — and web prefills the composer with it. A
+  /// category that expects a structured post otherwise hands the user a
+  /// blank box and rejects, or silently accepts, whatever they improvise.
+  String? topicTemplateFor(String categoryId) {
+    if (categoryId.isEmpty) return null;
+    final id = int.tryParse(categoryId);
+    if (id == null) return null;
+    for (final c in categories) {
+      if (c['id'] == id) {
+        final tpl = (c['topic_template'] as String?)?.trim();
+        return (tpl == null || tpl.isEmpty) ? null : tpl;
+      }
+    }
+    return null;
+  }
+
   static bool isResolved(String pluginUrl) =>
       _bySite[pluginUrl]?.resolved ?? false;
 

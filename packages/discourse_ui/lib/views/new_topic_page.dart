@@ -65,7 +65,19 @@ class _NewTopicPageState extends State<NewTopicPage> {
         if (widget.forumId.isNotEmpty) 'categoryId': widget.forumId,
       },
     );
-    _draftController.initialize();
+    // Prefill the category's topic template — but never over a draft.
+    // initialize() restores one asynchronously, so wait for it and fill
+    // only a composer that is still empty. Getting this order wrong would
+    // silently overwrite unsaved work with a blank skeleton.
+    _draftController.initialize().then((_) {
+      if (!mounted) return;
+      if (_contentController.text.trim().isNotEmpty) return;
+      final template = DiscourseSiteCapabilities.forSite(
+              widget.siteContext.site.pluginUrl)
+          .topicTemplateFor(widget.forumId);
+      if (template == null) return;
+      setState(() => _contentController.text = template);
+    });
   }
 
   @override

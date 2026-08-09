@@ -216,9 +216,12 @@ differences rather than payload inferences:
 - ~~`subcategory_ids` and friends~~ — **done**; see the §6 correction
   above. `subcategory_list_style` / `show_subcategory_list` (web's box vs
   list rendering) remain unread.
-- **`topic_template`** — prefills the composer for categories that define
-  one. A category expecting a bug-report template currently gets a blank
-  box, which is a quietly bad experience.
+- ~~**`topic_template`**~~ — **done.** 12 of meta's 45 categories define
+  one. The composer prefills it, but only after the draft restore has
+  settled and only into a still-empty box: `initialize()` restores
+  asynchronously, so filling first would silently overwrite unsaved work
+  with a blank skeleton. Verified on Marketplace, which prefills "What
+  would you like done? / When do you need it done?".
 - `minimum_required_tags` — composer validation the server will enforce
   anyway; better caught before submit.
 - `default_view`, `default_list_filter`, `default_top_period`,
