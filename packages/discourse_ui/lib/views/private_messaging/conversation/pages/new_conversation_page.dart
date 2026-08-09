@@ -1062,7 +1062,9 @@ class _NewConversationPageState extends State<NewConversationPage> {
               // Formatting button
               PopupMenuButton<String>(
                 enabled: _isMessageFieldFocused,
-                icon: Icon(Icons.format_bold, color: _isMessageFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
+                // See MessageComposePage: this opens the formatting menu,
+                // so it takes the formatting glyph rather than a bold one.
+                icon: Icon(Icons.text_format, color: _isMessageFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
                 tooltip: 'Formatting',
                 onSelected: _insertMarkup,
                 itemBuilder: (context) => [

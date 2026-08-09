@@ -254,6 +254,39 @@ Both halves now render: "in reply to X" walks a conversation upwards
 down (fetched on expand). Verified on meta against topics with real
 branching.
 
+## 9c. Composer and New Message vs web — audited
+
+Signed in on meta, comparing the app's New Topic / New Message against
+web's composer.
+
+**Structurally equivalent.** App: Participants (+ Add) · Subject ·
+Message · formatting menu · attach · image · mention · Send. Web:
+Recipients (+) · Title · Body · flat toolbar · Send message / Discard.
+
+**Formatting coverage is not the gap it looked like.** The toolbar's "B"
+is a *menu*, not a bold button, and it holds thirteen actions — bold,
+italic, underline, strikethrough, link, image, video, quote, code,
+spoiler, bullet list, numbered list, list item. That is broader than
+web's visible toolbar in places (spoiler, video). `DiscourseMarkup`
+already emits all of them in the markup Discourse actually cooks.
+
+- **Formatting menu icon — fixed.** It was `format_bold`, which reads as a
+  bold button, so the other twelve actions looked absent rather than one
+  tap away. Now `text_format`. Applied to both composers, which had
+  drifted to the same wrong glyph independently.
+
+Still open on the composer:
+
+- **No preview.** Web renders a live preview (side-by-side on desktop, a
+  toggle on mobile). The app has none, so on a Markdown forum you cannot
+  see what you typed will look like until it posts. The single biggest
+  remaining composer gap.
+- **No emoji picker.** Web has one; the app leans on the system keyboard,
+  which is a defensible mobile trade.
+- **No GIF or AI helper.** Both plugin-dependent on web.
+- **No explicit Discard.** Back exits; drafts are saved server-side, so
+  nothing is lost — but the exit is less obvious than web's button.
+
 ## 10. Cross-cutting
 
 - **Anonymous chat fetch — fixed** (`bf73875`). `GET /chat/api/me/channels`

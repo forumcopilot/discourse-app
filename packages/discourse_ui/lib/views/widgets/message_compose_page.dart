@@ -1417,7 +1417,11 @@ class _MessageComposePageState extends State<MessageComposePage> {
                 enabled: _isContentFieldFocused,
                 child: PopupMenuButton<String>(
                   enabled: _isContentFieldFocused,
-                  icon: Icon(Icons.format_bold, color: _isContentFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
+                  // `text_format`, not `format_bold`: this opens a menu of
+                  // thirteen actions (bold through spoiler and lists), and a
+                  // bold glyph reads as a bold *button* — so the other twelve
+                  // looked absent rather than one tap away.
+                  icon: Icon(Icons.text_format, color: _isContentFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
                   tooltip: AppLocalizations.of(context)?.formatting ?? 'Formatting',
                   onSelected: _insertMarkup,
                 itemBuilder: (context) => [
