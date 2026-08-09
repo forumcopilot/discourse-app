@@ -155,6 +155,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         canLike: true,
         isLiked: (t['liked'] as bool?) ?? false,
         likeCount: (t['like_count'] as int?) ?? 0,
+        participatedUserIds: _participantIds(details),
         isPinned: (t['pinned'] as bool?) ?? false,
         isAnnouncement: (t['pinned_globally'] as bool?) ?? false,
         url: '${siteContext.site.url}/t/$id',
@@ -232,6 +233,13 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         // flag/upload signal exists in this payload.
         canReport: true,
         canUpload: true,
+        // Same topic-level summary the sibling mapper reads. Entering a
+        // topic at an anchor post hits this builder instead of the one
+        // above, and used to drop these three — so the topic header was
+        // populated or empty depending on how the reader arrived.
+        viewCount: (t['views'] as int?) ?? 0,
+        likeCount: (t['like_count'] as int?) ?? 0,
+        participatedUserIds: _participantIds(details),
         poll: poll,
       );
     } catch (e) {
@@ -318,6 +326,12 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         // flag/upload signal exists in this payload.
         canReport: true,
         canUpload: true,
+        // See the by-post mapper: the unread anchor is the *common* entry
+        // for a signed-in reader, so this is the path that most often
+        // decided whether the topic header had any numbers at all.
+        viewCount: (t['views'] as int?) ?? 0,
+        likeCount: (t['like_count'] as int?) ?? 0,
+        participatedUserIds: _participantIds(details),
         poll: poll,
       );
     } catch (e) {
@@ -1606,6 +1620,19 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   /// Sentinel timestamp for failed/empty results (see [_emptyThread]).
   static final DateTime _noTimestamp =
       DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
+
+  /// Ids of everyone who posted in the topic, from the topic-view
+  /// serializer's `details.participants`.
+  ///
+  /// This is who Discourse's web UI counts as the topic's "users" in its
+  /// summary line — the posters summary, not the reply count and not
+  /// everyone who merely read.
+  static List<String> _participantIds(Map<String, dynamic> details) =>
+      ((details['participants'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((p) => (p['id'] ?? '').toString())
+          .where((s) => s.isNotEmpty)
+          .toList(growable: false);
 
   FCThreadResult _emptyThread({required String message}) {
     return FCThreadResult(

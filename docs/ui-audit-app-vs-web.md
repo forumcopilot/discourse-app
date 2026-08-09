@@ -74,9 +74,30 @@ Still open: last-reply attribution ("X replied 3 hours ago") and the
   used to be, so a post costs one line instead of two. Tap opens the
   picker, long-press lists who reacted, and the viewer's own participation
   is carried in the count's colour. `ReactionChipsRow` is deleted.
-- **No topic stats bar.** Web has `793 views · 7 likes · 4 links ·
-  6 users` plus participant avatars under the first post. The app has
-  nothing equivalent.
+- **Topic stats bar — fixed.** Web has `793 views · 7 likes · 4 links ·
+  6 users` plus participant avatars under the first post; the app had
+  nothing. `TopicStatsBar` now renders views · likes · users under the
+  opening post, gated on `postNumber == 1` like the poll and accepted
+  answer beside it. Icons rather than web's written labels, matching the
+  idiom the topic rows already set for the same numbers, so it needs no
+  new translated strings and survives a narrow phone.
+
+  Building it surfaced a real data bug behind it. The three numbers came
+  back 0 and the bar rendered as nothing, because only
+  `getThreadAsync` populated the topic header — `getThreadByPostAsync`
+  and `getThreadByUnreadAsync` never set `viewCount` / `likeCount`, and
+  no builder set `participatedUserIds`. Entering a topic at an anchor
+  post, which is the *normal* path for a signed-in reader with read
+  state, silently produced a header with no numbers. All three builders
+  now read them from the same `/t/{id}.json` payload they already had in
+  hand. Verified on the Pixel against try.discourse.org: the bar reads
+  `798 · 7 · 6`, matching the server exactly.
+
+  Still absent, deliberately rather than faked: **links** (`details.links`
+  is in the payload but not on `FCTopic`, so carrying it is a canonical-SDK
+  model change) and **participant avatars** (`participatedUserIds` gives
+  ids but no avatar URLs; Discourse builds those from a per-user
+  template, so it would cost a second fetch per topic).
 - **No time-gap dividers.** Web inserts "3 years later" between posts far
   apart in time. Long topics in the app read as one flat run.
 - **No category badge under the title.**
@@ -151,9 +172,16 @@ but it blocked auditing these screens. See "Session lost" below.
 
 ## 10. Cross-cutting
 
-- **Anonymous chat fetch.** `GET /chat/api/me/channels` fires three times
-  per anonymous launch and 403s every time — a guest cannot use chat.
-  Spun off as its own task.
+- **Anonymous chat fetch — fixed** (`bf73875`). `GET /chat/api/me/channels`
+  fired three times per anonymous launch and 403'd every time. All three
+  came from one call site, not three: `DiscourseConfigProxy` route-probes
+  the chat plugin on every `getConfig`, and the bootstrap calls `getConfig`
+  three times. The probe now resolves once per forum. Not a login gate —
+  the probe reads 403 as its *positive* signal ("route exists"), so gating
+  it on `isLoggedIn` would delete the answer for guests. Measured on the
+  Pixel against try.discourse.org: 7 sends → 5, probe 3 → 1.
+  `ChatChannelListPage`'s own fetch *is* login-gated, since that one is
+  genuinely per-user.
 - **Silent-failure pattern.** Two instances found (profile summary,
   reaction picker) where a failed request rendered *nothing* rather than
   an error. Both fixed here, but the pattern is worth grepping for: any
@@ -189,6 +217,11 @@ page in Chrome.
 
 1. ~~Code-block scrolling~~ — done.
 2. ~~Category badge on topic rows~~ — done (topic view still open).
-3. Topic stats bar + last-reply attribution (density parity).
+3. ~~Topic stats bar~~ — done. Last-reply attribution is still open, and
+   is the larger half: `FCTopic` carries no last-poster fields at all, so
+   "X replied 3 hours ago" needs a model change in the canonical SDK
+   (`/Volumes/CRUCIAL/tapatalk_flutter`) before it can land here — see the
+   Canonical SDK note in CLAUDE.md. The data itself is already in the
+   `/latest.json` payload (`posters[]` + `last_posted_at`).
 4. Profile: chat button, notification level.
 5. ~~Reaction cluster vs. per-emoji chips~~ — done, combined style.

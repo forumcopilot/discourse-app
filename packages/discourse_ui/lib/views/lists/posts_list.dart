@@ -13,6 +13,7 @@ import 'package:discourse_ui/views/widgets/image_actions.dart';
 import 'package:discourse_ui/views/widgets/avatar_actions.dart';
 import 'package:discourse_ui/views/widgets/thread_poll_mini_card.dart';
 import 'package:discourse_ui/views/widgets/suggested_topics_card.dart';
+import 'package:discourse_ui/views/widgets/topic_stats_bar.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -1162,6 +1163,24 @@ class _PostsState extends State<PostsList> {
         ),
       ),
     );
+    // Topic summary under the opening post, as web does. Gated on
+    // postNumber (not postIndex) for the same reason the poll and accepted
+    // answer above are: paging can put a later post at index 0, and the
+    // summary belongs to the topic's head, not to whatever scrolled into
+    // view first.
+    if (post.postNumber == 1) {
+      postWidget = Column(
+        mainAxisSize: MainAxisSize.min,
+        // Stretch, or the bar shrink-wraps its numbers: the rules would
+        // stop short of the post's edges and the row would sit centred,
+        // where web's spans the content column and reads left to right.
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          postWidget,
+          TopicStatsBar(topic: data.topic),
+        ],
+      );
+    }
     if (postIndex == postsListLength - 1) {
       // Add padding equal to the toolbar height so the last post can scroll above it
       final double toolbarHeight = _getBottomToolbarHeight(context);
