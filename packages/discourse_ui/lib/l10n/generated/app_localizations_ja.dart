@@ -1590,4 +1590,13 @@ class AppLocalizationsJa extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get profileViews => 'Views';
+
+  @override
+  String get badges => 'Badges';
+
+  @override
+  String get chatWithUser => 'Chat';
 }

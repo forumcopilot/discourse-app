@@ -37,14 +37,23 @@ web page instead of the app, and rows with no date. All closed.
 
 Still open on this screen:
 
-- **No Chat button.** Web shows Message *and* Chat; the app shows only
-  Send Message even though the forum has chat enabled.
+- **Chat button — implemented, unverified.** Web shows Message *and*
+  Chat. The button now renders, gated on the server's `can_chat_user`
+  rather than on whether the chat plugin is installed — different
+  questions, and only the server knows whether *this* viewer may chat with
+  *this* person. It opens (or reuses, via `upsert`) a DM channel.
+
+  Not verifiable on meta: `can_chat_user` is false for every user tested
+  there, so the button correctly never appears. The gating is confirmed;
+  the button's behaviour is not.
 - **No notification-level control.** Web has a "Normal" dropdown
   (Watching / Tracking / Normal / Muted) on the profile; the app has none.
 - **No profile banner.** Web renders the user's card background image.
-- **Header strip is thinner than web's.** Web: Joined · Last Post · Seen ·
-  Views · Trust Level. App: Member Since · Last Activity · Posts, plus a
-  trust-level chip. "Seen" and "Views" are absent.
+- **Header strip — Views and Badges added.** Web: Joined · Last Post ·
+  Seen · Views · Trust Level. The app now shows Member Since · Last
+  Activity · Posts · Views · Badges, plus the trust-level chip. Verified
+  on meta: Views 2,250 and Badges 17 for Oniel, matching
+  `/u/Oniel.json`. **"Seen" (last_seen_at) is still absent.**
 
 ## 3. Topic list (home) — partly fixed
 
@@ -56,6 +65,7 @@ Per-row, web shows and the app does not:
 | Tags | chips (`code`, `python`) | already present (audit was wrong) |
 | Like count | `♥ 7` | **added** |
 | Last reply attribution | "kodit4h1c7022 replied 3 hours ago" with avatar | **added** |
+| Participant avatar cluster | up to 5 faces per row | **added** |
 | "Hot" badge | shown | **added** |
 | View count | absent | shown (`👁 792`) |
 

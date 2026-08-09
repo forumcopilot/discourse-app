@@ -104,6 +104,19 @@ class FCUser with FCUserMappable {
   /// User account state (valid, moderated, email_confirm, email_confirm_edit, email_bounce, rejected, disabled)
   String? userState;
 
+  /// How many times this profile has been viewed (Discourse:
+  /// `profile_view_count`). 0 when the platform does not report it.
+  int profileViewCount;
+
+  /// Whether the viewer may start a chat with this user (Discourse:
+  /// `can_chat_user`). False when chat is unavailable, the viewer is a
+  /// guest, or the user does not accept chats — the server's answer, not
+  /// a guess from whether chat is installed.
+  bool canChatUser;
+
+  /// How many badges this user holds (Discourse: `badge_count`).
+  int badgeCount;
+
   FCUser({
     required this.id,
     required this.username,
@@ -137,6 +150,9 @@ class FCUser with FCUserMappable {
     this.canModerate = false,
     this.canSearch = false,
     this.userState = 'valid',
+    this.profileViewCount = 0,
+    this.canChatUser = false,
+    this.badgeCount = 0,
   });
 }
 

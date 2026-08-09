@@ -91,6 +91,19 @@ class TopicListItem extends StatelessWidget {
                             ),
                           ),
                         ],
+                        // Participant faces, as web shows on every row —
+                        // the fastest read of who is in a conversation.
+                        // Capped at five like web's, with a "+N" when more
+                        // took part, and skipped entirely for a topic with
+                        // a single voice, where the author avatar already
+                        // beside this says the same thing.
+                        if (topic.participantIconUrls.length > 1) ...[
+                          SizedBox(height: DesignTokens.spacingXS),
+                          _ParticipantCluster(
+                            iconUrls: topic.participantIconUrls,
+                            totalCount: topic.participantCount,
+                          ),
+                        ],
                         // "alice replied 3 hours ago" — web leads its rows
                         // with this because on a busy list the last voice is
                         // the reason to open a topic, and the person who
@@ -591,6 +604,83 @@ class TopicListItem extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// The row of participant faces web shows on each topic row.
+///
+/// Overlapped rather than spaced, so five faces cost about the width of
+/// three — on a phone row the alternative is either fewer people or a
+/// cramped line.
+class _ParticipantCluster extends StatelessWidget {
+  const _ParticipantCluster({
+    required this.iconUrls,
+    required this.totalCount,
+  });
+
+  final List<String> iconUrls;
+
+  /// The server's participant count, which can exceed what the posters
+  /// summary names — that list is capped, so "+N" is computed from this.
+  final int totalCount;
+
+  static const int _maxFaces = 5;
+  static const double _radius = 9;
+  static const double _overlap = 6;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final shown = iconUrls.take(_maxFaces).toList(growable: false);
+    final remainder =
+        (totalCount > 0 ? totalCount : iconUrls.length) - shown.length;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: _radius * 2,
+          width: shown.isEmpty
+              ? 0
+              : _radius * 2 + (shown.length - 1) * (_radius * 2 - _overlap),
+          child: Stack(
+            children: [
+              for (var i = 0; i < shown.length; i++)
+                Positioned(
+                  left: i * (_radius * 2 - _overlap),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      // A ring in the row's own background colour, so
+                      // overlapping faces stay separable instead of
+                      // merging into one shape.
+                      border: Border.all(
+                        color: theme.colorScheme.surface,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: UserAvatar(
+                      username: '',
+                      iconUrl: shown[i],
+                      radius: _radius,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        if (remainder > 0) ...[
+          SizedBox(width: DesignTokens.spacingXS),
+          Text(
+            '+$remainder',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              letterSpacing: DesignTokens.letterSpacingWide,
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

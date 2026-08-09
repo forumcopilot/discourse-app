@@ -732,6 +732,15 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       // The server's count, not participatedUserIds.length — the posters
       // summary is capped, so the list under-reports on busy topics.
       participantCount: (t['participant_count'] as int?) ?? 0,
+      // Faces for the row's participant cluster, in posters order. The
+      // topic-list payload ships `users[]` alongside `posters[]`, so this
+      // costs no extra request; entries the payload does not name are
+      // dropped rather than padded with a placeholder.
+      participantIconUrls: posters
+          .whereType<Map>()
+          .map((p) => _avatarUrlFrom(users[p['user_id'] as int?]?['avatar_template']))
+          .whereType<String>()
+          .toList(growable: false),
       linkCount: ((t['details'] as Map<String, dynamic>?)?['links'] as List?)
               ?.length ??
           0,

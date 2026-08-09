@@ -2935,6 +2935,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 year later} other{{count} years later}}'**
   String timeGapYearsLater(int count);
+
+  /// Profile header stat: how many times the profile was viewed
+  ///
+  /// In en, this message translates to:
+  /// **'Views'**
+  String get profileViews;
+
+  /// Profile header stat: number of badges held
+  ///
+  /// In en, this message translates to:
+  /// **'Badges'**
+  String get badges;
+
+  /// Button opening a chat with the profile owner
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get chatWithUser;
 }
 
 class _AppLocalizationsDelegate

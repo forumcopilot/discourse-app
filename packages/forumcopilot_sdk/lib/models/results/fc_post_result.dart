@@ -95,6 +95,7 @@ class FCThreadResult extends FCTopic with FCThreadResultMappable {
     bool isHot = false,
     int participantCount = 0,
     int linkCount = 0,
+    List<String> participantIconUrls = const [],
   }) : super(
           id: id,
           title: title,
@@ -147,6 +148,7 @@ class FCThreadResult extends FCTopic with FCThreadResultMappable {
           isHot: isHot,
           participantCount: participantCount,
           linkCount: linkCount,
+          participantIconUrls: participantIconUrls,
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
@@ -251,6 +253,7 @@ class FCThreadByUnreadResult extends FCTopic with FCThreadByUnreadResultMappable
     bool isHot = false,
     int participantCount = 0,
     int linkCount = 0,
+    List<String> participantIconUrls = const [],
   }) : super(
           id: id,
           title: title,
@@ -303,6 +306,7 @@ class FCThreadByUnreadResult extends FCTopic with FCThreadByUnreadResultMappable
           isHot: isHot,
           participantCount: participantCount,
           linkCount: linkCount,
+          participantIconUrls: participantIconUrls,
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
@@ -407,6 +411,7 @@ class FCThreadByPostResult extends FCTopic with FCThreadByPostResultMappable {
     bool isHot = false,
     int participantCount = 0,
     int linkCount = 0,
+    List<String> participantIconUrls = const [],
   }) : super(
           id: id,
           title: title,
@@ -459,6 +464,7 @@ class FCThreadByPostResult extends FCTopic with FCThreadByPostResultMappable {
           isHot: isHot,
           participantCount: participantCount,
           linkCount: linkCount,
+          participantIconUrls: participantIconUrls,
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,
@@ -684,6 +690,7 @@ class FCAnnouncementResult extends FCTopic with FCAnnouncementResultMappable {
     bool isHot = false,
     int participantCount = 0,
     int linkCount = 0,
+    List<String> participantIconUrls = const [],
   }) : super(
           id: id,
           title: title,
@@ -736,6 +743,7 @@ class FCAnnouncementResult extends FCTopic with FCAnnouncementResultMappable {
           isHot: isHot,
           participantCount: participantCount,
           linkCount: linkCount,
+          participantIconUrls: participantIconUrls,
           canReply: canReply,
           canReport: canReport,
           canUpload: canUpload,

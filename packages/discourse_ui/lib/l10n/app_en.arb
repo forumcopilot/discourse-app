@@ -1455,5 +1455,17 @@
         "type": "int"
       }
     }
+  },
+  "profileViews": "Views",
+  "@profileViews": {
+    "description": "Profile header stat: how many times the profile was viewed"
+  },
+  "badges": "Badges",
+  "@badges": {
+    "description": "Profile header stat: number of badges held"
+  },
+  "chatWithUser": "Chat",
+  "@chatWithUser": {
+    "description": "Button opening a chat with the profile owner"
   }
 }

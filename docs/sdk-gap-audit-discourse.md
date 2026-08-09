@@ -100,8 +100,8 @@ a payload the app fetches.
 
 | Open item | Field | Where |
 |---|---|---|
-| §2 profile "No Chat button" | `can_chat_user` | `/u/{name}.json` |
-| §2 header strip missing "Views" | `profile_view_count` | `/u/{name}.json` |
+| §2 profile "No Chat button" — **done** (unverified, see §2) | `can_chat_user` | `/u/{name}.json` |
+| §2 header strip missing "Views" — **done** | `profile_view_count` | `/u/{name}.json` |
 | §3 topic row "Hot" badge — **done** | `is_hot` | `/latest.json` |
 | §4 stats bar missing "4 links" — **done** | `details.links` | `/t/{id}.json` |
 | §4 stats bar users count — **done** | `participant_count` | `/t/{id}.json` |
@@ -155,9 +155,10 @@ makes the app read as a Discourse client rather than a generic forum app.
 Read against the same forum in a browser, so these are confirmed
 differences rather than payload inferences:
 
-- **Poster avatar cluster on topic rows.** Web shows up to five
-  participant avatars per row; the app shows the author plus the last
-  poster. `posters[]` already carries the rest.
+- ~~**Poster avatar cluster on topic rows.**~~ **Done** (canonical SDK
+  `ddee877`). Up to five overlapping faces per row, "+N" beyond that,
+  skipped when a topic has a single voice. Built from `posters[]` joined
+  against the `users[]` the same payload ships, so no extra request.
 - **"N Replies" expander under a post.** Web summarises replies *to* a
   post and expands them inline. `replyCount` is now on `FCPost` (unused so
   far), and `/posts/{id}/replies` returns the children — this is the other

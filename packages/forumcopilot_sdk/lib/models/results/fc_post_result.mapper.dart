@@ -400,6 +400,15 @@ class FCThreadResultMapper extends ClassMapperBase<FCThreadResult> {
     opt: true,
     def: 0,
   );
+  static List<String> _$participantIconUrls(FCThreadResult v) =>
+      v.participantIconUrls;
+  static const Field<FCThreadResult, List<String>> _f$participantIconUrls =
+      Field(
+        'participantIconUrls',
+        _$participantIconUrls,
+        opt: true,
+        def: const [],
+      );
 
   @override
   final MappableFields<FCThreadResult> fields = const {
@@ -461,6 +470,7 @@ class FCThreadResultMapper extends ClassMapperBase<FCThreadResult> {
     #isHot: _f$isHot,
     #participantCount: _f$participantCount,
     #linkCount: _f$linkCount,
+    #participantIconUrls: _f$participantIconUrls,
   };
 
   static FCThreadResult _instantiate(DecodingData data) {
@@ -523,6 +533,7 @@ class FCThreadResultMapper extends ClassMapperBase<FCThreadResult> {
       isHot: data.dec(_f$isHot),
       participantCount: data.dec(_f$participantCount),
       linkCount: data.dec(_f$linkCount),
+      participantIconUrls: data.dec(_f$participantIconUrls),
     );
   }
 
@@ -597,6 +608,9 @@ abstract class FCThreadResultCopyWith<$R, $In extends FCThreadResult, $Out>
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get tags;
   @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
+  get participantIconUrls;
+  @override
   $R call({
     bool? result,
     String? resultText,
@@ -656,6 +670,7 @@ abstract class FCThreadResultCopyWith<$R, $In extends FCThreadResult, $Out>
     bool? isHot,
     int? participantCount,
     int? linkCount,
+    List<String>? participantIconUrls,
   });
   FCThreadResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -694,6 +709,13 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
         (v, t) => ObjectCopyWith(v, $identity, t),
         (v) => call(tags: v),
       );
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
+  get participantIconUrls => ListCopyWith(
+    $value.participantIconUrls,
+    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v) => call(participantIconUrls: v),
+  );
   @override
   $R call({
     bool? result,
@@ -754,6 +776,7 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
     bool? isHot,
     int? participantCount,
     int? linkCount,
+    List<String>? participantIconUrls,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -815,6 +838,8 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
       if (isHot != null) #isHot: isHot,
       if (participantCount != null) #participantCount: participantCount,
       if (linkCount != null) #linkCount: linkCount,
+      if (participantIconUrls != null)
+        #participantIconUrls: participantIconUrls,
     }),
   );
   @override
@@ -883,6 +908,10 @@ class _FCThreadResultCopyWithImpl<$R, $Out>
     isHot: data.get(#isHot, or: $value.isHot),
     participantCount: data.get(#participantCount, or: $value.participantCount),
     linkCount: data.get(#linkCount, or: $value.linkCount),
+    participantIconUrls: data.get(
+      #participantIconUrls,
+      or: $value.participantIconUrls,
+    ),
   );
 
   @override
@@ -1290,6 +1319,15 @@ class FCThreadByUnreadResultMapper
     opt: true,
     def: 0,
   );
+  static List<String> _$participantIconUrls(FCThreadByUnreadResult v) =>
+      v.participantIconUrls;
+  static const Field<FCThreadByUnreadResult, List<String>>
+  _f$participantIconUrls = Field(
+    'participantIconUrls',
+    _$participantIconUrls,
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<FCThreadByUnreadResult> fields = const {
@@ -1352,6 +1390,7 @@ class FCThreadByUnreadResultMapper
     #isHot: _f$isHot,
     #participantCount: _f$participantCount,
     #linkCount: _f$linkCount,
+    #participantIconUrls: _f$participantIconUrls,
   };
 
   static FCThreadByUnreadResult _instantiate(DecodingData data) {
@@ -1415,6 +1454,7 @@ class FCThreadByUnreadResultMapper
       isHot: data.dec(_f$isHot),
       participantCount: data.dec(_f$participantCount),
       linkCount: data.dec(_f$linkCount),
+      participantIconUrls: data.dec(_f$participantIconUrls),
     );
   }
 
@@ -1497,6 +1537,9 @@ abstract class FCThreadByUnreadResultCopyWith<
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get tags;
   @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
+  get participantIconUrls;
+  @override
   $R call({
     bool? result,
     String? resultText,
@@ -1557,6 +1600,7 @@ abstract class FCThreadByUnreadResultCopyWith<
     bool? isHot,
     int? participantCount,
     int? linkCount,
+    List<String>? participantIconUrls,
   });
   FCThreadByUnreadResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -1596,6 +1640,13 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
         (v, t) => ObjectCopyWith(v, $identity, t),
         (v) => call(tags: v),
       );
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
+  get participantIconUrls => ListCopyWith(
+    $value.participantIconUrls,
+    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v) => call(participantIconUrls: v),
+  );
   @override
   $R call({
     bool? result,
@@ -1657,6 +1708,7 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
     bool? isHot,
     int? participantCount,
     int? linkCount,
+    List<String>? participantIconUrls,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -1719,6 +1771,8 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
       if (isHot != null) #isHot: isHot,
       if (participantCount != null) #participantCount: participantCount,
       if (linkCount != null) #linkCount: linkCount,
+      if (participantIconUrls != null)
+        #participantIconUrls: participantIconUrls,
     }),
   );
   @override
@@ -1788,6 +1842,10 @@ class _FCThreadByUnreadResultCopyWithImpl<$R, $Out>
     isHot: data.get(#isHot, or: $value.isHot),
     participantCount: data.get(#participantCount, or: $value.participantCount),
     linkCount: data.get(#linkCount, or: $value.linkCount),
+    participantIconUrls: data.get(
+      #participantIconUrls,
+      or: $value.participantIconUrls,
+    ),
   );
 
   @override
@@ -2197,6 +2255,15 @@ class FCThreadByPostResultMapper extends ClassMapperBase<FCThreadByPostResult> {
     opt: true,
     def: 0,
   );
+  static List<String> _$participantIconUrls(FCThreadByPostResult v) =>
+      v.participantIconUrls;
+  static const Field<FCThreadByPostResult, List<String>>
+  _f$participantIconUrls = Field(
+    'participantIconUrls',
+    _$participantIconUrls,
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<FCThreadByPostResult> fields = const {
@@ -2259,6 +2326,7 @@ class FCThreadByPostResultMapper extends ClassMapperBase<FCThreadByPostResult> {
     #isHot: _f$isHot,
     #participantCount: _f$participantCount,
     #linkCount: _f$linkCount,
+    #participantIconUrls: _f$participantIconUrls,
   };
 
   static FCThreadByPostResult _instantiate(DecodingData data) {
@@ -2322,6 +2390,7 @@ class FCThreadByPostResultMapper extends ClassMapperBase<FCThreadByPostResult> {
       isHot: data.dec(_f$isHot),
       participantCount: data.dec(_f$participantCount),
       linkCount: data.dec(_f$linkCount),
+      participantIconUrls: data.dec(_f$participantIconUrls),
     );
   }
 
@@ -2404,6 +2473,9 @@ abstract class FCThreadByPostResultCopyWith<
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get tags;
   @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
+  get participantIconUrls;
+  @override
   $R call({
     bool? result,
     String? resultText,
@@ -2464,6 +2536,7 @@ abstract class FCThreadByPostResultCopyWith<
     bool? isHot,
     int? participantCount,
     int? linkCount,
+    List<String>? participantIconUrls,
   });
   FCThreadByPostResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -2502,6 +2575,13 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
         (v, t) => ObjectCopyWith(v, $identity, t),
         (v) => call(tags: v),
       );
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
+  get participantIconUrls => ListCopyWith(
+    $value.participantIconUrls,
+    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v) => call(participantIconUrls: v),
+  );
   @override
   $R call({
     bool? result,
@@ -2563,6 +2643,7 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
     bool? isHot,
     int? participantCount,
     int? linkCount,
+    List<String>? participantIconUrls,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -2625,6 +2706,8 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
       if (isHot != null) #isHot: isHot,
       if (participantCount != null) #participantCount: participantCount,
       if (linkCount != null) #linkCount: linkCount,
+      if (participantIconUrls != null)
+        #participantIconUrls: participantIconUrls,
     }),
   );
   @override
@@ -2694,6 +2777,10 @@ class _FCThreadByPostResultCopyWithImpl<$R, $Out>
     isHot: data.get(#isHot, or: $value.isHot),
     participantCount: data.get(#participantCount, or: $value.participantCount),
     linkCount: data.get(#linkCount, or: $value.linkCount),
+    participantIconUrls: data.get(
+      #participantIconUrls,
+      or: $value.participantIconUrls,
+    ),
   );
 
   @override
@@ -4082,6 +4169,15 @@ class FCAnnouncementResultMapper extends ClassMapperBase<FCAnnouncementResult> {
     opt: true,
     def: 0,
   );
+  static List<String> _$participantIconUrls(FCAnnouncementResult v) =>
+      v.participantIconUrls;
+  static const Field<FCAnnouncementResult, List<String>>
+  _f$participantIconUrls = Field(
+    'participantIconUrls',
+    _$participantIconUrls,
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<FCAnnouncementResult> fields = const {
@@ -4145,6 +4241,7 @@ class FCAnnouncementResultMapper extends ClassMapperBase<FCAnnouncementResult> {
     #isHot: _f$isHot,
     #participantCount: _f$participantCount,
     #linkCount: _f$linkCount,
+    #participantIconUrls: _f$participantIconUrls,
   };
 
   static FCAnnouncementResult _instantiate(DecodingData data) {
@@ -4209,6 +4306,7 @@ class FCAnnouncementResultMapper extends ClassMapperBase<FCAnnouncementResult> {
       isHot: data.dec(_f$isHot),
       participantCount: data.dec(_f$participantCount),
       linkCount: data.dec(_f$linkCount),
+      participantIconUrls: data.dec(_f$participantIconUrls),
     );
   }
 
@@ -4291,6 +4389,9 @@ abstract class FCAnnouncementResultCopyWith<
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get tags;
   @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
+  get participantIconUrls;
+  @override
   $R call({
     bool? result,
     String? resultText,
@@ -4352,6 +4453,7 @@ abstract class FCAnnouncementResultCopyWith<
     bool? isHot,
     int? participantCount,
     int? linkCount,
+    List<String>? participantIconUrls,
   });
   FCAnnouncementResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -4390,6 +4492,13 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
         (v, t) => ObjectCopyWith(v, $identity, t),
         (v) => call(tags: v),
       );
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
+  get participantIconUrls => ListCopyWith(
+    $value.participantIconUrls,
+    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v) => call(participantIconUrls: v),
+  );
   @override
   $R call({
     bool? result,
@@ -4452,6 +4561,7 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
     bool? isHot,
     int? participantCount,
     int? linkCount,
+    List<String>? participantIconUrls,
   }) => $apply(
     FieldCopyWithData({
       if (result != null) #result: result,
@@ -4516,6 +4626,8 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
       if (isHot != null) #isHot: isHot,
       if (participantCount != null) #participantCount: participantCount,
       if (linkCount != null) #linkCount: linkCount,
+      if (participantIconUrls != null)
+        #participantIconUrls: participantIconUrls,
     }),
   );
   @override
@@ -4592,6 +4704,10 @@ class _FCAnnouncementResultCopyWithImpl<$R, $Out>
     isHot: data.get(#isHot, or: $value.isHot),
     participantCount: data.get(#participantCount, or: $value.participantCount),
     linkCount: data.get(#linkCount, or: $value.linkCount),
+    participantIconUrls: data.get(
+      #participantIconUrls,
+      or: $value.participantIconUrls,
+    ),
   );
 
   @override

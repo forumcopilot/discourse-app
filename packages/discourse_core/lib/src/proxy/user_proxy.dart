@@ -519,6 +519,14 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         userGroups: groups,
         customFields: customFields,
         canModerate: user['moderator'] == true,
+        // Profile density web shows and the app did not: view count, badge
+        // count, and — importantly — the server's own answer to whether
+        // this viewer may chat with this person. That is a different
+        // question from whether chat is installed, which is all the app
+        // could previously infer.
+        profileViewCount: (user['profile_view_count'] as int?) ?? 0,
+        canChatUser: user['can_chat_user'] == true,
+        badgeCount: (user['badge_count'] as int?) ?? 0,
         canSearch: false,
         currentActivity: null,
         currentTopicId: null,

@@ -367,6 +367,13 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     opt: true,
     def: 0,
   );
+  static List<String> _$participantIconUrls(FCTopic v) => v.participantIconUrls;
+  static const Field<FCTopic, List<String>> _f$participantIconUrls = Field(
+    'participantIconUrls',
+    _$participantIconUrls,
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<FCTopic> fields = const {
@@ -424,6 +431,7 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
     #isHot: _f$isHot,
     #participantCount: _f$participantCount,
     #linkCount: _f$linkCount,
+    #participantIconUrls: _f$participantIconUrls,
   };
 
   static FCTopic _instantiate(DecodingData data) {
@@ -482,6 +490,7 @@ class FCTopicMapper extends ClassMapperBase<FCTopic> {
       isHot: data.dec(_f$isHot),
       participantCount: data.dec(_f$participantCount),
       linkCount: data.dec(_f$linkCount),
+      participantIconUrls: data.dec(_f$participantIconUrls),
     );
   }
 
@@ -546,6 +555,8 @@ abstract class FCTopicCopyWith<$R, $In extends FCTopic, $Out>
   get participatedUserIds;
   FCPollCopyWith<$R, FCPoll, FCPoll>? get poll;
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get tags;
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
+  get participantIconUrls;
   $R call({
     String? id,
     String? title,
@@ -601,6 +612,7 @@ abstract class FCTopicCopyWith<$R, $In extends FCTopic, $Out>
     bool? isHot,
     int? participantCount,
     int? linkCount,
+    List<String>? participantIconUrls,
   });
   FCTopicCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -630,6 +642,13 @@ class _FCTopicCopyWithImpl<$R, $Out>
         (v, t) => ObjectCopyWith(v, $identity, t),
         (v) => call(tags: v),
       );
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
+  get participantIconUrls => ListCopyWith(
+    $value.participantIconUrls,
+    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v) => call(participantIconUrls: v),
+  );
   @override
   $R call({
     String? id,
@@ -686,6 +705,7 @@ class _FCTopicCopyWithImpl<$R, $Out>
     bool? isHot,
     int? participantCount,
     int? linkCount,
+    List<String>? participantIconUrls,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -743,6 +763,8 @@ class _FCTopicCopyWithImpl<$R, $Out>
       if (isHot != null) #isHot: isHot,
       if (participantCount != null) #participantCount: participantCount,
       if (linkCount != null) #linkCount: linkCount,
+      if (participantIconUrls != null)
+        #participantIconUrls: participantIconUrls,
     }),
   );
   @override
@@ -807,6 +829,10 @@ class _FCTopicCopyWithImpl<$R, $Out>
     isHot: data.get(#isHot, or: $value.isHot),
     participantCount: data.get(#participantCount, or: $value.participantCount),
     linkCount: data.get(#linkCount, or: $value.linkCount),
+    participantIconUrls: data.get(
+      #participantIconUrls,
+      or: $value.participantIconUrls,
+    ),
   );
 
   @override

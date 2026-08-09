@@ -11,6 +11,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_custom_field.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'package:discourse_core/discourse_core.dart'
     show
+        DiscourseChatProxy,
         DiscourseUserProxy,
         DiscourseSummaryUser,
         DiscourseUserSummary,
@@ -31,6 +32,7 @@ import 'package:get/get.dart';
 import 'full_screen_image_viewer.dart';
 import 'trust_level_sheet.dart';
 import 'user_avatar.dart';
+import '../chat/chat_channel_view.dart';
 import 'user_badges_row.dart';
 import 'user_activity_tabs.dart';
 import '../bookmarks_page.dart';
@@ -111,6 +113,7 @@ class _ProfileViewState extends State<ProfileView> {
   File? _selectedImageFile;
   bool _isUploading = false;
   bool _isTogglingFollow = false;
+  bool _isStartingChat = false;
 
   FCUserInfoResult get _userInfo => widget.userInfo;
 
@@ -654,6 +657,49 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
+  /// Opens (or reuses) a direct-message chat channel with this user.
+  ///
+  /// `upsert: true` because the intent is "talk to this person", not
+  /// "create a channel" — if one already exists, reuse it rather than
+  /// failing or making a duplicate.
+  Future<void> _handleStartChat() async {
+    if (_isStartingChat) return;
+    setState(() => _isStartingChat = true);
+    try {
+      // Discourse-only: creating a DM channel is not on IFCChatProxy,
+      // because the SDK's XenForo-shaped contract has no equivalent.
+      final proxy = SiteProxyService.getChatProxy() as DiscourseChatProxy;
+      final result = await proxy
+          .createDirectMessageChannelAsync([_userInfo.username], upsert: true);
+      if (!mounted) return;
+      final channel = result.channel;
+      if (!result.result || channel == null) {
+        // The server refuses for real reasons — DMs disabled, this user
+        // does not accept them — so show what it said rather than a
+        // generic failure.
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : 'Could not open a chat with this user.'),
+        ));
+        return;
+      }
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => Scaffold(
+            appBar: AppBar(title: Text(_userInfo.username)),
+            body: ChatChannelView(
+              siteContext: widget.siteContext,
+              channelId: channel.id,
+            ),
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isStartingChat = false);
+    }
+  }
+
   Widget _buildOtherActionRow(
       BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
     return Row(
@@ -704,6 +750,18 @@ class _ProfileViewState extends State<ProfileView> {
               colorScheme: colorScheme,
             ),
           ),
+          // Web offers Message *and* Chat on a profile. Gated on the
+          // server's `can_chat_user`, not on whether the chat plugin is
+          // installed: those are different questions, and only the server
+          // knows whether this viewer may chat with this person.
+          if (_userInfo.canChatUser) ...[
+            SizedBox(width: DesignTokens.spacingM),
+            OutlinedButton.icon(
+              onPressed: _isStartingChat ? null : _handleStartChat,
+              icon: Icon(Icons.forum_outlined, size: DesignTokens.iconSizeM),
+              label: Text(AppLocalizations.of(context)?.chatWithUser ?? 'Chat'),
+            ),
+          ],
         ],
       ],
     );
@@ -792,6 +850,24 @@ class _ProfileViewState extends State<ProfileView> {
               subtitle: NumberFormat.decimalPattern(
                       Localizations.localeOf(context).toString())
                   .format(_userInfo.postCount),
+            ),
+          // Web's profile header carries these two and the app's did not.
+          // Both come from the same /u/{name}.json the page already fetches.
+          if (_userInfo.profileViewCount != 0)
+            _buildInfoTile(
+              context,
+              icon: Icons.visibility_outlined,
+              title: AppLocalizations.of(context)?.profileViews ?? 'Views',
+              subtitle: NumberFormat.decimalPattern(
+                      Localizations.localeOf(context).toString())
+                  .format(_userInfo.profileViewCount),
+            ),
+          if (_userInfo.badgeCount != 0)
+            _buildInfoTile(
+              context,
+              icon: Icons.military_tech_outlined,
+              title: AppLocalizations.of(context)?.badges ?? 'Badges',
+              subtitle: _userInfo.badgeCount.toString(),
             ),
           if (_userInfo.followingCount != 0)
             _buildInfoTile(

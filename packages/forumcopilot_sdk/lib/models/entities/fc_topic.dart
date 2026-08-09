@@ -104,6 +104,16 @@ class FCTopic with FCTopicMappable {
   /// List of user IDs who participated in this topic
   List<String> participatedUserIds;
 
+  /// Avatar URLs for [participatedUserIds], in the same order and ready to
+  /// load.
+  ///
+  /// Forum web UIs show a cluster of participant faces on each topic row —
+  /// on a busy list that is the fastest signal of who is in a conversation.
+  /// Kept parallel to the id list rather than folded into it because the
+  /// ids are useful on their own, and a platform may know who took part
+  /// without being able to picture them.
+  List<String> participantIconUrls;
+
   /// Indicates if the topic is pinned/sticky
   @MappableField(hook: FlexibleBoolHook())
   bool isPinned;
@@ -227,5 +237,6 @@ class FCTopic with FCTopicMappable {
     this.isHot = false,
     this.participantCount = 0,
     this.linkCount = 0,
+    this.participantIconUrls = const [],
   });
 }
