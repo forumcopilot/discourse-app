@@ -9,6 +9,8 @@ import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteCapabilities;
 import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:discourse_ui/views/new_topic_page.dart';
+import 'package:discourse_ui/views/post_page.dart';
+import 'package:get/get.dart';
 import 'package:discourse_ui/views/widgets/forum_actions.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSubscriptionProxy;
@@ -57,16 +59,38 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
     }
 
     var topicCreated = false;
+    String? newTopicId;
+    var newTopicTitle = '';
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => NewTopicPage(
           siteContext: widget.siteContext,
           forumId: widget.forum.id,
           forumName: widget.forum.name,
-          onTopicCreated: () => topicCreated = true,
+          onTopicCreated: (topicId, title) {
+            topicCreated = true;
+            if (topicId.isNotEmpty) {
+              newTopicId = topicId;
+              newTopicTitle = title;
+            }
+          },
         ),
       ),
     );
+
+    // Open what was just created, as web does and as sending a PM already
+    // did. Done here rather than inside the composer: the composer pops
+    // itself on success, which would pop any route it pushed.
+    if (newTopicId != null && mounted) {
+      await Get.to(() => PostPage(
+            siteContext: widget.siteContext,
+            topicId: newTopicId!,
+            // The topic's title, not the category's — the first post
+            // renders whatever is passed here as its heading.
+            title: newTopicTitle,
+            forumId: widget.forum.id,
+          ));
+    }
 
     if ((result == true || topicCreated) && _refreshCallback != null) {
       _refreshCallback!();

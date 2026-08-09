@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -11,7 +10,6 @@ import 'package:discourse_ui/utils/image_optimization_utils.dart';
 import 'package:discourse_ui/utils/file_utils.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:discourse_ui/utils/discourse_draft_controller.dart';
-import 'package:discourse_ui/views/post_page.dart';
 import 'package:discourse_ui/views/widgets/tag_input_field.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteCapabilities;
@@ -25,7 +23,12 @@ class NewTopicPage extends StatefulWidget {
   /// reliable than the pop result: it still reaches the opener when a
   /// post-creation step throws and the page is later popped without a
   /// result.
-  final VoidCallback? onTopicCreated;
+  /// Called with the new topic's id once it lands.
+  ///
+  /// Reports rather than navigates: this page is popped by its own submit
+  /// flow, so a route pushed from here is popped straight back off. The
+  /// caller opens the topic after the composer has closed.
+  final void Function(String topicId, String title)? onTopicCreated;
 
   const NewTopicPage({
     super.key,
@@ -120,25 +123,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
       debugPrint('   - groupId passed: "$_groupId"');
 
       if (result.result) {
-        widget.onTopicCreated?.call();
-        // Open what was just created, as web does — and as this app already
-        // does after sending a private message. Landing back on the
-        // category list left the author with no confirmation beyond the
-        // composer closing, and no way to reach their own topic except by
-        // hunting for it below the pinned ones.
-        //
-        // `off` rather than `to`: the composer is finished, so it is
-        // replaced rather than stacked, and Back from the new topic
-        // returns to the list instead of to an empty composer.
-        final newTopicId = result.topicId?.trim();
-        if (newTopicId != null && newTopicId.isNotEmpty) {
-          Get.off(() => PostPage(
-                siteContext: widget.siteContext,
-                topicId: newTopicId,
-                title: title,
-                forumId: widget.forumId,
-              ));
-        }
+        widget.onTopicCreated?.call(result.topicId?.trim() ?? '', title);
         return true;
       } else {
         // Server returned result=false with a message - throw it directly without wrapping

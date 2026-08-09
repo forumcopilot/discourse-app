@@ -285,19 +285,41 @@ class _ForumTopicListState extends State<ForumTopicList> {
     }
 
     var topicCreated = false;
+    String? newTopicId;
+    var newTopicTitle = '';
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => NewTopicPage(
           siteContext: widget.siteContext,
           forumId: widget.forum.id,
           forumName: widget.forum.name,
-          onTopicCreated: () => topicCreated = true,
+          onTopicCreated: (topicId, title) {
+            topicCreated = true;
+            if (topicId.isNotEmpty) {
+              newTopicId = topicId;
+              newTopicTitle = title;
+            }
+          },
         ),
       ),
     );
 
     if (result == true || topicCreated) {
       _loadTopics();
+    }
+
+    // Open what was just created, as web does. This list owns the header's
+    // New Topic button, so the navigation belongs here as well as on the
+    // page's app-bar action — the two entry points are separate.
+    if (newTopicId != null && mounted) {
+      await Get.to(() => PostPage(
+            siteContext: widget.siteContext,
+            topicId: newTopicId!,
+            // The topic's title, not the category's — the first post
+            // renders whatever is passed here as its heading.
+            title: newTopicTitle,
+            forumId: widget.forum.id,
+          ));
     }
   }
 

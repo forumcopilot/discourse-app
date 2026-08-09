@@ -348,7 +348,7 @@ chips.
 
 ### Findings
 
-- **New topic does not open what you created — fixed.** After posting,
+- **New topic does not open what you created — fixed and verified.** After posting,
   the app returned to the category list, leaving the author no
   confirmation beyond the composer closing and no way to their own topic
   except hunting for it below the pinned ones. It now opens the created
