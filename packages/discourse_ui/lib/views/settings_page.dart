@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseSiteCapabilities;
 
 import '../theme/design_tokens.dart';
 import 'change_email_page.dart';
@@ -122,6 +124,12 @@ class ForumSettingsPage extends StatelessWidget {
             ),
           ),
           const Divider(height: 1),
+          // Legal links the forum publishes on /site.json. Rendered only
+          // when it names them: the paths are per-forum (meta's tos_url is
+          // the relative "/tos", its privacy policy an absolute
+          // discourse.org URL), so both are resolved against the forum
+          // base rather than assumed.
+          ..._legalLinks(context, colorScheme, textTheme),
           Padding(
             padding: const EdgeInsets.fromLTRB(
               DesignTokens.spacingL,
@@ -219,6 +227,54 @@ class ForumSettingsPage extends StatelessWidget {
   ///
   /// Confirmation dialog first because this triggers an immediate
   /// email — accidental taps would be annoying.
+
+  /// Terms / privacy rows, when the forum publishes them.
+  ///
+  /// App stores generally require a reachable privacy policy, and the
+  /// forum is the only party that knows its own — so these are read
+  /// rather than hardcoded, and simply absent on a forum that publishes
+  /// neither.
+  List<Widget> _legalLinks(
+      BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
+    final caps =
+        DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl);
+    final entries = <({String label, IconData icon, String url})>[
+      if (caps.tosUrl?.isNotEmpty ?? false)
+        (label: 'Terms of Service', icon: Icons.gavel_outlined, url: caps.tosUrl!),
+      if (caps.privacyPolicyUrl?.isNotEmpty ?? false)
+        (
+          label: 'Privacy Policy',
+          icon: Icons.privacy_tip_outlined,
+          url: caps.privacyPolicyUrl!
+        ),
+    ];
+    if (entries.isEmpty) return const [];
+    return [
+      for (final e in entries) ...[
+        ListTile(
+          leading: Icon(e.icon, color: colorScheme.onSurfaceVariant),
+          title: Text(e.label),
+          trailing: Icon(Icons.open_in_new,
+              size: 18, color: colorScheme.onSurfaceVariant),
+          onTap: () => _openForumUrl(context, e.url),
+        ),
+        const Divider(height: 1),
+      ],
+    ];
+  }
+
+  /// Opens a forum-published URL, which may be absolute or site-relative.
+  Future<void> _openForumUrl(BuildContext context, String url) async {
+    final uri = url.startsWith('http')
+        ? Uri.parse(url)
+        : Uri.parse(siteContext.site.url).resolve(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (context.mounted) {
+      _toast(context, "Couldn't open that page.");
+    }
+  }
+
   Future<void> _confirmPasswordReset(BuildContext context) async {
     final colorScheme = Theme.of(context).colorScheme;
     final confirmed = await showDialog<bool>(

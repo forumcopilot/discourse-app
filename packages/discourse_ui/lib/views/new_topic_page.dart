@@ -11,6 +11,8 @@ import 'package:discourse_ui/utils/file_utils.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:discourse_ui/utils/discourse_draft_controller.dart';
 import 'package:discourse_ui/views/widgets/tag_input_field.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseSiteCapabilities;
 
 class NewTopicPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -294,10 +296,18 @@ class _NewTopicPageState extends State<NewTopicPage> {
       titleController: _titleController,
       contentController: _contentController,
       onSubmit: _handleSubmitWithDraftDiscard,
-      extraHeader: TagInputField(
-        initial: _tags,
-        onChanged: (tags) => _tags = tags,
-      ),
+      // Only offer tagging when the forum says this user may tag
+      // (`can_tag_topics` on /site.json). Previously the field was always
+      // shown and the server refused the tags on submit — the user typed
+      // them, lost them, and was told why only after the round trip.
+      extraHeader: DiscourseSiteCapabilities.forSite(
+                  widget.siteContext.site.pluginUrl)
+              .canTagTopics
+          ? TagInputField(
+              initial: _tags,
+              onChanged: (tags) => _tags = tags,
+            )
+          : null,
       onFileUpload: (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false) ? _handleFileUpload : null,
       forumName: widget.forumName,
       onRemoveAttachment: (attachmentId) async {

@@ -225,15 +225,21 @@ chat probe. The rest below is still unread.
   forum already renders every provider it supports, inside that webview.
   Native buttons would duplicate it and could drift out of sync. Left
   unread deliberately.
-- **`can_tag_topics`, `can_create_tag`, `can_tag_pms`** — tag permissions.
-  The composer offers tagging without knowing whether it is allowed.
+- ~~**`can_tag_topics`**~~ — **done.** The new-topic composer only offers
+  the tag field when the forum says this user may tag. Before, the field
+  was always shown and the server refused the tags on submit: the user
+  typed them, lost them, and learned why only after the round trip.
+  Verified by data (meta answers `can_tag_topics: false`), not visually —
+  the compose entry point is not on the Home screen.
+  `can_create_tag` / `can_tag_pms` remain unread.
 - **`censored_regexp`, `watched_words_replace`, `watched_words_link`** —
   watched words. Web applies these client-side; the app does not, so
   moderated text can render raw.
 - `hashtag_configurations` / `hashtag_icons` — `#hashtag` rendering inside
   cooked content.
-- `tos_url`, `privacy_policy_url` — legal links, and likely a store
-  requirement.
+- ~~`tos_url`, `privacy_policy_url`~~ — **done.** Both render in Settings
+  when the forum publishes them, resolved against the forum base since
+  they may be relative ("/tos") or absolute. Verified on meta.
 - `top_tags`, `navigation_menu_site_top_tags` — tag discovery.
 - `homepage_choices`, `top_menu_items`, `filters` — which tabs a forum
   actually wants surfaced, instead of the app's fixed five.
