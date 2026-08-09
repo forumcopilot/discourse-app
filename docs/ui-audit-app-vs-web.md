@@ -325,6 +325,57 @@ own posts.
   `GET /t/{id}/{n}`, `POST /topics/timings`, `GET /t/{id}` — to display
   one new post. Worth a look given the rate-limit work elsewhere.
 
+## 9e. Composer options, attachments, edit history, delete — audited
+
+### What the composer offers, app vs web
+
+| | App | Web |
+|---|---|---|
+| New topic | Category · Tags · Title · Content · "Sent from mobile app" toggle | Category · Tags · Title · Body |
+| New message | Participants (chips, + Add) · Subject · Message | Recipients (+) · Title · Body |
+| Edit | Content (raw markdown) | Body (raw markdown) |
+| Formatting | 13-action menu: bold, italic, underline, strike, link, image, video, quote, code, spoiler, bullet/numbered list, list item | flat toolbar, ~12 |
+| Attach | paperclip (file) · image | upload button |
+
+Close to parity. The app additionally has a "Sent from Discourse mobile
+app" signature toggle web has no equivalent for; web additionally has
+preview, emoji picker, GIF and an AI helper.
+
+**Verified by posting on try.discourse.org:** reply, reply-with-quote,
+edit, new topic (id 1762) and a private message (id 1763) all succeed.
+User search for PM recipients works and recipients render as removable
+chips.
+
+### Findings
+
+- **New topic does not open what you created.** After posting, the app
+  returns to the category list; the new topic is not surfaced. Sending a
+  PM *does* navigate into the conversation, so the two write paths
+  disagree with each other, and web opens both.
+- **"No users found" shows before you have searched.** The PM recipient
+  picker renders its empty state on open, so a blank search field is
+  paired with "Try searching with a different username".
+- **Attachments could not be driven end to end.** The system photo picker
+  does not accept synthetic taps on its confirm button, so the upload was
+  not exercised. A harness limitation, not a defect — the composer's
+  upload path is unverified either way.
+
+### Corrections to earlier entries in this document
+
+- **The edit indicator exists.** An earlier note here said edited posts
+  carry no pencil. They do — marcy's post #1 on try.discourse.org shows
+  one. My own edit showed none because it fell inside Discourse's
+  `editing_grace_period`, which deliberately creates no revision. Correct
+  behaviour, wrongly recorded.
+- **Edit history is implemented.** `GET /posts/{id}/revisions/{n}.json`,
+  `DiscoursePostRevision`, and a `PostRevisionPage` all exist, reached
+  from the post overflow menu's "View history".
+- **Soft delete and recovery are implemented.** Discourse soft-deletes by
+  default (`DELETE /posts/{id}`, `DELETE /t/{id}`) and recovers via
+  `PUT .../recover`; permanent deletion needs `force_destroy=true` and
+  `can_permanently_delete?`. `DiscourseModerationProxy` covers all three,
+  and deleted posts render a badge.
+
 ## 10. Cross-cutting
 
 - **Anonymous chat fetch — fixed** (`bf73875`). `GET /chat/api/me/channels`
