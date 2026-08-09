@@ -127,21 +127,25 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage> {
 
       if (!mounted) return;
 
+      // Whether or not our backend took the key, the user is done here: they
+      // approved on the forum, and the grant is real. Holding them on this
+      // screen strands them behind an outage they cannot do anything about,
+      // and tapping Continue again only mints another key. Let them through
+      // and report the partial result on the way out.
+      //
+      // The messenger is resolved BEFORE the pop — afterwards this context is
+      // defunct and the message would go nowhere.
+      final messenger = ScaffoldMessenger.of(context);
+      Navigator.of(context).pop(uploaded);
       if (!uploaded) {
-        // The grant on the forum is real, so re-running it would just mint
-        // another key. Say what happened rather than silently claiming success.
-        setState(() => _granting = false);
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           const SnackBar(
             content: Text(
                 'Approved, but we could not reach ForumCopilot to finish setting '
                 'up. Try again later from Settings.'),
           ),
         );
-        return;
       }
-
-      Navigator.of(context).pop(true);
     } catch (e) {
       AppLogger.debug('🔔 [ENABLE_NOTIFICATIONS] grant failed: $e');
       if (!mounted) return;
