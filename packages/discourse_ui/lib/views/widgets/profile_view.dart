@@ -14,6 +14,7 @@ import 'package:discourse_core/discourse_core.dart'
         DiscourseChatProxy,
         DiscourseUserProxy,
         DiscourseSummaryUser,
+        DiscourseSummaryLink,
         DiscourseUserSummary,
         DiscourseSiteContextExtension;
 
@@ -1268,10 +1269,14 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
     final likedBy = summary.mostLikedByUsers;
     final topTopics = summary.topTopics;
     final topReplies = summary.topReplies;
+    final topLinks = summary.topLinks;
+    final mostRepliedTo = summary.mostRepliedToUsers;
     if (!showStats &&
         likedBy.isEmpty &&
         topTopics.isEmpty &&
-        topReplies.isEmpty) {
+        topReplies.isEmpty &&
+        topLinks.isEmpty &&
+        mostRepliedTo.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -1364,6 +1369,17 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
                       )),
                 ),
             ],
+          ),
+        // Top Links and Most Replied To complete web's summary. Both were
+        // already parsed off /u/{name}/summary.json — only the rendering
+        // was missing, so neither costs a request.
+        if (topLinks.isNotEmpty)
+          _SummaryLinksSection(links: topLinks.take(5).toList()),
+        if (mostRepliedTo.isNotEmpty)
+          _SummaryPeopleSection(
+            title: 'Most Replied To',
+            people: mostRepliedTo.take(5).toList(),
+            siteContext: widget.siteContext,
           ),
       ],
     );
@@ -1671,6 +1687,135 @@ class _SummaryUnavailable extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+
+/// Web's "Top Links": the outbound links this user posted that were
+/// clicked most. Tapping opens the link itself, not the post — the whole
+/// point of the section is where the link went.
+class _SummaryLinksSection extends StatelessWidget {
+  const _SummaryLinksSection({required this.links});
+
+  final List<DiscourseSummaryLink> links;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, DesignTokens.spacingL,
+          DesignTokens.spacingL, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Top Links',
+              style: textTheme.titleMedium
+                  ?.copyWith(fontWeight: DesignTokens.fontWeightBold)),
+          SizedBox(height: DesignTokens.spacingS),
+          for (final l in links)
+            InkWell(
+              onTap: () async {
+                final uri = Uri.tryParse(l.url);
+                if (uri != null && await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              },
+              child: Padding(
+                padding:
+                    EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      // Discourse leaves `title` null for a bare URL.
+                      l.title.isNotEmpty ? l.title : l.url,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.bodyMedium
+                          ?.copyWith(color: colorScheme.primary),
+                    ),
+                    SizedBox(height: DesignTokens.spacingXS / 2),
+                    Text(
+                      l.clicks == 1 ? '1 click' : '${l.clicks} clicks',
+                      style: textTheme.bodySmall
+                          ?.copyWith(color: colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Web's "Most Replied To" — the people this user answers most, with how
+/// often. Tapping opens their profile.
+class _SummaryPeopleSection extends StatelessWidget {
+  const _SummaryPeopleSection({
+    required this.title,
+    required this.people,
+    required this.siteContext,
+  });
+
+  final String title;
+  final List<DiscourseSummaryUser> people;
+  final SiteContext siteContext;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, DesignTokens.spacingL,
+          DesignTokens.spacingL, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title,
+              style: textTheme.titleMedium
+                  ?.copyWith(fontWeight: DesignTokens.fontWeightBold)),
+          SizedBox(height: DesignTokens.spacingS),
+          for (final u in people)
+            InkWell(
+              onTap: () => Get.to(() => UserProfilePage(
+                    siteContext: siteContext,
+                    userId: u.id.toString(),
+                    userName: u.username,
+                  )),
+              child: Padding(
+                padding:
+                    EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
+                child: Row(
+                  children: [
+                    UserAvatar(
+                      username: u.username,
+                      iconUrl: u.avatarUrl,
+                      radius: 14,
+                    ),
+                    SizedBox(width: DesignTokens.spacingM),
+                    Expanded(
+                      child: Text(
+                        u.name?.isNotEmpty == true ? u.name! : u.username,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.bodyMedium,
+                      ),
+                    ),
+                    Text(
+                      u.count == 1 ? '1 reply' : '${u.count} replies',
+                      style: textTheme.bodySmall
+                          ?.copyWith(color: colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

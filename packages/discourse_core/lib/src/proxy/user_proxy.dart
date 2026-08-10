@@ -627,8 +627,12 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           postTime: DateTime.tryParse(a['created_at']?.toString() ?? '') ??
               DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
           replyNumber: (a['post_number'] as int?) ?? 0,
-          postContent: a['excerpt']?.toString(),
-          shortContent: a['excerpt']?.toString(),
+          // /user_actions.json excerpts are cooked HTML, not text — a post
+          // whose excerpt starts with a lightbox anchor rendered the raw
+          // `<a class="lightbox" href="…">` in the profile feed. Flatten
+          // to text, which also decodes the entities Discourse escapes.
+          postContent: stripHtmlToText(a['excerpt']?.toString() ?? ''),
+          shortContent: stripHtmlToText(a['excerpt']?.toString() ?? ''),
         );
       }).toList();
       return FCUserReplyResult(

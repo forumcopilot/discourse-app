@@ -458,8 +458,8 @@ Compared signed in on try.discourse.org, own profile and others'.
 | Web | App |
 |---|---|
 | Activity sub-tabs: All · Topics · Replies · Read · Drafts · Likes · Bookmarks · Reactions · Solved · Votes | **Replies · Topics · Likes · Solved** |
-| Summary: Top Links | absent |
-| Summary: Most Replied To | absent |
+| Summary: Top Links | **added** |
+| Summary: Most Replied To | **added** |
 | Badges as a full page | badges *row* only |
 | Profile tabs: Summary / Activity / Notifications / Messages / Badges / Preferences | flat page + nav rows |
 | "Expand" (user card) | absent |
@@ -472,8 +472,19 @@ all of which are `/user_actions.json` filters, the same endpoint the
 Replies tab already uses, so this is filter plumbing rather than new
 surface.
 
-Top Links and Most Replied To come from the same `/u/{name}/summary.json`
-the stats already read.
+**Top Links and Most Replied To — added.** Both were already parsed off
+`/u/{name}/summary.json` into `DiscourseUserSummary`; only the rendering
+was missing, so neither costs a request. Links open the URL itself rather
+than the post — the point of the section is where the link went — and
+each replied-to person opens their profile. Hidden when empty, which is
+why they do not appear on a new account (web says "No links yet" there
+instead).
+
+Found while testing: **activity excerpts were rendering raw HTML.** A
+reply whose excerpt began with a lightbox anchor showed
+`<a class="lightbox" href="…">` as literal text in the profile feed.
+`/user_actions.json` excerpts are cooked HTML, not text; they are
+flattened now, which also decodes the entities Discourse escapes.
 
 ## 10. Cross-cutting
 
