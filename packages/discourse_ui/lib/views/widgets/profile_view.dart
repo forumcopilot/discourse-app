@@ -18,6 +18,7 @@ import 'package:discourse_core/discourse_core.dart'
         DiscourseUserSummary;
 
 import '../../l10n/generated/app_localizations.dart';
+import 'profile_section.dart';
 import '../../theme/design_tokens.dart';
 import '../../theme/style_builders.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -1115,9 +1116,11 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
     final topTopics = summary.topTopics;
     final topReplies = summary.topReplies;
     final topLinks = summary.topLinks;
+    final mostLiked = summary.mostLikedUsers;
     final mostRepliedTo = summary.mostRepliedToUsers;
     if (!showStats &&
         likedBy.isEmpty &&
+        mostLiked.isEmpty &&
         topTopics.isEmpty &&
         topReplies.isEmpty &&
         topLinks.isEmpty &&
@@ -1173,7 +1176,7 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _statsCard(context, colorScheme, textTheme, stats, showStats, likedBy),
+        _statsCard(context, colorScheme, textTheme, stats, showStats),
         if (topReplies.isNotEmpty)
           _SummaryTopicSection(
             title: 'Top Replies',
@@ -1218,14 +1221,31 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
         // Top Links and Most Replied To complete web's summary. Both were
         // already parsed off /u/{name}/summary.json — only the rendering
         // was missing, so neither costs a request.
-        if (topLinks.isNotEmpty)
-          _SummaryLinksSection(links: topLinks.take(5).toList()),
-        if (mostRepliedTo.isNotEmpty)
-          _SummaryPeopleSection(
-            title: 'Most Replied To',
-            people: mostRepliedTo.take(5).toList(),
+        if (likedBy.isNotEmpty)
+          _SummaryPeopleStrip(
+            title: 'Most Liked By',
+            people: likedBy,
+            countLabel: (n) => n == 1 ? '1 like' : '$n likes',
             siteContext: widget.siteContext,
           ),
+        // Web shows this third people list too. It was already parsed off
+        // the same payload and simply never rendered, so it costs nothing.
+        if (mostLiked.isNotEmpty)
+          _SummaryPeopleStrip(
+            title: 'Most Liked',
+            people: mostLiked,
+            countLabel: (n) => n == 1 ? '1 like' : '$n likes',
+            siteContext: widget.siteContext,
+          ),
+        if (mostRepliedTo.isNotEmpty)
+          _SummaryPeopleStrip(
+            title: 'Most Replied To',
+            people: mostRepliedTo.take(5).toList(),
+            countLabel: (n) => n == 1 ? '1 reply' : '$n replies',
+            siteContext: widget.siteContext,
+          ),
+        if (topLinks.isNotEmpty)
+          _SummaryLinksSection(links: topLinks.take(5).toList()),
       ],
     );
   }
@@ -1236,9 +1256,8 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
     TextTheme textTheme,
     List<({String value, String label})> stats,
     bool showStats,
-    List<DiscourseSummaryUser> likedBy,
   ) {
-    if (!showStats && likedBy.isEmpty) return const SizedBox.shrink();
+    if (!showStats) return const SizedBox.shrink();
     return Card(
       margin: EdgeInsets.symmetric(
         horizontal: DesignTokens.spacingL,
@@ -1313,57 +1332,6 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
                 },
               ),
             ],
-            if (likedBy.isNotEmpty) ...[
-              SizedBox(height: DesignTokens.spacingL),
-              Text(
-                'MOST LIKED BY',
-                style: textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  letterSpacing: DesignTokens.letterSpacingWide,
-                  fontWeight: DesignTokens.fontWeightSemiBold,
-                ),
-              ),
-              SizedBox(height: DesignTokens.spacingS),
-              SizedBox(
-                height: 44,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: likedBy.length,
-                  separatorBuilder: (_, __) =>
-                      const SizedBox(width: DesignTokens.spacingS),
-                  itemBuilder: (context, index) {
-                    final DiscourseSummaryUser user = likedBy[index];
-                    return Tooltip(
-                      message: '${user.username} · ${user.count}',
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => UserProfilePage(
-                                siteContext: widget.siteContext,
-                                userId: user.id.toString(),
-                                userName: user.username,
-                                profilePictureUrl: user.avatarUrl.isNotEmpty
-                                    ? user.avatarUrl
-                                    : null,
-                              ),
-                            ),
-                          );
-                        },
-                        child: UserAvatar(
-                          username: user.username,
-                          iconUrl: user.avatarUrl.isNotEmpty
-                              ? user.avatarUrl
-                              : null,
-                          radius: 22,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
           ],
         ),
       ),
@@ -1371,11 +1339,8 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
   }
 }
 
-/// A profile list section — heading plus rows — in the same shape as
-/// "Recent Posts" further down the page: a `titleLarge` bold heading in
-/// `paddingL`, then full-bleed tappable rows. The summary block used a
-/// card with uppercase micro-labels, which read as a different component
-/// from the rest of the profile.
+/// A profile list section: heading plus full-bleed tappable rows, in the
+/// shared [ProfileSection] chrome.
 class _SummaryTopicSection extends StatelessWidget {
   final String title;
   final List<_SummaryTopicRowData> rows;
@@ -1384,23 +1349,20 @@ class _SummaryTopicSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: DesignTokens.paddingL,
-          child: Text(
-            title,
-            style: textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: DesignTokens.fontWeightBold,
-            ),
-          ),
-        ),
-        for (final row in rows) _SummaryTopicRow(data: row),
-      ],
+    return ProfileSection(
+      title: title,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (var i = 0; i < rows.length; i++) ...[
+            // Rows are title-over-metadata with no card of their own, so
+            // two consecutive ones ran together — worst where every reply
+            // in a topic repeats the same topic title.
+            if (i > 0) const ProfileRowDivider(),
+            _SummaryTopicRow(data: rows[i]),
+          ],
+        ],
+      ),
     );
   }
 }
@@ -1550,16 +1512,13 @@ class _SummaryLinksSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, DesignTokens.spacingL,
-          DesignTokens.spacingL, 0),
+    return ProfileSection(
+      title: 'Top Links',
+      contentPadding:
+          EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Top Links',
-              style: textTheme.titleMedium
-                  ?.copyWith(fontWeight: DesignTokens.fontWeightBold)),
-          SizedBox(height: DesignTokens.spacingS),
           for (final l in links)
             InkWell(
               onTap: () async {
@@ -1598,69 +1557,101 @@ class _SummaryLinksSection extends StatelessWidget {
   }
 }
 
-/// Web's "Most Replied To" — the people this user answers most, with how
-/// often. Tapping opens their profile.
-class _SummaryPeopleSection extends StatelessWidget {
-  const _SummaryPeopleSection({
+/// The people sections of web's summary — "Most Liked By", "Most Liked",
+/// "Most Replied To" — as a swipeable strip of faces.
+///
+/// One shape for all three, because they are one kind of thing: a person
+/// and a count. "Most Liked By" used to live inside the stats card as a
+/// row of bare avatars under a `MOST LIKED BY` micro-label, which made a
+/// list of people look like a statistic and gave no way to tell who they
+/// were without long-pressing for a tooltip. The name is now on screen.
+class _SummaryPeopleStrip extends StatelessWidget {
+  const _SummaryPeopleStrip({
     required this.title,
     required this.people,
+    required this.countLabel,
     required this.siteContext,
   });
 
   final String title;
   final List<DiscourseSummaryUser> people;
+
+  /// Pluralised unit for the count, e.g. `(n) => n == 1 ? '1 like' : ...`.
+  /// The counts mean different things per section and saying so is the
+  /// only thing that distinguishes "Most Liked By" from "Most Replied To"
+  /// once both are strips of faces.
+  final String Function(int) countLabel;
+
   final SiteContext siteContext;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, DesignTokens.spacingL,
-          DesignTokens.spacingL, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title,
-              style: textTheme.titleMedium
-                  ?.copyWith(fontWeight: DesignTokens.fontWeightBold)),
-          SizedBox(height: DesignTokens.spacingS),
-          for (final u in people)
-            InkWell(
-              onTap: () => Get.to(() => UserProfilePage(
-                    siteContext: siteContext,
-                    userId: u.id.toString(),
-                    userName: u.username,
-                  )),
-              child: Padding(
-                padding:
-                    EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
-                child: Row(
-                  children: [
-                    UserAvatar(
-                      username: u.username,
-                      iconUrl: u.avatarUrl,
-                      radius: 14,
-                    ),
-                    SizedBox(width: DesignTokens.spacingM),
-                    Expanded(
-                      child: Text(
-                        u.name?.isNotEmpty == true ? u.name! : u.username,
+    return ProfileSection(
+      title: title,
+      child: SizedBox(
+        height: 108,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+          itemCount: people.length,
+          separatorBuilder: (_, __) =>
+              SizedBox(width: DesignTokens.spacingS),
+          itemBuilder: (context, index) {
+            final u = people[index];
+            return SizedBox(
+              // Wide enough for a typical username at bodySmall; longer
+              // ones ellipsize rather than reflowing the strip.
+              width: 84,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+                onTap: () => Get.to(() => UserProfilePage(
+                      siteContext: siteContext,
+                      userId: u.id.toString(),
+                      userName: u.username,
+                      profilePictureUrl:
+                          u.avatarUrl.isNotEmpty ? u.avatarUrl : null,
+                    )),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: DesignTokens.spacingS,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      UserAvatar(
+                        username: u.username,
+                        iconUrl: u.avatarUrl.isNotEmpty ? u.avatarUrl : null,
+                        radius: 22,
+                      ),
+                      SizedBox(height: DesignTokens.spacingXS),
+                      Text(
+                        u.username,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: DesignTokens.fontWeightSemiBold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      u.count == 1 ? '1 reply' : '${u.count} replies',
-                      style: textTheme.bodySmall
-                          ?.copyWith(color: colorScheme.onSurfaceVariant),
-                    ),
-                  ],
+                      Text(
+                        countLabel(u.count),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }

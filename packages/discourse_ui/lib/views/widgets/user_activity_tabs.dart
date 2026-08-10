@@ -3,6 +3,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 
 import '../../theme/design_tokens.dart';
 import 'filter_chip_bar.dart';
+import 'profile_section.dart';
 import 'user_created_topics.dart';
 import 'user_replied_posts.dart';
 
@@ -68,9 +69,16 @@ class _UserActivityTabsState extends State<UserActivityTabs> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    // Every other block on this page announces itself — "Top Replies",
+    // "Top Topics", "Most Liked By". Without a heading the chips read as
+    // controls belonging to the section above them rather than as the
+    // start of the feed below. Web solves this by making Activity its own
+    // tab; on one scrolling page a section heading is the equivalent.
+    return ProfileSection(
+      title: 'Activity',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
         _buildSelector(context),
         const SizedBox(height: DesignTokens.spacingS),
         if (_selected == _ActivityTab.topics)
@@ -98,35 +106,16 @@ class _UserActivityTabsState extends State<UserActivityTabs> {
             actionFilter: _selected.filter,
             emptyLabel: _selected.emptyLabel,
           ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildSelector(BuildContext context) {
     final tabs = _ActivityTab.values;
-    final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Every other block on this page announces itself — "Top Replies",
-        // "Top Topics", "Top Links". Without a heading the chips read as
-        // controls belonging to the summary section above them rather than
-        // as the start of the feed below. Web solves the same problem by
-        // making Activity its own tab; on one scrolling page a heading is
-        // the equivalent.
-        Padding(
-          padding: EdgeInsets.fromLTRB(
-            DesignTokens.spacingL,
-            DesignTokens.spacingL,
-            DesignTokens.spacingL,
-            0,
-          ),
-          child: Text(
-            'Activity',
-            style: textTheme.titleMedium
-                ?.copyWith(fontWeight: DesignTokens.fontWeightBold),
-          ),
-        ),
         FilterChipBar(
           options: [
             for (final t in tabs)
