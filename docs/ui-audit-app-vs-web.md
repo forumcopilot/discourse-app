@@ -460,7 +460,7 @@ Compared signed in on try.discourse.org, own profile and others'.
 | Activity sub-tabs: All · Topics · Replies · Read · Drafts · Likes · Bookmarks · Reactions · Solved · Votes | **Replies · Topics · Likes · Solved** |
 | Summary: Top Links | **added** |
 | Summary: Most Replied To | **added** |
-| Badges as a full page | badges *row* only |
+| Badges as a full page | badges row **+ an all-badges sheet** — near parity |
 | Profile tabs: Summary / Activity / Notifications / Messages / Badges / Preferences | flat page + nav rows |
 | "Expand" (user card) | absent |
 
