@@ -1057,6 +1057,12 @@ class _PostListItemState extends State<PostListItem> {
       case 'report':
         _handleReport();
         break;
+      case 'share':
+        _handleShare();
+        break;
+      case 'copy_link':
+        _handleCopyLink();
+        break;
       case 'history':
         _handleViewHistory();
         break;
@@ -1074,6 +1080,40 @@ class _PostListItemState extends State<PostListItem> {
   // Builds the popup menu items for the post header
   List<PopupMenuEntry<String>> _buildPopupMenuItems(BuildContext context) {
     final items = <PopupMenuEntry<String>>[];
+    // Share and Copy link come first and are offered to everyone,
+    // logged in or not — web puts a share control on every post, and
+    // without it the app had no way to link to a specific reply. Only
+    // hidden when the post carries no number to link to.
+    if (_postUrl != null) {
+      items.add(
+        PopupMenuItem<String>(
+          value: 'share',
+          child: Row(
+            children: [
+              Icon(Icons.share_outlined,
+                  size: DesignTokens.iconSizeM,
+                  color: Theme.of(context).colorScheme.secondary),
+              const SizedBox(width: DesignTokens.spacingM),
+              const Text('Share'),
+            ],
+          ),
+        ),
+      );
+      items.add(
+        PopupMenuItem<String>(
+          value: 'copy_link',
+          child: Row(
+            children: [
+              Icon(Icons.link,
+                  size: DesignTokens.iconSizeM,
+                  color: Theme.of(context).colorScheme.secondary),
+              const SizedBox(width: DesignTokens.spacingM),
+              const Text('Copy link'),
+            ],
+          ),
+        ),
+      );
+    }
     if (widget.siteContext.isLoggedIn && widget.post.canEdit) {
       items.add(
         PopupMenuItem<String>(
@@ -1165,6 +1205,37 @@ class _PostListItemState extends State<PostListItem> {
       );
     }
     return items;
+  }
+
+  /// This post's permalink.
+  ///
+  /// `/t/{topic_id}/{post_number}` — Discourse resolves the numeric form
+  /// and redirects to the slug URL, so the post does not need to carry a
+  /// slug the API never gave it. Null when the post has no number, which
+  /// is the one case there is nothing to link to.
+  String? get _postUrl {
+    final number = widget.post.postNumber;
+    final topicId = widget.post.topicId;
+    if (number == null || number <= 0 || topicId.isEmpty) return null;
+    final base = widget.siteContext.site.url.replaceAll(RegExp(r'/+$'), '');
+    if (base.isEmpty) return null;
+    return '$base/t/$topicId/$number';
+  }
+
+  void _handleShare() async {
+    final url = _postUrl;
+    if (url == null) return;
+    await UrlUtils.shareUrl(url);
+  }
+
+  void _handleCopyLink() async {
+    final url = _postUrl;
+    if (url == null) return;
+    await UrlUtils.copyUrlToClipboard(url);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Link copied')),
+    );
   }
 
   void _handleQuote() async {
