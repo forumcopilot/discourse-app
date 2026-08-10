@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/design_tokens.dart';
+import '../../utils/emoji_shortcodes.dart';
 import '../../utils/time_utils.dart';
 import 'user_avatar.dart';
 
@@ -77,7 +78,7 @@ class ActivityRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final excerptText = excerpt?.trim();
+    final excerptText = excerpt == null ? null : withEmojiShortcodes(excerpt!.trim());
 
     return Material(
       color: colorScheme.surface,
@@ -132,7 +133,7 @@ class ActivityRow extends StatelessWidget {
                 SizedBox(height: DesignTokens.spacingS),
               ],
               Text(
-                title,
+                withEmojiShortcodes(title),
                 textAlign: TextAlign.start,
                 style: textTheme.titleSmall?.copyWith(
                   color: colorScheme.onSurface,

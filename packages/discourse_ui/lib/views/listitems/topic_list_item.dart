@@ -7,6 +7,7 @@ import 'package:discourse_ui/utils/number_utils.dart';
 import 'package:discourse_ui/views/widgets/user_avatar.dart';
 import 'package:discourse_ui/views/tag_topics_page.dart';
 import '../../theme/design_tokens.dart';
+import '../../utils/emoji_shortcodes.dart';
 import '../../theme/style_builders.dart';
 
 /// Widget para representar un ítem de la lista de foros
@@ -236,7 +237,7 @@ class TopicListItem extends StatelessWidget {
                   ],
                   Expanded(
                     child: Text(
-                      topic.title,
+                      withEmojiShortcodes(topic.title),
                       style: StyleBuilders.titleTextStyle(
                         colorScheme: colorScheme,
                         textTheme: textTheme,
@@ -347,7 +348,7 @@ class TopicListItem extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingS),
                 child: Text(
-                  topic.shortContent!,
+                  withEmojiShortcodes(topic.shortContent!),
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
