@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 import 'package:forumcopilot_sdk/models/results/fc_topic_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/site/discourse_site_capabilities.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../util/html_text.dart';
 
@@ -574,6 +575,26 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
   Future<Map<int, String>> _loadCategoryNames() async {
     if (_catNamesById != null) return _catNamesById!;
     if (_catNamesLoading != null) return _catNamesLoading!;
+    // /site.json first: the app already fetches it once per forum for
+    // capabilities, and it carries every category including subcategories.
+    // /categories.json does not — meta.discourse.org returns 12 of its 45
+    // there and ignores include_subcategories entirely, so the topic list
+    // could not name the category of most of its own rows and the badge
+    // silently vanished from nearly every row.
+    final fromSite = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
+        .categories;
+    if (fromSite.isNotEmpty) {
+      final m = <int, String>{};
+      for (final c in fromSite) {
+        final id = c['id'];
+        final name = c['name']?.toString();
+        if (id is int && name != null && name.isNotEmpty) m[id] = name;
+      }
+      if (m.isNotEmpty) {
+        _catNamesById = m;
+        return m;
+      }
+    }
     final completer = Completer<Map<int, String>>();
     _catNamesLoading = completer.future;
     try {
