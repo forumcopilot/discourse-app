@@ -148,9 +148,11 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
         );
       }
       final response = await _searchRaw(searchString, page: page);
+      final titles = _topicTitles(response);
       final posts = ((response['posts'] as List?) ?? const [])
           .whereType<Map>()
-          .map((p) => _postFromSearchResult(p.cast<String, dynamic>()))
+          .map((p) => _postFromSearchResult(p.cast<String, dynamic>(),
+              topicTitles: titles))
           .toList();
       return FCSearchPostResult(
         result: true,
@@ -267,9 +269,11 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       }
       final effectivePage = page < 1 ? 1 : page;
       final response = await _searchRaw(q, page: effectivePage);
+      final titles = _topicTitles(response);
       final posts = ((response['posts'] as List?) ?? const [])
           .whereType<Map>()
-          .map((p) => _postFromSearchResult(p.cast<String, dynamic>()))
+          .map((p) => _postFromSearchResult(p.cast<String, dynamic>(),
+              topicTitles: titles))
           .toList();
       return FCSearchDataResultPost(
         result: true,
@@ -322,7 +326,8 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
         .toList();
     final posts = ((response['posts'] as List?) ?? const [])
         .whereType<Map>()
-        .map((p) => _postFromSearchResult(p.cast<String, dynamic>()))
+        .map((p) => _postFromSearchResult(p.cast<String, dynamic>(),
+            topicTitles: _topicTitles(response)))
         .toList();
     return DiscourseSearchResult(
       topics: topics,
@@ -483,7 +488,31 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
     );
   }
 
-  FCPost _postFromSearchResult(Map<String, dynamic> p) {
+  /// topic_id → title, from the `topics` array that rides alongside
+  /// `posts` in every `/search.json` response.
+  ///
+  /// `SearchPostSerializer` carries no title — only `topic_id` — because
+  /// the payload side-loads topics separately. Without this join every
+  /// search result rendered as an author, a date and an excerpt with a
+  /// blank where the topic name belongs, so there was no way to tell
+  /// what any result was about.
+  Map<String, String> _topicTitles(Map<String, dynamic> response) {
+    final titles = <String, String>{};
+    for (final t in ((response['topics'] as List?) ?? const [])) {
+      if (t is! Map) continue;
+      final id = t['id']?.toString();
+      final title = t['title']?.toString();
+      if (id != null && id.isNotEmpty && title != null && title.isNotEmpty) {
+        titles[id] = title;
+      }
+    }
+    return titles;
+  }
+
+  FCPost _postFromSearchResult(
+    Map<String, dynamic> p, {
+    Map<String, String> topicTitles = const {},
+  }) {
     final tpl = p['avatar_template'] as String?;
     String? avatarUrl;
     if (tpl != null && tpl.isNotEmpty) {
@@ -492,13 +521,14 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
           ? filled
           : '${siteContext.site.url}$filled';
     }
+    final topicId = (p['topic_id'] ?? '').toString();
     return FCPost(
       id: (p['id'] ?? '').toString(),
-      title: '',
+      title: topicTitles[topicId] ?? '',
       // Search results give us a `blurb` (text excerpt) rather than full
       // cooked HTML. That's actually nicer for the UI here.
       content: (p['blurb'] ?? '').toString(),
-      topicId: (p['topic_id'] ?? '').toString(),
+      topicId: topicId,
       // `SearchPostSerializer < BasicPostSerializer` serializes
       // name/username/avatar_template but NOT `user_id`
       // (app/serializers/basic_post_serializer.rb:5), so there is no

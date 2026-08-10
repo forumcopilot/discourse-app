@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/filter_chip_bar.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import '../models/cache_context.dart';
@@ -87,6 +88,14 @@ class _SearchPageState extends State<SearchPage> {
     _topicScrollController.addListener(_onTopicScroll);
     _postScrollController.addListener(_onPostScroll);
     _titlesOnlyScrollController.addListener(_onTitlesOnlyScroll);
+    // Focus the field on open. Without this the search screen arrived
+    // with no keyboard and nothing focused, so the first thing typed
+    // went nowhere and the user had to tap the field they had just
+    // navigated to. Post-frame because the focus node is not attached
+    // to the TextField until the first build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _searchFocusNode.requestFocus();
+    });
   }
 
   @override
@@ -708,45 +717,14 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildFilterChips(ColorScheme colorScheme, TextTheme textTheme) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: DesignTokens.spacingL,
-        vertical: DesignTokens.spacingM,
-      ),
-      child: SizedBox(
-        height: 40,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: _getFilterLabels(context).length,
-          separatorBuilder: (context, index) => SizedBox(width: DesignTokens.spacingS),
-          itemBuilder: (context, index) {
-            final isSelected = _selectedFilterIndex == index;
-            return FilterChip(
-              selected: isSelected,
-              label: Text(_getFilterLabels(context)[index]),
-              onSelected: (selected) {
-                setState(() {
-                  _selectedFilterIndex = index;
-                });
-              },
-              selectedColor: colorScheme.primaryContainer,
-              checkmarkColor: colorScheme.onPrimaryContainer,
-              labelStyle: textTheme.labelLarge?.copyWith(
-                color: isSelected ? colorScheme.onPrimaryContainer : colorScheme.onSurfaceVariant,
-                fontWeight: isSelected ? DesignTokens.fontWeightSemiBold : DesignTokens.fontWeightNormal,
-              ),
-              backgroundColor: colorScheme.surfaceVariant,
-              padding: EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingM,
-                vertical: DesignTokens.spacingS,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusL),
-              ),
-            );
-          },
-        ),
-      ),
+    // Was a hand-rolled copy of FilterChipBar — same styling, same
+    // layout, its own code — which is why it still wore the checkmark
+    // over the selected chip after the shared bar had dropped it.
+    final labels = _getFilterLabels(context);
+    return FilterChipBar(
+      options: [for (final l in labels) FilterChipOption(label: l)],
+      selectedIndex: _selectedFilterIndex,
+      onSelected: (i) => setState(() => _selectedFilterIndex = i),
     );
   }
 
