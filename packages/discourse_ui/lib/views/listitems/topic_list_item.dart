@@ -12,6 +12,10 @@ import '../../theme/style_builders.dart';
 
 /// Widget para representar un ítem de la lista de foros
 class TopicListItem extends StatelessWidget {
+  /// Whether to show the category badge. False inside a category page,
+  /// where the header already names it.
+  final bool showCategory;
+
   final SiteContext siteContext;
   final FCTopic topic;
   final VoidCallback? onTap;
@@ -22,6 +26,7 @@ class TopicListItem extends StatelessWidget {
     super.key,
     required this.siteContext,
     required this.topic,
+    this.showCategory = true,
     required this.onTap,
     this.topicIcon,
     this.onMarkAsRead,
@@ -260,7 +265,10 @@ class TopicListItem extends StatelessWidget {
                 // and the row showed no category at all — you could not
                 // tell where a topic lived without opening it. Web puts the
                 // category badge on every row, ahead of the tags.
-                final category = topic.forumName.trim();
+                // Suppressed inside a category: the header two rows up
+                // already says where you are, so repeating it on every
+                // row is noise the eye has to filter out.
+                final category = showCategory ? topic.forumName.trim() : '';
                 if (tags.isEmpty && category.isEmpty) {
                   return const SizedBox.shrink();
                 }

@@ -499,6 +499,8 @@ class _ForumTopicListState extends State<ForumTopicList> {
           ],
           if (announcements.isNotEmpty) ...[
             ...announcements.map((topic) => TopicListItem(
+                  // Inside a category — its header already names it.
+                  showCategory: false,
                   siteContext: widget.siteContext,
                   topic: topic,
                   topicIcon: Icons.campaign_outlined,
@@ -524,6 +526,8 @@ class _ForumTopicListState extends State<ForumTopicList> {
           ],
           if (stickyTopics.isNotEmpty) ...[
             ...stickyTopics.map((topic) => TopicListItem(
+                  // Inside a category — its header already names it.
+                  showCategory: false,
                   siteContext: widget.siteContext,
                   topic: topic,
                   onTap: () async {
@@ -543,6 +547,8 @@ class _ForumTopicListState extends State<ForumTopicList> {
           ],
           if (regularTopics.isNotEmpty) ...[
             ...regularTopics.map((topic) => TopicListItem(
+                  // Inside a category — its header already names it.
+                  showCategory: false,
                   siteContext: widget.siteContext,
                   topic: topic,
                   topicIcon: null,

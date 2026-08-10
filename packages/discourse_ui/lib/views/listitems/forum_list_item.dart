@@ -4,24 +4,11 @@ import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
 import 'package:discourse_ui/views/widgets/forum_actions.dart';
 import 'package:discourse_ui/views/widgets/forum_icon_widget.dart';
 import '../../theme/design_tokens.dart';
+import '../../utils/discourse_color.dart';
 import '../../theme/style_builders.dart';
 
 /// Parse a Discourse hex string like "BF1E2E" (no leading `#`) into a
 /// Color. Returns null on bad input so the UI can hide the stripe.
-Color? _parseDiscourseHex(String hex) {
-  var clean = hex.replaceAll('#', '').trim();
-  // Discourse stores whatever the admin typed, so 3-char shorthand is
-  // common — `tech` on try.discourse.org is "444". Expand it rather than
-  // dropping the colour, which is what made that category fall back to a
-  // hashed tile.
-  if (clean.length == 3) {
-    clean = clean.split('').map((ch) => '$ch$ch').join();
-  }
-  if (clean.length != 6) return null;
-  final v = int.tryParse(clean, radix: 16);
-  if (v == null) return null;
-  return Color(0xFF000000 | v);
-}
 
 /// Compact integer for badges: 1,234 → "1.2k", 12,345 → "12k".
 String _formatCount(int n) {
@@ -81,7 +68,7 @@ class ForumListItem extends StatelessWidget {
     // launch. Once the tile carried the real colour the stripe was just
     // the same colour twice, so it is gone.
     final categoryColor =
-        colorHex.isNotEmpty ? _parseDiscourseHex(colorHex) : null;
+        colorHex.isNotEmpty ? parseDiscourseHex(colorHex) : null;
     final topicCount = forum.topicCount;
 
     return Material(
@@ -115,7 +102,7 @@ class ForumListItem extends StatelessWidget {
                     backgroundColor: categoryColor,
                     iconColor: categoryColor == null
                         ? null
-                        : _parseDiscourseHex(forum.textColor ?? 'FFFFFF'),
+                        : parseDiscourseHex(forum.textColor ?? 'FFFFFF'),
                     fallbackIcon: Icons.forum_rounded,
                     forumName: forum.name,
                   ),

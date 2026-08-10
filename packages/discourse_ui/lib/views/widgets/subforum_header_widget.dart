@@ -7,6 +7,7 @@ import '../../utils/safe_image.dart';
 import '../../utils/avatar_color_utils.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'forum_icon_widget.dart';
+import '../../utils/discourse_color.dart';
 
 /// Widget that displays subforum icon, name, and description
 /// Used in the subforum view page below the breadcrumb
@@ -32,8 +33,16 @@ class SubforumHeaderWidget extends StatelessWidget {
       return colorScheme.primary;
     }
     
-    // If no logo, extract a vibrant primary color from the avatar's color scheme
-    // This ensures the background matches the default avatar logo color
+    // The category's own colour, when Discourse gave us one. This header
+    // was tinting itself from a hash of the category *name*, so
+    // Announcements (#ED207B, pink in the category list and on every
+    // topic row) opened to a green banner — the same category wearing two
+    // different colours one tap apart.
+    final ownColor = parseDiscourseHex(forum.color ?? '');
+    if (ownColor != null) return ownColor;
+
+    // No colour set: fall back to the name-derived palette so the header
+    // still matches the initial-letter tile beside it.
     if (forum.name.isEmpty) {
       return colorScheme.primary;
     }
@@ -183,6 +192,11 @@ class SubforumHeaderWidget extends StatelessWidget {
                     logoUrl: forum.logoUrl,
                     fallbackIcon: Icons.forum_rounded,
                     forumName: forum.name,
+                    // Same colour the category list row and every topic
+                    // badge use, so the tile does not change hue between
+                    // the list and the page it opens.
+                    backgroundColor: parseDiscourseHex(forum.color ?? ''),
+                    iconColor: parseDiscourseHex(forum.textColor ?? 'FFFFFF'),
                   ),
                   // Spacing between icon and name
                   const SizedBox(height: DesignTokens.spacingL),
