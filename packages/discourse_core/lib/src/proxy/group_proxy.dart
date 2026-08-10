@@ -238,6 +238,12 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
       // (Phase 5.46 — literal <p> tags were showing on group pages).
       bio: _plainBio(json),
       memberCount: (json['user_count'] as num?)?.toInt() ?? 0,
+      // Discourse omits `user_count` entirely when the viewer may not see
+      // the membership — it is withholding the number, not reporting an
+      // empty group. On meta, every group with a missing count also has
+      // `can_see_members: false`, and none reports a genuine zero.
+      canSeeMembers: (json['can_see_members'] as bool?) ??
+          (json['user_count'] != null),
       automatic: (json['automatic'] as bool?) ?? false,
       // `BasicGroupSerializer` has no `visible` attribute — it emits
       // `visibility_level` (app/serializers/basic_group_serializer.rb:10),

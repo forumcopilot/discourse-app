@@ -194,22 +194,27 @@ class _GroupRow extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.person_outline,
-              size: DesignTokens.iconSizeXS,
-              color: colorScheme.onSurfaceVariant),
-          const SizedBox(width: DesignTokens.spacingXS),
-          Text(
-            group.memberCount.toString(),
-            style: textTheme.labelMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: DesignTokens.fontWeightSemiBold,
+      // No count when the server withheld it. Printing "0" for a group
+      // whose membership you are not allowed to see says it is empty,
+      // which is a different claim from saying nothing.
+      trailing: !group.canSeeMembers
+          ? null
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.person_outline,
+                    size: DesignTokens.iconSizeXS,
+                    color: colorScheme.onSurfaceVariant),
+                const SizedBox(width: DesignTokens.spacingXS),
+                Text(
+                  group.memberCount.toString(),
+                  style: textTheme.labelMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: DesignTokens.fontWeightSemiBold,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
