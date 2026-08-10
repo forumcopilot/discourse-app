@@ -38,7 +38,29 @@ class UserActivityTabs extends StatefulWidget {
   State<UserActivityTabs> createState() => _UserActivityTabsState();
 }
 
-enum _ActivityTab { replies, topics }
+/// The profile's activity feeds. Web offers ten; these are the ones a
+/// *viewer* can actually read — `/user_actions.json` answers 403 to
+/// anyone but the user themself for WasLiked, Response, Mention, Quote
+/// and Edit, so offering them would be a tab that only ever errors.
+///
+/// Read, Reactions and Votes are absent for a different reason: they are
+/// not user_actions feeds at all (separate routes, and two of them are
+/// plugin-specific).
+enum _ActivityTab {
+  replies('Replies', Icons.reply_rounded, 5, 'No replies yet'),
+  topics('Topics', Icons.topic_outlined, 4, 'No topics yet'),
+  likes('Likes', Icons.favorite_border, 1, 'No likes given yet'),
+  solved('Solved', Icons.check_circle_outline, 15, 'No solutions yet');
+
+  const _ActivityTab(this.label, this.icon, this.filter, this.emptyLabel);
+
+  final String label;
+  final IconData icon;
+
+  /// The `/user_actions.json` filter id.
+  final int filter;
+  final String emptyLabel;
+}
 
 class _UserActivityTabsState extends State<UserActivityTabs> {
   _ActivityTab _selected = _ActivityTab.replies;
@@ -50,24 +72,30 @@ class _UserActivityTabsState extends State<UserActivityTabs> {
       children: [
         _buildSelector(context),
         const SizedBox(height: DesignTokens.spacingS),
-        if (_selected == _ActivityTab.replies)
-          UserRepliedPosts(
-            key: widget.repliesKey,
+        if (_selected == _ActivityTab.topics)
+          UserCreatedTopics(
+            // Key tied to the tab so flipping back-and-forth doesn't
+            // reuse the previously-disposed state. Combined with
+            // `(userName,userId)` so a user-switch also forces a refetch.
+            key: ValueKey('topics:${widget.userName}:${widget.userId}'),
             siteContext: widget.siteContext,
             userId: widget.userId,
             userName: widget.userName,
           )
         else
-          UserCreatedTopics(
-            // Key tied to the tab so flipping back-and-forth doesn't
-            // reuse the previously-disposed Replies state. Combined
-            // with `(userName,userId)` so a user-switch (rare) also
-            // forces a refetch.
-            key: ValueKey(
-                'topics:${widget.userName}:${widget.userId}'),
+          UserRepliedPosts(
+            // Replies keeps the parent's key so pull-to-refresh still
+            // reaches it; the other feeds key off the tab so switching
+            // refetches instead of showing the previous feed's items.
+            key: _selected == _ActivityTab.replies
+                ? widget.repliesKey
+                : ValueKey(
+                    'actions:${_selected.filter}:${widget.userName}'),
             siteContext: widget.siteContext,
             userId: widget.userId,
             userName: widget.userName,
+            actionFilter: _selected.filter,
+            emptyLabel: _selected.emptyLabel,
           ),
       ],
     );
@@ -81,22 +109,22 @@ class _UserActivityTabsState extends State<UserActivityTabs> {
         DesignTokens.spacingL,
         0,
       ),
-      child: Row(
-        children: [
-          _TabChip(
-            label: 'Replies',
-            icon: Icons.reply_rounded,
-            selected: _selected == _ActivityTab.replies,
-            onTap: () => setState(() => _selected = _ActivityTab.replies),
-          ),
-          const SizedBox(width: DesignTokens.spacingS),
-          _TabChip(
-            label: 'Topics',
-            icon: Icons.topic_outlined,
-            selected: _selected == _ActivityTab.topics,
-            onTap: () => setState(() => _selected = _ActivityTab.topics),
-          ),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (final tab in _ActivityTab.values) ...[
+              _TabChip(
+                label: tab.label,
+                icon: tab.icon,
+                selected: _selected == tab,
+                onTap: () => setState(() => _selected = tab),
+              ),
+              if (tab != _ActivityTab.values.last)
+                const SizedBox(width: DesignTokens.spacingS),
+            ],
+          ],
+        ),
       ),
     );
   }

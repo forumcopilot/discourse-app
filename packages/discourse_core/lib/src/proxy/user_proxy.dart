@@ -568,7 +568,23 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       int lastNum,
       String? searchId,
       String? username,
-      String? userId) async {
+      String? userId) =>
+      getUserActionsAsync(startNum, username, actionFilter: 5);
+
+  /// Discourse-only: any `/user_actions.json` feed for a user.
+  ///
+  /// Filter ids: 1=Like given, 3=Bookmark, 4=NewTopic, 5=Reply,
+  /// 15=Solved. 2/6/7/9/11 (WasLiked, Response, Mention, Quote, Edit)
+  /// answer 403 for anyone but the user themself, so they are not worth
+  /// offering to a viewer.
+  ///
+  /// Every filter returns the same action shape, so one parse serves them
+  /// all — the profile's activity tabs are this parameter and nothing
+  /// else. Not on IFCUserProxy: the SDK contract has a single "replies"
+  /// feed, because XenForo has no equivalent of user_actions.
+  Future<FCUserReplyResult> getUserActionsAsync(
+      int startNum, String? username,
+      {required int actionFilter}) async {
     if (username == null || username.isEmpty) {
       return FCUserReplyResult(
         result: false,
@@ -578,14 +594,9 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       );
     }
     try {
-      // /user_actions filter values:
-      //   1=Like, 2=WasLiked, 3=Bookmark, 4=NewTopic, 5=Reply,
-      //   6=Response (got replied to), 7=Mention, 9=Quote, 11=Edit,
-      //   12=Message
-      // We surface 5 (replies the user wrote).
       final response = await apiGet('/user_actions.json', query: {
         'username': username,
-        'filter': '5',
+        'filter': actionFilter.toString(),
         if (startNum > 0) 'offset': startNum.toString(),
       });
       final actions = ((response['user_actions'] as List?) ?? const [])

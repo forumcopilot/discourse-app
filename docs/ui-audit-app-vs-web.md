@@ -457,7 +457,7 @@ Compared signed in on try.discourse.org, own profile and others'.
 
 | Web | App |
 |---|---|
-| Activity sub-tabs: All · Topics · Replies · Read · Drafts · Likes · Bookmarks · Reactions · Solved · Votes | **Replies · Topics only** |
+| Activity sub-tabs: All · Topics · Replies · Read · Drafts · Likes · Bookmarks · Reactions · Solved · Votes | **Replies · Topics · Likes · Solved** |
 | Summary: Top Links | absent |
 | Summary: Most Replied To | absent |
 | Badges as a full page | badges *row* only |

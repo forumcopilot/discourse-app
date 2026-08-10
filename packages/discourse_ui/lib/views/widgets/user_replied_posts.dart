@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseUserProxy;
 import 'package:discourse_ui/views/widgets/user_avatar.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:get/get.dart';
@@ -17,11 +18,22 @@ class UserRepliedPosts extends StatefulWidget {
   final String? userId;
   final String? userName;
 
+  /// Which `/user_actions.json` feed to show — 5 (replies) by default.
+  /// Every filter returns the same action shape, so this one widget backs
+  /// all of the profile's activity tabs.
+  final int actionFilter;
+
+  /// Shown when the feed is empty; the wording differs per tab
+  /// ("No replies yet" reads wrong under Likes).
+  final String? emptyLabel;
+
   const UserRepliedPosts({
     super.key,
     required this.siteContext,
     this.userId,
     this.userName,
+    this.actionFilter = 5,
+    this.emptyLabel,
   });
 
   @override
@@ -90,7 +102,12 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
 
       AppLogger.debug('Fetching recent posts for user: ${widget.userName ?? widget.userId}, startNum: $startNum, lastNum: $lastNum');
       final proxy = SiteProxyFactory.getUserProxy();
-      final result = await proxy.getUserReplyPostAsync(startNum, lastNum, null, widget.userName, widget.userId);
+      // Discourse-only: user_actions filters are not on the SDK contract.
+      final result = proxy is DiscourseUserProxy
+          ? await proxy.getUserActionsAsync(startNum, widget.userName,
+              actionFilter: widget.actionFilter)
+          : await proxy.getUserReplyPostAsync(
+              startNum, lastNum, null, widget.userName, widget.userId);
       AppLogger.debug('Result from getUserReplyPostAsync: total: ${result.total}, posts count: ${result.posts.length}');
 
       if (mounted) {
@@ -130,7 +147,25 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
   @override
   Widget build(BuildContext context) {
     // Hide the entire section if there's an error or no posts (and not loading)
-    if (_error != null || (!_isLoading && (_recentPosts == null || _recentPosts!.isEmpty))) {
+    final isEmpty =
+        !_isLoading && (_recentPosts == null || _recentPosts!.isEmpty);
+    if (_error != null || isEmpty) {
+      // Rendering nothing was fine while Replies was the only feed — an
+      // empty profile simply had no section. With tabs it is not: tapping
+      // Likes or Solved and getting a blank page reads as broken rather
+      // than as "none yet". Say so when the caller gave us the wording.
+      final label = widget.emptyLabel;
+      if (_error == null && label != null) {
+        return Padding(
+          padding: DesignTokens.paddingL,
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        );
+      }
       return const SizedBox.shrink();
     }
 
