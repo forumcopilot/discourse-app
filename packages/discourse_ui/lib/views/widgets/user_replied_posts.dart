@@ -260,6 +260,42 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
     return author.toLowerCase() != owner.toLowerCase();
   }
 
+  /// The person this row should name, or null.
+  ///
+  /// The author when somebody else wrote the post (Likes). Otherwise the
+  /// actor, when the feed has one distinct from the author — on Solved
+  /// the post is the owner's own answer, and the fact worth showing is
+  /// who accepted it.
+  ActivityAttribution? _attributionFor(FCUserReply post) {
+    if (_isOtherAuthor(post)) {
+      return ActivityAttribution(
+        username: post.authorName,
+        avatarUrl: post.authorIconUrl,
+      );
+    }
+    final actor = post.actorName;
+    final label = _actorLabel;
+    if (actor != null && actor.isNotEmpty && label != null) {
+      return ActivityAttribution(
+        username: actor,
+        avatarUrl: post.actorIconUrl,
+        label: label,
+      );
+    }
+    return null;
+  }
+
+  /// What the actor did, phrased for this feed — null when the feed has no
+  /// sentence for it. Keyed off the filter rather than off "an actor
+  /// exists": every filter reports one, and only here does it mean
+  /// "accepted". Naming the actor without saying what they did would read
+  /// as a byline and credit the wrong person for the post.
+  String? get _actorLabel =>
+      widget.actionFilter == _solvedFilter ? 'Accepted by' : null;
+
+  /// `UserAction::SOLVED` — the discourse-solved plugin's action type.
+  static const int _solvedFilter = 15;
+
   Widget _buildPostItem(BuildContext context, FCUserReply post) {
     return ActivityRow(
       title: post.topicTitle.isNotEmpty ? post.topicTitle : 'Unknown Topic',
@@ -268,12 +304,7 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
       // `replyNumber` is the post's position in its topic, not a count of
       // replies — /user_actions.json has no reply count to give.
       postNumber: post.replyNumber,
-      attribution: _isOtherAuthor(post)
-          ? ActivityAttribution(
-              username: post.authorName,
-              avatarUrl: post.authorIconUrl,
-            )
-          : null,
+      attribution: _attributionFor(post),
       onTap: () => _navigateToPost(post),
     );
   }

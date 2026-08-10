@@ -3851,6 +3851,18 @@ class FCUserReplyMapper extends ClassMapperBase<FCUserReply> {
     _$shortContent,
     opt: true,
   );
+  static String? _$actorName(FCUserReply v) => v.actorName;
+  static const Field<FCUserReply, String> _f$actorName = Field(
+    'actorName',
+    _$actorName,
+    opt: true,
+  );
+  static String? _$actorIconUrl(FCUserReply v) => v.actorIconUrl;
+  static const Field<FCUserReply, String> _f$actorIconUrl = Field(
+    'actorIconUrl',
+    _$actorIconUrl,
+    opt: true,
+  );
 
   @override
   final MappableFields<FCUserReply> fields = const {
@@ -3866,6 +3878,8 @@ class FCUserReplyMapper extends ClassMapperBase<FCUserReply> {
     #replyNumber: _f$replyNumber,
     #postContent: _f$postContent,
     #shortContent: _f$shortContent,
+    #actorName: _f$actorName,
+    #actorIconUrl: _f$actorIconUrl,
   };
 
   static FCUserReply _instantiate(DecodingData data) {
@@ -3882,6 +3896,8 @@ class FCUserReplyMapper extends ClassMapperBase<FCUserReply> {
       replyNumber: data.dec(_f$replyNumber),
       postContent: data.dec(_f$postContent),
       shortContent: data.dec(_f$shortContent),
+      actorName: data.dec(_f$actorName),
+      actorIconUrl: data.dec(_f$actorIconUrl),
     );
   }
 
@@ -3958,6 +3974,8 @@ abstract class FCUserReplyCopyWith<$R, $In extends FCUserReply, $Out>
     int? replyNumber,
     String? postContent,
     String? shortContent,
+    String? actorName,
+    String? actorIconUrl,
   });
   FCUserReplyCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -3984,6 +4002,8 @@ class _FCUserReplyCopyWithImpl<$R, $Out>
     int? replyNumber,
     Object? postContent = $none,
     Object? shortContent = $none,
+    Object? actorName = $none,
+    Object? actorIconUrl = $none,
   }) => $apply(
     FieldCopyWithData({
       if (postId != null) #postId: postId,
@@ -3998,6 +4018,8 @@ class _FCUserReplyCopyWithImpl<$R, $Out>
       if (replyNumber != null) #replyNumber: replyNumber,
       if (postContent != $none) #postContent: postContent,
       if (shortContent != $none) #shortContent: shortContent,
+      if (actorName != $none) #actorName: actorName,
+      if (actorIconUrl != $none) #actorIconUrl: actorIconUrl,
     }),
   );
   @override
@@ -4014,6 +4036,8 @@ class _FCUserReplyCopyWithImpl<$R, $Out>
     replyNumber: data.get(#replyNumber, or: $value.replyNumber),
     postContent: data.get(#postContent, or: $value.postContent),
     shortContent: data.get(#shortContent, or: $value.shortContent),
+    actorName: data.get(#actorName, or: $value.actorName),
+    actorIconUrl: data.get(#actorIconUrl, or: $value.actorIconUrl),
   );
 
   @override

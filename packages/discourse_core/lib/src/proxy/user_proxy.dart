@@ -603,15 +603,25 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           .whereType<Map>()
           .map((a) => a.cast<String, dynamic>())
           .toList();
+      String? absoluteAvatar(String? template) {
+        if (template == null || template.isEmpty) return null;
+        final filled = template.replaceAll('{size}', '90');
+        return filled.startsWith('http')
+            ? filled
+            : '${siteContext.site.url}$filled';
+      }
+
       final replyList = actions.map((a) {
-        String? avatarUrl;
-        final tpl = a['avatar_template'] as String?;
-        if (tpl != null && tpl.isNotEmpty) {
-          final filled = tpl.replaceAll('{size}', '90');
-          avatarUrl = filled.startsWith('http')
-              ? filled
-              : '${siteContext.site.url}$filled';
-        }
+        final avatarUrl = absoluteAvatar(a['avatar_template'] as String?);
+        // UserActionSerializer carries the post's author (`username`) and
+        // separately whoever performed the action (`acting_username`).
+        // They differ only on some filters — on "solved" the post is the
+        // profile owner's answer and the actor is whoever accepted it —
+        // so record the actor only when it is genuinely a second person.
+        final author = (a['username'] ?? '').toString();
+        final actor = (a['acting_username'] ?? '').toString();
+        final hasDistinctActor = actor.isNotEmpty &&
+            actor.toLowerCase() != author.toLowerCase();
         return FCUserReply(
           postId: (a['post_id'] ?? '').toString(),
           topicId: (a['topic_id'] ?? '').toString(),
@@ -633,6 +643,10 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           // to text, which also decodes the entities Discourse escapes.
           postContent: stripHtmlToText(a['excerpt']?.toString() ?? ''),
           shortContent: stripHtmlToText(a['excerpt']?.toString() ?? ''),
+          actorName: hasDistinctActor ? actor : null,
+          actorIconUrl: hasDistinctActor
+              ? absoluteAvatar(a['acting_avatar_template'] as String?)
+              : null,
         );
       }).toList();
       return FCUserReplyResult(

@@ -4,13 +4,27 @@ import '../../theme/design_tokens.dart';
 import '../../utils/time_utils.dart';
 import 'user_avatar.dart';
 
-/// Who wrote the post a row points at — rendered only when that is someone
-/// other than the profile being viewed.
+/// The person a row names, when naming one says something.
+///
+/// Two different people can earn the line, which is why [label] exists.
+/// On Likes it is the post's author and the bare name is right — the row
+/// *is* their post. On Solved the post is the profile owner's answer and
+/// the person is whoever accepted it, so an unlabelled name would read as
+/// a byline and credit the wrong person; there the label says "Accepted
+/// by".
 class ActivityAttribution {
-  const ActivityAttribution({required this.username, this.avatarUrl});
+  const ActivityAttribution({
+    required this.username,
+    this.avatarUrl,
+    this.label,
+  });
 
   final String username;
   final String? avatarUrl;
+
+  /// Prefix shown before the name, e.g. "Accepted by". Null for a plain
+  /// byline.
+  final String? label;
 }
 
 /// One row in the profile's Activity feed, for every tab.
@@ -94,8 +108,17 @@ class ActivityRow extends StatelessWidget {
                     ),
                     SizedBox(width: DesignTokens.spacingS),
                     Expanded(
-                      child: Text(
-                        attribution!.username,
+                      child: Text.rich(
+                        TextSpan(children: [
+                          if (attribution!.label != null)
+                            TextSpan(
+                              text: '${attribution!.label} ',
+                              style: TextStyle(
+                                fontWeight: DesignTokens.fontWeightNormal,
+                              ),
+                            ),
+                          TextSpan(text: attribution!.username),
+                        ]),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: textTheme.labelLarge?.copyWith(

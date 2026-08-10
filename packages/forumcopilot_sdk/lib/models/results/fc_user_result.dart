@@ -727,6 +727,18 @@ class FCUserReply with FCUserReplyMappable {
   /// Short content
   String? shortContent;
 
+  /// Who performed the action that put this item in the feed, when that
+  /// is somebody other than the post's author.
+  ///
+  /// Separate from [authorName] because the two come apart: in an
+  /// activity feed of accepted answers, the post is the profile owner's
+  /// and the actor is whoever accepted it. Null when the feed has no
+  /// actor distinct from the author, which is the common case.
+  String? actorName;
+
+  /// Avatar for [actorName]. Null whenever [actorName] is.
+  String? actorIconUrl;
+
   FCUserReply({
     required this.postId,
     required this.topicId,
@@ -740,6 +752,8 @@ class FCUserReply with FCUserReplyMappable {
     this.replyNumber = 0,
     this.postContent,
     this.shortContent,
+    this.actorName,
+    this.actorIconUrl,
   });
 }
 
