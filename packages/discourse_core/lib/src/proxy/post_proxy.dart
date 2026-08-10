@@ -11,6 +11,7 @@ import 'package:forumcopilot_sdk/models/results/fc_post_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_reaction_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/site/discourse_site_capabilities.dart';
 import '../data/post/discourse_accepted_answer.dart';
 import '../data/post/discourse_valid_reactions.dart';
 import '../util/quote_markup.dart';
@@ -39,6 +40,27 @@ import '../util/html_text.dart';
 ///                                    GET `/post_action_users.json` as the
 ///                                    plugin-less fallback
 class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
+  /// The topic's category name, resolved from the cached /site.json tree.
+  /// `/t/{id}.json` gives only `category_id`.
+  String _categoryName(String categoryId) => categoryId.isEmpty
+      ? ''
+      : (DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
+              .categoryNameFor(categoryId) ??
+          '');
+
+  /// The topic's tags, as plain names.
+  ///
+  /// Discourse sends this two ways depending on the route and the
+  /// forum's tag settings: bare strings, or objects carrying
+  /// `{id, name, slug}`. Reading `name` off the object matters —
+  /// `toString()` on the map renders "{id: 35, name: mobile, slug:
+  /// mobile}" straight into the chip.
+  List<String> _topicTags(Map<String, dynamic> t) =>
+      ((t['tags'] as List?) ?? const [])
+          .map((e) => e is Map ? (e['name'] ?? '').toString() : e.toString())
+          .where((e) => e.isNotEmpty)
+          .toList(growable: false);
+
   DiscoursePostProxy(SiteContext context) : super(context);
 
   /// Windowed topic fetch.
@@ -129,7 +151,12 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         id: id,
         title: (t['title'] ?? '').toString(),
         forumId: categoryId,
-        forumName: '',
+        // `/t/{id}.json` carries `category_id` but no category name, the
+        // same shape as the topic lists — resolve it from the cached
+        // /site.json category tree rather than leaving the topic page
+        // unable to say where the topic lives.
+        forumName: _categoryName(categoryId),
+        tags: _topicTags(t),
         authorId: (createdBy['id'] ?? '').toString(),
         authorName: (createdBy['username'] ?? '').toString(),
         authorUserType: createdBy['admin'] == true
@@ -240,7 +267,8 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         id: topicId,
         title: (t['title'] ?? '').toString(),
         forumId: (t['category_id'] ?? '').toString(),
-        forumName: '',
+        forumName: _categoryName((t['category_id'] ?? '').toString()),
+        tags: _topicTags(t),
         authorId: (createdBy['id'] ?? '').toString(),
         authorName: (createdBy['username'] ?? '').toString(),
         authorUserType: '',
@@ -345,7 +373,8 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         id: (t['id'] ?? topicId).toString(),
         title: (t['title'] ?? '').toString(),
         forumId: (t['category_id'] ?? '').toString(),
-        forumName: '',
+        forumName: _categoryName((t['category_id'] ?? '').toString()),
+        tags: _topicTags(t),
         authorId: (createdBy['id'] ?? '').toString(),
         authorName: (createdBy['username'] ?? '').toString(),
         authorUserType: '',

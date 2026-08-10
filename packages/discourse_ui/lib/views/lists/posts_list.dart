@@ -1138,6 +1138,10 @@ class _PostsState extends State<PostsList> {
         post: post,
         threadId: widget.topicId,
         topicTitle: widget.topicTitle,
+        // Category and tags belong to the topic, so they ride with the
+        // opening post — where web puts them, directly under the title.
+        topicCategory: post.postNumber == 1 ? data.topic.forumName : '',
+        topicTags: post.postNumber == 1 ? data.topic.tags : const [],
         postController: _postsController,
         forumId: data.topic.forumId,
         isHighlighted: isHighlighted,

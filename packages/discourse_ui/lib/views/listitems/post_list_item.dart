@@ -31,6 +31,7 @@ import '../../utils/media_url_utils.dart';
 import '../../utils/url_utils.dart';
 import '../../utils/file_utils.dart';
 import '../../theme/design_tokens.dart';
+import '../widgets/topic_taxonomy_chips.dart';
 import '../../theme/style_builders.dart';
 import 'post_list_item_header.dart';
 import 'post_list_item_attachment.dart';
@@ -124,6 +125,11 @@ class PostListItem extends StatefulWidget {
   final String threadId;
   final String? forumId;
   final String topicTitle;
+
+  /// The topic's category name and tags. Only ever non-empty on the
+  /// opening post — they describe the topic, not the reply.
+  final String topicCategory;
+  final List<String> topicTags;
   final PostActions? actions;
   final void Function(String userId, String userName)? onAvatarTap;
   final PostController postController;
@@ -160,6 +166,8 @@ class PostListItem extends StatefulWidget {
     required this.post,
     required this.threadId,
     required this.topicTitle,
+    this.topicCategory = '',
+    this.topicTags = const [],
     required this.postController,
     this.forumId,
     this.actions,
@@ -750,6 +758,17 @@ class _PostListItemState extends State<PostListItem> {
                 fontWeight: DesignTokens.fontWeightBold,
               ),
             ),
+            if (widget.topicCategory.isNotEmpty ||
+                widget.topicTags.isNotEmpty) ...[
+              const SizedBox(height: DesignTokens.spacingS),
+              // Where the topic lives. The page named the topic and
+              // nothing else, so the one thing Discourse organises
+              // everything by was invisible until you went back out.
+              TopicTaxonomyChips(
+                category: widget.topicCategory,
+                tags: widget.topicTags,
+              ),
+            ],
             const SizedBox(height: DesignTokens.spacingM),
           ],
           // "in reply to X" — Discourse's defining reading affordance. Without

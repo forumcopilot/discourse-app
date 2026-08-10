@@ -153,6 +153,21 @@ class DiscourseSiteCapabilities {
     caps.resolved = true;
   }
 
+  /// A category's display name, or null when this forum's payload has
+  /// not been parsed or has no such category.
+  String? categoryNameFor(String categoryId) {
+    if (categoryId.isEmpty) return null;
+    final id = int.tryParse(categoryId);
+    if (id == null) return null;
+    for (final c in categories) {
+      if (c['id'] == id) {
+        final name = (c['name'] as String?)?.trim();
+        return (name == null || name.isEmpty) ? null : name;
+      }
+    }
+    return null;
+  }
+
   /// The composer template a category defines, or null.
   ///
   /// Discourse lets a category ship a skeleton — a bug-report form, a

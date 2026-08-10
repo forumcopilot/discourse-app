@@ -20,7 +20,7 @@ class AppForumConfig {
   ///   https://<sub>.ngrok-free.dev — Discourse must be launched with
   ///   `RAILS_DEVELOPMENT_HOSTS=.ngrok-free.dev,localhost` so the Rails
   ///   `HostAuthorization` middleware lets the tunnel hostname through.
-  static const String forumBaseUrl = 'https://try.discourse.org';
+  static const String forumBaseUrl = 'https://meta.discourse.org';
 
   /// Legacy plugin endpoint path. **Not used in v1** — Discourse
   /// authentication and data fetching go through stock REST endpoints.
