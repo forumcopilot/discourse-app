@@ -20,6 +20,8 @@ import '../../utils/url_utils.dart';
 import 'package:discourse_ui/views/widgets/not_signed_in_view.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseSocialProxy;
+import '../widgets/filter_chip_bar.dart';
+import '../widgets/empty_state_view.dart';
 
 class NotificationListTab extends StatefulWidget {
   final SiteContext siteContext;
@@ -140,6 +142,19 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
     }
   }
 
+  /// Whether the list is narrowed to unread. Drives `filter=unread`.
+  bool _unreadOnly = false;
+
+  void _setUnreadOnly(bool value) {
+    if (_unreadOnly == value) return;
+    setState(() {
+      _unreadOnly = value;
+      _topics = [];
+      _alerts = [];
+    });
+    _fetchTopics(reset: true);
+  }
+
   Future<void> _fetchTopics({bool reset = false}) async {
     final currentUsername = widget.siteContext.loginDataOutput?.user?.username;
 
@@ -177,7 +192,14 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
     }
     try {
       final socialProxy = SiteProxyFactory.getSocialProxy();
-      final alertData = await socialProxy.getAlertAsync(_page, _perPage, reset);
+      // Discourse's own `filter=unread`, when the connector supports it.
+      // The interface method has no filter — XenForo has no equivalent —
+      // so this narrows to the Discourse proxy rather than widening the
+      // shared contract.
+      final alertData = socialProxy is DiscourseSocialProxy
+          ? await socialProxy.getAlertFilteredAsync(_page, _perPage, reset,
+              unreadOnly: _unreadOnly)
+          : await socialProxy.getAlertAsync(_page, _perPage, reset);
       final alerts = alertData.items.where((alert) => alert.message.trim().isNotEmpty).toList();
       final topics = alerts
           .map((alert) => FCTopic(
@@ -584,7 +606,12 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
     }
 
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Column(
+        children: [
+          _buildFilterBar(),
+          const Expanded(child: Center(child: CircularProgressIndicator())),
+        ],
+      );
     }
     if (_error != null) {
       final colorScheme = Theme.of(context).colorScheme;
@@ -702,7 +729,27 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
         ),
       );
     }
-    return RefreshIndicator(
+    if (_topics.isEmpty) {
+      return Column(
+        children: [
+          _buildFilterBar(),
+          Expanded(
+            child: EmptyStateView.scrollable(
+              icon: Icons.notifications_none,
+              message: _unreadOnly ? 'No unread notifications' : 'No notifications yet',
+              hint: _unreadOnly
+                  ? "You're all caught up."
+                  : 'Replies, mentions and likes will show up here.',
+            ),
+          ),
+        ],
+      );
+    }
+    return Column(
+      children: [
+        _buildFilterBar(),
+        Expanded(
+          child: RefreshIndicator(
       onRefresh: _onRefresh,
       child: ListView.builder(
         controller: _scrollController,
@@ -733,7 +780,25 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
             );
           }
         },
-      ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// All / Unread, in the app's shared chip bar. Web narrows the same way
+  /// via `/notifications.json?filter=unread`; the app offered no way to
+  /// separate the two, so a busy account's unread items were buried under
+  /// however many read ones came back first.
+  Widget _buildFilterBar() {
+    return FilterChipBar(
+      options: const [
+        FilterChipOption(label: 'All'),
+        FilterChipOption(label: 'Unread'),
+      ],
+      selectedIndex: _unreadOnly ? 1 : 0,
+      onSelected: (i) => _setUnreadOnly(i == 1),
     );
   }
 }

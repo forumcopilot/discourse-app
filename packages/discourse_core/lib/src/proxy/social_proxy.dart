@@ -162,12 +162,31 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
   /// page 1 maps to offset 0 on `/notifications.json`, page 2 to
   /// offset `perpage`, and so on.
   @override
-  Future<FCAlertResult> getAlertAsync(int page, int perpage, bool forceRefresh) async {
+  Future<FCAlertResult> getAlertAsync(int page, int perpage, bool forceRefresh) =>
+      getAlertFilteredAsync(page, perpage, forceRefresh);
+
+  /// [getAlertAsync] plus Discourse's `filter` parameter.
+  ///
+  /// Not on IFCSocialProxy: the SDK contract has a single undifferentiated
+  /// alert feed because XenForo has no equivalent. `/notifications.json`
+  /// takes `filter=unread` (and `read`), which is how web offers its
+  /// unread view — see NotificationsController#index, which narrows to
+  /// `where(read: false)`.
+  ///
+  /// [unreadOnly] false sends no filter at all, so the default path is
+  /// byte-identical to what it was.
+  Future<FCAlertResult> getAlertFilteredAsync(
+    int page,
+    int perpage,
+    bool forceRefresh, {
+    bool unreadOnly = false,
+  }) async {
     try {
       final perPage = perpage <= 0 ? 30 : perpage;
       final response = await apiGet('/notifications.json', query: {
         if (page > 1) 'offset': ((page - 1) * perPage).toString(),
         'limit': perPage.toString(),
+        if (unreadOnly) 'filter': 'unread',
       });
       final items = ((response['notifications'] as List?) ?? const [])
           .whereType<Map>()
