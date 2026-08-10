@@ -539,20 +539,145 @@ hand on the device; the remaining screens can be audited after that.
 
 ## Not covered
 
-Still to audit, all of which need a signed-in session: notifications,
-search, messages/PMs, bookmarks, chat, drafts, settings, composer. The
-method above is cheap to repeat — `flutter run -d <device>` plus the same
-page in Chrome.
+Still to audit: **chat**, **drafts**, **composer** (new topic / reply /
+PM against web), and **attachments**, which were deferred mid-session and
+never picked up. The composer is the largest remaining gap and the only
+one where a defect costs a user their writing.
+
+Notifications, search, messages/PMs, bookmarks, groups, invites,
+notification settings and the topic page were covered in the session
+below.
+
+The method above is cheap to repeat — `flutter run -d <device>` plus the
+same page in Chrome.
 
 ## Suggested order
 
 1. ~~Code-block scrolling~~ — done.
 2. ~~Category badge on topic rows~~ — done (topic view still open).
-3. ~~Topic stats bar~~ — done. Last-reply attribution is still open, and
-   is the larger half: `FCTopic` carries no last-poster fields at all, so
-   "X replied 3 hours ago" needs a model change in the canonical SDK
-   (`/Volumes/CRUCIAL/tapatalk_flutter`) before it can land here — see the
-   Canonical SDK note in CLAUDE.md. The data itself is already in the
-   `/latest.json` payload (`posters[]` + `last_posted_at`).
+3. ~~Topic stats bar~~ — done, and last-reply attribution with it.
+   `FCTopic` now carries `lastPosterName` / `lastPosterIconUrl`, and the
+   topic row renders "X replied 3 hours ago" with the poster's avatar.
+   (This entry previously said the field did not exist and the work was
+   blocked on a canonical-SDK change; both had since landed.)
 4. Profile: chat button, notification level.
 5. ~~Reaction cluster vs. per-emoji chips~~ — done, combined style.
+6. Composer + attachments — the largest remaining gap (see *Not
+   covered*).
+
+---
+
+# Session 2 — signed in on meta.discourse.org
+
+Same method, different forum: `meta.discourse.org` read-only rather than
+the try sandbox, because meta has the data volume the earlier pass
+lacked — real categories, badges, group permissions and a profile with
+years of activity behind it. Screens the first pass listed as "not
+covered" are covered here.
+
+Two habits produced most of what follows, and are worth repeating rather
+than the findings themselves:
+
+- **Read the payload before believing the screen.** Four of these were
+  invisible on the device and obvious in the JSON. Two things that
+  *looked* broken (reply counts, code-block scrolling) turned out to be
+  correct once checked, and were left alone.
+- **A missing value is not a zero.** Three separate defects were the same
+  mistake: `?? 0` or `?? ''` turning "the server declined to say" into a
+  confident statement.
+
+## 11. Data the connector had and never showed
+
+- **Search results had no topic title — fixed** (`b4daa21`).
+  `/search.json` side-loads topics in their own array and
+  `SearchPostSerializer` carries only `topic_id`, so joining is the
+  caller's job; the converter instead hardcoded `title: ''`. Every result
+  rendered as an author, a date, a blank line and an excerpt.
+- **Category badge on topic rows — fixed** (`044a860`). Names were
+  resolved from `/categories.json`, which does not return the whole
+  tree: meta answers with 12 of its 45 and ignores
+  `include_subcategories`. None of the three categories on its Latest
+  page were among the twelve, so the badge collapsed on nearly every row.
+  `/site.json` has all 45 and is already fetched once per forum — the
+  fix removed a request as well.
+- **Topic page showed neither category nor tags — fixed** (`5c0cd70`).
+  Both now sit under the title, where web puts them. All three
+  topic-detail constructors were passing an empty category name, not
+  just the one.
+- **Privacy & Terms was a "coming soon" snackbar — fixed** (`aa5fa49`).
+  `tos_url` and `privacy_policy_url` were already parsed into
+  `DiscourseSiteCapabilities` and never read. Both shapes occur: meta
+  returns `/tos` site-relative and an absolute
+  `https://www.discourse.org/privacy`.
+- **Notifications had no unread filter — fixed** (`635442d`).
+  `/notifications.json?filter=unread` is how web narrows. Added on the
+  Discourse proxy, not `IFCSocialProxy`.
+
+## 12. Invented values
+
+- **Messages never showed unread — fixed** (`3763459`). The flag was
+  `unseen == true || unread > 0`, and neither half can fire: the server
+  hardcodes `unread` to 0 as a back-compat stub for old themes
+  (`listable_topic_serializer.rb`: `def unread; 0; end`), and `unseen`
+  means "never appeared in a list". Switching to `unread_posts` was still
+  not enough — a probe showed three PMs the notification tab called
+  unread coming back `unread_posts: 0, last_read: null`. Discourse calls
+  those *new*: the counter only covers posts after your read position and
+  there is no read position. Now recognised by a null
+  `last_read_post_number` against a real `highest_post_number`.
+- **Restricted groups showed "0 members" — fixed** (`bf3266c`).
+  Discourse omits `user_count` when `can_see_members` is false; `?? 0`
+  turned that into "this group is empty". On meta every group with a
+  missing count is restricted and not one reports a genuine zero.
+  Needed `FCGroup.canSeeMembers` (canonical SDK first, `da0cb856`).
+- **`post_number` rendered as a reply count — fixed** (`29d6e7d`). The
+  profile activity feed put the post's position in its topic behind a
+  speech-bubble icon, so a reply at position 45 read as a topic with 45
+  replies. The action feeds carry no reply count at all
+  (`reply_count` is null on every row); it reads "#45" now.
+
+## 13. Things that were right and were left alone
+
+Recorded because each cost time to check and would otherwise be checked
+again:
+
+- **Reply counts.** The row shows `posts_count - 1`, which is exactly
+  what web's `Topic#replyCount` computes. Not a bug.
+- **Code blocks.** They *do* scroll horizontally — the clipped-looking
+  screenshot was a scrollable block at offset zero, confirmed by swiping.
+- **Small-action posts** (`post_type: 3`). Rare — one across 25 recent
+  topics — and the ones that occur carry real cooked text, so they render
+  acceptably as ordinary posts.
+- **Notification unread styling.** Correct; sampled the row pixels to be
+  sure rather than trusting the eye.
+
+## 14. Consistency
+
+- **One chip bar** (`8d1447e`, `b4daa21`, `f7f99b2`). Four hand-rolled
+  copies existed — search, users directory, Top periods, activity tabs —
+  each drifting in background alpha, height or checkmark. All now use
+  `FilterChipBar`, which is also why dropping the checkmark only had to
+  happen once.
+- **One profile section chrome** (`2493d0f`, `f7f99b2`). The page had
+  four answers to "what does a section look like". Sections are now a
+  tinted break plus a heading; a band rather than a hairline because a
+  change of surface survives the low contrast dark themes are built on.
+- **Category colour** (`f1c0ef3`). Announcements is `#ED207B`. The list
+  drew it pink and the category page drew it green, because the header
+  hashed the category *name* while `forum.color` sat unused on the same
+  object.
+- **Emoji in list text** (`55cf8d9`). Cooked HTML carries emoji as
+  `<img class="emoji">` and was handled; plain-text titles and excerpts
+  kept the literal `:warning:`.
+
+## 15. Open, not addressed
+
+- **Invites is a locked door.** The drawer shows the row to everyone;
+  users without permission get a clean 403 state, but Discourse gates the
+  link on `can_invite_to_forum` and the app has no equivalent capability
+  wired through.
+- **Tags and category badges are not tappable.** On web they are links.
+  On a row they sit inside the row's own tap target, so following one
+  would need the chip to claim the gesture.
+- **Small actions render as full posts** with an avatar, where web uses a
+  compact one-line form. Low value while they stay this rare.
