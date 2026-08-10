@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseSiteCapabilities;
 import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/site_controller.dart';
 import 'package:discourse_ui/utils/number_utils.dart';
@@ -35,7 +37,9 @@ class ForumHeaderWidget extends StatelessWidget {
         logoUrl,
         width: 60,
         height: 60,
-        fit: BoxFit.cover,
+        // contain, not cover: a forum logo is artwork with a fixed aspect
+        // ratio, and cropping it to fill a square cuts the wordmark in half.
+        fit: BoxFit.contain,
         // If logo fails to load, fall back to first character avatar
         errorBuilder: (context, error, stackTrace) {
           return _buildInitialAvatar(context, siteName);
@@ -143,7 +147,18 @@ class ForumHeaderWidget extends StatelessWidget {
 
     return Obx(() {
       final site = siteController.currentSite.value;
-      final logoUrl = site?.logoUrl;
+      // The forum's own logo, from /site/settings.json. AppForumConfig
+      // ships logoUrl as null — a fork is expected to hardcode one — so
+      // without this the header always fell back to a generated initial
+      // tile even though the server had been handing us the real logo all
+      // along, on a payload already being read for the upload limits.
+      // A hardcoded config value still wins: that is the fork's override.
+      final configuredLogo = site?.logoUrl;
+      final logoUrl = (configuredLogo != null && configuredLogo.isNotEmpty)
+          ? configuredLogo
+          : DiscourseSiteCapabilities.forSite(site?.pluginUrl ?? '').logoFor(
+              dark: Theme.of(context).brightness == Brightness.dark,
+            );
       final siteName = site?.name ?? (AppLocalizations.of(context)?.forum ?? 'Forum');
       final domain = _getDomain(site?.url);
 

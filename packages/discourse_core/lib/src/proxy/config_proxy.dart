@@ -123,6 +123,18 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       final raw = settings['min_search_term_length'];
       final parsed = raw is num ? raw.toInt() : int.tryParse(raw?.toString() ?? '');
       if (parsed != null && parsed > 0) minSearchLength = parsed;
+      // …and the forum's own logos. `site_*_url` are the resolved absolute
+      // forms; the bare `logo` settings are protocol-relative. Free — this
+      // payload is already being read for the upload limits.
+      DiscourseSiteCapabilities.storeLogos(
+        siteContext.site.pluginUrl,
+        logoUrl: settings['site_logo_url'] as String?,
+        logoDarkUrl: settings['site_logo_dark_url'] as String?,
+        mobileLogoUrl: settings['site_mobile_logo_url'] as String?,
+        mobileLogoDarkUrl: settings['site_mobile_logo_dark_url'] as String?,
+        smallLogoUrl: settings['site_logo_small_url'] as String?,
+        smallLogoDarkUrl: settings['site_logo_small_dark_url'] as String?,
+      );
       // Same payload carries the topic time-gap threshold (default 7).
       final gapRaw = settings['show_time_gap_days'];
       siteContext.setShowTimeGapDays(gapRaw is num

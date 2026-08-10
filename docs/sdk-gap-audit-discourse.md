@@ -245,6 +245,34 @@ differences rather than payload inferences:
 - `topics_day` / `week` / `month` / `year` / `all_time`,
   `uploaded_logo_dark` / `uploaded_background_dark`, `description_excerpt`.
 
+### Branding — what the API returns, and what the app uses
+
+Checked because the forum header was showing a generated initial tile.
+
+| Asset | API | App |
+|---|---|---|
+| Category `color` / `text_color` | `/site.json`, `/categories.json` | **used** — tile + 4px stripe |
+| Category `uploaded_logo` / `_background` (+dark) | present, null on try | unused, untested |
+| Tag colour | **not returned at all** | n/a — Discourse has none in core |
+| Forum logo (`site_logo_url`, `site_logo_small_url`, `site_mobile_logo_url`, + dark variants, `site_favicon_url`) | `/site/settings.json` | **now used** |
+| Forum cover / banner | `about.banner_image` on meta, unset on try; `welcome_banner_image` empty on both | unused |
+
+The logos were the find: six resolved absolute URLs sitting in a payload
+the app already fetches for the upload limits, while the header fell back
+to a generated tile because `AppForumConfig.logoUrl` ships as null.
+
+`logo_small` is preferred for the header's square slot — try serves the
+same wide wordmark SVG for both `logo` and `mobile_logo`, so cover-fitting
+it cropped to the middle three letters. The widget also had to switch from
+`BoxFit.cover` to `contain`: a logo is fixed-aspect artwork, not a
+backdrop.
+
+**Tags carry no colour**, and of the eight fields they do return the app
+uses five — `id`, `name`, `text`, `count`, `description`, plus `pm_only`.
+Unused: `slug` (the app routes by name, which Discourse accepts) and
+`target_tag` (tag synonyms — a synonym should arguably redirect to its
+target, which the app does not do).
+
 ### Site-wide (`/site.json`)
 
 The app now reads a narrow slice — `top_menu_items` (drives the Hot tab),

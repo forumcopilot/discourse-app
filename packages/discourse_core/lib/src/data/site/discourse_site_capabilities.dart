@@ -35,6 +35,46 @@ class DiscourseSiteCapabilities {
   /// wear a category badge — web hides it.
   int? uncategorizedCategoryId;
 
+  /// The forum's own logos, from `/site/settings.json` (already fetched
+  /// for the upload limits). Absolute URLs — Discourse resolves these for
+  /// us in the `site_*_url` variants, unlike the raw `logo` settings which
+  /// are protocol-relative.
+  String? logoUrl;
+  String? logoDarkUrl;
+  String? mobileLogoUrl;
+  String? mobileLogoDarkUrl;
+  String? smallLogoUrl;
+  String? smallLogoDarkUrl;
+
+  /// The logo to show in a **square** slot, honouring the current theme.
+  ///
+  /// `logo_small` first: it is the square mark Discourse ships for exactly
+  /// this, and the full logo is usually a wide wordmark — try.discourse.org
+  /// serves the same wide SVG for `logo` and `mobile_logo`, so cover-fitting
+  /// it into a square tile crops to the middle three letters. Falls back
+  /// through small → mobile → full, dark variant first in dark mode, so a
+  /// forum that set only some of the six still gets something.
+  String? logoFor({required bool dark}) {
+    String? first(List<String?> candidates) {
+      for (final c in candidates) {
+        if (c != null && c.isNotEmpty) return c;
+      }
+      return null;
+    }
+
+    if (dark) {
+      return first([
+        smallLogoDarkUrl,
+        smallLogoUrl,
+        mobileLogoDarkUrl,
+        mobileLogoUrl,
+        logoDarkUrl,
+        logoUrl,
+      ]);
+    }
+    return first([smallLogoUrl, mobileLogoUrl, logoUrl]);
+  }
+
   /// Legal links, absolute or site-relative as the server gave them.
   String? tosUrl;
   String? privacyPolicyUrl;
@@ -104,6 +144,27 @@ class DiscourseSiteCapabilities {
       }
     }
     return null;
+  }
+
+  /// Records the forum's logos. Separate from [store] because they come
+  /// from `/site/settings.json`, not `/site.json`, and the two are read at
+  /// different points — so this must not depend on the other having run.
+  static void storeLogos(
+    String pluginUrl, {
+    String? logoUrl,
+    String? logoDarkUrl,
+    String? mobileLogoUrl,
+    String? mobileLogoDarkUrl,
+    String? smallLogoUrl,
+    String? smallLogoDarkUrl,
+  }) {
+    final caps = _bySite.putIfAbsent(pluginUrl, DiscourseSiteCapabilities._);
+    caps.logoUrl = logoUrl?.trim();
+    caps.logoDarkUrl = logoDarkUrl?.trim();
+    caps.mobileLogoUrl = mobileLogoUrl?.trim();
+    caps.mobileLogoDarkUrl = mobileLogoDarkUrl?.trim();
+    caps.smallLogoUrl = smallLogoUrl?.trim();
+    caps.smallLogoDarkUrl = smallLogoDarkUrl?.trim();
   }
 
   static bool isResolved(String pluginUrl) =>
