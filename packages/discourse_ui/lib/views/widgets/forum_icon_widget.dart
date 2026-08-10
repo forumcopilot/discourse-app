@@ -90,7 +90,30 @@ class ForumIconWidget extends StatelessWidget {
   Widget _buildInitialAvatar(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final isLightTheme = Theme.of(context).brightness == Brightness.light;
-    
+
+    // An explicitly supplied colour wins outright. This branch used to
+    // paint its own hashed gradient over whatever the caller passed, which
+    // is why a category tile stayed teal while its stripe was the real
+    // blue: the colour was arriving and being painted over. Hashing is the
+    // right answer only when nobody knows better.
+    if (backgroundColor != null) {
+      return Container(
+        width: size,
+        height: size,
+        color: backgroundColor,
+        child: Center(
+          child: Text(
+            siteName![0].toUpperCase(),
+            style: textTheme.titleLarge?.copyWith(
+              color: iconColor ?? Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: size * 0.5,
+            ),
+          ),
+        ),
+      );
+    }
+
     // Get color scheme for the site name
     final avatarColors = AvatarColorUtils.getUserAvatarColorScheme(
       siteName!,
@@ -173,11 +196,19 @@ class ForumListItemIconWidget extends StatelessWidget {
   final IconData? fallbackIcon;
   final String? forumName;
 
+  /// The category's own colour, when it has one. Without this the tile
+  /// falls back to a hash of the name — right for a person's avatar,
+  /// wrong for a category, whose colour an admin actually chose.
+  final Color? backgroundColor;
+  final Color? iconColor;
+
   const ForumListItemIconWidget({
     super.key,
     this.logoUrl,
     this.fallbackIcon,
     this.forumName,
+    this.backgroundColor,
+    this.iconColor,
   });
 
   @override
@@ -189,6 +220,8 @@ class ForumListItemIconWidget extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       context: 'subforum',
       siteName: forumName,
+      backgroundColor: backgroundColor,
+      iconColor: iconColor,
     );
   }
 }

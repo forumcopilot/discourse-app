@@ -9,7 +9,14 @@ import '../../theme/style_builders.dart';
 /// Parse a Discourse hex string like "BF1E2E" (no leading `#`) into a
 /// Color. Returns null on bad input so the UI can hide the stripe.
 Color? _parseDiscourseHex(String hex) {
-  final clean = hex.replaceAll('#', '').trim();
+  var clean = hex.replaceAll('#', '').trim();
+  // Discourse stores whatever the admin typed, so 3-char shorthand is
+  // common — `tech` on try.discourse.org is "444". Expand it rather than
+  // dropping the colour, which is what made that category fall back to a
+  // hashed tile.
+  if (clean.length == 3) {
+    clean = clean.split('').map((ch) => '$ch$ch').join();
+  }
   if (clean.length != 6) return null;
   final v = int.tryParse(clean, radix: 16);
   if (v == null) return null;
@@ -97,6 +104,17 @@ class ForumListItem extends StatelessWidget {
                         children: [
                   ForumListItemIconWidget(
                     logoUrl: forum.logoUrl,
+                    // The category's own colour, not a hash of its name.
+                    // ForumListItemIconWidget falls back to
+                    // AvatarColorUtils — fine for a person, wrong for a
+                    // category, which has a colour the admin chose and
+                    // which web shows as its swatch. Two different colours
+                    // for one category (hashed tile, real stripe) read as
+                    // two unrelated signals.
+                    backgroundColor: stripeColor,
+                    iconColor: stripeColor == null
+                        ? null
+                        : _parseDiscourseHex(forum.textColor ?? 'FFFFFF'),
                     fallbackIcon: Icons.forum_rounded,
                     forumName: forum.name,
                   ),
@@ -143,6 +161,19 @@ class ForumListItem extends StatelessWidget {
                             spacing: DesignTokens.spacingS,
                             runSpacing: DesignTokens.spacingXS,
                             children: [
+                              // Watching / tracking, as web marks on a
+                              // category. FCForum flattens Discourse's
+                              // five levels to a boolean (>= Tracking), so
+                              // this is one icon rather than web's
+                              // per-level glyph.
+                              if (forum.isSubscribed) ...[
+                                Icon(
+                                  Icons.notifications_active_outlined,
+                                  size: textTheme.bodySmall?.fontSize ?? 12,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                                const SizedBox(width: 12),
+                              ],
                               if (topicCount > 0)
                                 Container(
                                   padding: EdgeInsets.symmetric(
