@@ -697,7 +697,10 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           postTime:
               DateTime.tryParse(a['created_at']?.toString() ?? '') ??
                   DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
-          shortContent: a['excerpt']?.toString(),
+          // Same cooked-HTML excerpt as getUserActionsAsync — this path
+          // was passing it through raw, so a topic whose excerpt opened
+          // with a lightbox anchor or an emoji <img> showed the markup.
+          shortContent: stripHtmlToText(a['excerpt']?.toString() ?? ''),
         ));
       }
       return FCUserTopicResult(

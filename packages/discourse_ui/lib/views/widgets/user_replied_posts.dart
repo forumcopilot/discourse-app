@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseUserProxy;
-import 'package:discourse_ui/views/widgets/user_avatar.dart';
+import 'package:discourse_ui/views/widgets/activity_row.dart';
+import 'package:discourse_ui/views/widgets/profile_section.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/views/post_page.dart';
@@ -8,9 +9,6 @@ import 'package:discourse_ui/views/lists/posts_list.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/views/login_page.dart';
 import '../../theme/design_tokens.dart';
-import '../../theme/style_builders.dart';
-import 'package:discourse_ui/utils/time_utils.dart';
-import 'package:discourse_ui/utils/number_utils.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 
 class UserRepliedPosts extends StatefulWidget {
@@ -235,8 +233,12 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
     }
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ..._recentPosts!.map((post) => _buildPostItem(context, post, colorScheme, textTheme)).toList(),
+        for (var i = 0; i < _recentPosts!.length; i++) ...[
+          if (i > 0) const ProfileRowDivider(),
+          _buildPostItem(context, _recentPosts![i]),
+        ],
         if (_hasMorePosts)
           Padding(
             padding: DesignTokens.paddingL,
@@ -246,157 +248,34 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
     );
   }
 
-  Widget _buildPostItem(BuildContext context, FCUserReply post, ColorScheme colorScheme, TextTheme textTheme) {
-    return Material(
-      color: colorScheme.surface,
-      child: InkWell(
-        onTap: () async {
-          await _navigateToPost(post);
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header section with avatar, username, and timestamp
-            Padding(
-              padding: EdgeInsets.all(DesignTokens.spacingL),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Avatar
-                  UserAvatar(
-                    username: (post.authorName.isNotEmpty) ? post.authorName : (widget.userName ?? 'User'),
-                    iconUrl: (post.authorIconUrl?.isNotEmpty == true) ? post.authorIconUrl : null,
-                    radius: 20,
-                  ),
-                  SizedBox(width: DesignTokens.spacingL),
-                  // Author info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          (post.authorName.isNotEmpty) ? post.authorName : (widget.userName ?? 'Unknown'),
-                          style: textTheme.titleMedium?.copyWith(
-                            color: colorScheme.onSurface,
-                            fontWeight: DesignTokens.fontWeightMedium,
-                            letterSpacing: DesignTokens.letterSpacingMedium,
-                          ),
-                        ),
-                        if (post.postTime != DateTime.fromMillisecondsSinceEpoch(0)) ...[
-                          SizedBox(height: DesignTokens.spacingXS),
-                          Text(
-                            formatSmartDateTime(post.postTime, context),
-                            style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                              letterSpacing: DesignTokens.letterSpacingWide,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Title row (matching topic list item structure)
-            Padding(
-              padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingS),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      post.topicTitle.isNotEmpty ? post.topicTitle : 'Unknown Topic',
-                      style: StyleBuilders.titleTextStyle(
-                        colorScheme: colorScheme,
-                        textTheme: textTheme,
-                        fontSize: DesignTokens.fontSizeTopicTitle,
-                        fontWeight: DesignTokens.fontWeightMedium,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Short content if available
-            if (post.shortContent?.isNotEmpty == true) ...[
-              Padding(
-                padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingS),
-                child: Text(
-                  post.shortContent!,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-            // Metadata row
-            Padding(
-              padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingL),
-              child: Wrap(
-                spacing: DesignTokens.spacingL,
-                runSpacing: DesignTokens.spacingXS,
-                children: [
-                  if (post.forumName.isNotEmpty) ...[
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.forum_outlined,
-                          size: textTheme.bodySmall?.fontSize ?? DesignTokens.fontSizeXS,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        SizedBox(width: DesignTokens.spacingXS),
-                        Text(
-                          post.forumName,
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                            letterSpacing: DesignTokens.letterSpacingWide,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  if (post.replyNumber > 0) ...[
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.comment_outlined,
-                          size: textTheme.bodySmall?.fontSize ?? DesignTokens.fontSizeXS,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        SizedBox(width: DesignTokens.spacingXS),
-                        Text(
-                          formatNumber(context, post.replyNumber),
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                            letterSpacing: DesignTokens.letterSpacingWide,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            // Bottom divider
-            _buildBottomDivider(colorScheme),
-          ],
-        ),
-      ),
+  /// Whether this row's post was written by somebody other than the
+  /// profile owner. True only on the Likes feed in practice: the other
+  /// filters return the owner's own posts, where an avatar and name would
+  /// repeat the same person down the whole page.
+  bool _isOtherAuthor(FCUserReply post) {
+    final author = post.authorName.trim();
+    final owner = (widget.userName ?? '').trim();
+    if (author.isEmpty) return false;
+    if (owner.isEmpty) return true;
+    return author.toLowerCase() != owner.toLowerCase();
+  }
+
+  Widget _buildPostItem(BuildContext context, FCUserReply post) {
+    return ActivityRow(
+      title: post.topicTitle.isNotEmpty ? post.topicTitle : 'Unknown Topic',
+      excerpt: post.shortContent,
+      time: post.postTime,
+      // `replyNumber` is the post's position in its topic, not a count of
+      // replies — /user_actions.json has no reply count to give.
+      postNumber: post.replyNumber,
+      attribution: _isOtherAuthor(post)
+          ? ActivityAttribution(
+              username: post.authorName,
+              avatarUrl: post.authorIconUrl,
+            )
+          : null,
+      onTap: () => _navigateToPost(post),
     );
   }
 
-  Widget _buildBottomDivider(ColorScheme colorScheme) {
-    return Divider(
-      height: 1,
-      thickness: 1,
-      color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
-    );
-  }
 }

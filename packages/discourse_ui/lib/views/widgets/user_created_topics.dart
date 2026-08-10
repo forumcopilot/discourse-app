@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
-import 'package:discourse_ui/utils/time_utils.dart';
 import 'package:discourse_ui/views/post_page.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 
 import '../../theme/design_tokens.dart';
+import 'activity_row.dart';
 import 'empty_state_view.dart';
+import 'profile_section.dart';
 
 /// Phase 5.24 — sibling of `UserRepliedPosts` that lists topics
 /// **created** by the given user, backed by
@@ -96,7 +97,6 @@ class _UserCreatedTopicsState extends State<UserCreatedTopics> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     if (_loading && _topics == null) {
       return const Padding(
         padding: EdgeInsets.all(DesignTokens.spacingXL),
@@ -120,15 +120,13 @@ class _UserCreatedTopicsState extends State<UserCreatedTopics> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: topics.length,
-      separatorBuilder: (_, __) => Divider(
-        height: 1,
-        indent: DesignTokens.spacingL,
-        endIndent: DesignTokens.spacingL,
-        color: colorScheme.outlineVariant
-            .withValues(alpha: DesignTokens.opacityDivider),
-      ),
-      itemBuilder: (_, i) => _TopicRow(
-        topic: topics[i],
+      separatorBuilder: (_, __) => const ProfileRowDivider(),
+      itemBuilder: (_, i) => ActivityRow(
+        title: topics[i].topicTitle,
+        excerpt: topics[i].shortContent,
+        time: topics[i].postTime,
+        replyCount: topics[i].replyCount,
+        viewCount: topics[i].viewCount,
         onTap: () => _open(topics[i]),
       ),
     );
@@ -147,95 +145,6 @@ class _UserCreatedTopicsState extends State<UserCreatedTopics> {
           topicId: topic.topicId,
           title: topic.topicTitle,
           forumId: topic.forumId.isNotEmpty ? topic.forumId : null,
-        ),
-      ),
-    );
-  }
-}
-
-class _TopicRow extends StatelessWidget {
-  final FCUserTopic topic;
-  final VoidCallback onTap;
-
-  const _TopicRow({required this.topic, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: DesignTokens.spacingL,
-          vertical: DesignTokens.spacingM,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              topic.topicTitle,
-              style: textTheme.titleSmall?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: DesignTokens.fontWeightSemiBold,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            if (topic.shortContent != null &&
-                topic.shortContent!.trim().isNotEmpty) ...[
-              const SizedBox(height: DesignTokens.spacingXS),
-              Text(
-                topic.shortContent!.trim(),
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-            const SizedBox(height: DesignTokens.spacingS),
-            Row(
-              children: [
-                Icon(Icons.schedule,
-                    size: DesignTokens.iconSizeS,
-                    color: colorScheme.onSurfaceVariant),
-                const SizedBox(width: DesignTokens.spacingXS),
-                Text(
-                  formatSmartDateTime(topic.postTime, context),
-                  style: textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                if (topic.replyCount > 0) ...[
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Icon(Icons.comment_outlined,
-                      size: DesignTokens.iconSizeS,
-                      color: colorScheme.onSurfaceVariant),
-                  const SizedBox(width: DesignTokens.spacingXS),
-                  Text(
-                    topic.replyCount.toString(),
-                    style: textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-                if (topic.viewCount > 0) ...[
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Icon(Icons.visibility_outlined,
-                      size: DesignTokens.iconSizeS,
-                      color: colorScheme.onSurfaceVariant),
-                  const SizedBox(width: DesignTokens.spacingXS),
-                  Text(
-                    topic.viewCount.toString(),
-                    style: textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ],
         ),
       ),
     );

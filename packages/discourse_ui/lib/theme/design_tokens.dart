@@ -115,6 +115,9 @@ class DesignTokens {
   // TopicListItem and the legacy bookmarks page. `S` (18) is for
   // compact rows where two avatars stack (e.g. badge tiles), and `L`
   // (24) is for header / detail sections that anchor a screen.
+  // `XS` (14) is for an avatar that annotates a line of text rather than
+  // leading a row — the attribution line in the profile activity feed.
+  static const double avatarRadiusXS = 14.0;
   static const double avatarRadiusS = 18.0;
   static const double avatarRadiusM = 20.0;
   static const double avatarRadiusL = 24.0;
