@@ -696,6 +696,41 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     );
   }
 
+  /// How many posts in this topic the viewer has not read.
+  ///
+  /// `unread_posts` is the live field; `new_posts` is its twin (same
+  /// helper). Deliberately NOT `unread`: ListableTopicSerializer
+  /// hardcodes that one to 0 as a back-compat stub for old themes
+  /// ("def unread; 0; end"), so any test against it is dead code.
+  int _unreadPosts(Map<String, dynamic> t) {
+    final unread = t['unread_posts'];
+    if (unread is int) return unread;
+    final fresh = t['new_posts'];
+    if (fresh is int) return fresh;
+    return 0;
+  }
+
+  /// Whether this conversation should render as unread.
+  ///
+  /// Two different states look the same to a reader and Discourse
+  /// reports them differently. A PM you have opened and that has since
+  /// grown has `unread_posts > 0`. A PM you have *never* opened is
+  /// "new", not "unread": Discourse leaves `last_read_post_number` null
+  /// and still reports `unread_posts: 0`, because that counter only
+  /// covers posts after your read position and you have no read
+  /// position. Testing the counter alone therefore missed exactly the
+  /// messages that had never been read — verified on meta, where three
+  /// system PMs the notification list showed as unread all came back
+  /// `unseen: false, unread: 0, unread_posts: 0, last_read: null`.
+  bool _isUnreadOrNew(Map<String, dynamic> t) {
+    if (t['unseen'] == true) return true;
+    if (_unreadPosts(t) > 0) return true;
+    final highest = t['highest_post_number'];
+    return t['last_read_post_number'] == null &&
+        highest is int &&
+        highest > 0;
+  }
+
   FCConversationSummary _conversationSummaryFrom(
     Map<String, dynamic> t, {
     Map<int, Map<String, dynamic>> users = const {},
@@ -784,7 +819,15 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       lastUserId: lastUserId?.toString(),
       lastReplyTime: t['last_posted_at']?.toString(),
       lastConvTime: t['last_posted_at']?.toString(),
-      newPost: t['unseen'] == true || (t['unread'] as int? ?? 0) > 0,
+      // `unread_posts`, NOT `unread`. ListableTopicSerializer hardcodes
+      // `unread` to 0 — a back-compat stub kept for old themes
+      // (app/serializers/listable_topic_serializer.rb: "def unread; 0;
+      // end") — so the old test could only ever fire on `unseen`, which
+      // means "never opened", not "has new posts". A PM you had opened
+      // once and then received a reply to showed as read; and because
+      // this flag also gates the row's unread badge, the count beside it
+      // never rendered either, despite being read from the right field.
+      newPost: _isUnreadOrNew(t),
       participants: participants,
       canEdit: false,
       canClose: false,
@@ -795,7 +838,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       // into a random foreign topic (403). Open-at-position uses
       // initialStartNum instead.
       messageId: '',
-      unreadMessageCount: (t['unread_posts'] as int?) ?? 0,
+      unreadMessageCount: _unreadPosts(t),
     );
   }
 
