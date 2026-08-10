@@ -73,7 +73,11 @@ class FilterChipBar extends StatelessWidget {
                 onSelected(index);
               },
               selectedColor: colorScheme.primaryContainer,
-              checkmarkColor: colorScheme.onPrimaryContainer,
+              // No checkmark. Material draws it *over* the avatar slot, so
+              // a selected chip had a tick sitting on top of its own icon;
+              // and the chip already turns the highlight colour, so the
+              // tick was saying a second time what the fill already said.
+              showCheckmark: false,
               labelStyle: textTheme.labelLarge?.copyWith(
                 color: isSelected
                     ? colorScheme.onPrimaryContainer

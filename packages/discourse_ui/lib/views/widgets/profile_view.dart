@@ -34,7 +34,7 @@ import 'full_screen_image_viewer.dart';
 import 'trust_level_sheet.dart';
 import 'user_avatar.dart';
 import '../chat/chat_channel_view.dart';
-import 'user_badges_row.dart';
+import 'user_badges_section.dart';
 import 'user_activity_tabs.dart';
 import '../edit_profile_page.dart';
 import '../settings_page.dart';
@@ -91,6 +91,11 @@ class ProfileView extends StatefulWidget {
   /// page host increments this on pull-to-refresh).
   final int refreshToken;
 
+  /// The host's scroll controller. ProfileView is the scrollable itself —
+  /// hosts pass their controller in rather than wrapping it, because a
+  /// pinned sliver only pins inside the viewport that owns it.
+  final ScrollController? scrollController;
+
   const ProfileView({
     super.key,
     required this.siteContext,
@@ -101,6 +106,7 @@ class ProfileView extends StatefulWidget {
     this.onAvatarUploaded,
     this.repliesKey,
     this.refreshToken = 0,
+    this.scrollController,
   });
 
   @override
@@ -344,8 +350,49 @@ class _ProfileViewState extends State<ProfileView> {
 
   // --- Build -------------------------------------------------------
 
+  /// Which Activity feed is showing. Lives here rather than inside the
+  /// tab widget because the chip bar is now a pinned sliver and the feed
+  /// a separate one — they are siblings in the scroll view, so their
+  /// shared state has to sit above both.
+  ActivityTab _activityTab = ActivityTab.replies;
+
   @override
   Widget build(BuildContext context) {
+    // ProfileView owns the scrollable now. The hosts used to wrap it in a
+    // ListView / SingleChildScrollView, which made every part of the page
+    // a single box — and a box cannot pin anything. The chip bar has to be
+    // a direct sliver of the scroll view to stay on screen.
+    return CustomScrollView(
+      controller: widget.scrollController,
+      // Kept from the hosts: pull-to-refresh has to work even when the
+      // profile is short enough not to scroll.
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverToBoxAdapter(child: _buildHeaderAndSections(context)),
+        const SliverToBoxAdapter(child: ActivitySectionHeading()),
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: ActivityChipBarDelegate(
+            selected: _activityTab,
+            onSelected: (t) => setState(() => _activityTab = t),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: ActivityFeed(
+            siteContext: widget.siteContext,
+            tab: _activityTab,
+            userId: _userInfo.id,
+            userName: _userInfo.username,
+            repliesKey: widget.repliesKey,
+          ),
+        ),
+        SliverToBoxAdapter(
+            child: SizedBox(height: DesignTokens.spacingL)),
+      ],
+    );
+  }
+
+  Widget _buildHeaderAndSections(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -416,49 +463,10 @@ class _ProfileViewState extends State<ProfileView> {
             ),
           ),
         ],
-        // Discourse trust level badge (0–4). Hidden on
-        // forums that don't expose trustLevel.
-        if (_userInfo.trustLevel != null) ...[
-          SizedBox(height: DesignTokens.spacingS),
-          Center(
-            // Tappable — opens the trust-level explainer sheet.
-            child: Material(
-              color: colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                onTap: () => TrustLevelSheet.show(
-                  context: context,
-                  currentLevel: _userInfo.trustLevel!,
-                ),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                    border: Border.all(
-                      color: colorScheme.outlineVariant,
-                      width: 0.5,
-                    ),
-                  ),
-                  child: Text(
-                    _trustLevelLabel(_userInfo.trustLevel!),
-                    style: textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      letterSpacing: DesignTokens.letterSpacingWide,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-        // Discourse badges row (Bronze/Silver/Gold).
-        // Hidden when the user has no granted badges.
-        SizedBox(height: DesignTokens.spacingS),
-        UserBadgesRow(username: _userInfo.username),
+        // Trust level moved into the info card, and badges into their
+        // own section above Stats. Both were stacked under the username as
+        // chips, which pushed the actual profile below the fold and gave a
+        // one-line fact (trust level) the same weight as the name.
         SizedBox(height: DesignTokens.spacingM),
         // Action row — self: Edit profile + Settings;
         // other: Follow/Unfollow + Send Message.
@@ -474,6 +482,9 @@ class _ProfileViewState extends State<ProfileView> {
         // single row in it.
         const SizedBox(height: DesignTokens.spacingL),
         _buildInfoCard(context, colorScheme, textTheme),
+        // Badges get a section of their own, immediately above Stats.
+        // Renders nothing at all when the user has none.
+        UserBadgesSection(username: _userInfo.username),
         // Discourse summary stats (`/u/{username}/summary.json`).
         // Loaded lazily by the section itself so the main profile
         // fetch stays a single request; renders nothing while
@@ -486,15 +497,6 @@ class _ProfileViewState extends State<ProfileView> {
           username: _userInfo.username,
         ),
         SizedBox(height: DesignTokens.spacingS),
-        // Replies / Topics tab strip. The selected tab loads lazily;
-        // `repliesKey` still drives the page host's load-more path.
-        UserActivityTabs(
-          siteContext: widget.siteContext,
-          userId: _userInfo.id,
-          userName: _userInfo.username,
-          repliesKey: widget.repliesKey,
-        ),
-        SizedBox(height: DesignTokens.spacingL),
       ],
     );
   }
@@ -839,6 +841,21 @@ class _ProfileViewState extends State<ProfileView> {
                   .add_jm()
                   .format(_userInfo.lastActivityTime!.toLocal()),
             ),
+          // Trust level reads as a fact about the account, like the join
+          // date beside it — not as a title for the person, which is what
+          // a chip under the username made it look like. Still tappable
+          // for the explainer sheet.
+          if (_userInfo.trustLevel != null)
+            _buildInfoTile(
+              context,
+              icon: Icons.military_tech_outlined,
+              title: 'Trust Level',
+              subtitle: _trustLevelLabel(_userInfo.trustLevel!),
+              onTap: () => TrustLevelSheet.show(
+                context: context,
+                currentLevel: _userInfo.trustLevel!,
+              ),
+            ),
           if (_userInfo.postCount != 0)
             _buildInfoTile(
               context,
@@ -872,13 +889,9 @@ class _ProfileViewState extends State<ProfileView> {
                       Localizations.localeOf(context).toString())
                   .format(_userInfo.profileViewCount),
             ),
-          if (_userInfo.badgeCount != 0)
-            _buildInfoTile(
-              context,
-              icon: Icons.military_tech_outlined,
-              title: AppLocalizations.of(context)?.badges ?? 'Badges',
-              subtitle: _userInfo.badgeCount.toString(),
-            ),
+          // No badge *count* row: the Badges section sits immediately
+          // below this card and lists them, so the number restated what
+          // the next thing on screen already shows.
           if (_userInfo.followingCount != 0)
             _buildInfoTile(
               context,
@@ -1258,39 +1271,17 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
     bool showStats,
   ) {
     if (!showStats) return const SizedBox.shrink();
-    return Card(
-      margin: EdgeInsets.symmetric(
-        horizontal: DesignTokens.spacingL,
-        vertical: DesignTokens.spacingXS,
-      ),
-      elevation: DesignTokens.elevationNone,
-      color: colorScheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-        side: BorderSide(
-          color: colorScheme.outlineVariant
-              .withValues(alpha: DesignTokens.opacityLow),
-          width: DesignTokens.borderWidthThin,
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: DesignTokens.spacingL,
-          vertical: DesignTokens.spacingM,
-        ),
-        child: Column(
+    // Was a card with an uppercase STATS micro-label — a fourth chrome on
+    // a page that now has one. Same heading and tinted break as every
+    // section below it.
+    return ProfileSection(
+      title: 'Stats',
+      contentPadding:
+          EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (showStats) ...[
-              Text(
-                'STATS',
-                style: textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  letterSpacing: DesignTokens.letterSpacingWide,
-                  fontWeight: DesignTokens.fontWeightSemiBold,
-                ),
-              ),
-              SizedBox(height: DesignTokens.spacingS),
               LayoutBuilder(
                 builder: (context, constraints) {
                   final cellWidth =
@@ -1334,7 +1325,6 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
             ],
           ],
         ),
-      ),
     );
   }
 }

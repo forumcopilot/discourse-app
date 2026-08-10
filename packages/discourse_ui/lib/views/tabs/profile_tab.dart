@@ -277,34 +277,43 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
     // model — one profile experience for the tab and the avatar-tap
     // page). The tab keeps owning: NotSignedInView, resetTab/auth-
     // listener wiring, and the _userInfo/_hasLoaded fetch mechanics.
+    // ProfileView is the scrollable now, so it replaces the ListView
+    // rather than sitting inside it — a pinned sliver only pins inside
+    // the viewport that owns it. The error and loading states keep a
+    // scrollable of their own so pull-to-refresh still works there.
+    Widget placeholder(Widget child) => ListView(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [child],
+        );
+
     return RefreshIndicator(
       onRefresh: _handleRefresh,
-      child: ListView(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          if (_userInfo == null && _userInfoError != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                  vertical: DesignTokens.spacingXXL),
-              child: EmptyStateView.error(
-                message: _userInfoError!,
-                onRetry: () {
-                  setState(() {
-                    _userInfoError = null;
-                    _hasLoaded = false;
-                  });
-                  _fetchUserInfo();
-                },
+      child: _userInfo == null && _userInfoError != null
+          ? placeholder(
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: DesignTokens.spacingXXL),
+                child: EmptyStateView.error(
+                  message: _userInfoError!,
+                  onRetry: () {
+                    setState(() {
+                      _userInfoError = null;
+                      _hasLoaded = false;
+                    });
+                    _fetchUserInfo();
+                  },
+                ),
               ),
             )
-          else if (_userInfo == null)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingXXL),
-              child: Center(child: CircularProgressIndicator()),
-            )
-          else
-            ProfileView(
+          : _userInfo == null
+              ? placeholder(const Padding(
+                  padding:
+                      EdgeInsets.symmetric(vertical: DesignTokens.spacingXXL),
+                  child: Center(child: CircularProgressIndicator()),
+                ))
+              : ProfileView(
+              scrollController: _scrollController,
               siteContext: widget.siteContext,
               userInfo: _userInfo!,
               isSelf: true,
@@ -329,8 +338,6 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
                 _fetchUserInfo();
               },
             ),
-        ],
-      ),
     );
   }
 

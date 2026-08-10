@@ -330,16 +330,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ? Center(child: Text(AppLocalizations.of(context)?.userInformationNotAvailable ?? 'User information not available'))
                   : RefreshIndicator(
                       onRefresh: _refreshProfile,
-                      child: SingleChildScrollView(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(), // Enable pull-to-refresh even when content doesn't scroll
-                        // The whole profile body is the shared
-                        // ProfileView (subtraction model — one profile
-                        // experience for the tab and this page). This
-                        // page keeps owning: the app bar + moderation
-                        // overflow menu, the userInfo fetch, and the
-                        // pull-to-refresh wrapper.
-                        child: ProfileView(
+                      // The whole profile body is the shared ProfileView
+                      // (subtraction model — one profile experience for
+                      // the tab and this page). This page keeps owning:
+                      // the app bar + moderation overflow menu, the
+                      // userInfo fetch, and the pull-to-refresh wrapper.
+                      // ProfileView is the scrollable, so it takes the
+                      // controller instead of sitting inside one.
+                      child: ProfileView(
+                          scrollController: _scrollController,
                           siteContext: widget.siteContext,
                           userInfo: _userInfo!,
                           isSelf: widget.siteContext.loginDataOutput?.user?.id ==
@@ -354,7 +353,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             _refreshProfile();
                           },
                         ),
-                      ),
                     ),
     );
   }

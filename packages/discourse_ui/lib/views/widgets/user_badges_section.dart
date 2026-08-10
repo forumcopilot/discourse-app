@@ -4,24 +4,36 @@ import 'package:forumcopilot_sdk/models/entities/fc_badge.dart';
 
 import '../../theme/design_tokens.dart';
 import 'badge_detail_sheet.dart';
+import 'profile_section.dart';
 
-/// Horizontal scrolling row of Discourse badge chips, sized to slot
-/// under the trust-level chip on the user profile page.
-class UserBadgesRow extends StatefulWidget {
+/// The profile's Badges section.
+///
+/// Was a single-line horizontal strip wedged under the username, where
+/// badges scrolled sideways behind a "+N more" chip — so most of a user's
+/// badges were invisible, and the ones that showed competed with the name
+/// for the top of the page. As its own full-width section it can simply
+/// wrap: a user with nine badges sees nine badges.
+///
+/// Renders nothing — no heading, no break — when the user has none, so an
+/// empty section never appears on a new account's profile.
+class UserBadgesSection extends StatefulWidget {
   final String username;
+
+  /// Cap before the overflow action. Generous because wrapping costs a
+  /// row, not a scroll gesture; beyond this the sheet is the better view.
   final int maxToShow;
 
-  const UserBadgesRow({
+  const UserBadgesSection({
     super.key,
     required this.username,
-    this.maxToShow = 12,
+    this.maxToShow = 18,
   });
 
   @override
-  State<UserBadgesRow> createState() => _UserBadgesRowState();
+  State<UserBadgesSection> createState() => _UserBadgesSectionState();
 }
 
-class _UserBadgesRowState extends State<UserBadgesRow> {
+class _UserBadgesSectionState extends State<UserBadgesSection> {
   List<FCBadge>? _badges;
   bool _loading = false;
 
@@ -32,7 +44,7 @@ class _UserBadgesRowState extends State<UserBadgesRow> {
   }
 
   @override
-  void didUpdateWidget(covariant UserBadgesRow oldWidget) {
+  void didUpdateWidget(covariant UserBadgesSection oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.username != widget.username) _load();
   }
@@ -107,7 +119,6 @@ class _UserBadgesRowState extends State<UserBadgesRow> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final badges = _badges;
 
     if (_loading && badges == null) {
@@ -119,77 +130,96 @@ class _UserBadgesRowState extends State<UserBadgesRow> {
     final visible = badges.take(widget.maxToShow).toList();
     final remaining = badges.length - visible.length;
 
-    return SizedBox(
-      height: 32,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(
-            horizontal: DesignTokens.spacingL),
-        itemCount: visible.length + (remaining > 0 ? 1 : 0),
-        separatorBuilder: (_, __) =>
-            const SizedBox(width: DesignTokens.spacingS),
-        itemBuilder: (context, index) {
-          if (index == visible.length && remaining > 0) {
-            return ActionChip(
+    return ProfileSection(
+      title: 'Badges',
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+      child: Wrap(
+        spacing: DesignTokens.spacingS,
+        runSpacing: DesignTokens.spacingS,
+        children: [
+          for (final b in visible)
+            _BadgeChip(
+              badge: b,
+              background: _bgFor(b.tier, colorScheme),
+              foreground: _fgFor(b.tier),
+              onTap: () => showBadgeDetailSheet(context, b),
+            ),
+          if (remaining > 0)
+            ActionChip(
               label: Text('+$remaining more'),
               onPressed: () => _showAll(context),
-              padding: EdgeInsets.zero,
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            );
-          }
-          final b = visible[index];
-          final bg = _bgFor(b.tier, colorScheme);
-          final fg = _fgFor(b.tier);
-          return Tooltip(
-            message: b.description ?? b.name,
-            child: Material(
-              color: bg,
-              borderRadius: BorderRadius.circular(16),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: () => showBadgeDetailSheet(context, b),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: DesignTokens.spacingS, vertical: 4),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                        color: fg.withValues(alpha: 0.4), width: 0.6),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.workspace_premium,
-                        size: 14,
-                        color: fg,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        b.name,
-                        style: textTheme.labelSmall?.copyWith(
-                          color: fg,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      if (b.grantCount > 1) ...[
-                        const SizedBox(width: 3),
-                        Text(
-                          '×${b.grantCount}',
-                          style: textTheme.labelSmall?.copyWith(
-                            color: fg,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ],
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One badge. Tier colour carries the rank, the count suffix the repeats.
+class _BadgeChip extends StatelessWidget {
+  const _BadgeChip({
+    required this.badge,
+    required this.background,
+    required this.foreground,
+    required this.onTap,
+  });
+
+  final FCBadge badge;
+  final Color background;
+  final Color foreground;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Tooltip(
+      message: badge.description ?? badge.name,
+      child: Material(
+        color: background,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusL),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(DesignTokens.radiusL),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: DesignTokens.spacingM,
+              vertical: DesignTokens.spacingS - 2,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(DesignTokens.radiusL),
+              border: Border.all(
+                  color: foreground.withValues(alpha: 0.4), width: 0.6),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.workspace_premium,
+                    size: DesignTokens.iconSizeS, color: foreground),
+                const SizedBox(width: DesignTokens.spacingXS),
+                Text(
+                  badge.name,
+                  style: textTheme.labelMedium?.copyWith(
+                    color: foreground,
+                    fontWeight: DesignTokens.fontWeightSemiBold,
                   ),
                 ),
-              ),
+                if (badge.grantCount > 1) ...[
+                  const SizedBox(width: 3),
+                  Text(
+                    '×${badge.grantCount}',
+                    style: textTheme.labelMedium?.copyWith(
+                      color: foreground,
+                      fontWeight: DesignTokens.fontWeightNormal,
+                    ),
+                  ),
+                ],
+              ],
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
