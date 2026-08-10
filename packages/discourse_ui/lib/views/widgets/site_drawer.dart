@@ -17,6 +17,7 @@ import '../moderation/reviewables_page.dart';
 import '../settings/notification_settings_page.dart';
 import '../tags_page.dart';
 import '../users_directory_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Phase 5.18a — hamburger drawer ("More" menu).
 ///
@@ -155,10 +156,27 @@ class SiteDrawer extends StatelessWidget {
                       const NotificationSettingsPage(),
                     ),
                   ),
+                  // Real links, not a "coming soon" snackbar. /site.json
+                  // has carried tos_url and privacy_policy_url all along —
+                  // the connector was already parsing both into
+                  // DiscourseSiteCapabilities and nothing read them.
+                  _DrawerRow(
+                    icon: Icons.gavel_outlined,
+                    title: 'Terms of Service',
+                    onTap: () => _openLegal(context, _legalUrl(
+                      DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
+                          .tosUrl,
+                      '/tos',
+                    )),
+                  ),
                   _DrawerRow(
                     icon: Icons.policy_outlined,
-                    title: 'Privacy & Terms',
-                    onTap: () => _comingSoon(context, 'Privacy & Terms'),
+                    title: 'Privacy Policy',
+                    onTap: () => _openLegal(context, _legalUrl(
+                      DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
+                          .privacyPolicyUrl,
+                      '/privacy',
+                    )),
                   ),
                   if (siteContext.isLoggedIn)
                     _DrawerRow(
@@ -212,6 +230,33 @@ class SiteDrawer extends StatelessWidget {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
   }
 
+  /// Resolves a legal URL from the site setting, falling back to
+  /// Discourse's canonical path.
+  ///
+  /// The setting comes both ways: meta.discourse.org returns "/tos"
+  /// (site-relative) and an absolute "https://www.discourse.org/privacy"
+  /// for the privacy policy, because a hosted forum can point that one at
+  /// the company's own page. Absolute wins as given; relative is joined
+  /// to the forum; empty falls back to the built-in page, which every
+  /// Discourse serves.
+  String _legalUrl(String? configured, String fallbackPath) {
+    final base = siteContext.site.url.replaceAll(RegExp(r'/+$'), '');
+    final value = (configured ?? '').trim();
+    if (value.isEmpty) return '$base$fallbackPath';
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      return value;
+    }
+    return '$base${value.startsWith('/') ? '' : '/'}$value';
+  }
+
+  Future<void> _openLegal(BuildContext context, String url) async {
+    Navigator.of(context).pop();
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  // ignore: unused_element
   void _comingSoon(BuildContext context, String label) {
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(
