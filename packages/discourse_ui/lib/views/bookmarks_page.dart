@@ -13,6 +13,7 @@ import 'post_page.dart';
 import 'widgets/bookmark_reminder_sheet.dart';
 import 'widgets/user_avatar.dart';
 import '../utils/error_message.dart';
+import 'widgets/empty_state_view.dart';
 
 /// Discourse-native bookmarks list. Backed by `/u/{me}/bookmarks.json`,
 /// reachable from the user profile page (own profile only). Tapping an
@@ -238,19 +239,15 @@ class _BookmarksPageState extends State<BookmarksPage> {
       );
     }
     if (_entries.isEmpty) {
-      return ListView(
-        padding: const EdgeInsets.all(DesignTokens.spacingL),
-        children: [
-          Center(
-            child: Text(
-              'No bookmarks yet',
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
+      // Was a bare line of grey text pinned under the app bar, while
+      // every other empty list in the app (drafts, unread, chat) uses
+      // EmptyStateView — an icon, a message and a line saying what to do
+      // about it, centred in the viewport.
+      return const EmptyStateView.scrollable(
+        icon: Icons.bookmark_border,
+        message: 'No bookmarks yet',
+        hint: 'Bookmark a post from its actions row and it will be '
+            'waiting for you here.',
       );
     }
 
