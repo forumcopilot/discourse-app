@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_badge.dart';
 
 import '../../theme/design_tokens.dart';
 import '../../utils/time_utils.dart';
+import 'remote_circle_avatar.dart';
 
 /// Opens the shared badge-detail bottom sheet for [badge].
 ///
@@ -142,17 +143,12 @@ class _BadgeDetailSheetState extends State<BadgeDetailSheet> {
           children: [
             Row(
               children: [
-                CircleAvatar(
+                RemoteCircleAvatar(
                   radius: DesignTokens.avatarRadiusL,
                   backgroundColor: BadgeDetailSheet.tierColor(badge.tier),
-                  backgroundImage:
-                      (badge.imageUrl != null && badge.imageUrl!.isNotEmpty)
-                          ? NetworkImage(badge.imageUrl!)
-                          : null,
-                  child: (badge.imageUrl == null || badge.imageUrl!.isEmpty)
-                      ? const Icon(Icons.emoji_events_outlined,
-                          color: Colors.white)
-                      : null,
+                  imageUrl: badge.imageUrl,
+                  fallback: const Icon(Icons.emoji_events_outlined,
+                      color: Colors.white),
                 ),
                 const SizedBox(width: DesignTokens.spacingM),
                 Expanded(

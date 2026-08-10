@@ -8,6 +8,7 @@ import 'widgets/badge_detail_sheet.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
+import 'widgets/remote_circle_avatar.dart';
 
 /// Phase 5.18c-3 — Badges directory, third drawer destination under
 /// **Community**. Lists every visible badge on the forum, grouped
@@ -167,16 +168,12 @@ class _BadgeRow extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return ListTile(
       onTap: () => showBadgeDetailSheet(context, badge),
-      leading: CircleAvatar(
+      leading: RemoteCircleAvatar(
         radius: DesignTokens.avatarRadiusS,
         backgroundColor: _tierColor(badge.tier),
-        backgroundImage: (badge.imageUrl != null && badge.imageUrl!.isNotEmpty)
-            ? NetworkImage(badge.imageUrl!)
-            : null,
-        child: (badge.imageUrl == null || badge.imageUrl!.isEmpty)
-            ? const Icon(Icons.emoji_events_outlined,
-                color: Colors.white, size: DesignTokens.iconSizeSMedium)
-            : null,
+        imageUrl: badge.imageUrl,
+        fallback: const Icon(Icons.emoji_events_outlined,
+            color: Colors.white, size: DesignTokens.iconSizeSMedium),
       ),
       title: Text(
         badge.name,

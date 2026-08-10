@@ -11,6 +11,7 @@ import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
 import 'widgets/trust_level_chip.dart';
 import '../utils/error_message.dart';
+import 'widgets/remote_circle_avatar.dart';
 
 /// Phase 5.18c-2 — single-group screen. Fetches the group's metadata
 /// (`/groups/{name}.json`) and the first page of members
@@ -595,17 +596,13 @@ class _MemberRow extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return ListTile(
       onTap: onTap,
-      leading: CircleAvatar(
+      leading: RemoteCircleAvatar(
         radius: DesignTokens.avatarRadiusS,
         backgroundColor: colorScheme.surfaceContainerHighest,
-        backgroundImage: item.avatarUrl.isNotEmpty
-            ? NetworkImage(item.avatarUrl)
-            : null,
-        child: item.avatarUrl.isEmpty
-            ? Icon(Icons.person,
-                color: colorScheme.onSurfaceVariant,
-                size: DesignTokens.iconSizeSMedium)
-            : null,
+        imageUrl: item.avatarUrl,
+        fallback: Icon(Icons.person,
+            color: colorScheme.onSurfaceVariant,
+            size: DesignTokens.iconSizeSMedium),
       ),
       title: Text(
         item.username,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/design_tokens.dart';
 import 'trust_level_chip.dart';
+import 'remote_circle_avatar.dart';
 
 /// One user in a list — the directory, search results, or a recipient picker.
 ///
@@ -78,14 +79,12 @@ class UserListRow extends StatelessWidget {
 
     return ListTile(
       onTap: onTap,
-      leading: CircleAvatar(
+      leading: RemoteCircleAvatar(
         radius: DesignTokens.avatarRadiusM,
         backgroundColor: colorScheme.surfaceContainerHighest,
-        backgroundImage: hasAvatar ? NetworkImage(avatarUrl!) : null,
-        child: hasAvatar
-            ? null
-            : Icon(leadingIcon ?? Icons.person,
-                color: colorScheme.onSurfaceVariant),
+        imageUrl: hasAvatar ? avatarUrl : null,
+        fallback: Icon(leadingIcon ?? Icons.person,
+            color: colorScheme.onSurfaceVariant),
       ),
       title: Row(
         children: [
