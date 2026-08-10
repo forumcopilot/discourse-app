@@ -73,7 +73,14 @@ class ForumListItem extends StatelessWidget {
     // on tree rebuild). Empty color means the fetching endpoint didn't
     // include the field, so we skip the stripe + count badge.
     final colorHex = forum.color ?? '';
-    final stripeColor =
+    // The category's own colour, used for the tile. There used to be a
+    // 4px stripe down the left edge as well; it was originally meant to
+    // signal unread, but Discourse's category payload carries no unread
+    // count — that needs /u/{name}/topic-tracking-state.json and
+    // client-side aggregation, which is not worth an extra request per
+    // launch. Once the tile carried the real colour the stripe was just
+    // the same colour twice, so it is gone.
+    final categoryColor =
         colorHex.isNotEmpty ? _parseDiscourseHex(colorHex) : null;
     final topicCount = forum.topicCount;
 
@@ -88,12 +95,6 @@ class ForumListItem extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // 4px Discourse-category color stripe down the left
-                  // edge. Hidden on non-Discourse forums (stripeColor
-                  // null), and on Discourse forums where the color
-                  // field is absent from the response.
-                  if (stripeColor != null)
-                    Container(width: 4, color: stripeColor),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -111,8 +112,8 @@ class ForumListItem extends StatelessWidget {
                     // which web shows as its swatch. Two different colours
                     // for one category (hashed tile, real stripe) read as
                     // two unrelated signals.
-                    backgroundColor: stripeColor,
-                    iconColor: stripeColor == null
+                    backgroundColor: categoryColor,
+                    iconColor: categoryColor == null
                         ? null
                         : _parseDiscourseHex(forum.textColor ?? 'FFFFFF'),
                     fallbackIcon: Icons.forum_rounded,

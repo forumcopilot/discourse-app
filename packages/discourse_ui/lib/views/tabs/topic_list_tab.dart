@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/views/widgets/resettable_widget.dart';
 import 'package:discourse_ui/views/lists/latest_topics_list.dart';
+import 'package:discourse_ui/views/widgets/filter_chip_bar.dart';
 import 'package:discourse_ui/views/lists/hot_topics_list.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseSiteCapabilities;
 import 'package:discourse_ui/views/lists/new_topics_list.dart';
@@ -318,45 +319,12 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   }
 
   Widget _buildFilterChips() {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingM),
-      child: SizedBox(
-        height: 40,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: _getFilterLabels(context).length,
-          separatorBuilder: (context, index) => SizedBox(width: DesignTokens.spacingS),
-          itemBuilder: (context, index) {
-            final isSelected = _selectedFilterIndex == index;
-            return FilterChip(
-              selected: isSelected,
-              label: Text(_getFilterLabels(context)[index]),
-              onSelected: (selected) {
-                setState(() {
-                  _selectedFilterIndex = index;
-                });
-              },
-              selectedColor: colorScheme.primaryContainer,
-              checkmarkColor: colorScheme.onPrimaryContainer,
-              labelStyle: textTheme.labelLarge?.copyWith(
-                color: isSelected ? colorScheme.onPrimaryContainer : colorScheme.onSurfaceVariant,
-                fontWeight: isSelected ? DesignTokens.fontWeightSemiBold : DesignTokens.fontWeightNormal,
-              ),
-              backgroundColor: colorScheme.surfaceVariant,
-              padding: EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingM,
-                vertical: DesignTokens.spacingS,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusL),
-              ),
-            );
-          },
-        ),
-      ),
+    return FilterChipBar(
+      options: [
+        for (final label in _getFilterLabels(context)) FilterChipOption(label: label),
+      ],
+      selectedIndex: _selectedFilterIndex,
+      onSelected: (i) => setState(() => _selectedFilterIndex = i),
     );
   }
 

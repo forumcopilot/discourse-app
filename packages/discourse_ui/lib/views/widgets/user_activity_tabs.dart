@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 
 import '../../theme/design_tokens.dart';
+import 'filter_chip_bar.dart';
 import 'user_created_topics.dart';
 import 'user_replied_posts.dart';
 
@@ -102,54 +103,19 @@ class _UserActivityTabsState extends State<UserActivityTabs> {
   }
 
   Widget _buildSelector(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
+    final tabs = _ActivityTab.values;
+    return FilterChipBar(
+      options: [
+        for (final t in tabs) FilterChipOption(label: t.label, icon: t.icon),
+      ],
+      selectedIndex: tabs.indexOf(_selected),
+      onSelected: (i) => setState(() => _selected = tabs[i]),
+      padding: EdgeInsets.fromLTRB(
         DesignTokens.spacingL,
         DesignTokens.spacingL,
         DesignTokens.spacingL,
         0,
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            for (final tab in _ActivityTab.values) ...[
-              _TabChip(
-                label: tab.label,
-                icon: tab.icon,
-                selected: _selected == tab,
-                onTap: () => setState(() => _selected = tab),
-              ),
-              if (tab != _ActivityTab.values.last)
-                const SizedBox(width: DesignTokens.spacingS),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TabChip extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _TabChip({
-    required this.label,
-    required this.icon,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ChoiceChip(
-      avatar: Icon(icon, size: DesignTokens.iconSizeS),
-      label: Text(label),
-      selected: selected,
-      onSelected: (_) => onTap(),
     );
   }
 }

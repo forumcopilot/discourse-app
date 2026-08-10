@@ -384,12 +384,27 @@ chips.
 
 ## 9f. Category, subcategory and tag views vs web
 
+### Filter chips — one style, app-wide
+
+Three screens had grown three answers to the same control: Home used a
+hand-styled `FilterChip`, the profile a bare `ChoiceChip` on Material
+defaults, and the category page a third variant — so the same gesture
+looked different depending on where you were. `FilterChipBar` is now
+shared by all three, on Home's styling, which was the only one expressed
+in design tokens.
+
+The category page's chips also moved **below** the header card. They are
+handed to `ForumTopicList` rather than stacked above it, so they sit under
+the header and scroll with the content instead of floating over it.
+
 ### Categories list
 
 | | App | Web |
 |---|---|---|
 | Layout | vertical list, colour tile + name + description | 3-across card grid, colour swatch + name + description |
 | Topic count per category | **shown** | not shown in this box style |
+| Category colour | tile in the category's own colour | swatch in the same colour |
+| Watching / tracking | **shown** (bell) | shown |
 | Subcategory nesting | grouped under parent (fixed earlier) | grouped under parent |
 | Forum header | banner: logo, name, description, post/member counts | no equivalent — site identity lives in the nav bar |
 

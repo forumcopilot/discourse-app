@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:discourse_ui/views/appbars/forum_topics_app_bar.dart';
 import 'package:discourse_ui/views/lists/forum_topic_list.dart';
+import 'package:discourse_ui/views/widgets/filter_chip_bar.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteCapabilities;
 import 'package:discourse_ui/theme/design_tokens.dart';
@@ -189,38 +190,14 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
 
   _CategoryFilter _activeFilter = _CategoryFilter.latest;
 
-  Widget _buildFilterTabs(BuildContext context) {
+  Widget? _buildFilterTabs(BuildContext context) {
     final filters = _filters;
     // A lone tab is a label, not a choice.
-    if (filters.length < 2) return const SizedBox.shrink();
-    final colorScheme = Theme.of(context).colorScheme;
-    return SizedBox(
-      height: 48,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
-        itemCount: filters.length,
-        separatorBuilder: (_, __) => SizedBox(width: DesignTokens.spacingS),
-        itemBuilder: (context, i) {
-          final f = filters[i];
-          final selected = f == _activeFilter;
-          return Center(
-            child: ChoiceChip(
-              label: Text(f.label),
-              selected: selected,
-              onSelected: (_) {
-                if (selected) return;
-                setState(() => _activeFilter = f);
-              },
-              labelStyle: TextStyle(
-                color: selected
-                    ? colorScheme.onSecondaryContainer
-                    : colorScheme.onSurfaceVariant,
-              ),
-            ),
-          );
-        },
-      ),
+    if (filters.length < 2) return null;
+    return FilterChipBar(
+      options: [for (final f in filters) FilterChipOption(label: f.label)],
+      selectedIndex: filters.indexOf(_activeFilter),
+      onSelected: (i) => setState(() => _activeFilter = filters[i]),
     );
   }
 
@@ -239,19 +216,16 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
         canPost: widget.forum.canPost,
         canSubscribe: widget.forum.canSubscribe,
       ),
-      body: Column(
-        children: [
-          _buildFilterTabs(context),
-          Expanded(
-            child: ForumTopicList(
-              siteContext: widget.siteContext,
-              forum: widget.forum,
-              showSubforumHeader: true,
-              onRefreshAvailable: _onRefreshAvailable,
-              filter: _activeFilter.route,
-            ),
-          ),
-        ],
+      // The filter bar is handed to the list rather than stacked above it,
+      // so it sits *under* the category header card and scrolls with the
+      // content — the header is the first item inside that list.
+      body: ForumTopicList(
+        siteContext: widget.siteContext,
+        forum: widget.forum,
+        showSubforumHeader: true,
+        onRefreshAvailable: _onRefreshAvailable,
+        filter: _activeFilter.route,
+        headerTrailing: _buildFilterTabs(context),
       ),
     );
   }

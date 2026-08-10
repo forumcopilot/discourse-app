@@ -29,6 +29,11 @@ class ForumTopicList extends StatefulWidget {
   /// owns the tab strip and passes the choice down.
   final String filter;
 
+  /// Rendered directly beneath the subforum header, inside the scroll
+  /// view. The category's filter chips live here so they sit under the
+  /// header card rather than floating above it.
+  final Widget? headerTrailing;
+
   const ForumTopicList({
     super.key,
     required this.siteContext,
@@ -36,6 +41,7 @@ class ForumTopicList extends StatefulWidget {
     this.showSubforumHeader = false,
     this.onRefreshAvailable,
     this.filter = 'latest',
+    this.headerTrailing,
   });
 
   @override
@@ -428,6 +434,7 @@ class _ForumTopicListState extends State<ForumTopicList> {
               siteContext: widget.siteContext,
               onNewTopic: _handleNewTopic,
             ),
+          if (widget.headerTrailing != null) widget.headerTrailing!,
           // Show permission message if user cannot view content
           if (!canViewContent)
             Padding(
