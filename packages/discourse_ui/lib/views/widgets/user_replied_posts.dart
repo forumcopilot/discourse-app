@@ -172,22 +172,11 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: DesignTokens.paddingL,
-          child: Text(
-            'Recent Posts',
-            style: textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: DesignTokens.fontWeightBold,
-            ),
-          ),
-        ),
-        _buildContent(context, colorScheme, textTheme),
-      ],
-    );
+    // No heading of its own. This used to print "Recent Posts", which was
+    // true when replies were the only feed here; it now sits under the
+    // Activity chips, which already name what is being shown — and said
+    // "Recent Posts" over the Likes and Solved feeds too.
+    return _buildContent(context, colorScheme, textTheme);
   }
 
   Future<void> _navigateToPost(FCUserReply post) async {

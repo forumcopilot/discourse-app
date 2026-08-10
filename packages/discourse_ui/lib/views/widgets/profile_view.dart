@@ -15,8 +15,7 @@ import 'package:discourse_core/discourse_core.dart'
         DiscourseUserProxy,
         DiscourseSummaryUser,
         DiscourseSummaryLink,
-        DiscourseUserSummary,
-        DiscourseSiteContextExtension;
+        DiscourseUserSummary;
 
 import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
@@ -36,10 +35,7 @@ import 'user_avatar.dart';
 import '../chat/chat_channel_view.dart';
 import 'user_badges_row.dart';
 import 'user_activity_tabs.dart';
-import '../bookmarks_page.dart';
-import '../drafts_list_page.dart';
 import '../edit_profile_page.dart';
-import '../messages_page.dart';
 import '../settings_page.dart';
 import '../user_profile_page.dart';
 import '../private_messaging/conversation/pages/new_conversation_page.dart';
@@ -469,13 +465,12 @@ class _ProfileViewState extends State<ProfileView> {
           _buildSelfActionRow(context)
         else
           _buildOtherActionRow(context, colorScheme, textTheme),
-        if (widget.isSelf) ...[
-          SizedBox(height: DesignTokens.spacingL),
-          // Discourse-native "Your stuff" section. Aggregates
-          // Messages / Bookmarks / Drafts, matching how Discourse
-          // web exposes them under the user menu.
-          _ProfileActionsSection(siteContext: widget.siteContext),
-        ],
+        // The personal nav card (Messages / Bookmarks / Drafts) is gone.
+        // Messages is a bottom-nav tab in its own right, so the row was a
+        // second door to the same room; Bookmarks and Drafts moved to the
+        // drawer's Account section, where the rest of "your stuff" lives.
+        // Leaving one of the three behind would have been a card with a
+        // single row in it.
         const SizedBox(height: DesignTokens.spacingL),
         _buildInfoCard(context, colorScheme, textTheme),
         // Discourse summary stats (`/u/{username}/summary.json`).
@@ -1032,156 +1027,6 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
 }
-
-/// Compact list of links to the current user's stuff — Messages,
-/// Bookmarks, Drafts. Each row navigates to a dedicated page. Pre-
-/// Phase-5.17d the Messages slot lived as a top-level bottom-nav tab;
-/// the badge moved into Profile so the bottom nav can stay at 5 items
-/// (Home / Categories / Tags / Notifications / Profile).
-class _ProfileActionsSection extends StatelessWidget {
-  final SiteContext siteContext;
-  const _ProfileActionsSection({required this.siteContext});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    // Phase 5.18a — Messages lives in the bottom nav when Chat isn't
-    // enabled (we took its slot). To avoid surfacing Messages twice,
-    // hide the Profile row in that case. When Chat is enabled, the
-    // bottom-nav slot is Chat and Messages needs this row as its
-    // entry point (Discourse web nests PMs under the user menu the
-    // same way).
-    final showMessagesRow = siteContext.chatEnabled;
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: DesignTokens.spacingL,
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-          border: Border.all(
-            color: colorScheme.outlineVariant
-                .withValues(alpha: DesignTokens.opacityMediumLow),
-            width: 0.5,
-          ),
-        ),
-        child: Column(
-          children: [
-            if (showMessagesRow) ...[
-              _ActionRow(
-                icon: Icons.mail_outline,
-                title: 'Messages',
-                subtitle: 'Private messages and conversations',
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => MessagesPage(siteContext: siteContext),
-                  ),
-                ),
-              ),
-              Divider(
-                height: 1,
-                indent: 56,
-                color: colorScheme.outlineVariant
-                    .withValues(alpha: DesignTokens.opacityDivider),
-              ),
-            ],
-            _ActionRow(
-              icon: Icons.bookmark_outline,
-              title: 'Bookmarks',
-              subtitle: "Posts you've saved for later",
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => BookmarksPage(siteContext: siteContext),
-                ),
-              ),
-            ),
-            Divider(
-              height: 1,
-              indent: 56,
-              color: colorScheme.outlineVariant
-                  .withValues(alpha: DesignTokens.opacityDivider),
-            ),
-            _ActionRow(
-              icon: Icons.edit_note_outlined,
-              title: 'Drafts',
-              subtitle: 'Unfinished topics and replies',
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => DraftsListPage(siteContext: siteContext),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ActionRow extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-  const _ActionRow({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: DesignTokens.spacingL,
-          vertical: DesignTokens.spacingM,
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: colorScheme.onSurfaceVariant),
-            const SizedBox(width: DesignTokens.spacingM),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: textTheme.titleSmall?.copyWith(
-                        fontWeight: DesignTokens.fontWeightSemiBold),
-                  ),
-                  Text(
-                    subtitle,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right,
-                size: 20, color: colorScheme.onSurfaceVariant),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Summary stats block fed by Discourse's
-/// `GET /u/{username}/summary.json` (via
-/// `DiscourseUserProxy.getUserSummaryAsync`). Self-loading so the
-/// profile's main fetch is unaffected; the section stays invisible
-/// while loading, on failure, and when the server withheld the
-/// numeric stats from this viewer (`canSeeSummaryStats` false — the
-/// numbers all come back 0 in that case, so rendering them would be
-/// worse than hiding). Below the stats, a "Most liked by" avatar row
-/// appears when the summary carries any such users.
 class _UserSummarySection extends StatefulWidget {
   final SiteContext siteContext;
   final String username;

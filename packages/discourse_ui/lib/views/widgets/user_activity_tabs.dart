@@ -104,18 +104,44 @@ class _UserActivityTabsState extends State<UserActivityTabs> {
 
   Widget _buildSelector(BuildContext context) {
     final tabs = _ActivityTab.values;
-    return FilterChipBar(
-      options: [
-        for (final t in tabs) FilterChipOption(label: t.label, icon: t.icon),
+    final textTheme = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Every other block on this page announces itself — "Top Replies",
+        // "Top Topics", "Top Links". Without a heading the chips read as
+        // controls belonging to the summary section above them rather than
+        // as the start of the feed below. Web solves the same problem by
+        // making Activity its own tab; on one scrolling page a heading is
+        // the equivalent.
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            DesignTokens.spacingL,
+            DesignTokens.spacingL,
+            DesignTokens.spacingL,
+            0,
+          ),
+          child: Text(
+            'Activity',
+            style: textTheme.titleMedium
+                ?.copyWith(fontWeight: DesignTokens.fontWeightBold),
+          ),
+        ),
+        FilterChipBar(
+          options: [
+            for (final t in tabs)
+              FilterChipOption(label: t.label, icon: t.icon),
+          ],
+          selectedIndex: tabs.indexOf(_selected),
+          onSelected: (i) => setState(() => _selected = tabs[i]),
+          padding: EdgeInsets.fromLTRB(
+            DesignTokens.spacingL,
+            DesignTokens.spacingS,
+            DesignTokens.spacingL,
+            0,
+          ),
+        ),
       ],
-      selectedIndex: tabs.indexOf(_selected),
-      onSelected: (i) => setState(() => _selected = tabs[i]),
-      padding: EdgeInsets.fromLTRB(
-        DesignTokens.spacingL,
-        DesignTokens.spacingL,
-        DesignTokens.spacingL,
-        0,
-      ),
     );
   }
 }

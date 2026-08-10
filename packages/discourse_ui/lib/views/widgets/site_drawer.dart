@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseSiteCapabilities;
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:get/get.dart';
 
@@ -6,6 +8,8 @@ import '../../config/app_forum_config.dart';
 import '../../controllers/login_controller.dart';
 import '../../theme/design_tokens.dart';
 import '../badges_directory_page.dart';
+import '../bookmarks_page.dart';
+import '../drafts_list_page.dart';
 import '../groups_list_page.dart';
 import '../invites_page.dart';
 import '../login_page.dart';
@@ -120,6 +124,29 @@ class SiteDrawer extends StatelessWidget {
                     ),
                   const Divider(height: 1),
                   _SectionLabel(label: 'Account'),
+                  // Your own content, above the settings rows — Bookmarks
+                  // and Drafts are things you go *read*, while Notifications
+                  // and Privacy are things you go *configure*. Both moved
+                  // off the Profile tab, which had grown a second nav card
+                  // duplicating this section.
+                  if (siteContext.isLoggedIn) ...[
+                    _DrawerRow(
+                      icon: Icons.bookmark_outline,
+                      title: 'Bookmarks',
+                      onTap: () => _push(
+                        context,
+                        BookmarksPage(siteContext: siteContext),
+                      ),
+                    ),
+                    _DrawerRow(
+                      icon: Icons.edit_note_outlined,
+                      title: 'Drafts',
+                      onTap: () => _push(
+                        context,
+                        DraftsListPage(siteContext: siteContext),
+                      ),
+                    ),
+                  ],
                   _DrawerRow(
                     icon: Icons.settings_outlined,
                     title: 'Notifications',
@@ -241,6 +268,11 @@ class _Header extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final isLoggedIn = siteContext.isLoggedIn;
     final username = siteContext.loginDataOutput?.user?.username;
+    final wideLogo =
+        DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
+            .wideLogoFor(
+      dark: Theme.of(context).brightness == Brightness.dark,
+    );
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(
@@ -255,30 +287,30 @@ class _Header extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: DesignTokens.avatarRadiusM,
-                backgroundColor: colorScheme.primary,
-                child: Icon(
-                  Icons.forum,
-                  color: colorScheme.onPrimary,
-                  size: DesignTokens.iconSizeM,
+          // The forum's wordmark, where web puts it. This slot is
+          // full-width, which is the shape the wide logo is drawn for —
+          // and the wordmark *is* the forum's name as art, so it replaces
+          // the name text rather than sitting beside it and saying the
+          // same thing twice. Forums that publish no logo keep the
+          // icon-and-name treatment.
+          if (wideLogo != null)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ConstrainedBox(
+                // Height-bounded, width free: Discourse's logo has no
+                // fixed aspect ratio (148×40 here, but arbitrary), so the
+                // only safe constraint is the one web uses — cap the
+                // height and let the width follow.
+                constraints: const BoxConstraints(maxHeight: 32),
+                child: Image.network(
+                  wideLogo,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => _nameRow(context),
                 ),
               ),
-              const SizedBox(width: DesignTokens.spacingM),
-              Expanded(
-                child: Text(
-                  siteContext.site.name,
-                  style: textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onPrimaryContainer,
-                    fontWeight: DesignTokens.fontWeightSemiBold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
+            )
+          else
+            _nameRow(context),
           const SizedBox(height: DesignTokens.spacingM),
           Text(
             isLoggedIn && username != null
@@ -291,6 +323,40 @@ class _Header extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+extension _HeaderFallback on _Header {
+  /// The pre-logo treatment: a generic forum glyph and the site's name.
+  /// Kept as the fallback for forums that publish no logo, and for a logo
+  /// that fails to load.
+  Widget _nameRow(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: DesignTokens.avatarRadiusM,
+          backgroundColor: colorScheme.primary,
+          child: Icon(
+            Icons.forum,
+            color: colorScheme.onPrimary,
+            size: DesignTokens.iconSizeM,
+          ),
+        ),
+        const SizedBox(width: DesignTokens.spacingM),
+        Expanded(
+          child: Text(
+            siteContext.site.name,
+            style: textTheme.titleMedium?.copyWith(
+              color: colorScheme.onPrimaryContainer,
+              fontWeight: DesignTokens.fontWeightSemiBold,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }

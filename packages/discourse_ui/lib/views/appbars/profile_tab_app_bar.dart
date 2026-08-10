@@ -3,7 +3,6 @@ import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:get/get.dart';
-import '../users_directory_page.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
 
 class ProfileTabAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -38,24 +37,14 @@ class ProfileTabAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       centerTitle: false,
       actions: [
-        if (isLoggedIn) _buildMembersButton(context, colorScheme),
+        // Users lives in the drawer. It was in both places, and the app
+        // bar is the wrong one — a people directory is forum-wide
+        // navigation, not an action on the profile you are looking at.
         if (isLoggedIn) _buildLogoutButton(context, colorScheme),
       ],
     );
   }
 
-  Widget _buildMembersButton(BuildContext context, ColorScheme colorScheme) {
-    return IconButton(
-      icon: const Icon(Icons.people_alt_rounded),
-      // 'Users' is not localized; the drawer item hardcodes it too, so keep
-      // the two entry points to this page reading the same.
-      tooltip: 'Users',
-      onPressed: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => UsersDirectoryPage(siteContext: siteContext)),
-      ),
-    );
-  }
 
   Widget _buildLogoutButton(BuildContext context, ColorScheme colorScheme) {
     return IconButton(

@@ -75,6 +75,32 @@ class DiscourseSiteCapabilities {
     return first([smallLogoUrl, mobileLogoUrl, logoUrl]);
   }
 
+  /// The forum's **wide** logo — the wordmark, for a full-width slot.
+  ///
+  /// Deliberately separate from [logoFor], which serves square slots.
+  /// Discourse ships two assets because they are two shapes: on
+  /// try.discourse.org `logo` is 148×40 and `logo_small` is 103×104. Using
+  /// one where the other belongs either crops the wordmark or stretches
+  /// the mark.
+  ///
+  /// Prefers `mobile_logo`, which is the asset an admin picks specifically
+  /// for narrow screens; forums that leave it unset fall back to the full
+  /// logo, which is what Discourse itself does.
+  String? wideLogoFor({required bool dark}) {
+    String? first(List<String?> candidates) {
+      for (final c in candidates) {
+        if (c != null && c.isNotEmpty) return c;
+      }
+      return null;
+    }
+
+    if (dark) {
+      return first(
+          [mobileLogoDarkUrl, mobileLogoUrl, logoDarkUrl, logoUrl]);
+    }
+    return first([mobileLogoUrl, logoUrl]);
+  }
+
   /// Legal links, absolute or site-relative as the server gave them.
   String? tosUrl;
   String? privacyPolicyUrl;
