@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/filter_chip_bar.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_directory_item.dart';
@@ -281,31 +282,30 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
           // search, so they step aside while searching rather than sitting
           // there looking like they filter the results.
           if (!_isSearchMode) ...[
-          _buildSelector(
-            children: _DirectoryOrder.values.map((o) {
-              return Padding(
-                padding: const EdgeInsets.only(right: DesignTokens.spacingS),
-                child: ChoiceChip(
-                  avatar: Icon(o.icon, size: DesignTokens.iconSizeS),
-                  label: Text(o.label),
-                  selected: _order == o,
-                  onSelected: (_) => _setOrder(o),
-                ),
-              );
-            }).toList(),
-          ),
-          _buildSelector(
-            children: _DirectoryPeriod.values.map((p) {
-              return Padding(
-                padding: const EdgeInsets.only(right: DesignTokens.spacingS),
-                child: ChoiceChip(
-                  label: Text(p.label),
-                  selected: _period == p,
-                  onSelected: (_) => _setPeriod(p),
-                ),
-              );
-            }).toList(),
-          ),
+            // The shared bar, not bare ChoiceChips on Material defaults —
+            // these read as outlined boxes next to the filled pills used
+            // for the same gesture everywhere else in the app.
+            FilterChipBar(
+              options: [
+                for (final o in _DirectoryOrder.values)
+                  FilterChipOption(label: o.label, icon: o.icon),
+              ],
+              selectedIndex: _DirectoryOrder.values.indexOf(_order),
+              onSelected: (i) => _setOrder(_DirectoryOrder.values[i]),
+              padding: EdgeInsets.fromLTRB(DesignTokens.spacingL,
+                  DesignTokens.spacingS, DesignTokens.spacingL, 0),
+            ),
+            FilterChipBar(
+              options: [
+                for (final p in _DirectoryPeriod.values)
+                  FilterChipOption(label: p.label),
+              ],
+              selectedIndex: _DirectoryPeriod.values.indexOf(_period),
+              onSelected: (i) => _setPeriod(_DirectoryPeriod.values[i]),
+              padding: EdgeInsets.fromLTRB(DesignTokens.spacingL,
+                  DesignTokens.spacingS, DesignTokens.spacingL,
+                  DesignTokens.spacingS),
+            ),
           ],
           Divider(
             height: 1,
@@ -353,19 +353,6 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildSelector({required List<Widget> children}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: DesignTokens.spacingL,
-        vertical: DesignTokens.spacingS,
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(children: children),
-      ),
     );
   }
 

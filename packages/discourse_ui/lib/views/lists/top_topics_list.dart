@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 
 import '../../theme/design_tokens.dart';
+import '../widgets/filter_chip_bar.dart';
 import '../listitems/topic_list_item.dart';
 import '../tabs/topic_list_tab.dart';
 import '../post_page.dart';
@@ -180,44 +181,19 @@ class TopTopicsListState extends FCStatefulWidget<TopTopicsList>
   /// pinning at the top — Discourse web pins, but on mobile pinning
   /// would eat real estate from a short list).
   Widget _buildPeriodSelector() {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Padding(
+    // The shared bar. This was a fourth hand-tuned ChoiceChip strip:
+    // same intent, slightly different background alpha and height, so
+    // the Top period chips sat a couple of pixels off from the Latest /
+    // Hot / New chips directly above them.
+    return FilterChipBar(
+      options: [
+        for (final p in TopPeriod.values) FilterChipOption(label: p.label),
+      ],
+      selectedIndex: TopPeriod.values.indexOf(_period),
+      onSelected: (i) => _switchPeriod(TopPeriod.values[i]),
       padding: const EdgeInsets.symmetric(
         horizontal: DesignTokens.spacingL,
         vertical: DesignTokens.spacingS,
-      ),
-      child: SizedBox(
-        height: 34,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: TopPeriod.values.length,
-          separatorBuilder: (_, __) =>
-              const SizedBox(width: DesignTokens.spacingS),
-          itemBuilder: (_, i) {
-            final p = TopPeriod.values[i];
-            final selected = p == _period;
-            return ChoiceChip(
-              label: Text(p.label),
-              selected: selected,
-              onSelected: (_) => _switchPeriod(p),
-              labelStyle: TextStyle(
-                color: selected
-                    ? colorScheme.onPrimaryContainer
-                    : colorScheme.onSurfaceVariant,
-                fontWeight: selected
-                    ? DesignTokens.fontWeightSemiBold
-                    : DesignTokens.fontWeightNormal,
-              ),
-              selectedColor: colorScheme.primaryContainer,
-              backgroundColor: colorScheme.surfaceContainerHighest
-                  .withValues(alpha: DesignTokens.opacityMediumLow),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusL),
-              ),
-              showCheckmark: false,
-            );
-          },
-        ),
       ),
     );
   }
