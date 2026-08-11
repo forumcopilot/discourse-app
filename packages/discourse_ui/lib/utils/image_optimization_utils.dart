@@ -97,20 +97,17 @@ Future<XFile> optimizeImage(
     final jpgAllowed =
         constraints.extensions?.any((e) => e == 'jpg' || e == 'jpeg') == true;
 
-    // Convert to JPG if:
-    // 1. Original format is PNG/WebP/GIF/HEIC and JPG is allowed (size reduction or compatibility)
-    // 2. Original format is not in allowed extensions but JPG is allowed (unsupported format)
-    final isPng = extension == 'png';
-    final isWebp = extension == 'webp';
-    final isGif = extension == 'gif';
-    final isHeic = extension == 'heic' || extension == 'heif';
+    // Convert to JPEG only when the forum will not take the format at
+    // all. Converting a format the forum accepts is destructive for no
+    // gain — it was rewriting PNGs the server was happy to store, losing
+    // transparency and adding artefacts to exactly the screenshots and
+    // diagrams people post most.
     final isJpg = extension == 'jpg' || extension == 'jpeg';
     final isFormatSupported =
-        constraints.extensions?.contains(extension) == true;
+        constraints.extensions == null ||
+            constraints.extensions!.contains(extension);
 
-    final shouldConvertToJpg = jpgAllowed &&
-        !isJpg &&
-        (isPng || isWebp || isGif || isHeic || !isFormatSupported);
+    final shouldConvertToJpg = jpgAllowed && !isJpg && !isFormatSupported;
 
     // Step 5: Apply optimizations
     XFile optimizedFile = imageFile;

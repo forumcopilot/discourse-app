@@ -127,21 +127,13 @@ Future<AttachmentValidationResult> validateFile(
         }
       }
 
-      // Check if format conversion would be beneficial (if not already needed due to unsupported extension)
-      if (!needsFormatConversion && constraints.extensions != null) {
-        final isPng = extension == 'png';
-        final isWebp = extension == 'webp';
-        final isGif = extension == 'gif';
-        final isHeic = extension == 'heic' || extension == 'heif';
-        final isJpg = extension == 'jpg' || extension == 'jpeg';
-        final jpgAllowed = constraints.extensions!.any((e) => e == 'jpg' || e == 'jpeg');
-        
-        // Convert PNG/WebP/GIF/HEIC to JPG if JPG is allowed and it would reduce size
-        // (Skip if already JPG)
-        if (!isJpg && (isPng || isWebp || isGif || isHeic) && jpgAllowed) {
-          needsFormatConversion = true;
-        }
-      }
+      // Deliberately no "convert to JPEG because JPEG is allowed" rule.
+      // It used to fire for any PNG/WebP/GIF/HEIC the forum accepted as-is,
+      // so files that were never too big got re-encoded anyway: a PNG
+      // screenshot came back lossy with transparency flattened, a 4.7 KB
+      // PNG grew to 15.9 KB, and a GIF would have lost its animation.
+      // Conversion is still set above, where it is genuinely needed —
+      // when the forum does not accept the format at all.
     } catch (e) {
       // If we can't load the image, it might be corrupted
       // But we'll let the server handle this error

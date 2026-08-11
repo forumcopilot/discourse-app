@@ -4,15 +4,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
-import 'package:discourse_ui/utils/attachment_constraints_utils.dart';
-import 'package:discourse_ui/utils/attachment_validation_utils.dart';
-import 'package:discourse_ui/utils/image_optimization_utils.dart';
-import 'package:discourse_ui/utils/file_utils.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:discourse_ui/utils/discourse_draft_controller.dart';
 import 'package:discourse_ui/views/widgets/tag_input_field.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteCapabilities;
+import '../services/attachment_upload_service.dart';
 
 class NewTopicPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -149,24 +146,28 @@ class _NewTopicPageState extends State<NewTopicPage> {
     }
   }
 
+  /// Uploads one picked file and returns Discourse's `upload://` ref.
+  ///
+  /// The body of this method used to be a verbatim copy of the same
+  /// logic in five sibling composer pages. It now lives once in
+  /// AttachmentUploadService; what stays here is only what differs.
   Future<String?> _handleFileUpload(XFile file) async {
-    debugPrint('🔍 [NEW_TOPIC] _handleFileUpload called');
-    debugPrint('🔍 [NEW_TOPIC] File details:');
-    debugPrint('   - file.path: "${file.path}"');
-    debugPrint('   - file.name: "${file.name}"');
-    debugPrint('   - forumId: "${widget.forumId}"');
+    final outcome = await AttachmentUploadService.upload(
+      context: context,
+      file: file,
+      uploadType: 'post',
+      targetId: widget.forumId,
+      groupId: _groupId ?? '',
+      currentAttachmentCount: _attachmentIds.length,
+    );
 
-    // Get constraints from SiteContext
-    final siteContext = getCurrentSiteContext();
-    final constraints = getAttachmentConstraintsFromSiteContext(siteContext);
-
-    // Check attachment count limit
-    if (!canAddMoreAttachments(_attachmentIds.length, constraints)) {
-      if (mounted) {
+    if (outcome.cancelled) return null;
+    if (!outcome.succeeded) {
+      if (mounted && outcome.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Maximum of ${constraints!.count} attachment(s) allowed',
+              outcome.errorMessage!,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),
@@ -180,126 +181,8 @@ class _NewTopicPageState extends State<NewTopicPage> {
       return null;
     }
 
-    // Validate file
-    XFile fileToUpload = file;
-    if (constraints != null) {
-      final isImage = isImageFile(file.name);
-      final validation = await validateFile(
-        file,
-        constraints,
-        isImage,
-        currentAttachmentCount: _attachmentIds.length,
-      );
-
-      if (!validation.isValid) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                validation.errorMessage ?? 'File validation failed',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onErrorContainer,
-                    ),
-              ),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              margin: const EdgeInsets.all(8),
-            ),
-          );
-        }
-        return null;
-      }
-
-      // For images that need optimization
-      if (isImage && validation.needsOptimization) {
-        // Optimize image
-        try {
-          final optimizedFile = await optimizeImage(file, constraints);
-          fileToUpload = optimizedFile;
-          debugPrint('🔍 [NEW_TOPIC] Image optimized successfully');
-        } catch (e) {
-          debugPrint('❌ [NEW_TOPIC] Error optimizing image: $e');
-          String errorMessage = e.toString();
-          if (errorMessage.startsWith('Exception: ')) {
-            errorMessage = errorMessage.substring(11);
-          }
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  errorMessage,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                ),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                margin: const EdgeInsets.all(8),
-              ),
-            );
-          }
-          return null;
-        }
-      }
-    }
-
-    try {
-      debugPrint('🔍 [NEW_TOPIC] Getting attachment proxy...');
-      var attachmentProxy = SiteProxyFactory.getAttachmentProxy();
-      // Use existing groupId if available, otherwise use empty string
-      var groupId = _groupId ?? "";
-
-      debugPrint('🔍 [NEW_TOPIC] Reading file bytes...');
-      final fileBytes = await fileToUpload.readAsBytes();
-      debugPrint('🔍 [NEW_TOPIC] File bytes read: ${fileBytes.length} bytes');
-
-      debugPrint('🔍 [NEW_TOPIC] Calling uploadAttachmentAsync with:');
-      debugPrint('   - type: "post"');
-      debugPrint('   - id: "${widget.forumId}"');
-      debugPrint('   - groupId: "$groupId"');
-      debugPrint('   - attachmentName: "${fileToUpload.name}"');
-      debugPrint('   - bytes length: ${fileBytes.length}');
-
-      var uploadAttachmentResult = await attachmentProxy.uploadAttachmentAsync("post", widget.forumId, groupId, fileToUpload.name, fileBytes);
-
-      debugPrint('🔍 [NEW_TOPIC] Upload result:');
-      debugPrint('   - result: ${uploadAttachmentResult.result}');
-      debugPrint('   - resultText: "${uploadAttachmentResult.resultText}"');
-      debugPrint('   - attachmentId: "${uploadAttachmentResult.attachmentId}"');
-      debugPrint('   - groupId: "${uploadAttachmentResult.groupId}"');
-
-      if (uploadAttachmentResult.result) {
-        debugPrint('✅ [NEW_TOPIC] File upload successful');
-
-        // Phase 5.19 — store Discourse's `short_url` (carried in
-        // `FCAttachmentUploadResult.groupId` because the SDK's XF
-        // shape doesn't have a dedicated short_url field). The
-        // numeric `attachmentId` is useless on Discourse — what the
-        // post needs to reference the upload is the `upload://...`
-        // short_url, which the proxy's `appendAttachmentMarkdown`
-        // turns into the right Markdown image / file ref before
-        // POSTing.
-        final shortUrl = uploadAttachmentResult.groupId;
-        if (shortUrl != null && shortUrl.isNotEmpty) {
-          setState(() {
-            _attachmentIds.add(shortUrl);
-          });
-          debugPrint('✅ [NEW_TOPIC] Stored shortUrl: $shortUrl');
-          debugPrint('✅ [NEW_TOPIC] Current attachmentRefs: $_attachmentIds');
-          return shortUrl;
-        } else {
-          debugPrint('⚠️ [NEW_TOPIC] Upload succeeded but attachmentId is null or empty');
-          return null;
-        }
-      } else {
-        debugPrint('❌ [NEW_TOPIC] File upload failed: ${uploadAttachmentResult.resultText}');
-        throw Exception(uploadAttachmentResult.resultText ?? 'Failed to upload file');
-      }
-    } catch (e, stackTrace) {
-      debugPrint('❌ [NEW_TOPIC] Exception in _handleFileUpload: $e');
-      debugPrint('❌ [NEW_TOPIC] Stack trace: $stackTrace');
-      throw Exception('Failed to create topic: ${e.toString()}');
-    }
+    setState(() => _attachmentIds.add(outcome.shortUrl!));
+    return outcome.shortUrl;
   }
 
   @override

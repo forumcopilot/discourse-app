@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
-import 'package:discourse_ui/utils/attachment_constraints_utils.dart';
-import 'package:discourse_ui/utils/attachment_validation_utils.dart';
-import 'package:discourse_ui/utils/image_optimization_utils.dart';
-import 'package:discourse_ui/utils/file_utils.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../services/attachment_upload_service.dart';
 
 class EditConversationMessagePage extends StatefulWidget {
   final SiteContext siteContext;
@@ -153,128 +150,43 @@ class _EditConversationMessagePageState extends State<EditConversationMessagePag
     }
   }
 
+  /// Uploads one picked file and returns Discourse's `upload://` ref.
+  ///
+  /// The body of this method used to be a verbatim copy of the same
+  /// logic in five sibling composer pages. It now lives once in
+  /// AttachmentUploadService; what stays here is only what differs.
   Future<String?> _handleFileUpload(XFile file) async {
-    try {
-      // Get constraints from SiteContext
-      final siteContext = getCurrentSiteContext();
-      final constraints = getAttachmentConstraintsFromSiteContext(siteContext);
+    final outcome = await AttachmentUploadService.upload(
+      context: context,
+      file: file,
+      uploadType: 'pm',
+      targetId: widget.conversationId,
+      groupId: _groupId ?? '',
+      currentAttachmentCount: _attachmentIds.length,
+    );
 
-      // Check attachment count limit
-      if (!canAddMoreAttachments(_attachmentIds.length, constraints)) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Maximum of ${constraints!.count} attachment(s) allowed',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onErrorContainer,
-                    ),
-              ),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              margin: const EdgeInsets.all(8),
-            ),
-          );
-        }
-        return null;
-      }
-
-      // Validate file
-      XFile fileToUpload = file;
-      if (constraints != null) {
-        final isImage = isImageFile(file.name);
-        final validation = await validateFile(
-          file,
-          constraints,
-          isImage,
-          currentAttachmentCount: _attachmentIds.length,
-        );
-
-        if (!validation.isValid) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  validation.errorMessage ?? 'File validation failed',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onErrorContainer,
-                      ),
-                ),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                margin: const EdgeInsets.all(8),
-              ),
-            );
-          }
-          return null;
-        }
-
-        // For images that need optimization
-        if (isImage && validation.needsOptimization) {
-          // Optimize image
-          try {
-            final optimizedFile = await optimizeImage(file, constraints);
-            fileToUpload = optimizedFile;
-          } catch (e) {
-            String errorMessage = e.toString();
-            if (errorMessage.startsWith('Exception: ')) {
-              errorMessage = errorMessage.substring(11);
-            }
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    errorMessage,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
+    if (outcome.cancelled) return null;
+    if (!outcome.succeeded) {
+      if (mounted && outcome.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              outcome.errorMessage!,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onErrorContainer,
                   ),
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  margin: const EdgeInsets.all(8),
-                ),
-              );
-            }
-            return null;
-          }
-        }
+            ),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Theme.of(context).colorScheme.errorContainer,
+            margin: const EdgeInsets.all(8),
+          ),
+        );
       }
-
-      var attachmentProxy = SiteProxyFactory.getAttachmentProxy();
-      // Use existing groupId if available, otherwise use empty string
-      var groupId = _groupId ?? "";
-
-      final fileBytes = await fileToUpload.readAsBytes();
-
-      // For conversation messages, use "pm" type and conversationId
-      var uploadAttachmentResult = await attachmentProxy.uploadAttachmentAsync(
-        "pm",
-        widget.conversationId,
-        groupId,
-        fileToUpload.name,
-        fileBytes,
-      );
-
-      if (uploadAttachmentResult.result) {
-        // Phase 5.19 — store Discourse short_url (carried in `groupId`)
-        // so the proxy can build `![image](upload://...)` Markdown
-        // when the edit is saved.
-        final shortUrl = uploadAttachmentResult.groupId;
-        if (shortUrl != null && shortUrl.isNotEmpty) {
-          setState(() {
-            _attachmentIds.add(shortUrl);
-          });
-        } else {
-          return null;
-        }
-
-        return shortUrl;
-      } else {
-        throw Exception(uploadAttachmentResult.resultText ?? 'Failed to upload file');
-      }
-    } catch (e) {
-      throw Exception('Failed to upload file: ${e.toString()}');
+      return null;
     }
+
+    setState(() => _attachmentIds.add(outcome.shortUrl!));
+    return outcome.shortUrl;
   }
 
   @override

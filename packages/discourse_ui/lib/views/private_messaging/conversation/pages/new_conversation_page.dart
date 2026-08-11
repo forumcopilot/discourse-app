@@ -7,7 +7,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:discourse_ui/utils/file_picker_utils.dart';
 import 'package:discourse_ui/utils/attachment_constraints_utils.dart';
 import 'package:discourse_ui/utils/attachment_validation_utils.dart';
-import 'package:discourse_ui/utils/image_optimization_utils.dart';
 import 'package:discourse_ui/views/user_search_page.dart';
 import 'package:discourse_ui/views/widgets/user_avatar.dart';
 import 'conversation_page.dart';
@@ -15,6 +14,7 @@ import '../../../../theme/design_tokens.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io';
 import '../../../../utils/file_utils.dart';
+import '../../../../services/attachment_upload_service.dart';
 
 class NewConversationPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -699,29 +699,28 @@ class _NewConversationPageState extends State<NewConversationPage> {
     );
   }
 
+  /// Uploads one picked file and returns Discourse's `upload://` ref.
+  ///
+  /// The body of this method used to be a verbatim copy of the same
+  /// logic in five sibling composer pages. It now lives once in
+  /// AttachmentUploadService; what stays here is only what differs.
   Future<String?> _handleFileUpload(XFile file) async {
-    debugPrint('🔍 [NEW_CONVERSATION] _handleFileUpload called');
-    debugPrint('🔍 [NEW_CONVERSATION] File details:');
-    debugPrint('   - file.path: "${file.path}"');
-    debugPrint('   - file.name: "${file.name}"');
+    final outcome = await AttachmentUploadService.upload(
+      context: context,
+      file: file,
+      uploadType: 'pm',
+      targetId: '',
+      groupId: _groupId ?? '',
+      currentAttachmentCount: _attachmentIds.length,
+    );
 
-    // Check if this specific file is already uploading
-    if (_uploadingFiles[file.path] == true) {
-      debugPrint('⚠️ [NEW_CONVERSATION] File already uploading, returning');
-      return null;
-    }
-
-    // Get constraints from SiteContext
-    final siteContext = getCurrentSiteContext();
-    final constraints = getAttachmentConstraintsFromSiteContext(siteContext);
-
-    // Check attachment count limit
-    if (!canAddMoreAttachments(_attachments.length, constraints)) {
-      if (mounted) {
+    if (outcome.cancelled) return null;
+    if (!outcome.succeeded) {
+      if (mounted && outcome.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Maximum of ${constraints!.count} attachment(s) allowed',
+              outcome.errorMessage!,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),
@@ -735,189 +734,19 @@ class _NewConversationPageState extends State<NewConversationPage> {
       return null;
     }
 
-    // Validate file
-    XFile fileToUpload = file;
-    if (constraints != null) {
-      final isImage = isImageFile(file.name);
-      final validation = await validateFile(
-        file,
-        constraints,
-        isImage,
-        currentAttachmentCount: _attachments.length,
-      );
-
-      if (!validation.isValid) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                validation.errorMessage ?? 'File validation failed',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onErrorContainer,
-                    ),
-              ),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              margin: const EdgeInsets.all(8),
-            ),
-          );
-        }
-        return null;
-      }
-
-      // For images that need optimization
-      if (isImage && validation.needsOptimization) {
-        // Optimize image
-        try {
-          final optimizedFile = await optimizeImage(file, constraints);
-          fileToUpload = optimizedFile;
-          debugPrint('🔍 [NEW_CONVERSATION] Image optimized successfully');
-        } catch (e) {
-          debugPrint('❌ [NEW_CONVERSATION] Error optimizing image: $e');
-          String errorMessage = e.toString();
-          if (errorMessage.startsWith('Exception: ')) {
-            errorMessage = errorMessage.substring(11);
-          }
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  errorMessage,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                ),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                margin: const EdgeInsets.all(8),
-              ),
-            );
-          }
-          return null;
-        }
-      }
-    }
-
-    // Mark this file as uploading
+    // Keep _attachmentIds index-aligned with _attachments: the UI pairs
+    // them up by position for thumbnails.
     setState(() {
-      _uploadingFiles[fileToUpload.path] = true;
+      final i = _attachments.indexWhere((f) => f.path == file.path);
+      if (i != -1) {
+        while (_attachmentIds.length <= i) {
+          _attachmentIds.add('');
+        }
+        _attachmentIds[i] = outcome.shortUrl!;
+      }
+      _uploadingFiles.remove(file.path);
     });
-
-    try {
-      debugPrint('🔍 [NEW_CONVERSATION] Getting attachment proxy...');
-      var attachmentProxy = SiteProxyFactory.getAttachmentProxy();
-      // Use existing groupId if available, otherwise use empty string
-      var groupId = _groupId ?? "";
-
-      debugPrint('🔍 [NEW_CONVERSATION] Reading file bytes...');
-      final fileBytes = await fileToUpload.readAsBytes();
-      debugPrint('🔍 [NEW_CONVERSATION] File bytes read: ${fileBytes.length} bytes');
-
-      debugPrint('🔍 [NEW_CONVERSATION] Calling uploadAttachmentAsync with:');
-      debugPrint('   - type: "pm"');
-      debugPrint('   - id: "" (empty for new conversations)');
-      debugPrint('   - groupId: "$groupId"');
-      debugPrint('   - attachmentName: "${fileToUpload.name}"');
-      debugPrint('   - bytes length: ${fileBytes.length}');
-
-      var uploadAttachmentResult = await attachmentProxy.uploadAttachmentAsync(
-        "pm", // type for private messages/conversations
-        "", // empty string for new conversations (no conversation ID yet)
-        groupId,
-        file.name,
-        fileBytes,
-      );
-
-      debugPrint('🔍 [NEW_CONVERSATION] Upload result:');
-      debugPrint('   - result: ${uploadAttachmentResult.result}');
-      debugPrint('   - resultText: "${uploadAttachmentResult.resultText}"');
-      debugPrint('   - attachmentId: "${uploadAttachmentResult.attachmentId}"');
-      debugPrint('   - groupId: "${uploadAttachmentResult.groupId}"');
-
-      if (uploadAttachmentResult.result) {
-        debugPrint('✅ [NEW_CONVERSATION] File upload successful');
-
-        // Phase 5.19 — store Discourse's `short_url` (in `groupId`)
-        // at the matching file index. The proxy turns these into
-        // Discourse `![image](upload://...)` markdown when posting.
-        // PMs were uploaded with `for_private_message=true` (see
-        // `DiscourseAttachmentProxy.uploadAttachmentAsync` translating
-        // type='pm') so the URL is scoped to sender + recipient.
-        final shortUrl = uploadAttachmentResult.groupId;
-        if (shortUrl != null && shortUrl.isNotEmpty) {
-          setState(() {
-            // Find the index of this file in the attachments list
-            final fileIndex = _attachments.indexWhere((f) => f.path == file.path);
-            if (fileIndex != -1) {
-              // Insert at the correct position so the order in
-              // `_attachmentIds` mirrors `_attachments` (the UI may
-              // pair them up by index for thumbnail rendering).
-              while (_attachmentIds.length <= fileIndex) {
-                _attachmentIds.add('');
-              }
-              _attachmentIds[fileIndex] = shortUrl;
-            }
-            _uploadingFiles.remove(file.path);
-          });
-          debugPrint('✅ [NEW_CONVERSATION] Stored shortUrl: $shortUrl');
-          debugPrint('✅ [NEW_CONVERSATION] Current attachmentRefs: $_attachmentIds');
-          return shortUrl;
-        } else {
-          debugPrint('⚠️ [NEW_CONVERSATION] Upload succeeded but attachmentId is null or empty');
-          setState(() {
-            _uploadingFiles.remove(fileToUpload.path);
-          });
-          return null;
-        }
-      } else {
-        debugPrint('❌ [NEW_CONVERSATION] File upload failed: ${uploadAttachmentResult.resultText}');
-        // Remove file from list on failure
-        setState(() {
-          final fileIndex = _attachments.indexWhere((f) => f.path == file.path);
-          if (fileIndex != -1) {
-            _attachments.removeAt(fileIndex);
-            if (fileIndex < _attachmentIds.length) {
-              _attachmentIds.removeAt(fileIndex);
-            }
-          }
-          _uploadingFiles.remove(file.path);
-        });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(uploadAttachmentResult.resultText ?? AppLocalizations.of(context)?.failedToUploadFile('') ?? 'Failed to upload file'),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
-        }
-        return null;
-      }
-    } catch (e, stackTrace) {
-      debugPrint('❌ [NEW_CONVERSATION] Exception in _handleFileUpload: $e');
-      debugPrint('❌ [NEW_CONVERSATION] Stack trace: $stackTrace');
-      // Remove file from list on error
-      setState(() {
-        final fileIndex = _attachments.indexWhere((f) => f.path == file.path);
-        if (fileIndex != -1) {
-          _attachments.removeAt(fileIndex);
-          if (fileIndex < _attachmentIds.length) {
-            _attachmentIds.removeAt(fileIndex);
-          }
-        }
-        _uploadingFiles.remove(file.path);
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)?.failedToUploadFile(e.toString()) ?? 'Failed to upload file: ${e.toString()}'),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
-      return null;
-    }
+    return outcome.shortUrl;
   }
 
   void _handleFileAttachment() async {

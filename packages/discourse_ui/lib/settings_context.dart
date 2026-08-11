@@ -14,6 +14,10 @@ class SettingsContext {
   final RxInt pagePerSize = 20.obs; // Default page size for paging
   final Rx<Locale?> locale = Rx<Locale?>(null); // null = use system locale
 
+  /// "Don't ask again" for the oversized-image resize prompt. False means
+  /// ask each time; true means resize and say so without interrupting.
+  final RxBool alwaysResizeOversizedImages = false.obs;
+
   // Initialize settings from device
   Future<void> loadFromDevice() async {
     try {
@@ -36,6 +40,10 @@ class SettingsContext {
       if (loadedPagePerSize != null && loadedPagePerSize > 0) {
         pagePerSize.value = loadedPagePerSize;
       }
+
+      // Load the oversized-image resize preference
+      alwaysResizeOversizedImages.value =
+          prefs.getBool('always_resize_oversized_images') ?? false;
 
       // Load locale
       final String? localeCode = prefs.getString('locale');
@@ -92,5 +100,16 @@ class SettingsContext {
     pagePerSize.value = 20;
     locale.value = null; // Use system locale
     await saveToDevice();
+  }
+
+  /// Persists the "don't ask again" choice from the resize prompt.
+  Future<void> setAlwaysResizeOversizedImages(bool value) async {
+    alwaysResizeOversizedImages.value = value;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('always_resize_oversized_images', value);
+    } catch (e) {
+      AppLogger.debug('Failed to persist resize preference: $e');
+    }
   }
 }

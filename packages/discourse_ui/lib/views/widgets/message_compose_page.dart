@@ -9,11 +9,14 @@ import 'package:discourse_ui/views/user_search_page.dart';
 import 'package:discourse_ui/utils/file_picker_utils.dart';
 import 'package:discourse_ui/utils/attachment_constraints_utils.dart';
 import 'package:discourse_ui/utils/attachment_validation_utils.dart';
-import 'package:discourse_ui/utils/image_optimization_utils.dart';
 import 'package:discourse_ui/views/widgets/cached_redirect_image.dart';
 import 'dart:io';
 import 'package:discourse_ui/utils/file_utils.dart';
 import '../../theme/design_tokens.dart';
+import '../../settings_context.dart';
+import '../../utils/image_shrink.dart';
+import 'oversized_image_sheet.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
 
 class MessageComposePage extends StatefulWidget {
   final SiteContext siteContext;
@@ -267,6 +270,100 @@ class _MessageComposePageState extends State<MessageComposePage> {
   /// branches on `full` vs `thumb` — Discourse Markdown doesn't have
   /// that distinction; the rendered size is governed by the post's
   /// site/category settings.
+  /// Prepares a picked image for upload, asking before rewriting it.
+  ///
+  /// Shared by both pickers. They used to carry separate copies of this
+  /// logic, so fixing the image button left the paperclip still silently
+  /// transcoding — the two had already drifted once and would again.
+  ///
+  /// Returns the file to upload (the original when it already fits), or
+  /// null when the user declined or it cannot be made to fit.
+  Future<XFile?> _prepareImageForUpload(
+    XFile image,
+    FCAttachmentConstraints constraints,
+  ) async {
+    final maxBytes = constraints.size;
+    final pickedBytes = await File(image.path).length();
+    // Anything within the limit is uploaded exactly as picked. The old
+    // path re-encoded on `needsOptimization`, which also fires for "this
+    // is a PNG and JPEG is allowed" — converting files that were never
+    // too big, and which would have turned a GIF into a still frame.
+    if (maxBytes == null || maxBytes <= 0 || pickedBytes <= maxBytes) {
+      return image;
+    }
+
+    var proceed = SettingsContext.instance.alwaysResizeOversizedImages.value;
+    if (!proceed && mounted) {
+      final choice = await showOversizedImageSheet(
+        context,
+        fileName: image.name,
+        fileBytes: pickedBytes,
+        maxBytes: maxBytes,
+      );
+      proceed = choice == OversizedImageChoice.resize;
+    }
+    if (!proceed) return null;
+
+    final shrunk =
+        await shrinkImageToFit(File(image.path), maxBytes: maxBytes);
+    if (shrunk == null) {
+      if (mounted) {
+        _showAttachmentError(
+          '${image.name}: too large (${formatFileSize(pickedBytes)}) and '
+          'could not be resized. Limit is ${formatFileSize(maxBytes)}.',
+        );
+      }
+      return null;
+    }
+    if (mounted) {
+      final from = shrunk.originalSize;
+      final to = shrunk.newSize;
+      final dims = (from != null && to != null)
+          ? ' (${from.width}×${from.height} → ${to.width}×${to.height})'
+          : '';
+      _showAttachmentNotice(
+        '${image.name} resized to ${formatFileSize(shrunk.newBytes)}$dims '
+        'to fit the ${formatFileSize(maxBytes)} limit.',
+      );
+    }
+    return XFile(shrunk.file.path, name: image.name);
+  }
+
+  void _showAttachmentError(String message) {
+    final scheme = Theme.of(context).colorScheme;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: scheme.onErrorContainer)),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: scheme.errorContainer,
+        margin: const EdgeInsets.all(DesignTokens.spacingS),
+      ),
+    );
+  }
+
+  /// Says what was done to a file the user picked. Resizing without
+  /// telling anyone is how a 20 MB PNG became a 2.2 MB JPEG unnoticed.
+  void _showAttachmentNotice(String message) {
+    final scheme = Theme.of(context).colorScheme;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: scheme.onSurfaceVariant)),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: scheme.surfaceContainerHighest,
+        duration: const Duration(seconds: 5),
+        margin: const EdgeInsets.all(DesignTokens.spacingS),
+      ),
+    );
+  }
+
   void _insertAttachmentRef(String attachmentRef, String insertType) {
     // Ensure content field has focus
     if (!_contentFocusNode.hasFocus) {
@@ -383,34 +480,10 @@ class _MessageComposePageState extends State<MessageComposePage> {
             return;
           }
 
-          // For images that need optimization
-          if (isImage && validation.needsOptimization) {
-            // Optimize image
-            try {
-              final optimizedFile = await optimizeImage(file, constraints);
-              fileToUpload = optimizedFile;
-            } catch (e) {
-              String errorMessage = e.toString();
-              if (errorMessage.startsWith('Exception: ')) {
-                errorMessage = errorMessage.substring(11);
-              }
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      errorMessage,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                          ),
-                    ),
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                    margin: const EdgeInsets.all(DesignTokens.spacingS),
-                  ),
-                );
-              }
-              return;
-            }
+          if (isImage) {
+            final prepared = await _prepareImageForUpload(file, constraints);
+            if (prepared == null) return;
+            fileToUpload = prepared;
           }
         }
 
@@ -545,9 +618,15 @@ class _MessageComposePageState extends State<MessageComposePage> {
       final remainingSlots = constraints != null && constraints.count != null && constraints.count! > 0 ? constraints.count! - _attachments.length : null;
 
       // Pick multiple images (iOS 14+ / Android 4.3+)
-      List<XFile> selectedImages = await FilePickerUtils.pickMultiImage(
-        imageQuality: ImageQuality.medium,
-      );
+      // No imageQuality: any value makes image_picker re-encode. It
+      // rewrote every pick as JPEG and capped it at 1920px, so a PNG
+      // screenshot arrived lossy, renamed .jpg, with transparency
+      // flattened — and a 4.7 KB PNG came out 15.9 KB, so it was not
+      // even saving bytes. Worse, it ran *before* the size check, so a
+      // 20 MB file was silently rewritten to 2.2 MB and slipped under a
+      // 10 MB limit that could therefore never fire for an image.
+      // Upload what the user picked; let the server's limits be real.
+      List<XFile> selectedImages = await FilePickerUtils.pickMultiImage();
 
       // Limit to remaining slots if there's a limit
       if (remainingSlots != null && selectedImages.length > remainingSlots) {
@@ -624,35 +703,10 @@ class _MessageComposePageState extends State<MessageComposePage> {
               continue; // Skip this image and continue with next
             }
 
-            // If optimization is needed, optimize automatically
-            if (validation.needsOptimization) {
-              // Optimize image
-              try {
-                final optimizedImage = await optimizeImage(image, constraints);
-                imageToUpload = optimizedImage;
-              } catch (e) {
-                String errorMessage = e.toString();
-                if (errorMessage.startsWith('Exception: ')) {
-                  errorMessage = errorMessage.substring(11);
-                }
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        '${image.name}: $errorMessage',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onErrorContainer,
-                            ),
-                      ),
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                      margin: const EdgeInsets.all(DesignTokens.spacingS),
-                    ),
-                  );
-                }
-                continue; // Skip this image and continue with next
-              }
-            }
+            final prepared =
+                await _prepareImageForUpload(image, constraints);
+            if (prepared == null) continue;
+            imageToUpload = prepared;
           }
 
           // Add file to list immediately so user can see it

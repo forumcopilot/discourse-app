@@ -6,15 +6,12 @@ import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart' as forumcopilot_sdk;
 import 'package:discourse_core/discourse_core.dart' show DiscoursePostProxy;
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
-import 'package:discourse_ui/utils/attachment_constraints_utils.dart';
-import 'package:discourse_ui/utils/attachment_validation_utils.dart';
-import 'package:discourse_ui/utils/image_optimization_utils.dart';
-import 'package:discourse_ui/utils/file_utils.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import '../theme/design_tokens.dart';
 import '../utils/discourse_draft_controller.dart';
+import '../services/attachment_upload_service.dart';
 
 class ReplyPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -254,24 +251,31 @@ class _ReplyPageState extends State<ReplyPage> {
     }
   }
 
+  /// Uploads one picked file and returns Discourse's `upload://` ref.
+  ///
+  /// The 148 lines that used to live here — constraint lookup, count
+  /// check, validation, image optimisation, byte read, proxy call,
+  /// result unwrapping — were duplicated verbatim across six composer
+  /// pages. They now live in AttachmentUploadService; this page keeps
+  /// only what is actually its own: which topic the upload belongs to,
+  /// and where the resulting ref is stored.
   Future<String?> _handleFileUpload(XFile file) async {
-    debugPrint('🔍 [REPLY] _handleFileUpload called');
-    debugPrint('🔍 [REPLY] File details:');
-    debugPrint('   - file.path: "${file.path}"');
-    debugPrint('   - file.name: "${file.name}"');
-    debugPrint('   - forumId: "${widget.forumId}"');
+    final outcome = await AttachmentUploadService.upload(
+      context: context,
+      file: file,
+      uploadType: 'post',
+      targetId: widget.forumId ?? '',
+      groupId: _groupId ?? '',
+      currentAttachmentCount: _attachmentIds.length,
+    );
 
-    // Get constraints from SiteContext
-    final siteContext = getCurrentSiteContext();
-    final constraints = getAttachmentConstraintsFromSiteContext(siteContext);
-
-    // Check attachment count limit
-    if (!canAddMoreAttachments(_attachmentIds.length, constraints)) {
-      if (mounted) {
+    if (outcome.cancelled) return null;
+    if (!outcome.succeeded) {
+      if (mounted && outcome.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Maximum of ${constraints!.count} attachment(s) allowed',
+              outcome.errorMessage!,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),
@@ -285,122 +289,8 @@ class _ReplyPageState extends State<ReplyPage> {
       return null;
     }
 
-    // Validate file
-    XFile fileToUpload = file;
-    if (constraints != null) {
-      final isImage = isImageFile(file.name);
-      final validation = await validateFile(
-        file,
-        constraints,
-        isImage,
-        currentAttachmentCount: _attachmentIds.length,
-      );
-
-      if (!validation.isValid) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                validation.errorMessage ?? 'File validation failed',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onErrorContainer,
-                    ),
-              ),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              margin: const EdgeInsets.all(8),
-            ),
-          );
-        }
-        return null;
-      }
-
-      // For images that need optimization
-      if (isImage && validation.needsOptimization) {
-        // Optimize image
-        try {
-          final optimizedFile = await optimizeImage(file, constraints);
-          fileToUpload = optimizedFile;
-          debugPrint('🔍 [REPLY] Image optimized successfully');
-        } catch (e) {
-          debugPrint('❌ [REPLY] Error optimizing image: $e');
-          String errorMessage = e.toString();
-          if (errorMessage.startsWith('Exception: ')) {
-            errorMessage = errorMessage.substring(11);
-          }
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  errorMessage,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                ),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                margin: const EdgeInsets.all(8),
-              ),
-            );
-          }
-          return null;
-        }
-      }
-    }
-
-    try {
-      debugPrint('🔍 [REPLY] Getting attachment proxy...');
-      var attachmentProxy = SiteProxyFactory.getAttachmentProxy();
-      // Use existing groupId if available, otherwise use empty string
-      var groupId = _groupId ?? "";
-
-      debugPrint('🔍 [REPLY] Reading file bytes...');
-      final fileBytes = await fileToUpload.readAsBytes();
-      debugPrint('🔍 [REPLY] File bytes read: ${fileBytes.length} bytes');
-
-      debugPrint('🔍 [REPLY] Calling uploadAttachmentAsync with:');
-      debugPrint('   - type: "post"');
-      debugPrint('   - id: "${widget.forumId ?? ""}"');
-      debugPrint('   - groupId: "$groupId"');
-      debugPrint('   - attachmentName: "${fileToUpload.name}"');
-      debugPrint('   - bytes length: ${fileBytes.length}');
-
-      var uploadAttachmentResult = await attachmentProxy.uploadAttachmentAsync("post", widget.forumId ?? "", groupId, fileToUpload.name, fileBytes);
-      
-      debugPrint('🔍 [REPLY] Upload result:');
-      debugPrint('   - result: ${uploadAttachmentResult.result}');
-      debugPrint('   - resultText: "${uploadAttachmentResult.resultText}"');
-      debugPrint('   - attachmentId: "${uploadAttachmentResult.attachmentId}"');
-      debugPrint('   - groupId: "${uploadAttachmentResult.groupId}"');
-      
-      if (uploadAttachmentResult.result) {
-        debugPrint('✅ [REPLY] File upload successful');
-
-        // Phase 5.19 — store Discourse's `short_url` so the proxy can
-        // append `![image](upload://...)` markdown to the post body
-        // before submitting. The numeric `attachmentId` isn't useful
-        // on Discourse — it's the short_url that goes in the post raw.
-        final shortUrl = uploadAttachmentResult.groupId;
-        if (shortUrl != null && shortUrl.isNotEmpty) {
-          setState(() {
-            _attachmentIds.add(shortUrl);
-          });
-          debugPrint('✅ [REPLY] Stored shortUrl: $shortUrl');
-          debugPrint('✅ [REPLY] Current attachmentRefs: $_attachmentIds');
-          return shortUrl;
-        } else {
-          debugPrint('⚠️ [REPLY] Upload succeeded but short_url is null or empty');
-          return null;
-        }
-      } else {
-        debugPrint('❌ [REPLY] File upload failed: ${uploadAttachmentResult.resultText}');
-        throw Exception(uploadAttachmentResult.resultText ?? 'Failed to upload file');
-      }
-    } catch (e, stackTrace) {
-      debugPrint('❌ [REPLY] Exception in _handleFileUpload: $e');
-      debugPrint('❌ [REPLY] Stack trace: $stackTrace');
-      throw Exception('Failed to upload file: ${e.toString()}');
-    }
+    setState(() => _attachmentIds.add(outcome.shortUrl!));
+    return outcome.shortUrl;
   }
 
   @override
