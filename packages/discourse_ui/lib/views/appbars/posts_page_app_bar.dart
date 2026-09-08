@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../../theme/design_tokens.dart';
+import '../../utils/emoji_shortcodes.dart';
 
 class PostsPageAppBar extends StatefulWidget implements PreferredSizeWidget {
   const PostsPageAppBar({
@@ -161,7 +162,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
     if (textPainter.didExceedMaxLines) {
       // Text is too long, use smaller font size for both lines
       return Text(
-        title,
+        withEmojiShortcodes(title),
         style: textTheme.titleLarge?.copyWith(
           color: colorScheme.onSurface,
           fontWeight: DesignTokens.fontWeightMedium,
@@ -173,7 +174,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
     } else {
       // Text fits in one line, use regular font size
       return Text(
-        title,
+        withEmojiShortcodes(title),
         style: textTheme.titleLarge?.copyWith(
           color: colorScheme.onSurface,
           fontWeight: FontWeight.w500,
