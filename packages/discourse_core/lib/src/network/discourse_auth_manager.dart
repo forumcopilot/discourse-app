@@ -5,6 +5,8 @@ import 'dart:typed_data';
 
 import 'package:asn1lib/asn1lib.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import '../storage/discourse_secure_storage.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:pointycastle/export.dart' as pc;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -231,7 +233,20 @@ class DiscourseAuthManager {
 
   // ===== Persistence helpers =====
 
-  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+  static const FlutterSecureStorage _secureStorage = discourseSecureStorage;
+
+  /// A secure-storage read that treats a platform failure as "nothing
+  /// stored". A Keystore/Keychain error is a lost key either way; letting
+  /// it propagate turned a signed-out launch into a crashed one.
+  static Future<String?> _readSecure(String key) async {
+    try {
+      return await _secureStorage.read(key: key);
+    } catch (e) {
+      // ignore: avoid_print
+      print('⚠️ [DISCOURSE_AUTH] secure storage read failed for $key: $e');
+      return null;
+    }
+  }
 
   /// Per-install `client_id`, stable across handshakes. Discourse revokes a
   /// user's previous keys only for the SAME `client_id`, and keys push
@@ -288,7 +303,7 @@ class DiscourseAuthManager {
   Future<_HandshakeState?> _loadHandshakeState() async {
     final prefs = await SharedPreferences.getInstance();
     final p = _prefsPrefix();
-    var pk = await _secureStorage.read(key: '$p$_prefHandshakePrivateKey');
+    var pk = await _readSecure('$p$_prefHandshakePrivateKey');
     if (pk == null) {
       // Migrate-on-read: older builds kept the private key in plaintext
       // SharedPreferences. Move it to secure storage and delete the copy.

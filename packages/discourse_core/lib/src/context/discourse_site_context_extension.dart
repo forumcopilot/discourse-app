@@ -1,9 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:flutter/foundation.dart' show debugPrint, visibleForTesting;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../storage/discourse_secure_storage.dart';
 
 /// Discourse-specific authentication state attached to a [SiteContext].
 ///
@@ -21,7 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// SharedPreferences by older builds are migrated to secure storage on read.
 extension DiscourseSiteContextExtension on SiteContext {
   static final Expando<Map<String, dynamic>> _store = Expando('discourseStore');
-  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+  static const FlutterSecureStorage _secureStorage = discourseSecureStorage;
 
   Map<String, dynamic> _data() => _store[this] ??= <String, dynamic>{};
 
@@ -123,7 +125,14 @@ extension DiscourseSiteContextExtension on SiteContext {
     final prefs = await SharedPreferences.getInstance();
     final prefix = _prefsPrefix();
     final data = _data();
-    var key = await _secureStorage.read(key: '${prefix}_user_api_key');
+    String? key;
+    try {
+      key = await _secureStorage.read(key: '${prefix}_user_api_key');
+    } catch (e) {
+      // A Keystore/Keychain failure means the key is gone whatever we do;
+      // start signed out rather than fail the whole launch.
+      debugPrint('[DISCOURSE_AUTH] secure storage read failed: $e');
+    }
     if (key == null) {
       // Migrate-on-read: older builds stored the key in plaintext
       // SharedPreferences. Move it to secure storage and delete the copy.
@@ -135,6 +144,14 @@ extension DiscourseSiteContextExtension on SiteContext {
     }
     data['userApiKey'] = key;
     data['userApiClientId'] = prefs.getString('${prefix}_user_api_client_id');
+    if (key == null && data['userApiClientId'] != null) {
+      // The signature of a lost key: the non-secret half of the credential
+      // survived and the secret half did not. Sign-out and never-signed-in
+      // are otherwise indistinguishable from the outside; log it so the
+      // next report of "signed out after an update" has a cause.
+      debugPrint('[DISCOURSE_AUTH] client id present but User API Key '
+          'missing from secure storage — starting signed out');
+    }
     data['userApiPushEnabled'] =
         prefs.getBool('${prefix}_user_api_push_enabled') ?? false;
   }

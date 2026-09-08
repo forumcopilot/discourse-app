@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 11 and below (fullBackupContent).
+
+  The User API Key lives in flutter_secure_storage, which keeps its
+  ciphertext in the FlutterSecureStorage shared-preferences file and the
+  key that decrypts it in the hardware Keystore. Auto Backup copies the
+  file but can never copy the Keystore key, so a restored install (new
+  phone, reinstall from cloud backup) gets a blob it cannot read. The
+  library then throws, or wipes, on first read: the user is signed out
+  and, until it resets, the app cannot store a new key either.
+
+  Excluding the file means a restore starts cleanly signed out instead.
+  Ordinary preferences (settings, drafts, the login snapshot) still back
+  up; the snapshot alone is inert because the app only trusts it when a
+  key is present.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="FlutterSecureStorage.xml"/>
+</full-backup-content>
