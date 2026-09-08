@@ -51,9 +51,9 @@ jobs:
         # that are not this repo's to fix.
         run: flutter analyze --no-fatal-infos
 
-      - name: Test forumcopilot_sdk
-        run: flutter test
-        working-directory: packages/forumcopilot_sdk
+      # forumcopilot_sdk has no runnable tests: its test/ directory holds
+      # XenForo-era suites without a main(), kept in the canonical copy.
+      # It is exercised through discourse_core's and discourse_ui's tests.
 
       - name: Test discourse_core
         run: flutter test
@@ -103,3 +103,27 @@ jobs:
           name: app-debug.apk
           path: build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 14
+
+  windows:
+    name: buildlib.bat on Windows
+    # buildlib.bat is the Windows twin of buildlib.sh and nobody on the
+    # project has a Windows machine; this is the only place it runs.
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Bootstrap
+        shell: cmd
+        run: |
+          flutter pub get
+          call buildlib.bat
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
