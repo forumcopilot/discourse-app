@@ -78,8 +78,6 @@ macOS-only utilities:
 ./reset_storage.sh                    # wipes the local macOS app container (BUNDLE_ID=com.example.forumapp)
 ```
 
-`deploy_plugin.sh` was inherited from xenforoapp; it deploys the (non-existent in v1) Discourse plugin. Ignore until Phase 4 if a plugin is actually shipped.
-
 ## Editing notes
 
 - **Forum config is compile-time.** Changes to `lib/config/app_forum_config.dart` require a rebuild; there is no runtime override. `siteId = 1` is the stable local-storage key — don't change it unless you intend to invalidate persisted state.
@@ -96,7 +94,5 @@ Both entries that used to live here are resolved: every `Discourse*Proxy` calls 
 What's left is naming and shape, not behavior:
 
 - **`forumcopilot_sdk` is XenForo-shaped by origin.** Interface names, `FC*Result` wrappers and some field semantics still reflect XF. Follow the API/SDK strategy above rather than working around the shape.
-- **Composer helper names.** `MessageComposePage._insertBBCode` / `_insertAttachmentBBCode` (and the PM composer equivalents) emit Discourse **Markdown** despite their names — the bodies are correct, the identifiers are stale.
 - **`DiscoursePrivateMessageProxy`** is a deliberate loud shim (Phase 5.20e): Discourse models PMs as topics, so the XF inbox/sent-box contract fails fast with a pointer to `IFCPrivateConversationProxy`.
 - **`FCPost.inlineAttachments`** is always empty on Discourse — uploads are embedded directly in the cooked HTML. The field and its render branch are kept only for SDK compatibility.
-- **`deploy_plugin.sh`** deploys a plugin that does not exist in v1. Ignore it.

@@ -320,7 +320,9 @@ Full history is in [CHANGELOG.md](CHANGELOG.md); the phase-by-phase build log is
 
 ## Contributing
 
-Issues and pull requests are welcome. For a larger Discourse-native feature, please open an issue first so we can agree on whether the SDK interface should be extended rather than lossily mapped — see *Extending it* above.
+Issues and pull requests are welcome — see **[CONTRIBUTING.md](CONTRIBUTING.md)** for how to get a build running, what to check before a PR, and the two rules that are easy to trip over (the vendored SDK, and preferring Discourse's native concepts). The project follows a [Code of Conduct](CODE_OF_CONDUCT.md).
+
+For a larger Discourse-native feature, please open an issue first so we can agree on whether the SDK interface should be extended rather than lossily mapped — see *Extending it* above.
 
 Working with Claude Code or another AI coding tool? Point it at `CLAUDE.md` first; it documents the conventions and the current state of each layer.
 
