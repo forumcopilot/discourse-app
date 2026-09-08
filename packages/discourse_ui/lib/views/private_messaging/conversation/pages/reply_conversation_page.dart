@@ -32,7 +32,6 @@ class _ReplyConversationPageState extends State<ReplyConversationPage> {
   final List<XFile> _attachments = [];
   final List<String> _attachmentIds = [];
   String? _groupId;
-  bool _isUploading = false;
   Future<FCQuoteConversationResult>? _quoteFuture;
 
   @override

@@ -120,7 +120,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
       debugPrint('   - groupId passed: "$_groupId"');
 
       if (result.result) {
-        widget.onTopicCreated?.call(result.topicId?.trim() ?? '', title);
+        widget.onTopicCreated?.call(result.topicId.trim(), title);
         return true;
       } else {
         // Server returned result=false with a message - throw it directly without wrapping

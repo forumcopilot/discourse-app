@@ -8,7 +8,6 @@ import 'package:discourse_ui/views/lists/forum_topic_list.dart';
 import 'package:discourse_ui/views/widgets/filter_chip_bar.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteCapabilities;
-import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:discourse_ui/views/new_topic_page.dart';
 import 'package:discourse_ui/views/post_page.dart';
 import 'package:get/get.dart';

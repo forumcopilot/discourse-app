@@ -65,7 +65,6 @@ Future<ShrinkResult?> shrinkImageToFit(
   // shows "shrunk_3dd7012c_0.png".
   final root = await getTemporaryDirectory();
   final stamp = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
-  final ext = p.extension(source.path);
   final baseName = p.basename(source.path);
 
   // First guess from the area ratio: bytes scale roughly with pixel count,

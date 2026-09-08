@@ -9,7 +9,6 @@ import 'package:discourse_ui/views/lists/new_topics_list.dart';
 import 'package:discourse_ui/views/lists/top_topics_list.dart';
 import 'package:discourse_ui/views/lists/unread_topics_list.dart';
 import 'package:discourse_ui/views/widgets/forum_header_widget.dart';
-import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart' as forumcopilot_sdk;
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -341,8 +340,6 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
         return _topTopicsKey.currentState?.buildTopicItems() ?? [];
       case _HomeFilter.hot:
         return _hotTopicsKey.currentState?.buildTopicItems() ?? [];
-      default:
-        return _latestTopicsKey.currentState?.buildTopicItems() ?? [];
     }
   }
 
@@ -359,8 +356,6 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
         return _topTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
       case _HomeFilter.hot:
         return _hotTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
-      default:
-        return _latestTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
     }
   }
 
@@ -377,8 +372,6 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
         return _topTopicsKey.currentState?.buildEmptyState();
       case _HomeFilter.hot:
         return _hotTopicsKey.currentState?.buildEmptyState();
-      default:
-        return _latestTopicsKey.currentState?.buildEmptyState();
     }
   }
 
