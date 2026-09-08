@@ -68,9 +68,9 @@ Three layers, each replaceable:
 <details open>
 <summary><b>Browsing &amp; reading</b></summary>
 
-- **Home** — Discourse-native tabs: **Latest / New / Unread / Top**, with a period selector on Top (All / Yearly / Quarterly / Monthly / Weekly / Daily).
-- **Categories** — coloured stripe per category (from its own `color` / `text_color`), topic-count badges, sub-categories, category-filtered lists.
-- **Topic view** — rendered from Discourse's `cooked` HTML: Markdown, oneboxes, quoted posts, code blocks, mentions, native Unicode emoji, lightboxed images.
+- **Home** — Discourse-native tabs: **Latest / Hot / New / Unread / Top** (Hot appears when the forum offers it), with a period selector on Top (All / Yearly / Quarterly / Monthly / Weekly / Daily). The forum's own logo and wordmark in the header and drawer.
+- **Categories** — each category's tile in its own `color` / `text_color`, topic-count badges, sub-categories, category-filtered lists with Latest / Hot / New.
+- **Topic view** — rendered from Discourse's `cooked` HTML: Markdown, oneboxes, quoted posts, code blocks, mentions, native Unicode emoji, lightboxed images. Category and tags under the title, file attachments as download cards, and share / copy-link on every post.
 - **Tags** — chips on topic rows, tag-filtered lists, and a global Tags directory with search and popularity/alphabetical sort.
 - **Polls** — full voting widget with result charts.
 - **Suggested Topics** footer, mirroring Discourse web.
@@ -82,7 +82,7 @@ Three layers, each replaceable:
 
 - **Markdown composer** — Discourse-flavored Markdown, the only markup Discourse actually cooks.
 - New topic with category + tag selection; reply, quote, edit, delete.
-- **Attachments** — image and file uploads via `/uploads`, inserted as real Discourse upload refs.
+- **Attachments** — image and file uploads via `/uploads`, written the way Discourse web writes them (`![name|WxH]`, `[name|attachment] (size)`). An image over the forum's size limit offers to resize just enough to fit, keeping its format.
 - **Server-side drafts** — composer state round-trips through `/drafts.json`, so a draft started in the app appears in the web composer and vice versa.
 - **Post revisions** — view a post's edit history.
 - **Whisper / wiki** — staff whispers and wiki-editable posts.
@@ -93,9 +93,9 @@ Three layers, each replaceable:
 
 - **Likes and emoji reactions** (`discourse-reactions`) behind one canonical affordance — tap to like, long-press for the emoji picker, chips below the post.
 - **Bookmarks** with reminders, **follow/unfollow** (`discourse-follow`), **ignore user**.
-- **Notifications** — the full `/notifications.json` feed with type-aware rendering and per-type icon badges across all 39 Discourse notification types.
+- **Notifications** — the full `/notifications.json` feed with type-aware rendering and per-type icon badges across all 39 Discourse notification types, filterable to Unread.
 - **Notification levels** — Watching / Tracking / Normal / Muted on topics, categories and tags.
-- **Profile** — trust-level chip with explainer, badges, activity tabs (Replies / Topics), inline bio/location/website editing, avatar upload.
+- **Profile** — trust level (with explainer) and badges as their own sections, the Discourse summary (top replies and topics, most liked by, most replied to, top links), and activity tabs (Replies / Topics / Likes / Solved) that stay pinned while you scroll. Inline bio/location/website editing, avatar upload.
 - **Account** — change email, change password, notification preferences, do-not-disturb, ignored users, invites.
 - **Private messages** — conversation-style, with attachments and likes.
 </details>
@@ -118,7 +118,7 @@ ARB-based, English template at `packages/discourse_ui/lib/l10n/app_en.arb`, with
 
 ## Not yet implemented
 
-- **Push notifications** — the client side is done: with a relay configured, the User API Key handshake requests the `push` scope and registers a `push_url`, and Discourse POSTs notifications there. What's missing is **the relay backend** that forwards those to FCM/APNs. With no relay configured the app runs exactly as before and needs no Firebase files. (Forum Copilot runs a hosted relay — [get in touch](mailto:forumcopilot@gmail.com).)
+- **Push notifications** — the client side is done: with a relay configured, the User API Key handshake requests the `push` scope and registers a `push_url`, and Discourse POSTs notifications there. What's missing is **the relay backend** that forwards those to FCM/APNs. With no relay configured the app runs exactly as before and needs no real Firebase project — the committed `.example` placeholders are enough to compile (see Quick start). (Forum Copilot runs a hosted relay — [get in touch](mailto:forumcopilot@gmail.com).)
 - **Chat over MessageBus** — chat polls every 4s today; Discourse web subscribes over MessageBus for sub-second latency. The same swap would speed up topic live-updates and the notification badge.
 - **Chat threads and uploads** — reactions work; threaded replies and file uploads don't yet.
 - **Markdown preview in the composer** — the editor is text-only for now.
@@ -252,69 +252,7 @@ Concepts that took route 1 and are now first-class: tags, polls, bookmarks, four
 
 ## Changelog
 
-Full history is in [CHANGELOG.md](CHANGELOG.md); the phase-by-phase build log is collapsed at the bottom of this file.
-
-### Unreleased
-
-**Cooked-HTML content pipeline** *(replaces the last of the XenForo BBCode code)*
-- Post link previews, video cards and the image gallery now read Discourse's cooked HTML as a DOM, mirroring the server's own `PrettyText.extract_links` rules. Previously this ran through the inherited XenForo `BBCodeProcessor`, whose URL regex swept the raw markup — so favicons, onebox thumbnails and avatar `src`s each came back as a "link in this post" and got their own preview card.
-- Tapping an inline image now opens the right image. The gallery used to scan for `[IMG]` BBCode tags, which never appear in cooked HTML, so images embedded in a post were invisible to it.
-- Oneboxes stay server-rendered instead of being duplicated by an app-side preview card; YouTube and Twitter/X embeds are lifted into native cards and removed from the HTML so nothing renders twice.
-- `bbcode_processor.dart` (1,183 lines) and `attachment_utils.dart` deleted; `BBCodeCallbacks` renamed `PostContentCallbacks`. New `CookedContent` extractor covered by unit tests against real Discourse markup.
-- Analyzer warnings down from 34 to 1 — dead null-aware operators and redundant null checks left over from the SDK's nullability tightening.
-
-### 2026-08-05
-
-- **Honest-shape SDK fields.** Attachment upload URLs, group totals, bookmark and search pagination now carry real server signals instead of being dropped or synthesised.
-- **Purged fabricated data** (−7,700 lines). Search results, category permissions, group visibility, invite classification and account settings now report what the server actually said — including reporting failure rather than inventing a plausible zero.
-- **One canonical like/reaction affordance** on posts, replacing two overlapping controls.
-- **First-class fields replace all sidecars** — reactions and Q&A votes moved from `Expando` sidecars onto `FCPost` proper. Clickable badges and a trust-level explainer added.
-- **Discourse-native feature wave** — bookmark reminders, tag watching, polls, post revisions, whisper/wiki, reviewables, invites, do-not-disturb, topic summary, chat DMs and chat reactions.
-- **Unified profile experience**, avatar upload enabled, Discourse upload limits respected, cache-first session restore.
-- **Client-side push (Phase 3)** — User API Key `push` scope and `push_url` registration; relay backend still pending.
-- Fixes from a live on-device test pass and a full defect review.
-
-### 2026-08-04
-
-- **`discourse_ui` package extracted** — the app becomes a thin runner, so the whole UI can be hosted inside a multi-forum shell.
-- **Canonical `forumcopilot_sdk` adopted**; `discourse_core` repointed at it.
-- GetX singletons namespaced per site; a "Switch forum" drawer entry appears when hosted in a multi-forum app.
-
-<details>
-<summary><b>Earlier: phase-by-phase build log (Phases 0 – 5.31)</b></summary>
-
-| Phase | What |
-|---|---|
-| **0** | Scaffolding — forked from xenforoapp, packages renamed, app compiles. |
-| **1** | Auth + read path. `DiscourseClient`, User API Key handshake, all read-side proxies against stock Discourse REST. |
-| **2** | Write path + PMs. Replies, new topics, edit/delete, attachments, conversation-style PMs via `archetype: 'private_message'`. |
-| **4** | Composer Markdown swap + `flutter_html` post renderer + native Unicode emoji. |
-| **5.0–5.1** | Tags as first-class chips + tag-filtered topic lists. |
-| **5.2** | Solved indicator + bookmark proxy. |
-| **5.3** | Bookmark button + bookmarks list, trust levels, server-side drafts, poll voting. |
-| **5.4** | Four-level notification picker (Watching / Tracking / Normal / Muted). |
-| **5.5a** | Suggested Topics footer. |
-| **5.6** | Search filters (status / `in:` / tags / sort). |
-| **5.7** | User badges row on profile. |
-| **5.8** | Follow / unfollow toggle. |
-| **5.9** | Moderator surface — archive / unlist / rename in the topic menu. |
-| **5.10** | XF cruft removal — dead thanks UI, lossy `subscribeMode`, unreachable interface methods; `acceptedAnswer` → `isSolution`; native terminology in ARB. |
-| **5.11** | `discourse-reactions` — typed model, toggle API, picker sheet, chips row. |
-| **5.12** | Every remaining `callPluginApi` stub replaced with real Discourse REST or a graceful no-op. First commit with **zero analyzer errors**. |
-| **5.13** | Native tag input on new topics — chip field with `/tags/filter/search.json` autocomplete. |
-| **5.14** | `discourse-post-voting` — vertical up/down arrows on Q&A topics with optimistic flip. |
-| **5.15** | **Discourse Chat** — channels, messages, send/edit/delete, polling lifecycle. |
-| **5.16** | Fix: notifications list silently empty — ISO 8601 written where the consumer did `int.parse`. |
-| **5.17a–d** | IA reorganization to match Discourse web: Categories (coloured stripes), Home as Latest/New/Unread/Top, Tags tab, Profile consolidation with Messages / Bookmarks / Drafts. |
-| **5.18a,c,d** | Hamburger drawer; Chat-or-Messages bottom-nav slot with plugin probe; Users / Groups / Badges directories; UI consistency sweep with shared tokens and widgets. |
-| **5.19** | **Fixed the end-to-end attachment flow** — uploads were succeeding then being ignored at post time and garbage-collected after 7 days. Also scopes PM uploads with `for_private_message` (they were publicly reachable by URL). |
-| **5.20a–e** | Trimmed dead-end UI (legacy login form, report-user); notification preferences that actually round-trip to `user_option.*`; all 39 notification types with per-type icon badges; Forum Settings rebuilt; XF-shape PM box proxy reduced to a loud shim. |
-| **5.22–5.26** | Inline profile editing; change email / password; Replies / Topics activity tabs; ignore user + ignored-users page; move-to-category and merge-topic mod actions. |
-| **5.29** | Post-action button style guide — one shared `PostActionButton` recipe, 48×48 targets everywhere. |
-| **5.30–5.31** | SDK alignment — follow/unfollow lifted onto `IFCSocialProxy`; accepted-answer methods and `canAcceptAnswer` added to `IFCPostProxy` / `FCPost`. |
-| **5.45–5.47** | Server-side read tracking via `/topics/timings`; converter-fidelity audit; on-device bug-fix passes. |
-
-</details>
+See [`CHANGELOG.md`](CHANGELOG.md). It follows *Keep a Changelog*; the **[Unreleased]** section is what has landed since the last tagged release.
 
 ---
 
