@@ -51,9 +51,9 @@ jobs:
         # that are not this repo's to fix.
         run: flutter analyze --no-fatal-infos
 
-      # forumcopilot_sdk has no runnable tests: its test/ directory holds
-      # XenForo-era suites without a main(), kept in the canonical copy.
-      # It is exercised through discourse_core's and discourse_ui's tests.
+      # forumcopilot_sdk ships no tests in this repo (the canonical SDK's
+      # test/ is not vendored); it is exercised through discourse_core's
+      # and discourse_ui's tests.
 
       - name: Test discourse_core
         run: flutter test

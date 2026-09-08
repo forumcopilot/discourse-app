@@ -9,22 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Forum App';
-
-  @override
   String get loginTitle => 'Login';
-
-  @override
-  String get usernameLabel => 'Username';
-
-  @override
-  String get passwordLabel => 'Password';
-
-  @override
-  String get loginButton => 'Login';
-
-  @override
-  String get signInWithPasskey => 'Sign in with Passkey';
 
   @override
   String get usePasskey => 'Use Passkey';
@@ -33,145 +18,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passkeyContinuePrompt => 'Use your passkey to continue';
 
   @override
-  String get forgotPassword => 'Forgot password?';
-
-  @override
-  String get pleaseEnterUsername => 'Please enter your username';
-
-  @override
-  String get pleaseEnterPassword => 'Please enter your password';
-
-  @override
-  String credentialsSentToDomain(String domain) {
-    return 'Your username and password will be sent to $domain';
-  }
-
-  @override
-  String get createAccount => 'Create Account';
-
-  @override
-  String get alreadyHaveAccount => 'Already have an account? ';
-
-  @override
-  String get logIn => 'Log In';
-
-  @override
   String get continueButton => 'Continue';
-
-  @override
-  String get registrationNotAvailable => 'Registration Not Available';
-
-  @override
-  String get registrationNotAvailableMessage =>
-      'Registration is currently not available. The forum may be closed or registration may be disabled.';
-
-  @override
-  String get webRegistrationRequired => 'Web Registration Required';
-
-  @override
-  String get webRegistrationRequiredMessage =>
-      'This forum requires registration through the web browser. Please click the button below to open the registration page.';
-
-  @override
-  String get openRegistrationPage => 'Open Registration Page';
-
-  @override
-  String get loadingAdditionalFields => 'Loading additional fields...';
-
-  @override
-  String get pleaseSelectDateOfBirth => 'Please select your date of birth';
-
-  @override
-  String get pleaseEnterLocation => 'Please enter your location';
-
-  @override
-  String get pleaseIndicateEmailPreference =>
-      'Please indicate your email preference';
-
-  @override
-  String get pleaseFillAllRequiredFields =>
-      'Please fill in all required fields';
-
-  @override
-  String get pleaseAcceptTermsOfService => 'Please accept the Terms of Service';
-
-  @override
-  String get pleaseAcceptPrivacyPolicy => 'Please accept the Privacy Policy';
-
-  @override
-  String get registrationError => 'Registration Error';
-
-  @override
-  String get registrationFailed =>
-      'Registration failed. Please check your information.';
-
-  @override
-  String get registrationFailedTryAgain =>
-      'Registration failed. Please try again.';
-
-  @override
-  String get registrationInfo => 'Registration Info';
-
-  @override
-  String get openWebsite => 'Open Website';
-
-  @override
-  String couldNotOpenForumWebsite(String url) {
-    return 'Could not open the forum website. Please try visiting: $url';
-  }
-
-  @override
-  String get registrationSuccessfulEmailConfirm =>
-      'Registration successful! Please check your email to confirm your account before logging in.';
-
-  @override
-  String get registrationSuccessfulPendingApproval =>
-      'Registration successful! Your account is pending approval. You will be notified when your account is approved.';
-
-  @override
-  String get registrationSuccessfulAutoLogin =>
-      'Registration successful! You have been automatically logged in.';
-
-  @override
-  String get welcome => 'Welcome!';
-
-  @override
-  String get registrationSuccessful => 'Registration Successful';
-
-  @override
-  String get pleaseLoginWithNewAccount =>
-      'Please log in with your new account.';
-
-  @override
-  String get forgotPasswordTitle => 'Forgot Password';
-
-  @override
-  String get usernameOrEmailLabel => 'Username or Email';
-
-  @override
-  String get pleaseEnterUsernameOrEmail =>
-      'Please enter your username or email';
-
-  @override
-  String get sendResetLink => 'Send Reset Link';
-
-  @override
-  String get resetLinkSent => 'Reset Link Sent';
-
-  @override
-  String get passwordResetInstructionsSent =>
-      'Password reset instructions have been sent to your registered email address.';
-
-  @override
-  String get resetFailed => 'Reset Failed';
-
-  @override
-  String get unableToSendResetLink =>
-      'Unable to send reset link. Please try again.';
-
-  @override
-  String get errorSendingResetLink =>
-      'An error occurred while sending the reset link. Please check your connection and try again.';
 
   @override
   String get errorTitle => 'Error';
@@ -200,32 +47,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tryAgain => 'Try Again';
-
-  @override
-  String get getHelp => 'Get Help';
-
-  @override
-  String get somethingWentWrong => 'Something went wrong';
-
-  @override
-  String get unexpectedErrorOccurred =>
-      'An unexpected error occurred. Please try again.';
-
-  @override
-  String get noInternetConnection => 'No Internet Connection';
-
-  @override
-  String get checkInternetConnection =>
-      'Please check your internet connection and try again.';
-
-  @override
-  String get authenticationRequired => 'Authentication Required';
-
-  @override
-  String get pleaseLoginToContinue => 'Please log in to continue.';
-
-  @override
-  String get forumError => 'Forum Error';
 
   @override
   String get anErrorOccurred => 'An error occurred';
@@ -285,9 +106,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'You need to be signed in to view latest topics.';
 
   @override
-  String get noUnreadTopics => 'No Unread Topics';
-
-  @override
   String get thereAreNoUnreadTopics =>
       'There are no unread topics. Check back later for new discussions.';
 
@@ -302,50 +120,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'You need to be signed in to view your unread topics.';
 
   @override
-  String get noSubscribedTopics => 'No watched topics';
-
-  @override
-  String get noSubscribedTopicsMessage =>
-      'You aren\'t watching or tracking any topics. Open the bell menu on a topic to change its notification level.';
-
-  @override
-  String get signInToViewSubscribedTopics =>
-      'Sign in to view subscribed topics';
-
-  @override
-  String get youNeedToBeSignedInToViewSubscribedTopics =>
-      'You need to be signed in to view your subscribed topics.';
-
-  @override
-  String get noParticipatedTopics => 'No participated topics';
-
-  @override
-  String get topicsYouParticipatedIn =>
-      'Topics that you have participated in will be shown here.';
-
-  @override
-  String get signInToViewParticipatedTopics =>
-      'Sign in to view participated topics';
-
-  @override
-  String get youNeedToBeSignedInToViewParticipatedTopics =>
-      'You need to be signed in to view topics you have participated in.';
-
-  @override
   String get latest => 'Latest';
 
   @override
   String get unread => 'Unread';
-
-  @override
-  String get subscribed => 'Watched';
-
-  @override
-  String get participated => 'Participated';
-
-  @override
-  String get connectionTimedOut =>
-      'Connection timed out. The site may be down or unreachable.';
 
   @override
   String get failedToConnectToSite =>
@@ -366,22 +144,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newConversation => 'New Message';
 
   @override
-  String get newMessage => 'New Message';
-
-  @override
-  String get appSettings => 'App Settings';
-
-  @override
-  String get searchSites => 'Search Sites';
-
-  @override
   String get language => 'Language';
-
-  @override
-  String get systemDefault => 'System Default';
-
-  @override
-  String get followSystemLanguage => 'Follow system language';
 
   @override
   String get all => 'All';
@@ -403,9 +166,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get subscribe => 'Notifications';
-
-  @override
-  String get unsubscribe => 'Notifications';
 
   @override
   String get failedToSubscribeToThread => 'Failed to update notifications';
@@ -485,36 +245,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markRead => 'Mark Read';
 
   @override
-  String get reportUser => 'Report User';
-
-  @override
-  String get pleaseSelectReasonForReportingUser =>
-      'Please select a reason for reporting this user.';
-
-  @override
   String get spamOrAdvertising => 'Spam or advertising';
-
-  @override
-  String get harassmentOrBullying => 'Harassment or bullying';
-
-  @override
-  String get inappropriateContent => 'Inappropriate content';
-
-  @override
-  String get impersonationOrFakeAccount => 'Impersonation or fake account';
 
   @override
   String get otherPleaseSpecify => 'Other (please specify)';
 
   @override
   String get pleaseSpecifyReason => 'Please specify the reason';
-
-  @override
-  String get enterReasonForReportingUser =>
-      'Enter the reason for reporting this user';
-
-  @override
-  String get pleaseSelectReason => 'Please select a reason';
 
   @override
   String get banUser => 'Ban User';
@@ -555,12 +292,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreOptions => 'More options';
 
   @override
-  String get leaveConversation => 'Leave message';
-
-  @override
-  String get reportConversation => 'Report message';
-
-  @override
   String get topicClosed => 'Topic closed';
 
   @override
@@ -588,18 +319,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteConversations => 'Delete Messages';
-
-  @override
-  String get myForums => 'My Forums';
-
-  @override
-  String get recentlyVisited => 'Recently Visited';
-
-  @override
-  String get explore => 'Explore';
-
-  @override
-  String get forumCopilot => 'Forum Copilot';
 
   @override
   String get noConversations => 'No messages';
@@ -650,71 +369,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cleanSpam => 'Clean Spam';
 
   @override
-  String get failedToSaveMessage => 'Failed to save message';
-
-  @override
   String get failedToSaveConversation => 'Failed to save message';
 
   @override
-  String get failedToSaveSetting => 'Failed to save setting';
-
-  @override
-  String get failedToSavePost => 'Failed to save post';
-
-  @override
-  String errorLoadingSites(String error) {
-    return 'Error loading sites: $error';
-  }
-
-  @override
-  String connectingTo(String domainName) {
-    return 'Connecting to $domainName...';
-  }
-
-  @override
   String get members => 'Members';
-
-  @override
-  String get allMembers => 'All Members';
-
-  @override
-  String get online => 'Online';
-
-  @override
-  String get noMembersFound => 'No members found';
-
-  @override
-  String get searchForMembers => 'Search for members';
-
-  @override
-  String get enterUsernameToFindMembers =>
-      'Enter a username to find forum members';
-
-  @override
-  String get noMembersOnline => 'No members are currently online';
-
-  @override
-  String get enterUsernameToSearch => 'Enter username to search...';
-
-  @override
-  String get lookupMembers => 'Lookup Members';
-
-  @override
-  String get addMembers => 'Add Members';
-
-  @override
-  String get membersAddedSuccessfully => 'Members added successfully';
-
-  @override
-  String errorAddingMembers(String error) {
-    return 'Error adding members: $error';
-  }
-
-  @override
-  String get failedToLoadOnlineUsers => 'Failed to load online users';
-
-  @override
-  String get noUsersOnline => 'No users online';
 
   @override
   String membersCount(int count) {
@@ -772,15 +430,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteMessage => 'Delete Message';
 
   @override
-  String get areYouSureYouWantToDeleteThisMessage =>
-      'Are you sure you want to delete this message?';
-
-  @override
-  String failedToDeleteMessage(String error) {
-    return 'Failed to delete message: $error';
-  }
-
-  @override
   String get deletingPost => 'Deleting post...';
 
   @override
@@ -791,11 +440,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String failedToLikePost(String error) {
     return 'Failed to like post: $error';
-  }
-
-  @override
-  String failedToThankPost(String error) {
-    return 'Failed to thank post: $error';
   }
 
   @override
@@ -821,26 +465,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String errorLoadingMoreMessages(String error) {
-    return 'Error loading more messages: $error';
-  }
-
-  @override
-  String get inviteMessageOptional => 'Invite Message (optional)';
-
-  @override
-  String get iWouldLikeToAddYouToThisConversation =>
-      'I would like to add you to this message.';
-
-  @override
   String get searchFailed => 'Search failed';
-
-  @override
-  String get trySearchingWithDifferentUsername =>
-      'Try searching with a different username';
-
-  @override
-  String get noSitesFound => 'No sites found.';
 
   @override
   String get userInformationNotAvailable => 'User information not available';
@@ -996,28 +621,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invite => 'Invite';
 
   @override
-  String get welcomeBack => 'Welcome Back';
-
-  @override
-  String get signInToAccessYourProfile =>
-      'Sign in to access your profile and manage your account';
-
-  @override
-  String get enterYourUsername => 'Enter your username';
-
-  @override
-  String get enterYourPassword => 'Enter your password';
-
-  @override
-  String get dontHaveAnAccount => 'Don\'t have an account?';
-
-  @override
   String get enterKeywordsToSearchTopics =>
       'Enter keywords to search topics...';
-
-  @override
-  String get pleaseFillInAllRequiredFields =>
-      'Please fill in all required fields';
 
   @override
   String get undelete => 'Undelete';
@@ -1081,20 +686,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter keywords to find topics and posts';
 
   @override
-  String get enterKeywordsOrDomainToFindForums =>
-      'Enter keywords or domain to find forums';
-
-  @override
-  String get enterKeywordsOrDomainNamesToFindForums =>
-      'Enter keywords or domain names to find forums';
-
-  @override
-  String get appearance => 'Appearance';
-
-  @override
-  String get followSystemTheme => 'Follow system theme';
-
-  @override
   String get light => 'Light';
 
   @override
@@ -1106,16 +697,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get forumSettings => 'Forum Settings';
-
-  @override
-  String get noSettingsAvailable => 'No settings available';
-
-  @override
-  String get settingsCategoriesWillAppearHere =>
-      'Settings categories will appear here when available.';
-
-  @override
   String get unableToLoadProfile => 'Unable to Load Profile';
 
   @override
@@ -1123,15 +704,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportSubmittedSuccessfully => 'Report submitted successfully';
-
-  @override
-  String get failedToSubmitReport => 'Failed to submit report';
-
-  @override
-  String get searchForForums => 'Search for forums';
-
-  @override
-  String get searchForums => 'Search Forums';
 
   @override
   String get deleteTopic => 'Delete Topic';
@@ -1189,14 +761,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String errorLoadingMessage(String error) {
-    return 'Error loading message: $error';
-  }
-
-  @override
-  String get messageNotFound => 'Message not found';
-
-  @override
   String get home => 'Home';
 
   @override
@@ -1232,15 +796,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fullSize => 'Full Size';
 
   @override
-  String get alignLeft => 'Align Left';
-
-  @override
-  String get alignCenter => 'Align Center';
-
-  @override
-  String get alignRight => 'Align Right';
-
-  @override
   String get pleaseEnterTitle => 'Please enter a title';
 
   @override
@@ -1256,9 +811,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mentionUser => 'Mention User';
 
   @override
-  String get loggingIn => 'Logging in...';
-
-  @override
   String get submittingReport => 'Submitting report...';
 
   @override
@@ -1271,31 +823,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cleaningSpam => 'Cleaning spam...';
 
   @override
-  String get enterSubject => 'Enter subject';
-
-  @override
-  String get typeYourMessageHere => 'Type your message here';
-
-  @override
   String get writeYourMessage => 'Write your message...';
 
   @override
   String get writeYourReply => 'Write your reply...';
 
   @override
-  String get messageSentSuccessfully => 'Message sent successfully';
-
-  @override
-  String get replySentSuccessfully => 'Reply sent successfully';
-
-  @override
   String get conversationCreatedSuccessfully => 'Message created successfully';
 
   @override
   String get conversationMarkedAsUnread => 'Message marked as unread';
-
-  @override
-  String get messageMarkedAsUnread => 'Message marked as unread';
 
   @override
   String get conversationClosed => 'Message closed';
@@ -1315,28 +852,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String failedToUploadFile(String error) {
-    return 'Failed to upload file: $error';
-  }
-
-  @override
-  String failedToUploadImage(String error) {
-    return 'Failed to upload image: $error';
-  }
-
-  @override
-  String failedToSendMessage(String error) {
-    return 'Failed to send message: $error';
-  }
-
-  @override
   String failedToSendReply(String error) {
     return 'Failed to send reply: $error';
-  }
-
-  @override
-  String failedToMarkAsUnread(String error) {
-    return 'Failed to mark message as unread: $error';
   }
 
   @override
@@ -1366,29 +883,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goToBottom => 'Go to bottom';
 
   @override
-  String get replyAll => 'Reply All';
-
-  @override
-  String get forward => 'Forward';
-
-  @override
-  String get noForumsFound => 'No forums found.';
-
-  @override
   String get pleaseLoginToAccessContent =>
       'Please login to access this content and interact with posts.';
 
   @override
   String get searchUsers => 'Search users...';
-
-  @override
-  String get writeYourTitle => 'Write your title...';
-
-  @override
-  String get writeYourContent => 'Write your content...';
-
-  @override
-  String get selectAnOption => 'Select an option';
 
   @override
   String get enterConversationTitle => 'Enter message title';
@@ -1403,15 +902,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get report => 'Report';
-
-  @override
-  String get unfollow => 'Unfollow';
-
-  @override
-  String get follow => 'Follow';
-
-  @override
-  String get goToForums => 'Go to Forums';
 
   @override
   String get remove => 'Remove';
@@ -1432,9 +922,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goBack => 'Go Back';
 
   @override
-  String get privateMessagesNotAvailable => 'Private messages not available';
-
-  @override
   String failedToLoadPost(String error) {
     return 'Failed to load post: \n$error';
   }
@@ -1449,12 +936,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unlike => 'unlike';
-
-  @override
-  String get optimizeImage => 'Optimize Image';
-
-  @override
-  String get optimizeAndUpload => 'Optimize and Upload';
 
   @override
   String downloading(String filename) {
@@ -1472,20 +953,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get enterANumber => 'Enter a number';
-
-  @override
   String get failedToNavigateToForum => 'Failed to navigate to category';
-
-  @override
-  String failedToNavigateToForumName(String forumName) {
-    return 'Failed to navigate to $forumName';
-  }
-
-  @override
-  String forumNotFound(String forumName) {
-    return 'Category not found: $forumName';
-  }
 
   @override
   String forumNotFoundById(String forumId) {
@@ -1498,30 +966,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get likePost => 'Like post';
-
-  @override
-  String get unlikePost => 'Unlike post';
-
-  @override
-  String get thankPost => 'Thank post';
-
-  @override
-  String get showLikes => 'Show likes';
-
-  @override
-  String get showThanks => 'Show thanks';
-
-  @override
-  String get quotePost => 'Quote post';
-
-  @override
-  String get translate => 'Translate';
-
-  @override
-  String get showOriginal => 'Show Original';
-
-  @override
   String get translating => 'Translating...';
 
   @override
@@ -1529,21 +973,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get translatedContent => 'Translated content';
-
-  @override
-  String get selectLanguage => 'Select Language';
-
-  @override
-  String get translateTo => 'Translate to:';
-
-  @override
-  String get deviceLanguage => 'Device language';
-
-  @override
-  String get noPostsToTranslate => 'No posts to translate';
-
-  @override
-  String get translationFailed => 'Translation failed';
 
   @override
   String get twoFactorAuthentication => 'Two-Factor Authentication';
@@ -1980,27 +1409,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginFailed => 'Login Failed';
 
   @override
-  String get additionalInformation => 'Additional Information';
-
-  @override
-  String dateOfBirth(Object marker) {
-    return 'Date of Birth$marker';
-  }
-
-  @override
-  String minimumAgeYears(Object minimumAge) {
-    return 'Minimum age: $minimumAge years';
-  }
-
-  @override
-  String locationLabel(Object marker) {
-    return 'Location$marker';
-  }
-
-  @override
-  String get receiveSiteMailings => 'Receive site mailings';
-
-  @override
   String get moveToCategory => 'Move to category';
 
   @override
@@ -2029,18 +1437,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get edited => 'edited';
-
-  @override
-  String get imageExceedsUploadLimits =>
-      'This image exceeds the upload limits and needs to be optimized:';
-
-  @override
-  String get optimizationsToBeApplied => 'Optimizations to be applied:';
-
-  @override
-  String reductionPercent(Object percent) {
-    return 'Reduction: $percent%';
-  }
 
   @override
   String get editProfileManagedOnWebNote =>
@@ -2442,17 +1838,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String postsCount(Object count) {
     return '$count Posts';
   }
-
-  @override
-  String get protectedForum => 'Protected Forum';
-
-  @override
-  String isPasswordProtected(Object forumName) {
-    return '$forumName is password protected.';
-  }
-
-  @override
-  String get enter => 'Enter';
 
   @override
   String get permissionDeniedToSaveImage => 'Permission denied to save image';

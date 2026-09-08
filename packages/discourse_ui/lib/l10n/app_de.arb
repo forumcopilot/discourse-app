@@ -1,57 +1,9 @@
 {
   "@@locale": "de",
-  "appTitle": "Forum App",
-  "@appTitle": {
-    "description": "The application title"
-  },
   "loginTitle": "Anmelden",
-  "usernameLabel": "Benutzername",
-  "passwordLabel": "Passwort",
-  "loginButton": "Anmelden",
-  "signInWithPasskey": "Sign in with Passkey",
   "usePasskey": "Use Passkey",
   "passkeyContinuePrompt": "Use your passkey to continue",
-  "forgotPassword": "Passwort vergessen?",
-  "pleaseEnterUsername": "Bitte geben Sie Ihren Benutzernamen ein",
-  "pleaseEnterPassword": "Bitte geben Sie Ihr Passwort ein",
-  "credentialsSentToDomain": "Ihr Benutzername und Passwort werden an {domain} gesendet",
-  "createAccount": "Konto erstellen",
-  "alreadyHaveAccount": "Haben Sie bereits ein Konto? ",
-  "logIn": "Anmelden",
   "continueButton": "Fortfahren",
-  "registrationNotAvailable": "Registrierung nicht verfügbar",
-  "registrationNotAvailableMessage": "Die Registrierung ist derzeit nicht verfügbar. Das Forum kann geschlossen sein oder die Registrierung kann deaktiviert sein.",
-  "webRegistrationRequired": "Web-Registrierung erforderlich",
-  "webRegistrationRequiredMessage": "Dieses Forum erfordert eine Registrierung über den Webbrowser. Bitte klicken Sie auf die Schaltfläche unten, um die Registrierungsseite zu öffnen.",
-  "openRegistrationPage": "Registrierungsseite öffnen",
-  "loadingAdditionalFields": "Zusätzliche Felder werden geladen...",
-  "pleaseSelectDateOfBirth": "Bitte wählen Sie Ihr Geburtsdatum",
-  "pleaseEnterLocation": "Bitte geben Sie Ihren Standort ein",
-  "pleaseIndicateEmailPreference": "Bitte geben Sie Ihre E-Mail-Präferenz an",
-  "pleaseFillAllRequiredFields": "Bitte füllen Sie alle erforderlichen Felder aus",
-  "pleaseAcceptTermsOfService": "Bitte akzeptieren Sie die Nutzungsbedingungen",
-  "pleaseAcceptPrivacyPolicy": "Bitte akzeptieren Sie die Datenschutzrichtlinie",
-  "registrationError": "Registrierungsfehler",
-  "registrationFailed": "Registrierung fehlgeschlagen. Bitte überprüfen Sie Ihre Informationen.",
-  "registrationFailedTryAgain": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
-  "registrationInfo": "Registrierungsinformationen",
-  "openWebsite": "Website öffnen",
-  "couldNotOpenForumWebsite": "Die Forum-Website konnte nicht geöffnet werden. Bitte versuchen Sie: {url}",
-  "registrationSuccessfulEmailConfirm": "Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mail, um Ihr Konto zu bestätigen, bevor Sie sich anmelden.",
-  "registrationSuccessfulPendingApproval": "Registrierung erfolgreich! Ihr Konto wartet auf Genehmigung. Sie werden benachrichtigt, wenn Ihr Konto genehmigt wurde.",
-  "registrationSuccessfulAutoLogin": "Registrierung erfolgreich! Sie wurden automatisch angemeldet.",
-  "welcome": "Willkommen!",
-  "registrationSuccessful": "Registrierung erfolgreich",
-  "pleaseLoginWithNewAccount": "Bitte melden Sie sich mit Ihrem neuen Konto an.",
-  "forgotPasswordTitle": "Passwort vergessen",
-  "usernameOrEmailLabel": "Benutzername oder E-Mail",
-  "pleaseEnterUsernameOrEmail": "Bitte geben Sie Ihren Benutzernamen oder Ihre E-Mail ein",
-  "sendResetLink": "Reset-Link senden",
-  "resetLinkSent": "Reset-Link gesendet",
-  "passwordResetInstructionsSent": "Anweisungen zum Zurücksetzen Ihres Passworts wurden an Ihre registrierte E-Mail-Adresse gesendet.",
-  "resetFailed": "Zurücksetzung fehlgeschlagen",
-  "unableToSendResetLink": "Reset-Link konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
-  "errorSendingResetLink": "Beim Senden des Reset-Links ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
   "errorTitle": "Fehler",
   "okButton": "OK",
   "retryButton": "Wiederholen",
@@ -61,14 +13,6 @@
   "dismiss": "Verwerfen",
   "cancel": "Abbrechen",
   "tryAgain": "Erneut Versuchen",
-  "getHelp": "Hilfe erhalten",
-  "somethingWentWrong": "Etwas ist schiefgelaufen",
-  "unexpectedErrorOccurred": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-  "noInternetConnection": "Keine Internetverbindung",
-  "checkInternetConnection": "Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
-  "authenticationRequired": "Authentifizierung erforderlich",
-  "pleaseLoginToContinue": "Bitte melden Sie sich an, um fortzufahren.",
-  "forumError": "Forum-Fehler",
   "anErrorOccurred": "Ein Fehler ist aufgetreten",
   "accountPendingApproval": "Ihr Konto wartet auf Genehmigung. Sie können das Forum durchsuchen, aber nicht posten, bis ein Moderator Ihr Konto genehmigt.",
   "checkEmailToConfirm": "Bitte überprüfen Sie Ihre E-Mail, um Ihr Konto zu bestätigen. Klicken Sie auf den Bestätigungslink in der E-Mail, die wir Ihnen gesendet haben.",
@@ -85,35 +29,18 @@
   "noRecentTopicsToDisplay": "Es gibt keine neuesten Themen zum Anzeigen. Kommen Sie später für neue Diskussionen zurück.",
   "signInToViewLatestTopics": "Melden Sie sich an, um neueste Themen anzuzeigen",
   "youNeedToBeSignedInToViewLatestTopics": "Sie müssen angemeldet sein, um neueste Themen anzuzeigen",
-  "noUnreadTopics": "Keine ungelesenen Themen",
   "thereAreNoUnreadTopics": "Es gibt keine ungelesenen Themen. Kommen Sie später für neue Diskussionen zurück.",
   "youAreAllCaughtUp": "Sie sind auf dem neuesten Stand!",
   "signInToViewUnreadTopics": "Melden Sie sich an, um ungelesene Themen anzuzeigen",
   "youNeedToBeSignedInToViewUnreadTopics": "Sie müssen angemeldet sein, um Ihre ungelesenen Themen anzuzeigen",
-  "noSubscribedTopics": "Keine abonnierten Themen",
-  "noSubscribedTopicsMessage": "Sie haben keine Themen abonniert. Tippen Sie auf die Stern-Schaltfläche bei einem Thema, um es zu abonnieren und Benachrichtigungen für neue Updates zu erhalten.",
-  "signInToViewSubscribedTopics": "Melden Sie sich an, um abonnierte Themen anzuzeigen",
-  "youNeedToBeSignedInToViewSubscribedTopics": "Sie müssen angemeldet sein, um Ihre abonnierten Themen anzuzeigen",
-  "noParticipatedTopics": "Keine teilgenommenen Themen",
-  "topicsYouParticipatedIn": "Themen, an denen Sie teilgenommen haben, werden hier angezeigt.",
-  "signInToViewParticipatedTopics": "Melden Sie sich an, um teilgenommene Themen anzuzeigen",
-  "youNeedToBeSignedInToViewParticipatedTopics": "Sie müssen angemeldet sein, um Themen anzuzeigen, an denen Sie teilgenommen haben",
   "latest": "Neueste",
   "unread": "Ungelesen",
-  "subscribed": "Abonniert",
-  "participated": "Teilgenommen",
-  "connectionTimedOut": "Verbindungszeitüberschreitung. Die Website kann offline oder nicht erreichbar sein.",
   "failedToConnectToSite": "Verbindung zur Website fehlgeschlagen. Die Website kann offline oder nicht erreichbar sein.",
   "connectionFailed": "Verbindungsfehler",
   "failedToConnectToSiteName": "Verbindung zu {siteName} fehlgeschlagen",
   "loading": "Wird geladen...",
   "newConversation": "Neue Unterhaltung",
-  "newMessage": "Neue Nachricht",
-  "appSettings": "App-Einstellungen",
-  "searchSites": "Websites suchen",
   "language": "Sprache",
-  "systemDefault": "Systemstandard",
-  "followSystemLanguage": "Systemsprache verwenden",
   "all": "Alle",
   "topicsOnly": "Nur Themen",
   "titlesOnly": "Nur Titel",
@@ -122,7 +49,6 @@
   "subscribeTo": "zu abonnieren",
   "unsubscribeFrom": "das Abonnement zu kündigen",
   "subscribe": "Abonnieren",
-  "unsubscribe": "Abbestellen",
   "failedToSubscribeToThread": "Thread {action} fehlgeschlagen",
   "youCannotReplyToThisThread": "Sie können nicht auf diesen Thread antworten",
   "pleaseWaitForThreadToLoad": "Bitte warten Sie, bis der Thread geladen ist",
@@ -146,16 +72,9 @@
   "errorInvitingUser": "Fehler beim Einladen des Benutzers: {error}",
   "newTopic": "Neues Thema",
   "markRead": "Als gelesen markieren",
-  "reportUser": "Benutzer melden",
-  "pleaseSelectReasonForReportingUser": "Bitte wählen Sie einen Grund für die Meldung dieses Benutzers.",
   "spamOrAdvertising": "Spam oder Werbung",
-  "harassmentOrBullying": "Belästigung oder Mobbing",
-  "inappropriateContent": "Unangemessener Inhalt",
-  "impersonationOrFakeAccount": "Identitätsbetrug oder gefälschtes Konto",
   "otherPleaseSpecify": "Andere (bitte angeben)",
   "pleaseSpecifyReason": "Bitte geben Sie den Grund an",
-  "enterReasonForReportingUser": "Geben Sie den Grund für die Meldung dieses Benutzers ein",
-  "pleaseSelectReason": "Bitte wählen Sie einen Grund",
   "banUser": "Benutzer sperren",
   "unbanUser": "Benutzer entsperren",
   "pleaseSelectReasonForBanningUser": "Bitte wählen Sie einen Grund für die Sperrung von {username}",
@@ -167,8 +86,6 @@
   "banUntil": "Sperren bis",
   "selectDate": "Datum auswählen",
   "moreOptions": "Weitere Optionen",
-  "leaveConversation": "Unterhaltung verlassen",
-  "reportConversation": "Unterhaltung melden",
   "topicClosed": "Thema geschlossen",
   "topicOpened": "Thema geöffnet",
   "topicStickied": "Thema angeheftet",
@@ -178,10 +95,6 @@
   "handleThreads": "Threads verwalten",
   "deleteMessages": "Nachrichten löschen",
   "deleteConversations": "Unterhaltungen löschen",
-  "myForums": "Meine Foren",
-  "recentlyVisited": "Kürzlich Besucht",
-  "explore": "Erkunden",
-  "forumCopilot": "Forum Copilot",
   "noConversations": "Keine Unterhaltungen",
   "noConversationsMessage": "Sie haben noch keine Unterhaltungen. Starten Sie eine neue Unterhaltung, um mit dem Messaging zu beginnen.",
   "imageSavedToGallery": "Bild in Galerie gespeichert!",
@@ -205,50 +118,8 @@
   "likesGiven": "Gegebene Likes",
   "showMore": "Mehr anzeigen",
   "cleanSpam": "Spam bereinigen",
-  "failedToSaveMessage": "Fehler beim Speichern der Nachricht",
   "failedToSaveConversation": "Speichern der Unterhaltung fehlgeschlagen",
-  "failedToSaveSetting": "Fehler beim Speichern der Einstellung",
-  "failedToSavePost": "Fehler beim Speichern des Beitrags",
-  "errorLoadingSites": "Fehler beim Laden der Websites: {error}",
-  "@errorLoadingSites": {
-    "description": "Error message when loading explore sites fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "connectingTo": "Verbinde mit {domainName}...",
-  "@connectingTo": {
-    "description": "Message shown when connecting to a site",
-    "placeholders": {
-      "domainName": {
-        "type": "String"
-      }
-    }
-  },
   "members": "Mitglieder",
-  "allMembers": "Alle Mitglieder",
-  "online": "Online",
-  "noMembersFound": "Keine Mitglieder gefunden",
-  "searchForMembers": "Mitglieder suchen",
-  "enterUsernameToFindMembers": "Geben Sie einen Benutzernamen ein, um Forumsmitglieder zu finden",
-  "noMembersOnline": "Derzeit sind keine Mitglieder online",
-  "enterUsernameToSearch": "Benutzernamen zum Suchen eingeben...",
-  "lookupMembers": "Mitglieder Suchen",
-  "addMembers": "Mitglieder Hinzufügen",
-  "membersAddedSuccessfully": "Mitglieder erfolgreich hinzugefügt",
-  "errorAddingMembers": "Fehler beim Hinzufügen von Mitgliedern: {error}",
-  "@errorAddingMembers": {
-    "description": "Error message when adding members fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToLoadOnlineUsers": "Fehler beim Laden der Online-Benutzer",
-  "noUsersOnline": "Keine Benutzer online",
   "membersCount": "{count} Mitglieder",
   "@membersCount": {
     "description": "Number of members with label",
@@ -274,16 +145,6 @@
   "retry": "Wiederholen",
   "delete": "Löschen",
   "deleteMessage": "Nachricht Löschen",
-  "areYouSureYouWantToDeleteThisMessage": "Möchten Sie diese Nachricht wirklich löschen?",
-  "failedToDeleteMessage": "Fehler beim Löschen der Nachricht: {error}",
-  "@failedToDeleteMessage": {
-    "description": "Error message when deleting message fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "deletingPost": "Beitrag wird gelöscht...",
   "failedToUnlikePost": "Fehler beim Entfernen des Likes vom Beitrag: {error}",
   "@failedToUnlikePost": {
@@ -297,15 +158,6 @@
   "failedToLikePost": "Fehler beim Liken des Beitrags: {error}",
   "@failedToLikePost": {
     "description": "Error message when liking post fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToThankPost": "Fehler beim Danken des Beitrags: {error}",
-  "@failedToThankPost": {
-    "description": "Error message when thanking post fails",
     "placeholders": {
       "error": {
         "type": "String"
@@ -341,11 +193,7 @@
       }
     }
   },
-  "inviteMessageOptional": "Einladungsnachricht (optional)",
-  "iWouldLikeToAddYouToThisConversation": "Ich möchte Sie zu dieser Unterhaltung hinzufügen.",
   "searchFailed": "Suche fehlgeschlagen",
-  "trySearchingWithDifferentUsername": "Versuchen Sie es mit einem anderen Benutzernamen",
-  "noSitesFound": "Keine Websites gefunden.",
   "userInformationNotAvailable": "Benutzerinformationen nicht verfügbar",
   "birthday": "Geburtstag",
   "posts": "Beiträge",
@@ -440,30 +288,8 @@
   },
   "markAsUnread": "Als ungelesen markieren",
   "invite": "Einladen",
-  "welcomeBack": "Willkommen zurück!",
-  "signInToAccessYourProfile": "Melden Sie sich an, um auf Ihr Profil zuzugreifen und Ihr Konto zu verwalten",
-  "enterYourUsername": "Geben Sie Ihren Benutzernamen ein",
-  "enterYourPassword": "Geben Sie Ihr Passwort ein",
-  "dontHaveAnAccount": "Haben Sie kein Konto?",
   "enterKeywordsToSearchTopics": "Geben Sie Schlüsselwörter ein, um Themen zu suchen...",
-  "pleaseFillInAllRequiredFields": "Bitte füllen Sie alle erforderlichen Felder aus",
   "undelete": "Wiederherstellen",
-  "@credentialsSentToDomain": {
-    "description": "Message about credentials being sent to forum domain",
-    "placeholders": {
-      "domain": {
-        "type": "String"
-      }
-    }
-  },
-  "@couldNotOpenForumWebsite": {
-    "description": "Error message when cannot open forum website",
-    "placeholders": {
-      "url": {
-        "type": "String"
-      }
-    }
-  },
   "@failedToConnectToSiteName": {
     "description": "Error message when failed to connect to a site",
     "placeholders": {
@@ -545,10 +371,6 @@
   "pollOptionsCount": "{count} Optionen",
   "reactedBy": "Reagiert von",
   "enterKeywordsToFindTopicsAndPosts": "Geben Sie Schlüsselwörter ein, um Themen und Beiträge zu finden",
-  "enterKeywordsOrDomainToFindForums": "Geben Sie Schlüsselwörter oder eine Domain ein, um Foren zu finden",
-  "enterKeywordsOrDomainNamesToFindForums": "Geben Sie Schlüsselwörter oder Domänennamen ein, um Foren zu finden",
-  "appearance": "Erscheinungsbild",
-  "followSystemTheme": "Systemdesign verwenden",
   "light": "Hell",
   "dark": "Dunkel",
   "version": "Version {version} ({buildNumber})",
@@ -562,15 +384,9 @@
       }
     }
   },
-  "forumSettings": "Foren-Einstellungen",
-  "noSettingsAvailable": "Keine Einstellungen verfügbar",
-  "settingsCategoriesWillAppearHere": "Einstellungskategorien werden hier angezeigt, wenn sie verfügbar sind.",
   "unableToLoadProfile": "Profil konnte nicht geladen werden",
   "banned": "GESPERRT",
   "reportSubmittedSuccessfully": "Meldung erfolgreich abgesendet",
-  "failedToSubmitReport": "Meldung konnte nicht abgesendet werden",
-  "searchForForums": "Foren suchen",
-  "searchForums": "Foren suchen",
   "deleteTopic": "Thema löschen",
   "topicCanBeRestoredLater": "Thema kann später wiederhergestellt werden",
   "topicWillBePermanentlyDeleted": "Thema wird endgültig gelöscht",
@@ -598,15 +414,6 @@
       }
     }
   },
-  "errorLoadingMessage": "Fehler beim Laden der Nachricht: {error}",
-  "@errorLoadingMessage": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "messageNotFound": "Nachricht nicht gefunden",
   "home": "Startseite",
   "notifications": "Benachrichtigungen",
   "forums": "Foren",
@@ -618,28 +425,19 @@
   "howWouldYouLikeToInsertImage": "Wie möchten Sie dieses Bild einfügen?",
   "thumbnail": "Miniaturansicht",
   "fullSize": "Vollständige Größe",
-  "alignLeft": "Links ausrichten",
-  "alignCenter": "Zentriert ausrichten",
-  "alignRight": "Rechts ausrichten",
   "pleaseEnterTitle": "Bitte geben Sie einen Titel ein",
   "pleaseEnterContent": "Bitte geben Sie einen Inhalt ein",
   "uploading": "Hochladen...",
   "uploaded": "Hochgeladen",
   "mentionUser": "Benutzer erwähnen",
-  "loggingIn": "Anmelden...",
   "submittingReport": "Bericht senden...",
   "banningUser": "Benutzer sperren...",
   "unbanningUser": "Benutzersperre aufheben...",
   "cleaningSpam": "Spam bereinigen...",
-  "enterSubject": "Betreff eingeben",
-  "typeYourMessageHere": "Geben Sie hier Ihre Nachricht ein",
   "writeYourMessage": "Schreiben Sie Ihre Nachricht...",
   "writeYourReply": "Schreiben Sie Ihre Antwort...",
-  "messageSentSuccessfully": "Nachricht erfolgreich gesendet",
-  "replySentSuccessfully": "Antwort erfolgreich gesendet",
   "conversationCreatedSuccessfully": "Unterhaltung erfolgreich erstellt",
   "conversationMarkedAsUnread": "Unterhaltung als ungelesen markiert",
-  "messageMarkedAsUnread": "Nachricht als ungelesen markiert",
   "conversationClosed": "Unterhaltung geschlossen",
   "conversationOpened": "Unterhaltung geöffnet",
   "pleaseLoginToLikeMessages": "Bitte melden Sie sich an, um Nachrichten zu mögen",
@@ -652,40 +450,8 @@
       }
     }
   },
-  "failedToUploadFile": "Datei konnte nicht hochgeladen werden: {error}",
-  "@failedToUploadFile": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToUploadImage": "Bild konnte nicht hochgeladen werden: {error}",
-  "@failedToUploadImage": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToSendMessage": "Nachricht konnte nicht gesendet werden: {error}",
-  "@failedToSendMessage": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "failedToSendReply": "Antwort konnte nicht gesendet werden: {error}",
   "@failedToSendReply": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToMarkAsUnread": "Nachricht konnte nicht als ungelesen markiert werden: {error}",
-  "@failedToMarkAsUnread": {
     "placeholders": {
       "error": {
         "type": "String"
@@ -726,14 +492,8 @@
   },
   "goToTop": "Nach oben",
   "goToBottom": "Nach unten",
-  "replyAll": "Allen antworten",
-  "forward": "Weiterleiten",
-  "noForumsFound": "Keine Foren gefunden.",
   "pleaseLoginToAccessContent": "Bitte melden Sie sich an, um auf diesen Inhalt zuzugreifen und mit Beiträgen zu interagieren.",
   "searchUsers": "Benutzer suchen...",
-  "writeYourTitle": "Schreiben Sie Ihren Titel...",
-  "writeYourContent": "Schreiben Sie Ihren Inhalt...",
-  "selectAnOption": "Option auswählen",
   "enterConversationTitle": "Geben Sie den Titel der Unterhaltung ein",
   "enterCode": "Geben Sie den {count}-stelligen Code ein",
   "@enterCode": {
@@ -745,26 +505,14 @@
   },
   "edit": "Bearbeiten",
   "report": "Melden",
-  "unfollow": "Nicht mehr folgen",
-  "follow": "Folgen",
-  "goToForums": "Zu Foren gehen",
   "remove": "Entfernen",
   "subject": "Betreff",
   "message": "Nachricht",
   "titleCannotBeEmpty": "Der Titel darf nicht leer sein",
   "conversationUpdatedSuccessfully": "Unterhaltung erfolgreich aktualisiert",
   "goBack": "Zurück",
-  "privateMessagesNotAvailable": "Private Nachrichten nicht verfügbar",
   "failedToLoadPost": "Beitrag konnte nicht geladen werden: \n{error}",
   "@failedToLoadPost": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "errorLoadingMoreMessages": "Fehler beim Laden weiterer Nachrichten: {error}",
-  "@errorLoadingMoreMessages": {
     "placeholders": {
       "error": {
         "type": "String"
@@ -784,8 +532,6 @@
   },
   "like": "mögen",
   "unlike": "nicht mehr mögen",
-  "optimizeImage": "Bild optimieren",
-  "optimizeAndUpload": "Optimieren und hochladen",
   "downloading": "Lade {filename} herunter...",
   "@downloading": {
     "placeholders": {
@@ -813,24 +559,7 @@
       }
     }
   },
-  "enterANumber": "Geben Sie eine Zahl ein",
   "failedToNavigateToForum": "Navigation zum Forum fehlgeschlagen",
-  "failedToNavigateToForumName": "Navigation zu {forumName} fehlgeschlagen",
-  "@failedToNavigateToForumName": {
-    "placeholders": {
-      "forumName": {
-        "type": "String"
-      }
-    }
-  },
-  "forumNotFound": "Forum nicht gefunden: {forumName}",
-  "@forumNotFound": {
-    "placeholders": {
-      "forumName": {
-        "type": "String"
-      }
-    }
-  },
   "forumNotFoundById": "Forum nicht gefunden: {forumId}",
   "@forumNotFoundById": {
     "placeholders": {
@@ -847,22 +576,9 @@
       }
     }
   },
-  "translate": "Übersetzen",
-  "showOriginal": "Original anzeigen",
   "translating": "Übersetze...",
   "translated": "Übersetzt",
   "translatedContent": "Übersetzter Inhalt",
-  "selectLanguage": "Sprache auswählen",
-  "translateTo": "Übersetzen nach:",
-  "deviceLanguage": "Gerätesprache",
-  "noPostsToTranslate": "Keine Beiträge zum Übersetzen",
-  "translationFailed": "Übersetzung fehlgeschlagen",
-  "likePost": "Beitrag liken",
-  "unlikePost": "Like entfernen",
-  "thankPost": "Beitrag danken",
-  "showLikes": "Likes anzeigen",
-  "showThanks": "Danksagungen anzeigen",
-  "quotePost": "Beitrag zitieren",
   "twoFactorAuthentication": "Zwei-Faktor-Authentifizierung",
   "authenticationCodeLabel": "Authentifizierungscode",
   "pleaseEnterYourAuthenticationCode": "Bitte geben Sie Ihren Authentifizierungscode ein",
@@ -978,11 +694,6 @@
   "likeAgainInSeconds": "Du kannst diesen Beitrag in {seconds}s erneut liken",
   "loginInfo": "Anmeldeinfo",
   "loginFailed": "Anmeldung fehlgeschlagen",
-  "additionalInformation": "Zusätzliche Angaben",
-  "dateOfBirth": "Geburtsdatum{marker}",
-  "minimumAgeYears": "Mindestalter: {minimumAge} Jahre",
-  "locationLabel": "Ort{marker}",
-  "receiveSiteMailings": "Newsletter der Seite erhalten",
   "moveToCategory": "In Kategorie verschieben",
   "undeleteTopic": "Thema wiederherstellen",
   "undeleteTopicConfirmation": "Dieses Thema wirklich wiederherstellen? Es wird für andere Benutzer wieder sichtbar.",
@@ -992,9 +703,6 @@
   "newDirectMessage": "Neue Direktnachricht",
   "noMessagesYetSayHi": "Noch keine Nachrichten — sag Hallo.",
   "edited": "bearbeitet",
-  "imageExceedsUploadLimits": "Dieses Bild überschreitet die Upload-Grenzen und muss optimiert werden:",
-  "optimizationsToBeApplied": "Anzuwendende Optimierungen:",
-  "reductionPercent": "Reduzierung: {percent}%",
   "editProfileManagedOnWebNote": "Anzeigename, E-Mail, Passwort und weitere Kontoeinstellungen werden unter Konto → Konto im Web verwalten geändert. Dein Avatar lässt sich über das Kamerasymbol auf deinem Foto ändern.",
   "approvedButRelayUnreachable": "Genehmigt, aber ForumCopilot war nicht erreichbar, um die Einrichtung abzuschließen. Versuche es später in den Einstellungen erneut.",
   "notificationsAreTurnedOffForThisApp": "Benachrichtigungen sind für diese App deaktiviert",
@@ -1104,9 +812,6 @@
   "imageNotAvailable": "Bild nicht verfügbar",
   "allForumTopicsHaveBeenMarkedAs": "Alle Forenthemen wurden als gelesen markiert",
   "postsCount": "{count} Beiträge",
-  "protectedForum": "Geschütztes Forum",
-  "isPasswordProtected": "{forumName} ist passwortgeschützt.",
-  "enter": "Eingeben",
   "permissionDeniedToSaveImage": "Keine Berechtigung zum Speichern des Bildes",
   "postNotFound": "Beitrag nicht gefunden.",
   "failedToUploadFilePleaseTryAgain": "Datei konnte nicht hochgeladen werden. Bitte erneut versuchen.",

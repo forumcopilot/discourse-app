@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
-import 'package:discourse_ui/views/widgets/forum_actions.dart';
 import 'package:discourse_ui/views/widgets/forum_icon_widget.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/discourse_color.dart';
@@ -32,14 +31,10 @@ class ForumListItem extends StatelessWidget {
     this.onSubscriptionChanged,
   }) : super(key: key);
 
-  void _handleTap(BuildContext context) {
-    if (forum.isProtected) {
-      final forumActions = ForumActions();
-      forumActions.enterProtectedForum(context, siteContext, forum);
-    } else {
-      onTap?.call();
-    }
-  }
+  // A read-restricted category is one the server already let this user
+  // see (it is in /site.json), so it opens like any other. The lock badge
+  // stays as information.
+  void _handleTap(BuildContext context) => onTap?.call();
 
   Widget _buildBottomDivider(ColorScheme colorScheme) {
     return Divider(

@@ -83,7 +83,7 @@ same checks are not repeated.
 
 ### 1. `packages/forumcopilot_sdk` is a vendored copy — do not change its API here
 
-It is a byte-identical copy of a canonical SDK that is shared with the
+It is a copy of a canonical SDK (`lib/` and `pubspec.yaml` byte-identical; the canonical `test/` directory is not vendored) that is shared with the
 XenForo sibling app. Interface and model changes are made in the canonical
 copy first (where they must keep the XenForo connector compiling) and then
 synced back. A PR that edits an `IFC*Proxy` interface or an `FC*` model

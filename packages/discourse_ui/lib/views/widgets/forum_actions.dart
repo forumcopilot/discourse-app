@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/utils/error_dialog.dart';
-import 'package:discourse_ui/views/forum_topics_page.dart';
-import 'package:discourse_ui/views/widgets/forum_password_dialog.dart';
-import 'package:discourse_ui/controllers/global_loader_controller.dart';
 import 'package:discourse_ui/controllers/topic_controller.dart';
 import '../../l10n/generated/app_localizations.dart';
 
@@ -72,100 +67,4 @@ class ForumActions {
     }
   }
 
-  /// Handles entrance to a protected forum by showing password dialog and handling login
-  Future<void> enterProtectedForum(BuildContext context, SiteContext siteContext, FCForum forum, {VoidCallback? onSuccess}) async {
-    showDialog(
-      context: context,
-      builder: (context) => ForumPasswordDialog(
-        forumName: forum.name,
-        onPasswordSubmitted: (password) async {
-          await _loginToProtectedForum(context, siteContext, forum, password, onSuccess: onSuccess);
-        },
-      ),
-    );
-  }
-
-  /// Performs the actual login to a protected forum
-  Future<void> _loginToProtectedForum(BuildContext context, SiteContext siteContext, FCForum forum, String password, {VoidCallback? onSuccess}) async {
-    try {
-      // Show loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-
-      final forumProxy = SiteProxyFactory.getForumProxy();
-
-      final loginResult = await forumProxy.loginForum(forum.id, password);
-
-      // Close loading dialog
-      Get.back();
-
-      if (loginResult.result) {
-        // Login successful
-        if (onSuccess != null) {
-          onSuccess();
-        } else {
-          // Default behavior: navigate to forum topics page
-          Get.to(() => ForumTopicsPage(forum: forum, siteContext: siteContext));
-        }
-      } else {
-        // Login failed, show error message
-        _showErrorDialog(context, 'Invalid password. Please try again.');
-      }
-    } catch (e) {
-      // Close loading dialog if it's still open
-      if (Get.isDialogOpen ?? false) {
-        Get.back();
-      }
-
-      // Show error message
-      _showErrorDialog(context, 'Failed to login to forum: ${e.toString()}');
-    }
-  }
-
-  /// Shows an error dialog with the given message
-  void _showErrorDialog(BuildContext context, String message) {
-    // Hide any active loader before showing error dialog
-    try {
-      if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
-        DiscourseGlobalLoaderController.to.hide();
-      }
-    } catch (e) {
-      // Ignore if DiscourseGlobalLoaderController is not available
-    }
-
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          AppLocalizations.of(context)!.loginFailed,
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-          ),
-        ),
-        content: Text(
-          message,
-          style: textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text(
-              'OK',
-              style: TextStyle(color: colorScheme.primary),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

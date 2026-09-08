@@ -1,73 +1,9 @@
 {
   "@@locale": "pt",
-  "appTitle": "Forum App",
-  "@appTitle": {
-    "description": "The application title"
-  },
   "loginTitle": "Entrar",
-  "usernameLabel": "Nome de usuário",
-  "passwordLabel": "Senha",
-  "loginButton": "Entrar",
-  "signInWithPasskey": "Sign in with Passkey",
   "usePasskey": "Use Passkey",
   "passkeyContinuePrompt": "Use your passkey to continue",
-  "forgotPassword": "Esqueceu a senha?",
-  "pleaseEnterUsername": "Por favor, insira seu nome de usuário",
-  "pleaseEnterPassword": "Por favor, insira sua senha",
-  "credentialsSentToDomain": "Seu nome de usuário e senha serão enviados para {domain}",
-  "@credentialsSentToDomain": {
-    "description": "Message about credentials being sent to forum domain",
-    "placeholders": {
-      "domain": {
-        "type": "String"
-      }
-    }
-  },
-  "createAccount": "Criar conta",
-  "alreadyHaveAccount": "Já tem uma conta? ",
-  "logIn": "Entrar",
   "continueButton": "Continuar",
-  "registrationNotAvailable": "Registro não disponível",
-  "registrationNotAvailableMessage": "O registro não está disponível no momento. O fórum pode estar fechado ou o registro pode estar desabilitado.",
-  "webRegistrationRequired": "Registro via web necessário",
-  "webRegistrationRequiredMessage": "Este fórum requer registro através do navegador web. Por favor, clique no botão abaixo para abrir a página de registro.",
-  "openRegistrationPage": "Abrir página de registro",
-  "loadingAdditionalFields": "Carregando campos adicionais...",
-  "pleaseSelectDateOfBirth": "Por favor, selecione sua data de nascimento",
-  "pleaseEnterLocation": "Por favor, insira sua localização",
-  "pleaseIndicateEmailPreference": "Por favor, indique sua preferência de e-mail",
-  "pleaseFillAllRequiredFields": "Por favor, preencha todos os campos obrigatórios",
-  "pleaseAcceptTermsOfService": "Por favor, aceite os Termos de Serviço",
-  "pleaseAcceptPrivacyPolicy": "Por favor, aceite a Política de Privacidade",
-  "registrationError": "Erro de registro",
-  "registrationFailed": "O registro falhou. Por favor, verifique suas informações.",
-  "registrationFailedTryAgain": "O registro falhou. Por favor, tente novamente.",
-  "registrationInfo": "Informações de registro",
-  "openWebsite": "Abrir site",
-  "couldNotOpenForumWebsite": "Não foi possível abrir o site do fórum. Por favor, tente visitar: {url}",
-  "@couldNotOpenForumWebsite": {
-    "description": "Error message when cannot open forum website",
-    "placeholders": {
-      "url": {
-        "type": "String"
-      }
-    }
-  },
-  "registrationSuccessfulEmailConfirm": "Registro bem-sucedido! Por favor, verifique seu e-mail para confirmar sua conta antes de fazer login.",
-  "registrationSuccessfulPendingApproval": "Registro bem-sucedido! Sua conta está aguardando aprovação. Você será notificado quando sua conta for aprovada.",
-  "registrationSuccessfulAutoLogin": "Registro bem-sucedido! Você foi automaticamente conectado.",
-  "welcome": "Bem-vindo!",
-  "registrationSuccessful": "Registro bem-sucedido",
-  "pleaseLoginWithNewAccount": "Por favor, faça login com sua nova conta.",
-  "forgotPasswordTitle": "Esqueceu a senha",
-  "usernameOrEmailLabel": "Nome de usuário ou e-mail",
-  "pleaseEnterUsernameOrEmail": "Por favor, insira seu nome de usuário ou e-mail",
-  "sendResetLink": "Enviar link de redefinição",
-  "resetLinkSent": "Link de redefinição enviado",
-  "passwordResetInstructionsSent": "As instruções para redefinir sua senha foram enviadas para seu endereço de e-mail registrado.",
-  "resetFailed": "Falha na redefinição",
-  "unableToSendResetLink": "Não foi possível enviar o link de redefinição. Por favor, tente novamente.",
-  "errorSendingResetLink": "Ocorreu um erro ao enviar o link de redefinição. Por favor, verifique sua conexão e tente novamente.",
   "errorTitle": "Erro",
   "okButton": "OK",
   "retryButton": "Tentar novamente",
@@ -77,14 +13,6 @@
   "dismiss": "Dispensar",
   "cancel": "Cancelar",
   "tryAgain": "Tentar Novamente",
-  "getHelp": "Obter ajuda",
-  "somethingWentWrong": "Algo deu errado",
-  "unexpectedErrorOccurred": "Ocorreu um erro inesperado. Por favor, tente novamente.",
-  "noInternetConnection": "Sem conexão com a Internet",
-  "checkInternetConnection": "Por favor, verifique sua conexão com a Internet e tente novamente.",
-  "authenticationRequired": "Autenticação necessária",
-  "pleaseLoginToContinue": "Por favor, faça login para continuar.",
-  "forumError": "Erro do fórum",
   "anErrorOccurred": "Ocorreu um erro",
   "accountPendingApproval": "Sua conta está aguardando aprovação. Você pode navegar pelo fórum, mas não pode postar até que um moderador aprove sua conta.",
   "checkEmailToConfirm": "Por favor, verifique seu e-mail para confirmar sua conta. Clique no link de confirmação no e-mail que enviamos.",
@@ -101,24 +29,12 @@
   "noRecentTopicsToDisplay": "Não há tópicos recentes para exibir. Volte mais tarde para novas discussões.",
   "signInToViewLatestTopics": "Faça login para ver tópicos recentes",
   "youNeedToBeSignedInToViewLatestTopics": "Você precisa estar conectado para ver tópicos recentes",
-  "noUnreadTopics": "Sem tópicos não lidos",
   "thereAreNoUnreadTopics": "Não há tópicos não lidos. Volte mais tarde para novas discussões.",
   "youAreAllCaughtUp": "Você está em dia!",
   "signInToViewUnreadTopics": "Faça login para ver tópicos não lidos",
   "youNeedToBeSignedInToViewUnreadTopics": "Você precisa estar conectado para ver seus tópicos não lidos",
-  "noSubscribedTopics": "Sem tópicos inscritos",
-  "noSubscribedTopicsMessage": "Você não se inscreveu em nenhum tópico. Toque no botão de estrela em um tópico para se inscrever e receber notificações de novas atualizações.",
-  "signInToViewSubscribedTopics": "Faça login para ver tópicos inscritos",
-  "youNeedToBeSignedInToViewSubscribedTopics": "Você precisa estar conectado para ver seus tópicos inscritos",
-  "noParticipatedTopics": "Sem tópicos participados",
-  "topicsYouParticipatedIn": "Os tópicos em que você participou serão exibidos aqui.",
-  "signInToViewParticipatedTopics": "Faça login para ver tópicos participados",
-  "youNeedToBeSignedInToViewParticipatedTopics": "Você precisa estar conectado para ver tópicos em que participou",
   "latest": "Recentes",
   "unread": "Não lidos",
-  "subscribed": "Inscritos",
-  "participated": "Participados",
-  "connectionTimedOut": "Tempo de conexão esgotado. O site pode estar fora do ar ou inacessível.",
   "failedToConnectToSite": "Falha ao conectar ao site. O site pode estar fora do ar ou inacessível.",
   "connectionFailed": "Falha de conexão",
   "failedToConnectToSiteName": "Falha ao conectar a {siteName}",
@@ -132,12 +48,7 @@
   },
   "loading": "Carregando...",
   "newConversation": "Nova conversa",
-  "newMessage": "Nova mensagem",
-  "appSettings": "Configurações do aplicativo",
-  "searchSites": "Buscar sites",
   "language": "Idioma",
-  "systemDefault": "Padrão do sistema",
-  "followSystemLanguage": "Seguir o idioma do sistema",
   "all": "Todos",
   "topicsOnly": "Apenas tópicos",
   "titlesOnly": "Apenas títulos",
@@ -162,7 +73,6 @@
   "subscribeTo": "inscrever-se em",
   "unsubscribeFrom": "cancelar inscrição de",
   "subscribe": "Inscrever-se",
-  "unsubscribe": "Cancelar inscrição",
   "failedToSubscribeToThread": "Falha ao {action} tópico",
   "@failedToSubscribeToThread": {
     "description": "Error message when subscribe/unsubscribe fails",
@@ -210,16 +120,9 @@
   },
   "newTopic": "Novo tópico",
   "markRead": "Marcar como lido",
-  "reportUser": "Denunciar usuário",
-  "pleaseSelectReasonForReportingUser": "Por favor, selecione um motivo para denunciar este usuário.",
   "spamOrAdvertising": "Spam ou publicidade",
-  "harassmentOrBullying": "Assédio ou bullying",
-  "inappropriateContent": "Conteúdo inadequado",
-  "impersonationOrFakeAccount": "Imitação ou conta falsa",
   "otherPleaseSpecify": "Outro (por favor, especifique)",
   "pleaseSpecifyReason": "Por favor, especifique o motivo",
-  "enterReasonForReportingUser": "Insira o motivo para denunciar este usuário",
-  "pleaseSelectReason": "Por favor, selecione um motivo",
   "banUser": "Banir usuário",
   "unbanUser": "Desbanir usuário",
   "pleaseSelectReasonForBanningUser": "Por favor, selecione um motivo para banir {username}",
@@ -239,8 +142,6 @@
   "banUntil": "Banir até",
   "selectDate": "Selecionar data",
   "moreOptions": "Mais opções",
-  "leaveConversation": "Deixar conversa",
-  "reportConversation": "Denunciar conversa",
   "topicClosed": "Tópico fechado",
   "topicOpened": "Tópico aberto",
   "topicStickied": "Tópico fixado",
@@ -258,10 +159,6 @@
   "handleThreads": "Gerenciar tópicos",
   "deleteMessages": "Excluir mensagens",
   "deleteConversations": "Excluir conversas",
-  "myForums": "Meus Fóruns",
-  "recentlyVisited": "Visitados Recentemente",
-  "explore": "Explorar",
-  "forumCopilot": "Forum Copilot",
   "noConversations": "Sem conversas",
   "noConversationsMessage": "Você ainda não tem conversas. Inicie uma nova conversa para começar a enviar mensagens.",
   "imageSavedToGallery": "Imagem salva na galeria!",
@@ -285,50 +182,8 @@
   "likesGiven": "Curtidas Dadas",
   "showMore": "Mostrar mais",
   "cleanSpam": "Limpar spam",
-  "failedToSaveMessage": "Falha ao salvar mensagem",
   "failedToSaveConversation": "Falha ao salvar conversa",
-  "failedToSaveSetting": "Falha ao salvar configuração",
-  "failedToSavePost": "Falha ao salvar publicação",
-  "errorLoadingSites": "Erro ao carregar sites: {error}",
-  "@errorLoadingSites": {
-    "description": "Error message when loading explore sites fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "connectingTo": "Conectando a {domainName}...",
-  "@connectingTo": {
-    "description": "Message shown when connecting to a site",
-    "placeholders": {
-      "domainName": {
-        "type": "String"
-      }
-    }
-  },
   "members": "Membros",
-  "allMembers": "Todos os Membros",
-  "online": "Online",
-  "noMembersFound": "Nenhum membro encontrado",
-  "searchForMembers": "Buscar membros",
-  "enterUsernameToFindMembers": "Digite um nome de usuário para encontrar membros do fórum",
-  "noMembersOnline": "Não há membros online no momento",
-  "enterUsernameToSearch": "Digite o nome de usuário para buscar...",
-  "lookupMembers": "Buscar Membros",
-  "addMembers": "Adicionar Membros",
-  "membersAddedSuccessfully": "Membros adicionados com sucesso",
-  "errorAddingMembers": "Erro ao adicionar membros: {error}",
-  "@errorAddingMembers": {
-    "description": "Error message when adding members fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToLoadOnlineUsers": "Falha ao carregar usuários online",
-  "noUsersOnline": "Nenhum usuário online",
   "membersCount": "{count} Membros",
   "@membersCount": {
     "description": "Number of members with label",
@@ -354,16 +209,6 @@
   "retry": "Tentar Novamente",
   "delete": "Excluir",
   "deleteMessage": "Excluir Mensagem",
-  "areYouSureYouWantToDeleteThisMessage": "Tem certeza de que deseja excluir esta mensagem?",
-  "failedToDeleteMessage": "Falha ao excluir mensagem: {error}",
-  "@failedToDeleteMessage": {
-    "description": "Error message when deleting message fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "deletingPost": "Excluindo publicação...",
   "failedToUnlikePost": "Falha ao remover curtida da publicação: {error}",
   "@failedToUnlikePost": {
@@ -377,15 +222,6 @@
   "failedToLikePost": "Falha ao curtir publicação: {error}",
   "@failedToLikePost": {
     "description": "Error message when liking post fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToThankPost": "Falha ao agradecer publicação: {error}",
-  "@failedToThankPost": {
-    "description": "Error message when thanking post fails",
     "placeholders": {
       "error": {
         "type": "String"
@@ -421,11 +257,7 @@
       }
     }
   },
-  "inviteMessageOptional": "Mensagem de Convite (opcional)",
-  "iWouldLikeToAddYouToThisConversation": "Eu gostaria de adicionar você a esta conversa.",
   "searchFailed": "Busca falhou",
-  "trySearchingWithDifferentUsername": "Tente buscar com um nome de usuário diferente",
-  "noSitesFound": "Nenhum site encontrado.",
   "userInformationNotAvailable": "Informações do usuário não disponíveis",
   "birthday": "Aniversário",
   "posts": "Publicações",
@@ -520,13 +352,7 @@
   },
   "markAsUnread": "Marcar como não lido",
   "invite": "Convidar",
-  "welcomeBack": "Bem-vindo de volta!",
-  "signInToAccessYourProfile": "Faça login para acessar seu perfil e gerenciar sua conta",
-  "enterYourUsername": "Digite seu nome de usuário",
-  "enterYourPassword": "Digite sua senha",
-  "dontHaveAnAccount": "Não tem uma conta?",
   "enterKeywordsToSearchTopics": "Digite palavras-chave para buscar tópicos...",
-  "pleaseFillInAllRequiredFields": "Por favor, preencha todos os campos obrigatórios",
   "undelete": "Restaurar",
   "refresh": "Atualizar",
   "share": "Compartilhar",
@@ -545,10 +371,6 @@
   "pollOptionsCount": "{count} opções",
   "reactedBy": "Reagido por",
   "enterKeywordsToFindTopicsAndPosts": "Digite palavras-chave para encontrar tópicos e postagens",
-  "enterKeywordsOrDomainToFindForums": "Digite palavras-chave ou domínio para encontrar fóruns",
-  "enterKeywordsOrDomainNamesToFindForums": "Digite palavras-chave ou nomes de domínio para encontrar fóruns",
-  "appearance": "Aparência",
-  "followSystemTheme": "Seguir o tema do sistema",
   "light": "Claro",
   "dark": "Escuro",
   "version": "versão {version} ({buildNumber})",
@@ -562,15 +384,9 @@
       }
     }
   },
-  "forumSettings": "Configurações do Fórum",
-  "noSettingsAvailable": "Nenhuma configuração disponível",
-  "settingsCategoriesWillAppearHere": "As categorias de configurações aparecerão aqui quando disponíveis.",
   "unableToLoadProfile": "Não foi possível carregar o perfil",
   "banned": "BANIDO",
   "reportSubmittedSuccessfully": "Denúncia enviada com sucesso",
-  "failedToSubmitReport": "Falha ao enviar denúncia",
-  "searchForForums": "Buscar fóruns",
-  "searchForums": "Buscar Fóruns",
   "deleteTopic": "Excluir tópico",
   "topicCanBeRestoredLater": "O tópico pode ser restaurado mais tarde",
   "topicWillBePermanentlyDeleted": "O tópico será excluído permanentemente",
@@ -598,15 +414,6 @@
       }
     }
   },
-  "errorLoadingMessage": "Erro ao carregar mensagem: {error}",
-  "@errorLoadingMessage": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "messageNotFound": "Mensagem não encontrada",
   "home": "Início",
   "notifications": "Notificações",
   "forums": "Fóruns",
@@ -618,28 +425,19 @@
   "howWouldYouLikeToInsertImage": "Como você gostaria de inserir esta imagem?",
   "thumbnail": "Miniatura",
   "fullSize": "Tamanho completo",
-  "alignLeft": "Alinhar à esquerda",
-  "alignCenter": "Alinhar ao centro",
-  "alignRight": "Alinhar à direita",
   "pleaseEnterTitle": "Por favor, insira um título",
   "pleaseEnterContent": "Por favor, insira algum conteúdo",
   "uploading": "Enviando...",
   "uploaded": "Enviado",
   "mentionUser": "Mencionar usuário",
-  "loggingIn": "Entrando...",
   "submittingReport": "Enviando relatório...",
   "banningUser": "Banindo usuário...",
   "unbanningUser": "Desbanindo usuário...",
   "cleaningSpam": "Limpando spam...",
-  "enterSubject": "Insira o assunto",
-  "typeYourMessageHere": "Digite sua mensagem aqui",
   "writeYourMessage": "Escreva sua mensagem...",
   "writeYourReply": "Escreva sua resposta...",
-  "messageSentSuccessfully": "Mensagem enviada com sucesso",
-  "replySentSuccessfully": "Resposta enviada com sucesso",
   "conversationCreatedSuccessfully": "Conversa criada com sucesso",
   "conversationMarkedAsUnread": "Conversa marcada como não lida",
-  "messageMarkedAsUnread": "Mensagem marcada como não lida",
   "conversationClosed": "Conversa fechada",
   "conversationOpened": "Conversa aberta",
   "pleaseLoginToLikeMessages": "Por favor, faça login para curtir mensagens",
@@ -652,40 +450,8 @@
       }
     }
   },
-  "failedToUploadFile": "Falha ao enviar arquivo: {error}",
-  "@failedToUploadFile": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToUploadImage": "Falha ao enviar imagem: {error}",
-  "@failedToUploadImage": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToSendMessage": "Falha ao enviar mensagem: {error}",
-  "@failedToSendMessage": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "failedToSendReply": "Falha ao enviar resposta: {error}",
   "@failedToSendReply": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToMarkAsUnread": "Falha ao marcar mensagem como não lida: {error}",
-  "@failedToMarkAsUnread": {
     "placeholders": {
       "error": {
         "type": "String"
@@ -726,14 +492,8 @@
   },
   "goToTop": "Ir para o topo",
   "goToBottom": "Ir para o fundo",
-  "replyAll": "Responder a todos",
-  "forward": "Encaminhar",
-  "noForumsFound": "Nenhum fórum encontrado.",
   "pleaseLoginToAccessContent": "Por favor, faça login para acessar este conteúdo e interagir com as postagens.",
   "searchUsers": "Buscar usuários...",
-  "writeYourTitle": "Escreva seu título...",
-  "writeYourContent": "Escreva seu conteúdo...",
-  "selectAnOption": "Selecione uma opção",
   "enterConversationTitle": "Insira o título da conversa",
   "enterCode": "Insira código de {count} dígitos",
   "@enterCode": {
@@ -745,26 +505,14 @@
   },
   "edit": "Editar",
   "report": "Denunciar",
-  "unfollow": "Deixar de seguir",
-  "follow": "Seguir",
-  "goToForums": "Ir para Fóruns",
   "remove": "Remover",
   "subject": "Assunto",
   "message": "Mensagem",
   "titleCannotBeEmpty": "O título não pode estar vazio",
   "conversationUpdatedSuccessfully": "Conversa atualizada com sucesso",
   "goBack": "Voltar",
-  "privateMessagesNotAvailable": "Mensagens privadas não disponíveis",
   "failedToLoadPost": "Erro ao carregar publicação: \n{error}",
   "@failedToLoadPost": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "errorLoadingMoreMessages": "Erro ao carregar mais mensagens: {error}",
-  "@errorLoadingMoreMessages": {
     "placeholders": {
       "error": {
         "type": "String"
@@ -784,8 +532,6 @@
   },
   "like": "curtir",
   "unlike": "descurtir",
-  "optimizeImage": "Otimizar imagem",
-  "optimizeAndUpload": "Otimizar e enviar",
   "downloading": "Baixando {filename}...",
   "@downloading": {
     "placeholders": {
@@ -813,24 +559,7 @@
       }
     }
   },
-  "enterANumber": "Digite um número",
   "failedToNavigateToForum": "Falha ao navegar para o fórum",
-  "failedToNavigateToForumName": "Falha ao navegar para {forumName}",
-  "@failedToNavigateToForumName": {
-    "placeholders": {
-      "forumName": {
-        "type": "String"
-      }
-    }
-  },
-  "forumNotFound": "Fórum não encontrado: {forumName}",
-  "@forumNotFound": {
-    "placeholders": {
-      "forumName": {
-        "type": "String"
-      }
-    }
-  },
   "forumNotFoundById": "Fórum não encontrado: {forumId}",
   "@forumNotFoundById": {
     "placeholders": {
@@ -847,22 +576,9 @@
       }
     }
   },
-  "translate": "Traduzir",
-  "showOriginal": "Mostrar original",
   "translating": "Traduzindo...",
   "translated": "Traduzido",
   "translatedContent": "Conteúdo traduzido",
-  "selectLanguage": "Selecionar idioma",
-  "translateTo": "Traduzir para:",
-  "deviceLanguage": "Idioma do dispositivo",
-  "noPostsToTranslate": "Nenhuma publicação para traduzir",
-  "translationFailed": "Falha na tradução",
-  "likePost": "Curtir publicação",
-  "unlikePost": "Descurtir publicação",
-  "thankPost": "Agradecer publicação",
-  "showLikes": "Mostrar curtidas",
-  "showThanks": "Mostrar agradecimentos",
-  "quotePost": "Citar publicação",
   "twoFactorAuthentication": "Autenticação de dois fatores",
   "authenticationCodeLabel": "Código de autenticação",
   "pleaseEnterYourAuthenticationCode": "Digite seu código de autenticação",
@@ -978,11 +694,6 @@
   "likeAgainInSeconds": "Você pode curtir esta postagem novamente em {seconds}s",
   "loginInfo": "Informações de login",
   "loginFailed": "Falha no login",
-  "additionalInformation": "Informações adicionais",
-  "dateOfBirth": "Data de nascimento{marker}",
-  "minimumAgeYears": "Idade mínima: {minimumAge} anos",
-  "locationLabel": "Localização{marker}",
-  "receiveSiteMailings": "Receber e-mails do site",
   "moveToCategory": "Mover para categoria",
   "undeleteTopic": "Restaurar tópico",
   "undeleteTopicConfirmation": "Tem certeza de que deseja restaurar este tópico? Ele voltará a ficar visível para outros usuários.",
@@ -992,9 +703,6 @@
   "newDirectMessage": "Nova mensagem direta",
   "noMessagesYetSayHi": "Nenhuma mensagem ainda — diga oi.",
   "edited": "editado",
-  "imageExceedsUploadLimits": "Esta imagem excede os limites de envio e precisa ser otimizada:",
-  "optimizationsToBeApplied": "Otimizações a aplicar:",
-  "reductionPercent": "Redução: {percent}%",
   "editProfileManagedOnWebNote": "Nome de exibição, e-mail, senha e outras configurações da conta são gerenciados em Conta → Gerenciar conta na web. Seu avatar pode ser alterado tocando no ícone de câmera na foto.",
   "approvedButRelayUnreachable": "Aprovado, mas não foi possível contatar o ForumCopilot para concluir a configuração. Tente novamente mais tarde em Configurações.",
   "notificationsAreTurnedOffForThisApp": "As notificações estão desativadas para este app",
@@ -1104,9 +812,6 @@
   "imageNotAvailable": "Imagem indisponível",
   "allForumTopicsHaveBeenMarkedAs": "Todos os tópicos do fórum foram marcados como lidos",
   "postsCount": "{count} postagens",
-  "protectedForum": "Fórum protegido",
-  "isPasswordProtected": "{forumName} está protegido por senha.",
-  "enter": "Entrar",
   "permissionDeniedToSaveImage": "Permissão negada para salvar a imagem",
   "postNotFound": "Postagem não encontrada.",
   "failedToUploadFilePleaseTryAgain": "Falha ao enviar o arquivo. Tente novamente.",

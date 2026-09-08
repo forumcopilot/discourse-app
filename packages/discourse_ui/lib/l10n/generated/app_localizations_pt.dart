@@ -9,22 +9,7 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
-  String get appTitle => 'Forum App';
-
-  @override
   String get loginTitle => 'Entrar';
-
-  @override
-  String get usernameLabel => 'Nome de usuário';
-
-  @override
-  String get passwordLabel => 'Senha';
-
-  @override
-  String get loginButton => 'Entrar';
-
-  @override
-  String get signInWithPasskey => 'Sign in with Passkey';
 
   @override
   String get usePasskey => 'Use Passkey';
@@ -33,148 +18,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get passkeyContinuePrompt => 'Use your passkey to continue';
 
   @override
-  String get forgotPassword => 'Esqueceu a senha?';
-
-  @override
-  String get pleaseEnterUsername => 'Por favor, insira seu nome de usuário';
-
-  @override
-  String get pleaseEnterPassword => 'Por favor, insira sua senha';
-
-  @override
-  String credentialsSentToDomain(String domain) {
-    return 'Seu nome de usuário e senha serão enviados para $domain';
-  }
-
-  @override
-  String get createAccount => 'Criar conta';
-
-  @override
-  String get alreadyHaveAccount => 'Já tem uma conta? ';
-
-  @override
-  String get logIn => 'Entrar';
-
-  @override
   String get continueButton => 'Continuar';
-
-  @override
-  String get registrationNotAvailable => 'Registro não disponível';
-
-  @override
-  String get registrationNotAvailableMessage =>
-      'O registro não está disponível no momento. O fórum pode estar fechado ou o registro pode estar desabilitado.';
-
-  @override
-  String get webRegistrationRequired => 'Registro via web necessário';
-
-  @override
-  String get webRegistrationRequiredMessage =>
-      'Este fórum requer registro através do navegador web. Por favor, clique no botão abaixo para abrir a página de registro.';
-
-  @override
-  String get openRegistrationPage => 'Abrir página de registro';
-
-  @override
-  String get loadingAdditionalFields => 'Carregando campos adicionais...';
-
-  @override
-  String get pleaseSelectDateOfBirth =>
-      'Por favor, selecione sua data de nascimento';
-
-  @override
-  String get pleaseEnterLocation => 'Por favor, insira sua localização';
-
-  @override
-  String get pleaseIndicateEmailPreference =>
-      'Por favor, indique sua preferência de e-mail';
-
-  @override
-  String get pleaseFillAllRequiredFields =>
-      'Por favor, preencha todos os campos obrigatórios';
-
-  @override
-  String get pleaseAcceptTermsOfService =>
-      'Por favor, aceite os Termos de Serviço';
-
-  @override
-  String get pleaseAcceptPrivacyPolicy =>
-      'Por favor, aceite a Política de Privacidade';
-
-  @override
-  String get registrationError => 'Erro de registro';
-
-  @override
-  String get registrationFailed =>
-      'O registro falhou. Por favor, verifique suas informações.';
-
-  @override
-  String get registrationFailedTryAgain =>
-      'O registro falhou. Por favor, tente novamente.';
-
-  @override
-  String get registrationInfo => 'Informações de registro';
-
-  @override
-  String get openWebsite => 'Abrir site';
-
-  @override
-  String couldNotOpenForumWebsite(String url) {
-    return 'Não foi possível abrir o site do fórum. Por favor, tente visitar: $url';
-  }
-
-  @override
-  String get registrationSuccessfulEmailConfirm =>
-      'Registro bem-sucedido! Por favor, verifique seu e-mail para confirmar sua conta antes de fazer login.';
-
-  @override
-  String get registrationSuccessfulPendingApproval =>
-      'Registro bem-sucedido! Sua conta está aguardando aprovação. Você será notificado quando sua conta for aprovada.';
-
-  @override
-  String get registrationSuccessfulAutoLogin =>
-      'Registro bem-sucedido! Você foi automaticamente conectado.';
-
-  @override
-  String get welcome => 'Bem-vindo!';
-
-  @override
-  String get registrationSuccessful => 'Registro bem-sucedido';
-
-  @override
-  String get pleaseLoginWithNewAccount =>
-      'Por favor, faça login com sua nova conta.';
-
-  @override
-  String get forgotPasswordTitle => 'Esqueceu a senha';
-
-  @override
-  String get usernameOrEmailLabel => 'Nome de usuário ou e-mail';
-
-  @override
-  String get pleaseEnterUsernameOrEmail =>
-      'Por favor, insira seu nome de usuário ou e-mail';
-
-  @override
-  String get sendResetLink => 'Enviar link de redefinição';
-
-  @override
-  String get resetLinkSent => 'Link de redefinição enviado';
-
-  @override
-  String get passwordResetInstructionsSent =>
-      'As instruções para redefinir sua senha foram enviadas para seu endereço de e-mail registrado.';
-
-  @override
-  String get resetFailed => 'Falha na redefinição';
-
-  @override
-  String get unableToSendResetLink =>
-      'Não foi possível enviar o link de redefinição. Por favor, tente novamente.';
-
-  @override
-  String get errorSendingResetLink =>
-      'Ocorreu um erro ao enviar o link de redefinição. Por favor, verifique sua conexão e tente novamente.';
 
   @override
   String get errorTitle => 'Erro';
@@ -203,32 +47,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tryAgain => 'Tentar Novamente';
-
-  @override
-  String get getHelp => 'Obter ajuda';
-
-  @override
-  String get somethingWentWrong => 'Algo deu errado';
-
-  @override
-  String get unexpectedErrorOccurred =>
-      'Ocorreu um erro inesperado. Por favor, tente novamente.';
-
-  @override
-  String get noInternetConnection => 'Sem conexão com a Internet';
-
-  @override
-  String get checkInternetConnection =>
-      'Por favor, verifique sua conexão com a Internet e tente novamente.';
-
-  @override
-  String get authenticationRequired => 'Autenticação necessária';
-
-  @override
-  String get pleaseLoginToContinue => 'Por favor, faça login para continuar.';
-
-  @override
-  String get forumError => 'Erro do fórum';
 
   @override
   String get anErrorOccurred => 'Ocorreu um erro';
@@ -288,9 +106,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Você precisa estar conectado para ver tópicos recentes';
 
   @override
-  String get noUnreadTopics => 'Sem tópicos não lidos';
-
-  @override
   String get thereAreNoUnreadTopics =>
       'Não há tópicos não lidos. Volte mais tarde para novas discussões.';
 
@@ -306,50 +121,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Você precisa estar conectado para ver seus tópicos não lidos';
 
   @override
-  String get noSubscribedTopics => 'Sem tópicos inscritos';
-
-  @override
-  String get noSubscribedTopicsMessage =>
-      'Você não se inscreveu em nenhum tópico. Toque no botão de estrela em um tópico para se inscrever e receber notificações de novas atualizações.';
-
-  @override
-  String get signInToViewSubscribedTopics =>
-      'Faça login para ver tópicos inscritos';
-
-  @override
-  String get youNeedToBeSignedInToViewSubscribedTopics =>
-      'Você precisa estar conectado para ver seus tópicos inscritos';
-
-  @override
-  String get noParticipatedTopics => 'Sem tópicos participados';
-
-  @override
-  String get topicsYouParticipatedIn =>
-      'Os tópicos em que você participou serão exibidos aqui.';
-
-  @override
-  String get signInToViewParticipatedTopics =>
-      'Faça login para ver tópicos participados';
-
-  @override
-  String get youNeedToBeSignedInToViewParticipatedTopics =>
-      'Você precisa estar conectado para ver tópicos em que participou';
-
-  @override
   String get latest => 'Recentes';
 
   @override
   String get unread => 'Não lidos';
-
-  @override
-  String get subscribed => 'Inscritos';
-
-  @override
-  String get participated => 'Participados';
-
-  @override
-  String get connectionTimedOut =>
-      'Tempo de conexão esgotado. O site pode estar fora do ar ou inacessível.';
 
   @override
   String get failedToConnectToSite =>
@@ -370,22 +145,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get newConversation => 'Nova conversa';
 
   @override
-  String get newMessage => 'Nova mensagem';
-
-  @override
-  String get appSettings => 'Configurações do aplicativo';
-
-  @override
-  String get searchSites => 'Buscar sites';
-
-  @override
   String get language => 'Idioma';
-
-  @override
-  String get systemDefault => 'Padrão do sistema';
-
-  @override
-  String get followSystemLanguage => 'Seguir o idioma do sistema';
 
   @override
   String get all => 'Todos';
@@ -407,9 +167,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get subscribe => 'Inscrever-se';
-
-  @override
-  String get unsubscribe => 'Cancelar inscrição';
 
   @override
   String get failedToSubscribeToThread => 'Falha ao null tópico';
@@ -493,36 +250,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get markRead => 'Marcar como lido';
 
   @override
-  String get reportUser => 'Denunciar usuário';
-
-  @override
-  String get pleaseSelectReasonForReportingUser =>
-      'Por favor, selecione um motivo para denunciar este usuário.';
-
-  @override
   String get spamOrAdvertising => 'Spam ou publicidade';
-
-  @override
-  String get harassmentOrBullying => 'Assédio ou bullying';
-
-  @override
-  String get inappropriateContent => 'Conteúdo inadequado';
-
-  @override
-  String get impersonationOrFakeAccount => 'Imitação ou conta falsa';
 
   @override
   String get otherPleaseSpecify => 'Outro (por favor, especifique)';
 
   @override
   String get pleaseSpecifyReason => 'Por favor, especifique o motivo';
-
-  @override
-  String get enterReasonForReportingUser =>
-      'Insira o motivo para denunciar este usuário';
-
-  @override
-  String get pleaseSelectReason => 'Por favor, selecione um motivo';
 
   @override
   String get banUser => 'Banir usuário';
@@ -563,12 +297,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get moreOptions => 'Mais opções';
 
   @override
-  String get leaveConversation => 'Deixar conversa';
-
-  @override
-  String get reportConversation => 'Denunciar conversa';
-
-  @override
   String get topicClosed => 'Tópico fechado';
 
   @override
@@ -596,18 +324,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get deleteConversations => 'Excluir conversas';
-
-  @override
-  String get myForums => 'Meus Fóruns';
-
-  @override
-  String get recentlyVisited => 'Visitados Recentemente';
-
-  @override
-  String get explore => 'Explorar';
-
-  @override
-  String get forumCopilot => 'Forum Copilot';
 
   @override
   String get noConversations => 'Sem conversas';
@@ -658,71 +374,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get cleanSpam => 'Limpar spam';
 
   @override
-  String get failedToSaveMessage => 'Falha ao salvar mensagem';
-
-  @override
   String get failedToSaveConversation => 'Falha ao salvar conversa';
 
   @override
-  String get failedToSaveSetting => 'Falha ao salvar configuração';
-
-  @override
-  String get failedToSavePost => 'Falha ao salvar publicação';
-
-  @override
-  String errorLoadingSites(String error) {
-    return 'Erro ao carregar sites: $error';
-  }
-
-  @override
-  String connectingTo(String domainName) {
-    return 'Conectando a $domainName...';
-  }
-
-  @override
   String get members => 'Membros';
-
-  @override
-  String get allMembers => 'Todos os Membros';
-
-  @override
-  String get online => 'Online';
-
-  @override
-  String get noMembersFound => 'Nenhum membro encontrado';
-
-  @override
-  String get searchForMembers => 'Buscar membros';
-
-  @override
-  String get enterUsernameToFindMembers =>
-      'Digite um nome de usuário para encontrar membros do fórum';
-
-  @override
-  String get noMembersOnline => 'Não há membros online no momento';
-
-  @override
-  String get enterUsernameToSearch => 'Digite o nome de usuário para buscar...';
-
-  @override
-  String get lookupMembers => 'Buscar Membros';
-
-  @override
-  String get addMembers => 'Adicionar Membros';
-
-  @override
-  String get membersAddedSuccessfully => 'Membros adicionados com sucesso';
-
-  @override
-  String errorAddingMembers(String error) {
-    return 'Erro ao adicionar membros: $error';
-  }
-
-  @override
-  String get failedToLoadOnlineUsers => 'Falha ao carregar usuários online';
-
-  @override
-  String get noUsersOnline => 'Nenhum usuário online';
 
   @override
   String membersCount(int count) {
@@ -780,15 +435,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get deleteMessage => 'Excluir Mensagem';
 
   @override
-  String get areYouSureYouWantToDeleteThisMessage =>
-      'Tem certeza de que deseja excluir esta mensagem?';
-
-  @override
-  String failedToDeleteMessage(String error) {
-    return 'Falha ao excluir mensagem: $error';
-  }
-
-  @override
   String get deletingPost => 'Excluindo publicação...';
 
   @override
@@ -799,11 +445,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String failedToLikePost(String error) {
     return 'Falha ao curtir publicação: $error';
-  }
-
-  @override
-  String failedToThankPost(String error) {
-    return 'Falha ao agradecer publicação: $error';
   }
 
   @override
@@ -829,26 +470,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String errorLoadingMoreMessages(String error) {
-    return 'Erro ao carregar mais mensagens: $error';
-  }
-
-  @override
-  String get inviteMessageOptional => 'Mensagem de Convite (opcional)';
-
-  @override
-  String get iWouldLikeToAddYouToThisConversation =>
-      'Eu gostaria de adicionar você a esta conversa.';
-
-  @override
   String get searchFailed => 'Busca falhou';
-
-  @override
-  String get trySearchingWithDifferentUsername =>
-      'Tente buscar com um nome de usuário diferente';
-
-  @override
-  String get noSitesFound => 'Nenhum site encontrado.';
 
   @override
   String get userInformationNotAvailable =>
@@ -1005,28 +627,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get invite => 'Convidar';
 
   @override
-  String get welcomeBack => 'Bem-vindo de volta!';
-
-  @override
-  String get signInToAccessYourProfile =>
-      'Faça login para acessar seu perfil e gerenciar sua conta';
-
-  @override
-  String get enterYourUsername => 'Digite seu nome de usuário';
-
-  @override
-  String get enterYourPassword => 'Digite sua senha';
-
-  @override
-  String get dontHaveAnAccount => 'Não tem uma conta?';
-
-  @override
   String get enterKeywordsToSearchTopics =>
       'Digite palavras-chave para buscar tópicos...';
-
-  @override
-  String get pleaseFillInAllRequiredFields =>
-      'Por favor, preencha todos os campos obrigatórios';
 
   @override
   String get undelete => 'Restaurar';
@@ -1090,20 +692,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Digite palavras-chave para encontrar tópicos e postagens';
 
   @override
-  String get enterKeywordsOrDomainToFindForums =>
-      'Digite palavras-chave ou domínio para encontrar fóruns';
-
-  @override
-  String get enterKeywordsOrDomainNamesToFindForums =>
-      'Digite palavras-chave ou nomes de domínio para encontrar fóruns';
-
-  @override
-  String get appearance => 'Aparência';
-
-  @override
-  String get followSystemTheme => 'Seguir o tema do sistema';
-
-  @override
   String get light => 'Claro';
 
   @override
@@ -1115,16 +703,6 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get forumSettings => 'Configurações do Fórum';
-
-  @override
-  String get noSettingsAvailable => 'Nenhuma configuração disponível';
-
-  @override
-  String get settingsCategoriesWillAppearHere =>
-      'As categorias de configurações aparecerão aqui quando disponíveis.';
-
-  @override
   String get unableToLoadProfile => 'Não foi possível carregar o perfil';
 
   @override
@@ -1132,15 +710,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get reportSubmittedSuccessfully => 'Denúncia enviada com sucesso';
-
-  @override
-  String get failedToSubmitReport => 'Falha ao enviar denúncia';
-
-  @override
-  String get searchForForums => 'Buscar fóruns';
-
-  @override
-  String get searchForums => 'Buscar Fóruns';
 
   @override
   String get deleteTopic => 'Excluir tópico';
@@ -1199,14 +768,6 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String errorLoadingMessage(String error) {
-    return 'Erro ao carregar mensagem: $error';
-  }
-
-  @override
-  String get messageNotFound => 'Mensagem não encontrada';
-
-  @override
   String get home => 'Início';
 
   @override
@@ -1242,15 +803,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fullSize => 'Tamanho completo';
 
   @override
-  String get alignLeft => 'Alinhar à esquerda';
-
-  @override
-  String get alignCenter => 'Alinhar ao centro';
-
-  @override
-  String get alignRight => 'Alinhar à direita';
-
-  @override
   String get pleaseEnterTitle => 'Por favor, insira um título';
 
   @override
@@ -1266,9 +818,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get mentionUser => 'Mencionar usuário';
 
   @override
-  String get loggingIn => 'Entrando...';
-
-  @override
   String get submittingReport => 'Enviando relatório...';
 
   @override
@@ -1281,31 +830,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get cleaningSpam => 'Limpando spam...';
 
   @override
-  String get enterSubject => 'Insira o assunto';
-
-  @override
-  String get typeYourMessageHere => 'Digite sua mensagem aqui';
-
-  @override
   String get writeYourMessage => 'Escreva sua mensagem...';
 
   @override
   String get writeYourReply => 'Escreva sua resposta...';
 
   @override
-  String get messageSentSuccessfully => 'Mensagem enviada com sucesso';
-
-  @override
-  String get replySentSuccessfully => 'Resposta enviada com sucesso';
-
-  @override
   String get conversationCreatedSuccessfully => 'Conversa criada com sucesso';
 
   @override
   String get conversationMarkedAsUnread => 'Conversa marcada como não lida';
-
-  @override
-  String get messageMarkedAsUnread => 'Mensagem marcada como não lida';
 
   @override
   String get conversationClosed => 'Conversa fechada';
@@ -1326,28 +860,8 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String failedToUploadFile(String error) {
-    return 'Falha ao enviar arquivo: $error';
-  }
-
-  @override
-  String failedToUploadImage(String error) {
-    return 'Falha ao enviar imagem: $error';
-  }
-
-  @override
-  String failedToSendMessage(String error) {
-    return 'Falha ao enviar mensagem: $error';
-  }
-
-  @override
   String failedToSendReply(String error) {
     return 'Falha ao enviar resposta: $error';
-  }
-
-  @override
-  String failedToMarkAsUnread(String error) {
-    return 'Falha ao marcar mensagem como não lida: $error';
   }
 
   @override
@@ -1377,29 +891,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get goToBottom => 'Ir para o fundo';
 
   @override
-  String get replyAll => 'Responder a todos';
-
-  @override
-  String get forward => 'Encaminhar';
-
-  @override
-  String get noForumsFound => 'Nenhum fórum encontrado.';
-
-  @override
   String get pleaseLoginToAccessContent =>
       'Por favor, faça login para acessar este conteúdo e interagir com as postagens.';
 
   @override
   String get searchUsers => 'Buscar usuários...';
-
-  @override
-  String get writeYourTitle => 'Escreva seu título...';
-
-  @override
-  String get writeYourContent => 'Escreva seu conteúdo...';
-
-  @override
-  String get selectAnOption => 'Selecione uma opção';
 
   @override
   String get enterConversationTitle => 'Insira o título da conversa';
@@ -1414,15 +910,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get report => 'Denunciar';
-
-  @override
-  String get unfollow => 'Deixar de seguir';
-
-  @override
-  String get follow => 'Seguir';
-
-  @override
-  String get goToForums => 'Ir para Fóruns';
 
   @override
   String get remove => 'Remover';
@@ -1444,10 +931,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get goBack => 'Voltar';
 
   @override
-  String get privateMessagesNotAvailable =>
-      'Mensagens privadas não disponíveis';
-
-  @override
   String failedToLoadPost(String error) {
     return 'Erro ao carregar publicação: \n$error';
   }
@@ -1462,12 +945,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get unlike => 'descurtir';
-
-  @override
-  String get optimizeImage => 'Otimizar imagem';
-
-  @override
-  String get optimizeAndUpload => 'Otimizar e enviar';
 
   @override
   String downloading(String filename) {
@@ -1485,20 +962,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get enterANumber => 'Digite um número';
-
-  @override
   String get failedToNavigateToForum => 'Falha ao navegar para o fórum';
-
-  @override
-  String failedToNavigateToForumName(String forumName) {
-    return 'Falha ao navegar para $forumName';
-  }
-
-  @override
-  String forumNotFound(String forumName) {
-    return 'Fórum não encontrado: $forumName';
-  }
 
   @override
   String forumNotFoundById(String forumId) {
@@ -1511,30 +975,6 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get likePost => 'Curtir publicação';
-
-  @override
-  String get unlikePost => 'Descurtir publicação';
-
-  @override
-  String get thankPost => 'Agradecer publicação';
-
-  @override
-  String get showLikes => 'Mostrar curtidas';
-
-  @override
-  String get showThanks => 'Mostrar agradecimentos';
-
-  @override
-  String get quotePost => 'Citar publicação';
-
-  @override
-  String get translate => 'Traduzir';
-
-  @override
-  String get showOriginal => 'Mostrar original';
-
-  @override
   String get translating => 'Traduzindo...';
 
   @override
@@ -1542,21 +982,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get translatedContent => 'Conteúdo traduzido';
-
-  @override
-  String get selectLanguage => 'Selecionar idioma';
-
-  @override
-  String get translateTo => 'Traduzir para:';
-
-  @override
-  String get deviceLanguage => 'Idioma do dispositivo';
-
-  @override
-  String get noPostsToTranslate => 'Nenhuma publicação para traduzir';
-
-  @override
-  String get translationFailed => 'Falha na tradução';
 
   @override
   String get twoFactorAuthentication => 'Autenticação de dois fatores';
@@ -1994,27 +1419,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get loginFailed => 'Falha no login';
 
   @override
-  String get additionalInformation => 'Informações adicionais';
-
-  @override
-  String dateOfBirth(Object marker) {
-    return 'Data de nascimento$marker';
-  }
-
-  @override
-  String minimumAgeYears(Object minimumAge) {
-    return 'Idade mínima: $minimumAge anos';
-  }
-
-  @override
-  String locationLabel(Object marker) {
-    return 'Localização$marker';
-  }
-
-  @override
-  String get receiveSiteMailings => 'Receber e-mails do site';
-
-  @override
   String get moveToCategory => 'Mover para categoria';
 
   @override
@@ -2043,18 +1447,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get edited => 'editado';
-
-  @override
-  String get imageExceedsUploadLimits =>
-      'Esta imagem excede os limites de envio e precisa ser otimizada:';
-
-  @override
-  String get optimizationsToBeApplied => 'Otimizações a aplicar:';
-
-  @override
-  String reductionPercent(Object percent) {
-    return 'Redução: $percent%';
-  }
 
   @override
   String get editProfileManagedOnWebNote =>
@@ -2456,17 +1848,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String postsCount(Object count) {
     return '$count postagens';
   }
-
-  @override
-  String get protectedForum => 'Fórum protegido';
-
-  @override
-  String isPasswordProtected(Object forumName) {
-    return '$forumName está protegido por senha.';
-  }
-
-  @override
-  String get enter => 'Entrar';
 
   @override
   String get permissionDeniedToSaveImage =>

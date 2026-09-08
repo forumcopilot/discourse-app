@@ -1,73 +1,9 @@
 {
   "@@locale": "nl",
-  "appTitle": "Forum App",
-  "@appTitle": {
-    "description": "The application title"
-  },
   "loginTitle": "Inloggen",
-  "usernameLabel": "Gebruikersnaam",
-  "passwordLabel": "Wachtwoord",
-  "loginButton": "Inloggen",
-  "signInWithPasskey": "Sign in with Passkey",
   "usePasskey": "Use Passkey",
   "passkeyContinuePrompt": "Use your passkey to continue",
-  "forgotPassword": "Wachtwoord vergeten?",
-  "pleaseEnterUsername": "Voer uw gebruikersnaam in",
-  "pleaseEnterPassword": "Voer uw wachtwoord in",
-  "credentialsSentToDomain": "Uw gebruikersnaam en wachtwoord worden naar {domain} gestuurd",
-  "@credentialsSentToDomain": {
-    "description": "Message about credentials being sent to forum domain",
-    "placeholders": {
-      "domain": {
-        "type": "String"
-      }
-    }
-  },
-  "createAccount": "Account aanmaken",
-  "alreadyHaveAccount": "Heeft u al een account? ",
-  "logIn": "Inloggen",
   "continueButton": "Doorgaan",
-  "registrationNotAvailable": "Registratie niet beschikbaar",
-  "registrationNotAvailableMessage": "Registratie is momenteel niet beschikbaar. Het forum kan gesloten zijn of registratie kan zijn uitgeschakeld.",
-  "webRegistrationRequired": "Webregistratie vereist",
-  "webRegistrationRequiredMessage": "Dit forum vereist registratie via de webbrowser. Klik op de knop hieronder om de registratiepagina te openen.",
-  "openRegistrationPage": "Registratiepagina openen",
-  "loadingAdditionalFields": "Extra velden laden...",
-  "pleaseSelectDateOfBirth": "Selecteer uw geboortedatum",
-  "pleaseEnterLocation": "Voer uw locatie in",
-  "pleaseIndicateEmailPreference": "Geef uw e-mailvoorkeur op",
-  "pleaseFillAllRequiredFields": "Vul alle verplichte velden in",
-  "pleaseAcceptTermsOfService": "Accepteer de servicevoorwaarden",
-  "pleaseAcceptPrivacyPolicy": "Accepteer het privacybeleid",
-  "registrationError": "Registratiefout",
-  "registrationFailed": "Registratie mislukt. Controleer uw gegevens.",
-  "registrationFailedTryAgain": "Registratie mislukt. Probeer het opnieuw.",
-  "registrationInfo": "Registratiegegevens",
-  "openWebsite": "Website openen",
-  "couldNotOpenForumWebsite": "Kon de forumwebsite niet openen. Probeer: {url}",
-  "@couldNotOpenForumWebsite": {
-    "description": "Error message when cannot open forum website",
-    "placeholders": {
-      "url": {
-        "type": "String"
-      }
-    }
-  },
-  "registrationSuccessfulEmailConfirm": "Registratie geslaagd! Controleer uw e-mail om uw account te bevestigen voordat u inlogt.",
-  "registrationSuccessfulPendingApproval": "Registratie geslaagd! Uw account wacht op goedkeuring. U wordt op de hoogte gesteld wanneer uw account is goedgekeurd.",
-  "registrationSuccessfulAutoLogin": "Registratie geslaagd! U bent automatisch ingelogd.",
-  "welcome": "Welkom!",
-  "registrationSuccessful": "Registratie geslaagd",
-  "pleaseLoginWithNewAccount": "Log in met uw nieuwe account.",
-  "forgotPasswordTitle": "Wachtwoord vergeten",
-  "usernameOrEmailLabel": "Gebruikersnaam of e-mail",
-  "pleaseEnterUsernameOrEmail": "Voer uw gebruikersnaam of e-mail in",
-  "sendResetLink": "Resetlink verzenden",
-  "resetLinkSent": "Resetlink verzonden",
-  "passwordResetInstructionsSent": "Instructies voor het resetten van uw wachtwoord zijn naar uw geregistreerde e-mailadres gestuurd.",
-  "resetFailed": "Reset mislukt",
-  "unableToSendResetLink": "Kon resetlink niet verzenden. Probeer het opnieuw.",
-  "errorSendingResetLink": "Er is een fout opgetreden bij het verzenden van de resetlink. Controleer uw verbinding en probeer het opnieuw.",
   "errorTitle": "Fout",
   "okButton": "OK",
   "retryButton": "Opnieuw",
@@ -77,14 +13,6 @@
   "dismiss": "Sluiten",
   "cancel": "Annuleren",
   "tryAgain": "Opnieuw proberen",
-  "getHelp": "Hulp krijgen",
-  "somethingWentWrong": "Er is iets misgegaan",
-  "unexpectedErrorOccurred": "Er is een onverwachte fout opgetreden. Probeer het opnieuw.",
-  "noInternetConnection": "Geen internetverbinding",
-  "checkInternetConnection": "Controleer uw internetverbinding en probeer het opnieuw.",
-  "authenticationRequired": "Authenticatie vereist",
-  "pleaseLoginToContinue": "Log in om door te gaan.",
-  "forumError": "Forumfout",
   "anErrorOccurred": "Er is een fout opgetreden",
   "accountPendingApproval": "Uw account wacht op goedkeuring. U kunt het forum bekijken maar niet posten tot een moderator uw account goedkeurt.",
   "checkEmailToConfirm": "Controleer uw e-mail om uw account te bevestigen. Klik op de bevestigingslink in de e-mail die we u hebben gestuurd.",
@@ -101,24 +29,12 @@
   "noRecentTopicsToDisplay": "Er zijn geen recente onderwerpen om weer te geven. Kom later terug voor nieuwe discussies.",
   "signInToViewLatestTopics": "Log in om nieuwste onderwerpen te bekijken",
   "youNeedToBeSignedInToViewLatestTopics": "U moet ingelogd zijn om nieuwste onderwerpen te bekijken.",
-  "noUnreadTopics": "Geen ongelezen onderwerpen",
   "thereAreNoUnreadTopics": "Er zijn geen ongelezen onderwerpen. Kom later terug voor nieuwe discussies.",
   "youAreAllCaughtUp": "U bent helemaal bij!",
   "signInToViewUnreadTopics": "Log in om ongelezen onderwerpen te bekijken",
   "youNeedToBeSignedInToViewUnreadTopics": "U moet ingelogd zijn om uw ongelezen onderwerpen te bekijken.",
-  "noSubscribedTopics": "Geen geabonneerde onderwerpen",
-  "noSubscribedTopicsMessage": "U heeft zich op geen onderwerpen geabonneerd. Tik op de ster bij een onderwerp om te abonneren en meldingen te ontvangen.",
-  "signInToViewSubscribedTopics": "Log in om geabonneerde onderwerpen te bekijken",
-  "youNeedToBeSignedInToViewSubscribedTopics": "U moet ingelogd zijn om uw geabonneerde onderwerpen te bekijken.",
-  "noParticipatedTopics": "Geen onderwerpen waaraan u hebt deelgenomen",
-  "topicsYouParticipatedIn": "Onderwerpen waaraan u hebt deelgenomen worden hier getoond.",
-  "signInToViewParticipatedTopics": "Log in om onderwerpen waaraan u hebt deelgenomen te bekijken",
-  "youNeedToBeSignedInToViewParticipatedTopics": "U moet ingelogd zijn om onderwerpen waaraan u hebt deelgenomen te bekijken.",
   "latest": "Nieuwste",
   "unread": "Ongelezen",
-  "subscribed": "Geabonneerd",
-  "participated": "Deelgenomen",
-  "connectionTimedOut": "Verbinding time-out. De site kan offline of onbereikbaar zijn.",
   "failedToConnectToSite": "Kon geen verbinding maken met de site. De site kan offline of onbereikbaar zijn.",
   "connectionFailed": "Verbinding mislukt",
   "failedToConnectToSiteName": "Kon geen verbinding maken met {siteName}",
@@ -132,12 +48,7 @@
   },
   "loading": "Laden...",
   "newConversation": "Nieuw gesprek",
-  "newMessage": "Nieuw bericht",
-  "appSettings": "App-instellingen",
-  "searchSites": "Sites zoeken",
   "language": "Taal",
-  "systemDefault": "Systeemstandaard",
-  "followSystemLanguage": "Systeemtaal volgen",
   "all": "Alles",
   "topicsOnly": "Alleen onderwerpen",
   "titlesOnly": "Alleen titels",
@@ -162,7 +73,6 @@
   "subscribeTo": "abonneren op",
   "unsubscribeFrom": "abonnement opzeggen van",
   "subscribe": "Abonneren",
-  "unsubscribe": "Afmelden",
   "failedToSubscribeToThread": "Kon {action} onderwerp niet",
   "@failedToSubscribeToThread": {
     "description": "Error message when subscribe/unsubscribe fails",
@@ -213,16 +123,9 @@
   },
   "newTopic": "Nieuw onderwerp",
   "markRead": "Als gelezen markeren",
-  "reportUser": "Gebruiker melden",
-  "pleaseSelectReasonForReportingUser": "Selecteer een reden voor het melden van deze gebruiker.",
   "spamOrAdvertising": "Spam of reclame",
-  "harassmentOrBullying": "Intimidatie of pesten",
-  "inappropriateContent": "Ongepaste inhoud",
-  "impersonationOrFakeAccount": "Impersonatie of nepaccount",
   "otherPleaseSpecify": "Anders (geef op)",
   "pleaseSpecifyReason": "Geef de reden op",
-  "enterReasonForReportingUser": "Voer de reden voor het melden van deze gebruiker in",
-  "pleaseSelectReason": "Selecteer een reden",
   "banUser": "Gebruiker blokkeren",
   "unbanUser": "Blokkering opheffen",
   "pleaseSelectReasonForBanningUser": "Selecteer een reden voor het blokkeren van {username}",
@@ -242,8 +145,6 @@
   "banUntil": "Blokkeren tot",
   "selectDate": "Selecteer datum",
   "moreOptions": "Meer opties",
-  "leaveConversation": "Gesprek verlaten",
-  "reportConversation": "Gesprek melden",
   "topicClosed": "Onderwerp gesloten",
   "topicOpened": "Onderwerp geopend",
   "topicStickied": "Onderwerp vastgezet",
@@ -261,10 +162,6 @@
   "handleThreads": "Onderwerpen afhandelen",
   "deleteMessages": "Berichten verwijderen",
   "deleteConversations": "Gesprekken verwijderen",
-  "myForums": "Mijn forums",
-  "recentlyVisited": "Recent bezocht",
-  "explore": "Ontdekken",
-  "forumCopilot": "Forum Copilot",
   "noConversations": "Geen gesprekken",
   "noConversationsMessage": "U heeft nog geen gesprekken. Start een nieuw gesprek om te beginnen.",
   "imageSavedToGallery": "Afbeelding opgeslagen in galerij!",
@@ -288,50 +185,8 @@
   "likesGiven": "Gegeven likes",
   "showMore": "Meer tonen",
   "cleanSpam": "Spam opruimen",
-  "failedToSaveMessage": "Kon bericht niet opslaan",
   "failedToSaveConversation": "Kon gesprek niet opslaan",
-  "failedToSaveSetting": "Kon instelling niet opslaan",
-  "failedToSavePost": "Kon bericht niet opslaan",
-  "errorLoadingSites": "Fout bij laden van sites: {error}",
-  "@errorLoadingSites": {
-    "description": "Error message when loading explore sites fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "connectingTo": "Verbinden met {domainName}...",
-  "@connectingTo": {
-    "description": "Message shown when connecting to a site",
-    "placeholders": {
-      "domainName": {
-        "type": "String"
-      }
-    }
-  },
   "members": "Leden",
-  "allMembers": "Alle leden",
-  "online": "Online",
-  "noMembersFound": "Geen leden gevonden",
-  "searchForMembers": "Leden zoeken",
-  "enterUsernameToFindMembers": "Voer een gebruikersnaam in om forumleden te vinden",
-  "noMembersOnline": "Er zijn momenteel geen leden online",
-  "enterUsernameToSearch": "Voer gebruikersnaam in om te zoeken...",
-  "lookupMembers": "Leden opzoeken",
-  "addMembers": "Leden toevoegen",
-  "membersAddedSuccessfully": "Leden succesvol toegevoegd",
-  "errorAddingMembers": "Fout bij toevoegen van leden: {error}",
-  "@errorAddingMembers": {
-    "description": "Error message when adding members fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToLoadOnlineUsers": "Kon online gebruikers niet laden",
-  "noUsersOnline": "Geen gebruikers online",
   "membersCount": "{count} leden",
   "@membersCount": {
     "description": "Number of members with label",
@@ -357,16 +212,6 @@
   "retry": "Opnieuw",
   "delete": "Verwijderen",
   "deleteMessage": "Bericht verwijderen",
-  "areYouSureYouWantToDeleteThisMessage": "Weet u zeker dat u dit bericht wilt verwijderen?",
-  "failedToDeleteMessage": "Kon bericht niet verwijderen: {error}",
-  "@failedToDeleteMessage": {
-    "description": "Error message when deleting message fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "deletingPost": "Bericht verwijderen...",
   "failedToUnlikePost": "Kon bericht niet unliken: {error}",
   "@failedToUnlikePost": {
@@ -380,15 +225,6 @@
   "failedToLikePost": "Kon bericht niet liken: {error}",
   "@failedToLikePost": {
     "description": "Error message when liking post fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToThankPost": "Kon bericht niet bedanken: {error}",
-  "@failedToThankPost": {
-    "description": "Error message when thanking post fails",
     "placeholders": {
       "error": {
         "type": "String"
@@ -416,15 +252,6 @@
     }
   },
   "errorLoadingMoreConversations": "Fout bij laden van meer gesprekken: {error}",
-  "errorLoadingMoreMessages": "Fout bij laden van meer berichten: {error}",
-  "@errorLoadingMoreMessages": {
-    "description": "Error message when loading more messages fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "@errorLoadingMoreConversations": {
     "description": "Error message when loading more conversations fails",
     "placeholders": {
@@ -433,11 +260,7 @@
       }
     }
   },
-  "inviteMessageOptional": "Uitnodigingsbericht (optioneel)",
-  "iWouldLikeToAddYouToThisConversation": "Ik wil u aan dit gesprek toevoegen.",
   "searchFailed": "Zoeken mislukt",
-  "trySearchingWithDifferentUsername": "Probeer te zoeken met een andere gebruikersnaam",
-  "noSitesFound": "Geen sites gevonden.",
   "userInformationNotAvailable": "Gebruikersinformatie niet beschikbaar",
   "birthday": "Verjaardag",
   "posts": "Berichten",
@@ -532,13 +355,7 @@
   },
   "markAsUnread": "Als ongelezen markeren",
   "invite": "Uitnodigen",
-  "welcomeBack": "Welkom terug",
-  "signInToAccessYourProfile": "Log in om uw profiel te openen en uw account te beheren",
-  "enterYourUsername": "Voer uw gebruikersnaam in",
-  "enterYourPassword": "Voer uw wachtwoord in",
-  "dontHaveAnAccount": "Heeft u geen account?",
   "enterKeywordsToSearchTopics": "Voer zoekwoorden in om onderwerpen te zoeken...",
-  "pleaseFillInAllRequiredFields": "Vul alle verplichte velden in",
   "undelete": "Verwijdering ongedaan maken",
   "refresh": "Vernieuwen",
   "@refresh": {
@@ -587,30 +404,8 @@
   "@enterKeywordsToFindTopicsAndPosts": {
     "description": "Hint text for searching topics and posts"
   },
-  "enterKeywordsOrDomainToFindForums": "Voer zoekwoorden of domein in om forums te vinden",
-  "@enterKeywordsOrDomainToFindForums": {
-    "description": "Hint text for searching forums by keywords or domain"
-  },
-  "enterKeywordsOrDomainNamesToFindForums": "Voer zoekwoorden of domeinnamen in om forums te vinden",
-  "@enterKeywordsOrDomainNamesToFindForums": {
-    "description": "Description text for searching forums"
-  },
   "@language": {
     "description": "Settings section title for language selection"
-  },
-  "@systemDefault": {
-    "description": "Option to use system default settings"
-  },
-  "@followSystemLanguage": {
-    "description": "Description for system default language option"
-  },
-  "appearance": "Weergave",
-  "@appearance": {
-    "description": "Settings section title for appearance/theme"
-  },
-  "followSystemTheme": "Systeemthema volgen",
-  "@followSystemTheme": {
-    "description": "Description for system default theme option"
   },
   "light": "Licht",
   "@light": {
@@ -632,18 +427,6 @@
       }
     }
   },
-  "forumSettings": "Foruminstellingen",
-  "@forumSettings": {
-    "description": "Title for forum settings page"
-  },
-  "noSettingsAvailable": "Geen instellingen beschikbaar",
-  "@noSettingsAvailable": {
-    "description": "Message when no settings are available"
-  },
-  "settingsCategoriesWillAppearHere": "Instellingcategorieën verschijnen hier wanneer beschikbaar.",
-  "@settingsCategoriesWillAppearHere": {
-    "description": "Message explaining when settings categories will appear"
-  },
   "@spamCleaner": {
     "description": "Menu item for spam cleaner tool"
   },
@@ -661,27 +444,12 @@
   "@showMore": {
     "description": "Button to show more content"
   },
-  "@reportUser": {
-    "description": "Title for report user dialog"
-  },
   "@submitReport": {
     "description": "Button to submit a report"
   },
   "reportSubmittedSuccessfully": "Melding succesvol verzonden",
   "@reportSubmittedSuccessfully": {
     "description": "Success message after submitting a report"
-  },
-  "failedToSubmitReport": "Kon melding niet verzenden",
-  "@failedToSubmitReport": {
-    "description": "Error message when report submission fails"
-  },
-  "searchForForums": "Forums zoeken",
-  "@searchForForums": {
-    "description": "Placeholder text for forum search"
-  },
-  "searchForums": "Forums zoeken",
-  "@searchForums": {
-    "description": "Title for the search forums page"
   },
   "deleteTopic": "Onderwerp verwijderen",
   "@deleteTopic": {
@@ -777,19 +545,6 @@
       }
     }
   },
-  "errorLoadingMessage": "Fout bij laden van bericht: {error}",
-  "@errorLoadingMessage": {
-    "description": "Error message when loading message fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "messageNotFound": "Bericht niet gevonden",
-  "@messageNotFound": {
-    "description": "Message when message is not found"
-  },
   "home": "Start",
   "@home": {
     "description": "Home tab title"
@@ -834,18 +589,6 @@
   "@fullSize": {
     "description": "Option to insert image at full size"
   },
-  "alignLeft": "Links uitlijnen",
-  "@alignLeft": {
-    "description": "Text alignment option: left"
-  },
-  "alignCenter": "Centreren",
-  "@alignCenter": {
-    "description": "Text alignment option: center"
-  },
-  "alignRight": "Rechts uitlijnen",
-  "@alignRight": {
-    "description": "Text alignment option: right"
-  },
   "pleaseEnterTitle": "Voer een titel in",
   "@pleaseEnterTitle": {
     "description": "Validation message when title is empty"
@@ -866,10 +609,6 @@
   "@mentionUser": {
     "description": "Tooltip for mention user button"
   },
-  "loggingIn": "Inloggen...",
-  "@loggingIn": {
-    "description": "Status message when logging in"
-  },
   "submittingReport": "Melding verzenden...",
   "@submittingReport": {
     "description": "Status message when submitting report"
@@ -886,14 +625,6 @@
   "@cleaningSpam": {
     "description": "Status message when cleaning spam"
   },
-  "enterSubject": "Voer onderwerp in",
-  "@enterSubject": {
-    "description": "Hint text for subject field"
-  },
-  "typeYourMessageHere": "Typ hier uw bericht",
-  "@typeYourMessageHere": {
-    "description": "Hint text for message field"
-  },
   "writeYourMessage": "Schrijf uw bericht...",
   "@writeYourMessage": {
     "description": "Hint text for writing message"
@@ -902,14 +633,6 @@
   "@writeYourReply": {
     "description": "Hint text for writing reply"
   },
-  "messageSentSuccessfully": "Bericht succesvol verzonden",
-  "@messageSentSuccessfully": {
-    "description": "Success message after sending message"
-  },
-  "replySentSuccessfully": "Antwoord succesvol verzonden",
-  "@replySentSuccessfully": {
-    "description": "Success message after sending reply"
-  },
   "conversationCreatedSuccessfully": "Gesprek succesvol aangemaakt",
   "@conversationCreatedSuccessfully": {
     "description": "Success message after creating conversation"
@@ -917,10 +640,6 @@
   "conversationMarkedAsUnread": "Gesprek als ongelezen gemarkeerd",
   "@conversationMarkedAsUnread": {
     "description": "Success message when marking conversation as unread"
-  },
-  "messageMarkedAsUnread": "Bericht als ongelezen gemarkeerd",
-  "@messageMarkedAsUnread": {
-    "description": "Success message when marking message as unread"
   },
   "conversationClosed": "Gesprek gesloten",
   "@conversationClosed": {
@@ -947,45 +666,9 @@
       }
     }
   },
-  "failedToUploadFile": "Kon bestand niet uploaden: {error}",
-  "@failedToUploadFile": {
-    "description": "Error message when uploading file fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToUploadImage": "Kon afbeelding niet uploaden: {error}",
-  "@failedToUploadImage": {
-    "description": "Error message when uploading image fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToSendMessage": "Kon bericht niet verzenden: {error}",
-  "@failedToSendMessage": {
-    "description": "Error message when sending message fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "failedToSendReply": "Kon antwoord niet verzenden: {error}",
   "@failedToSendReply": {
     "description": "Error message when sending reply fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToMarkAsUnread": "Kon bericht niet als ongelezen markeren: {error}",
-  "@failedToMarkAsUnread": {
-    "description": "Error message when marking message as unread fails",
     "placeholders": {
       "error": {
         "type": "String"
@@ -1036,18 +719,6 @@
   "@goToBottom": {
     "description": "Tooltip for go to bottom button"
   },
-  "replyAll": "Allen beantwoorden",
-  "@replyAll": {
-    "description": "Tooltip for reply all button"
-  },
-  "forward": "Doorsturen",
-  "@forward": {
-    "description": "Tooltip for forward button"
-  },
-  "noForumsFound": "Geen forums gevonden.",
-  "@noForumsFound": {
-    "description": "Message when no forums are found"
-  },
   "pleaseLoginToAccessContent": "Log in om deze inhoud te bekijken en te reageren op berichten.",
   "@pleaseLoginToAccessContent": {
     "description": "Message asking user to login to access content"
@@ -1055,18 +726,6 @@
   "searchUsers": "Gebruikers zoeken...",
   "@searchUsers": {
     "description": "Hint text for searching users"
-  },
-  "writeYourTitle": "Schrijf uw titel...",
-  "@writeYourTitle": {
-    "description": "Hint text for title field"
-  },
-  "writeYourContent": "Schrijf uw inhoud...",
-  "@writeYourContent": {
-    "description": "Hint text for content field"
-  },
-  "selectAnOption": "Selecteer een optie",
-  "@selectAnOption": {
-    "description": "Hint text for select field"
   },
   "enterConversationTitle": "Voer gesprekstitel in",
   "@enterConversationTitle": {
@@ -1088,18 +747,6 @@
   "report": "Melden",
   "@report": {
     "description": "Button text to report"
-  },
-  "unfollow": "Ontvolgen",
-  "@unfollow": {
-    "description": "Button text to unfollow"
-  },
-  "follow": "Volgen",
-  "@follow": {
-    "description": "Button text to follow"
-  },
-  "goToForums": "Naar forums",
-  "@goToForums": {
-    "description": "Button text to go to forums"
   },
   "remove": "Verwijderen",
   "@remove": {
@@ -1127,10 +774,6 @@
   },
   "@signInToViewMessages": {
     "description": "Message asking user to sign in to view messages"
-  },
-  "privateMessagesNotAvailable": "Privéberichten niet beschikbaar",
-  "@privateMessagesNotAvailable": {
-    "description": "Message when private messages are not available"
   },
   "failedToLoadPost": "Failed to load post: \n{error}",
   "@failedToLoadPost": {
@@ -1160,14 +803,6 @@
   "unlike": "unliken",
   "@unlike": {
     "description": "Action verb: unlike"
-  },
-  "optimizeImage": "Afbeelding optimaliseren",
-  "@optimizeImage": {
-    "description": "Title for image optimization dialog"
-  },
-  "optimizeAndUpload": "Optimaliseren en uploaden",
-  "@optimizeAndUpload": {
-    "description": "Button text to optimize and upload image"
   },
   "downloading": "Downloaden {filename}...",
   "@downloading": {
@@ -1199,34 +834,12 @@
       }
     }
   },
-  "enterANumber": "Voer een getal in",
-  "@enterANumber": {
-    "description": "Hint text for number input field"
-  },
   "failedToNavigateToForum": "Kon niet naar forum navigeren",
   "@failedToNavigateToForum": {
     "description": "Error message when navigation to forum fails"
   },
-  "failedToNavigateToForumName": "Kon niet navigeren naar {forumName}",
-  "@failedToNavigateToForumName": {
-    "description": "Error message when navigation to specific forum fails",
-    "placeholders": {
-      "forumName": {
-        "type": "String"
-      }
-    }
-  },
   "@failedToSaveConversation": {
     "description": "Error message when saving conversation fails"
-  },
-  "forumNotFound": "Forum niet gevonden: {forumName}",
-  "@forumNotFound": {
-    "description": "Error message when forum is not found",
-    "placeholders": {
-      "forumName": {
-        "type": "String"
-      }
-    }
   },
   "forumNotFoundById": "Forum niet gevonden: {forumId}",
   "@forumNotFoundById": {
@@ -1246,43 +859,11 @@
       }
     }
   },
-  "likePost": "Bericht liken",
-  "@likePost": {
-    "description": "Accessibility label for like button"
-  },
-  "unlikePost": "Bericht unliken",
-  "@unlikePost": {
-    "description": "Accessibility label for unlike button"
-  },
-  "thankPost": "Bericht bedanken",
-  "@thankPost": {
-    "description": "Accessibility label for thank button"
-  },
-  "showLikes": "Likes tonen",
-  "@showLikes": {
-    "description": "Accessibility hint for showing likes list"
-  },
-  "showThanks": "Bedankingen tonen",
-  "@showThanks": {
-    "description": "Accessibility hint for showing thanks list"
-  },
-  "quotePost": "Bericht citeren",
-  "@quotePost": {
-    "description": "Accessibility label for quote button"
-  },
   "@attachFile": {
     "description": "Accessibility label for attach file button"
   },
   "@uploadImage": {
     "description": "Accessibility label for upload image button"
-  },
-  "translate": "Vertalen",
-  "@translate": {
-    "description": "Menu item to translate thread content"
-  },
-  "showOriginal": "Origineel tonen",
-  "@showOriginal": {
-    "description": "Button to show original content instead of translation"
   },
   "translating": "Vertalen...",
   "@translating": {
@@ -1295,26 +876,6 @@
   "translatedContent": "Vertaalde inhoud",
   "@translatedContent": {
     "description": "Label for translated content"
-  },
-  "selectLanguage": "Taal selecteren",
-  "@selectLanguage": {
-    "description": "Title for language selection dialog"
-  },
-  "translateTo": "Vertalen naar:",
-  "@translateTo": {
-    "description": "Label for target language selection"
-  },
-  "deviceLanguage": "Apparaattaal",
-  "@deviceLanguage": {
-    "description": "Indicator that a language is the device default"
-  },
-  "noPostsToTranslate": "Geen berichten om te vertalen",
-  "@noPostsToTranslate": {
-    "description": "Message when there are no posts available for translation"
-  },
-  "translationFailed": "Vertalen mislukt",
-  "@translationFailed": {
-    "description": "Error message when translation fails"
   },
   "twoFactorAuthentication": "Tweefactorauthenticatie",
   "authenticationCodeLabel": "Authenticatiecode",
@@ -1431,11 +992,6 @@
   "likeAgainInSeconds": "Je kunt dit bericht over {seconds}s opnieuw liken",
   "loginInfo": "Aanmeldinfo",
   "loginFailed": "Aanmelden mislukt",
-  "additionalInformation": "Aanvullende informatie",
-  "dateOfBirth": "Geboortedatum{marker}",
-  "minimumAgeYears": "Minimumleeftijd: {minimumAge} jaar",
-  "locationLabel": "Locatie{marker}",
-  "receiveSiteMailings": "Site-mailings ontvangen",
   "moveToCategory": "Verplaatsen naar categorie",
   "undeleteTopic": "Onderwerp herstellen",
   "undeleteTopicConfirmation": "Weet je zeker dat je dit onderwerp wilt herstellen? Het wordt weer zichtbaar voor andere gebruikers.",
@@ -1445,9 +1001,6 @@
   "newDirectMessage": "Nieuw direct bericht",
   "noMessagesYetSayHi": "Nog geen berichten — zeg hallo.",
   "edited": "bewerkt",
-  "imageExceedsUploadLimits": "Deze afbeelding overschrijdt de uploadlimieten en moet worden geoptimaliseerd:",
-  "optimizationsToBeApplied": "Toe te passen optimalisaties:",
-  "reductionPercent": "Reductie: {percent}%",
   "editProfileManagedOnWebNote": "Weergavenaam, e-mail, wachtwoord en andere accountinstellingen beheer je onder Account → Account beheren op het web. Je avatar wijzig je door op het camerapictogram op je foto te tikken.",
   "approvedButRelayUnreachable": "Goedgekeurd, maar ForumCopilot was niet bereikbaar om de installatie af te ronden. Probeer het later opnieuw via Instellingen.",
   "notificationsAreTurnedOffForThisApp": "Meldingen zijn uitgeschakeld voor deze app",
@@ -1557,9 +1110,6 @@
   "imageNotAvailable": "Afbeelding niet beschikbaar",
   "allForumTopicsHaveBeenMarkedAs": "Alle forumonderwerpen zijn gemarkeerd als gelezen",
   "postsCount": "{count} berichten",
-  "protectedForum": "Beveiligd forum",
-  "isPasswordProtected": "{forumName} is beveiligd met een wachtwoord.",
-  "enter": "Invoeren",
   "permissionDeniedToSaveImage": "Geen toestemming om de afbeelding op te slaan",
   "postNotFound": "Bericht niet gevonden.",
   "failedToUploadFilePleaseTryAgain": "Bestand uploaden mislukt. Probeer het opnieuw.",

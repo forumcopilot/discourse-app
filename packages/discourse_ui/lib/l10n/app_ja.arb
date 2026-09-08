@@ -1,57 +1,9 @@
 {
   "@@locale": "ja",
-  "appTitle": "Forum App",
-  "@appTitle": {
-    "description": "The application title"
-  },
   "loginTitle": "ログイン",
-  "usernameLabel": "ユーザー名",
-  "passwordLabel": "パスワード",
-  "loginButton": "ログイン",
-  "signInWithPasskey": "Sign in with Passkey",
   "usePasskey": "Use Passkey",
   "passkeyContinuePrompt": "Use your passkey to continue",
-  "forgotPassword": "パスワードをお忘れですか？",
-  "pleaseEnterUsername": "ユーザー名を入力してください",
-  "pleaseEnterPassword": "パスワードを入力してください",
-  "credentialsSentToDomain": "ユーザー名とパスワードは {domain} に送信されます",
-  "createAccount": "アカウント作成",
-  "alreadyHaveAccount": "既にアカウントをお持ちですか？ ",
-  "logIn": "ログイン",
   "continueButton": "続ける",
-  "registrationNotAvailable": "登録は利用できません",
-  "registrationNotAvailableMessage": "現在、登録は利用できません。フォーラムが閉鎖されているか、登録が無効になっている可能性があります。",
-  "webRegistrationRequired": "ウェブ登録が必要です",
-  "webRegistrationRequiredMessage": "このフォーラムはウェブブラウザ経由での登録が必要です。下のボタンをクリックして登録ページを開いてください。",
-  "openRegistrationPage": "登録ページを開く",
-  "loadingAdditionalFields": "追加フィールドを読み込み中...",
-  "pleaseSelectDateOfBirth": "生年月日を選択してください",
-  "pleaseEnterLocation": "所在地を入力してください",
-  "pleaseIndicateEmailPreference": "メール設定を指定してください",
-  "pleaseFillAllRequiredFields": "すべての必須フィールドに入力してください",
-  "pleaseAcceptTermsOfService": "利用規約に同意してください",
-  "pleaseAcceptPrivacyPolicy": "プライバシーポリシーに同意してください",
-  "registrationError": "登録エラー",
-  "registrationFailed": "登録に失敗しました。情報を確認してください。",
-  "registrationFailedTryAgain": "登録に失敗しました。もう一度お試しください。",
-  "registrationInfo": "登録情報",
-  "openWebsite": "ウェブサイトを開く",
-  "couldNotOpenForumWebsite": "フォーラムのウェブサイトを開けませんでした。次のURLにアクセスしてください: {url}",
-  "registrationSuccessfulEmailConfirm": "登録が完了しました！ログインする前に、メールを確認してアカウントを確認してください。",
-  "registrationSuccessfulPendingApproval": "登録が完了しました！アカウントは承認待ちです。アカウントが承認されると通知されます。",
-  "registrationSuccessfulAutoLogin": "登録が完了しました！自動的にログインされました。",
-  "welcome": "ようこそ！",
-  "registrationSuccessful": "登録成功",
-  "pleaseLoginWithNewAccount": "新しいアカウントでログインしてください。",
-  "forgotPasswordTitle": "パスワードを忘れた場合",
-  "usernameOrEmailLabel": "ユーザー名またはメールアドレス",
-  "pleaseEnterUsernameOrEmail": "ユーザー名またはメールアドレスを入力してください",
-  "sendResetLink": "リセットリンクを送信",
-  "resetLinkSent": "リセットリンクを送信しました",
-  "passwordResetInstructionsSent": "パスワードリセットの手順が登録済みのメールアドレスに送信されました。",
-  "resetFailed": "リセット失敗",
-  "unableToSendResetLink": "リセットリンクを送信できませんでした。もう一度お試しください。",
-  "errorSendingResetLink": "リセットリンクの送信中にエラーが発生しました。接続を確認してもう一度お試しください。",
   "errorTitle": "エラー",
   "okButton": "OK",
   "retryButton": "再試行",
@@ -61,14 +13,6 @@
   "dismiss": "閉じる",
   "cancel": "キャンセル",
   "tryAgain": "再試行",
-  "getHelp": "ヘルプを取得",
-  "somethingWentWrong": "問題が発生しました",
-  "unexpectedErrorOccurred": "予期しないエラーが発生しました。もう一度お試しください。",
-  "noInternetConnection": "インターネット接続なし",
-  "checkInternetConnection": "インターネット接続を確認してもう一度お試しください。",
-  "authenticationRequired": "認証が必要です",
-  "pleaseLoginToContinue": "続行するにはログインしてください。",
-  "forumError": "フォーラムエラー",
   "anErrorOccurred": "エラーが発生しました",
   "accountPendingApproval": "アカウントは承認待ちです。フォーラムを閲覧できますが、モデレーターがアカウントを承認するまで投稿できません。",
   "checkEmailToConfirm": "アカウントを確認するためにメールを確認してください。送信したメールの確認リンクをクリックしてください。",
@@ -85,35 +29,18 @@
   "noRecentTopicsToDisplay": "表示する最新トピックがありません。後で新しいディスカッションを確認してください。",
   "signInToViewLatestTopics": "最新トピックを表示するにはログインしてください",
   "youNeedToBeSignedInToViewLatestTopics": "最新トピックを表示するにはログインする必要があります",
-  "noUnreadTopics": "未読トピックなし",
   "thereAreNoUnreadTopics": "未読トピックがありません。後で新しいディスカッションを確認してください。",
   "youAreAllCaughtUp": "すべて確認済みです！",
   "signInToViewUnreadTopics": "未読トピックを表示するにはログインしてください",
   "youNeedToBeSignedInToViewUnreadTopics": "未読トピックを表示するにはログインする必要があります",
-  "noSubscribedTopics": "購読トピックなし",
-  "noSubscribedTopicsMessage": "トピックを購読していません。トピックの星ボタンをタップして購読し、新しい更新の通知を受け取ります。",
-  "signInToViewSubscribedTopics": "購読トピックを表示するにはログインしてください",
-  "youNeedToBeSignedInToViewSubscribedTopics": "購読トピックを表示するにはログインする必要があります",
-  "noParticipatedTopics": "参加トピックなし",
-  "topicsYouParticipatedIn": "参加したトピックがここに表示されます。",
-  "signInToViewParticipatedTopics": "参加トピックを表示するにはログインしてください",
-  "youNeedToBeSignedInToViewParticipatedTopics": "参加したトピックを表示するにはログインする必要があります",
   "latest": "最新",
   "unread": "未読",
-  "subscribed": "購読",
-  "participated": "参加",
-  "connectionTimedOut": "接続がタイムアウトしました。サイトがダウンしているか、アクセスできない可能性があります。",
   "failedToConnectToSite": "サイトに接続できませんでした。サイトがダウンしているか、アクセスできない可能性があります。",
   "connectionFailed": "接続失敗",
   "failedToConnectToSiteName": "{siteName} に接続できませんでした",
   "loading": "読み込み中...",
   "newConversation": "新しい会話",
-  "newMessage": "新しいメッセージ",
-  "appSettings": "アプリ設定",
-  "searchSites": "サイトを検索",
   "language": "言語",
-  "systemDefault": "システムデフォルト",
-  "followSystemLanguage": "システムの言語に従う",
   "all": "すべて",
   "topicsOnly": "トピックのみ",
   "titlesOnly": "タイトルのみ",
@@ -122,7 +49,6 @@
   "subscribeTo": "購読する",
   "unsubscribeFrom": "購読を解除する",
   "subscribe": "購読",
-  "unsubscribe": "購読解除",
   "failedToSubscribeToThread": "スレッドの {action} に失敗しました",
   "youCannotReplyToThisThread": "このスレッドに返信できません",
   "pleaseWaitForThreadToLoad": "スレッドの読み込みを待ってください",
@@ -146,16 +72,9 @@
   "errorInvitingUser": "ユーザーの招待エラー: {error}",
   "newTopic": "新しいトピック",
   "markRead": "既読にする",
-  "reportUser": "ユーザーを報告",
-  "pleaseSelectReasonForReportingUser": "このユーザーを報告する理由を選択してください。",
   "spamOrAdvertising": "スパムまたは広告",
-  "harassmentOrBullying": "嫌がらせまたはいじめ",
-  "inappropriateContent": "不適切なコンテンツ",
-  "impersonationOrFakeAccount": "なりすましまたは偽アカウント",
   "otherPleaseSpecify": "その他（指定してください）",
   "pleaseSpecifyReason": "理由を指定してください",
-  "enterReasonForReportingUser": "このユーザーを報告する理由を入力してください",
-  "pleaseSelectReason": "理由を選択してください",
   "banUser": "ユーザーを禁止",
   "unbanUser": "ユーザーの禁止を解除",
   "pleaseSelectReasonForBanningUser": "{username} を禁止する理由を選択してください",
@@ -167,8 +86,6 @@
   "banUntil": "禁止期限",
   "selectDate": "日付を選択",
   "moreOptions": "その他のオプション",
-  "leaveConversation": "会話を退出",
-  "reportConversation": "会話を報告",
   "topicClosed": "トピックが閉じられました",
   "topicOpened": "トピックが開かれました",
   "topicStickied": "トピックが固定されました",
@@ -178,10 +95,6 @@
   "handleThreads": "スレッドを処理",
   "deleteMessages": "メッセージを削除",
   "deleteConversations": "会話を削除",
-  "myForums": "マイフォーラム",
-  "recentlyVisited": "最近訪問した",
-  "explore": "探索",
-  "forumCopilot": "Forum Copilot",
   "noConversations": "会話なし",
   "noConversationsMessage": "まだ会話がありません。新しい会話を開始してメッセージングを始めましょう。",
   "imageSavedToGallery": "画像がギャラリーに保存されました！",
@@ -205,50 +118,8 @@
   "likesGiven": "与えたいいね",
   "showMore": "もっと見る",
   "cleanSpam": "スパムをクリーンアップ",
-  "failedToSaveMessage": "メッセージの保存に失敗しました",
   "failedToSaveConversation": "会話の保存に失敗しました",
-  "failedToSaveSetting": "設定の保存に失敗しました",
-  "failedToSavePost": "投稿の保存に失敗しました",
-  "errorLoadingSites": "サイトの読み込みエラー: {error}",
-  "@errorLoadingSites": {
-    "description": "Error message when loading explore sites fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "connectingTo": "{domainName}に接続中...",
-  "@connectingTo": {
-    "description": "Message shown when connecting to a site",
-    "placeholders": {
-      "domainName": {
-        "type": "String"
-      }
-    }
-  },
   "members": "メンバー",
-  "allMembers": "すべてのメンバー",
-  "online": "オンライン",
-  "noMembersFound": "メンバーが見つかりません",
-  "searchForMembers": "メンバーを検索",
-  "enterUsernameToFindMembers": "フォーラムメンバーを見つけるためにユーザー名を入力してください",
-  "noMembersOnline": "現在オンラインのメンバーはいません",
-  "enterUsernameToSearch": "検索するユーザー名を入力...",
-  "lookupMembers": "メンバーを検索",
-  "addMembers": "メンバーを追加",
-  "membersAddedSuccessfully": "メンバーが正常に追加されました",
-  "errorAddingMembers": "メンバーの追加エラー: {error}",
-  "@errorAddingMembers": {
-    "description": "Error message when adding members fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToLoadOnlineUsers": "オンラインユーザーの読み込みに失敗しました",
-  "noUsersOnline": "オンラインユーザーなし",
   "membersCount": "{count} メンバー",
   "@membersCount": {
     "description": "Number of members with label",
@@ -274,16 +145,6 @@
   "retry": "再試行",
   "delete": "削除",
   "deleteMessage": "メッセージを削除",
-  "areYouSureYouWantToDeleteThisMessage": "このメッセージを削除してもよろしいですか？",
-  "failedToDeleteMessage": "メッセージの削除に失敗しました: {error}",
-  "@failedToDeleteMessage": {
-    "description": "Error message when deleting message fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "deletingPost": "投稿を削除中...",
   "failedToUnlikePost": "投稿のいいねを解除できませんでした: {error}",
   "@failedToUnlikePost": {
@@ -297,15 +158,6 @@
   "failedToLikePost": "投稿にいいねできませんでした: {error}",
   "@failedToLikePost": {
     "description": "Error message when liking post fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToThankPost": "投稿に感謝できませんでした: {error}",
-  "@failedToThankPost": {
-    "description": "Error message when thanking post fails",
     "placeholders": {
       "error": {
         "type": "String"
@@ -341,11 +193,7 @@
       }
     }
   },
-  "inviteMessageOptional": "招待メッセージ（オプション）",
-  "iWouldLikeToAddYouToThisConversation": "この会話に追加させていただきたいです。",
   "searchFailed": "検索に失敗しました",
-  "trySearchingWithDifferentUsername": "別のユーザー名で検索してみてください",
-  "noSitesFound": "サイトが見つかりませんでした。",
   "userInformationNotAvailable": "ユーザー情報が利用できません",
   "birthday": "誕生日",
   "posts": "投稿",
@@ -440,30 +288,8 @@
   },
   "markAsUnread": "未読としてマーク",
   "invite": "招待",
-  "welcomeBack": "おかえりなさい！",
-  "signInToAccessYourProfile": "ログインしてプロフィールにアクセスし、アカウントを管理してください",
-  "enterYourUsername": "ユーザー名を入力してください",
-  "enterYourPassword": "パスワードを入力してください",
-  "dontHaveAnAccount": "アカウントをお持ちでないですか？",
   "enterKeywordsToSearchTopics": "トピックを検索するキーワードを入力...",
-  "pleaseFillInAllRequiredFields": "すべての必須フィールドに入力してください",
   "undelete": "復元",
-  "@credentialsSentToDomain": {
-    "description": "Message about credentials being sent to forum domain",
-    "placeholders": {
-      "domain": {
-        "type": "String"
-      }
-    }
-  },
-  "@couldNotOpenForumWebsite": {
-    "description": "Error message when cannot open forum website",
-    "placeholders": {
-      "url": {
-        "type": "String"
-      }
-    }
-  },
   "@failedToConnectToSiteName": {
     "description": "Error message when failed to connect to a site",
     "placeholders": {
@@ -545,10 +371,6 @@
   "pollOptionsCount": "{count}件の選択肢",
   "reactedBy": "リアクションした人",
   "enterKeywordsToFindTopicsAndPosts": "キーワードを入力してトピックと投稿を検索",
-  "enterKeywordsOrDomainToFindForums": "キーワードまたはドメインを入力してフォーラムを検索",
-  "enterKeywordsOrDomainNamesToFindForums": "キーワードまたはドメイン名を入力してフォーラムを検索",
-  "appearance": "外観",
-  "followSystemTheme": "システムのテーマに従う",
   "light": "ライト",
   "dark": "ダーク",
   "version": "バージョン {version} ({buildNumber})",
@@ -562,15 +384,9 @@
       }
     }
   },
-  "forumSettings": "フォーラム設定",
-  "noSettingsAvailable": "設定が利用できません",
-  "settingsCategoriesWillAppearHere": "設定カテゴリは利用可能になるとここに表示されます。",
   "unableToLoadProfile": "プロフィールを読み込めません",
   "banned": "禁止",
   "reportSubmittedSuccessfully": "報告が正常に送信されました",
-  "failedToSubmitReport": "報告の送信に失敗しました",
-  "searchForForums": "フォーラムを検索",
-  "searchForums": "フォーラムを検索",
   "deleteTopic": "トピックを削除",
   "topicCanBeRestoredLater": "トピックは後で復元できます",
   "topicWillBePermanentlyDeleted": "トピックは完全に削除されます",
@@ -598,15 +414,6 @@
       }
     }
   },
-  "errorLoadingMessage": "メッセージの読み込みエラー: {error}",
-  "@errorLoadingMessage": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "messageNotFound": "メッセージが見つかりません",
   "home": "ホーム",
   "notifications": "通知",
   "forums": "フォーラム",
@@ -618,28 +425,19 @@
   "howWouldYouLikeToInsertImage": "この画像をどのように挿入しますか？",
   "thumbnail": "サムネイル",
   "fullSize": "フルサイズ",
-  "alignLeft": "左揃え",
-  "alignCenter": "中央揃え",
-  "alignRight": "右揃え",
   "pleaseEnterTitle": "タイトルを入力してください",
   "pleaseEnterContent": "コンテンツを入力してください",
   "uploading": "アップロード中...",
   "uploaded": "アップロード済み",
   "mentionUser": "ユーザーをメンション",
-  "loggingIn": "ログイン中...",
   "submittingReport": "レポート送信中...",
   "banningUser": "ユーザーを禁止中...",
   "unbanningUser": "ユーザーの禁止解除中...",
   "cleaningSpam": "スパムをクリーンアップ中...",
-  "enterSubject": "件名を入力",
-  "typeYourMessageHere": "ここにメッセージを入力",
   "writeYourMessage": "メッセージを書く...",
   "writeYourReply": "返信を書く...",
-  "messageSentSuccessfully": "メッセージが正常に送信されました",
-  "replySentSuccessfully": "返信が正常に送信されました",
   "conversationCreatedSuccessfully": "会話が正常に作成されました",
   "conversationMarkedAsUnread": "会話が未読としてマークされました",
-  "messageMarkedAsUnread": "メッセージが未読としてマークされました",
   "conversationClosed": "会話が閉じられました",
   "conversationOpened": "会話が開かれました",
   "pleaseLoginToLikeMessages": "メッセージにいいねするにはログインしてください",
@@ -652,40 +450,8 @@
       }
     }
   },
-  "failedToUploadFile": "ファイルのアップロードに失敗しました: {error}",
-  "@failedToUploadFile": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToUploadImage": "画像のアップロードに失敗しました: {error}",
-  "@failedToUploadImage": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToSendMessage": "メッセージの送信に失敗しました: {error}",
-  "@failedToSendMessage": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "failedToSendReply": "返信の送信に失敗しました: {error}",
   "@failedToSendReply": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToMarkAsUnread": "メッセージを未読としてマークできませんでした: {error}",
-  "@failedToMarkAsUnread": {
     "placeholders": {
       "error": {
         "type": "String"
@@ -726,14 +492,8 @@
   },
   "goToTop": "トップへ",
   "goToBottom": "ボトムへ",
-  "replyAll": "全員に返信",
-  "forward": "転送",
-  "noForumsFound": "フォーラムが見つかりません。",
   "pleaseLoginToAccessContent": "このコンテンツにアクセスして投稿とやり取りするには、ログインしてください。",
   "searchUsers": "ユーザーを検索...",
-  "writeYourTitle": "タイトルを書く...",
-  "writeYourContent": "コンテンツを書く...",
-  "selectAnOption": "オプションを選択",
   "enterConversationTitle": "会話のタイトルを入力",
   "enterCode": "{count}桁のコードを入力",
   "@enterCode": {
@@ -745,26 +505,14 @@
   },
   "edit": "編集",
   "report": "報告",
-  "unfollow": "フォロー解除",
-  "follow": "フォロー",
-  "goToForums": "フォーラムへ",
   "remove": "削除",
   "subject": "件名",
   "message": "メッセージ",
   "titleCannotBeEmpty": "タイトルを入力してください",
   "conversationUpdatedSuccessfully": "会話が正常に更新されました",
   "goBack": "戻る",
-  "privateMessagesNotAvailable": "プライベートメッセージは利用できません",
   "failedToLoadPost": "投稿の読み込みに失敗しました: \n{error}",
   "@failedToLoadPost": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "errorLoadingMoreMessages": "メッセージの読み込みエラー: {error}",
-  "@errorLoadingMoreMessages": {
     "placeholders": {
       "error": {
         "type": "String"
@@ -784,8 +532,6 @@
   },
   "like": "いいね",
   "unlike": "いいねを取り消す",
-  "optimizeImage": "画像を最適化",
-  "optimizeAndUpload": "最適化してアップロード",
   "downloading": "{filename}をダウンロード中...",
   "@downloading": {
     "placeholders": {
@@ -813,24 +559,7 @@
       }
     }
   },
-  "enterANumber": "数字を入力",
   "failedToNavigateToForum": "フォーラムへの移動に失敗しました",
-  "failedToNavigateToForumName": "{forumName}への移動に失敗しました",
-  "@failedToNavigateToForumName": {
-    "placeholders": {
-      "forumName": {
-        "type": "String"
-      }
-    }
-  },
-  "forumNotFound": "フォーラムが見つかりません: {forumName}",
-  "@forumNotFound": {
-    "placeholders": {
-      "forumName": {
-        "type": "String"
-      }
-    }
-  },
   "forumNotFoundById": "フォーラムが見つかりません: {forumId}",
   "@forumNotFoundById": {
     "placeholders": {
@@ -847,22 +576,9 @@
       }
     }
   },
-  "translate": "翻訳",
-  "showOriginal": "原文を表示",
   "translating": "翻訳中...",
   "translated": "翻訳済み",
   "translatedContent": "翻訳されたコンテンツ",
-  "selectLanguage": "言語を選択",
-  "translateTo": "翻訳先:",
-  "deviceLanguage": "デバイスの言語",
-  "noPostsToTranslate": "翻訳する投稿がありません",
-  "translationFailed": "翻訳に失敗しました",
-  "likePost": "いいね",
-  "unlikePost": "いいねを取り消す",
-  "thankPost": "投稿に感謝",
-  "showLikes": "いいねを表示",
-  "showThanks": "感謝を表示",
-  "quotePost": "投稿を引用",
   "twoFactorAuthentication": "2 要素認証",
   "authenticationCodeLabel": "認証コード",
   "pleaseEnterYourAuthenticationCode": "認証コードを入力してください",
@@ -978,11 +694,6 @@
   "likeAgainInSeconds": "{seconds}秒後にもう一度いいねできます",
   "loginInfo": "ログイン情報",
   "loginFailed": "ログインに失敗しました",
-  "additionalInformation": "追加情報",
-  "dateOfBirth": "生年月日{marker}",
-  "minimumAgeYears": "最低年齢: {minimumAge} 歳",
-  "locationLabel": "所在地{marker}",
-  "receiveSiteMailings": "サイトからのメールを受け取る",
   "moveToCategory": "カテゴリに移動",
   "undeleteTopic": "トピックを復元",
   "undeleteTopicConfirmation": "このトピックを復元しますか？他のユーザーに再び表示されます。",
@@ -992,9 +703,6 @@
   "newDirectMessage": "新しいダイレクトメッセージ",
   "noMessagesYetSayHi": "まだメッセージはありません — 挨拶してみましょう。",
   "edited": "編集済み",
-  "imageExceedsUploadLimits": "この画像はアップロード上限を超えているため最適化が必要です:",
-  "optimizationsToBeApplied": "適用される最適化:",
-  "reductionPercent": "削減率: {percent}%",
   "editProfileManagedOnWebNote": "表示名、メール、パスワードなどのアカウント設定は「アカウント → ウェブでアカウントを管理」から変更します。アバターは写真のカメラアイコンをタップして変更できます。",
   "approvedButRelayUnreachable": "承認されましたが、設定を完了するための ForumCopilot に接続できませんでした。後で設定から再試行してください。",
   "notificationsAreTurnedOffForThisApp": "このアプリの通知はオフになっています",
@@ -1104,9 +812,6 @@
   "imageNotAvailable": "画像を表示できません",
   "allForumTopicsHaveBeenMarkedAs": "フォーラムの全トピックを既読にしました",
   "postsCount": "{count} 件の投稿",
-  "protectedForum": "保護されたフォーラム",
-  "isPasswordProtected": "{forumName} はパスワードで保護されています。",
-  "enter": "入力",
   "permissionDeniedToSaveImage": "画像を保存する権限がありません",
   "postNotFound": "投稿が見つかりません。",
   "failedToUploadFilePleaseTryAgain": "ファイルをアップロードできませんでした。もう一度お試しください。",

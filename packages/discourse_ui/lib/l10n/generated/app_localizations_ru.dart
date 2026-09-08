@@ -9,22 +9,7 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
-  String get appTitle => 'Forum App';
-
-  @override
   String get loginTitle => 'Вход';
-
-  @override
-  String get usernameLabel => 'Имя пользователя';
-
-  @override
-  String get passwordLabel => 'Пароль';
-
-  @override
-  String get loginButton => 'Войти';
-
-  @override
-  String get signInWithPasskey => 'Sign in with Passkey';
 
   @override
   String get usePasskey => 'Use Passkey';
@@ -33,148 +18,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get passkeyContinuePrompt => 'Use your passkey to continue';
 
   @override
-  String get forgotPassword => 'Забыли пароль?';
-
-  @override
-  String get pleaseEnterUsername => 'Пожалуйста, введите ваше имя пользователя';
-
-  @override
-  String get pleaseEnterPassword => 'Пожалуйста, введите ваш пароль';
-
-  @override
-  String credentialsSentToDomain(String domain) {
-    return 'Ваше имя пользователя и пароль будут отправлены на $domain';
-  }
-
-  @override
-  String get createAccount => 'Создать аккаунт';
-
-  @override
-  String get alreadyHaveAccount => 'Уже есть аккаунт? ';
-
-  @override
-  String get logIn => 'Войти';
-
-  @override
   String get continueButton => 'Продолжить';
-
-  @override
-  String get registrationNotAvailable => 'Регистрация недоступна';
-
-  @override
-  String get registrationNotAvailableMessage =>
-      'Регистрация в настоящее время недоступна. Форум может быть закрыт или регистрация может быть отключена.';
-
-  @override
-  String get webRegistrationRequired => 'Требуется регистрация через веб';
-
-  @override
-  String get webRegistrationRequiredMessage =>
-      'Этот форум требует регистрации через веб-браузер. Пожалуйста, нажмите кнопку ниже, чтобы открыть страницу регистрации.';
-
-  @override
-  String get openRegistrationPage => 'Открыть страницу регистрации';
-
-  @override
-  String get loadingAdditionalFields => 'Загрузка дополнительных полей...';
-
-  @override
-  String get pleaseSelectDateOfBirth =>
-      'Пожалуйста, выберите вашу дату рождения';
-
-  @override
-  String get pleaseEnterLocation => 'Пожалуйста, введите ваше местоположение';
-
-  @override
-  String get pleaseIndicateEmailPreference =>
-      'Пожалуйста, укажите ваши предпочтения по электронной почте';
-
-  @override
-  String get pleaseFillAllRequiredFields =>
-      'Пожалуйста, заполните все обязательные поля';
-
-  @override
-  String get pleaseAcceptTermsOfService =>
-      'Пожалуйста, примите Условия использования';
-
-  @override
-  String get pleaseAcceptPrivacyPolicy =>
-      'Пожалуйста, примите Политику конфиденциальности';
-
-  @override
-  String get registrationError => 'Ошибка регистрации';
-
-  @override
-  String get registrationFailed =>
-      'Регистрация не удалась. Пожалуйста, проверьте вашу информацию.';
-
-  @override
-  String get registrationFailedTryAgain =>
-      'Регистрация не удалась. Пожалуйста, попробуйте снова.';
-
-  @override
-  String get registrationInfo => 'Информация о регистрации';
-
-  @override
-  String get openWebsite => 'Открыть веб-сайт';
-
-  @override
-  String couldNotOpenForumWebsite(String url) {
-    return 'Не удалось открыть веб-сайт форума. Пожалуйста, попробуйте посетить: $url';
-  }
-
-  @override
-  String get registrationSuccessfulEmailConfirm =>
-      'Регистрация успешна! Пожалуйста, проверьте вашу электронную почту, чтобы подтвердить ваш аккаунт перед входом.';
-
-  @override
-  String get registrationSuccessfulPendingApproval =>
-      'Регистрация успешна! Ваш аккаунт ожидает одобрения. Вы будете уведомлены, когда ваш аккаунт будет одобрен.';
-
-  @override
-  String get registrationSuccessfulAutoLogin =>
-      'Регистрация успешна! Вы автоматически вошли в систему.';
-
-  @override
-  String get welcome => 'Добро пожаловать!';
-
-  @override
-  String get registrationSuccessful => 'Регистрация успешна';
-
-  @override
-  String get pleaseLoginWithNewAccount =>
-      'Пожалуйста, войдите с вашим новым аккаунтом.';
-
-  @override
-  String get forgotPasswordTitle => 'Забыли пароль';
-
-  @override
-  String get usernameOrEmailLabel => 'Имя пользователя или электронная почта';
-
-  @override
-  String get pleaseEnterUsernameOrEmail =>
-      'Пожалуйста, введите ваше имя пользователя или электронную почту';
-
-  @override
-  String get sendResetLink => 'Отправить ссылку для сброса';
-
-  @override
-  String get resetLinkSent => 'Ссылка для сброса отправлена';
-
-  @override
-  String get passwordResetInstructionsSent =>
-      'Инструкции по сбросу пароля были отправлены на ваш зарегистрированный адрес электронной почты.';
-
-  @override
-  String get resetFailed => 'Сброс не удался';
-
-  @override
-  String get unableToSendResetLink =>
-      'Не удалось отправить ссылку для сброса. Пожалуйста, попробуйте снова.';
-
-  @override
-  String get errorSendingResetLink =>
-      'Произошла ошибка при отправке ссылки для сброса. Пожалуйста, проверьте ваше соединение и попробуйте снова.';
 
   @override
   String get errorTitle => 'Ошибка';
@@ -203,32 +47,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get tryAgain => 'Попробовать Снова';
-
-  @override
-  String get getHelp => 'Получить помощь';
-
-  @override
-  String get somethingWentWrong => 'Что-то пошло не так';
-
-  @override
-  String get unexpectedErrorOccurred =>
-      'Произошла неожиданная ошибка. Пожалуйста, попробуйте снова.';
-
-  @override
-  String get noInternetConnection => 'Нет подключения к интернету';
-
-  @override
-  String get checkInternetConnection =>
-      'Пожалуйста, проверьте ваше подключение к интернету и попробуйте снова.';
-
-  @override
-  String get authenticationRequired => 'Требуется аутентификация';
-
-  @override
-  String get pleaseLoginToContinue => 'Пожалуйста, войдите, чтобы продолжить.';
-
-  @override
-  String get forumError => 'Ошибка форума';
 
   @override
   String get anErrorOccurred => 'Произошла ошибка';
@@ -289,9 +107,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Вам нужно войти, чтобы просмотреть последние темы';
 
   @override
-  String get noUnreadTopics => 'Нет непрочитанных тем';
-
-  @override
   String get thereAreNoUnreadTopics =>
       'Нет непрочитанных тем. Вернитесь позже для новых обсуждений.';
 
@@ -307,50 +122,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Вам нужно войти, чтобы просмотреть ваши непрочитанные темы';
 
   @override
-  String get noSubscribedTopics => 'Нет подписанных тем';
-
-  @override
-  String get noSubscribedTopicsMessage =>
-      'Вы не подписались ни на одну тему. Нажмите кнопку звездочки на теме, чтобы подписаться и получать уведомления о новых обновлениях.';
-
-  @override
-  String get signInToViewSubscribedTopics =>
-      'Войдите, чтобы просмотреть подписанные темы';
-
-  @override
-  String get youNeedToBeSignedInToViewSubscribedTopics =>
-      'Вам нужно войти, чтобы просмотреть ваши подписанные темы';
-
-  @override
-  String get noParticipatedTopics => 'Нет тем с участием';
-
-  @override
-  String get topicsYouParticipatedIn =>
-      'Темы, в которых вы участвовали, будут показаны здесь.';
-
-  @override
-  String get signInToViewParticipatedTopics =>
-      'Войдите, чтобы просмотреть темы с участием';
-
-  @override
-  String get youNeedToBeSignedInToViewParticipatedTopics =>
-      'Вам нужно войти, чтобы просмотреть темы, в которых вы участвовали';
-
-  @override
   String get latest => 'Последние';
 
   @override
   String get unread => 'Непрочитанные';
-
-  @override
-  String get subscribed => 'Подписанные';
-
-  @override
-  String get participated => 'С участием';
-
-  @override
-  String get connectionTimedOut =>
-      'Время соединения истекло. Сайт может быть недоступен или недостижим.';
 
   @override
   String get failedToConnectToSite =>
@@ -371,22 +146,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get newConversation => 'Новый разговор';
 
   @override
-  String get newMessage => 'Новое сообщение';
-
-  @override
-  String get appSettings => 'Настройки приложения';
-
-  @override
-  String get searchSites => 'Поиск сайтов';
-
-  @override
   String get language => 'Язык';
-
-  @override
-  String get systemDefault => 'По умолчанию системы';
-
-  @override
-  String get followSystemLanguage => 'Следовать языку системы';
 
   @override
   String get all => 'Все';
@@ -408,9 +168,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get subscribe => 'Подписаться';
-
-  @override
-  String get unsubscribe => 'Отписаться';
 
   @override
   String get failedToSubscribeToThread => 'Не удалось null тему';
@@ -491,37 +248,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get markRead => 'Отметить как прочитанное';
 
   @override
-  String get reportUser => 'Пожаловаться на пользователя';
-
-  @override
-  String get pleaseSelectReasonForReportingUser =>
-      'Пожалуйста, выберите причину жалобы на этого пользователя.';
-
-  @override
   String get spamOrAdvertising => 'Спам или реклама';
-
-  @override
-  String get harassmentOrBullying => 'Преследование или издевательство';
-
-  @override
-  String get inappropriateContent => 'Неуместный контент';
-
-  @override
-  String get impersonationOrFakeAccount =>
-      'Подделка личности или фальшивый аккаунт';
 
   @override
   String get otherPleaseSpecify => 'Другое (пожалуйста, укажите)';
 
   @override
   String get pleaseSpecifyReason => 'Пожалуйста, укажите причину';
-
-  @override
-  String get enterReasonForReportingUser =>
-      'Введите причину жалобы на этого пользователя';
-
-  @override
-  String get pleaseSelectReason => 'Пожалуйста, выберите причину';
 
   @override
   String get banUser => 'Заблокировать пользователя';
@@ -562,12 +295,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get moreOptions => 'Дополнительные опции';
 
   @override
-  String get leaveConversation => 'Покинуть разговор';
-
-  @override
-  String get reportConversation => 'Пожаловаться на разговор';
-
-  @override
   String get topicClosed => 'Тема закрыта';
 
   @override
@@ -595,18 +322,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deleteConversations => 'Удалить разговоры';
-
-  @override
-  String get myForums => 'Мои Форумы';
-
-  @override
-  String get recentlyVisited => 'Недавно Посещенные';
-
-  @override
-  String get explore => 'Исследовать';
-
-  @override
-  String get forumCopilot => 'Forum Copilot';
 
   @override
   String get noConversations => 'Нет разговоров';
@@ -657,72 +372,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cleanSpam => 'Очистить спам';
 
   @override
-  String get failedToSaveMessage => 'Ошибка при сохранении сообщения';
-
-  @override
   String get failedToSaveConversation => 'Не удалось сохранить разговор';
 
   @override
-  String get failedToSaveSetting => 'Ошибка при сохранении настройки';
-
-  @override
-  String get failedToSavePost => 'Ошибка при сохранении сообщения';
-
-  @override
-  String errorLoadingSites(String error) {
-    return 'Ошибка при загрузке сайтов: $error';
-  }
-
-  @override
-  String connectingTo(String domainName) {
-    return 'Подключение к $domainName...';
-  }
-
-  @override
   String get members => 'Участники';
-
-  @override
-  String get allMembers => 'Все Участники';
-
-  @override
-  String get online => 'Онлайн';
-
-  @override
-  String get noMembersFound => 'Участники не найдены';
-
-  @override
-  String get searchForMembers => 'Поиск участников';
-
-  @override
-  String get enterUsernameToFindMembers =>
-      'Введите имя пользователя, чтобы найти участников форума';
-
-  @override
-  String get noMembersOnline => 'В настоящее время нет участников в сети';
-
-  @override
-  String get enterUsernameToSearch => 'Введите имя пользователя для поиска...';
-
-  @override
-  String get lookupMembers => 'Поиск Участников';
-
-  @override
-  String get addMembers => 'Добавить Участников';
-
-  @override
-  String get membersAddedSuccessfully => 'Участники успешно добавлены';
-
-  @override
-  String errorAddingMembers(String error) {
-    return 'Ошибка при добавлении участников: $error';
-  }
-
-  @override
-  String get failedToLoadOnlineUsers =>
-      'Ошибка при загрузке пользователей в сети';
-
-  @override
-  String get noUsersOnline => 'Нет пользователей в сети';
 
   @override
   String membersCount(int count) {
@@ -780,15 +433,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deleteMessage => 'Удалить Сообщение';
 
   @override
-  String get areYouSureYouWantToDeleteThisMessage =>
-      'Вы уверены, что хотите удалить это сообщение?';
-
-  @override
-  String failedToDeleteMessage(String error) {
-    return 'Ошибка при удалении сообщения: $error';
-  }
-
-  @override
   String get deletingPost => 'Удаление сообщения...';
 
   @override
@@ -799,11 +443,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String failedToLikePost(String error) {
     return 'Ошибка при лайке сообщения: $error';
-  }
-
-  @override
-  String failedToThankPost(String error) {
-    return 'Ошибка при благодарности сообщению: $error';
   }
 
   @override
@@ -829,27 +468,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String errorLoadingMoreMessages(String error) {
-    return 'Ошибка при загрузке дополнительных сообщений: $error';
-  }
-
-  @override
-  String get inviteMessageOptional =>
-      'Пригласительное Сообщение (необязательно)';
-
-  @override
-  String get iWouldLikeToAddYouToThisConversation =>
-      'Я хотел бы добавить вас в этот разговор.';
-
-  @override
   String get searchFailed => 'Поиск не удался';
-
-  @override
-  String get trySearchingWithDifferentUsername =>
-      'Попробуйте поискать с другим именем пользователя';
-
-  @override
-  String get noSitesFound => 'Сайты не найдены.';
 
   @override
   String get userInformationNotAvailable =>
@@ -1006,28 +625,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get invite => 'Пригласить';
 
   @override
-  String get welcomeBack => 'С возвращением!';
-
-  @override
-  String get signInToAccessYourProfile =>
-      'Войдите, чтобы получить доступ к своему профилю и управлять аккаунтом';
-
-  @override
-  String get enterYourUsername => 'Введите ваше имя пользователя';
-
-  @override
-  String get enterYourPassword => 'Введите ваш пароль';
-
-  @override
-  String get dontHaveAnAccount => 'Нет аккаунта?';
-
-  @override
   String get enterKeywordsToSearchTopics =>
       'Введите ключевые слова для поиска тем...';
-
-  @override
-  String get pleaseFillInAllRequiredFields =>
-      'Пожалуйста, заполните все обязательные поля';
 
   @override
   String get undelete => 'Восстановить';
@@ -1091,20 +690,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Введите ключевые слова для поиска тем и сообщений';
 
   @override
-  String get enterKeywordsOrDomainToFindForums =>
-      'Введите ключевые слова или домен для поиска форумов';
-
-  @override
-  String get enterKeywordsOrDomainNamesToFindForums =>
-      'Введите ключевые слова или доменные имена для поиска форумов';
-
-  @override
-  String get appearance => 'Внешний вид';
-
-  @override
-  String get followSystemTheme => 'Следовать теме системы';
-
-  @override
   String get light => 'Светлая';
 
   @override
@@ -1116,16 +701,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get forumSettings => 'Настройки форума';
-
-  @override
-  String get noSettingsAvailable => 'Настройки недоступны';
-
-  @override
-  String get settingsCategoriesWillAppearHere =>
-      'Категории настроек появятся здесь, когда будут доступны.';
-
-  @override
   String get unableToLoadProfile => 'Не удалось загрузить профиль';
 
   @override
@@ -1133,15 +708,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get reportSubmittedSuccessfully => 'Жалоба успешно отправлена';
-
-  @override
-  String get failedToSubmitReport => 'Не удалось отправить жалобу';
-
-  @override
-  String get searchForForums => 'Поиск форумов';
-
-  @override
-  String get searchForums => 'Поиск форумов';
 
   @override
   String get deleteTopic => 'Удалить тему';
@@ -1198,14 +764,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String errorLoadingMessage(String error) {
-    return 'Ошибка загрузки сообщения: $error';
-  }
-
-  @override
-  String get messageNotFound => 'Сообщение не найдено';
-
-  @override
   String get home => 'Главная';
 
   @override
@@ -1241,15 +799,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get fullSize => 'Полный размер';
 
   @override
-  String get alignLeft => 'Выровнять по левому краю';
-
-  @override
-  String get alignCenter => 'Выровнять по центру';
-
-  @override
-  String get alignRight => 'Выровнять по правому краю';
-
-  @override
   String get pleaseEnterTitle => 'Пожалуйста, введите заголовок';
 
   @override
@@ -1265,9 +814,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get mentionUser => 'Упомянуть пользователя';
 
   @override
-  String get loggingIn => 'Вход в систему...';
-
-  @override
   String get submittingReport => 'Отправка отчёта...';
 
   @override
@@ -1280,31 +826,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cleaningSpam => 'Очистка спама...';
 
   @override
-  String get enterSubject => 'Введите тему';
-
-  @override
-  String get typeYourMessageHere => 'Введите ваше сообщение здесь';
-
-  @override
   String get writeYourMessage => 'Напишите ваше сообщение...';
 
   @override
   String get writeYourReply => 'Напишите ваш ответ...';
 
   @override
-  String get messageSentSuccessfully => 'Сообщение успешно отправлено';
-
-  @override
-  String get replySentSuccessfully => 'Ответ успешно отправлен';
-
-  @override
   String get conversationCreatedSuccessfully => 'Разговор успешно создан';
 
   @override
   String get conversationMarkedAsUnread => 'Разговор отмечен как непрочитанный';
-
-  @override
-  String get messageMarkedAsUnread => 'Сообщение отмечено как непрочитанное';
 
   @override
   String get conversationClosed => 'Разговор закрыт';
@@ -1325,28 +856,8 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String failedToUploadFile(String error) {
-    return 'Не удалось загрузить файл: $error';
-  }
-
-  @override
-  String failedToUploadImage(String error) {
-    return 'Не удалось загрузить изображение: $error';
-  }
-
-  @override
-  String failedToSendMessage(String error) {
-    return 'Не удалось отправить сообщение: $error';
-  }
-
-  @override
   String failedToSendReply(String error) {
     return 'Не удалось отправить ответ: $error';
-  }
-
-  @override
-  String failedToMarkAsUnread(String error) {
-    return 'Не удалось отметить сообщение как непрочитанное: $error';
   }
 
   @override
@@ -1376,29 +887,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get goToBottom => 'Перейти вниз';
 
   @override
-  String get replyAll => 'Ответить всем';
-
-  @override
-  String get forward => 'Переслать';
-
-  @override
-  String get noForumsFound => 'Форумы не найдены.';
-
-  @override
   String get pleaseLoginToAccessContent =>
       'Пожалуйста, войдите, чтобы получить доступ к этому содержимому и взаимодействовать с сообщениями.';
 
   @override
   String get searchUsers => 'Поиск пользователей...';
-
-  @override
-  String get writeYourTitle => 'Напишите ваш заголовок...';
-
-  @override
-  String get writeYourContent => 'Напишите ваше содержимое...';
-
-  @override
-  String get selectAnOption => 'Выберите опцию';
 
   @override
   String get enterConversationTitle => 'Введите заголовок разговора';
@@ -1413,15 +906,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get report => 'Пожаловаться';
-
-  @override
-  String get unfollow => 'Отписаться';
-
-  @override
-  String get follow => 'Подписаться';
-
-  @override
-  String get goToForums => 'Перейти к форумам';
 
   @override
   String get remove => 'Удалить';
@@ -1442,9 +926,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get goBack => 'Назад';
 
   @override
-  String get privateMessagesNotAvailable => 'Приватные сообщения недоступны';
-
-  @override
   String failedToLoadPost(String error) {
     return 'Не удалось загрузить сообщение: \n$error';
   }
@@ -1459,12 +940,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get unlike => 'убрать лайк';
-
-  @override
-  String get optimizeImage => 'Оптимизировать изображение';
-
-  @override
-  String get optimizeAndUpload => 'Оптимизировать и загрузить';
 
   @override
   String downloading(String filename) {
@@ -1482,20 +957,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get enterANumber => 'Введите число';
-
-  @override
   String get failedToNavigateToForum => 'Не удалось перейти к форуму';
-
-  @override
-  String failedToNavigateToForumName(String forumName) {
-    return 'Не удалось перейти к $forumName';
-  }
-
-  @override
-  String forumNotFound(String forumName) {
-    return 'Форум не найден: $forumName';
-  }
 
   @override
   String forumNotFoundById(String forumId) {
@@ -1508,30 +970,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get likePost => 'Нравится';
-
-  @override
-  String get unlikePost => 'Больше не нравится';
-
-  @override
-  String get thankPost => 'Поблагодарить';
-
-  @override
-  String get showLikes => 'Показать лайки';
-
-  @override
-  String get showThanks => 'Показать благодарности';
-
-  @override
-  String get quotePost => 'Цитировать пост';
-
-  @override
-  String get translate => 'Перевести';
-
-  @override
-  String get showOriginal => 'Показать оригинал';
-
-  @override
   String get translating => 'Перевод...';
 
   @override
@@ -1539,21 +977,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get translatedContent => 'Переведённый контент';
-
-  @override
-  String get selectLanguage => 'Выберите язык';
-
-  @override
-  String get translateTo => 'Перевести на:';
-
-  @override
-  String get deviceLanguage => 'Язык устройства';
-
-  @override
-  String get noPostsToTranslate => 'Нет постов для перевода';
-
-  @override
-  String get translationFailed => 'Ошибка перевода';
 
   @override
   String get twoFactorAuthentication => 'Двухфакторная аутентификация';
@@ -1994,27 +1417,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get loginFailed => 'Ошибка входа';
 
   @override
-  String get additionalInformation => 'Дополнительная информация';
-
-  @override
-  String dateOfBirth(Object marker) {
-    return 'Дата рождения$marker';
-  }
-
-  @override
-  String minimumAgeYears(Object minimumAge) {
-    return 'Минимальный возраст: $minimumAge лет';
-  }
-
-  @override
-  String locationLabel(Object marker) {
-    return 'Местоположение$marker';
-  }
-
-  @override
-  String get receiveSiteMailings => 'Получать рассылку сайта';
-
-  @override
   String get moveToCategory => 'Переместить в категорию';
 
   @override
@@ -2043,18 +1445,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get edited => 'изменено';
-
-  @override
-  String get imageExceedsUploadLimits =>
-      'Изображение превышает лимиты загрузки, его нужно оптимизировать:';
-
-  @override
-  String get optimizationsToBeApplied => 'Будут применены оптимизации:';
-
-  @override
-  String reductionPercent(Object percent) {
-    return 'Уменьшение: $percent%';
-  }
 
   @override
   String get editProfileManagedOnWebNote =>
@@ -2453,17 +1843,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String postsCount(Object count) {
     return 'Сообщений: $count';
   }
-
-  @override
-  String get protectedForum => 'Защищённый форум';
-
-  @override
-  String isPasswordProtected(Object forumName) {
-    return '$forumName защищён паролем.';
-  }
-
-  @override
-  String get enter => 'Ввести';
 
   @override
   String get permissionDeniedToSaveImage =>

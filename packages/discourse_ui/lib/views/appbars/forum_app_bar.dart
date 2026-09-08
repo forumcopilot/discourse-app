@@ -7,9 +7,9 @@ import 'package:get/get.dart';
 import '../search_page.dart';
 import '../users_directory_page.dart';
 import '../login_page.dart';
-import '../register_page.dart';
 import '../widgets/forum_actions.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
+import 'package:discourse_ui/utils/url_utils.dart';
 
 class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isLoggedIn;
@@ -158,7 +158,9 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
         Navigator.push(context, MaterialPageRoute(builder: (_) => LoginPage(siteContext: siteContext)));
         break;
       case 'register':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterPage(siteContext: siteContext)));
+        // Discourse has no in-app registration (the account proxy says so
+        // honestly); sign-up happens on the web.
+        UrlUtils.openUrl('${siteContext.site.url}/signup');
         break;
       case 'mark_read':
         ForumActions().markAllAsRead(context, '0');

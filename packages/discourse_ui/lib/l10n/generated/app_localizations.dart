@@ -116,41 +116,11 @@ abstract class AppLocalizations {
     Locale('zh')
   ];
 
-  /// The application title
-  ///
-  /// In en, this message translates to:
-  /// **'Forum App'**
-  String get appTitle;
-
   /// No description provided for @loginTitle.
   ///
   /// In en, this message translates to:
   /// **'Login'**
   String get loginTitle;
-
-  /// No description provided for @usernameLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Username'**
-  String get usernameLabel;
-
-  /// No description provided for @passwordLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Password'**
-  String get passwordLabel;
-
-  /// No description provided for @loginButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Login'**
-  String get loginButton;
-
-  /// No description provided for @signInWithPasskey.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign in with Passkey'**
-  String get signInWithPasskey;
 
   /// No description provided for @usePasskey.
   ///
@@ -164,251 +134,11 @@ abstract class AppLocalizations {
   /// **'Use your passkey to continue'**
   String get passkeyContinuePrompt;
 
-  /// No description provided for @forgotPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Forgot password?'**
-  String get forgotPassword;
-
-  /// No description provided for @pleaseEnterUsername.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter your username'**
-  String get pleaseEnterUsername;
-
-  /// No description provided for @pleaseEnterPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter your password'**
-  String get pleaseEnterPassword;
-
-  /// Message about credentials being sent to forum domain
-  ///
-  /// In en, this message translates to:
-  /// **'Your username and password will be sent to {domain}'**
-  String credentialsSentToDomain(String domain);
-
-  /// No description provided for @createAccount.
-  ///
-  /// In en, this message translates to:
-  /// **'Create Account'**
-  String get createAccount;
-
-  /// No description provided for @alreadyHaveAccount.
-  ///
-  /// In en, this message translates to:
-  /// **'Already have an account? '**
-  String get alreadyHaveAccount;
-
-  /// No description provided for @logIn.
-  ///
-  /// In en, this message translates to:
-  /// **'Log In'**
-  String get logIn;
-
   /// No description provided for @continueButton.
   ///
   /// In en, this message translates to:
   /// **'Continue'**
   String get continueButton;
-
-  /// No description provided for @registrationNotAvailable.
-  ///
-  /// In en, this message translates to:
-  /// **'Registration Not Available'**
-  String get registrationNotAvailable;
-
-  /// No description provided for @registrationNotAvailableMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Registration is currently not available. The forum may be closed or registration may be disabled.'**
-  String get registrationNotAvailableMessage;
-
-  /// No description provided for @webRegistrationRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Web Registration Required'**
-  String get webRegistrationRequired;
-
-  /// No description provided for @webRegistrationRequiredMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'This forum requires registration through the web browser. Please click the button below to open the registration page.'**
-  String get webRegistrationRequiredMessage;
-
-  /// No description provided for @openRegistrationPage.
-  ///
-  /// In en, this message translates to:
-  /// **'Open Registration Page'**
-  String get openRegistrationPage;
-
-  /// No description provided for @loadingAdditionalFields.
-  ///
-  /// In en, this message translates to:
-  /// **'Loading additional fields...'**
-  String get loadingAdditionalFields;
-
-  /// No description provided for @pleaseSelectDateOfBirth.
-  ///
-  /// In en, this message translates to:
-  /// **'Please select your date of birth'**
-  String get pleaseSelectDateOfBirth;
-
-  /// No description provided for @pleaseEnterLocation.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter your location'**
-  String get pleaseEnterLocation;
-
-  /// No description provided for @pleaseIndicateEmailPreference.
-  ///
-  /// In en, this message translates to:
-  /// **'Please indicate your email preference'**
-  String get pleaseIndicateEmailPreference;
-
-  /// No description provided for @pleaseFillAllRequiredFields.
-  ///
-  /// In en, this message translates to:
-  /// **'Please fill in all required fields'**
-  String get pleaseFillAllRequiredFields;
-
-  /// No description provided for @pleaseAcceptTermsOfService.
-  ///
-  /// In en, this message translates to:
-  /// **'Please accept the Terms of Service'**
-  String get pleaseAcceptTermsOfService;
-
-  /// No description provided for @pleaseAcceptPrivacyPolicy.
-  ///
-  /// In en, this message translates to:
-  /// **'Please accept the Privacy Policy'**
-  String get pleaseAcceptPrivacyPolicy;
-
-  /// No description provided for @registrationError.
-  ///
-  /// In en, this message translates to:
-  /// **'Registration Error'**
-  String get registrationError;
-
-  /// No description provided for @registrationFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Registration failed. Please check your information.'**
-  String get registrationFailed;
-
-  /// No description provided for @registrationFailedTryAgain.
-  ///
-  /// In en, this message translates to:
-  /// **'Registration failed. Please try again.'**
-  String get registrationFailedTryAgain;
-
-  /// No description provided for @registrationInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Registration Info'**
-  String get registrationInfo;
-
-  /// No description provided for @openWebsite.
-  ///
-  /// In en, this message translates to:
-  /// **'Open Website'**
-  String get openWebsite;
-
-  /// Error message when cannot open forum website
-  ///
-  /// In en, this message translates to:
-  /// **'Could not open the forum website. Please try visiting: {url}'**
-  String couldNotOpenForumWebsite(String url);
-
-  /// No description provided for @registrationSuccessfulEmailConfirm.
-  ///
-  /// In en, this message translates to:
-  /// **'Registration successful! Please check your email to confirm your account before logging in.'**
-  String get registrationSuccessfulEmailConfirm;
-
-  /// No description provided for @registrationSuccessfulPendingApproval.
-  ///
-  /// In en, this message translates to:
-  /// **'Registration successful! Your account is pending approval. You will be notified when your account is approved.'**
-  String get registrationSuccessfulPendingApproval;
-
-  /// No description provided for @registrationSuccessfulAutoLogin.
-  ///
-  /// In en, this message translates to:
-  /// **'Registration successful! You have been automatically logged in.'**
-  String get registrationSuccessfulAutoLogin;
-
-  /// No description provided for @welcome.
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome!'**
-  String get welcome;
-
-  /// No description provided for @registrationSuccessful.
-  ///
-  /// In en, this message translates to:
-  /// **'Registration Successful'**
-  String get registrationSuccessful;
-
-  /// No description provided for @pleaseLoginWithNewAccount.
-  ///
-  /// In en, this message translates to:
-  /// **'Please log in with your new account.'**
-  String get pleaseLoginWithNewAccount;
-
-  /// No description provided for @forgotPasswordTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Forgot Password'**
-  String get forgotPasswordTitle;
-
-  /// No description provided for @usernameOrEmailLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Username or Email'**
-  String get usernameOrEmailLabel;
-
-  /// No description provided for @pleaseEnterUsernameOrEmail.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter your username or email'**
-  String get pleaseEnterUsernameOrEmail;
-
-  /// No description provided for @sendResetLink.
-  ///
-  /// In en, this message translates to:
-  /// **'Send Reset Link'**
-  String get sendResetLink;
-
-  /// No description provided for @resetLinkSent.
-  ///
-  /// In en, this message translates to:
-  /// **'Reset Link Sent'**
-  String get resetLinkSent;
-
-  /// No description provided for @passwordResetInstructionsSent.
-  ///
-  /// In en, this message translates to:
-  /// **'Password reset instructions have been sent to your registered email address.'**
-  String get passwordResetInstructionsSent;
-
-  /// No description provided for @resetFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Reset Failed'**
-  String get resetFailed;
-
-  /// No description provided for @unableToSendResetLink.
-  ///
-  /// In en, this message translates to:
-  /// **'Unable to send reset link. Please try again.'**
-  String get unableToSendResetLink;
-
-  /// No description provided for @errorSendingResetLink.
-  ///
-  /// In en, this message translates to:
-  /// **'An error occurred while sending the reset link. Please check your connection and try again.'**
-  String get errorSendingResetLink;
 
   /// No description provided for @errorTitle.
   ///
@@ -463,54 +193,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try Again'**
   String get tryAgain;
-
-  /// No description provided for @getHelp.
-  ///
-  /// In en, this message translates to:
-  /// **'Get Help'**
-  String get getHelp;
-
-  /// No description provided for @somethingWentWrong.
-  ///
-  /// In en, this message translates to:
-  /// **'Something went wrong'**
-  String get somethingWentWrong;
-
-  /// No description provided for @unexpectedErrorOccurred.
-  ///
-  /// In en, this message translates to:
-  /// **'An unexpected error occurred. Please try again.'**
-  String get unexpectedErrorOccurred;
-
-  /// No description provided for @noInternetConnection.
-  ///
-  /// In en, this message translates to:
-  /// **'No Internet Connection'**
-  String get noInternetConnection;
-
-  /// No description provided for @checkInternetConnection.
-  ///
-  /// In en, this message translates to:
-  /// **'Please check your internet connection and try again.'**
-  String get checkInternetConnection;
-
-  /// No description provided for @authenticationRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Authentication Required'**
-  String get authenticationRequired;
-
-  /// No description provided for @pleaseLoginToContinue.
-  ///
-  /// In en, this message translates to:
-  /// **'Please log in to continue.'**
-  String get pleaseLoginToContinue;
-
-  /// No description provided for @forumError.
-  ///
-  /// In en, this message translates to:
-  /// **'Forum Error'**
-  String get forumError;
 
   /// No description provided for @anErrorOccurred.
   ///
@@ -608,12 +290,6 @@ abstract class AppLocalizations {
   /// **'You need to be signed in to view latest topics.'**
   String get youNeedToBeSignedInToViewLatestTopics;
 
-  /// No description provided for @noUnreadTopics.
-  ///
-  /// In en, this message translates to:
-  /// **'No Unread Topics'**
-  String get noUnreadTopics;
-
   /// No description provided for @thereAreNoUnreadTopics.
   ///
   /// In en, this message translates to:
@@ -638,54 +314,6 @@ abstract class AppLocalizations {
   /// **'You need to be signed in to view your unread topics.'**
   String get youNeedToBeSignedInToViewUnreadTopics;
 
-  /// No description provided for @noSubscribedTopics.
-  ///
-  /// In en, this message translates to:
-  /// **'No watched topics'**
-  String get noSubscribedTopics;
-
-  /// No description provided for @noSubscribedTopicsMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'You aren\'t watching or tracking any topics. Open the bell menu on a topic to change its notification level.'**
-  String get noSubscribedTopicsMessage;
-
-  /// No description provided for @signInToViewSubscribedTopics.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign in to view subscribed topics'**
-  String get signInToViewSubscribedTopics;
-
-  /// No description provided for @youNeedToBeSignedInToViewSubscribedTopics.
-  ///
-  /// In en, this message translates to:
-  /// **'You need to be signed in to view your subscribed topics.'**
-  String get youNeedToBeSignedInToViewSubscribedTopics;
-
-  /// No description provided for @noParticipatedTopics.
-  ///
-  /// In en, this message translates to:
-  /// **'No participated topics'**
-  String get noParticipatedTopics;
-
-  /// No description provided for @topicsYouParticipatedIn.
-  ///
-  /// In en, this message translates to:
-  /// **'Topics that you have participated in will be shown here.'**
-  String get topicsYouParticipatedIn;
-
-  /// No description provided for @signInToViewParticipatedTopics.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign in to view participated topics'**
-  String get signInToViewParticipatedTopics;
-
-  /// No description provided for @youNeedToBeSignedInToViewParticipatedTopics.
-  ///
-  /// In en, this message translates to:
-  /// **'You need to be signed in to view topics you have participated in.'**
-  String get youNeedToBeSignedInToViewParticipatedTopics;
-
   /// No description provided for @latest.
   ///
   /// In en, this message translates to:
@@ -697,24 +325,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unread'**
   String get unread;
-
-  /// No description provided for @subscribed.
-  ///
-  /// In en, this message translates to:
-  /// **'Watched'**
-  String get subscribed;
-
-  /// No description provided for @participated.
-  ///
-  /// In en, this message translates to:
-  /// **'Participated'**
-  String get participated;
-
-  /// No description provided for @connectionTimedOut.
-  ///
-  /// In en, this message translates to:
-  /// **'Connection timed out. The site may be down or unreachable.'**
-  String get connectionTimedOut;
 
   /// No description provided for @failedToConnectToSite.
   ///
@@ -746,41 +356,11 @@ abstract class AppLocalizations {
   /// **'New Message'**
   String get newConversation;
 
-  /// No description provided for @newMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'New Message'**
-  String get newMessage;
-
-  /// No description provided for @appSettings.
-  ///
-  /// In en, this message translates to:
-  /// **'App Settings'**
-  String get appSettings;
-
-  /// No description provided for @searchSites.
-  ///
-  /// In en, this message translates to:
-  /// **'Search Sites'**
-  String get searchSites;
-
   /// Settings section title for language selection
   ///
   /// In en, this message translates to:
   /// **'Language'**
   String get language;
-
-  /// Option to use system default settings
-  ///
-  /// In en, this message translates to:
-  /// **'System Default'**
-  String get systemDefault;
-
-  /// Description for system default language option
-  ///
-  /// In en, this message translates to:
-  /// **'Follow system language'**
-  String get followSystemLanguage;
 
   /// No description provided for @all.
   ///
@@ -817,12 +397,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notifications'**
   String get subscribe;
-
-  /// No description provided for @unsubscribe.
-  ///
-  /// In en, this message translates to:
-  /// **'Notifications'**
-  String get unsubscribe;
 
   /// Error message when changing notification level fails
   ///
@@ -962,41 +536,11 @@ abstract class AppLocalizations {
   /// **'Mark Read'**
   String get markRead;
 
-  /// Title for report user dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Report User'**
-  String get reportUser;
-
-  /// No description provided for @pleaseSelectReasonForReportingUser.
-  ///
-  /// In en, this message translates to:
-  /// **'Please select a reason for reporting this user.'**
-  String get pleaseSelectReasonForReportingUser;
-
   /// No description provided for @spamOrAdvertising.
   ///
   /// In en, this message translates to:
   /// **'Spam or advertising'**
   String get spamOrAdvertising;
-
-  /// No description provided for @harassmentOrBullying.
-  ///
-  /// In en, this message translates to:
-  /// **'Harassment or bullying'**
-  String get harassmentOrBullying;
-
-  /// No description provided for @inappropriateContent.
-  ///
-  /// In en, this message translates to:
-  /// **'Inappropriate content'**
-  String get inappropriateContent;
-
-  /// No description provided for @impersonationOrFakeAccount.
-  ///
-  /// In en, this message translates to:
-  /// **'Impersonation or fake account'**
-  String get impersonationOrFakeAccount;
 
   /// No description provided for @otherPleaseSpecify.
   ///
@@ -1009,18 +553,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please specify the reason'**
   String get pleaseSpecifyReason;
-
-  /// No description provided for @enterReasonForReportingUser.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the reason for reporting this user'**
-  String get enterReasonForReportingUser;
-
-  /// No description provided for @pleaseSelectReason.
-  ///
-  /// In en, this message translates to:
-  /// **'Please select a reason'**
-  String get pleaseSelectReason;
 
   /// Button to ban a user
   ///
@@ -1088,18 +620,6 @@ abstract class AppLocalizations {
   /// **'More options'**
   String get moreOptions;
 
-  /// No description provided for @leaveConversation.
-  ///
-  /// In en, this message translates to:
-  /// **'Leave message'**
-  String get leaveConversation;
-
-  /// No description provided for @reportConversation.
-  ///
-  /// In en, this message translates to:
-  /// **'Report message'**
-  String get reportConversation;
-
   /// No description provided for @topicClosed.
   ///
   /// In en, this message translates to:
@@ -1153,30 +673,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete Messages'**
   String get deleteConversations;
-
-  /// No description provided for @myForums.
-  ///
-  /// In en, this message translates to:
-  /// **'My Forums'**
-  String get myForums;
-
-  /// No description provided for @recentlyVisited.
-  ///
-  /// In en, this message translates to:
-  /// **'Recently Visited'**
-  String get recentlyVisited;
-
-  /// No description provided for @explore.
-  ///
-  /// In en, this message translates to:
-  /// **'Explore'**
-  String get explore;
-
-  /// No description provided for @forumCopilot.
-  ///
-  /// In en, this message translates to:
-  /// **'Forum Copilot'**
-  String get forumCopilot;
 
   /// No description provided for @noConversations.
   ///
@@ -1268,125 +764,17 @@ abstract class AppLocalizations {
   /// **'Clean Spam'**
   String get cleanSpam;
 
-  /// No description provided for @failedToSaveMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to save message'**
-  String get failedToSaveMessage;
-
   /// Error message when saving conversation fails
   ///
   /// In en, this message translates to:
   /// **'Failed to save message'**
   String get failedToSaveConversation;
 
-  /// No description provided for @failedToSaveSetting.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to save setting'**
-  String get failedToSaveSetting;
-
-  /// No description provided for @failedToSavePost.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to save post'**
-  String get failedToSavePost;
-
-  /// Error message when loading explore sites fails
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading sites: {error}'**
-  String errorLoadingSites(String error);
-
-  /// Message shown when connecting to a site
-  ///
-  /// In en, this message translates to:
-  /// **'Connecting to {domainName}...'**
-  String connectingTo(String domainName);
-
   /// No description provided for @members.
   ///
   /// In en, this message translates to:
   /// **'Members'**
   String get members;
-
-  /// No description provided for @allMembers.
-  ///
-  /// In en, this message translates to:
-  /// **'All Members'**
-  String get allMembers;
-
-  /// No description provided for @online.
-  ///
-  /// In en, this message translates to:
-  /// **'Online'**
-  String get online;
-
-  /// No description provided for @noMembersFound.
-  ///
-  /// In en, this message translates to:
-  /// **'No members found'**
-  String get noMembersFound;
-
-  /// No description provided for @searchForMembers.
-  ///
-  /// In en, this message translates to:
-  /// **'Search for members'**
-  String get searchForMembers;
-
-  /// No description provided for @enterUsernameToFindMembers.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter a username to find forum members'**
-  String get enterUsernameToFindMembers;
-
-  /// No description provided for @noMembersOnline.
-  ///
-  /// In en, this message translates to:
-  /// **'No members are currently online'**
-  String get noMembersOnline;
-
-  /// No description provided for @enterUsernameToSearch.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter username to search...'**
-  String get enterUsernameToSearch;
-
-  /// No description provided for @lookupMembers.
-  ///
-  /// In en, this message translates to:
-  /// **'Lookup Members'**
-  String get lookupMembers;
-
-  /// No description provided for @addMembers.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Members'**
-  String get addMembers;
-
-  /// No description provided for @membersAddedSuccessfully.
-  ///
-  /// In en, this message translates to:
-  /// **'Members added successfully'**
-  String get membersAddedSuccessfully;
-
-  /// Error message when adding members fails
-  ///
-  /// In en, this message translates to:
-  /// **'Error adding members: {error}'**
-  String errorAddingMembers(String error);
-
-  /// No description provided for @failedToLoadOnlineUsers.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load online users'**
-  String get failedToLoadOnlineUsers;
-
-  /// No description provided for @noUsersOnline.
-  ///
-  /// In en, this message translates to:
-  /// **'No users online'**
-  String get noUsersOnline;
 
   /// Number of members with label
   ///
@@ -1484,18 +872,6 @@ abstract class AppLocalizations {
   /// **'Delete Message'**
   String get deleteMessage;
 
-  /// No description provided for @areYouSureYouWantToDeleteThisMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to delete this message?'**
-  String get areYouSureYouWantToDeleteThisMessage;
-
-  /// Error message when deleting message fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to delete message: {error}'**
-  String failedToDeleteMessage(String error);
-
   /// No description provided for @deletingPost.
   ///
   /// In en, this message translates to:
@@ -1513,12 +889,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to like post: {error}'**
   String failedToLikePost(String error);
-
-  /// Error message when thanking post fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to thank post: {error}'**
-  String failedToThankPost(String error);
 
   /// Message asking user to sign in to view messages
   ///
@@ -1550,41 +920,11 @@ abstract class AppLocalizations {
   /// **'Error loading more messages: {error}'**
   String errorLoadingMoreConversations(String error);
 
-  /// Error message when loading more messages fails
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading more messages: {error}'**
-  String errorLoadingMoreMessages(String error);
-
-  /// No description provided for @inviteMessageOptional.
-  ///
-  /// In en, this message translates to:
-  /// **'Invite Message (optional)'**
-  String get inviteMessageOptional;
-
-  /// No description provided for @iWouldLikeToAddYouToThisConversation.
-  ///
-  /// In en, this message translates to:
-  /// **'I would like to add you to this message.'**
-  String get iWouldLikeToAddYouToThisConversation;
-
   /// No description provided for @searchFailed.
   ///
   /// In en, this message translates to:
   /// **'Search failed'**
   String get searchFailed;
-
-  /// No description provided for @trySearchingWithDifferentUsername.
-  ///
-  /// In en, this message translates to:
-  /// **'Try searching with a different username'**
-  String get trySearchingWithDifferentUsername;
-
-  /// No description provided for @noSitesFound.
-  ///
-  /// In en, this message translates to:
-  /// **'No sites found.'**
-  String get noSitesFound;
 
   /// No description provided for @userInformationNotAvailable.
   ///
@@ -1862,47 +1202,11 @@ abstract class AppLocalizations {
   /// **'Invite'**
   String get invite;
 
-  /// No description provided for @welcomeBack.
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome Back'**
-  String get welcomeBack;
-
-  /// No description provided for @signInToAccessYourProfile.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign in to access your profile and manage your account'**
-  String get signInToAccessYourProfile;
-
-  /// No description provided for @enterYourUsername.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your username'**
-  String get enterYourUsername;
-
-  /// No description provided for @enterYourPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your password'**
-  String get enterYourPassword;
-
-  /// No description provided for @dontHaveAnAccount.
-  ///
-  /// In en, this message translates to:
-  /// **'Don\'t have an account?'**
-  String get dontHaveAnAccount;
-
   /// No description provided for @enterKeywordsToSearchTopics.
   ///
   /// In en, this message translates to:
   /// **'Enter keywords to search topics...'**
   String get enterKeywordsToSearchTopics;
-
-  /// No description provided for @pleaseFillInAllRequiredFields.
-  ///
-  /// In en, this message translates to:
-  /// **'Please fill in all required fields'**
-  String get pleaseFillInAllRequiredFields;
 
   /// No description provided for @undelete.
   ///
@@ -2012,30 +1316,6 @@ abstract class AppLocalizations {
   /// **'Enter keywords to find topics and posts'**
   String get enterKeywordsToFindTopicsAndPosts;
 
-  /// Hint text for searching forums by keywords or domain
-  ///
-  /// In en, this message translates to:
-  /// **'Enter keywords or domain to find forums'**
-  String get enterKeywordsOrDomainToFindForums;
-
-  /// Description text for searching forums
-  ///
-  /// In en, this message translates to:
-  /// **'Enter keywords or domain names to find forums'**
-  String get enterKeywordsOrDomainNamesToFindForums;
-
-  /// Settings section title for appearance/theme
-  ///
-  /// In en, this message translates to:
-  /// **'Appearance'**
-  String get appearance;
-
-  /// Description for system default theme option
-  ///
-  /// In en, this message translates to:
-  /// **'Follow system theme'**
-  String get followSystemTheme;
-
   /// Light theme option
   ///
   /// In en, this message translates to:
@@ -2054,24 +1334,6 @@ abstract class AppLocalizations {
   /// **'version {version} ({buildNumber})'**
   String version(String version, String buildNumber);
 
-  /// Title for forum settings page
-  ///
-  /// In en, this message translates to:
-  /// **'Forum Settings'**
-  String get forumSettings;
-
-  /// Message when no settings are available
-  ///
-  /// In en, this message translates to:
-  /// **'No settings available'**
-  String get noSettingsAvailable;
-
-  /// Message explaining when settings categories will appear
-  ///
-  /// In en, this message translates to:
-  /// **'Settings categories will appear here when available.'**
-  String get settingsCategoriesWillAppearHere;
-
   /// Error message when profile cannot be loaded
   ///
   /// In en, this message translates to:
@@ -2089,24 +1351,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Report submitted successfully'**
   String get reportSubmittedSuccessfully;
-
-  /// Error message when report submission fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to submit report'**
-  String get failedToSubmitReport;
-
-  /// Placeholder text for forum search
-  ///
-  /// In en, this message translates to:
-  /// **'Search for forums'**
-  String get searchForForums;
-
-  /// Title for the search forums page
-  ///
-  /// In en, this message translates to:
-  /// **'Search Forums'**
-  String get searchForums;
 
   /// Title for delete topic dialog
   ///
@@ -2210,18 +1454,6 @@ abstract class AppLocalizations {
   /// **'Successfully cleaned spam for {username}. Actions: {actions}'**
   String successfullyCleanedSpam(String username, String actions);
 
-  /// Error message when loading message fails
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading message: {error}'**
-  String errorLoadingMessage(String error);
-
-  /// Message when message is not found
-  ///
-  /// In en, this message translates to:
-  /// **'Message not found'**
-  String get messageNotFound;
-
   /// Home tab title
   ///
   /// In en, this message translates to:
@@ -2288,24 +1520,6 @@ abstract class AppLocalizations {
   /// **'Full Size'**
   String get fullSize;
 
-  /// Text alignment option: left
-  ///
-  /// In en, this message translates to:
-  /// **'Align Left'**
-  String get alignLeft;
-
-  /// Text alignment option: center
-  ///
-  /// In en, this message translates to:
-  /// **'Align Center'**
-  String get alignCenter;
-
-  /// Text alignment option: right
-  ///
-  /// In en, this message translates to:
-  /// **'Align Right'**
-  String get alignRight;
-
   /// Validation message when title is empty
   ///
   /// In en, this message translates to:
@@ -2336,12 +1550,6 @@ abstract class AppLocalizations {
   /// **'Mention User'**
   String get mentionUser;
 
-  /// Status message when logging in
-  ///
-  /// In en, this message translates to:
-  /// **'Logging in...'**
-  String get loggingIn;
-
   /// Status message when submitting report
   ///
   /// In en, this message translates to:
@@ -2366,18 +1574,6 @@ abstract class AppLocalizations {
   /// **'Cleaning spam...'**
   String get cleaningSpam;
 
-  /// Hint text for subject field
-  ///
-  /// In en, this message translates to:
-  /// **'Enter subject'**
-  String get enterSubject;
-
-  /// Hint text for message field
-  ///
-  /// In en, this message translates to:
-  /// **'Type your message here'**
-  String get typeYourMessageHere;
-
   /// Hint text for writing message
   ///
   /// In en, this message translates to:
@@ -2390,18 +1586,6 @@ abstract class AppLocalizations {
   /// **'Write your reply...'**
   String get writeYourReply;
 
-  /// Success message after sending message
-  ///
-  /// In en, this message translates to:
-  /// **'Message sent successfully'**
-  String get messageSentSuccessfully;
-
-  /// Success message after sending reply
-  ///
-  /// In en, this message translates to:
-  /// **'Reply sent successfully'**
-  String get replySentSuccessfully;
-
   /// Success message after creating conversation
   ///
   /// In en, this message translates to:
@@ -2413,12 +1597,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Message marked as unread'**
   String get conversationMarkedAsUnread;
-
-  /// Success message when marking message as unread
-  ///
-  /// In en, this message translates to:
-  /// **'Message marked as unread'**
-  String get messageMarkedAsUnread;
 
   /// Success message when closing conversation
   ///
@@ -2450,35 +1628,11 @@ abstract class AppLocalizations {
   /// **'Failed to load quote: \n{error}'**
   String failedToLoadQuote(String error);
 
-  /// Error message when uploading file fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to upload file: {error}'**
-  String failedToUploadFile(String error);
-
-  /// Error message when uploading image fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to upload image: {error}'**
-  String failedToUploadImage(String error);
-
-  /// Error message when sending message fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to send message: {error}'**
-  String failedToSendMessage(String error);
-
   /// Error message when sending reply fails
   ///
   /// In en, this message translates to:
   /// **'Failed to send reply: {error}'**
   String failedToSendReply(String error);
-
-  /// Error message when marking message as unread fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to mark message as unread: {error}'**
-  String failedToMarkAsUnread(String error);
 
   /// Error message when marking conversation as unread fails
   ///
@@ -2516,24 +1670,6 @@ abstract class AppLocalizations {
   /// **'Go to bottom'**
   String get goToBottom;
 
-  /// Tooltip for reply all button
-  ///
-  /// In en, this message translates to:
-  /// **'Reply All'**
-  String get replyAll;
-
-  /// Tooltip for forward button
-  ///
-  /// In en, this message translates to:
-  /// **'Forward'**
-  String get forward;
-
-  /// Message when no forums are found
-  ///
-  /// In en, this message translates to:
-  /// **'No forums found.'**
-  String get noForumsFound;
-
   /// Message asking user to login to access content
   ///
   /// In en, this message translates to:
@@ -2545,24 +1681,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search users...'**
   String get searchUsers;
-
-  /// Hint text for title field
-  ///
-  /// In en, this message translates to:
-  /// **'Write your title...'**
-  String get writeYourTitle;
-
-  /// Hint text for content field
-  ///
-  /// In en, this message translates to:
-  /// **'Write your content...'**
-  String get writeYourContent;
-
-  /// Hint text for select field
-  ///
-  /// In en, this message translates to:
-  /// **'Select an option'**
-  String get selectAnOption;
 
   /// Hint text for conversation title field
   ///
@@ -2587,24 +1705,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Report'**
   String get report;
-
-  /// Button text to unfollow
-  ///
-  /// In en, this message translates to:
-  /// **'Unfollow'**
-  String get unfollow;
-
-  /// Button text to follow
-  ///
-  /// In en, this message translates to:
-  /// **'Follow'**
-  String get follow;
-
-  /// Button text to go to forums
-  ///
-  /// In en, this message translates to:
-  /// **'Go to Forums'**
-  String get goToForums;
 
   /// Button text to remove
   ///
@@ -2642,12 +1742,6 @@ abstract class AppLocalizations {
   /// **'Go Back'**
   String get goBack;
 
-  /// Message when private messages are not available
-  ///
-  /// In en, this message translates to:
-  /// **'Private messages not available'**
-  String get privateMessagesNotAvailable;
-
   /// Error message when loading post fails
   ///
   /// In en, this message translates to:
@@ -2672,18 +1766,6 @@ abstract class AppLocalizations {
   /// **'unlike'**
   String get unlike;
 
-  /// Title for image optimization dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Optimize Image'**
-  String get optimizeImage;
-
-  /// Button text to optimize and upload image
-  ///
-  /// In en, this message translates to:
-  /// **'Optimize and Upload'**
-  String get optimizeAndUpload;
-
   /// Status message when downloading file
   ///
   /// In en, this message translates to:
@@ -2702,29 +1784,11 @@ abstract class AppLocalizations {
   /// **'Error downloading {filename}: {error}'**
   String errorDownloading(String filename, String error);
 
-  /// Hint text for number input field
-  ///
-  /// In en, this message translates to:
-  /// **'Enter a number'**
-  String get enterANumber;
-
   /// Error message when navigation to category fails
   ///
   /// In en, this message translates to:
   /// **'Failed to navigate to category'**
   String get failedToNavigateToForum;
-
-  /// Error message when navigation to specific forum fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to navigate to {forumName}'**
-  String failedToNavigateToForumName(String forumName);
-
-  /// Error message when category is not found
-  ///
-  /// In en, this message translates to:
-  /// **'Category not found: {forumName}'**
-  String forumNotFound(String forumName);
 
   /// Error message when forum is not found by ID
   ///
@@ -2737,54 +1801,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not open link: {error}'**
   String couldNotOpenLink(String error);
-
-  /// Accessibility label for like button
-  ///
-  /// In en, this message translates to:
-  /// **'Like post'**
-  String get likePost;
-
-  /// Accessibility label for unlike button
-  ///
-  /// In en, this message translates to:
-  /// **'Unlike post'**
-  String get unlikePost;
-
-  /// Accessibility label for thank button
-  ///
-  /// In en, this message translates to:
-  /// **'Thank post'**
-  String get thankPost;
-
-  /// Accessibility hint for showing likes list
-  ///
-  /// In en, this message translates to:
-  /// **'Show likes'**
-  String get showLikes;
-
-  /// Accessibility hint for showing thanks list
-  ///
-  /// In en, this message translates to:
-  /// **'Show thanks'**
-  String get showThanks;
-
-  /// Accessibility label for quote button
-  ///
-  /// In en, this message translates to:
-  /// **'Quote post'**
-  String get quotePost;
-
-  /// Menu item to translate thread content
-  ///
-  /// In en, this message translates to:
-  /// **'Translate'**
-  String get translate;
-
-  /// Button to show original content instead of translation
-  ///
-  /// In en, this message translates to:
-  /// **'Show Original'**
-  String get showOriginal;
 
   /// Loading indicator while translating
   ///
@@ -2803,36 +1819,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Translated content'**
   String get translatedContent;
-
-  /// Title for language selection dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Select Language'**
-  String get selectLanguage;
-
-  /// Label for target language selection
-  ///
-  /// In en, this message translates to:
-  /// **'Translate to:'**
-  String get translateTo;
-
-  /// Indicator that a language is the device default
-  ///
-  /// In en, this message translates to:
-  /// **'Device language'**
-  String get deviceLanguage;
-
-  /// Message when there are no posts available for translation
-  ///
-  /// In en, this message translates to:
-  /// **'No posts to translate'**
-  String get noPostsToTranslate;
-
-  /// Error message when translation fails
-  ///
-  /// In en, this message translates to:
-  /// **'Translation failed'**
-  String get translationFailed;
 
   /// Title for the two-factor auth dialog
   ///
@@ -3524,36 +2510,6 @@ abstract class AppLocalizations {
   /// **'Login Failed'**
   String get loginFailed;
 
-  /// UI text: Additional Information
-  ///
-  /// In en, this message translates to:
-  /// **'Additional Information'**
-  String get additionalInformation;
-
-  /// UI text: Date of Birth{requiredValue}
-  ///
-  /// In en, this message translates to:
-  /// **'Date of Birth{marker}'**
-  String dateOfBirth(Object marker);
-
-  /// UI text: Minimum age: {minimumAge} years
-  ///
-  /// In en, this message translates to:
-  /// **'Minimum age: {minimumAge} years'**
-  String minimumAgeYears(Object minimumAge);
-
-  /// UI text: Location{isRequired}
-  ///
-  /// In en, this message translates to:
-  /// **'Location{marker}'**
-  String locationLabel(Object marker);
-
-  /// UI text: Receive site mailings
-  ///
-  /// In en, this message translates to:
-  /// **'Receive site mailings'**
-  String get receiveSiteMailings;
-
   /// UI text: Move to category
   ///
   /// In en, this message translates to:
@@ -3607,24 +2563,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'edited'**
   String get edited;
-
-  /// UI text: This image exceeds the upload limits and needs to be optimiz
-  ///
-  /// In en, this message translates to:
-  /// **'This image exceeds the upload limits and needs to be optimized:'**
-  String get imageExceedsUploadLimits;
-
-  /// UI text: Optimizations to be applied:
-  ///
-  /// In en, this message translates to:
-  /// **'Optimizations to be applied:'**
-  String get optimizationsToBeApplied;
-
-  /// UI text: Reduction: {toStringAsFixed}%
-  ///
-  /// In en, this message translates to:
-  /// **'Reduction: {percent}%'**
-  String reductionPercent(Object percent);
 
   /// UI text: Display name, email, password, and other account settings ar
   ///
@@ -4279,24 +3217,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} Posts'**
   String postsCount(Object count);
-
-  /// UI text: Protected Forum
-  ///
-  /// In en, this message translates to:
-  /// **'Protected Forum'**
-  String get protectedForum;
-
-  /// UI text: {forumName} is password protected.
-  ///
-  /// In en, this message translates to:
-  /// **'{forumName} is password protected.'**
-  String isPasswordProtected(Object forumName);
-
-  /// UI text: Enter
-  ///
-  /// In en, this message translates to:
-  /// **'Enter'**
-  String get enter;
 
   /// UI text: Permission denied to save image
   ///

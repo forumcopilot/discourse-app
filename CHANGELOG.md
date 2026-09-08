@@ -25,6 +25,10 @@ Everything on the road to 1.0, in one sitting after the 0.8.0 tag.
 - Nine analyzer warnings cleared so analyze can gate CI (`5f4514d`).
 - Audit doc: the "Not covered" list now records what happened to each item — composer and attachments closed on-device, PM attachments share that path, drafts reviewed against `DraftsController`, chat uploads not implemented (`4882732`).
 
+### Removed
+- **XenForo-era code that could not work on Discourse**: in-app registration (`register_page`, `additional_information_page`, `custom_field_widget`, `basic_registration_fields`, `location_service`) — the account proxy always answered "sign up on the web", and the two entry points now open the forum's `/signup`; the password-protected-forum flow (`forum_password_dialog`, `ForumActions.enterProtectedForum`) — Discourse categories use group permissions, so a read-restricted category now opens like any other and keeps its lock badge; the XenForo messages page and its app bars; the pre-consent image optimizer dialog; unreferenced passkey validation helpers and error widgets. 180 localization keys that nothing referenced any more went with them, in all eleven ARBs.
+- `packages/forumcopilot_sdk/test/` — XenForo/Tapatalk interface suites with no `main()`, driven from those platforms' own packages. The vendored SDK now carries `lib/` and `pubspec.yaml` only; the rsync rule in `CLAUDE.md` excludes `test/`.
+
 ### Fixed
 - **Signed out after an update or restore** (`f9e33af`). Both secure-storage call sites used library defaults — on Android the legacy scheme the library itself warns against. One shared instance now uses EncryptedSharedPreferences with `resetOnError`; the manifest excludes the secure-storage file from Auto Backup and device transfer (a restored blob is unreadable without the Keystore key); a read that throws starts the app signed out instead of crashing, and logs the lost-key signature. Not reproduced on a device this session; the fix follows the library's own guidance.
 - **`flutter gen-l10n` aborted from the repo root** (`d562317`) — `l10n.yaml` lives in `discourse_ui`. Both bootstrap scripts run it there; this was CI's first red run.

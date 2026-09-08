@@ -3,8 +3,8 @@ import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/views/login_page.dart';
-import 'package:discourse_ui/views/register_page.dart';
 import '../../theme/design_tokens.dart';
+import 'package:discourse_ui/utils/url_utils.dart';
 
 class NotSignedInView extends StatelessWidget {
   final SiteContext siteContext;
@@ -99,7 +99,7 @@ class NotSignedInView extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () {
-                      Get.to(() => RegisterPage(siteContext: siteContext));
+                      UrlUtils.openUrl('${siteContext.site.url}/signup');
                     },
                     style: OutlinedButton.styleFrom(
                       padding: EdgeInsets.symmetric(
