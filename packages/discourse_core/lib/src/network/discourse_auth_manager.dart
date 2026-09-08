@@ -5,13 +5,12 @@ import 'dart:typed_data';
 
 import 'package:asn1lib/asn1lib.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-import '../storage/discourse_secure_storage.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:pointycastle/export.dart' as pc;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../context/discourse_site_context_extension.dart';
+import '../storage/discourse_secure_storage.dart';
 import 'discourse_client.dart';
 
 /// Discourse User API Key handshake.
