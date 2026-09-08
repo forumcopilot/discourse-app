@@ -21,6 +21,8 @@ done
 echo "Generating forumcopilot_sdk mappers..."
 (cd packages/forumcopilot_sdk && dart run build_runner build --delete-conflicting-outputs)
 
+# l10n.yaml and `generate: true` live in discourse_ui, not at the root —
+# run from the root, gen-l10n aborts (that was CI's first red run).
 echo "Generating localizations..."
-flutter gen-l10n
+(cd packages/discourse_ui && flutter gen-l10n)
 echo "Done."
