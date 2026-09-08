@@ -4545,6 +4545,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Don\'t ask again — always resize to fit'**
   String get dontAskAgainAlwaysResize;
+
+  /// Snackbar when the category list fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load categories.'**
+  String get couldNotLoadCategories;
 }
 
 class _AppLocalizationsDelegate

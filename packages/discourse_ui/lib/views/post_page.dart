@@ -473,7 +473,7 @@ class _PostPageState extends State<PostPage> {
     if (!mounted) return;
     if (!forumResult.result || forumResult.forums.isEmpty) {
       messenger.showSnackBar(
-        const SnackBar(content: Text("Couldn't load categories.")),
+        SnackBar(content: Text(AppLocalizations.of(context)!.couldNotLoadCategories)),
       );
       return;
     }

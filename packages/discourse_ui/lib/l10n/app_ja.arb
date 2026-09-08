@@ -1147,5 +1147,6 @@
   "trustLevelsExplanation": "メンバーは閲覧と参加によって信頼を積み上げます。レベルが上がるごとに新しい機能が使えるようになります。",
   "activity": "アクティビティ",
   "dontUpload": "アップロードしない",
-  "dontAskAgainAlwaysResize": "今後表示しない — 常に縮小して合わせる"
+  "dontAskAgainAlwaysResize": "今後表示しない — 常に縮小して合わせる",
+  "couldNotLoadCategories": "カテゴリを読み込めませんでした。"
 }

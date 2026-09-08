@@ -2802,5 +2802,9 @@
   "dontAskAgainAlwaysResize": "Don't ask again — always resize to fit",
   "@dontAskAgainAlwaysResize": {
     "description": "Checkbox on the oversized image sheet"
+  },
+  "couldNotLoadCategories": "Couldn't load categories.",
+  "@couldNotLoadCategories": {
+    "description": "Snackbar when the category list fails to load"
   }
 }

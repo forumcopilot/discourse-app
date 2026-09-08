@@ -2641,4 +2641,8 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get dontAskAgainAlwaysResize =>
       'Nicht mehr fragen — immer passend verkleinern';
+
+  @override
+  String get couldNotLoadCategories =>
+      'Kategorien konnten nicht geladen werden.';
 }

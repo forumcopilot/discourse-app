@@ -2612,4 +2612,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dontAskAgainAlwaysResize =>
       'Don\'t ask again — always resize to fit';
+
+  @override
+  String get couldNotLoadCategories => 'Couldn\'t load categories.';
 }

@@ -2623,4 +2623,7 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get dontAskAgainAlwaysResize =>
       'Больше не спрашивать — всегда уменьшать';
+
+  @override
+  String get couldNotLoadCategories => 'Не удалось загрузить категории.';
 }

@@ -2491,4 +2491,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dontAskAgainAlwaysResize => '不再询问 — 始终缩小以适应';
+
+  @override
+  String get couldNotLoadCategories => '无法加载分类。';
 }

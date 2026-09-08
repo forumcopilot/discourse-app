@@ -2526,4 +2526,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get dontAskAgainAlwaysResize => '今後表示しない — 常に縮小して合わせる';
+
+  @override
+  String get couldNotLoadCategories => 'カテゴリを読み込めませんでした。';
 }

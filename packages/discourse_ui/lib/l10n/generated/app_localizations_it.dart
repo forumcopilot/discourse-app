@@ -2633,4 +2633,7 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get dontAskAgainAlwaysResize =>
       'Non chiedere più — ridimensiona sempre';
+
+  @override
+  String get couldNotLoadCategories => 'Impossibile caricare le categorie.';
 }

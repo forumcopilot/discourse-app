@@ -1147,5 +1147,6 @@
   "trustLevelsExplanation": "Los miembros ganan confianza leyendo y participando. Cada nivel desbloquea nuevas capacidades.",
   "activity": "Actividad",
   "dontUpload": "No subir",
-  "dontAskAgainAlwaysResize": "No volver a preguntar: reducir siempre para que quepa"
+  "dontAskAgainAlwaysResize": "No volver a preguntar: reducir siempre para que quepa",
+  "couldNotLoadCategories": "No se pudieron cargar las categorías."
 }

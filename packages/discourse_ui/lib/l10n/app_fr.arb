@@ -1147,5 +1147,6 @@
   "trustLevelsExplanation": "Les membres gagnent en confiance en lisant et en participant. Chaque niveau débloque de nouvelles possibilités.",
   "activity": "Activité",
   "dontUpload": "Ne pas envoyer",
-  "dontAskAgainAlwaysResize": "Ne plus demander — toujours redimensionner"
+  "dontAskAgainAlwaysResize": "Ne plus demander — toujours redimensionner",
+  "couldNotLoadCategories": "Impossible de charger les catégories."
 }

@@ -1147,5 +1147,6 @@
   "trustLevelsExplanation": "成员通过阅读和参与获得信任。每个等级都会解锁新的权限。",
   "activity": "动态",
   "dontUpload": "不上传",
-  "dontAskAgainAlwaysResize": "不再询问 — 始终缩小以适应"
+  "dontAskAgainAlwaysResize": "不再询问 — 始终缩小以适应",
+  "couldNotLoadCategories": "无法加载分类。"
 }

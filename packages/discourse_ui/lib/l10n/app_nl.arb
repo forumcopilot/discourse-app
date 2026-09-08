@@ -1600,5 +1600,6 @@
   "trustLevelsExplanation": "Leden verdienen vertrouwen door te lezen en mee te doen. Elk niveau ontgrendelt nieuwe mogelijkheden.",
   "activity": "Activiteit",
   "dontUpload": "Niet uploaden",
-  "dontAskAgainAlwaysResize": "Niet meer vragen — altijd passend verkleinen"
+  "dontAskAgainAlwaysResize": "Niet meer vragen — altijd passend verkleinen",
+  "couldNotLoadCategories": "Categorieën laden mislukt."
 }

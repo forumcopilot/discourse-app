@@ -2517,4 +2517,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get dontAskAgainAlwaysResize => '다시 묻지 않기 — 항상 크기에 맞게 조정';
+
+  @override
+  String get couldNotLoadCategories => '카테고리를 불러오지 못했습니다.';
 }

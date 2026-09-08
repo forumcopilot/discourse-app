@@ -1147,5 +1147,6 @@
   "trustLevelsExplanation": "Mitglieder gewinnen Vertrauen durch Lesen und Mitmachen. Jede Stufe schaltet neue Möglichkeiten frei.",
   "activity": "Aktivität",
   "dontUpload": "Nicht hochladen",
-  "dontAskAgainAlwaysResize": "Nicht mehr fragen — immer passend verkleinern"
+  "dontAskAgainAlwaysResize": "Nicht mehr fragen — immer passend verkleinern",
+  "couldNotLoadCategories": "Kategorien konnten nicht geladen werden."
 }

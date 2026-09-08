@@ -1147,5 +1147,6 @@
   "trustLevelsExplanation": "구성원은 읽고 참여하며 신뢰를 쌓습니다. 등급마다 새로운 기능이 열립니다.",
   "activity": "활동",
   "dontUpload": "업로드 안 함",
-  "dontAskAgainAlwaysResize": "다시 묻지 않기 — 항상 크기에 맞게 조정"
+  "dontAskAgainAlwaysResize": "다시 묻지 않기 — 항상 크기에 맞게 조정",
+  "couldNotLoadCategories": "카테고리를 불러오지 못했습니다."
 }

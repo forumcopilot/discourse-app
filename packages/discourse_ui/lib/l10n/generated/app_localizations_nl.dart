@@ -2619,4 +2619,7 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get dontAskAgainAlwaysResize =>
       'Niet meer vragen — altijd passend verkleinen';
+
+  @override
+  String get couldNotLoadCategories => 'Categorieën laden mislukt.';
 }
