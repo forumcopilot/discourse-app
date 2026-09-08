@@ -118,7 +118,7 @@ ARB-based, English template at `packages/discourse_ui/lib/l10n/app_en.arb`, with
 
 ## Not yet implemented
 
-- **Push notifications** — the client side is done: with a relay configured, the User API Key handshake requests the `push` scope and registers a `push_url`, and Discourse POSTs notifications there. What's missing is **the relay backend** that forwards those to FCM/APNs. With no relay configured the app runs exactly as before and needs no real Firebase project — the committed `.example` placeholders are enough to compile (see Quick start). (Forum Copilot runs a hosted relay — [get in touch](mailto:forumcopilot@gmail.com).)
+- **Push notifications** — the client side is done: with a relay configured, the User API Key handshake requests the `push` scope and registers a `push_url`, and Discourse POSTs notifications there. What's missing is **the relay backend** that forwards those to FCM/APNs. See [docs/push.md](docs/push.md) for the decision and what an admin has to enable. With no relay configured the app runs exactly as before and needs no real Firebase project — the committed `.example` placeholders are enough to compile (see Quick start). (Forum Copilot runs a hosted relay — [get in touch](mailto:forumcopilot@gmail.com).)
 - **Chat over MessageBus** — chat polls every 4s today; Discourse web subscribes over MessageBus for sub-second latency. The same swap would speed up topic live-updates and the notification badge.
 - **Chat threads and uploads** — reactions work; threaded replies and file uploads don't yet.
 - **Markdown preview in the composer** — the editor is text-only for now.

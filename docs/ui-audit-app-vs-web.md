@@ -539,14 +539,31 @@ hand on the device; the remaining screens can be audited after that.
 
 ## Not covered
 
-Still to audit: **chat**, **drafts**, **composer** (new topic / reply /
-PM against web), and **attachments**, which were deferred mid-session and
-never picked up. The composer is the largest remaining gap and the only
-one where a defect costs a user their writing.
+Everything below was outstanding at the end of the on-device sessions.
+Where a later session closed an item, the finding is recorded here rather
+than in a new section, so this list stays the single place to look.
 
-Notifications, search, messages/PMs, bookmarks, groups, invites,
-notification settings and the topic page were covered in the session
-below.
+- **Composer and attachments** — closed 2026-09-08 on the local Discourse
+  with an admin account. Found and fixed: silent JPEG re-encoding of every
+  picked image, a size cap that could never fire, uploads named "file" and
+  "image" in the post body, six copies of the upload logic. Now one
+  `AttachmentUploadService`, resize-to-fit only with consent, and
+  attachments render as cards. Commits a1d4b37 and 9b94d16.
+- **PM attachments** — same code path as posts since 9b94d16 (the
+  conversation composers call the shared service), so covered by the
+  above. Not separately exercised on a device.
+- **Drafts** — reviewed against `DraftsController` and `Draft.set` in the
+  Discourse source rather than on a device. The contract is honoured:
+  the app sends `draft_key`, `sequence` and JSON-string `data`, stores the
+  returned `draft_sequence`, and sends it back on the next save and on
+  delete; a stale sequence comes back as 409 and surfaces as the server's
+  own message. Not sent: `owner` (web's per-tab id) and `force_save`. The
+  server only gates on `sequence`, so neither affects correctness; the
+  app can never offer web's "overwrite the other window's draft" button.
+- **Chat uploads** — not implemented in the app (README, "Not yet
+  implemented"). Nothing to compare until they are.
+- **Chat** in general (channel list, messages, reactions) — still not
+  audited against web.
 
 The method above is cheap to repeat — `flutter run -d <device>` plus the
 same page in Chrome.
