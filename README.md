@@ -258,11 +258,24 @@ See [`CHANGELOG.md`](CHANGELOG.md). It follows *Keep a Changelog*; the **[Unrele
 
 ## Before you publish a fork
 
-1. Set the forum URL, name and branding in `app_forum_config.dart`.
-2. Set your own bundle / application IDs for Android, iOS and macOS.
-3. Set your Apple Development Team in the Xcode project before signing.
-4. Configure passkey association files (`assetlinks.json`, `apple-app-site-association`) with your package / team IDs and certificate fingerprints.
-5. If wiring push: add your own Firebase config files, and **never commit a service-account JSON**.
+Everything that identifies the app is a placeholder. The checked-in values build and run against the Discourse sandbox, and nothing more; a store will reject `com.example`, and "Forum App" is not a name. Change all of these:
+
+| What | Where | Placeholder today |
+|---|---|---|
+| Forum URL, name, description, branding | `packages/discourse_ui/lib/config/app_forum_config.dart` | `https://try.discourse.org`, `Discourse` |
+| Android application id and namespace | `android/app/build.gradle` (`applicationId`, `namespace`), and move `android/app/src/main/kotlin/com/example/forumapp/MainActivity.kt` to the matching package path | `com.example.forumapp` |
+| Android app name | `android/app/src/main/AndroidManifest.xml` (`android:label`) | `Forum App` |
+| iOS bundle id, display name | `ios/Runner.xcodeproj` (`PRODUCT_BUNDLE_IDENTIFIER`, three configurations), `ios/Runner/Info.plist` (`CFBundleDisplayName`, `CFBundleName`) | `com.example.forumapp`, `Forum App` |
+| macOS bundle id, product name | `macos/Runner/Configs/AppInfo.xcconfig` (`PRODUCT_BUNDLE_IDENTIFIER`, `PRODUCT_NAME`) | `com.example.forumapp`, `Forum App` |
+| Package name the passkey / app-link config refers to | `AppForumConfig.androidPackageName`, plus your hosted `assetlinks.json` and `apple-app-site-association` with your team id and certificate fingerprints | `com.example.forumapp` |
+| Icons and splash | `assets/`, then `dart run flutter_launcher_icons` and `dart run flutter_native_splash:create` | Forum Copilot artwork |
+| Apple Development Team | Xcode signing settings | none |
+| Firebase, only if you wire push | your own `google-services.json` / `GoogleService-Info.plist` in place of the `.example` placeholders; **never commit a service-account JSON** | placeholders |
+| Local dev helper | `reset_storage.sh` (`BUNDLE_ID`) | `com.example.forumapp` |
+
+### Naming
+
+This project is not affiliated with, endorsed by, or an official product of Civilized Discourse Construction Kit, Inc. "Discourse" is their trademark. A fork should be named for the community it serves, not as "the Discourse app", and its store listing should say it is a third-party client.
 
 ---
 
