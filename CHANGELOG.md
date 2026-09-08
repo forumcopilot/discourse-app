@@ -6,7 +6,19 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
-Everything on the road to 1.0, in one sitting after the 0.8.0 tag.
+## [1.0.0] - 2026-09-08
+
+The first release that calls itself finished. Since 0.8.0 the same day:
+every UI string is localized in eleven languages, deprecated API uses
+are at zero, CI checks a fresh clone on Linux and Windows on every push,
+the User API Key survives app updates (reproduced and fixed on a Pixel),
+the iOS floor is 15.0, and the last XenForo-era code that could not work
+on Discourse is gone. Push notifications ship optional and off by
+default; the relay lives outside this repo.
+
+Not verified for this release: an Xcode build at the new 15.0 floor.
+`pod install` resolves; the Mac that cut the release lacks the iOS
+platform component. Android, macOS, Windows and Linux were exercised.
 
 ### Added
 - **CI** (`be591c7`, `0bd34f6`, `d562317`): GitHub Actions runs the README's own Quick start on every push — pub get, `buildlib.sh`, a check that the SDK's generated code is committed, analyze with errors and warnings fatal, every package's tests, a debug APK from the `.example` Firebase placeholder — and `buildlib.bat` on a Windows runner, the first time that script has ever been executed.
