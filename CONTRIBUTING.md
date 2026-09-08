@@ -19,12 +19,28 @@ flutter pub get
 buildlib.bat           # Windows
 ```
 
-`buildlib` runs the `dart_mappable` / `json_annotation` codegen inside
-`packages/forumcopilot_sdk` and then `flutter gen-l10n`. Re-run it whenever
-you change an ARB file or an annotated class in the SDK. `discourse_core`
-has its own codegen: if you touch an annotated class there, run
-`dart run build_runner build --delete-conflicting-outputs` inside
-`packages/discourse_core` as well.
+`buildlib` does three things, and the first is the one people miss: it
+runs `dart pub get` inside each nested package (`forumcopilot_sdk`,
+`discourse_core`, `discourse_ui`), because the root `flutter pub get`
+writes no `package_config` for them and the analyzer then reports
+hundreds of unresolved imports. It then runs the `dart_mappable` /
+`json_annotation` codegen inside `packages/forumcopilot_sdk` — the only
+package with generated code — and `flutter gen-l10n`. Re-run it whenever
+you change an ARB file or an annotated class in the SDK.
+
+Android, iOS and macOS builds need a Firebase config file to exist even
+though push is off by default — the Google Services gradle plugin and the
+Xcode bundle-resource reference both fail hard without it. The committed
+`.example` placeholders are enough to compile:
+
+```bash
+cp android/app/google-services.json.example       android/app/google-services.json
+cp ios/Runner/GoogleService-Info.plist.example    ios/Runner/GoogleService-Info.plist
+cp macos/Runner/GoogleService-Info.plist.example  macos/Runner/GoogleService-Info.plist
+```
+
+They are gitignored, so real ones cannot be committed by accident. Web,
+Windows and Linux skip Firebase and need nothing.
 
 Then:
 

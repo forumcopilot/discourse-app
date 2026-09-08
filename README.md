@@ -134,9 +134,19 @@ ARB-based, English template at `packages/discourse_ui/lib/l10n/app_en.arb`, with
 git clone https://github.com/forumcopilot/discourse-app.git
 cd discourse-app
 flutter pub get
-./buildlib.sh          # codegen + gen-l10n   (Windows: buildlib.bat)
+./buildlib.sh          # resolves the nested packages, codegen, gen-l10n   (Windows: buildlib.bat)
+
+# Android / iOS / macOS builds require a Firebase config file to *exist*,
+# even with push disabled. The committed .example placeholders are enough
+# to compile — copy them, and replace with real ones only if you wire push.
+cp android/app/google-services.json.example        android/app/google-services.json
+cp ios/Runner/GoogleService-Info.plist.example     ios/Runner/GoogleService-Info.plist
+cp macos/Runner/GoogleService-Info.plist.example   macos/Runner/GoogleService-Info.plist
+
 flutter run -d macos   # or -d chrome, -d <ios-device>, -d <android-id>
 ```
+
+Web, Windows and Linux skip Firebase entirely and need no config file. The three files above are gitignored, so your real ones can never be committed by accident.
 
 ### Point it at your forum
 
@@ -156,7 +166,7 @@ The grant redirect defaults to `discourse://auth_redirect` — the universal sch
 
 ### Codegen
 
-`buildlib.sh` runs `build_runner` inside `packages/forumcopilot_sdk` and `packages/discourse_core`, then `flutter gen-l10n`. **Re-run it after** editing an ARB file or any `dart_mappable` / `json_annotation` annotated class.
+`buildlib.sh` resolves each nested package (`dart pub get` in all three — root `flutter pub get` does not do this, and skipping it leaves the analyzer with hundreds of unresolved imports), runs `build_runner` inside `packages/forumcopilot_sdk`, then `flutter gen-l10n`. **Re-run it after** editing an ARB file or any `dart_mappable` / `json_annotation` annotated class in the SDK. The SDK is the only package with generated code.
 
 > ⚠ On Dart 3.10 the `dart_mappable` build hook fails with `'dart compile' does not support build hooks`. Until that's fixed upstream, hand-edit the affected `.mapper.dart` — recent commits show the pattern.
 
