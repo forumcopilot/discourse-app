@@ -1,0 +1,105 @@
+# The fresh-clone guarantee, checked on every push instead of by hand.
+#
+# Mirrors README "Quick start" exactly: a checkout with nothing but the
+# committed files and the .example Firebase config must analyze, pass
+# every package's tests, and produce a debug APK. When this goes red the
+# README is wrong, not the workflow.
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: 3.38.7
+
+jobs:
+  check:
+    name: Analyze and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Bootstrap (same steps as README Quick start)
+        run: |
+          flutter pub get
+          ./buildlib.sh
+
+      - name: Generated SDK code is committed and current
+        # buildlib.sh regenerates forumcopilot_sdk's mappers; if that
+        # produced a diff, someone changed an annotated model and forgot
+        # to commit the output.
+        run: git diff --exit-code --stat -- packages/forumcopilot_sdk
+
+      - name: Analyze
+        # Errors and warnings fail the build. Infos do not: flutter analyze
+        # makes them fatal by default, and the vendored SDK carries ~900
+        # style infos (XenForo-era identifier names, super-parameter hints)
+        # that are not this repo's to fix.
+        run: flutter analyze --no-fatal-infos
+
+      - name: Test forumcopilot_sdk
+        run: flutter test
+        working-directory: packages/forumcopilot_sdk
+
+      - name: Test discourse_core
+        run: flutter test
+        working-directory: packages/discourse_core
+
+      - name: Test discourse_ui
+        run: flutter test
+        working-directory: packages/discourse_ui
+
+      - name: Test app
+        run: flutter test
+
+  android:
+    name: Debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Bootstrap
+        run: |
+          flutter pub get
+          ./buildlib.sh
+
+      - name: Placeholder Firebase config
+        # Never a real project: the placeholder from the repo, exactly as
+        # the README tells a new clone to do.
+        run: cp android/app/google-services.json.example android/app/google-services.json
+
+      - name: Build
+        run: flutter build apk --debug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-debug.apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14
