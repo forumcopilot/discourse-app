@@ -11,6 +11,7 @@ import 'ignored_users_page.dart';
 import 'settings/notification_settings_page.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Phase 5.20d — Forum Settings page rebuilt as a curated Discourse-
 /// native section list.
@@ -42,7 +43,7 @@ class ForumSettingsPage extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.notifications_outlined,
                 color: colorScheme.onSurfaceVariant),
-            title: const Text('Notifications'),
+            title: Text(AppLocalizations.of(context)!.notifications),
             subtitle: Text(
               'Email frequency, like aggregation, digest schedule',
               style: textTheme.bodySmall?.copyWith(
@@ -61,7 +62,7 @@ class ForumSettingsPage extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.open_in_new_rounded,
                 color: colorScheme.onSurfaceVariant),
-            title: const Text('Manage account on web'),
+            title: Text(AppLocalizations.of(context)!.manageAccountOnWeb),
             subtitle: Text(
               'Profile, email, password, security, advanced settings',
               style: textTheme.bodySmall?.copyWith(
@@ -77,7 +78,7 @@ class ForumSettingsPage extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.alternate_email_rounded,
                 color: colorScheme.onSurfaceVariant),
-            title: const Text('Change email'),
+            title: Text(AppLocalizations.of(context)!.changeEmail),
             subtitle: Text(
               "We'll send a verification link to the new address",
               style: textTheme.bodySmall?.copyWith(
@@ -92,7 +93,7 @@ class ForumSettingsPage extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.password_rounded,
                 color: colorScheme.onSurfaceVariant),
-            title: const Text('Change password'),
+            title: Text(AppLocalizations.of(context)!.changePassword),
             subtitle: Text(
               'Trigger a password-reset email to your current address',
               style: textTheme.bodySmall?.copyWith(
@@ -107,7 +108,7 @@ class ForumSettingsPage extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.notifications_off_outlined,
                 color: colorScheme.onSurfaceVariant),
-            title: const Text('Ignored users'),
+            title: Text(AppLocalizations.of(context)!.ignoredUsers),
             subtitle: Text(
               'See and manage users whose posts are hidden from you',
               style: textTheme.bodySmall?.copyWith(
@@ -185,7 +186,7 @@ class ForumSettingsPage extends StatelessWidget {
                             DesignTokens.radiusExtendedButton),
                       ),
                     ),
-                    child: const Text('Delete account'),
+                    child: Text(AppLocalizations.of(context)!.deleteAccount),
                   ),
                 ],
               ),
@@ -281,7 +282,7 @@ class ForumSettingsPage extends StatelessWidget {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Change password'),
+          title: Text(AppLocalizations.of(context)!.changePassword),
           content: const Text(
             'We’ll email you a password-reset link. Click it to '
             'choose a new password — the change is handled on the '
@@ -290,7 +291,7 @@ class ForumSettingsPage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../settings_context.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/file_utils.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// What the user chose when an image came in over the forum's size cap.
 enum OversizedImageChoice { resize, skip }
@@ -122,7 +123,7 @@ class _OversizedImageSheetState extends State<_OversizedImageSheet> {
                     if (!context.mounted) return;
                     Navigator.of(context).pop(OversizedImageChoice.resize);
                   },
-                  child: const Text('Resize and upload'),
+                  child: Text(AppLocalizations.of(context)!.resizeAndUpload),
                 ),
               ],
             ),

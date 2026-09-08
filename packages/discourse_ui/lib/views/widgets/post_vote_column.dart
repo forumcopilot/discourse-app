@@ -3,6 +3,7 @@ import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_vote.dart';
 
 import '../../theme/design_tokens.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Stack Overflow-style vertical voting column for Q&A topics, backed
 /// by the `discourse-post-voting` plugin:
@@ -42,7 +43,7 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
     if (_inFlight) return;
     if (!widget.isLoggedIn) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to vote')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseLogInToVote)),
       );
       return;
     }

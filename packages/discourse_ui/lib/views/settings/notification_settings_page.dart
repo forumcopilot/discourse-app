@@ -12,6 +12,7 @@ import '../../controllers/site_controller.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/simple_list_app_bar.dart';
 import '../../utils/error_message.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Phase 5.20b — notification preferences screen, rebuilt to sync
 /// against Discourse's user_option API.
@@ -306,8 +307,8 @@ class _PushStatusTile extends StatelessWidget {
           Icons.notifications_off_outlined,
           color: colorScheme.onSurfaceVariant,
         ),
-        title: const Text('Push notifications'),
-        subtitle: const Text('Not available in this build'),
+        title: Text(AppLocalizations.of(context)!.pushNotifications),
+        subtitle: Text(AppLocalizations.of(context)!.pushNotAvailableInThisBuild),
         enabled: false,
       );
     }
@@ -323,8 +324,8 @@ class _PushStatusTile extends StatelessWidget {
           Icons.notifications_active_outlined,
           color: colorScheme.primary,
         ),
-        title: const Text('Push notifications'),
-        subtitle: const Text('Enabled for this login'),
+        title: Text(AppLocalizations.of(context)!.pushNotifications),
+        subtitle: Text(AppLocalizations.of(context)!.pushEnabledForThisLogin),
       );
     }
 
@@ -333,7 +334,7 @@ class _PushStatusTile extends StatelessWidget {
         Icons.notification_important_outlined,
         color: colorScheme.error,
       ),
-      title: const Text('Push notifications'),
+      title: Text(AppLocalizations.of(context)!.pushNotifications),
       subtitle: const Text(
         'Not active for this login — log out and log back in to '
         'authorize push notifications',
@@ -494,10 +495,10 @@ class _DoNotDisturbTileState extends State<_DoNotDisturbTile> {
     final colorScheme = Theme.of(context).colorScheme;
 
     if (_loading) {
-      return const ListTile(
+      return ListTile(
         leading: Icon(Icons.do_not_disturb_on_outlined),
-        title: Text('Do not disturb'),
-        subtitle: Text('Checking status…'),
+        title: Text(AppLocalizations.of(context)!.doNotDisturb),
+        subtitle: Text(AppLocalizations.of(context)!.checkingStatus),
         enabled: false,
       );
     }
@@ -508,11 +509,11 @@ class _DoNotDisturbTileState extends State<_DoNotDisturbTile> {
           Icons.do_not_disturb_on,
           color: colorScheme.primary,
         ),
-        title: const Text('Do not disturb'),
-        subtitle: Text('On until ${_untilLabel(context, _endsAt!)}'),
+        title: Text(AppLocalizations.of(context)!.doNotDisturb),
+        subtitle: Text(AppLocalizations.of(context)!.doNotDisturbOnUntil(_untilLabel(context, _endsAt!))),
         trailing: TextButton(
           onPressed: _busy ? null : _leave,
-          child: const Text('Turn off'),
+          child: Text(AppLocalizations.of(context)!.turnOff),
         ),
       );
     }
@@ -523,7 +524,7 @@ class _DoNotDisturbTileState extends State<_DoNotDisturbTile> {
         Icons.do_not_disturb_on_outlined,
         color: colorScheme.onSurfaceVariant,
       ),
-      title: const Text('Do not disturb'),
+      title: Text(AppLocalizations.of(context)!.doNotDisturb),
       subtitle: const Text(
         'Pause notifications for a while — Discourse holds them '
         'until the window ends',

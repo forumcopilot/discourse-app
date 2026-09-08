@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_badge.dart';
 import '../../theme/design_tokens.dart';
 import 'badge_detail_sheet.dart';
 import 'profile_section.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// The profile's Badges section.
 ///
@@ -147,7 +148,7 @@ class _UserBadgesSectionState extends State<UserBadgesSection> {
             ),
           if (remaining > 0)
             ActionChip(
-              label: Text('+$remaining more'),
+              label: Text(AppLocalizations.of(context)!.moreBadges(remaining)),
               onPressed: () => _showAll(context),
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

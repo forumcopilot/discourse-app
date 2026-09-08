@@ -11,6 +11,7 @@ import 'listitems/topic_list_item.dart';
 import 'post_page.dart';
 import 'widgets/notification_level_sheet.dart';
 import '../utils/error_message.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Tag-filtered topic list. Reachable from a tappable tag chip in the
 /// Latest tab; hits Discourse's `/tag/{name}.json` endpoint.
@@ -127,7 +128,7 @@ class _TagTopicsPageState extends State<TagTopicsPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content:
-                Text('Notification level for "${widget.tag}" updated'),
+                Text(AppLocalizations.of(context)!.tagNotificationLevelUpdated(widget.tag)),
           ),
         );
       },

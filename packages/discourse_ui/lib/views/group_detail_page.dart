@@ -12,6 +12,7 @@ import 'widgets/simple_list_app_bar.dart';
 import 'widgets/trust_level_chip.dart';
 import '../utils/error_message.dart';
 import 'widgets/remote_circle_avatar.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Phase 5.18c-2 — single-group screen. Fetches the group's metadata
 /// (`/groups/{name}.json`) and the first page of members
@@ -184,7 +185,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
       builder: (dialogContext) {
         final colorScheme = Theme.of(dialogContext).colorScheme;
         return AlertDialog(
-          title: const Text('Leave group?'),
+          title: Text(AppLocalizations.of(context)!.leaveGroupQuestion),
           content: Text(
             'You will no longer be a member of ${group.displayName}. '
             'You can rejoin at any time.',
@@ -192,12 +193,12 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
               style: TextButton.styleFrom(foregroundColor: colorScheme.error),
-              child: const Text('Leave'),
+              child: Text(AppLocalizations.of(context)!.leave),
             ),
           ],
         );
@@ -237,7 +238,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
     final reason = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text('Request to join ${group.displayName}'),
+        title: Text(AppLocalizations.of(context)!.requestToJoinGroup(group.displayName)),
         content: TextField(
           controller: controller,
           autofocus: true,
@@ -252,12 +253,12 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           FilledButton(
             onPressed: () =>
                 Navigator.of(dialogContext).pop(controller.text.trim()),
-            child: const Text('Send request'),
+            child: Text(AppLocalizations.of(context)!.sendRequest),
           ),
         ],
       ),
@@ -464,7 +465,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
                   ),
                 )
               : const Icon(Icons.logout_rounded),
-          label: const Text('Leave group'),
+          label: Text(AppLocalizations.of(context)!.leaveGroup),
           style: OutlinedButton.styleFrom(
             foregroundColor: colorScheme.error,
             side: BorderSide(
@@ -507,7 +508,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
       child = FilledButton.tonalIcon(
         onPressed: _membershipBusy ? null : _handleRequestMembership,
         icon: const Icon(Icons.outgoing_mail),
-        label: const Text('Request to join'),
+        label: Text(AppLocalizations.of(context)!.requestToJoin),
       );
     } else {
       return const [];

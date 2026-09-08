@@ -8,6 +8,7 @@ import 'user_profile_page.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Phase 5.25 — list users you've ignored (Discourse notification
 /// level 2), with a per-row "Unignore" action.
@@ -88,7 +89,7 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
           _busy.remove(user.username);
         });
         messenger.showSnackBar(
-          SnackBar(content: Text('Stopped ignoring @${user.username}')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.stoppedIgnoringUser(user.username))),
         );
       } else {
         setState(() {

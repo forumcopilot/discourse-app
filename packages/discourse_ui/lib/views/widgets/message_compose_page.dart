@@ -1706,7 +1706,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                             size: 16,
                             color: colorScheme.onSecondaryContainer,
                           ),
-                          label: const Text('Whisper'),
+                          label: Text(AppLocalizations.of(context)!.whisper),
                           labelStyle: textTheme.labelSmall?.copyWith(
                             color: colorScheme.onSecondaryContainer,
                           ),

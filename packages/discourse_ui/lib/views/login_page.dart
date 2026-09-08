@@ -9,6 +9,7 @@ import 'package:discourse_ui/services/discourse_login_service.dart';
 import 'package:discourse_ui/views/discourse_login_webview_page.dart';
 import 'package:discourse_ui/views/enable_notifications_page.dart';
 import 'package:discourse_ui/views/site_home_page.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Phase 5.20a — the login page on Discourse is a single
 /// "Sign in with {domain}" CTA that launches the User API Key
@@ -72,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not start sign-in: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.couldNotStartSignIn(e.toString()))),
       );
       _popBack();
       return;
@@ -100,8 +101,8 @@ class _LoginPageState extends State<LoginPage> {
     final payload = loginService.extractPayload(redirectUrl);
     if (payload == null || payload.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sign-in cancelled — no payload returned'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.signInCancelledNoPayload),
         ),
       );
       _popBack();
@@ -113,7 +114,7 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sign-in failed: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.signInFailed(e.toString()))),
       );
       _popBack();
       return;

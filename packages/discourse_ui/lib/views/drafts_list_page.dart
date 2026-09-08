@@ -11,6 +11,7 @@ import 'post_page.dart';
 import 'reply_page.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Discourse-native drafts list (`/drafts.json`). Surfaces all of the
 /// current user's saved drafts — new topics, replies, and PMs.
@@ -76,17 +77,17 @@ class _DraftsListPageState extends State<DraftsListPage> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Discard draft?'),
-        content: const Text('This will permanently remove the saved draft.'),
+        title: Text(AppLocalizations.of(context)!.discardDraftQuestion),
+        content: Text(AppLocalizations.of(context)!.discardDraftWarning),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
+              child: Text(AppLocalizations.of(context)!.cancel)),
           FilledButton(
               style: FilledButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.error),
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Discard')),
+              child: Text(AppLocalizations.of(context)!.discard)),
         ],
       ),
     );

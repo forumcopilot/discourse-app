@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart'; // Added for BuildContext
+import '../l10n/generated/app_localizations.dart';
 
 /// Forum template types enum
 enum ForumTemplate {
@@ -1093,7 +1094,7 @@ class UrlUtils {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Email copied to clipboard: $cleanEmail'),
+              content: Text(AppLocalizations.of(context)!.emailCopiedToClipboard(cleanEmail)),
               duration: const Duration(seconds: 2),
             ),
           );
@@ -1104,7 +1105,7 @@ class UrlUtils {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not open email: $email'),
+            content: Text(AppLocalizations.of(context)!.couldNotOpenEmail(email)),
             duration: const Duration(seconds: 2),
           ),
         );

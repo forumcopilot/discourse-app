@@ -10,6 +10,7 @@ import '../theme/design_tokens.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Invites screen — Discourse-native shareable invite links and email
 /// invites (`DiscourseInviteProxy`, no XenForo-shaped SDK counterpart).
@@ -191,14 +192,14 @@ class _InvitesPageState extends State<InvitesPage> {
                           );
                           if (!sheetContext.mounted) return;
                           ScaffoldMessenger.of(sheetContext).showSnackBar(
-                            const SnackBar(
-                              content: Text('Invite link copied'),
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context)!.inviteLinkCopied),
                               duration: Duration(seconds: 2),
                             ),
                           );
                         },
                         icon: const Icon(Icons.copy_rounded),
-                        label: const Text('Copy'),
+                        label: Text(AppLocalizations.of(context)!.copy),
                       ),
                     ),
                     SizedBox(width: DesignTokens.spacingM),
@@ -207,7 +208,7 @@ class _InvitesPageState extends State<InvitesPage> {
                         onPressed: () =>
                             SharePlus.instance.share(ShareParams(text: invite.link)),
                         icon: const Icon(Icons.share_outlined),
-                        label: const Text('Share'),
+                        label: Text(AppLocalizations.of(context)!.share),
                       ),
                     ),
                   ],
@@ -230,7 +231,7 @@ class _InvitesPageState extends State<InvitesPage> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Invite by email'),
+          title: Text(AppLocalizations.of(context)!.inviteByEmail),
           content: Form(
             key: formKey,
             child: Column(
@@ -267,7 +268,7 @@ class _InvitesPageState extends State<InvitesPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             FilledButton(
               onPressed: () {
@@ -275,7 +276,7 @@ class _InvitesPageState extends State<InvitesPage> {
                   Navigator.of(dialogContext).pop(true);
                 }
               },
-              child: const Text('Send invite'),
+              child: Text(AppLocalizations.of(context)!.sendInvite),
             ),
           ],
         );
@@ -305,7 +306,7 @@ class _InvitesPageState extends State<InvitesPage> {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Invite sent to $email')),
+      SnackBar(content: Text(AppLocalizations.of(context)!.inviteSentTo(email))),
     );
     await _load();
   }
@@ -314,7 +315,7 @@ class _InvitesPageState extends State<InvitesPage> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Revoke invite?'),
+        title: Text(AppLocalizations.of(context)!.revokeInviteQuestion),
         content: Text(
           invite.isLinkInvite
               ? 'The invite link will stop working.'
@@ -323,14 +324,14 @@ class _InvitesPageState extends State<InvitesPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(dialogContext).colorScheme.error,
             ),
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Revoke'),
+            child: Text(AppLocalizations.of(context)!.revoke),
           ),
         ],
       ),
@@ -391,7 +392,7 @@ class _InvitesPageState extends State<InvitesPage> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.add_link),
-              label: const Text('New invite link'),
+              label: Text(AppLocalizations.of(context)!.newInviteLink),
             ),
     );
   }
@@ -485,8 +486,8 @@ class _InvitesPageState extends State<InvitesPage> {
                 );
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Invite link copied'),
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context)!.inviteLinkCopied),
                     duration: Duration(seconds: 2),
                   ),
                 );

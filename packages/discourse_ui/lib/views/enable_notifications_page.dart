@@ -12,6 +12,7 @@ import '../core/logging/app_logger.dart';
 import '../services/discourse_login_service.dart';
 import '../theme/design_tokens.dart';
 import 'discourse_login_webview_page.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Asks the user to grant a notifications-only User API Key, shown once after
 /// a successful sign-in.
@@ -151,7 +152,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage> {
       if (!mounted) return;
       setState(() => _granting = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not enable notifications: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.couldNotEnableNotifications(e.toString()))),
       );
     }
   }
@@ -215,7 +216,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage> {
     final osBlocked = _osPermission != null && !_osPermission!.isGranted;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Turn on notifications')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.turnOnNotifications)),
       body: SafeArea(
         child: Padding(
           padding: DesignTokens.paddingL,
@@ -312,7 +313,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage> {
                           child:
                               CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Continue'),
+                      : Text(AppLocalizations.of(context)!.continueButton),
                 ),
               ),
               const SizedBox(height: DesignTokens.spacingS),
@@ -321,7 +322,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage> {
                 child: TextButton(
                   onPressed:
                       _granting ? null : () => Navigator.of(context).pop(false),
-                  child: const Text('Not now'),
+                  child: Text(AppLocalizations.of(context)!.notNow),
                 ),
               ),
 

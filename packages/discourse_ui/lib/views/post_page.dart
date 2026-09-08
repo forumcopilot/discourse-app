@@ -566,7 +566,7 @@ class _PostPageState extends State<PostPage> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Merge into topic'),
+          title: Text(AppLocalizations.of(context)!.mergeIntoTopic),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -594,7 +594,7 @@ class _PostPageState extends State<PostPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             FilledButton(
               onPressed: () {
@@ -606,7 +606,7 @@ class _PostPageState extends State<PostPage> {
                 backgroundColor: colorScheme.error,
                 foregroundColor: colorScheme.onError,
               ),
-              child: const Text('Merge'),
+              child: Text(AppLocalizations.of(context)!.merge),
             ),
           ],
         );

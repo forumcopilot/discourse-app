@@ -1185,7 +1185,7 @@ class PostActionsHandler {
     if (seconds <= 0) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('You can like this post again in ${seconds}s'),
+        content: Text(AppLocalizations.of(context)!.likeAgainInSeconds(seconds)),
         duration: const Duration(seconds: 2),
       ),
     );

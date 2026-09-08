@@ -14,6 +14,7 @@ import 'widgets/bookmark_reminder_sheet.dart';
 import 'widgets/user_avatar.dart';
 import '../utils/error_message.dart';
 import 'widgets/empty_state_view.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Discourse-native bookmarks list. Backed by `/u/{me}/bookmarks.json`,
 /// reachable from the user profile page (own profile only). Tapping an
@@ -203,10 +204,10 @@ class _BookmarksPageState extends State<BookmarksPage> {
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Icon(Icons.bookmark, size: 20),
             SizedBox(width: 8),
-            Text('Bookmarks'),
+            Text(AppLocalizations.of(context)!.bookmarks),
           ],
         ),
       ),
@@ -460,7 +461,7 @@ class _BookmarkTile extends StatelessWidget {
                             size: DesignTokens.iconSizeM,
                             color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingM),
-                        const Text('Clear reminder'),
+                        Text(AppLocalizations.of(context)!.clearReminder),
                       ],
                     ),
                   ),
@@ -472,7 +473,7 @@ class _BookmarkTile extends StatelessWidget {
                           size: DesignTokens.iconSizeM,
                           color: colorScheme.error),
                       const SizedBox(width: DesignTokens.spacingM),
-                      const Text('Remove bookmark'),
+                      Text(AppLocalizations.of(context)!.removeBookmark),
                     ],
                   ),
                 ),

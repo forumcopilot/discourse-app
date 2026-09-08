@@ -596,7 +596,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     if (result.result) {
       _notificationTabKey.currentState?.resetTab();
       messenger.showSnackBar(
-        const SnackBar(content: Text('All notifications marked as read')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.allNotificationsMarkedAsRead)),
       );
     } else {
       messenger.showSnackBar(

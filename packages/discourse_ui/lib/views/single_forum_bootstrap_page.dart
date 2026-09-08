@@ -11,6 +11,7 @@ import 'package:discourse_ui/views/site_home_page.dart';
 import 'package:discourse_ui/services/site_initialization_service.dart';
 import 'package:discourse_ui/views/widgets/progress_dialog.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import '../l10n/generated/app_localizations.dart';
 
 class SingleForumBootstrapPage extends StatefulWidget {
   /// Site to connect to. When null (the standalone single-forum app),
@@ -195,7 +196,7 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
                     FilledButton.icon(
                       onPressed: _initializeForum,
                       icon: const Icon(Icons.refresh),
-                      label: const Text('Retry Connection'),
+                      label: Text(AppLocalizations.of(context)!.retryConnection),
                     ),
                   ],
                 ],

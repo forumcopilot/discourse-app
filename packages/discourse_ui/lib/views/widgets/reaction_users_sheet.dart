@@ -293,7 +293,7 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
                     )
                   : TextButton(
                       onPressed: () => _load(more: true),
-                      child: const Text('Load more'),
+                      child: Text(AppLocalizations.of(context)!.loadMore),
                     ),
             ),
           );

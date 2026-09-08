@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/design_tokens.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Outcome of [BookmarkReminderSheet.show].
 ///
@@ -100,7 +101,7 @@ class _BookmarkReminderSheetBody extends StatelessWidget {
         DateTime(date.year, date.month, date.day, time.hour, time.minute);
     if (!chosen.isAfter(DateTime.now())) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Reminder time must be in the future')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.reminderTimeMustBeInFuture)),
       );
       return;
     }
@@ -146,25 +147,25 @@ class _BookmarkReminderSheetBody extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.schedule, color: colorScheme.primary),
-            title: const Text('In two hours'),
+            title: Text(AppLocalizations.of(context)!.inTwoHours),
             subtitle: Text(_describe(context, twoHours)),
             onTap: () => _pick(context, twoHours),
           ),
           ListTile(
             leading: Icon(Icons.wb_sunny_outlined, color: colorScheme.primary),
-            title: const Text('Tomorrow'),
+            title: Text(AppLocalizations.of(context)!.tomorrow),
             subtitle: Text(_describe(context, tomorrow)),
             onTap: () => _pick(context, tomorrow),
           ),
           ListTile(
             leading: Icon(Icons.next_week_outlined, color: colorScheme.primary),
-            title: const Text('Next week'),
+            title: Text(AppLocalizations.of(context)!.nextWeek),
             subtitle: Text(_describe(context, nextWeek)),
             onTap: () => _pick(context, nextWeek),
           ),
           ListTile(
             leading: Icon(Icons.calendar_month, color: colorScheme.primary),
-            title: const Text('Custom date & time'),
+            title: Text(AppLocalizations.of(context)!.customDateAndTime),
             onTap: () => _pickCustom(context),
           ),
           ListTile(

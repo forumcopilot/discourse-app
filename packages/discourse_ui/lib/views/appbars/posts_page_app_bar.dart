@@ -709,7 +709,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             FilledButton(
               onPressed: () {
@@ -732,7 +732,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Rename Topic'),
+          title: Text(AppLocalizations.of(context)!.renameTopic),
           content: TextField(
             controller: controller,
             autofocus: true,
@@ -755,7 +755,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             FilledButton(
               onPressed: () {
@@ -767,7 +767,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                 Navigator.of(dialogContext).pop();
                 _renameTo(trimmed);
               },
-              child: const Text('Save'),
+              child: Text(AppLocalizations.of(context)!.save),
             ),
           ],
         );

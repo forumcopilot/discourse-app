@@ -7,6 +7,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_tag.dart';
 import '../../theme/design_tokens.dart';
 import '../tag_topics_page.dart';
 import '../widgets/notification_level_sheet.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Global Tags tab — lists every tag the current user can see, sorted
 /// by topic count (most-used first). Tapping a tag drills into the
@@ -159,7 +160,7 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Notification level for "${tag.name}" updated'),
+            content: Text(AppLocalizations.of(context)!.tagNotificationLevelUpdated(tag.name)),
           ),
         );
       },

@@ -10,6 +10,7 @@ import 'package:discourse_core/discourse_core.dart'
 import '../../theme/design_tokens.dart';
 import '../../utils/time_utils.dart';
 import '../post_page.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Discourse-native moderator review queue (`/review.json`). Staff (and
 /// reviewer-group members) see flagged posts, queued posts, and queued
@@ -220,11 +221,11 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Confirm'),
+            child: Text(AppLocalizations.of(context)!.confirm),
           ),
         ],
       ),
@@ -263,12 +264,12 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(null),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           FilledButton(
             onPressed: () =>
                 Navigator.of(context).pop(controller.text.trim()),
-            child: const Text('Confirm'),
+            child: Text(AppLocalizations.of(context)!.confirm),
           ),
         ],
       ),
@@ -309,10 +310,10 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Icon(Icons.flag_outlined, size: 20),
             SizedBox(width: 8),
-            Text('Review Queue'),
+            Text(AppLocalizations.of(context)!.reviewQueue),
           ],
         ),
       ),
@@ -542,10 +543,10 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
               children: [
                 if (reviewable.targetCreatedByUsername?.isNotEmpty ==
                     true)
-                  _metaText('By ${reviewable.targetCreatedByUsername}',
+                  _metaText(AppLocalizations.of(context)!.reviewableBy(reviewable.targetCreatedByUsername!),
                       textTheme, colorScheme),
                 if (reviewable.createdByUsername?.isNotEmpty == true)
-                  _metaText('Reported by ${reviewable.createdByUsername}',
+                  _metaText(AppLocalizations.of(context)!.reportedBy(reviewable.createdByUsername!),
                       textTheme, colorScheme),
                 _metaText(
                     'Score ${reviewable.score.toStringAsFixed(1)}',

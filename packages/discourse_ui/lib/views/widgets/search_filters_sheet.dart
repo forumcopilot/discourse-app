@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/models/search/fc_search_filters.dart';
 
 import '../../theme/design_tokens.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Bottom sheet that lets the user toggle Discourse-native search filters
 /// (status, personal, sort, tags) on top of a free-text query. Returns
@@ -130,7 +131,7 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
                       ?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const Spacer(),
-                TextButton(onPressed: _reset, child: const Text('Reset')),
+                TextButton(onPressed: _reset, child: Text(AppLocalizations.of(context)!.reset)),
               ],
             ),
           ),
@@ -183,12 +184,12 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
                 _section('Match type', textTheme, colorScheme),
                 _wrap([
                   FilterChip(
-                    label: const Text('Title only'),
+                    label: Text(AppLocalizations.of(context)!.titleOnly),
                     selected: _titleOnly,
                     onSelected: (v) => setState(() => _titleOnly = v),
                   ),
                   FilterChip(
-                    label: const Text('First posts only'),
+                    label: Text(AppLocalizations.of(context)!.firstPostsOnly),
                     selected: _firstPostsOnly,
                     onSelected: (v) => setState(() => _firstPostsOnly = v),
                   ),
@@ -212,7 +213,7 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
                 _section('Sort', textTheme, colorScheme),
                 _wrap([
                   ChoiceChip(
-                    label: const Text('Relevance'),
+                    label: Text(AppLocalizations.of(context)!.relevance),
                     selected: _sort == null,
                     onSelected: (v) {
                       if (v) setState(() => _sort = null);
@@ -244,14 +245,14 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancel'),
+                    child: Text(AppLocalizations.of(context)!.cancel),
                   ),
                 ),
                 const SizedBox(width: DesignTokens.spacingM),
                 Expanded(
                   child: FilledButton(
                     onPressed: _apply,
-                    child: const Text('Apply'),
+                    child: Text(AppLocalizations.of(context)!.apply),
                   ),
                 ),
               ],

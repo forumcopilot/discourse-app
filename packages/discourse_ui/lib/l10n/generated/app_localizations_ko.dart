@@ -1617,4 +1617,310 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get lastSeen => 'Seen';
+
+  @override
+  String get chat => 'Chat';
+
+  @override
+  String comingSoon(String label) {
+    return '$label — coming soon';
+  }
+
+  @override
+  String moreBadges(Object count) {
+    return '+$count more';
+  }
+
+  @override
+  String get allNotificationsMarkedAsRead => 'All notifications marked as read';
+
+  @override
+  String get apply => 'Apply';
+
+  @override
+  String get bookmarks => 'Bookmarks';
+
+  @override
+  String reviewableBy(String username) {
+    return 'By $username';
+  }
+
+  @override
+  String get changeEmail => 'Change email';
+
+  @override
+  String get changePassword => 'Change password';
+
+  @override
+  String get checkingStatus => 'Checking status…';
+
+  @override
+  String get clearReminder => 'Clear reminder';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get copyLink => 'Copy link';
+
+  @override
+  String couldNotEnableNotifications(String error) {
+    return 'Could not enable notifications: $error';
+  }
+
+  @override
+  String get couldNotFindBookmark => 'Could not find this bookmark';
+
+  @override
+  String couldNotOpenEmail(String email) {
+    return 'Could not open email: $email';
+  }
+
+  @override
+  String couldNotStartSignIn(String error) {
+    return 'Could not start sign-in: $error';
+  }
+
+  @override
+  String get customDateAndTime => 'Custom date & time';
+
+  @override
+  String get deleteAccount => 'Delete account';
+
+  @override
+  String get deleteMessageQuestion => 'Delete message?';
+
+  @override
+  String get discard => 'Discard';
+
+  @override
+  String get discardDraftQuestion => 'Discard draft?';
+
+  @override
+  String get doNotDisturb => 'Do not disturb';
+
+  @override
+  String get editHistory => 'Edit history';
+
+  @override
+  String get editProfile => 'Edit profile';
+
+  @override
+  String get editReminder => 'Edit reminder';
+
+  @override
+  String emailCopiedToClipboard(String email) {
+    return 'Email copied to clipboard: $email';
+  }
+
+  @override
+  String get pushEnabledForThisLogin => 'Enabled for this login';
+
+  @override
+  String get failedToLoadMoreTopics =>
+      'Failed to load more topics. Scroll to retry.';
+
+  @override
+  String get failedToUpdateNotificationLevel =>
+      'Failed to update notification level';
+
+  @override
+  String get firstPostsOnly => 'First posts only';
+
+  @override
+  String get ignoredUsers => 'Ignored users';
+
+  @override
+  String get inTwoHours => 'In two hours';
+
+  @override
+  String get inviteByEmail => 'Invite by email';
+
+  @override
+  String get inviteLinkCopied => 'Invite link copied';
+
+  @override
+  String inviteSentTo(String email) {
+    return 'Invite sent to $email';
+  }
+
+  @override
+  String get leave => 'Leave';
+
+  @override
+  String get leaveGroup => 'Leave group';
+
+  @override
+  String get leaveGroupQuestion => 'Leave group?';
+
+  @override
+  String get linkCopied => 'Link copied';
+
+  @override
+  String get loadMore => 'Load more';
+
+  @override
+  String get manageAccountOnWeb => 'Manage account on web';
+
+  @override
+  String get merge => 'Merge';
+
+  @override
+  String get mergeIntoTopic => 'Merge into topic';
+
+  @override
+  String get newInviteLink => 'New invite link';
+
+  @override
+  String get nextWeek => 'Next week';
+
+  @override
+  String get pushNotAvailableInThisBuild => 'Not available in this build';
+
+  @override
+  String get notNow => 'Not now';
+
+  @override
+  String tagNotificationLevelUpdated(String tag) {
+    return 'Notification level for \"$tag\" updated';
+  }
+
+  @override
+  String doNotDisturbOnUntil(String until) {
+    return 'On until $until';
+  }
+
+  @override
+  String get pleaseLogInToBookmark => 'Please log in to bookmark';
+
+  @override
+  String get pleaseLogInToFollowUsers => 'Please log in to follow users';
+
+  @override
+  String get pleaseLogInToMarkAnswers => 'Please log in to mark answers';
+
+  @override
+  String get pleaseLogInToReact => 'Please log in to react';
+
+  @override
+  String get pleaseLogInToVote => 'Please log in to vote';
+
+  @override
+  String get pushNotifications => 'Push notifications';
+
+  @override
+  String get relevance => 'Relevance';
+
+  @override
+  String get reminderTimeMustBeInFuture =>
+      'Reminder time must be in the future';
+
+  @override
+  String get removeBookmark => 'Remove bookmark';
+
+  @override
+  String get removeVote => 'Remove vote';
+
+  @override
+  String get renameTopic => 'Rename topic';
+
+  @override
+  String reportedBy(String username) {
+    return 'Reported by $username';
+  }
+
+  @override
+  String get requestToJoin => 'Request to join';
+
+  @override
+  String requestToJoinGroup(String group) {
+    return 'Request to join $group';
+  }
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get resizeAndUpload => 'Resize and upload';
+
+  @override
+  String get retryConnection => 'Retry connection';
+
+  @override
+  String get reviewQueue => 'Review queue';
+
+  @override
+  String get revoke => 'Revoke';
+
+  @override
+  String get revokeInviteQuestion => 'Revoke invite?';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get sendInvite => 'Send invite';
+
+  @override
+  String get sendRequest => 'Send request';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get showVoters => 'Show voters';
+
+  @override
+  String get signOut => 'Sign out';
+
+  @override
+  String get signOutQuestion => 'Sign out?';
+
+  @override
+  String get signInCancelledNoPayload =>
+      'Sign-in cancelled — no payload returned';
+
+  @override
+  String signInFailed(String error) {
+    return 'Sign-in failed: $error';
+  }
+
+  @override
+  String get startChat => 'Start chat';
+
+  @override
+  String stoppedIgnoringUser(String username) {
+    return 'Stopped ignoring @$username';
+  }
+
+  @override
+  String get submit => 'Submit';
+
+  @override
+  String get discardDraftWarning =>
+      'This will permanently remove the saved draft.';
+
+  @override
+  String get deleteChatMessageWarning =>
+      'This will remove the message for everyone.';
+
+  @override
+  String get titleOnly => 'Title only';
+
+  @override
+  String get tomorrow => 'Tomorrow';
+
+  @override
+  String get turnOff => 'Turn off';
+
+  @override
+  String get turnOnNotifications => 'Turn on notifications';
+
+  @override
+  String get whisper => 'Whisper';
+
+  @override
+  String likeAgainInSeconds(Object seconds) {
+    return 'You can like this post again in ${seconds}s';
+  }
 }

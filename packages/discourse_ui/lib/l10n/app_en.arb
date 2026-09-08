@@ -1489,5 +1489,440 @@
   "lastSeen": "Seen",
   "@lastSeen": {
     "description": "Profile stat: when the user was last online"
+  },
+  "chat": "Chat",
+  "@chat": {
+    "description": "UI text: Chat"
+  },
+  "comingSoon": "{label} — coming soon",
+  "@comingSoon": {
+    "description": "UI text: {label} — coming soon",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "moreBadges": "+{count} more",
+  "@moreBadges": {
+    "description": "UI text: +{count} more",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "allNotificationsMarkedAsRead": "All notifications marked as read",
+  "@allNotificationsMarkedAsRead": {
+    "description": "UI text: All notifications marked as read"
+  },
+  "apply": "Apply",
+  "@apply": {
+    "description": "UI text: Apply"
+  },
+  "bookmarks": "Bookmarks",
+  "@bookmarks": {
+    "description": "UI text: Bookmarks"
+  },
+  "reviewableBy": "By {username}",
+  "@reviewableBy": {
+    "description": "UI text: By {username}",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "changeEmail": "Change email",
+  "@changeEmail": {
+    "description": "UI text: Change email"
+  },
+  "changePassword": "Change password",
+  "@changePassword": {
+    "description": "UI text: Change password"
+  },
+  "checkingStatus": "Checking status…",
+  "@checkingStatus": {
+    "description": "UI text: Checking status…"
+  },
+  "clearReminder": "Clear reminder",
+  "@clearReminder": {
+    "description": "UI text: Clear reminder"
+  },
+  "copy": "Copy",
+  "@copy": {
+    "description": "UI text: Copy"
+  },
+  "copyLink": "Copy link",
+  "@copyLink": {
+    "description": "UI text: Copy link"
+  },
+  "couldNotEnableNotifications": "Could not enable notifications: {error}",
+  "@couldNotEnableNotifications": {
+    "description": "UI text: Could not enable notifications: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "couldNotFindBookmark": "Could not find this bookmark",
+  "@couldNotFindBookmark": {
+    "description": "UI text: Could not find this bookmark"
+  },
+  "couldNotOpenEmail": "Could not open email: {email}",
+  "@couldNotOpenEmail": {
+    "description": "UI text: Could not open email: {email}",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "couldNotStartSignIn": "Could not start sign-in: {error}",
+  "@couldNotStartSignIn": {
+    "description": "UI text: Could not start sign-in: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "customDateAndTime": "Custom date & time",
+  "@customDateAndTime": {
+    "description": "UI text: Custom date & time"
+  },
+  "deleteAccount": "Delete account",
+  "@deleteAccount": {
+    "description": "UI text: Delete account"
+  },
+  "deleteMessageQuestion": "Delete message?",
+  "@deleteMessageQuestion": {
+    "description": "UI text: Delete message?"
+  },
+  "discard": "Discard",
+  "@discard": {
+    "description": "UI text: Discard"
+  },
+  "discardDraftQuestion": "Discard draft?",
+  "@discardDraftQuestion": {
+    "description": "UI text: Discard draft?"
+  },
+  "doNotDisturb": "Do not disturb",
+  "@doNotDisturb": {
+    "description": "UI text: Do not disturb"
+  },
+  "editHistory": "Edit history",
+  "@editHistory": {
+    "description": "UI text: Edit history"
+  },
+  "editProfile": "Edit profile",
+  "@editProfile": {
+    "description": "UI text: Edit profile"
+  },
+  "editReminder": "Edit reminder",
+  "@editReminder": {
+    "description": "UI text: Edit reminder"
+  },
+  "emailCopiedToClipboard": "Email copied to clipboard: {email}",
+  "@emailCopiedToClipboard": {
+    "description": "UI text: Email copied to clipboard: {email}",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "pushEnabledForThisLogin": "Enabled for this login",
+  "@pushEnabledForThisLogin": {
+    "description": "UI text: Enabled for this login"
+  },
+  "failedToLoadMoreTopics": "Failed to load more topics. Scroll to retry.",
+  "@failedToLoadMoreTopics": {
+    "description": "UI text: Failed to load more topics. Scroll to retry."
+  },
+  "failedToUpdateNotificationLevel": "Failed to update notification level",
+  "@failedToUpdateNotificationLevel": {
+    "description": "UI text: Failed to update notification level"
+  },
+  "firstPostsOnly": "First posts only",
+  "@firstPostsOnly": {
+    "description": "UI text: First posts only"
+  },
+  "ignoredUsers": "Ignored users",
+  "@ignoredUsers": {
+    "description": "UI text: Ignored users"
+  },
+  "inTwoHours": "In two hours",
+  "@inTwoHours": {
+    "description": "UI text: In two hours"
+  },
+  "inviteByEmail": "Invite by email",
+  "@inviteByEmail": {
+    "description": "UI text: Invite by email"
+  },
+  "inviteLinkCopied": "Invite link copied",
+  "@inviteLinkCopied": {
+    "description": "UI text: Invite link copied"
+  },
+  "inviteSentTo": "Invite sent to {email}",
+  "@inviteSentTo": {
+    "description": "UI text: Invite sent to {email}",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "leave": "Leave",
+  "@leave": {
+    "description": "UI text: Leave"
+  },
+  "leaveGroup": "Leave group",
+  "@leaveGroup": {
+    "description": "UI text: Leave group"
+  },
+  "leaveGroupQuestion": "Leave group?",
+  "@leaveGroupQuestion": {
+    "description": "UI text: Leave group?"
+  },
+  "linkCopied": "Link copied",
+  "@linkCopied": {
+    "description": "UI text: Link copied"
+  },
+  "loadMore": "Load more",
+  "@loadMore": {
+    "description": "UI text: Load more"
+  },
+  "manageAccountOnWeb": "Manage account on web",
+  "@manageAccountOnWeb": {
+    "description": "UI text: Manage account on web"
+  },
+  "merge": "Merge",
+  "@merge": {
+    "description": "UI text: Merge"
+  },
+  "mergeIntoTopic": "Merge into topic",
+  "@mergeIntoTopic": {
+    "description": "UI text: Merge into topic"
+  },
+  "newInviteLink": "New invite link",
+  "@newInviteLink": {
+    "description": "UI text: New invite link"
+  },
+  "nextWeek": "Next week",
+  "@nextWeek": {
+    "description": "UI text: Next week"
+  },
+  "pushNotAvailableInThisBuild": "Not available in this build",
+  "@pushNotAvailableInThisBuild": {
+    "description": "UI text: Not available in this build"
+  },
+  "notNow": "Not now",
+  "@notNow": {
+    "description": "UI text: Not now"
+  },
+  "tagNotificationLevelUpdated": "Notification level for \"{tag}\" updated",
+  "@tagNotificationLevelUpdated": {
+    "description": "UI text: Notification level for \"{tag}\" updated",
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "doNotDisturbOnUntil": "On until {until}",
+  "@doNotDisturbOnUntil": {
+    "description": "UI text: On until {until}",
+    "placeholders": {
+      "until": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseLogInToBookmark": "Please log in to bookmark",
+  "@pleaseLogInToBookmark": {
+    "description": "UI text: Please log in to bookmark"
+  },
+  "pleaseLogInToFollowUsers": "Please log in to follow users",
+  "@pleaseLogInToFollowUsers": {
+    "description": "UI text: Please log in to follow users"
+  },
+  "pleaseLogInToMarkAnswers": "Please log in to mark answers",
+  "@pleaseLogInToMarkAnswers": {
+    "description": "UI text: Please log in to mark answers"
+  },
+  "pleaseLogInToReact": "Please log in to react",
+  "@pleaseLogInToReact": {
+    "description": "UI text: Please log in to react"
+  },
+  "pleaseLogInToVote": "Please log in to vote",
+  "@pleaseLogInToVote": {
+    "description": "UI text: Please log in to vote"
+  },
+  "pushNotifications": "Push notifications",
+  "@pushNotifications": {
+    "description": "UI text: Push notifications"
+  },
+  "relevance": "Relevance",
+  "@relevance": {
+    "description": "UI text: Relevance"
+  },
+  "reminderTimeMustBeInFuture": "Reminder time must be in the future",
+  "@reminderTimeMustBeInFuture": {
+    "description": "UI text: Reminder time must be in the future"
+  },
+  "removeBookmark": "Remove bookmark",
+  "@removeBookmark": {
+    "description": "UI text: Remove bookmark"
+  },
+  "removeVote": "Remove vote",
+  "@removeVote": {
+    "description": "UI text: Remove vote"
+  },
+  "renameTopic": "Rename topic",
+  "@renameTopic": {
+    "description": "UI text: Rename topic"
+  },
+  "reportedBy": "Reported by {username}",
+  "@reportedBy": {
+    "description": "UI text: Reported by {username}",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "requestToJoin": "Request to join",
+  "@requestToJoin": {
+    "description": "UI text: Request to join"
+  },
+  "requestToJoinGroup": "Request to join {group}",
+  "@requestToJoinGroup": {
+    "description": "UI text: Request to join {group}",
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "reset": "Reset",
+  "@reset": {
+    "description": "UI text: Reset"
+  },
+  "resizeAndUpload": "Resize and upload",
+  "@resizeAndUpload": {
+    "description": "UI text: Resize and upload"
+  },
+  "retryConnection": "Retry connection",
+  "@retryConnection": {
+    "description": "UI text: Retry connection"
+  },
+  "reviewQueue": "Review queue",
+  "@reviewQueue": {
+    "description": "UI text: Review queue"
+  },
+  "revoke": "Revoke",
+  "@revoke": {
+    "description": "UI text: Revoke"
+  },
+  "revokeInviteQuestion": "Revoke invite?",
+  "@revokeInviteQuestion": {
+    "description": "UI text: Revoke invite?"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "UI text: Save"
+  },
+  "sendInvite": "Send invite",
+  "@sendInvite": {
+    "description": "UI text: Send invite"
+  },
+  "sendRequest": "Send request",
+  "@sendRequest": {
+    "description": "UI text: Send request"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "UI text: Settings"
+  },
+  "showVoters": "Show voters",
+  "@showVoters": {
+    "description": "UI text: Show voters"
+  },
+  "signOut": "Sign out",
+  "@signOut": {
+    "description": "UI text: Sign out"
+  },
+  "signOutQuestion": "Sign out?",
+  "@signOutQuestion": {
+    "description": "UI text: Sign out?"
+  },
+  "signInCancelledNoPayload": "Sign-in cancelled — no payload returned",
+  "@signInCancelledNoPayload": {
+    "description": "UI text: Sign-in cancelled — no payload returned"
+  },
+  "signInFailed": "Sign-in failed: {error}",
+  "@signInFailed": {
+    "description": "UI text: Sign-in failed: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "startChat": "Start chat",
+  "@startChat": {
+    "description": "UI text: Start chat"
+  },
+  "stoppedIgnoringUser": "Stopped ignoring @{username}",
+  "@stoppedIgnoringUser": {
+    "description": "UI text: Stopped ignoring @{username}",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "submit": "Submit",
+  "@submit": {
+    "description": "UI text: Submit"
+  },
+  "discardDraftWarning": "This will permanently remove the saved draft.",
+  "@discardDraftWarning": {
+    "description": "UI text: This will permanently remove the saved draft."
+  },
+  "deleteChatMessageWarning": "This will remove the message for everyone.",
+  "@deleteChatMessageWarning": {
+    "description": "UI text: This will remove the message for everyone."
+  },
+  "titleOnly": "Title only",
+  "@titleOnly": {
+    "description": "UI text: Title only"
+  },
+  "tomorrow": "Tomorrow",
+  "@tomorrow": {
+    "description": "UI text: Tomorrow"
+  },
+  "turnOff": "Turn off",
+  "@turnOff": {
+    "description": "UI text: Turn off"
+  },
+  "turnOnNotifications": "Turn on notifications",
+  "@turnOnNotifications": {
+    "description": "UI text: Turn on notifications"
+  },
+  "whisper": "Whisper",
+  "@whisper": {
+    "description": "UI text: Whisper"
+  },
+  "likeAgainInSeconds": "You can like this post again in {seconds}s",
+  "@likeAgainInSeconds": {
+    "description": "UI text: You can like this post again in {seconds}s",
+    "placeholders": {
+      "seconds": {
+        "type": "Object"
+      }
+    }
   }
 }

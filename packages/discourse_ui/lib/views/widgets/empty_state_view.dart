@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/design_tokens.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Phase 5.18d — shared "icon + message" column for empty / error
 /// states. Was inlined in `UsersDirectoryPage`, `GroupsListPage`,
@@ -115,7 +116,7 @@ class EmptyStateView extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh, size: DesignTokens.iconSizeM),
-              label: const Text('Try again'),
+              label: Text(AppLocalizations.of(context)!.tryAgain),
             ),
           ],
         ],

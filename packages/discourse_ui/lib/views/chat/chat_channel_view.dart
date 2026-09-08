@@ -8,6 +8,7 @@ import '../../theme/design_tokens.dart';
 import 'widgets/chat_composer.dart';
 import 'widgets/chat_message_bubble.dart';
 import 'widgets/chat_reaction_chips.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Embeds a single Discourse Chat channel — message list + composer —
 /// without its own Scaffold/AppBar so it can plug into a tab body or
@@ -233,7 +234,7 @@ class _ChatChannelViewState extends State<ChatChannelView> {
               const Divider(height: 1),
               ListTile(
                 leading: const Icon(Icons.edit),
-                title: const Text('Edit'),
+                title: Text(AppLocalizations.of(context)!.edit),
                 onTap: () {
                   Navigator.pop(context);
                   _showEditDialog(m.id, m.message);
@@ -241,7 +242,7 @@ class _ChatChannelViewState extends State<ChatChannelView> {
               ),
               ListTile(
                 leading: const Icon(Icons.delete_outline),
-                title: const Text('Delete'),
+                title: Text(AppLocalizations.of(context)!.delete),
                 onTap: () async {
                   Navigator.pop(context);
                   final ok = await _confirmDelete();
@@ -259,17 +260,17 @@ class _ChatChannelViewState extends State<ChatChannelView> {
     final result = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Delete message?'),
-        content: const Text('This will remove the message for everyone.'),
+        title: Text(AppLocalizations.of(context)!.deleteMessageQuestion),
+        content: Text(AppLocalizations.of(context)!.deleteChatMessageWarning),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
+              child: Text(AppLocalizations.of(context)!.cancel)),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.error),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: Text(AppLocalizations.of(context)!.delete),
           ),
         ],
       ),
@@ -282,12 +283,12 @@ class _ChatChannelViewState extends State<ChatChannelView> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Edit message'),
+        title: Text(AppLocalizations.of(context)!.editMessage),
         content: TextField(controller: ctrl, maxLines: 4, autofocus: true),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
+              child: Text(AppLocalizations.of(context)!.cancel)),
           ElevatedButton(
             onPressed: () async {
               final txt = ctrl.text.trim();
@@ -296,7 +297,7 @@ class _ChatChannelViewState extends State<ChatChannelView> {
                 await _controller.edit(id, txt);
               }
             },
-            child: const Text('Save'),
+            child: Text(AppLocalizations.of(context)!.save),
           ),
         ],
       ),

@@ -373,7 +373,7 @@ class ConversationAppBar extends BaseForumAppBar {
           // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('$username has been invited to the conversation'),
+              content: Text(AppLocalizations.of(context)!.usernameHasBeenInvited(username)),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );

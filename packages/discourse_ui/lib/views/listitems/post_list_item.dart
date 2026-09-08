@@ -1113,7 +1113,7 @@ class _PostListItemState extends State<PostListItem> {
                   size: DesignTokens.iconSizeM,
                   color: Theme.of(context).colorScheme.secondary),
               const SizedBox(width: DesignTokens.spacingM),
-              const Text('Share'),
+              Text(AppLocalizations.of(context)!.share),
             ],
           ),
         ),
@@ -1127,7 +1127,7 @@ class _PostListItemState extends State<PostListItem> {
                   size: DesignTokens.iconSizeM,
                   color: Theme.of(context).colorScheme.secondary),
               const SizedBox(width: DesignTokens.spacingM),
-              const Text('Copy link'),
+              Text(AppLocalizations.of(context)!.copyLink),
             ],
           ),
         ),
@@ -1217,7 +1217,7 @@ class _PostListItemState extends State<PostListItem> {
                   size: DesignTokens.iconSizeM,
                   color: Theme.of(context).colorScheme.secondary),
               const SizedBox(width: DesignTokens.spacingM),
-              const Text('Edit history'),
+              Text(AppLocalizations.of(context)!.editHistory),
             ],
           ),
         ),
@@ -1253,7 +1253,7 @@ class _PostListItemState extends State<PostListItem> {
     await UrlUtils.copyUrlToClipboard(url);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Link copied')),
+      SnackBar(content: Text(AppLocalizations.of(context)!.linkCopied)),
     );
   }
 
@@ -1366,7 +1366,7 @@ class _PostListItemState extends State<PostListItem> {
   Future<void> _handleBookmarkLongPress() async {
     if (!widget.siteContext.isLoggedIn) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to bookmark')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseLogInToBookmark)),
       );
       return;
     }
@@ -1397,13 +1397,13 @@ class _PostListItemState extends State<PostListItem> {
           children: [
             ListTile(
               leading: Icon(Icons.alarm, color: colorScheme.primary),
-              title: const Text('Edit reminder'),
+              title: Text(AppLocalizations.of(context)!.editReminder),
               onTap: () => Navigator.pop(sheetContext, 'edit'),
             ),
             ListTile(
               leading: Icon(Icons.bookmark_remove_outlined,
                   color: colorScheme.error),
-              title: const Text('Remove bookmark'),
+              title: Text(AppLocalizations.of(context)!.removeBookmark),
               onTap: () => Navigator.pop(sheetContext, 'remove'),
             ),
             const SizedBox(height: DesignTokens.spacingS),
@@ -1478,7 +1478,7 @@ class _PostListItemState extends State<PostListItem> {
     if (!mounted) return;
     if (entry == null) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Could not find this bookmark')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.couldNotFindBookmark)),
       );
       return;
     }
@@ -1547,7 +1547,7 @@ class _PostListItemState extends State<PostListItem> {
   Future<void> _handleToggleAcceptAnswer() async {
     if (!widget.siteContext.isLoggedIn) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to mark answers')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseLogInToMarkAnswers)),
       );
       return;
     }
@@ -1584,7 +1584,7 @@ class _PostListItemState extends State<PostListItem> {
         widget.post.isSolution = wasSolution;
       });
       messenger.showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.error(e.toString()))),
       );
     }
   }
@@ -1622,7 +1622,7 @@ class _PostListItemState extends State<PostListItem> {
   Future<void> _openReactionPicker() async {
     if (!widget.siteContext.isLoggedIn) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to react')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseLogInToReact)),
       );
       return;
     }

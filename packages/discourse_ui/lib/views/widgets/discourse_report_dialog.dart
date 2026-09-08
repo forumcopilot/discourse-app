@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 
 import '../../core/logging/app_logger.dart';
 import '../../theme/design_tokens.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Discourse's flag options, in the order the web modal lists them.
 ///
@@ -88,7 +89,7 @@ Future<void> showDiscourseReportDialog(
 
   final messenger = ScaffoldMessenger.of(context);
   messenger.showSnackBar(
-    const SnackBar(content: Text('Submitting report…')),
+    SnackBar(content: Text(AppLocalizations.of(context)!.submittingReport)),
   );
 
   final response = await proxy.flagPostAsync(
@@ -150,7 +151,7 @@ class _ReportDialogState extends State<_ReportDialog> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AlertDialog(
-      title: const Text('Report'),
+      title: Text(AppLocalizations.of(context)!.report),
       content: SingleChildScrollView(
         child: RadioGroup<_FlagOption>(
           groupValue: _selected,
@@ -221,11 +222,11 @@ class _ReportDialogState extends State<_ReportDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         FilledButton(
           onPressed: _selected == null ? null : _submit,
-          child: const Text('Submit'),
+          child: Text(AppLocalizations.of(context)!.submit),
         ),
       ],
     );

@@ -284,7 +284,7 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
                               ),
                             )
                           : Icon(Icons.undo, size: DesignTokens.iconSizeS),
-                      label: const Text('Remove vote'),
+                      label: Text(AppLocalizations.of(context)!.removeVote),
                     ),
                   if (showRemoveVote && showVoters)
                     SizedBox(width: DesignTokens.spacingS),
@@ -293,7 +293,7 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
                       onPressed: _showVoters,
                       icon: Icon(Icons.people_outline,
                           size: DesignTokens.iconSizeS),
-                      label: const Text('Show voters'),
+                      label: Text(AppLocalizations.of(context)!.showVoters),
                     ),
                 ],
               ),
@@ -670,7 +670,7 @@ class _PollVotersSheetState extends State<_PollVotersSheet> {
                                 )
                               : TextButton(
                                   onPressed: () => _loadMore(optionId),
-                                  child: const Text('Show more'),
+                                  child: Text(AppLocalizations.of(context)!.showMore),
                                 ),
                         ),
                     ],

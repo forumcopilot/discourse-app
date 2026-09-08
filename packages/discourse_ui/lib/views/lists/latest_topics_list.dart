@@ -201,8 +201,8 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
       AppLogger.warning('LatestTopicsList load-more failed: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to load more topics. Scroll to retry.'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.failedToLoadMoreTopics),
           ),
         );
       }

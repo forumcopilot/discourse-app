@@ -2971,6 +2971,546 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Seen'**
   String get lastSeen;
+
+  /// UI text: Chat
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get chat;
+
+  /// UI text: {label} — coming soon
+  ///
+  /// In en, this message translates to:
+  /// **'{label} — coming soon'**
+  String comingSoon(String label);
+
+  /// UI text: +{count} more
+  ///
+  /// In en, this message translates to:
+  /// **'+{count} more'**
+  String moreBadges(Object count);
+
+  /// UI text: All notifications marked as read
+  ///
+  /// In en, this message translates to:
+  /// **'All notifications marked as read'**
+  String get allNotificationsMarkedAsRead;
+
+  /// UI text: Apply
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get apply;
+
+  /// UI text: Bookmarks
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarks'**
+  String get bookmarks;
+
+  /// UI text: By {username}
+  ///
+  /// In en, this message translates to:
+  /// **'By {username}'**
+  String reviewableBy(String username);
+
+  /// UI text: Change email
+  ///
+  /// In en, this message translates to:
+  /// **'Change email'**
+  String get changeEmail;
+
+  /// UI text: Change password
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get changePassword;
+
+  /// UI text: Checking status…
+  ///
+  /// In en, this message translates to:
+  /// **'Checking status…'**
+  String get checkingStatus;
+
+  /// UI text: Clear reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Clear reminder'**
+  String get clearReminder;
+
+  /// UI text: Copy
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
+
+  /// UI text: Copy link
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get copyLink;
+
+  /// UI text: Could not enable notifications: {error}
+  ///
+  /// In en, this message translates to:
+  /// **'Could not enable notifications: {error}'**
+  String couldNotEnableNotifications(String error);
+
+  /// UI text: Could not find this bookmark
+  ///
+  /// In en, this message translates to:
+  /// **'Could not find this bookmark'**
+  String get couldNotFindBookmark;
+
+  /// UI text: Could not open email: {email}
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open email: {email}'**
+  String couldNotOpenEmail(String email);
+
+  /// UI text: Could not start sign-in: {error}
+  ///
+  /// In en, this message translates to:
+  /// **'Could not start sign-in: {error}'**
+  String couldNotStartSignIn(String error);
+
+  /// UI text: Custom date & time
+  ///
+  /// In en, this message translates to:
+  /// **'Custom date & time'**
+  String get customDateAndTime;
+
+  /// UI text: Delete account
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get deleteAccount;
+
+  /// UI text: Delete message?
+  ///
+  /// In en, this message translates to:
+  /// **'Delete message?'**
+  String get deleteMessageQuestion;
+
+  /// UI text: Discard
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get discard;
+
+  /// UI text: Discard draft?
+  ///
+  /// In en, this message translates to:
+  /// **'Discard draft?'**
+  String get discardDraftQuestion;
+
+  /// UI text: Do not disturb
+  ///
+  /// In en, this message translates to:
+  /// **'Do not disturb'**
+  String get doNotDisturb;
+
+  /// UI text: Edit history
+  ///
+  /// In en, this message translates to:
+  /// **'Edit history'**
+  String get editHistory;
+
+  /// UI text: Edit profile
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profile'**
+  String get editProfile;
+
+  /// UI text: Edit reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Edit reminder'**
+  String get editReminder;
+
+  /// UI text: Email copied to clipboard: {email}
+  ///
+  /// In en, this message translates to:
+  /// **'Email copied to clipboard: {email}'**
+  String emailCopiedToClipboard(String email);
+
+  /// UI text: Enabled for this login
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled for this login'**
+  String get pushEnabledForThisLogin;
+
+  /// UI text: Failed to load more topics. Scroll to retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load more topics. Scroll to retry.'**
+  String get failedToLoadMoreTopics;
+
+  /// UI text: Failed to update notification level
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update notification level'**
+  String get failedToUpdateNotificationLevel;
+
+  /// UI text: First posts only
+  ///
+  /// In en, this message translates to:
+  /// **'First posts only'**
+  String get firstPostsOnly;
+
+  /// UI text: Ignored users
+  ///
+  /// In en, this message translates to:
+  /// **'Ignored users'**
+  String get ignoredUsers;
+
+  /// UI text: In two hours
+  ///
+  /// In en, this message translates to:
+  /// **'In two hours'**
+  String get inTwoHours;
+
+  /// UI text: Invite by email
+  ///
+  /// In en, this message translates to:
+  /// **'Invite by email'**
+  String get inviteByEmail;
+
+  /// UI text: Invite link copied
+  ///
+  /// In en, this message translates to:
+  /// **'Invite link copied'**
+  String get inviteLinkCopied;
+
+  /// UI text: Invite sent to {email}
+  ///
+  /// In en, this message translates to:
+  /// **'Invite sent to {email}'**
+  String inviteSentTo(String email);
+
+  /// UI text: Leave
+  ///
+  /// In en, this message translates to:
+  /// **'Leave'**
+  String get leave;
+
+  /// UI text: Leave group
+  ///
+  /// In en, this message translates to:
+  /// **'Leave group'**
+  String get leaveGroup;
+
+  /// UI text: Leave group?
+  ///
+  /// In en, this message translates to:
+  /// **'Leave group?'**
+  String get leaveGroupQuestion;
+
+  /// UI text: Link copied
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied'**
+  String get linkCopied;
+
+  /// UI text: Load more
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get loadMore;
+
+  /// UI text: Manage account on web
+  ///
+  /// In en, this message translates to:
+  /// **'Manage account on web'**
+  String get manageAccountOnWeb;
+
+  /// UI text: Merge
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get merge;
+
+  /// UI text: Merge into topic
+  ///
+  /// In en, this message translates to:
+  /// **'Merge into topic'**
+  String get mergeIntoTopic;
+
+  /// UI text: New invite link
+  ///
+  /// In en, this message translates to:
+  /// **'New invite link'**
+  String get newInviteLink;
+
+  /// UI text: Next week
+  ///
+  /// In en, this message translates to:
+  /// **'Next week'**
+  String get nextWeek;
+
+  /// UI text: Not available in this build
+  ///
+  /// In en, this message translates to:
+  /// **'Not available in this build'**
+  String get pushNotAvailableInThisBuild;
+
+  /// UI text: Not now
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get notNow;
+
+  /// UI text: Notification level for "{tag}" updated
+  ///
+  /// In en, this message translates to:
+  /// **'Notification level for \"{tag}\" updated'**
+  String tagNotificationLevelUpdated(String tag);
+
+  /// UI text: On until {until}
+  ///
+  /// In en, this message translates to:
+  /// **'On until {until}'**
+  String doNotDisturbOnUntil(String until);
+
+  /// UI text: Please log in to bookmark
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in to bookmark'**
+  String get pleaseLogInToBookmark;
+
+  /// UI text: Please log in to follow users
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in to follow users'**
+  String get pleaseLogInToFollowUsers;
+
+  /// UI text: Please log in to mark answers
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in to mark answers'**
+  String get pleaseLogInToMarkAnswers;
+
+  /// UI text: Please log in to react
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in to react'**
+  String get pleaseLogInToReact;
+
+  /// UI text: Please log in to vote
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in to vote'**
+  String get pleaseLogInToVote;
+
+  /// UI text: Push notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Push notifications'**
+  String get pushNotifications;
+
+  /// UI text: Relevance
+  ///
+  /// In en, this message translates to:
+  /// **'Relevance'**
+  String get relevance;
+
+  /// UI text: Reminder time must be in the future
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder time must be in the future'**
+  String get reminderTimeMustBeInFuture;
+
+  /// UI text: Remove bookmark
+  ///
+  /// In en, this message translates to:
+  /// **'Remove bookmark'**
+  String get removeBookmark;
+
+  /// UI text: Remove vote
+  ///
+  /// In en, this message translates to:
+  /// **'Remove vote'**
+  String get removeVote;
+
+  /// UI text: Rename topic
+  ///
+  /// In en, this message translates to:
+  /// **'Rename topic'**
+  String get renameTopic;
+
+  /// UI text: Reported by {username}
+  ///
+  /// In en, this message translates to:
+  /// **'Reported by {username}'**
+  String reportedBy(String username);
+
+  /// UI text: Request to join
+  ///
+  /// In en, this message translates to:
+  /// **'Request to join'**
+  String get requestToJoin;
+
+  /// UI text: Request to join {group}
+  ///
+  /// In en, this message translates to:
+  /// **'Request to join {group}'**
+  String requestToJoinGroup(String group);
+
+  /// UI text: Reset
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// UI text: Resize and upload
+  ///
+  /// In en, this message translates to:
+  /// **'Resize and upload'**
+  String get resizeAndUpload;
+
+  /// UI text: Retry connection
+  ///
+  /// In en, this message translates to:
+  /// **'Retry connection'**
+  String get retryConnection;
+
+  /// UI text: Review queue
+  ///
+  /// In en, this message translates to:
+  /// **'Review queue'**
+  String get reviewQueue;
+
+  /// UI text: Revoke
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke'**
+  String get revoke;
+
+  /// UI text: Revoke invite?
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke invite?'**
+  String get revokeInviteQuestion;
+
+  /// UI text: Save
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// UI text: Send invite
+  ///
+  /// In en, this message translates to:
+  /// **'Send invite'**
+  String get sendInvite;
+
+  /// UI text: Send request
+  ///
+  /// In en, this message translates to:
+  /// **'Send request'**
+  String get sendRequest;
+
+  /// UI text: Settings
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// UI text: Show voters
+  ///
+  /// In en, this message translates to:
+  /// **'Show voters'**
+  String get showVoters;
+
+  /// UI text: Sign out
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get signOut;
+
+  /// UI text: Sign out?
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out?'**
+  String get signOutQuestion;
+
+  /// UI text: Sign-in cancelled — no payload returned
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in cancelled — no payload returned'**
+  String get signInCancelledNoPayload;
+
+  /// UI text: Sign-in failed: {error}
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in failed: {error}'**
+  String signInFailed(String error);
+
+  /// UI text: Start chat
+  ///
+  /// In en, this message translates to:
+  /// **'Start chat'**
+  String get startChat;
+
+  /// UI text: Stopped ignoring @{username}
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped ignoring @{username}'**
+  String stoppedIgnoringUser(String username);
+
+  /// UI text: Submit
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get submit;
+
+  /// UI text: This will permanently remove the saved draft.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently remove the saved draft.'**
+  String get discardDraftWarning;
+
+  /// UI text: This will remove the message for everyone.
+  ///
+  /// In en, this message translates to:
+  /// **'This will remove the message for everyone.'**
+  String get deleteChatMessageWarning;
+
+  /// UI text: Title only
+  ///
+  /// In en, this message translates to:
+  /// **'Title only'**
+  String get titleOnly;
+
+  /// UI text: Tomorrow
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get tomorrow;
+
+  /// UI text: Turn off
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off'**
+  String get turnOff;
+
+  /// UI text: Turn on notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on notifications'**
+  String get turnOnNotifications;
+
+  /// UI text: Whisper
+  ///
+  /// In en, this message translates to:
+  /// **'Whisper'**
+  String get whisper;
+
+  /// UI text: You can like this post again in {seconds}s
+  ///
+  /// In en, this message translates to:
+  /// **'You can like this post again in {seconds}s'**
+  String likeAgainInSeconds(Object seconds);
 }
 
 class _AppLocalizationsDelegate

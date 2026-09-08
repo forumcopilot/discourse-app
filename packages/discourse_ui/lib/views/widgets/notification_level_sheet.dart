@@ -4,6 +4,7 @@ import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
 
 import '../../theme/design_tokens.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// A bottom-sheet picker that mirrors Discourse's per-topic / per-category
 /// / per-tag notification-level dropdown. Supports the full 4-level enum:
@@ -173,7 +174,7 @@ class _NotificationLevelSheetState extends State<NotificationLevelSheet> {
       if (mounted) Navigator.of(context).pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update notification level')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.failedToUpdateNotificationLevel)),
       );
     }
   }

@@ -304,7 +304,7 @@ class _ProfileViewState extends State<ProfileView> {
     if (_isTogglingFollow) return;
     if (!widget.siteContext.isLoggedIn) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to follow users')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseLogInToFollowUsers)),
       );
       return;
     }
@@ -630,7 +630,7 @@ class _ProfileViewState extends State<ProfileView> {
                 }
               },
               icon: Icon(Icons.edit_outlined, size: DesignTokens.iconSizeM),
-              label: const Text('Edit profile'),
+              label: Text(AppLocalizations.of(context)!.editProfile),
             ),
           ),
           SizedBox(width: DesignTokens.spacingS),
@@ -648,7 +648,7 @@ class _ProfileViewState extends State<ProfileView> {
               },
               icon: Icon(Icons.settings_outlined,
                   size: DesignTokens.iconSizeM),
-              label: const Text('Settings'),
+              label: Text(AppLocalizations.of(context)!.settings),
             ),
           ),
         ],

@@ -18,6 +18,7 @@ import '../settings/notification_settings_page.dart';
 import '../tags_page.dart';
 import '../users_directory_page.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Phase 5.18a — hamburger drawer ("More" menu).
 ///
@@ -261,7 +262,7 @@ class SiteDrawer extends StatelessWidget {
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$label — coming soon'),
+        content: Text(AppLocalizations.of(context)!.comingSoon(label)),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -274,19 +275,19 @@ class SiteDrawer extends StatelessWidget {
       builder: (dialogContext) {
         final colorScheme = Theme.of(dialogContext).colorScheme;
         return AlertDialog(
-          title: const Text('Sign out?'),
+          title: Text(AppLocalizations.of(context)!.signOutQuestion),
           content: Text(
             'You will be signed out of ${siteContext.site.name}. You can sign back in any time.',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
               style: TextButton.styleFrom(foregroundColor: colorScheme.error),
-              child: const Text('Sign out'),
+              child: Text(AppLocalizations.of(context)!.signOut),
             ),
           ],
         );

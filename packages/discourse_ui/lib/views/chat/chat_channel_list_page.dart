@@ -14,6 +14,7 @@ import '../widgets/user_list_row.dart';
 import '../widgets/resettable_widget.dart';
 import '../widgets/user_avatar.dart';
 import 'chat_channel_view.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// DM channel titles come back from the serializer already filled with
 /// the other members' usernames (channel_serializer.rb:
@@ -235,10 +236,10 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Icon(Icons.chat_bubble_outline, size: 20),
             SizedBox(width: 8),
-            Text('Chat'),
+            Text(AppLocalizations.of(context)!.chat),
           ],
         ),
         actions: [
@@ -639,7 +640,7 @@ class _NewDmSheetState extends State<_NewDmSheet> {
               TextButton(
                 onPressed:
                     _creating ? null : () => Navigator.of(context).pop(),
-                child: const Text('Cancel'),
+                child: Text(AppLocalizations.of(context)!.cancel),
               ),
               const SizedBox(width: DesignTokens.spacingS),
               FilledButton(
@@ -650,7 +651,7 @@ class _NewDmSheetState extends State<_NewDmSheet> {
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Start chat'),
+                    : Text(AppLocalizations.of(context)!.startChat),
               ),
             ],
           ),
