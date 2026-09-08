@@ -1,8 +1,12 @@
-# Uncomment this line to define a global platform for your project
-# Minimum 18.4 required: flutter_inappwebview links libswiftWebKit.dylib which is
-# missing in iOS 18.4+ simulator runtimes for apps with older deployment targets
-# (WebKit bug 293831). Setting 18.4 fixes the "Library not loaded" crash at launch.
-platform :ios, '18.4'
+# Devices: iOS 15 is the real floor (Firebase iOS SDK 12 needs 15; every
+# other pod is lower). The project used to be pinned to 18.4 for a bug that
+# only exists in the SIMULATOR: iOS 18.4+ simulator runtimes dropped
+# libswiftWebKit.dylib for binaries with older deployment targets, and
+# flutter_inappwebview links it, so the app crashed at launch with
+# "Library not loaded" (WebKit bug 293831). That pin shut out every iPhone
+# not on the current OS to fix a developer-only crash. The workaround now
+# applies to simulator builds alone, in post_install below.
+platform :ios, '15.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -44,7 +48,8 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '18.4'
+      # Simulator only — see the note at the top of this file.
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET[sdk=iphonesimulator*]'] = '18.4'
     end
   end
 end
