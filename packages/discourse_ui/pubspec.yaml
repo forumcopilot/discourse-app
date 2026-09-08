@@ -5,6 +5,8 @@ version: 0.7.0
 
 environment:
   sdk: ^3.6.1
+  # RadioGroup (Flutter 3.32) is the newest framework API in use; CI pins 3.38.7.
+  flutter: ">=3.32.0"
 
 dependencies:
   flutter:

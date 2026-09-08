@@ -6,6 +6,31 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+Everything on the road to 1.0, in one sitting after the 0.8.0 tag.
+
+### Added
+- **CI** (`be591c7`, `0bd34f6`, `d562317`): GitHub Actions runs the README's own Quick start on every push — pub get, `buildlib.sh`, a check that the SDK's generated code is committed, analyze with errors and warnings fatal, every package's tests, a debug APK from the `.example` Firebase placeholder — and `buildlib.bat` on a Windows runner, the first time that script has ever been executed.
+- **Handshake test** (`41cc812`): the User API Key flow end to end with the test playing Discourse — request URL, stable client id, RSA-OAEP and PKCS1 payloads, nonce rejection, superseded handshake, push recorded only when this app asked for it.
+- **Persistence test** (`f9e33af`): the key survives a process restart, never lands in plain prefs, migrates from older builds, a lost key starts the app signed out rather than crashed, sign-out clears everything.
+- **Widget tests** (`0999d76`) for the oversized-image consent sheet and the attachment card.
+- **Fork checklist and naming section** in the README (`ed76be2`): every identity placeholder with its file, and a statement that the project is not affiliated with Discourse's makers.
+- `docs/push.md` (`4882732`): push ships optional and off by default; what is built, what is not, what a forum admin must enable.
+- `v0.8.0` tag and this file's first dated section (`fa5c25f`).
+
+### Changed
+- **Every UI string goes through `AppLocalizations`** (`541aed4`, `5c2d938`, `d8cb640`): 366 hard-coded `Text('…')` literals replaced, 262 new English keys, all translated in the ten other locales (`9faf755`, `466ee46`) along with 12 older keys that had been English-only. What remains unlocalized is composed data — "@handle", "#12", "3 / 40", "TL2".
+- **Zero deprecated API uses, down from 93** (`6e666ff`): `surfaceVariant`, Radio `groupValue`/`onChanged` → `RadioGroup`, share_plus `SharePlus.instance`, `activeThumbColor`, `onPopInvokedWithResult`, passkeys availability, and the Cloudflare interceptor's webview cache clearing (canonical SDK `9ce8ba6d`). The declared Flutter floor is now 3.32.
+- **iOS deployment target 18.4 → 15.0** (`591babf`). The old pin was a workaround for a simulator-only crash (libswiftWebKit, WebKit bug 293831), applied to device builds too; it now applies to the simulator SDK alone. `pod install` verified; an Xcode build is not, this Mac lacks the iOS platform component.
+- **Android app label "Discourse" → "Forum App"**, matching iOS and macOS (`f9e33af`).
+- Nine analyzer warnings cleared so analyze can gate CI (`5f4514d`).
+- Audit doc: the "Not covered" list now records what happened to each item — composer and attachments closed on-device, PM attachments share that path, drafts reviewed against `DraftsController`, chat uploads not implemented (`4882732`).
+
+### Fixed
+- **Signed out after an update or restore** (`f9e33af`). Both secure-storage call sites used library defaults — on Android the legacy scheme the library itself warns against. One shared instance now uses EncryptedSharedPreferences with `resetOnError`; the manifest excludes the secure-storage file from Auto Backup and device transfer (a restored blob is unreadable without the Keystore key); a read that throws starts the app signed out instead of crashing, and logs the lost-key signature. Not reproduced on a device this session; the fix follows the library's own guidance.
+- **`flutter gen-l10n` aborted from the repo root** (`d562317`) — `l10n.yaml` lives in `discourse_ui`. Both bootstrap scripts run it there; this was CI's first red run.
+- `forumcopilot_sdk`'s `test/` directory holds suites with no `main()`; CI no longer tries to run them (`0bd34f6`).
+
+
 ## [0.8.0] - 2026-09-08
 
 ### Added

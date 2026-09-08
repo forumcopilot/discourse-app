@@ -1,5 +1,7 @@
 # Discourse App
 
+[![CI](https://github.com/forumcopilot/discourse-app/actions/workflows/ci.yml/badge.svg)](https://github.com/forumcopilot/discourse-app/actions/workflows/ci.yml)
+
 An open-source Flutter mobile app for a **single Discourse community**.
 
 Point it at your forum's URL, build it, ship it. It talks to Discourse's **stock REST/JSON API** using **User API Keys** — the same mechanism Discourse's own official app uses. There is **no server-side plugin to install**, no admin API key to hand out, and nothing to run alongside your forum.

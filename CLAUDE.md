@@ -69,8 +69,12 @@ Tests:
 
 ```bash
 flutter test                          # app-level (just test/widget_test.dart)
+(cd packages/discourse_core && flutter test)   # proxies, auth handshake, credential persistence, upload markdown
+(cd packages/discourse_ui && flutter test)     # markup, cooked content, emoji, widget tests
 flutter test test/widget_test.dart -p chrome              # single file / single platform
 ```
+
+`packages/forumcopilot_sdk/test/` holds XenForo-era suites with no `main()`; `flutter test` cannot run them and CI skips that package. CI (`.github/workflows/ci.yml`) runs analyze (`--no-fatal-infos`; errors and warnings fatal) and the three runnable test sets on every push, plus a debug APK and `buildlib.bat` on Windows.
 
 macOS-only utilities:
 
