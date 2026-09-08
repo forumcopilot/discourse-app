@@ -1589,17 +1589,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String topicLastReplyBy(String username, String time) {
-    return '$username replied $time';
+    return '$username antwoordde $time';
   }
 
   @override
   String inReplyToUser(String username) {
-    return 'in reply to $username';
+    return 'als antwoord op $username';
   }
 
   @override
   String inReplyToPost(int number) {
-    return 'in reply to post #$number';
+    return 'als antwoord op bericht #$number';
   }
 
   @override
@@ -1607,8 +1607,8 @@ class AppLocalizationsNl extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days later',
-      one: '1 day later',
+      other: '$count dagen later',
+      one: '1 dag later',
     );
     return '$_temp0';
   }
@@ -1618,8 +1618,8 @@ class AppLocalizationsNl extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count months later',
-      one: '1 month later',
+      other: '$count maanden later',
+      one: '1 maand later',
     );
     return '$_temp0';
   }
@@ -1629,14 +1629,14 @@ class AppLocalizationsNl extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count years later',
-      one: '1 year later',
+      other: '$count jaar later',
+      one: '1 jaar later',
     );
     return '$_temp0';
   }
 
   @override
-  String get profileViews => 'Views';
+  String get profileViews => 'Weergaven';
 
   @override
   String get badges => 'Badges';
@@ -1649,8 +1649,8 @@ class AppLocalizationsNl extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count replies',
-      one: '1 reply',
+      other: '$count antwoorden',
+      one: '1 antwoord',
     );
     return '$_temp0';
   }
@@ -1660,318 +1660,320 @@ class AppLocalizationsNl extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count votes',
-      one: '1 vote',
+      other: '$count stemmen',
+      one: '1 stem',
     );
     return '$_temp0';
   }
 
   @override
-  String get lastSeen => 'Seen';
+  String get lastSeen => 'Gezien';
 
   @override
   String get chat => 'Chat';
 
   @override
   String comingSoon(String label) {
-    return '$label — coming soon';
+    return '$label — binnenkort';
   }
 
   @override
   String moreBadges(Object count) {
-    return '+$count more';
+    return '+$count meer';
   }
 
   @override
-  String get allNotificationsMarkedAsRead => 'All notifications marked as read';
+  String get allNotificationsMarkedAsRead =>
+      'Alle meldingen gemarkeerd als gelezen';
 
   @override
-  String get apply => 'Apply';
+  String get apply => 'Toepassen';
 
   @override
-  String get bookmarks => 'Bookmarks';
+  String get bookmarks => 'Bladwijzers';
 
   @override
   String reviewableBy(String username) {
-    return 'By $username';
+    return 'Door $username';
   }
 
   @override
-  String get changeEmail => 'Change email';
+  String get changeEmail => 'E-mailadres wijzigen';
 
   @override
-  String get changePassword => 'Change password';
+  String get changePassword => 'Wachtwoord wijzigen';
 
   @override
-  String get checkingStatus => 'Checking status…';
+  String get checkingStatus => 'Status controleren…';
 
   @override
-  String get clearReminder => 'Clear reminder';
+  String get clearReminder => 'Herinnering verwijderen';
 
   @override
-  String get copy => 'Copy';
+  String get copy => 'Kopiëren';
 
   @override
-  String get copyLink => 'Copy link';
+  String get copyLink => 'Link kopiëren';
 
   @override
   String couldNotEnableNotifications(String error) {
-    return 'Could not enable notifications: $error';
+    return 'Meldingen konden niet worden ingeschakeld: $error';
   }
 
   @override
-  String get couldNotFindBookmark => 'Could not find this bookmark';
+  String get couldNotFindBookmark => 'Deze bladwijzer is niet gevonden';
 
   @override
   String couldNotOpenEmail(String email) {
-    return 'Could not open email: $email';
+    return 'E-mail kon niet worden geopend: $email';
   }
 
   @override
   String couldNotStartSignIn(String error) {
-    return 'Could not start sign-in: $error';
+    return 'Aanmelden kon niet worden gestart: $error';
   }
 
   @override
-  String get customDateAndTime => 'Custom date & time';
+  String get customDateAndTime => 'Eigen datum en tijd';
 
   @override
-  String get deleteAccount => 'Delete account';
+  String get deleteAccount => 'Account verwijderen';
 
   @override
-  String get deleteMessageQuestion => 'Delete message?';
+  String get deleteMessageQuestion => 'Bericht verwijderen?';
 
   @override
-  String get discard => 'Discard';
+  String get discard => 'Verwerpen';
 
   @override
-  String get discardDraftQuestion => 'Discard draft?';
+  String get discardDraftQuestion => 'Concept verwerpen?';
 
   @override
-  String get doNotDisturb => 'Do not disturb';
+  String get doNotDisturb => 'Niet storen';
 
   @override
-  String get editHistory => 'Edit history';
+  String get editHistory => 'Bewerkingsgeschiedenis';
 
   @override
-  String get editProfile => 'Edit profile';
+  String get editProfile => 'Profiel bewerken';
 
   @override
-  String get editReminder => 'Edit reminder';
+  String get editReminder => 'Herinnering bewerken';
 
   @override
   String emailCopiedToClipboard(String email) {
-    return 'Email copied to clipboard: $email';
+    return 'E-mail gekopieerd naar klembord: $email';
   }
 
   @override
-  String get pushEnabledForThisLogin => 'Enabled for this login';
+  String get pushEnabledForThisLogin => 'Ingeschakeld voor deze aanmelding';
 
   @override
   String get failedToLoadMoreTopics =>
-      'Failed to load more topics. Scroll to retry.';
+      'Meer onderwerpen laden mislukt. Scroll om opnieuw te proberen.';
 
   @override
   String get failedToUpdateNotificationLevel =>
-      'Failed to update notification level';
+      'Meldingsniveau bijwerken mislukt';
 
   @override
-  String get firstPostsOnly => 'First posts only';
+  String get firstPostsOnly => 'Alleen eerste berichten';
 
   @override
-  String get ignoredUsers => 'Ignored users';
+  String get ignoredUsers => 'Genegeerde gebruikers';
 
   @override
-  String get inTwoHours => 'In two hours';
+  String get inTwoHours => 'Over twee uur';
 
   @override
-  String get inviteByEmail => 'Invite by email';
+  String get inviteByEmail => 'Uitnodigen via e-mail';
 
   @override
-  String get inviteLinkCopied => 'Invite link copied';
+  String get inviteLinkCopied => 'Uitnodigingslink gekopieerd';
 
   @override
   String inviteSentTo(String email) {
-    return 'Invite sent to $email';
+    return 'Uitnodiging verzonden naar $email';
   }
 
   @override
-  String get leave => 'Leave';
+  String get leave => 'Verlaten';
 
   @override
-  String get leaveGroup => 'Leave group';
+  String get leaveGroup => 'Groep verlaten';
 
   @override
-  String get leaveGroupQuestion => 'Leave group?';
+  String get leaveGroupQuestion => 'Groep verlaten?';
 
   @override
-  String get linkCopied => 'Link copied';
+  String get linkCopied => 'Link gekopieerd';
 
   @override
-  String get loadMore => 'Load more';
+  String get loadMore => 'Meer laden';
 
   @override
-  String get manageAccountOnWeb => 'Manage account on web';
+  String get manageAccountOnWeb => 'Account beheren op het web';
 
   @override
-  String get merge => 'Merge';
+  String get merge => 'Samenvoegen';
 
   @override
-  String get mergeIntoTopic => 'Merge into topic';
+  String get mergeIntoTopic => 'Samenvoegen in onderwerp';
 
   @override
-  String get newInviteLink => 'New invite link';
+  String get newInviteLink => 'Nieuwe uitnodigingslink';
 
   @override
-  String get nextWeek => 'Next week';
+  String get nextWeek => 'Volgende week';
 
   @override
-  String get pushNotAvailableInThisBuild => 'Not available in this build';
+  String get pushNotAvailableInThisBuild => 'Niet beschikbaar in deze build';
 
   @override
-  String get notNow => 'Not now';
+  String get notNow => 'Niet nu';
 
   @override
   String tagNotificationLevelUpdated(String tag) {
-    return 'Notification level for \"$tag\" updated';
+    return 'Meldingsniveau voor \"$tag\" bijgewerkt';
   }
 
   @override
   String doNotDisturbOnUntil(String until) {
-    return 'On until $until';
+    return 'Aan tot $until';
   }
 
   @override
-  String get pleaseLogInToBookmark => 'Please log in to bookmark';
+  String get pleaseLogInToBookmark => 'Meld je aan om een bladwijzer te maken';
 
   @override
-  String get pleaseLogInToFollowUsers => 'Please log in to follow users';
+  String get pleaseLogInToFollowUsers => 'Meld je aan om gebruikers te volgen';
 
   @override
-  String get pleaseLogInToMarkAnswers => 'Please log in to mark answers';
+  String get pleaseLogInToMarkAnswers =>
+      'Meld je aan om antwoorden te markeren';
 
   @override
-  String get pleaseLogInToReact => 'Please log in to react';
+  String get pleaseLogInToReact => 'Meld je aan om te reageren';
 
   @override
-  String get pleaseLogInToVote => 'Please log in to vote';
+  String get pleaseLogInToVote => 'Meld je aan om te stemmen';
 
   @override
-  String get pushNotifications => 'Push notifications';
+  String get pushNotifications => 'Pushmeldingen';
 
   @override
-  String get relevance => 'Relevance';
+  String get relevance => 'Relevantie';
 
   @override
   String get reminderTimeMustBeInFuture =>
-      'Reminder time must be in the future';
+      'De herinneringstijd moet in de toekomst liggen';
 
   @override
-  String get removeBookmark => 'Remove bookmark';
+  String get removeBookmark => 'Bladwijzer verwijderen';
 
   @override
-  String get removeVote => 'Remove vote';
+  String get removeVote => 'Stem verwijderen';
 
   @override
-  String get renameTopic => 'Rename topic';
+  String get renameTopic => 'Onderwerp hernoemen';
 
   @override
   String reportedBy(String username) {
-    return 'Reported by $username';
+    return 'Gemeld door $username';
   }
 
   @override
-  String get requestToJoin => 'Request to join';
+  String get requestToJoin => 'Lidmaatschap aanvragen';
 
   @override
   String requestToJoinGroup(String group) {
-    return 'Request to join $group';
+    return 'Lidmaatschap van $group aanvragen';
   }
 
   @override
-  String get reset => 'Reset';
+  String get reset => 'Herstellen';
 
   @override
-  String get resizeAndUpload => 'Resize and upload';
+  String get resizeAndUpload => 'Verkleinen en uploaden';
 
   @override
-  String get retryConnection => 'Retry connection';
+  String get retryConnection => 'Verbinding opnieuw proberen';
 
   @override
-  String get reviewQueue => 'Review queue';
+  String get reviewQueue => 'Beoordelingswachtrij';
 
   @override
-  String get revoke => 'Revoke';
+  String get revoke => 'Intrekken';
 
   @override
-  String get revokeInviteQuestion => 'Revoke invite?';
+  String get revokeInviteQuestion => 'Uitnodiging intrekken?';
 
   @override
-  String get save => 'Save';
+  String get save => 'Opslaan';
 
   @override
-  String get sendInvite => 'Send invite';
+  String get sendInvite => 'Uitnodiging verzenden';
 
   @override
-  String get sendRequest => 'Send request';
+  String get sendRequest => 'Aanvraag verzenden';
 
   @override
-  String get settings => 'Settings';
+  String get settings => 'Instellingen';
 
   @override
-  String get showVoters => 'Show voters';
+  String get showVoters => 'Stemmers tonen';
 
   @override
-  String get signOut => 'Sign out';
+  String get signOut => 'Afmelden';
 
   @override
-  String get signOutQuestion => 'Sign out?';
+  String get signOutQuestion => 'Afmelden?';
 
   @override
   String get signInCancelledNoPayload =>
-      'Sign-in cancelled — no payload returned';
+      'Aanmelden geannuleerd — geen antwoord ontvangen';
 
   @override
   String signInFailed(String error) {
-    return 'Sign-in failed: $error';
+    return 'Aanmelden mislukt: $error';
   }
 
   @override
-  String get startChat => 'Start chat';
+  String get startChat => 'Chat starten';
 
   @override
   String stoppedIgnoringUser(String username) {
-    return 'Stopped ignoring @$username';
+    return 'Je negeert @$username niet meer';
   }
 
   @override
-  String get submit => 'Submit';
+  String get submit => 'Verzenden';
 
   @override
   String get discardDraftWarning =>
-      'This will permanently remove the saved draft.';
+      'Het opgeslagen concept wordt permanent verwijderd.';
 
   @override
   String get deleteChatMessageWarning =>
-      'This will remove the message for everyone.';
+      'Het bericht wordt voor iedereen verwijderd.';
 
   @override
-  String get titleOnly => 'Title only';
+  String get titleOnly => 'Alleen titel';
 
   @override
-  String get tomorrow => 'Tomorrow';
+  String get tomorrow => 'Morgen';
 
   @override
-  String get turnOff => 'Turn off';
+  String get turnOff => 'Uitschakelen';
 
   @override
-  String get turnOnNotifications => 'Turn on notifications';
+  String get turnOnNotifications => 'Meldingen inschakelen';
 
   @override
-  String get whisper => 'Whisper';
+  String get whisper => 'Fluisteren';
 
   @override
   String likeAgainInSeconds(Object seconds) {
-    return 'You can like this post again in ${seconds}s';
+    return 'Je kunt dit bericht over ${seconds}s opnieuw liken';
   }
 }

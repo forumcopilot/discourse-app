@@ -4,7 +4,6 @@
   "@appTitle": {
     "description": "The application title"
   },
-  
   "loginTitle": "Вход",
   "usernameLabel": "Имя пользователя",
   "passwordLabel": "Пароль",
@@ -24,7 +23,6 @@
       }
     }
   },
-  
   "createAccount": "Создать аккаунт",
   "alreadyHaveAccount": "Уже есть аккаунт? ",
   "logIn": "Войти",
@@ -61,7 +59,6 @@
   "welcome": "Добро пожаловать!",
   "registrationSuccessful": "Регистрация успешна",
   "pleaseLoginWithNewAccount": "Пожалуйста, войдите с вашим новым аккаунтом.",
-  
   "forgotPasswordTitle": "Забыли пароль",
   "usernameOrEmailLabel": "Имя пользователя или электронная почта",
   "pleaseEnterUsernameOrEmail": "Пожалуйста, введите ваше имя пользователя или электронную почту",
@@ -71,7 +68,6 @@
   "resetFailed": "Сброс не удался",
   "unableToSendResetLink": "Не удалось отправить ссылку для сброса. Пожалуйста, попробуйте снова.",
   "errorSendingResetLink": "Произошла ошибка при отправке ссылки для сброса. Пожалуйста, проверьте ваше соединение и попробуйте снова.",
-  
   "errorTitle": "Ошибка",
   "okButton": "ОК",
   "retryButton": "Повторить",
@@ -80,7 +76,7 @@
   "errorMessageCopiedToClipboard": "Сообщение об ошибке скопировано в буфер обмена",
   "dismiss": "Закрыть",
   "cancel": "Отмена",
-  "tryAgain": "Попробовать снова",
+  "tryAgain": "Попробовать Снова",
   "getHelp": "Получить помощь",
   "somethingWentWrong": "Что-то пошло не так",
   "unexpectedErrorOccurred": "Произошла неожиданная ошибка. Пожалуйста, попробуйте снова.",
@@ -90,7 +86,6 @@
   "pleaseLoginToContinue": "Пожалуйста, войдите, чтобы продолжить.",
   "forumError": "Ошибка форума",
   "anErrorOccurred": "Произошла ошибка",
-  
   "accountPendingApproval": "Ваш аккаунт ожидает одобрения. Вы можете просматривать форум, но не можете публиковать сообщения, пока модератор не одобрит ваш аккаунт.",
   "checkEmailToConfirm": "Пожалуйста, проверьте вашу электронную почту, чтобы подтвердить ваш аккаунт. Нажмите на ссылку подтверждения в письме, которое мы вам отправили.",
   "checkNewEmailToConfirm": "Пожалуйста, проверьте ваш новый адрес электронной почты, чтобы подтвердить изменение. Ваш старый адрес электронной почты останется активным, пока вы не подтвердите новый.",
@@ -102,33 +97,27 @@
   "accountStatusRequiresAttention": "Статус вашего аккаунта требует внимания. Пожалуйста, свяжитесь с администратором, если у вас есть вопросы.",
   "updateEmail": "Обновить электронную почту",
   "resend": "Отправить снова",
-  
   "noLatestTopics": "Нет последних тем",
   "noRecentTopicsToDisplay": "Нет последних тем для отображения. Вернитесь позже для новых обсуждений.",
   "signInToViewLatestTopics": "Войдите, чтобы просмотреть последние темы",
   "youNeedToBeSignedInToViewLatestTopics": "Вам нужно войти, чтобы просмотреть последние темы",
-  
   "noUnreadTopics": "Нет непрочитанных тем",
   "thereAreNoUnreadTopics": "Нет непрочитанных тем. Вернитесь позже для новых обсуждений.",
   "youAreAllCaughtUp": "Вы все просмотрели!",
   "signInToViewUnreadTopics": "Войдите, чтобы просмотреть непрочитанные темы",
   "youNeedToBeSignedInToViewUnreadTopics": "Вам нужно войти, чтобы просмотреть ваши непрочитанные темы",
-  
   "noSubscribedTopics": "Нет подписанных тем",
   "noSubscribedTopicsMessage": "Вы не подписались ни на одну тему. Нажмите кнопку звездочки на теме, чтобы подписаться и получать уведомления о новых обновлениях.",
   "signInToViewSubscribedTopics": "Войдите, чтобы просмотреть подписанные темы",
   "youNeedToBeSignedInToViewSubscribedTopics": "Вам нужно войти, чтобы просмотреть ваши подписанные темы",
-  
   "noParticipatedTopics": "Нет тем с участием",
   "topicsYouParticipatedIn": "Темы, в которых вы участвовали, будут показаны здесь.",
   "signInToViewParticipatedTopics": "Войдите, чтобы просмотреть темы с участием",
   "youNeedToBeSignedInToViewParticipatedTopics": "Вам нужно войти, чтобы просмотреть темы, в которых вы участвовали",
-  
   "latest": "Последние",
   "unread": "Непрочитанные",
   "subscribed": "Подписанные",
   "participated": "С участием",
-  
   "connectionTimedOut": "Время соединения истекло. Сайт может быть недоступен или недостижим.",
   "failedToConnectToSite": "Не удалось подключиться к сайту. Сайт может быть недоступен или недостижим.",
   "connectionFailed": "Ошибка подключения",
@@ -144,17 +133,14 @@
   "loading": "Загрузка...",
   "newConversation": "Новый разговор",
   "newMessage": "Новое сообщение",
-  
   "appSettings": "Настройки приложения",
   "searchSites": "Поиск сайтов",
   "language": "Язык",
-  "systemDefault": "Системный по умолчанию",
+  "systemDefault": "По умолчанию системы",
   "followSystemLanguage": "Следовать языку системы",
-  
   "all": "Все",
   "topicsOnly": "Только темы",
   "titlesOnly": "Только заголовки",
-  
   "failedToShareTopic": "Не удалось поделиться темой: {error}",
   "@failedToShareTopic": {
     "description": "Error message when sharing topic fails",
@@ -186,28 +172,23 @@
       }
     }
   },
-  
   "youCannotReplyToThisThread": "Вы не можете ответить на эту тему",
   "pleaseWaitForThreadToLoad": "Пожалуйста, подождите, пока тема загрузится",
-  
   "softDelete": "Мягкое удаление",
   "postCanBeRestoredLater": "Сообщение можно восстановить позже",
-  "hardDelete": "Жесткое удаление",
+  "hardDelete": "Жёсткое удаление",
   "postWillBePermanentlyDeleted": "Сообщение будет удалено навсегда",
   "reasonForDeletion": "Причина удаления",
   "enterReasonForDeletingPost": "Введите причину удаления этого сообщения",
   "pleaseEnterReasonForDeletion": "Пожалуйста, введите причину удаления",
-  
   "reportPost": "Пожаловаться на сообщение",
   "pleaseProvideReasonForReporting": "Пожалуйста, укажите причину жалобы на это сообщение.",
   "reason": "Причина",
   "enterReasonForReportingPost": "Введите причину жалобы на это сообщение",
   "pleaseEnterReason": "Пожалуйста, введите причину",
   "submitReport": "Отправить жалобу",
-  
   "selectedActions": "Выбранные действия:",
   "thisActionCannotBeUndone": "Это действие нельзя отменить.",
-  
   "participantsLabel": "Участники",
   "usernameHasBeenInvited": "{username} был приглашен в разговор",
   "@usernameHasBeenInvited": {
@@ -229,7 +210,6 @@
   },
   "newTopic": "Новая тема",
   "markRead": "Отметить как прочитанное",
-  
   "reportUser": "Пожаловаться на пользователя",
   "pleaseSelectReasonForReportingUser": "Пожалуйста, выберите причину жалобы на этого пользователя.",
   "spamOrAdvertising": "Спам или реклама",
@@ -240,7 +220,6 @@
   "pleaseSpecifyReason": "Пожалуйста, укажите причину",
   "enterReasonForReportingUser": "Введите причину жалобы на этого пользователя",
   "pleaseSelectReason": "Пожалуйста, выберите причину",
-  
   "banUser": "Заблокировать пользователя",
   "unbanUser": "Разблокировать пользователя",
   "pleaseSelectReasonForBanningUser": "Пожалуйста, выберите причину блокировки {username}",
@@ -259,16 +238,13 @@
   "enterReasonForBanningUser": "Введите причину блокировки этого пользователя",
   "banUntil": "Заблокировать до",
   "selectDate": "Выбрать дату",
-  
   "moreOptions": "Дополнительные опции",
   "leaveConversation": "Покинуть разговор",
   "reportConversation": "Пожаловаться на разговор",
-  
   "topicClosed": "Тема закрыта",
   "topicOpened": "Тема открыта",
   "topicStickied": "Тема закреплена",
   "topicUnstickied": "Тема откреплена",
-  
   "cannotEditMessage": "Невозможно отредактировать это сообщение: {error}",
   "@cannotEditMessage": {
     "description": "Error message when cannot edit message",
@@ -282,15 +258,12 @@
   "handleThreads": "Управление темами",
   "deleteMessages": "Удалить сообщения",
   "deleteConversations": "Удалить разговоры",
-  
   "myForums": "Мои Форумы",
   "recentlyVisited": "Недавно Посещенные",
   "explore": "Исследовать",
   "forumCopilot": "Forum Copilot",
-  
   "noConversations": "Нет разговоров",
   "noConversationsMessage": "У вас пока нет разговоров. Начните новый разговор, чтобы начать обмен сообщениями.",
-  
   "imageSavedToGallery": "Изображение сохранено в галерею!",
   "failedToSaveImage": "Ошибка при сохранении изображения: {error}",
   "@failedToSaveImage": {
@@ -301,23 +274,19 @@
       }
     }
   },
-  
   "userProfile": "Профиль Пользователя",
   "deletePost": "Удалить Сообщение",
   "loginRequired": "Требуется Вход",
-  
-  "spamCleaner": "Очиститель Спама",
-  "tryAgain": "Попробовать Снова",
-  "sendMessage": "Отправить Сообщение",
+  "spamCleaner": "Очистка спама",
+  "sendMessage": "Отправить сообщение",
   "memberSince": "Участник С",
   "lastActivity": "Последняя Активность",
   "likesReceived": "Полученные Лайки",
   "likesGiven": "Данные Лайки",
-  "showMore": "Показать Больше",
-  "cleanSpam": "Очистить Спам",
-  
+  "showMore": "Показать больше",
+  "cleanSpam": "Очистить спам",
   "failedToSaveMessage": "Ошибка при сохранении сообщения",
-  "failedToSaveConversation": "Ошибка при сохранении разговора",
+  "failedToSaveConversation": "Не удалось сохранить разговор",
   "failedToSaveSetting": "Ошибка при сохранении настройки",
   "failedToSavePost": "Ошибка при сохранении сообщения",
   "errorLoadingSites": "Ошибка при загрузке сайтов: {error}",
@@ -329,7 +298,6 @@
       }
     }
   },
-  
   "connectingTo": "Подключение к {domainName}...",
   "@connectingTo": {
     "description": "Message shown when connecting to a site",
@@ -339,7 +307,6 @@
       }
     }
   },
-  
   "members": "Участники",
   "allMembers": "Все Участники",
   "online": "Онлайн",
@@ -373,9 +340,7 @@
     }
   },
   "noSubject": "Без темы",
-  
   "search": "Поиск",
-  "moreOptions": "Дополнительные опции",
   "logout": "Выйти",
   "areYouSureYouWantToLogout": "Вы уверены, что хотите выйти?",
   "register": "Зарегистрироваться",
@@ -386,7 +351,6 @@
   "profile": "Профиль",
   "messages": "Сообщения",
   "add": "Добавить",
-  "dismiss": "Закрыть",
   "retry": "Повторить",
   "delete": "Удалить",
   "deleteMessage": "Удалить Сообщение",
@@ -461,7 +425,6 @@
   "iWouldLikeToAddYouToThisConversation": "Я хотел бы добавить вас в этот разговор.",
   "searchFailed": "Поиск не удался",
   "trySearchingWithDifferentUsername": "Попробуйте поискать с другим именем пользователя",
-  "enterUsernameToSearch": "Введите имя пользователя для поиска...",
   "noSitesFound": "Сайты не найдены.",
   "userInformationNotAvailable": "Информация о пользователе недоступна",
   "birthday": "День рождения",
@@ -584,9 +547,6 @@
   "enterKeywordsToFindTopicsAndPosts": "Введите ключевые слова для поиска тем и сообщений",
   "enterKeywordsOrDomainToFindForums": "Введите ключевые слова или домен для поиска форумов",
   "enterKeywordsOrDomainNamesToFindForums": "Введите ключевые слова или доменные имена для поиска форумов",
-  "language": "Язык",
-  "systemDefault": "По умолчанию системы",
-  "followSystemLanguage": "Следовать языку системы",
   "appearance": "Внешний вид",
   "followSystemTheme": "Следовать теме системы",
   "light": "Светлая",
@@ -605,27 +565,17 @@
   "forumSettings": "Настройки форума",
   "noSettingsAvailable": "Настройки недоступны",
   "settingsCategoriesWillAppearHere": "Категории настроек появятся здесь, когда будут доступны.",
-  "spamCleaner": "Очистка спама",
   "unableToLoadProfile": "Не удалось загрузить профиль",
   "banned": "ЗАБЛОКИРОВАН",
-  "sendMessage": "Отправить сообщение",
-  "showMore": "Показать больше",
-  "reportUser": "Пожаловаться на пользователя",
-  "submitReport": "Отправить жалобу",
   "reportSubmittedSuccessfully": "Жалоба успешно отправлена",
   "failedToSubmitReport": "Не удалось отправить жалобу",
   "searchForForums": "Поиск форумов",
   "searchForums": "Поиск форумов",
   "deleteTopic": "Удалить тему",
-  "softDelete": "Мягкое удаление",
   "topicCanBeRestoredLater": "Тему можно восстановить позже",
-  "hardDelete": "Жёсткое удаление",
   "topicWillBePermanentlyDeleted": "Тема будет удалена навсегда",
-  "reasonForDeletion": "Причина удаления",
   "enterReasonForDeletingTopic": "Введите причину удаления этой темы",
-  "pleaseEnterReasonForDeletion": "Пожалуйста, введите причину удаления",
   "pleaseSelectEndDate": "Пожалуйста, выберите дату окончания",
-  "banUser": "Заблокировать пользователя",
   "userBannedSuccessfully": "Пользователь успешно заблокирован",
   "failedToBanUser": "Не удалось заблокировать пользователя",
   "userUnbannedSuccessfully": "Пользователь успешно разблокирован",
@@ -633,7 +583,6 @@
   "spamCleanUser": "Очистить спам пользователя",
   "deletePrivateConversations": "Удалить приватные разговоры",
   "banTheUserAccount": "Заблокировать учётную запись пользователя",
-  "cleanSpam": "Очистить спам",
   "handledThreads": "Обработанные темы",
   "deletedMessages": "Удалённые сообщения",
   "deletedConversations": "Удалённые разговоры",
@@ -658,14 +607,12 @@
     }
   },
   "messageNotFound": "Сообщение не найдено",
-  
   "home": "Главная",
   "notifications": "Уведомления",
   "forums": "Форумы",
   "markAllForumsAsRead": "Отметить все форумы как прочитанные?",
   "markAllForumsAsReadMessage": "Это отметит все форумы и темы как прочитанные. Это действие нельзя отменить.",
   "markAsRead": "Отметить как прочитанное",
-  
   "content": "Содержание",
   "insertImage": "Вставить изображение",
   "howWouldYouLikeToInsertImage": "Как вы хотите вставить это изображение?",
@@ -679,13 +626,11 @@
   "uploading": "Загрузка...",
   "uploaded": "Загружено",
   "mentionUser": "Упомянуть пользователя",
-  
   "loggingIn": "Вход в систему...",
   "submittingReport": "Отправка отчёта...",
   "banningUser": "Блокировка пользователя...",
   "unbanningUser": "Разблокировка пользователя...",
   "cleaningSpam": "Очистка спама...",
-  
   "enterSubject": "Введите тему",
   "typeYourMessageHere": "Введите ваше сообщение здесь",
   "writeYourMessage": "Напишите ваше сообщение...",
@@ -779,15 +724,12 @@
       }
     }
   },
-  
   "goToTop": "Перейти вверх",
   "goToBottom": "Перейти вниз",
   "replyAll": "Ответить всем",
   "forward": "Переслать",
-  
   "noForumsFound": "Форумы не найдены.",
   "pleaseLoginToAccessContent": "Пожалуйста, войдите, чтобы получить доступ к этому содержимому и взаимодействовать с сообщениями.",
-  
   "searchUsers": "Поиск пользователей...",
   "writeYourTitle": "Напишите ваш заголовок...",
   "writeYourContent": "Напишите ваше содержимое...",
@@ -801,21 +743,17 @@
       }
     }
   },
-  
   "edit": "Редактировать",
   "report": "Пожаловаться",
   "unfollow": "Отписаться",
   "follow": "Подписаться",
-  
   "goToForums": "Перейти к форумам",
   "remove": "Удалить",
-  
   "subject": "Тема",
   "message": "Сообщение",
   "titleCannotBeEmpty": "Заголовок не может быть пустым",
   "conversationUpdatedSuccessfully": "Разговор успешно обновлён",
   "goBack": "Назад",
-  "signInToViewMessages": "Войдите, чтобы просмотреть сообщения",
   "privateMessagesNotAvailable": "Приватные сообщения недоступны",
   "failedToLoadPost": "Не удалось загрузить сообщение: \n{error}",
   "@failedToLoadPost": {
@@ -876,7 +814,6 @@
     }
   },
   "enterANumber": "Введите число",
-  
   "failedToNavigateToForum": "Не удалось перейти к форуму",
   "failedToNavigateToForumName": "Не удалось перейти к {forumName}",
   "@failedToNavigateToForumName": {
@@ -886,8 +823,6 @@
       }
     }
   },
-  "failedToSaveConversation": "Не удалось сохранить разговор",
-  
   "forumNotFound": "Форум не найден: {forumName}",
   "@forumNotFound": {
     "placeholders": {
@@ -922,7 +857,6 @@
   "deviceLanguage": "Язык устройства",
   "noPostsToTranslate": "Нет постов для перевода",
   "translationFailed": "Ошибка перевода",
-  
   "likePost": "Нравится",
   "unlikePost": "Больше не нравится",
   "thankPost": "Поблагодарить",
@@ -939,5 +873,107 @@
   "replyOptions": "Параметры ответа",
   "replyWithQuote": "Ответить с цитатой",
   "fileSavedToDownloads": "Файл сохранен в Загрузки: {filename}",
-  "fileSavedToDocuments": "Файл сохранен в Документы: {filename}"
+  "fileSavedToDocuments": "Файл сохранен в Документы: {filename}",
+  "topicLastReplyBy": "{username} ответил(а) {time}",
+  "inReplyToUser": "в ответ {username}",
+  "inReplyToPost": "в ответ на сообщение #{number}",
+  "timeGapDaysLater": "{count, plural, =1{1 день спустя} few{{count} дня спустя} other{{count} дней спустя}}",
+  "timeGapMonthsLater": "{count, plural, =1{1 месяц спустя} few{{count} месяца спустя} other{{count} месяцев спустя}}",
+  "timeGapYearsLater": "{count, plural, =1{1 год спустя} few{{count} года спустя} other{{count} лет спустя}}",
+  "profileViews": "Просмотры",
+  "badges": "Награды",
+  "chatWithUser": "Чат",
+  "nReplies": "{count, plural, =1{1 ответ} few{{count} ответа} other{{count} ответов}}",
+  "nVotes": "{count, plural, =1{1 голос} few{{count} голоса} other{{count} голосов}}",
+  "lastSeen": "Был(а)",
+  "chat": "Чат",
+  "comingSoon": "{label} — скоро",
+  "moreBadges": "ещё {count}",
+  "allNotificationsMarkedAsRead": "Все уведомления отмечены как прочитанные",
+  "apply": "Применить",
+  "bookmarks": "Закладки",
+  "reviewableBy": "Автор: {username}",
+  "changeEmail": "Изменить адрес электронной почты",
+  "changePassword": "Изменить пароль",
+  "checkingStatus": "Проверка состояния…",
+  "clearReminder": "Убрать напоминание",
+  "copy": "Копировать",
+  "copyLink": "Скопировать ссылку",
+  "couldNotEnableNotifications": "Не удалось включить уведомления: {error}",
+  "couldNotFindBookmark": "Закладка не найдена",
+  "couldNotOpenEmail": "Не удалось открыть почту: {email}",
+  "couldNotStartSignIn": "Не удалось начать вход: {error}",
+  "customDateAndTime": "Своя дата и время",
+  "deleteAccount": "Удалить аккаунт",
+  "deleteMessageQuestion": "Удалить сообщение?",
+  "discard": "Отменить",
+  "discardDraftQuestion": "Удалить черновик?",
+  "doNotDisturb": "Не беспокоить",
+  "editHistory": "История правок",
+  "editProfile": "Редактировать профиль",
+  "editReminder": "Изменить напоминание",
+  "emailCopiedToClipboard": "Адрес скопирован в буфер обмена: {email}",
+  "pushEnabledForThisLogin": "Включены для этого входа",
+  "failedToLoadMoreTopics": "Не удалось загрузить темы. Прокрутите, чтобы повторить.",
+  "failedToUpdateNotificationLevel": "Не удалось изменить уровень уведомлений",
+  "firstPostsOnly": "Только первые сообщения",
+  "ignoredUsers": "Игнорируемые пользователи",
+  "inTwoHours": "Через два часа",
+  "inviteByEmail": "Пригласить по почте",
+  "inviteLinkCopied": "Ссылка-приглашение скопирована",
+  "inviteSentTo": "Приглашение отправлено на {email}",
+  "leave": "Покинуть",
+  "leaveGroup": "Покинуть группу",
+  "leaveGroupQuestion": "Покинуть группу?",
+  "linkCopied": "Ссылка скопирована",
+  "loadMore": "Загрузить ещё",
+  "manageAccountOnWeb": "Управление аккаунтом в браузере",
+  "merge": "Объединить",
+  "mergeIntoTopic": "Объединить с темой",
+  "newInviteLink": "Новая ссылка-приглашение",
+  "nextWeek": "На следующей неделе",
+  "pushNotAvailableInThisBuild": "Недоступно в этой сборке",
+  "notNow": "Не сейчас",
+  "tagNotificationLevelUpdated": "Уровень уведомлений для «{tag}» обновлён",
+  "doNotDisturbOnUntil": "Включено до {until}",
+  "pleaseLogInToBookmark": "Войдите, чтобы добавить закладку",
+  "pleaseLogInToFollowUsers": "Войдите, чтобы подписаться на пользователей",
+  "pleaseLogInToMarkAnswers": "Войдите, чтобы отмечать ответы",
+  "pleaseLogInToReact": "Войдите, чтобы отреагировать",
+  "pleaseLogInToVote": "Войдите, чтобы проголосовать",
+  "pushNotifications": "Push-уведомления",
+  "relevance": "Релевантность",
+  "reminderTimeMustBeInFuture": "Время напоминания должно быть в будущем",
+  "removeBookmark": "Удалить закладку",
+  "removeVote": "Отозвать голос",
+  "renameTopic": "Переименовать тему",
+  "reportedBy": "Пожаловался: {username}",
+  "requestToJoin": "Запросить вступление",
+  "requestToJoinGroup": "Запросить вступление в {group}",
+  "reset": "Сбросить",
+  "resizeAndUpload": "Уменьшить и загрузить",
+  "retryConnection": "Повторить подключение",
+  "reviewQueue": "Очередь на проверку",
+  "revoke": "Отозвать",
+  "revokeInviteQuestion": "Отозвать приглашение?",
+  "save": "Сохранить",
+  "sendInvite": "Отправить приглашение",
+  "sendRequest": "Отправить запрос",
+  "settings": "Настройки",
+  "showVoters": "Показать проголосовавших",
+  "signOut": "Выйти",
+  "signOutQuestion": "Выйти?",
+  "signInCancelledNoPayload": "Вход отменён — ответ не получен",
+  "signInFailed": "Ошибка входа: {error}",
+  "startChat": "Начать чат",
+  "stoppedIgnoringUser": "@{username} больше не игнорируется",
+  "submit": "Отправить",
+  "discardDraftWarning": "Сохранённый черновик будет удалён без возможности восстановления.",
+  "deleteChatMessageWarning": "Сообщение будет удалено для всех.",
+  "titleOnly": "Только заголовок",
+  "tomorrow": "Завтра",
+  "turnOff": "Выключить",
+  "turnOnNotifications": "Включить уведомления",
+  "whisper": "Шёпот",
+  "likeAgainInSeconds": "Снова поставить лайк можно через {seconds} с"
 }

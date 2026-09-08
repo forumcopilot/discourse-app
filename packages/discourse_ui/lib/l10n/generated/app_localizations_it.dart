@@ -1601,17 +1601,17 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String topicLastReplyBy(String username, String time) {
-    return '$username replied $time';
+    return '$username ha risposto $time';
   }
 
   @override
   String inReplyToUser(String username) {
-    return 'in reply to $username';
+    return 'in risposta a $username';
   }
 
   @override
   String inReplyToPost(int number) {
-    return 'in reply to post #$number';
+    return 'in risposta al post #$number';
   }
 
   @override
@@ -1619,8 +1619,8 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days later',
-      one: '1 day later',
+      other: '$count giorni dopo',
+      one: '1 giorno dopo',
     );
     return '$_temp0';
   }
@@ -1630,8 +1630,8 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count months later',
-      one: '1 month later',
+      other: '$count mesi dopo',
+      one: '1 mese dopo',
     );
     return '$_temp0';
   }
@@ -1641,17 +1641,17 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count years later',
-      one: '1 year later',
+      other: '$count anni dopo',
+      one: '1 anno dopo',
     );
     return '$_temp0';
   }
 
   @override
-  String get profileViews => 'Views';
+  String get profileViews => 'Visualizzazioni';
 
   @override
-  String get badges => 'Badges';
+  String get badges => 'Badge';
 
   @override
   String get chatWithUser => 'Chat';
@@ -1661,8 +1661,8 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count replies',
-      one: '1 reply',
+      other: '$count risposte',
+      one: '1 risposta',
     );
     return '$_temp0';
   }
@@ -1672,318 +1672,321 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count votes',
-      one: '1 vote',
+      other: '$count voti',
+      one: '1 voto',
     );
     return '$_temp0';
   }
 
   @override
-  String get lastSeen => 'Seen';
+  String get lastSeen => 'Visto';
 
   @override
   String get chat => 'Chat';
 
   @override
   String comingSoon(String label) {
-    return '$label — coming soon';
+    return '$label — in arrivo';
   }
 
   @override
   String moreBadges(Object count) {
-    return '+$count more';
+    return '+$count altri';
   }
 
   @override
-  String get allNotificationsMarkedAsRead => 'All notifications marked as read';
+  String get allNotificationsMarkedAsRead =>
+      'Tutte le notifiche segnate come lette';
 
   @override
-  String get apply => 'Apply';
+  String get apply => 'Applica';
 
   @override
-  String get bookmarks => 'Bookmarks';
+  String get bookmarks => 'Segnalibri';
 
   @override
   String reviewableBy(String username) {
-    return 'By $username';
+    return 'Di $username';
   }
 
   @override
-  String get changeEmail => 'Change email';
+  String get changeEmail => 'Cambia e-mail';
 
   @override
-  String get changePassword => 'Change password';
+  String get changePassword => 'Cambia password';
 
   @override
-  String get checkingStatus => 'Checking status…';
+  String get checkingStatus => 'Verifica dello stato…';
 
   @override
-  String get clearReminder => 'Clear reminder';
+  String get clearReminder => 'Rimuovi promemoria';
 
   @override
-  String get copy => 'Copy';
+  String get copy => 'Copia';
 
   @override
-  String get copyLink => 'Copy link';
+  String get copyLink => 'Copia link';
 
   @override
   String couldNotEnableNotifications(String error) {
-    return 'Could not enable notifications: $error';
+    return 'Impossibile attivare le notifiche: $error';
   }
 
   @override
-  String get couldNotFindBookmark => 'Could not find this bookmark';
+  String get couldNotFindBookmark => 'Segnalibro non trovato';
 
   @override
   String couldNotOpenEmail(String email) {
-    return 'Could not open email: $email';
+    return 'Impossibile aprire l’e-mail: $email';
   }
 
   @override
   String couldNotStartSignIn(String error) {
-    return 'Could not start sign-in: $error';
+    return 'Impossibile avviare l’accesso: $error';
   }
 
   @override
-  String get customDateAndTime => 'Custom date & time';
+  String get customDateAndTime => 'Data e ora personalizzate';
 
   @override
-  String get deleteAccount => 'Delete account';
+  String get deleteAccount => 'Elimina account';
 
   @override
-  String get deleteMessageQuestion => 'Delete message?';
+  String get deleteMessageQuestion => 'Eliminare il messaggio?';
 
   @override
-  String get discard => 'Discard';
+  String get discard => 'Scarta';
 
   @override
-  String get discardDraftQuestion => 'Discard draft?';
+  String get discardDraftQuestion => 'Scartare la bozza?';
 
   @override
-  String get doNotDisturb => 'Do not disturb';
+  String get doNotDisturb => 'Non disturbare';
 
   @override
-  String get editHistory => 'Edit history';
+  String get editHistory => 'Cronologia modifiche';
 
   @override
-  String get editProfile => 'Edit profile';
+  String get editProfile => 'Modifica profilo';
 
   @override
-  String get editReminder => 'Edit reminder';
+  String get editReminder => 'Modifica promemoria';
 
   @override
   String emailCopiedToClipboard(String email) {
-    return 'Email copied to clipboard: $email';
+    return 'E-mail copiata negli appunti: $email';
   }
 
   @override
-  String get pushEnabledForThisLogin => 'Enabled for this login';
+  String get pushEnabledForThisLogin => 'Attive per questo accesso';
 
   @override
   String get failedToLoadMoreTopics =>
-      'Failed to load more topics. Scroll to retry.';
+      'Impossibile caricare altri argomenti. Scorri per riprovare.';
 
   @override
   String get failedToUpdateNotificationLevel =>
-      'Failed to update notification level';
+      'Impossibile aggiornare il livello di notifica';
 
   @override
-  String get firstPostsOnly => 'First posts only';
+  String get firstPostsOnly => 'Solo primi post';
 
   @override
-  String get ignoredUsers => 'Ignored users';
+  String get ignoredUsers => 'Utenti ignorati';
 
   @override
-  String get inTwoHours => 'In two hours';
+  String get inTwoHours => 'Tra due ore';
 
   @override
-  String get inviteByEmail => 'Invite by email';
+  String get inviteByEmail => 'Invita via e-mail';
 
   @override
-  String get inviteLinkCopied => 'Invite link copied';
+  String get inviteLinkCopied => 'Link di invito copiato';
 
   @override
   String inviteSentTo(String email) {
-    return 'Invite sent to $email';
+    return 'Invito inviato a $email';
   }
 
   @override
-  String get leave => 'Leave';
+  String get leave => 'Esci';
 
   @override
-  String get leaveGroup => 'Leave group';
+  String get leaveGroup => 'Esci dal gruppo';
 
   @override
-  String get leaveGroupQuestion => 'Leave group?';
+  String get leaveGroupQuestion => 'Uscire dal gruppo?';
 
   @override
-  String get linkCopied => 'Link copied';
+  String get linkCopied => 'Link copiato';
 
   @override
-  String get loadMore => 'Load more';
+  String get loadMore => 'Carica altro';
 
   @override
-  String get manageAccountOnWeb => 'Manage account on web';
+  String get manageAccountOnWeb => 'Gestisci account sul web';
 
   @override
-  String get merge => 'Merge';
+  String get merge => 'Unisci';
 
   @override
-  String get mergeIntoTopic => 'Merge into topic';
+  String get mergeIntoTopic => 'Unisci in un argomento';
 
   @override
-  String get newInviteLink => 'New invite link';
+  String get newInviteLink => 'Nuovo link di invito';
 
   @override
-  String get nextWeek => 'Next week';
+  String get nextWeek => 'La prossima settimana';
 
   @override
-  String get pushNotAvailableInThisBuild => 'Not available in this build';
+  String get pushNotAvailableInThisBuild =>
+      'Non disponibile in questa versione';
 
   @override
-  String get notNow => 'Not now';
+  String get notNow => 'Non ora';
 
   @override
   String tagNotificationLevelUpdated(String tag) {
-    return 'Notification level for \"$tag\" updated';
+    return 'Livello di notifica per \"$tag\" aggiornato';
   }
 
   @override
   String doNotDisturbOnUntil(String until) {
-    return 'On until $until';
+    return 'Attivo fino a $until';
   }
 
   @override
-  String get pleaseLogInToBookmark => 'Please log in to bookmark';
+  String get pleaseLogInToBookmark => 'Accedi per aggiungere un segnalibro';
 
   @override
-  String get pleaseLogInToFollowUsers => 'Please log in to follow users';
+  String get pleaseLogInToFollowUsers => 'Accedi per seguire gli utenti';
 
   @override
-  String get pleaseLogInToMarkAnswers => 'Please log in to mark answers';
+  String get pleaseLogInToMarkAnswers =>
+      'Accedi per contrassegnare le risposte';
 
   @override
-  String get pleaseLogInToReact => 'Please log in to react';
+  String get pleaseLogInToReact => 'Accedi per reagire';
 
   @override
-  String get pleaseLogInToVote => 'Please log in to vote';
+  String get pleaseLogInToVote => 'Accedi per votare';
 
   @override
-  String get pushNotifications => 'Push notifications';
+  String get pushNotifications => 'Notifiche push';
 
   @override
-  String get relevance => 'Relevance';
+  String get relevance => 'Rilevanza';
 
   @override
   String get reminderTimeMustBeInFuture =>
-      'Reminder time must be in the future';
+      'L’ora del promemoria deve essere futura';
 
   @override
-  String get removeBookmark => 'Remove bookmark';
+  String get removeBookmark => 'Rimuovi segnalibro';
 
   @override
-  String get removeVote => 'Remove vote';
+  String get removeVote => 'Rimuovi voto';
 
   @override
-  String get renameTopic => 'Rename topic';
+  String get renameTopic => 'Rinomina argomento';
 
   @override
   String reportedBy(String username) {
-    return 'Reported by $username';
+    return 'Segnalato da $username';
   }
 
   @override
-  String get requestToJoin => 'Request to join';
+  String get requestToJoin => 'Richiedi di partecipare';
 
   @override
   String requestToJoinGroup(String group) {
-    return 'Request to join $group';
+    return 'Richiedi di partecipare a $group';
   }
 
   @override
-  String get reset => 'Reset';
+  String get reset => 'Reimposta';
 
   @override
-  String get resizeAndUpload => 'Resize and upload';
+  String get resizeAndUpload => 'Ridimensiona e carica';
 
   @override
-  String get retryConnection => 'Retry connection';
+  String get retryConnection => 'Riprova la connessione';
 
   @override
-  String get reviewQueue => 'Review queue';
+  String get reviewQueue => 'Coda di revisione';
 
   @override
-  String get revoke => 'Revoke';
+  String get revoke => 'Revoca';
 
   @override
-  String get revokeInviteQuestion => 'Revoke invite?';
+  String get revokeInviteQuestion => 'Revocare l’invito?';
 
   @override
-  String get save => 'Save';
+  String get save => 'Salva';
 
   @override
-  String get sendInvite => 'Send invite';
+  String get sendInvite => 'Invia invito';
 
   @override
-  String get sendRequest => 'Send request';
+  String get sendRequest => 'Invia richiesta';
 
   @override
-  String get settings => 'Settings';
+  String get settings => 'Impostazioni';
 
   @override
-  String get showVoters => 'Show voters';
+  String get showVoters => 'Mostra votanti';
 
   @override
-  String get signOut => 'Sign out';
+  String get signOut => 'Esci';
 
   @override
-  String get signOutQuestion => 'Sign out?';
+  String get signOutQuestion => 'Uscire?';
 
   @override
   String get signInCancelledNoPayload =>
-      'Sign-in cancelled — no payload returned';
+      'Accesso annullato — nessuna risposta ricevuta';
 
   @override
   String signInFailed(String error) {
-    return 'Sign-in failed: $error';
+    return 'Accesso non riuscito: $error';
   }
 
   @override
-  String get startChat => 'Start chat';
+  String get startChat => 'Avvia chat';
 
   @override
   String stoppedIgnoringUser(String username) {
-    return 'Stopped ignoring @$username';
+    return 'Hai smesso di ignorare @$username';
   }
 
   @override
-  String get submit => 'Submit';
+  String get submit => 'Invia';
 
   @override
   String get discardDraftWarning =>
-      'This will permanently remove the saved draft.';
+      'La bozza salvata verrà rimossa definitivamente.';
 
   @override
   String get deleteChatMessageWarning =>
-      'This will remove the message for everyone.';
+      'Il messaggio verrà rimosso per tutti.';
 
   @override
-  String get titleOnly => 'Title only';
+  String get titleOnly => 'Solo titolo';
 
   @override
-  String get tomorrow => 'Tomorrow';
+  String get tomorrow => 'Domani';
 
   @override
-  String get turnOff => 'Turn off';
+  String get turnOff => 'Disattiva';
 
   @override
-  String get turnOnNotifications => 'Turn on notifications';
+  String get turnOnNotifications => 'Attiva le notifiche';
 
   @override
-  String get whisper => 'Whisper';
+  String get whisper => 'Sussurro';
 
   @override
   String likeAgainInSeconds(Object seconds) {
-    return 'You can like this post again in ${seconds}s';
+    return 'Potrai mettere di nuovo mi piace tra ${seconds}s';
   }
 }

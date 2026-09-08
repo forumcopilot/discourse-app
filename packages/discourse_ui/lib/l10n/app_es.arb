@@ -4,7 +4,6 @@
   "@appTitle": {
     "description": "The application title"
   },
-  
   "loginTitle": "Iniciar sesión",
   "usernameLabel": "Nombre de usuario",
   "passwordLabel": "Contraseña",
@@ -24,7 +23,6 @@
       }
     }
   },
-  
   "createAccount": "Crear cuenta",
   "alreadyHaveAccount": "¿Ya tienes una cuenta? ",
   "logIn": "Iniciar sesión",
@@ -61,7 +59,6 @@
   "welcome": "¡Bienvenido!",
   "registrationSuccessful": "Registro exitoso",
   "pleaseLoginWithNewAccount": "Por favor inicia sesión con tu nueva cuenta.",
-  
   "forgotPasswordTitle": "Olvidé mi contraseña",
   "usernameOrEmailLabel": "Nombre de usuario o correo electrónico",
   "pleaseEnterUsernameOrEmail": "Por favor ingresa tu nombre de usuario o correo electrónico",
@@ -71,7 +68,6 @@
   "resetFailed": "Restablecimiento fallido",
   "unableToSendResetLink": "No se pudo enviar el enlace de restablecimiento. Por favor intenta de nuevo.",
   "errorSendingResetLink": "Ocurrió un error al enviar el enlace de restablecimiento. Por favor verifica tu conexión e intenta de nuevo.",
-  
   "errorTitle": "Error",
   "okButton": "Aceptar",
   "retryButton": "Reintentar",
@@ -80,7 +76,7 @@
   "errorMessageCopiedToClipboard": "Mensaje de error copiado al portapapeles",
   "dismiss": "Descartar",
   "cancel": "Cancelar",
-  "tryAgain": "Intentar de nuevo",
+  "tryAgain": "Intentar de Nuevo",
   "getHelp": "Obtener ayuda",
   "somethingWentWrong": "Algo salió mal",
   "unexpectedErrorOccurred": "Ocurrió un error inesperado. Por favor intenta de nuevo.",
@@ -90,7 +86,6 @@
   "pleaseLoginToContinue": "Por favor inicia sesión para continuar.",
   "forumError": "Error del foro",
   "anErrorOccurred": "Ocurrió un error",
-  
   "accountPendingApproval": "Tu cuenta está pendiente de aprobación. Puedes navegar por el foro pero no puedes publicar hasta que un moderador apruebe tu cuenta.",
   "checkEmailToConfirm": "Por favor revisa tu correo electrónico para confirmar tu cuenta. Haz clic en el enlace de confirmación en el correo que te enviamos.",
   "checkNewEmailToConfirm": "Por favor revisa tu nueva dirección de correo electrónico para confirmar el cambio. Tu correo anterior permanecerá activo hasta que confirmes el nuevo.",
@@ -102,33 +97,27 @@
   "accountStatusRequiresAttention": "El estado de tu cuenta requiere atención. Por favor contacta a un administrador si tienes preguntas.",
   "updateEmail": "Actualizar correo electrónico",
   "resend": "Reenviar",
-  
   "noLatestTopics": "No hay temas recientes",
   "noRecentTopicsToDisplay": "No hay temas recientes para mostrar. Vuelve más tarde para nuevas discusiones.",
   "signInToViewLatestTopics": "Inicia sesión para ver temas recientes",
   "youNeedToBeSignedInToViewLatestTopics": "Necesitas iniciar sesión para ver temas recientes",
-  
   "noUnreadTopics": "No hay temas sin leer",
   "thereAreNoUnreadTopics": "No hay temas sin leer. Vuelve más tarde para nuevas discusiones.",
   "youAreAllCaughtUp": "¡Estás al día!",
   "signInToViewUnreadTopics": "Inicia sesión para ver temas sin leer",
   "youNeedToBeSignedInToViewUnreadTopics": "Necesitas iniciar sesión para ver tus temas sin leer",
-  
   "noSubscribedTopics": "No hay temas suscritos",
   "noSubscribedTopicsMessage": "No te has suscrito a ningún tema. Toca el botón de estrella en un tema para suscribirte y recibir notificaciones de nuevas actualizaciones.",
   "signInToViewSubscribedTopics": "Inicia sesión para ver temas suscritos",
   "youNeedToBeSignedInToViewSubscribedTopics": "Necesitas iniciar sesión para ver tus temas suscritos",
-  
   "noParticipatedTopics": "No hay temas participados",
   "topicsYouParticipatedIn": "Los temas en los que has participado se mostrarán aquí.",
   "signInToViewParticipatedTopics": "Inicia sesión para ver temas participados",
   "youNeedToBeSignedInToViewParticipatedTopics": "Necesitas iniciar sesión para ver temas en los que has participado",
-  
   "latest": "Recientes",
   "unread": "Sin leer",
   "subscribed": "Suscritos",
   "participated": "Participados",
-  
   "connectionTimedOut": "La conexión expiró. El sitio puede estar caído o inaccesible.",
   "failedToConnectToSite": "Error al conectar con el sitio. El sitio puede estar caído o inaccesible.",
   "connectionFailed": "Error de conexión",
@@ -144,17 +133,14 @@
   "loading": "Cargando...",
   "newConversation": "Nueva conversación",
   "newMessage": "Nuevo mensaje",
-  
   "appSettings": "Configuración de la aplicación",
   "searchSites": "Buscar sitios",
   "language": "Idioma",
   "systemDefault": "Predeterminado del sistema",
   "followSystemLanguage": "Seguir el idioma del sistema",
-  
   "all": "Todo",
   "topicsOnly": "Solo temas",
   "titlesOnly": "Solo títulos",
-  
   "failedToShareTopic": "Error al compartir tema: {error}",
   "@failedToShareTopic": {
     "description": "Error message when sharing topic fails",
@@ -186,29 +172,23 @@
       }
     }
   },
-  
   "youCannotReplyToThisThread": "No puedes responder a este hilo",
   "pleaseWaitForThreadToLoad": "Por favor espera a que el hilo se cargue",
-  
   "softDelete": "Eliminación suave",
   "postCanBeRestoredLater": "La publicación puede ser restaurada más tarde",
   "hardDelete": "Eliminación permanente",
   "postWillBePermanentlyDeleted": "La publicación será eliminada permanentemente",
-  "reasonForDeletion": "Razón para la eliminación",
+  "reasonForDeletion": "Razón de eliminación",
   "enterReasonForDeletingPost": "Ingresa la razón para eliminar esta publicación",
   "pleaseEnterReasonForDeletion": "Por favor ingresa una razón para la eliminación",
-  
   "reportPost": "Reportar publicación",
   "pleaseProvideReasonForReporting": "Por favor proporciona una razón para reportar esta publicación.",
   "reason": "Razón",
   "enterReasonForReportingPost": "Ingresa la razón para reportar esta publicación",
   "pleaseEnterReason": "Por favor ingresa una razón",
   "submitReport": "Enviar reporte",
-  
   "selectedActions": "Acciones seleccionadas:",
   "thisActionCannotBeUndone": "Esta acción no se puede deshacer.",
-  
-  "participantsLabel": "Participantes",
   "participantsLabel": "Participantes",
   "usernameHasBeenInvited": "{username} ha sido invitado a la conversación",
   "@usernameHasBeenInvited": {
@@ -230,8 +210,7 @@
   },
   "newTopic": "Nuevo tema",
   "markRead": "Marcar como leído",
-  
-  "reportUser": "Reportar Usuario",
+  "reportUser": "Reportar usuario",
   "pleaseSelectReasonForReportingUser": "Por favor selecciona un motivo para reportar a este usuario.",
   "spamOrAdvertising": "Spam o publicidad",
   "harassmentOrBullying": "Acoso o intimidación",
@@ -241,8 +220,7 @@
   "pleaseSpecifyReason": "Por favor especifica el motivo",
   "enterReasonForReportingUser": "Ingresa el motivo para reportar a este usuario",
   "pleaseSelectReason": "Por favor selecciona un motivo",
-  
-  "banUser": "Banear Usuario",
+  "banUser": "Bloquear usuario",
   "unbanUser": "Desbanear Usuario",
   "pleaseSelectReasonForBanningUser": "Por favor selecciona un motivo para banear a {username}",
   "@pleaseSelectReasonForBanningUser": {
@@ -260,17 +238,13 @@
   "enterReasonForBanningUser": "Ingresa el motivo para banear a este usuario",
   "banUntil": "Banear hasta",
   "selectDate": "Seleccionar fecha",
-  "unbanUser": "Desbanear Usuario",
-  
   "moreOptions": "Más opciones",
   "leaveConversation": "Dejar conversación",
   "reportConversation": "Reportar conversación",
-  
   "topicClosed": "Tema cerrado",
   "topicOpened": "Tema abierto",
   "topicStickied": "Tema fijado",
   "topicUnstickied": "Tema desfijado",
-  
   "cannotEditMessage": "No se puede editar este mensaje: {error}",
   "@cannotEditMessage": {
     "description": "Mensaje de error cuando no se puede editar mensaje",
@@ -284,15 +258,12 @@
   "handleThreads": "Gestionar Hilos",
   "deleteMessages": "Eliminar Mensajes",
   "deleteConversations": "Eliminar Conversaciones",
-  
   "myForums": "Mis Foros",
   "recentlyVisited": "Visitados Recientemente",
   "explore": "Explorar",
   "forumCopilot": "Forum Copilot",
-  
   "noConversations": "Sin conversaciones",
   "noConversationsMessage": "Aún no tienes conversaciones. Inicia una nueva conversación para comenzar a enviar mensajes.",
-  
   "imageSavedToGallery": "¡Imagen guardada en la galería!",
   "failedToSaveImage": "Error al guardar imagen: {error}",
   "@failedToSaveImage": {
@@ -303,21 +274,17 @@
       }
     }
   },
-  
   "userProfile": "Perfil de Usuario",
   "deletePost": "Eliminar Publicación",
   "loginRequired": "Inicio de Sesión Requerido",
-  
   "spamCleaner": "Limpiador de Spam",
-  "tryAgain": "Intentar de Nuevo",
-  "sendMessage": "Enviar Mensaje",
+  "sendMessage": "Enviar mensaje",
   "memberSince": "Miembro Desde",
   "lastActivity": "Última Actividad",
   "likesReceived": "Me Gusta Recibidos",
   "likesGiven": "Me Gusta Dados",
-  "showMore": "Mostrar Más",
-  "cleanSpam": "Limpiar Spam",
-  
+  "showMore": "Mostrar más",
+  "cleanSpam": "Limpiar spam",
   "failedToSaveMessage": "Error al guardar mensaje",
   "failedToSaveConversation": "Error al guardar conversación",
   "failedToSaveSetting": "Error al guardar configuración",
@@ -331,7 +298,6 @@
       }
     }
   },
-  
   "connectingTo": "Conectando a {domainName}...",
   "@connectingTo": {
     "description": "Message shown when connecting to a site",
@@ -341,7 +307,6 @@
       }
     }
   },
-  
   "members": "Miembros",
   "allMembers": "Todos los Miembros",
   "online": "En Línea",
@@ -375,9 +340,7 @@
     }
   },
   "noSubject": "Sin asunto",
-  
   "search": "Buscar",
-  "moreOptions": "Más opciones",
   "logout": "Cerrar sesión",
   "areYouSureYouWantToLogout": "¿Estás seguro de que quieres cerrar sesión?",
   "register": "Registrarse",
@@ -388,7 +351,6 @@
   "profile": "Perfil",
   "messages": "Mensajes",
   "add": "Agregar",
-  "dismiss": "Descartar",
   "retry": "Reintentar",
   "delete": "Eliminar",
   "deleteMessage": "Eliminar Mensaje",
@@ -463,7 +425,6 @@
   "iWouldLikeToAddYouToThisConversation": "Me gustaría agregarte a esta conversación.",
   "searchFailed": "Búsqueda fallida",
   "trySearchingWithDifferentUsername": "Intenta buscar con un nombre de usuario diferente",
-  "enterUsernameToSearch": "Ingresa nombre de usuario para buscar...",
   "noSitesFound": "No se encontraron sitios.",
   "userInformationNotAvailable": "Información de usuario no disponible",
   "birthday": "Cumpleaños",
@@ -586,9 +547,6 @@
   "enterKeywordsToFindTopicsAndPosts": "Ingresa palabras clave para encontrar temas y publicaciones",
   "enterKeywordsOrDomainToFindForums": "Ingresa palabras clave o dominio para encontrar foros",
   "enterKeywordsOrDomainNamesToFindForums": "Ingresa palabras clave o nombres de dominio para encontrar foros",
-  "language": "Idioma",
-  "systemDefault": "Predeterminado del sistema",
-  "followSystemLanguage": "Seguir el idioma del sistema",
   "appearance": "Apariencia",
   "followSystemTheme": "Seguir el tema del sistema",
   "light": "Claro",
@@ -607,27 +565,17 @@
   "forumSettings": "Configuración del Foro",
   "noSettingsAvailable": "No hay configuraciones disponibles",
   "settingsCategoriesWillAppearHere": "Las categorías de configuración aparecerán aquí cuando estén disponibles.",
-  "spamCleaner": "Limpiador de Spam",
   "unableToLoadProfile": "No se puede cargar el perfil",
   "banned": "BLOQUEADO",
-  "sendMessage": "Enviar mensaje",
-  "showMore": "Mostrar más",
-  "reportUser": "Reportar usuario",
-  "submitReport": "Enviar reporte",
   "reportSubmittedSuccessfully": "Reporte enviado exitosamente",
   "failedToSubmitReport": "Error al enviar el reporte",
   "searchForForums": "Buscar foros",
   "searchForums": "Buscar Foros",
   "deleteTopic": "Eliminar tema",
-  "softDelete": "Eliminación suave",
   "topicCanBeRestoredLater": "El tema puede restaurarse más tarde",
-  "hardDelete": "Eliminación permanente",
   "topicWillBePermanentlyDeleted": "El tema será eliminado permanentemente",
-  "reasonForDeletion": "Razón de eliminación",
   "enterReasonForDeletingTopic": "Ingresa la razón para eliminar este tema",
-  "pleaseEnterReasonForDeletion": "Por favor ingresa una razón para la eliminación",
   "pleaseSelectEndDate": "Por favor selecciona una fecha de finalización",
-  "banUser": "Bloquear usuario",
   "userBannedSuccessfully": "Usuario bloqueado exitosamente",
   "failedToBanUser": "Error al bloquear usuario",
   "userUnbannedSuccessfully": "Usuario desbloqueado exitosamente",
@@ -635,7 +583,6 @@
   "spamCleanUser": "Limpiar spam del usuario",
   "deletePrivateConversations": "Eliminar conversaciones privadas",
   "banTheUserAccount": "Bloquear la cuenta del usuario",
-  "cleanSpam": "Limpiar spam",
   "handledThreads": "Temas manejados",
   "deletedMessages": "Mensajes eliminados",
   "deletedConversations": "Conversaciones eliminadas",
@@ -660,14 +607,12 @@
     }
   },
   "messageNotFound": "Mensaje no encontrado",
-  
   "home": "Inicio",
   "notifications": "Notificaciones",
   "forums": "Foros",
   "markAllForumsAsRead": "¿Marcar todos los foros como leídos?",
   "markAllForumsAsReadMessage": "Esto marcará todos los foros y temas como leídos. Esta acción no se puede deshacer.",
   "markAsRead": "Marcar como leído",
-  
   "content": "Contenido",
   "insertImage": "Insertar imagen",
   "howWouldYouLikeToInsertImage": "¿Cómo te gustaría insertar esta imagen?",
@@ -681,13 +626,11 @@
   "uploading": "Subiendo...",
   "uploaded": "Subido",
   "mentionUser": "Mencionar usuario",
-  
   "loggingIn": "Iniciando sesión...",
   "submittingReport": "Enviando reporte...",
   "banningUser": "Prohibiendo usuario...",
   "unbanningUser": "Desprohibiendo usuario...",
   "cleaningSpam": "Limpiando spam...",
-  
   "enterSubject": "Ingresa el asunto",
   "typeYourMessageHere": "Escribe tu mensaje aquí",
   "writeYourMessage": "Escribe tu mensaje...",
@@ -781,15 +724,12 @@
       }
     }
   },
-  
   "goToTop": "Ir arriba",
   "goToBottom": "Ir abajo",
   "replyAll": "Responder a todos",
   "forward": "Reenviar",
-  
   "noForumsFound": "No se encontraron foros.",
   "pleaseLoginToAccessContent": "Por favor inicia sesión para acceder a este contenido e interactuar con las publicaciones.",
-  
   "searchUsers": "Buscar usuarios...",
   "writeYourTitle": "Escribe tu título...",
   "writeYourContent": "Escribe tu contenido...",
@@ -803,21 +743,17 @@
       }
     }
   },
-  
   "edit": "Editar",
   "report": "Reportar",
   "unfollow": "Dejar de seguir",
   "follow": "Seguir",
-  
   "goToForums": "Ir a Foros",
   "remove": "Eliminar",
-  
   "subject": "Asunto",
   "message": "Mensaje",
   "titleCannotBeEmpty": "El título no puede estar vacío",
   "conversationUpdatedSuccessfully": "Conversación actualizada exitosamente",
   "goBack": "Volver",
-  "signInToViewMessages": "Inicia sesión para ver mensajes",
   "privateMessagesNotAvailable": "Los mensajes privados no están disponibles",
   "failedToLoadPost": "Error al cargar publicación: \n{error}",
   "@failedToLoadPost": {
@@ -878,7 +814,6 @@
     }
   },
   "enterANumber": "Ingresa un número",
-  
   "failedToNavigateToForum": "Error al navegar al foro",
   "failedToNavigateToForumName": "Error al navegar a {forumName}",
   "@failedToNavigateToForumName": {
@@ -888,8 +823,6 @@
       }
     }
   },
-  "failedToSaveConversation": "Error al guardar conversación",
-  
   "forumNotFound": "Foro no encontrado: {forumName}",
   "@forumNotFound": {
     "placeholders": {
@@ -924,7 +857,6 @@
   "deviceLanguage": "Idioma del dispositivo",
   "noPostsToTranslate": "No hay publicaciones para traducir",
   "translationFailed": "Error en la traducción",
-  
   "likePost": "Me gusta",
   "unlikePost": "Ya no me gusta",
   "thankPost": "Agradecer publicación",
@@ -941,5 +873,107 @@
   "replyOptions": "Opciones de respuesta",
   "replyWithQuote": "Responder con cita",
   "fileSavedToDownloads": "Archivo guardado en Descargas: {filename}",
-  "fileSavedToDocuments": "Archivo guardado en Documentos: {filename}"
+  "fileSavedToDocuments": "Archivo guardado en Documentos: {filename}",
+  "topicLastReplyBy": "{username} respondió {time}",
+  "inReplyToUser": "en respuesta a {username}",
+  "inReplyToPost": "en respuesta a la publicación #{number}",
+  "timeGapDaysLater": "{count, plural, =1{1 día después} other{{count} días después}}",
+  "timeGapMonthsLater": "{count, plural, =1{1 mes después} other{{count} meses después}}",
+  "timeGapYearsLater": "{count, plural, =1{1 año después} other{{count} años después}}",
+  "profileViews": "Visitas",
+  "badges": "Insignias",
+  "chatWithUser": "Chat",
+  "nReplies": "{count, plural, =1{1 respuesta} other{{count} respuestas}}",
+  "nVotes": "{count, plural, =1{1 voto} other{{count} votos}}",
+  "lastSeen": "Visto",
+  "chat": "Chat",
+  "comingSoon": "{label} — próximamente",
+  "moreBadges": "+{count} más",
+  "allNotificationsMarkedAsRead": "Todas las notificaciones marcadas como leídas",
+  "apply": "Aplicar",
+  "bookmarks": "Marcadores",
+  "reviewableBy": "Por {username}",
+  "changeEmail": "Cambiar correo electrónico",
+  "changePassword": "Cambiar contraseña",
+  "checkingStatus": "Comprobando estado…",
+  "clearReminder": "Quitar recordatorio",
+  "copy": "Copiar",
+  "copyLink": "Copiar enlace",
+  "couldNotEnableNotifications": "No se pudieron activar las notificaciones: {error}",
+  "couldNotFindBookmark": "No se encontró este marcador",
+  "couldNotOpenEmail": "No se pudo abrir el correo: {email}",
+  "couldNotStartSignIn": "No se pudo iniciar sesión: {error}",
+  "customDateAndTime": "Fecha y hora personalizadas",
+  "deleteAccount": "Eliminar cuenta",
+  "deleteMessageQuestion": "¿Eliminar mensaje?",
+  "discard": "Descartar",
+  "discardDraftQuestion": "¿Descartar borrador?",
+  "doNotDisturb": "No molestar",
+  "editHistory": "Historial de ediciones",
+  "editProfile": "Editar perfil",
+  "editReminder": "Editar recordatorio",
+  "emailCopiedToClipboard": "Correo copiado al portapapeles: {email}",
+  "pushEnabledForThisLogin": "Activadas para este inicio de sesión",
+  "failedToLoadMoreTopics": "No se pudieron cargar más temas. Desplázate para reintentar.",
+  "failedToUpdateNotificationLevel": "No se pudo actualizar el nivel de notificación",
+  "firstPostsOnly": "Solo primeras publicaciones",
+  "ignoredUsers": "Usuarios ignorados",
+  "inTwoHours": "En dos horas",
+  "inviteByEmail": "Invitar por correo",
+  "inviteLinkCopied": "Enlace de invitación copiado",
+  "inviteSentTo": "Invitación enviada a {email}",
+  "leave": "Salir",
+  "leaveGroup": "Salir del grupo",
+  "leaveGroupQuestion": "¿Salir del grupo?",
+  "linkCopied": "Enlace copiado",
+  "loadMore": "Cargar más",
+  "manageAccountOnWeb": "Administrar cuenta en la web",
+  "merge": "Fusionar",
+  "mergeIntoTopic": "Fusionar en tema",
+  "newInviteLink": "Nuevo enlace de invitación",
+  "nextWeek": "La próxima semana",
+  "pushNotAvailableInThisBuild": "No disponible en esta versión",
+  "notNow": "Ahora no",
+  "tagNotificationLevelUpdated": "Nivel de notificación de «{tag}» actualizado",
+  "doNotDisturbOnUntil": "Activado hasta {until}",
+  "pleaseLogInToBookmark": "Inicia sesión para guardar marcadores",
+  "pleaseLogInToFollowUsers": "Inicia sesión para seguir usuarios",
+  "pleaseLogInToMarkAnswers": "Inicia sesión para marcar respuestas",
+  "pleaseLogInToReact": "Inicia sesión para reaccionar",
+  "pleaseLogInToVote": "Inicia sesión para votar",
+  "pushNotifications": "Notificaciones push",
+  "relevance": "Relevancia",
+  "reminderTimeMustBeInFuture": "La hora del recordatorio debe ser futura",
+  "removeBookmark": "Quitar marcador",
+  "removeVote": "Quitar voto",
+  "renameTopic": "Renombrar tema",
+  "reportedBy": "Reportado por {username}",
+  "requestToJoin": "Solicitar unirse",
+  "requestToJoinGroup": "Solicitar unirse a {group}",
+  "reset": "Restablecer",
+  "resizeAndUpload": "Reducir y subir",
+  "retryConnection": "Reintentar conexión",
+  "reviewQueue": "Cola de revisión",
+  "revoke": "Revocar",
+  "revokeInviteQuestion": "¿Revocar invitación?",
+  "save": "Guardar",
+  "sendInvite": "Enviar invitación",
+  "sendRequest": "Enviar solicitud",
+  "settings": "Ajustes",
+  "showVoters": "Mostrar votantes",
+  "signOut": "Cerrar sesión",
+  "signOutQuestion": "¿Cerrar sesión?",
+  "signInCancelledNoPayload": "Inicio de sesión cancelado: no se recibió respuesta",
+  "signInFailed": "Error al iniciar sesión: {error}",
+  "startChat": "Iniciar chat",
+  "stoppedIgnoringUser": "Dejaste de ignorar a @{username}",
+  "submit": "Enviar",
+  "discardDraftWarning": "El borrador guardado se eliminará de forma permanente.",
+  "deleteChatMessageWarning": "El mensaje se eliminará para todos.",
+  "titleOnly": "Solo título",
+  "tomorrow": "Mañana",
+  "turnOff": "Desactivar",
+  "turnOnNotifications": "Activar notificaciones",
+  "whisper": "Susurro",
+  "likeAgainInSeconds": "Puedes volver a dar me gusta en {seconds}s"
 }

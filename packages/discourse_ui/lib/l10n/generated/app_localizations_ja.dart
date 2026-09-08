@@ -1545,17 +1545,17 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String topicLastReplyBy(String username, String time) {
-    return '$username replied $time';
+    return '$username が $time に返信';
   }
 
   @override
   String inReplyToUser(String username) {
-    return 'in reply to $username';
+    return '$username への返信';
   }
 
   @override
   String inReplyToPost(int number) {
-    return 'in reply to post #$number';
+    return '投稿 #$number への返信';
   }
 
   @override
@@ -1563,8 +1563,7 @@ class AppLocalizationsJa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days later',
-      one: '1 day later',
+      other: '$count 日後',
     );
     return '$_temp0';
   }
@@ -1574,8 +1573,7 @@ class AppLocalizationsJa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count months later',
-      one: '1 month later',
+      other: '$count か月後',
     );
     return '$_temp0';
   }
@@ -1585,28 +1583,26 @@ class AppLocalizationsJa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count years later',
-      one: '1 year later',
+      other: '$count 年後',
     );
     return '$_temp0';
   }
 
   @override
-  String get profileViews => 'Views';
+  String get profileViews => '閲覧数';
 
   @override
-  String get badges => 'Badges';
+  String get badges => 'バッジ';
 
   @override
-  String get chatWithUser => 'Chat';
+  String get chatWithUser => 'チャット';
 
   @override
   String nReplies(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count replies',
-      one: '1 reply',
+      other: '$count 件の返信',
     );
     return '$_temp0';
   }
@@ -1616,318 +1612,311 @@ class AppLocalizationsJa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count votes',
-      one: '1 vote',
+      other: '$count 票',
     );
     return '$_temp0';
   }
 
   @override
-  String get lastSeen => 'Seen';
+  String get lastSeen => '最終アクセス';
 
   @override
-  String get chat => 'Chat';
+  String get chat => 'チャット';
 
   @override
   String comingSoon(String label) {
-    return '$label — coming soon';
+    return '$label — 近日公開';
   }
 
   @override
   String moreBadges(Object count) {
-    return '+$count more';
+    return '他 $count 件';
   }
 
   @override
-  String get allNotificationsMarkedAsRead => 'All notifications marked as read';
+  String get allNotificationsMarkedAsRead => 'すべての通知を既読にしました';
 
   @override
-  String get apply => 'Apply';
+  String get apply => '適用';
 
   @override
-  String get bookmarks => 'Bookmarks';
+  String get bookmarks => 'ブックマーク';
 
   @override
   String reviewableBy(String username) {
-    return 'By $username';
+    return '$username による';
   }
 
   @override
-  String get changeEmail => 'Change email';
+  String get changeEmail => 'メールアドレスを変更';
 
   @override
-  String get changePassword => 'Change password';
+  String get changePassword => 'パスワードを変更';
 
   @override
-  String get checkingStatus => 'Checking status…';
+  String get checkingStatus => '状態を確認しています…';
 
   @override
-  String get clearReminder => 'Clear reminder';
+  String get clearReminder => 'リマインダーを解除';
 
   @override
-  String get copy => 'Copy';
+  String get copy => 'コピー';
 
   @override
-  String get copyLink => 'Copy link';
+  String get copyLink => 'リンクをコピー';
 
   @override
   String couldNotEnableNotifications(String error) {
-    return 'Could not enable notifications: $error';
+    return '通知を有効にできませんでした: $error';
   }
 
   @override
-  String get couldNotFindBookmark => 'Could not find this bookmark';
+  String get couldNotFindBookmark => 'このブックマークが見つかりません';
 
   @override
   String couldNotOpenEmail(String email) {
-    return 'Could not open email: $email';
+    return 'メールを開けませんでした: $email';
   }
 
   @override
   String couldNotStartSignIn(String error) {
-    return 'Could not start sign-in: $error';
+    return 'サインインを開始できませんでした: $error';
   }
 
   @override
-  String get customDateAndTime => 'Custom date & time';
+  String get customDateAndTime => '日時を指定';
 
   @override
-  String get deleteAccount => 'Delete account';
+  String get deleteAccount => 'アカウントを削除';
 
   @override
-  String get deleteMessageQuestion => 'Delete message?';
+  String get deleteMessageQuestion => 'メッセージを削除しますか？';
 
   @override
-  String get discard => 'Discard';
+  String get discard => '破棄';
 
   @override
-  String get discardDraftQuestion => 'Discard draft?';
+  String get discardDraftQuestion => '下書きを破棄しますか？';
 
   @override
-  String get doNotDisturb => 'Do not disturb';
+  String get doNotDisturb => 'おやすみモード';
 
   @override
-  String get editHistory => 'Edit history';
+  String get editHistory => '編集履歴';
 
   @override
-  String get editProfile => 'Edit profile';
+  String get editProfile => 'プロフィールを編集';
 
   @override
-  String get editReminder => 'Edit reminder';
+  String get editReminder => 'リマインダーを編集';
 
   @override
   String emailCopiedToClipboard(String email) {
-    return 'Email copied to clipboard: $email';
+    return 'メールアドレスをコピーしました: $email';
   }
 
   @override
-  String get pushEnabledForThisLogin => 'Enabled for this login';
+  String get pushEnabledForThisLogin => 'このログインで有効';
 
   @override
-  String get failedToLoadMoreTopics =>
-      'Failed to load more topics. Scroll to retry.';
+  String get failedToLoadMoreTopics => 'トピックをさらに読み込めませんでした。スクロールして再試行してください。';
 
   @override
-  String get failedToUpdateNotificationLevel =>
-      'Failed to update notification level';
+  String get failedToUpdateNotificationLevel => '通知レベルを更新できませんでした';
 
   @override
-  String get firstPostsOnly => 'First posts only';
+  String get firstPostsOnly => '最初の投稿のみ';
 
   @override
-  String get ignoredUsers => 'Ignored users';
+  String get ignoredUsers => '無視中のユーザー';
 
   @override
-  String get inTwoHours => 'In two hours';
+  String get inTwoHours => '2時間後';
 
   @override
-  String get inviteByEmail => 'Invite by email';
+  String get inviteByEmail => 'メールで招待';
 
   @override
-  String get inviteLinkCopied => 'Invite link copied';
+  String get inviteLinkCopied => '招待リンクをコピーしました';
 
   @override
   String inviteSentTo(String email) {
-    return 'Invite sent to $email';
+    return '$email に招待を送信しました';
   }
 
   @override
-  String get leave => 'Leave';
+  String get leave => '退出';
 
   @override
-  String get leaveGroup => 'Leave group';
+  String get leaveGroup => 'グループを退出';
 
   @override
-  String get leaveGroupQuestion => 'Leave group?';
+  String get leaveGroupQuestion => 'グループを退出しますか？';
 
   @override
-  String get linkCopied => 'Link copied';
+  String get linkCopied => 'リンクをコピーしました';
 
   @override
-  String get loadMore => 'Load more';
+  String get loadMore => 'さらに読み込む';
 
   @override
-  String get manageAccountOnWeb => 'Manage account on web';
+  String get manageAccountOnWeb => 'ウェブでアカウントを管理';
 
   @override
-  String get merge => 'Merge';
+  String get merge => '統合';
 
   @override
-  String get mergeIntoTopic => 'Merge into topic';
+  String get mergeIntoTopic => 'トピックに統合';
 
   @override
-  String get newInviteLink => 'New invite link';
+  String get newInviteLink => '新しい招待リンク';
 
   @override
-  String get nextWeek => 'Next week';
+  String get nextWeek => '来週';
 
   @override
-  String get pushNotAvailableInThisBuild => 'Not available in this build';
+  String get pushNotAvailableInThisBuild => 'このビルドでは利用できません';
 
   @override
-  String get notNow => 'Not now';
+  String get notNow => 'あとで';
 
   @override
   String tagNotificationLevelUpdated(String tag) {
-    return 'Notification level for \"$tag\" updated';
+    return '「$tag」の通知レベルを更新しました';
   }
 
   @override
   String doNotDisturbOnUntil(String until) {
-    return 'On until $until';
+    return '$until までオン';
   }
 
   @override
-  String get pleaseLogInToBookmark => 'Please log in to bookmark';
+  String get pleaseLogInToBookmark => 'ブックマークするにはログインしてください';
 
   @override
-  String get pleaseLogInToFollowUsers => 'Please log in to follow users';
+  String get pleaseLogInToFollowUsers => 'フォローするにはログインしてください';
 
   @override
-  String get pleaseLogInToMarkAnswers => 'Please log in to mark answers';
+  String get pleaseLogInToMarkAnswers => '回答をマークするにはログインしてください';
 
   @override
-  String get pleaseLogInToReact => 'Please log in to react';
+  String get pleaseLogInToReact => 'リアクションするにはログインしてください';
 
   @override
-  String get pleaseLogInToVote => 'Please log in to vote';
+  String get pleaseLogInToVote => '投票するにはログインしてください';
 
   @override
-  String get pushNotifications => 'Push notifications';
+  String get pushNotifications => 'プッシュ通知';
 
   @override
-  String get relevance => 'Relevance';
+  String get relevance => '関連度';
 
   @override
-  String get reminderTimeMustBeInFuture =>
-      'Reminder time must be in the future';
+  String get reminderTimeMustBeInFuture => 'リマインダーの時刻は未来の時刻を指定してください';
 
   @override
-  String get removeBookmark => 'Remove bookmark';
+  String get removeBookmark => 'ブックマークを解除';
 
   @override
-  String get removeVote => 'Remove vote';
+  String get removeVote => '投票を取り消す';
 
   @override
-  String get renameTopic => 'Rename topic';
+  String get renameTopic => 'トピック名を変更';
 
   @override
   String reportedBy(String username) {
-    return 'Reported by $username';
+    return '$username が報告';
   }
 
   @override
-  String get requestToJoin => 'Request to join';
+  String get requestToJoin => '参加をリクエスト';
 
   @override
   String requestToJoinGroup(String group) {
-    return 'Request to join $group';
+    return '$group への参加をリクエスト';
   }
 
   @override
-  String get reset => 'Reset';
+  String get reset => 'リセット';
 
   @override
-  String get resizeAndUpload => 'Resize and upload';
+  String get resizeAndUpload => '縮小してアップロード';
 
   @override
-  String get retryConnection => 'Retry connection';
+  String get retryConnection => '再接続';
 
   @override
-  String get reviewQueue => 'Review queue';
+  String get reviewQueue => 'レビューキュー';
 
   @override
-  String get revoke => 'Revoke';
+  String get revoke => '取り消す';
 
   @override
-  String get revokeInviteQuestion => 'Revoke invite?';
+  String get revokeInviteQuestion => '招待を取り消しますか？';
 
   @override
-  String get save => 'Save';
+  String get save => '保存';
 
   @override
-  String get sendInvite => 'Send invite';
+  String get sendInvite => '招待を送信';
 
   @override
-  String get sendRequest => 'Send request';
+  String get sendRequest => 'リクエストを送信';
 
   @override
-  String get settings => 'Settings';
+  String get settings => '設定';
 
   @override
-  String get showVoters => 'Show voters';
+  String get showVoters => '投票者を表示';
 
   @override
-  String get signOut => 'Sign out';
+  String get signOut => 'サインアウト';
 
   @override
-  String get signOutQuestion => 'Sign out?';
+  String get signOutQuestion => 'サインアウトしますか？';
 
   @override
-  String get signInCancelledNoPayload =>
-      'Sign-in cancelled — no payload returned';
+  String get signInCancelledNoPayload => 'サインインがキャンセルされました — 応答がありません';
 
   @override
   String signInFailed(String error) {
-    return 'Sign-in failed: $error';
+    return 'サインインに失敗しました: $error';
   }
 
   @override
-  String get startChat => 'Start chat';
+  String get startChat => 'チャットを開始';
 
   @override
   String stoppedIgnoringUser(String username) {
-    return 'Stopped ignoring @$username';
+    return '@$username の無視を解除しました';
   }
 
   @override
-  String get submit => 'Submit';
+  String get submit => '送信';
 
   @override
-  String get discardDraftWarning =>
-      'This will permanently remove the saved draft.';
+  String get discardDraftWarning => '保存した下書きは完全に削除されます。';
 
   @override
-  String get deleteChatMessageWarning =>
-      'This will remove the message for everyone.';
+  String get deleteChatMessageWarning => 'このメッセージは全員から削除されます。';
 
   @override
-  String get titleOnly => 'Title only';
+  String get titleOnly => 'タイトルのみ';
 
   @override
-  String get tomorrow => 'Tomorrow';
+  String get tomorrow => '明日';
 
   @override
-  String get turnOff => 'Turn off';
+  String get turnOff => 'オフにする';
 
   @override
-  String get turnOnNotifications => 'Turn on notifications';
+  String get turnOnNotifications => '通知をオンにする';
 
   @override
-  String get whisper => 'Whisper';
+  String get whisper => 'ウィスパー';
 
   @override
   String likeAgainInSeconds(Object seconds) {
-    return 'You can like this post again in ${seconds}s';
+    return '$seconds秒後にもう一度いいねできます';
   }
 }

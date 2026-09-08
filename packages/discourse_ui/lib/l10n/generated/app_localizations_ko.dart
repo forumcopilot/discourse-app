@@ -1538,17 +1538,17 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String topicLastReplyBy(String username, String time) {
-    return '$username replied $time';
+    return '$username님이 $time에 답글';
   }
 
   @override
   String inReplyToUser(String username) {
-    return 'in reply to $username';
+    return '$username님에 대한 답글';
   }
 
   @override
   String inReplyToPost(int number) {
-    return 'in reply to post #$number';
+    return '게시물 #$number에 대한 답글';
   }
 
   @override
@@ -1556,8 +1556,7 @@ class AppLocalizationsKo extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days later',
-      one: '1 day later',
+      other: '$count일 후',
     );
     return '$_temp0';
   }
@@ -1567,8 +1566,7 @@ class AppLocalizationsKo extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count months later',
-      one: '1 month later',
+      other: '$count개월 후',
     );
     return '$_temp0';
   }
@@ -1578,28 +1576,26 @@ class AppLocalizationsKo extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count years later',
-      one: '1 year later',
+      other: '$count년 후',
     );
     return '$_temp0';
   }
 
   @override
-  String get profileViews => 'Views';
+  String get profileViews => '조회수';
 
   @override
-  String get badges => 'Badges';
+  String get badges => '배지';
 
   @override
-  String get chatWithUser => 'Chat';
+  String get chatWithUser => '채팅';
 
   @override
   String nReplies(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count replies',
-      one: '1 reply',
+      other: '답글 $count개',
     );
     return '$_temp0';
   }
@@ -1609,318 +1605,311 @@ class AppLocalizationsKo extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count votes',
-      one: '1 vote',
+      other: '$count표',
     );
     return '$_temp0';
   }
 
   @override
-  String get lastSeen => 'Seen';
+  String get lastSeen => '마지막 접속';
 
   @override
-  String get chat => 'Chat';
+  String get chat => '채팅';
 
   @override
   String comingSoon(String label) {
-    return '$label — coming soon';
+    return '$label — 곧 제공';
   }
 
   @override
   String moreBadges(Object count) {
-    return '+$count more';
+    return '+$count개 더';
   }
 
   @override
-  String get allNotificationsMarkedAsRead => 'All notifications marked as read';
+  String get allNotificationsMarkedAsRead => '모든 알림을 읽음으로 표시했습니다';
 
   @override
-  String get apply => 'Apply';
+  String get apply => '적용';
 
   @override
-  String get bookmarks => 'Bookmarks';
+  String get bookmarks => '북마크';
 
   @override
   String reviewableBy(String username) {
-    return 'By $username';
+    return '$username 작성';
   }
 
   @override
-  String get changeEmail => 'Change email';
+  String get changeEmail => '이메일 변경';
 
   @override
-  String get changePassword => 'Change password';
+  String get changePassword => '비밀번호 변경';
 
   @override
-  String get checkingStatus => 'Checking status…';
+  String get checkingStatus => '상태 확인 중…';
 
   @override
-  String get clearReminder => 'Clear reminder';
+  String get clearReminder => '알림 지우기';
 
   @override
-  String get copy => 'Copy';
+  String get copy => '복사';
 
   @override
-  String get copyLink => 'Copy link';
+  String get copyLink => '링크 복사';
 
   @override
   String couldNotEnableNotifications(String error) {
-    return 'Could not enable notifications: $error';
+    return '알림을 켤 수 없습니다: $error';
   }
 
   @override
-  String get couldNotFindBookmark => 'Could not find this bookmark';
+  String get couldNotFindBookmark => '이 북마크를 찾을 수 없습니다';
 
   @override
   String couldNotOpenEmail(String email) {
-    return 'Could not open email: $email';
+    return '이메일을 열 수 없습니다: $email';
   }
 
   @override
   String couldNotStartSignIn(String error) {
-    return 'Could not start sign-in: $error';
+    return '로그인을 시작할 수 없습니다: $error';
   }
 
   @override
-  String get customDateAndTime => 'Custom date & time';
+  String get customDateAndTime => '날짜와 시간 지정';
 
   @override
-  String get deleteAccount => 'Delete account';
+  String get deleteAccount => '계정 삭제';
 
   @override
-  String get deleteMessageQuestion => 'Delete message?';
+  String get deleteMessageQuestion => '메시지를 삭제할까요?';
 
   @override
-  String get discard => 'Discard';
+  String get discard => '버리기';
 
   @override
-  String get discardDraftQuestion => 'Discard draft?';
+  String get discardDraftQuestion => '임시 저장을 버릴까요?';
 
   @override
-  String get doNotDisturb => 'Do not disturb';
+  String get doNotDisturb => '방해 금지';
 
   @override
-  String get editHistory => 'Edit history';
+  String get editHistory => '편집 기록';
 
   @override
-  String get editProfile => 'Edit profile';
+  String get editProfile => '프로필 편집';
 
   @override
-  String get editReminder => 'Edit reminder';
+  String get editReminder => '알림 편집';
 
   @override
   String emailCopiedToClipboard(String email) {
-    return 'Email copied to clipboard: $email';
+    return '이메일을 클립보드에 복사했습니다: $email';
   }
 
   @override
-  String get pushEnabledForThisLogin => 'Enabled for this login';
+  String get pushEnabledForThisLogin => '이 로그인에서 사용 중';
 
   @override
-  String get failedToLoadMoreTopics =>
-      'Failed to load more topics. Scroll to retry.';
+  String get failedToLoadMoreTopics => '더 많은 주제를 불러오지 못했습니다. 스크롤하여 다시 시도하세요.';
 
   @override
-  String get failedToUpdateNotificationLevel =>
-      'Failed to update notification level';
+  String get failedToUpdateNotificationLevel => '알림 수준을 변경하지 못했습니다';
 
   @override
-  String get firstPostsOnly => 'First posts only';
+  String get firstPostsOnly => '첫 게시물만';
 
   @override
-  String get ignoredUsers => 'Ignored users';
+  String get ignoredUsers => '무시한 사용자';
 
   @override
-  String get inTwoHours => 'In two hours';
+  String get inTwoHours => '두 시간 후';
 
   @override
-  String get inviteByEmail => 'Invite by email';
+  String get inviteByEmail => '이메일로 초대';
 
   @override
-  String get inviteLinkCopied => 'Invite link copied';
+  String get inviteLinkCopied => '초대 링크를 복사했습니다';
 
   @override
   String inviteSentTo(String email) {
-    return 'Invite sent to $email';
+    return '$email(으)로 초대를 보냈습니다';
   }
 
   @override
-  String get leave => 'Leave';
+  String get leave => '나가기';
 
   @override
-  String get leaveGroup => 'Leave group';
+  String get leaveGroup => '그룹 나가기';
 
   @override
-  String get leaveGroupQuestion => 'Leave group?';
+  String get leaveGroupQuestion => '그룹에서 나갈까요?';
 
   @override
-  String get linkCopied => 'Link copied';
+  String get linkCopied => '링크를 복사했습니다';
 
   @override
-  String get loadMore => 'Load more';
+  String get loadMore => '더 불러오기';
 
   @override
-  String get manageAccountOnWeb => 'Manage account on web';
+  String get manageAccountOnWeb => '웹에서 계정 관리';
 
   @override
-  String get merge => 'Merge';
+  String get merge => '병합';
 
   @override
-  String get mergeIntoTopic => 'Merge into topic';
+  String get mergeIntoTopic => '주제에 병합';
 
   @override
-  String get newInviteLink => 'New invite link';
+  String get newInviteLink => '새 초대 링크';
 
   @override
-  String get nextWeek => 'Next week';
+  String get nextWeek => '다음 주';
 
   @override
-  String get pushNotAvailableInThisBuild => 'Not available in this build';
+  String get pushNotAvailableInThisBuild => '이 빌드에서는 사용할 수 없습니다';
 
   @override
-  String get notNow => 'Not now';
+  String get notNow => '나중에';
 
   @override
   String tagNotificationLevelUpdated(String tag) {
-    return 'Notification level for \"$tag\" updated';
+    return '\"$tag\" 알림 수준을 변경했습니다';
   }
 
   @override
   String doNotDisturbOnUntil(String until) {
-    return 'On until $until';
+    return '$until까지 켜짐';
   }
 
   @override
-  String get pleaseLogInToBookmark => 'Please log in to bookmark';
+  String get pleaseLogInToBookmark => '북마크하려면 로그인하세요';
 
   @override
-  String get pleaseLogInToFollowUsers => 'Please log in to follow users';
+  String get pleaseLogInToFollowUsers => '사용자를 팔로우하려면 로그인하세요';
 
   @override
-  String get pleaseLogInToMarkAnswers => 'Please log in to mark answers';
+  String get pleaseLogInToMarkAnswers => '답변을 표시하려면 로그인하세요';
 
   @override
-  String get pleaseLogInToReact => 'Please log in to react';
+  String get pleaseLogInToReact => '반응하려면 로그인하세요';
 
   @override
-  String get pleaseLogInToVote => 'Please log in to vote';
+  String get pleaseLogInToVote => '투표하려면 로그인하세요';
 
   @override
-  String get pushNotifications => 'Push notifications';
+  String get pushNotifications => '푸시 알림';
 
   @override
-  String get relevance => 'Relevance';
+  String get relevance => '관련성';
 
   @override
-  String get reminderTimeMustBeInFuture =>
-      'Reminder time must be in the future';
+  String get reminderTimeMustBeInFuture => '알림 시간은 미래여야 합니다';
 
   @override
-  String get removeBookmark => 'Remove bookmark';
+  String get removeBookmark => '북마크 삭제';
 
   @override
-  String get removeVote => 'Remove vote';
+  String get removeVote => '투표 취소';
 
   @override
-  String get renameTopic => 'Rename topic';
+  String get renameTopic => '주제 이름 변경';
 
   @override
   String reportedBy(String username) {
-    return 'Reported by $username';
+    return '$username 신고';
   }
 
   @override
-  String get requestToJoin => 'Request to join';
+  String get requestToJoin => '가입 요청';
 
   @override
   String requestToJoinGroup(String group) {
-    return 'Request to join $group';
+    return '$group 가입 요청';
   }
 
   @override
-  String get reset => 'Reset';
+  String get reset => '초기화';
 
   @override
-  String get resizeAndUpload => 'Resize and upload';
+  String get resizeAndUpload => '크기 조정 후 업로드';
 
   @override
-  String get retryConnection => 'Retry connection';
+  String get retryConnection => '다시 연결';
 
   @override
-  String get reviewQueue => 'Review queue';
+  String get reviewQueue => '검토 대기열';
 
   @override
-  String get revoke => 'Revoke';
+  String get revoke => '취소';
 
   @override
-  String get revokeInviteQuestion => 'Revoke invite?';
+  String get revokeInviteQuestion => '초대를 취소할까요?';
 
   @override
-  String get save => 'Save';
+  String get save => '저장';
 
   @override
-  String get sendInvite => 'Send invite';
+  String get sendInvite => '초대 보내기';
 
   @override
-  String get sendRequest => 'Send request';
+  String get sendRequest => '요청 보내기';
 
   @override
-  String get settings => 'Settings';
+  String get settings => '설정';
 
   @override
-  String get showVoters => 'Show voters';
+  String get showVoters => '투표자 보기';
 
   @override
-  String get signOut => 'Sign out';
+  String get signOut => '로그아웃';
 
   @override
-  String get signOutQuestion => 'Sign out?';
+  String get signOutQuestion => '로그아웃할까요?';
 
   @override
-  String get signInCancelledNoPayload =>
-      'Sign-in cancelled — no payload returned';
+  String get signInCancelledNoPayload => '로그인이 취소되었습니다 — 응답이 없습니다';
 
   @override
   String signInFailed(String error) {
-    return 'Sign-in failed: $error';
+    return '로그인 실패: $error';
   }
 
   @override
-  String get startChat => 'Start chat';
+  String get startChat => '채팅 시작';
 
   @override
   String stoppedIgnoringUser(String username) {
-    return 'Stopped ignoring @$username';
+    return '@$username 무시를 해제했습니다';
   }
 
   @override
-  String get submit => 'Submit';
+  String get submit => '제출';
 
   @override
-  String get discardDraftWarning =>
-      'This will permanently remove the saved draft.';
+  String get discardDraftWarning => '저장된 임시 글이 영구히 삭제됩니다.';
 
   @override
-  String get deleteChatMessageWarning =>
-      'This will remove the message for everyone.';
+  String get deleteChatMessageWarning => '모든 사람에게서 메시지가 삭제됩니다.';
 
   @override
-  String get titleOnly => 'Title only';
+  String get titleOnly => '제목만';
 
   @override
-  String get tomorrow => 'Tomorrow';
+  String get tomorrow => '내일';
 
   @override
-  String get turnOff => 'Turn off';
+  String get turnOff => '끄기';
 
   @override
-  String get turnOnNotifications => 'Turn on notifications';
+  String get turnOnNotifications => '알림 켜기';
 
   @override
-  String get whisper => 'Whisper';
+  String get whisper => '귓속말';
 
   @override
   String likeAgainInSeconds(Object seconds) {
-    return 'You can like this post again in ${seconds}s';
+    return '$seconds초 후에 다시 좋아요를 누를 수 있습니다';
   }
 }

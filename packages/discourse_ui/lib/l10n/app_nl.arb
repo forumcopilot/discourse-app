@@ -4,7 +4,6 @@
   "@appTitle": {
     "description": "The application title"
   },
-  
   "loginTitle": "Inloggen",
   "usernameLabel": "Gebruikersnaam",
   "passwordLabel": "Wachtwoord",
@@ -24,7 +23,6 @@
       }
     }
   },
-  
   "createAccount": "Account aanmaken",
   "alreadyHaveAccount": "Heeft u al een account? ",
   "logIn": "Inloggen",
@@ -61,7 +59,6 @@
   "welcome": "Welkom!",
   "registrationSuccessful": "Registratie geslaagd",
   "pleaseLoginWithNewAccount": "Log in met uw nieuwe account.",
-  
   "forgotPasswordTitle": "Wachtwoord vergeten",
   "usernameOrEmailLabel": "Gebruikersnaam of e-mail",
   "pleaseEnterUsernameOrEmail": "Voer uw gebruikersnaam of e-mail in",
@@ -71,7 +68,6 @@
   "resetFailed": "Reset mislukt",
   "unableToSendResetLink": "Kon resetlink niet verzenden. Probeer het opnieuw.",
   "errorSendingResetLink": "Er is een fout opgetreden bij het verzenden van de resetlink. Controleer uw verbinding en probeer het opnieuw.",
-  
   "errorTitle": "Fout",
   "okButton": "OK",
   "retryButton": "Opnieuw",
@@ -90,7 +86,6 @@
   "pleaseLoginToContinue": "Log in om door te gaan.",
   "forumError": "Forumfout",
   "anErrorOccurred": "Er is een fout opgetreden",
-  
   "accountPendingApproval": "Uw account wacht op goedkeuring. U kunt het forum bekijken maar niet posten tot een moderator uw account goedkeurt.",
   "checkEmailToConfirm": "Controleer uw e-mail om uw account te bevestigen. Klik op de bevestigingslink in de e-mail die we u hebben gestuurd.",
   "checkNewEmailToConfirm": "Controleer uw nieuwe e-mailadres om de wijziging te bevestigen. Uw oude e-mail blijft actief tot u de nieuwe bevestigt.",
@@ -102,33 +97,27 @@
   "accountStatusRequiresAttention": "Uw accountstatus vereist aandacht. Neem contact op met een beheerder bij vragen.",
   "updateEmail": "E-mail bijwerken",
   "resend": "Opnieuw verzenden",
-  
   "noLatestTopics": "Geen nieuwste onderwerpen",
   "noRecentTopicsToDisplay": "Er zijn geen recente onderwerpen om weer te geven. Kom later terug voor nieuwe discussies.",
   "signInToViewLatestTopics": "Log in om nieuwste onderwerpen te bekijken",
-  "youNeedToBeSignedInToViewLatestTopics": "U moet ingelogd zijn om nieuwste onderwerpen te bekijken",
-  
+  "youNeedToBeSignedInToViewLatestTopics": "U moet ingelogd zijn om nieuwste onderwerpen te bekijken.",
   "noUnreadTopics": "Geen ongelezen onderwerpen",
   "thereAreNoUnreadTopics": "Er zijn geen ongelezen onderwerpen. Kom later terug voor nieuwe discussies.",
   "youAreAllCaughtUp": "U bent helemaal bij!",
   "signInToViewUnreadTopics": "Log in om ongelezen onderwerpen te bekijken",
-  "youNeedToBeSignedInToViewUnreadTopics": "U moet ingelogd zijn om uw ongelezen onderwerpen te bekijken",
-  
+  "youNeedToBeSignedInToViewUnreadTopics": "U moet ingelogd zijn om uw ongelezen onderwerpen te bekijken.",
   "noSubscribedTopics": "Geen geabonneerde onderwerpen",
   "noSubscribedTopicsMessage": "U heeft zich op geen onderwerpen geabonneerd. Tik op de ster bij een onderwerp om te abonneren en meldingen te ontvangen.",
   "signInToViewSubscribedTopics": "Log in om geabonneerde onderwerpen te bekijken",
-  "youNeedToBeSignedInToViewSubscribedTopics": "U moet ingelogd zijn om uw geabonneerde onderwerpen te bekijken",
-  
+  "youNeedToBeSignedInToViewSubscribedTopics": "U moet ingelogd zijn om uw geabonneerde onderwerpen te bekijken.",
   "noParticipatedTopics": "Geen onderwerpen waaraan u hebt deelgenomen",
   "topicsYouParticipatedIn": "Onderwerpen waaraan u hebt deelgenomen worden hier getoond.",
   "signInToViewParticipatedTopics": "Log in om onderwerpen waaraan u hebt deelgenomen te bekijken",
-  "youNeedToBeSignedInToViewParticipatedTopics": "U moet ingelogd zijn om onderwerpen waaraan u hebt deelgenomen te bekijken",
-  
+  "youNeedToBeSignedInToViewParticipatedTopics": "U moet ingelogd zijn om onderwerpen waaraan u hebt deelgenomen te bekijken.",
   "latest": "Nieuwste",
   "unread": "Ongelezen",
   "subscribed": "Geabonneerd",
   "participated": "Deelgenomen",
-  
   "connectionTimedOut": "Verbinding time-out. De site kan offline of onbereikbaar zijn.",
   "failedToConnectToSite": "Kon geen verbinding maken met de site. De site kan offline of onbereikbaar zijn.",
   "connectionFailed": "Verbinding mislukt",
@@ -144,17 +133,14 @@
   "loading": "Laden...",
   "newConversation": "Nieuw gesprek",
   "newMessage": "Nieuw bericht",
-  
   "appSettings": "App-instellingen",
   "searchSites": "Sites zoeken",
   "language": "Taal",
   "systemDefault": "Systeemstandaard",
   "followSystemLanguage": "Systeemtaal volgen",
-  
   "all": "Alles",
   "topicsOnly": "Alleen onderwerpen",
   "titlesOnly": "Alleen titels",
-  
   "failedToShareTopic": "Kon onderwerp niet delen: {error}",
   "@failedToShareTopic": {
     "description": "Error message when sharing topic fails",
@@ -186,10 +172,8 @@
       }
     }
   },
-  
   "youCannotReplyToThisThread": "U kunt niet op dit onderwerp reageren",
   "pleaseWaitForThreadToLoad": "Wacht tot het onderwerp is geladen",
-  
   "softDelete": "Zacht verwijderen",
   "postCanBeRestoredLater": "Bericht kan later worden hersteld",
   "hardDelete": "Definitief verwijderen",
@@ -197,17 +181,14 @@
   "reasonForDeletion": "Reden voor verwijdering",
   "enterReasonForDeletingPost": "Voer de reden voor het verwijderen van dit bericht in",
   "pleaseEnterReasonForDeletion": "Voer een reden voor verwijdering in",
-  
   "reportPost": "Bericht melden",
   "pleaseProvideReasonForReporting": "Geef een reden op voor het melden van dit bericht.",
   "reason": "Reden",
   "enterReasonForReportingPost": "Voer de reden voor het melden van dit bericht in",
   "pleaseEnterReason": "Voer een reden in",
   "submitReport": "Melding verzenden",
-  
   "selectedActions": "Geselecteerde acties:",
   "thisActionCannotBeUndone": "Deze actie kan niet ongedaan worden gemaakt.",
-  
   "participantsLabel": "Deelnemers",
   "@participantsLabel": {
     "description": "Label for participants (without count)"
@@ -232,7 +213,6 @@
   },
   "newTopic": "Nieuw onderwerp",
   "markRead": "Als gelezen markeren",
-  
   "reportUser": "Gebruiker melden",
   "pleaseSelectReasonForReportingUser": "Selecteer een reden voor het melden van deze gebruiker.",
   "spamOrAdvertising": "Spam of reclame",
@@ -243,8 +223,6 @@
   "pleaseSpecifyReason": "Geef de reden op",
   "enterReasonForReportingUser": "Voer de reden voor het melden van deze gebruiker in",
   "pleaseSelectReason": "Selecteer een reden",
-  "submitReport": "Melding verzenden",
-  
   "banUser": "Gebruiker blokkeren",
   "unbanUser": "Blokkering opheffen",
   "pleaseSelectReasonForBanningUser": "Selecteer een reden voor het blokkeren van {username}",
@@ -263,17 +241,13 @@
   "enterReasonForBanningUser": "Voer de reden voor het blokkeren van deze gebruiker in",
   "banUntil": "Blokkeren tot",
   "selectDate": "Selecteer datum",
-  "unbanUser": "Blokkering opheffen",
-  
   "moreOptions": "Meer opties",
   "leaveConversation": "Gesprek verlaten",
   "reportConversation": "Gesprek melden",
-  
   "topicClosed": "Onderwerp gesloten",
   "topicOpened": "Onderwerp geopend",
   "topicStickied": "Onderwerp vastgezet",
   "topicUnstickied": "Onderwerp losgemaakt",
-  
   "cannotEditMessage": "Dit bericht kan niet worden bewerkt: {error}",
   "@cannotEditMessage": {
     "description": "Error message when cannot edit message",
@@ -287,15 +261,12 @@
   "handleThreads": "Onderwerpen afhandelen",
   "deleteMessages": "Berichten verwijderen",
   "deleteConversations": "Gesprekken verwijderen",
-  
   "myForums": "Mijn forums",
   "recentlyVisited": "Recent bezocht",
   "explore": "Ontdekken",
   "forumCopilot": "Forum Copilot",
-  
   "noConversations": "Geen gesprekken",
   "noConversationsMessage": "U heeft nog geen gesprekken. Start een nieuw gesprek om te beginnen.",
-  
   "imageSavedToGallery": "Afbeelding opgeslagen in galerij!",
   "failedToSaveImage": "Kon afbeelding niet opslaan: {error}",
   "@failedToSaveImage": {
@@ -306,13 +277,10 @@
       }
     }
   },
-  
   "userProfile": "Gebruikersprofiel",
   "deletePost": "Bericht verwijderen",
   "loginRequired": "Inloggen vereist",
-  
   "spamCleaner": "Spam opruimer",
-  "tryAgain": "Opnieuw proberen",
   "sendMessage": "Bericht verzenden",
   "memberSince": "Lid sinds",
   "lastActivity": "Laatste activiteit",
@@ -320,7 +288,6 @@
   "likesGiven": "Gegeven likes",
   "showMore": "Meer tonen",
   "cleanSpam": "Spam opruimen",
-  
   "failedToSaveMessage": "Kon bericht niet opslaan",
   "failedToSaveConversation": "Kon gesprek niet opslaan",
   "failedToSaveSetting": "Kon instelling niet opslaan",
@@ -334,7 +301,6 @@
       }
     }
   },
-  
   "connectingTo": "Verbinden met {domainName}...",
   "@connectingTo": {
     "description": "Message shown when connecting to a site",
@@ -344,7 +310,6 @@
       }
     }
   },
-  
   "members": "Leden",
   "allMembers": "Alle leden",
   "online": "Online",
@@ -378,9 +343,7 @@
     }
   },
   "noSubject": "Geen onderwerp",
-  
   "search": "Zoeken",
-  "moreOptions": "Meer opties",
   "logout": "Uitloggen",
   "areYouSureYouWantToLogout": "Weet u zeker dat u wilt uitloggen?",
   "register": "Registreren",
@@ -391,7 +354,6 @@
   "profile": "Profiel",
   "messages": "Berichten",
   "add": "Toevoegen",
-  "dismiss": "Sluiten",
   "retry": "Opnieuw",
   "delete": "Verwijderen",
   "deleteMessage": "Bericht verwijderen",
@@ -475,7 +437,6 @@
   "iWouldLikeToAddYouToThisConversation": "Ik wil u aan dit gesprek toevoegen.",
   "searchFailed": "Zoeken mislukt",
   "trySearchingWithDifferentUsername": "Probeer te zoeken met een andere gebruikersnaam",
-  "enterUsernameToSearch": "Voer gebruikersnaam in om te zoeken...",
   "noSitesFound": "Geen sites gevonden.",
   "userInformationNotAvailable": "Gebruikersinformatie niet beschikbaar",
   "birthday": "Verjaardag",
@@ -511,10 +472,7 @@
     }
   },
   "selectActionsToPerform": "Selecteer de uit te voeren acties:",
-  "handleThreads": "Onderwerpen afhandelen",
   "moveOrDeleteThreadsBasedOnAdminSettings": "Verplaats of verwijder onderwerpen op basis van beheerderinstellingen",
-  "deleteMessages": "Berichten verwijderen",
-  "deleteConversations": "Gesprekken verwijderen",
   "messageUpdatedSuccessfully": "Bericht succesvol bijgewerkt",
   "error": "Fout: {error}",
   "@error": {
@@ -582,22 +540,6 @@
   "enterKeywordsToSearchTopics": "Voer zoekwoorden in om onderwerpen te zoeken...",
   "pleaseFillInAllRequiredFields": "Vul alle verplichte velden in",
   "undelete": "Verwijdering ongedaan maken",
-  
-  "signInToViewUnreadTopics": "Log in om ongelezen onderwerpen te bekijken",
-  "youNeedToBeSignedInToViewUnreadTopics": "U moet ingelogd zijn om uw ongelezen onderwerpen te bekijken.",
-  "signInToViewSubscribedTopics": "Log in om geabonneerde onderwerpen te bekijken",
-  "youNeedToBeSignedInToViewSubscribedTopics": "U moet ingelogd zijn om uw geabonneerde onderwerpen te bekijken.",
-  "signInToViewParticipatedTopics": "Log in om onderwerpen waaraan u hebt deelgenomen te bekijken",
-  "youNeedToBeSignedInToViewParticipatedTopics": "U moet ingelogd zijn om onderwerpen waaraan u hebt deelgenomen te bekijken.",
-  "signInToViewLatestTopics": "Log in om nieuwste onderwerpen te bekijken",
-  "youNeedToBeSignedInToViewLatestTopics": "U moet ingelogd zijn om nieuwste onderwerpen te bekijken.",
-  "markAsUnread": "Als ongelezen markeren",
-  "invite": "Uitnodigen",
-  "welcomeBack": "Welkom terug",
-  "signInToAccessYourProfile": "Log in om uw profiel te openen en uw account te beheren",
-  "enterYourUsername": "Voer uw gebruikersnaam in",
-  "enterYourPassword": "Voer uw wachtwoord in",
-  "dontHaveAnAccount": "Heeft u geen account?",
   "refresh": "Vernieuwen",
   "@refresh": {
     "description": "Menu item to refresh content"
@@ -653,15 +595,12 @@
   "@enterKeywordsOrDomainNamesToFindForums": {
     "description": "Description text for searching forums"
   },
-  "language": "Taal",
   "@language": {
     "description": "Settings section title for language selection"
   },
-  "systemDefault": "Systeemstandaard",
   "@systemDefault": {
     "description": "Option to use system default settings"
   },
-  "followSystemLanguage": "Systeemtaal volgen",
   "@followSystemLanguage": {
     "description": "Description for system default language option"
   },
@@ -705,7 +644,6 @@
   "@settingsCategoriesWillAppearHere": {
     "description": "Message explaining when settings categories will appear"
   },
-  "spamCleaner": "Spam opruimer",
   "@spamCleaner": {
     "description": "Menu item for spam cleaner tool"
   },
@@ -717,19 +655,15 @@
   "@banned": {
     "description": "Badge text for banned users"
   },
-  "sendMessage": "Bericht verzenden",
   "@sendMessage": {
     "description": "Button to send a message to a user"
   },
-  "showMore": "Meer tonen",
   "@showMore": {
     "description": "Button to show more content"
   },
-  "reportUser": "Gebruiker melden",
   "@reportUser": {
     "description": "Title for report user dialog"
   },
-  "submitReport": "Melding verzenden",
   "@submitReport": {
     "description": "Button to submit a report"
   },
@@ -753,7 +687,6 @@
   "@deleteTopic": {
     "description": "Title for delete topic dialog"
   },
-  "softDelete": "Zacht verwijderen",
   "@softDelete": {
     "description": "Option for soft delete (can be restored)"
   },
@@ -761,7 +694,6 @@
   "@topicCanBeRestoredLater": {
     "description": "Description for soft delete option"
   },
-  "hardDelete": "Definitief verwijderen",
   "@hardDelete": {
     "description": "Option for hard delete (permanent)"
   },
@@ -769,7 +701,6 @@
   "@topicWillBePermanentlyDeleted": {
     "description": "Description for hard delete option"
   },
-  "reasonForDeletion": "Reden voor verwijdering",
   "@reasonForDeletion": {
     "description": "Label for deletion reason field"
   },
@@ -777,7 +708,6 @@
   "@enterReasonForDeletingTopic": {
     "description": "Hint text for deletion reason field"
   },
-  "pleaseEnterReasonForDeletion": "Voer een reden voor verwijdering in",
   "@pleaseEnterReasonForDeletion": {
     "description": "Validation message for deletion reason"
   },
@@ -785,7 +715,6 @@
   "@pleaseSelectEndDate": {
     "description": "Error message when end date is not selected"
   },
-  "banUser": "Gebruiker blokkeren",
   "@banUser": {
     "description": "Button to ban a user"
   },
@@ -817,7 +746,6 @@
   "@banTheUserAccount": {
     "description": "Option to ban user account in spam clean"
   },
-  "cleanSpam": "Spam opruimen",
   "@cleanSpam": {
     "description": "Button to execute spam clean"
   },
@@ -862,7 +790,6 @@
   "@messageNotFound": {
     "description": "Message when message is not found"
   },
-  
   "home": "Start",
   "@home": {
     "description": "Home tab title"
@@ -887,7 +814,6 @@
   "@markAsRead": {
     "description": "Button text to mark as read"
   },
-  
   "content": "Inhoud",
   "@content": {
     "description": "Content label for message compose"
@@ -940,7 +866,6 @@
   "@mentionUser": {
     "description": "Tooltip for mention user button"
   },
-  
   "loggingIn": "Inloggen...",
   "@loggingIn": {
     "description": "Status message when logging in"
@@ -961,7 +886,6 @@
   "@cleaningSpam": {
     "description": "Status message when cleaning spam"
   },
-  
   "enterSubject": "Voer onderwerp in",
   "@enterSubject": {
     "description": "Hint text for subject field"
@@ -1104,7 +1028,6 @@
       }
     }
   },
-  
   "goToTop": "Naar boven",
   "@goToTop": {
     "description": "Tooltip for go to top button"
@@ -1121,7 +1044,6 @@
   "@forward": {
     "description": "Tooltip for forward button"
   },
-  
   "noForumsFound": "Geen forums gevonden.",
   "@noForumsFound": {
     "description": "Message when no forums are found"
@@ -1130,7 +1052,6 @@
   "@pleaseLoginToAccessContent": {
     "description": "Message asking user to login to access content"
   },
-  
   "searchUsers": "Gebruikers zoeken...",
   "@searchUsers": {
     "description": "Hint text for searching users"
@@ -1160,7 +1081,6 @@
       }
     }
   },
-  
   "edit": "Bewerken",
   "@edit": {
     "description": "Button text to edit"
@@ -1177,7 +1097,6 @@
   "@follow": {
     "description": "Button text to follow"
   },
-  
   "goToForums": "Naar forums",
   "@goToForums": {
     "description": "Button text to go to forums"
@@ -1186,7 +1105,6 @@
   "@remove": {
     "description": "Button text to remove"
   },
-  
   "subject": "Onderwerp",
   "@subject": {
     "description": "Label for subject field"
@@ -1207,7 +1125,6 @@
   "@goBack": {
     "description": "Button text to go back"
   },
-  "signInToViewMessages": "Log in om berichten te bekijken",
   "@signInToViewMessages": {
     "description": "Message asking user to sign in to view messages"
   },
@@ -1286,7 +1203,6 @@
   "@enterANumber": {
     "description": "Hint text for number input field"
   },
-  
   "failedToNavigateToForum": "Kon niet naar forum navigeren",
   "@failedToNavigateToForum": {
     "description": "Error message when navigation to forum fails"
@@ -1300,11 +1216,9 @@
       }
     }
   },
-  "failedToSaveConversation": "Kon gesprek niet opslaan",
   "@failedToSaveConversation": {
     "description": "Error message when saving conversation fails"
   },
-  
   "forumNotFound": "Forum niet gevonden: {forumName}",
   "@forumNotFound": {
     "description": "Error message when forum is not found",
@@ -1332,7 +1246,6 @@
       }
     }
   },
-  
   "likePost": "Bericht liken",
   "@likePost": {
     "description": "Accessibility label for like button"
@@ -1357,15 +1270,12 @@
   "@quotePost": {
     "description": "Accessibility label for quote button"
   },
-  "attachFile": "Bestand bijvoegen",
   "@attachFile": {
     "description": "Accessibility label for attach file button"
   },
-  "uploadImage": "Afbeelding uploaden",
   "@uploadImage": {
     "description": "Accessibility label for upload image button"
   },
-  
   "translate": "Vertalen",
   "@translate": {
     "description": "Menu item to translate thread content"
@@ -1416,5 +1326,107 @@
   "replyOptions": "Antwoordopties",
   "replyWithQuote": "Antwoord met citaat",
   "fileSavedToDownloads": "Bestand opgeslagen in Downloads: {filename}",
-  "fileSavedToDocuments": "Bestand opgeslagen in Documenten: {filename}"
+  "fileSavedToDocuments": "Bestand opgeslagen in Documenten: {filename}",
+  "topicLastReplyBy": "{username} antwoordde {time}",
+  "inReplyToUser": "als antwoord op {username}",
+  "inReplyToPost": "als antwoord op bericht #{number}",
+  "timeGapDaysLater": "{count, plural, =1{1 dag later} other{{count} dagen later}}",
+  "timeGapMonthsLater": "{count, plural, =1{1 maand later} other{{count} maanden later}}",
+  "timeGapYearsLater": "{count, plural, =1{1 jaar later} other{{count} jaar later}}",
+  "profileViews": "Weergaven",
+  "badges": "Badges",
+  "chatWithUser": "Chat",
+  "nReplies": "{count, plural, =1{1 antwoord} other{{count} antwoorden}}",
+  "nVotes": "{count, plural, =1{1 stem} other{{count} stemmen}}",
+  "lastSeen": "Gezien",
+  "chat": "Chat",
+  "comingSoon": "{label} — binnenkort",
+  "moreBadges": "+{count} meer",
+  "allNotificationsMarkedAsRead": "Alle meldingen gemarkeerd als gelezen",
+  "apply": "Toepassen",
+  "bookmarks": "Bladwijzers",
+  "reviewableBy": "Door {username}",
+  "changeEmail": "E-mailadres wijzigen",
+  "changePassword": "Wachtwoord wijzigen",
+  "checkingStatus": "Status controleren…",
+  "clearReminder": "Herinnering verwijderen",
+  "copy": "Kopiëren",
+  "copyLink": "Link kopiëren",
+  "couldNotEnableNotifications": "Meldingen konden niet worden ingeschakeld: {error}",
+  "couldNotFindBookmark": "Deze bladwijzer is niet gevonden",
+  "couldNotOpenEmail": "E-mail kon niet worden geopend: {email}",
+  "couldNotStartSignIn": "Aanmelden kon niet worden gestart: {error}",
+  "customDateAndTime": "Eigen datum en tijd",
+  "deleteAccount": "Account verwijderen",
+  "deleteMessageQuestion": "Bericht verwijderen?",
+  "discard": "Verwerpen",
+  "discardDraftQuestion": "Concept verwerpen?",
+  "doNotDisturb": "Niet storen",
+  "editHistory": "Bewerkingsgeschiedenis",
+  "editProfile": "Profiel bewerken",
+  "editReminder": "Herinnering bewerken",
+  "emailCopiedToClipboard": "E-mail gekopieerd naar klembord: {email}",
+  "pushEnabledForThisLogin": "Ingeschakeld voor deze aanmelding",
+  "failedToLoadMoreTopics": "Meer onderwerpen laden mislukt. Scroll om opnieuw te proberen.",
+  "failedToUpdateNotificationLevel": "Meldingsniveau bijwerken mislukt",
+  "firstPostsOnly": "Alleen eerste berichten",
+  "ignoredUsers": "Genegeerde gebruikers",
+  "inTwoHours": "Over twee uur",
+  "inviteByEmail": "Uitnodigen via e-mail",
+  "inviteLinkCopied": "Uitnodigingslink gekopieerd",
+  "inviteSentTo": "Uitnodiging verzonden naar {email}",
+  "leave": "Verlaten",
+  "leaveGroup": "Groep verlaten",
+  "leaveGroupQuestion": "Groep verlaten?",
+  "linkCopied": "Link gekopieerd",
+  "loadMore": "Meer laden",
+  "manageAccountOnWeb": "Account beheren op het web",
+  "merge": "Samenvoegen",
+  "mergeIntoTopic": "Samenvoegen in onderwerp",
+  "newInviteLink": "Nieuwe uitnodigingslink",
+  "nextWeek": "Volgende week",
+  "pushNotAvailableInThisBuild": "Niet beschikbaar in deze build",
+  "notNow": "Niet nu",
+  "tagNotificationLevelUpdated": "Meldingsniveau voor \"{tag}\" bijgewerkt",
+  "doNotDisturbOnUntil": "Aan tot {until}",
+  "pleaseLogInToBookmark": "Meld je aan om een bladwijzer te maken",
+  "pleaseLogInToFollowUsers": "Meld je aan om gebruikers te volgen",
+  "pleaseLogInToMarkAnswers": "Meld je aan om antwoorden te markeren",
+  "pleaseLogInToReact": "Meld je aan om te reageren",
+  "pleaseLogInToVote": "Meld je aan om te stemmen",
+  "pushNotifications": "Pushmeldingen",
+  "relevance": "Relevantie",
+  "reminderTimeMustBeInFuture": "De herinneringstijd moet in de toekomst liggen",
+  "removeBookmark": "Bladwijzer verwijderen",
+  "removeVote": "Stem verwijderen",
+  "renameTopic": "Onderwerp hernoemen",
+  "reportedBy": "Gemeld door {username}",
+  "requestToJoin": "Lidmaatschap aanvragen",
+  "requestToJoinGroup": "Lidmaatschap van {group} aanvragen",
+  "reset": "Herstellen",
+  "resizeAndUpload": "Verkleinen en uploaden",
+  "retryConnection": "Verbinding opnieuw proberen",
+  "reviewQueue": "Beoordelingswachtrij",
+  "revoke": "Intrekken",
+  "revokeInviteQuestion": "Uitnodiging intrekken?",
+  "save": "Opslaan",
+  "sendInvite": "Uitnodiging verzenden",
+  "sendRequest": "Aanvraag verzenden",
+  "settings": "Instellingen",
+  "showVoters": "Stemmers tonen",
+  "signOut": "Afmelden",
+  "signOutQuestion": "Afmelden?",
+  "signInCancelledNoPayload": "Aanmelden geannuleerd — geen antwoord ontvangen",
+  "signInFailed": "Aanmelden mislukt: {error}",
+  "startChat": "Chat starten",
+  "stoppedIgnoringUser": "Je negeert @{username} niet meer",
+  "submit": "Verzenden",
+  "discardDraftWarning": "Het opgeslagen concept wordt permanent verwijderd.",
+  "deleteChatMessageWarning": "Het bericht wordt voor iedereen verwijderd.",
+  "titleOnly": "Alleen titel",
+  "tomorrow": "Morgen",
+  "turnOff": "Uitschakelen",
+  "turnOnNotifications": "Meldingen inschakelen",
+  "whisper": "Fluisteren",
+  "likeAgainInSeconds": "Je kunt dit bericht over {seconds}s opnieuw liken"
 }

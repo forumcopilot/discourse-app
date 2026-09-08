@@ -1521,17 +1521,17 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String topicLastReplyBy(String username, String time) {
-    return '$username replied $time';
+    return '$username 回复于 $time';
   }
 
   @override
   String inReplyToUser(String username) {
-    return 'in reply to $username';
+    return '回复 $username';
   }
 
   @override
   String inReplyToPost(int number) {
-    return 'in reply to post #$number';
+    return '回复帖子 #$number';
   }
 
   @override
@@ -1539,8 +1539,7 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days later',
-      one: '1 day later',
+      other: '$count 天后',
     );
     return '$_temp0';
   }
@@ -1550,8 +1549,7 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count months later',
-      one: '1 month later',
+      other: '$count 个月后',
     );
     return '$_temp0';
   }
@@ -1561,28 +1559,26 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count years later',
-      one: '1 year later',
+      other: '$count 年后',
     );
     return '$_temp0';
   }
 
   @override
-  String get profileViews => 'Views';
+  String get profileViews => '浏览量';
 
   @override
-  String get badges => 'Badges';
+  String get badges => '徽章';
 
   @override
-  String get chatWithUser => 'Chat';
+  String get chatWithUser => '聊天';
 
   @override
   String nReplies(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count replies',
-      one: '1 reply',
+      other: '$count 条回复',
     );
     return '$_temp0';
   }
@@ -1592,318 +1588,311 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count votes',
-      one: '1 vote',
+      other: '$count 票',
     );
     return '$_temp0';
   }
 
   @override
-  String get lastSeen => 'Seen';
+  String get lastSeen => '最后访问';
 
   @override
-  String get chat => 'Chat';
+  String get chat => '聊天';
 
   @override
   String comingSoon(String label) {
-    return '$label — coming soon';
+    return '$label — 即将推出';
   }
 
   @override
   String moreBadges(Object count) {
-    return '+$count more';
+    return '还有 $count 个';
   }
 
   @override
-  String get allNotificationsMarkedAsRead => 'All notifications marked as read';
+  String get allNotificationsMarkedAsRead => '所有通知已标记为已读';
 
   @override
-  String get apply => 'Apply';
+  String get apply => '应用';
 
   @override
-  String get bookmarks => 'Bookmarks';
+  String get bookmarks => '书签';
 
   @override
   String reviewableBy(String username) {
-    return 'By $username';
+    return '由 $username 发布';
   }
 
   @override
-  String get changeEmail => 'Change email';
+  String get changeEmail => '更改邮箱';
 
   @override
-  String get changePassword => 'Change password';
+  String get changePassword => '更改密码';
 
   @override
-  String get checkingStatus => 'Checking status…';
+  String get checkingStatus => '正在检查状态…';
 
   @override
-  String get clearReminder => 'Clear reminder';
+  String get clearReminder => '清除提醒';
 
   @override
-  String get copy => 'Copy';
+  String get copy => '复制';
 
   @override
-  String get copyLink => 'Copy link';
+  String get copyLink => '复制链接';
 
   @override
   String couldNotEnableNotifications(String error) {
-    return 'Could not enable notifications: $error';
+    return '无法启用通知：$error';
   }
 
   @override
-  String get couldNotFindBookmark => 'Could not find this bookmark';
+  String get couldNotFindBookmark => '找不到此书签';
 
   @override
   String couldNotOpenEmail(String email) {
-    return 'Could not open email: $email';
+    return '无法打开邮箱：$email';
   }
 
   @override
   String couldNotStartSignIn(String error) {
-    return 'Could not start sign-in: $error';
+    return '无法开始登录：$error';
   }
 
   @override
-  String get customDateAndTime => 'Custom date & time';
+  String get customDateAndTime => '自定义日期和时间';
 
   @override
-  String get deleteAccount => 'Delete account';
+  String get deleteAccount => '删除账户';
 
   @override
-  String get deleteMessageQuestion => 'Delete message?';
+  String get deleteMessageQuestion => '删除消息？';
 
   @override
-  String get discard => 'Discard';
+  String get discard => '放弃';
 
   @override
-  String get discardDraftQuestion => 'Discard draft?';
+  String get discardDraftQuestion => '放弃草稿？';
 
   @override
-  String get doNotDisturb => 'Do not disturb';
+  String get doNotDisturb => '请勿打扰';
 
   @override
-  String get editHistory => 'Edit history';
+  String get editHistory => '编辑历史';
 
   @override
-  String get editProfile => 'Edit profile';
+  String get editProfile => '编辑资料';
 
   @override
-  String get editReminder => 'Edit reminder';
+  String get editReminder => '编辑提醒';
 
   @override
   String emailCopiedToClipboard(String email) {
-    return 'Email copied to clipboard: $email';
+    return '邮箱已复制到剪贴板：$email';
   }
 
   @override
-  String get pushEnabledForThisLogin => 'Enabled for this login';
+  String get pushEnabledForThisLogin => '已为此次登录启用';
 
   @override
-  String get failedToLoadMoreTopics =>
-      'Failed to load more topics. Scroll to retry.';
+  String get failedToLoadMoreTopics => '无法加载更多主题。滚动以重试。';
 
   @override
-  String get failedToUpdateNotificationLevel =>
-      'Failed to update notification level';
+  String get failedToUpdateNotificationLevel => '无法更新通知级别';
 
   @override
-  String get firstPostsOnly => 'First posts only';
+  String get firstPostsOnly => '仅首帖';
 
   @override
-  String get ignoredUsers => 'Ignored users';
+  String get ignoredUsers => '已忽略的用户';
 
   @override
-  String get inTwoHours => 'In two hours';
+  String get inTwoHours => '两小时后';
 
   @override
-  String get inviteByEmail => 'Invite by email';
+  String get inviteByEmail => '通过邮件邀请';
 
   @override
-  String get inviteLinkCopied => 'Invite link copied';
+  String get inviteLinkCopied => '邀请链接已复制';
 
   @override
   String inviteSentTo(String email) {
-    return 'Invite sent to $email';
+    return '邀请已发送至 $email';
   }
 
   @override
-  String get leave => 'Leave';
+  String get leave => '退出';
 
   @override
-  String get leaveGroup => 'Leave group';
+  String get leaveGroup => '退出群组';
 
   @override
-  String get leaveGroupQuestion => 'Leave group?';
+  String get leaveGroupQuestion => '退出群组？';
 
   @override
-  String get linkCopied => 'Link copied';
+  String get linkCopied => '链接已复制';
 
   @override
-  String get loadMore => 'Load more';
+  String get loadMore => '加载更多';
 
   @override
-  String get manageAccountOnWeb => 'Manage account on web';
+  String get manageAccountOnWeb => '在网页上管理账户';
 
   @override
-  String get merge => 'Merge';
+  String get merge => '合并';
 
   @override
-  String get mergeIntoTopic => 'Merge into topic';
+  String get mergeIntoTopic => '合并到主题';
 
   @override
-  String get newInviteLink => 'New invite link';
+  String get newInviteLink => '新邀请链接';
 
   @override
-  String get nextWeek => 'Next week';
+  String get nextWeek => '下周';
 
   @override
-  String get pushNotAvailableInThisBuild => 'Not available in this build';
+  String get pushNotAvailableInThisBuild => '此版本不可用';
 
   @override
-  String get notNow => 'Not now';
+  String get notNow => '暂不';
 
   @override
   String tagNotificationLevelUpdated(String tag) {
-    return 'Notification level for \"$tag\" updated';
+    return '已更新“$tag”的通知级别';
   }
 
   @override
   String doNotDisturbOnUntil(String until) {
-    return 'On until $until';
+    return '开启至 $until';
   }
 
   @override
-  String get pleaseLogInToBookmark => 'Please log in to bookmark';
+  String get pleaseLogInToBookmark => '请登录后添加书签';
 
   @override
-  String get pleaseLogInToFollowUsers => 'Please log in to follow users';
+  String get pleaseLogInToFollowUsers => '请登录后关注用户';
 
   @override
-  String get pleaseLogInToMarkAnswers => 'Please log in to mark answers';
+  String get pleaseLogInToMarkAnswers => '请登录后标记答案';
 
   @override
-  String get pleaseLogInToReact => 'Please log in to react';
+  String get pleaseLogInToReact => '请登录后添加反应';
 
   @override
-  String get pleaseLogInToVote => 'Please log in to vote';
+  String get pleaseLogInToVote => '请登录后投票';
 
   @override
-  String get pushNotifications => 'Push notifications';
+  String get pushNotifications => '推送通知';
 
   @override
-  String get relevance => 'Relevance';
+  String get relevance => '相关性';
 
   @override
-  String get reminderTimeMustBeInFuture =>
-      'Reminder time must be in the future';
+  String get reminderTimeMustBeInFuture => '提醒时间必须在将来';
 
   @override
-  String get removeBookmark => 'Remove bookmark';
+  String get removeBookmark => '移除书签';
 
   @override
-  String get removeVote => 'Remove vote';
+  String get removeVote => '撤销投票';
 
   @override
-  String get renameTopic => 'Rename topic';
+  String get renameTopic => '重命名主题';
 
   @override
   String reportedBy(String username) {
-    return 'Reported by $username';
+    return '由 $username 举报';
   }
 
   @override
-  String get requestToJoin => 'Request to join';
+  String get requestToJoin => '申请加入';
 
   @override
   String requestToJoinGroup(String group) {
-    return 'Request to join $group';
+    return '申请加入 $group';
   }
 
   @override
-  String get reset => 'Reset';
+  String get reset => '重置';
 
   @override
-  String get resizeAndUpload => 'Resize and upload';
+  String get resizeAndUpload => '缩小并上传';
 
   @override
-  String get retryConnection => 'Retry connection';
+  String get retryConnection => '重试连接';
 
   @override
-  String get reviewQueue => 'Review queue';
+  String get reviewQueue => '审核队列';
 
   @override
-  String get revoke => 'Revoke';
+  String get revoke => '撤销';
 
   @override
-  String get revokeInviteQuestion => 'Revoke invite?';
+  String get revokeInviteQuestion => '撤销邀请？';
 
   @override
-  String get save => 'Save';
+  String get save => '保存';
 
   @override
-  String get sendInvite => 'Send invite';
+  String get sendInvite => '发送邀请';
 
   @override
-  String get sendRequest => 'Send request';
+  String get sendRequest => '发送申请';
 
   @override
-  String get settings => 'Settings';
+  String get settings => '设置';
 
   @override
-  String get showVoters => 'Show voters';
+  String get showVoters => '显示投票者';
 
   @override
-  String get signOut => 'Sign out';
+  String get signOut => '退出登录';
 
   @override
-  String get signOutQuestion => 'Sign out?';
+  String get signOutQuestion => '退出登录？';
 
   @override
-  String get signInCancelledNoPayload =>
-      'Sign-in cancelled — no payload returned';
+  String get signInCancelledNoPayload => '登录已取消 — 未收到响应';
 
   @override
   String signInFailed(String error) {
-    return 'Sign-in failed: $error';
+    return '登录失败：$error';
   }
 
   @override
-  String get startChat => 'Start chat';
+  String get startChat => '开始聊天';
 
   @override
   String stoppedIgnoringUser(String username) {
-    return 'Stopped ignoring @$username';
+    return '已取消忽略 @$username';
   }
 
   @override
-  String get submit => 'Submit';
+  String get submit => '提交';
 
   @override
-  String get discardDraftWarning =>
-      'This will permanently remove the saved draft.';
+  String get discardDraftWarning => '已保存的草稿将被永久删除。';
 
   @override
-  String get deleteChatMessageWarning =>
-      'This will remove the message for everyone.';
+  String get deleteChatMessageWarning => '此消息将对所有人删除。';
 
   @override
-  String get titleOnly => 'Title only';
+  String get titleOnly => '仅标题';
 
   @override
-  String get tomorrow => 'Tomorrow';
+  String get tomorrow => '明天';
 
   @override
-  String get turnOff => 'Turn off';
+  String get turnOff => '关闭';
 
   @override
-  String get turnOnNotifications => 'Turn on notifications';
+  String get turnOnNotifications => '开启通知';
 
   @override
-  String get whisper => 'Whisper';
+  String get whisper => '悄悄话';
 
   @override
   String likeAgainInSeconds(Object seconds) {
-    return 'You can like this post again in ${seconds}s';
+    return '$seconds 秒后可再次点赞';
   }
 }
