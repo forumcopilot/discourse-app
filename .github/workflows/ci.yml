@@ -126,4 +126,19 @@ jobs:
           call buildlib.bat
 
       - name: Analyze
-        run: flutter analyze --no-fatal-infos
+        # Per package on Windows. A root-level analyze there resolves the
+        # nested packages' test files against the ROOT package config (no
+        # package:test) and reports ~300 bogus "URI doesn't exist" errors;
+        # on Linux and macOS the nested package_configs are honoured.
+        shell: cmd
+        run: |
+          flutter analyze --no-fatal-infos lib test
+          if errorlevel 1 exit /b 1
+          cd packages\discourse_core
+          flutter analyze --no-fatal-infos
+          if errorlevel 1 exit /b 1
+          cd ..\discourse_ui
+          flutter analyze --no-fatal-infos
+          if errorlevel 1 exit /b 1
+          cd ..\forumcopilot_sdk
+          flutter analyze --no-fatal-infos
