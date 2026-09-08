@@ -9,6 +9,7 @@ import 'package:forumcopilot_sdk/services/fc_http_client.dart';
 import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/attachment/discourse_upload_metadata.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../data/attachment/discourse_upload_limits.dart';
 
@@ -167,6 +168,20 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
       final body = data is String
           ? jsonDecode(data) as Map<String, dynamic>
           : (data as Map<String, dynamic>?) ?? const <String, dynamic>{};
+      // Keep the parts of the response the SDK result has nowhere to
+      // put, so the Markdown builder can name the file the way web does
+      // instead of writing a generic "image" / "file".
+      DiscourseUploadMetadata.remember(
+        body['short_url']?.toString(),
+        DiscourseUploadMetadata(
+          fileName: body['original_filename']?.toString() ?? filename,
+          fileSize: (body['filesize'] as int?) ?? bytes.length,
+          width: body['width'] as int?,
+          height: body['height'] as int?,
+          thumbnailWidth: body['thumbnail_width'] as int?,
+          thumbnailHeight: body['thumbnail_height'] as int?,
+        ),
+      );
       return FCAttachmentUploadResult(
         result: true,
         resultText: '',

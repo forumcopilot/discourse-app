@@ -5,6 +5,9 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'post_content_callbacks.dart' show PostContentCallbacks;
+import '../../theme/design_tokens.dart';
+import '../../utils/file_utils.dart';
+import '../../utils/url_utils.dart';
 
 /// Renders post content. The data we get from Discourse's `/t/{id}.json`
 /// post stream is the `cooked` HTML field — i.e. server-rendered Markdown
@@ -50,7 +53,7 @@ class RichTextContent extends StatelessWidget {
     final accent = colorScheme.primary;
 
     return Html(
-      data: content,
+      data: _foldAttachmentSize(content),
       onLinkTap: (url, attributes, _) {
         if (url == null || url.isEmpty) return;
         final resolved = _resolveUrl(url);
@@ -184,6 +187,28 @@ class RichTextContent extends StatelessWidget {
       // the OS, works offline, no network round-trips. Falls back to the
       // PNG for forum-custom emoji that aren't in standard Unicode.
       extensions: [
+        // Discourse renders a non-image upload as
+        // `<a class="attachment">name</a> (117 Bytes)`, and styles it with
+        // a download glyph via CSS ::before — which flutter_html cannot
+        // express, so it came out as a bare blue link indistinguishable
+        // from any other. Draw the chip web draws instead.
+        _AttachmentLinkExtension(
+          onShare: (href) {
+            // ignore: discarded_futures
+            UrlUtils.shareUrl(_resolveUrl(href));
+          },
+          onTap: (href) {
+            final resolved = _resolveUrl(href);
+            if (callbacks?.onUrlTap != null) {
+              callbacks!.onUrlTap!(resolved);
+              return;
+            }
+            // ignore: discarded_futures
+            launchUrlString(resolved, mode: LaunchMode.externalApplication);
+          },
+          colorScheme: colorScheme,
+          textTheme: Theme.of(context).textTheme,
+        ),
         // Code blocks scroll sideways; they must never wrap. flutter_html
         // wraps by default, which broke shared code rather than merely
         // squashing it: a Python post rendered
@@ -294,5 +319,161 @@ class RichTextContent extends StatelessWidget {
     }
     if (url.startsWith('/')) return '$base$url';
     return '$base/$url';
+  }
+}
+
+
+/// Folds Discourse's trailing size text into the anchor.
+///
+/// Cooked output is `<a class="attachment">notes.txt</a> (117 Bytes)` —
+/// the size is a sibling text node, so an extension replacing only the
+/// anchor would leave "(117 Bytes)" stranded beside the card. Moving it
+/// onto the element lets the card show name and size together, the way
+/// the composer's own attachment row does.
+String _foldAttachmentSize(String html) {
+  return html.replaceAllMapped(
+    RegExp(
+      r'(<a\s+class="attachment"[^>]*>.*?</a>)\s*\(([^)]{1,20})\)',
+      caseSensitive: false,
+      dotAll: true,
+    ),
+    (m) {
+      final anchor = m.group(1)!;
+      final size = m.group(2)!;
+      return anchor.replaceFirst('<a ', '<a data-size="$size" ');
+    },
+  );
+}
+
+/// Renders `<a class="attachment">` as the same attachment row the
+/// composer shows — a file-type tile, the filename, and its size —
+/// rather than a bare blue link.
+///
+/// Matches only that class, so ordinary links, mentions and lightbox
+/// anchors keep the default handling. That is why this is a custom
+/// [HtmlExtension] with its own [matches] instead of a TagExtension on
+/// `a`, which would have swallowed all four.
+class _AttachmentLinkExtension extends HtmlExtension {
+  const _AttachmentLinkExtension({
+    required this.onTap,
+    required this.onShare,
+    required this.colorScheme,
+    required this.textTheme,
+  });
+
+  final void Function(String href) onTap;
+  final void Function(String href) onShare;
+  final ColorScheme colorScheme;
+  final TextTheme textTheme;
+
+  @override
+  Set<String> get supportedTags => {'a'};
+
+  @override
+  bool matches(ExtensionContext context) =>
+      context.elementName == 'a' && context.classes.contains('attachment');
+
+  @override
+  InlineSpan build(ExtensionContext context) {
+    final href = context.attributes['href'] ?? '';
+    final name = context.element?.text.trim() ?? '';
+    final size = context.attributes['data-size'];
+    final label = name.isEmpty ? 'Attachment' : name;
+
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      // minWidth infinity makes the card fill the line box, so it reads as
+      // a row in a list rather than a chip floating in a paragraph —
+      // matching the composer's attachment list.
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: double.infinity),
+        child: Padding(
+        padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingXS),
+        child: Material(
+          color: colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+            side: BorderSide(
+              color: colorScheme.outlineVariant
+                  .withValues(alpha: DesignTokens.opacityDivider),
+              width: DesignTokens.borderWidthThin,
+            ),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: href.isEmpty ? null : () => onTap(href),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: DesignTokens.spacingS,
+                vertical: 6,
+              ),
+              child: Row(
+                children: [
+                  // Same 48px type tile the composer draws, from the same
+                  // helpers, so an attachment looks identical whether you
+                  // are about to post it or reading it back.
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: getFileTypeColor(label),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      getFileIcon(getFileType(label)),
+                      size: 24,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.bodyMedium
+                              ?.copyWith(color: colorScheme.onSurface),
+                        ),
+                        SizedBox(height: DesignTokens.spacingXS / 2),
+                        Text(
+                          [
+                            getFileType(label).toUpperCase(),
+                            if (size != null && size.isNotEmpty) size,
+                          ].join(' • '),
+                          style: textTheme.bodySmall
+                              ?.copyWith(color: colorScheme.onSurfaceVariant),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: DesignTokens.spacingXS),
+                  IconButton(
+                    tooltip: 'Share',
+                    visualDensity: VisualDensity.compact,
+                    onPressed: href.isEmpty ? null : () => onShare(href),
+                    icon: Icon(Icons.share_outlined,
+                        size: DesignTokens.iconSizeM,
+                        color: colorScheme.onSurfaceVariant),
+                  ),
+                  IconButton(
+                    tooltip: 'Download',
+                    visualDensity: VisualDensity.compact,
+                    onPressed: href.isEmpty ? null : () => onTap(href),
+                    icon: Icon(Icons.download_rounded,
+                        size: DesignTokens.iconSizeM,
+                        color: colorScheme.primary),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        ),
+      ),
+    );
   }
 }

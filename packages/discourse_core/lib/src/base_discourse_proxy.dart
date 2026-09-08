@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/network/fc_call_result.dart';
 
 import 'network/discourse_client.dart';
+import 'data/attachment/discourse_upload_metadata.dart';
 
 /// Common base for every `Discourse*Proxy`.
 ///
@@ -165,16 +166,8 @@ abstract class BaseDiscourseProxy {
     return '$trimmed\n\n$block';
   }
 
-  String _markdownForUpload(String shortUrl) {
-    final lower = shortUrl.toLowerCase();
-    const imageExts = [
-      '.png', '.jpg', '.jpeg', '.gif', '.webp', '.heic', '.bmp', '.svg',
-    ];
-    final isImage = imageExts.any(lower.endsWith);
-    return isImage
-        ? '![image]($shortUrl)'
-        : '[file|attachment]($shortUrl)';
-  }
+  String _markdownForUpload(String shortUrl) =>
+      discourseUploadMarkdown(shortUrl);
 
 }
 

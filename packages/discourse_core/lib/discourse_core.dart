@@ -56,6 +56,7 @@ export 'src/data/post/discourse_post_revision.dart';
 export 'src/data/post/discourse_accepted_answer.dart';
 export 'src/data/post/discourse_valid_reactions.dart';
 export 'src/data/site/discourse_site_capabilities.dart';
+export 'src/data/attachment/discourse_upload_metadata.dart';
 export 'src/util/html_text.dart' show stripHtmlToText;
 export 'src/util/quote_markup.dart';
 export 'src/data/post/discourse_suggested_topic.dart';

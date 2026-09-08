@@ -1,4 +1,6 @@
 import 'package:flutter/services.dart' show TextEditingValue, TextSelection;
+import 'package:discourse_core/discourse_core.dart'
+    show discourseUploadMarkdown;
 
 /// Formatting-toolbar actions, expressed in the markup Discourse actually
 /// cooks.
@@ -156,6 +158,11 @@ class DiscourseMarkup {
   /// Images embed inline; everything else renders as a download link.
   /// Discourse Markdown has no thumbnail-vs-full distinction — rendered
   /// size is governed by the site/category settings.
+  /// Delegates to the connector so the composer's inline insert and the
+  /// proxy's append-on-send produce identical Markdown. They used to
+  /// hardcode their own, which is how both ended up writing "image" and
+  /// "file" instead of the real filename. [isImage] is now derived from
+  /// the short_url's extension inside that helper.
   static String attachmentRef(String shortUrl, {required bool isImage}) =>
-      isImage ? '![image]($shortUrl)' : '[file|attachment]($shortUrl)';
+      discourseUploadMarkdown(shortUrl);
 }
