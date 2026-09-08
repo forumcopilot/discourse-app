@@ -2605,4 +2605,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get activity => 'Activity';
+
+  @override
+  String get dontUpload => 'Don\'t upload';
+
+  @override
+  String get dontAskAgainAlwaysResize =>
+      'Don\'t ask again — always resize to fit';
 }

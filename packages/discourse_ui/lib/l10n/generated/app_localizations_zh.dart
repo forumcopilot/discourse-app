@@ -1897,635 +1897,598 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get loginInfo => 'Login Info';
+  String get loginInfo => '登录信息';
 
   @override
-  String get loginFailed => 'Login Failed';
+  String get loginFailed => '登录失败';
 
   @override
-  String get additionalInformation => 'Additional Information';
+  String get additionalInformation => '附加信息';
 
   @override
   String dateOfBirth(Object marker) {
-    return 'Date of Birth$marker';
+    return '出生日期$marker';
   }
 
   @override
   String minimumAgeYears(Object minimumAge) {
-    return 'Minimum age: $minimumAge years';
+    return '最低年龄：$minimumAge 岁';
   }
 
   @override
   String locationLabel(Object marker) {
-    return 'Location$marker';
+    return '位置$marker';
   }
 
   @override
-  String get receiveSiteMailings => 'Receive site mailings';
+  String get receiveSiteMailings => '接收站点邮件';
 
   @override
-  String get moveToCategory => 'Move to category';
+  String get moveToCategory => '移动到分类';
 
   @override
-  String get undeleteTopic => 'Undelete Topic';
+  String get undeleteTopic => '恢复主题';
 
   @override
-  String get undeleteTopicConfirmation =>
-      'Are you sure you want to undelete this topic? It will be visible to other users again.';
+  String get undeleteTopicConfirmation => '确定要恢复此主题吗？它将再次对其他用户可见。';
 
   @override
-  String get send => 'Send';
+  String get send => '发送';
 
   @override
-  String get changeEmailExplanation =>
-      'We’ll send a confirmation link to your new email. The change takes effect when you click it.';
+  String get changeEmailExplanation => '我们会向新邮箱发送确认链接。点击后更改即生效。';
 
   @override
   String get changeEmailSecurityNote =>
-      'For added security, Discourse may require you to confirm via the link in the email. Check your spam folder if you don’t see it.';
+      '为了安全，Discourse 可能要求你通过邮件中的链接确认。如果没有收到，请检查垃圾邮件文件夹。';
 
   @override
-  String get newDirectMessage => 'New direct message';
+  String get newDirectMessage => '新私信';
 
   @override
-  String get noMessagesYetSayHi => 'No messages yet — say hi.';
+  String get noMessagesYetSayHi => '还没有消息 — 打个招呼吧。';
 
   @override
-  String get edited => 'edited';
+  String get edited => '已编辑';
 
   @override
-  String get imageExceedsUploadLimits =>
-      'This image exceeds the upload limits and needs to be optimized:';
+  String get imageExceedsUploadLimits => '此图片超出上传限制，需要优化：';
 
   @override
-  String get optimizationsToBeApplied => 'Optimizations to be applied:';
+  String get optimizationsToBeApplied => '将应用的优化：';
 
   @override
   String reductionPercent(Object percent) {
-    return 'Reduction: $percent%';
+    return '缩减：$percent%';
   }
 
   @override
   String get editProfileManagedOnWebNote =>
-      'Display name, email, password, and other account settings are managed under Account → Manage account on web. Your avatar can be changed by tapping the camera badge on your photo.';
+      '显示名称、邮箱、密码及其他账户设置在“账户 → 在网页上管理账户”中管理。点击照片上的相机图标可更换头像。';
 
   @override
   String get approvedButRelayUnreachable =>
-      'Approved, but we could not reach ForumCopilot to finish setting up. Try again later from Settings.';
+      '已批准，但无法连接 ForumCopilot 完成设置。请稍后在设置中重试。';
 
   @override
-  String get notificationsAreTurnedOffForThisApp =>
-      'Notifications are turned off for this app';
+  String get notificationsAreTurnedOffForThisApp => '此应用的通知已关闭';
 
   @override
   String forumWillAskToApproveNotifications(Object forumName) {
-    return 'Next, $forumName will ask you to approve “Notifications”.';
+    return '接下来，$forumName 会请求你批准“通知”。';
   }
 
   @override
   String get approveNotificationsExplanation =>
-      'Approving lets us check your notifications for you and send them to this device. This permission cannot post, reply, or read your messages.';
+      '批准后，我们可以为你查看通知并发送到此设备。该权限无法发帖、回复或读取你的消息。';
 
   @override
-  String get forumOwnerPushNote =>
-      'If this forum’s owner sets up notifications for the app, this step won’t be needed.';
+  String get forumOwnerPushNote => '如果论坛所有者为应用设置了通知，则无需此步骤。';
 
   @override
-  String get pleaseLoginToCreateANewTopic =>
-      'Please login to create a new topic';
+  String get pleaseLoginToCreateANewTopic => '请登录后创建新主题';
 
   @override
-  String get pleaseLoginToSubscribeToForums =>
-      'Please login to subscribe to forums';
+  String get pleaseLoginToSubscribeToForums => '请登录后订阅论坛';
 
   @override
   String leaveGroupWarning(Object group) {
-    return 'You will no longer be a member of $group. You can rejoin at any time.';
+    return '你将不再是 $group 的成员。你可以随时重新加入。';
   }
 
   @override
-  String get groupMembersPrivate => 'The member list of this group is private.';
+  String get groupMembersPrivate => '此群组的成员列表不公开。';
 
   @override
-  String get unignore => 'Unignore';
+  String get unignore => '取消忽略';
 
   @override
-  String get inviteLinkCreated => 'Invite link created';
+  String get inviteLinkCreated => '邀请链接已创建';
 
   @override
   String expiresOn(Object date) {
-    return 'Expires $date';
+    return '$date 过期';
   }
 
   @override
-  String get protected => 'Protected';
+  String get protected => '受保护';
 
   @override
-  String get solution => 'Solution';
+  String get solution => '解决方案';
 
   @override
-  String get deleted => 'DELETED';
+  String get deleted => '已删除';
 
   @override
-  String get pleaseLoginToViewUserProfiles =>
-      'Please login to view user profiles.';
+  String get pleaseLoginToViewUserProfiles => '请登录后查看用户资料。';
 
   @override
-  String get announcement => 'Announcement';
+  String get announcement => '公告';
 
   @override
-  String get solved => 'Solved';
+  String get solved => '已解决';
 
   @override
-  String get hot => 'Hot';
+  String get hot => '热门';
 
   @override
-  String get pinned => 'Pinned';
+  String get pinned => '置顶';
 
   @override
-  String get subscribedLabel => 'Subscribed';
+  String get subscribedLabel => '已订阅';
 
   @override
-  String get locked => 'Locked';
+  String get locked => '已锁定';
 
   @override
-  String get poll => 'Poll';
+  String get poll => '投票';
 
   @override
   String errorLoadingContent(Object error) {
-    return 'Error loading content: $error';
+    return '加载内容出错：$error';
   }
 
   @override
-  String get noPermissionToViewSubforum =>
-      'You do not have permission to view topics in this subforum.';
+  String get noPermissionToViewSubforum => '你没有权限查看此子论坛中的主题。';
 
   @override
-  String get noDiscussionsYet => 'No discussions yet.';
+  String get noDiscussionsYet => '还没有讨论。';
 
   @override
-  String get jumpToPost => 'Jump to Post';
+  String get jumpToPost => '跳转到帖子';
 
   @override
-  String get jump => 'Jump';
+  String get jump => '跳转';
 
   @override
-  String get endOfTheDiscussion => 'End of the discussion';
+  String get endOfTheDiscussion => '讨论结束';
 
   @override
-  String get reviewQueueStaffOnly =>
-      'Only staff and reviewers can see the review queue.';
+  String get reviewQueueStaffOnly => '只有管理人员和审核员可以查看审核队列。';
 
   @override
-  String get nothingToReview => 'Nothing to review';
+  String get nothingToReview => '没有待审核内容';
 
   @override
   String refreshFailed(Object error) {
-    return 'Refresh failed: $error';
+    return '刷新失败：$error';
   }
 
   @override
-  String get topicDeletedBanner =>
-      'This topic is deleted and hidden from other users';
+  String get topicDeletedBanner => '此主题已删除并对其他用户隐藏';
 
   @override
-  String get topicClosedBanner =>
-      'This topic is closed and no longer accepting replies';
+  String get topicClosedBanner => '此主题已关闭，不再接受回复';
 
   @override
-  String get topicPinnedBanner =>
-      'This topic is pinned to the top of the forum';
+  String get topicPinnedBanner => '此主题已置顶';
 
   @override
-  String get youAreSubscribedToThisTopic => 'You are subscribed to this topic';
+  String get youAreSubscribedToThisTopic => '你已订阅此主题';
 
   @override
-  String get refreshing => 'Refreshing...';
+  String get refreshing => '正在刷新...';
 
   @override
-  String get title => 'Title';
+  String get title => '标题';
 
   @override
   String editedAt(Object time) {
-    return 'Edited $time';
+    return '编辑于 $time';
   }
 
   @override
   String editReason(Object reason) {
-    return 'Reason: $reason';
+    return '原因：$reason';
   }
 
   @override
-  String get thisDiffIsTooLargeToDisplay =>
-      'This diff is too large to display.';
+  String get thisDiffIsTooLargeToDisplay => '差异过大，无法显示。';
 
   @override
-  String get noContentChangesInThisRevision =>
-      'No content changes in this revision.';
+  String get noContentChangesInThisRevision => '此版本没有内容更改。';
 
   @override
   String revisionOf(Object currentVersion, Object versionCount) {
-    return 'Revision $currentVersion of $versionCount';
+    return '第 $currentVersion 版，共 $versionCount 版';
   }
 
   @override
-  String get editConversation => 'Edit conversation';
+  String get editConversation => '编辑会话';
 
   @override
-  String get closeConversation => 'Close conversation';
+  String get closeConversation => '关闭会话';
 
   @override
-  String get openConversation => 'Open conversation';
+  String get openConversation => '打开会话';
 
   @override
-  String get leaveConversation2 => 'Leave conversation';
+  String get leaveConversation2 => '退出会话';
 
   @override
-  String get reportConversation2 => 'Report conversation';
+  String get reportConversation2 => '举报会话';
 
   @override
-  String get closeConversation2 => 'Close Conversation';
+  String get closeConversation2 => '关闭会话';
 
   @override
-  String get closeConversationConfirmation =>
-      'Are you sure you want to close this conversation? This will prevent new replies from being posted.';
+  String get closeConversationConfirmation => '确定要关闭此会话吗？将无法发布新回复。';
 
   @override
-  String get close => 'Close';
+  String get close => '关闭';
 
   @override
-  String get openConversation2 => 'Open Conversation';
+  String get openConversation2 => '打开会话';
 
   @override
-  String get openConversationConfirmation =>
-      'Are you sure you want to open this conversation? This will allow new replies to be posted.';
+  String get openConversationConfirmation => '确定要打开此会话吗？将允许发布新回复。';
 
   @override
-  String get open => 'Open';
+  String get open => '打开';
 
   @override
-  String get leaveConversation3 => 'Leave Conversation';
+  String get leaveConversation3 => '退出会话';
 
   @override
-  String get leaveConversationConfirmation =>
-      'Are you sure you want to leave this conversation? This will hide it from your inbox.';
+  String get leaveConversationConfirmation => '确定要退出此会话吗？它将从收件箱中隐藏。';
 
   @override
   String errorLoadingConversation(Object error) {
-    return 'Error loading conversation: $error';
+    return '加载会话出错：$error';
   }
 
   @override
-  String get conversationNotFound => 'Conversation not found';
+  String get conversationNotFound => '未找到会话';
 
   @override
-  String get conversationClosedBanner =>
-      'This conversation is closed and no longer accepting replies';
+  String get conversationClosedBanner => '此会话已关闭，不再接受回复';
 
   @override
-  String get noMessagesFound => 'No messages found';
+  String get noMessagesFound => '未找到消息';
 
   @override
-  String get endOfConversation => 'End of conversation';
+  String get endOfConversation => '会话结束';
 
   @override
-  String get jumpToMessage => 'Jump to Message';
+  String get jumpToMessage => '跳转到消息';
 
   @override
-  String get editConversation2 => 'Edit Conversation';
+  String get editConversation2 => '编辑会话';
 
   @override
-  String get failedToLoadMessage2 => 'Failed to load message';
+  String get failedToLoadMessage2 => '无法加载消息';
 
   @override
-  String get cannotEditThisConversation => 'Cannot edit this conversation';
+  String get cannotEditThisConversation => '无法编辑此会话';
 
   @override
-  String get options => 'Options';
+  String get options => '选项';
 
   @override
-  String get conversationOpen => 'Conversation Open';
+  String get conversationOpen => '会话开放';
 
   @override
   String failedToCreateConversation(Object error) {
-    return 'Failed to create conversation: $error';
+    return '无法创建会话：$error';
   }
 
   @override
   String maximumAttachmentsAllowed(Object count) {
-    return 'Maximum of $count attachment(s) allowed';
+    return '最多允许 $count 个附件';
   }
 
   @override
-  String get noImagesFoundToDisplay => 'No images found to display.';
+  String get noImagesFoundToDisplay => '没有可显示的图片。';
 
   @override
-  String get pleaseLoginToViewThisAttachment =>
-      'Please login to view this attachment';
+  String get pleaseLoginToViewThisAttachment => '请登录后查看此附件';
 
   @override
-  String get searchForTopics => 'Search for topics';
+  String get searchForTopics => '搜索主题';
 
   @override
-  String get noTopicsFound => 'No topics found';
+  String get noTopicsFound => '未找到主题';
 
   @override
-  String get trySearchingWithDifferentKeywords =>
-      'Try searching with different keywords';
+  String get trySearchingWithDifferentKeywords => '请尝试其他关键词';
 
   @override
-  String get noPostsFound => 'No posts found';
+  String get noPostsFound => '未找到帖子';
 
   @override
   String get perTopicNotificationLevelsNote =>
-      'Per-category and per-topic notification levels are set from those screens directly — tap the bell icon on any topic or category to override.';
+      '按分类和按主题的通知级别在相应页面直接设置 — 点击任意主题或分类上的铃铛图标。';
 
   @override
-  String get pushNotActiveForThisLogin =>
-      'Not active for this login — log out and log back in to authorize push notifications';
+  String get pushNotActiveForThisLogin => '此次登录未启用 — 请退出并重新登录以授权推送通知';
 
   @override
-  String get pauseNotificationsFor => 'Pause notifications for…';
+  String get pauseNotificationsFor => '暂停通知…';
 
   @override
-  String get doNotDisturbExplanation =>
-      'Pause notifications for a while — Discourse holds them until the window ends';
+  String get doNotDisturbExplanation => '暂停通知一段时间 — Discourse 会保留它们直到时段结束';
 
   @override
-  String get emailSettingsSubtitle =>
-      'Email frequency, like aggregation, digest schedule';
+  String get emailSettingsSubtitle => '邮件频率、点赞汇总、摘要计划';
 
   @override
-  String get manageAccountSubtitle =>
-      'Profile, email, password, security, advanced settings';
+  String get manageAccountSubtitle => '资料、邮箱、密码、安全、高级设置';
 
   @override
-  String get changePasswordSubtitle =>
-      'Trigger a password-reset email to your current address';
+  String get changePasswordSubtitle => '向当前邮箱发送密码重置邮件';
 
   @override
-  String get ignoredUsersSubtitle =>
-      'See and manage users whose posts are hidden from you';
+  String get ignoredUsersSubtitle => '查看和管理其帖子对你隐藏的用户';
 
   @override
   String get deleteAccountExplanation =>
-      'Removing your account is handled on the forum. Continue to open the site and contact the staff team — Discourse forums process deletions per their own policy.';
+      '账户删除由论坛处理。点击“继续”打开站点并联系管理团队 — Discourse 论坛按各自的政策处理删除。';
 
   @override
-  String get verificationEmailSent =>
-      'Verification email sent — click the link to confirm your new address.';
+  String get verificationEmailSent => '验证邮件已发送 — 请点击链接确认新地址。';
 
   @override
   String get passwordResetExplanation =>
-      'We’ll email you a password-reset link. Click it to choose a new password — the change is handled on the forum, not in this app.';
+      '我们会向你发送密码重置链接。点击链接设置新密码 — 更改在论坛中完成，而非本应用。';
 
   @override
-  String get sendResetEmail => 'Send reset email';
+  String get sendResetEmail => '发送重置邮件';
 
   @override
   String get deleteAccountDialogBody =>
-      'Your account is managed by the forum. Please contact the forum staff directly to request account removal. Continue will open the forum in your browser so you can use the site’s own contact / staff message flow.';
+      '你的账户由论坛管理。请直接联系论坛管理团队申请删除账户。“继续”将在浏览器中打开论坛，以便使用站点自身的联系/管理团队消息流程。';
 
   @override
-  String get initializingForum => 'Initializing forum…';
+  String get initializingForum => '正在初始化论坛…';
 
   @override
-  String get unableToLoadForums => 'Unable to Load Forums';
+  String get unableToLoadForums => '无法加载论坛';
 
   @override
-  String get noForumsToDisplayExplanation =>
-      'There are no forums to display. This might be due to permissions or the forum structure.';
+  String get noForumsToDisplayExplanation => '没有可显示的论坛。可能是权限或论坛结构所致。';
 
   @override
-  String get subscribedForums => 'Subscribed Forums';
+  String get subscribedForums => '已订阅的论坛';
 
   @override
-  String get errorLoadingNotifications => 'Error loading notifications';
+  String get errorLoadingNotifications => '加载通知出错';
 
   @override
-  String get pullDownToRefresh => 'Pull down to refresh';
+  String get pullDownToRefresh => '下拉刷新';
 
   @override
-  String get noNewNotificationsExplanation =>
-      'You have no new notifications. Check back later for updates on topics you\'re following.';
+  String get noNewNotificationsExplanation => '没有新通知。稍后再来查看你关注主题的更新。';
 
   @override
   String noTagsMatch(Object filter) {
-    return 'No tags match \"$filter\".';
+    return '没有与“$filter”匹配的标签。';
   }
 
   @override
   String noTopicsTagged(Object tag) {
-    return 'No topics tagged \"$tag\"';
+    return '没有带“$tag”标签的主题';
   }
 
   @override
   String failedToBanUser2(Object error) {
-    return 'Failed to ban user: $error';
+    return '无法封禁用户：$error';
   }
 
   @override
   String unbanUserConfirmation(Object username) {
-    return 'Are you sure you want to unban $username?';
+    return '确定要解封 $username 吗？';
   }
 
   @override
   String failedToUnbanUser2(Object error) {
-    return 'Failed to unban user: $error';
+    return '无法解封用户：$error';
   }
 
   @override
-  String get deletePostsProfilePostsAndComments =>
-      'Delete posts, profile posts, and comments';
+  String get deletePostsProfilePostsAndComments => '删除帖子、个人资料帖子和评论';
 
   @override
   String spamCleanConfirmation(Object username) {
-    return 'Are you sure you want to spam clean $username?';
+    return '确定要清理 $username 的垃圾内容吗？';
   }
 
   @override
   String failedToCleanSpam(Object error) {
-    return 'Failed to clean spam: $error';
+    return '清理垃圾内容失败：$error';
   }
 
   @override
-  String get searchUser => 'Search User';
+  String get searchUser => '搜索用户';
 
   @override
-  String get tapToOpen => 'Tap to open';
+  String get tapToOpen => '点击打开';
 
   @override
-  String get imageNotAvailable => 'Image not available';
+  String get imageNotAvailable => '图片不可用';
 
   @override
-  String get allForumTopicsHaveBeenMarkedAs =>
-      'All forum topics have been marked as read';
+  String get allForumTopicsHaveBeenMarkedAs => '所有论坛主题已标记为已读';
 
   @override
   String postsCount(Object count) {
-    return '$count Posts';
+    return '$count 篇帖子';
   }
 
   @override
-  String get protectedForum => 'Protected Forum';
+  String get protectedForum => '受保护的论坛';
 
   @override
   String isPasswordProtected(Object forumName) {
-    return '$forumName is password protected.';
+    return '$forumName 受密码保护。';
   }
 
   @override
-  String get enter => 'Enter';
+  String get enter => '输入';
 
   @override
-  String get permissionDeniedToSaveImage => 'Permission denied to save image';
+  String get permissionDeniedToSaveImage => '没有保存图片的权限';
 
   @override
-  String get postNotFound => 'Post not found.';
+  String get postNotFound => '未找到帖子。';
 
   @override
-  String get failedToUploadFilePleaseTryAgain =>
-      'Failed to upload file. Please try again.';
+  String get failedToUploadFilePleaseTryAgain => '文件上传失败。请重试。';
 
   @override
   String failedToUploadFile2(Object errorMessage) {
-    return 'Failed to upload file: $errorMessage';
+    return '文件上传失败：$errorMessage';
   }
 
   @override
-  String get failedToPickFile => 'Failed to pick file';
+  String get failedToPickFile => '选择文件失败';
 
   @override
   String onlyNMoreAttachmentsAllowed(
       Object remainingSlots, Object remainingSlots2) {
-    return 'Only $remainingSlots more attachment(s) allowed. Processing first $remainingSlots2 image(s).';
+    return '仅允许再添加 $remainingSlots 个附件。将处理前 $remainingSlots2 张图片。';
   }
 
   @override
-  String get attachmentLimitReachedSkippingRemainingImages =>
-      'Attachment limit reached. Skipping remaining images.';
+  String get attachmentLimitReachedSkippingRemainingImages => '已达到附件上限。跳过剩余图片。';
 
   @override
   String failedToUploadImagePleaseTryAgain(Object fileName) {
-    return '$fileName: Failed to upload image. Please try again.';
+    return '$fileName：图片上传失败。请重试。';
   }
 
   @override
   String failedToUploadImage2(Object errorMessage, Object fileName) {
-    return '$fileName: Failed to upload image: $errorMessage';
+    return '$fileName：图片上传失败：$errorMessage';
   }
 
   @override
-  String get failedToPickImage => 'Failed to pick image';
+  String get failedToPickImage => '选择图片失败';
 
   @override
   String failedToRemoveAttachment2(Object error) {
-    return 'Failed to remove attachment: $error';
+    return '移除附件失败：$error';
   }
 
   @override
   String sentFromMobileApp(Object siteName) {
-    return 'Sent from $siteName mobile app';
+    return '来自 $siteName 移动应用';
   }
 
   @override
-  String get pleaseWaitForAttachmentsToFinishUploading =>
-      'Please wait for attachments to finish uploading';
+  String get pleaseWaitForAttachmentsToFinishUploading => '请等待附件上传完成';
 
   @override
-  String get imageIsTooLargeToUpload => 'Image is too large to upload';
+  String get imageIsTooLargeToUpload => '图片过大，无法上传';
 
   @override
   String fileTooLargeForForum(
       Object fileName, Object fileBytes, Object maxBytes) {
-    return '$fileName is $fileBytes. This forum allows up to $maxBytes.';
+    return '$fileName 大小为 $fileBytes。此论坛最多允许 $maxBytes。';
   }
 
   @override
-  String get resizeToFitExplanation =>
-      'It can be scaled down just enough to fit, keeping its format and as much detail as the limit allows.';
+  String get resizeToFitExplanation => '可以将其缩小到刚好符合限制，保留原格式和尽可能多的细节。';
 
   @override
-  String get failedToPostReplyPleaseTryAgain =>
-      'Failed to post reply. Please try again.';
+  String get failedToPostReplyPleaseTryAgain => '回复发布失败。请重试。';
 
   @override
-  String get pleaseWaitForTheThreadToLoad =>
-      'Please wait for the thread to load';
+  String get pleaseWaitForTheThreadToLoad => '请等待主题加载完成';
 
   @override
-  String get failedToUpdatePostPleaseTryAgain =>
-      'Failed to update post. Please try again.';
+  String get failedToUpdatePostPleaseTryAgain => '帖子更新失败。请重试。';
 
   @override
-  String get postDeletedSuccessfully => 'Post deleted successfully';
+  String get postDeletedSuccessfully => '帖子已删除';
 
   @override
   String failedToDeletePost(Object error) {
-    return 'Failed to delete post: $error';
+    return '删除帖子失败：$error';
   }
 
   @override
   String failedToSubmitReport2(Object error) {
-    return 'Failed to submit report: $error';
+    return '提交举报失败：$error';
   }
 
   @override
-  String get editHistoryNotAvailable =>
-      'Edit history is not available for this post';
+  String get editHistoryNotAvailable => '此帖子没有可用的编辑历史';
 
   @override
-  String get noPermissionToUploadAvatar =>
-      'You do not have permission to upload avatars';
+  String get noPermissionToUploadAvatar => '你没有上传头像的权限';
 
   @override
-  String get avatarUploadedSuccessfully => 'Avatar uploaded successfully';
+  String get avatarUploadedSuccessfully => '头像已上传';
 
   @override
   String failedToPickImage2(Object error) {
-    return 'Failed to pick image: $error';
+    return '选择图片失败：$error';
   }
 
   @override
-  String get react => 'React';
+  String get react => '添加反应';
 
   @override
-  String get reactionsAreNotEnabledOnThisForum =>
-      'Reactions are not enabled on this forum.';
+  String get reactionsAreNotEnabledOnThisForum => '此论坛未启用反应功能。';
 
   @override
-  String get noReactionsYet => 'No reactions yet';
+  String get noReactionsYet => '还没有反应';
 
   @override
-  String get searchFilters => 'Search filters';
+  String get searchFilters => '搜索筛选';
 
   @override
   String signOutWarning(Object siteName) {
-    return 'You will be signed out of $siteName. You can sign back in any time.';
+    return '你将退出 $siteName。你可以随时重新登录。';
   }
 
   @override
-  String get suggestedTopics => 'Suggested Topics';
+  String get suggestedTopics => '推荐主题';
 
   @override
-  String get newLabel => 'NEW';
+  String get newLabel => '新';
 
   @override
-  String get voteRemoved => 'Vote removed';
+  String get voteRemoved => '已撤销投票';
 
   @override
-  String get voters => 'Voters';
+  String get voters => '投票者';
 
   @override
-  String get noVotesYet => 'No votes yet.';
+  String get noVotesYet => '还没有投票。';
 
   @override
-  String get trustLevels => 'Trust levels';
+  String get trustLevels => '信任等级';
 
   @override
-  String get trustLevelsExplanation =>
-      'Members earn trust by reading and participating. Each level unlocks new abilities.';
+  String get trustLevelsExplanation => '成员通过阅读和参与获得信任。每个等级都会解锁新的权限。';
 
   @override
-  String get activity => 'Activity';
+  String get activity => '动态';
+
+  @override
+  String get dontUpload => '不上传';
+
+  @override
+  String get dontAskAgainAlwaysResize => '不再询问 — 始终缩小以适应';
 }

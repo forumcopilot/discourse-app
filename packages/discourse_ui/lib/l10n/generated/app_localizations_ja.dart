@@ -1921,635 +1921,609 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get loginInfo => 'Login Info';
+  String get loginInfo => 'ログイン情報';
 
   @override
-  String get loginFailed => 'Login Failed';
+  String get loginFailed => 'ログインに失敗しました';
 
   @override
-  String get additionalInformation => 'Additional Information';
+  String get additionalInformation => '追加情報';
 
   @override
   String dateOfBirth(Object marker) {
-    return 'Date of Birth$marker';
+    return '生年月日$marker';
   }
 
   @override
   String minimumAgeYears(Object minimumAge) {
-    return 'Minimum age: $minimumAge years';
+    return '最低年齢: $minimumAge 歳';
   }
 
   @override
   String locationLabel(Object marker) {
-    return 'Location$marker';
+    return '所在地$marker';
   }
 
   @override
-  String get receiveSiteMailings => 'Receive site mailings';
+  String get receiveSiteMailings => 'サイトからのメールを受け取る';
 
   @override
-  String get moveToCategory => 'Move to category';
+  String get moveToCategory => 'カテゴリに移動';
 
   @override
-  String get undeleteTopic => 'Undelete Topic';
+  String get undeleteTopic => 'トピックを復元';
 
   @override
-  String get undeleteTopicConfirmation =>
-      'Are you sure you want to undelete this topic? It will be visible to other users again.';
+  String get undeleteTopicConfirmation => 'このトピックを復元しますか？他のユーザーに再び表示されます。';
 
   @override
-  String get send => 'Send';
+  String get send => '送信';
 
   @override
   String get changeEmailExplanation =>
-      'We’ll send a confirmation link to your new email. The change takes effect when you click it.';
+      '新しいメールアドレスに確認リンクを送ります。リンクをクリックすると変更が反映されます。';
 
   @override
   String get changeEmailSecurityNote =>
-      'For added security, Discourse may require you to confirm via the link in the email. Check your spam folder if you don’t see it.';
+      'セキュリティのため、Discourse からメール内のリンクで確認を求められることがあります。届かない場合は迷惑メールフォルダを確認してください。';
 
   @override
-  String get newDirectMessage => 'New direct message';
+  String get newDirectMessage => '新しいダイレクトメッセージ';
 
   @override
-  String get noMessagesYetSayHi => 'No messages yet — say hi.';
+  String get noMessagesYetSayHi => 'まだメッセージはありません — 挨拶してみましょう。';
 
   @override
-  String get edited => 'edited';
+  String get edited => '編集済み';
 
   @override
-  String get imageExceedsUploadLimits =>
-      'This image exceeds the upload limits and needs to be optimized:';
+  String get imageExceedsUploadLimits => 'この画像はアップロード上限を超えているため最適化が必要です:';
 
   @override
-  String get optimizationsToBeApplied => 'Optimizations to be applied:';
+  String get optimizationsToBeApplied => '適用される最適化:';
 
   @override
   String reductionPercent(Object percent) {
-    return 'Reduction: $percent%';
+    return '削減率: $percent%';
   }
 
   @override
   String get editProfileManagedOnWebNote =>
-      'Display name, email, password, and other account settings are managed under Account → Manage account on web. Your avatar can be changed by tapping the camera badge on your photo.';
+      '表示名、メール、パスワードなどのアカウント設定は「アカウント → ウェブでアカウントを管理」から変更します。アバターは写真のカメラアイコンをタップして変更できます。';
 
   @override
   String get approvedButRelayUnreachable =>
-      'Approved, but we could not reach ForumCopilot to finish setting up. Try again later from Settings.';
+      '承認されましたが、設定を完了するための ForumCopilot に接続できませんでした。後で設定から再試行してください。';
 
   @override
-  String get notificationsAreTurnedOffForThisApp =>
-      'Notifications are turned off for this app';
+  String get notificationsAreTurnedOffForThisApp => 'このアプリの通知はオフになっています';
 
   @override
   String forumWillAskToApproveNotifications(Object forumName) {
-    return 'Next, $forumName will ask you to approve “Notifications”.';
+    return '次に、$forumName が「通知」の承認を求めます。';
   }
 
   @override
   String get approveNotificationsExplanation =>
-      'Approving lets us check your notifications for you and send them to this device. This permission cannot post, reply, or read your messages.';
+      '承認すると、通知を確認してこのデバイスに送信できるようになります。この権限では投稿、返信、メッセージの閲覧はできません。';
 
   @override
-  String get forumOwnerPushNote =>
-      'If this forum’s owner sets up notifications for the app, this step won’t be needed.';
+  String get forumOwnerPushNote => 'このフォーラムの管理者がアプリの通知を設定すれば、この手順は不要になります。';
 
   @override
-  String get pleaseLoginToCreateANewTopic =>
-      'Please login to create a new topic';
+  String get pleaseLoginToCreateANewTopic => '新しいトピックを作成するにはログインしてください';
 
   @override
-  String get pleaseLoginToSubscribeToForums =>
-      'Please login to subscribe to forums';
+  String get pleaseLoginToSubscribeToForums => 'フォーラムを購読するにはログインしてください';
 
   @override
   String leaveGroupWarning(Object group) {
-    return 'You will no longer be a member of $group. You can rejoin at any time.';
+    return '$group のメンバーではなくなります。いつでも再参加できます。';
   }
 
   @override
-  String get groupMembersPrivate => 'The member list of this group is private.';
+  String get groupMembersPrivate => 'このグループのメンバー一覧は非公開です。';
 
   @override
-  String get unignore => 'Unignore';
+  String get unignore => '無視を解除';
 
   @override
-  String get inviteLinkCreated => 'Invite link created';
+  String get inviteLinkCreated => '招待リンクを作成しました';
 
   @override
   String expiresOn(Object date) {
-    return 'Expires $date';
+    return '$date に期限切れ';
   }
 
   @override
-  String get protected => 'Protected';
+  String get protected => '保護中';
 
   @override
-  String get solution => 'Solution';
+  String get solution => '解決策';
 
   @override
-  String get deleted => 'DELETED';
+  String get deleted => '削除済み';
 
   @override
-  String get pleaseLoginToViewUserProfiles =>
-      'Please login to view user profiles.';
+  String get pleaseLoginToViewUserProfiles => 'ユーザープロフィールを見るにはログインしてください。';
 
   @override
-  String get announcement => 'Announcement';
+  String get announcement => 'お知らせ';
 
   @override
-  String get solved => 'Solved';
+  String get solved => '解決済み';
 
   @override
-  String get hot => 'Hot';
+  String get hot => '注目';
 
   @override
-  String get pinned => 'Pinned';
+  String get pinned => '固定';
 
   @override
-  String get subscribedLabel => 'Subscribed';
+  String get subscribedLabel => '購読中';
 
   @override
-  String get locked => 'Locked';
+  String get locked => 'ロック中';
 
   @override
-  String get poll => 'Poll';
+  String get poll => '投票';
 
   @override
   String errorLoadingContent(Object error) {
-    return 'Error loading content: $error';
+    return 'コンテンツの読み込みエラー: $error';
   }
 
   @override
-  String get noPermissionToViewSubforum =>
-      'You do not have permission to view topics in this subforum.';
+  String get noPermissionToViewSubforum => 'このサブフォーラムのトピックを閲覧する権限がありません。';
 
   @override
-  String get noDiscussionsYet => 'No discussions yet.';
+  String get noDiscussionsYet => 'まだ議論はありません。';
 
   @override
-  String get jumpToPost => 'Jump to Post';
+  String get jumpToPost => '投稿へ移動';
 
   @override
-  String get jump => 'Jump';
+  String get jump => '移動';
 
   @override
-  String get endOfTheDiscussion => 'End of the discussion';
+  String get endOfTheDiscussion => '議論の終わり';
 
   @override
-  String get reviewQueueStaffOnly =>
-      'Only staff and reviewers can see the review queue.';
+  String get reviewQueueStaffOnly => 'レビューキューはスタッフとレビュアーのみ閲覧できます。';
 
   @override
-  String get nothingToReview => 'Nothing to review';
+  String get nothingToReview => 'レビュー対象はありません';
 
   @override
   String refreshFailed(Object error) {
-    return 'Refresh failed: $error';
+    return '更新に失敗しました: $error';
   }
 
   @override
-  String get topicDeletedBanner =>
-      'This topic is deleted and hidden from other users';
+  String get topicDeletedBanner => 'このトピックは削除され、他のユーザーには表示されません';
 
   @override
-  String get topicClosedBanner =>
-      'This topic is closed and no longer accepting replies';
+  String get topicClosedBanner => 'このトピックはクローズされ、返信できません';
 
   @override
-  String get topicPinnedBanner =>
-      'This topic is pinned to the top of the forum';
+  String get topicPinnedBanner => 'このトピックはフォーラムの先頭に固定されています';
 
   @override
-  String get youAreSubscribedToThisTopic => 'You are subscribed to this topic';
+  String get youAreSubscribedToThisTopic => 'このトピックを購読しています';
 
   @override
-  String get refreshing => 'Refreshing...';
+  String get refreshing => '更新中...';
 
   @override
-  String get title => 'Title';
+  String get title => 'タイトル';
 
   @override
   String editedAt(Object time) {
-    return 'Edited $time';
+    return '$time に編集';
   }
 
   @override
   String editReason(Object reason) {
-    return 'Reason: $reason';
+    return '理由: $reason';
   }
 
   @override
-  String get thisDiffIsTooLargeToDisplay =>
-      'This diff is too large to display.';
+  String get thisDiffIsTooLargeToDisplay => 'この差分は大きすぎて表示できません。';
 
   @override
-  String get noContentChangesInThisRevision =>
-      'No content changes in this revision.';
+  String get noContentChangesInThisRevision => 'この版に内容の変更はありません。';
 
   @override
   String revisionOf(Object currentVersion, Object versionCount) {
-    return 'Revision $currentVersion of $versionCount';
+    return '版 $currentVersion / $versionCount';
   }
 
   @override
-  String get editConversation => 'Edit conversation';
+  String get editConversation => '会話を編集';
 
   @override
-  String get closeConversation => 'Close conversation';
+  String get closeConversation => '会話をクローズ';
 
   @override
-  String get openConversation => 'Open conversation';
+  String get openConversation => '会話を再開';
 
   @override
-  String get leaveConversation2 => 'Leave conversation';
+  String get leaveConversation2 => '会話から退出';
 
   @override
-  String get reportConversation2 => 'Report conversation';
+  String get reportConversation2 => '会話を報告';
 
   @override
-  String get closeConversation2 => 'Close Conversation';
+  String get closeConversation2 => '会話をクローズ';
 
   @override
-  String get closeConversationConfirmation =>
-      'Are you sure you want to close this conversation? This will prevent new replies from being posted.';
+  String get closeConversationConfirmation => 'この会話をクローズしますか？新しい返信ができなくなります。';
 
   @override
-  String get close => 'Close';
+  String get close => '閉じる';
 
   @override
-  String get openConversation2 => 'Open Conversation';
+  String get openConversation2 => '会話を再開';
 
   @override
-  String get openConversationConfirmation =>
-      'Are you sure you want to open this conversation? This will allow new replies to be posted.';
+  String get openConversationConfirmation => 'この会話を再開しますか？新しい返信ができるようになります。';
 
   @override
-  String get open => 'Open';
+  String get open => '開く';
 
   @override
-  String get leaveConversation3 => 'Leave Conversation';
+  String get leaveConversation3 => '会話から退出';
 
   @override
-  String get leaveConversationConfirmation =>
-      'Are you sure you want to leave this conversation? This will hide it from your inbox.';
+  String get leaveConversationConfirmation => 'この会話から退出しますか？受信トレイに表示されなくなります。';
 
   @override
   String errorLoadingConversation(Object error) {
-    return 'Error loading conversation: $error';
+    return '会話の読み込みエラー: $error';
   }
 
   @override
-  String get conversationNotFound => 'Conversation not found';
+  String get conversationNotFound => '会話が見つかりません';
 
   @override
-  String get conversationClosedBanner =>
-      'This conversation is closed and no longer accepting replies';
+  String get conversationClosedBanner => 'この会話はクローズされ、返信できません';
 
   @override
-  String get noMessagesFound => 'No messages found';
+  String get noMessagesFound => 'メッセージが見つかりません';
 
   @override
-  String get endOfConversation => 'End of conversation';
+  String get endOfConversation => '会話の終わり';
 
   @override
-  String get jumpToMessage => 'Jump to Message';
+  String get jumpToMessage => 'メッセージへ移動';
 
   @override
-  String get editConversation2 => 'Edit Conversation';
+  String get editConversation2 => '会話を編集';
 
   @override
-  String get failedToLoadMessage2 => 'Failed to load message';
+  String get failedToLoadMessage2 => 'メッセージを読み込めませんでした';
 
   @override
-  String get cannotEditThisConversation => 'Cannot edit this conversation';
+  String get cannotEditThisConversation => 'この会話は編集できません';
 
   @override
-  String get options => 'Options';
+  String get options => 'オプション';
 
   @override
-  String get conversationOpen => 'Conversation Open';
+  String get conversationOpen => '会話をオープンにする';
 
   @override
   String failedToCreateConversation(Object error) {
-    return 'Failed to create conversation: $error';
+    return '会話を作成できませんでした: $error';
   }
 
   @override
   String maximumAttachmentsAllowed(Object count) {
-    return 'Maximum of $count attachment(s) allowed';
+    return '添付ファイルは最大 $count 件までです';
   }
 
   @override
-  String get noImagesFoundToDisplay => 'No images found to display.';
+  String get noImagesFoundToDisplay => '表示できる画像がありません。';
 
   @override
-  String get pleaseLoginToViewThisAttachment =>
-      'Please login to view this attachment';
+  String get pleaseLoginToViewThisAttachment => 'この添付ファイルを見るにはログインしてください';
 
   @override
-  String get searchForTopics => 'Search for topics';
+  String get searchForTopics => 'トピックを検索';
 
   @override
-  String get noTopicsFound => 'No topics found';
+  String get noTopicsFound => 'トピックが見つかりません';
 
   @override
-  String get trySearchingWithDifferentKeywords =>
-      'Try searching with different keywords';
+  String get trySearchingWithDifferentKeywords => '別のキーワードで検索してみてください';
 
   @override
-  String get noPostsFound => 'No posts found';
+  String get noPostsFound => '投稿が見つかりません';
 
   @override
   String get perTopicNotificationLevelsNote =>
-      'Per-category and per-topic notification levels are set from those screens directly — tap the bell icon on any topic or category to override.';
+      'カテゴリ別・トピック別の通知レベルは各画面で設定します — トピックやカテゴリのベルアイコンをタップしてください。';
 
   @override
   String get pushNotActiveForThisLogin =>
-      'Not active for this login — log out and log back in to authorize push notifications';
+      'このログインでは無効です — ログアウトして再ログインするとプッシュ通知を許可できます';
 
   @override
-  String get pauseNotificationsFor => 'Pause notifications for…';
+  String get pauseNotificationsFor => '通知を一時停止する期間…';
 
   @override
   String get doNotDisturbExplanation =>
-      'Pause notifications for a while — Discourse holds them until the window ends';
+      '通知をしばらく停止します — 期間が終わるまで Discourse が保留します';
 
   @override
-  String get emailSettingsSubtitle =>
-      'Email frequency, like aggregation, digest schedule';
+  String get emailSettingsSubtitle => 'メールの頻度、いいねの集約、ダイジェストの予定';
 
   @override
-  String get manageAccountSubtitle =>
-      'Profile, email, password, security, advanced settings';
+  String get manageAccountSubtitle => 'プロフィール、メール、パスワード、セキュリティ、詳細設定';
 
   @override
-  String get changePasswordSubtitle =>
-      'Trigger a password-reset email to your current address';
+  String get changePasswordSubtitle => '現在のメールアドレスにパスワード再設定メールを送ります';
 
   @override
-  String get ignoredUsersSubtitle =>
-      'See and manage users whose posts are hidden from you';
+  String get ignoredUsersSubtitle => '投稿が非表示になっているユーザーを確認・管理';
 
   @override
   String get deleteAccountExplanation =>
-      'Removing your account is handled on the forum. Continue to open the site and contact the staff team — Discourse forums process deletions per their own policy.';
+      'アカウントの削除はフォーラム側で行います。「続行」でサイトを開き、スタッフに連絡してください — Discourse フォーラムは各自のポリシーで削除を処理します。';
 
   @override
   String get verificationEmailSent =>
-      'Verification email sent — click the link to confirm your new address.';
+      '確認メールを送信しました — リンクをクリックして新しいアドレスを確認してください。';
 
   @override
   String get passwordResetExplanation =>
-      'We’ll email you a password-reset link. Click it to choose a new password — the change is handled on the forum, not in this app.';
+      'パスワード再設定リンクをメールで送ります。リンクから新しいパスワードを設定してください — 変更はこのアプリではなくフォーラム側で行われます。';
 
   @override
-  String get sendResetEmail => 'Send reset email';
+  String get sendResetEmail => '再設定メールを送信';
 
   @override
   String get deleteAccountDialogBody =>
-      'Your account is managed by the forum. Please contact the forum staff directly to request account removal. Continue will open the forum in your browser so you can use the site’s own contact / staff message flow.';
+      'アカウントはフォーラムが管理しています。削除はフォーラムのスタッフに直接依頼してください。「続行」でブラウザにフォーラムを開き、サイトの連絡・スタッフメッセージ機能を利用できます。';
 
   @override
-  String get initializingForum => 'Initializing forum…';
+  String get initializingForum => 'フォーラムを初期化しています…';
 
   @override
-  String get unableToLoadForums => 'Unable to Load Forums';
+  String get unableToLoadForums => 'フォーラムを読み込めません';
 
   @override
   String get noForumsToDisplayExplanation =>
-      'There are no forums to display. This might be due to permissions or the forum structure.';
+      '表示するフォーラムがありません。権限またはフォーラムの構成が原因の可能性があります。';
 
   @override
-  String get subscribedForums => 'Subscribed Forums';
+  String get subscribedForums => '購読中のフォーラム';
 
   @override
-  String get errorLoadingNotifications => 'Error loading notifications';
+  String get errorLoadingNotifications => '通知の読み込みエラー';
 
   @override
-  String get pullDownToRefresh => 'Pull down to refresh';
+  String get pullDownToRefresh => '下に引いて更新';
 
   @override
   String get noNewNotificationsExplanation =>
-      'You have no new notifications. Check back later for updates on topics you\'re following.';
+      '新しい通知はありません。フォロー中のトピックの更新は後で確認してください。';
 
   @override
   String noTagsMatch(Object filter) {
-    return 'No tags match \"$filter\".';
+    return '「$filter」に一致するタグはありません。';
   }
 
   @override
   String noTopicsTagged(Object tag) {
-    return 'No topics tagged \"$tag\"';
+    return '「$tag」タグのトピックはありません';
   }
 
   @override
   String failedToBanUser2(Object error) {
-    return 'Failed to ban user: $error';
+    return 'ユーザーを利用停止にできませんでした: $error';
   }
 
   @override
   String unbanUserConfirmation(Object username) {
-    return 'Are you sure you want to unban $username?';
+    return '$username の利用停止を解除しますか？';
   }
 
   @override
   String failedToUnbanUser2(Object error) {
-    return 'Failed to unban user: $error';
+    return '利用停止を解除できませんでした: $error';
   }
 
   @override
-  String get deletePostsProfilePostsAndComments =>
-      'Delete posts, profile posts, and comments';
+  String get deletePostsProfilePostsAndComments => '投稿、プロフィール投稿、コメントを削除';
 
   @override
   String spamCleanConfirmation(Object username) {
-    return 'Are you sure you want to spam clean $username?';
+    return '$username のスパムを一掃しますか？';
   }
 
   @override
   String failedToCleanSpam(Object error) {
-    return 'Failed to clean spam: $error';
+    return 'スパムを一掃できませんでした: $error';
   }
 
   @override
-  String get searchUser => 'Search User';
+  String get searchUser => 'ユーザーを検索';
 
   @override
-  String get tapToOpen => 'Tap to open';
+  String get tapToOpen => 'タップして開く';
 
   @override
-  String get imageNotAvailable => 'Image not available';
+  String get imageNotAvailable => '画像を表示できません';
 
   @override
-  String get allForumTopicsHaveBeenMarkedAs =>
-      'All forum topics have been marked as read';
+  String get allForumTopicsHaveBeenMarkedAs => 'フォーラムの全トピックを既読にしました';
 
   @override
   String postsCount(Object count) {
-    return '$count Posts';
+    return '$count 件の投稿';
   }
 
   @override
-  String get protectedForum => 'Protected Forum';
+  String get protectedForum => '保護されたフォーラム';
 
   @override
   String isPasswordProtected(Object forumName) {
-    return '$forumName is password protected.';
+    return '$forumName はパスワードで保護されています。';
   }
 
   @override
-  String get enter => 'Enter';
+  String get enter => '入力';
 
   @override
-  String get permissionDeniedToSaveImage => 'Permission denied to save image';
+  String get permissionDeniedToSaveImage => '画像を保存する権限がありません';
 
   @override
-  String get postNotFound => 'Post not found.';
+  String get postNotFound => '投稿が見つかりません。';
 
   @override
   String get failedToUploadFilePleaseTryAgain =>
-      'Failed to upload file. Please try again.';
+      'ファイルをアップロードできませんでした。もう一度お試しください。';
 
   @override
   String failedToUploadFile2(Object errorMessage) {
-    return 'Failed to upload file: $errorMessage';
+    return 'ファイルをアップロードできませんでした: $errorMessage';
   }
 
   @override
-  String get failedToPickFile => 'Failed to pick file';
+  String get failedToPickFile => 'ファイルを選択できませんでした';
 
   @override
   String onlyNMoreAttachmentsAllowed(
       Object remainingSlots, Object remainingSlots2) {
-    return 'Only $remainingSlots more attachment(s) allowed. Processing first $remainingSlots2 image(s).';
+    return 'あと $remainingSlots 件のみ添付できます。最初の $remainingSlots2 枚を処理します。';
   }
 
   @override
   String get attachmentLimitReachedSkippingRemainingImages =>
-      'Attachment limit reached. Skipping remaining images.';
+      '添付ファイルの上限に達しました。残りの画像はスキップします。';
 
   @override
   String failedToUploadImagePleaseTryAgain(Object fileName) {
-    return '$fileName: Failed to upload image. Please try again.';
+    return '$fileName: 画像をアップロードできませんでした。もう一度お試しください。';
   }
 
   @override
   String failedToUploadImage2(Object errorMessage, Object fileName) {
-    return '$fileName: Failed to upload image: $errorMessage';
+    return '$fileName: 画像をアップロードできませんでした: $errorMessage';
   }
 
   @override
-  String get failedToPickImage => 'Failed to pick image';
+  String get failedToPickImage => '画像を選択できませんでした';
 
   @override
   String failedToRemoveAttachment2(Object error) {
-    return 'Failed to remove attachment: $error';
+    return '添付ファイルを削除できませんでした: $error';
   }
 
   @override
   String sentFromMobileApp(Object siteName) {
-    return 'Sent from $siteName mobile app';
+    return '$siteName モバイルアプリから送信';
   }
 
   @override
   String get pleaseWaitForAttachmentsToFinishUploading =>
-      'Please wait for attachments to finish uploading';
+      '添付ファイルのアップロード完了までお待ちください';
 
   @override
-  String get imageIsTooLargeToUpload => 'Image is too large to upload';
+  String get imageIsTooLargeToUpload => '画像が大きすぎてアップロードできません';
 
   @override
   String fileTooLargeForForum(
       Object fileName, Object fileBytes, Object maxBytes) {
-    return '$fileName is $fileBytes. This forum allows up to $maxBytes.';
+    return '$fileName は $fileBytes です。このフォーラムの上限は $maxBytes です。';
   }
 
   @override
   String get resizeToFitExplanation =>
-      'It can be scaled down just enough to fit, keeping its format and as much detail as the limit allows.';
+      '形式を保ったまま、上限内に収まるぎりぎりまで縮小し、できるだけ画質を維持します。';
 
   @override
-  String get failedToPostReplyPleaseTryAgain =>
-      'Failed to post reply. Please try again.';
+  String get failedToPostReplyPleaseTryAgain => '返信を投稿できませんでした。もう一度お試しください。';
 
   @override
-  String get pleaseWaitForTheThreadToLoad =>
-      'Please wait for the thread to load';
+  String get pleaseWaitForTheThreadToLoad => 'トピックの読み込みが終わるまでお待ちください';
 
   @override
-  String get failedToUpdatePostPleaseTryAgain =>
-      'Failed to update post. Please try again.';
+  String get failedToUpdatePostPleaseTryAgain => '投稿を更新できませんでした。もう一度お試しください。';
 
   @override
-  String get postDeletedSuccessfully => 'Post deleted successfully';
+  String get postDeletedSuccessfully => '投稿を削除しました';
 
   @override
   String failedToDeletePost(Object error) {
-    return 'Failed to delete post: $error';
+    return '投稿を削除できませんでした: $error';
   }
 
   @override
   String failedToSubmitReport2(Object error) {
-    return 'Failed to submit report: $error';
+    return '報告を送信できませんでした: $error';
   }
 
   @override
-  String get editHistoryNotAvailable =>
-      'Edit history is not available for this post';
+  String get editHistoryNotAvailable => 'この投稿の編集履歴は利用できません';
 
   @override
-  String get noPermissionToUploadAvatar =>
-      'You do not have permission to upload avatars';
+  String get noPermissionToUploadAvatar => 'アバターをアップロードする権限がありません';
 
   @override
-  String get avatarUploadedSuccessfully => 'Avatar uploaded successfully';
+  String get avatarUploadedSuccessfully => 'アバターをアップロードしました';
 
   @override
   String failedToPickImage2(Object error) {
-    return 'Failed to pick image: $error';
+    return '画像を選択できませんでした: $error';
   }
 
   @override
-  String get react => 'React';
+  String get react => 'リアクション';
 
   @override
-  String get reactionsAreNotEnabledOnThisForum =>
-      'Reactions are not enabled on this forum.';
+  String get reactionsAreNotEnabledOnThisForum => 'このフォーラムではリアクションが有効になっていません。';
 
   @override
-  String get noReactionsYet => 'No reactions yet';
+  String get noReactionsYet => 'まだリアクションはありません';
 
   @override
-  String get searchFilters => 'Search filters';
+  String get searchFilters => '検索フィルター';
 
   @override
   String signOutWarning(Object siteName) {
-    return 'You will be signed out of $siteName. You can sign back in any time.';
+    return '$siteName からサインアウトします。いつでも再度サインインできます。';
   }
 
   @override
-  String get suggestedTopics => 'Suggested Topics';
+  String get suggestedTopics => 'おすすめのトピック';
 
   @override
-  String get newLabel => 'NEW';
+  String get newLabel => '新着';
 
   @override
-  String get voteRemoved => 'Vote removed';
+  String get voteRemoved => '投票を取り消しました';
 
   @override
-  String get voters => 'Voters';
+  String get voters => '投票者';
 
   @override
-  String get noVotesYet => 'No votes yet.';
+  String get noVotesYet => 'まだ投票はありません。';
 
   @override
-  String get trustLevels => 'Trust levels';
+  String get trustLevels => '信頼レベル';
 
   @override
   String get trustLevelsExplanation =>
-      'Members earn trust by reading and participating. Each level unlocks new abilities.';
+      'メンバーは閲覧と参加によって信頼を積み上げます。レベルが上がるごとに新しい機能が使えるようになります。';
 
   @override
-  String get activity => 'Activity';
+  String get activity => 'アクティビティ';
+
+  @override
+  String get dontUpload => 'アップロードしない';
+
+  @override
+  String get dontAskAgainAlwaysResize => '今後表示しない — 常に縮小して合わせる';
 }

@@ -1914,635 +1914,607 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get loginInfo => 'Login Info';
+  String get loginInfo => '로그인 정보';
 
   @override
-  String get loginFailed => 'Login Failed';
+  String get loginFailed => '로그인 실패';
 
   @override
-  String get additionalInformation => 'Additional Information';
+  String get additionalInformation => '추가 정보';
 
   @override
   String dateOfBirth(Object marker) {
-    return 'Date of Birth$marker';
+    return '생년월일$marker';
   }
 
   @override
   String minimumAgeYears(Object minimumAge) {
-    return 'Minimum age: $minimumAge years';
+    return '최소 연령: $minimumAge세';
   }
 
   @override
   String locationLabel(Object marker) {
-    return 'Location$marker';
+    return '위치$marker';
   }
 
   @override
-  String get receiveSiteMailings => 'Receive site mailings';
+  String get receiveSiteMailings => '사이트 메일 수신';
 
   @override
-  String get moveToCategory => 'Move to category';
+  String get moveToCategory => '카테고리로 이동';
 
   @override
-  String get undeleteTopic => 'Undelete Topic';
+  String get undeleteTopic => '주제 복원';
 
   @override
-  String get undeleteTopicConfirmation =>
-      'Are you sure you want to undelete this topic? It will be visible to other users again.';
+  String get undeleteTopicConfirmation => '이 주제를 복원할까요? 다른 사용자에게 다시 표시됩니다.';
 
   @override
-  String get send => 'Send';
+  String get send => '보내기';
 
   @override
   String get changeEmailExplanation =>
-      'We’ll send a confirmation link to your new email. The change takes effect when you click it.';
+      '새 이메일로 확인 링크를 보냅니다. 링크를 클릭하면 변경이 적용됩니다.';
 
   @override
   String get changeEmailSecurityNote =>
-      'For added security, Discourse may require you to confirm via the link in the email. Check your spam folder if you don’t see it.';
+      '보안을 위해 Discourse가 이메일의 링크로 확인을 요구할 수 있습니다. 보이지 않으면 스팸 폴더를 확인하세요.';
 
   @override
-  String get newDirectMessage => 'New direct message';
+  String get newDirectMessage => '새 다이렉트 메시지';
 
   @override
-  String get noMessagesYetSayHi => 'No messages yet — say hi.';
+  String get noMessagesYetSayHi => '아직 메시지가 없습니다 — 인사해 보세요.';
 
   @override
-  String get edited => 'edited';
+  String get edited => '수정됨';
 
   @override
-  String get imageExceedsUploadLimits =>
-      'This image exceeds the upload limits and needs to be optimized:';
+  String get imageExceedsUploadLimits => '이 이미지는 업로드 제한을 초과하여 최적화가 필요합니다:';
 
   @override
-  String get optimizationsToBeApplied => 'Optimizations to be applied:';
+  String get optimizationsToBeApplied => '적용될 최적화:';
 
   @override
   String reductionPercent(Object percent) {
-    return 'Reduction: $percent%';
+    return '감소율: $percent%';
   }
 
   @override
   String get editProfileManagedOnWebNote =>
-      'Display name, email, password, and other account settings are managed under Account → Manage account on web. Your avatar can be changed by tapping the camera badge on your photo.';
+      '표시 이름, 이메일, 비밀번호 및 기타 계정 설정은 계정 → 웹에서 계정 관리에서 변경합니다. 아바타는 사진의 카메라 배지를 탭하여 변경할 수 있습니다.';
 
   @override
   String get approvedButRelayUnreachable =>
-      'Approved, but we could not reach ForumCopilot to finish setting up. Try again later from Settings.';
+      '승인되었지만 설정을 마치기 위한 ForumCopilot에 연결할 수 없었습니다. 나중에 설정에서 다시 시도하세요.';
 
   @override
-  String get notificationsAreTurnedOffForThisApp =>
-      'Notifications are turned off for this app';
+  String get notificationsAreTurnedOffForThisApp => '이 앱의 알림이 꺼져 있습니다';
 
   @override
   String forumWillAskToApproveNotifications(Object forumName) {
-    return 'Next, $forumName will ask you to approve “Notifications”.';
+    return '다음으로 $forumName에서 \"알림\" 승인을 요청합니다.';
   }
 
   @override
   String get approveNotificationsExplanation =>
-      'Approving lets us check your notifications for you and send them to this device. This permission cannot post, reply, or read your messages.';
+      '승인하면 알림을 확인하여 이 기기로 보낼 수 있습니다. 이 권한으로는 게시, 답글, 메시지 읽기를 할 수 없습니다.';
 
   @override
-  String get forumOwnerPushNote =>
-      'If this forum’s owner sets up notifications for the app, this step won’t be needed.';
+  String get forumOwnerPushNote => '이 포럼 운영자가 앱 알림을 설정하면 이 단계는 필요 없습니다.';
 
   @override
-  String get pleaseLoginToCreateANewTopic =>
-      'Please login to create a new topic';
+  String get pleaseLoginToCreateANewTopic => '새 주제를 만들려면 로그인하세요';
 
   @override
-  String get pleaseLoginToSubscribeToForums =>
-      'Please login to subscribe to forums';
+  String get pleaseLoginToSubscribeToForums => '포럼을 구독하려면 로그인하세요';
 
   @override
   String leaveGroupWarning(Object group) {
-    return 'You will no longer be a member of $group. You can rejoin at any time.';
+    return '더 이상 $group의 구성원이 아니게 됩니다. 언제든지 다시 가입할 수 있습니다.';
   }
 
   @override
-  String get groupMembersPrivate => 'The member list of this group is private.';
+  String get groupMembersPrivate => '이 그룹의 구성원 목록은 비공개입니다.';
 
   @override
-  String get unignore => 'Unignore';
+  String get unignore => '무시 해제';
 
   @override
-  String get inviteLinkCreated => 'Invite link created';
+  String get inviteLinkCreated => '초대 링크를 만들었습니다';
 
   @override
   String expiresOn(Object date) {
-    return 'Expires $date';
+    return '$date 만료';
   }
 
   @override
-  String get protected => 'Protected';
+  String get protected => '보호됨';
 
   @override
-  String get solution => 'Solution';
+  String get solution => '해결책';
 
   @override
-  String get deleted => 'DELETED';
+  String get deleted => '삭제됨';
 
   @override
-  String get pleaseLoginToViewUserProfiles =>
-      'Please login to view user profiles.';
+  String get pleaseLoginToViewUserProfiles => '사용자 프로필을 보려면 로그인하세요.';
 
   @override
-  String get announcement => 'Announcement';
+  String get announcement => '공지';
 
   @override
-  String get solved => 'Solved';
+  String get solved => '해결됨';
 
   @override
-  String get hot => 'Hot';
+  String get hot => '인기';
 
   @override
-  String get pinned => 'Pinned';
+  String get pinned => '고정됨';
 
   @override
-  String get subscribedLabel => 'Subscribed';
+  String get subscribedLabel => '구독 중';
 
   @override
-  String get locked => 'Locked';
+  String get locked => '잠김';
 
   @override
-  String get poll => 'Poll';
+  String get poll => '투표';
 
   @override
   String errorLoadingContent(Object error) {
-    return 'Error loading content: $error';
+    return '콘텐츠 불러오기 오류: $error';
   }
 
   @override
-  String get noPermissionToViewSubforum =>
-      'You do not have permission to view topics in this subforum.';
+  String get noPermissionToViewSubforum => '이 하위 포럼의 주제를 볼 권한이 없습니다.';
 
   @override
-  String get noDiscussionsYet => 'No discussions yet.';
+  String get noDiscussionsYet => '아직 토론이 없습니다.';
 
   @override
-  String get jumpToPost => 'Jump to Post';
+  String get jumpToPost => '게시물로 이동';
 
   @override
-  String get jump => 'Jump';
+  String get jump => '이동';
 
   @override
-  String get endOfTheDiscussion => 'End of the discussion';
+  String get endOfTheDiscussion => '토론 끝';
 
   @override
-  String get reviewQueueStaffOnly =>
-      'Only staff and reviewers can see the review queue.';
+  String get reviewQueueStaffOnly => '검토 대기열은 스태프와 검토자만 볼 수 있습니다.';
 
   @override
-  String get nothingToReview => 'Nothing to review';
+  String get nothingToReview => '검토할 항목이 없습니다';
 
   @override
   String refreshFailed(Object error) {
-    return 'Refresh failed: $error';
+    return '새로고침 실패: $error';
   }
 
   @override
-  String get topicDeletedBanner =>
-      'This topic is deleted and hidden from other users';
+  String get topicDeletedBanner => '이 주제는 삭제되어 다른 사용자에게 보이지 않습니다';
 
   @override
-  String get topicClosedBanner =>
-      'This topic is closed and no longer accepting replies';
+  String get topicClosedBanner => '이 주제는 닫혀 더 이상 답글을 받지 않습니다';
 
   @override
-  String get topicPinnedBanner =>
-      'This topic is pinned to the top of the forum';
+  String get topicPinnedBanner => '이 주제는 포럼 상단에 고정되어 있습니다';
 
   @override
-  String get youAreSubscribedToThisTopic => 'You are subscribed to this topic';
+  String get youAreSubscribedToThisTopic => '이 주제를 구독 중입니다';
 
   @override
-  String get refreshing => 'Refreshing...';
+  String get refreshing => '새로고침 중...';
 
   @override
-  String get title => 'Title';
+  String get title => '제목';
 
   @override
   String editedAt(Object time) {
-    return 'Edited $time';
+    return '$time 수정';
   }
 
   @override
   String editReason(Object reason) {
-    return 'Reason: $reason';
+    return '사유: $reason';
   }
 
   @override
-  String get thisDiffIsTooLargeToDisplay =>
-      'This diff is too large to display.';
+  String get thisDiffIsTooLargeToDisplay => '이 변경 내용은 너무 커서 표시할 수 없습니다.';
 
   @override
-  String get noContentChangesInThisRevision =>
-      'No content changes in this revision.';
+  String get noContentChangesInThisRevision => '이 수정본에는 내용 변경이 없습니다.';
 
   @override
   String revisionOf(Object currentVersion, Object versionCount) {
-    return 'Revision $currentVersion of $versionCount';
+    return '수정본 $currentVersion/$versionCount';
   }
 
   @override
-  String get editConversation => 'Edit conversation';
+  String get editConversation => '대화 편집';
 
   @override
-  String get closeConversation => 'Close conversation';
+  String get closeConversation => '대화 닫기';
 
   @override
-  String get openConversation => 'Open conversation';
+  String get openConversation => '대화 열기';
 
   @override
-  String get leaveConversation2 => 'Leave conversation';
+  String get leaveConversation2 => '대화 나가기';
 
   @override
-  String get reportConversation2 => 'Report conversation';
+  String get reportConversation2 => '대화 신고';
 
   @override
-  String get closeConversation2 => 'Close Conversation';
+  String get closeConversation2 => '대화 닫기';
 
   @override
-  String get closeConversationConfirmation =>
-      'Are you sure you want to close this conversation? This will prevent new replies from being posted.';
+  String get closeConversationConfirmation => '이 대화를 닫을까요? 새 답글을 작성할 수 없게 됩니다.';
 
   @override
-  String get close => 'Close';
+  String get close => '닫기';
 
   @override
-  String get openConversation2 => 'Open Conversation';
+  String get openConversation2 => '대화 열기';
 
   @override
-  String get openConversationConfirmation =>
-      'Are you sure you want to open this conversation? This will allow new replies to be posted.';
+  String get openConversationConfirmation => '이 대화를 열까요? 새 답글을 작성할 수 있게 됩니다.';
 
   @override
-  String get open => 'Open';
+  String get open => '열기';
 
   @override
-  String get leaveConversation3 => 'Leave Conversation';
+  String get leaveConversation3 => '대화 나가기';
 
   @override
-  String get leaveConversationConfirmation =>
-      'Are you sure you want to leave this conversation? This will hide it from your inbox.';
+  String get leaveConversationConfirmation => '이 대화에서 나갈까요? 받은편지함에서 숨겨집니다.';
 
   @override
   String errorLoadingConversation(Object error) {
-    return 'Error loading conversation: $error';
+    return '대화 불러오기 오류: $error';
   }
 
   @override
-  String get conversationNotFound => 'Conversation not found';
+  String get conversationNotFound => '대화를 찾을 수 없습니다';
 
   @override
-  String get conversationClosedBanner =>
-      'This conversation is closed and no longer accepting replies';
+  String get conversationClosedBanner => '이 대화는 닫혀 더 이상 답글을 받지 않습니다';
 
   @override
-  String get noMessagesFound => 'No messages found';
+  String get noMessagesFound => '메시지가 없습니다';
 
   @override
-  String get endOfConversation => 'End of conversation';
+  String get endOfConversation => '대화 끝';
 
   @override
-  String get jumpToMessage => 'Jump to Message';
+  String get jumpToMessage => '메시지로 이동';
 
   @override
-  String get editConversation2 => 'Edit Conversation';
+  String get editConversation2 => '대화 편집';
 
   @override
-  String get failedToLoadMessage2 => 'Failed to load message';
+  String get failedToLoadMessage2 => '메시지를 불러오지 못했습니다';
 
   @override
-  String get cannotEditThisConversation => 'Cannot edit this conversation';
+  String get cannotEditThisConversation => '이 대화는 편집할 수 없습니다';
 
   @override
-  String get options => 'Options';
+  String get options => '옵션';
 
   @override
-  String get conversationOpen => 'Conversation Open';
+  String get conversationOpen => '대화 열림';
 
   @override
   String failedToCreateConversation(Object error) {
-    return 'Failed to create conversation: $error';
+    return '대화를 만들 수 없습니다: $error';
   }
 
   @override
   String maximumAttachmentsAllowed(Object count) {
-    return 'Maximum of $count attachment(s) allowed';
+    return '최대 $count개의 첨부 파일만 허용됩니다';
   }
 
   @override
-  String get noImagesFoundToDisplay => 'No images found to display.';
+  String get noImagesFoundToDisplay => '표시할 이미지가 없습니다.';
 
   @override
-  String get pleaseLoginToViewThisAttachment =>
-      'Please login to view this attachment';
+  String get pleaseLoginToViewThisAttachment => '이 첨부 파일을 보려면 로그인하세요';
 
   @override
-  String get searchForTopics => 'Search for topics';
+  String get searchForTopics => '주제 검색';
 
   @override
-  String get noTopicsFound => 'No topics found';
+  String get noTopicsFound => '주제를 찾을 수 없습니다';
 
   @override
-  String get trySearchingWithDifferentKeywords =>
-      'Try searching with different keywords';
+  String get trySearchingWithDifferentKeywords => '다른 키워드로 검색해 보세요';
 
   @override
-  String get noPostsFound => 'No posts found';
+  String get noPostsFound => '게시물을 찾을 수 없습니다';
 
   @override
   String get perTopicNotificationLevelsNote =>
-      'Per-category and per-topic notification levels are set from those screens directly — tap the bell icon on any topic or category to override.';
+      '카테고리별·주제별 알림 수준은 해당 화면에서 직접 설정합니다 — 주제나 카테고리의 종 아이콘을 탭하세요.';
 
   @override
   String get pushNotActiveForThisLogin =>
-      'Not active for this login — log out and log back in to authorize push notifications';
+      '이 로그인에서는 비활성 — 로그아웃 후 다시 로그인하여 푸시 알림을 허용하세요';
 
   @override
-  String get pauseNotificationsFor => 'Pause notifications for…';
+  String get pauseNotificationsFor => '알림 일시 중지 기간…';
 
   @override
   String get doNotDisturbExplanation =>
-      'Pause notifications for a while — Discourse holds them until the window ends';
+      '알림을 잠시 멈춥니다 — 기간이 끝날 때까지 Discourse가 보관합니다';
 
   @override
-  String get emailSettingsSubtitle =>
-      'Email frequency, like aggregation, digest schedule';
+  String get emailSettingsSubtitle => '이메일 빈도, 좋아요 모아보기, 다이제스트 일정';
 
   @override
-  String get manageAccountSubtitle =>
-      'Profile, email, password, security, advanced settings';
+  String get manageAccountSubtitle => '프로필, 이메일, 비밀번호, 보안, 고급 설정';
 
   @override
-  String get changePasswordSubtitle =>
-      'Trigger a password-reset email to your current address';
+  String get changePasswordSubtitle => '현재 주소로 비밀번호 재설정 이메일을 보냅니다';
 
   @override
-  String get ignoredUsersSubtitle =>
-      'See and manage users whose posts are hidden from you';
+  String get ignoredUsersSubtitle => '게시물이 숨겨진 사용자를 보고 관리';
 
   @override
   String get deleteAccountExplanation =>
-      'Removing your account is handled on the forum. Continue to open the site and contact the staff team — Discourse forums process deletions per their own policy.';
+      '계정 삭제는 포럼에서 처리합니다. 계속을 눌러 사이트를 열고 스태프에게 문의하세요 — Discourse 포럼은 자체 정책에 따라 삭제를 처리합니다.';
 
   @override
-  String get verificationEmailSent =>
-      'Verification email sent — click the link to confirm your new address.';
+  String get verificationEmailSent => '확인 이메일을 보냈습니다 — 링크를 클릭하여 새 주소를 확인하세요.';
 
   @override
   String get passwordResetExplanation =>
-      'We’ll email you a password-reset link. Click it to choose a new password — the change is handled on the forum, not in this app.';
+      '비밀번호 재설정 링크를 이메일로 보냅니다. 링크를 클릭해 새 비밀번호를 정하세요 — 변경은 이 앱이 아니라 포럼에서 처리됩니다.';
 
   @override
-  String get sendResetEmail => 'Send reset email';
+  String get sendResetEmail => '재설정 이메일 보내기';
 
   @override
   String get deleteAccountDialogBody =>
-      'Your account is managed by the forum. Please contact the forum staff directly to request account removal. Continue will open the forum in your browser so you can use the site’s own contact / staff message flow.';
+      '계정은 포럼에서 관리합니다. 계정 삭제는 포럼 스태프에게 직접 요청하세요. 계속을 누르면 브라우저에서 포럼이 열려 사이트의 문의/스태프 메시지 기능을 사용할 수 있습니다.';
 
   @override
-  String get initializingForum => 'Initializing forum…';
+  String get initializingForum => '포럼 초기화 중…';
 
   @override
-  String get unableToLoadForums => 'Unable to Load Forums';
+  String get unableToLoadForums => '포럼을 불러올 수 없습니다';
 
   @override
   String get noForumsToDisplayExplanation =>
-      'There are no forums to display. This might be due to permissions or the forum structure.';
+      '표시할 포럼이 없습니다. 권한이나 포럼 구조 때문일 수 있습니다.';
 
   @override
-  String get subscribedForums => 'Subscribed Forums';
+  String get subscribedForums => '구독한 포럼';
 
   @override
-  String get errorLoadingNotifications => 'Error loading notifications';
+  String get errorLoadingNotifications => '알림 불러오기 오류';
 
   @override
-  String get pullDownToRefresh => 'Pull down to refresh';
+  String get pullDownToRefresh => '아래로 당겨 새로고침';
 
   @override
   String get noNewNotificationsExplanation =>
-      'You have no new notifications. Check back later for updates on topics you\'re following.';
+      '새 알림이 없습니다. 팔로우 중인 주제의 업데이트는 나중에 확인하세요.';
 
   @override
   String noTagsMatch(Object filter) {
-    return 'No tags match \"$filter\".';
+    return '\"$filter\"과(와) 일치하는 태그가 없습니다.';
   }
 
   @override
   String noTopicsTagged(Object tag) {
-    return 'No topics tagged \"$tag\"';
+    return '\"$tag\" 태그가 있는 주제가 없습니다';
   }
 
   @override
   String failedToBanUser2(Object error) {
-    return 'Failed to ban user: $error';
+    return '사용자를 차단하지 못했습니다: $error';
   }
 
   @override
   String unbanUserConfirmation(Object username) {
-    return 'Are you sure you want to unban $username?';
+    return '$username 차단을 해제할까요?';
   }
 
   @override
   String failedToUnbanUser2(Object error) {
-    return 'Failed to unban user: $error';
+    return '차단을 해제하지 못했습니다: $error';
   }
 
   @override
-  String get deletePostsProfilePostsAndComments =>
-      'Delete posts, profile posts, and comments';
+  String get deletePostsProfilePostsAndComments => '게시물, 프로필 게시물, 댓글 삭제';
 
   @override
   String spamCleanConfirmation(Object username) {
-    return 'Are you sure you want to spam clean $username?';
+    return '$username의 스팸을 정리할까요?';
   }
 
   @override
   String failedToCleanSpam(Object error) {
-    return 'Failed to clean spam: $error';
+    return '스팸 정리 실패: $error';
   }
 
   @override
-  String get searchUser => 'Search User';
+  String get searchUser => '사용자 검색';
 
   @override
-  String get tapToOpen => 'Tap to open';
+  String get tapToOpen => '탭하여 열기';
 
   @override
-  String get imageNotAvailable => 'Image not available';
+  String get imageNotAvailable => '이미지를 사용할 수 없습니다';
 
   @override
-  String get allForumTopicsHaveBeenMarkedAs =>
-      'All forum topics have been marked as read';
+  String get allForumTopicsHaveBeenMarkedAs => '모든 포럼 주제를 읽음으로 표시했습니다';
 
   @override
   String postsCount(Object count) {
-    return '$count Posts';
+    return '게시물 $count개';
   }
 
   @override
-  String get protectedForum => 'Protected Forum';
+  String get protectedForum => '보호된 포럼';
 
   @override
   String isPasswordProtected(Object forumName) {
-    return '$forumName is password protected.';
+    return '$forumName은(는) 비밀번호로 보호됩니다.';
   }
 
   @override
-  String get enter => 'Enter';
+  String get enter => '입력';
 
   @override
-  String get permissionDeniedToSaveImage => 'Permission denied to save image';
+  String get permissionDeniedToSaveImage => '이미지를 저장할 권한이 없습니다';
 
   @override
-  String get postNotFound => 'Post not found.';
+  String get postNotFound => '게시물을 찾을 수 없습니다.';
 
   @override
-  String get failedToUploadFilePleaseTryAgain =>
-      'Failed to upload file. Please try again.';
+  String get failedToUploadFilePleaseTryAgain => '파일을 업로드하지 못했습니다. 다시 시도하세요.';
 
   @override
   String failedToUploadFile2(Object errorMessage) {
-    return 'Failed to upload file: $errorMessage';
+    return '파일 업로드 실패: $errorMessage';
   }
 
   @override
-  String get failedToPickFile => 'Failed to pick file';
+  String get failedToPickFile => '파일을 선택하지 못했습니다';
 
   @override
   String onlyNMoreAttachmentsAllowed(
       Object remainingSlots, Object remainingSlots2) {
-    return 'Only $remainingSlots more attachment(s) allowed. Processing first $remainingSlots2 image(s).';
+    return '$remainingSlots개의 첨부 파일만 더 추가할 수 있습니다. 처음 $remainingSlots2개의 이미지를 처리합니다.';
   }
 
   @override
   String get attachmentLimitReachedSkippingRemainingImages =>
-      'Attachment limit reached. Skipping remaining images.';
+      '첨부 파일 한도에 도달했습니다. 나머지 이미지는 건너뜁니다.';
 
   @override
   String failedToUploadImagePleaseTryAgain(Object fileName) {
-    return '$fileName: Failed to upload image. Please try again.';
+    return '$fileName: 이미지를 업로드하지 못했습니다. 다시 시도하세요.';
   }
 
   @override
   String failedToUploadImage2(Object errorMessage, Object fileName) {
-    return '$fileName: Failed to upload image: $errorMessage';
+    return '$fileName: 이미지 업로드 실패: $errorMessage';
   }
 
   @override
-  String get failedToPickImage => 'Failed to pick image';
+  String get failedToPickImage => '이미지를 선택하지 못했습니다';
 
   @override
   String failedToRemoveAttachment2(Object error) {
-    return 'Failed to remove attachment: $error';
+    return '첨부 파일을 제거하지 못했습니다: $error';
   }
 
   @override
   String sentFromMobileApp(Object siteName) {
-    return 'Sent from $siteName mobile app';
+    return '$siteName 모바일 앱에서 보냄';
   }
 
   @override
   String get pleaseWaitForAttachmentsToFinishUploading =>
-      'Please wait for attachments to finish uploading';
+      '첨부 파일 업로드가 끝날 때까지 기다려 주세요';
 
   @override
-  String get imageIsTooLargeToUpload => 'Image is too large to upload';
+  String get imageIsTooLargeToUpload => '이미지가 너무 커서 업로드할 수 없습니다';
 
   @override
   String fileTooLargeForForum(
       Object fileName, Object fileBytes, Object maxBytes) {
-    return '$fileName is $fileBytes. This forum allows up to $maxBytes.';
+    return '$fileName의 크기는 $fileBytes입니다. 이 포럼은 최대 $maxBytes까지 허용합니다.';
   }
 
   @override
   String get resizeToFitExplanation =>
-      'It can be scaled down just enough to fit, keeping its format and as much detail as the limit allows.';
+      '형식을 유지한 채 제한에 맞을 만큼만 축소하며 가능한 한 세부 묘사를 보존합니다.';
 
   @override
-  String get failedToPostReplyPleaseTryAgain =>
-      'Failed to post reply. Please try again.';
+  String get failedToPostReplyPleaseTryAgain => '답글을 게시하지 못했습니다. 다시 시도하세요.';
 
   @override
-  String get pleaseWaitForTheThreadToLoad =>
-      'Please wait for the thread to load';
+  String get pleaseWaitForTheThreadToLoad => '주제가 로드될 때까지 기다려 주세요';
 
   @override
-  String get failedToUpdatePostPleaseTryAgain =>
-      'Failed to update post. Please try again.';
+  String get failedToUpdatePostPleaseTryAgain => '게시물을 수정하지 못했습니다. 다시 시도하세요.';
 
   @override
-  String get postDeletedSuccessfully => 'Post deleted successfully';
+  String get postDeletedSuccessfully => '게시물을 삭제했습니다';
 
   @override
   String failedToDeletePost(Object error) {
-    return 'Failed to delete post: $error';
+    return '게시물 삭제 실패: $error';
   }
 
   @override
   String failedToSubmitReport2(Object error) {
-    return 'Failed to submit report: $error';
+    return '신고 제출 실패: $error';
   }
 
   @override
-  String get editHistoryNotAvailable =>
-      'Edit history is not available for this post';
+  String get editHistoryNotAvailable => '이 게시물의 편집 기록을 볼 수 없습니다';
 
   @override
-  String get noPermissionToUploadAvatar =>
-      'You do not have permission to upload avatars';
+  String get noPermissionToUploadAvatar => '아바타를 업로드할 권한이 없습니다';
 
   @override
-  String get avatarUploadedSuccessfully => 'Avatar uploaded successfully';
+  String get avatarUploadedSuccessfully => '아바타를 업로드했습니다';
 
   @override
   String failedToPickImage2(Object error) {
-    return 'Failed to pick image: $error';
+    return '이미지 선택 실패: $error';
   }
 
   @override
-  String get react => 'React';
+  String get react => '반응';
 
   @override
-  String get reactionsAreNotEnabledOnThisForum =>
-      'Reactions are not enabled on this forum.';
+  String get reactionsAreNotEnabledOnThisForum => '이 포럼에서는 반응 기능이 꺼져 있습니다.';
 
   @override
-  String get noReactionsYet => 'No reactions yet';
+  String get noReactionsYet => '아직 반응이 없습니다';
 
   @override
-  String get searchFilters => 'Search filters';
+  String get searchFilters => '검색 필터';
 
   @override
   String signOutWarning(Object siteName) {
-    return 'You will be signed out of $siteName. You can sign back in any time.';
+    return '$siteName에서 로그아웃됩니다. 언제든지 다시 로그인할 수 있습니다.';
   }
 
   @override
-  String get suggestedTopics => 'Suggested Topics';
+  String get suggestedTopics => '추천 주제';
 
   @override
-  String get newLabel => 'NEW';
+  String get newLabel => '신규';
 
   @override
-  String get voteRemoved => 'Vote removed';
+  String get voteRemoved => '투표를 취소했습니다';
 
   @override
-  String get voters => 'Voters';
+  String get voters => '투표자';
 
   @override
-  String get noVotesYet => 'No votes yet.';
+  String get noVotesYet => '아직 투표가 없습니다.';
 
   @override
-  String get trustLevels => 'Trust levels';
+  String get trustLevels => '신뢰 등급';
 
   @override
   String get trustLevelsExplanation =>
-      'Members earn trust by reading and participating. Each level unlocks new abilities.';
+      '구성원은 읽고 참여하며 신뢰를 쌓습니다. 등급마다 새로운 기능이 열립니다.';
 
   @override
-  String get activity => 'Activity';
+  String get activity => '활동';
+
+  @override
+  String get dontUpload => '업로드 안 함';
+
+  @override
+  String get dontAskAgainAlwaysResize => '다시 묻지 않기 — 항상 크기에 맞게 조정';
 }

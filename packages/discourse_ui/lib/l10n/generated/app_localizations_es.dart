@@ -1992,635 +1992,645 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get loginInfo => 'Login Info';
+  String get loginInfo => 'Información de inicio de sesión';
 
   @override
-  String get loginFailed => 'Login Failed';
+  String get loginFailed => 'Error de inicio de sesión';
 
   @override
-  String get additionalInformation => 'Additional Information';
+  String get additionalInformation => 'Información adicional';
 
   @override
   String dateOfBirth(Object marker) {
-    return 'Date of Birth$marker';
+    return 'Fecha de nacimiento$marker';
   }
 
   @override
   String minimumAgeYears(Object minimumAge) {
-    return 'Minimum age: $minimumAge years';
+    return 'Edad mínima: $minimumAge años';
   }
 
   @override
   String locationLabel(Object marker) {
-    return 'Location$marker';
+    return 'Ubicación$marker';
   }
 
   @override
-  String get receiveSiteMailings => 'Receive site mailings';
+  String get receiveSiteMailings => 'Recibir correos del sitio';
 
   @override
-  String get moveToCategory => 'Move to category';
+  String get moveToCategory => 'Mover a categoría';
 
   @override
-  String get undeleteTopic => 'Undelete Topic';
+  String get undeleteTopic => 'Restaurar tema';
 
   @override
   String get undeleteTopicConfirmation =>
-      'Are you sure you want to undelete this topic? It will be visible to other users again.';
+      '¿Seguro que quieres restaurar este tema? Volverá a ser visible para otros usuarios.';
 
   @override
-  String get send => 'Send';
+  String get send => 'Enviar';
 
   @override
   String get changeEmailExplanation =>
-      'We’ll send a confirmation link to your new email. The change takes effect when you click it.';
+      'Enviaremos un enlace de confirmación a tu nuevo correo. El cambio se aplicará cuando hagas clic en él.';
 
   @override
   String get changeEmailSecurityNote =>
-      'For added security, Discourse may require you to confirm via the link in the email. Check your spam folder if you don’t see it.';
+      'Por seguridad, Discourse puede pedirte confirmar mediante el enlace del correo. Revisa la carpeta de spam si no lo ves.';
 
   @override
-  String get newDirectMessage => 'New direct message';
+  String get newDirectMessage => 'Nuevo mensaje directo';
 
   @override
-  String get noMessagesYetSayHi => 'No messages yet — say hi.';
+  String get noMessagesYetSayHi => 'Aún no hay mensajes: saluda.';
 
   @override
-  String get edited => 'edited';
+  String get edited => 'editado';
 
   @override
   String get imageExceedsUploadLimits =>
-      'This image exceeds the upload limits and needs to be optimized:';
+      'Esta imagen supera los límites de subida y debe optimizarse:';
 
   @override
-  String get optimizationsToBeApplied => 'Optimizations to be applied:';
+  String get optimizationsToBeApplied => 'Optimizaciones que se aplicarán:';
 
   @override
   String reductionPercent(Object percent) {
-    return 'Reduction: $percent%';
+    return 'Reducción: $percent%';
   }
 
   @override
   String get editProfileManagedOnWebNote =>
-      'Display name, email, password, and other account settings are managed under Account → Manage account on web. Your avatar can be changed by tapping the camera badge on your photo.';
+      'El nombre visible, el correo, la contraseña y otros ajustes de la cuenta se gestionan en Cuenta → Administrar cuenta en la web. Puedes cambiar tu avatar tocando el icono de cámara en tu foto.';
 
   @override
   String get approvedButRelayUnreachable =>
-      'Approved, but we could not reach ForumCopilot to finish setting up. Try again later from Settings.';
+      'Aprobado, pero no pudimos conectar con ForumCopilot para terminar la configuración. Inténtalo más tarde desde Ajustes.';
 
   @override
   String get notificationsAreTurnedOffForThisApp =>
-      'Notifications are turned off for this app';
+      'Las notificaciones están desactivadas para esta app';
 
   @override
   String forumWillAskToApproveNotifications(Object forumName) {
-    return 'Next, $forumName will ask you to approve “Notifications”.';
+    return 'A continuación, $forumName te pedirá aprobar «Notificaciones».';
   }
 
   @override
   String get approveNotificationsExplanation =>
-      'Approving lets us check your notifications for you and send them to this device. This permission cannot post, reply, or read your messages.';
+      'Al aprobar, podremos consultar tus notificaciones y enviarlas a este dispositivo. Este permiso no puede publicar, responder ni leer tus mensajes.';
 
   @override
   String get forumOwnerPushNote =>
-      'If this forum’s owner sets up notifications for the app, this step won’t be needed.';
+      'Si el administrador de este foro configura las notificaciones para la app, este paso no será necesario.';
 
   @override
-  String get pleaseLoginToCreateANewTopic =>
-      'Please login to create a new topic';
+  String get pleaseLoginToCreateANewTopic => 'Inicia sesión para crear un tema';
 
   @override
   String get pleaseLoginToSubscribeToForums =>
-      'Please login to subscribe to forums';
+      'Inicia sesión para suscribirte a foros';
 
   @override
   String leaveGroupWarning(Object group) {
-    return 'You will no longer be a member of $group. You can rejoin at any time.';
+    return 'Dejarás de ser miembro de $group. Puedes volver a unirte cuando quieras.';
   }
 
   @override
-  String get groupMembersPrivate => 'The member list of this group is private.';
+  String get groupMembersPrivate =>
+      'La lista de miembros de este grupo es privada.';
 
   @override
-  String get unignore => 'Unignore';
+  String get unignore => 'Dejar de ignorar';
 
   @override
-  String get inviteLinkCreated => 'Invite link created';
+  String get inviteLinkCreated => 'Enlace de invitación creado';
 
   @override
   String expiresOn(Object date) {
-    return 'Expires $date';
+    return 'Caduca el $date';
   }
 
   @override
-  String get protected => 'Protected';
+  String get protected => 'Protegido';
 
   @override
-  String get solution => 'Solution';
+  String get solution => 'Solución';
 
   @override
-  String get deleted => 'DELETED';
+  String get deleted => 'ELIMINADO';
 
   @override
   String get pleaseLoginToViewUserProfiles =>
-      'Please login to view user profiles.';
+      'Inicia sesión para ver perfiles de usuario.';
 
   @override
-  String get announcement => 'Announcement';
+  String get announcement => 'Anuncio';
 
   @override
-  String get solved => 'Solved';
+  String get solved => 'Resuelto';
 
   @override
-  String get hot => 'Hot';
+  String get hot => 'Popular';
 
   @override
-  String get pinned => 'Pinned';
+  String get pinned => 'Fijado';
 
   @override
-  String get subscribedLabel => 'Subscribed';
+  String get subscribedLabel => 'Suscrito';
 
   @override
-  String get locked => 'Locked';
+  String get locked => 'Bloqueado';
 
   @override
-  String get poll => 'Poll';
+  String get poll => 'Encuesta';
 
   @override
   String errorLoadingContent(Object error) {
-    return 'Error loading content: $error';
+    return 'Error al cargar el contenido: $error';
   }
 
   @override
   String get noPermissionToViewSubforum =>
-      'You do not have permission to view topics in this subforum.';
+      'No tienes permiso para ver los temas de este subforo.';
 
   @override
-  String get noDiscussionsYet => 'No discussions yet.';
+  String get noDiscussionsYet => 'Aún no hay discusiones.';
 
   @override
-  String get jumpToPost => 'Jump to Post';
+  String get jumpToPost => 'Ir a la publicación';
 
   @override
-  String get jump => 'Jump';
+  String get jump => 'Ir';
 
   @override
-  String get endOfTheDiscussion => 'End of the discussion';
+  String get endOfTheDiscussion => 'Fin de la discusión';
 
   @override
   String get reviewQueueStaffOnly =>
-      'Only staff and reviewers can see the review queue.';
+      'Solo el personal y los revisores pueden ver la cola de revisión.';
 
   @override
-  String get nothingToReview => 'Nothing to review';
+  String get nothingToReview => 'Nada que revisar';
 
   @override
   String refreshFailed(Object error) {
-    return 'Refresh failed: $error';
+    return 'Error al actualizar: $error';
   }
 
   @override
   String get topicDeletedBanner =>
-      'This topic is deleted and hidden from other users';
+      'Este tema está eliminado y oculto para otros usuarios';
 
   @override
   String get topicClosedBanner =>
-      'This topic is closed and no longer accepting replies';
+      'Este tema está cerrado y ya no acepta respuestas';
 
   @override
   String get topicPinnedBanner =>
-      'This topic is pinned to the top of the forum';
+      'Este tema está fijado en la parte superior del foro';
 
   @override
-  String get youAreSubscribedToThisTopic => 'You are subscribed to this topic';
+  String get youAreSubscribedToThisTopic => 'Estás suscrito a este tema';
 
   @override
-  String get refreshing => 'Refreshing...';
+  String get refreshing => 'Actualizando...';
 
   @override
-  String get title => 'Title';
+  String get title => 'Título';
 
   @override
   String editedAt(Object time) {
-    return 'Edited $time';
+    return 'Editado $time';
   }
 
   @override
   String editReason(Object reason) {
-    return 'Reason: $reason';
+    return 'Motivo: $reason';
   }
 
   @override
   String get thisDiffIsTooLargeToDisplay =>
-      'This diff is too large to display.';
+      'Esta diferencia es demasiado grande para mostrarla.';
 
   @override
   String get noContentChangesInThisRevision =>
-      'No content changes in this revision.';
+      'No hay cambios de contenido en esta revisión.';
 
   @override
   String revisionOf(Object currentVersion, Object versionCount) {
-    return 'Revision $currentVersion of $versionCount';
+    return 'Revisión $currentVersion de $versionCount';
   }
 
   @override
-  String get editConversation => 'Edit conversation';
+  String get editConversation => 'Editar conversación';
 
   @override
-  String get closeConversation => 'Close conversation';
+  String get closeConversation => 'Cerrar conversación';
 
   @override
-  String get openConversation => 'Open conversation';
+  String get openConversation => 'Abrir conversación';
 
   @override
-  String get leaveConversation2 => 'Leave conversation';
+  String get leaveConversation2 => 'Salir de la conversación';
 
   @override
-  String get reportConversation2 => 'Report conversation';
+  String get reportConversation2 => 'Reportar conversación';
 
   @override
-  String get closeConversation2 => 'Close Conversation';
+  String get closeConversation2 => 'Cerrar conversación';
 
   @override
   String get closeConversationConfirmation =>
-      'Are you sure you want to close this conversation? This will prevent new replies from being posted.';
+      '¿Seguro que quieres cerrar esta conversación? Ya no se podrán publicar respuestas.';
 
   @override
-  String get close => 'Close';
+  String get close => 'Cerrar';
 
   @override
-  String get openConversation2 => 'Open Conversation';
+  String get openConversation2 => 'Abrir conversación';
 
   @override
   String get openConversationConfirmation =>
-      'Are you sure you want to open this conversation? This will allow new replies to be posted.';
+      '¿Seguro que quieres abrir esta conversación? Se podrán publicar nuevas respuestas.';
 
   @override
-  String get open => 'Open';
+  String get open => 'Abrir';
 
   @override
-  String get leaveConversation3 => 'Leave Conversation';
+  String get leaveConversation3 => 'Salir de la conversación';
 
   @override
   String get leaveConversationConfirmation =>
-      'Are you sure you want to leave this conversation? This will hide it from your inbox.';
+      '¿Seguro que quieres salir de esta conversación? Se ocultará de tu bandeja de entrada.';
 
   @override
   String errorLoadingConversation(Object error) {
-    return 'Error loading conversation: $error';
+    return 'Error al cargar la conversación: $error';
   }
 
   @override
-  String get conversationNotFound => 'Conversation not found';
+  String get conversationNotFound => 'Conversación no encontrada';
 
   @override
   String get conversationClosedBanner =>
-      'This conversation is closed and no longer accepting replies';
+      'Esta conversación está cerrada y ya no acepta respuestas';
 
   @override
-  String get noMessagesFound => 'No messages found';
+  String get noMessagesFound => 'No se encontraron mensajes';
 
   @override
-  String get endOfConversation => 'End of conversation';
+  String get endOfConversation => 'Fin de la conversación';
 
   @override
-  String get jumpToMessage => 'Jump to Message';
+  String get jumpToMessage => 'Ir al mensaje';
 
   @override
-  String get editConversation2 => 'Edit Conversation';
+  String get editConversation2 => 'Editar conversación';
 
   @override
-  String get failedToLoadMessage2 => 'Failed to load message';
+  String get failedToLoadMessage2 => 'No se pudo cargar el mensaje';
 
   @override
-  String get cannotEditThisConversation => 'Cannot edit this conversation';
+  String get cannotEditThisConversation =>
+      'No se puede editar esta conversación';
 
   @override
-  String get options => 'Options';
+  String get options => 'Opciones';
 
   @override
-  String get conversationOpen => 'Conversation Open';
+  String get conversationOpen => 'Conversación abierta';
 
   @override
   String failedToCreateConversation(Object error) {
-    return 'Failed to create conversation: $error';
+    return 'No se pudo crear la conversación: $error';
   }
 
   @override
   String maximumAttachmentsAllowed(Object count) {
-    return 'Maximum of $count attachment(s) allowed';
+    return 'Máximo de $count adjunto(s) permitido(s)';
   }
 
   @override
-  String get noImagesFoundToDisplay => 'No images found to display.';
+  String get noImagesFoundToDisplay =>
+      'No se encontraron imágenes para mostrar.';
 
   @override
   String get pleaseLoginToViewThisAttachment =>
-      'Please login to view this attachment';
+      'Inicia sesión para ver este adjunto';
 
   @override
-  String get searchForTopics => 'Search for topics';
+  String get searchForTopics => 'Buscar temas';
 
   @override
-  String get noTopicsFound => 'No topics found';
+  String get noTopicsFound => 'No se encontraron temas';
 
   @override
   String get trySearchingWithDifferentKeywords =>
-      'Try searching with different keywords';
+      'Prueba con otras palabras clave';
 
   @override
-  String get noPostsFound => 'No posts found';
+  String get noPostsFound => 'No se encontraron publicaciones';
 
   @override
   String get perTopicNotificationLevelsNote =>
-      'Per-category and per-topic notification levels are set from those screens directly — tap the bell icon on any topic or category to override.';
+      'Los niveles de notificación por categoría y por tema se ajustan en esas pantallas: toca el icono de campana en cualquier tema o categoría.';
 
   @override
   String get pushNotActiveForThisLogin =>
-      'Not active for this login — log out and log back in to authorize push notifications';
+      'No activas para este inicio de sesión: cierra sesión y vuelve a entrar para autorizar las notificaciones push';
 
   @override
-  String get pauseNotificationsFor => 'Pause notifications for…';
+  String get pauseNotificationsFor => 'Pausar notificaciones durante…';
 
   @override
   String get doNotDisturbExplanation =>
-      'Pause notifications for a while — Discourse holds them until the window ends';
+      'Pausa las notificaciones un tiempo: Discourse las retiene hasta que termine el periodo';
 
   @override
   String get emailSettingsSubtitle =>
-      'Email frequency, like aggregation, digest schedule';
+      'Frecuencia de correo, agrupación de me gusta, resumen periódico';
 
   @override
   String get manageAccountSubtitle =>
-      'Profile, email, password, security, advanced settings';
+      'Perfil, correo, contraseña, seguridad, ajustes avanzados';
 
   @override
   String get changePasswordSubtitle =>
-      'Trigger a password-reset email to your current address';
+      'Envía un correo de restablecimiento de contraseña a tu dirección actual';
 
   @override
   String get ignoredUsersSubtitle =>
-      'See and manage users whose posts are hidden from you';
+      'Ver y gestionar usuarios cuyas publicaciones están ocultas para ti';
 
   @override
   String get deleteAccountExplanation =>
-      'Removing your account is handled on the forum. Continue to open the site and contact the staff team — Discourse forums process deletions per their own policy.';
+      'La eliminación de tu cuenta se gestiona en el foro. Continúa para abrir el sitio y contactar al equipo: los foros Discourse procesan las eliminaciones según su propia política.';
 
   @override
   String get verificationEmailSent =>
-      'Verification email sent — click the link to confirm your new address.';
+      'Correo de verificación enviado: haz clic en el enlace para confirmar tu nueva dirección.';
 
   @override
   String get passwordResetExplanation =>
-      'We’ll email you a password-reset link. Click it to choose a new password — the change is handled on the forum, not in this app.';
+      'Te enviaremos un enlace para restablecer la contraseña. Haz clic para elegir una nueva: el cambio se gestiona en el foro, no en esta app.';
 
   @override
-  String get sendResetEmail => 'Send reset email';
+  String get sendResetEmail => 'Enviar correo de restablecimiento';
 
   @override
   String get deleteAccountDialogBody =>
-      'Your account is managed by the forum. Please contact the forum staff directly to request account removal. Continue will open the forum in your browser so you can use the site’s own contact / staff message flow.';
+      'Tu cuenta la gestiona el foro. Contacta directamente con el equipo del foro para solicitar la eliminación. «Continuar» abrirá el foro en tu navegador para usar su propio flujo de contacto o mensaje al equipo.';
 
   @override
-  String get initializingForum => 'Initializing forum…';
+  String get initializingForum => 'Inicializando foro…';
 
   @override
-  String get unableToLoadForums => 'Unable to Load Forums';
+  String get unableToLoadForums => 'No se pudieron cargar los foros';
 
   @override
   String get noForumsToDisplayExplanation =>
-      'There are no forums to display. This might be due to permissions or the forum structure.';
+      'No hay foros que mostrar. Puede deberse a permisos o a la estructura del foro.';
 
   @override
-  String get subscribedForums => 'Subscribed Forums';
+  String get subscribedForums => 'Foros suscritos';
 
   @override
-  String get errorLoadingNotifications => 'Error loading notifications';
+  String get errorLoadingNotifications => 'Error al cargar las notificaciones';
 
   @override
-  String get pullDownToRefresh => 'Pull down to refresh';
+  String get pullDownToRefresh => 'Desliza hacia abajo para actualizar';
 
   @override
   String get noNewNotificationsExplanation =>
-      'You have no new notifications. Check back later for updates on topics you\'re following.';
+      'No tienes notificaciones nuevas. Vuelve más tarde para ver novedades de los temas que sigues.';
 
   @override
   String noTagsMatch(Object filter) {
-    return 'No tags match \"$filter\".';
+    return 'Ninguna etiqueta coincide con «$filter».';
   }
 
   @override
   String noTopicsTagged(Object tag) {
-    return 'No topics tagged \"$tag\"';
+    return 'No hay temas con la etiqueta «$tag»';
   }
 
   @override
   String failedToBanUser2(Object error) {
-    return 'Failed to ban user: $error';
+    return 'No se pudo banear al usuario: $error';
   }
 
   @override
   String unbanUserConfirmation(Object username) {
-    return 'Are you sure you want to unban $username?';
+    return '¿Seguro que quieres desbanear a $username?';
   }
 
   @override
   String failedToUnbanUser2(Object error) {
-    return 'Failed to unban user: $error';
+    return 'No se pudo desbanear al usuario: $error';
   }
 
   @override
   String get deletePostsProfilePostsAndComments =>
-      'Delete posts, profile posts, and comments';
+      'Eliminar publicaciones, publicaciones de perfil y comentarios';
 
   @override
   String spamCleanConfirmation(Object username) {
-    return 'Are you sure you want to spam clean $username?';
+    return '¿Seguro que quieres limpiar el spam de $username?';
   }
 
   @override
   String failedToCleanSpam(Object error) {
-    return 'Failed to clean spam: $error';
+    return 'No se pudo limpiar el spam: $error';
   }
 
   @override
-  String get searchUser => 'Search User';
+  String get searchUser => 'Buscar usuario';
 
   @override
-  String get tapToOpen => 'Tap to open';
+  String get tapToOpen => 'Toca para abrir';
 
   @override
-  String get imageNotAvailable => 'Image not available';
+  String get imageNotAvailable => 'Imagen no disponible';
 
   @override
   String get allForumTopicsHaveBeenMarkedAs =>
-      'All forum topics have been marked as read';
+      'Todos los temas del foro se marcaron como leídos';
 
   @override
   String postsCount(Object count) {
-    return '$count Posts';
+    return '$count publicaciones';
   }
 
   @override
-  String get protectedForum => 'Protected Forum';
+  String get protectedForum => 'Foro protegido';
 
   @override
   String isPasswordProtected(Object forumName) {
-    return '$forumName is password protected.';
+    return '$forumName está protegido con contraseña.';
   }
 
   @override
-  String get enter => 'Enter';
+  String get enter => 'Entrar';
 
   @override
-  String get permissionDeniedToSaveImage => 'Permission denied to save image';
+  String get permissionDeniedToSaveImage =>
+      'Permiso denegado para guardar la imagen';
 
   @override
-  String get postNotFound => 'Post not found.';
+  String get postNotFound => 'Publicación no encontrada.';
 
   @override
   String get failedToUploadFilePleaseTryAgain =>
-      'Failed to upload file. Please try again.';
+      'No se pudo subir el archivo. Inténtalo de nuevo.';
 
   @override
   String failedToUploadFile2(Object errorMessage) {
-    return 'Failed to upload file: $errorMessage';
+    return 'No se pudo subir el archivo: $errorMessage';
   }
 
   @override
-  String get failedToPickFile => 'Failed to pick file';
+  String get failedToPickFile => 'No se pudo seleccionar el archivo';
 
   @override
   String onlyNMoreAttachmentsAllowed(
       Object remainingSlots, Object remainingSlots2) {
-    return 'Only $remainingSlots more attachment(s) allowed. Processing first $remainingSlots2 image(s).';
+    return 'Solo se permiten $remainingSlots adjunto(s) más. Se procesarán las primeras $remainingSlots2 imágenes.';
   }
 
   @override
   String get attachmentLimitReachedSkippingRemainingImages =>
-      'Attachment limit reached. Skipping remaining images.';
+      'Límite de adjuntos alcanzado. Se omiten las imágenes restantes.';
 
   @override
   String failedToUploadImagePleaseTryAgain(Object fileName) {
-    return '$fileName: Failed to upload image. Please try again.';
+    return '$fileName: no se pudo subir la imagen. Inténtalo de nuevo.';
   }
 
   @override
   String failedToUploadImage2(Object errorMessage, Object fileName) {
-    return '$fileName: Failed to upload image: $errorMessage';
+    return '$fileName: no se pudo subir la imagen: $errorMessage';
   }
 
   @override
-  String get failedToPickImage => 'Failed to pick image';
+  String get failedToPickImage => 'No se pudo seleccionar la imagen';
 
   @override
   String failedToRemoveAttachment2(Object error) {
-    return 'Failed to remove attachment: $error';
+    return 'No se pudo quitar el adjunto: $error';
   }
 
   @override
   String sentFromMobileApp(Object siteName) {
-    return 'Sent from $siteName mobile app';
+    return 'Enviado desde la app móvil de $siteName';
   }
 
   @override
   String get pleaseWaitForAttachmentsToFinishUploading =>
-      'Please wait for attachments to finish uploading';
+      'Espera a que terminen de subirse los adjuntos';
 
   @override
-  String get imageIsTooLargeToUpload => 'Image is too large to upload';
+  String get imageIsTooLargeToUpload =>
+      'La imagen es demasiado grande para subirla';
 
   @override
   String fileTooLargeForForum(
       Object fileName, Object fileBytes, Object maxBytes) {
-    return '$fileName is $fileBytes. This forum allows up to $maxBytes.';
+    return '$fileName pesa $fileBytes. Este foro permite hasta $maxBytes.';
   }
 
   @override
   String get resizeToFitExplanation =>
-      'It can be scaled down just enough to fit, keeping its format and as much detail as the limit allows.';
+      'Puede reducirse justo lo necesario para que quepa, manteniendo el formato y todo el detalle que permita el límite.';
 
   @override
   String get failedToPostReplyPleaseTryAgain =>
-      'Failed to post reply. Please try again.';
+      'No se pudo publicar la respuesta. Inténtalo de nuevo.';
 
   @override
-  String get pleaseWaitForTheThreadToLoad =>
-      'Please wait for the thread to load';
+  String get pleaseWaitForTheThreadToLoad => 'Espera a que se cargue el tema';
 
   @override
   String get failedToUpdatePostPleaseTryAgain =>
-      'Failed to update post. Please try again.';
+      'No se pudo actualizar la publicación. Inténtalo de nuevo.';
 
   @override
-  String get postDeletedSuccessfully => 'Post deleted successfully';
+  String get postDeletedSuccessfully => 'Publicación eliminada';
 
   @override
   String failedToDeletePost(Object error) {
-    return 'Failed to delete post: $error';
+    return 'No se pudo eliminar la publicación: $error';
   }
 
   @override
   String failedToSubmitReport2(Object error) {
-    return 'Failed to submit report: $error';
+    return 'No se pudo enviar el reporte: $error';
   }
 
   @override
   String get editHistoryNotAvailable =>
-      'Edit history is not available for this post';
+      'El historial de ediciones no está disponible para esta publicación';
 
   @override
   String get noPermissionToUploadAvatar =>
-      'You do not have permission to upload avatars';
+      'No tienes permiso para subir avatares';
 
   @override
-  String get avatarUploadedSuccessfully => 'Avatar uploaded successfully';
+  String get avatarUploadedSuccessfully => 'Avatar subido';
 
   @override
   String failedToPickImage2(Object error) {
-    return 'Failed to pick image: $error';
+    return 'No se pudo seleccionar la imagen: $error';
   }
 
   @override
-  String get react => 'React';
+  String get react => 'Reaccionar';
 
   @override
   String get reactionsAreNotEnabledOnThisForum =>
-      'Reactions are not enabled on this forum.';
+      'Las reacciones no están habilitadas en este foro.';
 
   @override
-  String get noReactionsYet => 'No reactions yet';
+  String get noReactionsYet => 'Aún no hay reacciones';
 
   @override
-  String get searchFilters => 'Search filters';
+  String get searchFilters => 'Filtros de búsqueda';
 
   @override
   String signOutWarning(Object siteName) {
-    return 'You will be signed out of $siteName. You can sign back in any time.';
+    return 'Cerrarás sesión en $siteName. Puedes volver a iniciar sesión cuando quieras.';
   }
 
   @override
-  String get suggestedTopics => 'Suggested Topics';
+  String get suggestedTopics => 'Temas sugeridos';
 
   @override
-  String get newLabel => 'NEW';
+  String get newLabel => 'NUEVO';
 
   @override
-  String get voteRemoved => 'Vote removed';
+  String get voteRemoved => 'Voto eliminado';
 
   @override
-  String get voters => 'Voters';
+  String get voters => 'Votantes';
 
   @override
-  String get noVotesYet => 'No votes yet.';
+  String get noVotesYet => 'Aún no hay votos.';
 
   @override
-  String get trustLevels => 'Trust levels';
+  String get trustLevels => 'Niveles de confianza';
 
   @override
   String get trustLevelsExplanation =>
-      'Members earn trust by reading and participating. Each level unlocks new abilities.';
+      'Los miembros ganan confianza leyendo y participando. Cada nivel desbloquea nuevas capacidades.';
 
   @override
-  String get activity => 'Activity';
+  String get activity => 'Actividad';
+
+  @override
+  String get dontUpload => 'No subir';
+
+  @override
+  String get dontAskAgainAlwaysResize =>
+      'No volver a preguntar: reducir siempre para que quepa';
 }

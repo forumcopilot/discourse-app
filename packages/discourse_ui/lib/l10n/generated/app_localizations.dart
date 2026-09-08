@@ -4533,6 +4533,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Activity'**
   String get activity;
+
+  /// Decline uploading an oversized image
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t upload'**
+  String get dontUpload;
+
+  /// Checkbox on the oversized image sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t ask again — always resize to fit'**
+  String get dontAskAgainAlwaysResize;
 }
 
 class _AppLocalizationsDelegate

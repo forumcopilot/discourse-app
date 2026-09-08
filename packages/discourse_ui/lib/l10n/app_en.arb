@@ -2794,5 +2794,13 @@
   "activity": "Activity",
   "@activity": {
     "description": "UI text: Activity"
+  },
+  "dontUpload": "Don't upload",
+  "@dontUpload": {
+    "description": "Decline uploading an oversized image"
+  },
+  "dontAskAgainAlwaysResize": "Don't ask again — always resize to fit",
+  "@dontAskAgainAlwaysResize": {
+    "description": "Checkbox on the oversized image sheet"
   }
 }

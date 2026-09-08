@@ -99,7 +99,7 @@ class _OversizedImageSheetState extends State<_OversizedImageSheet> {
               contentPadding: EdgeInsets.zero,
               controlAffinity: ListTileControlAffinity.leading,
               dense: true,
-              title: Text("Don't ask again — always resize to fit",
+              title: Text(AppLocalizations.of(context)!.dontAskAgainAlwaysResize,
                   style: textTheme.bodyMedium),
             ),
             SizedBox(height: DesignTokens.spacingS),
@@ -109,7 +109,7 @@ class _OversizedImageSheetState extends State<_OversizedImageSheet> {
                 TextButton(
                   onPressed: () => Navigator.of(context)
                       .pop(OversizedImageChoice.skip),
-                  child: const Text("Don't upload"),
+                  child: Text(AppLocalizations.of(context)!.dontUpload),
                 ),
                 SizedBox(width: DesignTokens.spacingS),
                 FilledButton(
