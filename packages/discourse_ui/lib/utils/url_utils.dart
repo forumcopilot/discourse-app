@@ -535,11 +535,11 @@ class UrlUtils {
     try {
       final String shareText = title != null ? '$title\n$url' : url;
 
-      await Share.share(
-        shareText,
+      await SharePlus.instance.share(ShareParams(
+        text: shareText,
         subject: subject,
         sharePositionOrigin: sharePositionOrigin,
-      );
+      ));
     } catch (e) {
       debugPrint('Error sharing URL: $e');
       // Fallback to copying URL to clipboard
@@ -562,11 +562,11 @@ class UrlUtils {
     try {
       final String shareContent = '$text\n\n$url';
 
-      await Share.share(
-        shareContent,
+      await SharePlus.instance.share(ShareParams(
+        text: shareContent,
         subject: subject,
         sharePositionOrigin: sharePositionOrigin,
-      );
+      ));
     } catch (e) {
       debugPrint('Error sharing URL with text: $e');
       // Fallback to copying content to clipboard
@@ -630,10 +630,10 @@ class UrlUtils {
     String? subject,
   }) async {
     final String shareText = title != null ? '$title\n$url' : url;
-    await Share.share(
-      shareText,
+    await SharePlus.instance.share(ShareParams(
+      text: shareText,
       subject: subject,
-    );
+    ));
   }
 
   /// Android specific URL sharing
@@ -643,10 +643,10 @@ class UrlUtils {
     String? subject,
   }) async {
     final String shareText = title != null ? '$title\n$url' : url;
-    await Share.share(
-      shareText,
+    await SharePlus.instance.share(ShareParams(
+      text: shareText,
       subject: subject,
-    );
+    ));
   }
 
   /// macOS specific URL sharing
@@ -656,10 +656,10 @@ class UrlUtils {
     String? subject,
   }) async {
     final String shareText = title != null ? '$title\n$url' : url;
-    await Share.share(
-      shareText,
+    await SharePlus.instance.share(ShareParams(
+      text: shareText,
       subject: subject,
-    );
+    ));
   }
 
   /// Web platform URL sharing
@@ -670,7 +670,7 @@ class UrlUtils {
     try {
       // Try to use Web Share API - share_plus will handle availability internally
       final String shareText = title != null ? '$title\n$url' : url;
-      await Share.share(shareText);
+      await SharePlus.instance.share(ShareParams(text: shareText));
     } catch (e) {
       debugPrint('Web sharing failed, copying to clipboard: $e');
       // Fallback to clipboard if Web Share API is not available

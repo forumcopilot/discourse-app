@@ -232,7 +232,7 @@ class _LinkPreviewCardState extends State<LinkPreviewCard> with AutomaticKeepAli
         margin: EdgeInsets.only(top: DesignTokens.spacingS),
         padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingM, vertical: DesignTokens.spacingS),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceVariant,
+          color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(DesignTokens.radiusS),
           border: Border.all(
             color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
@@ -265,7 +265,7 @@ class _LinkPreviewCardState extends State<LinkPreviewCard> with AutomaticKeepAli
     return Container(
       margin: EdgeInsets.only(top: DesignTokens.spacingS),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
         borderRadius: BorderRadius.circular(DesignTokens.radiusS),
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),

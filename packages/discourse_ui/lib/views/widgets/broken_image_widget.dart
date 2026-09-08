@@ -95,7 +95,7 @@ class BrokenImageWidget extends StatelessWidget {
         borderRadius: DesignTokens.radiusS,
         borderOpacity: 0.2,
       ).copyWith(
-        color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {

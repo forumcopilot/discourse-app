@@ -469,7 +469,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           ),
                         ),
                         const SizedBox(height: DesignTokens.spacingL),
-                        ...banReasons.map((reason) {
+                        RadioGroup<String>(
+                          groupValue: selectedReason,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedReason = value;
+                            });
+                          },
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: banReasons.map((reason) {
                           return RadioListTile<String>(
                             title: Text(
                               reason,
@@ -478,15 +487,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               ),
                             ),
                             value: reason,
-                            groupValue: selectedReason,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedReason = value;
-                              });
-                            },
                             contentPadding: EdgeInsets.zero,
                           );
                         }).toList(),
+                          ),
+                        ),
                         if (selectedReason == l10n.otherPleaseSpecify) ...[
                           const SizedBox(height: DesignTokens.spacingM),
                           TextFormField(
@@ -575,6 +580,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ),
                       ),
                       const SizedBox(height: DesignTokens.spacingL),
+                      RadioGroup<String>(
+                        groupValue: banLength,
+                        onChanged: (value) {
+                          setState(() {
+                            banLength = value;
+                            if (value == 'permanent') {
+                              selectedEndDate = null;
+                            } else if (selectedEndDate == null) {
+                              // Default to 7 days from now if no date selected
+                              selectedEndDate =
+                                  DateTime.now().add(const Duration(days: 7));
+                            }
+                          });
+                        },
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
                       RadioListTile<String>(
                         title: Text(
                           AppLocalizations.of(context)?.permanent ?? 'Permanent',
@@ -583,13 +605,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           ),
                         ),
                         value: 'permanent',
-                        groupValue: banLength,
-                        onChanged: (value) {
-                          setState(() {
-                            banLength = value;
-                            selectedEndDate = null;
-                          });
-                        },
                         contentPadding: EdgeInsets.zero,
                       ),
                       RadioListTile<String>(
@@ -600,17 +615,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           ),
                         ),
                         value: 'temporary',
-                        groupValue: banLength,
-                        onChanged: (value) {
-                          setState(() {
-                            banLength = value;
-                            // Default to 7 days from now if no date selected
-                            if (selectedEndDate == null) {
-                              selectedEndDate = DateTime.now().add(const Duration(days: 7));
-                            }
-                          });
-                        },
                         contentPadding: EdgeInsets.zero,
+                      ),
+                          ],
+                        ),
                       ),
                       // Date picker for temporary ban
                       if (banLength == 'temporary') ...[

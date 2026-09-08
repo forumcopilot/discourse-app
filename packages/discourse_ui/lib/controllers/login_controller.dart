@@ -15,6 +15,8 @@ import 'package:discourse_ui/views/dialogs/tfa_input_dialog.dart';
 import 'package:forumcopilot_sdk/models/domain/site.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_user_proxy.dart';
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:passkeys/authenticator.dart';
 import 'package:passkeys/exceptions.dart';
 import 'package:passkeys/types.dart';
@@ -1222,7 +1224,22 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
     }
 
     final authenticator = PasskeyAuthenticator();
-    final canAuthenticate = await authenticator.canAuthenticate();
+    // canAuthenticate() is deprecated in favour of the per-platform
+    // availability query; every branch is the same platform call, cast.
+    final availability = authenticator.getAvailability();
+    final bool canAuthenticate;
+    if (kIsWeb) {
+      canAuthenticate = (await availability.web()).hasPasskeySupport;
+    } else {
+      canAuthenticate = switch (defaultTargetPlatform) {
+        TargetPlatform.android =>
+          (await availability.android()).hasPasskeySupport,
+        TargetPlatform.iOS => (await availability.iOS()).hasPasskeySupport,
+        TargetPlatform.windows =>
+          (await availability.windows()).hasPasskeySupport,
+        _ => false,
+      };
+    }
     if (!canAuthenticate) {
       throw PermissionException.featureNotAvailable('Passkeys');
     }

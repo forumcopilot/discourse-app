@@ -284,7 +284,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                     hintText: AppLocalizations.of(context)?.enterConversationTitle ?? 'Enter message title',
                     hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                     filled: true,
-                    fillColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+                    fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                       borderSide: BorderSide.none,
@@ -319,7 +319,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                     SizedBox(height: DesignTokens.spacingS),
                     Container(
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+                        color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
                         borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                       ),
                       child: Column(
@@ -352,7 +352,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                                 _hasChanges = true;
                               });
                             },
-                            activeColor: colorScheme.primary,
+                            activeThumbColor: colorScheme.primary,
                           ),
                         ],
                       ),

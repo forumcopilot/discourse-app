@@ -37,7 +37,7 @@ class SnackbarHelper {
       );
 
   /// Surface a neutral informational message. Uses
-  /// `colorScheme.surfaceVariant` to sit unobtrusively above the
+  /// `colorScheme.surfaceContainerHighest` to sit unobtrusively above the
   /// surface without competing with primary content.
   static void showInfo(
     BuildContext context,
@@ -48,7 +48,7 @@ class SnackbarHelper {
       _show(
         context,
         message,
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
         action: action,
         duration: duration,

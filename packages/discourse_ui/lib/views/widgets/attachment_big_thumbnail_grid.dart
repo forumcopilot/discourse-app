@@ -82,7 +82,7 @@ class AttachmentBigThumbnailGrid extends StatelessWidget {
       margin: EdgeInsets.only(top: DesignTokens.spacingS),
       padding: DesignTokens.paddingS,
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
         borderRadius: BorderRadius.circular(DesignTokens.radiusS),
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
@@ -110,7 +110,7 @@ class AttachmentBigThumbnailGrid extends StatelessWidget {
                   topLeft: Radius.circular(DesignTokens.radiusS),
                   topRight: Radius.circular(DesignTokens.radiusS),
                 ),
-                color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+                color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.only(
@@ -134,7 +134,7 @@ class AttachmentBigThumbnailGrid extends StatelessWidget {
                           return Container(
                             width: actualWidth,
                             height: actualWidth, // Square fallback
-                            color: colorScheme.surfaceVariant.withValues(alpha: 0.5),
+                            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                             child: Icon(
                               Icons.broken_image,
                               size: 32,
@@ -176,8 +176,8 @@ class AttachmentBigThumbnailGrid extends StatelessWidget {
                 // Optimize for dark mode - use higher opacity in dark mode for better visibility
                 final isDarkMode = Theme.of(context).brightness == Brightness.dark;
                 final backgroundColor = isDarkMode
-                    ? colorScheme.surfaceVariant.withValues(alpha: 0.5) // Higher opacity in dark mode
-                    : colorScheme.surfaceVariant.withValues(alpha: 0.3); // Lower opacity in light mode
+                    ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5) // Higher opacity in dark mode
+                    : colorScheme.surfaceContainerHighest.withValues(alpha: 0.3); // Lower opacity in light mode
                 
                 return Container(
                   decoration: BoxDecoration(

@@ -255,7 +255,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
           size: DesignTokens.iconSizeSMedium,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         labelStyle: TextStyle(
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
@@ -453,7 +453,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                               hintText: 'Enter subject',
                               hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                               filled: true,
-                              fillColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+                              fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                                 borderSide: BorderSide.none,
@@ -500,7 +500,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                               hintText: AppLocalizations.of(context)?.writeYourMessage ?? 'Write your message...',
                               hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                               filled: true,
-                              fillColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+                              fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                                 borderSide: BorderSide.none,
@@ -553,7 +553,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                             Container(
                               padding: DesignTokens.paddingS,
                               decoration: BoxDecoration(
-                                color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+                                color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
                                 borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                               ),
                               child: Column(
@@ -576,7 +576,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                                                       width: 48,
                                                       height: 48,
                                                       decoration: BoxDecoration(
-                                                        color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+                                                        color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
                                                         borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                                                       ),
                                                       child: ClipRRect(
@@ -673,7 +673,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                                             padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingM),
                                             child: LinearProgressIndicator(
                                               minHeight: 2,
-                                              backgroundColor: colorScheme.surfaceVariant,
+                                              backgroundColor: colorScheme.surfaceContainerHighest,
                                               valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
                                             ),
                                           ),

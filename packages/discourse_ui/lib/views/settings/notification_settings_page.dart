@@ -661,7 +661,12 @@ class _EnumTile<T> extends StatelessWidget {
       showDragHandle: true,
       builder: (sheetContext) {
         return SafeArea(
-          child: Column(
+          child: RadioGroup<T>(
+            groupValue: value,
+            onChanged: (v) {
+              if (v != null) Navigator.of(sheetContext).pop(v);
+            },
+            child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -684,15 +689,12 @@ class _EnumTile<T> extends StatelessWidget {
                 return RadioListTile<T>(
                   title: Text(opt.label),
                   value: opt.value,
-                  groupValue: value,
-                  onChanged: (v) {
-                    if (v != null) Navigator.of(sheetContext).pop(v);
-                  },
                   selected: isSelected,
                 );
               }),
               SizedBox(height: DesignTokens.spacingS),
             ],
+            ),
           ),
         );
       },

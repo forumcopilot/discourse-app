@@ -204,7 +204,8 @@ class _InvitesPageState extends State<InvitesPage> {
                     SizedBox(width: DesignTokens.spacingM),
                     Expanded(
                       child: FilledButton.icon(
-                        onPressed: () => Share.share(invite.link),
+                        onPressed: () =>
+                            SharePlus.instance.share(ShareParams(text: invite.link)),
                         icon: const Icon(Icons.share_outlined),
                         label: const Text('Share'),
                       ),

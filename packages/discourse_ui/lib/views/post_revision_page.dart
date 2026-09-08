@@ -182,7 +182,7 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
     return Container(
       padding: DesignTokens.paddingM,
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant
+        color: colorScheme.surfaceContainerHighest
             .withValues(alpha: DesignTokens.opacityLow),
         borderRadius: BorderRadius.circular(DesignTokens.radiusM),
         border: Border.all(

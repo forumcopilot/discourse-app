@@ -206,7 +206,7 @@ class ForumListItem extends StatelessWidget {
                                   ),
                                   decoration: StyleBuilders.badgeDecoration(
                                     colorScheme: colorScheme,
-                                    backgroundColor: colorScheme.surfaceVariant
+                                    backgroundColor: colorScheme.surfaceContainerHighest
                                         .withValues(alpha: DesignTokens.opacityMediumLow),
                                     borderRadius: DesignTokens.radiusM,
                                   ),

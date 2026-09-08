@@ -243,7 +243,7 @@ class StyleBuilders {
     double? borderOpacity,
   }) {
     return BoxDecoration(
-      color: color ?? colorScheme.surfaceVariant,
+      color: color ?? colorScheme.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(
         borderRadius ?? DesignTokens.radiusXS,
       ),
@@ -391,7 +391,7 @@ class StyleBuilders {
     double? borderWidth,
   }) {
     return BoxDecoration(
-      color: color ?? colorScheme.surfaceVariant,
+      color: color ?? colorScheme.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(
         borderRadius ?? DesignTokens.radiusS,
       ),

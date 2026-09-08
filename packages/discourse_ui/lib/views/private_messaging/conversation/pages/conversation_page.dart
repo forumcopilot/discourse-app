@@ -969,7 +969,7 @@ class _ConversationPageState extends State<ConversationPage> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.7),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
               border: Border(
                 bottom: BorderSide(
                   color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),

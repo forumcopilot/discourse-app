@@ -66,8 +66,7 @@ class _DiscourseLoginWebViewPageState extends State<DiscourseLoginWebViewPage> {
         initialSettings: InAppWebViewSettings(
           // Cookies/session aren't shared with the system browser, so the
           // user logs in fresh inside the webview every time. That's the
-          // right default for an auth flow.
-          clearCache: false,
+          // right default for an auth flow (and the default setting).
           useShouldOverrideUrlLoading: true,
           // Allow Discourse to pop OAuth provider windows (Google/etc.)
           // inside the same webview if they get configured.

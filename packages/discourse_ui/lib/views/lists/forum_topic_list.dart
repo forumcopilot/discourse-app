@@ -442,7 +442,7 @@ class _ForumTopicListState extends State<ForumTopicList> {
               child: Container(
                 padding: DesignTokens.paddingM,
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceVariant,
+                  color: colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                 ),
                 child: Row(

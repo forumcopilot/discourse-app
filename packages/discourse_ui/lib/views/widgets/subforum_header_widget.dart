@@ -112,7 +112,7 @@ class SubforumHeaderWidget extends StatelessWidget {
                       children: [
                         // Base background color
                         Container(
-                          color: colorScheme.surfaceVariant,
+                          color: colorScheme.surfaceContainerHighest,
                         ),
                         // Pattern image with theme color tint
                         // Matches default logo color when no logo is present

@@ -135,7 +135,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
           ),
         ),
         filled: true,
-        fillColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+        fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
         contentPadding: DesignTokens.paddingInput,
       ),
       style: textTheme.bodyLarge?.copyWith(

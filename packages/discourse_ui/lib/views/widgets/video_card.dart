@@ -117,7 +117,7 @@ class _VideoCardState extends State<VideoCard> with AutomaticKeepAliveClientMixi
         margin: EdgeInsets.only(top: DesignTokens.spacingS),
         padding: DesignTokens.paddingS,
         decoration: BoxDecoration(
-          color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+          color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
           borderRadius: BorderRadius.circular(DesignTokens.radiusS),
           border: Border.all(
             color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
@@ -157,7 +157,7 @@ class _VideoCardState extends State<VideoCard> with AutomaticKeepAliveClientMixi
     return Container(
       margin: EdgeInsets.only(top: DesignTokens.spacingS),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
         borderRadius: BorderRadius.circular(DesignTokens.radiusS),
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),

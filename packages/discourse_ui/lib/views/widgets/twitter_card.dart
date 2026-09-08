@@ -134,7 +134,7 @@ class _TwitterCardState extends State<TwitterCard> with AutomaticKeepAliveClient
     return Container(
       margin: EdgeInsets.only(top: DesignTokens.spacingS),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
         borderRadius: BorderRadius.circular(DesignTokens.radiusS),
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),

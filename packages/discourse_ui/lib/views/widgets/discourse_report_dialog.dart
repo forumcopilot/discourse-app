@@ -152,7 +152,13 @@ class _ReportDialogState extends State<_ReportDialog> {
     return AlertDialog(
       title: const Text('Report'),
       content: SingleChildScrollView(
-        child: Column(
+        child: RadioGroup<_FlagOption>(
+          groupValue: _selected,
+          onChanged: (v) => setState(() {
+            _selected = v;
+            _showMessageError = false;
+          }),
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -168,14 +174,7 @@ class _ReportDialogState extends State<_ReportDialog> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Radio<_FlagOption>(
-                        value: option,
-                        groupValue: _selected,
-                        onChanged: (v) => setState(() {
-                          _selected = v;
-                          _showMessageError = false;
-                        }),
-                      ),
+                      Radio<_FlagOption>(value: option),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,6 +215,7 @@ class _ReportDialogState extends State<_ReportDialog> {
               ),
             ],
           ],
+          ),
         ),
       ),
       actions: [

@@ -351,7 +351,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
                     ? colorScheme.onPrimaryContainer
                     : colorScheme.onSurface,
               ),
-              backgroundColor: colorScheme.surfaceVariant
+              backgroundColor: colorScheme.surfaceContainerHighest
                   .withValues(alpha: DesignTokens.opacityLow),
               side: BorderSide(
                 color: _status == value
@@ -482,7 +482,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
                   decoration: BoxDecoration(
                     color: (isPending
                             ? colorScheme.tertiaryContainer
-                            : colorScheme.surfaceVariant)
+                            : colorScheme.surfaceContainerHighest)
                         .withValues(alpha: DesignTokens.opacityMediumLow),
                     borderRadius:
                         BorderRadius.circular(DesignTokens.radiusS),
@@ -521,7 +521,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
                 width: double.infinity,
                 padding: DesignTokens.paddingS,
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceVariant
+                  color: colorScheme.surfaceContainerHighest
                       .withValues(alpha: DesignTokens.opacityLow),
                   borderRadius: BorderRadius.circular(DesignTokens.radiusS),
                 ),

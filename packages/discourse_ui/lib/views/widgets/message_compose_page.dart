@@ -640,7 +640,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     ),
               ),
               behavior: SnackBarBehavior.floating,
-              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
               margin: const EdgeInsets.all(DesignTokens.spacingS),
             ),
           );
@@ -666,7 +666,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                         ),
                   ),
                   behavior: SnackBarBehavior.floating,
-                  backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                   margin: const EdgeInsets.all(DesignTokens.spacingS),
                 ),
               );
@@ -935,7 +935,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
         Container(
           padding: DesignTokens.paddingS,
           decoration: BoxDecoration(
-            color: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+            color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
             borderRadius: BorderRadius.circular(DesignTokens.radiusS),
             border: Border.all(
               color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
@@ -991,7 +991,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                             width: 48,
                                             height: 48,
                                             decoration: BoxDecoration(
-                                              color: isImage ? Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow) : getFileTypeColor(attachment.name),
+                                              color: isImage ? Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow) : getFileTypeColor(attachment.name),
                                               borderRadius: BorderRadius.circular(8),
                                             ),
                                             child: isImage
@@ -1066,7 +1066,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                   padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingM),
                                   child: LinearProgressIndicator(
                                     minHeight: 2,
-                                    backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                                     valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
                                   ),
                                 ),
@@ -1141,7 +1141,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   height: 48,
                   decoration: BoxDecoration(
                     color: isImage && attachment.thumbnailUrl != null && attachment.thumbnailUrl!.isNotEmpty
-                        ? colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow)
+                        ? colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow)
                         : getFileTypeColor(attachment.filename),
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -1242,7 +1242,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
           _includeSignature = value;
         });
       },
-      activeColor: colorScheme.primary,
+      activeThumbColor: colorScheme.primary,
     );
   }
 
@@ -1664,7 +1664,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
 
     return PopScope(
       canPop: true,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         // Dismiss keyboard when back gesture/button is triggered
         // This handles iOS swipe-back and Android back button
         _titleFocusNode.unfocus();
@@ -1776,7 +1776,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                           ),
                                         ),
                                         label: Text(widget.forumName!),
-                                        backgroundColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+                                        backgroundColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
                                         labelStyle: textTheme.bodyMedium?.copyWith(
                                           color: colorScheme.onSurface,
                                         ),
@@ -1830,7 +1830,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                         ),
                                       ),
                                       filled: true,
-                                      fillColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+                                      fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
                                       contentPadding: DesignTokens.paddingInput,
                                     ),
                                     style: textTheme.titleMedium?.copyWith(
@@ -1879,7 +1879,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                       ),
                                     ),
                                     filled: true,
-                                    fillColor: colorScheme.surfaceVariant.withValues(alpha: DesignTokens.opacityLow),
+                                    fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
                                     contentPadding: DesignTokens.paddingL,
                                   ),
                                   style: textTheme.bodyLarge?.copyWith(

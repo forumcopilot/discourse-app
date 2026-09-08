@@ -86,7 +86,7 @@ class FilterChipBar extends StatelessWidget {
                     ? DesignTokens.fontWeightSemiBold
                     : DesignTokens.fontWeightNormal,
               ),
-              backgroundColor: colorScheme.surfaceVariant,
+              backgroundColor: colorScheme.surfaceContainerHighest,
               padding: EdgeInsets.symmetric(
                 horizontal: DesignTokens.spacingM,
                 vertical: DesignTokens.spacingS,
