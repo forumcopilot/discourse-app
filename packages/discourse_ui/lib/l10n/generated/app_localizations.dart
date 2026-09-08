@@ -3511,6 +3511,1028 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You can like this post again in {seconds}s'**
   String likeAgainInSeconds(Object seconds);
+
+  /// UI text: Login Info
+  ///
+  /// In en, this message translates to:
+  /// **'Login Info'**
+  String get loginInfo;
+
+  /// UI text: Login Failed
+  ///
+  /// In en, this message translates to:
+  /// **'Login Failed'**
+  String get loginFailed;
+
+  /// UI text: Additional Information
+  ///
+  /// In en, this message translates to:
+  /// **'Additional Information'**
+  String get additionalInformation;
+
+  /// UI text: Date of Birth{requiredValue}
+  ///
+  /// In en, this message translates to:
+  /// **'Date of Birth{marker}'**
+  String dateOfBirth(Object marker);
+
+  /// UI text: Minimum age: {minimumAge} years
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum age: {minimumAge} years'**
+  String minimumAgeYears(Object minimumAge);
+
+  /// UI text: Location{isRequired}
+  ///
+  /// In en, this message translates to:
+  /// **'Location{marker}'**
+  String locationLabel(Object marker);
+
+  /// UI text: Receive site mailings
+  ///
+  /// In en, this message translates to:
+  /// **'Receive site mailings'**
+  String get receiveSiteMailings;
+
+  /// UI text: Move to category
+  ///
+  /// In en, this message translates to:
+  /// **'Move to category'**
+  String get moveToCategory;
+
+  /// UI text: Undelete Topic
+  ///
+  /// In en, this message translates to:
+  /// **'Undelete Topic'**
+  String get undeleteTopic;
+
+  /// UI text: Are you sure you want to undelete this topic? It will be vis
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to undelete this topic? It will be visible to other users again.'**
+  String get undeleteTopicConfirmation;
+
+  /// UI text: Send
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get send;
+
+  /// UI text: We’ll send a confirmation link to your new email. The change
+  ///
+  /// In en, this message translates to:
+  /// **'We’ll send a confirmation link to your new email. The change takes effect when you click it.'**
+  String get changeEmailExplanation;
+
+  /// UI text: For added security, Discourse may require you to confirm via
+  ///
+  /// In en, this message translates to:
+  /// **'For added security, Discourse may require you to confirm via the link in the email. Check your spam folder if you don’t see it.'**
+  String get changeEmailSecurityNote;
+
+  /// UI text: New direct message
+  ///
+  /// In en, this message translates to:
+  /// **'New direct message'**
+  String get newDirectMessage;
+
+  /// UI text: No messages yet — say hi.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet — say hi.'**
+  String get noMessagesYetSayHi;
+
+  /// UI text: edited
+  ///
+  /// In en, this message translates to:
+  /// **'edited'**
+  String get edited;
+
+  /// UI text: This image exceeds the upload limits and needs to be optimiz
+  ///
+  /// In en, this message translates to:
+  /// **'This image exceeds the upload limits and needs to be optimized:'**
+  String get imageExceedsUploadLimits;
+
+  /// UI text: Optimizations to be applied:
+  ///
+  /// In en, this message translates to:
+  /// **'Optimizations to be applied:'**
+  String get optimizationsToBeApplied;
+
+  /// UI text: Reduction: {toStringAsFixed}%
+  ///
+  /// In en, this message translates to:
+  /// **'Reduction: {percent}%'**
+  String reductionPercent(Object percent);
+
+  /// UI text: Display name, email, password, and other account settings ar
+  ///
+  /// In en, this message translates to:
+  /// **'Display name, email, password, and other account settings are managed under Account → Manage account on web. Your avatar can be changed by tapping the camera badge on your photo.'**
+  String get editProfileManagedOnWebNote;
+
+  /// UI text: push approved but relay unreachable
+  ///
+  /// In en, this message translates to:
+  /// **'Approved, but we could not reach ForumCopilot to finish setting up. Try again later from Settings.'**
+  String get approvedButRelayUnreachable;
+
+  /// UI text: Notifications are turned off for this app
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are turned off for this app'**
+  String get notificationsAreTurnedOffForThisApp;
+
+  /// UI text: Next, {forumName} will ask you to approve “Notifications”.
+  ///
+  /// In en, this message translates to:
+  /// **'Next, {forumName} will ask you to approve “Notifications”.'**
+  String forumWillAskToApproveNotifications(Object forumName);
+
+  /// UI text: Approving lets us check your notifications for you and send
+  ///
+  /// In en, this message translates to:
+  /// **'Approving lets us check your notifications for you and send them to this device. This permission cannot post, reply, or read your messages.'**
+  String get approveNotificationsExplanation;
+
+  /// UI text: If this forum’s owner sets up notifications for the app, thi
+  ///
+  /// In en, this message translates to:
+  /// **'If this forum’s owner sets up notifications for the app, this step won’t be needed.'**
+  String get forumOwnerPushNote;
+
+  /// UI text: Please login to create a new topic
+  ///
+  /// In en, this message translates to:
+  /// **'Please login to create a new topic'**
+  String get pleaseLoginToCreateANewTopic;
+
+  /// UI text: Please login to subscribe to forums
+  ///
+  /// In en, this message translates to:
+  /// **'Please login to subscribe to forums'**
+  String get pleaseLoginToSubscribeToForums;
+
+  /// UI text: You will no longer be a member of {displayName}. You can rej
+  ///
+  /// In en, this message translates to:
+  /// **'You will no longer be a member of {group}. You can rejoin at any time.'**
+  String leaveGroupWarning(Object group);
+
+  /// UI text: The member list of this group is private.
+  ///
+  /// In en, this message translates to:
+  /// **'The member list of this group is private.'**
+  String get groupMembersPrivate;
+
+  /// UI text: Unignore
+  ///
+  /// In en, this message translates to:
+  /// **'Unignore'**
+  String get unignore;
+
+  /// UI text: Invite link created
+  ///
+  /// In en, this message translates to:
+  /// **'Invite link created'**
+  String get inviteLinkCreated;
+
+  /// UI text: Expires {toLocal}
+  ///
+  /// In en, this message translates to:
+  /// **'Expires {date}'**
+  String expiresOn(Object date);
+
+  /// UI text: Protected
+  ///
+  /// In en, this message translates to:
+  /// **'Protected'**
+  String get protected;
+
+  /// UI text: Solution
+  ///
+  /// In en, this message translates to:
+  /// **'Solution'**
+  String get solution;
+
+  /// UI text: DELETED
+  ///
+  /// In en, this message translates to:
+  /// **'DELETED'**
+  String get deleted;
+
+  /// UI text: Please login to view user profiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Please login to view user profiles.'**
+  String get pleaseLoginToViewUserProfiles;
+
+  /// UI text: Announcement
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement'**
+  String get announcement;
+
+  /// UI text: Solved
+  ///
+  /// In en, this message translates to:
+  /// **'Solved'**
+  String get solved;
+
+  /// UI text: Hot
+  ///
+  /// In en, this message translates to:
+  /// **'Hot'**
+  String get hot;
+
+  /// UI text: Pinned
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned'**
+  String get pinned;
+
+  /// UI text: Subscribed
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribed'**
+  String get subscribedLabel;
+
+  /// UI text: Locked
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get locked;
+
+  /// UI text: Poll
+  ///
+  /// In en, this message translates to:
+  /// **'Poll'**
+  String get poll;
+
+  /// UI text: Error loading content: {error}
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading content: {error}'**
+  String errorLoadingContent(Object error);
+
+  /// UI text: You do not have permission to view topics in this subforum.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to view topics in this subforum.'**
+  String get noPermissionToViewSubforum;
+
+  /// UI text: No discussions yet.
+  ///
+  /// In en, this message translates to:
+  /// **'No discussions yet.'**
+  String get noDiscussionsYet;
+
+  /// UI text: Jump to Post
+  ///
+  /// In en, this message translates to:
+  /// **'Jump to Post'**
+  String get jumpToPost;
+
+  /// UI text: Jump
+  ///
+  /// In en, this message translates to:
+  /// **'Jump'**
+  String get jump;
+
+  /// UI text: End of the discussion
+  ///
+  /// In en, this message translates to:
+  /// **'End of the discussion'**
+  String get endOfTheDiscussion;
+
+  /// UI text: Only staff and reviewers can see the review queue.
+  ///
+  /// In en, this message translates to:
+  /// **'Only staff and reviewers can see the review queue.'**
+  String get reviewQueueStaffOnly;
+
+  /// UI text: Nothing to review
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to review'**
+  String get nothingToReview;
+
+  /// UI text: Refresh failed: {e}
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh failed: {error}'**
+  String refreshFailed(Object error);
+
+  /// UI text: This topic is deleted and hidden from other users
+  ///
+  /// In en, this message translates to:
+  /// **'This topic is deleted and hidden from other users'**
+  String get topicDeletedBanner;
+
+  /// UI text: This topic is closed and no longer accepting replies
+  ///
+  /// In en, this message translates to:
+  /// **'This topic is closed and no longer accepting replies'**
+  String get topicClosedBanner;
+
+  /// UI text: This topic is pinned to the top of the forum
+  ///
+  /// In en, this message translates to:
+  /// **'This topic is pinned to the top of the forum'**
+  String get topicPinnedBanner;
+
+  /// UI text: You are subscribed to this topic
+  ///
+  /// In en, this message translates to:
+  /// **'You are subscribed to this topic'**
+  String get youAreSubscribedToThisTopic;
+
+  /// UI text: Refreshing...
+  ///
+  /// In en, this message translates to:
+  /// **'Refreshing...'**
+  String get refreshing;
+
+  /// UI text: Title
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get title;
+
+  /// UI text: Edited {createdAtcontext}
+  ///
+  /// In en, this message translates to:
+  /// **'Edited {time}'**
+  String editedAt(Object time);
+
+  /// UI text: Reason: {trim}
+  ///
+  /// In en, this message translates to:
+  /// **'Reason: {reason}'**
+  String editReason(Object reason);
+
+  /// UI text: This diff is too large to display.
+  ///
+  /// In en, this message translates to:
+  /// **'This diff is too large to display.'**
+  String get thisDiffIsTooLargeToDisplay;
+
+  /// UI text: No content changes in this revision.
+  ///
+  /// In en, this message translates to:
+  /// **'No content changes in this revision.'**
+  String get noContentChangesInThisRevision;
+
+  /// UI text: Revision {currentVersion} of {versionCount}
+  ///
+  /// In en, this message translates to:
+  /// **'Revision {currentVersion} of {versionCount}'**
+  String revisionOf(Object currentVersion, Object versionCount);
+
+  /// UI text: Edit conversation
+  ///
+  /// In en, this message translates to:
+  /// **'Edit conversation'**
+  String get editConversation;
+
+  /// UI text: Close conversation
+  ///
+  /// In en, this message translates to:
+  /// **'Close conversation'**
+  String get closeConversation;
+
+  /// UI text: Open conversation
+  ///
+  /// In en, this message translates to:
+  /// **'Open conversation'**
+  String get openConversation;
+
+  /// UI text: Leave conversation
+  ///
+  /// In en, this message translates to:
+  /// **'Leave conversation'**
+  String get leaveConversation2;
+
+  /// UI text: Report conversation
+  ///
+  /// In en, this message translates to:
+  /// **'Report conversation'**
+  String get reportConversation2;
+
+  /// UI text: Close Conversation
+  ///
+  /// In en, this message translates to:
+  /// **'Close Conversation'**
+  String get closeConversation2;
+
+  /// UI text: Are you sure you want to close this conversation? This will
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to close this conversation? This will prevent new replies from being posted.'**
+  String get closeConversationConfirmation;
+
+  /// UI text: Close
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// UI text: Open Conversation
+  ///
+  /// In en, this message translates to:
+  /// **'Open Conversation'**
+  String get openConversation2;
+
+  /// UI text: Are you sure you want to open this conversation? This will a
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to open this conversation? This will allow new replies to be posted.'**
+  String get openConversationConfirmation;
+
+  /// UI text: Open
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get open;
+
+  /// UI text: Leave Conversation
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Conversation'**
+  String get leaveConversation3;
+
+  /// UI text: Are you sure you want to leave this conversation? This will
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to leave this conversation? This will hide it from your inbox.'**
+  String get leaveConversationConfirmation;
+
+  /// UI text: Error loading conversation: {error}
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading conversation: {error}'**
+  String errorLoadingConversation(Object error);
+
+  /// UI text: Conversation not found
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation not found'**
+  String get conversationNotFound;
+
+  /// UI text: This conversation is closed and no longer accepting replies
+  ///
+  /// In en, this message translates to:
+  /// **'This conversation is closed and no longer accepting replies'**
+  String get conversationClosedBanner;
+
+  /// UI text: No messages found
+  ///
+  /// In en, this message translates to:
+  /// **'No messages found'**
+  String get noMessagesFound;
+
+  /// UI text: End of conversation
+  ///
+  /// In en, this message translates to:
+  /// **'End of conversation'**
+  String get endOfConversation;
+
+  /// UI text: Jump to Message
+  ///
+  /// In en, this message translates to:
+  /// **'Jump to Message'**
+  String get jumpToMessage;
+
+  /// UI text: Edit Conversation
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Conversation'**
+  String get editConversation2;
+
+  /// UI text: Failed to load message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load message'**
+  String get failedToLoadMessage2;
+
+  /// UI text: Cannot edit this conversation
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot edit this conversation'**
+  String get cannotEditThisConversation;
+
+  /// UI text: Options
+  ///
+  /// In en, this message translates to:
+  /// **'Options'**
+  String get options;
+
+  /// UI text: Conversation Open
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation Open'**
+  String get conversationOpen;
+
+  /// UI text: Failed to create conversation: {toString}
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create conversation: {error}'**
+  String failedToCreateConversation(Object error);
+
+  /// UI text: Maximum of {count} attachment(s) allowed
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum of {count} attachment(s) allowed'**
+  String maximumAttachmentsAllowed(Object count);
+
+  /// UI text: No images found to display.
+  ///
+  /// In en, this message translates to:
+  /// **'No images found to display.'**
+  String get noImagesFoundToDisplay;
+
+  /// UI text: Please login to view this attachment
+  ///
+  /// In en, this message translates to:
+  /// **'Please login to view this attachment'**
+  String get pleaseLoginToViewThisAttachment;
+
+  /// UI text: Search for topics
+  ///
+  /// In en, this message translates to:
+  /// **'Search for topics'**
+  String get searchForTopics;
+
+  /// UI text: No topics found
+  ///
+  /// In en, this message translates to:
+  /// **'No topics found'**
+  String get noTopicsFound;
+
+  /// UI text: Try searching with different keywords
+  ///
+  /// In en, this message translates to:
+  /// **'Try searching with different keywords'**
+  String get trySearchingWithDifferentKeywords;
+
+  /// UI text: No posts found
+  ///
+  /// In en, this message translates to:
+  /// **'No posts found'**
+  String get noPostsFound;
+
+  /// UI text: Per-category and per-topic notification levels are set from
+  ///
+  /// In en, this message translates to:
+  /// **'Per-category and per-topic notification levels are set from those screens directly — tap the bell icon on any topic or category to override.'**
+  String get perTopicNotificationLevelsNote;
+
+  /// UI text: Not active for this login — log out and log back in to autho
+  ///
+  /// In en, this message translates to:
+  /// **'Not active for this login — log out and log back in to authorize push notifications'**
+  String get pushNotActiveForThisLogin;
+
+  /// UI text: Pause notifications for…
+  ///
+  /// In en, this message translates to:
+  /// **'Pause notifications for…'**
+  String get pauseNotificationsFor;
+
+  /// UI text: Pause notifications for a while — Discourse holds them until
+  ///
+  /// In en, this message translates to:
+  /// **'Pause notifications for a while — Discourse holds them until the window ends'**
+  String get doNotDisturbExplanation;
+
+  /// UI text: Email frequency, like aggregation, digest schedule
+  ///
+  /// In en, this message translates to:
+  /// **'Email frequency, like aggregation, digest schedule'**
+  String get emailSettingsSubtitle;
+
+  /// UI text: Profile, email, password, security, advanced settings
+  ///
+  /// In en, this message translates to:
+  /// **'Profile, email, password, security, advanced settings'**
+  String get manageAccountSubtitle;
+
+  /// UI text: Trigger a password-reset email to your current address
+  ///
+  /// In en, this message translates to:
+  /// **'Trigger a password-reset email to your current address'**
+  String get changePasswordSubtitle;
+
+  /// UI text: See and manage users whose posts are hidden from you
+  ///
+  /// In en, this message translates to:
+  /// **'See and manage users whose posts are hidden from you'**
+  String get ignoredUsersSubtitle;
+
+  /// UI text: Removing your account is handled on the forum. Continue to o
+  ///
+  /// In en, this message translates to:
+  /// **'Removing your account is handled on the forum. Continue to open the site and contact the staff team — Discourse forums process deletions per their own policy.'**
+  String get deleteAccountExplanation;
+
+  /// UI text: Verification email sent — click the link to confirm your new
+  ///
+  /// In en, this message translates to:
+  /// **'Verification email sent — click the link to confirm your new address.'**
+  String get verificationEmailSent;
+
+  /// UI text: We’ll email you a password-reset link. Click it to choose a
+  ///
+  /// In en, this message translates to:
+  /// **'We’ll email you a password-reset link. Click it to choose a new password — the change is handled on the forum, not in this app.'**
+  String get passwordResetExplanation;
+
+  /// UI text: Send reset email
+  ///
+  /// In en, this message translates to:
+  /// **'Send reset email'**
+  String get sendResetEmail;
+
+  /// UI text: Your account is managed by the forum. Please contact the for
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is managed by the forum. Please contact the forum staff directly to request account removal. Continue will open the forum in your browser so you can use the site’s own contact / staff message flow.'**
+  String get deleteAccountDialogBody;
+
+  /// UI text: Initializing forum…
+  ///
+  /// In en, this message translates to:
+  /// **'Initializing forum…'**
+  String get initializingForum;
+
+  /// UI text: Unable to Load Forums
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to Load Forums'**
+  String get unableToLoadForums;
+
+  /// UI text: There are no forums to display. This might be due to permiss
+  ///
+  /// In en, this message translates to:
+  /// **'There are no forums to display. This might be due to permissions or the forum structure.'**
+  String get noForumsToDisplayExplanation;
+
+  /// UI text: Subscribed Forums
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribed Forums'**
+  String get subscribedForums;
+
+  /// UI text: Error loading notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading notifications'**
+  String get errorLoadingNotifications;
+
+  /// UI text: Pull down to refresh
+  ///
+  /// In en, this message translates to:
+  /// **'Pull down to refresh'**
+  String get pullDownToRefresh;
+
+  /// UI text: You have no new notifications. Check back later for updates
+  ///
+  /// In en, this message translates to:
+  /// **'You have no new notifications. Check back later for updates on topics you\'re following.'**
+  String get noNewNotificationsExplanation;
+
+  /// UI text: No tags match "{text}".
+  ///
+  /// In en, this message translates to:
+  /// **'No tags match \"{filter}\".'**
+  String noTagsMatch(Object filter);
+
+  /// UI text: No topics tagged "{tag}"
+  ///
+  /// In en, this message translates to:
+  /// **'No topics tagged \"{tag}\"'**
+  String noTopicsTagged(Object tag);
+
+  /// UI text: Failed to ban user: {toString}
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to ban user: {error}'**
+  String failedToBanUser2(Object error);
+
+  /// UI text: Are you sure you want to unban {username}?
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to unban {username}?'**
+  String unbanUserConfirmation(Object username);
+
+  /// UI text: Failed to unban user: {toString}
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to unban user: {error}'**
+  String failedToUnbanUser2(Object error);
+
+  /// UI text: Delete posts, profile posts, and comments
+  ///
+  /// In en, this message translates to:
+  /// **'Delete posts, profile posts, and comments'**
+  String get deletePostsProfilePostsAndComments;
+
+  /// UI text: Are you sure you want to spam clean {username}?
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to spam clean {username}?'**
+  String spamCleanConfirmation(Object username);
+
+  /// UI text: Failed to clean spam: {toString}
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to clean spam: {error}'**
+  String failedToCleanSpam(Object error);
+
+  /// UI text: Search User
+  ///
+  /// In en, this message translates to:
+  /// **'Search User'**
+  String get searchUser;
+
+  /// UI text: Tap to open
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to open'**
+  String get tapToOpen;
+
+  /// UI text: Image not available
+  ///
+  /// In en, this message translates to:
+  /// **'Image not available'**
+  String get imageNotAvailable;
+
+  /// UI text: All forum topics have been marked as read
+  ///
+  /// In en, this message translates to:
+  /// **'All forum topics have been marked as read'**
+  String get allForumTopicsHaveBeenMarkedAs;
+
+  /// UI text: {total_posts0} Posts
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Posts'**
+  String postsCount(Object count);
+
+  /// UI text: Protected Forum
+  ///
+  /// In en, this message translates to:
+  /// **'Protected Forum'**
+  String get protectedForum;
+
+  /// UI text: {forumName} is password protected.
+  ///
+  /// In en, this message translates to:
+  /// **'{forumName} is password protected.'**
+  String isPasswordProtected(Object forumName);
+
+  /// UI text: Enter
+  ///
+  /// In en, this message translates to:
+  /// **'Enter'**
+  String get enter;
+
+  /// UI text: Permission denied to save image
+  ///
+  /// In en, this message translates to:
+  /// **'Permission denied to save image'**
+  String get permissionDeniedToSaveImage;
+
+  /// UI text: Post not found.
+  ///
+  /// In en, this message translates to:
+  /// **'Post not found.'**
+  String get postNotFound;
+
+  /// UI text: Failed to upload file. Please try again.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to upload file. Please try again.'**
+  String get failedToUploadFilePleaseTryAgain;
+
+  /// UI text: Failed to upload file: {errorMessage}
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to upload file: {errorMessage}'**
+  String failedToUploadFile2(Object errorMessage);
+
+  /// UI text: Failed to pick file
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pick file'**
+  String get failedToPickFile;
+
+  /// UI text: Only {remainingSlots} more attachment(s) allowed. Processing
+  ///
+  /// In en, this message translates to:
+  /// **'Only {remainingSlots} more attachment(s) allowed. Processing first {remainingSlots2} image(s).'**
+  String onlyNMoreAttachmentsAllowed(
+      Object remainingSlots, Object remainingSlots2);
+
+  /// UI text: Attachment limit reached. Skipping remaining images.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachment limit reached. Skipping remaining images.'**
+  String get attachmentLimitReachedSkippingRemainingImages;
+
+  /// UI text: {name}: Failed to upload image. Please try again.
+  ///
+  /// In en, this message translates to:
+  /// **'{fileName}: Failed to upload image. Please try again.'**
+  String failedToUploadImagePleaseTryAgain(Object fileName);
+
+  /// UI text: {name}: Failed to upload image: {errorMessage}
+  ///
+  /// In en, this message translates to:
+  /// **'{fileName}: Failed to upload image: {errorMessage}'**
+  String failedToUploadImage2(Object errorMessage, Object fileName);
+
+  /// UI text: Failed to pick image
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pick image'**
+  String get failedToPickImage;
+
+  /// UI text: Failed to remove attachment: {toString}
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to remove attachment: {error}'**
+  String failedToRemoveAttachment2(Object error);
+
+  /// UI text: Sent from {name} mobile app
+  ///
+  /// In en, this message translates to:
+  /// **'Sent from {siteName} mobile app'**
+  String sentFromMobileApp(Object siteName);
+
+  /// UI text: Please wait for attachments to finish uploading
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait for attachments to finish uploading'**
+  String get pleaseWaitForAttachmentsToFinishUploading;
+
+  /// UI text: Image is too large to upload
+  ///
+  /// In en, this message translates to:
+  /// **'Image is too large to upload'**
+  String get imageIsTooLargeToUpload;
+
+  /// UI text: {fileName} is {fileBytes}. This forum allows up to {maxBytes
+  ///
+  /// In en, this message translates to:
+  /// **'{fileName} is {fileBytes}. This forum allows up to {maxBytes}.'**
+  String fileTooLargeForForum(
+      Object fileName, Object fileBytes, Object maxBytes);
+
+  /// UI text: It can be scaled down just enough to fit, keeping its format
+  ///
+  /// In en, this message translates to:
+  /// **'It can be scaled down just enough to fit, keeping its format and as much detail as the limit allows.'**
+  String get resizeToFitExplanation;
+
+  /// UI text: Failed to post reply. Please try again.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to post reply. Please try again.'**
+  String get failedToPostReplyPleaseTryAgain;
+
+  /// UI text: Please wait for the thread to load
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait for the thread to load'**
+  String get pleaseWaitForTheThreadToLoad;
+
+  /// UI text: Failed to update post. Please try again.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update post. Please try again.'**
+  String get failedToUpdatePostPleaseTryAgain;
+
+  /// UI text: Post deleted successfully
+  ///
+  /// In en, this message translates to:
+  /// **'Post deleted successfully'**
+  String get postDeletedSuccessfully;
+
+  /// UI text: Failed to delete post: {toString}
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete post: {error}'**
+  String failedToDeletePost(Object error);
+
+  /// UI text: Failed to submit report: {toString}
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to submit report: {error}'**
+  String failedToSubmitReport2(Object error);
+
+  /// UI text: Edit history is not available for this post
+  ///
+  /// In en, this message translates to:
+  /// **'Edit history is not available for this post'**
+  String get editHistoryNotAvailable;
+
+  /// UI text: You do not have permission to upload avatars
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to upload avatars'**
+  String get noPermissionToUploadAvatar;
+
+  /// UI text: Avatar uploaded successfully
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar uploaded successfully'**
+  String get avatarUploadedSuccessfully;
+
+  /// UI text: Failed to pick image: {e}
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pick image: {error}'**
+  String failedToPickImage2(Object error);
+
+  /// UI text: React
+  ///
+  /// In en, this message translates to:
+  /// **'React'**
+  String get react;
+
+  /// UI text: Reactions are not enabled on this forum.
+  ///
+  /// In en, this message translates to:
+  /// **'Reactions are not enabled on this forum.'**
+  String get reactionsAreNotEnabledOnThisForum;
+
+  /// UI text: No reactions yet
+  ///
+  /// In en, this message translates to:
+  /// **'No reactions yet'**
+  String get noReactionsYet;
+
+  /// UI text: Search filters
+  ///
+  /// In en, this message translates to:
+  /// **'Search filters'**
+  String get searchFilters;
+
+  /// UI text: You will be signed out of {name}. You can sign back in any t
+  ///
+  /// In en, this message translates to:
+  /// **'You will be signed out of {siteName}. You can sign back in any time.'**
+  String signOutWarning(Object siteName);
+
+  /// UI text: Suggested Topics
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested Topics'**
+  String get suggestedTopics;
+
+  /// UI text: NEW
+  ///
+  /// In en, this message translates to:
+  /// **'NEW'**
+  String get newLabel;
+
+  /// UI text: Vote removed
+  ///
+  /// In en, this message translates to:
+  /// **'Vote removed'**
+  String get voteRemoved;
+
+  /// UI text: Voters
+  ///
+  /// In en, this message translates to:
+  /// **'Voters'**
+  String get voters;
+
+  /// UI text: No votes yet.
+  ///
+  /// In en, this message translates to:
+  /// **'No votes yet.'**
+  String get noVotesYet;
+
+  /// UI text: Trust levels
+  ///
+  /// In en, this message translates to:
+  /// **'Trust levels'**
+  String get trustLevels;
+
+  /// UI text: Members earn trust by reading and participating. Each level
+  ///
+  /// In en, this message translates to:
+  /// **'Members earn trust by reading and participating. Each level unlocks new abilities.'**
+  String get trustLevelsExplanation;
+
+  /// UI text: Activity
+  ///
+  /// In en, this message translates to:
+  /// **'Activity'**
+  String get activity;
 }
 
 class _AppLocalizationsDelegate

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class ForumPasswordDialog extends StatefulWidget {
   final String forumName;
@@ -31,7 +32,7 @@ class _ForumPasswordDialogState extends State<ForumPasswordDialog> {
 
     return AlertDialog(
       title: Text(
-        'Protected Forum',
+        AppLocalizations.of(context)!.protectedForum,
         style: textTheme.titleLarge?.copyWith(
           color: colorScheme.onSurface,
         ),
@@ -43,7 +44,7 @@ class _ForumPasswordDialogState extends State<ForumPasswordDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${widget.forumName} is password protected.',
+              AppLocalizations.of(context)!.isPasswordProtected(widget.forumName),
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -72,7 +73,7 @@ class _ForumPasswordDialogState extends State<ForumPasswordDialog> {
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(
-            'Cancel',
+            AppLocalizations.of(context)!.cancel,
             style: textTheme.labelLarge?.copyWith(
               color: colorScheme.primary,
             ),
@@ -86,7 +87,7 @@ class _ForumPasswordDialogState extends State<ForumPasswordDialog> {
             }
           },
           child: Text(
-            'Enter',
+            AppLocalizations.of(context)!.enter,
             style: textTheme.labelLarge?.copyWith(
               color: colorScheme.onPrimary,
             ),

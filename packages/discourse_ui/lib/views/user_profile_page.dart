@@ -882,7 +882,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   const SizedBox(width: DesignTokens.spacingM),
                   Expanded(
                     child: Text(
-                      'Failed to ban user: ${e.toString()}',
+                      AppLocalizations.of(context)!.failedToBanUser2(e.toString()),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onErrorContainer,
                           ),
@@ -928,7 +928,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
           ),
           content: Text(
-            'Are you sure you want to unban ${_userInfo!.username}?',
+            AppLocalizations.of(context)!.unbanUserConfirmation(_userInfo!.username),
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurface,
             ),
@@ -937,7 +937,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(
-                'Cancel',
+                AppLocalizations.of(context)!.cancel,
                 style: TextStyle(color: colorScheme.onSurfaceVariant),
               ),
             ),
@@ -1095,7 +1095,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 const SizedBox(width: DesignTokens.spacingM),
                 Expanded(
                   child: Text(
-                    'Failed to unban user: ${e.toString()}',
+                    AppLocalizations.of(context)!.failedToUnbanUser2(e.toString()),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onErrorContainer,
                         ),
@@ -1149,7 +1149,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Spam Clean ${_userInfo!.username}',
+                      AppLocalizations.of(context)!.spamClean(_userInfo!.username),
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -1191,7 +1191,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ),
                       ),
                       subtitle: Text(
-                        'Delete posts, profile posts, and comments',
+                        AppLocalizations.of(context)!.deletePostsProfilePostsAndComments,
                         style: textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -1248,7 +1248,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                     const SizedBox(height: DesignTokens.spacingL),
                     Text(
-                      'This action cannot be undone.',
+                      AppLocalizations.of(context)!.thisActionCannotBeUndone,
                       style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.error,
                         fontWeight: DesignTokens.fontWeightMedium,
@@ -1315,7 +1315,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Are you sure you want to spam clean ${_userInfo!.username}?',
+                AppLocalizations.of(context)!.spamCleanConfirmation(_userInfo!.username),
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurface,
                 ),
@@ -1323,7 +1323,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               if (selectedActions.isNotEmpty) ...[
                 const SizedBox(height: DesignTokens.spacingL),
                 Text(
-                  'Selected actions:',
+                  AppLocalizations.of(context)!.selectedActions,
                   style: textTheme.titleSmall?.copyWith(
                     color: colorScheme.onSurface,
                   ),
@@ -1351,7 +1351,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ],
               const SizedBox(height: DesignTokens.spacingL),
               Text(
-                'This action cannot be undone.',
+                AppLocalizations.of(context)!.thisActionCannotBeUndone,
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.error,
                   fontWeight: DesignTokens.fontWeightMedium,
@@ -1363,7 +1363,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(
-                'Cancel',
+                AppLocalizations.of(context)!.cancel,
                 style: TextStyle(color: colorScheme.onSurfaceVariant),
               ),
             ),
@@ -1556,7 +1556,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 const SizedBox(width: DesignTokens.spacingM),
                 Expanded(
                   child: Text(
-                    'Failed to clean spam: ${e.toString()}',
+                    AppLocalizations.of(context)!.failedToCleanSpam(e.toString()),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onErrorContainer,
                         ),

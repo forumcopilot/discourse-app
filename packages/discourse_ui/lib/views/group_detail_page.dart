@@ -187,8 +187,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.leaveGroupQuestion),
           content: Text(
-            'You will no longer be a member of ${group.displayName}. '
-            'You can rejoin at any time.',
+            AppLocalizations.of(context)!.leaveGroupWarning(group.displayName),
           ),
           actions: [
             TextButton(
@@ -538,7 +537,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
               color: colorScheme.onSurfaceVariant),
           const SizedBox(height: DesignTokens.spacingM),
           Text(
-            'The member list of this group is private.',
+            AppLocalizations.of(context)!.groupMembersPrivate,
             style: textTheme.bodyMedium
                 ?.copyWith(color: colorScheme.onSurfaceVariant),
             textAlign: TextAlign.center,

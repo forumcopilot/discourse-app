@@ -1924,5 +1924,875 @@
         "type": "Object"
       }
     }
+  },
+  "loginInfo": "Login Info",
+  "@loginInfo": {
+    "description": "UI text: Login Info"
+  },
+  "loginFailed": "Login Failed",
+  "@loginFailed": {
+    "description": "UI text: Login Failed"
+  },
+  "additionalInformation": "Additional Information",
+  "@additionalInformation": {
+    "description": "UI text: Additional Information"
+  },
+  "dateOfBirth": "Date of Birth{marker}",
+  "@dateOfBirth": {
+    "description": "UI text: Date of Birth{requiredValue}",
+    "placeholders": {
+      "marker": {
+        "type": "Object"
+      }
+    }
+  },
+  "minimumAgeYears": "Minimum age: {minimumAge} years",
+  "@minimumAgeYears": {
+    "description": "UI text: Minimum age: {minimumAge} years",
+    "placeholders": {
+      "minimumAge": {
+        "type": "Object"
+      }
+    }
+  },
+  "locationLabel": "Location{marker}",
+  "@locationLabel": {
+    "description": "UI text: Location{isRequired}",
+    "placeholders": {
+      "marker": {
+        "type": "Object"
+      }
+    }
+  },
+  "receiveSiteMailings": "Receive site mailings",
+  "@receiveSiteMailings": {
+    "description": "UI text: Receive site mailings"
+  },
+  "moveToCategory": "Move to category",
+  "@moveToCategory": {
+    "description": "UI text: Move to category"
+  },
+  "undeleteTopic": "Undelete Topic",
+  "@undeleteTopic": {
+    "description": "UI text: Undelete Topic"
+  },
+  "undeleteTopicConfirmation": "Are you sure you want to undelete this topic? It will be visible to other users again.",
+  "@undeleteTopicConfirmation": {
+    "description": "UI text: Are you sure you want to undelete this topic? It will be vis"
+  },
+  "send": "Send",
+  "@send": {
+    "description": "UI text: Send"
+  },
+  "changeEmailExplanation": "We’ll send a confirmation link to your new email. The change takes effect when you click it.",
+  "@changeEmailExplanation": {
+    "description": "UI text: We’ll send a confirmation link to your new email. The change"
+  },
+  "changeEmailSecurityNote": "For added security, Discourse may require you to confirm via the link in the email. Check your spam folder if you don’t see it.",
+  "@changeEmailSecurityNote": {
+    "description": "UI text: For added security, Discourse may require you to confirm via"
+  },
+  "newDirectMessage": "New direct message",
+  "@newDirectMessage": {
+    "description": "UI text: New direct message"
+  },
+  "noMessagesYetSayHi": "No messages yet — say hi.",
+  "@noMessagesYetSayHi": {
+    "description": "UI text: No messages yet — say hi."
+  },
+  "edited": "edited",
+  "@edited": {
+    "description": "UI text: edited"
+  },
+  "imageExceedsUploadLimits": "This image exceeds the upload limits and needs to be optimized:",
+  "@imageExceedsUploadLimits": {
+    "description": "UI text: This image exceeds the upload limits and needs to be optimiz"
+  },
+  "optimizationsToBeApplied": "Optimizations to be applied:",
+  "@optimizationsToBeApplied": {
+    "description": "UI text: Optimizations to be applied:"
+  },
+  "reductionPercent": "Reduction: {percent}%",
+  "@reductionPercent": {
+    "description": "UI text: Reduction: {toStringAsFixed}%",
+    "placeholders": {
+      "percent": {
+        "type": "Object"
+      }
+    }
+  },
+  "editProfileManagedOnWebNote": "Display name, email, password, and other account settings are managed under Account → Manage account on web. Your avatar can be changed by tapping the camera badge on your photo.",
+  "@editProfileManagedOnWebNote": {
+    "description": "UI text: Display name, email, password, and other account settings ar"
+  },
+  "approvedButRelayUnreachable": "Approved, but we could not reach ForumCopilot to finish setting up. Try again later from Settings.",
+  "@approvedButRelayUnreachable": {
+    "description": "UI text: push approved but relay unreachable"
+  },
+  "notificationsAreTurnedOffForThisApp": "Notifications are turned off for this app",
+  "@notificationsAreTurnedOffForThisApp": {
+    "description": "UI text: Notifications are turned off for this app"
+  },
+  "forumWillAskToApproveNotifications": "Next, {forumName} will ask you to approve “Notifications”.",
+  "@forumWillAskToApproveNotifications": {
+    "description": "UI text: Next, {forumName} will ask you to approve “Notifications”.",
+    "placeholders": {
+      "forumName": {
+        "type": "Object"
+      }
+    }
+  },
+  "approveNotificationsExplanation": "Approving lets us check your notifications for you and send them to this device. This permission cannot post, reply, or read your messages.",
+  "@approveNotificationsExplanation": {
+    "description": "UI text: Approving lets us check your notifications for you and send "
+  },
+  "forumOwnerPushNote": "If this forum’s owner sets up notifications for the app, this step won’t be needed.",
+  "@forumOwnerPushNote": {
+    "description": "UI text: If this forum’s owner sets up notifications for the app, thi"
+  },
+  "pleaseLoginToCreateANewTopic": "Please login to create a new topic",
+  "@pleaseLoginToCreateANewTopic": {
+    "description": "UI text: Please login to create a new topic"
+  },
+  "pleaseLoginToSubscribeToForums": "Please login to subscribe to forums",
+  "@pleaseLoginToSubscribeToForums": {
+    "description": "UI text: Please login to subscribe to forums"
+  },
+  "leaveGroupWarning": "You will no longer be a member of {group}. You can rejoin at any time.",
+  "@leaveGroupWarning": {
+    "description": "UI text: You will no longer be a member of {displayName}. You can rej",
+    "placeholders": {
+      "group": {
+        "type": "Object"
+      }
+    }
+  },
+  "groupMembersPrivate": "The member list of this group is private.",
+  "@groupMembersPrivate": {
+    "description": "UI text: The member list of this group is private."
+  },
+  "unignore": "Unignore",
+  "@unignore": {
+    "description": "UI text: Unignore"
+  },
+  "inviteLinkCreated": "Invite link created",
+  "@inviteLinkCreated": {
+    "description": "UI text: Invite link created"
+  },
+  "expiresOn": "Expires {date}",
+  "@expiresOn": {
+    "description": "UI text: Expires {toLocal}",
+    "placeholders": {
+      "date": {
+        "type": "Object"
+      }
+    }
+  },
+  "protected": "Protected",
+  "@protected": {
+    "description": "UI text: Protected"
+  },
+  "solution": "Solution",
+  "@solution": {
+    "description": "UI text: Solution"
+  },
+  "deleted": "DELETED",
+  "@deleted": {
+    "description": "UI text: DELETED"
+  },
+  "pleaseLoginToViewUserProfiles": "Please login to view user profiles.",
+  "@pleaseLoginToViewUserProfiles": {
+    "description": "UI text: Please login to view user profiles."
+  },
+  "announcement": "Announcement",
+  "@announcement": {
+    "description": "UI text: Announcement"
+  },
+  "solved": "Solved",
+  "@solved": {
+    "description": "UI text: Solved"
+  },
+  "hot": "Hot",
+  "@hot": {
+    "description": "UI text: Hot"
+  },
+  "pinned": "Pinned",
+  "@pinned": {
+    "description": "UI text: Pinned"
+  },
+  "subscribedLabel": "Subscribed",
+  "@subscribedLabel": {
+    "description": "UI text: Subscribed"
+  },
+  "locked": "Locked",
+  "@locked": {
+    "description": "UI text: Locked"
+  },
+  "poll": "Poll",
+  "@poll": {
+    "description": "UI text: Poll"
+  },
+  "errorLoadingContent": "Error loading content: {error}",
+  "@errorLoadingContent": {
+    "description": "UI text: Error loading content: {error}",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "noPermissionToViewSubforum": "You do not have permission to view topics in this subforum.",
+  "@noPermissionToViewSubforum": {
+    "description": "UI text: You do not have permission to view topics in this subforum."
+  },
+  "noDiscussionsYet": "No discussions yet.",
+  "@noDiscussionsYet": {
+    "description": "UI text: No discussions yet."
+  },
+  "jumpToPost": "Jump to Post",
+  "@jumpToPost": {
+    "description": "UI text: Jump to Post"
+  },
+  "jump": "Jump",
+  "@jump": {
+    "description": "UI text: Jump"
+  },
+  "endOfTheDiscussion": "End of the discussion",
+  "@endOfTheDiscussion": {
+    "description": "UI text: End of the discussion"
+  },
+  "reviewQueueStaffOnly": "Only staff and reviewers can see the review queue.",
+  "@reviewQueueStaffOnly": {
+    "description": "UI text: Only staff and reviewers can see the review queue."
+  },
+  "nothingToReview": "Nothing to review",
+  "@nothingToReview": {
+    "description": "UI text: Nothing to review"
+  },
+  "refreshFailed": "Refresh failed: {error}",
+  "@refreshFailed": {
+    "description": "UI text: Refresh failed: {e}",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "topicDeletedBanner": "This topic is deleted and hidden from other users",
+  "@topicDeletedBanner": {
+    "description": "UI text: This topic is deleted and hidden from other users"
+  },
+  "topicClosedBanner": "This topic is closed and no longer accepting replies",
+  "@topicClosedBanner": {
+    "description": "UI text: This topic is closed and no longer accepting replies"
+  },
+  "topicPinnedBanner": "This topic is pinned to the top of the forum",
+  "@topicPinnedBanner": {
+    "description": "UI text: This topic is pinned to the top of the forum"
+  },
+  "youAreSubscribedToThisTopic": "You are subscribed to this topic",
+  "@youAreSubscribedToThisTopic": {
+    "description": "UI text: You are subscribed to this topic"
+  },
+  "refreshing": "Refreshing...",
+  "@refreshing": {
+    "description": "UI text: Refreshing..."
+  },
+  "title": "Title",
+  "@title": {
+    "description": "UI text: Title"
+  },
+  "editedAt": "Edited {time}",
+  "@editedAt": {
+    "description": "UI text: Edited {createdAtcontext}",
+    "placeholders": {
+      "time": {
+        "type": "Object"
+      }
+    }
+  },
+  "editReason": "Reason: {reason}",
+  "@editReason": {
+    "description": "UI text: Reason: {trim}",
+    "placeholders": {
+      "reason": {
+        "type": "Object"
+      }
+    }
+  },
+  "thisDiffIsTooLargeToDisplay": "This diff is too large to display.",
+  "@thisDiffIsTooLargeToDisplay": {
+    "description": "UI text: This diff is too large to display."
+  },
+  "noContentChangesInThisRevision": "No content changes in this revision.",
+  "@noContentChangesInThisRevision": {
+    "description": "UI text: No content changes in this revision."
+  },
+  "revisionOf": "Revision {currentVersion} of {versionCount}",
+  "@revisionOf": {
+    "description": "UI text: Revision {currentVersion} of {versionCount}",
+    "placeholders": {
+      "currentVersion": {
+        "type": "Object"
+      },
+      "versionCount": {
+        "type": "Object"
+      }
+    }
+  },
+  "editConversation": "Edit conversation",
+  "@editConversation": {
+    "description": "UI text: Edit conversation"
+  },
+  "closeConversation": "Close conversation",
+  "@closeConversation": {
+    "description": "UI text: Close conversation"
+  },
+  "openConversation": "Open conversation",
+  "@openConversation": {
+    "description": "UI text: Open conversation"
+  },
+  "leaveConversation2": "Leave conversation",
+  "@leaveConversation2": {
+    "description": "UI text: Leave conversation"
+  },
+  "reportConversation2": "Report conversation",
+  "@reportConversation2": {
+    "description": "UI text: Report conversation"
+  },
+  "closeConversation2": "Close Conversation",
+  "@closeConversation2": {
+    "description": "UI text: Close Conversation"
+  },
+  "closeConversationConfirmation": "Are you sure you want to close this conversation? This will prevent new replies from being posted.",
+  "@closeConversationConfirmation": {
+    "description": "UI text: Are you sure you want to close this conversation? This will "
+  },
+  "close": "Close",
+  "@close": {
+    "description": "UI text: Close"
+  },
+  "openConversation2": "Open Conversation",
+  "@openConversation2": {
+    "description": "UI text: Open Conversation"
+  },
+  "openConversationConfirmation": "Are you sure you want to open this conversation? This will allow new replies to be posted.",
+  "@openConversationConfirmation": {
+    "description": "UI text: Are you sure you want to open this conversation? This will a"
+  },
+  "open": "Open",
+  "@open": {
+    "description": "UI text: Open"
+  },
+  "leaveConversation3": "Leave Conversation",
+  "@leaveConversation3": {
+    "description": "UI text: Leave Conversation"
+  },
+  "leaveConversationConfirmation": "Are you sure you want to leave this conversation? This will hide it from your inbox.",
+  "@leaveConversationConfirmation": {
+    "description": "UI text: Are you sure you want to leave this conversation? This will "
+  },
+  "errorLoadingConversation": "Error loading conversation: {error}",
+  "@errorLoadingConversation": {
+    "description": "UI text: Error loading conversation: {error}",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "conversationNotFound": "Conversation not found",
+  "@conversationNotFound": {
+    "description": "UI text: Conversation not found"
+  },
+  "conversationClosedBanner": "This conversation is closed and no longer accepting replies",
+  "@conversationClosedBanner": {
+    "description": "UI text: This conversation is closed and no longer accepting replies"
+  },
+  "noMessagesFound": "No messages found",
+  "@noMessagesFound": {
+    "description": "UI text: No messages found"
+  },
+  "endOfConversation": "End of conversation",
+  "@endOfConversation": {
+    "description": "UI text: End of conversation"
+  },
+  "jumpToMessage": "Jump to Message",
+  "@jumpToMessage": {
+    "description": "UI text: Jump to Message"
+  },
+  "editConversation2": "Edit Conversation",
+  "@editConversation2": {
+    "description": "UI text: Edit Conversation"
+  },
+  "failedToLoadMessage2": "Failed to load message",
+  "@failedToLoadMessage2": {
+    "description": "UI text: Failed to load message"
+  },
+  "cannotEditThisConversation": "Cannot edit this conversation",
+  "@cannotEditThisConversation": {
+    "description": "UI text: Cannot edit this conversation"
+  },
+  "options": "Options",
+  "@options": {
+    "description": "UI text: Options"
+  },
+  "conversationOpen": "Conversation Open",
+  "@conversationOpen": {
+    "description": "UI text: Conversation Open"
+  },
+  "failedToCreateConversation": "Failed to create conversation: {error}",
+  "@failedToCreateConversation": {
+    "description": "UI text: Failed to create conversation: {toString}",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "maximumAttachmentsAllowed": "Maximum of {count} attachment(s) allowed",
+  "@maximumAttachmentsAllowed": {
+    "description": "UI text: Maximum of {count} attachment(s) allowed",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "noImagesFoundToDisplay": "No images found to display.",
+  "@noImagesFoundToDisplay": {
+    "description": "UI text: No images found to display."
+  },
+  "pleaseLoginToViewThisAttachment": "Please login to view this attachment",
+  "@pleaseLoginToViewThisAttachment": {
+    "description": "UI text: Please login to view this attachment"
+  },
+  "searchForTopics": "Search for topics",
+  "@searchForTopics": {
+    "description": "UI text: Search for topics"
+  },
+  "noTopicsFound": "No topics found",
+  "@noTopicsFound": {
+    "description": "UI text: No topics found"
+  },
+  "trySearchingWithDifferentKeywords": "Try searching with different keywords",
+  "@trySearchingWithDifferentKeywords": {
+    "description": "UI text: Try searching with different keywords"
+  },
+  "noPostsFound": "No posts found",
+  "@noPostsFound": {
+    "description": "UI text: No posts found"
+  },
+  "perTopicNotificationLevelsNote": "Per-category and per-topic notification levels are set from those screens directly — tap the bell icon on any topic or category to override.",
+  "@perTopicNotificationLevelsNote": {
+    "description": "UI text: Per-category and per-topic notification levels are set from "
+  },
+  "pushNotActiveForThisLogin": "Not active for this login — log out and log back in to authorize push notifications",
+  "@pushNotActiveForThisLogin": {
+    "description": "UI text: Not active for this login — log out and log back in to autho"
+  },
+  "pauseNotificationsFor": "Pause notifications for…",
+  "@pauseNotificationsFor": {
+    "description": "UI text: Pause notifications for…"
+  },
+  "doNotDisturbExplanation": "Pause notifications for a while — Discourse holds them until the window ends",
+  "@doNotDisturbExplanation": {
+    "description": "UI text: Pause notifications for a while — Discourse holds them until"
+  },
+  "emailSettingsSubtitle": "Email frequency, like aggregation, digest schedule",
+  "@emailSettingsSubtitle": {
+    "description": "UI text: Email frequency, like aggregation, digest schedule"
+  },
+  "manageAccountSubtitle": "Profile, email, password, security, advanced settings",
+  "@manageAccountSubtitle": {
+    "description": "UI text: Profile, email, password, security, advanced settings"
+  },
+  "changePasswordSubtitle": "Trigger a password-reset email to your current address",
+  "@changePasswordSubtitle": {
+    "description": "UI text: Trigger a password-reset email to your current address"
+  },
+  "ignoredUsersSubtitle": "See and manage users whose posts are hidden from you",
+  "@ignoredUsersSubtitle": {
+    "description": "UI text: See and manage users whose posts are hidden from you"
+  },
+  "deleteAccountExplanation": "Removing your account is handled on the forum. Continue to open the site and contact the staff team — Discourse forums process deletions per their own policy.",
+  "@deleteAccountExplanation": {
+    "description": "UI text: Removing your account is handled on the forum. Continue to o"
+  },
+  "verificationEmailSent": "Verification email sent — click the link to confirm your new address.",
+  "@verificationEmailSent": {
+    "description": "UI text: Verification email sent — click the link to confirm your new"
+  },
+  "passwordResetExplanation": "We’ll email you a password-reset link. Click it to choose a new password — the change is handled on the forum, not in this app.",
+  "@passwordResetExplanation": {
+    "description": "UI text: We’ll email you a password-reset link. Click it to choose a "
+  },
+  "sendResetEmail": "Send reset email",
+  "@sendResetEmail": {
+    "description": "UI text: Send reset email"
+  },
+  "deleteAccountDialogBody": "Your account is managed by the forum. Please contact the forum staff directly to request account removal. Continue will open the forum in your browser so you can use the site’s own contact / staff message flow.",
+  "@deleteAccountDialogBody": {
+    "description": "UI text: Your account is managed by the forum. Please contact the for"
+  },
+  "initializingForum": "Initializing forum…",
+  "@initializingForum": {
+    "description": "UI text: Initializing forum…"
+  },
+  "unableToLoadForums": "Unable to Load Forums",
+  "@unableToLoadForums": {
+    "description": "UI text: Unable to Load Forums"
+  },
+  "noForumsToDisplayExplanation": "There are no forums to display. This might be due to permissions or the forum structure.",
+  "@noForumsToDisplayExplanation": {
+    "description": "UI text: There are no forums to display. This might be due to permiss"
+  },
+  "subscribedForums": "Subscribed Forums",
+  "@subscribedForums": {
+    "description": "UI text: Subscribed Forums"
+  },
+  "errorLoadingNotifications": "Error loading notifications",
+  "@errorLoadingNotifications": {
+    "description": "UI text: Error loading notifications"
+  },
+  "pullDownToRefresh": "Pull down to refresh",
+  "@pullDownToRefresh": {
+    "description": "UI text: Pull down to refresh"
+  },
+  "noNewNotificationsExplanation": "You have no new notifications. Check back later for updates on topics you're following.",
+  "@noNewNotificationsExplanation": {
+    "description": "UI text: You have no new notifications. Check back later for updates "
+  },
+  "noTagsMatch": "No tags match \"{filter}\".",
+  "@noTagsMatch": {
+    "description": "UI text: No tags match \"{text}\".",
+    "placeholders": {
+      "filter": {
+        "type": "Object"
+      }
+    }
+  },
+  "noTopicsTagged": "No topics tagged \"{tag}\"",
+  "@noTopicsTagged": {
+    "description": "UI text: No topics tagged \"{tag}\"",
+    "placeholders": {
+      "tag": {
+        "type": "Object"
+      }
+    }
+  },
+  "failedToBanUser2": "Failed to ban user: {error}",
+  "@failedToBanUser2": {
+    "description": "UI text: Failed to ban user: {toString}",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "unbanUserConfirmation": "Are you sure you want to unban {username}?",
+  "@unbanUserConfirmation": {
+    "description": "UI text: Are you sure you want to unban {username}?",
+    "placeholders": {
+      "username": {
+        "type": "Object"
+      }
+    }
+  },
+  "failedToUnbanUser2": "Failed to unban user: {error}",
+  "@failedToUnbanUser2": {
+    "description": "UI text: Failed to unban user: {toString}",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "deletePostsProfilePostsAndComments": "Delete posts, profile posts, and comments",
+  "@deletePostsProfilePostsAndComments": {
+    "description": "UI text: Delete posts, profile posts, and comments"
+  },
+  "spamCleanConfirmation": "Are you sure you want to spam clean {username}?",
+  "@spamCleanConfirmation": {
+    "description": "UI text: Are you sure you want to spam clean {username}?",
+    "placeholders": {
+      "username": {
+        "type": "Object"
+      }
+    }
+  },
+  "failedToCleanSpam": "Failed to clean spam: {error}",
+  "@failedToCleanSpam": {
+    "description": "UI text: Failed to clean spam: {toString}",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "searchUser": "Search User",
+  "@searchUser": {
+    "description": "UI text: Search User"
+  },
+  "tapToOpen": "Tap to open",
+  "@tapToOpen": {
+    "description": "UI text: Tap to open"
+  },
+  "imageNotAvailable": "Image not available",
+  "@imageNotAvailable": {
+    "description": "UI text: Image not available"
+  },
+  "allForumTopicsHaveBeenMarkedAs": "All forum topics have been marked as read",
+  "@allForumTopicsHaveBeenMarkedAs": {
+    "description": "UI text: All forum topics have been marked as read"
+  },
+  "postsCount": "{count} Posts",
+  "@postsCount": {
+    "description": "UI text: {total_posts0} Posts",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "protectedForum": "Protected Forum",
+  "@protectedForum": {
+    "description": "UI text: Protected Forum"
+  },
+  "isPasswordProtected": "{forumName} is password protected.",
+  "@isPasswordProtected": {
+    "description": "UI text: {forumName} is password protected.",
+    "placeholders": {
+      "forumName": {
+        "type": "Object"
+      }
+    }
+  },
+  "enter": "Enter",
+  "@enter": {
+    "description": "UI text: Enter"
+  },
+  "permissionDeniedToSaveImage": "Permission denied to save image",
+  "@permissionDeniedToSaveImage": {
+    "description": "UI text: Permission denied to save image"
+  },
+  "postNotFound": "Post not found.",
+  "@postNotFound": {
+    "description": "UI text: Post not found."
+  },
+  "failedToUploadFilePleaseTryAgain": "Failed to upload file. Please try again.",
+  "@failedToUploadFilePleaseTryAgain": {
+    "description": "UI text: Failed to upload file. Please try again."
+  },
+  "failedToUploadFile2": "Failed to upload file: {errorMessage}",
+  "@failedToUploadFile2": {
+    "description": "UI text: Failed to upload file: {errorMessage}",
+    "placeholders": {
+      "errorMessage": {
+        "type": "Object"
+      }
+    }
+  },
+  "failedToPickFile": "Failed to pick file",
+  "@failedToPickFile": {
+    "description": "UI text: Failed to pick file"
+  },
+  "onlyNMoreAttachmentsAllowed": "Only {remainingSlots} more attachment(s) allowed. Processing first {remainingSlots2} image(s).",
+  "@onlyNMoreAttachmentsAllowed": {
+    "description": "UI text: Only {remainingSlots} more attachment(s) allowed. Processing",
+    "placeholders": {
+      "remainingSlots": {
+        "type": "Object"
+      },
+      "remainingSlots2": {
+        "type": "Object"
+      }
+    }
+  },
+  "attachmentLimitReachedSkippingRemainingImages": "Attachment limit reached. Skipping remaining images.",
+  "@attachmentLimitReachedSkippingRemainingImages": {
+    "description": "UI text: Attachment limit reached. Skipping remaining images."
+  },
+  "failedToUploadImagePleaseTryAgain": "{fileName}: Failed to upload image. Please try again.",
+  "@failedToUploadImagePleaseTryAgain": {
+    "description": "UI text: {name}: Failed to upload image. Please try again.",
+    "placeholders": {
+      "fileName": {
+        "type": "Object"
+      }
+    }
+  },
+  "failedToUploadImage2": "{fileName}: Failed to upload image: {errorMessage}",
+  "@failedToUploadImage2": {
+    "description": "UI text: {name}: Failed to upload image: {errorMessage}",
+    "placeholders": {
+      "errorMessage": {
+        "type": "Object"
+      },
+      "fileName": {
+        "type": "Object"
+      }
+    }
+  },
+  "failedToPickImage": "Failed to pick image",
+  "@failedToPickImage": {
+    "description": "UI text: Failed to pick image"
+  },
+  "failedToRemoveAttachment2": "Failed to remove attachment: {error}",
+  "@failedToRemoveAttachment2": {
+    "description": "UI text: Failed to remove attachment: {toString}",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "sentFromMobileApp": "Sent from {siteName} mobile app",
+  "@sentFromMobileApp": {
+    "description": "UI text: Sent from {name} mobile app",
+    "placeholders": {
+      "siteName": {
+        "type": "Object"
+      }
+    }
+  },
+  "pleaseWaitForAttachmentsToFinishUploading": "Please wait for attachments to finish uploading",
+  "@pleaseWaitForAttachmentsToFinishUploading": {
+    "description": "UI text: Please wait for attachments to finish uploading"
+  },
+  "imageIsTooLargeToUpload": "Image is too large to upload",
+  "@imageIsTooLargeToUpload": {
+    "description": "UI text: Image is too large to upload"
+  },
+  "fileTooLargeForForum": "{fileName} is {fileBytes}. This forum allows up to {maxBytes}.",
+  "@fileTooLargeForForum": {
+    "description": "UI text: {fileName} is {fileBytes}. This forum allows up to {maxBytes",
+    "placeholders": {
+      "fileName": {
+        "type": "Object"
+      },
+      "fileBytes": {
+        "type": "Object"
+      },
+      "maxBytes": {
+        "type": "Object"
+      }
+    }
+  },
+  "resizeToFitExplanation": "It can be scaled down just enough to fit, keeping its format and as much detail as the limit allows.",
+  "@resizeToFitExplanation": {
+    "description": "UI text: It can be scaled down just enough to fit, keeping its format"
+  },
+  "failedToPostReplyPleaseTryAgain": "Failed to post reply. Please try again.",
+  "@failedToPostReplyPleaseTryAgain": {
+    "description": "UI text: Failed to post reply. Please try again."
+  },
+  "pleaseWaitForTheThreadToLoad": "Please wait for the thread to load",
+  "@pleaseWaitForTheThreadToLoad": {
+    "description": "UI text: Please wait for the thread to load"
+  },
+  "failedToUpdatePostPleaseTryAgain": "Failed to update post. Please try again.",
+  "@failedToUpdatePostPleaseTryAgain": {
+    "description": "UI text: Failed to update post. Please try again."
+  },
+  "postDeletedSuccessfully": "Post deleted successfully",
+  "@postDeletedSuccessfully": {
+    "description": "UI text: Post deleted successfully"
+  },
+  "failedToDeletePost": "Failed to delete post: {error}",
+  "@failedToDeletePost": {
+    "description": "UI text: Failed to delete post: {toString}",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "failedToSubmitReport2": "Failed to submit report: {error}",
+  "@failedToSubmitReport2": {
+    "description": "UI text: Failed to submit report: {toString}",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "editHistoryNotAvailable": "Edit history is not available for this post",
+  "@editHistoryNotAvailable": {
+    "description": "UI text: Edit history is not available for this post"
+  },
+  "noPermissionToUploadAvatar": "You do not have permission to upload avatars",
+  "@noPermissionToUploadAvatar": {
+    "description": "UI text: You do not have permission to upload avatars"
+  },
+  "avatarUploadedSuccessfully": "Avatar uploaded successfully",
+  "@avatarUploadedSuccessfully": {
+    "description": "UI text: Avatar uploaded successfully"
+  },
+  "failedToPickImage2": "Failed to pick image: {error}",
+  "@failedToPickImage2": {
+    "description": "UI text: Failed to pick image: {e}",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "react": "React",
+  "@react": {
+    "description": "UI text: React"
+  },
+  "reactionsAreNotEnabledOnThisForum": "Reactions are not enabled on this forum.",
+  "@reactionsAreNotEnabledOnThisForum": {
+    "description": "UI text: Reactions are not enabled on this forum."
+  },
+  "noReactionsYet": "No reactions yet",
+  "@noReactionsYet": {
+    "description": "UI text: No reactions yet"
+  },
+  "searchFilters": "Search filters",
+  "@searchFilters": {
+    "description": "UI text: Search filters"
+  },
+  "signOutWarning": "You will be signed out of {siteName}. You can sign back in any time.",
+  "@signOutWarning": {
+    "description": "UI text: You will be signed out of {name}. You can sign back in any t",
+    "placeholders": {
+      "siteName": {
+        "type": "Object"
+      }
+    }
+  },
+  "suggestedTopics": "Suggested Topics",
+  "@suggestedTopics": {
+    "description": "UI text: Suggested Topics"
+  },
+  "newLabel": "NEW",
+  "@newLabel": {
+    "description": "UI text: NEW"
+  },
+  "voteRemoved": "Vote removed",
+  "@voteRemoved": {
+    "description": "UI text: Vote removed"
+  },
+  "voters": "Voters",
+  "@voters": {
+    "description": "UI text: Voters"
+  },
+  "noVotesYet": "No votes yet.",
+  "@noVotesYet": {
+    "description": "UI text: No votes yet."
+  },
+  "trustLevels": "Trust levels",
+  "@trustLevels": {
+    "description": "UI text: Trust levels"
+  },
+  "trustLevelsExplanation": "Members earn trust by reading and participating. Each level unlocks new abilities.",
+  "@trustLevelsExplanation": {
+    "description": "UI text: Members earn trust by reading and participating. Each level "
+  },
+  "activity": "Activity",
+  "@activity": {
+    "description": "UI text: Activity"
   }
 }

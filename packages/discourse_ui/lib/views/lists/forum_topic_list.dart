@@ -276,7 +276,7 @@ class _ForumTopicListState extends State<ForumTopicList> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Please login to create a new topic',
+            AppLocalizations.of(context)!.pleaseLoginToCreateANewTopic,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
@@ -386,7 +386,7 @@ class _ForumTopicListState extends State<ForumTopicList> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Error loading content: $_error',
+              AppLocalizations.of(context)!.errorLoadingContent(_error ?? ''),
               textAlign: TextAlign.center,
               style: TextStyle(color: colorScheme.error),
             ),
@@ -455,7 +455,7 @@ class _ForumTopicListState extends State<ForumTopicList> {
                     const SizedBox(width: DesignTokens.spacingM),
                     Expanded(
                       child: Text(
-                        'You do not have permission to view topics in this subforum.',
+                        AppLocalizations.of(context)!.noPermissionToViewSubforum,
                         style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -471,7 +471,7 @@ class _ForumTopicListState extends State<ForumTopicList> {
               padding: DesignTokens.paddingXXL,
               child: Center(
                 child: Text(
-                  'No discussions yet.',
+                  AppLocalizations.of(context)!.noDiscussionsYet,
                   style: textTheme.bodyLarge?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),

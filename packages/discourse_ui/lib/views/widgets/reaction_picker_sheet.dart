@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 import '../../utils/like_cooldown.dart';
 import '../../theme/design_tokens.dart';
 import 'reaction_glyph.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Bottom-sheet picker for the `discourse-reactions` plugin. Loads the
 /// forum's enabled emoji set from `/discourse-reactions/custom-reactions`
@@ -134,7 +135,7 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
                 DesignTokens.spacingS,
               ),
               child: Text(
-                'React',
+                AppLocalizations.of(context)!.react,
                 style: textTheme.titleMedium
                     ?.copyWith(fontWeight: FontWeight.w600),
               ),
@@ -150,7 +151,7 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
               Padding(
                 padding: const EdgeInsets.all(DesignTokens.spacingL),
                 child: Text(
-                  'Reactions are not enabled on this forum.',
+                  AppLocalizations.of(context)!.reactionsAreNotEnabledOnThisForum,
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),

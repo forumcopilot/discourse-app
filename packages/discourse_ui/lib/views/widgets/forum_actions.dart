@@ -8,6 +8,7 @@ import 'package:discourse_ui/views/forum_topics_page.dart';
 import 'package:discourse_ui/views/widgets/forum_password_dialog.dart';
 import 'package:discourse_ui/controllers/global_loader_controller.dart';
 import 'package:discourse_ui/controllers/topic_controller.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class ForumActions {
   // Track if markAllAsRead is currently in progress to prevent concurrent calls
@@ -45,7 +46,7 @@ class ForumActions {
             scaffoldMessenger.showSnackBar(
               SnackBar(
                 content: Text(
-                  'All forum topics have been marked as read',
+                  AppLocalizations.of(context)!.allForumTopicsHaveBeenMarkedAs,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onInverseSurface,
                   ),
@@ -144,7 +145,7 @@ class ForumActions {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Login Failed',
+          AppLocalizations.of(context)!.loginFailed,
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
           ),

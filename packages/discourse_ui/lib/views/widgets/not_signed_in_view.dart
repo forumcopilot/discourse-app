@@ -87,7 +87,7 @@ class NotSignedInView extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Login',
+                      AppLocalizations.of(context)!.loginTitle,
                       style: textTheme.titleMedium?.copyWith(
                         color: colorScheme.onPrimary,
                         fontWeight: DesignTokens.fontWeightBold,

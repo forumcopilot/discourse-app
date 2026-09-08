@@ -114,7 +114,7 @@ class _ChatChannelViewState extends State<ChatChannelView> {
                 child: Padding(
                   padding: const EdgeInsets.all(DesignTokens.spacingXXL),
                   child: Text(
-                    'No messages yet — say hi.',
+                    AppLocalizations.of(context)!.noMessagesYetSayHi,
                     style: theme.textTheme.bodyMedium
                         ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                   ),

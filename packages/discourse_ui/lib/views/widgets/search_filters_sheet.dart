@@ -126,7 +126,7 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
             child: Row(
               children: [
                 Text(
-                  'Search filters',
+                  AppLocalizations.of(context)!.searchFilters,
                   style: textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.w600),
                 ),

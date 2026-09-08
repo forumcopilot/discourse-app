@@ -11,6 +11,7 @@ import '../login_page.dart';
 import '../../utils/avatar_cache_utils.dart';
 import '../../theme/design_tokens.dart';
 import '../../theme/style_builders.dart';
+import '../../l10n/generated/app_localizations.dart';
 // import '../../utils/avatar_color_utils.dart';
 
 class PostListItemHeader extends StatelessWidget {
@@ -173,7 +174,7 @@ class PostListItemHeader extends StatelessWidget {
                             ),
                             SizedBox(width: DesignTokens.spacingXS),
                             Text(
-                              'BANNED',
+                              AppLocalizations.of(context)!.banned,
                               style: StyleBuilders.badgeTextStyle(
                                 colorScheme: colorScheme,
                                 textTheme: textTheme,
@@ -205,7 +206,7 @@ class PostListItemHeader extends StatelessWidget {
                             ),
                             SizedBox(width: DesignTokens.spacingXS),
                             Text(
-                              'DELETED',
+                              AppLocalizations.of(context)!.deleted,
                               style: StyleBuilders.badgeTextStyle(
                                 colorScheme: colorScheme,
                                 textTheme: textTheme,
@@ -288,13 +289,13 @@ class PostListItemHeader extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Login Required',
+          AppLocalizations.of(context)!.loginRequired,
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
           ),
         ),
         content: Text(
-          'Please login to view user profiles.',
+          AppLocalizations.of(context)!.pleaseLoginToViewUserProfiles,
           style: textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSurface,
           ),
@@ -303,7 +304,7 @@ class PostListItemHeader extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Cancel',
+              AppLocalizations.of(context)!.cancel,
               style: TextStyle(color: colorScheme.primary),
             ),
           ),
@@ -313,7 +314,7 @@ class PostListItemHeader extends StatelessWidget {
               Get.to(() => LoginPage(siteContext: siteContext));
             },
             child: Text(
-              'Login',
+              AppLocalizations.of(context)!.loginTitle,
               style: TextStyle(color: colorScheme.primary),
             ),
           ),

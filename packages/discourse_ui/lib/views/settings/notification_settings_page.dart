@@ -268,9 +268,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             DesignTokens.spacingS,
           ),
           child: Text(
-            'Per-category and per-topic notification levels are set '
-            'from those screens directly — tap the bell icon on any '
-            'topic or category to override.',
+            AppLocalizations.of(context)!.perTopicNotificationLevelsNote,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -335,9 +333,8 @@ class _PushStatusTile extends StatelessWidget {
         color: colorScheme.error,
       ),
       title: Text(AppLocalizations.of(context)!.pushNotifications),
-      subtitle: const Text(
-        'Not active for this login — log out and log back in to '
-        'authorize push notifications',
+      subtitle: Text(
+        AppLocalizations.of(context)!.pushNotActiveForThisLogin,
       ),
     );
   }
@@ -455,7 +452,7 @@ class _DoNotDisturbTileState extends State<_DoNotDisturbTile> {
                   DesignTokens.spacingS,
                 ),
                 child: Text(
-                  'Pause notifications for…',
+                  AppLocalizations.of(context)!.pauseNotificationsFor,
                   style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
                         fontWeight: DesignTokens.fontWeightSemiBold,
                       ),
@@ -525,9 +522,8 @@ class _DoNotDisturbTileState extends State<_DoNotDisturbTile> {
         color: colorScheme.onSurfaceVariant,
       ),
       title: Text(AppLocalizations.of(context)!.doNotDisturb),
-      subtitle: const Text(
-        'Pause notifications for a while — Discourse holds them '
-        'until the window ends',
+      subtitle: Text(
+        AppLocalizations.of(context)!.doNotDisturbExplanation,
       ),
       trailing: Icon(
         Icons.chevron_right_rounded,

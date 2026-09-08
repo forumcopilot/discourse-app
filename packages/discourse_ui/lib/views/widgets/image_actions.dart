@@ -5,6 +5,7 @@ import 'package:discourse_ui/controllers/post_controller.dart';
 import 'package:discourse_ui/utils/cooked_content.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class ImageActions {
   final PostController _postsController;
@@ -69,7 +70,7 @@ class ImageActions {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Post not found.',
+              AppLocalizations.of(context)!.postNotFound,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),
@@ -149,7 +150,7 @@ class ImageActions {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'No images found to display.',
+              AppLocalizations.of(context)!.noImagesFoundToDisplay,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onInverseSurface,
                   ),

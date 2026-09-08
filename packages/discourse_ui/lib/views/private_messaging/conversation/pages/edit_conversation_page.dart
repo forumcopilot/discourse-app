@@ -130,7 +130,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Edit Conversation',
+          AppLocalizations.of(context)!.editConversation2,
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
             fontWeight: DesignTokens.fontWeightSemiBold,
@@ -181,7 +181,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                     ),
                     SizedBox(height: DesignTokens.spacingM),
                     Text(
-                      'Failed to load message',
+                      AppLocalizations.of(context)!.failedToLoadMessage2,
                       style: textTheme.titleMedium?.copyWith(
                         color: colorScheme.error,
                       ),
@@ -221,7 +221,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                     ),
                     SizedBox(height: DesignTokens.spacingM),
                     Text(
-                      'Cannot edit this conversation',
+                      AppLocalizations.of(context)!.cannotEditThisConversation,
                       style: textTheme.titleMedium?.copyWith(
                         color: colorScheme.error,
                       ),
@@ -271,7 +271,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
               children: [
                 // Title field
                 Text(
-                  'Title',
+                  AppLocalizations.of(context)!.title,
                   style: textTheme.titleSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontWeight: DesignTokens.fontWeightMedium,
@@ -310,7 +310,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Options',
+                      AppLocalizations.of(context)!.options,
                       style: textTheme.titleSmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                         fontWeight: DesignTokens.fontWeightMedium,
@@ -333,7 +333,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                           // Conversation Open toggle
                           SwitchListTile(
                             title: Text(
-                              'Conversation Open',
+                              AppLocalizations.of(context)!.conversationOpen,
                               style: textTheme.titleSmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                                 fontWeight: DesignTokens.fontWeightMedium,

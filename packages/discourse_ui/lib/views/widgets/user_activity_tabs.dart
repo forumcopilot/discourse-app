@@ -6,6 +6,7 @@ import 'filter_chip_bar.dart';
 import 'profile_section.dart';
 import 'user_created_topics.dart';
 import 'user_replied_posts.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// The profile's activity feeds. Web offers ten; these are the ones a
 /// *viewer* can actually read — `/user_actions.json` answers 403 to
@@ -60,7 +61,7 @@ class ActivitySectionHeading extends StatelessWidget {
           // controls belonging to the section above rather than the start
           // of the feed below.
           child: Text(
-            'Activity',
+            AppLocalizations.of(context)!.activity,
             style: textTheme.titleMedium?.copyWith(
               color: colorScheme.onSurface,
               fontWeight: DesignTokens.fontWeightBold,

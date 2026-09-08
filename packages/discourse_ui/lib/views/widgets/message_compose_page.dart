@@ -421,7 +421,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Maximum of ${pickConstraints!.count} attachment(s) allowed',
+                AppLocalizations.of(context)!.maximumAttachmentsAllowed((pickConstraints!.count ?? 0)),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onErrorContainer,
                     ),
@@ -520,7 +520,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'Failed to upload file. Please try again.',
+                    AppLocalizations.of(context)!.failedToUploadFilePleaseTryAgain,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onErrorContainer,
                         ),
@@ -552,7 +552,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Failed to upload file: $errorMessage',
+                  AppLocalizations.of(context)!.failedToUploadFile2(errorMessage),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onErrorContainer,
                       ),
@@ -571,7 +571,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Failed to pick file',
+              AppLocalizations.of(context)!.failedToPickFile,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),
@@ -600,7 +600,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Maximum of ${constraints!.count} attachment(s) allowed',
+                AppLocalizations.of(context)!.maximumAttachmentsAllowed((constraints!.count ?? 0)),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onErrorContainer,
                     ),
@@ -634,7 +634,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Only ${remainingSlots} more attachment(s) allowed. Processing first ${remainingSlots} image(s).',
+                AppLocalizations.of(context)!.onlyNMoreAttachmentsAllowed(remainingSlots, remainingSlots),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -660,7 +660,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'Attachment limit reached. Skipping remaining images.',
+                    AppLocalizations.of(context)!.attachmentLimitReachedSkippingRemainingImages,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -741,7 +741,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      '${imageToUpload.name}: Failed to upload image. Please try again.',
+                      AppLocalizations.of(context)!.failedToUploadImagePleaseTryAgain(imageToUpload.name),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onErrorContainer,
                           ),
@@ -771,7 +771,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    '${imageToUpload.name}: Failed to upload image: $errorMessage',
+                    AppLocalizations.of(context)!.failedToUploadImage2(imageToUpload.name, errorMessage),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onErrorContainer,
                         ),
@@ -791,7 +791,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Failed to pick image',
+              AppLocalizations.of(context)!.failedToPickImage,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),
@@ -885,7 +885,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Failed to remove attachment: ${e.toString()}',
+              AppLocalizations.of(context)!.failedToRemoveAttachment2(e.toString()),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),
@@ -923,7 +923,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
             Icon(Icons.attach_file, size: DesignTokens.iconSizeM, color: colorScheme.onSurfaceVariant),
             SizedBox(width: DesignTokens.spacingS),
             Text(
-              'Attachments',
+              AppLocalizations.of(context)!.attachments,
               style: textTheme.titleSmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
                 fontWeight: DesignTokens.fontWeightMedium,
@@ -1231,7 +1231,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
 
     return SwitchListTile(
       title: Text(
-        'Sent from ${widget.siteContext.site.name} mobile app',
+        AppLocalizations.of(context)!.sentFromMobileApp(widget.siteContext.site.name),
         style: textTheme.bodyMedium?.copyWith(
           color: colorScheme.onSurface,
         ),
@@ -1313,7 +1313,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Please wait for attachments to finish uploading',
+            AppLocalizations.of(context)!.pleaseWaitForAttachmentsToFinishUploading,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
@@ -1801,7 +1801,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Title',
+                                    AppLocalizations.of(context)!.title,
                                     style: textTheme.titleSmall?.copyWith(
                                       color: colorScheme.onSurfaceVariant,
                                       fontWeight: DesignTokens.fontWeightMedium,

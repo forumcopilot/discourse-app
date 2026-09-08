@@ -687,13 +687,13 @@ class _ConversationPageState extends State<ConversationPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Close Conversation',
+          AppLocalizations.of(context)!.closeConversation2,
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
           ),
         ),
         content: Text(
-          'Are you sure you want to close this conversation? This will prevent new replies from being posted.',
+          AppLocalizations.of(context)!.closeConversationConfirmation,
           style: textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -709,7 +709,7 @@ class _ConversationPageState extends State<ConversationPage> {
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(
-              'Close',
+              AppLocalizations.of(context)!.close,
               style: TextStyle(color: colorScheme.onPrimary),
             ),
           ),
@@ -761,13 +761,13 @@ class _ConversationPageState extends State<ConversationPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Open Conversation',
+          AppLocalizations.of(context)!.openConversation2,
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
           ),
         ),
         content: Text(
-          'Are you sure you want to open this conversation? This will allow new replies to be posted.',
+          AppLocalizations.of(context)!.openConversationConfirmation,
           style: textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -783,7 +783,7 @@ class _ConversationPageState extends State<ConversationPage> {
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(
-              'Open',
+              AppLocalizations.of(context)!.open,
               style: TextStyle(color: colorScheme.onPrimary),
             ),
           ),
@@ -835,13 +835,13 @@ class _ConversationPageState extends State<ConversationPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Leave Conversation',
+          AppLocalizations.of(context)!.leaveConversation3,
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
           ),
         ),
         content: Text(
-          'Are you sure you want to leave this conversation? This will hide it from your inbox.',
+          AppLocalizations.of(context)!.leaveConversationConfirmation,
           style: textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -857,7 +857,7 @@ class _ConversationPageState extends State<ConversationPage> {
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(
-              'Leave',
+              AppLocalizations.of(context)!.leave,
               style: TextStyle(color: colorScheme.onPrimary),
             ),
           ),
@@ -936,7 +936,7 @@ class _ConversationPageState extends State<ConversationPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Error loading conversation: $_error',
+              AppLocalizations.of(context)!.errorLoadingConversation(_error ?? ''),
               textAlign: TextAlign.center,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
@@ -953,7 +953,7 @@ class _ConversationPageState extends State<ConversationPage> {
     if (_conversation == null) {
       return Center(
         child: Text(
-          'Conversation not found',
+          AppLocalizations.of(context)!.conversationNotFound,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -988,7 +988,7 @@ class _ConversationPageState extends State<ConversationPage> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'This conversation is closed and no longer accepting replies',
+                    AppLocalizations.of(context)!.conversationClosedBanner,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -1088,7 +1088,7 @@ class _ConversationPageState extends State<ConversationPage> {
                           padding: const EdgeInsets.all(16.0),
                           child: Center(
                             child: Text(
-                              'No messages found',
+                              AppLocalizations.of(context)!.noMessagesFound,
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   ),
@@ -1122,7 +1122,7 @@ class _ConversationPageState extends State<ConversationPage> {
                                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                                 child: Center(
                                   child: Text(
-                                    'End of conversation',
+                                    AppLocalizations.of(context)!.endOfConversation,
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                                           fontStyle: FontStyle.italic,
@@ -1351,7 +1351,7 @@ class _ConversationPageState extends State<ConversationPage> {
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
               title: Text(
-                'Jump to Message',
+                AppLocalizations.of(context)!.jumpToMessage,
                 style: textTheme.titleLarge?.copyWith(
                   color: colorScheme.onSurface,
                 ),
@@ -1395,7 +1395,7 @@ class _ConversationPageState extends State<ConversationPage> {
                     await _jumpToMessagePosition(selectedMessagePosition);
                   },
                   child: Text(
-                    'Jump',
+                    AppLocalizations.of(context)!.jump,
                     style: TextStyle(color: colorScheme.primary),
                   ),
                 ),

@@ -499,7 +499,7 @@ class _PostPageState extends State<PostPage> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Move to category',
+                      AppLocalizations.of(context)!.moveToCategory,
                       style: textTheme.titleMedium?.copyWith(
                         color: colorScheme.onSurface,
                         fontWeight: DesignTokens.fontWeightSemiBold,
@@ -738,7 +738,7 @@ class _PostPageState extends State<PostPage> {
                 scaffoldMessenger.showSnackBar(
                   SnackBar(
                     content: Text(
-                      'Refresh failed: $e',
+                      AppLocalizations.of(context)!.refreshFailed(e),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onErrorContainer,
                           ),
@@ -818,7 +818,7 @@ class _PostPageState extends State<PostPage> {
                         const SizedBox(width: DesignTokens.spacingM),
                         Expanded(
                           child: Text(
-                            'This topic is deleted and hidden from other users',
+                            AppLocalizations.of(context)!.topicDeletedBanner,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: Theme.of(context).colorScheme.onErrorContainer,
                                 ),
@@ -867,7 +867,7 @@ class _PostPageState extends State<PostPage> {
                         const SizedBox(width: DesignTokens.spacingM),
                         Expanded(
                           child: Text(
-                            'This topic is closed and no longer accepting replies',
+                            AppLocalizations.of(context)!.topicClosedBanner,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: Theme.of(context).colorScheme.onTertiaryContainer,
                                 ),
@@ -916,7 +916,7 @@ class _PostPageState extends State<PostPage> {
                         const SizedBox(width: DesignTokens.spacingM),
                         Expanded(
                           child: Text(
-                            'This topic is pinned to the top of the forum',
+                            AppLocalizations.of(context)!.topicPinnedBanner,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: Theme.of(context).colorScheme.onPrimaryContainer,
                                 ),
@@ -965,7 +965,7 @@ class _PostPageState extends State<PostPage> {
                         const SizedBox(width: DesignTokens.spacingM),
                         Expanded(
                           child: Text(
-                            'You are subscribed to this topic',
+                            AppLocalizations.of(context)!.youAreSubscribedToThisTopic,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: Theme.of(context).colorScheme.onSecondaryContainer,
                                 ),
@@ -1104,7 +1104,7 @@ class _PostPageState extends State<PostPage> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Refreshing...',
+                      AppLocalizations.of(context)!.refreshing,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),

@@ -644,7 +644,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
             const SizedBox(height: DesignTokens.spacingL),
             Text(
-              'Search for topics',
+              AppLocalizations.of(context)!.searchForTopics,
               style: StyleBuilders.titleTextStyle(
                 colorScheme: colorScheme,
                 textTheme: textTheme,
@@ -745,14 +745,14 @@ class _SearchPageState extends State<SearchPage> {
             ),
             const SizedBox(height: DesignTokens.spacingL),
             Text(
-              'No topics found',
+              AppLocalizations.of(context)!.noTopicsFound,
               style: textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: DesignTokens.spacingS),
             Text(
-              'Try searching with different keywords',
+              AppLocalizations.of(context)!.trySearchingWithDifferentKeywords,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
@@ -822,14 +822,14 @@ class _SearchPageState extends State<SearchPage> {
             ),
             const SizedBox(height: DesignTokens.spacingL),
             Text(
-              'No posts found',
+              AppLocalizations.of(context)!.noPostsFound,
               style: textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: DesignTokens.spacingS),
             Text(
-              'Try searching with different keywords',
+              AppLocalizations.of(context)!.trySearchingWithDifferentKeywords,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
@@ -917,14 +917,14 @@ class _SearchPageState extends State<SearchPage> {
             ),
             const SizedBox(height: DesignTokens.spacingL),
             Text(
-              'No topics found',
+              AppLocalizations.of(context)!.noTopicsFound,
               style: textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: DesignTokens.spacingS),
             Text(
-              'Try searching with different keywords',
+              AppLocalizations.of(context)!.trySearchingWithDifferentKeywords,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),

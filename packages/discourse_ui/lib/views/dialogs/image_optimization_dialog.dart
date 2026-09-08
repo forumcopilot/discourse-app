@@ -29,7 +29,7 @@ Future<bool> showImageOptimizationDialog(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'This image exceeds the upload limits and needs to be optimized:',
+                AppLocalizations.of(context)!.imageExceedsUploadLimits,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 16),
@@ -48,7 +48,7 @@ Future<bool> showImageOptimizationDialog(
               const Divider(),
               const SizedBox(height: 12),
               Text(
-                'Optimizations to be applied:',
+                AppLocalizations.of(context)!.optimizationsToBeApplied,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -89,7 +89,7 @@ Future<bool> showImageOptimizationDialog(
                 ),
               if (plan.estimatedSize != null)
                 Text(
-                  'Reduction: ${((1 - plan.estimatedSize! / plan.originalSize) * 100).toStringAsFixed(1)}%',
+                  AppLocalizations.of(context)!.reductionPercent(((1 - plan.estimatedSize! / plan.originalSize) * 100).toStringAsFixed(1)),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                       ),

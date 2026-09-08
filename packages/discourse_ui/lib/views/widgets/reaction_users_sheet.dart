@@ -270,7 +270,7 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
     if (_users.isEmpty) {
       return Center(
         child: Text(
-          'No reactions yet',
+          AppLocalizations.of(context)!.noReactionsYet,
           style: textTheme.bodyMedium
               ?.copyWith(color: colorScheme.onSurfaceVariant),
         ),

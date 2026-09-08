@@ -8,6 +8,7 @@ import '../theme/design_tokens.dart';
 import '../utils/time_utils.dart';
 import 'widgets/rich_text_content.dart';
 import 'widgets/user_avatar.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Discourse-native edit-history viewer. Shows one revision at a time —
 /// the server-rendered inline diff (`body_changes.inline`, with
@@ -91,7 +92,7 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Edit History',
+          AppLocalizations.of(context)!.editHistory,
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
             fontWeight: DesignTokens.fontWeightMedium,
@@ -152,7 +153,7 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
               if (rev.titleInlineHtml != null &&
                   rev.titleInlineHtml!.isNotEmpty) ...[
                 Text(
-                  'Title',
+                  AppLocalizations.of(context)!.title,
                   style: textTheme.titleSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontWeight: DesignTokens.fontWeightMedium,
@@ -213,7 +214,7 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
                 ),
                 if (rev.createdAt != null)
                   Text(
-                    'Edited ${formatTimeAgo(rev.createdAt!, context)}',
+                    AppLocalizations.of(context)!.editedAt(formatTimeAgo(rev.createdAt!, context)),
                     style: textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -221,7 +222,7 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
                 if (rev.editReason?.trim().isNotEmpty == true) ...[
                   const SizedBox(height: DesignTokens.spacingXS),
                   Text(
-                    'Reason: ${rev.editReason!.trim()}',
+                    AppLocalizations.of(context)!.editReason(rev.editReason!.trim()),
                     style: textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                       fontStyle: FontStyle.italic,
@@ -263,7 +264,7 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
                 const SizedBox(width: DesignTokens.spacingS),
                 Expanded(
                   child: Text(
-                    'This diff is too large to display.',
+                    AppLocalizations.of(context)!.thisDiffIsTooLargeToDisplay,
                     style: textTheme.bodySmall?.copyWith(
                       color: colorScheme.onErrorContainer,
                     ),
@@ -292,7 +293,7 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
     }
     if (fallbackHtml == null || fallbackHtml.isEmpty) {
       return Text(
-        'No content changes in this revision.',
+        AppLocalizations.of(context)!.noContentChangesInThisRevision,
         style: textTheme.bodyMedium?.copyWith(
           color: colorScheme.onSurfaceVariant,
         ),
@@ -338,7 +339,7 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
                     : () => _load(revision: rev.previousRevision),
               ),
               Text(
-                'Revision ${rev.currentVersion} of ${rev.versionCount}',
+                AppLocalizations.of(context)!.revisionOf(rev.currentVersion, rev.versionCount),
                 style: textTheme.titleSmall?.copyWith(
                   color: colorScheme.onSurface,
                   fontWeight: DesignTokens.fontWeightMedium,

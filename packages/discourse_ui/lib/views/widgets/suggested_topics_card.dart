@@ -10,6 +10,7 @@ import '../../utils/time_utils.dart';
 import '../lists/posts_list.dart';
 import '../post_page.dart';
 import 'user_avatar.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// "Suggested Topics" footer card, rendered at the bottom of every
 /// topic page on Discourse. Mirrors the web client's footer block so
@@ -132,7 +133,7 @@ class _SuggestedTopicsCardState extends State<SuggestedTopicsCard> {
               DesignTokens.spacingS,
             ),
             child: Text(
-              'Suggested Topics',
+              AppLocalizations.of(context)!.suggestedTopics,
               style: textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: colorScheme.onSurfaceVariant,
@@ -214,7 +215,7 @@ class _SuggestedTopicTile extends StatelessWidget {
                             borderRadius: BorderRadius.circular(2),
                           ),
                           child: Text(
-                            'NEW',
+                            AppLocalizations.of(context)!.newLabel,
                             style: textTheme.labelSmall?.copyWith(
                               color: colorScheme.onPrimary,
                               fontSize: 9,

@@ -244,7 +244,7 @@ class _AllBadgesSheet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Badges',
+            AppLocalizations.of(context)!.badges,
             style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: DesignTokens.spacingM),

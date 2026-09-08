@@ -118,7 +118,7 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Vote removed',
+              AppLocalizations.of(context)!.voteRemoved,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onInverseSurface,
                   ),
@@ -567,7 +567,7 @@ class _PollVotersSheetState extends State<_PollVotersSheet> {
                 DesignTokens.spacingS,
               ),
               child: Text(
-                'Voters',
+                AppLocalizations.of(context)!.voters,
                 style: textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -593,7 +593,7 @@ class _PollVotersSheetState extends State<_PollVotersSheet> {
               Padding(
                 padding: const EdgeInsets.all(DesignTokens.spacingL),
                 child: Text(
-                  'No votes yet.',
+                  AppLocalizations.of(context)!.noVotesYet,
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),

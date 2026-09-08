@@ -737,7 +737,7 @@ class _PostListItemState extends State<PostListItem> {
                   ),
                   const SizedBox(width: DesignTokens.spacingXS),
                   Text(
-                    'Solution',
+                    AppLocalizations.of(context)!.solution,
                     style: textTheme.labelMedium?.copyWith(
                       color: Colors.green.shade800,
                       fontWeight: DesignTokens.fontWeightBold,

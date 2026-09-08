@@ -515,7 +515,7 @@ class _ConversationAttachmentActions {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'No images found to display.',
+            AppLocalizations.of(context)!.noImagesFoundToDisplay,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
@@ -544,7 +544,7 @@ class _ConversationAttachmentActions {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Please login to view this attachment',
+          AppLocalizations.of(context)!.pleaseLoginToViewThisAttachment,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onErrorContainer,
               ),

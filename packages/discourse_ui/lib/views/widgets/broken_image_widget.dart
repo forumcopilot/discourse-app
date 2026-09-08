@@ -169,7 +169,7 @@ class BrokenImageWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Tap to open',
+                    AppLocalizations.of(context)!.tapToOpen,
                     style: textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                       fontSize: fontSize - 1,
@@ -178,7 +178,7 @@ class BrokenImageWidget extends StatelessWidget {
                   ),
                 ] else ...[
                   Text(
-                    'Image not available',
+                    AppLocalizations.of(context)!.imageNotAvailable,
                     style: textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
                       fontSize: fontSize,

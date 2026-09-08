@@ -6,6 +6,7 @@ import 'package:discourse_ui/views/widgets/forum_icon_widget.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/discourse_color.dart';
 import '../../theme/style_builders.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Parse a Discourse hex string like "BF1E2E" (no leading `#`) into a
 /// Color. Returns null on bad input so the UI can hide the stripe.
@@ -254,7 +255,7 @@ class ForumListItem extends StatelessWidget {
                                       ),
                                       const SizedBox(width: DesignTokens.spacingXS),
                                       Text(
-                                        'Protected',
+                                        AppLocalizations.of(context)!.protected,
                                         style: StyleBuilders.smallTextStyle(
                                           colorScheme: colorScheme,
                                           textTheme: textTheme,

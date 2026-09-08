@@ -159,7 +159,7 @@ class _ProfileViewState extends State<ProfileView> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'You do not have permission to upload avatars',
+              AppLocalizations.of(context)!.noPermissionToUploadAvatar,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),
@@ -217,7 +217,7 @@ class _ProfileViewState extends State<ProfileView> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'Avatar uploaded successfully',
+                    AppLocalizations.of(context)!.avatarUploadedSuccessfully,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color:
                               Theme.of(context).colorScheme.onInverseSurface,
@@ -255,7 +255,7 @@ class _ProfileViewState extends State<ProfileView> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Failed to pick image: $e',
+              AppLocalizations.of(context)!.failedToPickImage2(e),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),

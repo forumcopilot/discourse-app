@@ -15,6 +15,7 @@ import 'package:discourse_ui/views/widgets/forum_actions.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSubscriptionProxy;
 import 'package:discourse_ui/views/widgets/notification_level_sheet.dart';
+import '../l10n/generated/app_localizations.dart';
 
 class ForumTopicsPage extends StatefulWidget {
   final FCForum forum;
@@ -44,7 +45,7 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Please login to create a new topic',
+            AppLocalizations.of(context)!.pleaseLoginToCreateANewTopic,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
@@ -102,7 +103,7 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Please login to subscribe to forums',
+            AppLocalizations.of(context)!.pleaseLoginToSubscribeToForums,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),

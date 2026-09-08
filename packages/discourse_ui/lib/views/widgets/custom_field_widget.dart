@@ -125,7 +125,7 @@ class _CustomFieldWidgetState extends State<CustomFieldWidget> {
             prefixIcon: Icons.arrow_drop_down_circle_outlined,
           ),
           hint: Text(
-            'Select an option',
+            AppLocalizations.of(context)!.selectAnOption,
             style: TextStyle(color: colorScheme.onSurfaceVariant),
           ),
           items: options.entries.map((entry) {

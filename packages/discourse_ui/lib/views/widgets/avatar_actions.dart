@@ -44,13 +44,13 @@ class AvatarActions {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Login Required',
+          AppLocalizations.of(context)!.loginRequired,
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
           ),
         ),
         content: Text(
-          'Please login to view user profiles.',
+          AppLocalizations.of(context)!.pleaseLoginToViewUserProfiles,
           style: textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSurface,
           ),
@@ -69,7 +69,7 @@ class AvatarActions {
               Get.to(() => LoginPage(siteContext: siteContext));
             },
             child: Text(
-              'Login',
+              AppLocalizations.of(context)!.loginTitle,
               style: TextStyle(color: colorScheme.primary),
             ),
           ),

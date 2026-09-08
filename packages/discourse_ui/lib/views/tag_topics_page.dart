@@ -221,7 +221,7 @@ class _TagTopicsPageState extends State<TagTopicsPage> {
         children: [
           Center(
             child: Text(
-              'No topics tagged "${widget.tag}"',
+              AppLocalizations.of(context)!.noTopicsTagged(widget.tag),
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),

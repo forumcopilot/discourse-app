@@ -560,7 +560,7 @@ class _NewDmSheetState extends State<_NewDmSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'New direct message',
+            AppLocalizations.of(context)!.newDirectMessage,
             style:
                 textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),

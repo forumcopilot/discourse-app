@@ -638,7 +638,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
                         ),
                         const SizedBox(height: DesignTokens.spacingXL),
                         Text(
-                          'Error loading notifications',
+                          AppLocalizations.of(context)!.errorLoadingNotifications,
                           style: textTheme.headlineSmall?.copyWith(
                             color: colorScheme.onSurface,
                             fontWeight: DesignTokens.fontWeightBold,
@@ -655,7 +655,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
                         ),
                         const SizedBox(height: DesignTokens.spacingL),
                         Text(
-                          'Pull down to refresh',
+                          AppLocalizations.of(context)!.pullDownToRefresh,
                           style: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                           ),
@@ -705,7 +705,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
                         ),
                         const SizedBox(height: DesignTokens.spacingS),
                         Text(
-                          'You have no new notifications. Check back later for updates on topics you\'re following.',
+                          AppLocalizations.of(context)!.noNewNotificationsExplanation,
                           style: textTheme.bodyLarge?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -713,7 +713,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
                         ),
                         const SizedBox(height: DesignTokens.spacingL),
                         Text(
-                          'Pull down to refresh',
+                          AppLocalizations.of(context)!.pullDownToRefresh,
                           style: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                           ),

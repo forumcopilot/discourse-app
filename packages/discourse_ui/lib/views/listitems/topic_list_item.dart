@@ -227,7 +227,7 @@ class TopicListItem extends StatelessWidget {
                           ),
                           SizedBox(width: DesignTokens.spacingXS),
                           Text(
-                            'DELETED',
+                            AppLocalizations.of(context)!.deleted,
                             style: StyleBuilders.smallTextStyle(
                               colorScheme: colorScheme,
                               textTheme: textTheme,
@@ -487,7 +487,7 @@ class TopicListItem extends StatelessWidget {
                             if (showLabels) ...[
                               SizedBox(width: DesignTokens.spacingXS),
                               Text(
-                                'Announcement',
+                                AppLocalizations.of(context)!.announcement,
                                 style: textTheme.bodySmall?.copyWith(
                                   color: metaColor,
                                   letterSpacing: DesignTokens.letterSpacingWide,
@@ -508,7 +508,7 @@ class TopicListItem extends StatelessWidget {
                             if (showLabels) ...[
                               SizedBox(width: DesignTokens.spacingXS),
                               Text(
-                                'Solved',
+                                AppLocalizations.of(context)!.solved,
                                 style: textTheme.bodySmall?.copyWith(
                                   color: Colors.green.shade600,
                                   letterSpacing: DesignTokens.letterSpacingWide,
@@ -535,7 +535,7 @@ class TopicListItem extends StatelessWidget {
                             if (showLabels) ...[
                               SizedBox(width: DesignTokens.spacingXS),
                               Text(
-                                'Hot',
+                                AppLocalizations.of(context)!.hot,
                                 style: textTheme.bodySmall?.copyWith(
                                   color: Colors.deepOrange.shade400,
                                   letterSpacing: DesignTokens.letterSpacingWide,
@@ -556,7 +556,7 @@ class TopicListItem extends StatelessWidget {
                             if (showLabels) ...[
                               SizedBox(width: DesignTokens.spacingXS),
                               Text(
-                                'Pinned',
+                                AppLocalizations.of(context)!.pinned,
                                 style: textTheme.bodySmall?.copyWith(
                                   color: metaColor,
                                   letterSpacing: DesignTokens.letterSpacingWide,
@@ -577,7 +577,7 @@ class TopicListItem extends StatelessWidget {
                             if (showLabels) ...[
                               SizedBox(width: DesignTokens.spacingXS),
                               Text(
-                                'Subscribed',
+                                AppLocalizations.of(context)!.subscribedLabel,
                                 style: textTheme.bodySmall?.copyWith(
                                   color: metaColor,
                                   letterSpacing: DesignTokens.letterSpacingWide,
@@ -598,7 +598,7 @@ class TopicListItem extends StatelessWidget {
                             if (showLabels) ...[
                               SizedBox(width: DesignTokens.spacingXS),
                               Text(
-                                'Locked',
+                                AppLocalizations.of(context)!.locked,
                                 style: textTheme.bodySmall?.copyWith(
                                   color: metaColor,
                                   letterSpacing: DesignTokens.letterSpacingWide,
@@ -620,7 +620,7 @@ class TopicListItem extends StatelessWidget {
                             if (showLabels) ...[
                               SizedBox(width: DesignTokens.spacingXS),
                               Text(
-                                'Poll',
+                                AppLocalizations.of(context)!.poll,
                                 style: textTheme.bodySmall?.copyWith(
                                   color: metaColor,
                                   letterSpacing: DesignTokens.letterSpacingWide,

@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import '../theme/design_tokens.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Phase 5.22 — inline profile editing.
 ///
@@ -134,7 +135,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                   )
                 : Text(
-                    'Save',
+                    AppLocalizations.of(context)!.save,
                     style: TextStyle(
                       color: colorScheme.primary,
                       fontWeight: DesignTokens.fontWeightSemiBold,
@@ -185,10 +186,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
               const SizedBox(height: DesignTokens.spacingXL),
               Text(
-                'Display name, email, password, and other account '
-                'settings are managed under Account → Manage account '
-                'on web. Your avatar can be changed by tapping the '
-                'camera badge on your photo.',
+                AppLocalizations.of(context)!.editProfileManagedOnWebNote,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),

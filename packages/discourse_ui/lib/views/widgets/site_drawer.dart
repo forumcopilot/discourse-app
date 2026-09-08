@@ -277,7 +277,7 @@ class SiteDrawer extends StatelessWidget {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.signOutQuestion),
           content: Text(
-            'You will be signed out of ${siteContext.site.name}. You can sign back in any time.',
+            AppLocalizations.of(context)!.signOutWarning(siteContext.site.name),
           ),
           actions: [
             TextButton(

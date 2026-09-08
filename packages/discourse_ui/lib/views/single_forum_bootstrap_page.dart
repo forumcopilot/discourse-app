@@ -177,7 +177,7 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
                     const CircularProgressIndicator(),
                     const SizedBox(height: 16),
                     Text(
-                      'Initializing forum…',
+                      AppLocalizations.of(context)!.initializingForum,
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),

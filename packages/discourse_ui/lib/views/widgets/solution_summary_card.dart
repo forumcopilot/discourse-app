@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../../theme/design_tokens.dart';
 import 'rich_text_content.dart';
 import 'user_avatar.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// The accepted-answer panel shown under the FIRST post of a solved topic.
 ///
@@ -64,7 +65,7 @@ class SolutionSummaryCard extends StatelessWidget {
                         size: DesignTokens.iconSizeM, color: accent),
                     SizedBox(width: DesignTokens.spacingS),
                     Text(
-                      'Solution',
+                      AppLocalizations.of(context)!.solution,
                       style: textTheme.titleSmall?.copyWith(
                         color: accent,
                         fontWeight: DesignTokens.fontWeightSemiBold,

@@ -122,7 +122,7 @@ class ConversationAppBar extends BaseForumAppBar {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Edit conversation',
+                    AppLocalizations.of(context)!.editConversation,
                     style: TextStyle(
                       color: colorScheme.onSurface,
                     ),
@@ -143,7 +143,7 @@ class ConversationAppBar extends BaseForumAppBar {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Close conversation',
+                    AppLocalizations.of(context)!.closeConversation,
                     style: TextStyle(
                       color: colorScheme.onSurface,
                     ),
@@ -163,7 +163,7 @@ class ConversationAppBar extends BaseForumAppBar {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Open conversation',
+                    AppLocalizations.of(context)!.openConversation,
                     style: TextStyle(
                       color: colorScheme.onSurface,
                     ),
@@ -186,7 +186,7 @@ class ConversationAppBar extends BaseForumAppBar {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Leave conversation',
+                    AppLocalizations.of(context)!.leaveConversation2,
                     style: TextStyle(
                       color: colorScheme.error,
                     ),
@@ -207,7 +207,7 @@ class ConversationAppBar extends BaseForumAppBar {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Report conversation',
+                    AppLocalizations.of(context)!.reportConversation2,
                     style: TextStyle(
                       color: colorScheme.error,
                     ),

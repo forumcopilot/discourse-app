@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import '../theme/design_tokens.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Phase 5.23 — change-email flow.
 ///
@@ -95,7 +96,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                     ),
                   )
                 : Text(
-                    'Send',
+                    AppLocalizations.of(context)!.send,
                     style: TextStyle(
                       color: colorScheme.primary,
                       fontWeight: DesignTokens.fontWeightSemiBold,
@@ -113,8 +114,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'We’ll send a confirmation link to your new email. '
-                'The change takes effect when you click it.',
+                AppLocalizations.of(context)!.changeEmailExplanation,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -149,9 +149,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
               ),
               const SizedBox(height: DesignTokens.spacingXL),
               Text(
-                'For added security, Discourse may require you to '
-                'confirm via the link in the email. Check your spam '
-                'folder if you don’t see it.',
+                AppLocalizations.of(context)!.changeEmailSecurityNote,
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),

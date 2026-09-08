@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/design_tokens.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Purely informational bottom sheet explaining Discourse's five trust
 /// levels, opened by tapping the "TL{n} · {name}" chip on a profile.
@@ -81,7 +82,7 @@ class TrustLevelSheet extends StatelessWidget {
                 DesignTokens.spacingXS,
               ),
               child: Text(
-                'Trust levels',
+                AppLocalizations.of(context)!.trustLevels,
                 style: textTheme.titleMedium?.copyWith(
                   fontWeight: DesignTokens.fontWeightSemiBold,
                 ),
@@ -95,8 +96,7 @@ class TrustLevelSheet extends StatelessWidget {
                 DesignTokens.spacingM,
               ),
               child: Text(
-                'Members earn trust by reading and participating. '
-                'Each level unlocks new abilities.',
+                AppLocalizations.of(context)!.trustLevelsExplanation,
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),

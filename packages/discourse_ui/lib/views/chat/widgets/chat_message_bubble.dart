@@ -8,6 +8,7 @@ import '../../user_profile_page.dart';
 import '../../widgets/rich_text_content.dart';
 import '../../widgets/user_avatar.dart';
 import 'chat_reaction_chips.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 /// One chat message bubble — left-aligned for others, right-aligned for
 /// self. Ported from the qhtt xenforoapp's Siropu bubble; the rendering
@@ -137,7 +138,7 @@ class ChatMessageBubble extends StatelessWidget {
                       children: [
                         if (message.edited) ...[
                           Text(
-                            'edited',
+                            AppLocalizations.of(context)!.edited,
                             style: textTheme.labelSmall?.copyWith(
                               color: mutedTextColor,
                               fontStyle: FontStyle.italic,

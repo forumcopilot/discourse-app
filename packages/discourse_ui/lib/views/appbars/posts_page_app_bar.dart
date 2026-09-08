@@ -336,7 +336,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   ),
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
-                    'Rename topic',
+                    AppLocalizations.of(context)!.renameTopic,
                     style: textTheme.titleMedium?.copyWith(
                       color: colorScheme.onSurface,
                     ),
@@ -357,7 +357,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   ),
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
-                    'Move to category',
+                    AppLocalizations.of(context)!.moveToCategory,
                     style: textTheme.titleMedium?.copyWith(
                       color: colorScheme.onSurface,
                     ),
@@ -377,7 +377,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   ),
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
-                    'Merge into topic',
+                    AppLocalizations.of(context)!.mergeIntoTopic,
                     style: textTheme.titleMedium?.copyWith(
                       color: colorScheme.onSurface,
                     ),
@@ -521,7 +521,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                           Navigator.of(context).pop();
                         },
                         child: Text(
-                          'Cancel',
+                          AppLocalizations.of(context)!.cancel,
                           style: textTheme.labelLarge?.copyWith(
                             color: colorScheme.primary,
                           ),
@@ -581,7 +581,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                           Navigator.of(context).pop();
                         },
                         child: Text(
-                          'Cancel',
+                          AppLocalizations.of(context)!.cancel,
                           style: textTheme.labelLarge?.copyWith(
                             color: colorScheme.primary,
                           ),
@@ -624,13 +624,13 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: Text(
-                        'Undelete Topic',
+                        AppLocalizations.of(context)!.undeleteTopic,
                         style: textTheme.titleLarge?.copyWith(
                           color: colorScheme.error,
                         ),
                       ),
                       content: Text(
-                        'Are you sure you want to undelete this topic? It will be visible to other users again.',
+                        AppLocalizations.of(context)!.undeleteTopicConfirmation,
                         style: textTheme.bodyLarge?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -641,7 +641,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                             Navigator.of(context).pop();
                           },
                           child: Text(
-                            'Cancel',
+                            AppLocalizations.of(context)!.cancel,
                             style: textTheme.labelLarge?.copyWith(
                               color: colorScheme.primary,
                             ),

@@ -257,7 +257,7 @@ class PostActionsHandler {
               const SizedBox(width: DesignTokens.spacingM),
               Expanded(
                 child: Text(
-                  'Failed to post reply. Please try again.',
+                  AppLocalizations.of(context)!.failedToPostReplyPleaseTryAgain,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onErrorContainer,
                       ),
@@ -308,7 +308,7 @@ class PostActionsHandler {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Please wait for the thread to load',
+            AppLocalizations.of(context)!.pleaseWaitForTheThreadToLoad,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
@@ -336,7 +336,7 @@ class PostActionsHandler {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Please wait for the thread to load',
+              AppLocalizations.of(context)!.pleaseWaitForTheThreadToLoad,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onInverseSurface,
                   ),
@@ -358,7 +358,7 @@ class PostActionsHandler {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Please wait for the thread to load',
+              AppLocalizations.of(context)!.pleaseWaitForTheThreadToLoad,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onInverseSurface,
                   ),
@@ -484,7 +484,7 @@ class PostActionsHandler {
               const SizedBox(width: DesignTokens.spacingM),
               Expanded(
                 child: Text(
-                  'Failed to update post. Please try again.',
+                  AppLocalizations.of(context)!.failedToUpdatePostPleaseTryAgain,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onErrorContainer,
                       ),
@@ -658,7 +658,7 @@ class PostActionsHandler {
                   ),
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
-                    'Post deleted successfully',
+                    AppLocalizations.of(context)!.postDeletedSuccessfully,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onInverseSurface,
                         ),
@@ -696,7 +696,7 @@ class PostActionsHandler {
                   const SizedBox(width: DesignTokens.spacingM),
                   Expanded(
                     child: Text(
-                      'Failed to delete post: ${e.toString()}',
+                      AppLocalizations.of(context)!.failedToDeletePost(e.toString()),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onErrorContainer,
                           ),
@@ -809,7 +809,7 @@ class PostActionsHandler {
               ),
               const SizedBox(width: DesignTokens.spacingM),
               Text(
-                'Submitting report...',
+                AppLocalizations.of(context)!.submittingReport,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onInverseSurface,
                     ),
@@ -852,7 +852,7 @@ class PostActionsHandler {
                     ),
                     const SizedBox(width: DesignTokens.spacingM),
                     Text(
-                      'Report submitted successfully',
+                      AppLocalizations.of(context)!.reportSubmittedSuccessfully,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onInverseSurface,
                           ),
@@ -934,7 +934,7 @@ class PostActionsHandler {
                   const SizedBox(width: DesignTokens.spacingM),
                   Expanded(
                     child: Text(
-                      'Failed to submit report: ${e.toString()}',
+                      AppLocalizations.of(context)!.failedToSubmitReport2(e.toString()),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onErrorContainer,
                           ),
@@ -975,7 +975,7 @@ class PostActionsHandler {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Edit history is not available for this post',
+            AppLocalizations.of(context)!.editHistoryNotAvailable,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
@@ -1267,7 +1267,7 @@ class PostActionsHandler {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Login Required',
+          AppLocalizations.of(context)!.loginRequired,
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
           ),
@@ -1282,7 +1282,7 @@ class PostActionsHandler {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Cancel',
+              AppLocalizations.of(context)!.cancel,
               style: TextStyle(color: colorScheme.primary),
             ),
           ),
@@ -1311,7 +1311,7 @@ class PostActionsHandler {
               }
             },
             child: Text(
-              'Login',
+              AppLocalizations.of(context)!.loginTitle,
               style: TextStyle(color: colorScheme.primary),
             ),
           ),

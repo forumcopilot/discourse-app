@@ -190,7 +190,7 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
                       ),
                     )
                   : Text(
-                      'Unignore',
+                      AppLocalizations.of(context)!.unignore,
                       style: TextStyle(
                         color: colorScheme.primary,
                         fontWeight: DesignTokens.fontWeightSemiBold,

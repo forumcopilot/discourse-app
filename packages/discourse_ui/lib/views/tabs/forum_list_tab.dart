@@ -346,7 +346,7 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
             ),
             const SizedBox(height: DesignTokens.spacingL),
             Text(
-              'Unable to Load Forums',
+              AppLocalizations.of(context)!.unableToLoadForums,
               textAlign: TextAlign.center,
               style: textTheme.titleLarge?.copyWith(
                 color: colorScheme.error,
@@ -410,7 +410,7 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
                     ),
                     const SizedBox(height: DesignTokens.spacingS),
                     Text(
-                      'There are no forums to display. This might be due to permissions or the forum structure.',
+                      AppLocalizations.of(context)!.noForumsToDisplayExplanation,
                       style: textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -453,7 +453,7 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
                   ),
                   const SizedBox(width: DesignTokens.spacingS),
                   Text(
-                    'Subscribed Forums',
+                    AppLocalizations.of(context)!.subscribedForums,
                     style: StyleBuilders.titleTextStyle(
                       colorScheme: colorScheme,
                       textTheme: textTheme,

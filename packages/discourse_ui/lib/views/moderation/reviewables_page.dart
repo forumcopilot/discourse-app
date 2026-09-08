@@ -403,7 +403,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
               child: Padding(
                 padding: const EdgeInsets.only(top: DesignTokens.spacingS),
                 child: Text(
-                  'Only staff and reviewers can see the review queue.',
+                  AppLocalizations.of(context)!.reviewQueueStaffOnly,
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -420,7 +420,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
         children: [
           Center(
             child: Text(
-              'Nothing to review',
+              AppLocalizations.of(context)!.nothingToReview,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),

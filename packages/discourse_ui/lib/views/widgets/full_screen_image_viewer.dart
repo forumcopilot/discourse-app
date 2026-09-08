@@ -80,7 +80,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Permission denied to save image',
+                AppLocalizations.of(context)!.permissionDeniedToSaveImage,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onErrorContainer,
                     ),

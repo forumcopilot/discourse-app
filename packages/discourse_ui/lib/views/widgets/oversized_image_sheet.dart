@@ -72,7 +72,7 @@ class _OversizedImageSheetState extends State<_OversizedImageSheet> {
                 SizedBox(width: DesignTokens.spacingM),
                 Expanded(
                   child: Text(
-                    'Image is too large to upload',
+                    AppLocalizations.of(context)!.imageIsTooLargeToUpload,
                     style: textTheme.titleMedium?.copyWith(
                       fontWeight: DesignTokens.fontWeightBold,
                     ),
@@ -82,15 +82,13 @@ class _OversizedImageSheetState extends State<_OversizedImageSheet> {
             ),
             SizedBox(height: DesignTokens.spacingM),
             Text(
-              '${widget.fileName} is ${formatFileSize(widget.fileBytes)}. '
-              'This forum allows up to ${formatFileSize(widget.maxBytes)}.',
+              AppLocalizations.of(context)!.fileTooLargeForForum(widget.fileName, formatFileSize(widget.fileBytes), formatFileSize(widget.maxBytes)),
               style: textTheme.bodyMedium
                   ?.copyWith(color: colorScheme.onSurfaceVariant),
             ),
             SizedBox(height: DesignTokens.spacingS),
             Text(
-              'It can be scaled down just enough to fit, keeping its format '
-              'and as much detail as the limit allows.',
+              AppLocalizations.of(context)!.resizeToFitExplanation,
               style: textTheme.bodyMedium
                   ?.copyWith(color: colorScheme.onSurfaceVariant),
             ),

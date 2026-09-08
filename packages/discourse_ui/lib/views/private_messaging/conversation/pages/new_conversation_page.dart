@@ -209,7 +209,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                   SizedBox(width: DesignTokens.spacingM),
                   Expanded(
                     child: Text(
-                      'Failed to create conversation: ${e.toString()}',
+                      AppLocalizations.of(context)!.failedToCreateConversation(e.toString()),
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onErrorContainer,
                       ),
@@ -272,7 +272,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Participants',
+          AppLocalizations.of(context)!.participantsLabel,
           style: textTheme.titleSmall?.copyWith(
             color: colorScheme.onSurfaceVariant,
             fontWeight: DesignTokens.fontWeightMedium,
@@ -291,7 +291,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                 color: colorScheme.primary,
               ),
               label: Text(
-                'Add',
+                AppLocalizations.of(context)!.add,
                 style: TextStyle(
                   color: colorScheme.primary,
                 ),
@@ -337,7 +337,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'New Message',
+          AppLocalizations.of(context)!.newConversation,
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
             fontWeight: DesignTokens.fontWeightSemiBold,
@@ -440,7 +440,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Subject',
+                            AppLocalizations.of(context)!.subject,
                             style: textTheme.titleSmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                               fontWeight: DesignTokens.fontWeightMedium,
@@ -486,7 +486,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Message',
+                            AppLocalizations.of(context)!.message,
                             style: textTheme.titleSmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                               fontWeight: DesignTokens.fontWeightMedium,
@@ -541,7 +541,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                                 Icon(Icons.attach_file, size: DesignTokens.iconSizeM, color: colorScheme.onSurfaceVariant),
                                 SizedBox(width: DesignTokens.spacingS),
                                 Text(
-                                  'Attachments',
+                                  AppLocalizations.of(context)!.attachments,
                                   style: textTheme.titleSmall?.copyWith(
                                     color: colorScheme.onSurfaceVariant,
                                     fontWeight: DesignTokens.fontWeightMedium,
@@ -774,7 +774,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Maximum of ${constraints!.count} attachment(s) allowed',
+              AppLocalizations.of(context)!.maximumAttachmentsAllowed((constraints!.count ?? 0)),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),

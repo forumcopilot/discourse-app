@@ -45,7 +45,7 @@ class ForumSettingsPage extends StatelessWidget {
                 color: colorScheme.onSurfaceVariant),
             title: Text(AppLocalizations.of(context)!.notifications),
             subtitle: Text(
-              'Email frequency, like aggregation, digest schedule',
+              AppLocalizations.of(context)!.emailSettingsSubtitle,
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -64,7 +64,7 @@ class ForumSettingsPage extends StatelessWidget {
                 color: colorScheme.onSurfaceVariant),
             title: Text(AppLocalizations.of(context)!.manageAccountOnWeb),
             subtitle: Text(
-              'Profile, email, password, security, advanced settings',
+              AppLocalizations.of(context)!.manageAccountSubtitle,
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -95,7 +95,7 @@ class ForumSettingsPage extends StatelessWidget {
                 color: colorScheme.onSurfaceVariant),
             title: Text(AppLocalizations.of(context)!.changePassword),
             subtitle: Text(
-              'Trigger a password-reset email to your current address',
+              AppLocalizations.of(context)!.changePasswordSubtitle,
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -110,7 +110,7 @@ class ForumSettingsPage extends StatelessWidget {
                 color: colorScheme.onSurfaceVariant),
             title: Text(AppLocalizations.of(context)!.ignoredUsers),
             subtitle: Text(
-              'See and manage users whose posts are hidden from you',
+              AppLocalizations.of(context)!.ignoredUsersSubtitle,
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -155,7 +155,7 @@ class ForumSettingsPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Delete account',
+                    AppLocalizations.of(context)!.deleteAccount,
                     style: textTheme.titleMedium?.copyWith(
                       color: colorScheme.onSurface,
                       fontWeight:
@@ -164,10 +164,7 @@ class ForumSettingsPage extends StatelessWidget {
                   ),
                   const SizedBox(height: DesignTokens.spacingS),
                   Text(
-                    'Removing your account is handled on the forum. '
-                    'Continue to open the site and contact the staff '
-                    'team — Discourse forums process deletions per '
-                    'their own policy.',
+                    AppLocalizations.of(context)!.deleteAccountExplanation,
                     style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -210,10 +207,9 @@ class ForumSettingsPage extends StatelessWidget {
     );
     if (sent == true) {
       messenger.showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Verification email sent — click the link to confirm '
-            'your new address.',
+            AppLocalizations.of(context)!.verificationEmailSent,
           ),
         ),
       );
@@ -283,10 +279,8 @@ class ForumSettingsPage extends StatelessWidget {
       builder: (dialogContext) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.changePassword),
-          content: const Text(
-            'We’ll email you a password-reset link. Click it to '
-            'choose a new password — the change is handled on the '
-            'forum, not in this app.',
+          content: Text(
+            AppLocalizations.of(context)!.passwordResetExplanation,
           ),
           actions: [
             TextButton(
@@ -296,7 +290,7 @@ class ForumSettingsPage extends StatelessWidget {
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
               child: Text(
-                'Send reset email',
+                AppLocalizations.of(context)!.sendResetEmail,
                 style: TextStyle(
                   color: colorScheme.primary,
                   fontWeight: DesignTokens.fontWeightSemiBold,
@@ -371,17 +365,14 @@ class ForumSettingsPage extends StatelessWidget {
         return AlertDialog(
           backgroundColor: colorScheme.surface,
           title: Text(
-            'Delete account',
+            AppLocalizations.of(context)!.deleteAccount,
             style: textTheme.titleLarge?.copyWith(
               color: colorScheme.onSurface,
               fontWeight: DesignTokens.fontWeightMedium,
             ),
           ),
           content: Text(
-            'Your account is managed by the forum. Please contact the '
-            'forum staff directly to request account removal. Continue '
-            'will open the forum in your browser so you can use the '
-            'site’s own contact / staff message flow.',
+            AppLocalizations.of(context)!.deleteAccountDialogBody,
             style: textTheme.bodyLarge?.copyWith(
               color: colorScheme.onSurface,
             ),
@@ -390,7 +381,7 @@ class ForumSettingsPage extends StatelessWidget {
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
-                'Cancel',
+                AppLocalizations.of(context)!.cancel,
                 style: textTheme.labelLarge?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -402,7 +393,7 @@ class ForumSettingsPage extends StatelessWidget {
                 await _openForumHomePage(context);
               },
               child: Text(
-                'Continue',
+                AppLocalizations.of(context)!.continueButton,
                 style: textTheme.labelLarge?.copyWith(
                   color: colorScheme.primary,
                 ),

@@ -140,10 +140,9 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage> {
       Navigator.of(context).pop(uploaded);
       if (!uploaded) {
         messenger.showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-                'Approved, but we could not reach ForumCopilot to finish setting '
-                'up. Try again later from Settings.'),
+                AppLocalizations.of(context)!.approvedButRelayUnreachable),
           ),
         );
       }
@@ -249,7 +248,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage> {
                           const SizedBox(width: DesignTokens.spacingS),
                           Expanded(
                             child: Text(
-                              'Notifications are turned off for this app',
+                              AppLocalizations.of(context)!.notificationsAreTurnedOffForThisApp,
                               style: textTheme.titleSmall?.copyWith(
                                 color: colorScheme.onSurface,
                                 fontWeight: DesignTokens.fontWeightSemiBold,
@@ -285,7 +284,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage> {
 
               // Step 2 — what the next screen will ask, in plain terms.
               Text(
-                'Next, $_forumName will ask you to approve “Notifications”.',
+                AppLocalizations.of(context)!.forumWillAskToApproveNotifications(_forumName),
                 style: textTheme.titleMedium?.copyWith(
                   color: colorScheme.onSurface,
                   fontWeight: DesignTokens.fontWeightSemiBold,
@@ -293,9 +292,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage> {
               ),
               const SizedBox(height: DesignTokens.spacingS),
               Text(
-                'Approving lets us check your notifications for you and send '
-                'them to this device. This permission cannot post, reply, or '
-                'read your messages.',
+                AppLocalizations.of(context)!.approveNotificationsExplanation,
                 style: textTheme.bodyMedium
                     ?.copyWith(color: colorScheme.onSurfaceVariant),
               ),
@@ -328,8 +325,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage> {
 
               const SizedBox(height: DesignTokens.spacingM),
               Text(
-                'If this forum’s owner sets up notifications for the app, '
-                'this step won’t be needed.',
+                AppLocalizations.of(context)!.forumOwnerPushNote,
                 textAlign: TextAlign.center,
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant

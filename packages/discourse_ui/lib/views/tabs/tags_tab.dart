@@ -279,7 +279,7 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
               padding: const EdgeInsets.all(DesignTokens.spacingL),
               child: Center(
                 child: Text(
-                  'No tags match "${_filterController.text}".',
+                  AppLocalizations.of(context)!.noTagsMatch(_filterController.text),
                   style: textTheme.bodyMedium
                       ?.copyWith(color: colorScheme.onSurfaceVariant),
                 ),

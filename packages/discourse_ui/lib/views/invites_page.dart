@@ -153,7 +153,7 @@ class _InvitesPageState extends State<InvitesPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Invite link created',
+                  AppLocalizations.of(context)!.inviteLinkCreated,
                   style: textTheme.titleMedium?.copyWith(
                     fontWeight: DesignTokens.fontWeightSemiBold,
                   ),
@@ -161,7 +161,7 @@ class _InvitesPageState extends State<InvitesPage> {
                 if (invite.expiresAt != null) ...[
                   SizedBox(height: DesignTokens.spacingXS),
                   Text(
-                    'Expires ${DateFormat.yMMMd().format(invite.expiresAt!.toLocal())}',
+                    AppLocalizations.of(context)!.expiresOn(DateFormat.yMMMd().format(invite.expiresAt!.toLocal())),
                     style: textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),

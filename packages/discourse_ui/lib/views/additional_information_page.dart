@@ -142,7 +142,7 @@ class _AdditionalInformationPageState extends State<AdditionalInformationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Additional Information',
+          AppLocalizations.of(context)!.additionalInformation,
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
             fontWeight: DesignTokens.fontWeightMedium,
@@ -311,7 +311,7 @@ class _AdditionalInformationPageState extends State<AdditionalInformationPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Date of Birth${requirement.required ? " *" : ""}',
+          AppLocalizations.of(context)!.dateOfBirth(requirement.required ? " *" : ""),
           style: StyleBuilders.titleTextStyle(
             colorScheme: colorScheme,
             textTheme: textTheme,
@@ -373,7 +373,7 @@ class _AdditionalInformationPageState extends State<AdditionalInformationPage> {
           Padding(
             padding: const EdgeInsets.only(top: DesignTokens.spacingS),
             child: Text(
-              'Minimum age: ${requirement.minimumAge} years',
+              AppLocalizations.of(context)!.minimumAgeYears((requirement.minimumAge ?? 0)),
               style: StyleBuilders.smallTextStyle(
                 colorScheme: colorScheme,
                 textTheme: textTheme,
@@ -392,7 +392,7 @@ class _AdditionalInformationPageState extends State<AdditionalInformationPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Location${isRequired ? " *" : ""}',
+          AppLocalizations.of(context)!.locationLabel(isRequired ? " *" : ""),
           style: StyleBuilders.titleTextStyle(
             colorScheme: colorScheme,
             textTheme: textTheme,
@@ -434,7 +434,7 @@ class _AdditionalInformationPageState extends State<AdditionalInformationPage> {
   Widget _buildEmailChoiceField(ColorScheme colorScheme, TextTheme textTheme) {
     return CheckboxListTile(
       title: Text(
-        'Receive site mailings',
+        AppLocalizations.of(context)!.receiveSiteMailings,
         style: StyleBuilders.titleTextStyle(
           colorScheme: colorScheme,
           textTheme: textTheme,
@@ -574,7 +574,7 @@ class _AdditionalInformationPageState extends State<AdditionalInformationPage> {
           elevation: DesignTokens.elevationNone,
         ),
         child: Text(
-          'Create Account',
+          AppLocalizations.of(context)!.createAccount,
           style: StyleBuilders.titleTextStyle(
             colorScheme: colorScheme,
             textTheme: textTheme,
