@@ -24,7 +24,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
   - Custom-emoji reaction images decode at display size.
   - The forum header tints its pattern through the image paint instead of a `ColorFiltered` layer, and no longer wraps itself in `IntrinsicHeight`; same look, one layout pass and no full-header saveLayer.
 
-  Analyzed and unit-tested; device benchmark pending (the Pixel was not connected when this landed). Numbers will be added to the audit doc when measured.
+
+  Benchmark (Pixel 10a, profile build, meta.discourse.org, eight flings per screen), baseline → phase 1 → this release: topic list build p50 6.9 → 3.3 → 0.8 ms, p90 14.9 → 11.3 → 2.1 ms, frames over 16.7 ms 31 % → 7 % → 3 %, frames over 33 ms 16 → 8 → 1; thread build p50 0.8 → 0.8 → 0.7 ms, p99 30 → 13 → 18 ms (a different, preview-heavy topic was at the top of Latest this run), worst 83 → 51 → 47 ms.
 
 ## [1.0.7] - 2026-09-09
 

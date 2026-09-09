@@ -30,6 +30,24 @@ sniffing, flat avatar placeholder, participant cluster removed):
 Avatar pipeline in the same run: 129 cache-miss lookups (was 598), 0
 decode failures (was 10), 0 file-to-network fallbacks (was 88).
 
+After phases 2 and 3 (v1.0.8: virtualized Home feed, `Offstage` state
+holders, no per-post `VisibilityDetector`, cooked parse memoized and
+warmed off-thread, styles per theme, chips without clips, `ColoredBox`
+post roots, shared handlers, memoized avatar colours, wider pagination
+runway, static skeletons, header without `IntrinsicHeight`/`ColorFiltered`):
+
+| screen | frames | build p50 / p90 / p99 / max | raster p50 / p90 / p99 / max | frames over 16.7 ms | over 33 ms |
+|---|---|---|---|---|---|
+| topic list (Latest) | 1064 | 0.8 / 2.1 / 14.6 / 46 ms | 4.5 / 5.4 / 6.9 / 17 ms | 30 (3 %) | 1 |
+| thread | 1039 | 0.7 / 2.1 / 18.1 / 47 ms | 3.9 / 5.2 / 7.7 / 14 ms | 23 | 5 |
+
+The thread row in this run was a different topic (the pinned "Embed
+Discourse as a full comment system" announcement, with several link
+previews whose hosts do not resolve) — meta's Latest order had changed —
+so its p99 is not a like-for-like comparison with phase 1. Avatar
+pipeline: 94 cache-miss lookups (was 598 at baseline, 129 after phase 1),
+1 decode failure, 0 fallbacks.
+
 Reading the baseline:
 
 - **The topic list is build-bound and slow on every frame.** A median
@@ -193,10 +211,6 @@ Reading the baseline:
 Re-run the benchmark after each phase; the numbers above are the
 baseline.
 
-Status: phase 1 measured (table above). Phases 2 and 3 landed in v1.0.8
-(virtualized Home feed, `Offstage` state holders, chips without clips,
-`ColoredBox` post roots, shared handlers, memoized avatar colours, wider
-pagination runway, static skeletons, flutter_html styles per theme, cooked
-parse memoized by content and warmed per page on a worker isolate, header
-without `IntrinsicHeight`/`ColorFiltered`) — analyzed and unit-tested, not
-yet measured on the Pixel.
+Status: all three phases measured (tables above). What remains is the
+UI-level list — inline preview cap, tag chip cap, last-poster avatar,
+metadata row — which changes what users see and needs a decision.
