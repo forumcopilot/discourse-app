@@ -6,6 +6,21 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.8] - 2026-09-09
+
+### Changed
+- **Scroll performance, phases 2 and 3** (`docs/perf-audit-2026-09.md`):
+  - The Home feed is virtualized. Each topic row is its own sliver child of a `CustomScrollView`, so only rows near the viewport are built and laid out. Before, the whole loaded feed was one `Column` inside a `ListView`, rebuilt and re-laid-out in full on every load-more and filter change.
+  - The five filter lists are kept mounted for their state inside `Offstage` instead of at `Positioned(-10000)` under `Opacity(0)`, and Latest and Unread no longer build a complete second copy of the feed off-screen every frame.
+  - Category and tag chips are plain decorated boxes; the antialiased `Material` clip was a saveLayer per chip per row.
+  - Only the highlighted post is wrapped in an `AnimatedContainer`; every other post is a `ColoredBox`.
+  - One `AvatarActions`, `ImageActions` and `PostActionsHandler` per thread instead of three new objects per post per build.
+  - Avatar colour schemes and gradients are memoized per username.
+  - Thread pagination triggers eight items from either end instead of three, so a fast fling no longer reaches the end of the loaded window before the next page arrives.
+  - Loading skeletons in the topic list and thread are static blocks; the shimmer was a ShaderMask saveLayer every frame during first load.
+
+  Analyzed and unit-tested; device benchmark pending (the Pixel was not connected when this landed). Numbers will be added to the audit doc when measured.
+
 ## [1.0.7] - 2026-09-09
 
 ### Changed

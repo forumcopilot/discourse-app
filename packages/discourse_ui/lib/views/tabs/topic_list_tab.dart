@@ -13,62 +13,37 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart' as forumcopilot_sdk;
 import 'package:discourse_ui/core/logging/app_logger.dart';
 
-/// Reactive widget that observes controller changes and rebuilds topic items
-class _ReactiveTopicItems extends StatefulWidget {
-  final int filterIndex;
-  final List<Widget> Function() buildItems;
-  final Widget? Function() buildEmptyState;
-
-  const _ReactiveTopicItems({
-    required this.filterIndex,
-    required this.buildItems,
-    required this.buildEmptyState,
-  });
-
-  @override
-  State<_ReactiveTopicItems> createState() => _ReactiveTopicItemsState();
-}
-
-class _ReactiveTopicItemsState extends State<_ReactiveTopicItems> {
-  @override
-  Widget build(BuildContext context) {
-    // Simple: just build content, no Obx complexity
-    return _buildContent(context);
+/// The rows of the active filter as slivers.
+///
+/// Each topic is its own sliver child, so only the rows in (and just
+/// beyond) the viewport are built and laid out. The previous shape — one
+/// `Column` of every loaded row as a single `ListView` child — built and
+/// laid out the whole feed on every rebuild, which is what made the Home
+/// tab scroll at half frame rate once a few pages were loaded.
+List<Widget> _topicSlivers(BuildContext context, List<Widget> items, Widget? emptyState) {
+  if (items.length == 1 && items.first is Center &&
+      (items.first as Center).child is CircularProgressIndicator) {
+    return [SliverToBoxAdapter(child: items.first)];
   }
-
-  Widget _buildContent(BuildContext context) {
-    final topicItems = widget.buildItems();
-    final emptyState = widget.buildEmptyState();
-
-    // If we have items, check if the only item is a spinner
-    if (topicItems.isNotEmpty) {
-      // Check if the first (and possibly only) item is a CircularProgressIndicator wrapped in Center
-      final firstItem = topicItems.first;
-      if (topicItems.length == 1 && firstItem is Center) {
-        final centerChild = firstItem.child;
-        if (centerChild is CircularProgressIndicator) {
-          // Show spinner instead of empty state when loading
-          return firstItem;
-        }
-      }
-      // If we have multiple items or the item is not a spinner, show the items
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: topicItems,
-      );
-    }
-
-    // If no items and we have empty state, show it
-    if (emptyState != null) {
-      return SizedBox(
-        height: MediaQuery.of(context).size.height - 300,
-        child: emptyState,
-      );
-    }
-
-    // Fallback: show spinner if nothing else
-    return const Center(child: CircularProgressIndicator());
+  if (items.isNotEmpty) {
+    return [
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, i) => items[i],
+          childCount: items.length,
+        ),
+      ),
+    ];
   }
+  if (emptyState != null) {
+    return [SliverFillRemaining(hasScrollBody: false, child: emptyState)];
+  }
+  return const [
+    SliverFillRemaining(
+      hasScrollBody: false,
+      child: Center(child: CircularProgressIndicator()),
+    ),
+  ];
 }
 
 class TopicListTab extends StatefulWidget {
@@ -375,62 +350,51 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
     }
   }
 
-  // Ensure topic list widgets are initialized (but not visible)
-  // We use IndexedStack to keep all widgets mounted for state management
-  // Position them off-screen with constrained size to avoid layout errors
+  /// The five list states, kept mounted for their controllers and
+  /// GlobalKeys but never laid out or painted: their `build()` returns
+  /// `SizedBox.shrink()` and `Offstage` skips the rest. They used to sit
+  /// at Positioned(-10000) inside Opacity(0), where Latest and Unread
+  /// still built a complete second copy of the feed every frame.
   Widget _buildTopicListWidgets() {
-    return Positioned(
-      left: -10000, // Position completely off-screen
-      top: -10000,
-      child: IgnorePointer(
-        ignoring: true,
-        child: Opacity(
-          opacity: 0.0,
-          child: SizedBox(
-            width: 100, // Small but bounded size
-            height: 100,
-            child: ClipRect(
-              child: IndexedStack(
-                index: _selectedFilterIndex,
-                children: [
-                  for (final f in _filters)
-                    switch (f) {
-                      _HomeFilter.latest => LatestTopicsList(
-                          key: _latestTopicsKey,
-                          isActive: widget.isActive &&
-                              _activeFilter == _HomeFilter.latest,
-                          siteContext: widget.siteContext,
-                        ),
-                      _HomeFilter.hot => HotTopicsList(
-                          key: _hotTopicsKey,
-                          isActive: widget.isActive &&
-                              _activeFilter == _HomeFilter.hot,
-                          siteContext: widget.siteContext,
-                        ),
-                      _HomeFilter.newTopics => NewTopicsList(
-                          key: _newTopicsKey,
-                          isActive: widget.isActive &&
-                              _activeFilter == _HomeFilter.newTopics,
-                          siteContext: widget.siteContext,
-                        ),
-                      _HomeFilter.unread => UnreadTopicsList(
-                          key: _unreadTopicsKey,
-                          isActive: widget.isActive &&
-                              _activeFilter == _HomeFilter.unread,
-                          siteContext: widget.siteContext,
-                        ),
-                      _HomeFilter.top => TopTopicsList(
-                          key: _topTopicsKey,
-                          isActive: widget.isActive &&
-                              _activeFilter == _HomeFilter.top,
-                          siteContext: widget.siteContext,
-                        ),
-                    },
-                ],
-              ),
-            ),
-          ),
-        ),
+    return Offstage(
+      offstage: true,
+      child: IndexedStack(
+        index: _selectedFilterIndex,
+        children: [
+          for (final f in _filters)
+            switch (f) {
+              _HomeFilter.latest => LatestTopicsList(
+                  key: _latestTopicsKey,
+                  isActive: widget.isActive &&
+                      _activeFilter == _HomeFilter.latest,
+                  siteContext: widget.siteContext,
+                ),
+              _HomeFilter.hot => HotTopicsList(
+                  key: _hotTopicsKey,
+                  isActive: widget.isActive &&
+                      _activeFilter == _HomeFilter.hot,
+                  siteContext: widget.siteContext,
+                ),
+              _HomeFilter.newTopics => NewTopicsList(
+                  key: _newTopicsKey,
+                  isActive: widget.isActive &&
+                      _activeFilter == _HomeFilter.newTopics,
+                  siteContext: widget.siteContext,
+                ),
+              _HomeFilter.unread => UnreadTopicsList(
+                  key: _unreadTopicsKey,
+                  isActive: widget.isActive &&
+                      _activeFilter == _HomeFilter.unread,
+                  siteContext: widget.siteContext,
+                ),
+              _HomeFilter.top => TopTopicsList(
+                  key: _topTopicsKey,
+                  isActive: widget.isActive &&
+                      _activeFilter == _HomeFilter.top,
+                  siteContext: widget.siteContext,
+                ),
+            },
+        ],
       ),
     );
   }
@@ -481,28 +445,22 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
       );
     }
 
-    // Always show the ListView - buildTopicItems() handles loading states
-    // The _ReactiveTopicItems widget uses Obx internally to observe controller changes
     return Stack(
       children: [
         RefreshIndicator(
           onRefresh: _handleRefresh,
-          child: ListView(
+          child: CustomScrollView(
             controller: _scrollController,
-            children: [
-              // Forum Header
-              ForumHeaderWidget(
-                boardStats: widget.boardStats,
-                extendUnderAppBar: true,
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: ForumHeaderWidget(
+                  boardStats: widget.boardStats,
+                  extendUnderAppBar: true,
+                ),
               ),
-              // Filter Chips
-              _buildFilterChips(),
-              // Empty state or topic items - wrapped in reactive widget
-              _ReactiveTopicItems(
-                filterIndex: _selectedFilterIndex,
-                buildItems: _buildTopicItems,
-                buildEmptyState: _buildEmptyState,
-              ),
+              SliverToBoxAdapter(child: _buildFilterChips()),
+              ..._topicSlivers(context, _buildTopicItems(), _buildEmptyState()),
             ],
           ),
         ),

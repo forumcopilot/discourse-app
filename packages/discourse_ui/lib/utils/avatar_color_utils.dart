@@ -70,7 +70,20 @@ class AvatarColorUtils {
   /// [isLightTheme] Whether the current theme is light
   ///
   /// Returns a map with 'background' and 'text' colors
-  static Map<String, Color> getUserAvatarColorScheme(String username, {bool isLightTheme = true}) {
+  /// Memoized per username and theme: these are called for every avatar
+  /// on every build, and the answer never changes.
+  static final Map<String, Map<String, Color>> _schemeCache = {};
+  static final Map<String, List<Color>> _gradientCache = {};
+
+  static Map<String, Color> getUserAvatarColorScheme(String username, {bool isLightTheme = true}) =>
+      _schemeCache.putIfAbsent('$isLightTheme|$username',
+          () => _computeUserAvatarColorScheme(username, isLightTheme: isLightTheme));
+
+  static List<Color> getGradientColors(String username, {bool isLightTheme = true}) =>
+      _gradientCache.putIfAbsent('$isLightTheme|$username',
+          () => _computeGradientColors(username, isLightTheme: isLightTheme));
+
+  static Map<String, Color> _computeUserAvatarColorScheme(String username, {bool isLightTheme = true}) {
     final backgroundColor = getUserAvatarColor(username, isLightTheme: isLightTheme);
     final textColor = getTextColorForBackground(backgroundColor);
 
@@ -87,7 +100,7 @@ class AvatarColorUtils {
   /// [isLightTheme] Whether the current theme is light
   ///
   /// Returns a list of two colors for a gradient (from lighter to darker or vice versa)
-  static List<Color> getGradientColors(String username, {bool isLightTheme = true}) {
+  static List<Color> _computeGradientColors(String username, {bool isLightTheme = true}) {
     if (username.isEmpty) {
       // Return grey gradient for empty username
       if (isLightTheme) {

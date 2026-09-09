@@ -17,7 +17,6 @@ import 'package:discourse_ui/views/widgets/suggested_topics_card.dart';
 import 'package:discourse_ui/views/widgets/topic_stats_bar.dart';
 import 'package:discourse_ui/views/widgets/post_time_gap.dart';
 import 'package:visibility_detector/visibility_detector.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
@@ -564,7 +563,7 @@ class _PostsState extends State<PostsList> {
       // guarded by _isLoadingMore/_isScrollLoadingEnabled at the top of this
       // method plus a 500ms cooldown to avoid re-triggering right after the
       // post-load scroll restoration.
-      if (firstVisibleItem.index <= 2 && _hasMoreEarlier()) {
+      if (firstVisibleItem.index <= 6 && _hasMoreEarlier()) {
         final now = DateTime.now();
         final canLoad = _lastEarlierLoadTime == null || now.difference(_lastEarlierLoadTime!) > const Duration(milliseconds: 500);
         if (canLoad) {
@@ -576,7 +575,7 @@ class _PostsState extends State<PostsList> {
       final data = _postsController.threadDataOutput.value;
       if (data != null) {
         final totalItems = data.loadedCount;
-        if (lastVisibleItem.index >= totalItems - 3 && _hasMorePosts) {
+        if (lastVisibleItem.index >= totalItems - 8 && _hasMorePosts) {
           _loadMoreLater();
         }
 
@@ -988,115 +987,114 @@ class _PostsState extends State<PostsList> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Shimmer.fromColors(
-      baseColor: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
-      highlightColor: isDark ? Colors.grey.shade500 : Colors.grey.shade100,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header row: avatar + name/time bars
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.grey.shade800 : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+    // Flat blocks. The shimmer here was a ShaderMask saveLayer per frame
+    // while the list was already at its busiest.
+    final block = isDark ? Colors.grey.shade700 : Colors.grey.shade300;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row: avatar + name/time bars
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: block,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 160,
-                        height: 14,
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.grey.shade800 : Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 160,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: block,
+                        borderRadius: BorderRadius.circular(4),
                       ),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: 100,
-                        height: 12,
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.grey.shade800 : Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 100,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: block,
+                        borderRadius: BorderRadius.circular(4),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Body lines
-            Container(
-              width: double.infinity,
-              height: 12,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey.shade800 : Colors.white,
-                borderRadius: BorderRadius.circular(4),
               ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Body lines
+          Container(
+            width: double.infinity,
+            height: 12,
+            decoration: BoxDecoration(
+              color: block,
+              borderRadius: BorderRadius.circular(4),
             ),
-            const SizedBox(height: 8),
-            Container(
-              width: double.infinity,
-              height: 12,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey.shade800 : Colors.white,
-                borderRadius: BorderRadius.circular(4),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            height: 12,
+            decoration: BoxDecoration(
+              color: block,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.6,
+            height: 12,
+            decoration: BoxDecoration(
+              color: block,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Action row placeholders
+          Row(
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: block,
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              width: MediaQuery.of(context).size.width * 0.6,
-              height: 12,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey.shade800 : Colors.white,
-                borderRadius: BorderRadius.circular(4),
+              const SizedBox(width: 12),
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: block,
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            // Action row placeholders
-            Row(
-              children: [
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.grey.shade800 : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+              const SizedBox(width: 12),
+              Container(
+                width: 48,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: block,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(width: 12),
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.grey.shade800 : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  width: 48,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.grey.shade800 : Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -1120,10 +1118,19 @@ class _PostsState extends State<PostsList> {
     return iconButtonHeight + verticalPadding + safeAreaBottom;
   }
 
+  // One of each for the whole list. They were built afresh for every
+  // post on every build, which alone guaranteed no row ever received an
+  // equal widget.
+  late final AvatarActions _avatarActions = AvatarActions();
+  late final ImageActions _imageActions =
+      ImageActions(_postsController, siteContext: widget.siteContext);
+  late final PostActionsHandler _postActionsHandler = PostActionsHandler(
+      _postsController, widget.siteContext, fallbackForumId: widget.forumId);
+
   Widget _buildPostItem(BuildContext context, FCPost post, int postIndex, int postsListLength, ThreadViewData data, {bool isHighlighted = false}) {
-    final avatarActions = AvatarActions();
-    final imageActions = ImageActions(_postsController, siteContext: widget.siteContext);
-    final postActionsHandler = PostActionsHandler(_postsController, widget.siteContext, fallbackForumId: widget.forumId);
+    final avatarActions = _avatarActions;
+    final imageActions = _imageActions;
+    final postActionsHandler = _postActionsHandler;
 
     Widget postWidget = VisibilityDetector(
       key: Key('post_${post.id}'),

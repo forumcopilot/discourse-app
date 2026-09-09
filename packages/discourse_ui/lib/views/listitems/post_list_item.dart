@@ -973,39 +973,45 @@ class _PostListItemState extends State<PostListItem> {
         ? colorScheme.primaryContainer.withValues(alpha: 0.4)
         : colorScheme.surface;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 400),
-      curve: Curves.easeInOut,
-      color: backgroundColor,
-      child: Material(
-        color: Colors.transparent,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildPostHeader(context),
-            _buildPostContent(context, data, colorScheme, textTheme),
-            // Accepted answer panel, first post only — the same condition Discourse's
-            // own plugin uses (post_number === 1 && topic.accepted_answer) and the same
-            // position (immediately after the cooked content).
-            if (widget.post.postNumber == 1 && widget.acceptedAnswer != null)
-              Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
-                child: SolutionSummaryCard(
-                  siteContext: widget.siteContext,
-                  answer: widget.acceptedAnswer!,
-                  onJumpToAnswer: widget.onJumpToAcceptedAnswer == null
-                      ? null
-                      : () => widget.onJumpToAcceptedAnswer!(
-                          widget.acceptedAnswer!.postNumber),
-                ),
+    // Only the highlighted post animates; every other post used to carry
+    // an AnimatedContainer (a ticker each) for a fade it never showed.
+    final body = Material(
+      color: Colors.transparent,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildPostHeader(context),
+          _buildPostContent(context, data, colorScheme, textTheme),
+          // Accepted answer panel, first post only — the same condition Discourse's
+          // own plugin uses (post_number === 1 && topic.accepted_answer) and the same
+          // position (immediately after the cooked content).
+          if (widget.post.postNumber == 1 && widget.acceptedAnswer != null)
+            Padding(
+              padding:
+                  EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+              child: SolutionSummaryCard(
+                siteContext: widget.siteContext,
+                answer: widget.acceptedAnswer!,
+                onJumpToAnswer: widget.onJumpToAcceptedAnswer == null
+                    ? null
+                    : () => widget.onJumpToAcceptedAnswer!(
+                        widget.acceptedAnswer!.postNumber),
               ),
-            _buildRepliesDisclosure(context, colorScheme, textTheme),
-            _buildBottomDivider(colorScheme),
-          ],
-        ),
+            ),
+          _buildRepliesDisclosure(context, colorScheme, textTheme),
+          _buildBottomDivider(colorScheme),
+        ],
       ),
     );
+    if (widget.isHighlighted) {
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+        color: backgroundColor,
+        child: body,
+      );
+    }
+    return ColoredBox(color: backgroundColor, child: body);
   }
 
   Widget _buildReplyButtonWithMenu(

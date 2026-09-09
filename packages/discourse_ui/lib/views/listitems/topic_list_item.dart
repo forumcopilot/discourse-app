@@ -271,13 +271,14 @@ class TopicListItem extends StatelessWidget {
                     runSpacing: DesignTokens.spacingXS,
                     children: [
                       if (category.isNotEmpty)
-                        Material(
-                          color: colorScheme.secondaryContainer,
-                          shape: RoundedRectangleBorder(
+                        // A DecoratedBox, not a clipped Material: an
+                        // antialiased clip is a saveLayer per chip per row.
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: colorScheme.secondaryContainer,
                             borderRadius:
                                 BorderRadius.circular(DesignTokens.radiusS),
                           ),
-                          clipBehavior: Clip.antiAlias,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
@@ -298,15 +299,16 @@ class TopicListItem extends StatelessWidget {
                         borderRadius:
                             BorderRadius.circular(DesignTokens.radiusS),
                       );
-                      return Material(
-                        color: colorScheme.surfaceContainerHighest,
-                        shape: chipShape.copyWith(
-                          side: BorderSide(
+                      return DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerHighest,
+                          borderRadius:
+                              BorderRadius.circular(DesignTokens.radiusS),
+                          border: Border.all(
                             color: colorScheme.outlineVariant,
                             width: 0.5,
                           ),
                         ),
-                        clipBehavior: Clip.antiAlias,
                         child: InkWell(
                           customBorder: chipShape,
                           onTap: () => Navigator.of(context).push(

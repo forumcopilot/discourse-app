@@ -192,3 +192,11 @@ Reading the baseline:
 
 Re-run the benchmark after each phase; the numbers above are the
 baseline.
+
+Status: phase 1 measured (table above). Phases 2 and 3 landed in v1.0.8
+(virtualized Home feed, `Offstage` state holders, chips without clips,
+`ColoredBox` post roots, shared handlers, memoized avatar colours, wider
+pagination runway, static skeletons) — analyzed and unit-tested, not yet
+measured on the Pixel. Still open from phase 3: hoisting the flutter_html
+style tables, the header's `IntrinsicHeight`/`ColorFiltered`, and moving
+`CookedContent.parse` to fetch time.

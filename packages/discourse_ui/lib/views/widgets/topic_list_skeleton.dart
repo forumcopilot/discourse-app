@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../../theme/design_tokens.dart';
 
@@ -30,15 +29,9 @@ class TopicListSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final base = colorScheme.surfaceContainerHighest;
-    final highlight = colorScheme.surface;
-    return Shimmer.fromColors(
-      baseColor: base,
-      highlightColor: highlight,
-      // Use a slower period than the default so the sweep doesn't feel
-      // anxious on screens that load quickly.
-      period: const Duration(milliseconds: 1400),
-      child: ListView.separated(
+    // Static rows. The shimmer was a ShaderMask saveLayer on every frame
+    // during first load, when the UI thread is already the bottleneck.
+    return ListView.separated(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: shrinkWrap,
         itemCount: rowCount,
@@ -49,7 +42,6 @@ class TopicListSkeleton extends StatelessWidget {
               .withValues(alpha: DesignTokens.opacityLow),
         ),
         itemBuilder: (context, _) => const _TopicSkeletonRow(),
-      ),
     );
   }
 }
