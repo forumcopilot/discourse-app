@@ -6,6 +6,11 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-09-08
+
+### Changed
+- The drawer is localized (its section labels and rows were the last raw strings in the UI), and the two "Switch forum" rows a hosted build could show are one row at the top, driven by `DiscourseHost.switchForum` with the route-below-the-shell heuristic as fallback.
+
 ## [1.0.3] - 2026-09-08
 
 ### Added

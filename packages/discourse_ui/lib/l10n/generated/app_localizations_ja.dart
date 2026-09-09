@@ -1941,4 +1941,34 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get switchForum => 'フォーラムを切り替え';
+
+  @override
+  String get explore => '探索';
+
+  @override
+  String get tags => 'タグ';
+
+  @override
+  String get community => 'コミュニティ';
+
+  @override
+  String get users => 'ユーザー';
+
+  @override
+  String get groups => 'グループ';
+
+  @override
+  String get invites => '招待';
+
+  @override
+  String get account => 'アカウント';
+
+  @override
+  String get drafts => '下書き';
+
+  @override
+  String get termsOfService => '利用規約';
+
+  @override
+  String get privacyPolicy => 'プライバシーポリシー';
 }

@@ -3477,6 +3477,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Switch forum'**
   String get switchForum;
+
+  /// Drawer: Explore
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get explore;
+
+  /// Drawer: Tags
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get tags;
+
+  /// Drawer: Community
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get community;
+
+  /// Drawer: Users
+  ///
+  /// In en, this message translates to:
+  /// **'Users'**
+  String get users;
+
+  /// Drawer: Groups
+  ///
+  /// In en, this message translates to:
+  /// **'Groups'**
+  String get groups;
+
+  /// Drawer: Invites
+  ///
+  /// In en, this message translates to:
+  /// **'Invites'**
+  String get invites;
+
+  /// Drawer: Account
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get account;
+
+  /// Drawer: Drafts
+  ///
+  /// In en, this message translates to:
+  /// **'Drafts'**
+  String get drafts;
+
+  /// Drawer: Terms of Service
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get termsOfService;
+
+  /// Drawer: Privacy Policy
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
 }
 
 class _AppLocalizationsDelegate

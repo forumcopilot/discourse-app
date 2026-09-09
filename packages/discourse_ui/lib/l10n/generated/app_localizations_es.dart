@@ -2019,4 +2019,34 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get switchForum => 'Cambiar de foro';
+
+  @override
+  String get explore => 'Explorar';
+
+  @override
+  String get tags => 'Etiquetas';
+
+  @override
+  String get community => 'Comunidad';
+
+  @override
+  String get users => 'Usuarios';
+
+  @override
+  String get groups => 'Grupos';
+
+  @override
+  String get invites => 'Invitaciones';
+
+  @override
+  String get account => 'Cuenta';
+
+  @override
+  String get drafts => 'Borradores';
+
+  @override
+  String get termsOfService => 'Términos del servicio';
+
+  @override
+  String get privacyPolicy => 'Política de privacidad';
 }

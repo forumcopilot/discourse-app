@@ -854,5 +854,15 @@
   "dontUpload": "Não enviar",
   "dontAskAgainAlwaysResize": "Não perguntar novamente — sempre redimensionar",
   "couldNotLoadCategories": "Não foi possível carregar as categorias.",
-  "switchForum": "Trocar de fórum"
+  "switchForum": "Trocar de fórum",
+  "explore": "Explorar",
+  "tags": "Tags",
+  "community": "Comunidade",
+  "users": "Usuários",
+  "groups": "Grupos",
+  "invites": "Convites",
+  "account": "Conta",
+  "drafts": "Rascunhos",
+  "termsOfService": "Termos de serviço",
+  "privacyPolicy": "Política de privacidade"
 }

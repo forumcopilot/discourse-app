@@ -2302,5 +2302,45 @@
   "switchForum": "Switch forum",
   "@switchForum": {
     "description": "Drawer entry, shown only inside a multi-forum host app, that returns to its forum list"
+  },
+  "explore": "Explore",
+  "@explore": {
+    "description": "Drawer: Explore"
+  },
+  "tags": "Tags",
+  "@tags": {
+    "description": "Drawer: Tags"
+  },
+  "community": "Community",
+  "@community": {
+    "description": "Drawer: Community"
+  },
+  "users": "Users",
+  "@users": {
+    "description": "Drawer: Users"
+  },
+  "groups": "Groups",
+  "@groups": {
+    "description": "Drawer: Groups"
+  },
+  "invites": "Invites",
+  "@invites": {
+    "description": "Drawer: Invites"
+  },
+  "account": "Account",
+  "@account": {
+    "description": "Drawer: Account"
+  },
+  "drafts": "Drafts",
+  "@drafts": {
+    "description": "Drawer: Drafts"
+  },
+  "termsOfService": "Terms of Service",
+  "@termsOfService": {
+    "description": "Drawer: Terms of Service"
+  },
+  "privacyPolicy": "Privacy Policy",
+  "@privacyPolicy": {
+    "description": "Drawer: Privacy Policy"
   }
 }

@@ -2026,4 +2026,34 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get switchForum => 'Changer de forum';
+
+  @override
+  String get explore => 'Explorer';
+
+  @override
+  String get tags => 'Étiquettes';
+
+  @override
+  String get community => 'Communauté';
+
+  @override
+  String get users => 'Utilisateurs';
+
+  @override
+  String get groups => 'Groupes';
+
+  @override
+  String get invites => 'Invitations';
+
+  @override
+  String get account => 'Compte';
+
+  @override
+  String get drafts => 'Brouillons';
+
+  @override
+  String get termsOfService => 'Conditions d’utilisation';
+
+  @override
+  String get privacyPolicy => 'Politique de confidentialité';
 }

@@ -2003,4 +2003,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get switchForum => 'Switch forum';
+
+  @override
+  String get explore => 'Explore';
+
+  @override
+  String get tags => 'Tags';
+
+  @override
+  String get community => 'Community';
+
+  @override
+  String get users => 'Users';
+
+  @override
+  String get groups => 'Groups';
+
+  @override
+  String get invites => 'Invites';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get drafts => 'Drafts';
+
+  @override
+  String get termsOfService => 'Terms of Service';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
 }

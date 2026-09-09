@@ -1152,5 +1152,15 @@
   "dontUpload": "Niet uploaden",
   "dontAskAgainAlwaysResize": "Niet meer vragen — altijd passend verkleinen",
   "couldNotLoadCategories": "Categorieën laden mislukt.",
-  "switchForum": "Ander forum"
+  "switchForum": "Ander forum",
+  "explore": "Ontdekken",
+  "tags": "Tags",
+  "community": "Community",
+  "users": "Gebruikers",
+  "groups": "Groepen",
+  "invites": "Uitnodigingen",
+  "account": "Account",
+  "drafts": "Concepten",
+  "termsOfService": "Servicevoorwaarden",
+  "privacyPolicy": "Privacybeleid"
 }

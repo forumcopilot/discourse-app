@@ -854,5 +854,15 @@
   "dontUpload": "アップロードしない",
   "dontAskAgainAlwaysResize": "今後表示しない — 常に縮小して合わせる",
   "couldNotLoadCategories": "カテゴリを読み込めませんでした。",
-  "switchForum": "フォーラムを切り替え"
+  "switchForum": "フォーラムを切り替え",
+  "explore": "探索",
+  "tags": "タグ",
+  "community": "コミュニティ",
+  "users": "ユーザー",
+  "groups": "グループ",
+  "invites": "招待",
+  "account": "アカウント",
+  "drafts": "下書き",
+  "termsOfService": "利用規約",
+  "privacyPolicy": "プライバシーポリシー"
 }

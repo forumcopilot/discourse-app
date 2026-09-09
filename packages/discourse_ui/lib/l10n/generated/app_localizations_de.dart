@@ -2028,4 +2028,34 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get switchForum => 'Forum wechseln';
+
+  @override
+  String get explore => 'Entdecken';
+
+  @override
+  String get tags => 'Schlagwörter';
+
+  @override
+  String get community => 'Community';
+
+  @override
+  String get users => 'Benutzer';
+
+  @override
+  String get groups => 'Gruppen';
+
+  @override
+  String get invites => 'Einladungen';
+
+  @override
+  String get account => 'Konto';
+
+  @override
+  String get drafts => 'Entwürfe';
+
+  @override
+  String get termsOfService => 'Nutzungsbedingungen';
+
+  @override
+  String get privacyPolicy => 'Datenschutzerklärung';
 }

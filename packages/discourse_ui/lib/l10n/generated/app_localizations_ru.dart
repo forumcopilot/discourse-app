@@ -2008,4 +2008,34 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get switchForum => 'Сменить форум';
+
+  @override
+  String get explore => 'Обзор';
+
+  @override
+  String get tags => 'Теги';
+
+  @override
+  String get community => 'Сообщество';
+
+  @override
+  String get users => 'Пользователи';
+
+  @override
+  String get groups => 'Группы';
+
+  @override
+  String get invites => 'Приглашения';
+
+  @override
+  String get account => 'Аккаунт';
+
+  @override
+  String get drafts => 'Черновики';
+
+  @override
+  String get termsOfService => 'Условия использования';
+
+  @override
+  String get privacyPolicy => 'Политика конфиденциальности';
 }

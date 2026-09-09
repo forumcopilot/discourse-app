@@ -2013,4 +2013,34 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get switchForum => 'Ander forum';
+
+  @override
+  String get explore => 'Ontdekken';
+
+  @override
+  String get tags => 'Tags';
+
+  @override
+  String get community => 'Community';
+
+  @override
+  String get users => 'Gebruikers';
+
+  @override
+  String get groups => 'Groepen';
+
+  @override
+  String get invites => 'Uitnodigingen';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get drafts => 'Concepten';
+
+  @override
+  String get termsOfService => 'Servicevoorwaarden';
+
+  @override
+  String get privacyPolicy => 'Privacybeleid';
 }

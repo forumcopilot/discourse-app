@@ -2014,4 +2014,34 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get switchForum => 'Trocar de fórum';
+
+  @override
+  String get explore => 'Explorar';
+
+  @override
+  String get tags => 'Tags';
+
+  @override
+  String get community => 'Comunidade';
+
+  @override
+  String get users => 'Usuários';
+
+  @override
+  String get groups => 'Grupos';
+
+  @override
+  String get invites => 'Convites';
+
+  @override
+  String get account => 'Conta';
+
+  @override
+  String get drafts => 'Rascunhos';
+
+  @override
+  String get termsOfService => 'Termos de serviço';
+
+  @override
+  String get privacyPolicy => 'Política de privacidade';
 }

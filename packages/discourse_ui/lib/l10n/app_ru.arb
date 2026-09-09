@@ -854,5 +854,15 @@
   "dontUpload": "Не загружать",
   "dontAskAgainAlwaysResize": "Больше не спрашивать — всегда уменьшать",
   "couldNotLoadCategories": "Не удалось загрузить категории.",
-  "switchForum": "Сменить форум"
+  "switchForum": "Сменить форум",
+  "explore": "Обзор",
+  "tags": "Теги",
+  "community": "Сообщество",
+  "users": "Пользователи",
+  "groups": "Группы",
+  "invites": "Приглашения",
+  "account": "Аккаунт",
+  "drafts": "Черновики",
+  "termsOfService": "Условия использования",
+  "privacyPolicy": "Политика конфиденциальности"
 }

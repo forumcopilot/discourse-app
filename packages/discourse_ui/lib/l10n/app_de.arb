@@ -854,5 +854,15 @@
   "dontUpload": "Nicht hochladen",
   "dontAskAgainAlwaysResize": "Nicht mehr fragen — immer passend verkleinern",
   "couldNotLoadCategories": "Kategorien konnten nicht geladen werden.",
-  "switchForum": "Forum wechseln"
+  "switchForum": "Forum wechseln",
+  "explore": "Entdecken",
+  "tags": "Schlagwörter",
+  "community": "Community",
+  "users": "Benutzer",
+  "groups": "Gruppen",
+  "invites": "Einladungen",
+  "account": "Konto",
+  "drafts": "Entwürfe",
+  "termsOfService": "Nutzungsbedingungen",
+  "privacyPolicy": "Datenschutzerklärung"
 }

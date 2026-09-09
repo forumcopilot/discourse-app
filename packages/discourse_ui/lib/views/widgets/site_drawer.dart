@@ -61,32 +61,41 @@ class SiteDrawer extends StatelessWidget {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  // Only inside a multi-forum host: the way back to its list.
-                  if (DiscourseHost.switchForum != null) ...[
+                  // Only inside a multi-forum host: the way back to its
+                  // list. A host says so through DiscourseHost.switchForum;
+                  // failing that, a route below this shell means we were
+                  // pushed on top of one. Standalone builds show nothing.
+                  if (DiscourseHost.switchForum != null ||
+                      Navigator.of(context).canPop()) ...[
                     _DrawerRow(
                       icon: Icons.grid_view_rounded,
                       title: AppLocalizations.of(context)!.switchForum,
                       onTap: () {
                         Navigator.of(context).pop(); // close drawer
-                        DiscourseHost.switchForum!();
+                        final hook = DiscourseHost.switchForum;
+                        if (hook != null) {
+                          hook();
+                        } else {
+                          Navigator.of(context).popUntil((route) => route.isFirst);
+                        }
                       },
                     ),
                     const Divider(height: 1),
                   ],
-                  _SectionLabel(label: 'Explore'),
+                  _SectionLabel(label: AppLocalizations.of(context)!.explore),
                   _DrawerRow(
                     icon: Icons.label_outline,
-                    title: 'Tags',
+                    title: AppLocalizations.of(context)!.tags,
                     onTap: () => _push(
                       context,
                       TagsPage(siteContext: siteContext),
                     ),
                   ),
                   const Divider(height: 1),
-                  _SectionLabel(label: 'Community'),
+                  _SectionLabel(label: AppLocalizations.of(context)!.community),
                   _DrawerRow(
                     icon: Icons.people_outline,
-                    title: 'Users',
+                    title: AppLocalizations.of(context)!.users,
                     onTap: () => _push(
                       context,
                       UsersDirectoryPage(siteContext: siteContext),
@@ -94,7 +103,7 @@ class SiteDrawer extends StatelessWidget {
                   ),
                   _DrawerRow(
                     icon: Icons.groups_outlined,
-                    title: 'Groups',
+                    title: AppLocalizations.of(context)!.groups,
                     onTap: () => _push(
                       context,
                       GroupsListPage(siteContext: siteContext),
@@ -102,7 +111,7 @@ class SiteDrawer extends StatelessWidget {
                   ),
                   _DrawerRow(
                     icon: Icons.emoji_events_outlined,
-                    title: 'Badges',
+                    title: AppLocalizations.of(context)!.badges,
                     onTap: () => _push(
                       context,
                       BadgesDirectoryPage(siteContext: siteContext),
@@ -116,7 +125,7 @@ class SiteDrawer extends StatelessWidget {
                   if (siteContext.isLoggedIn)
                     _DrawerRow(
                       icon: Icons.person_add_alt_outlined,
-                      title: 'Invites',
+                      title: AppLocalizations.of(context)!.invites,
                       onTap: () => _push(
                         context,
                         InvitesPage(siteContext: siteContext),
@@ -131,14 +140,14 @@ class SiteDrawer extends StatelessWidget {
                           false))
                     _DrawerRow(
                       icon: Icons.fact_check_outlined,
-                      title: 'Review queue',
+                      title: AppLocalizations.of(context)!.reviewQueue,
                       onTap: () => _push(
                         context,
                         ReviewablesPage(siteContext: siteContext),
                       ),
                     ),
                   const Divider(height: 1),
-                  _SectionLabel(label: 'Account'),
+                  _SectionLabel(label: AppLocalizations.of(context)!.account),
                   // Your own content, above the settings rows — Bookmarks
                   // and Drafts are things you go *read*, while Notifications
                   // and Privacy are things you go *configure*. Both moved
@@ -147,7 +156,7 @@ class SiteDrawer extends StatelessWidget {
                   if (siteContext.isLoggedIn) ...[
                     _DrawerRow(
                       icon: Icons.bookmark_outline,
-                      title: 'Bookmarks',
+                      title: AppLocalizations.of(context)!.bookmarks,
                       onTap: () => _push(
                         context,
                         BookmarksPage(siteContext: siteContext),
@@ -155,7 +164,7 @@ class SiteDrawer extends StatelessWidget {
                     ),
                     _DrawerRow(
                       icon: Icons.edit_note_outlined,
-                      title: 'Drafts',
+                      title: AppLocalizations.of(context)!.drafts,
                       onTap: () => _push(
                         context,
                         DraftsListPage(siteContext: siteContext),
@@ -164,7 +173,7 @@ class SiteDrawer extends StatelessWidget {
                   ],
                   _DrawerRow(
                     icon: Icons.settings_outlined,
-                    title: 'Notifications',
+                    title: AppLocalizations.of(context)!.notifications,
                     onTap: () => _push(
                       context,
                       const NotificationSettingsPage(),
@@ -176,7 +185,7 @@ class SiteDrawer extends StatelessWidget {
                   // DiscourseSiteCapabilities and nothing read them.
                   _DrawerRow(
                     icon: Icons.gavel_outlined,
-                    title: 'Terms of Service',
+                    title: AppLocalizations.of(context)!.termsOfService,
                     onTap: () => _openLegal(context, _legalUrl(
                       DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
                           .tosUrl,
@@ -185,7 +194,7 @@ class SiteDrawer extends StatelessWidget {
                   ),
                   _DrawerRow(
                     icon: Icons.policy_outlined,
-                    title: 'Privacy Policy',
+                    title: AppLocalizations.of(context)!.privacyPolicy,
                     onTap: () => _openLegal(context, _legalUrl(
                       DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
                           .privacyPolicyUrl,
@@ -195,35 +204,19 @@ class SiteDrawer extends StatelessWidget {
                   if (siteContext.isLoggedIn)
                     _DrawerRow(
                       icon: Icons.logout,
-                      title: 'Sign out',
+                      title: AppLocalizations.of(context)!.signOut,
                       iconColor: colorScheme.error,
                       onTap: () => _confirmSignOut(context),
                     )
                   else
                     _DrawerRow(
                       icon: Icons.login,
-                      title: 'Sign in',
+                      title: AppLocalizations.of(context)!.signIn,
                       onTap: () => _push(
                         context,
                         LoginPage(siteContext: siteContext),
                       ),
                     ),
-                  // When hosted inside a multi-forum app the site shell is
-                  // pushed on top of the host's forum chooser; offer a way
-                  // back. Standalone builds have no route below the shell,
-                  // so this row stays hidden there.
-                  if (Navigator.of(context).canPop()) ...[
-                    const Divider(height: 1),
-                    _DrawerRow(
-                      icon: Icons.swap_horiz,
-                      title: 'Switch forum',
-                      onTap: () {
-                        Navigator.of(context).pop(); // close drawer
-                        Navigator.of(context)
-                            .popUntil((route) => route.isFirst);
-                      },
-                    ),
-                  ],
                 ],
               ),
             ),

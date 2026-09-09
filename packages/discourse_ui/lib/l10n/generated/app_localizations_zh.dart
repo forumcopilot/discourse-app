@@ -1916,4 +1916,34 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get switchForum => '切换论坛';
+
+  @override
+  String get explore => '探索';
+
+  @override
+  String get tags => '标签';
+
+  @override
+  String get community => '社区';
+
+  @override
+  String get users => '用户';
+
+  @override
+  String get groups => '群组';
+
+  @override
+  String get invites => '邀请';
+
+  @override
+  String get account => '账户';
+
+  @override
+  String get drafts => '草稿';
+
+  @override
+  String get termsOfService => '服务条款';
+
+  @override
+  String get privacyPolicy => '隐私政策';
 }

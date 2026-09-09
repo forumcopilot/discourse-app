@@ -854,5 +854,15 @@
   "dontUpload": "업로드 안 함",
   "dontAskAgainAlwaysResize": "다시 묻지 않기 — 항상 크기에 맞게 조정",
   "couldNotLoadCategories": "카테고리를 불러오지 못했습니다.",
-  "switchForum": "포럼 전환"
+  "switchForum": "포럼 전환",
+  "explore": "탐색",
+  "tags": "태그",
+  "community": "커뮤니티",
+  "users": "사용자",
+  "groups": "그룹",
+  "invites": "초대",
+  "account": "계정",
+  "drafts": "임시 저장",
+  "termsOfService": "서비스 약관",
+  "privacyPolicy": "개인정보 처리방침"
 }

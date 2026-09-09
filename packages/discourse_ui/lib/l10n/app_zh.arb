@@ -854,5 +854,15 @@
   "dontUpload": "不上传",
   "dontAskAgainAlwaysResize": "不再询问 — 始终缩小以适应",
   "couldNotLoadCategories": "无法加载分类。",
-  "switchForum": "切换论坛"
+  "switchForum": "切换论坛",
+  "explore": "探索",
+  "tags": "标签",
+  "community": "社区",
+  "users": "用户",
+  "groups": "群组",
+  "invites": "邀请",
+  "account": "账户",
+  "drafts": "草稿",
+  "termsOfService": "服务条款",
+  "privacyPolicy": "隐私政策"
 }

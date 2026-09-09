@@ -1933,4 +1933,34 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get switchForum => '포럼 전환';
+
+  @override
+  String get explore => '탐색';
+
+  @override
+  String get tags => '태그';
+
+  @override
+  String get community => '커뮤니티';
+
+  @override
+  String get users => '사용자';
+
+  @override
+  String get groups => '그룹';
+
+  @override
+  String get invites => '초대';
+
+  @override
+  String get account => '계정';
+
+  @override
+  String get drafts => '임시 저장';
+
+  @override
+  String get termsOfService => '서비스 약관';
+
+  @override
+  String get privacyPolicy => '개인정보 처리방침';
 }

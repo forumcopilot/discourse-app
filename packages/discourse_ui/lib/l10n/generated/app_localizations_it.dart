@@ -2025,4 +2025,34 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get switchForum => 'Cambia forum';
+
+  @override
+  String get explore => 'Esplora';
+
+  @override
+  String get tags => 'Tag';
+
+  @override
+  String get community => 'Comunità';
+
+  @override
+  String get users => 'Utenti';
+
+  @override
+  String get groups => 'Gruppi';
+
+  @override
+  String get invites => 'Inviti';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get drafts => 'Bozze';
+
+  @override
+  String get termsOfService => 'Termini di servizio';
+
+  @override
+  String get privacyPolicy => 'Informativa sulla privacy';
 }
