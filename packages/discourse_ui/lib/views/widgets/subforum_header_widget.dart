@@ -128,7 +128,7 @@ class SubforumHeaderWidget extends StatelessWidget {
                               : BlendMode.color,   // Stronger color application for light mode
                           ),
                           child: Image.asset(
-                            'assets/forum_header_bg.png',
+                            'packages/discourse_ui/assets/forum_header_bg.png',
                             fit: BoxFit.cover,
                             width: double.infinity,
                             height: double.infinity,

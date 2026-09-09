@@ -9,6 +9,8 @@ import 'package:forumcopilot_sdk/forumcopilot_sdk.dart' as forumcopilot_sdk;
 import 'package:discourse_ui/utils/safe_image.dart';
 import 'package:discourse_ui/utils/avatar_color_utils.dart';
 import '../../theme/design_tokens.dart';
+import '../../utils/discourse_color.dart';
+import 'brand_image.dart';
 
 class ForumHeaderWidget extends StatelessWidget {
   final forumcopilot_sdk.FCBoardStatResult? boardStats;
@@ -30,24 +32,61 @@ class ForumHeaderWidget extends StatelessWidget {
     }
   }
 
+  /// The wordmark, contained, at header height — never squeezed into a
+  /// square. Falls back to the square tile when the forum has no wide logo.
+  Widget _buildLogoBlock(
+      BuildContext context, String? wideLogo, String? squareLogo, String siteName) {
+    if (wideLogo != null && wideLogo.isNotEmpty) {
+      return ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 44, maxWidth: 260),
+        child: BrandImage(
+          wideLogo,
+          height: 44,
+          fit: BoxFit.contain,
+          alignment: Alignment.centerLeft,
+          fallback: (context) => _buildLogoTile(context, squareLogo, siteName),
+        ),
+      );
+    }
+    return _buildLogoTile(context, squareLogo, siteName);
+  }
+
+  Widget _buildLogoTile(BuildContext context, String? logoUrl, String siteName) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+        color: colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
+            blurRadius: 6,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+        child: _buildLogoContent(context, logoUrl, siteName),
+      ),
+    );
+  }
+
   Widget _buildLogoContent(BuildContext context, String? logoUrl, String siteName) {
-    // If we have a logo URL, try to load it
     if (logoUrl != null && logoUrl.isNotEmpty) {
-      return SafeImageNetwork.networkSafe(
+      return BrandImage(
         logoUrl,
         width: 60,
         height: 60,
         // contain, not cover: a forum logo is artwork with a fixed aspect
         // ratio, and cropping it to fill a square cuts the wordmark in half.
         fit: BoxFit.contain,
-        // If logo fails to load, fall back to first character avatar
-        errorBuilder: (context, error, stackTrace) {
-          return _buildInitialAvatar(context, siteName);
-        },
+        alignment: Alignment.center,
+        fallback: (context) => _buildInitialAvatar(context, siteName),
       );
     }
-
-    // If no logo, show the first character with gradient
     return _buildInitialAvatar(context, siteName);
   }
 
@@ -160,6 +199,22 @@ class ForumHeaderWidget extends StatelessWidget {
               dark: Theme.of(context).brightness == Brightness.dark,
             );
       final siteName = site?.name ?? (AppLocalizations.of(context)?.forum ?? 'Forum');
+      // The forum's own header: its wordmark on its header colour, the way
+      // the browser shows it. Both come from payloads already fetched
+      // (/site.json colour scheme, /site/settings.json logos). A forum on
+      // the stock scheme has no colours; it keeps our pattern background.
+      final caps = DiscourseSiteCapabilities.forSite(site?.pluginUrl ?? '');
+      final wideLogo = (configuredLogo != null && configuredLogo.isNotEmpty)
+          ? configuredLogo
+          : caps.wideLogoFor(dark: isDarkMode);
+      final brandBg = parseDiscourseHex(caps.headerBackgroundFor(dark: isDarkMode) ?? '');
+      final brandFgParsed = parseDiscourseHex(caps.headerPrimaryFor(dark: isDarkMode) ?? '');
+      final fg = brandFgParsed ??
+          (brandBg == null
+              ? colorScheme.onSurface
+              : (ThemeData.estimateBrightnessForColor(brandBg) == Brightness.dark
+                  ? Colors.white
+                  : Colors.black87));
       final domain = _getDomain(site?.url);
 
       // Calculate padding based on whether it should extend under app bar
@@ -201,7 +256,7 @@ class ForumHeaderWidget extends StatelessWidget {
                               : BlendMode.color,   // Stronger color application for light mode
                           ),
                           child: Image.asset(
-                            'assets/forum_header_bg.png',
+                            'packages/discourse_ui/assets/forum_header_bg.png',
                             fit: BoxFit.cover,
                             width: double.infinity,
                             height: double.infinity,
@@ -215,6 +270,7 @@ class ForumHeaderWidget extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if (brandBg != null) Container(color: brandBg),
                     // Network background (only shown if URL exists and loads successfully)
                     Builder(
                       builder: (context) {
@@ -262,75 +318,37 @@ class ForumHeaderWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Row with Logo and Name/Domain
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Forum Logo - always show
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                            color: colorScheme.surface,
-                            boxShadow: [
-                              BoxShadow(
-                                color: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
-                                blurRadius: 6,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                            child: _buildLogoContent(context, logoUrl, siteName),
-                          ),
-                        ),
-                        SizedBox(width: DesignTokens.spacingM),
-                        // Forum Name and Domain
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Forum Name
-                              Text(
-                                site?.name ?? 'Forum',
-                                style: TextStyle(
-                                  color: colorScheme.onSurface,
-                                  fontWeight: DesignTokens.fontWeightBold,
-                                  fontSize: DesignTokens.fontSizeL,
-                                ),
-                                textAlign: TextAlign.left,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              // Domain Name
-                              if (domain != null) ...[
-                                SizedBox(height: DesignTokens.spacingXS / 2),
-                                Text(
-                                  domain,
-                                  style: TextStyle(
-                                    color: colorScheme.onSurface.withValues(alpha: DesignTokens.opacityMedium),
-                                    fontSize: DesignTokens.fontSizeS,
-                                    fontWeight: DesignTokens.fontWeightNormal,
-                                  ),
-                                  textAlign: TextAlign.left,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
+                    _buildLogoBlock(context, wideLogo, logoUrl, siteName),
+                    SizedBox(height: DesignTokens.spacingS),
+                    Text(
+                      site?.name ?? 'Forum',
+                      style: TextStyle(
+                        color: fg,
+                        fontWeight: DesignTokens.fontWeightBold,
+                        fontSize: DesignTokens.fontSizeL,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
+                    if (domain != null) ...[
+                      SizedBox(height: DesignTokens.spacingXS / 2),
+                      Text(
+                        domain,
+                        style: TextStyle(
+                          color: fg.withValues(alpha: DesignTokens.opacityMedium),
+                          fontSize: DesignTokens.fontSizeS,
+                          fontWeight: DesignTokens.fontWeightNormal,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                     SizedBox(height: DesignTokens.spacingS),
                     // Forum Description
                     Text(
                       site?.description ?? 'No description available.',
                       style: TextStyle(
-                        color: colorScheme.onSurface.withValues(alpha: DesignTokens.opacityHigh),
+                        color: fg.withValues(alpha: DesignTokens.opacityHigh),
                         fontSize: DesignTokens.fontSizeS,
                         fontWeight: DesignTokens.fontWeightMedium,
                       ),
@@ -348,7 +366,7 @@ class ForumHeaderWidget extends StatelessWidget {
                             Text(
                               AppLocalizations.of(context)!.postsCount(formatNumber(context, boardStats?.total_posts ?? 0)),
                               style: TextStyle(
-                                color: colorScheme.onSurface.withValues(alpha: DesignTokens.opacityHigh),
+                                color: fg.withValues(alpha: DesignTokens.opacityHigh),
                                 fontWeight: DesignTokens.fontWeightMedium,
                                 fontSize: DesignTokens.fontSizeXS,
                               ),
@@ -360,7 +378,7 @@ class ForumHeaderWidget extends StatelessWidget {
                             Text(
                               AppLocalizations.of(context)?.membersCount(boardStats?.total_members ?? 0) ?? '${formatNumber(context, boardStats?.total_members ?? 0)} Members',
                               style: TextStyle(
-                                color: colorScheme.onSurface.withValues(alpha: DesignTokens.opacityHigh),
+                                color: fg.withValues(alpha: DesignTokens.opacityHigh),
                                 fontWeight: DesignTokens.fontWeightMedium,
                                 fontSize: DesignTokens.fontSizeXS,
                               ),

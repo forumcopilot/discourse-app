@@ -102,6 +102,20 @@ class DiscourseSiteCapabilities {
   }
 
   /// Legal links, absolute or site-relative as the server gave them.
+  /// Header colours from the forum's default colour schemes in `/site.json`
+  /// (`default_light_color_scheme` / `default_dark_color_scheme`, each a
+  /// list of `{name, hex}`). Six-digit hex without '#', null when the forum
+  /// runs the stock scheme (Discourse then omits the object entirely).
+  String? headerBackgroundHex;
+  String? headerPrimaryHex;
+  String? headerBackgroundDarkHex;
+  String? headerPrimaryDarkHex;
+
+  String? headerBackgroundFor({required bool dark}) =>
+      dark ? (headerBackgroundDarkHex ?? headerBackgroundHex) : headerBackgroundHex;
+  String? headerPrimaryFor({required bool dark}) =>
+      dark ? (headerPrimaryDarkHex ?? headerPrimaryHex) : headerPrimaryHex;
+
   String? tosUrl;
   String? privacyPolicyUrl;
 
@@ -148,6 +162,12 @@ class DiscourseSiteCapabilities {
         .whereType<Map>()
         .map((c) => c.cast<String, dynamic>())
         .toList(growable: false);
+    final light = _schemeColors(site['default_light_color_scheme']);
+    final dark = _schemeColors(site['default_dark_color_scheme']);
+    caps.headerBackgroundHex = light['header_background'];
+    caps.headerPrimaryHex = light['header_primary'];
+    caps.headerBackgroundDarkHex = dark['header_background'];
+    caps.headerPrimaryDarkHex = dark['header_primary'];
     caps.tosUrl = (site['tos_url'] as String?)?.trim();
     caps.privacyPolicyUrl = (site['privacy_policy_url'] as String?)?.trim();
     caps.resolved = true;
@@ -213,4 +233,20 @@ class DiscourseSiteCapabilities {
 
   @visibleForTesting
   static void reset() => _bySite.clear();
+}
+
+/// `{colors: [{name, hex}, …]}` → `{name: hex}`, keeping only well-formed
+/// 3- or 6-digit hex values. Anything else returns empty.
+Map<String, String> _schemeColors(Object? scheme) {
+  if (scheme is! Map) return const {};
+  final out = <String, String>{};
+  for (final c in (scheme['colors'] as List?) ?? const []) {
+    if (c is! Map) continue;
+    final name = c['name']?.toString();
+    final hex = c['hex']?.toString().trim().replaceFirst('#', '');
+    if (name == null || hex == null) continue;
+    if (!RegExp(r'^[0-9a-fA-F]{6}$|^[0-9a-fA-F]{3}$').hasMatch(hex)) continue;
+    out[name] = hex.length == 3 ? hex.split('').map((ch) => ch + ch).join() : hex;
+  }
+  return out;
 }

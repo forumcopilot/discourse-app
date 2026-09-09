@@ -43,6 +43,7 @@ dependencies:
   # Shortcode (`:wave:`) -> Unicode lookup for Discourse emoji.
   emojis: ^0.9.9
   cached_network_image: ^3.4.1
+  flutter_svg: ^2.0.10
   flutter_cache_manager: ^3.4.1
   flutter_inappwebview: ^6.1.5
   scrollable_positioned_list: ^0.3.8
@@ -63,3 +64,7 @@ dev_dependencies:
 flutter:
   generate: true
   uses-material-design: true
+  # The module's own artwork, addressed as packages/discourse_ui/assets/…
+  # so no host app has to ship copies.
+  assets:
+    - assets/
