@@ -111,6 +111,10 @@ class DiscourseSiteCapabilities {
   String? headerBackgroundDarkHex;
   String? headerPrimaryDarkHex;
 
+  /// True when the admin uploaded any dark-mode logo variant.
+  bool get hasDarkLogo => [logoDarkUrl, mobileLogoDarkUrl, smallLogoDarkUrl]
+      .any((u) => u != null && u.isNotEmpty);
+
   String? headerBackgroundFor({required bool dark}) =>
       dark ? (headerBackgroundDarkHex ?? headerBackgroundHex) : headerBackgroundHex;
   String? headerPrimaryFor({required bool dark}) =>

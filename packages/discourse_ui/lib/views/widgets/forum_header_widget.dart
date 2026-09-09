@@ -204,11 +204,16 @@ class ForumHeaderWidget extends StatelessWidget {
       // (/site.json colour scheme, /site/settings.json logos). A forum on
       // the stock scheme has no colours; it keeps our pattern background.
       final caps = DiscourseSiteCapabilities.forSite(site?.pluginUrl ?? '');
+      // Wordmarks are transparent artwork drawn for one background. A forum
+      // that ships a dark-mode logo gets its dark header colours in dark
+      // mode; one that does not keeps its light colours even in dark mode,
+      // so a black wordmark never lands on a near-black strip.
+      final useDarkBrand = isDarkMode && caps.hasDarkLogo;
       final wideLogo = (configuredLogo != null && configuredLogo.isNotEmpty)
           ? configuredLogo
-          : caps.wideLogoFor(dark: isDarkMode);
-      final brandBg = parseDiscourseHex(caps.headerBackgroundFor(dark: isDarkMode) ?? '');
-      final brandFgParsed = parseDiscourseHex(caps.headerPrimaryFor(dark: isDarkMode) ?? '');
+          : caps.wideLogoFor(dark: useDarkBrand);
+      final brandBg = parseDiscourseHex(caps.headerBackgroundFor(dark: useDarkBrand) ?? '');
+      final brandFgParsed = parseDiscourseHex(caps.headerPrimaryFor(dark: useDarkBrand) ?? '');
       final fg = brandFgParsed ??
           (brandBg == null
               ? colorScheme.onSurface
