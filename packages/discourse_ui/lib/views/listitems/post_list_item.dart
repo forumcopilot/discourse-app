@@ -310,11 +310,26 @@ class _PostListItemState extends State<PostListItem> {
         .where((att) => !(att.isInline ?? false))
         .toList();
 
+    // One preview per post, the way web oneboxes one link: a video if
+    // there is one, else a tweet, else the first external link. Each
+    // card is a network fetch the moment the post appears, and a post
+    // with a dozen bare links used to spawn a dozen of them.
+    final video = content.youtubeUrls.take(1).toList();
+    final tweet = video.isEmpty ? content.twitterUrls.take(1).toList() : const <String>[];
+    final link = (video.isEmpty && tweet.isEmpty)
+        ? content.linkUrls
+            .where((url) =>
+                !MediaUrlUtils.isEmail(url) &&
+                !UrlUtils.isSameDomain(widget.siteContext, url))
+            .take(1)
+            .toList()
+        : const <String>[];
+
     return _PostContentData(
       html: content.html,
-      limitedUrls: content.linkUrls.take(10).toList(),
-      limitedYoutubeUrls: content.youtubeUrls.take(10).toList(),
-      limitedTwitterUrls: content.twitterUrls.take(10).toList(),
+      limitedUrls: link,
+      limitedYoutubeUrls: video,
+      limitedTwitterUrls: tweet,
       attachments: nonInlineAttachments,
       inlineAttachments: widget.post.inlineAttachments,
     );
@@ -889,12 +904,8 @@ class _PostListItemState extends State<PostListItem> {
             const SizedBox(height: DesignTokens.spacingM),
             StyleBuilders.divider(colorScheme: colorScheme),
             const SizedBox(height: DesignTokens.spacingS),
-            ...data.limitedUrls
-                .where((url) =>
-                    !MediaUrlUtils.isEmail(url) &&
-                    !UrlUtils.isSameDomain(widget.siteContext, url))
-                .map((url) =>
-                    LinkPreviewCard(url: url, siteContext: widget.siteContext)),
+            ...data.limitedUrls.map((url) =>
+                LinkPreviewCard(url: url, siteContext: widget.siteContext)),
           ],
           if (data.attachments.isNotEmpty) ...[
             const SizedBox(height: DesignTokens.spacingS),

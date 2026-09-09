@@ -106,35 +106,20 @@ class TopicListItem extends StatelessWidget {
                         if (topic.lastPosterName != null &&
                             topic.lastPostedAt != null) ...[
                           SizedBox(height: DesignTokens.spacingXS),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              UserAvatar(
-                                username: topic.lastPosterName!,
-                                iconUrl: topic.lastPosterIconUrl,
-                                radius: 8,
-                              ),
-                              SizedBox(width: DesignTokens.spacingXS),
-                              Flexible(
-                                child: Text(
-                                  AppLocalizations.of(context)
-                                          ?.topicLastReplyBy(
-                                        topic.lastPosterName!,
-                                        formatSmartDateTime(
-                                            topic.lastPostedAt!, context),
-                                      ) ??
-                                      '${topic.lastPosterName} replied '
-                                          '${formatSmartDateTime(topic.lastPostedAt!, context)}',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                    letterSpacing:
-                                        DesignTokens.letterSpacingWide,
-                                  ),
-                                ),
-                              ),
-                            ],
+                          Text(
+                            AppLocalizations.of(context)?.topicLastReplyBy(
+                                  topic.lastPosterName!,
+                                  formatSmartDateTime(
+                                      topic.lastPostedAt!, context),
+                                ) ??
+                                '${topic.lastPosterName} replied '
+                                    '${formatSmartDateTime(topic.lastPostedAt!, context)}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              letterSpacing: DesignTokens.letterSpacingWide,
+                            ),
                           ),
                         ],
                       ],
@@ -294,7 +279,9 @@ class TopicListItem extends StatelessWidget {
                             ),
                           ),
                         ),
-                      ...tags.map((tag) {
+                      // Two tags and a "+N": a row is a glance, not an
+                      // index, and every chip is layout and paint.
+                      ...tags.take(2).map((tag) {
                       final chipShape = RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.circular(DesignTokens.radiusS),
@@ -335,6 +322,18 @@ class TopicListItem extends StatelessWidget {
                         ),
                       );
                     }),
+                      if (tags.length > 2)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 4, vertical: 2),
+                          child: Text(
+                            '+${tags.length - 2}',
+                            style: textTheme.labelSmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              letterSpacing: DesignTokens.letterSpacingWide,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 );
@@ -354,279 +353,92 @@ class TopicListItem extends StatelessWidget {
                 ),
               ),
             ],
-            // Metadata row
-            Builder(
-              builder: (context) {
-                // Count status icons to determine if we should show labels
-                final statusIconCount = [
-                  if (topicIcon != null) 1,
-                  if (topic.isSolved) 1,
-                  if (topic.isHot) 1,
-                  if (topic.isPinned) 1,
-                  if (topic.isSubscribed) 1,
-                  if (topic.isClosed) 1,
-                  if (topic.hasPoll) 1,
-                ].length;
-                final showLabels = statusIconCount == 1;
-                final metaColor = colorScheme.onSurfaceVariant.withValues(alpha: 0.72);
-                
-                return Padding(
-                  padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingL),
-                  child: Wrap(
-                    spacing: DesignTokens.spacingL,
-                    runSpacing: DesignTokens.spacingXS,
-                    children: [
-                      if (topic.replyCount > 0) ...[
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.comment_outlined,
-                              size: textTheme.bodySmall?.fontSize ?? 12,
-                              color: metaColor,
-                            ),
-                            SizedBox(width: DesignTokens.spacingXS),
-                            Text(
-                              formatNumber(context, topic.replyCount),
-                              style: textTheme.bodySmall?.copyWith(
-                                color: metaColor,
-                                letterSpacing: DesignTokens.letterSpacingWide,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                      // Likes — web shows these on every row and they are a
-                      // better signal of a topic worth opening than views.
-                      if (topic.likeCount > 0) ...[
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.favorite_border,
-                              size: textTheme.bodySmall?.fontSize ?? 12,
-                              color: metaColor,
-                            ),
-                            SizedBox(width: DesignTokens.spacingXS),
-                            Text(
-                              formatNumber(context, topic.likeCount),
-                              style: textTheme.bodySmall?.copyWith(
-                                color: metaColor,
-                                letterSpacing: DesignTokens.letterSpacingWide,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                      // Vote count, where the forum runs topic voting.
-                      // Web puts it on the row beside the other counts, and
-                      // on a feature-request list it is the number that
-                      // matters most.
-                      if (topic.voteCount > 0) ...[
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.arrow_upward,
-                              size: textTheme.bodySmall?.fontSize ?? 12,
-                              color: metaColor,
-                            ),
-                            SizedBox(width: DesignTokens.spacingXS),
-                            Text(
-                              AppLocalizations.of(context)
-                                      ?.nVotes(topic.voteCount) ??
-                                  '${topic.voteCount} votes',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: metaColor,
-                                letterSpacing: DesignTokens.letterSpacingWide,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                      if (topic.viewCount > 0) ...[
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.visibility_outlined,
-                              size: textTheme.bodySmall?.fontSize ?? 12,
-                              color: metaColor,
-                            ),
-                            SizedBox(width: DesignTokens.spacingXS),
-                            Text(
-                              formatNumber(context, topic.viewCount),
-                              style: textTheme.bodySmall?.copyWith(
-                                color: metaColor,
-                                letterSpacing: DesignTokens.letterSpacingWide,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                      if (topicIcon != null)
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              topicIcon,
-                              size: textTheme.bodySmall?.fontSize ?? 12,
-                              color: metaColor,
-                            ),
-                            if (showLabels) ...[
-                              SizedBox(width: DesignTokens.spacingXS),
-                              Text(
-                                AppLocalizations.of(context)!.announcement,
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: metaColor,
-                                  letterSpacing: DesignTokens.letterSpacingWide,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      if (topic.isSolved)
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.check_circle,
-                              size: textTheme.bodySmall?.fontSize ?? 12,
-                              color: Colors.green.shade600,
-                            ),
-                            if (showLabels) ...[
-                              SizedBox(width: DesignTokens.spacingXS),
-                              Text(
-                                AppLocalizations.of(context)!.solved,
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: Colors.green.shade600,
-                                  letterSpacing: DesignTokens.letterSpacingWide,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      // Discourse's own trending flag (`is_hot`), which web
-                      // badges on the row. Not derivable from the counts
-                      // beside it — the server weighs recency and activity
-                      // together — so it is shown only when the server says
-                      // so, and tinted rather than left grey because "hot"
-                      // is the one badge here that is an invitation.
-                      if (topic.isHot)
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.local_fire_department,
-                              size: textTheme.bodySmall?.fontSize ?? 12,
-                              color: Colors.deepOrange.shade400,
-                            ),
-                            if (showLabels) ...[
-                              SizedBox(width: DesignTokens.spacingXS),
-                              Text(
-                                AppLocalizations.of(context)!.hot,
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: Colors.deepOrange.shade400,
-                                  letterSpacing: DesignTokens.letterSpacingWide,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      if (topic.isPinned)
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.push_pin_outlined,
-                              size: textTheme.bodySmall?.fontSize ?? 12,
-                              color: metaColor,
-                            ),
-                            if (showLabels) ...[
-                              SizedBox(width: DesignTokens.spacingXS),
-                              Text(
-                                AppLocalizations.of(context)!.pinned,
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: metaColor,
-                                  letterSpacing: DesignTokens.letterSpacingWide,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      if (topic.isSubscribed)
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.watch_outlined,
-                              size: textTheme.bodySmall?.fontSize ?? 12,
-                              color: metaColor,
-                            ),
-                            if (showLabels) ...[
-                              SizedBox(width: DesignTokens.spacingXS),
-                              Text(
-                                AppLocalizations.of(context)!.subscribedLabel,
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: metaColor,
-                                  letterSpacing: DesignTokens.letterSpacingWide,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      if (topic.isClosed)
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.lock_outlined,
-                              size: textTheme.bodySmall?.fontSize ?? 12,
-                              color: metaColor,
-                            ),
-                            if (showLabels) ...[
-                              SizedBox(width: DesignTokens.spacingXS),
-                              Text(
-                                AppLocalizations.of(context)!.locked,
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: metaColor,
-                                  letterSpacing: DesignTokens.letterSpacingWide,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      // Show poll icon in topic list so users can identify threads with polls.
-                      if (topic.hasPoll)
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.poll_outlined,
-                              size: textTheme.bodySmall?.fontSize ?? 12,
-                              color: metaColor,
-                            ),
-                            if (showLabels) ...[
-                              SizedBox(width: DesignTokens.spacingXS),
-                              Text(
-                                AppLocalizations.of(context)!.poll,
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: metaColor,
-                                  letterSpacing: DesignTokens.letterSpacingWide,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                    ],
-                  ),
-                );
-              },
-            ),
+            // Metadata row: the three counts (plus votes where a forum runs
+            // topic voting) and one status badge. It was two Wraps of up
+            // to nine items; the counts are what a row is scanned for, and
+            // one badge says the one thing that matters about a topic.
+            _MetaRow(topic: topic, topicIcon: topicIcon),
             // Bottom divider
             _buildBottomDivider(colorScheme),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _MetaRow extends StatelessWidget {
+  const _MetaRow({required this.topic, required this.topicIcon});
+  final FCTopic topic;
+  final IconData? topicIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
+    final metaColor = colorScheme.onSurfaceVariant.withValues(alpha: 0.72);
+    final size = textTheme.bodySmall?.fontSize ?? 12;
+    final style = textTheme.bodySmall?.copyWith(
+      color: metaColor,
+      letterSpacing: DesignTokens.letterSpacingWide,
+    );
+
+    Widget count(IconData icon, String text) => Padding(
+          padding: EdgeInsets.only(right: DesignTokens.spacingL),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: size, color: metaColor),
+              SizedBox(width: DesignTokens.spacingXS),
+              Text(text, style: style),
+            ],
+          ),
+        );
+
+    // One badge, by how much it changes what the reader should expect.
+    final (IconData, String, Color)? badge = topicIcon != null
+        ? (topicIcon!, l10n?.announcement ?? 'Announcement', metaColor)
+        : topic.isSolved
+            ? (Icons.check_circle, l10n?.solved ?? 'Solved', Colors.green.shade600)
+            : topic.isClosed
+                ? (Icons.lock_outlined, l10n?.locked ?? 'Locked', metaColor)
+                : topic.isHot
+                    ? (Icons.local_fire_department, l10n?.hot ?? 'Hot', Colors.deepOrange.shade400)
+                    : topic.isPinned
+                        ? (Icons.push_pin_outlined, l10n?.pinned ?? 'Pinned', metaColor)
+                        : topic.hasPoll
+                            ? (Icons.poll_outlined, l10n?.poll ?? 'Poll', metaColor)
+                            : topic.isSubscribed
+                                ? (Icons.watch_outlined, l10n?.subscribedLabel ?? 'Watching', metaColor)
+                                : null;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingL),
+      child: Row(
+        children: [
+          if (topic.replyCount > 0)
+            count(Icons.comment_outlined, formatNumber(context, topic.replyCount)),
+          if (topic.likeCount > 0)
+            count(Icons.favorite_border, formatNumber(context, topic.likeCount)),
+          if (topic.voteCount > 0)
+            count(Icons.arrow_upward, l10n?.nVotes(topic.voteCount) ?? '${topic.voteCount} votes'),
+          if (topic.viewCount > 0)
+            count(Icons.visibility_outlined, formatNumber(context, topic.viewCount)),
+          if (badge != null) ...[
+            const Spacer(),
+            Icon(badge.$1, size: size, color: badge.$3),
+            SizedBox(width: DesignTokens.spacingXS),
+            Flexible(
+              child: Text(
+                badge.$2,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: style?.copyWith(color: badge.$3),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

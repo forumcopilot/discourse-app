@@ -211,6 +211,7 @@ Reading the baseline:
 Re-run the benchmark after each phase; the numbers above are the
 baseline.
 
-Status: all three phases measured (tables above). What remains is the
-UI-level list — inline preview cap, tag chip cap, last-poster avatar,
-metadata row — which changes what users see and needs a decision.
+Status: all three phases measured (tables above). The UI-level list
+(one preview per post, two tag chips plus "+N", no last-poster avatar,
+compact metadata row with one badge) shipped in v1.0.9; the ForumHeader
+pre-tinted asset is not needed now that the tint is paint-level.

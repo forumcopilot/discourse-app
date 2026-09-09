@@ -6,6 +6,15 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.9] - 2026-09-09
+
+### Changed
+- **Lighter topic rows and posts** — the UI half of the scroll audit (`docs/perf-audit-2026-09.md`), each cut removing per-row layout, paint or network work:
+  - A post shows **one** preview card: a video if it has one, else a tweet, else the first external link. Web oneboxes one link too; the app allowed up to thirty cards, each a network fetch the moment the post appeared.
+  - A topic row shows at most **two tag chips** plus "+N".
+  - The "alice replied 3h ago" line is text only; the mini avatar beside it is gone (it was the seventh image per row).
+  - The metadata row is replies, likes, votes where a forum has them, views, and **one** status badge chosen by what matters most (announcement, solved, locked, hot, pinned, poll, watching), right-aligned — instead of two wrapping rows of up to nine items.
+
 ## [1.0.8] - 2026-09-09
 
 ### Changed
