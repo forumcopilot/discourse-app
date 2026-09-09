@@ -6,6 +6,11 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-09-08
+
+### Changed
+- **Forum logos are cached on disk.** `BrandImage` now loads raster logos through `CachedNetworkImage` and SVG logos as files through the same `flutter_cache_manager` store (thirty days), instead of re-downloading on every build. Matters most to multi-forum hosts that paint hundreds of directory icons; the single-forum app gains the header and drawer wordmark. Web keeps the plain network SVG loader.
+
 ## [1.0.5] - 2026-09-08
 
 ### Changed
