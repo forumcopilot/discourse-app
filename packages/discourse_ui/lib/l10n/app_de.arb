@@ -864,5 +864,7 @@
   "account": "Konto",
   "drafts": "Entwürfe",
   "termsOfService": "Nutzungsbedingungen",
-  "privacyPolicy": "Datenschutzerklärung"
+  "privacyPolicy": "Datenschutzerklärung",
+  "signedInAs": "Angemeldet als {username}",
+  "notSignedIn": "Nicht angemeldet"
 }

@@ -1162,5 +1162,7 @@
   "account": "Account",
   "drafts": "Concepten",
   "termsOfService": "Servicevoorwaarden",
-  "privacyPolicy": "Privacybeleid"
+  "privacyPolicy": "Privacybeleid",
+  "signedInAs": "Aangemeld als {username}",
+  "notSignedIn": "Niet aangemeld"
 }

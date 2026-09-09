@@ -2055,4 +2055,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Informativa sulla privacy';
+
+  @override
+  String signedInAs(String username) {
+    return 'Accesso effettuato come $username';
+  }
+
+  @override
+  String get notSignedIn => 'Non hai effettuato l’accesso';
 }

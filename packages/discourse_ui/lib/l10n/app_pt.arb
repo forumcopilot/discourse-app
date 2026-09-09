@@ -864,5 +864,7 @@
   "account": "Conta",
   "drafts": "Rascunhos",
   "termsOfService": "Termos de serviço",
-  "privacyPolicy": "Política de privacidade"
+  "privacyPolicy": "Política de privacidade",
+  "signedInAs": "Conectado como {username}",
+  "notSignedIn": "Não conectado"
 }

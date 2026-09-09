@@ -2058,4 +2058,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Datenschutzerklärung';
+
+  @override
+  String signedInAs(String username) {
+    return 'Angemeldet als $username';
+  }
+
+  @override
+  String get notSignedIn => 'Nicht angemeldet';
 }

@@ -864,5 +864,7 @@
   "account": "Аккаунт",
   "drafts": "Черновики",
   "termsOfService": "Условия использования",
-  "privacyPolicy": "Политика конфиденциальности"
+  "privacyPolicy": "Политика конфиденциальности",
+  "signedInAs": "Вы вошли как {username}",
+  "notSignedIn": "Вы не вошли"
 }

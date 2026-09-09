@@ -1946,4 +1946,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get privacyPolicy => '隐私政策';
+
+  @override
+  String signedInAs(String username) {
+    return '已登录：$username';
+  }
+
+  @override
+  String get notSignedIn => '未登录';
 }

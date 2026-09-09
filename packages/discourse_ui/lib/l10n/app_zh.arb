@@ -864,5 +864,7 @@
   "account": "账户",
   "drafts": "草稿",
   "termsOfService": "服务条款",
-  "privacyPolicy": "隐私政策"
+  "privacyPolicy": "隐私政策",
+  "signedInAs": "已登录：{username}",
+  "notSignedIn": "未登录"
 }

@@ -6,6 +6,11 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-09-08
+
+### Changed
+- **Sign in moved into the drawer header**, next to the "Not signed in" line, as a button — it was the last row of the drawer, below Privacy Policy. Web keeps its Log In in the header for the same reason. Sign out stays at the bottom. The header's own strings are localized and its wordmark renders through `BrandImage` (SVG, dark-logo rule).
+
 ## [1.0.4] - 2026-09-08
 
 ### Changed

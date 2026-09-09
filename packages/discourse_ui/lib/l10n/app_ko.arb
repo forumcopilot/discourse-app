@@ -864,5 +864,7 @@
   "account": "계정",
   "drafts": "임시 저장",
   "termsOfService": "서비스 약관",
-  "privacyPolicy": "개인정보 처리방침"
+  "privacyPolicy": "개인정보 처리방침",
+  "signedInAs": "{username}(으)로 로그인됨",
+  "notSignedIn": "로그인하지 않음"
 }

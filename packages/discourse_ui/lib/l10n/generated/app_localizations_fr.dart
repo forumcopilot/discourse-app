@@ -2056,4 +2056,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Politique de confidentialité';
+
+  @override
+  String signedInAs(String username) {
+    return 'Connecté en tant que $username';
+  }
+
+  @override
+  String get notSignedIn => 'Non connecté';
 }

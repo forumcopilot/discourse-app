@@ -2043,4 +2043,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Privacybeleid';
+
+  @override
+  String signedInAs(String username) {
+    return 'Aangemeld als $username';
+  }
+
+  @override
+  String get notSignedIn => 'Niet aangemeld';
 }

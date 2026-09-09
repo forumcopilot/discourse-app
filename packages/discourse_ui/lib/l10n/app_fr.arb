@@ -864,5 +864,7 @@
   "account": "Compte",
   "drafts": "Brouillons",
   "termsOfService": "Conditions d’utilisation",
-  "privacyPolicy": "Politique de confidentialité"
+  "privacyPolicy": "Politique de confidentialité",
+  "signedInAs": "Connecté en tant que {username}",
+  "notSignedIn": "Non connecté"
 }

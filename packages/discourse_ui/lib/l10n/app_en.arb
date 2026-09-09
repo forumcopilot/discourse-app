@@ -2342,5 +2342,18 @@
   "privacyPolicy": "Privacy Policy",
   "@privacyPolicy": {
     "description": "Drawer: Privacy Policy"
+  },
+  "signedInAs": "Signed in as {username}",
+  "@signedInAs": {
+    "description": "Drawer header",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "notSignedIn": "Not signed in",
+  "@notSignedIn": {
+    "description": "Drawer header"
   }
 }

@@ -1963,4 +1963,12 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get privacyPolicy => '개인정보 처리방침';
+
+  @override
+  String signedInAs(String username) {
+    return '$username(으)로 로그인됨';
+  }
+
+  @override
+  String get notSignedIn => '로그인하지 않음';
 }

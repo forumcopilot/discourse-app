@@ -20,6 +20,7 @@ import '../users_directory_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../host/discourse_host.dart';
+import 'brand_image.dart';
 
 /// Phase 5.18a — hamburger drawer ("More" menu).
 ///
@@ -208,15 +209,6 @@ class SiteDrawer extends StatelessWidget {
                       iconColor: colorScheme.error,
                       onTap: () => _confirmSignOut(context),
                     )
-                  else
-                    _DrawerRow(
-                      icon: Icons.login,
-                      title: AppLocalizations.of(context)!.signIn,
-                      onTap: () => _push(
-                        context,
-                        LoginPage(siteContext: siteContext),
-                      ),
-                    ),
                 ],
               ),
             ),
@@ -320,10 +312,11 @@ class _Header extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final isLoggedIn = siteContext.isLoggedIn;
     final username = siteContext.loginDataOutput?.user?.username;
-    final wideLogo =
-        DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
-            .wideLogoFor(
-      dark: Theme.of(context).brightness == Brightness.dark,
+    final caps = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl);
+    // Same rule as the forum header: a dark-mode logo only if the forum
+    // ships one; the header block is our primaryContainer either way.
+    final wideLogo = caps.wideLogoFor(
+      dark: Theme.of(context).brightness == Brightness.dark && caps.hasDarkLogo,
     );
     return Container(
       width: double.infinity,
@@ -354,10 +347,12 @@ class _Header extends StatelessWidget {
                 // only safe constraint is the one web uses — cap the
                 // height and let the width follow.
                 constraints: const BoxConstraints(maxHeight: 32),
-                child: Image.network(
+                child: BrandImage(
                   wideLogo,
+                  height: 32,
                   fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => _nameRow(context),
+                  alignment: Alignment.centerLeft,
+                  fallback: _nameRow,
                 ),
               ),
             )
@@ -366,13 +361,29 @@ class _Header extends StatelessWidget {
           const SizedBox(height: DesignTokens.spacingM),
           Text(
             isLoggedIn && username != null
-                ? 'Signed in as $username'
-                : 'Not signed in',
+                ? AppLocalizations.of(context)!.signedInAs(username)
+                : AppLocalizations.of(context)!.notSignedIn,
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onPrimaryContainer
                   .withValues(alpha: DesignTokens.opacityHigh),
             ),
           ),
+          // Sign in where the state is announced, not at the end of the
+          // list. Web keeps its Log In button in the header for the same
+          // reason: it is the first thing a visitor looks for.
+          if (!isLoggedIn) ...[
+            const SizedBox(height: DesignTokens.spacingM),
+            FilledButton.icon(
+              onPressed: () {
+                Navigator.of(context).pop(); // close drawer
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => LoginPage(siteContext: siteContext),
+                ));
+              },
+              icon: const Icon(Icons.login, size: 18),
+              label: Text(AppLocalizations.of(context)!.signIn),
+            ),
+          ],
         ],
       ),
     );

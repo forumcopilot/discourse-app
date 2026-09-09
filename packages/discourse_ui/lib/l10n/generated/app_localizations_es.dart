@@ -2049,4 +2049,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Política de privacidad';
+
+  @override
+  String signedInAs(String username) {
+    return 'Sesión iniciada como $username';
+  }
+
+  @override
+  String get notSignedIn => 'Sin iniciar sesión';
 }

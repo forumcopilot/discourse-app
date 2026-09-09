@@ -864,5 +864,7 @@
   "account": "Cuenta",
   "drafts": "Borradores",
   "termsOfService": "Términos del servicio",
-  "privacyPolicy": "Política de privacidad"
+  "privacyPolicy": "Política de privacidad",
+  "signedInAs": "Sesión iniciada como {username}",
+  "notSignedIn": "Sin iniciar sesión"
 }

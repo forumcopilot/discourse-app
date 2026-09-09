@@ -2044,4 +2044,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Política de privacidade';
+
+  @override
+  String signedInAs(String username) {
+    return 'Conectado como $username';
+  }
+
+  @override
+  String get notSignedIn => 'Não conectado';
 }

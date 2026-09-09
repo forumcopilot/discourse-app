@@ -3537,6 +3537,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy Policy'**
   String get privacyPolicy;
+
+  /// Drawer header
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {username}'**
+  String signedInAs(String username);
+
+  /// Drawer header
+  ///
+  /// In en, this message translates to:
+  /// **'Not signed in'**
+  String get notSignedIn;
 }
 
 class _AppLocalizationsDelegate

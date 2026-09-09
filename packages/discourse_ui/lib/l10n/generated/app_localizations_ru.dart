@@ -2038,4 +2038,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Политика конфиденциальности';
+
+  @override
+  String signedInAs(String username) {
+    return 'Вы вошли как $username';
+  }
+
+  @override
+  String get notSignedIn => 'Вы не вошли';
 }

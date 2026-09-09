@@ -864,5 +864,7 @@
   "account": "Account",
   "drafts": "Bozze",
   "termsOfService": "Termini di servizio",
-  "privacyPolicy": "Informativa sulla privacy"
+  "privacyPolicy": "Informativa sulla privacy",
+  "signedInAs": "Accesso effettuato come {username}",
+  "notSignedIn": "Non hai effettuato l’accesso"
 }

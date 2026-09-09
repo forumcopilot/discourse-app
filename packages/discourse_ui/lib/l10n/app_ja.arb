@@ -864,5 +864,7 @@
   "account": "アカウント",
   "drafts": "下書き",
   "termsOfService": "利用規約",
-  "privacyPolicy": "プライバシーポリシー"
+  "privacyPolicy": "プライバシーポリシー",
+  "signedInAs": "{username} としてサインイン中",
+  "notSignedIn": "サインインしていません"
 }

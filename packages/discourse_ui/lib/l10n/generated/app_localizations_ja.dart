@@ -1971,4 +1971,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'プライバシーポリシー';
+
+  @override
+  String signedInAs(String username) {
+    return '$username としてサインイン中';
+  }
+
+  @override
+  String get notSignedIn => 'サインインしていません';
 }
