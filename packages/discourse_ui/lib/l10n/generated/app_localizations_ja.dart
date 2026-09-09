@@ -1938,4 +1938,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get couldNotLoadCategories => 'カテゴリを読み込めませんでした。';
+
+  @override
+  String get switchForum => 'フォーラムを切り替え';
 }

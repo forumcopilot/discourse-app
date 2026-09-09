@@ -853,5 +853,6 @@
   "activity": "アクティビティ",
   "dontUpload": "アップロードしない",
   "dontAskAgainAlwaysResize": "今後表示しない — 常に縮小して合わせる",
-  "couldNotLoadCategories": "カテゴリを読み込めませんでした。"
+  "couldNotLoadCategories": "カテゴリを読み込めませんでした。",
+  "switchForum": "フォーラムを切り替え"
 }

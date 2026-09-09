@@ -1930,4 +1930,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get couldNotLoadCategories => '카테고리를 불러오지 못했습니다.';
+
+  @override
+  String get switchForum => '포럼 전환';
 }

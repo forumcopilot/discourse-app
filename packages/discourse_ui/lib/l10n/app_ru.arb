@@ -853,5 +853,6 @@
   "activity": "Активность",
   "dontUpload": "Не загружать",
   "dontAskAgainAlwaysResize": "Больше не спрашивать — всегда уменьшать",
-  "couldNotLoadCategories": "Не удалось загрузить категории."
+  "couldNotLoadCategories": "Не удалось загрузить категории.",
+  "switchForum": "Сменить форум"
 }

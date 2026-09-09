@@ -19,6 +19,7 @@ import '../tags_page.dart';
 import '../users_directory_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../host/discourse_host.dart';
 
 /// Phase 5.18a — hamburger drawer ("More" menu).
 ///
@@ -60,6 +61,18 @@ class SiteDrawer extends StatelessWidget {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
+                  // Only inside a multi-forum host: the way back to its list.
+                  if (DiscourseHost.switchForum != null) ...[
+                    _DrawerRow(
+                      icon: Icons.grid_view_rounded,
+                      title: AppLocalizations.of(context)!.switchForum,
+                      onTap: () {
+                        Navigator.of(context).pop(); // close drawer
+                        DiscourseHost.switchForum!();
+                      },
+                    ),
+                    const Divider(height: 1),
+                  ],
                   _SectionLabel(label: 'Explore'),
                   _DrawerRow(
                     icon: Icons.label_outline,

@@ -3471,6 +3471,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t load categories.'**
   String get couldNotLoadCategories;
+
+  /// Drawer entry, shown only inside a multi-forum host app, that returns to its forum list
+  ///
+  /// In en, this message translates to:
+  /// **'Switch forum'**
+  String get switchForum;
 }
 
 class _AppLocalizationsDelegate

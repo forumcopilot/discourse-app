@@ -1913,4 +1913,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get couldNotLoadCategories => '无法加载分类。';
+
+  @override
+  String get switchForum => '切换论坛';
 }

@@ -2010,4 +2010,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get couldNotLoadCategories => 'Categorieën laden mislukt.';
+
+  @override
+  String get switchForum => 'Ander forum';
 }

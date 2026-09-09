@@ -6,6 +6,11 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-09-08
+
+### Added
+- **Host hooks** (`DiscourseHost`) for multi-forum apps that mount the module per forum: `switchForum` puts a "Switch forum" entry at the top of the drawer that returns to the host's forum list; `resolveForum` lets the host say which of its forums a push notification belongs to, instead of the module rebuilding the single configured forum. Both are null by default; the single-forum template is unchanged.
+
 ## [1.0.2] - 2026-09-08
 
 ### Fixed

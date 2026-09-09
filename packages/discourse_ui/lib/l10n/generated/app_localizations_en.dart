@@ -2000,4 +2000,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get couldNotLoadCategories => 'Couldn\'t load categories.';
+
+  @override
+  String get switchForum => 'Switch forum';
 }

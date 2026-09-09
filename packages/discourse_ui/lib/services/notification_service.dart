@@ -23,6 +23,7 @@ import '../views/private_messaging/conversation/pages/conversation_page.dart';
 import '../views/user_profile_page.dart';
 import '../core/errors/error_handling_mixins.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import '../host/discourse_host.dart';
 
 class NotificationService with ServiceErrorHandlingMixin {
   static final NotificationService _instance = NotificationService._internal();
@@ -512,7 +513,19 @@ class NotificationService with ServiceErrorHandlingMixin {
   }
 
   // Resolve forum for notifications in single-forum mode.
-  Future<Site?> _findForumBySiteId(int siteId) async {
+  Future<Site?> _findForumBySiteId(int siteId, Map<String, dynamic> data) async {
+    // A multi-forum host knows which of its forums this is; the template
+    // has exactly one and rebuilds it from config.
+    final resolve = DiscourseHost.resolveForum;
+    if (resolve != null) {
+      try {
+        final resolved = await resolve(siteId, data);
+        if (resolved != null) return resolved;
+        AppLogger.debug('⚠️ [NotificationService] Host could not resolve site_id $siteId; falling back to the configured forum');
+      } catch (e) {
+        AppLogger.debug('❌ [NotificationService] Host resolveForum failed: $e');
+      }
+    }
     try {
       final configuredSite = AppForumConfig.buildSite();
 
@@ -630,7 +643,7 @@ class NotificationService with ServiceErrorHandlingMixin {
 
       // Look up forum by site_id
       AppLogger.debug('🔎 [NotificationService] Looking up forum by site_id: $siteId');
-      final Site? targetForum = await _findForumBySiteId(siteId);
+      final Site? targetForum = await _findForumBySiteId(siteId, data);
 
       if (targetForum == null) {
         AppLogger.debug('❌ [NotificationService] Forum not found for site_id: $siteId');
@@ -750,7 +763,7 @@ class NotificationService with ServiceErrorHandlingMixin {
 
       // Look up forum by site_id
       AppLogger.debug('🔎 [NotificationService] Looking up forum by site_id: $siteId');
-      final Site? targetForum = await _findForumBySiteId(siteId);
+      final Site? targetForum = await _findForumBySiteId(siteId, data);
 
       if (targetForum == null) {
         AppLogger.debug('❌ [NotificationService] Forum not found for site_id: $siteId');
@@ -811,7 +824,7 @@ class NotificationService with ServiceErrorHandlingMixin {
 
       // Look up forum by site_id
       AppLogger.debug('🔎 [NotificationService] Looking up forum by site_id: $siteId');
-      final Site? targetForum = await _findForumBySiteId(siteId);
+      final Site? targetForum = await _findForumBySiteId(siteId, data);
 
       if (targetForum == null) {
         AppLogger.debug('❌ [NotificationService] Forum not found for site_id: $siteId');

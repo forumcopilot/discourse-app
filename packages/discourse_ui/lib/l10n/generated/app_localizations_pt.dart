@@ -2011,4 +2011,7 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get couldNotLoadCategories =>
       'Não foi possível carregar as categorias.';
+
+  @override
+  String get switchForum => 'Trocar de fórum';
 }

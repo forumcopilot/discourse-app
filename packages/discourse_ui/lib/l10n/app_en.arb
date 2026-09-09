@@ -2298,5 +2298,9 @@
   "couldNotLoadCategories": "Couldn't load categories.",
   "@couldNotLoadCategories": {
     "description": "Snackbar when the category list fails to load"
+  },
+  "switchForum": "Switch forum",
+  "@switchForum": {
+    "description": "Drawer entry, shown only inside a multi-forum host app, that returns to its forum list"
   }
 }

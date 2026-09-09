@@ -853,5 +853,6 @@
   "activity": "Attività",
   "dontUpload": "Non caricare",
   "dontAskAgainAlwaysResize": "Non chiedere più — ridimensiona sempre",
-  "couldNotLoadCategories": "Impossibile caricare le categorie."
+  "couldNotLoadCategories": "Impossibile caricare le categorie.",
+  "switchForum": "Cambia forum"
 }

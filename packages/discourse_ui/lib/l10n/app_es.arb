@@ -853,5 +853,6 @@
   "activity": "Actividad",
   "dontUpload": "No subir",
   "dontAskAgainAlwaysResize": "No volver a preguntar: reducir siempre para que quepa",
-  "couldNotLoadCategories": "No se pudieron cargar las categorías."
+  "couldNotLoadCategories": "No se pudieron cargar las categorías.",
+  "switchForum": "Cambiar de foro"
 }

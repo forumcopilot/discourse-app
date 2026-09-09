@@ -2022,4 +2022,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get couldNotLoadCategories => 'Impossibile caricare le categorie.';
+
+  @override
+  String get switchForum => 'Cambia forum';
 }

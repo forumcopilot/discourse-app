@@ -853,5 +853,6 @@
   "activity": "动态",
   "dontUpload": "不上传",
   "dontAskAgainAlwaysResize": "不再询问 — 始终缩小以适应",
-  "couldNotLoadCategories": "无法加载分类。"
+  "couldNotLoadCategories": "无法加载分类。",
+  "switchForum": "切换论坛"
 }

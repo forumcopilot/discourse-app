@@ -1151,5 +1151,6 @@
   "activity": "Activiteit",
   "dontUpload": "Niet uploaden",
   "dontAskAgainAlwaysResize": "Niet meer vragen — altijd passend verkleinen",
-  "couldNotLoadCategories": "Categorieën laden mislukt."
+  "couldNotLoadCategories": "Categorieën laden mislukt.",
+  "switchForum": "Ander forum"
 }
