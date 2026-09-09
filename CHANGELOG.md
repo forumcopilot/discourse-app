@@ -20,6 +20,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
   - Loading skeletons in the topic list and thread are static blocks; the shimmer was a ShaderMask saveLayer every frame during first load.
   - flutter_html style tables are built once per theme and shared, instead of ~45 objects per post per build.
   - `CookedContent.parse` is memoized by cooked HTML (bounded LRU), so a post scrolled back into view is not re-parsed, and each page of a thread is parsed ahead of time on a worker isolate as it arrives.
+  - No more `VisibilityDetector` per post (each carried a timer and layout tracking); the visible-post index comes from the list's own position stream. Post rows are keyed by post id at the outermost widget so a prepended page no longer rebuilds them.
+  - Custom-emoji reaction images decode at display size.
   - The forum header tints its pattern through the image paint instead of a `ColorFiltered` layer, and no longer wraps itself in `IntrinsicHeight`; same look, one layout pass and no full-header saveLayer.
 
   Analyzed and unit-tested; device benchmark pending (the Pixel was not connected when this landed). Numbers will be added to the audit doc when measured.

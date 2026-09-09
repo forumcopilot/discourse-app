@@ -90,10 +90,15 @@ class ReactionGlyph extends StatelessWidget {
 
     final url = _customEmojiUrl();
     if (url != null) {
+      // Decode at display size: a custom emoji PNG can be hundreds of
+      // pixels wide, and there are several per reaction row.
+      final px = (size * MediaQuery.devicePixelRatioOf(context)).ceil();
       return Image.network(
         url,
         width: size,
         height: size,
+        cacheWidth: px,
+        cacheHeight: px,
         errorBuilder: (_, __, ___) => _fallback(context),
       );
     }

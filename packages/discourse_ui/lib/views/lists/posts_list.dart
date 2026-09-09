@@ -18,7 +18,6 @@ import 'package:discourse_ui/views/widgets/thread_poll_mini_card.dart';
 import 'package:discourse_ui/views/widgets/suggested_topics_card.dart';
 import 'package:discourse_ui/views/widgets/topic_stats_bar.dart';
 import 'package:discourse_ui/views/widgets/post_time_gap.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
@@ -554,6 +553,31 @@ class _PostsState extends State<PostsList> {
         ),
       ),
     );
+  }
+
+  /// The post that fills most of the viewport, for the bottom-bar label
+  /// and the jump dialog. Derived from the positions the list already
+  /// reports on every scroll frame.
+  void _trackVisiblePost() {
+    final data = _postsController.threadDataOutput.value;
+    if (data == null) return;
+    final positions = _itemPositionsListener.itemPositions.value;
+    if (positions.isEmpty) return;
+    ItemPosition? best;
+    var bestVisible = 0.0;
+    for (final p in positions) {
+      final visible = p.itemTrailingEdge.clamp(0.0, 1.0) - p.itemLeadingEdge.clamp(0.0, 1.0);
+      if (visible > bestVisible) {
+        bestVisible = visible;
+        best = p;
+      }
+    }
+    if (best == null) return;
+    final offset = (_isLoadingMore && _pagingDirection == _PagingDirection.earlier) ? 1 : 0;
+    final i = best.index - offset;
+    final posts = data.posts;
+    if (i < 0 || i >= posts.length) return;
+    _currentVisiblePostIndex = (posts[i].postNumber ?? 1) - 1;
   }
 
   void _onScroll() {
@@ -1143,14 +1167,12 @@ class _PostsState extends State<PostsList> {
     final imageActions = _imageActions;
     final postActionsHandler = _postActionsHandler;
 
-    Widget postWidget = VisibilityDetector(
-      key: Key('post_${post.id}'),
-      onVisibilityChanged: (info) {
-        if (!mounted) return;
-        if (info.visibleFraction > 0.5) {
-          _currentVisiblePostIndex = (post.postNumber ?? 1) - 1;
-        }
-      },
+    // Keyed so the element survives index shifts when a page is prepended.
+    // The VisibilityDetector that used to sit here (one per post, each
+    // with its own timer and layout tracking) only fed the visible-post
+    // index; that now comes from the list's own position stream.
+    Widget postWidget = KeyedSubtree(
+      key: ValueKey('post_${post.id}'),
       child: PostListItem(
         siteContext: widget.siteContext,
         onAvatarTap: (userId, userName) => avatarActions.handleAvatarTap(context, widget.siteContext, userId, userName, postActionsHandler: postActionsHandler, onRefresh: _refreshCurrentPage),
@@ -1554,6 +1576,7 @@ class _PostsState extends State<PostsList> {
   /// Setup scroll listener for item positions
   void _setupScrollListener() {
     _itemPositionsListener.itemPositions.addListener(_onScroll);
+    _itemPositionsListener.itemPositions.addListener(_trackVisiblePost);
   }
 
   /// Attempts to jump to the initial target post instantly without animation
@@ -1627,6 +1650,7 @@ class _PostsState extends State<PostsList> {
     _warmWorker?.dispose();
     _visiblePostIndex.dispose();
     _itemPositionsListener.itemPositions.removeListener(_onScroll);
+    _itemPositionsListener.itemPositions.removeListener(_trackVisiblePost);
     _highlightTimer?.cancel(); // Cancel timer on dispose
     // Dispose the controller to prevent memory leaks
     _postsController.dispose();
