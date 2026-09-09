@@ -6,6 +6,9 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Fixed
+- `discourse_ui` caps the `html` package below 0.15.7, which dropped `Element.matches` while `flutter_html` 3.0.0 still calls it. A fresh consumer resolving 0.15.7 failed to compile; this repo's lock had 0.15.6 and never noticed.
+
 ## [1.0.0] - 2026-09-08
 
 The first release that calls itself finished. Since 0.8.0 the same day:
