@@ -196,7 +196,7 @@ baseline.
 Status: phase 1 measured (table above). Phases 2 and 3 landed in v1.0.8
 (virtualized Home feed, `Offstage` state holders, chips without clips,
 `ColoredBox` post roots, shared handlers, memoized avatar colours, wider
-pagination runway, static skeletons) — analyzed and unit-tested, not yet
-measured on the Pixel. Still open from phase 3: hoisting the flutter_html
-style tables, the header's `IntrinsicHeight`/`ColorFiltered`, and moving
-`CookedContent.parse` to fetch time.
+pagination runway, static skeletons, flutter_html styles per theme, cooked
+parse memoized by content and warmed per page on a worker isolate, header
+without `IntrinsicHeight`/`ColorFiltered`) — analyzed and unit-tested, not
+yet measured on the Pixel.

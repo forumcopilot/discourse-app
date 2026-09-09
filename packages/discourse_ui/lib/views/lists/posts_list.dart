@@ -6,6 +6,8 @@ import '../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/models/thread_view_data.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:get/get.dart';
+
+import '../../utils/cooked_content.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:discourse_ui/controllers/post_controller.dart';
 import 'package:discourse_ui/views/listitems/post_list_item.dart';
@@ -148,6 +150,15 @@ class _PostsState extends State<PostsList> {
   @override
   void initState() {
     super.initState();
+    // Parse each page's cooked HTML on a worker isolate as it arrives, so
+    // the first build of a post finds its content already extracted.
+    _warmWorker = ever<ThreadViewData?>(_postsController.threadDataOutput, (data) {
+      if (data == null) return;
+      CookedContent.warm(
+        [for (final p in data.posts) p.content],
+        forumBaseUrl: widget.siteContext.site.url,
+      );
+    });
 
     // Schedule callback for the next frame to avoid setState during build
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1609,8 +1620,11 @@ class _PostsState extends State<PostsList> {
     AppLogger.debug('PostsList: Highlighting post $postId');
   }
 
+  Worker? _warmWorker;
+
   @override
   void dispose() {
+    _warmWorker?.dispose();
     _visiblePostIndex.dispose();
     _itemPositionsListener.itemPositions.removeListener(_onScroll);
     _highlightTimer?.cancel(); // Cancel timer on dispose

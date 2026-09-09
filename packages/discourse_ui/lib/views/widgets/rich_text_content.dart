@@ -84,102 +84,7 @@ class RichTextContent extends StatelessWidget {
         // ignore: discarded_futures
         launchUrlString(resolved, mode: LaunchMode.externalApplication);
       },
-      style: {
-        'body': Style(
-          margin: Margins.zero,
-          padding: HtmlPaddings.zero,
-          fontSize: FontSize(body.fontSize ?? 14),
-          color: bodyColor,
-          lineHeight: const LineHeight(1.4),
-        ),
-        'p': Style(
-          margin: Margins.only(bottom: 8),
-          padding: HtmlPaddings.zero,
-        ),
-        'a': Style(
-          color: accent,
-          textDecoration: TextDecoration.underline,
-        ),
-        'a.mention': Style(
-          color: accent,
-          fontWeight: FontWeight.w600,
-          textDecoration: TextDecoration.none,
-        ),
-        'a.hashtag-cooked': Style(
-          color: accent,
-          fontWeight: FontWeight.w500,
-          textDecoration: TextDecoration.none,
-        ),
-        'aside.quote': Style(
-          margin: Margins.symmetric(vertical: 8),
-          padding: HtmlPaddings.symmetric(horizontal: 12, vertical: 8),
-          backgroundColor: colorScheme.surfaceContainerHighest,
-          border: Border(
-            left: BorderSide(color: accent, width: 3),
-          ),
-        ),
-        'aside.quote .title': Style(
-          fontSize: FontSize(13),
-          fontWeight: FontWeight.w600,
-          color: mutedColor,
-          margin: Margins.only(bottom: 4),
-        ),
-        'aside.quote blockquote': Style(
-          margin: Margins.zero,
-          padding: HtmlPaddings.zero,
-        ),
-        'blockquote': Style(
-          margin: Margins.symmetric(vertical: 8),
-          padding: HtmlPaddings.symmetric(horizontal: 12, vertical: 8),
-          backgroundColor: colorScheme.surfaceContainerHighest,
-          border: Border(
-            left: BorderSide(color: accent, width: 3),
-          ),
-        ),
-        'code': Style(
-          backgroundColor: colorScheme.surfaceContainerHighest,
-          padding: HtmlPaddings.symmetric(horizontal: 4, vertical: 2),
-          fontSize: FontSize((body.fontSize ?? 14) * 0.92),
-          fontFamily: 'monospace',
-        ),
-        'pre': Style(
-          margin: Margins.symmetric(vertical: 8),
-          padding: HtmlPaddings.all(12),
-          backgroundColor: colorScheme.surfaceContainerHighest,
-          fontSize: FontSize((body.fontSize ?? 14) * 0.92),
-          fontFamily: 'monospace',
-        ),
-        'pre code': Style(
-          backgroundColor: Colors.transparent,
-          padding: HtmlPaddings.zero,
-        ),
-        'ul, ol': Style(
-          margin: Margins.symmetric(vertical: 4),
-          padding: HtmlPaddings.only(left: 24),
-        ),
-        'li': Style(margin: Margins.only(bottom: 2)),
-        'h1': Style(
-          fontSize: FontSize((body.fontSize ?? 14) * 1.7),
-          fontWeight: FontWeight.bold,
-          margin: Margins.only(top: 12, bottom: 6),
-        ),
-        'h2': Style(
-          fontSize: FontSize((body.fontSize ?? 14) * 1.45),
-          fontWeight: FontWeight.bold,
-          margin: Margins.only(top: 10, bottom: 4),
-        ),
-        'h3': Style(
-          fontSize: FontSize((body.fontSize ?? 14) * 1.25),
-          fontWeight: FontWeight.bold,
-          margin: Margins.only(top: 8, bottom: 4),
-        ),
-        'img.emoji': Style(
-          width: Width(20),
-          height: Height(20),
-          display: Display.inlineBlock,
-          verticalAlign: VerticalAlign.middle,
-        ),
-      },
+      style: _stylesFor(colorScheme, body, bodyColor, mutedColor, accent),
       // Resolve relative URLs (img src, a href) to absolute against the
       // forum base. For Discourse emoji (`<img class="emoji" alt=":wave:">`)
       // we look up the alt-shortcode in the Unicode emoji table and render
@@ -479,4 +384,119 @@ class _AttachmentLinkExtension extends HtmlExtension {
       ),
     );
   }
+}
+
+/// flutter_html style tables, one per theme.
+///
+/// The map is ~20 `Style` objects with their margins, paddings and
+/// borders; building it inside `build()` meant every post allocated all
+/// of it on every rebuild. It depends only on the theme, so it is built
+/// once per distinct colour/size combination and shared.
+final Map<(int, int, int, int, double), Map<String, Style>> _styleCache = {};
+
+Map<String, Style> _stylesFor(ColorScheme colorScheme, TextStyle body,
+    Color bodyColor, Color mutedColor, Color accent) {
+  final key = (
+    bodyColor.toARGB32(),
+    mutedColor.toARGB32(),
+    accent.toARGB32(),
+    colorScheme.surfaceContainerHighest.toARGB32(),
+    body.fontSize ?? 14,
+  );
+  return _styleCache.putIfAbsent(key, () => {
+    'body': Style(
+      margin: Margins.zero,
+      padding: HtmlPaddings.zero,
+      fontSize: FontSize(body.fontSize ?? 14),
+      color: bodyColor,
+      lineHeight: const LineHeight(1.4),
+    ),
+    'p': Style(
+      margin: Margins.only(bottom: 8),
+      padding: HtmlPaddings.zero,
+    ),
+    'a': Style(
+      color: accent,
+      textDecoration: TextDecoration.underline,
+    ),
+    'a.mention': Style(
+      color: accent,
+      fontWeight: FontWeight.w600,
+      textDecoration: TextDecoration.none,
+    ),
+    'a.hashtag-cooked': Style(
+      color: accent,
+      fontWeight: FontWeight.w500,
+      textDecoration: TextDecoration.none,
+    ),
+    'aside.quote': Style(
+      margin: Margins.symmetric(vertical: 8),
+      padding: HtmlPaddings.symmetric(horizontal: 12, vertical: 8),
+      backgroundColor: colorScheme.surfaceContainerHighest,
+      border: Border(
+        left: BorderSide(color: accent, width: 3),
+      ),
+    ),
+    'aside.quote .title': Style(
+      fontSize: FontSize(13),
+      fontWeight: FontWeight.w600,
+      color: mutedColor,
+      margin: Margins.only(bottom: 4),
+    ),
+    'aside.quote blockquote': Style(
+      margin: Margins.zero,
+      padding: HtmlPaddings.zero,
+    ),
+    'blockquote': Style(
+      margin: Margins.symmetric(vertical: 8),
+      padding: HtmlPaddings.symmetric(horizontal: 12, vertical: 8),
+      backgroundColor: colorScheme.surfaceContainerHighest,
+      border: Border(
+        left: BorderSide(color: accent, width: 3),
+      ),
+    ),
+    'code': Style(
+      backgroundColor: colorScheme.surfaceContainerHighest,
+      padding: HtmlPaddings.symmetric(horizontal: 4, vertical: 2),
+      fontSize: FontSize((body.fontSize ?? 14) * 0.92),
+      fontFamily: 'monospace',
+    ),
+    'pre': Style(
+      margin: Margins.symmetric(vertical: 8),
+      padding: HtmlPaddings.all(12),
+      backgroundColor: colorScheme.surfaceContainerHighest,
+      fontSize: FontSize((body.fontSize ?? 14) * 0.92),
+      fontFamily: 'monospace',
+    ),
+    'pre code': Style(
+      backgroundColor: Colors.transparent,
+      padding: HtmlPaddings.zero,
+    ),
+    'ul, ol': Style(
+      margin: Margins.symmetric(vertical: 4),
+      padding: HtmlPaddings.only(left: 24),
+    ),
+    'li': Style(margin: Margins.only(bottom: 2)),
+    'h1': Style(
+      fontSize: FontSize((body.fontSize ?? 14) * 1.7),
+      fontWeight: FontWeight.bold,
+      margin: Margins.only(top: 12, bottom: 6),
+    ),
+    'h2': Style(
+      fontSize: FontSize((body.fontSize ?? 14) * 1.45),
+      fontWeight: FontWeight.bold,
+      margin: Margins.only(top: 10, bottom: 4),
+    ),
+    'h3': Style(
+      fontSize: FontSize((body.fontSize ?? 14) * 1.25),
+      fontWeight: FontWeight.bold,
+      margin: Margins.only(top: 8, bottom: 4),
+    ),
+    'img.emoji': Style(
+      width: Width(20),
+      height: Height(20),
+      display: Display.inlineBlock,
+      verticalAlign: VerticalAlign.middle,
+    ),
+  });
 }

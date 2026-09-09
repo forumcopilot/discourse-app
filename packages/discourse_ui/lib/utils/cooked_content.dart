@@ -1,5 +1,8 @@
 import 'package:html/dom.dart' as dom;
+import 'package:flutter/foundation.dart' show compute;
 import 'package:html/parser.dart' as html_parser;
+
+import '../core/cache/lru_cache.dart';
 
 import 'media_url_utils.dart';
 
@@ -65,7 +68,46 @@ class CookedContent {
   ///
   /// [forumBaseUrl] resolves the relative URLs Discourse emits for local
   /// uploads (`/uploads/...`); pass the site's base URL.
+  /// Parsed results by cooked HTML. A post's row is rebuilt from scratch
+  /// every time it scrolls back into view, and the parse below is a full
+  /// DOM build plus six selector sweeps; keyed by the string itself so an
+  /// edited post (new cooked HTML) simply misses. Bounded, most recent
+  /// kept — a long thread is a few hundred posts.
+  static final LRUCache<String, CookedContent> _cache = LRUCache(maxSize: 400);
+
+  /// Parses a page of posts on a worker isolate and files the results,
+  /// so the frame that first shows each post finds its parse ready. If
+  /// the frame comes first it simply parses on the spot as before.
+  static Future<void> warm(List<String> cookedHtml, {required String forumBaseUrl}) async {
+    final pending = cookedHtml
+        .where((c) => !_cache.containsKey('$forumBaseUrl\u0000$c'))
+        .toList();
+    if (pending.isEmpty) return;
+    try {
+      final parsed = await compute(_parseBatch, (pending, forumBaseUrl));
+      for (var i = 0; i < pending.length; i++) {
+        _cache.put('$forumBaseUrl\u0000${pending[i]}', parsed[i]);
+      }
+    } catch (_) {
+      // Best effort: the on-demand path still works.
+    }
+  }
+
+  static List<CookedContent> _parseBatch((List<String>, String) args) {
+    final (cooked, base) = args;
+    return [for (final c in cooked) _parse(c, forumBaseUrl: base)];
+  }
+
   static CookedContent parse(String cooked, {required String forumBaseUrl}) {
+    final key = '$forumBaseUrl\u0000$cooked';
+    final hit = _cache.get(key);
+    if (hit != null) return hit;
+    final parsed = _parse(cooked, forumBaseUrl: forumBaseUrl);
+    _cache.put(key, parsed);
+    return parsed;
+  }
+
+  static CookedContent _parse(String cooked, {required String forumBaseUrl}) {
     if (cooked.trim().isEmpty) return empty;
 
     final dom.Document document = html_parser.parse(cooked);
