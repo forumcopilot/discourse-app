@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-09-08
+
 ### Added
 - **The forum's own header.** The wordmark renders wide and contained at header height instead of squeezed into a 60 px square (which cropped "Discourse" to "iscourse"), on the forum's own header colour with its header text colour, the way the browser shows it. Both come from payloads already fetched: the colour scheme in `/site.json`, the logos in `/site/settings.json`. A forum on the stock scheme keeps the pattern background. SVG logos now render (`flutter_svg`); a good share of forums use them.
 
