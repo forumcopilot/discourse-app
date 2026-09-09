@@ -2,67 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:discourse_ui/views/widgets/cached_redirect_image.dart';
 import 'package:discourse_ui/utils/avatar_color_utils.dart';
 
-class _ShimmerLoadingCircle extends StatefulWidget {
-  final double size;
-  final Color baseColor;
-  final Color highlightColor;
-
-  const _ShimmerLoadingCircle({
-    required this.size,
-    required this.baseColor,
-    required this.highlightColor,
-  });
-
-  @override
-  State<_ShimmerLoadingCircle> createState() => _ShimmerLoadingCircleState();
-}
-
-class _ShimmerLoadingCircleState extends State<_ShimmerLoadingCircle> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        final double percent = _controller.value; // 0..1
-        final Alignment begin = Alignment(-1.5 + 3.0 * percent, 0);
-        final Alignment end = Alignment(1.5 + 3.0 * percent, 0);
-        return ClipOval(
-          child: Container(
-            width: widget.size,
-            height: widget.size,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: begin,
-                end: end,
-                colors: [
-                  widget.baseColor,
-                  widget.highlightColor,
-                  widget.baseColor,
-                ],
-                stops: const [0.2, 0.5, 0.8],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
 class UserAvatar extends StatelessWidget {
   final String username;
   final String? iconUrl;
@@ -119,10 +58,15 @@ class UserAvatar extends StatelessWidget {
                 cacheKey: cacheKey,
                 cacheWidth: cacheSize,
                 cacheHeight: cacheSize,
-                placeholder: (context, url) => _ShimmerLoadingCircle(
-                  size: radius * 2,
-                  baseColor: avatarColors['background']!,
-                  highlightColor: avatarColors['background']!.withValues(alpha: 0.6),
+                // A flat tinted disc. The shimmer it replaces ran an
+                // animation controller per avatar until the image landed.
+                placeholder: (context, url) => Container(
+                  width: radius * 2,
+                  height: radius * 2,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: avatarColors['background'],
+                  ),
                 ),
                 errorWidget: (context, url, error) => Container(
                   width: radius * 2,

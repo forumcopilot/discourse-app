@@ -6,6 +6,19 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-09-09
+
+### Changed
+- **Scroll performance, phase 1** (see `docs/perf-audit-2026-09.md` for the audit and baseline):
+  - A post's cooked HTML is parsed once per post instance instead of on every build of the row. `PostListItem` keeps the extracted content and drops it only when the post or its translation changes.
+  - Scrolling a thread no longer rebuilds the whole list. The "n / total" position in the bottom bar is fed by a `ValueNotifier` instead of a `setState` fired by every post's `VisibilityDetector`.
+  - Avatars and other cached images decode at display size (`ResizeImage` on the file path — a 240 px avatar was decoded in full for a 40 px slot), start loading in `initState` rather than one frame later, and fetch once instead of twice per widget. SVG avatars, which Discourse allows and serves under a `.png` URL, are sniffed and rendered with `flutter_svg` instead of failing.
+  - The avatar placeholder is a flat tinted disc; the shimmer ran an animation controller per avatar until the image landed.
+  - The attachment-size fold in `RichTextContent` compiles its regex once and skips posts with no attachment link.
+- **Topic rows no longer show the participant avatar cluster.** Five extra network images per row for a detail the author avatar and "alice replied" line already cover. The model still carries `participantIconUrls` for anyone who wants it back.
+
+  Benchmark (Pixel 10a, profile build, meta.discourse.org, eight flings per screen), before → after: topic list build p50 6.9 → 3.3 ms, p90 14.9 → 11.3 ms, frames over 16.7 ms 31 % → 7 %; thread build p99 30 → 13 ms, worst frame 83 → 51 ms, frames over 33 ms 11 → 3; avatar decode failures 10 → 0 and file-to-network fallbacks 88 → 0.
+
 ## [1.0.6] - 2026-09-08
 
 ### Changed

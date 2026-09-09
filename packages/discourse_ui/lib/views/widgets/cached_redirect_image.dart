@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:io';
 
 import 'package:discourse_ui/utils/network_utils.dart';
@@ -64,7 +65,11 @@ class ImageLoader {
       }
 
       // Return both the image file and the final URL where we found it
-      return ImageData(file: imageFile, resolvedUrl: resolvedUrl);
+      return ImageData(
+        file: imageFile,
+        resolvedUrl: resolvedUrl,
+        isSvg: await _looksLikeSvg(imageFile),
+      );
     } catch (e) {
       // Something went wrong, print the error and pass it along
       debugPrint('Error loading image $url: $e');
@@ -78,7 +83,25 @@ class ImageData {
   final File file;
   final String resolvedUrl;
 
-  ImageData({required this.file, required this.resolvedUrl});
+  /// Discourse lets users upload SVG avatars and serves them under a
+  /// `.png` URL; a bitmap decoder rejects them, so the file is sniffed.
+  final bool isSvg;
+
+  ImageData({required this.file, required this.resolvedUrl, this.isSvg = false});
+}
+
+Future<bool> _looksLikeSvg(File file) async {
+  try {
+    final raf = await file.open();
+    try {
+      final head = String.fromCharCodes(await raf.read(256)).trimLeft();
+      return head.startsWith('<svg') || head.startsWith('<?xml');
+    } finally {
+      await raf.close();
+    }
+  } catch (_) {
+    return false;
+  }
 }
 
 /// A widget that displays images from the internet with smart caching and redirect handling
@@ -124,18 +147,17 @@ class _CachedRedirectImageState extends State<CachedRedirectImage> {
   @override
   void initState() {
     super.initState();
-    // Defer the image loading to avoid build-time conflicts
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        setState(() {
-          _resolvedUrlFuture = _getImageUrl();
-          _imageDataFuture = _getImageData();
-        });
-      }
-    });
-    // Initialize with a completed future to avoid null issues
-    _resolvedUrlFuture = Future.value(widget.imageUrl);
-    _imageDataFuture = Future.value(null);
+    // Start loading now. The previous post-frame hop plus setState cost
+    // every image an extra frame and a rebuild before it began.
+    _startLoading();
+  }
+
+  /// One fetch per image: the resolved URL is derived from the same
+  /// future the file comes from, instead of a second fetch of its own.
+  void _startLoading() {
+    _imageDataFuture = _getImageData();
+    _resolvedUrlFuture =
+        _imageDataFuture.then((d) => d?.resolvedUrl ?? widget.imageUrl);
   }
 
   /// Checks if we need to update the image when the widget's properties change
@@ -144,32 +166,7 @@ class _CachedRedirectImageState extends State<CachedRedirectImage> {
   void didUpdateWidget(CachedRedirectImage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.imageUrl != widget.imageUrl || oldWidget.cacheKey != widget.cacheKey) {
-      // Defer the image loading to avoid build-time conflicts
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          setState(() {
-            _resolvedUrlFuture = _getImageUrl();
-            _imageDataFuture = _getImageData();
-          });
-        }
-      });
-    }
-  }
-
-  /// Gets the final URL for the image, handling any redirects along the way
-  /// Like finding the correct address when someone has moved to a new house
-  Future<String> _getImageUrl() async {
-    try {
-      // Use our shared helper to get the image
-      final imageData = await ImageLoader.fetchImageFile(
-        widget.imageUrl,
-        cacheKey: widget.cacheKey,
-      );
-      return imageData.resolvedUrl;
-    } catch (e) {
-      // If something goes wrong, note the error but return the original URL
-      debugPrint('Error in CachedRedirectImage for ${widget.imageUrl}: $e');
-      return widget.imageUrl;
+      _startLoading();
     }
   }
 
@@ -198,8 +195,20 @@ class _CachedRedirectImageState extends State<CachedRedirectImage> {
         // This uses the same cookie-aware download path as the full-screen viewer
         if (imageDataSnapshot.hasData && imageDataSnapshot.data != null) {
           final imageFile = imageDataSnapshot.data!.file;
+          if (imageDataSnapshot.data!.isSvg) {
+            return SvgPicture.file(
+              imageFile,
+              width: widget.width,
+              height: widget.height,
+              fit: widget.fit,
+              errorBuilder: (context, _, __) => _buildNetworkImage(),
+            );
+          }
           return Image(
-            image: FileImage(imageFile),
+            // Decode at display size. Without this a 240 px avatar was
+            // decoded in full for a 40 px slot, for every avatar.
+            image: ResizeImage.resizeIfNeeded(
+                widget.cacheWidth, widget.cacheHeight, FileImage(imageFile)),
             width: widget.width,
             height: widget.height,
             fit: widget.fit,

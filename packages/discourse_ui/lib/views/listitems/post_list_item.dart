@@ -242,6 +242,10 @@ class _PostListItemState extends State<PostListItem> {
     // Keyed items survive a refresh, so the state copied in initState goes
     // stale when the parent hands us a fresh FCPost. Re-sync whenever the
     // post instance changes (same-instance rebuilds keep local mutations).
+    if (!identical(oldWidget.post, widget.post) ||
+        oldWidget.translatedContent != widget.translatedContent) {
+      _contentData = null;
+    }
     if (!identical(oldWidget.post, widget.post)) {
       _isLiked = widget.post.isLiked;
       _likeCount = widget.post.likeCount;
@@ -288,6 +292,9 @@ class _PostListItemState extends State<PostListItem> {
   /// `findPlainUrls` swept the markup with a bare URL regex, so every
   /// `href`, onebox thumbnail, favicon and avatar `src` came back as a
   /// link in the post and got its own preview card.
+  /// Cache of [_extractPostContentData] for the current post instance.
+  _PostContentData? _contentData;
+
   _PostContentData _extractPostContentData() {
     // Use translated content if available, otherwise use original.
     final cooked = widget.translatedContent ?? widget.post.content;
@@ -955,7 +962,10 @@ class _PostListItemState extends State<PostListItem> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final data = _extractPostContentData();
+    // Parsed once per post instance, not per frame: the parse is a full
+    // HTML DOM build plus six selector sweeps, and this build runs for
+    // every visible post whenever the list rebuilds.
+    final data = _contentData ??= _extractPostContentData();
 
     // Determine background color based on highlight state
     // Use a more visible highlight color

@@ -106,7 +106,14 @@ class _PostsState extends State<PostsList> {
   final int _pageSize = 20;
   String? _anchorPostId;
   int? _gotoPage;
-  int _currentVisiblePostIndex = 0;
+  /// Which post is mostly on screen. A notifier rather than state: it
+  /// changes on every post scrolled past, and the only things that show
+  /// it are the "n / total" label in the bottom bar and the jump dialog,
+  /// so a setState here rebuilt the whole list — and re-parsed every
+  /// visible post's HTML — for a two-character label.
+  final ValueNotifier<int> _visiblePostIndex = ValueNotifier<int>(0);
+  int get _currentVisiblePostIndex => _visiblePostIndex.value;
+  set _currentVisiblePostIndex(int v) => _visiblePostIndex.value = v;
   int? _pendingInitialScrollIndex;
   bool _hasJumpedToInitialPost = false;
   String? _highlightedPostId; // Track which post should be highlighted
@@ -1123,13 +1130,7 @@ class _PostsState extends State<PostsList> {
       onVisibilityChanged: (info) {
         if (!mounted) return;
         if (info.visibleFraction > 0.5) {
-          final newIndex = (post.postNumber ?? 1) - 1;
-          // Only update state if the visible post index actually changed
-          if (_currentVisiblePostIndex != newIndex) {
-            setState(() {
-              _currentVisiblePostIndex = newIndex;
-            });
-          }
+          _currentVisiblePostIndex = (post.postNumber ?? 1) - 1;
         }
       },
       child: PostListItem(
@@ -1388,9 +1389,12 @@ class _PostsState extends State<PostsList> {
                   onTap: () {
                     _showJumpToPostDialog(context, data);
                   },
-                  child: Text(
-                    '${_currentVisiblePostIndex + 1} / ${data.totalPosts}',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: _visiblePostIndex,
+                    builder: (context, index, _) => Text(
+                      '${index + 1} / ${data.totalPosts}',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ),
                 ),
                 const Spacer(),
@@ -1600,6 +1604,7 @@ class _PostsState extends State<PostsList> {
 
   @override
   void dispose() {
+    _visiblePostIndex.dispose();
     _itemPositionsListener.itemPositions.removeListener(_onScroll);
     _highlightTimer?.cancel(); // Cancel timer on dispose
     // Dispose the controller to prevent memory leaks

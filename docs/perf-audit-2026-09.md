@@ -18,7 +18,19 @@ timings from `SchedulerBinding.addTimingsCallback`.
 | thread, run 1 | 1005 | 0.8 / 2.5 / 27.5 / 89 ms | 4.4 / 5.5 / 6.6 / 13 ms | 19 | 10 |
 | thread, run 2 | 965 | 0.8 / 2.3 / 30.2 / 83 ms | 4.6 / 5.7 / 7.7 / 10 ms | 20 | 11 |
 
-Reading it:
+After phase 1 (v1.0.7: cached cooked-content parse, no per-post
+`setState` on scroll, avatar decode at display size with one fetch and SVG
+sniffing, flat avatar placeholder, participant cluster removed):
+
+| screen | frames | build p50 / p90 / p99 / max | raster p50 / p90 / p99 / max | frames over 16.7 ms | over 33 ms |
+|---|---|---|---|---|---|
+| topic list (Latest) | 1157 | 3.3 / 11.3 / 21.1 / 99 ms | 4.9 / 6.9 / 8.3 / 32 ms | 84 (7 %) | 8 |
+| thread | 1039 | 0.8 / 1.7 / 13.1 / 51 ms | 3.5 / 4.8 / 6.9 / 17 ms | 12 | 3 |
+
+Avatar pipeline in the same run: 129 cache-miss lookups (was 598), 0
+decode failures (was 10), 0 file-to-network fallbacks (was 88).
+
+Reading the baseline:
 
 - **The topic list is build-bound and slow on every frame.** A median
   build of 6.8 ms on a 120 Hz device (8.3 ms budget) leaves nothing for

@@ -330,13 +330,16 @@ class RichTextContent extends StatelessWidget {
 /// anchor would leave "(117 Bytes)" stranded beside the card. Moving it
 /// onto the element lets the card show name and size together, the way
 /// the composer's own attachment row does.
+final RegExp _attachmentSizePattern = RegExp(
+  r'(<a\s+class="attachment"[^>]*>.*?</a>)\s*\(([^)]{1,20})\)',
+  caseSensitive: false,
+  dotAll: true,
+);
+
 String _foldAttachmentSize(String html) {
+  if (!html.contains('class="attachment"')) return html;
   return html.replaceAllMapped(
-    RegExp(
-      r'(<a\s+class="attachment"[^>]*>.*?</a>)\s*\(([^)]{1,20})\)',
-      caseSensitive: false,
-      dotAll: true,
-    ),
+    _attachmentSizePattern,
     (m) {
       final anchor = m.group(1)!;
       final size = m.group(2)!;
