@@ -6,6 +6,11 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-09-08
+
+### Fixed
+- Header colours in dark mode: a forum that ships no dark-mode logo keeps its light header colours in dark mode, so its transparent wordmark always sits on the background it was drawn for. Meta's black wordmark no longer lands on a near-black strip.
+
 ## [1.0.1] - 2026-09-08
 
 ### Added
