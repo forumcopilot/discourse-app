@@ -6,6 +6,11 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.12] - 2026-09-09
+
+### Changed
+- **A host app can name itself on Discourse's grant page.** `application_name` is what Discourse prints on `/user-api-key/new` ("… would like to access your account") and stores on the `UserApiKeyClient` row, so it is also what the user sees later under Preferences → Security → Apps — the one string telling them which app is asking. It was hard-coded to the template's `Discourse Mobile`, which a multi-forum host cannot change because the value is compile-time and the package is shared. `AppForumConfig.setUserApiApplicationName()` now overrides it at startup, the same way `setPushApiBaseUrl()` already does; the compile-time value moved to `defaultUserApiApplicationName` and still applies to forks that set nothing. Both grants read it, the login key and the separate notifications key.
+
 ## [1.0.11] - 2026-09-09
 
 ### Fixed

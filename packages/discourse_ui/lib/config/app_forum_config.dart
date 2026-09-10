@@ -31,9 +31,35 @@ class AppForumConfig {
   static const String pluginEndpoint = '';
 
   /// Display name shown to the user on Discourse's User API Key grant page
-  /// (`/user-api-key/new`). Discourse stores this verbatim on the
-  /// `UserApiKeyClient` row.
-  static const String userApiApplicationName = 'Discourse Mobile';
+  /// (`/user-api-key/new`) — "`<name>` would like to access your account".
+  /// Discourse stores it verbatim on the `UserApiKeyClient` row, so it is
+  /// also what the user sees later under Preferences → Security → Apps.
+  ///
+  /// This is the one string on that page the user reads to decide whether
+  /// to trust the request, so it should name the app they installed. A
+  /// fork edits [defaultUserApiApplicationName]; a **host app** that mounts
+  /// this package for many forums cannot use a compile-time value and calls
+  /// [setUserApiApplicationName] once at startup instead. Read
+  /// [userApiApplicationName] everywhere; it honours the override.
+  static const String defaultUserApiApplicationName = 'Discourse Mobile';
+
+  static String? _userApiApplicationNameOverride;
+
+  /// Application name in effect: the host app's override when set,
+  /// otherwise the compile-time [defaultUserApiApplicationName].
+  static String get userApiApplicationName =>
+      _userApiApplicationNameOverride ?? defaultUserApiApplicationName;
+
+  /// Names this build on the grant page. Call before the first login:
+  /// Discourse records the name when the key is minted and never updates
+  /// it, so keys issued earlier keep whatever name was sent then.
+  ///
+  /// Pass null or an empty string to fall back to the compile-time default.
+  static void setUserApiApplicationName(String? name) {
+    final trimmed = name?.trim();
+    _userApiApplicationNameOverride =
+        (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+  }
 
   /// Redirect Discourse appends `?payload=<base64>` to after the user
   /// authorizes the User API Key request. The in-app webview intercepts
