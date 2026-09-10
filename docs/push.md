@@ -53,8 +53,24 @@ on `NotificationKeyService` — and run a poller: read
 bumps the user's seen pointer), deliver everything above a per-key
 high-water mark, advance the mark only for what was delivered. Discourse
 rate-limits per key (20/min, 2880/day), so one poll a minute per user is
-safe. What it delivers must be a payload the app can act on: see
-`NotificationService._navigateFromNotification` for the fields it reads.
+safe.
+
+What it delivers has to be a payload the app can act on. The contract is
+`DiscourseNotificationRoute` in `discourse_ui`, and its tests are the
+specification:
+
+| field | meaning |
+|---|---|
+| `type` | `discourse_notification` — what marks the payload as this backend's |
+| `site_url` | the forum, as the backend spells it; how a multi-forum app picks which of its forums to open |
+| `topic_id` | the topic to open, when the notification is about one |
+| `post_number` | position within that topic; the app opens the page holding it |
+| `content_id` | the post *id* where `/notifications.json` exposed one (`data.original_post_id`) — a better anchor than the post number, since Discourse resolves it exactly |
+
+Everything else is passed through for display. A payload naming no topic —
+a badge, a bookmark reminder — is expected rather than an error: the app
+opens its notification list. FCM data payloads are string-to-string, so
+every number arrives as text.
 
 ## What is not in this repo
 
