@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.13] - 2026-09-10
+
 ### Added
 - **The notifications grant now has a switch, and it is off by default.** After sign-in the app offers a second, notifications-only User API Key that a backend polls on the user's behalf — the way to get push on a forum whose owner has not allowlisted a push URL. That flow ran unconditionally and uploaded the key to a compile-time ForumCopilot address, so every fork asked its users to hand a forum key to a server the fork's author does not run. It is now behind `AppForumConfig.notificationsApiBaseUrl`: empty (the default) means no second handshake and nothing uploaded; a host app sets it once at startup with `setNotificationsApiBaseUrl()`, a fork edits `defaultNotificationsApiBaseUrl`. Deliberately separate from `pushApiBaseUrl`, which is the relay path and changes what the login handshake asks for. The three calls live in `NotificationKeyService` (`discourse_ui`), which documents the contract a backend has to serve; `ForumCopilotApiService`'s copies in the SDK are no longer used.
 - **The forum is identified by URL, so a host without directory ids can use the grant.** Upload, device-token sync and revoke all bailed on a null `Site.id`, which is every forum a host opens by address: the key was minted on the forum and then went nowhere, once per sign-in. `site_url` is now the identity and `site_id` rides along only when there is one.
