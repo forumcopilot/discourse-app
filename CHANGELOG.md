@@ -6,6 +6,11 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.10] - 2026-09-09
+
+### Fixed
+- **Emoji shortcodes in topic titles and excerpts** now resolve against Discourse's own name table instead of a generic emoji library, whose short names covered fewer than half of Discourse's. A title ending in `:studio_microphone:` showed the raw shortcode in the topic list and the posts app bar; it now shows 🎙️. Aliases (`:slight_smile:`, `:+1:`) and the `:name:tN:` skin-tone suffix resolve too, and names Discourse itself would not render stay untouched. The table is generated from the `discourse-emojis` gem by `packages/discourse_ui/tool/gen_discourse_emoji_data.dart`.
+
 ## [1.0.9] - 2026-09-09
 
 ### Changed
