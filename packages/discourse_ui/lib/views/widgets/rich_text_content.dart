@@ -1,4 +1,3 @@
-import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -6,6 +5,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 import 'post_content_callbacks.dart' show PostContentCallbacks;
 import '../../theme/design_tokens.dart';
+import '../../utils/emoji_shortcodes.dart';
 import '../../utils/file_utils.dart';
 import '../../utils/url_utils.dart';
 
@@ -165,10 +165,12 @@ class RichTextContent extends StatelessWidget {
             final isEmoji = classes.contains('emoji');
 
             if (isEmoji) {
-              final shortcode = alt.replaceAll(':', '').trim();
-              if (shortcode.isNotEmpty) {
-                final unicode = Emoji.byShortName(shortcode)?.char;
-                if (unicode != null && unicode.isNotEmpty) {
+              // alt is `:name:` or `:name:tN:` for a skin-toned emoji.
+              final m = _emojiAlt.firstMatch(alt.trim());
+              if (m != null) {
+                final unicode =
+                    discourseEmojiChar(m.group(1)!, tone: m.group(2));
+                if (unicode != null) {
                   return Text(
                     unicode,
                     style: body.copyWith(
@@ -235,6 +237,11 @@ class RichTextContent extends StatelessWidget {
 /// anchor would leave "(117 Bytes)" stranded beside the card. Moving it
 /// onto the element lets the card show name and size together, the way
 /// the composer's own attachment row does.
+/// The `alt` Discourse puts on an inline emoji image: `:name:`, or
+/// `:name:tN:` when a skin tone was applied.
+final RegExp _emojiAlt =
+    RegExp(r'^:([a-z0-9_+-]+)(?::t([1-6]))?:$', caseSensitive: false);
+
 final RegExp _attachmentSizePattern = RegExp(
   r'(<a\s+class="attachment"[^>]*>.*?</a>)\s*\(([^)]{1,20})\)',
   caseSensitive: false,

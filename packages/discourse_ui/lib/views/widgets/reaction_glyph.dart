@@ -1,7 +1,8 @@
-import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 
 import 'package:forumcopilot_sdk/context/site_context.dart';
+
+import '../../utils/emoji_shortcodes.dart';
 
 /// Renders a Discourse reaction id (an emoji shortcode like `heart`,
 /// `+1`, `party_parrot`) as a glyph.
@@ -37,37 +38,16 @@ class ReactionGlyph extends StatelessWidget {
   static String normalize(String reactionId) =>
       reactionId.replaceAll(':', '').trim();
 
-  /// Discourse shortcodes the `emojis` package does not know under that
-  /// name. `+1`/`-1` are the ones that matter: they are in Discourse's
-  /// default reaction set, and without this they rendered as the literal
-  /// text ":+1:" in the picker.
-  static const Map<String, String> _aliases = {
-    '+1': '👍',
-    'thumbsup': '👍',
-    '-1': '👎',
-    'thumbsdown': '👎',
-    'heart': '❤️',
-    'laughing': '😆',
-    'open_mouth': '😮',
-    'clap': '👏',
-    'partying_face': '🥳',
-    'tada': '🎉',
-    'rocket': '🚀',
-    'eyes': '👀',
-    'confetti_ball': '🎊',
-    'hugs': '🤗',
-  };
-
   /// The unicode character for [reactionId], or null when Discourse's
   /// shortcode has no unicode equivalent (i.e. it is a custom emoji).
+  ///
+  /// Resolved against Discourse's own emoji table, so names like `+1`,
+  /// `-1` and `hugs` — which a generic emoji library files under other
+  /// short names — come out as the glyph Discourse itself shows.
   static String? unicodeFor(String reactionId) {
     final clean = normalize(reactionId);
     if (clean.isEmpty) return null;
-    final alias = _aliases[clean];
-    if (alias != null) return alias;
-    final emoji = Emoji.byShortName(clean);
-    if (emoji != null && emoji.char.isNotEmpty) return emoji.char;
-    return null;
+    return discourseEmojiChar(clean);
   }
 
   String? _customEmojiUrl() {

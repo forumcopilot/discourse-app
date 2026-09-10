@@ -40,8 +40,6 @@ dependencies:
   html: '>=0.15.6 <0.15.7' # 0.15.7 drops Element.matches, which flutter_html 3.0.0 still calls
   html_unescape: ^2.0.0
   flutter_html: ^3.0.0-beta.2
-  # Reaction glyph lookup, and fully-qualified forms for tool/gen_discourse_emoji_data.dart.
-  emojis: ^0.9.9
   cached_network_image: ^3.4.1
   flutter_svg: ^2.0.10
   flutter_cache_manager: ^3.4.1
@@ -60,6 +58,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  # Only tool/gen_discourse_emoji_data.dart uses it, to pick the fully-qualified
+  # form of each emoji. App code resolves names through the generated Discourse
+  # table in lib/utils/discourse_emoji_data.dart.
+  emojis: ^0.9.9
 
 flutter:
   generate: true

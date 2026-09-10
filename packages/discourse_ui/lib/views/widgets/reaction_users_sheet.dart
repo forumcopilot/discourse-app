@@ -1,5 +1,4 @@
 import 'package:discourse_core/discourse_core.dart' show DiscoursePostProxy;
-import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_like.dart';
@@ -9,6 +8,7 @@ import 'package:discourse_ui/services/site_proxy_service.dart';
 import '../../core/logging/app_logger.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
+import '../../utils/emoji_shortcodes.dart';
 import '../user_profile_page.dart';
 import 'user_avatar.dart';
 
@@ -157,9 +157,8 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
   String? _glyphFor(String? shortcode) {
     if (shortcode == null || shortcode.isEmpty) return null;
     final clean = shortcode.replaceAll(':', '').trim();
-    final emoji = Emoji.byShortName(clean);
-    if (emoji != null && emoji.char.isNotEmpty) return emoji.char;
-    return null;
+    if (clean.isEmpty) return null;
+    return discourseEmojiChar(clean);
   }
 
   void _openProfile(FCLike user) {
