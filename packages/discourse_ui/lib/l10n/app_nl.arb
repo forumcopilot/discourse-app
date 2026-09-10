@@ -1002,7 +1002,7 @@
   "noMessagesYetSayHi": "Nog geen berichten — zeg hallo.",
   "edited": "bewerkt",
   "editProfileManagedOnWebNote": "Weergavenaam, e-mail, wachtwoord en andere accountinstellingen beheer je onder Account → Account beheren op het web. Je avatar wijzig je door op het camerapictogram op je foto te tikken.",
-  "approvedButRelayUnreachable": "Goedgekeurd, maar ForumCopilot was niet bereikbaar om de installatie af te ronden. Probeer het later opnieuw via Instellingen.",
+  "approvedButRelayUnreachable": "Goedgekeurd, maar de meldingsserver was niet bereikbaar om de installatie af te ronden. Probeer het later opnieuw via Instellingen.",
   "notificationsAreTurnedOffForThisApp": "Meldingen zijn uitgeschakeld voor deze app",
   "forumWillAskToApproveNotifications": "Hierna vraagt {forumName} je om \"Meldingen\" goed te keuren.",
   "approveNotificationsExplanation": "Door goed te keuren mogen we je meldingen ophalen en naar dit apparaat sturen. Deze toestemming kan niet posten, reageren of je berichten lezen.",
@@ -1164,5 +1164,12 @@
   "termsOfService": "Servicevoorwaarden",
   "privacyPolicy": "Privacybeleid",
   "signedInAs": "Aangemeld als {username}",
-  "notSignedIn": "Niet aangemeld"
+  "notSignedIn": "Niet aangemeld",
+  "deviceWillNotShowAlertsUntilAllowedInSettings": "Je apparaat toont geen meldingen totdat je notificaties toestaat in Instellingen.",
+  "openSettings": "Instellingen openen",
+  "notificationsOnThisDevice": "Meldingen op dit apparaat",
+  "notificationsGrantOnSubtitle": "Reacties, vermeldingen en berichten van dit forum worden hier bezorgd.",
+  "notificationsGrantOffSubtitle": "Keur het eenmalig goed op het forum om reacties, vermeldingen en berichten hier te ontvangen.",
+  "turnOn": "Inschakelen",
+  "couldNotTurnOffNotifications": "Kon meldingen niet uitschakelen. Probeer het later opnieuw."
 }

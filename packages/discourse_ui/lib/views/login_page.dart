@@ -3,6 +3,7 @@ import 'package:discourse_core/discourse_core.dart'
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:get/get.dart';
+import 'package:discourse_ui/config/app_forum_config.dart';
 import 'package:discourse_ui/controllers/global_loader_controller.dart';
 import 'package:discourse_ui/controllers/site_controller.dart';
 import 'package:discourse_ui/services/discourse_login_service.dart';
@@ -158,10 +159,17 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  /// Offers the notifications grant. Never rethrows: the user is signed in
-  /// either way, and a failure here must not strand them on the login page.
+  /// Offers the notifications grant — only when this build has a backend to
+  /// hand the key to, and only once per forum: a completed grant is
+  /// remembered, so a user signing in again is not asked to approve what
+  /// they already approved. Never rethrows: the user is signed in either
+  /// way, and a failure here must not strand them on the login page.
   Future<void> _promptEnableNotifications() async {
+    if (!AppForumConfig.isNotificationsGrantEnabled) return;
     try {
+      final alreadyGranted = await DiscourseLoginService(widget.siteContext)
+          .hasNotificationsGrant();
+      if (alreadyGranted || !mounted) return;
       await Navigator.of(context).push<bool>(
         MaterialPageRoute<bool>(
           builder: (_) =>

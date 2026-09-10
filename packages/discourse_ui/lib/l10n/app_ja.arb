@@ -704,7 +704,7 @@
   "noMessagesYetSayHi": "まだメッセージはありません — 挨拶してみましょう。",
   "edited": "編集済み",
   "editProfileManagedOnWebNote": "表示名、メール、パスワードなどのアカウント設定は「アカウント → ウェブでアカウントを管理」から変更します。アバターは写真のカメラアイコンをタップして変更できます。",
-  "approvedButRelayUnreachable": "承認されましたが、設定を完了するための ForumCopilot に接続できませんでした。後で設定から再試行してください。",
+  "approvedButRelayUnreachable": "承認されましたが、設定を完了するための通知サーバーに接続できませんでした。後で設定から再試行してください。",
   "notificationsAreTurnedOffForThisApp": "このアプリの通知はオフになっています",
   "forumWillAskToApproveNotifications": "次に、{forumName} が「通知」の承認を求めます。",
   "approveNotificationsExplanation": "承認すると、通知を確認してこのデバイスに送信できるようになります。この権限では投稿、返信、メッセージの閲覧はできません。",
@@ -866,5 +866,12 @@
   "termsOfService": "利用規約",
   "privacyPolicy": "プライバシーポリシー",
   "signedInAs": "{username} としてサインイン中",
-  "notSignedIn": "サインインしていません"
+  "notSignedIn": "サインインしていません",
+  "deviceWillNotShowAlertsUntilAllowedInSettings": "設定で通知を許可するまで、この端末には通知が表示されません。",
+  "openSettings": "設定を開く",
+  "notificationsOnThisDevice": "この端末での通知",
+  "notificationsGrantOnSubtitle": "このフォーラムの返信、メンション、メッセージがここに届きます。",
+  "notificationsGrantOffSubtitle": "フォーラムで一度承認すると、返信、メンション、メッセージがここに届きます。",
+  "turnOn": "オンにする",
+  "couldNotTurnOffNotifications": "通知をオフにできませんでした。後でもう一度お試しください。"
 }

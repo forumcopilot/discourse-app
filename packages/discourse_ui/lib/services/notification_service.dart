@@ -61,13 +61,24 @@ class NotificationService with ServiceErrorHandlingMixin {
     try {
       AppLogger.debug('🔧 [NotificationService] Starting initialization...');
 
-      // Request permissions with better error handling
-      try {
-        await _requestPermissions();
-        AppLogger.debug('✅ [NotificationService] Permissions requested successfully');
-      } catch (e) {
-        AppLogger.debug('⚠️ [NotificationService] Permission request failed: $e');
-        // Continue without permissions - user can grant them later
+      // The system permission prompt is shown here, at launch, only for the
+      // relay path (a configured push backend): there is no later moment
+      // where that path explains itself. The notifications-grant flow asks
+      // on its own page, right after sign-in, where the user has just read
+      // what the alerts are for — and a build with neither has nothing to
+      // show, so it never asks. Token acquisition below does not depend on
+      // the answer; only display does.
+      if (AppForumConfig.isPushBackendEnabled) {
+        try {
+          await _requestPermissions();
+          AppLogger.debug('✅ [NotificationService] Permissions requested successfully');
+        } catch (e) {
+          AppLogger.debug('⚠️ [NotificationService] Permission request failed: $e');
+          // Continue without permissions - user can grant them later
+        }
+      } else {
+        AppLogger.debug('🔕 [NotificationService] No push relay configured — '
+            'not prompting for notification permission at launch');
       }
 
       // Initialize local notifications with better error handling
@@ -202,10 +213,13 @@ class NotificationService with ServiceErrorHandlingMixin {
   // Initialize local notifications
   Future<void> _initializeLocalNotifications() async {
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    // Permission is asked explicitly (see initialize), never as a side
+    // effect of plugin setup — with these on, iOS prompted at first launch
+    // before the user had seen anything to want alerts about.
     const darwinSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
     );
 
     const initSettings = InitializationSettings(

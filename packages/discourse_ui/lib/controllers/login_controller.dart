@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:discourse_ui/services/discourse_login_service.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
-import 'package:forumcopilot_sdk/services/forumcopilot_api_service.dart';
+import 'package:discourse_ui/config/app_forum_config.dart';
+import 'package:discourse_ui/services/notification_key_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/network/fc_api_exception.dart';
 import 'package:get/get.dart';
@@ -1052,18 +1053,25 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
     }
   }
 
-  /// Tell our backend to stop polling notifications for this install on this
-  /// forum. Never throws — a failure here must not block signing out.
+  /// Tell the notifications backend to stop polling for this install on this
+  /// forum, and forget the grant so the next sign-in offers it again. Never
+  /// throws — a failure here must not block signing out.
   Future<void> _revokeNotificationsKey(SiteContext siteContext) async {
+    if (!AppForumConfig.isNotificationsGrantEnabled) return;
     try {
-      final siteId = siteContext.site.id;
-      if (siteId == null) return;
-      final clientId =
-          await DiscourseLoginService(siteContext).notificationsClientId();
-      await ForumCopilotApiService.revokeDiscourseNotificationKey(
-        siteId: siteId,
-        clientId: clientId,
-      );
+      final loginService = DiscourseLoginService(siteContext);
+      if (await loginService.hasNotificationsGrant()) {
+        final clientId = await loginService.notificationsClientId();
+        await NotificationKeyService.revoke(
+          siteUrl: siteContext.site.url,
+          siteId: siteContext.site.id,
+          clientId: clientId,
+        );
+      }
+      // Forgotten either way: the session it belonged to is ending, and a
+      // backend that could not be reached drops the key on its own once the
+      // forum starts rejecting it.
+      await loginService.clearNotificationsGrant();
     } catch (e) {
       AppLogger.debug(
           '🔔 [LOGOUT] Could not revoke the notifications key (continuing): $e');

@@ -1534,7 +1534,7 @@
   "@editProfileManagedOnWebNote": {
     "description": "UI text: Display name, email, password, and other account settings ar"
   },
-  "approvedButRelayUnreachable": "Approved, but we could not reach ForumCopilot to finish setting up. Try again later from Settings.",
+  "approvedButRelayUnreachable": "Approved, but we could not reach the notifications server to finish setting up. Try again later from Settings.",
   "@approvedButRelayUnreachable": {
     "description": "UI text: push approved but relay unreachable"
   },
@@ -2355,5 +2355,33 @@
   "notSignedIn": "Not signed in",
   "@notSignedIn": {
     "description": "Drawer header"
+  },
+  "deviceWillNotShowAlertsUntilAllowedInSettings": "Your device will not show alerts until you allow notifications in Settings.",
+  "@deviceWillNotShowAlertsUntilAllowedInSettings": {
+    "description": "Grant page banner, shown when the OS notification permission was refused"
+  },
+  "openSettings": "Open Settings",
+  "@openSettings": {
+    "description": "Button: open the app's page in the system settings"
+  },
+  "notificationsOnThisDevice": "Notifications on this device",
+  "@notificationsOnThisDevice": {
+    "description": "Settings row title: the notifications grant"
+  },
+  "notificationsGrantOnSubtitle": "Replies, mentions and messages from this forum are delivered here.",
+  "@notificationsGrantOnSubtitle": {
+    "description": "Settings row subtitle when the notifications grant is on"
+  },
+  "notificationsGrantOffSubtitle": "Approve once on the forum to get its replies, mentions and messages here.",
+  "@notificationsGrantOffSubtitle": {
+    "description": "Settings row subtitle when the notifications grant is off"
+  },
+  "turnOn": "Turn on",
+  "@turnOn": {
+    "description": "Button"
+  },
+  "couldNotTurnOffNotifications": "Couldn't turn off notifications. Try again later.",
+  "@couldNotTurnOffNotifications": {
+    "description": "Snackbar when the notifications backend rejected the revoke"
   }
 }

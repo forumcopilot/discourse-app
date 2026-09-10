@@ -1462,7 +1462,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get approvedButRelayUnreachable =>
-      'Approvato, ma non è stato possibile raggiungere ForumCopilot per completare la configurazione. Riprova più tardi dalle Impostazioni.';
+      'Approvato, ma non è stato possibile raggiungere il server delle notifiche per completare la configurazione. Riprova più tardi dalle Impostazioni.';
 
   @override
   String get notificationsAreTurnedOffForThisApp =>
@@ -2063,4 +2063,29 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notSignedIn => 'Non hai effettuato l’accesso';
+
+  @override
+  String get deviceWillNotShowAlertsUntilAllowedInSettings =>
+      'Il dispositivo non mostrerà avvisi finché non consenti le notifiche nelle Impostazioni.';
+
+  @override
+  String get openSettings => 'Apri impostazioni';
+
+  @override
+  String get notificationsOnThisDevice => 'Notifiche su questo dispositivo';
+
+  @override
+  String get notificationsGrantOnSubtitle =>
+      'Risposte, menzioni e messaggi di questo forum vengono recapitati qui.';
+
+  @override
+  String get notificationsGrantOffSubtitle =>
+      'Approva una volta sul forum per ricevere qui risposte, menzioni e messaggi.';
+
+  @override
+  String get turnOn => 'Attiva';
+
+  @override
+  String get couldNotTurnOffNotifications =>
+      'Impossibile disattivare le notifiche. Riprova più tardi.';
 }

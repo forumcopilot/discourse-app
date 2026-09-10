@@ -704,7 +704,7 @@
   "noMessagesYetSayHi": "Nenhuma mensagem ainda — diga oi.",
   "edited": "editado",
   "editProfileManagedOnWebNote": "Nome de exibição, e-mail, senha e outras configurações da conta são gerenciados em Conta → Gerenciar conta na web. Seu avatar pode ser alterado tocando no ícone de câmera na foto.",
-  "approvedButRelayUnreachable": "Aprovado, mas não foi possível contatar o ForumCopilot para concluir a configuração. Tente novamente mais tarde em Configurações.",
+  "approvedButRelayUnreachable": "Aprovado, mas não foi possível contactar o servidor de notificações para concluir a configuração. Tente novamente mais tarde em Configurações.",
   "notificationsAreTurnedOffForThisApp": "As notificações estão desativadas para este app",
   "forumWillAskToApproveNotifications": "Em seguida, {forumName} pedirá que você aprove \"Notificações\".",
   "approveNotificationsExplanation": "Ao aprovar, podemos verificar suas notificações e enviá-las a este dispositivo. Esta permissão não pode publicar, responder ou ler suas mensagens.",
@@ -866,5 +866,12 @@
   "termsOfService": "Termos de serviço",
   "privacyPolicy": "Política de privacidade",
   "signedInAs": "Conectado como {username}",
-  "notSignedIn": "Não conectado"
+  "notSignedIn": "Não conectado",
+  "deviceWillNotShowAlertsUntilAllowedInSettings": "O seu dispositivo não mostrará alertas até que permita as notificações em Configurações.",
+  "openSettings": "Abrir configurações",
+  "notificationsOnThisDevice": "Notificações neste dispositivo",
+  "notificationsGrantOnSubtitle": "Respostas, menções e mensagens deste fórum são entregues aqui.",
+  "notificationsGrantOffSubtitle": "Aprove uma vez no fórum para receber aqui as respostas, menções e mensagens.",
+  "turnOn": "Ativar",
+  "couldNotTurnOffNotifications": "Não foi possível desativar as notificações. Tente novamente mais tarde."
 }

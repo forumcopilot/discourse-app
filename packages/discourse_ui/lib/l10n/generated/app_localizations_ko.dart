@@ -1407,7 +1407,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get approvedButRelayUnreachable =>
-      '승인되었지만 설정을 마치기 위한 ForumCopilot에 연결할 수 없었습니다. 나중에 설정에서 다시 시도하세요.';
+      '승인되었지만 설정을 완료하기 위한 알림 서버에 연결할 수 없습니다. 나중에 설정에서 다시 시도해 주세요.';
 
   @override
   String get notificationsAreTurnedOffForThisApp => '이 앱의 알림이 꺼져 있습니다';
@@ -1971,4 +1971,27 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get notSignedIn => '로그인하지 않음';
+
+  @override
+  String get deviceWillNotShowAlertsUntilAllowedInSettings =>
+      '설정에서 알림을 허용할 때까지 이 기기에는 알림이 표시되지 않습니다.';
+
+  @override
+  String get openSettings => '설정 열기';
+
+  @override
+  String get notificationsOnThisDevice => '이 기기의 알림';
+
+  @override
+  String get notificationsGrantOnSubtitle => '이 포럼의 답글, 멘션, 메시지가 이 기기로 전달됩니다.';
+
+  @override
+  String get notificationsGrantOffSubtitle =>
+      '포럼에서 한 번 승인하면 답글, 멘션, 메시지를 여기서 받을 수 있습니다.';
+
+  @override
+  String get turnOn => '켜기';
+
+  @override
+  String get couldNotTurnOffNotifications => '알림을 끌 수 없습니다. 나중에 다시 시도해 주세요.';
 }

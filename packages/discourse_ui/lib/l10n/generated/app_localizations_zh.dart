@@ -1397,8 +1397,7 @@ class AppLocalizationsZh extends AppLocalizations {
       '显示名称、邮箱、密码及其他账户设置在“账户 → 在网页上管理账户”中管理。点击照片上的相机图标可更换头像。';
 
   @override
-  String get approvedButRelayUnreachable =>
-      '已批准，但无法连接 ForumCopilot 完成设置。请稍后在设置中重试。';
+  String get approvedButRelayUnreachable => '已批准，但无法连接通知服务器以完成设置。请稍后在“设置”中重试。';
 
   @override
   String get notificationsAreTurnedOffForThisApp => '此应用的通知已关闭';
@@ -1954,4 +1953,26 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get notSignedIn => '未登录';
+
+  @override
+  String get deviceWillNotShowAlertsUntilAllowedInSettings =>
+      '在“设置”中允许通知之前，设备不会显示提醒。';
+
+  @override
+  String get openSettings => '打开设置';
+
+  @override
+  String get notificationsOnThisDevice => '此设备上的通知';
+
+  @override
+  String get notificationsGrantOnSubtitle => '此论坛的回复、提及和消息会送达此设备。';
+
+  @override
+  String get notificationsGrantOffSubtitle => '在论坛上批准一次，即可在此接收其回复、提及和消息。';
+
+  @override
+  String get turnOn => '开启';
+
+  @override
+  String get couldNotTurnOffNotifications => '无法关闭通知。请稍后再试。';
 }

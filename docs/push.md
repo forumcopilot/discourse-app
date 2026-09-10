@@ -1,49 +1,73 @@
 # Push notifications: status and decision
 
-**Decision (2026-09-08): push ships as an optional feature, off by default,
-with the client side complete and the relay out of scope for this repo.**
-1.0 does not wait for a relay.
+**Decision (2026-09-08, revised 2026-09-10): push ships as two optional
+client paths, both off by default; the servers are out of scope for this
+repo.** 1.0 did not wait for either.
 
-## What is in the app
+## Why two paths
 
-With `AppForumConfig.pushApiBaseUrl` set, the User API Key handshake
-requests the `push` scope and registers a static `push_url`
-(`<pushApiBaseUrl>/discourse/push`). Discourse then POSTs every
-notification for that key to the relay, tagged with the handshake
-`client_id`. The app sends the same `client_id` to the relay's
-`/devices/register` together with its FCM token, so the relay can map one
-to the other. `DiscourseSiteContextExtension.userApiPushEnabled` records
-whether the grant really included push; the notification settings page
-tells a user whose key predates the grant to sign in again (a key's
+Discourse only pushes to a URL the forum **owner** has added to
+`allowed_user_api_push_urls`. That is the relay path below, and it is the
+right one for a forum whose owner runs (or subscribes to) the app. On a
+forum nobody has configured — every forum a multi-forum host opens by
+address — nothing would ever arrive. The notifications grant covers that
+case with nothing from the forum's admins: the user themselves grants a
+second User API Key, scoped to `notifications` alone, and a backend polls
+their notifications with it.
+
+## Path 1 — relay (`AppForumConfig.pushApiBaseUrl`)
+
+With it set, the User API Key handshake requests the `push` scope and
+registers a static `push_url` (`<pushApiBaseUrl>/discourse/push`).
+Discourse then POSTs every notification for that key to the relay, tagged
+with the handshake `client_id`. The app sends the same `client_id` to the
+relay's `/devices/register` together with its FCM token, so the relay can
+map one to the other. `DiscourseSiteContextExtension.userApiPushEnabled`
+records whether the grant really included push; the notification settings
+page tells a user whose key predates the grant to sign in again (a key's
 scopes are immutable).
 
-With `pushApiBaseUrl` empty (the default) none of this runs and no
-Firebase project is needed; the committed `.example` config files exist
-only so the native builds compile.
+What a forum admin must do: add the exact `push_url` to
+`allowed_user_api_push_urls` (Discourse substring-matches, so use a static
+URL); keep `push` in `allow_user_api_key_scopes`; verify the relay checks
+`push_api_secret_key` from the payload before trusting it. Existing logins
+predate the grant and must sign in again.
+
+## Path 2 — notifications grant (`AppForumConfig.notificationsApiBaseUrl`)
+
+With it set, the sign-in flow ends on `EnableNotificationsPage`, which
+asks the OS for notification permission (there, not at launch — the user
+has just read what the alerts are for) and then runs a second handshake:
+`notifications` scope only (four routes: `notifications#index`, `#totals`,
+`#mark_read`, `message_bus`), its own client id (`<install>:notify`), no
+`push_url`. The key is never persisted on the device; it goes to the
+backend via `NotificationKeyService`, keyed on the forum URL and the client
+id, together with the FCM token, which is re-sent whenever it becomes
+known or rotates. A completed grant is remembered per forum, so signing in
+again does not ask again; sign-out revokes and forgets it, and Settings →
+Notifications turns it on or off later.
+
+The backend has to serve three routes under the base URL — the bodies are
+on `NotificationKeyService` — and run a poller: read
+`/notifications.json?filter=unread` with the stored key (that branch never
+bumps the user's seen pointer), deliver everything above a per-key
+high-water mark, advance the mark only for what was delivered. Discourse
+rate-limits per key (20/min, 2880/day), so one poll a minute per user is
+safe. What it delivers must be a payload the app can act on: see
+`NotificationService._navigateFromNotification` for the fields it reads.
 
 ## What is not in this repo
 
-A relay that accepts Discourse's POST at `/discourse/push` and forwards
-it to FCM/APNs by `client_id`. It is a small service, but it holds push
-credentials and receives unauthenticated traffic from the forum, so it
-belongs in its own deployable, not in a client template. Forum Copilot
-runs one for its hosted customers; a fork can run its own against the
-contract on `AppForumConfig.discoursePushUrl`.
-
-## What a forum admin must do to enable it
-
-1. Add the exact `push_url` to the `allowed_user_api_push_urls` site
-   setting (Discourse substring-matches, so use a static URL).
-2. Keep `push` in `allow_user_api_key_scopes`.
-3. Verify the relay checks `push_api_secret_key` from the payload before
-   trusting it.
-
-Existing logins predate the grant and must sign in again.
+Either server. A relay accepts unauthenticated POSTs from the forum and
+holds push credentials; a poller holds users' forum keys. Both belong in
+their own deployable, not in a client template. Forum Copilot runs them
+for its hosted customers; a fork can run its own against the contracts
+above.
 
 ## Why not wait
 
-Nothing else in the app depends on it, the setting defaults to off, the
-README lists it as not yet implemented, and the code paths are
-byte-identical to pre-push behaviour when it is off (checked in the
-`app_forum_config_push_test`). Shipping 1.0 with push optional is honest;
-holding 1.0 for a server nobody has to run is not.
+Nothing else in the app depends on either path, both default to off, and
+the code paths are byte-identical to pre-push behaviour when they are
+(checked in `app_forum_config_push_test` and
+`notifications_api_base_url_test`). Shipping with push optional is honest;
+holding a release for a server nobody has to run is not.

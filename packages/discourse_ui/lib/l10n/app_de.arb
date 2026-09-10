@@ -704,7 +704,7 @@
   "noMessagesYetSayHi": "Noch keine Nachrichten — sag Hallo.",
   "edited": "bearbeitet",
   "editProfileManagedOnWebNote": "Anzeigename, E-Mail, Passwort und weitere Kontoeinstellungen werden unter Konto → Konto im Web verwalten geändert. Dein Avatar lässt sich über das Kamerasymbol auf deinem Foto ändern.",
-  "approvedButRelayUnreachable": "Genehmigt, aber ForumCopilot war nicht erreichbar, um die Einrichtung abzuschließen. Versuche es später in den Einstellungen erneut.",
+  "approvedButRelayUnreachable": "Genehmigt, aber der Benachrichtigungsserver war nicht erreichbar, um die Einrichtung abzuschließen. Versuche es später in den Einstellungen erneut.",
   "notificationsAreTurnedOffForThisApp": "Benachrichtigungen sind für diese App deaktiviert",
   "forumWillAskToApproveNotifications": "Als Nächstes bittet dich {forumName}, „Benachrichtigungen“ zu genehmigen.",
   "approveNotificationsExplanation": "Mit der Genehmigung dürfen wir deine Benachrichtigungen für dich abrufen und an dieses Gerät senden. Diese Berechtigung kann nicht posten, antworten oder deine Nachrichten lesen.",
@@ -866,5 +866,12 @@
   "termsOfService": "Nutzungsbedingungen",
   "privacyPolicy": "Datenschutzerklärung",
   "signedInAs": "Angemeldet als {username}",
-  "notSignedIn": "Nicht angemeldet"
+  "notSignedIn": "Nicht angemeldet",
+  "deviceWillNotShowAlertsUntilAllowedInSettings": "Dein Gerät zeigt keine Hinweise an, bis du Benachrichtigungen in den Einstellungen erlaubst.",
+  "openSettings": "Einstellungen öffnen",
+  "notificationsOnThisDevice": "Benachrichtigungen auf diesem Gerät",
+  "notificationsGrantOnSubtitle": "Antworten, Erwähnungen und Nachrichten aus diesem Forum werden hierher zugestellt.",
+  "notificationsGrantOffSubtitle": "Einmal im Forum bestätigen, um Antworten, Erwähnungen und Nachrichten hier zu erhalten.",
+  "turnOn": "Einschalten",
+  "couldNotTurnOffNotifications": "Benachrichtigungen konnten nicht ausgeschaltet werden. Versuche es später erneut."
 }

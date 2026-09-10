@@ -95,8 +95,9 @@ class AppForumConfig {
     'one_time_password',
   ];
 
-  /// Scopes for the SECOND handshake — the key handed to our backend so it can
-  /// poll this user's notifications and deliver them as push.
+  /// Scopes for the SECOND handshake — the key handed to the notifications
+  /// backend ([notificationsApiBaseUrl]) so it can poll this user's
+  /// notifications and deliver them as push.
   ///
   /// `notifications` alone, deliberately. It grants exactly four routes
   /// (notifications#index, #totals, #mark_read, and message_bus) — enough to
@@ -113,6 +114,46 @@ class AppForumConfig {
   /// distinct from the login key. Discourse destroys existing keys for the same
   /// (client_id, user) on each grant, so sharing an id would sign the user out.
   static const String userApiNotificationsClientIdSuffix = 'notify';
+
+  /// Base URL of the notifications backend: the server this app hands the
+  /// notifications-only key to, which polls the forum on the user's behalf
+  /// and delivers what arrives as push. It must serve
+  /// `POST /discourse/notification-key`,
+  /// `POST /discourse/notification-key/device` and
+  /// `DELETE /discourse/notification-key` — the bodies are documented on
+  /// `NotificationKeyService`. Empty (the default) turns the whole flow off:
+  /// no second handshake after sign-in, nothing uploaded anywhere.
+  ///
+  /// Deliberately separate from [pushApiBaseUrl]. That is the relay path: it
+  /// makes the login handshake request the `push` scope and a `push_url`,
+  /// which only delivers once the forum's owner has allowlisted the URL.
+  /// This path needs nothing from the forum's admins, which is why a
+  /// multi-forum host wants it and not the other.
+  ///
+  /// A fork edits [defaultNotificationsApiBaseUrl]; a **host app** calls
+  /// [setNotificationsApiBaseUrl] once at startup, before the first login.
+  /// Read [notificationsApiBaseUrl] everywhere; it honours the override.
+  static const String defaultNotificationsApiBaseUrl = '';
+
+  static String? _notificationsApiBaseUrlOverride;
+
+  /// Notifications backend base URL in effect: the host app's override when
+  /// set, otherwise the compile-time [defaultNotificationsApiBaseUrl].
+  static String get notificationsApiBaseUrl =>
+      _notificationsApiBaseUrlOverride ?? defaultNotificationsApiBaseUrl;
+
+  /// Points the notifications grant at [baseUrl]. Pass null or an empty
+  /// string to fall back to the compile-time default.
+  static void setNotificationsApiBaseUrl(String? baseUrl) {
+    final trimmed = baseUrl?.trim();
+    _notificationsApiBaseUrlOverride =
+        (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+  }
+
+  /// True when a notifications backend is configured, so the app offers the
+  /// second grant after sign-in and keeps its device token attached to it.
+  static bool get isNotificationsGrantEnabled =>
+      notificationsApiBaseUrl.trim().isNotEmpty;
 
   /// Optional branding metadata.
   static const String forumDescription =

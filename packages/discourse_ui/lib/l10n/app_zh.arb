@@ -704,7 +704,7 @@
   "noMessagesYetSayHi": "还没有消息 — 打个招呼吧。",
   "edited": "已编辑",
   "editProfileManagedOnWebNote": "显示名称、邮箱、密码及其他账户设置在“账户 → 在网页上管理账户”中管理。点击照片上的相机图标可更换头像。",
-  "approvedButRelayUnreachable": "已批准，但无法连接 ForumCopilot 完成设置。请稍后在设置中重试。",
+  "approvedButRelayUnreachable": "已批准，但无法连接通知服务器以完成设置。请稍后在“设置”中重试。",
   "notificationsAreTurnedOffForThisApp": "此应用的通知已关闭",
   "forumWillAskToApproveNotifications": "接下来，{forumName} 会请求你批准“通知”。",
   "approveNotificationsExplanation": "批准后，我们可以为你查看通知并发送到此设备。该权限无法发帖、回复或读取你的消息。",
@@ -866,5 +866,12 @@
   "termsOfService": "服务条款",
   "privacyPolicy": "隐私政策",
   "signedInAs": "已登录：{username}",
-  "notSignedIn": "未登录"
+  "notSignedIn": "未登录",
+  "deviceWillNotShowAlertsUntilAllowedInSettings": "在“设置”中允许通知之前，设备不会显示提醒。",
+  "openSettings": "打开设置",
+  "notificationsOnThisDevice": "此设备上的通知",
+  "notificationsGrantOnSubtitle": "此论坛的回复、提及和消息会送达此设备。",
+  "notificationsGrantOffSubtitle": "在论坛上批准一次，即可在此接收其回复、提及和消息。",
+  "turnOn": "开启",
+  "couldNotTurnOffNotifications": "无法关闭通知。请稍后再试。"
 }

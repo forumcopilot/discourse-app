@@ -1452,7 +1452,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get approvedButRelayUnreachable =>
-      'Одобрено, но не удалось связаться с ForumCopilot для завершения настройки. Повторите позже в настройках.';
+      'Одобрено, но не удалось связаться с сервером уведомлений, чтобы завершить настройку. Повторите попытку позже в настройках.';
 
   @override
   String get notificationsAreTurnedOffForThisApp =>
@@ -2046,4 +2046,29 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get notSignedIn => 'Вы не вошли';
+
+  @override
+  String get deviceWillNotShowAlertsUntilAllowedInSettings =>
+      'Устройство не будет показывать уведомления, пока вы не разрешите их в настройках.';
+
+  @override
+  String get openSettings => 'Открыть настройки';
+
+  @override
+  String get notificationsOnThisDevice => 'Уведомления на этом устройстве';
+
+  @override
+  String get notificationsGrantOnSubtitle =>
+      'Ответы, упоминания и сообщения с этого форума доставляются сюда.';
+
+  @override
+  String get notificationsGrantOffSubtitle =>
+      'Подтвердите один раз на форуме, чтобы получать здесь ответы, упоминания и сообщения.';
+
+  @override
+  String get turnOn => 'Включить';
+
+  @override
+  String get couldNotTurnOffNotifications =>
+      'Не удалось отключить уведомления. Повторите попытку позже.';
 }

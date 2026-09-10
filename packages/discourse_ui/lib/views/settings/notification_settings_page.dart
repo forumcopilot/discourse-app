@@ -9,6 +9,9 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../controllers/site_controller.dart';
+import '../../services/discourse_login_service.dart';
+import '../../services/notification_key_service.dart';
+import '../enable_notifications_page.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/simple_list_app_bar.dart';
 import '../../utils/error_message.dart';
@@ -155,7 +158,15 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       children: [
         if (_saving) const LinearProgressIndicator(minHeight: 2),
         _Section(label: 'Push'),
-        const _PushStatusTile(),
+        // Two different mechanisms with different states: the notifications
+        // grant (a backend polls the forum with a key the user approved) and
+        // the relay (Discourse pushes to an allowlisted URL). Show the one
+        // this build uses; a build with neither keeps the relay tile's
+        // "not available" row so the section still says something.
+        if (AppForumConfig.isNotificationsGrantEnabled && _siteContext != null)
+          _NotificationsGrantTile(siteContext: _siteContext!)
+        else
+          const _PushStatusTile(),
         const Divider(height: 1),
         // Do not disturb — Discourse-native (`/do-not-disturb.json`).
         // Only meaningful for a signed-in user; the tile manages its
@@ -336,6 +347,119 @@ class _PushStatusTile extends StatelessWidget {
       subtitle: Text(
         AppLocalizations.of(context)!.pushNotActiveForThisLogin,
       ),
+    );
+  }
+}
+
+/// The notifications grant for this device, with a way to change the answer
+/// given at sign-in. "On" means the backend holds a notifications-only key
+/// for this forum and polls it for this device; "Turn on" runs the same
+/// [EnableNotificationsPage] the sign-in flow shows, and "Turn off" tells the
+/// backend to stop and forgets the grant, so the next sign-in offers it
+/// again.
+///
+/// The state is the locally remembered grant, not a server query: the
+/// backend has no read endpoint, and the flag is written only once the
+/// backend confirmed it stored the key.
+class _NotificationsGrantTile extends StatefulWidget {
+  final SiteContext siteContext;
+
+  const _NotificationsGrantTile({required this.siteContext});
+
+  @override
+  State<_NotificationsGrantTile> createState() =>
+      _NotificationsGrantTileState();
+}
+
+class _NotificationsGrantTileState extends State<_NotificationsGrantTile> {
+  bool _loading = true;
+  bool _busy = false;
+  bool _granted = false;
+
+  DiscourseLoginService get _loginService =>
+      DiscourseLoginService(widget.siteContext);
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final granted = await _loginService.hasNotificationsGrant();
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      _granted = granted;
+    });
+  }
+
+  Future<void> _turnOn() async {
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => EnableNotificationsPage(siteContext: widget.siteContext),
+      ),
+    );
+    if (!mounted) return;
+    // Re-read the remembered grant rather than trusting the pop value: the
+    // page records it only once the backend took the key.
+    await _load();
+  }
+
+  Future<void> _turnOff() async {
+    setState(() => _busy = true);
+    final site = widget.siteContext.site;
+    final clientId = await _loginService.notificationsClientId();
+    final revoked = await NotificationKeyService.revoke(
+      siteUrl: site.url,
+      siteId: site.id,
+      clientId: clientId,
+    );
+    // Only a confirmed revoke flips the state: forgetting the grant while the
+    // backend still polls would keep delivering to a user who asked for
+    // silence — the opposite of what they just did.
+    if (revoked) await _loginService.clearNotificationsGrant();
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      if (revoked) _granted = false;
+    });
+    if (!revoked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              AppLocalizations.of(context)!.couldNotTurnOffNotifications),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+
+    return ListTile(
+      leading: Icon(
+        _granted
+            ? Icons.notifications_active_outlined
+            : Icons.notifications_off_outlined,
+        color: _granted ? colorScheme.primary : colorScheme.onSurfaceVariant,
+      ),
+      title: Text(l10n.notificationsOnThisDevice),
+      subtitle: Text(_granted
+          ? l10n.notificationsGrantOnSubtitle
+          : l10n.notificationsGrantOffSubtitle),
+      trailing: _loading || _busy
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : TextButton(
+              onPressed: _granted ? _turnOff : _turnOn,
+              child: Text(_granted ? l10n.turnOff : l10n.turnOn),
+            ),
     );
   }
 }

@@ -1465,7 +1465,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get approvedButRelayUnreachable =>
-      'Genehmigt, aber ForumCopilot war nicht erreichbar, um die Einrichtung abzuschließen. Versuche es später in den Einstellungen erneut.';
+      'Genehmigt, aber der Benachrichtigungsserver war nicht erreichbar, um die Einrichtung abzuschließen. Versuche es später in den Einstellungen erneut.';
 
   @override
   String get notificationsAreTurnedOffForThisApp =>
@@ -2066,4 +2066,29 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get notSignedIn => 'Nicht angemeldet';
+
+  @override
+  String get deviceWillNotShowAlertsUntilAllowedInSettings =>
+      'Dein Gerät zeigt keine Hinweise an, bis du Benachrichtigungen in den Einstellungen erlaubst.';
+
+  @override
+  String get openSettings => 'Einstellungen öffnen';
+
+  @override
+  String get notificationsOnThisDevice => 'Benachrichtigungen auf diesem Gerät';
+
+  @override
+  String get notificationsGrantOnSubtitle =>
+      'Antworten, Erwähnungen und Nachrichten aus diesem Forum werden hierher zugestellt.';
+
+  @override
+  String get notificationsGrantOffSubtitle =>
+      'Einmal im Forum bestätigen, um Antworten, Erwähnungen und Nachrichten hier zu erhalten.';
+
+  @override
+  String get turnOn => 'Einschalten';
+
+  @override
+  String get couldNotTurnOffNotifications =>
+      'Benachrichtigungen konnten nicht ausgeschaltet werden. Versuche es später erneut.';
 }

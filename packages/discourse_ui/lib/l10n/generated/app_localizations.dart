@@ -2573,7 +2573,7 @@ abstract class AppLocalizations {
   /// UI text: push approved but relay unreachable
   ///
   /// In en, this message translates to:
-  /// **'Approved, but we could not reach ForumCopilot to finish setting up. Try again later from Settings.'**
+  /// **'Approved, but we could not reach the notifications server to finish setting up. Try again later from Settings.'**
   String get approvedButRelayUnreachable;
 
   /// UI text: Notifications are turned off for this app
@@ -3549,6 +3549,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not signed in'**
   String get notSignedIn;
+
+  /// Grant page banner, shown when the OS notification permission was refused
+  ///
+  /// In en, this message translates to:
+  /// **'Your device will not show alerts until you allow notifications in Settings.'**
+  String get deviceWillNotShowAlertsUntilAllowedInSettings;
+
+  /// Button: open the app's page in the system settings
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get openSettings;
+
+  /// Settings row title: the notifications grant
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications on this device'**
+  String get notificationsOnThisDevice;
+
+  /// Settings row subtitle when the notifications grant is on
+  ///
+  /// In en, this message translates to:
+  /// **'Replies, mentions and messages from this forum are delivered here.'**
+  String get notificationsGrantOnSubtitle;
+
+  /// Settings row subtitle when the notifications grant is off
+  ///
+  /// In en, this message translates to:
+  /// **'Approve once on the forum to get its replies, mentions and messages here.'**
+  String get notificationsGrantOffSubtitle;
+
+  /// Button
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on'**
+  String get turnOn;
+
+  /// Snackbar when the notifications backend rejected the revoke
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t turn off notifications. Try again later.'**
+  String get couldNotTurnOffNotifications;
 }
 
 class _AppLocalizationsDelegate

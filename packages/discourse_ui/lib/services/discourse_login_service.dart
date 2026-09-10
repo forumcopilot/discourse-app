@@ -1,19 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:discourse_core/discourse_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteContextExtension;
-import 'package:forumcopilot_sdk/services/forumcopilot_api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_user.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'package:forumcopilot_sdk/network/fc_call_result.dart';
 
 import '../config/app_forum_config.dart';
 import '../core/logging/app_logger.dart';
+import 'notification_key_service.dart';
 
 /// Drives the Discourse User API Key login flow from the app side.
 ///
@@ -85,6 +85,36 @@ class DiscourseLoginService {
     );
   }
 
+  static const String _prefNotificationsGranted = '_notifications_key_granted';
+
+  String get _notificationsGrantKey =>
+      '${siteContext.discourseStoragePrefix}$_prefNotificationsGranted';
+
+  /// Whether the notifications grant for THIS forum was completed and taken
+  /// by the backend. Set by [markNotificationsGranted] once the key is stored
+  /// server-side — not merely approved on the forum, since a grant the backend
+  /// never received delivers nothing and should be offered again.
+  ///
+  /// Per forum, under the same prefix as the forum's credentials, because a
+  /// multi-forum host signs into many forums from one install and each one
+  /// is granted separately.
+  Future<bool> hasNotificationsGrant() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_notificationsGrantKey) ?? false;
+  }
+
+  Future<void> markNotificationsGranted() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_notificationsGrantKey, true);
+  }
+
+  /// Forget the grant — at sign-out, or when the user turns notifications off
+  /// — so the next sign-in offers it again.
+  Future<void> clearNotificationsGrant() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_notificationsGrantKey);
+  }
+
   /// Point any stored notifications grant for THIS forum at [token].
   ///
   /// Called from two places, because neither alone is sufficient: entering a
@@ -101,19 +131,22 @@ class DiscourseLoginService {
   /// is never initialized there and its `fcmToken` is always null.
   /// FirebaseMessaging is the one source of truth in both.
   Future<void> syncNotificationDeviceToken({String? token, String? platform}) async {
-    final siteId = siteContext.site.id;
-    if (siteId == null) return;
+    if (!AppForumConfig.isNotificationsGrantEnabled) return;
+    // Nothing to attach to until the grant completed on this forum — and the
+    // backend would only no-op, so save it the request.
+    if (!await hasNotificationsGrant()) return;
 
     try {
       final effective = token ?? await FirebaseMessaging.instance.getToken();
       if (effective == null || effective.isEmpty) return;
 
       final clientId = await notificationsClientId();
-      await ForumCopilotApiService.updateDiscourseNotificationDevice(
-        siteId: siteId,
+      await NotificationKeyService.updateDevice(
+        siteUrl: siteContext.site.url,
+        siteId: siteContext.site.id,
         clientId: clientId,
         deviceToken: effective,
-        devicePlatform: platform ?? (Platform.isIOS ? 'ios' : 'android'),
+        devicePlatform: platform ?? NotificationKeyService.devicePlatform,
       );
     } catch (e) {
       AppLogger.debug(

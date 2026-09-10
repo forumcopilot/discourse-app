@@ -236,5 +236,12 @@ extension DiscourseSiteContextExtension on SiteContext {
   @visibleForTesting
   static void resetChatProbeCache() => _chatProbe.clear();
 
+  /// Key prefix under which this forum's Discourse state lives in
+  /// SharedPreferences and secure storage. Public so app-layer state that
+  /// belongs to the same forum — whether the notifications grant was
+  /// completed, say — is filed under the same prefix rather than a second
+  /// scheme that could drift from it.
+  String get discourseStoragePrefix => _prefsPrefix();
+
   String _prefsPrefix() => 'discourse:${site.pluginUrl}';
 }

@@ -1413,7 +1413,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get approvedButRelayUnreachable =>
-      '承認されましたが、設定を完了するための ForumCopilot に接続できませんでした。後で設定から再試行してください。';
+      '承認されましたが、設定を完了するための通知サーバーに接続できませんでした。後で設定から再試行してください。';
 
   @override
   String get notificationsAreTurnedOffForThisApp => 'このアプリの通知はオフになっています';
@@ -1979,4 +1979,27 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get notSignedIn => 'サインインしていません';
+
+  @override
+  String get deviceWillNotShowAlertsUntilAllowedInSettings =>
+      '設定で通知を許可するまで、この端末には通知が表示されません。';
+
+  @override
+  String get openSettings => '設定を開く';
+
+  @override
+  String get notificationsOnThisDevice => 'この端末での通知';
+
+  @override
+  String get notificationsGrantOnSubtitle => 'このフォーラムの返信、メンション、メッセージがここに届きます。';
+
+  @override
+  String get notificationsGrantOffSubtitle =>
+      'フォーラムで一度承認すると、返信、メンション、メッセージがここに届きます。';
+
+  @override
+  String get turnOn => 'オンにする';
+
+  @override
+  String get couldNotTurnOffNotifications => '通知をオフにできませんでした。後でもう一度お試しください。';
 }

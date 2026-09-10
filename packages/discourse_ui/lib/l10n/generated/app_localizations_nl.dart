@@ -1451,7 +1451,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get approvedButRelayUnreachable =>
-      'Goedgekeurd, maar ForumCopilot was niet bereikbaar om de installatie af te ronden. Probeer het later opnieuw via Instellingen.';
+      'Goedgekeurd, maar de meldingsserver was niet bereikbaar om de installatie af te ronden. Probeer het later opnieuw via Instellingen.';
 
   @override
   String get notificationsAreTurnedOffForThisApp =>
@@ -2051,4 +2051,29 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get notSignedIn => 'Niet aangemeld';
+
+  @override
+  String get deviceWillNotShowAlertsUntilAllowedInSettings =>
+      'Je apparaat toont geen meldingen totdat je notificaties toestaat in Instellingen.';
+
+  @override
+  String get openSettings => 'Instellingen openen';
+
+  @override
+  String get notificationsOnThisDevice => 'Meldingen op dit apparaat';
+
+  @override
+  String get notificationsGrantOnSubtitle =>
+      'Reacties, vermeldingen en berichten van dit forum worden hier bezorgd.';
+
+  @override
+  String get notificationsGrantOffSubtitle =>
+      'Keur het eenmalig goed op het forum om reacties, vermeldingen en berichten hier te ontvangen.';
+
+  @override
+  String get turnOn => 'Inschakelen';
+
+  @override
+  String get couldNotTurnOffNotifications =>
+      'Kon meldingen niet uitschakelen. Probeer het later opnieuw.';
 }

@@ -44,7 +44,7 @@ The code is free so you can see exactly what you would be getting. Most communit
 
 - **Your forum's app** — name, icon, colours, splash, store listings, and the App Store and Play Store submissions handled end to end.
 - **Features this repo does not have** — a screen for your plugin, single sign-on with your existing accounts, paywalled categories, in-app purchases, offline reading, whatever your community actually needs.
-- **Push notifications** — the relay side set up and hosted, so your members get replies and mentions on their phones.
+- **Push notifications** — two client paths, both off by default, see [docs/push.md](docs/push.md). *Relay*: with `pushApiBaseUrl` set, the User API Key handshake requests the `push` scope and a `push_url`, and Discourse POSTs notifications there — but only on forums whose owner allowlisted the URL. *Notifications grant*: with `notificationsApiBaseUrl` set, the app asks the user for a second, notifications-only key after sign-in and hands it to that backend, which polls the forum and delivers what arrives; this needs nothing from the forum's admins. Neither backend is in this repo; `NotificationKeyService` documents the grant contract. With both unset the app runs exactly as before and needs no real Firebase project — the committed `.example` placeholders are enough to compile (see Quick start).
 - **Beyond forums** — the same team builds and ships Flutter apps generally. If you have a mobile product in mind that is not a forum at all, we are happy to talk.
 
 **Get in touch: [forumcopilot@gmail.com](mailto:forumcopilot@gmail.com)** — say what community or product it is for and roughly what you want, and you will get a real reply, usually the same day.
