@@ -8,6 +8,19 @@ Point it at your forum's URL, build it, ship it. It talks to Discourse's **stock
 
 Targets Android, iOS, macOS, Windows, Linux, and web. Flutter `^3.6.1` / Dart `^3.6.1`. MIT licensed.
 
+<p align="center">
+  <img src="docs/screenshots/topic-list.png" width="260" alt="Topic list of a Discourse forum in the app">
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/thread.png" width="260" alt="A thread with posts, reactions and the reply bar">
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/abda-home.png" width="260" alt="ABDA, the multi-forum app built on this project">
+</p>
+<p align="center"><sub>Left and centre: this app on meta.discourse.org. Right: <a href="https://betterdiscourse.app">ABDA</a>, which wraps this same code in a forum chooser.</sub></p>
+
+## Try it without building anything
+
+**[ABDA – A Better Discourse App](https://betterdiscourse.app)** is this project shipped as a product: the exact screens in this repo, plus a directory of 900+ public Discourse forums to open them against. Open your own forum in it by address and you are looking at what a fork of this repo gives your community — minus the forum chooser, plus your name and icon. It is on its way to the App Store and Google Play; the site carries the download links as they go live, and until then the quick start below builds the same thing.
+
 ---
 
 ## Part of Forum Copilot
@@ -18,15 +31,21 @@ This app comes out of **[Forum Copilot](https://forumcopilot.com)**, a service t
 |---|---|---|
 | **discourse-app** *(this repo)* | Discourse | [github.com/forumcopilot/discourse-app](https://github.com/forumcopilot/discourse-app) |
 | **xenforoapp** | XenForo (via the Forum Copilot add-on) | [github.com/forumcopilot/xenforoapp](https://github.com/forumcopilot/xenforoapp) |
+| **ABDA** | Discourse — this app mounted for any forum, with a directory | [betterdiscourse.app](https://betterdiscourse.app) |
 | **ForumCopilot.com** | Hosted SaaS — multi-forum, push relay, white-label builds | [forumcopilot.com](https://forumcopilot.com) |
 
 This repo is the Discourse-native sibling of `xenforoapp`: same UI shell, same SDK shape, but the data layer speaks Discourse REST instead of an XF plugin.
 
-### 💼 We welcome customization work
+### 💼 Customization work is why this is open source
 
-Want this app tailored to your community — custom branding, extra screens, a plugin integration we haven't built yet, or the whole thing published to the App Store and Play Store under your name? **We do that.**
+The code is free so you can see exactly what you would be getting. Most communities that adopt it do not want to run a Flutter toolchain — they want it done. That work is what we sell, and it is not limited to forum apps:
 
-**Get in touch: [forumcopilot@gmail.com](mailto:forumcopilot@gmail.com)**
+- **Your forum's app** — name, icon, colours, splash, store listings, and the App Store and Play Store submissions handled end to end.
+- **Features this repo does not have** — a screen for your plugin, single sign-on with your existing accounts, paywalled categories, in-app purchases, offline reading, whatever your community actually needs.
+- **Push notifications** — the relay side set up and hosted, so your members get replies and mentions on their phones.
+- **Beyond forums** — the same team builds and ships Flutter apps generally. If you have a mobile product in mind that is not a forum at all, we are happy to talk.
+
+**Get in touch: [forumcopilot@gmail.com](mailto:forumcopilot@gmail.com)** — say what community or product it is for and roughly what you want, and you will get a real reply, usually the same day.
 
 Fork it and go it alone under the MIT license, or hand it to us — both are fine.
 
@@ -293,9 +312,9 @@ Working with Claude Code or another AI coding tool? Point it at `CLAUDE.md` firs
 
 ## Need it built for you?
 
-Custom branding, new screens, a plugin integration, or a full App Store / Play Store release under your community's name — we take on that work.
+Custom branding, new screens, a plugin integration, a full App Store / Play Store release under your community's name — or a Flutter app that has nothing to do with forums. We take on that work; see [what a custom build covers](https://betterdiscourse.app/#custom).
 
-**[forumcopilot@gmail.com](mailto:forumcopilot@gmail.com)** · [forumcopilot.com](https://forumcopilot.com)
+**[forumcopilot@gmail.com](mailto:forumcopilot@gmail.com)** · [betterdiscourse.app](https://betterdiscourse.app) · [forumcopilot.com](https://forumcopilot.com)
 
 ---
 
