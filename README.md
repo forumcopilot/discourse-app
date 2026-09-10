@@ -9,13 +9,15 @@ Point it at your forum's URL, build it, ship it. It talks to Discourse's **stock
 Targets Android, iOS, macOS, Windows, Linux, and web. Flutter `^3.6.1` / Dart `^3.6.1`. MIT licensed.
 
 <p align="center">
-  <img src="docs/screenshots/topic-list.png" width="260" alt="Topic list of a Discourse forum in the app">
-  &nbsp;&nbsp;
-  <img src="docs/screenshots/thread.png" width="260" alt="A thread with posts, reactions and the reply bar">
-  &nbsp;&nbsp;
-  <img src="docs/screenshots/abda-home.png" width="260" alt="ABDA, the multi-forum app built on this project">
+  <img src="docs/screenshots/forum-home.png" width="196" alt="A forum's home in the app: its logo, description and stats, then the Latest / Hot / New / Unread tabs">
+  &nbsp;
+  <img src="docs/screenshots/thread.png" width="196" alt="A thread with posts, reactions and the reply bar">
+  &nbsp;
+  <img src="docs/screenshots/drawer.png" width="196" alt="The drawer: sign in, tags, users, groups, badges, notifications">
+  &nbsp;
+  <img src="docs/screenshots/abda-home.png" width="196" alt="ABDA, the multi-forum app built on this project">
 </p>
-<p align="center"><sub>Left and centre: this app on meta.discourse.org. Right: <a href="https://betterdiscourse.app">ABDA</a>, which wraps this same code in a forum chooser.</sub></p>
+<p align="center"><sub>First three: this app on meta.discourse.org, as shipped inside <a href="https://betterdiscourse.app">ABDA</a> (the "Switch forum" row is ABDA's; a single-forum fork has no such thing). Last: ABDA's own home, the forum chooser that wraps this code.</sub></p>
 
 ## Try it without building anything
 
