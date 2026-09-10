@@ -28,6 +28,7 @@ import 'tabs/profile_tab.dart';
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
 import 'widgets/resettable_widget.dart';
 import 'widgets/site_drawer.dart';
+import 'site_home_tab.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/core/async/async_utils.dart';
 import 'dart:async';
@@ -36,10 +37,16 @@ class SiteHomePage extends StatefulWidget {
   final Site? siteToInitialize;
   final bool showGlobalLoader;
 
+  /// Tab to open on, instead of the topic feed. Honoured once that tab
+  /// exists — the notifications tab only appears after the forum's config
+  /// arrives — and ignored on a forum that does not have it.
+  final SiteHomeTab? initialTab;
+
   const SiteHomePage({
     super.key,
     this.siteToInitialize,
     this.showGlobalLoader = true,
+    this.initialTab,
   });
 
   // Static flag to trigger autoShowLogin in ProfileTab after registration
@@ -106,12 +113,73 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     return _enabledTabs.length;
   }
 
+  /// A tab this page has been asked to open on but could not yet — the tab
+  /// may not exist until the forum's config has been read. Cleared once
+  /// applied.
+  SiteHomeTab? _pendingTab;
+  Worker? _requestedTabWorker;
+
+  String? _tabIdFor(SiteHomeTab tab) {
+    switch (tab) {
+      case SiteHomeTab.topics:
+        return _topicsTab;
+      case SiteHomeTab.categories:
+        return _forumsTab;
+      case SiteHomeTab.inbox:
+        return _isChatEnabled ? _chatTab : _messagesTab;
+      case SiteHomeTab.notifications:
+        return _notificationsTab;
+      case SiteHomeTab.profile:
+        return _profileTab;
+    }
+  }
+
+  /// Switch to [_pendingTab] if the forum has it. Called after every change
+  /// to the tab set, because the request usually arrives before the tabs do.
+  void _applyPendingTab() {
+    final pending = _pendingTab;
+    if (pending == null || !mounted) return;
+
+    final id = _tabIdFor(pending);
+    final index = id == null ? -1 : _enabledTabs.indexOf(id);
+    // Not there yet — keep the request; the config may still be loading.
+    if (index < 0 || index >= _tabController.length) return;
+
+    _pendingTab = null;
+    if (Get.isRegistered<DiscourseSiteController>()) {
+      Get.find<DiscourseSiteController>().requestedHomeTab.value = null;
+    }
+    if (_tabController.index == index) return;
+
+    AppLogger.debug('🧭 [SITE_HOME] Opening on the $id tab as requested');
+    setState(() {
+      _tabController.index = index;
+      _previousTabIndex = index;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: _tabCount, vsync: this);
     _previousTabIndex = _tabController.index; // Initialize to match initial index
     _tabController.addListener(_onTabChanged);
+
+    // A tab asked for at construction and one asked for later through the site
+    // controller are the same thing to this page: a pending request, applied
+    // as soon as the tab it names exists.
+    _pendingTab = widget.initialTab;
+    if (Get.isRegistered<DiscourseSiteController>()) {
+      final siteController = Get.find<DiscourseSiteController>();
+      _pendingTab ??= siteController.requestedHomeTab.value;
+      _requestedTabWorker =
+          ever<SiteHomeTab?>(siteController.requestedHomeTab, (tab) {
+        if (tab == null || !mounted) return;
+        _pendingTab = tab;
+        _applyPendingTab();
+      });
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) => _applyPendingTab());
 
     // If siteToInitialize is null, site was already initialized in bootstrap flow.
     // Do not set context, listener, or load here when site is initialized: the block
@@ -259,6 +327,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
         if (isInitialized) {
           AppLogger.debug('🏁 [SITE_HOME] Site initialization completed - refreshing all tabs');
           _recreateTabController();
+          _applyPendingTab();
           _resetAllTabs();
           // Load board stats once for sharing between tabs
           _loadBoardStats();
@@ -323,6 +392,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
   void _handleLoginStateChange(bool isLoggedIn) {
     if (!mounted) return;
     _recreateTabController();
+    _applyPendingTab();
     _resetAllTabs();
     // Fetch inbox stat after login to update badge
     if (isLoggedIn) {
@@ -759,6 +829,8 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     if (_tabController.length != enabledTabs.length) {
       AppLogger.debug('🔄 [SITE_HOME] Tab count mismatch detected in build - recreating TabController');
       _recreateTabController();
+      // Inside build, so setState is out; take the request on the next frame.
+      WidgetsBinding.instance.addPostFrameCallback((_) => _applyPendingTab());
     }
 
     final isLoggedIn = _siteContext!.isLoggedIn;
@@ -1011,6 +1083,9 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     // Remove tab controller listener
     _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
+
+    _requestedTabWorker?.dispose();
+    _requestedTabWorker = null;
 
     // Remove login state listener if it exists
     if (_loginStateListener != null && _siteContext != null) {

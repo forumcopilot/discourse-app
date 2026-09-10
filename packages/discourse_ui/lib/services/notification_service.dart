@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/services.dart';
 import 'package:discourse_ui/config/app_forum_config.dart';
+import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/domain/site.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'device_service.dart';
@@ -24,6 +25,8 @@ import '../views/user_profile_page.dart';
 import '../core/errors/error_handling_mixins.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../host/discourse_host.dart';
+import '../views/site_home_tab.dart';
+import 'notification_route.dart';
 
 class NotificationService with ServiceErrorHandlingMixin {
   static final NotificationService _instance = NotificationService._internal();
@@ -448,6 +451,15 @@ class NotificationService with ServiceErrorHandlingMixin {
     try {
       AppLogger.debug('🔔 [NotificationService] Navigate from notification with data: $data');
 
+      // Notifications from the notifications backend carry Discourse's own
+      // fields rather than the plugin's content_type shape, and are routed on
+      // their own terms — including the routine case of naming nothing to
+      // open, which is a tab change rather than an error.
+      if (DiscourseNotificationRoute.handles(data)) {
+        await _handleDiscourseNotification(data);
+        return;
+      }
+
       // Extract content type and required fields
       final String contentType = (data['content_type'] ?? '').toString().toLowerCase();
       final dynamic rawSiteId = data['site_id'];
@@ -526,6 +538,126 @@ class NotificationService with ServiceErrorHandlingMixin {
     }
   }
 
+  /// Route a notification delivered by the notifications backend.
+  ///
+  /// Where the plugin path treats a payload it cannot act on as an error,
+  /// this one expects them: a badge or a bookmark reminder names no topic,
+  /// and the notification list is where the user was heading anyway. Only a
+  /// forum we cannot open at all leaves them where they were.
+  Future<void> _handleDiscourseNotification(Map<String, dynamic> data) async {
+    final route = DiscourseNotificationRoute.from(data);
+    AppLogger.debug('🔔 [NotificationService] Discourse notification → $route');
+
+    final targetForum = await _findForumForDiscourseNotification(route, data);
+    if (targetForum == null) {
+      AppLogger.debug('❌ [NotificationService] No forum to open this notification in');
+      _openAppWithoutNavigation();
+      return;
+    }
+
+    // Leave a different forum before opening this one, as the plugin path does.
+    final siteController =
+        Get.isRegistered<DiscourseSiteController>() ? Get.find<DiscourseSiteController>() : null;
+    final alreadyHere = _isSameForum(siteController?.currentSite.value, targetForum) &&
+        (siteController?.isInitialized.value ?? false) &&
+        siteController?.currentSiteContext.value != null;
+    if (!alreadyHere) {
+      await _resetToHomeIfNeeded();
+    }
+
+    final opened = await _initializeSiteAndWait(targetForum);
+    final siteContext = opened?.currentSiteContext.value;
+    if (opened == null || siteContext == null) {
+      AppLogger.debug('⚠️ [NotificationService] Could not open ${targetForum.name}');
+      _openAppWithoutNavigation();
+      return;
+    }
+    if (!siteContext.isLoggedIn) {
+      // The notification was raised for a signed-in user, so the session has
+      // lapsed since. Site initialization already tried to restore it; a topic
+      // reads fine as a guest, so carry on rather than interrupting with a
+      // login screen the user did not ask for.
+      AppLogger.debug('🔔 [NotificationService] Opening the destination signed out');
+    }
+
+    switch (route.kind) {
+      case NotificationRouteKind.post:
+        AppLogger.debug('✅ [NotificationService] Opening topic ${route.topicId} at post ${route.postId}');
+        _openTopic(siteContext,
+            topicId: route.topicId!,
+            mode: PostsListMode.thread_by_post,
+            anchorPostId: route.postId);
+      case NotificationRouteKind.topicPage:
+        AppLogger.debug('✅ [NotificationService] Opening topic ${route.topicId} at page ${route.page}');
+        _openTopic(siteContext,
+            topicId: route.topicId!,
+            mode: PostsListMode.goto_page,
+            gotoPage: route.page);
+      case NotificationRouteKind.notificationsTab:
+        AppLogger.debug('✅ [NotificationService] Nothing to open — showing the notification list');
+        siteController?.requestHomeTab(SiteHomeTab.notifications);
+    }
+  }
+
+  /// The forum a backend notification belongs to.
+  ///
+  /// The same resolution as the plugin path — a multi-forum host is asked
+  /// first, the configured forum answers otherwise — but the backend keys
+  /// forums by address and sends the same `site_id` for all of them, so the
+  /// id carries no information here and `site_url` is what a host matches on.
+  Future<Site?> _findForumForDiscourseNotification(
+    DiscourseNotificationRoute route,
+    Map<String, dynamic> data,
+  ) async {
+    final forum = await _findForumBySiteId(0, data);
+    final named = route.siteUrl;
+    if (forum != null && named != null) {
+      final want = Uri.tryParse(named)?.host.toLowerCase();
+      final got = Uri.tryParse(forum.url)?.host.toLowerCase();
+      if (want != null && got != null && want != got) {
+        AppLogger.debug(
+            '⚠️ [NotificationService] Notification names $want but this build resolved $got — opening $got');
+      }
+    }
+    return forum;
+  }
+
+  /// Open a topic, replacing the one on screen rather than stacking onto it.
+  void _openTopic(
+    SiteContext siteContext, {
+    required String topicId,
+    required PostsListMode mode,
+    String? anchorPostId,
+    int? gotoPage,
+  }) {
+    postPageBuilder() => PostPage(
+          siteContext: siteContext,
+          topicId: topicId,
+          title: '', // PostPage loads the real title with the thread.
+          mode: mode,
+          anchorPostId: anchorPostId,
+          gotoPage: gotoPage,
+        );
+    if (Get.currentRoute == '/PostPage') {
+      Get.off(postPageBuilder);
+    } else {
+      Get.to(postPageBuilder);
+    }
+  }
+
+  /// Whether two [Site]s are the same forum: by id when both have one, by
+  /// host otherwise. The host arm is what a multi-forum app opening forums by
+  /// address needs — every one of its forums has a null id, so an id-only
+  /// comparison answers "different forum" for the forum already on screen and
+  /// stacks a second copy of it on every notification.
+  static bool _isSameForum(Site? a, Site? b) {
+    if (a == null || b == null) return false;
+    if (a.id != null && b.id != null) return a.id == b.id;
+    final aHost = Uri.tryParse(a.url)?.host.toLowerCase();
+    final bHost = Uri.tryParse(b.url)?.host.toLowerCase();
+    return aHost != null && aHost.isNotEmpty && aHost == bHost;
+  }
+
   // Resolve forum for notifications in single-forum mode.
   Future<Site?> _findForumBySiteId(int siteId, Map<String, dynamic> data) async {
     // A multi-forum host knows which of its forums this is; the template
@@ -567,8 +699,8 @@ class NotificationService with ServiceErrorHandlingMixin {
       // Ensure we only short-circuit when the initialized context matches the target forum.
       // This prevents returning stale contexts when switching forums via push notifications.
       final currentContext = siteController.currentSiteContext.value;
-      final isSameSite = currentSite?.id != null && currentSite!.id == targetForum.id;
-      final isContextMatching = currentContext?.site.id != null && currentContext!.site.id == targetForum.id;
+      final isSameSite = _isSameForum(currentSite, targetForum);
+      final isContextMatching = _isSameForum(currentContext?.site, targetForum);
       final isAlreadyInitialized = siteController.isInitialized.value && currentContext != null && isContextMatching;
       if (isSameSite && isAlreadyInitialized) {
         AppLogger.debug('🔔 [NotificationService] Using already initialized forum ${targetForum.name} (${targetForum.id})');
@@ -589,7 +721,9 @@ class NotificationService with ServiceErrorHandlingMixin {
       // Wait for both initialization and site context to be ready
       while (DateTime.now().difference(start) < timeout) {
         final siteContext = siteController.currentSiteContext.value;
-        final isContextReady = siteController.isInitialized.value && siteContext != null && siteContext.site.id == targetForum.id;
+        final isContextReady = siteController.isInitialized.value &&
+            siteContext != null &&
+            _isSameForum(siteContext.site, targetForum);
         if (isContextReady) {
           // Initialization complete, but wait a bit more to ensure login and cookies are set
           // This gives time for auto-login to complete and cookies to be restored

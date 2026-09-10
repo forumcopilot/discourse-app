@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/views/login_page.dart';
+import 'package:discourse_ui/views/site_home_tab.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/domain/site.dart';
@@ -24,6 +25,18 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
   var currentSite = Rxn<Site>(); // Make currentSite reactive
 
   var currentSiteContext = Rxn<SiteContext>();
+
+  /// A tab [SiteHomePage] should switch to, set by code that has no reference
+  /// to the page — a tapped notification with nothing specific to open, say.
+  ///
+  /// The page consumes it and sets it back to null. A request made before the
+  /// tab exists (notifications only appear once the forum's config has
+  /// arrived) is kept until the tabs settle, so the ordering between a
+  /// notification tap and initialization does not decide whether it works.
+  final Rxn<SiteHomeTab> requestedHomeTab = Rxn<SiteHomeTab>();
+
+  /// Ask the home page to open on [tab]. Safe to call before the page exists.
+  void requestHomeTab(SiteHomeTab tab) => requestedHomeTab.value = tab;
 
   // Timeout configuration (in seconds)
   static const int _defaultTimeoutSeconds = 30;

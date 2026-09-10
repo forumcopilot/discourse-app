@@ -6,6 +6,16 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.14] - 2026-09-10
+
+### Added
+- **A notification from the notifications backend now opens what it is about.** The backend delivers Discourse's own vocabulary — `topic_id`, `post_number`, and the post id only when `/notifications.json` exposed one — while tap routing understood the XenForo plugin's `content_type`/`content_id` shape alone. Every delivered notification therefore opened the app on an "Unsupported notification type" dialog. `NotificationRoute` (`discourse_ui`) now decides the destination from the payload alone: the post when its id is known (replies, mentions, quotes, likes, links, messages), otherwise the topic at the page holding that post number, otherwise the notification list. It is pure, so the rules are readable and tested rather than tangled in navigation.
+- **The notification list is now a real destination.** A badge, a bookmark reminder or a plugin's own type names nothing to open, and those used to raise an error dialog. `SiteHomePage.initialTab` and `DiscourseSiteController.requestHomeTab()` let anything ask the home page to open on a tab; the request waits if that tab does not exist yet, since the notifications tab only appears once the forum's config has arrived.
+
+### Fixed
+- **A notification for the forum already on screen no longer stacks a second copy of it.** Two forums were compared by id, and a multi-forum host that opens forums by address has no ids for them, so the comparison answered "different forum" every time and pushed another home page onto the stack. Forums with ids still compare by id; the rest compare by host.
+
+
 ## [1.0.13] - 2026-09-10
 
 ### Added
