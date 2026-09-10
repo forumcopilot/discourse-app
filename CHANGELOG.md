@@ -6,6 +6,14 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.11] - 2026-09-09
+
+### Fixed
+- **Emoji in reaction chips and post bodies** now resolve against Discourse's own name table, the one 1.0.10 introduced for titles and excerpts. Reaction glyphs went through the generic emoji library plus a hand-kept alias list for the handful of names it files differently (`:+1:`, `:-1:`, `:hugs:`); the reaction-users sheet and the inline emoji in cooked post HTML had no such cover, so the 866 Discourse names that library does not know fell back to a network image or to nothing. Inline emoji in posts also honour the `:name:tN:` skin-tone suffix now. The alias list is gone, and a test pins the default reaction set so its removal cannot regress them.
+
+### Changed
+- The `emojis` package is now a dev dependency: only `packages/discourse_ui/tool/gen_discourse_emoji_data.dart` still uses it, so the app no longer ships it.
+
 ## [1.0.10] - 2026-09-09
 
 ### Fixed
