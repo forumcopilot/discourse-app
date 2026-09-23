@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.21] - 2026-09-23
+
 Thread rendering, batch 2: forums that turned the app away now open.
 
 ### Fixed
@@ -13,7 +15,7 @@ Thread rendering, batch 2: forums that turned the app away now open.
 - **A rate limit on one forum no longer pauses the others.** The 429 cooldown was one app-wide value; in a multi-forum app, forum A's cooldown stalled every request to forum B. It is now kept per forum.
 
 ### Changed
-- The vendored `forumcopilot_sdk` is synced with the canonical copy again, which also brings its fix that stops a legacy login field from persisting a password copy in local storage.
+- The vendored `forumcopilot_sdk` is synced with the canonical copy again (tapatalk_flutter `42e35057`), which also brings its fix that stops a legacy login field from persisting a password copy in local storage.
 
 ## [1.0.20] - 2026-09-23
 
