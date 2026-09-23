@@ -40,6 +40,7 @@ dependencies:
   html: '>=0.15.6 <0.15.7' # 0.15.7 drops Element.matches, which flutter_html 3.0.0 still calls
   html_unescape: ^2.0.0
   flutter_html: ^3.0.0-beta.2
+  flutter_layout_grid: ^2.0.8 # post tables: CSS-grid track sizing, with col/rowspan
   cached_network_image: ^3.4.1
   flutter_svg: ^2.0.10
   flutter_cache_manager: ^3.4.1

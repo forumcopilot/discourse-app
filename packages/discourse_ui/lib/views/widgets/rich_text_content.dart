@@ -6,9 +6,13 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'brand_image.dart';
+import 'embed_cards.dart';
 import 'post_content_callbacks.dart' show PostContentCallbacks;
+import 'post_table.dart';
+import 'twitter_card.dart';
 import '../../core/cache/lru_cache.dart';
 import '../../theme/design_tokens.dart';
+import '../../utils/embed_links.dart';
 import '../../utils/emoji_shortcodes.dart';
 import '../../utils/file_utils.dart';
 import '../../utils/html_colors.dart';
@@ -60,6 +64,18 @@ class RichTextContent extends StatelessWidget {
     final html = _readableAuthorColours(
         _foldAttachmentSize(content), colorScheme.surface);
 
+    // Embed previews open the video or post itself — for YouTube, TikTok
+    // and the like, in their app — through the same path as a link tap.
+    void openEmbed(String url) {
+      final resolved = _resolveUrl(url);
+      if (callbacks?.onUrlTap != null) {
+        callbacks!.onUrlTap!(resolved);
+        return;
+      }
+      // ignore: discarded_futures
+      launchUrlString(resolved, mode: LaunchMode.externalApplication);
+    }
+
     return PostBodyFallback(
       html: html,
       child: Html(
@@ -102,6 +118,8 @@ class RichTextContent extends StatelessWidget {
       // the OS, works offline, no network round-trips. Falls back to the
       // PNG for forum-custom emoji that aren't in standard Unicode.
       extensions: [
+        PostTableExtension(colorScheme: colorScheme),
+        _EmbedExtension(resolve: _resolveUrl, onOpen: openEmbed),
         // Discourse renders a non-image upload as
         // `<a class="attachment">name</a> (117 Bytes)`, and styles it with
         // a download glyph via CSS ::before — which flutter_html cannot
@@ -203,6 +221,21 @@ class RichTextContent extends StatelessWidget {
             final h = double.tryParse(
                     extensionContext.attributes['height'] ?? '') ??
                 (isEmoji ? 20 : null);
+            // A onebox's avatar (a tweet's author, a GitHub user) is a small
+            // square beside the text on the web; at its own 400×400 it
+            // would fill the post.
+            if (classes.contains('onebox-avatar')) {
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: Image.network(
+                  resolved,
+                  width: 48,
+                  height: 48,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, _, __) => const SizedBox(width: 48, height: 48),
+                ),
+              );
+            }
             // Image.network cannot decode SVG (uploads, badges, GitHub's
             // favicon) and showed the alt text instead. BrandImage draws it
             // with flutter_svg from the disk cache, falling back the same way
@@ -449,6 +482,144 @@ String _foldAttachmentSize(String html) {
       return anchor.replaceFirst('<a ', '<a data-size="$size" ');
     },
   );
+}
+
+/// Discourse's embeds, drawn as native previews where the web shows the
+/// player (see [EmbedLink]):
+///
+///  * `div.lazy-video-container` — YouTube, Vimeo and TikTok, with the
+///    title and thumbnail the forum stored — and the older `div.lazyYT`;
+///  * `<iframe>` — any other site's player: a video preview for video
+///    sites, a row naming the site for the rest;
+///  * `<video>` and `div.video-placeholder-container` — uploads, played in
+///    the app's video viewer — and `<audio>`, played in place;
+///  * `a.onebox` — a video or tweet URL alone on its line that the forum
+///    did not turn into an embed.
+///
+/// flutter_html renders none of these by itself: videos showed as a bare
+/// thumbnail, iframes and audio as nothing.
+class _EmbedExtension extends HtmlExtension {
+  const _EmbedExtension({required this.resolve, required this.onOpen});
+
+  final String Function(String url) resolve;
+  final void Function(String url) onOpen;
+
+  static final RegExp _tweet = RegExp(
+      r'^https?://(?:www\.|mobile\.)?(?:twitter|x)\.com/\w+/status(?:es)?/\d+',
+      caseSensitive: false);
+
+  @override
+  Set<String> get supportedTags => const {'iframe', 'video', 'audio'};
+
+  @override
+  bool matches(ExtensionContext context) {
+    switch (context.elementName) {
+      case 'iframe':
+        return (context.attributes['src'] ?? '').trim().isNotEmpty;
+      case 'video':
+      case 'audio':
+        return _mediaSrc(context.element) != null;
+      case 'div':
+        final c = context.classes;
+        return c.contains('lazy-video-container') ||
+            c.contains('lazyYT') ||
+            c.contains('video-placeholder-container');
+      case 'a':
+        if (!context.classes.contains('onebox')) return false;
+        final href = (context.attributes['href'] ?? '').trim();
+        return _tweet.hasMatch(href) || EmbedLink.fromUrl(href) != null;
+    }
+    return false;
+  }
+
+  @override
+  InlineSpan build(ExtensionContext context) {
+    final card = _card(context);
+    // Markup that did not yield a card renders as it would have otherwise.
+    if (card == null) return TextSpan(children: context.inlineSpanChildren);
+    return WidgetSpan(child: SizedBox(width: double.infinity, child: card));
+  }
+
+  Widget? _card(ExtensionContext context) {
+    final element = context.element;
+    if (element == null) return null;
+    final a = element.attributes;
+    switch (context.elementName) {
+      case 'div':
+        if (context.classes.contains('video-placeholder-container')) {
+          final src = a['data-video-src'];
+          if (src == null || src.isEmpty) return null;
+          final thumb = a['data-thumbnail-src'];
+          return PostVideoCard(
+            src: resolve(src),
+            poster: thumb == null || thumb.isEmpty ? null : resolve(thumb),
+          );
+        }
+        if (context.classes.contains('lazyYT')) {
+          // The older discourse-lazy-yt plugin. Its stored title is often
+          // just " - YouTube"; then the card looks the title up instead.
+          final id = a['data-youtube-id'];
+          if (id == null || id.isEmpty) return null;
+          final title = (a['data-youtube-title'] ?? '')
+              .replaceFirst(RegExp(r'\s*-\s*YouTube\s*$'), '')
+              .trim();
+          final thumb = element.querySelector('img[src]')?.attributes['src'];
+          final link = EmbedLink.fromUrl(
+            'https://www.youtube.com/watch?v=$id',
+            title: title.isEmpty ? null : title,
+            thumbnailUrl: thumb == null ? null : resolve(thumb),
+          );
+          return link == null ? null : EmbedPreviewCard(link: link, onOpen: onOpen);
+        }
+        final href = element.querySelector('a[href]')?.attributes['href'];
+        final thumb = element.querySelector('img[src]')?.attributes['src'];
+        final link = EmbedLink.fromLazyVideo(
+          a,
+          href: href == null ? null : resolve(href),
+          thumbnailUrl: thumb == null ? null : resolve(thumb),
+        );
+        return link == null ? null : EmbedPreviewCard(link: link, onOpen: onOpen);
+      case 'iframe':
+        // An iframe's content is its fallback markup, kept as raw text.
+        final fallback = element.text;
+        final innerHref = RegExp(r'href="([^"]+)"').firstMatch(fallback)?.group(1);
+        final innerText = fallback.replaceAll(RegExp(r'<[^>]*>'), ' ').trim();
+        final link = EmbedLink.fromIframe(
+          resolve(a['src']!.trim()),
+          title: a['title'],
+          innerHref: innerHref,
+          innerText: innerText.isEmpty ? null : innerText,
+        );
+        return link == null ? null : EmbedPreviewCard(link: link, onOpen: onOpen);
+      case 'video':
+        final src = _mediaSrc(element)!;
+        final poster = a['poster'];
+        final w = double.tryParse(a['width'] ?? '');
+        final h = double.tryParse(a['height'] ?? '');
+        return PostVideoCard(
+          src: resolve(src),
+          poster: poster == null || poster.isEmpty ? null : resolve(poster),
+          aspectRatio: (w != null && h != null && h > 0) ? w / h : null,
+        );
+      case 'audio':
+        return PostAudioPlayer(src: resolve(_mediaSrc(element)!));
+      case 'a':
+        final href = a['href']!.trim();
+        if (_tweet.hasMatch(href)) return TwitterCard(url: href);
+        final link = EmbedLink.fromUrl(href);
+        return link == null ? null : EmbedPreviewCard(link: link, onOpen: onOpen);
+    }
+    return null;
+  }
+
+  /// A `<video>`/`<audio>` source: its `src`, or its first `<source src>`.
+  static String? _mediaSrc(dom.Element? element) {
+    if (element == null) return null;
+    final own = element.attributes['src']?.trim();
+    if (own != null && own.isNotEmpty) return own;
+    final source = element.querySelector('source[src]')?.attributes['src']?.trim();
+    return (source == null || source.isEmpty) ? null : source;
+  }
 }
 
 /// Renders `<a class="attachment">` as the same attachment row the

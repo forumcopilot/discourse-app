@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:forumcopilot_sdk/services/forumcopilot_api_service.dart';
 
 /// Container for Twitter preview metadata
 class TwitterPreviewData {
@@ -89,8 +90,7 @@ class TwitterCache {
         return cachedData;
       }
 
-      // No valid cache found — remote enrichment is disabled in this
-      // standalone template, so this always comes back null.
+      // No valid cache: ask forumcopilot.com, as the ForumCopilot app does.
       debugPrint('TwitterCache: Fetching fresh data for tweet $tweetId');
       final freshData = await _fetchFromApi(cleanUrl, tweetId);
 
@@ -114,14 +114,75 @@ class TwitterCache {
     }
   }
 
-  /// Remote tweet metadata came from the ForumCopilot cloud service in the
-  /// multi-tenant app. This standalone template has no such backend, so this
-  /// is a permanent no-op and cards fall back to rendering a plain link.
+  /// Fetches Twitter data from the ForumCopilot API
   static Future<TwitterPreviewData?> _fetchFromApi(String url, String tweetId) async {
-    debugPrint(
-      'TwitterCache: Remote metadata disabled in standalone mode for tweet $tweetId',
-    );
-    return null;
+    try {
+      debugPrint('TwitterCache: Fetching tweet data for tweet ID: $tweetId');
+
+      final data = await ForumCopilotApiService.getTwitterTweetData(tweetId);
+
+      if (data != null) {
+        debugPrint('TwitterCache: API response received');
+
+        if (data['success'] == true && data['data'] != null && data['data'].isNotEmpty) {
+          final tweetData = data['data'][0];
+          debugPrint('TwitterCache: Tweet data: $tweetData');
+
+          final authorHandle = _extractHandleFromContent(tweetData['content']);
+          final cleanedTweetText = _cleanTweetContent(tweetData['content']);
+
+          return TwitterPreviewData(
+            url: url,
+            tweetId: tweetId,
+            authorName: tweetData['author_name'],
+            authorHandle: authorHandle,
+            tweetText: cleanedTweetText,
+          );
+        } else if (data['success'] == false) {
+          debugPrint('TwitterCache: ForumCopilot API returned success=false');
+          return null;
+        } else {
+          debugPrint('TwitterCache: ForumCopilot API error: Invalid response format');
+          return null;
+        }
+      } else {
+        debugPrint('TwitterCache: ForumCopilot API error: No data received');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('TwitterCache: Error fetching from API for tweet $tweetId: $e');
+      return null;
+    }
+  }
+
+  /// Extracts Twitter handle from tweet content
+  static String? _extractHandleFromContent(String? content) {
+    if (content == null) return null;
+
+    // Extract handle from content like "— Crypto Briefing (@Crypto_Briefing) July 7, 2025"
+    final handleRegex = RegExp(r'@([a-zA-Z0-9_]+)');
+    final match = handleRegex.firstMatch(content);
+    return match?.group(1);
+  }
+
+  /// Cleans the tweet content by removing attribution and decoding HTML entities
+  static String _cleanTweetContent(String? content) {
+    if (content == null) return '';
+
+    // Remove the author attribution part at the end
+    // Pattern: "— Author Name (@handle) Date"
+    final attributionRegex = RegExp(r'\s*—\s*[^@]+\(@[^)]+\)\s+\w+\s+\d+,\s+\d+$');
+    String cleaned = content.replaceAll(attributionRegex, '');
+
+    // Decode HTML entities
+    cleaned = cleaned.replaceAll('&mdash;', '—');
+    cleaned = cleaned.replaceAll('&amp;', '&');
+    cleaned = cleaned.replaceAll('&lt;', '<');
+    cleaned = cleaned.replaceAll('&gt;', '>');
+    cleaned = cleaned.replaceAll('&quot;', '"');
+    cleaned = cleaned.replaceAll('&#39;', "'");
+
+    return cleaned.trim();
   }
 
   /// Gets cached data from local storage

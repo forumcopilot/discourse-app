@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:forumcopilot_sdk/services/forumcopilot_api_service.dart';
 
 /// Container for YouTube video preview metadata
 class YouTubePreviewData {
@@ -101,8 +102,7 @@ class YouTubeCache {
         return cachedData;
       }
 
-      // No valid cache found — remote enrichment is disabled in this
-      // standalone template, so this always comes back null.
+      // No valid cache: ask forumcopilot.com, as the ForumCopilot app does.
       debugPrint('YouTubeCache: Fetching fresh data for video $videoId');
       final freshData = await _fetchFromApi(cleanUrl, videoId);
 
@@ -126,14 +126,57 @@ class YouTubeCache {
     }
   }
 
-  /// Remote video metadata came from the ForumCopilot cloud service in the
-  /// multi-tenant app. This standalone template has no such backend, so this
-  /// is a permanent no-op and cards fall back to rendering a plain link.
+  /// Fetches YouTube data from the ForumCopilot API
   static Future<YouTubePreviewData?> _fetchFromApi(String url, String videoId) async {
-    debugPrint(
-      'YouTubeCache: Remote metadata disabled in standalone mode for video $videoId',
-    );
-    return null;
+    try {
+      debugPrint('YouTubeCache: Fetching video data for video ID: $videoId');
+
+      final data = await ForumCopilotApiService.getYouTubeVideoData(videoId);
+
+      if (data != null) {
+        debugPrint('YouTubeCache: API response received');
+
+        if (data['success'] == true && data['data'] != null && data['data'].isNotEmpty) {
+          final videoData = data['data'][0];
+          debugPrint('YouTubeCache: Video data: $videoData');
+
+          // Process preview image URL
+          String? processedImageUrl;
+          if (videoData['preview'] != null && videoData['preview']['orig_url'] != null) {
+            String imageUrl = videoData['preview']['orig_url'];
+            // Ensure URL has proper protocol
+            if (!imageUrl.startsWith('http')) {
+              imageUrl = 'https://$imageUrl';
+            }
+            processedImageUrl = imageUrl;
+            debugPrint('YouTubeCache: Processed preview image URL: $processedImageUrl');
+          } else {
+            debugPrint('YouTubeCache: No preview image URL found');
+          }
+
+          return YouTubePreviewData(
+            url: url,
+            videoId: videoId,
+            videoTitle: videoData['title'],
+            authorName: videoData['author_name'],
+            authorAvatar: videoData['author_avatar'],
+            previewImageUrl: processedImageUrl,
+          );
+        } else if (data['success'] == false) {
+          debugPrint('YouTubeCache: ForumCopilot API returned success=false');
+          return null;
+        } else {
+          debugPrint('YouTubeCache: ForumCopilot API error: Invalid response format');
+          return null;
+        }
+      } else {
+        debugPrint('YouTubeCache: ForumCopilot API error: No data received');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('YouTubeCache: Error fetching from API for video $videoId: $e');
+      return null;
+    }
   }
 
   /// Gets cached data from local storage

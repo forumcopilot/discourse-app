@@ -5,10 +5,9 @@ import 'package:html/parser.dart' as html_parser;
 import '../core/cache/lru_cache.dart';
 
 import 'html_colors.dart';
-import 'media_url_utils.dart';
 
-/// The media Discourse embedded in a post, pulled out of the server's
-/// `cooked` HTML.
+/// A post's `cooked` HTML prepared for rendering, and the images and links
+/// in it.
 ///
 /// Discourse cooks Markdown to HTML on the server and hands us the result
 /// in the post stream's `cooked` field. Everything worth extracting is
@@ -21,27 +20,24 @@ import 'media_url_utils.dart';
 /// so favicons, onebox thumbnails and avatar `src`s all came back as
 /// "links in this post" and each got its own preview card.
 ///
+/// Embeds are left in place: RichTextContent recognises Discourse's embed
+/// markup (lazy videos, iframes, tweet oneboxes) and draws native
+/// previews exactly where the web shows the player.
+///
 /// The anchor-collection rules below deliberately mirror
 /// `PrettyText.extract_links` in the Discourse source
 /// (`lib/pretty_text.rb`) — same selectors, same exclusions — so the app
 /// agrees with the server about what counts as a link in a post.
 class CookedContent {
-  /// The cooked HTML with natively-rendered embeds removed, ready to hand
-  /// to `RichTextContent`. Nodes are stripped only when the app renders
-  /// the same thing as a native card below the post (YouTube, Twitter/X),
-  /// so nothing is shown twice.
+  /// The cooked HTML, ready to hand to `RichTextContent`, minus what the
+  /// web hides with CSS. Embeds (videos, tweets, iframes) stay where the
+  /// author put them: RichTextContent draws each as a native preview.
   final String html;
 
-  /// YouTube watch URLs, for `VideoCard`.
-  final List<String> youtubeUrls;
-
-  /// Twitter/X status permalinks, for `TwitterCard`.
-  final List<String> twitterUrls;
-
-  /// Everything else worth a `LinkPreviewCard`. Excludes links Discourse
-  /// already onebox'd — the server-rendered `aside.onebox` stays in
-  /// [html] and is the better preview, since it costs no extra fetch and
-  /// reflects what the forum itself decided to show.
+  /// External links worth a preview. Excludes links Discourse already
+  /// onebox'd — the server-rendered `aside.onebox` stays in [html] and is
+  /// the better preview, since it costs no extra fetch and reflects what
+  /// the forum itself decided to show.
   final List<String> linkUrls;
 
   /// Content images in document order, absolute, full-size where the
@@ -51,16 +47,12 @@ class CookedContent {
 
   const CookedContent({
     required this.html,
-    required this.youtubeUrls,
-    required this.twitterUrls,
     required this.linkUrls,
     required this.imageUrls,
   });
 
   static const CookedContent empty = CookedContent(
     html: '',
-    youtubeUrls: <String>[],
-    twitterUrls: <String>[],
     linkUrls: <String>[],
     imageUrls: <String>[],
   );
@@ -116,81 +108,27 @@ class CookedContent {
     if (body == null) return CookedContent.empty.copyWithHtml(cooked);
 
     final origin = _origin(forumBaseUrl);
-    final youtube = <String>{};
-    final twitter = <String>{};
     final links = <String>{};
     final images = <String>{};
 
-    // ---- 1. Lazy-video containers (discourse-lazy-videos) -------------
-    // <div class="youtube-onebox lazy-video-container" data-video-id="..."
-    //      data-provider-name="youtube"><a href="..."><img ...></a></div>
-    // flutter_html renders the inner thumbnail as a plain image with no
-    // play affordance, so we drop the node and show a VideoCard.
-    for (final node in body.querySelectorAll('.lazy-video-container').toList()) {
-      final provider =
-          (node.attributes['data-provider-name'] ?? '').toLowerCase();
-      final videoId = node.attributes['data-video-id'] ?? '';
-      final href = node.querySelector('a[href]')?.attributes['href'] ?? '';
-
-      if (provider == 'youtube' && videoId.isNotEmpty) {
-        youtube.add(MediaUrlUtils.youtubeWatchUrl(videoId));
-        node.remove();
-      } else if (href.isNotEmpty && MediaUrlUtils.isYoutubeUrl(href)) {
-        youtube.add(href);
-        node.remove();
-      } else if (href.isNotEmpty && _isExternalHttpUrl(href, origin)) {
-        // Vimeo/TikTok/etc. — VideoCard is YouTube-only, so these fall
-        // through to a normal link preview. Keep the node: its thumbnail
-        // is still the most useful thing we can render inline.
-        links.add(href);
-      }
-    }
-
-    // ---- 2. Video embeds (non-lazy oneboxes, .video-container) --------
-    // flutter_html cannot render an <iframe> at all — these would show as
-    // a blank gap. Pull the YouTube id out of the embed src instead.
-    for (final iframe in body.querySelectorAll('iframe[src]').toList()) {
-      final src = iframe.attributes['src'] ?? '';
-      final videoId = _youtubeIdFromEmbedSrc(src);
-      if (videoId == null) continue;
-      youtube.add(MediaUrlUtils.youtubeWatchUrl(videoId));
-      _removeEmbedWrapper(iframe);
-    }
-
-    // ---- 3. Oneboxes -------------------------------------------------
-    // Discourse's own link extractor keys on aside.onebox[data-onebox-src]
-    // (lib/pretty_text.rb), so we do too.
-    for (final onebox in body.querySelectorAll('aside.onebox').toList()) {
-      final src = onebox.attributes['data-onebox-src'] ??
-          onebox.querySelector('header.source a[href]')?.attributes['href'] ??
-          onebox.querySelector('a[href]')?.attributes['href'] ??
-          '';
-      if (src.isEmpty) continue;
-
-      if (MediaUrlUtils.isYoutubeUrl(src)) {
-        youtube.add(src);
-        onebox.remove();
-      } else if (MediaUrlUtils.isTwitterUrl(src)) {
-        twitter.add(src);
-        onebox.remove();
-      }
-      // Any other onebox stays put — the server already rendered the
-      // preview, so adding a LinkPreviewCard would duplicate it.
-    }
-
-    // ---- 3b. What web hides with CSS ---------------------------------
+    // ---- 1. What web hides with CSS -----------------------------------
     // flutter_html has no stylesheet, so markup Discourse ships for CSS to
     // hide would be printed:
     //  * `.lightbox-wrapper .meta` — the upload's file name, dimensions and
     //    size ("image1672×941 318 KB"), which web shows only as an expand
     //    icon;
     //  * `.hidden` — e.g. the full issue body a GitHub onebox carries behind
-    //    its two-line excerpt (web: `display: none`).
+    //    its two-line excerpt (web: `display: none`);
+    //  * an inline `display: none` — older YouTube oneboxes ship a hidden
+    //    thumbnail next to the player, which the image renderer would show.
     for (final node in body.querySelectorAll('.lightbox-wrapper .meta, .hidden').toList()) {
       node.remove();
     }
+    for (final node in body.querySelectorAll('[style]').toList()) {
+      if (_hiddenInline.hasMatch(node.attributes['style'] ?? '')) node.remove();
+    }
 
-    // ---- 3c. Author colours ------------------------------------------
+    // ---- 2. Author colours ------------------------------------------
     // `<font color>` from the BBCode `[color]` tag. flutter_html parses a
     // `#…` value as an integer and throws on anything but hex digits,
     // taking the whole post with it (`#PG985740` on community.robotime.com),
@@ -205,7 +143,7 @@ class CookedContent {
       }
     }
 
-    // ---- 4. Images ---------------------------------------------------
+    // ---- 3. Images ---------------------------------------------------
     // Lightboxed uploads: <div class="lightbox-wrapper">
     //   <a class="lightbox" href="FULL"><img src="RESIZED"></a></div>
     // The anchor href is the original; prefer it over the <img src>.
@@ -223,7 +161,7 @@ class CookedContent {
       if (src.isNotEmpty) images.add(_absolute(src, origin));
     }
 
-    // ---- 5. Remaining anchors ----------------------------------------
+    // ---- 4. Remaining anchors ----------------------------------------
     // Mirrors PrettyText.extract_links: skip anchors inside quotes,
     // oneboxes and elided sections, skip image-wrapping anchors, skip
     // in-page fragments.
@@ -253,35 +191,24 @@ class CookedContent {
         continue;
       }
       if (!_isExternalHttpUrl(href, origin)) continue;
-
-      if (MediaUrlUtils.isYoutubeUrl(href)) {
-        youtube.add(href);
-      } else if (MediaUrlUtils.isTwitterUrl(href)) {
-        twitter.add(href);
-      } else {
-        links.add(href);
-      }
+      links.add(href);
     }
 
     return CookedContent(
       html: body.innerHtml,
-      youtubeUrls: youtube.toList(),
-      twitterUrls: twitter.toList(),
-      // A link that also produced a video/tweet card would show twice.
-      linkUrls: links
-          .where((u) => !youtube.contains(u) && !twitter.contains(u))
-          .toList(),
+      linkUrls: links.toList(),
       imageUrls: images.toList(),
     );
   }
 
   CookedContent copyWithHtml(String newHtml) => CookedContent(
         html: newHtml,
-        youtubeUrls: youtubeUrls,
-        twitterUrls: twitterUrls,
         linkUrls: linkUrls,
         imageUrls: imageUrls,
       );
+
+  static final RegExp _hiddenInline =
+      RegExp(r'(^|;)\s*display\s*:\s*none\b', caseSensitive: false);
 
   // -------------------------------------------------------------------
   // Helpers
@@ -318,28 +245,6 @@ class CookedContent {
       parent = parent.parent;
     }
     return false;
-  }
-
-  /// Removes the wrapper Discourse puts around a video embed so we don't
-  /// leave an empty `.video-container` behind after taking the iframe.
-  static void _removeEmbedWrapper(dom.Element iframe) {
-    final parent = iframe.parent;
-    if (parent != null &&
-        (_classes(parent).contains('video-container') ||
-            (parent.localName == 'aside' &&
-                _classes(parent).contains('onebox')))) {
-      parent.remove();
-      return;
-    }
-    iframe.remove();
-  }
-
-  static String? _youtubeIdFromEmbedSrc(String src) {
-    final match = RegExp(
-      r'^(?:https?:)?\/\/(?:www\.)?(?:youtube\.com|youtube-nocookie\.com)\/embed\/([a-zA-Z0-9_-]{11})',
-      caseSensitive: false,
-    ).firstMatch(src.trim());
-    return match?.group(1);
   }
 
   /// Scheme + host + port of [baseUrl], or an empty string when it cannot

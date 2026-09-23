@@ -6,6 +6,22 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+Thread rendering, batch 3: content that disappeared from posts. Covered by `packages/discourse_ui/test/post_media_rendering_test.dart` and `embed_links_test.dart`, and checked before/after on the Pixel in light and dark themes.
+
+### Fixed
+- **Tables render.** flutter_html has no table support, so a table and every word in it vanished — 98% of the text the audit found missing from posts (2,020 posts on 469 forums). Tables are now laid out like the web's mobile view: at least as wide as the post, columns sized by their content with long cells wrapping, and a table too wide even then scrolls sideways in its own box. Header rows are bold with a heavier rule, `style="text-align:…"` is kept, colspan and rowspan work, and links, code and emoji inside cells behave as elsewhere. Rules follow the light/dark theme.
+- **Videos appear where the author put them.** YouTube, Vimeo and TikTok embeds show the forum's thumbnail and title with the site's play button, as on the web, instead of a bare image or a card appended under the post; tapping opens the video in its app. The same preview is drawn for player iframes (YouTube, Vimeo, Dailymotion, Twitch, Loom, Wistia, Bilibili, Facebook video, …), older `lazyYT` embeds, and video links the forum did not turn into an embed. A YouTube embed that arrives without a title gets it from forumcopilot.com, as in the ForumCopilot app; embeds that carry their title cost no request.
+- **Embeds from other sites show a preview card** instead of nothing. Every `<iframe>` the forum allows (Spotify, SoundCloud, Bandcamp, Reddit, Instagram, Google Maps, Steam, …) becomes a row naming the site and, where the embed says, the track or post; tapping opens the site or its app. The app does not run third-party players inside posts.
+- **Uploaded videos and audio play.** `<video>` uploads and Discourse's newer video placeholder show their poster with a play button and open in the app's video player; `<audio>` uploads get an in-place player with a scrubbable progress bar.
+- **Tweets keep the preview the forum made** instead of being replaced by a bare link; the author's avatar is drawn small rather than at 400×400. A tweet link the forum did not preview gets the tweet card, filled from forumcopilot.com.
+- **Markup hidden with an inline `display: none` stays hidden** (older YouTube oneboxes ship a hidden thumbnail beside the player).
+
+### Changed
+- Added `flutter_layout_grid` (table layout with the CSS grid sizing algorithm, including spans).
+
+### Removed
+- The video and tweet cards drawn below a post (`VideoCard`); embeds are now drawn in place.
+
 ## [1.0.21] - 2026-09-23
 
 Thread rendering, batch 2: forums that turned the app away now open.

@@ -82,9 +82,10 @@ void main() {
     });
   });
 
-  group('CookedContent.parse — video', () {
-    test('reads a lazy YouTube container and strips it from the HTML', () {
+  group('CookedContent.parse — embeds stay in place', () {
+    test('keeps a lazy YouTube container where the author put it', () {
       const cooked = '''
+<p>Before</p>
 <div class="youtube-onebox lazy-video-container"
   data-video-id="kPRA0W1kECg"
   data-video-title="15 Sorting Algorithms in 6 Minutes"
@@ -92,48 +93,47 @@ void main() {
   <a href="https://www.youtube.com/watch?v=kPRA0W1kECg" target="_blank" class="video-thumbnail">
     <img class="youtube-thumbnail" src="https://img.youtube.com/vi/kPRA0W1kECg/maxresdefault.jpg">
   </a>
-</div>''';
+</div>
+<p>After</p>''';
 
       final content = CookedContent.parse(cooked, forumBaseUrl: _forum);
 
-      expect(content.youtubeUrls,
-          ['https://www.youtube.com/watch?v=kPRA0W1kECg']);
-      // Removed so the VideoCard below the post isn't shadowed by a bare
-      // thumbnail image with no play affordance.
-      expect(content.html, isNot(contains('lazy-video-container')));
-      // The thumbnail is chrome, not a gallery image.
+      // RichTextContent draws it in place, between the two paragraphs.
+      final html = content.html;
+      expect(html, contains('lazy-video-container'));
+      expect(html.indexOf('Before'), lessThan(html.indexOf('lazy-video-container')));
+      expect(html.indexOf('lazy-video-container'), lessThan(html.indexOf('After')));
+      // The thumbnail is chrome, not a gallery image, nor a link preview.
       expect(content.imageUrls, isEmpty);
-      // And it must not also show up as a generic link preview.
       expect(content.linkUrls, isEmpty);
     });
 
-    test('recovers the video from a non-lazy embed iframe', () {
-      // flutter_html cannot render an <iframe>, so without this the post
-      // would show an empty gap where the video should be.
+    test('keeps iframes and tweet oneboxes', () {
       const cooked = '<div class="video-container">'
           '<iframe src="https://www.youtube.com/embed/kPRA0W1kECg" '
-          'frameborder="0" allowfullscreen></iframe></div>';
+          'frameborder="0" allowfullscreen></iframe></div>'
+          '<aside class="onebox twitterstatus" data-onebox-src="https://twitter.com/discourse/status/1234567890">'
+          '<article class="onebox-body"><div class="tweet">a tweet</div></article></aside>';
 
       final content = CookedContent.parse(cooked, forumBaseUrl: _forum);
 
-      expect(content.youtubeUrls,
-          ['https://www.youtube.com/watch?v=kPRA0W1kECg']);
-      expect(content.html, isNot(contains('video-container')));
+      expect(content.html, contains('<iframe'));
+      expect(content.html, contains('a tweet'));
+      expect(content.linkUrls, isEmpty);
     });
 
-    test('routes a Twitter onebox to the tweet card', () {
-      const cooked = '''
-<aside class="onebox twitterstatus" data-onebox-src="https://twitter.com/discourse/status/1234567890">
-  <header class="source"><a href="https://twitter.com/discourse/status/1234567890">twitter.com</a></header>
-  <article class="onebox-body"><p>a tweet</p></article>
-</aside>''';
+    test('drops what an inline style hides, as a browser would', () {
+      // Older YouTube oneboxes: a hidden thumbnail beside the player.
+      const cooked = '<p><img class="youtube-thumbnail onebox" style="display: none;" '
+          'src="https://img.youtube.com/vi/kPRA0W1kECg/maxresdefault.jpg">'
+          '<iframe src="https://www.youtube.com/embed/kPRA0W1kECg"></iframe>'
+          '<span style="color: red">kept</span></p>';
 
       final content = CookedContent.parse(cooked, forumBaseUrl: _forum);
 
-      expect(content.twitterUrls,
-          ['https://twitter.com/discourse/status/1234567890']);
-      expect(content.linkUrls, isEmpty);
-      expect(content.html, isNot(contains('onebox-body')));
+      expect(content.html, isNot(contains('maxresdefault')));
+      expect(content.html, contains('<iframe'));
+      expect(content.html, contains('kept'));
     });
   });
 

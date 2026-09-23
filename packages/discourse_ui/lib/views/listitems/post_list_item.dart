@@ -17,8 +17,6 @@ import '../widgets/reaction_picker_sheet.dart';
 import '../widgets/reaction_users_sheet.dart';
 import '../widgets/post_action_button.dart';
 import '../widgets/post_vote_column.dart';
-import '../widgets/video_card.dart';
-import '../widgets/twitter_card.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../utils/like_cooldown.dart';
 import '../widgets/post_actions.dart';
@@ -49,17 +47,13 @@ import '../lists/posts_list.dart';
 import '../../services/site_proxy_service.dart';
 
 class _PostContentData {
-  /// Cooked HTML with natively-carded embeds removed, ready for
-  /// `RichTextContent`.
+  /// Cooked HTML ready for `RichTextContent`, which draws the post's
+  /// embeds (videos, tweets, iframes) in place.
   final String html;
-  final List<String> limitedYoutubeUrls;
-  final List<String> limitedTwitterUrls;
   final List<FCAttachment> attachments;
   final List<FCAttachment> inlineAttachments;
   _PostContentData({
     required this.html,
-    required this.limitedYoutubeUrls,
-    required this.limitedTwitterUrls,
     required this.attachments,
     required this.inlineAttachments,
   });
@@ -278,8 +272,7 @@ class _PostListItemState extends State<PostListItem> {
     }
   }
 
-  /// Pulls the renderable HTML and the embedded media out of the post's
-  /// cooked content.
+  /// Pulls the renderable HTML and the attachments out of the post.
   ///
   /// Discourse serves server-rendered HTML in `cooked`, so everything here
   /// reads the DOM. The previous implementation ran the HTML through the
@@ -306,17 +299,11 @@ class _PostListItemState extends State<PostListItem> {
         .where((att) => !(att.isInline ?? false))
         .toList();
 
-    // A video if there is one, else a tweet. No preview card for plain
-    // links: web shows only what the forum oneboxed (and those are already
-    // in the cooked HTML), and a card per post meant the phone fetched a
-    // third-party page for every post that scrolled into view.
-    final video = content.youtubeUrls.take(1).toList();
-    final tweet = video.isEmpty ? content.twitterUrls.take(1).toList() : const <String>[];
-
+    // No cards below the post: videos, tweets and other embeds are drawn
+    // in place by RichTextContent, where the web shows them, and plain
+    // links get no preview — web shows only what the forum oneboxed.
     return _PostContentData(
       html: content.html,
-      limitedYoutubeUrls: video,
-      limitedTwitterUrls: tweet,
       attachments: nonInlineAttachments,
       inlineAttachments: widget.post.inlineAttachments,
     );
@@ -861,9 +848,7 @@ class _PostListItemState extends State<PostListItem> {
           ],
           // Discourse posts arrive as server-rendered HTML in the
           // `cooked` field, so we render it directly with flutter_html
-          // via RichTextContent. `data.html` is that cooked HTML minus the
-          // embeds we render as native cards below (YouTube, Twitter/X),
-          // so neither is shown twice.
+          // via RichTextContent, which also draws the embeds in place.
           RichTextContent(
             siteContext: widget.siteContext,
             content: data.html,
@@ -875,18 +860,6 @@ class _PostListItemState extends State<PostListItem> {
           // long-press lists the real reactors, trailing "+" opens the
           // full picker. Hidden only in the zero state, where the
           // heart button in the action row takes over.
-          if (data.limitedYoutubeUrls.isNotEmpty) ...[
-            const SizedBox(height: DesignTokens.spacingM),
-            StyleBuilders.divider(colorScheme: colorScheme),
-            const SizedBox(height: DesignTokens.spacingS),
-            ...data.limitedYoutubeUrls.map((url) => VideoCard(url: url)),
-          ],
-          if (data.limitedTwitterUrls.isNotEmpty) ...[
-            const SizedBox(height: DesignTokens.spacingM),
-            StyleBuilders.divider(colorScheme: colorScheme),
-            const SizedBox(height: DesignTokens.spacingS),
-            ...data.limitedTwitterUrls.map((url) => TwitterCard(url: url)),
-          ],
           if (data.attachments.isNotEmpty) ...[
             const SizedBox(height: DesignTokens.spacingS),
             PostListItemAttachment(
