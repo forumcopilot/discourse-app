@@ -4,7 +4,11 @@ import 'package:forumcopilot_sdk/models/entities/fc_chat_channel.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
 import 'package:forumcopilot_sdk/models/results/fc_chat_result.dart';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
+
 import '../base_discourse_proxy.dart';
+import '../data/chat/discourse_chat_event.dart';
+import '../network/discourse_message_bus.dart';
 
 /// Discourse implementation of [IFCChatProxy] (Phase 5.39 — lifted
 /// off the `DiscourseChatProxy.forCurrentSite()` sidecar).
@@ -22,10 +26,10 @@ import '../base_discourse_proxy.dart';
 ///   * `PUT    /chat/:cid/react/:mid`                 — add/remove a
 ///                                                      message reaction
 ///
-/// Polling: no Discourse-native long-poll for chat (web uses
-/// MessageBus + websockets). For mobile we re-fetch the recent
-/// message slice with `target_message_id` / `direction=newer`. A
-/// future revision can subscribe via MessageBus for realtime updates.
+/// Live updates: [watchChannel] subscribes to the channel's MessageBus
+/// channel `/chat/{id}` (long-polled by DiscourseMessageBus), which is how
+/// Discourse web stays current. Polling with `direction=future` remains for a
+/// key the forum refuses message-bus access to.
 ///
 /// All methods return `result:false` results when the plugin isn't
 /// installed (404) so UI degrades gracefully.
@@ -79,6 +83,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       final response = await apiGet('/chat/api/channels/$channelId');
       final ch = (response['channel'] as Map?)?.cast<String, dynamic>();
       if (ch == null) return FCChatChannelResult(result: true);
+      _recordBusLastId(channelId, ch);
       return FCChatChannelResult(result: true, channel: _channelFromJson(ch));
     } on DiscourseApiException catch (e) {
       return FCChatChannelResult(result: false, resultText: e.userMessage);
@@ -347,6 +352,83 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     } catch (e) {
       return FCChatActionResult(result: false, resultText: describeApiError(e));
     }
+  }
+
+  // ===== Live updates (Discourse-only) =====
+
+  /// Each channel's MessageBus position as of its last fetch
+  /// (`meta.message_bus_last_ids.channel_message_bus_last_id`), keyed by forum
+  /// and channel: subscribing from there delivers exactly what was published
+  /// after the messages on screen were loaded.
+  static final Map<String, int> _busLastIds = {};
+
+  String _busKey(int channelId) => '${siteContext.site.url}|$channelId';
+
+  void _recordBusLastId(int channelId, Map<String, dynamic> channelJson) {
+    final ids = ((channelJson['meta'] as Map?)?['message_bus_last_ids'] as Map?);
+    final id = (ids?['channel_message_bus_last_id'] as num?)?.toInt();
+    if (id != null) _busLastIds[_busKey(channelId)] = id;
+  }
+
+  /// Whether [watchChannel] can deliver: false once the forum has refused this
+  /// key's message-bus requests (a key minted without the `message_bus`
+  /// scope). Callers then fall back to fetching.
+  bool get liveUpdatesAvailable =>
+      !DiscourseMessageBus.of(siteContext).isUnavailable;
+
+  /// Discourse-only: call [onEvent] for every change published to
+  /// [channelId] after its last [getChannelAsync] — new, edited, deleted and
+  /// restored messages, and reactions. Returns a function that stops
+  /// watching, or null when live updates are unavailable.
+  void Function()? watchChannel(
+    int channelId,
+    void Function(DiscourseChatEvent event) onEvent,
+  ) {
+    final bus = DiscourseMessageBus.of(siteContext);
+    if (bus.isUnavailable) return null;
+    return bus.subscribe(
+      '/chat/$channelId',
+      (data) {
+        final event = chatEventFrom(data);
+        if (event != null) onEvent(event);
+      },
+      lastId: _busLastIds[_busKey(channelId)] ?? -1,
+    );
+  }
+
+  /// One MessageBus payload from `/chat/{id}` as an event, or null for kinds
+  /// the app does not show (threads, notices, flags).
+  @visibleForTesting
+  DiscourseChatEvent? chatEventFrom(Map<String, dynamic> data) {
+    final type = data['type']?.toString();
+    switch (type) {
+      case 'sent' || 'edit' || 'processed' || 'restore' || 'refresh':
+        final m = data['chat_message'];
+        if (m is! Map) return null;
+        return DiscourseChatMessageChanged(
+            type!, _messageFromJson(m.cast<String, dynamic>()));
+      case 'delete':
+        final id = (data['deleted_id'] as num?)?.toInt();
+        return id == null ? null : DiscourseChatMessagesDeleted([id]);
+      case 'bulk_delete':
+        final ids = ((data['deleted_ids'] as List?) ?? const [])
+            .whereType<num>()
+            .map((n) => n.toInt())
+            .toList();
+        return ids.isEmpty ? null : DiscourseChatMessagesDeleted(ids);
+      case 'reaction':
+        final id = (data['chat_message_id'] as num?)?.toInt();
+        final user = (data['user'] as Map?)?['username']?.toString();
+        final emoji = data['emoji']?.toString();
+        if (id == null || user == null || emoji == null) return null;
+        return DiscourseChatReaction(
+          messageId: id,
+          emoji: emoji,
+          username: user,
+          added: data['action'] == 'add',
+        );
+    }
+    return null;
   }
 
   FCChatChannel _channelFromJson(

@@ -211,7 +211,10 @@ class DiscourseClient {
   ///   after:  GET /t/57.json → POST /topics/timings → (cache hit ×2)
   ///
   /// — one topic fetch instead of two, on every topic open.
-  static bool _isInertWrite(String path) => path.startsWith('/topics/timings');
+  // A message-bus poll is a POST that changes nothing (DiscourseMessageBus);
+  // treating it as a write would empty the read cache every few seconds.
+  static bool _isInertWrite(String path) =>
+      path.startsWith('/topics/timings') || path.startsWith('/message-bus/');
 
   /// Stable string for a query map, so the same request always produces the
   /// same cache key.

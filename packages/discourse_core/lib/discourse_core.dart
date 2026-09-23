@@ -18,6 +18,7 @@ export 'src/proxy/post_proxy.dart';
 // Discourse-only proxies
 export 'src/proxy/bookmark_proxy.dart';
 export 'src/proxy/chat_proxy.dart';
+export 'src/data/chat/discourse_chat_event.dart';
 export 'src/proxy/group_proxy.dart';
 export 'src/proxy/invite_proxy.dart';
 export 'src/proxy/tag_proxy.dart';
@@ -37,6 +38,7 @@ export 'src/proxy/private_message_proxy.dart';
 // Network layer
 export 'src/network/discourse_client.dart';
 export 'src/network/discourse_auth_manager.dart';
+export 'src/network/discourse_message_bus.dart';
 
 // Context extensions
 export 'src/context/discourse_site_context_extension.dart';

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
 import 'package:get/get.dart';
@@ -84,8 +85,14 @@ class _ChatChannelViewState extends State<ChatChannelView> {
   }
 
   void _onScroll() {
-    // Load older messages when scrolled near the top.
-    if (_scroll.position.pixels <= 50 && !_controller.isLoadingOlder.value) {
+    // Load older messages when the reader scrolls up to near the top. Only a
+    // scroll toward the start counts: with fewer messages than fill the
+    // screen the list always sits at the top, and the automatic scroll to a
+    // newly arrived message asked for older ones every time.
+    final position = _scroll.position;
+    if (position.pixels <= 50 &&
+        position.userScrollDirection == ScrollDirection.forward &&
+        !_controller.isLoadingOlder.value) {
       _controller.loadOlder();
     }
   }
