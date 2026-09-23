@@ -1,4 +1,5 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import '../util/html_text.dart';
 import '../util/quote_markup.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_private_conversation_proxy.dart';
@@ -55,7 +56,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
         'archetype': 'private_message',
         'target_recipients': userName.join(','),
         'title': subject,
-        'raw': textBody,
+        'raw': appendAttachmentMarkdown(textBody, attachmentIds),
       });
       return FCNewConversationResult(
         result: true,
@@ -95,9 +96,14 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       // (lib/post_creator.rb) — surfacing as "Sorry, you can't create a PM on an
       // existing topic." The topic's archetype is already private_message; replying to
       // it does not need to restate that.
+      //
+      // Uploads arrive as `upload://` refs in [attachmentIds] and are only
+      // part of the message once written into raw — the composer uploads
+      // them first. This used to post [textBody] alone, so a PM reply's
+      // image uploaded fine and then never appeared.
       final response = await apiPost('/posts.json', body: {
         'topic_id': int.tryParse(conversationId) ?? conversationId,
-        'raw': textBody,
+        'raw': appendAttachmentMarkdown(textBody, attachmentIds),
       });
       return FCReplyConversationResult(
         result: true,
@@ -518,7 +524,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
   }) async {
     try {
       final response = await apiPut('/posts/$messageId.json', body: {
-        'post': {'raw': messageContent},
+        'post': {'raw': appendAttachmentMarkdown(messageContent, attachmentIds)},
       });
       return FCSaveRawMessageResult(
         result: true,
@@ -636,11 +642,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
           .map((m) => _conversationMessageFrom(m.cast<String, dynamic>()))
           .toList();
       final details = (t['details'] as Map<String, dynamic>?) ?? const {};
-      final allowedUsers = (details['allowed_users'] as List?) ?? const [];
-      final participants = allowedUsers
-          .whereType<Map>()
-          .map((u) => _participantFrom(u.cast<String, dynamic>()))
-          .toList();
+      final participants = _participantsFrom(details);
       final canEdit = (details['can_edit'] as bool?) ?? false;
 
       return FCConversationResult(
@@ -893,6 +895,42 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       canEdit: p['can_edit'] == true,
       messageNumber: p['post_number'] as int?,
     );
+  }
+
+  /// Everyone on the message, author first, de-duplicated by id.
+  ///
+  /// Discourse splits this across three fields of `details`, and reading
+  /// only `allowed_users` lost people: the serializer drops from it anyone
+  /// covered by one of the message's `allowed_groups` (except the viewer),
+  /// which removes `system` — a member of every staff and trust-level group —
+  /// from system messages, so a PM the user had replied to showed
+  /// "1 participant" (topic_view_details_serializer.rb, `allowed_users`).
+  /// `created_by` and `participants` (who has posted) bring them back, and
+  /// the count then agrees with the inbox list, which counts posters too.
+  /// Groups themselves are not listed yet: the SDK participant has no way
+  /// to say "group".
+  @visibleForTesting
+  List<FCParticipant> participantsFrom(Map<String, dynamic> details) =>
+      _participantsFrom(details);
+
+  List<FCParticipant> _participantsFrom(Map<String, dynamic> details) {
+    final seen = <String>{};
+    final out = <FCParticipant>[];
+    void add(Object? u) {
+      if (u is! Map) return;
+      final p = _participantFrom(u.cast<String, dynamic>());
+      if (p.userId.isEmpty || !seen.add(p.userId)) return;
+      out.add(p);
+    }
+
+    add(details['created_by']);
+    for (final u in (details['allowed_users'] as List?) ?? const []) {
+      add(u);
+    }
+    for (final u in (details['participants'] as List?) ?? const []) {
+      add(u);
+    }
+    return out;
   }
 
   FCParticipant _participantFrom(Map<String, dynamic> u) {
