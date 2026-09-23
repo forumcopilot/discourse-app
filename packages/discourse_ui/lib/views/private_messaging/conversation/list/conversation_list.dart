@@ -111,6 +111,19 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
     widget.siteContext.isLoggedInNotifier.addListener(_authStateListener);
   }
 
+  /// Load now unless this list already has (or is about to). For a parent
+  /// that shows the list itself, rather than relying on the visibility
+  /// callback alone.
+  void loadIfNeeded() {
+    if (_initialLoadInFlight || !_shouldLoadConversations()) return;
+    _initialLoadInFlight = true;
+    loadConversations().whenComplete(() => _initialLoadInFlight = false);
+  }
+
+  /// Set while [loadIfNeeded] has a load running, so the visibility callback
+  /// and an explicit request do not start two.
+  bool _initialLoadInFlight = false;
+
   bool _shouldLoadConversations() {
     final currentUsername = widget.siteContext.loginDataOutput?.user?.username;
 
@@ -351,15 +364,16 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
     }
 
     return VisibilityDetector(
-      key: const Key('conversation_list'),
+      // Must be unique among live detectors: the inbox and archive lists are
+      // both mounted (IndexedStack), and with one shared key the archive's
+      // visibility was never reported, so it never loaded and spun forever.
+      key: Key(widget.archived ? 'conversation_list_archive' : 'conversation_list'),
       onVisibilityChanged: (VisibilityInfo info) {
         final isVisible = info.visibleFraction > 0.5;
 
         // Only load conversations if they haven't been loaded yet (initial load)
         // Don't auto-refresh when returning from navigation - user can pull to refresh
-        if (isVisible && _shouldLoadConversations()) {
-          loadConversations();
-        }
+        if (isVisible) loadIfNeeded();
       },
       child: _buildContent(context),
     );

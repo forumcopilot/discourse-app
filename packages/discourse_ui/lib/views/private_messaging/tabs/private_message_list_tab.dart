@@ -85,8 +85,14 @@ class PrivateMessageListTabState extends FCStatefulWidget<PrivateMessageListTab>
                   ],
                   selected: {_showArchive},
                   showSelectedIcon: false,
-                  onSelectionChanged: (selection) =>
-                      setState(() => _showArchive = selection.first),
+                  onSelectionChanged: (selection) {
+                    setState(() => _showArchive = selection.first);
+                    if (_showArchive) {
+                      // First visit: start the archive's load directly.
+                      WidgetsBinding.instance.addPostFrameCallback(
+                          (_) => _archiveKey.currentState?.loadIfNeeded());
+                    }
+                  },
                 ),
               ),
             ),
