@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.20] - 2026-09-23
+
 Thread rendering, batch 1 of the audit that opened the first 50 topics of all 924 ABDA directory forums on a Pixel 4a and compared posts with the web (292k posts rendered). Every fix below is covered by `test/post_body_rendering_test.dart` and was checked before/after on the Pixel in light and dark themes.
 
 ### Fixed
