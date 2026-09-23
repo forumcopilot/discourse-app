@@ -1759,6 +1759,99 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get chatChannels => 'Channels';
+
+  @override
+  String get chatDms => 'DMs';
+
+  @override
+  String get chatNoChannels => 'You have not joined any channels yet!';
+
+  @override
+  String get chatNoDms => 'You have not joined any direct messages yet!';
+
+  @override
+  String get chatNoDmsCta => 'Start a conversation';
+
+  @override
+  String chatPlaceholderChannel(String channel) {
+    return 'Chat in $channel';
+  }
+
+  @override
+  String chatPlaceholderUsers(String names) {
+    return 'Chat with $names';
+  }
+
+  @override
+  String get chatPlaceholderGroup => 'Chat in group';
+
+  @override
+  String get chatPlaceholderSelf => 'Jot something down';
+
+  @override
+  String get chatPlaceholderArchived =>
+      'Channel is archived, you cannot send new messages right now.';
+
+  @override
+  String get chatPlaceholderClosed =>
+      'Channel is closed, you cannot send new messages right now.';
+
+  @override
+  String get chatPlaceholderReadOnly =>
+      'Channel is read only, you cannot send new messages right now.';
+
+  @override
+  String get chatPlaceholderSilenced =>
+      'You cannot send messages at this time.';
+
+  @override
+  String get chatDeleteConfirm =>
+      'Are you sure you want to delete this message?';
+
+  @override
+  String get chatStartNewDm => 'Start new DM';
+
+  @override
+  String get chatCreatePersonal => 'Create a personal chat';
+
+  @override
+  String get chatCreateGroup => 'Create group chat';
+
+  @override
+  String get chatCannotCreate => 'Sorry, you cannot send direct messages.';
+
+  @override
+  String get chatDisabledUser => 'has disabled chat';
+
+  @override
+  String get chatSearchPlaceholder => '@somebody';
+
+  @override
+  String get chatAddMorePlaceholder => '...add more members';
+
+  @override
+  String chatUserNotFound(String name) {
+    return '@$name not found';
+  }
+
+  @override
+  String get chatCouldNotStartDm => 'Could not start the chat.';
+
+  @override
+  String get chatSignInTitle => 'Sign in to use chat';
+
+  @override
+  String get chatSignInMessage =>
+      'You need to be signed in to view and join chat channels.';
+
+  @override
+  String get chatDirectMessage => 'Direct message';
+
+  @override
+  String get chatNotAvailable => 'Chat is not available on this forum.';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Failed to send message: $error';
   }

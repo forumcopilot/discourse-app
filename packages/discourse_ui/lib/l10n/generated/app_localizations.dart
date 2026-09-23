@@ -3092,6 +3092,168 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 participant} other{{count} participants}}'**
   String participantCount(int count);
 
+  /// UI text (Discourse chat): Channels
+  ///
+  /// In en, this message translates to:
+  /// **'Channels'**
+  String get chatChannels;
+
+  /// UI text (Discourse chat): DMs
+  ///
+  /// In en, this message translates to:
+  /// **'DMs'**
+  String get chatDms;
+
+  /// UI text (Discourse chat): You have not joined any channels yet!
+  ///
+  /// In en, this message translates to:
+  /// **'You have not joined any channels yet!'**
+  String get chatNoChannels;
+
+  /// UI text (Discourse chat): You have not joined any direct messages yet!
+  ///
+  /// In en, this message translates to:
+  /// **'You have not joined any direct messages yet!'**
+  String get chatNoDms;
+
+  /// UI text (Discourse chat): Start a conversation
+  ///
+  /// In en, this message translates to:
+  /// **'Start a conversation'**
+  String get chatNoDmsCta;
+
+  /// UI text (Discourse chat): Chat in {channel}
+  ///
+  /// In en, this message translates to:
+  /// **'Chat in {channel}'**
+  String chatPlaceholderChannel(String channel);
+
+  /// UI text (Discourse chat): Chat with {names}
+  ///
+  /// In en, this message translates to:
+  /// **'Chat with {names}'**
+  String chatPlaceholderUsers(String names);
+
+  /// UI text (Discourse chat): Chat in group
+  ///
+  /// In en, this message translates to:
+  /// **'Chat in group'**
+  String get chatPlaceholderGroup;
+
+  /// UI text (Discourse chat): Jot something down
+  ///
+  /// In en, this message translates to:
+  /// **'Jot something down'**
+  String get chatPlaceholderSelf;
+
+  /// UI text (Discourse chat): Channel is archived, you cannot send new messages right now.
+  ///
+  /// In en, this message translates to:
+  /// **'Channel is archived, you cannot send new messages right now.'**
+  String get chatPlaceholderArchived;
+
+  /// UI text (Discourse chat): Channel is closed, you cannot send new messages right now.
+  ///
+  /// In en, this message translates to:
+  /// **'Channel is closed, you cannot send new messages right now.'**
+  String get chatPlaceholderClosed;
+
+  /// UI text (Discourse chat): Channel is read only, you cannot send new messages right now.
+  ///
+  /// In en, this message translates to:
+  /// **'Channel is read only, you cannot send new messages right now.'**
+  String get chatPlaceholderReadOnly;
+
+  /// UI text (Discourse chat): You cannot send messages at this time.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot send messages at this time.'**
+  String get chatPlaceholderSilenced;
+
+  /// UI text (Discourse chat): Are you sure you want to delete this message?
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this message?'**
+  String get chatDeleteConfirm;
+
+  /// UI text (Discourse chat): Start new DM
+  ///
+  /// In en, this message translates to:
+  /// **'Start new DM'**
+  String get chatStartNewDm;
+
+  /// UI text (Discourse chat): Create a personal chat
+  ///
+  /// In en, this message translates to:
+  /// **'Create a personal chat'**
+  String get chatCreatePersonal;
+
+  /// UI text (Discourse chat): Create group chat
+  ///
+  /// In en, this message translates to:
+  /// **'Create group chat'**
+  String get chatCreateGroup;
+
+  /// UI text (Discourse chat): Sorry, you cannot send direct messages.
+  ///
+  /// In en, this message translates to:
+  /// **'Sorry, you cannot send direct messages.'**
+  String get chatCannotCreate;
+
+  /// UI text (Discourse chat): has disabled chat
+  ///
+  /// In en, this message translates to:
+  /// **'has disabled chat'**
+  String get chatDisabledUser;
+
+  /// UI text (Discourse chat): @somebody
+  ///
+  /// In en, this message translates to:
+  /// **'@somebody'**
+  String get chatSearchPlaceholder;
+
+  /// UI text (Discourse chat): ...add more members
+  ///
+  /// In en, this message translates to:
+  /// **'...add more members'**
+  String get chatAddMorePlaceholder;
+
+  /// UI text (Discourse chat): @{name} not found
+  ///
+  /// In en, this message translates to:
+  /// **'@{name} not found'**
+  String chatUserNotFound(String name);
+
+  /// UI text (Discourse chat): Could not start the chat.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not start the chat.'**
+  String get chatCouldNotStartDm;
+
+  /// UI text (Discourse chat): Sign in to use chat
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to use chat'**
+  String get chatSignInTitle;
+
+  /// UI text (Discourse chat): You need to be signed in to view and join chat channels.
+  ///
+  /// In en, this message translates to:
+  /// **'You need to be signed in to view and join chat channels.'**
+  String get chatSignInMessage;
+
+  /// UI text (Discourse chat): Direct message
+  ///
+  /// In en, this message translates to:
+  /// **'Direct message'**
+  String get chatDirectMessage;
+
+  /// UI text (Discourse chat): Chat is not available on this forum.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat is not available on this forum.'**
+  String get chatNotAvailable;
+
   /// UI text: Failed to send message: {error}
   ///
   /// In en, this message translates to:

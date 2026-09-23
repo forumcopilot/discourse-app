@@ -77,16 +77,40 @@ class _ChatMessagesTabState extends State<ChatMessagesTab>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
+    // This row is the slot's header (InboxTabAppBar has no toolbar), so it
+    // carries the drawer button every other tab has in its app bar, in the
+    // same place. The divider is drawn under the whole row rather than just
+    // the tabs.
+    final hasDrawer = Scaffold.maybeOf(context)?.hasDrawer ?? false;
     return Column(
       children: [
-        TabBar(
-          controller: _controller,
-          tabs: [
-            // 'Chat' is not localized anywhere yet — ChatTabAppBar hardcodes it
-            // too, so keep the two consistent rather than inventing a key here.
-            const Tab(text: 'Chat'),
-            Tab(text: l10n?.messages ?? 'Messages'),
-          ],
+        DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              if (hasDrawer)
+                const SizedBox(
+                  width: kToolbarHeight,
+                  child: Center(child: DrawerButton()),
+                ),
+              Expanded(
+                child: TabBar(
+                  controller: _controller,
+                  dividerColor: Colors.transparent,
+                  tabs: [
+                    Tab(text: l10n?.chat ?? 'Chat'),
+                    Tab(text: l10n?.messages ?? 'Messages'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         Expanded(
           child: TabBarView(

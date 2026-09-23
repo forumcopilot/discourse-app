@@ -1950,6 +1950,129 @@
       }
     }
   },
+  "chatChannels": "Channels",
+  "@chatChannels": {
+    "description": "UI text (Discourse chat): Channels"
+  },
+  "chatDms": "DMs",
+  "@chatDms": {
+    "description": "UI text (Discourse chat): DMs"
+  },
+  "chatNoChannels": "You have not joined any channels yet!",
+  "@chatNoChannels": {
+    "description": "UI text (Discourse chat): You have not joined any channels yet!"
+  },
+  "chatNoDms": "You have not joined any direct messages yet!",
+  "@chatNoDms": {
+    "description": "UI text (Discourse chat): You have not joined any direct messages yet!"
+  },
+  "chatNoDmsCta": "Start a conversation",
+  "@chatNoDmsCta": {
+    "description": "UI text (Discourse chat): Start a conversation"
+  },
+  "chatPlaceholderChannel": "Chat in {channel}",
+  "@chatPlaceholderChannel": {
+    "description": "UI text (Discourse chat): Chat in {channel}",
+    "placeholders": {
+      "channel": {
+        "type": "String"
+      }
+    }
+  },
+  "chatPlaceholderUsers": "Chat with {names}",
+  "@chatPlaceholderUsers": {
+    "description": "UI text (Discourse chat): Chat with {names}",
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "chatPlaceholderGroup": "Chat in group",
+  "@chatPlaceholderGroup": {
+    "description": "UI text (Discourse chat): Chat in group"
+  },
+  "chatPlaceholderSelf": "Jot something down",
+  "@chatPlaceholderSelf": {
+    "description": "UI text (Discourse chat): Jot something down"
+  },
+  "chatPlaceholderArchived": "Channel is archived, you cannot send new messages right now.",
+  "@chatPlaceholderArchived": {
+    "description": "UI text (Discourse chat): Channel is archived, you cannot send new messages right now."
+  },
+  "chatPlaceholderClosed": "Channel is closed, you cannot send new messages right now.",
+  "@chatPlaceholderClosed": {
+    "description": "UI text (Discourse chat): Channel is closed, you cannot send new messages right now."
+  },
+  "chatPlaceholderReadOnly": "Channel is read only, you cannot send new messages right now.",
+  "@chatPlaceholderReadOnly": {
+    "description": "UI text (Discourse chat): Channel is read only, you cannot send new messages right now."
+  },
+  "chatPlaceholderSilenced": "You cannot send messages at this time.",
+  "@chatPlaceholderSilenced": {
+    "description": "UI text (Discourse chat): You cannot send messages at this time."
+  },
+  "chatDeleteConfirm": "Are you sure you want to delete this message?",
+  "@chatDeleteConfirm": {
+    "description": "UI text (Discourse chat): Are you sure you want to delete this message?"
+  },
+  "chatStartNewDm": "Start new DM",
+  "@chatStartNewDm": {
+    "description": "UI text (Discourse chat): Start new DM"
+  },
+  "chatCreatePersonal": "Create a personal chat",
+  "@chatCreatePersonal": {
+    "description": "UI text (Discourse chat): Create a personal chat"
+  },
+  "chatCreateGroup": "Create group chat",
+  "@chatCreateGroup": {
+    "description": "UI text (Discourse chat): Create group chat"
+  },
+  "chatCannotCreate": "Sorry, you cannot send direct messages.",
+  "@chatCannotCreate": {
+    "description": "UI text (Discourse chat): Sorry, you cannot send direct messages."
+  },
+  "chatDisabledUser": "has disabled chat",
+  "@chatDisabledUser": {
+    "description": "UI text (Discourse chat): has disabled chat"
+  },
+  "chatSearchPlaceholder": "@somebody",
+  "@chatSearchPlaceholder": {
+    "description": "UI text (Discourse chat): @somebody"
+  },
+  "chatAddMorePlaceholder": "...add more members",
+  "@chatAddMorePlaceholder": {
+    "description": "UI text (Discourse chat): ...add more members"
+  },
+  "chatUserNotFound": "@{name} not found",
+  "@chatUserNotFound": {
+    "description": "UI text (Discourse chat): @{name} not found",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chatCouldNotStartDm": "Could not start the chat.",
+  "@chatCouldNotStartDm": {
+    "description": "UI text (Discourse chat): Could not start the chat."
+  },
+  "chatSignInTitle": "Sign in to use chat",
+  "@chatSignInTitle": {
+    "description": "UI text (Discourse chat): Sign in to use chat"
+  },
+  "chatSignInMessage": "You need to be signed in to view and join chat channels.",
+  "@chatSignInMessage": {
+    "description": "UI text (Discourse chat): You need to be signed in to view and join chat channels."
+  },
+  "chatDirectMessage": "Direct message",
+  "@chatDirectMessage": {
+    "description": "UI text (Discourse chat): Direct message"
+  },
+  "chatNotAvailable": "Chat is not available on this forum.",
+  "@chatNotAvailable": {
+    "description": "UI text (Discourse chat): Chat is not available on this forum."
+  },
   "failedToCreateConversation": "Failed to send message: {error}",
   "@failedToCreateConversation": {
     "description": "UI text: Failed to send message: {error}",

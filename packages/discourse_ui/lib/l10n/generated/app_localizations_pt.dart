@@ -1767,6 +1767,101 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get chatChannels => 'Canais';
+
+  @override
+  String get chatDms => 'MDs';
+
+  @override
+  String get chatNoChannels => 'Você ainda não entrou em nenhum canal!';
+
+  @override
+  String get chatNoDms =>
+      'Você ainda não entrou em nenhum canal de mensagem direta!';
+
+  @override
+  String get chatNoDmsCta => 'Iniciar uma conversa';
+
+  @override
+  String chatPlaceholderChannel(String channel) {
+    return 'Converse em $channel';
+  }
+
+  @override
+  String chatPlaceholderUsers(String names) {
+    return 'Conversar com $names';
+  }
+
+  @override
+  String get chatPlaceholderGroup => 'Chat em grupo';
+
+  @override
+  String get chatPlaceholderSelf => 'Anotar algo';
+
+  @override
+  String get chatPlaceholderArchived =>
+      'Canal arquivado, não é possível enviar novas mensagens no momento.';
+
+  @override
+  String get chatPlaceholderClosed =>
+      'Canal fechado, não é possível enviar novas mensagens no momento.';
+
+  @override
+  String get chatPlaceholderReadOnly =>
+      'Canal somente para leitura, não é possível enviar novas mensagens no momento.';
+
+  @override
+  String get chatPlaceholderSilenced =>
+      'Você não pode enviar mensagens neste momento.';
+
+  @override
+  String get chatDeleteConfirm =>
+      'Tem certeza de que deseja excluir esta mensagem?';
+
+  @override
+  String get chatStartNewDm => 'Iniciar nova DM';
+
+  @override
+  String get chatCreatePersonal => 'Criar um chat pessoal';
+
+  @override
+  String get chatCreateGroup => 'Criar chat em grupo';
+
+  @override
+  String get chatCannotCreate =>
+      'Desculpe, você não pode enviar mensagens diretas.';
+
+  @override
+  String get chatDisabledUser => 'desativou o chat';
+
+  @override
+  String get chatSearchPlaceholder => '@alguém';
+
+  @override
+  String get chatAddMorePlaceholder => '... incluir mais membros';
+
+  @override
+  String chatUserNotFound(String name) {
+    return '@$name não encontrado';
+  }
+
+  @override
+  String get chatCouldNotStartDm => 'Não foi possível iniciar o chat.';
+
+  @override
+  String get chatSignInTitle => 'Entre para usar o chat';
+
+  @override
+  String get chatSignInMessage =>
+      'Você precisa entrar para ver e participar de canais de chat.';
+
+  @override
+  String get chatDirectMessage => 'Mensagem direta';
+
+  @override
+  String get chatNotAvailable => 'O chat não está disponível neste fórum.';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Não foi possível enviar a mensagem: $error';
   }

@@ -1703,6 +1703,93 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get chatChannels => '채널';
+
+  @override
+  String get chatDms => 'DM';
+
+  @override
+  String get chatNoChannels => '아직 참여한 채널이 없습니다!';
+
+  @override
+  String get chatNoDms => '아직 개인 메시지가 없습니다!';
+
+  @override
+  String get chatNoDmsCta => '대화 시작하기';
+
+  @override
+  String chatPlaceholderChannel(String channel) {
+    return '$channel에서 채팅';
+  }
+
+  @override
+  String chatPlaceholderUsers(String names) {
+    return '$names과 채팅';
+  }
+
+  @override
+  String get chatPlaceholderGroup => '그룹 채팅';
+
+  @override
+  String get chatPlaceholderSelf => '메모하기';
+
+  @override
+  String get chatPlaceholderArchived => '채널이 보관되어 메시지를 보낼 수 없습니다.';
+
+  @override
+  String get chatPlaceholderClosed => '채널이 닫혀 있어 지금은 메시지를 보낼 수 없습니다.';
+
+  @override
+  String get chatPlaceholderReadOnly => '채널이 읽기 전용이므로 메시지를 보낼 수 없습니다.';
+
+  @override
+  String get chatPlaceholderSilenced => '지금은 메시지를 보낼 수 없습니다.';
+
+  @override
+  String get chatDeleteConfirm => '이 메시지를 삭제할까요?';
+
+  @override
+  String get chatStartNewDm => '새로운 채팅 시작';
+
+  @override
+  String get chatCreatePersonal => '개인 채팅 만들기';
+
+  @override
+  String get chatCreateGroup => '그룹 채팅 만들기';
+
+  @override
+  String get chatCannotCreate => '죄송합니다. 다이렉트 메시지를 보낼 수 없습니다.';
+
+  @override
+  String get chatDisabledUser => '채팅 비활성화됨';
+
+  @override
+  String get chatSearchPlaceholder => '@누군가';
+
+  @override
+  String get chatAddMorePlaceholder => '...사용자 추가';
+
+  @override
+  String chatUserNotFound(String name) {
+    return '@$name을(를) 찾을 수 없습니다';
+  }
+
+  @override
+  String get chatCouldNotStartDm => '채팅을 시작하지 못했습니다.';
+
+  @override
+  String get chatSignInTitle => '채팅을 사용하려면 로그인하세요';
+
+  @override
+  String get chatSignInMessage => '채팅 채널을 보고 참여하려면 로그인해야 합니다.';
+
+  @override
+  String get chatDirectMessage => '다이렉트 메시지';
+
+  @override
+  String get chatNotAvailable => '이 포럼에서는 채팅을 사용할 수 없습니다.';
+
+  @override
   String failedToCreateConversation(Object error) {
     return '메시지를 보내지 못했습니다: $error';
   }

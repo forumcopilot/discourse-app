@@ -1707,6 +1707,93 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get chatChannels => 'チャンネル';
+
+  @override
+  String get chatDms => 'DM';
+
+  @override
+  String get chatNoChannels => 'まだチャンネルに参加していません！';
+
+  @override
+  String get chatNoDms => 'まだダイレクトメッセージに参加していません！';
+
+  @override
+  String get chatNoDmsCta => '会話を始める';
+
+  @override
+  String chatPlaceholderChannel(String channel) {
+    return '$channel 内でチャット';
+  }
+
+  @override
+  String chatPlaceholderUsers(String names) {
+    return '$names とチャット';
+  }
+
+  @override
+  String get chatPlaceholderGroup => 'グループチャット';
+
+  @override
+  String get chatPlaceholderSelf => 'メモを書き留める';
+
+  @override
+  String get chatPlaceholderArchived => 'チャンネルはアーカイブされているため、新しいメッセージを送信できません。';
+
+  @override
+  String get chatPlaceholderClosed => 'チャンネルは閉鎖されているため、新しいメッセージを送信できません。';
+
+  @override
+  String get chatPlaceholderReadOnly => 'チャンネルは読み取り専用であるため、新しいメッセージを送信できません。';
+
+  @override
+  String get chatPlaceholderSilenced => '現在、メッセージを送信できません。';
+
+  @override
+  String get chatDeleteConfirm => 'このメッセージを削除してもよろしいですか？';
+
+  @override
+  String get chatStartNewDm => '新しい DM を開始';
+
+  @override
+  String get chatCreatePersonal => 'パーソナルチャットを作成';
+
+  @override
+  String get chatCreateGroup => 'グループチャットを作成';
+
+  @override
+  String get chatCannotCreate => 'ダイレクトメッセージを送信できません。';
+
+  @override
+  String get chatDisabledUser => 'はチャットを無効にしました';
+
+  @override
+  String get chatSearchPlaceholder => '@somebody';
+
+  @override
+  String get chatAddMorePlaceholder => '...さらにメンバーを追加';
+
+  @override
+  String chatUserNotFound(String name) {
+    return '@$name が見つかりません';
+  }
+
+  @override
+  String get chatCouldNotStartDm => 'チャットを開始できませんでした。';
+
+  @override
+  String get chatSignInTitle => 'チャットを使うにはサインインしてください';
+
+  @override
+  String get chatSignInMessage => 'チャットチャンネルを表示して参加するにはサインインが必要です。';
+
+  @override
+  String get chatDirectMessage => 'ダイレクトメッセージ';
+
+  @override
+  String get chatNotAvailable => 'このフォーラムではチャットを利用できません。';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'メッセージを送信できませんでした: $error';
   }

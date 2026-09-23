@@ -236,17 +236,7 @@ class DiscourseLoginService {
 
     final result = _loginResultFromCurrentUser(cu);
 
-    // Authoritative chat availability, straight from the current-user
-    // record. `has_chat_enabled` is what Discourse's own client reads;
-    // the route probe in DiscourseConfigProxy has to infer it from a
-    // status code, and infers wrong in both directions — meta answers 403
-    // to a guest on a forum where chat IS enabled, and a 403 can equally
-    // mean the plugin is absent. When we are signed in we do not have to
-    // guess, so don't.
-    if (cu.containsKey('has_chat_enabled') || cu.containsKey('can_chat')) {
-      siteContext.setChatEnabled(
-          cu['has_chat_enabled'] == true || cu['can_chat'] == true);
-    }
+    _applyChatFlags(cu);
 
     siteContext.setLoginData(result);
     siteContext.resetOnLogin();
@@ -287,6 +277,7 @@ class DiscourseLoginService {
         final cu = (data['current_user'] as Map<String, dynamic>?) ?? const {};
         if (cu.isEmpty) return false;
         final result = _loginResultFromCurrentUser(cu);
+        _applyChatFlags(cu);
         siteContext.setLoginData(result);
         // Refresh the cached identity for future offline launches.
         await siteContext.saveLoginSnapshot(result.toJson());
@@ -385,6 +376,7 @@ class DiscourseLoginService {
               (data['current_user'] as Map<String, dynamic>?) ?? const {};
           if (cu.isNotEmpty) {
             final result = _loginResultFromCurrentUser(cu);
+            _applyChatFlags(cu);
             siteContext.setLoginData(result);
             await siteContext.saveLoginSnapshot(result.toJson());
             AppLogger.info(
@@ -437,6 +429,21 @@ class DiscourseLoginService {
       return 'network error';
     }
     return 'HTTP ${response.statusCode}';
+  }
+
+  /// Chat availability for the signed-in user, straight from the current-user
+  /// record — what Discourse's own client reads (`chat.userCanChat`,
+  /// `userCanDirectMessage`). The route probe in DiscourseConfigProxy has to
+  /// infer it from a status code, and a signed-in member outside
+  /// `chat_allowed_groups` gets the same 403 there as a guest on a forum
+  /// with chat on. Discourse leaves each field out when it is false, so an
+  /// absent `has_chat_enabled` means no chat: turned off for the forum, not
+  /// allowed for this user, or turned off in their own preferences.
+  void _applyChatFlags(Map<String, dynamic> cu) {
+    siteContext.setChatEnabled(cu['has_chat_enabled'] == true);
+    siteContext.setChatCanDirectMessage(cu['can_direct_message'] == true ||
+        cu['admin'] == true ||
+        cu['moderator'] == true);
   }
 
   /// Build the [FCLoginResult] stored on the [SiteContext] (and cached as

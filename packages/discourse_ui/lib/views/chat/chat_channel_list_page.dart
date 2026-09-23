@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseChatProxy, DiscourseChatable;
+    show DiscourseChatProxy, DiscourseChatable, DiscourseSiteContextExtension;
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -21,11 +21,11 @@ import '../../l10n/generated/app_localizations.dart';
 /// `object.name || object.title(scope.user)`), so they are normally
 /// non-empty. Guard anyway — `FCChatChannel` carries no member list to
 /// fall back on client-side.
-String _channelDisplayTitle(FCChatChannel ch) {
+String _channelDisplayTitle(BuildContext context, FCChatChannel ch) {
   if (ch.title.isNotEmpty) return ch.title;
   return ch.chatableType == 'DirectMessage'
-      ? 'Direct message'
-      : 'Channel ${ch.id}';
+      ? AppLocalizations.of(context)!.chatDirectMessage
+      : '#${ch.id}';
 }
 
 /// Top-level Chat surface: lists the user's joined channels and opens
@@ -61,6 +61,10 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
   List<FCChatChannel>? _channels;
   bool _loading = false;
   String? _error;
+
+  /// Discourse keeps channels and direct messages apart (Channels / DMs);
+  /// this list mixed them, sorted unread-first.
+  bool _showDms = false;
 
   // Track login state so the channel list reloads after an in-session
   // login/logout (same pattern as NotificationListTab). Without this
@@ -117,7 +121,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
       setState(() {
         _loading = false;
         _channels = const [];
-        _error = 'Sign in to use chat.';
+        _error = AppLocalizations.of(context)!.chatSignInTitle;
       });
       return;
     }
@@ -135,14 +139,13 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
           _channels = const [];
           _error = result.resultText?.isNotEmpty == true
               ? result.resultText
-              : 'Chat is not available on this forum.';
+              : AppLocalizations.of(context)!.chatNotAvailable;
           return;
         }
+        // An empty list is not an error: each tab has its own empty state.
+        // ("Ask an admin to invite you" was wrong too — Discourse users
+        // browse and join channels themselves.)
         _channels = result.channels;
-        if (result.channels.isEmpty) {
-          _error =
-              'No chat channels yet. Ask an admin to invite you to one.';
-        }
       });
     } catch (e) {
       if (!mounted) return;
@@ -155,7 +158,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
   }
 
   Future<void> _open(FCChatChannel ch) async {
-    final title = _channelDisplayTitle(ch);
+    final title = _channelDisplayTitle(context, ch);
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ChatChannelScreen(
@@ -196,8 +199,8 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     if (!widget.siteContext.isLoggedIn) {
       return NotSignedInView(
         siteContext: widget.siteContext,
-        title: 'Sign in to use chat',
-        message: 'You need to be signed in to view and join chat channels.',
+        title: AppLocalizations.of(context)!.chatSignInTitle,
+        message: AppLocalizations.of(context)!.chatSignInMessage,
         icon: Icons.chat_bubble_outline_rounded,
       );
     }
@@ -206,11 +209,16 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
       onRefresh: _load,
       child: _buildBody(),
     );
-    final fab = widget.siteContext.isLoggedIn
-        ? FloatingActionButton(
-            tooltip: 'New direct message',
+    // Only people allowed to start direct messages get the button (Discourse:
+    // `userCanDirectMessage`).
+    final fab = widget.siteContext.isLoggedIn &&
+            widget.siteContext.chatCanDirectMessage
+        // Labelled like Messages' "New Message" button beside it; the words
+        // are Discourse's sidebar link ("Start new DM").
+        ? FloatingActionButton.extended(
             onPressed: _startNewDm,
-            child: const Icon(Icons.add_comment_outlined),
+            icon: const Icon(Icons.add_comment_outlined),
+            label: Text(AppLocalizations.of(context)!.chatStartNewDm),
           )
         : null;
     // Embedded mode (Phase 5.18a bottom-nav Chat slot): caller owns
@@ -243,7 +251,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
+            tooltip: AppLocalizations.of(context)!.refresh,
             onPressed: _loading ? null : _load,
           ),
         ],
@@ -255,6 +263,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
 
   Widget _buildBody() {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     final channels = _channels;
 
     if (_loading && channels == null) {
@@ -266,15 +275,102 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
         message: _error!,
       );
     }
-    return ListView.separated(
-      itemCount: channels?.length ?? 0,
-      separatorBuilder: (_, __) => Divider(
-        height: 1,
-        color: colorScheme.outlineVariant
-            .withValues(alpha: DesignTokens.opacityDivider),
+
+    // Discourse's order: channels by name, DMs by latest message.
+    final all = channels ?? const <FCChatChannel>[];
+    // Which halves exist, as on Discourse: no Channels when the forum turned
+    // public channels off, and no DMs for someone who may not start one and
+    // has none to read (`userCanAccessDirectMessages`). With only one, there
+    // is nothing to switch.
+    final canDm = widget.siteContext.chatCanDirectMessage;
+    final hasChannels = widget.siteContext.chatPublicChannelsEnabled;
+    final hasDms = canDm || all.any((c) => c.chatableType == 'DirectMessage');
+    final showDms = hasChannels && hasDms ? _showDms : !hasChannels;
+    final shown = all
+        .where((c) => (c.chatableType == 'DirectMessage') == showDms)
+        .toList()
+      ..sort(showDms
+          ? (a, b) => (b.lastMessageAt ?? DateTime(0))
+              .compareTo(a.lastMessageAt ?? DateTime(0))
+          : (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    int unreadIn(bool dms) => all
+        .where((c) => (c.chatableType == 'DirectMessage') == dms)
+        .fold(0, (n, c) => n + c.unreadCount);
+
+    final switcher = Padding(
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.spacingL,
+        DesignTokens.spacingS,
+        DesignTokens.spacingL,
+        DesignTokens.spacingXS,
       ),
+      child: SizedBox(
+        width: double.infinity,
+        child: SegmentedButton<bool>(
+          segments: [
+            ButtonSegment(
+              value: false,
+              icon: const Icon(Icons.tag),
+              label: Badge(
+                isLabelVisible: unreadIn(false) > 0,
+                smallSize: 8,
+                child: Text(l10n.chatChannels),
+              ),
+            ),
+            ButtonSegment(
+              value: true,
+              icon: const Icon(Icons.person_outline),
+              label: Badge(
+                isLabelVisible: unreadIn(true) > 0,
+                smallSize: 8,
+                child: Text(l10n.chatDms),
+              ),
+            ),
+          ],
+          selected: {showDms},
+          showSelectedIcon: false,
+          onSelectionChanged: (sel) => setState(() => _showDms = sel.first),
+        ),
+      ),
+    );
+
+    final header = hasChannels && hasDms
+        ? switcher
+        : const SizedBox(height: DesignTokens.spacingS);
+
+    if (shown.isEmpty) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          header,
+          const SizedBox(height: DesignTokens.spacingXL),
+          EmptyStateView(
+            icon: showDms ? Icons.person_outline : Icons.tag,
+            message: showDms ? l10n.chatNoDms : l10n.chatNoChannels,
+          ),
+          if (showDms && canDm)
+            Center(
+              child: FilledButton.tonal(
+                onPressed: _startNewDm,
+                child: Text(l10n.chatNoDmsCta),
+              ),
+            ),
+        ],
+      );
+    }
+    return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
+      itemCount: shown.length + 1,
+      separatorBuilder: (_, i) => i == 0
+          ? const SizedBox.shrink()
+          : Divider(
+              height: 1,
+              color: colorScheme.outlineVariant
+                  .withValues(alpha: DesignTokens.opacityDivider),
+            ),
       itemBuilder: (_, i) {
-        final ch = channels![i];
+        if (i == 0) return header;
+        final ch = shown[i - 1];
         return _ChannelTile(channel: ch, onTap: () => _open(ch));
       },
     );
@@ -290,9 +386,10 @@ class _ChannelTile extends StatelessWidget {
   IconData _iconFor() {
     switch (channel.chatableType) {
       case 'DirectMessage':
-        return Icons.person_outline;
-      case 'TopicChat':
-        return Icons.forum_outlined;
+        // A group chat is titled with its members' names, comma-separated.
+        return channel.title.contains(',')
+            ? Icons.group_outlined
+            : Icons.person_outline;
       case 'Category':
       default:
         return Icons.tag;
@@ -321,7 +418,7 @@ class _ChannelTile extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              _channelDisplayTitle(channel),
+              _channelDisplayTitle(context, channel),
               style: textTheme.titleSmall?.copyWith(
                 fontWeight: hasUnread ? FontWeight.w700 : FontWeight.w500,
               ),
@@ -497,7 +594,7 @@ class _NewDmSheetState extends State<_NewDmSheet> {
   Future<void> _create() async {
     final proxy = SiteProxyService.getChatProxy();
     if (proxy is! DiscourseChatProxy) {
-      setState(() => _error = 'Direct messages are not available.');
+      setState(() => _error = AppLocalizations.of(context)!.chatCannotCreate);
       return;
     }
     setState(() {
@@ -510,6 +607,8 @@ class _NewDmSheetState extends State<_NewDmSheet> {
     // without saying so, and a request left with nobody else in it opens a
     // DM with yourself — so an unknown name, or someone who cannot chat,
     // stops here and nothing is created.
+    // Looked up before the awaits below.
+    final l10n = AppLocalizations.of(context)!;
     final chosen = [..._selected];
     final seen = {for (final c in chosen) _key(c)};
     final problems = <String>[];
@@ -526,7 +625,9 @@ class _NewDmSheetState extends State<_NewDmSheet> {
           .toList();
       final usable = exact.where((c) => c.canChat).toList();
       if (usable.isEmpty) {
-        problems.add(exact.isEmpty ? '@$name not found' : '@$name can\'t chat');
+        problems.add(exact.isEmpty
+            ? l10n.chatUserNotFound(name)
+            : '@$name ${l10n.chatDisabledUser}');
         continue;
       }
       chosen.add(usable.first);
@@ -537,7 +638,7 @@ class _NewDmSheetState extends State<_NewDmSheet> {
       setState(() {
         _creating = false;
         _error = chosen.isEmpty && problems.isEmpty
-            ? 'Enter at least one username.'
+            ? AppLocalizations.of(context)!.pleaseAddARecipient
             : problems.join(' · ');
       });
       return;
@@ -560,7 +661,7 @@ class _NewDmSheetState extends State<_NewDmSheet> {
           _creating = false;
           _error = result.resultText?.isNotEmpty == true
               ? result.resultText
-              : 'Could not start the direct message.';
+              : AppLocalizations.of(context)!.chatCouldNotStartDm;
         });
         return;
       }
@@ -594,7 +695,7 @@ class _NewDmSheetState extends State<_NewDmSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            AppLocalizations.of(context)!.newDirectMessage,
+            AppLocalizations.of(context)!.chatCreatePersonal,
             style:
                 textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
@@ -630,8 +731,8 @@ class _NewDmSheetState extends State<_NewDmSheet> {
             onSubmitted: (_) => _create(),
             decoration: InputDecoration(
               hintText: _selected.isEmpty
-                  ? 'Type a username…'
-                  : 'Add another username…',
+                  ? AppLocalizations.of(context)!.chatSearchPlaceholder
+                  : AppLocalizations.of(context)!.chatAddMorePlaceholder,
               isDense: true,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(DesignTokens.radiusM),
@@ -659,7 +760,9 @@ class _NewDmSheetState extends State<_NewDmSheet> {
                   opacity: u.canChat ? 1 : DesignTokens.opacityDisabled,
                   child: UserListRow(
                     username: u.name,
-                    subtitle: u.canChat ? u.label : "Can't chat",
+                    subtitle: u.canChat
+                        ? u.label
+                        : AppLocalizations.of(context)!.chatDisabledUser,
                     avatarUrl: u.avatarUrl,
                     leadingIcon: u.isGroup ? Icons.groups_rounded : null,
                     onTap: u.canChat ? () => _pick(u) : null,
@@ -691,7 +794,10 @@ class _NewDmSheetState extends State<_NewDmSheet> {
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : Text(AppLocalizations.of(context)!.startChat),
+                    // Discourse's wording once it is a group chat.
+                    : Text(_selected.length > 1
+                        ? AppLocalizations.of(context)!.chatCreateGroup
+                        : AppLocalizations.of(context)!.startChat),
               ),
             ],
           ),

@@ -1767,6 +1767,100 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get chatChannels => 'Kanalen';
+
+  @override
+  String get chatDms => 'Directe berichten';
+
+  @override
+  String get chatNoChannels => 'Je neemt nog niet deel aan kanalen!';
+
+  @override
+  String get chatNoDms => 'Je neemt nog niet deel aan directe berichten!';
+
+  @override
+  String get chatNoDmsCta => 'Gesprek starten';
+
+  @override
+  String chatPlaceholderChannel(String channel) {
+    return 'Chat in $channel';
+  }
+
+  @override
+  String chatPlaceholderUsers(String names) {
+    return 'Chatten met $names';
+  }
+
+  @override
+  String get chatPlaceholderGroup => 'Chatten in groep';
+
+  @override
+  String get chatPlaceholderSelf => 'Schrijf iets';
+
+  @override
+  String get chatPlaceholderArchived =>
+      'Kanaal is gearchiveerd, je kunt momenteel geen nieuwe berichten sturen.';
+
+  @override
+  String get chatPlaceholderClosed =>
+      'Kanaal is gesloten, je kunt momenteel geen nieuwe berichten sturen.';
+
+  @override
+  String get chatPlaceholderReadOnly =>
+      'Kanaal is alleen-lezen, je kunt momenteel geen nieuwe berichten sturen.';
+
+  @override
+  String get chatPlaceholderSilenced =>
+      'Je kunt op dit moment geen berichten sturen.';
+
+  @override
+  String get chatDeleteConfirm =>
+      'Weet je zeker dat je dit bericht wilt verwijderen?';
+
+  @override
+  String get chatStartNewDm => 'Nieuw direct bericht';
+
+  @override
+  String get chatCreatePersonal => 'Maak een persoonlijke chat';
+
+  @override
+  String get chatCreateGroup => 'Groepschat maken';
+
+  @override
+  String get chatCannotCreate =>
+      'Sorry, je kunt geen directe berichten sturen.';
+
+  @override
+  String get chatDisabledUser => 'heeft de chat uitgeschakeld';
+
+  @override
+  String get chatSearchPlaceholder => '@iemand';
+
+  @override
+  String get chatAddMorePlaceholder => '... voeg meer leden toe';
+
+  @override
+  String chatUserNotFound(String name) {
+    return '@$name niet gevonden';
+  }
+
+  @override
+  String get chatCouldNotStartDm => 'Kon de chat niet starten.';
+
+  @override
+  String get chatSignInTitle => 'Log in om de chat te gebruiken';
+
+  @override
+  String get chatSignInMessage =>
+      'Je moet ingelogd zijn om chatkanalen te zien en eraan deel te nemen.';
+
+  @override
+  String get chatDirectMessage => 'Direct bericht';
+
+  @override
+  String get chatNotAvailable => 'Chat is niet beschikbaar op dit forum.';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Kon bericht niet verzenden: $error';
   }

@@ -286,6 +286,33 @@ extension DiscourseSiteContextExtension on SiteContext {
     _chatProbe[_prefsPrefix()] = enabled;
   }
 
+  /// `enable_public_channels` (a `client: true` chat setting, read from
+  /// `/site/settings.json`). Off means chat is direct messages only: Discourse
+  /// drops the Channels list and opens chat on direct messages
+  /// (chat-drawer-router.js). Defaults to true until the settings are read.
+  bool get chatPublicChannelsEnabled =>
+      _chatPublicChannels[_prefsPrefix()] ?? true;
+
+  static final Map<String, bool> _chatPublicChannels = <String, bool>{};
+
+  void setChatPublicChannelsEnabled(bool enabled) {
+    _chatPublicChannels[_prefsPrefix()] = enabled;
+  }
+
+  /// Whether the signed-in user may start chat direct messages: staff, or
+  /// `can_direct_message` on the current user (member of
+  /// `direct_message_enabled_groups`) — Discourse's `userCanDirectMessage`.
+  /// Someone who may not still sees the direct messages others started with
+  /// them. Defaults to true until the current user is read.
+  bool get chatCanDirectMessage =>
+      _chatCanDirectMessage[_prefsPrefix()] ?? true;
+
+  static final Map<String, bool> _chatCanDirectMessage = <String, bool>{};
+
+  void setChatCanDirectMessage(bool allowed) {
+    _chatCanDirectMessage[_prefsPrefix()] = allowed;
+  }
+
   /// `show_time_gap_days` from `/site/settings.json`.
   ///
   /// Discourse inserts a "3 months later" divider between consecutive posts
@@ -303,7 +330,11 @@ extension DiscourseSiteContextExtension on SiteContext {
   /// Drops memoized probe results. Process-lifetime state, so tests that
   /// measure request volume must be able to start from a clean slate.
   @visibleForTesting
-  static void resetChatProbeCache() => _chatProbe.clear();
+  static void resetChatProbeCache() {
+    _chatProbe.clear();
+    _chatPublicChannels.clear();
+    _chatCanDirectMessage.clear();
+  }
 
   /// Key prefix under which this forum's Discourse state lives in
   /// SharedPreferences and secure storage. Public so app-layer state that

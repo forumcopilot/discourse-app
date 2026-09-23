@@ -598,32 +598,41 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         return 'Event reminder: "$topic"';
       case _ntEventInvitation:
         return '$from invited you to "$topic"';
+      // Discourse chat's own wording (plugins/chat client.en.yml,
+      // notifications.popup / notifications.*), including the personal-chat
+      // variants: a DM notification used to read "mentioned you in #alice".
       case _ntChatMention:
         final channel = s('chat_channel_title');
+        final dm = data['is_direct_message_channel'] == true;
+        final who = s('identifier');
+        final target = who.isNotEmpty ? '@$who' : 'you';
+        if (dm) return '$from mentioned $target in personal chat';
         return channel.isNotEmpty
-            ? '$from mentioned you in #$channel'
-            : '$from mentioned you in chat';
+            ? '$from mentioned $target in "$channel"'
+            : '$from mentioned $target in chat';
       case _ntChatMessage:
-        final channel = s('chat_channel_title');
-        return channel.isNotEmpty
-            ? 'New message in #$channel'
+        return data['is_direct_message_channel'] == true
+            ? 'New chat message from $from'
             : 'New chat message';
       case _ntChatInvitation:
-        return '$from invited you to chat';
+        return '$from invited you to join a chat channel';
       case _ntChatGroupMention:
         final group = s('identifier');
         final channel = s('chat_channel_title');
+        if (data['is_direct_message_channel'] == true) {
+          return '$from mentioned @$group in personal chat';
+        }
         if (group.isNotEmpty && channel.isNotEmpty) {
-          return '@$group was mentioned in #$channel';
+          return '$from mentioned @$group in "$channel"';
         }
         return 'Your group was mentioned in chat';
       case _ntChatQuoted:
-        return '$from quoted you in chat';
+        return '$from quoted your chat message';
       case _ntChatWatchedThread:
         final channel = s('chat_channel_title');
         return channel.isNotEmpty
-            ? 'New reply in a thread in #$channel'
-            : 'New reply in a chat thread';
+            ? 'New reply in a watched thread in "$channel"'
+            : 'New reply in a watched chat thread';
       case _ntAssigned:
         return '"$topic" was assigned to you';
       case _ntQuestionAnswerUserCommented:

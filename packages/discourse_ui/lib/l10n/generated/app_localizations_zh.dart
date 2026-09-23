@@ -1690,6 +1690,93 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get chatChannels => '频道';
+
+  @override
+  String get chatDms => '直接消息';
+
+  @override
+  String get chatNoChannels => '您还没有加入任何频道！';
+
+  @override
+  String get chatNoDms => '您还没有加入任何直接消息！';
+
+  @override
+  String get chatNoDmsCta => '开始一个对话';
+
+  @override
+  String chatPlaceholderChannel(String channel) {
+    return '在 $channel 中聊天';
+  }
+
+  @override
+  String chatPlaceholderUsers(String names) {
+    return '与 $names 聊天';
+  }
+
+  @override
+  String get chatPlaceholderGroup => '群聊';
+
+  @override
+  String get chatPlaceholderSelf => '做些记录';
+
+  @override
+  String get chatPlaceholderArchived => '频道已归档，您现在无法发送新消息。';
+
+  @override
+  String get chatPlaceholderClosed => '频道已关闭，您现在无法发送新消息。';
+
+  @override
+  String get chatPlaceholderReadOnly => '频道为只读，您现在无法发送新消息。';
+
+  @override
+  String get chatPlaceholderSilenced => '您目前无法发送消息。';
+
+  @override
+  String get chatDeleteConfirm => '确定要删除此消息吗？';
+
+  @override
+  String get chatStartNewDm => '开始新的 DM';
+
+  @override
+  String get chatCreatePersonal => '创建个人聊天';
+
+  @override
+  String get chatCreateGroup => '创建群组聊天';
+
+  @override
+  String get chatCannotCreate => '抱歉，您无法发送直接消息。';
+
+  @override
+  String get chatDisabledUser => '已禁用聊天';
+
+  @override
+  String get chatSearchPlaceholder => '@ 某人';
+
+  @override
+  String get chatAddMorePlaceholder => '…添加更多成员';
+
+  @override
+  String chatUserNotFound(String name) {
+    return '未找到 @$name';
+  }
+
+  @override
+  String get chatCouldNotStartDm => '无法开始聊天。';
+
+  @override
+  String get chatSignInTitle => '登录后才能使用聊天';
+
+  @override
+  String get chatSignInMessage => '登录后才能查看和加入聊天频道。';
+
+  @override
+  String get chatDirectMessage => '直接消息';
+
+  @override
+  String get chatNotAvailable => '此论坛不提供聊天。';
+
+  @override
   String failedToCreateConversation(Object error) {
     return '无法发送消息：$error';
   }

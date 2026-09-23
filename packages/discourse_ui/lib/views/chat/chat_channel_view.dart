@@ -279,20 +279,39 @@ class _ChatChannelViewState extends State<ChatChannelView> {
           // Staff may still post in a closed channel; nobody while silenced.
           final readonly = ch != null &&
               !(_permissions?.canWriteIn(ch.status) ?? ch.isOpen);
-          final isDm = ch?.chatableType == 'DirectMessage';
           return ChatComposer(
             enabled: !readonly,
-            hintText: readonly
-                ? 'Channel is read-only'
-                // DM titles are the member usernames — no '#' prefix.
-                : isDm
-                    ? 'Message ${ch!.title.isNotEmpty ? ch.title : 'group'}…'
-                    : 'Type a message in #${ch?.title ?? 'chat'}…',
+            hintText: _composerHint(ch, readonly),
             onSend: _controller.send,
           );
         }),
       ],
     );
+  }
+
+  /// Discourse's composer placeholders (chat.placeholder_*): why nothing can
+  /// be sent, or where the message goes.
+  String _composerHint(FCChatChannel? ch, bool readonly) {
+    final l10n = AppLocalizations.of(context)!;
+    if (ch == null) return '';
+    if (_permissions?.silenced == true) return l10n.chatPlaceholderSilenced;
+    if (readonly) {
+      return switch (ch.status) {
+        'archived' => l10n.chatPlaceholderArchived,
+        'closed' => l10n.chatPlaceholderClosed,
+        _ => l10n.chatPlaceholderReadOnly,
+      };
+    }
+    if (ch.chatableType == 'DirectMessage') {
+      // A DM is titled with the other members; with nobody else it is the
+      // viewer's own notes channel.
+      final me = widget.siteContext.currentUsername;
+      return ch.title.isEmpty || ch.title == me
+          ? l10n.chatPlaceholderSelf
+          : l10n.chatPlaceholderUsers(ch.title);
+    }
+    // Discourse names the channel with its hash: "Chat in #general".
+    return l10n.chatPlaceholderChannel('#${ch.title}');
   }
 
   DiscourseChatPermissions? get _permissions => DiscourseChatPermissions.forChannel(
@@ -364,8 +383,9 @@ class _ChatChannelViewState extends State<ChatChannelView> {
     final result = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.deleteMessageQuestion),
-        content: Text(AppLocalizations.of(context)!.deleteChatMessageWarning),
+        // Discourse's own confirmation. (The old "removes it for everyone"
+        // overstated it: a deleted chat message can be restored.)
+        content: Text(AppLocalizations.of(context)!.chatDeleteConfirm),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
@@ -387,7 +407,7 @@ class _ChatChannelViewState extends State<ChatChannelView> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.editMessage),
+        title: Text(AppLocalizations.of(context)!.edit),
         content: TextField(controller: ctrl, maxLines: 4, autofocus: true),
         actions: [
           TextButton(
@@ -451,7 +471,7 @@ class _ErrorBanner extends StatelessWidget {
 /// How a channel is titled: `#name` for a channel, the members for a DM.
 String chatChannelTitle(FCChatChannel ch) {
   if (ch.chatableType == 'DirectMessage') {
-    return ch.title.isNotEmpty ? ch.title : 'Direct message';
+    return ch.title;
   }
   return '#${ch.title.isNotEmpty ? ch.title : 'channel ${ch.id}'}';
 }

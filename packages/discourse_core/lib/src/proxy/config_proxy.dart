@@ -178,6 +178,12 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       siteContext.setShowTimeGapDays(gapRaw is num
           ? gapRaw.toInt()
           : int.tryParse(gapRaw?.toString() ?? ''));
+      // Chat without public channels is direct messages only. Absent (no
+      // chat plugin) leaves the default; the Chat tab is hidden then anyway.
+      final publicChannels = settings['enable_public_channels'];
+      if (publicChannels is bool) {
+        siteContext.setChatPublicChannelsEnabled(publicChannels);
+      }
     } catch (e) {
       // ignore: avoid_print
       print('⚠️ [DISCOURSE_CONFIG] /site/settings.json failed '

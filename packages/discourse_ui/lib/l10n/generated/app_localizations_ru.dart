@@ -1767,6 +1767,99 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get chatChannels => 'Каналы';
+
+  @override
+  String get chatDms => 'Прямые сообщения';
+
+  @override
+  String get chatNoChannels => 'Вы еще не присоединились ни к одному каналу!';
+
+  @override
+  String get chatNoDms => 'Вы еще не начали общение через прямые сообщения!';
+
+  @override
+  String get chatNoDmsCta => 'Начать разговор';
+
+  @override
+  String chatPlaceholderChannel(String channel) {
+    return 'Чат в канале «$channel»';
+  }
+
+  @override
+  String chatPlaceholderUsers(String names) {
+    return 'Чат с $names';
+  }
+
+  @override
+  String get chatPlaceholderGroup => 'Чат в группе';
+
+  @override
+  String get chatPlaceholderSelf => 'Напишите что-нибудь';
+
+  @override
+  String get chatPlaceholderArchived =>
+      'Канал архивирован, вы не можете отправлять новые сообщения.';
+
+  @override
+  String get chatPlaceholderClosed =>
+      'Канал закрыт, вы не можете отправлять новые сообщения.';
+
+  @override
+  String get chatPlaceholderReadOnly =>
+      'Канал в режиме «только для чтения», вы не можете отправлять новые сообщения.';
+
+  @override
+  String get chatPlaceholderSilenced =>
+      'В настоящее время вы не можете отправлять сообщения.';
+
+  @override
+  String get chatDeleteConfirm =>
+      'Вы уверены, что хотите удалить это сообщение?';
+
+  @override
+  String get chatStartNewDm => 'Начать новый DM';
+
+  @override
+  String get chatCreatePersonal => 'Создать личный чат';
+
+  @override
+  String get chatCreateGroup => 'Создать групповой чат';
+
+  @override
+  String get chatCannotCreate => 'Вы не можете отправлять прямые сообщения.';
+
+  @override
+  String get chatDisabledUser => 'отключил(а) чат';
+
+  @override
+  String get chatSearchPlaceholder => '@пользователь';
+
+  @override
+  String get chatAddMorePlaceholder => '... добавить еще участников';
+
+  @override
+  String chatUserNotFound(String name) {
+    return '@$name не найден(а)';
+  }
+
+  @override
+  String get chatCouldNotStartDm => 'Не удалось начать чат.';
+
+  @override
+  String get chatSignInTitle => 'Войдите, чтобы пользоваться чатом';
+
+  @override
+  String get chatSignInMessage =>
+      'Войдите, чтобы видеть каналы чата и присоединяться к ним.';
+
+  @override
+  String get chatDirectMessage => 'Прямое сообщение';
+
+  @override
+  String get chatNotAvailable => 'Чат недоступен на этом форуме.';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Не удалось отправить сообщение: $error';
   }

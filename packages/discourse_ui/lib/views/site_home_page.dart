@@ -757,10 +757,9 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           isLoggedIn: isLoggedIn,
         );
       case _chatTab:
-        // One title for the whole slot rather than echoing the selected sub-tab:
-        // an app bar reading "Chat" directly above a "Chat | Messages" tab bar is
-        // pure repetition, and it left the header changing under the user as they
-        // switched. "Inbox" names the section both halves belong to.
+        // No title: the slot's "Chat | Messages" tab bar is its header (see
+        // InboxTabAppBar — Discourse has no umbrella term, and "Inbox" is its
+        // name for the personal-message folder).
         return InboxTabAppBar(
           siteContext: _siteContext!,
           isLoggedIn: isLoggedIn,
