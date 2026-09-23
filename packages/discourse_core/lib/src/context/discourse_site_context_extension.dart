@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show debugPrint, visibleForTesting;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, debugPrint, defaultTargetPlatform, kIsWeb, visibleForTesting;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +24,27 @@ import '../storage/discourse_secure_storage.dart';
 /// SharedPreferences by older builds are migrated to secure storage on read.
 extension DiscourseSiteContextExtension on SiteContext {
   static final Expando<Map<String, dynamic>> _store = Expando('discourseStore');
-  static const FlutterSecureStorage _secureStorage = discourseSecureStorage;
+
+  /// Tests swap in a store whose reads fail; the plugin's own mock never does.
+  @visibleForTesting
+  static FlutterSecureStorage? debugSecureStorageOverride;
+
+  /// Pauses between attempts when the platform refuses a key read. A refusal
+  /// is typically the Keychain around a lock-state change, which settles in
+  /// well under a second; the total stays short because site init waits on it.
+  @visibleForTesting
+  static List<Duration> keyReadRetryDelays = const [
+    Duration(milliseconds: 250),
+    Duration(milliseconds: 750),
+    Duration(milliseconds: 1500),
+  ];
+
+  static FlutterSecureStorage get _secureStorage =>
+      debugSecureStorageOverride ?? discourseSecureStorage;
+
+  /// Set once this forum's key entry has been rewritten under the current iOS
+  /// accessibility class, so the move happens once rather than every launch.
+  static const String _iosKeyClassValue = 'first_unlock';
 
   Map<String, dynamic> _data() => _store[this] ??= <String, dynamic>{};
 
@@ -70,6 +91,9 @@ extension DiscourseSiteContextExtension on SiteContext {
     final prefs = await SharedPreferences.getInstance();
     final prefix = _prefsPrefix();
     await _secureStorage.write(key: '${prefix}_user_api_key', value: userApiKey);
+    if (_isIOS) {
+      await prefs.setString('${prefix}_user_api_key_ios_class', _iosKeyClassValue);
+    }
     // Make sure no plaintext copy from an older build lingers.
     await prefs.remove('${prefix}_user_api_key');
     await prefs.setString('${prefix}_user_api_client_id', userApiClientId);
@@ -88,7 +112,13 @@ extension DiscourseSiteContextExtension on SiteContext {
     final prefs = await SharedPreferences.getInstance();
     final prefix = _prefsPrefix();
     await _secureStorage.delete(key: '${prefix}_user_api_key');
+    if (_isIOS && debugSecureStorageOverride == null) {
+      // An entry an older build wrote under the previous class, never moved
+      // because no launch read it since: the delete above cannot see it.
+      await legacyAppleSecureStorage.delete(key: '${prefix}_user_api_key');
+    }
     await prefs.remove('${prefix}_user_api_key');
+    await prefs.remove('${prefix}_user_api_key_ios_class');
     await prefs.remove('${prefix}_user_api_client_id');
     await prefs.remove('${prefix}_user_api_push_enabled');
     await prefs.remove('${prefix}_login_snapshot');
@@ -121,30 +151,69 @@ extension DiscourseSiteContextExtension on SiteContext {
 
   /// Hydrate in-memory credentials from storage. Call once at app start
   /// (before issuing any authenticated request).
+  ///
+  /// A read the platform *refuses* is not a read that found nothing. The
+  /// plugin throws for the first (e.g. iOS `errSecInteractionNotAllowed`
+  /// while the Keychain is locked) and returns null for the second, and only
+  /// the second means signed out. So a refusal is retried briefly, and if it
+  /// persists, a key this context already holds is kept: site init reads the
+  /// key twice (once before the first fetches, again in
+  /// `restorePersistedSession`), and a refusal on the second read used to
+  /// overwrite a good key with null and sign the user out for the session.
   Future<void> loadUserApiCredentials() async {
     final prefs = await SharedPreferences.getInstance();
     final prefix = _prefsPrefix();
     final data = _data();
     String? key;
-    try {
-      key = await _secureStorage.read(key: '${prefix}_user_api_key');
-    } catch (e) {
-      // A Keystore/Keychain failure means the key is gone whatever we do;
-      // start signed out rather than fail the whole launch.
-      debugPrint('[DISCOURSE_AUTH] secure storage read failed: $e');
+    Object? readError;
+    for (var attempt = 0;; attempt++) {
+      try {
+        key = await _secureStorage.read(key: '${prefix}_user_api_key');
+        readError = null;
+        break;
+      } catch (e) {
+        readError = e;
+        if (attempt >= keyReadRetryDelays.length) break;
+        await Future<void>.delayed(keyReadRetryDelays[attempt]);
+      }
     }
-    if (key == null) {
+    if (readError != null) {
+      final held = data['userApiKey'] as String?;
+      debugPrint('[DISCOURSE_AUTH] secure storage refused the key read '
+          '(${keyReadRetryDelays.length + 1} attempts): $readError — '
+          '${held != null ? 'keeping the key already loaded' : 'starting signed out; the stored key is untouched'}');
+      key = held;
+    } else if (key != null && _isIOS &&
+        prefs.getString('${prefix}_user_api_key_ios_class') != _iosKeyClassValue) {
+      // Move the entry to the current accessibility class. The plugin's write
+      // replaces an existing entry of any class, so this is the whole move.
+      try {
+        await _secureStorage.write(key: '${prefix}_user_api_key', value: key);
+        await prefs.setString(
+            '${prefix}_user_api_key_ios_class', _iosKeyClassValue);
+      } catch (e) {
+        // The key was just read, so it is still stored under the old class;
+        // the next launch tries again.
+        debugPrint('[DISCOURSE_AUTH] could not move the key to the new '
+            'Keychain class: $e');
+      }
+    }
+    if (key == null && readError == null) {
       // Migrate-on-read: older builds stored the key in plaintext
       // SharedPreferences. Move it to secure storage and delete the copy.
       key = prefs.getString('${prefix}_user_api_key');
       if (key != null) {
         await _secureStorage.write(key: '${prefix}_user_api_key', value: key);
+        if (_isIOS) {
+          await prefs.setString(
+              '${prefix}_user_api_key_ios_class', _iosKeyClassValue);
+        }
         await prefs.remove('${prefix}_user_api_key');
       }
     }
     data['userApiKey'] = key;
     data['userApiClientId'] = prefs.getString('${prefix}_user_api_client_id');
-    if (key == null && data['userApiClientId'] != null) {
+    if (key == null && readError == null && data['userApiClientId'] != null) {
       // The signature of a lost key: the non-secret half of the credential
       // survived and the secret half did not. Sign-out and never-signed-in
       // are otherwise indistinguishable from the outside; log it so the
@@ -244,4 +313,9 @@ extension DiscourseSiteContextExtension on SiteContext {
   String get discourseStoragePrefix => _prefsPrefix();
 
   String _prefsPrefix() => 'discourse:${site.pluginUrl}';
+
+  /// The Keychain class move and the legacy delete are iOS-only; Android's
+  /// store has no accessibility classes and macOS keeps the old one.
+  static bool get _isIOS =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
 }

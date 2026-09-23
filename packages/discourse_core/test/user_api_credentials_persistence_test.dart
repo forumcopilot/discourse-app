@@ -1,4 +1,6 @@
 import 'package:discourse_core/discourse_core.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
@@ -34,6 +36,15 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     FlutterSecureStorage.setMockInitialValues({});
+    DiscourseSiteContextExtension.keyReadRetryDelays = const [
+      Duration.zero,
+      Duration.zero,
+    ];
+  });
+
+  tearDown(() {
+    DiscourseSiteContextExtension.debugSecureStorageOverride = null;
+    debugDefaultTargetPlatformOverride = null;
   });
 
   test('credentials written by one context are readable by a fresh one',
@@ -130,4 +141,155 @@ void main() {
       isNull,
     );
   });
+
+  // A refused read (the Keychain around a lock-state change) is not an empty
+  // store. Verified on an iPhone 17 on 2026-09-22: a notification tapped on
+  // the lock screen opened the forum signed out, while the key was intact —
+  // a cold start signed back in.
+  group('a refused key read', () {
+    test('is retried, and a later success loads the key', () async {
+      await freshContext().setUserApiCredentials(
+        userApiKey: 'k-secret',
+        userApiClientId: 'client-1',
+      );
+      final flaky = _RefusingStorage(refusals: 2);
+      DiscourseSiteContextExtension.debugSecureStorageOverride = flaky;
+
+      final ctx = freshContext();
+      await ctx.loadUserApiCredentials();
+      expect(flaky.reads, 3);
+      expect(ctx.userApiKey, 'k-secret');
+      expect(ctx.hasUserApiKey, isTrue);
+    });
+
+    test('does not drop a key this context already holds', () async {
+      // Site init loads the key, then restorePersistedSession loads it again;
+      // the second read being refused must not sign the user out.
+      final ctx = freshContext();
+      await ctx.setUserApiCredentials(
+        userApiKey: 'k-secret',
+        userApiClientId: 'client-1',
+      );
+      await ctx.loadUserApiCredentials();
+      expect(ctx.hasUserApiKey, isTrue);
+
+      DiscourseSiteContextExtension.debugSecureStorageOverride =
+          _RefusingStorage(refusals: 99);
+      await ctx.loadUserApiCredentials();
+      expect(ctx.userApiKey, 'k-secret');
+      expect(ctx.hasUserApiKey, isTrue);
+    });
+
+    test('with nothing loaded starts signed out but leaves the key stored',
+        () async {
+      await freshContext().setUserApiCredentials(
+        userApiKey: 'k-secret',
+        userApiClientId: 'client-1',
+      );
+      DiscourseSiteContextExtension.debugSecureStorageOverride =
+          _RefusingStorage(refusals: 99);
+
+      final ctx = freshContext();
+      await expectLater(ctx.loadUserApiCredentials(), completes);
+      expect(ctx.hasUserApiKey, isFalse);
+      expect(ctx.userApiAuthHeaders(), isEmpty);
+
+      // The store was never touched, so the next launch signs back in.
+      DiscourseSiteContextExtension.debugSecureStorageOverride = null;
+      final next = freshContext();
+      await next.loadUserApiCredentials();
+      expect(next.userApiKey, 'k-secret');
+    });
+  });
+
+  group('iOS Keychain class move', () {
+    test('an entry from an older build is rewritten once, then left alone',
+        () async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      // What an older build left: key in the Keychain, no class marker.
+      FlutterSecureStorage.setMockInitialValues(
+          {'${prefix()}_user_api_key': 'k-old'});
+      SharedPreferences.setMockInitialValues(
+          {'${prefix()}_user_api_client_id': 'client-1'});
+      final counting = _RefusingStorage(refusals: 0);
+      DiscourseSiteContextExtension.debugSecureStorageOverride = counting;
+
+      await freshContext().loadUserApiCredentials();
+      expect(counting.writes, 1, reason: 'moved under the new class');
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('${prefix()}_user_api_key_ios_class'),
+          'first_unlock');
+
+      final again = freshContext();
+      await again.loadUserApiCredentials();
+      expect(counting.writes, 1, reason: 'already moved');
+      expect(again.userApiKey, 'k-old');
+    });
+
+    test('sign-out forgets the marker with the key', () async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      final ctx = freshContext();
+      await ctx.setUserApiCredentials(
+        userApiKey: 'k-secret',
+        userApiClientId: 'client-1',
+      );
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('${prefix()}_user_api_key_ios_class'),
+          'first_unlock');
+
+      await ctx.clearUserApiCredentials();
+      expect(prefs.getString('${prefix()}_user_api_key_ios_class'), isNull);
+      expect(
+        await const FlutterSecureStorage()
+            .read(key: '${prefix()}_user_api_key'),
+        isNull,
+      );
+    });
+  });
+}
+
+/// Refuses the first [refusals] reads the way iOS does while the Keychain is
+/// locked, then defers to the plugin's mock store. Counts reads and writes.
+class _RefusingStorage extends FlutterSecureStorage {
+  _RefusingStorage({required this.refusals});
+
+  int refusals;
+  int reads = 0;
+  int writes = 0;
+
+  @override
+  Future<String?> read({
+    required String key,
+    IOSOptions? iOptions,
+    AndroidOptions? aOptions,
+    LinuxOptions? lOptions,
+    WebOptions? webOptions,
+    MacOsOptions? mOptions,
+    WindowsOptions? wOptions,
+  }) async {
+    reads++;
+    if (refusals > 0) {
+      refusals--;
+      throw PlatformException(
+        code: 'Unexpected security result code',
+        message: 'Code: -25308, Message: User interaction is not allowed.',
+      );
+    }
+    return const FlutterSecureStorage().read(key: key);
+  }
+
+  @override
+  Future<void> write({
+    required String key,
+    required String? value,
+    IOSOptions? iOptions,
+    AndroidOptions? aOptions,
+    LinuxOptions? lOptions,
+    WebOptions? webOptions,
+    MacOsOptions? mOptions,
+    WindowsOptions? wOptions,
+  }) {
+    writes++;
+    return const FlutterSecureStorage().write(key: key, value: value);
+  }
 }

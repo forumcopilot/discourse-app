@@ -17,12 +17,36 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// did not come with it) clear itself instead of throwing on every read,
 /// which would leave the app unable to sign in again either.
 ///
-/// iOS and macOS keep the library default (`kSecAttrAccessibleWhenUnlocked`)
-/// deliberately. The app never reads the key while the device is locked,
-/// and changing the accessibility class is not free: this plugin version's
-/// `delete` includes the class in its Keychain query, so entries written
-/// under the old class could no longer be removed on sign-out.
+/// iOS. `first_unlock` (`kSecAttrAccessibleAfterFirstUnlock`) instead of the
+/// library default `unlocked`. With push, the app does read the key around
+/// lock-state transitions — a notification tapped on the lock screen opens
+/// the forum as the device unlocks — and a refused read used to start that
+/// session signed out (verified on an iPhone 17, 2026-09-22). `first_unlock`
+/// keeps the item readable from the first unlock after boot until shutdown,
+/// and keeps the old class's backup behaviour (not `_this_device`), so the
+/// only thing that changes is lock state.
+///
+/// Changing the class is not free on this plugin version: `delete` puts the
+/// class in its Keychain query, so an entry written under the old class is
+/// invisible to a delete through this store. Entries are therefore moved on
+/// read (see `loadUserApiCredentials`; the plugin's `write` replaces an entry
+/// of any class), and sign-out also deletes through
+/// [legacyAppleSecureStorage].
+///
+/// macOS keeps the library default: a Mac has no lock-screen notification
+/// path into the app.
 const FlutterSecureStorage discourseSecureStorage = FlutterSecureStorage(
+  aOptions: AndroidOptions(
+    encryptedSharedPreferences: true,
+    resetOnError: true,
+  ),
+  iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+);
+
+/// The store as it was before iOS moved to `first_unlock` — the library's
+/// default class. Only for deleting entries an older build wrote on iOS;
+/// never write through it.
+const FlutterSecureStorage legacyAppleSecureStorage = FlutterSecureStorage(
   aOptions: AndroidOptions(
     encryptedSharedPreferences: true,
     resetOnError: true,
