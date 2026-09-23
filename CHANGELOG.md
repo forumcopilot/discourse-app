@@ -6,6 +6,27 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.18] - 2026-09-23
+
+Chat, reviewed against Discourse's chat plugin and tested on a Pixel 4a against a local Discourse with a second user posting through the API.
+
+### Added
+- **Live chat over MessageBus.** An open channel used to re-fetch 50 messages every 4 s — 15 requests a minute against the User API Key's 20/minute and 2,880/day, so a channel left open used up the key's day in about three hours — and never showed other people's edits, deletions or reactions. `DiscourseMessageBus` now long-polls `/message-bus/{client}/poll` the way Discourse web does (held ~25 s, polls at least 6 s apart, Retry-After honoured, a 30 s refetch fallback when the key has no message-bus access). Measured: an idle open channel makes 2.4 requests a minute, a burst of ten messages peaks near 14, and a phone with the screen off makes none. New messages, edits, reactions and deletions appear live; "mark read" is sent at most every 30 s.
+- **Images and files in chat.** Discourse sends them in a message's `uploads`, not its cooked HTML, so they were empty bubbles. They are drawn with the topic view's attachment widgets, and an image opens full screen.
+- **A chat notification opens its message**, fetched around it, scrolled to and briefly highlighted, with the channel as the title.
+
+### Changed
+- **Discourse's words for chat**, in all eleven languages: a **Channels | DMs** switch with unread dots, a "Start new DM" button, a "Create a personal chat" sheet, composer hints ("Chat in #general", "Chat with @bob", and read-only, closed, archived or silenced states), the delete confirmation, and chat notification texts that say whether it was a DM or a channel.
+- **No "Inbox" title over Chat | Messages.** Discourse uses that word for the personal-message folder; the Chat | Messages row is now the header and carries the drawer button.
+- **Chat appears only for people who can use it**, as on Discourse: the Chat half needs the member's `has_chat_enabled` (the forum's setting, `chat_allowed_groups`, and their own preference), Channels needs `enable_public_channels`, and DMs and the new-DM button need `can_direct_message` (or existing DMs to read).
+- Edit, delete and the composer follow Discourse's permissions from the channel's meta: write in an open channel (a closed one if you moderate it), never while silenced; delete your own or anyone's as the forum allows.
+
+### Fixed
+- **New DM could open a chat with only yourself.** The sheet sent every pick, groups included, as `target_usernames`, and Discourse drops names it cannot use. It now searches `/chat/api/chatables` (people who cannot chat shown but not pickable), sends groups as `target_groups`, and stops on an unknown name before anything is created.
+- **Editing a message removed its attachments** on the server (a missing `upload_ids` reads as "no uploads"). Edits send the message's upload ids and keep its reactions.
+- The profile's Chat button no longer depends on the member accepting personal messages.
+- A channel that fails to load says so with Retry instead of "No messages yet", and the channel list refreshes its badges when you come back from a channel.
+
 ## [1.0.17] - 2026-09-23
 
 Opening a forum: one screen that fills in, and an offline failure that says so. Tested on a Pixel 4a against meta.discourse.org.
