@@ -6,6 +6,16 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.15] - 2026-09-22
+
+### Fixed
+- **A notification tapped on the lock screen no longer opens the forum signed out.** Found on an iPhone 17: the session came back on the next cold start, so the key was intact — the read had been *refused*. The plugin throws for a refused read (the iOS Keychain around a lock-state change) and returns null for an empty store, and `loadUserApiCredentials` treated both as "no key". Site init reads the key twice, so one refusal on the second read overwrote a good in-memory key and signed the user out for the session. A refusal is now retried briefly; if it persists, a key the context already holds is kept, and otherwise the session starts signed out with the stored key untouched, so the next launch recovers.
+- **iOS keeps the User API Key readable after the first unlock** (`kSecAttrAccessibleAfterFirstUnlock`) instead of only while unlocked. The old class assumed the app never reads the key on a locked device, which push made false. Backup behaviour is unchanged (not `_ThisDeviceOnly`). Existing keys move to the new class on the first launch that reads them, once; sign-out also deletes under the old class for a key no launch has moved yet. Android and macOS are unchanged.
+- **A topic that fails to load now says so.** A refused load — typically a private message opened while signed out — rendered as an empty topic with no title, "End of the discussion" and "1 / 0". The list now shows the forum's own reason, a sign-in hint when signed out, and Retry.
+
+### Documentation
+- `docs/push.md` states the payload contract a notifications backend has to meet.
+
 ## [1.0.14] - 2026-09-10
 
 ### Added
