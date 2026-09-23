@@ -6,6 +6,24 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+Thread rendering, batch 1 of the audit that opened the first 50 topics of all 924 ABDA directory forums on a Pixel 4a and compared posts with the web (292k posts rendered). Every fix below is covered by `test/post_body_rendering_test.dart` and was checked before/after on the Pixel in light and dark themes.
+
+### Fixed
+- **Images keep their proportions.** An upload wider than the screen kept its HTML height while its width shrank, so every large image sat in a band of blank space. The box now follows the image's aspect ratio.
+- **No file-name captions under images.** The lightbox caption Discourse ships for its hover overlay (`image1408×768 113 KB`) was printed under every upload; it is dropped, as web hides it.
+- **`<hr>` is a thin divider** instead of a heavy black box followed by ~280dp of empty space.
+- **Quotes are drawn once**; every quote had a second bar and background from the blockquote inside it.
+- **Hidden content stays hidden.** Markup Discourse hides with CSS (`.hidden`, e.g. the full issue body behind a GitHub onebox's excerpt) was printed.
+- **An invalid author colour no longer breaks a post.** `<font color="#PG985740">` made flutter_html throw and the post became an error box. Author colours are normalised (all CSS colour names now work, invalid ones are dropped as a browser would), and if flutter_html ever fails on a post again it shows as plain text instead of an error box (`installPostBodyErrorFallback`, installed by `setupErrorHandling`).
+- **Author colours stay readable in light and dark themes.** Colours chosen against a light forum are lightened or darkened only as far as needed to reach WCAG 4.5:1 contrast with the current background, keeping their hue.
+- **SVG images render** (uploads, favicons) instead of falling back to their alt text.
+- **Checklists show which items are ticked** (☑ / ☐ in theme colours).
+- **Names that start with an emoji** no longer throw in letter icons ("🎓 Docs"): category icons, forum headers and letter avatars take the first whole character.
+- **Solved topics show their answer under the question again.** Current discourse-solved sends `accepted_answers` (a list); only the older `accepted_answer` was read, so the panel was missing on 389 of 417 solved-enabled forums.
+
+### Removed
+- **Link-preview cards under posts.** For the first plain link in a post the app fetched the page from the phone and added a card the web never shows; posts now show only what the forum oneboxed.
+
 ## [1.0.19] - 2026-09-23
 
 Photos and files: sending them in chat, taking them with the camera, and uploading them at the size the forum's website uses. Tested on a Pixel 4a against a local Discourse.

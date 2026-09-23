@@ -4,6 +4,7 @@ import 'package:html/parser.dart' as html_parser;
 
 import '../core/cache/lru_cache.dart';
 
+import 'html_colors.dart';
 import 'media_url_utils.dart';
 
 /// The media Discourse embedded in a post, pulled out of the server's
@@ -175,6 +176,33 @@ class CookedContent {
       }
       // Any other onebox stays put — the server already rendered the
       // preview, so adding a LinkPreviewCard would duplicate it.
+    }
+
+    // ---- 3b. What web hides with CSS ---------------------------------
+    // flutter_html has no stylesheet, so markup Discourse ships for CSS to
+    // hide would be printed:
+    //  * `.lightbox-wrapper .meta` — the upload's file name, dimensions and
+    //    size ("image1672×941 318 KB"), which web shows only as an expand
+    //    icon;
+    //  * `.hidden` — e.g. the full issue body a GitHub onebox carries behind
+    //    its two-line excerpt (web: `display: none`).
+    for (final node in body.querySelectorAll('.lightbox-wrapper .meta, .hidden').toList()) {
+      node.remove();
+    }
+
+    // ---- 3c. Author colours ------------------------------------------
+    // `<font color>` from the BBCode `[color]` tag. flutter_html parses a
+    // `#…` value as an integer and throws on anything but hex digits,
+    // taking the whole post with it (`#PG985740` on community.robotime.com),
+    // and knows only 16 colour names. Normalise to `#rrggbb`, or drop what a
+    // browser would ignore; RichTextContent then adapts it to the theme.
+    for (final el in body.querySelectorAll('[color]')) {
+      final normalized = normalizeHtmlColor(el.attributes['color']);
+      if (normalized == null) {
+        el.attributes.remove('color');
+      } else {
+        el.attributes['color'] = normalized;
+      }
     }
 
     // ---- 4. Images ---------------------------------------------------

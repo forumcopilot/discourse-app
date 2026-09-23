@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants.dart';
 import '../../utils/safe_image.dart';
 import '../../utils/avatar_color_utils.dart';
+import '../../utils/initials.dart';
 
 class ForumIconWidget extends StatelessWidget {
   final String? logoUrl;
@@ -103,7 +104,7 @@ class ForumIconWidget extends StatelessWidget {
         color: backgroundColor,
         child: Center(
           child: Text(
-            siteName![0].toUpperCase(),
+            initialOf(siteName!),
             style: textTheme.titleLarge?.copyWith(
               color: iconColor ?? Colors.white,
               fontWeight: FontWeight.w600,
@@ -136,7 +137,7 @@ class ForumIconWidget extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          siteName![0].toUpperCase(),
+          initialOf(siteName!),
           style: textTheme.titleLarge?.copyWith(
             color: avatarColors['text']!,
             fontWeight: FontWeight.w600,

@@ -44,12 +44,28 @@ class DiscourseAcceptedAnswer {
 
   /// Returns null when the topic has no accepted answer, or when the payload lacks the
   /// two fields the panel cannot render without.
+  ///
+  /// Reads both shapes discourse-solved has serialized:
+  ///  * `accepted_answer: {post_number, username, name, excerpt, accepter_*}` — older
+  ///    plugin versions;
+  ///  * `accepted_answers: [{id, post_number, username, avatar_template, cooked, url,
+  ///    …}]` — current versions, which allow more than one solution per topic and send
+  ///    the answer's full cooked HTML instead of an excerpt. Of 417 directory forums with
+  ///    a solved topic on their Latest page (2026-09-23), 389 sent this shape, and
+  ///    reading only the old key left the panel blank on all of them. The first entry
+  ///    is shown, as the panel has room for one.
   static DiscourseAcceptedAnswer? fromTopicJson(Map<String, dynamic> topic) {
-    final raw = topic['accepted_answer'];
+    var raw = topic['accepted_answer'];
+    if (raw is! Map) {
+      final list = topic['accepted_answers'];
+      raw = list is List ? list.whereType<Map>().firstOrNull : null;
+    }
     if (raw is! Map) return null;
     final a = raw.cast<String, dynamic>();
 
-    final postNumber = (a['post_number'] as num?)?.toInt();
+    // Numbers have arrived both as JSON numbers and as strings.
+    final pn = a['post_number'];
+    final postNumber = pn is num ? pn.toInt() : int.tryParse('${pn ?? ''}');
     final username = (a['username'] ?? '').toString();
     if (postNumber == null || username.isEmpty) return null;
 
@@ -63,7 +79,7 @@ class DiscourseAcceptedAnswer {
       username: username,
       name: str(a['name']),
       avatarTemplate: str(a['avatar_template']),
-      excerptHtml: str(a['excerpt']),
+      excerptHtml: str(a['excerpt'] ?? a['cooked']),
       accepterUsername: str(a['accepter_username']),
       accepterName: str(a['accepter_name']),
     );

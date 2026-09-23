@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart' as html_parser;
 import 'package:url_launcher/url_launcher_string.dart';
 
+import 'brand_image.dart';
 import 'post_content_callbacks.dart' show PostContentCallbacks;
+import '../../core/cache/lru_cache.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/emoji_shortcodes.dart';
 import '../../utils/file_utils.dart';
+import '../../utils/html_colors.dart';
 import '../../utils/url_utils.dart';
 
 /// Renders post content. The data we get from Discourse's `/t/{id}.json`
@@ -52,8 +57,13 @@ class RichTextContent extends StatelessWidget {
     final mutedColor = colorScheme.onSurfaceVariant;
     final accent = colorScheme.primary;
 
-    return Html(
-      data: _foldAttachmentSize(content),
+    final html = _readableAuthorColours(
+        _foldAttachmentSize(content), colorScheme.surface);
+
+    return PostBodyFallback(
+      html: html,
+      child: Html(
+      data: html,
       onLinkTap: (url, attributes, _) {
         if (url == null || url.isEmpty) return;
         final resolved = _resolveUrl(url);
@@ -193,13 +203,40 @@ class RichTextContent extends StatelessWidget {
             final h = double.tryParse(
                     extensionContext.attributes['height'] ?? '') ??
                 (isEmoji ? 20 : null);
-            final image = Image.network(
-              resolved,
-              width: w,
-              height: h,
-              errorBuilder: (_, __, ___) =>
-                  Text(alt, style: TextStyle(color: mutedColor)),
-            );
+            // Image.network cannot decode SVG (uploads, badges, GitHub's
+            // favicon) and showed the alt text instead. BrandImage draws it
+            // with flutter_svg from the disk cache, falling back the same way
+            // when the file is missing or not SVG.
+            final isSvg = BrandImage.isSvg(resolved);
+            Widget fallback(BuildContext _) =>
+                Text(alt, style: TextStyle(color: mutedColor));
+            Widget picture({double? width, double? height}) => isSvg
+                ? BrandImage(
+                    resolved,
+                    width: width,
+                    height: height,
+                    fit: BoxFit.contain,
+                    fallback: fallback,
+                  )
+                : Image.network(
+                    resolved,
+                    width: width,
+                    height: height,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, _, __) => fallback(context),
+                  );
+            // An upload wider than the column keeps its proportions. Given
+            // both attributes, RenderImage clamps the width to the column
+            // but keeps the height, and the picture ends up centred in a
+            // box that is too tall — a blank band above and below every
+            // large image. AspectRatio sizes the box from the width it
+            // actually gets.
+            final Widget image = (!isEmoji && w != null && h != null && w > 0 && h > 0)
+                ? ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: w),
+                    child: AspectRatio(aspectRatio: w / h, child: picture()),
+                  )
+                : picture(width: w, height: h);
             // Route content-image taps to the in-app viewer (emoji stay
             // plain inline glyphs/images).
             final onImageTap = callbacks?.onImageTap;
@@ -212,7 +249,45 @@ class RichTextContent extends StatelessWidget {
             );
           },
         ),
+        // Web draws <hr> as a thin rule in the border colour. flutter_html's
+        // default is a black Border.all box with auto margins, which in a
+        // post left a heavy rule and ~280dp of blank space under it.
+        TagExtension(
+          tagsToExtend: {'hr'},
+          builder: (_) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
+            child: SizedBox(
+              width: double.infinity,
+              child: Divider(
+                height: 1,
+                thickness: 1,
+                color: colorScheme.outlineVariant,
+              ),
+            ),
+          ),
+        ),
+        // discourse-checklist cooks `[x]` / `[ ]` into an empty
+        // span.chcklst-box whose glyph is CSS; without one, checked and
+        // unchecked items read the same.
+        MatcherExtension.inline(
+          matcher: (c) => c.classes.contains('chcklst-box'),
+          builder: (c) {
+            final checked = c.classes.contains('checked');
+            return WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: Icon(
+                  checked ? Icons.check_box : Icons.check_box_outline_blank,
+                  size: (body.fontSize ?? 14) * 1.25,
+                  color: checked ? accent : mutedColor,
+                ),
+              ),
+            );
+          },
+        ),
       ],
+      ),
     );
   }
 
@@ -229,6 +304,122 @@ class RichTextContent extends StatelessWidget {
   }
 }
 
+
+/// Author colours (`<font color>`, normalised to `#rrggbb` by CookedContent)
+/// adjusted to stay readable on [surface]: black text turns light grey in
+/// the dark theme, a pale cyan darkens on the light one. Hue is kept, and
+/// colours that already contrast are left alone. Keyed by theme so a
+/// light/dark switch re-renders with the other set.
+final LRUCache<String, String> _themedHtmlCache = LRUCache(maxSize: 200);
+final RegExp _authorColour = RegExp(r'(?<=\s)color="(#[0-9a-f]{6})"');
+
+String _readableAuthorColours(String html, Color surface) {
+  if (!html.contains('color="#')) return html;
+  final key = '${surface.toARGB32()}\u0000$html';
+  final hit = _themedHtmlCache.get(key);
+  if (hit != null) return hit;
+  final themed = html.replaceAllMapped(_authorColour, (m) {
+    final adjusted = readableOn(colorFromHex(m.group(1)!), surface);
+    return 'color="${colorToHex(adjusted)}"';
+  });
+  _themedHtmlCache.put(key, themed);
+  return themed;
+}
+
+/// A post body's text, kept at hand in case flutter_html cannot build it.
+///
+/// When flutter_html throws while building a post (it did on an invalid
+/// `<font color>`), Flutter puts an error box in its place — grey in
+/// release and, inside a scrolling thread, unbounded: 100,000dp tall. With
+/// this above the Html widget, the error box is replaced by the post's
+/// plain text instead, so an unexpected construct degrades to something
+/// readable.
+class PostBodyFallback extends InheritedWidget {
+  const PostBodyFallback({super.key, required this.html, required super.child});
+
+  final String html;
+
+  static PostBodyFallback? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<PostBodyFallback>();
+
+  String get plainText => _plainTextOf(html);
+
+  @override
+  bool updateShouldNotify(PostBodyFallback oldWidget) => oldWidget.html != html;
+}
+
+/// Wraps whatever ErrorWidget.builder is installed (Flutter's default unless
+/// the host set its own). Only errors that took down a whole post body — no
+/// flutter_html box between the failure and [PostBodyFallback] — become the
+/// post's plain text; a failure deeper inside keeps the previous error
+/// widget, bounded in height so it can never swallow a thread.
+///
+/// Called once from the app's error-handling setup; returns a callback that
+/// restores the previous builder (tests use it).
+VoidCallback installPostBodyErrorFallback() {
+  final previous = ErrorWidget.builder;
+  ErrorWidget.builder =
+      (details) => _PostBodyErrorView(details: details, previous: previous);
+  return () => ErrorWidget.builder = previous;
+}
+
+class _PostBodyErrorView extends StatelessWidget {
+  const _PostBodyErrorView({required this.details, required this.previous});
+
+  final FlutterErrorDetails details;
+  final ErrorWidgetBuilder previous;
+
+  @override
+  Widget build(BuildContext context) {
+    final fallback = PostBodyFallback.maybeOf(context);
+    final insideRenderedHtml =
+        context.findAncestorWidgetOfExactType<CssBoxWidget>() != null;
+    if (fallback != null && !insideRenderedHtml) {
+      return Text(fallback.plainText, style: Theme.of(context).textTheme.bodyMedium);
+    }
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 200),
+      child: previous(details),
+    );
+  }
+}
+
+const _plainTextBlocks = {
+  'p', 'div', 'li', 'ul', 'ol', 'table', 'tr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+  'pre', 'blockquote', 'aside', 'header', 'article', 'section', 'details',
+  'summary', 'figure', 'figcaption', 'hr', 'dl', 'dt', 'dd',
+};
+
+String _plainTextOf(String html) {
+  final sb = StringBuffer();
+  void walk(dom.Node node) {
+    if (node is dom.Text) {
+      sb.write(node.text);
+      return;
+    }
+    if (node is dom.Element) {
+      final tag = node.localName;
+      if (tag == 'br') {
+        sb.write('\n');
+        return;
+      }
+      if (tag == 'script' || tag == 'style') return;
+      final block = _plainTextBlocks.contains(tag);
+      if (block) sb.write('\n');
+      node.nodes.forEach(walk);
+      if (block) sb.write('\n');
+      return;
+    }
+    node.nodes.forEach(walk);
+  }
+
+  walk(html_parser.parseFragment(html));
+  return sb
+      .toString()
+      .replaceAll(RegExp(r'[ \t]+'), ' ')
+      .replaceAll(RegExp(r' *\n[\s]*\n+ *'), '\n\n')
+      .trim();
+}
 
 /// Folds Discourse's trailing size text into the anchor.
 ///
@@ -450,10 +641,6 @@ Map<String, Style> _stylesFor(ColorScheme colorScheme, TextStyle body,
       color: mutedColor,
       margin: Margins.only(bottom: 4),
     ),
-    'aside.quote blockquote': Style(
-      margin: Margins.zero,
-      padding: HtmlPaddings.zero,
-    ),
     'blockquote': Style(
       margin: Margins.symmetric(vertical: 8),
       padding: HtmlPaddings.symmetric(horizontal: 12, vertical: 8),
@@ -461,6 +648,16 @@ Map<String, Style> _stylesFor(ColorScheme colorScheme, TextStyle body,
       border: Border(
         left: BorderSide(color: accent, width: 3),
       ),
+    ),
+    // After 'blockquote': flutter_html merges matching rules in map order,
+    // so this one has to come later to win. The quote's aside already draws
+    // the bar and the fill; the blockquote inside it must not draw them a
+    // second time (it did — every quote had two bars and two backgrounds).
+    'aside.quote blockquote': Style(
+      margin: Margins.zero,
+      padding: HtmlPaddings.zero,
+      backgroundColor: Colors.transparent,
+      border: const Border(),
     ),
     'code': Style(
       backgroundColor: colorScheme.surfaceContainerHighest,

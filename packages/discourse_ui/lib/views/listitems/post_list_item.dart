@@ -17,7 +17,6 @@ import '../widgets/reaction_picker_sheet.dart';
 import '../widgets/reaction_users_sheet.dart';
 import '../widgets/post_action_button.dart';
 import '../widgets/post_vote_column.dart';
-import '../widgets/link_preview_card.dart';
 import '../widgets/video_card.dart';
 import '../widgets/twitter_card.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -27,7 +26,6 @@ import '../widgets/thread_poll_card.dart';
 import '../../controllers/post_controller.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import '../../utils/cooked_content.dart';
-import '../../utils/media_url_utils.dart';
 import '../../utils/url_utils.dart';
 import '../../utils/file_utils.dart';
 import '../../theme/design_tokens.dart';
@@ -54,14 +52,12 @@ class _PostContentData {
   /// Cooked HTML with natively-carded embeds removed, ready for
   /// `RichTextContent`.
   final String html;
-  final List<String> limitedUrls;
   final List<String> limitedYoutubeUrls;
   final List<String> limitedTwitterUrls;
   final List<FCAttachment> attachments;
   final List<FCAttachment> inlineAttachments;
   _PostContentData({
     required this.html,
-    required this.limitedUrls,
     required this.limitedYoutubeUrls,
     required this.limitedTwitterUrls,
     required this.attachments,
@@ -310,24 +306,15 @@ class _PostListItemState extends State<PostListItem> {
         .where((att) => !(att.isInline ?? false))
         .toList();
 
-    // One preview per post, the way web oneboxes one link: a video if
-    // there is one, else a tweet, else the first external link. Each
-    // card is a network fetch the moment the post appears, and a post
-    // with a dozen bare links used to spawn a dozen of them.
+    // A video if there is one, else a tweet. No preview card for plain
+    // links: web shows only what the forum oneboxed (and those are already
+    // in the cooked HTML), and a card per post meant the phone fetched a
+    // third-party page for every post that scrolled into view.
     final video = content.youtubeUrls.take(1).toList();
     final tweet = video.isEmpty ? content.twitterUrls.take(1).toList() : const <String>[];
-    final link = (video.isEmpty && tweet.isEmpty)
-        ? content.linkUrls
-            .where((url) =>
-                !MediaUrlUtils.isEmail(url) &&
-                !UrlUtils.isSameDomain(widget.siteContext, url))
-            .take(1)
-            .toList()
-        : const <String>[];
 
     return _PostContentData(
       html: content.html,
-      limitedUrls: link,
       limitedYoutubeUrls: video,
       limitedTwitterUrls: tweet,
       attachments: nonInlineAttachments,
@@ -899,13 +886,6 @@ class _PostListItemState extends State<PostListItem> {
             StyleBuilders.divider(colorScheme: colorScheme),
             const SizedBox(height: DesignTokens.spacingS),
             ...data.limitedTwitterUrls.map((url) => TwitterCard(url: url)),
-          ],
-          if (data.limitedUrls.isNotEmpty) ...[
-            const SizedBox(height: DesignTokens.spacingM),
-            StyleBuilders.divider(colorScheme: colorScheme),
-            const SizedBox(height: DesignTokens.spacingS),
-            ...data.limitedUrls.map((url) =>
-                LinkPreviewCard(url: url, siteContext: widget.siteContext)),
           ],
           if (data.attachments.isNotEmpty) ...[
             const SizedBox(height: DesignTokens.spacingS),

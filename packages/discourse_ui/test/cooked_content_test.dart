@@ -179,4 +179,32 @@ void main() {
     expect(content.linkUrls, isEmpty);
     expect(content.imageUrls, isEmpty);
   });
+
+  group('CookedContent.parse — what web hides, and author colours', () {
+    test('drops the lightbox caption and .hidden content', () {
+      const cooked = '''
+<div class="lightbox-wrapper"><a class="lightbox" href="/uploads/o.png"><img src="/uploads/r.png" width="690" height="388">
+<div class="meta"><span class="filename">image</span><span class="informations">1672×941 318 KB</span></div></a></div>
+<p>Excerpt<span class="excerpt hidden">full issue body</span></p>''';
+
+      final html = CookedContent.parse(cooked, forumBaseUrl: _forum).html;
+
+      expect(html, isNot(contains('1672×941')));
+      expect(html, isNot(contains('full issue body')));
+      expect(html, contains('Excerpt'));
+    });
+
+    test('normalises author colours and drops the ones a browser ignores', () {
+      const cooked = '<p><font color="#PG985740">a</font> <font color="LimeGreen">b</font> '
+          '<font color="#F0A">c</font> <font color="nonsense">d</font></p>';
+
+      final html = CookedContent.parse(cooked, forumBaseUrl: _forum).html;
+
+      expect(html, isNot(contains('PG985740')));
+      expect(html, contains('color="#32cd32"'));
+      expect(html, contains('color="#ff00aa"'));
+      expect(html, isNot(contains('nonsense')));
+    });
+  });
 }
+

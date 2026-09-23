@@ -11,10 +11,15 @@ import 'package:discourse_ui/controllers/site_controller.dart';
 import 'package:discourse_ui/controllers/global_loader_controller.dart';
 import 'package:discourse_ui/theme/app_theme.dart';
 import 'package:discourse_ui/views/single_forum_bootstrap_page.dart';
+import 'package:discourse_ui/views/widgets/rich_text_content.dart' show installPostBodyErrorFallback;
 import 'package:discourse_ui/views/widgets/user_state_banner.dart';
 import 'package:discourse_ui/settings_context.dart';
 
 void setupErrorHandling() {
+  // A post flutter_html cannot build shows as plain text instead of an
+  // error box (see PostBodyFallback).
+  installPostBodyErrorFallback();
+
   FlutterError.onError = (FlutterErrorDetails details) async {
     // Ignore known Flutter Windows keyboard assertion error
     // This is a known issue in Flutter on Windows and doesn't affect functionality

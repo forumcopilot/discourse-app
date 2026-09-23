@@ -11,6 +11,7 @@ import 'package:discourse_ui/utils/avatar_color_utils.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/discourse_color.dart';
 import 'brand_image.dart';
+import '../../utils/initials.dart';
 
 class ForumHeaderWidget extends StatelessWidget {
   final forumcopilot_sdk.FCBoardStatResult? boardStats;
@@ -136,7 +137,7 @@ class ForumHeaderWidget extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          siteName.isNotEmpty ? siteName[0].toUpperCase() : 'F',
+          initialOf(siteName, fallback: 'F'),
           style: TextStyle(
             color: avatarColors['text']!,
             fontWeight: DesignTokens.fontWeightSemiBold,

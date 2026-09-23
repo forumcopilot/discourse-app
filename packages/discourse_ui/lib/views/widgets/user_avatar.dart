@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/views/widgets/cached_redirect_image.dart';
 import 'package:discourse_ui/utils/avatar_color_utils.dart';
+import '../../utils/initials.dart';
 
 class UserAvatar extends StatelessWidget {
   final String username;
@@ -81,7 +82,7 @@ class UserAvatar extends StatelessWidget {
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    username.isNotEmpty ? username[0].toUpperCase() : '?',
+                    initialOf(username),
                     style: textTheme.titleMedium?.copyWith(
                       color: avatarColors['text']!,
                       fontWeight: FontWeight.w600,
@@ -105,7 +106,7 @@ class UserAvatar extends StatelessWidget {
             ),
             alignment: Alignment.center,
             child: Text(
-              username.isNotEmpty ? username[0].toUpperCase() : '?',
+              initialOf(username),
               style: textTheme.titleMedium?.copyWith(
                 color: avatarColors['text']!,
                 fontWeight: FontWeight.w600,
