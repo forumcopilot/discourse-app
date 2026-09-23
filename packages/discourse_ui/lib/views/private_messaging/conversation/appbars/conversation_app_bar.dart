@@ -18,7 +18,6 @@ class ConversationAppBar extends BaseForumAppBar {
     required this.siteContext,
     this.onLeave,
     this.onMarkUnread,
-    this.onReport,
     this.participantCount = 0,
     this.canEdit = false,
     this.canClose = false,
@@ -35,7 +34,6 @@ class ConversationAppBar extends BaseForumAppBar {
 
   final VoidCallback? onLeave;
   final VoidCallback? onMarkUnread;
-  final VoidCallback? onReport;
   final VoidCallback? onClose;
   final VoidCallback? onUnclose;
   final VoidCallback? onEdit;
@@ -103,9 +101,6 @@ class ConversationAppBar extends BaseForumAppBar {
             case 'leave':
               if (onLeave != null) onLeave!();
               break;
-            case 'report':
-              if (onReport != null) onReport!();
-              break;
           }
         },
         itemBuilder: (BuildContext context) => [
@@ -172,7 +167,7 @@ class ConversationAppBar extends BaseForumAppBar {
               ),
             ),
           // Divider between close/unclose and other actions
-          if (canClose && (onLeave != null || onReport != null)) const PopupMenuDivider(),
+          if (canClose && onLeave != null) const PopupMenuDivider(),
           // Leave conversation
           if (onLeave != null)
             PopupMenuItem<String>(
@@ -187,27 +182,6 @@ class ConversationAppBar extends BaseForumAppBar {
                   const SizedBox(width: 12),
                   Text(
                     AppLocalizations.of(context)!.leaveConversation2,
-                    style: TextStyle(
-                      color: colorScheme.error,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          // Report (if available)
-          if (onReport != null)
-            PopupMenuItem<String>(
-              value: 'report',
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.flag_outlined,
-                    color: colorScheme.error,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    AppLocalizations.of(context)!.reportConversation2,
                     style: TextStyle(
                       color: colorScheme.error,
                     ),

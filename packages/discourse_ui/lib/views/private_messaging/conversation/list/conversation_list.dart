@@ -531,7 +531,11 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
 
     if (mounted) {
       setState(() {
-        _conversations!.addAll(conversationsData.list);
+        // Inbox and sent are paged separately and merged, so a message can
+        // come back on more than one page; keep the first.
+        final seen = {for (final c in _conversations!) c.conv_id};
+        _conversations!.addAll(
+            conversationsData.list.where((c) => seen.add(c.conv_id)));
         _currentPage = nextPage;
         _hasMoreData = conversationsData.list.length >= _itemsPerPage;
       });

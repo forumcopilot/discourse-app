@@ -189,7 +189,8 @@ class ConversationHeaderItem extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Avatar with Online Status Dot
+                  // Avatar. (The green "online" dot is gone: Discourse sends no presence
+                  // here, and the dot only ever meant "this is you".)
                   Stack(
                     children: [
                       GestureDetector(
@@ -217,22 +218,6 @@ class ConversationHeaderItem extends StatelessWidget {
                                   avatarUrl: message.iconUrl!,
                                 )
                               : null,
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          width: DesignTokens.statusDotSize,
-                          height: DesignTokens.statusDotSize,
-                          decoration: BoxDecoration(
-                            color: message.isFromCurrentUser == true ? Colors.green : Colors.grey,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: colorScheme.surface,
-                              width: DesignTokens.borderWidthThinMedium,
-                            ),
-                          ),
                         ),
                       ),
                     ],
@@ -734,7 +719,8 @@ class ConversationItem extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Avatar with Online Status Dot
+                  // Avatar. (The green "online" dot is gone: Discourse sends no presence
+                  // here, and the dot only ever meant "this is you".)
                   Stack(
                     children: [
                       GestureDetector(
@@ -762,22 +748,6 @@ class ConversationItem extends StatelessWidget {
                                   avatarUrl: message.iconUrl!,
                                 )
                               : null,
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          width: DesignTokens.statusDotSize,
-                          height: DesignTokens.statusDotSize,
-                          decoration: BoxDecoration(
-                            color: message.isFromCurrentUser == true ? Colors.green : Colors.grey,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: colorScheme.surface,
-                              width: DesignTokens.borderWidthThinMedium,
-                            ),
-                          ),
                         ),
                       ),
                     ],

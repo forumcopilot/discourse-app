@@ -7,10 +7,16 @@ class EditConversationPage extends StatefulWidget {
   final SiteContext siteContext;
   final String conversationId;
 
+  /// Whether the viewer may open or close the message (Discourse's
+  /// `can_close_topic`: staff, trust level 4, category moderators). Everyone
+  /// else only edits the title.
+  final bool canClose;
+
   const EditConversationPage({
     super.key,
     required this.siteContext,
     required this.conversationId,
+    this.canClose = false,
   });
 
   @override
@@ -20,6 +26,10 @@ class EditConversationPage extends StatefulWidget {
 class _EditConversationPageState extends State<EditConversationPage> {
   late final TextEditingController _titleController;
   bool? _conversationOpen;
+
+  /// The open state as loaded, so a save only sends a status change the
+  /// user actually made.
+  bool? _initialOpen;
   bool _isSubmitting = false;
   bool _hasChanges = false;
   bool _controllerInitialized = false;
@@ -73,7 +83,13 @@ class _EditConversationPageState extends State<EditConversationPage> {
       final result = await SiteProxyFactory.getPrivateConversationProxy().saveRawConversationAsync(
         widget.conversationId,
         conversationTitle: _titleController.text.trim(),
-        conversationOpen: _conversationOpen,
+        // Every save used to send the open state, so for anyone who cannot
+        // close messages the title saved and then PUT /t/{id}/status failed
+        // with a permission error. Only a change made by someone allowed to
+        // make it is sent now.
+        conversationOpen: widget.canClose && _conversationOpen != _initialOpen
+            ? _conversationOpen
+            : null,
       );
 
       if (!result.result) {
@@ -262,6 +278,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
           }
           if (_conversationOpen == null) {
             _conversationOpen = data.conversationOpen ?? true;
+            _initialOpen = _conversationOpen;
           }
 
           return SingleChildScrollView(
@@ -305,8 +322,10 @@ class _EditConversationPageState extends State<EditConversationPage> {
                 ),
                 SizedBox(height: DesignTokens.spacingL),
 
-                // Options section
-                Column(
+                // Options section: only the open/closed switch, for those
+                // who may use it.
+                if (widget.canClose)
+                  Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -324,13 +343,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                       ),
                       child: Column(
                         children: [
-                          // Open Invite toggle
-                          Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
-                          ),
-                          // Conversation Open toggle
+                          // Open for replies
                           SwitchListTile(
                             title: Text(
                               AppLocalizations.of(context)!.conversationOpen,

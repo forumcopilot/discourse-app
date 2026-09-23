@@ -8,6 +8,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_like.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/message/discourse_message_permissions.dart';
 import '../context/discourse_site_context_extension.dart';
 
 /// Discourse implementation of [IFCPrivateConversationProxy].
@@ -229,8 +230,14 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       // For a unified WhatsApp-style "all conversations" view, fetch both
       // in parallel and merge (dedup + sort by last activity).
       final encUser = Uri.encodeComponent(username);
+      // The caller's n-th window is Discourse's page n. Discourse pages hold
+      // 30 topics whatever the caller asks for, and this used to divide the
+      // start by 30 — with the list's 20-wide windows, the second window
+      // (start 20) asked for page 0 again and the list showed it twice.
+      final windowSize = lastNum - startNum + 1;
+      final page = windowSize > 0 ? startNum ~/ windowSize : 0;
       final pageQuery = <String, dynamic>{
-        if (startNum > 0) 'page': (startNum / 30).floor().toString(),
+        if (page > 0) 'page': page.toString(),
       };
       final responses = await Future.wait([
         apiGet('/topics/private-messages/$encUser.json', query: pageQuery),
@@ -363,23 +370,31 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
   @override
   Future<FCMarkConversationUnreadResult> markConversationUnreadAsync(
       String conversationId) async {
-    // Discourse PMs mark "unread" by clearing topic timings via DELETE
-    // /t/{id}/timings. The endpoint exists but is rarely surfaced; for now
-    // we report success without server side-effect (lossy).
-    return FCMarkConversationUnreadResult(
-      result: true,
-      resultText: '',
-    );
+    // What Discourse web's "Mark unread" sends (topic.js): drop the
+    // viewer's timing for the last post read, mark the latest notification
+    // unread, and republish the message's tracking state
+    // (TopicsController#destroy_timings). This used to report success
+    // without a request, so the flag vanished on the next list refresh.
+    try {
+      await apiDelete('/t/$conversationId/timings.json',
+          query: {'last': '1'});
+      return FCMarkConversationUnreadResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCMarkConversationUnreadResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCMarkConversationUnreadResult(
+          result: false, resultText: describeApiError(e));
+    }
   }
 
   @override
   Future<FCMarkConversationReadResult> markConversationReadAsync(
       String conversationId) async {
-    // Discourse marks read implicitly when /t/{id}.json is fetched; an
-    // explicit "mark read" maps to setting last-read post timing. The
-    // /topics/timings endpoint expects per-post-number entries which the
-    // SDK contract doesn't surface — opening the conversation in the UI
-    // already triggers the read state. Report success here.
+    // A JSON fetch of /t/{id}.json does NOT move the read position; only
+    // POST /topics/timings does, and it needs post numbers this contract
+    // does not carry. The message screen reports what it shows through
+    // IFCTopicProxy.markPostsReadAsync instead (PMs are topics).
     return FCMarkConversationReadResult(result: true, resultText: '');
   }
 
@@ -639,11 +654,21 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       final messages = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
+          // Post type 3 is Discourse's small action — "left the message",
+          // "invited …", "closed this" — with no body. The message view has
+          // no row for it and drew each one as an empty bubble.
+          .where((m) => m['post_type'] != 3)
           .map((m) => _conversationMessageFrom(m.cast<String, dynamic>()))
           .toList();
       final details = (t['details'] as Map<String, dynamic>?) ?? const {};
       final participants = _participantsFrom(details);
       final canEdit = (details['can_edit'] as bool?) ?? false;
+      DiscourseMessagePermissions.store(
+        conversationId,
+        DiscourseMessagePermissions(
+          canLeave: details.containsKey('can_remove_self_id'),
+        ),
+      );
 
       return FCConversationResult(
         result: true,
@@ -669,7 +694,10 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
         // to people the server would reject.
         canInvite: details['can_invite_to'] == true,
         canEdit: canEdit,
-        canClose: canEdit,
+        // Closing is for staff, trust level 4 and category moderators
+        // (topic_guardian.rb), not for whoever may edit the title — the
+        // Close action used to be offered with canEdit and then refused.
+        canClose: details['can_close_topic'] == true,
         isClosed: (t['closed'] as bool?) ?? false,
         totalMessageNum: (t['posts_count'] as int?) ?? messages.length,
         lastRead: (t['last_read_post_number'] as int?) ?? 0,

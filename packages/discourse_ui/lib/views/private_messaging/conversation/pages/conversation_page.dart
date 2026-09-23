@@ -18,6 +18,8 @@ import '../../../../utils/accessibility_helpers.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import 'package:discourse_ui/services/site_proxy_service.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseMessagePermissions;
 import '../../../login_page.dart';
 
 class ConversationPage extends StatefulWidget {
@@ -164,6 +166,35 @@ class _ConversationPageState extends State<ConversationPage> {
     }
 
     await _loadConversation(loadMore: true, loadOlder: true);
+  }
+
+  /// Post numbers already reported to the read tracker for this message.
+  final Set<int> _reportedMessageNumbers = {};
+
+  /// Tell Discourse which posts were shown, so the message stops counting as
+  /// unread. Fetching /t/{id}.json does not move the read position; only
+  /// POST /topics/timings does, which is what the topic view already sends
+  /// (PostsList._reportPostsRead) — a PM is a topic, so the same call works.
+  /// Before this, opening a PM left it unread in the inbox and in the badge.
+  /// Fire-and-forget: read tracking must never disturb reading.
+  void _reportMessagesRead() {
+    if (!widget.siteContext.isLoggedIn) return;
+    final messages = _conversation?.messages ?? const <FCConversationMessage>[];
+    final fresh = <int>[];
+    for (final m in messages) {
+      final n = m.messageNumber;
+      if (n != null && _reportedMessageNumbers.add(n)) fresh.add(n);
+    }
+    if (fresh.isEmpty) return;
+    SiteProxyService.getTopicProxy()
+        .markPostsReadAsync(topicId: widget.conversationId, postNumbers: fresh)
+        .then((r) {
+      if (!r.result) {
+        AppLogger.debug('ConversationPage: read report failed: ${r.resultText}');
+      }
+    }).catchError((Object e) {
+      AppLogger.debug('ConversationPage: read report error: $e');
+    });
   }
 
   /// Merges two message lists preserving order and dropping duplicate ids
@@ -543,6 +574,7 @@ class _ConversationPageState extends State<ConversationPage> {
         });
       }
     }
+    _reportMessagesRead();
   }
 
   /// Highlights a message by ID and clears it after 3 seconds
@@ -868,10 +900,20 @@ class _ConversationPageState extends State<ConversationPage> {
 
     try {
       final conversationProxy = SiteProxyFactory.getPrivateConversationProxy();
-      await conversationProxy.leaveConversationAsync(widget.conversationId, 1); // 1 = soft leave
-      if (mounted) {
-        Navigator.of(context).pop(true);
+      final r = await conversationProxy.leaveConversationAsync(widget.conversationId, 1);
+      if (!mounted) return;
+      if (!r.result) {
+        // The screen used to close with `true` regardless, and the list then
+        // dropped a message the server had refused to let the user leave.
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.failedToLeaveConversation(r.resultText ?? '')),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+        return;
       }
+      Navigator.of(context).pop(true);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -890,7 +932,11 @@ class _ConversationPageState extends State<ConversationPage> {
       appBar: ConversationAppBar(
         title: _conversation?.convTitle ?? widget.subject,
         siteContext: widget.siteContext,
-        onLeave: _leaveConversation,
+        // Discourse only lets some people remove themselves (see
+        // DiscourseMessagePermissions.canLeave); Leave was offered to all.
+        onLeave: DiscourseMessagePermissions.forTopic(widget.conversationId)?.canLeave == true
+            ? _leaveConversation
+            : null,
         onMarkUnread: _markAsUnread,
         participantCount: _conversation?.participantCount ?? 0,
         canEdit: _conversation?.canEdit ?? false,
@@ -915,6 +961,7 @@ class _ConversationPageState extends State<ConversationPage> {
         builder: (context) => EditConversationPage(
           siteContext: widget.siteContext,
           conversationId: widget.conversationId,
+          canClose: _conversation?.canClose ?? false,
         ),
       ),
     );
