@@ -6,6 +6,20 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.19] - 2026-09-23
+
+Photos and files: sending them in chat, taking them with the camera, and uploading them at the size the forum's website uses. Tested on a Pixel 4a against a local Discourse.
+
+### Added
+- **Images and files in chat.** The chat composer has an attach button — Take photo, Upload image, Attach file. Each file uploads as soon as it is picked (as `chat-composer`, like Discourse's own composer), shows above the input with a spinner and a remove button, and goes with the message by id; a message may be files alone, and the sender sees them at once. Hidden when the forum turns `chat_allow_uploads` off or nothing can be sent in the channel.
+- **Take photo, everywhere images are uploaded:** chat, the topic, reply, edit and personal-message composers, a new personal message, and the profile picture. Camera photos are named like a camera names them (`IMG_20260923_113747.jpg`) rather than with a random id, which a post would show as the image's description.
+
+### Changed
+- **Photos are uploaded at the size the forum's website uploads them.** Discourse's composer shrinks photos in the browser before uploading, following the forum's `composer_media_optimization_*` and `image_quality` settings; the app now does the same for JPEG photos of 512 KB or more: scaled to 1920 px wide when wider, re-encoded at the forum's quality, turned upright, with metadata such as GPS location removed. A 12-megapixel phone photo used to go up at 3024×4032 and 2–3 MB; it now arrives at 1920×2560 and about 0.5 MB. PNG screenshots, GIFs and other files are left untouched (the website converts PNGs to JPEG as well, which flattens transparency). The original is kept if shrinking would not make it smaller, and the "too large, resize?" question only appears if a photo is still over the forum's limit afterwards. Forums that turn the setting off get full-size uploads, as before.
+
+### Fixed
+- An open chat now stays on its newest message while an image or reaction lays out below it; a new photo used to be left half off screen.
+
 ## [1.0.18] - 2026-09-23
 
 Chat, reviewed against Discourse's chat plugin and tested on a Pixel 4a against a local Discourse with a second user posting through the API.
