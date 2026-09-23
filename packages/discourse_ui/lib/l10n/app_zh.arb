@@ -47,7 +47,7 @@
     }
   },
   "loading": "加载中...",
-  "newConversation": "新对话",
+  "newConversation": "新消息",
   "language": "语言",
   "all": "全部",
   "topicsOnly": "仅主题",
@@ -100,7 +100,7 @@
   "selectedActions": "选定的操作:",
   "thisActionCannotBeUndone": "此操作无法撤销。",
   "participantsLabel": "参与者",
-  "usernameHasBeenInvited": "{username} 已被邀请加入对话",
+  "usernameHasBeenInvited": "已邀请 {username} 加入消息",
   "@usernameHasBeenInvited": {
     "description": "Message when user is invited to conversation",
     "placeholders": {
@@ -158,9 +158,9 @@
   "confirmSpamClean": "确认清理垃圾邮件",
   "handleThreads": "处理主题",
   "deleteMessages": "删除消息",
-  "deleteConversations": "删除对话",
-  "noConversations": "无对话",
-  "noConversationsMessage": "您还没有对话。开始新对话以开始发送消息。",
+  "deleteConversations": "删除消息",
+  "noConversations": "您没有任何消息",
+  "noConversationsMessage": "您还没有消息。写一条新消息开始吧。",
   "imageSavedToGallery": "图片已保存到相册！",
   "failedToSaveImage": "保存图片失败: {error}",
   "@failedToSaveImage": {
@@ -175,14 +175,14 @@
   "deletePost": "删除帖子",
   "loginRequired": "需要登录",
   "spamCleaner": "垃圾清理",
-  "sendMessage": "发送消息",
+  "sendMessage": "私信",
   "memberSince": "注册日期",
   "lastActivity": "最后活动",
   "likesReceived": "收到的赞",
   "likesGiven": "给出的赞",
   "showMore": "显示更多",
   "cleanSpam": "清理垃圾信息",
-  "failedToSaveConversation": "保存对话失败",
+  "failedToSaveConversation": "无法保存消息",
   "members": "成员",
   "membersCount": "{count} 成员",
   "@membersCount": {
@@ -229,8 +229,8 @@
     }
   },
   "signInToViewMessages": "请登录以查看消息",
-  "youNeedToBeSignedInToViewConversations": "您需要登录才能查看您的对话。",
-  "errorLoadingConversations": "加载对话错误: {error}",
+  "youNeedToBeSignedInToViewConversations": "登录后才能查看您的消息。",
+  "errorLoadingConversations": "加载消息出错：{error}",
   "@errorLoadingConversations": {
     "description": "Error message when loading conversations fails",
     "placeholders": {
@@ -239,7 +239,7 @@
       }
     }
   },
-  "failedToLeaveConversation": "离开对话失败: {error}",
+  "failedToLeaveConversation": "无法离开消息：{error}",
   "@failedToLeaveConversation": {
     "description": "Error message when leaving conversation fails",
     "placeholders": {
@@ -248,7 +248,7 @@
       }
     }
   },
-  "errorLoadingMoreConversations": "加载更多对话错误: {error}",
+  "errorLoadingMoreConversations": "加载更多消息出错：{error}",
   "@errorLoadingMoreConversations": {
     "description": "Error message when loading more conversations fails",
     "placeholders": {
@@ -397,11 +397,11 @@
   "userUnbannedSuccessfully": "用户解封成功",
   "failedToUnbanUser": "解封用户失败",
   "spamCleanUser": "清理用户垃圾信息",
-  "deletePrivateConversations": "删除私密对话",
+  "deletePrivateConversations": "删除私信",
   "banTheUserAccount": "封禁用户账户",
   "handledThreads": "已处理的线程",
   "deletedMessages": "已删除的消息",
-  "deletedConversations": "已删除的对话",
+  "deletedConversations": "已删除的消息",
   "bannedUser": "已封禁的用户",
   "successfullyCleanedSpam": "成功清理 {username} 的垃圾信息。操作: {actions}",
   "@successfullyCleanedSpam": {
@@ -436,10 +436,10 @@
   "cleaningSpam": "清理垃圾信息中...",
   "writeYourMessage": "编写您的消息...",
   "writeYourReply": "编写您的回复...",
-  "conversationCreatedSuccessfully": "对话创建成功",
-  "conversationMarkedAsUnread": "对话已标记为未读",
-  "conversationClosed": "对话已关闭",
-  "conversationOpened": "对话已打开",
+  "conversationCreatedSuccessfully": "消息已发送",
+  "conversationMarkedAsUnread": "消息已标记为未读",
+  "conversationClosed": "消息已关闭",
+  "conversationOpened": "消息已打开",
   "pleaseLoginToLikeMessages": "请登录以点赞消息",
   "loadEarlierMessages": "加载更早的消息",
   "failedToLoadQuote": "加载引用失败: \n{error}",
@@ -458,7 +458,7 @@
       }
     }
   },
-  "failedToMarkConversationAsUnread": "标记对话为未读失败: {error}",
+  "failedToMarkConversationAsUnread": "无法将消息标记为未读：{error}",
   "@failedToMarkConversationAsUnread": {
     "placeholders": {
       "error": {
@@ -466,7 +466,7 @@
       }
     }
   },
-  "failedToCloseConversation": "关闭对话失败: {error}",
+  "failedToCloseConversation": "无法关闭消息：{error}",
   "@failedToCloseConversation": {
     "placeholders": {
       "error": {
@@ -474,7 +474,7 @@
       }
     }
   },
-  "failedToOpenConversation": "打开对话失败: {error}",
+  "failedToOpenConversation": "无法打开消息：{error}",
   "@failedToOpenConversation": {
     "placeholders": {
       "error": {
@@ -494,7 +494,7 @@
   "goToBottom": "跳到底部",
   "pleaseLoginToAccessContent": "请登录以访问此内容并与帖子互动。",
   "searchUsers": "搜索用户...",
-  "enterConversationTitle": "输入对话标题",
+  "enterConversationTitle": "输入消息标题",
   "enterCode": "输入{count}位代码",
   "@enterCode": {
     "placeholders": {
@@ -509,7 +509,7 @@
   "subject": "主题",
   "message": "消息",
   "titleCannotBeEmpty": "标题不能为空",
-  "conversationUpdatedSuccessfully": "对话更新成功",
+  "conversationUpdatedSuccessfully": "消息已更新",
   "goBack": "返回",
   "failedToLoadPost": "加载帖子失败: \n{error}",
   "@failedToLoadPost": {
@@ -747,31 +747,38 @@
   "thisDiffIsTooLargeToDisplay": "差异过大，无法显示。",
   "noContentChangesInThisRevision": "此版本没有内容更改。",
   "revisionOf": "第 {currentVersion} 版，共 {versionCount} 版",
-  "editConversation": "编辑会话",
-  "closeConversation": "关闭会话",
-  "openConversation": "打开会话",
-  "leaveConversation2": "退出会话",
-  "reportConversation2": "举报会话",
-  "closeConversation2": "关闭会话",
-  "closeConversationConfirmation": "确定要关闭此会话吗？将无法发布新回复。",
+  "editConversation": "编辑标题",
+  "closeConversation": "关闭消息",
+  "openConversation": "打开消息",
+  "leaveConversation2": "离开消息",
+  "reportConversation2": "举报消息",
+  "closeConversation2": "关闭消息",
+  "closeConversationConfirmation": "关闭此消息？关闭后将不再接受新回复。",
   "close": "关闭",
-  "openConversation2": "打开会话",
-  "openConversationConfirmation": "确定要打开此会话吗？将允许发布新回复。",
+  "openConversation2": "打开消息",
+  "openConversationConfirmation": "打开此消息？打开后将重新接受新回复。",
   "open": "打开",
-  "leaveConversation3": "退出会话",
-  "leaveConversationConfirmation": "确定要退出此会话吗？它将从收件箱中隐藏。",
-  "errorLoadingConversation": "加载会话出错：{error}",
-  "conversationNotFound": "未找到会话",
-  "conversationClosedBanner": "此会话已关闭，不再接受回复",
+  "leaveConversation3": "离开消息",
+  "leaveConversationConfirmation": "确定要从此消息中移除自己吗？您将无法再看到或回复它。",
+  "errorLoadingConversation": "加载消息出错：{error}",
+  "conversationNotFound": "未找到消息",
+  "conversationClosedBanner": "此消息已关闭；不再接受新回复",
   "noMessagesFound": "未找到消息",
-  "endOfConversation": "会话结束",
+  "endOfConversation": "讨论结束",
   "jumpToMessage": "跳转到消息",
-  "editConversation2": "编辑会话",
+  "editConversation2": "编辑标题",
   "failedToLoadMessage2": "无法加载消息",
-  "cannotEditThisConversation": "无法编辑此会话",
+  "cannotEditThisConversation": "您无法编辑此消息",
   "options": "选项",
-  "conversationOpen": "会话开放",
-  "failedToCreateConversation": "无法创建会话：{error}",
+  "conversationOpen": "允许回复",
+  "messageTitleHint": "用一句话概括讨论内容…",
+  "messageOpenForReplies": "接受新回复",
+  "messageClosedForReplies": "已关闭：不接受新回复",
+  "messageSentWithoutId": "消息已发送，但论坛未返回该消息。请查看您的消息。",
+  "messageCouldNotBeSent": "无法发送消息。",
+  "messageIdMissing": "无法打开此消息：缺少 ID。",
+  "pleaseAddARecipient": "请至少添加一位收件人",
+  "failedToCreateConversation": "无法发送消息：{error}",
   "maximumAttachmentsAllowed": "最多允许 {count} 个附件",
   "noImagesFoundToDisplay": "没有可显示的图片。",
   "pleaseLoginToViewThisAttachment": "请登录后查看此附件",

@@ -906,8 +906,8 @@ class NotificationService with ServiceErrorHandlingMixin {
         }
       }
 
-      // Extract optional subject, default to "Conversation" if not provided
-      final String subject = data.containsKey('subject') ? data['subject'].toString() : 'Conversation';
+      // Extract optional subject, default to "Message" if not provided
+      final String subject = data.containsKey('subject') ? data['subject'].toString() : 'Message';
 
       // Look up forum by site_id
       AppLogger.debug('🔎 [NotificationService] Looking up forum by site_id: $siteId');

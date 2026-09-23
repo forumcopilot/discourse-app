@@ -340,7 +340,9 @@ class _EditConversationPageState extends State<EditConversationPage> {
                               ),
                             ),
                             subtitle: Text(
-                              _conversationOpen == true ? 'Conversation is open for replies' : 'Conversation is closed (no replies allowed)',
+                              _conversationOpen == true
+                                  ? AppLocalizations.of(context)!.messageOpenForReplies
+                                  : AppLocalizations.of(context)!.messageClosedForReplies,
                               style: textTheme.bodySmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                               ),

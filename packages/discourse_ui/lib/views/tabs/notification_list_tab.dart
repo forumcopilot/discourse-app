@@ -395,7 +395,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
       // For conversation_message type: open the conversation
       final conversationId = alert.conversationId ?? alert.content_id;
       if (conversationId == null || conversationId.isEmpty) {
-        _showErrorDialog(context, 'Conversation ID is missing. Cannot open the conversation.');
+        _showErrorDialog(context, AppLocalizations.of(context)!.messageIdMissing);
         return;
       }
 

@@ -17,7 +17,7 @@ enum _FlagOption {
   notifyUser(
     DiscoursePostProxy.flagNotifyUser,
     'Message the author',
-    'Send them a private message. Moderators are not involved.',
+    'Send them a personal message. Moderators are not involved.',
     needsMessage: true,
     isPrivateMessage: true,
   ),

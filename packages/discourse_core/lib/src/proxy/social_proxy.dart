@@ -523,7 +523,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       case _ntPrivateMessage:
         return 'New message from $from: "$topic"';
       case _ntInvitedToPm:
-        return '$from invited you to a private message: "$topic"';
+        return '$from invited you to a message: "$topic"';
       case _ntInviteeAccepted:
         return '$from accepted your invitation';
       case _ntPosted:

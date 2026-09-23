@@ -47,7 +47,7 @@
     }
   },
   "loading": "Загрузка...",
-  "newConversation": "Новый разговор",
+  "newConversation": "Новое сообщение",
   "language": "Язык",
   "all": "Все",
   "topicsOnly": "Только темы",
@@ -100,7 +100,7 @@
   "selectedActions": "Выбранные действия:",
   "thisActionCannotBeUndone": "Это действие нельзя отменить.",
   "participantsLabel": "Участники",
-  "usernameHasBeenInvited": "{username} был приглашен в разговор",
+  "usernameHasBeenInvited": "{username} приглашён(а) в сообщение",
   "@usernameHasBeenInvited": {
     "description": "Message when user is invited to conversation",
     "placeholders": {
@@ -158,9 +158,9 @@
   "confirmSpamClean": "Подтвердить очистку спама",
   "handleThreads": "Управление темами",
   "deleteMessages": "Удалить сообщения",
-  "deleteConversations": "Удалить разговоры",
-  "noConversations": "Нет разговоров",
-  "noConversationsMessage": "У вас пока нет разговоров. Начните новый разговор, чтобы начать обмен сообщениями.",
+  "deleteConversations": "Удалить сообщения",
+  "noConversations": "У вас нет сообщений",
+  "noConversationsMessage": "У вас пока нет сообщений. Напишите новое сообщение, чтобы начать.",
   "imageSavedToGallery": "Изображение сохранено в галерею!",
   "failedToSaveImage": "Ошибка при сохранении изображения: {error}",
   "@failedToSaveImage": {
@@ -175,14 +175,14 @@
   "deletePost": "Удалить Сообщение",
   "loginRequired": "Требуется Вход",
   "spamCleaner": "Очистка спама",
-  "sendMessage": "Отправить сообщение",
+  "sendMessage": "Сообщение",
   "memberSince": "Участник С",
   "lastActivity": "Последняя Активность",
   "likesReceived": "Полученные Лайки",
   "likesGiven": "Данные Лайки",
   "showMore": "Показать больше",
   "cleanSpam": "Очистить спам",
-  "failedToSaveConversation": "Не удалось сохранить разговор",
+  "failedToSaveConversation": "Не удалось сохранить сообщение",
   "members": "Участники",
   "membersCount": "{count} Участников",
   "@membersCount": {
@@ -229,8 +229,8 @@
     }
   },
   "signInToViewMessages": "Войдите, чтобы просмотреть сообщения",
-  "youNeedToBeSignedInToViewConversations": "Вам нужно войти, чтобы просмотреть ваши разговоры.",
-  "errorLoadingConversations": "Ошибка при загрузке разговоров: {error}",
+  "youNeedToBeSignedInToViewConversations": "Войдите, чтобы увидеть свои сообщения.",
+  "errorLoadingConversations": "Ошибка загрузки сообщений: {error}",
   "@errorLoadingConversations": {
     "description": "Error message when loading conversations fails",
     "placeholders": {
@@ -239,7 +239,7 @@
       }
     }
   },
-  "failedToLeaveConversation": "Ошибка при выходе из разговора: {error}",
+  "failedToLeaveConversation": "Не удалось покинуть сообщение: {error}",
   "@failedToLeaveConversation": {
     "description": "Error message when leaving conversation fails",
     "placeholders": {
@@ -248,7 +248,7 @@
       }
     }
   },
-  "errorLoadingMoreConversations": "Ошибка при загрузке дополнительных разговоров: {error}",
+  "errorLoadingMoreConversations": "Ошибка загрузки других сообщений: {error}",
   "@errorLoadingMoreConversations": {
     "description": "Error message when loading more conversations fails",
     "placeholders": {
@@ -397,11 +397,11 @@
   "userUnbannedSuccessfully": "Пользователь успешно разблокирован",
   "failedToUnbanUser": "Не удалось разблокировать пользователя",
   "spamCleanUser": "Очистить спам пользователя",
-  "deletePrivateConversations": "Удалить приватные разговоры",
+  "deletePrivateConversations": "Удалить личные сообщения",
   "banTheUserAccount": "Заблокировать учётную запись пользователя",
   "handledThreads": "Обработанные темы",
   "deletedMessages": "Удалённые сообщения",
-  "deletedConversations": "Удалённые разговоры",
+  "deletedConversations": "Удалённые сообщения",
   "bannedUser": "Заблокированный пользователь",
   "successfullyCleanedSpam": "Спам успешно очищен для {username}. Действия: {actions}",
   "@successfullyCleanedSpam": {
@@ -436,10 +436,10 @@
   "cleaningSpam": "Очистка спама...",
   "writeYourMessage": "Напишите ваше сообщение...",
   "writeYourReply": "Напишите ваш ответ...",
-  "conversationCreatedSuccessfully": "Разговор успешно создан",
-  "conversationMarkedAsUnread": "Разговор отмечен как непрочитанный",
-  "conversationClosed": "Разговор закрыт",
-  "conversationOpened": "Разговор открыт",
+  "conversationCreatedSuccessfully": "Сообщение отправлено",
+  "conversationMarkedAsUnread": "Сообщение отмечено как непрочитанное",
+  "conversationClosed": "Сообщение закрыто",
+  "conversationOpened": "Сообщение открыто",
   "pleaseLoginToLikeMessages": "Пожалуйста, войдите, чтобы лайкать сообщения",
   "loadEarlierMessages": "Загрузить более ранние сообщения",
   "failedToLoadQuote": "Не удалось загрузить цитату: \n{error}",
@@ -458,7 +458,7 @@
       }
     }
   },
-  "failedToMarkConversationAsUnread": "Не удалось отметить разговор как непрочитанный: {error}",
+  "failedToMarkConversationAsUnread": "Не удалось отметить сообщение как непрочитанное: {error}",
   "@failedToMarkConversationAsUnread": {
     "placeholders": {
       "error": {
@@ -466,7 +466,7 @@
       }
     }
   },
-  "failedToCloseConversation": "Не удалось закрыть разговор: {error}",
+  "failedToCloseConversation": "Не удалось закрыть сообщение: {error}",
   "@failedToCloseConversation": {
     "placeholders": {
       "error": {
@@ -474,7 +474,7 @@
       }
     }
   },
-  "failedToOpenConversation": "Не удалось открыть разговор: {error}",
+  "failedToOpenConversation": "Не удалось открыть сообщение: {error}",
   "@failedToOpenConversation": {
     "placeholders": {
       "error": {
@@ -494,7 +494,7 @@
   "goToBottom": "Перейти вниз",
   "pleaseLoginToAccessContent": "Пожалуйста, войдите, чтобы получить доступ к этому содержимому и взаимодействовать с сообщениями.",
   "searchUsers": "Поиск пользователей...",
-  "enterConversationTitle": "Введите заголовок разговора",
+  "enterConversationTitle": "Введите заголовок сообщения",
   "enterCode": "Введите {count}-значный код",
   "@enterCode": {
     "placeholders": {
@@ -509,7 +509,7 @@
   "subject": "Тема",
   "message": "Сообщение",
   "titleCannotBeEmpty": "Заголовок не может быть пустым",
-  "conversationUpdatedSuccessfully": "Разговор успешно обновлён",
+  "conversationUpdatedSuccessfully": "Сообщение обновлено",
   "goBack": "Назад",
   "failedToLoadPost": "Не удалось загрузить сообщение: \n{error}",
   "@failedToLoadPost": {
@@ -747,31 +747,38 @@
   "thisDiffIsTooLargeToDisplay": "Слишком большое изменение для отображения.",
   "noContentChangesInThisRevision": "В этой версии нет изменений содержимого.",
   "revisionOf": "Версия {currentVersion} из {versionCount}",
-  "editConversation": "Изменить беседу",
-  "closeConversation": "Закрыть беседу",
-  "openConversation": "Открыть беседу",
-  "leaveConversation2": "Покинуть беседу",
-  "reportConversation2": "Пожаловаться на беседу",
-  "closeConversation2": "Закрыть беседу",
-  "closeConversationConfirmation": "Закрыть эту беседу? Новые ответы будут невозможны.",
+  "editConversation": "Изменить заголовок",
+  "closeConversation": "Закрыть сообщение",
+  "openConversation": "Открыть сообщение",
+  "leaveConversation2": "Покинуть сообщение",
+  "reportConversation2": "Пожаловаться на сообщение",
+  "closeConversation2": "Закрыть сообщение",
+  "closeConversationConfirmation": "Закрыть это сообщение? В нём больше нельзя будет отвечать.",
   "close": "Закрыть",
-  "openConversation2": "Открыть беседу",
-  "openConversationConfirmation": "Открыть эту беседу? Снова можно будет отвечать.",
+  "openConversation2": "Открыть сообщение",
+  "openConversationConfirmation": "Открыть это сообщение? В нём снова можно будет отвечать.",
   "open": "Открыть",
-  "leaveConversation3": "Покинуть беседу",
-  "leaveConversationConfirmation": "Покинуть эту беседу? Она будет скрыта из входящих.",
-  "errorLoadingConversation": "Ошибка загрузки беседы: {error}",
-  "conversationNotFound": "Беседа не найдена",
-  "conversationClosedBanner": "Беседа закрыта и больше не принимает ответы",
+  "leaveConversation3": "Покинуть сообщение",
+  "leaveConversationConfirmation": "Вы уверены, что хотите выйти из этого сообщения? Вы больше не сможете видеть его или отвечать в нём.",
+  "errorLoadingConversation": "Ошибка загрузки сообщения: {error}",
+  "conversationNotFound": "Сообщение не найдено",
+  "conversationClosedBanner": "Сообщение закрыто; в нём больше нельзя отвечать",
   "noMessagesFound": "Сообщения не найдены",
-  "endOfConversation": "Конец беседы",
+  "endOfConversation": "Конец обсуждения",
   "jumpToMessage": "Перейти к сообщению",
-  "editConversation2": "Изменить беседу",
+  "editConversation2": "Изменить заголовок",
   "failedToLoadMessage2": "Не удалось загрузить сообщение",
-  "cannotEditThisConversation": "Эту беседу нельзя изменить",
+  "cannotEditThisConversation": "Вы не можете изменить это сообщение",
   "options": "Параметры",
-  "conversationOpen": "Беседа открыта",
-  "failedToCreateConversation": "Не удалось создать беседу: {error}",
+  "conversationOpen": "Открыто для ответов",
+  "messageTitleHint": "Название: суть коротким предложением",
+  "messageOpenForReplies": "Можно отвечать",
+  "messageClosedForReplies": "Закрыто: отвечать нельзя",
+  "messageSentWithoutId": "Сообщение отправлено, но форум его не вернул. Проверьте свои сообщения.",
+  "messageCouldNotBeSent": "Не удалось отправить сообщение.",
+  "messageIdMissing": "Не удаётся открыть сообщение: отсутствует его ID.",
+  "pleaseAddARecipient": "Добавьте хотя бы одного получателя",
+  "failedToCreateConversation": "Не удалось отправить сообщение: {error}",
   "maximumAttachmentsAllowed": "Не более {count} вложений",
   "noImagesFoundToDisplay": "Нет изображений для показа.",
   "pleaseLoginToViewThisAttachment": "Войдите, чтобы открыть вложение",

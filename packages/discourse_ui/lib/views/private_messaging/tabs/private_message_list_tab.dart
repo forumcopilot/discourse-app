@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/views/widgets/resettable_widget.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:discourse_ui/views/widgets/not_signed_in_view.dart';
@@ -44,7 +45,7 @@ class PrivateMessageListTabState extends FCStatefulWidget<PrivateMessageListTab>
           return NotSignedInView(
             siteContext: widget.siteContext,
             title: 'Sign in to view messages',
-            message: 'You need to be signed in to view your private messages.',
+            message: AppLocalizations.of(context)!.youNeedToBeSignedInToViewConversations,
             icon: Icons.mail_outline_rounded,
           );
         }

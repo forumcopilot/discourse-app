@@ -138,7 +138,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get loading => '読み込み中...';
 
   @override
-  String get newConversation => '新しい会話';
+  String get newConversation => '新規メッセージ';
 
   @override
   String get language => '言語';
@@ -222,7 +222,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String usernameHasBeenInvited(String username) {
-    return '$username が会話に招待されました';
+    return '$username をメッセージに招待しました';
   }
 
   @override
@@ -307,13 +307,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deleteMessages => 'メッセージを削除';
 
   @override
-  String get deleteConversations => '会話を削除';
+  String get deleteConversations => 'メッセージを削除';
 
   @override
-  String get noConversations => '会話なし';
+  String get noConversations => 'メッセージはありません';
 
   @override
-  String get noConversationsMessage => 'まだ会話がありません。新しい会話を開始してメッセージングを始めましょう。';
+  String get noConversationsMessage => 'まだメッセージはありません。新しいメッセージを書いて始めましょう。';
 
   @override
   String get imageSavedToGallery => '画像がギャラリーに保存されました！';
@@ -336,7 +336,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get spamCleaner => 'スパムクリーナー';
 
   @override
-  String get sendMessage => 'メッセージを送信';
+  String get sendMessage => 'メッセージ';
 
   @override
   String get memberSince => 'メンバー登録日';
@@ -357,7 +357,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get cleanSpam => 'スパムをクリーンアップ';
 
   @override
-  String get failedToSaveConversation => '会話の保存に失敗しました';
+  String get failedToSaveConversation => 'メッセージを保存できませんでした';
 
   @override
   String get members => 'メンバー';
@@ -434,22 +434,21 @@ class AppLocalizationsJa extends AppLocalizations {
   String get signInToViewMessages => 'メッセージを表示するにはログインしてください';
 
   @override
-  String get youNeedToBeSignedInToViewConversations =>
-      '会話を表示するにはログインする必要があります。';
+  String get youNeedToBeSignedInToViewConversations => 'メッセージを見るにはサインインが必要です。';
 
   @override
   String errorLoadingConversations(String error) {
-    return '会話の読み込みエラー: $error';
+    return 'メッセージの読み込みエラー: $error';
   }
 
   @override
   String failedToLeaveConversation(String error) {
-    return '会話を退出できませんでした: $error';
+    return 'メッセージから退出できませんでした: $error';
   }
 
   @override
   String errorLoadingMoreConversations(String error) {
-    return '追加の会話の読み込みエラー: $error';
+    return 'さらにメッセージを読み込む際のエラー: $error';
   }
 
   @override
@@ -602,7 +601,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get markAsUnread => '未読としてマーク';
+  String get markAsUnread => '未読にする';
 
   @override
   String get invite => '招待';
@@ -721,7 +720,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get spamCleanUser => 'ユーザーのスパムをクリーンアップ';
 
   @override
-  String get deletePrivateConversations => 'プライベート会話を削除';
+  String get deletePrivateConversations => '個人メッセージを削除';
 
   @override
   String get banTheUserAccount => 'ユーザーアカウントを禁止';
@@ -733,7 +732,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deletedMessages => '削除されたメッセージ';
 
   @override
-  String get deletedConversations => '削除された会話';
+  String get deletedConversations => '削除されたメッセージ';
 
   @override
   String get bannedUser => '禁止されたユーザー';
@@ -811,16 +810,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get writeYourReply => '返信を書く...';
 
   @override
-  String get conversationCreatedSuccessfully => '会話が正常に作成されました';
+  String get conversationCreatedSuccessfully => 'メッセージを送信しました';
 
   @override
-  String get conversationMarkedAsUnread => '会話が未読としてマークされました';
+  String get conversationMarkedAsUnread => 'メッセージを未読にしました';
 
   @override
-  String get conversationClosed => '会話が閉じられました';
+  String get conversationClosed => 'メッセージをクローズしました';
 
   @override
-  String get conversationOpened => '会話が開かれました';
+  String get conversationOpened => 'メッセージをオープンしました';
 
   @override
   String get pleaseLoginToLikeMessages => 'メッセージにいいねするにはログインしてください';
@@ -840,17 +839,17 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String failedToMarkConversationAsUnread(String error) {
-    return '会話を未読としてマークできませんでした: $error';
+    return 'メッセージを未読にできませんでした: $error';
   }
 
   @override
   String failedToCloseConversation(String error) {
-    return '会話を閉じることができませんでした: $error';
+    return 'メッセージをクローズできませんでした: $error';
   }
 
   @override
   String failedToOpenConversation(String error) {
-    return '会話を開くことができませんでした: $error';
+    return 'メッセージをオープンできませんでした: $error';
   }
 
   @override
@@ -872,7 +871,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get searchUsers => 'ユーザーを検索...';
 
   @override
-  String get enterConversationTitle => '会話のタイトルを入力';
+  String get enterConversationTitle => 'メッセージのタイトルを入力';
 
   @override
   String enterCode(int count) {
@@ -898,7 +897,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get titleCannotBeEmpty => 'タイトルを入力してください';
 
   @override
-  String get conversationUpdatedSuccessfully => '会話が正常に更新されました';
+  String get conversationUpdatedSuccessfully => 'メッセージを更新しました';
 
   @override
   String get goBack => '戻る';
@@ -1559,82 +1558,105 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get editConversation => '会話を編集';
+  String get editConversation => 'タイトルを編集';
 
   @override
-  String get closeConversation => '会話をクローズ';
+  String get closeConversation => 'メッセージをクローズ';
 
   @override
-  String get openConversation => '会話を再開';
+  String get openConversation => 'メッセージをオープン';
 
   @override
-  String get leaveConversation2 => '会話から退出';
+  String get leaveConversation2 => 'メッセージから退出';
 
   @override
-  String get reportConversation2 => '会話を報告';
+  String get reportConversation2 => 'メッセージを通報';
 
   @override
-  String get closeConversation2 => '会話をクローズ';
+  String get closeConversation2 => 'メッセージをクローズ';
 
   @override
-  String get closeConversationConfirmation => 'この会話をクローズしますか？新しい返信ができなくなります。';
+  String get closeConversationConfirmation => 'このメッセージをクローズしますか？新たに返信できなくなります。';
 
   @override
   String get close => '閉じる';
 
   @override
-  String get openConversation2 => '会話を再開';
+  String get openConversation2 => 'メッセージをオープン';
 
   @override
-  String get openConversationConfirmation => 'この会話を再開しますか？新しい返信ができるようになります。';
+  String get openConversationConfirmation => 'このメッセージをオープンしますか？再び返信できるようになります。';
 
   @override
   String get open => '開く';
 
   @override
-  String get leaveConversation3 => '会話から退出';
+  String get leaveConversation3 => 'メッセージから退出';
 
   @override
-  String get leaveConversationConfirmation => 'この会話から退出しますか？受信トレイに表示されなくなります。';
+  String get leaveConversationConfirmation =>
+      'このメッセージから自分自身を削除してもよろしいですか？このメッセージの閲覧または返信を行えなくなります。';
 
   @override
   String errorLoadingConversation(Object error) {
-    return '会話の読み込みエラー: $error';
+    return 'メッセージの読み込みエラー: $error';
   }
 
   @override
-  String get conversationNotFound => '会話が見つかりません';
+  String get conversationNotFound => 'メッセージが見つかりません';
 
   @override
-  String get conversationClosedBanner => 'この会話はクローズされ、返信できません';
+  String get conversationClosedBanner => 'このメッセージはクローズしています。新たに返信することはできません。';
 
   @override
   String get noMessagesFound => 'メッセージが見つかりません';
 
   @override
-  String get endOfConversation => '会話の終わり';
+  String get endOfConversation => '議論の終わり';
 
   @override
   String get jumpToMessage => 'メッセージへ移動';
 
   @override
-  String get editConversation2 => '会話を編集';
+  String get editConversation2 => 'タイトルを編集';
 
   @override
   String get failedToLoadMessage2 => 'メッセージを読み込めませんでした';
 
   @override
-  String get cannotEditThisConversation => 'この会話は編集できません';
+  String get cannotEditThisConversation => 'このメッセージは編集できません';
 
   @override
   String get options => 'オプション';
 
   @override
-  String get conversationOpen => '会話をオープンにする';
+  String get conversationOpen => '返信を受け付ける';
+
+  @override
+  String get messageTitleHint => 'タイトルを入力してください';
+
+  @override
+  String get messageOpenForReplies => '新しい返信を受け付けています';
+
+  @override
+  String get messageClosedForReplies => 'クローズ: 新しい返信は受け付けません';
+
+  @override
+  String get messageSentWithoutId =>
+      'メッセージは送信されましたが、フォーラムから返されませんでした。メッセージ一覧を確認してください。';
+
+  @override
+  String get messageCouldNotBeSent => 'メッセージを送信できませんでした。';
+
+  @override
+  String get messageIdMissing => 'このメッセージを開けません: ID がありません。';
+
+  @override
+  String get pleaseAddARecipient => '宛先を 1 人以上追加してください';
 
   @override
   String failedToCreateConversation(Object error) {
-    return '会話を作成できませんでした: $error';
+    return 'メッセージを送信できませんでした: $error';
   }
 
   @override

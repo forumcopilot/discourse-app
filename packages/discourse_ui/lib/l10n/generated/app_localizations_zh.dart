@@ -129,7 +129,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get loading => '加载中...';
 
   @override
-  String get newConversation => '新对话';
+  String get newConversation => '新消息';
 
   @override
   String get language => '语言';
@@ -213,7 +213,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String usernameHasBeenInvited(String username) {
-    return '$username 已被邀请加入对话';
+    return '已邀请 $username 加入消息';
   }
 
   @override
@@ -298,13 +298,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteMessages => '删除消息';
 
   @override
-  String get deleteConversations => '删除对话';
+  String get deleteConversations => '删除消息';
 
   @override
-  String get noConversations => '无对话';
+  String get noConversations => '您没有任何消息';
 
   @override
-  String get noConversationsMessage => '您还没有对话。开始新对话以开始发送消息。';
+  String get noConversationsMessage => '您还没有消息。写一条新消息开始吧。';
 
   @override
   String get imageSavedToGallery => '图片已保存到相册！';
@@ -327,7 +327,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get spamCleaner => '垃圾清理';
 
   @override
-  String get sendMessage => '发送消息';
+  String get sendMessage => '私信';
 
   @override
   String get memberSince => '注册日期';
@@ -348,7 +348,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cleanSpam => '清理垃圾信息';
 
   @override
-  String get failedToSaveConversation => '保存对话失败';
+  String get failedToSaveConversation => '无法保存消息';
 
   @override
   String get members => '成员';
@@ -425,21 +425,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get signInToViewMessages => '请登录以查看消息';
 
   @override
-  String get youNeedToBeSignedInToViewConversations => '您需要登录才能查看您的对话。';
+  String get youNeedToBeSignedInToViewConversations => '登录后才能查看您的消息。';
 
   @override
   String errorLoadingConversations(String error) {
-    return '加载对话错误: $error';
+    return '加载消息出错：$error';
   }
 
   @override
   String failedToLeaveConversation(String error) {
-    return '离开对话失败: $error';
+    return '无法离开消息：$error';
   }
 
   @override
   String errorLoadingMoreConversations(String error) {
-    return '加载更多对话错误: $error';
+    return '加载更多消息出错：$error';
   }
 
   @override
@@ -709,7 +709,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get spamCleanUser => '清理用户垃圾信息';
 
   @override
-  String get deletePrivateConversations => '删除私密对话';
+  String get deletePrivateConversations => '删除私信';
 
   @override
   String get banTheUserAccount => '封禁用户账户';
@@ -721,7 +721,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deletedMessages => '已删除的消息';
 
   @override
-  String get deletedConversations => '已删除的对话';
+  String get deletedConversations => '已删除的消息';
 
   @override
   String get bannedUser => '已封禁的用户';
@@ -798,16 +798,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get writeYourReply => '编写您的回复...';
 
   @override
-  String get conversationCreatedSuccessfully => '对话创建成功';
+  String get conversationCreatedSuccessfully => '消息已发送';
 
   @override
-  String get conversationMarkedAsUnread => '对话已标记为未读';
+  String get conversationMarkedAsUnread => '消息已标记为未读';
 
   @override
-  String get conversationClosed => '对话已关闭';
+  String get conversationClosed => '消息已关闭';
 
   @override
-  String get conversationOpened => '对话已打开';
+  String get conversationOpened => '消息已打开';
 
   @override
   String get pleaseLoginToLikeMessages => '请登录以点赞消息';
@@ -827,17 +827,17 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String failedToMarkConversationAsUnread(String error) {
-    return '标记对话为未读失败: $error';
+    return '无法将消息标记为未读：$error';
   }
 
   @override
   String failedToCloseConversation(String error) {
-    return '关闭对话失败: $error';
+    return '无法关闭消息：$error';
   }
 
   @override
   String failedToOpenConversation(String error) {
-    return '打开对话失败: $error';
+    return '无法打开消息：$error';
   }
 
   @override
@@ -858,7 +858,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchUsers => '搜索用户...';
 
   @override
-  String get enterConversationTitle => '输入对话标题';
+  String get enterConversationTitle => '输入消息标题';
 
   @override
   String enterCode(int count) {
@@ -884,7 +884,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get titleCannotBeEmpty => '标题不能为空';
 
   @override
-  String get conversationUpdatedSuccessfully => '对话更新成功';
+  String get conversationUpdatedSuccessfully => '消息已更新';
 
   @override
   String get goBack => '返回';
@@ -1543,82 +1543,103 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get editConversation => '编辑会话';
+  String get editConversation => '编辑标题';
 
   @override
-  String get closeConversation => '关闭会话';
+  String get closeConversation => '关闭消息';
 
   @override
-  String get openConversation => '打开会话';
+  String get openConversation => '打开消息';
 
   @override
-  String get leaveConversation2 => '退出会话';
+  String get leaveConversation2 => '离开消息';
 
   @override
-  String get reportConversation2 => '举报会话';
+  String get reportConversation2 => '举报消息';
 
   @override
-  String get closeConversation2 => '关闭会话';
+  String get closeConversation2 => '关闭消息';
 
   @override
-  String get closeConversationConfirmation => '确定要关闭此会话吗？将无法发布新回复。';
+  String get closeConversationConfirmation => '关闭此消息？关闭后将不再接受新回复。';
 
   @override
   String get close => '关闭';
 
   @override
-  String get openConversation2 => '打开会话';
+  String get openConversation2 => '打开消息';
 
   @override
-  String get openConversationConfirmation => '确定要打开此会话吗？将允许发布新回复。';
+  String get openConversationConfirmation => '打开此消息？打开后将重新接受新回复。';
 
   @override
   String get open => '打开';
 
   @override
-  String get leaveConversation3 => '退出会话';
+  String get leaveConversation3 => '离开消息';
 
   @override
-  String get leaveConversationConfirmation => '确定要退出此会话吗？它将从收件箱中隐藏。';
+  String get leaveConversationConfirmation => '确定要从此消息中移除自己吗？您将无法再看到或回复它。';
 
   @override
   String errorLoadingConversation(Object error) {
-    return '加载会话出错：$error';
+    return '加载消息出错：$error';
   }
 
   @override
-  String get conversationNotFound => '未找到会话';
+  String get conversationNotFound => '未找到消息';
 
   @override
-  String get conversationClosedBanner => '此会话已关闭，不再接受回复';
+  String get conversationClosedBanner => '此消息已关闭；不再接受新回复';
 
   @override
   String get noMessagesFound => '未找到消息';
 
   @override
-  String get endOfConversation => '会话结束';
+  String get endOfConversation => '讨论结束';
 
   @override
   String get jumpToMessage => '跳转到消息';
 
   @override
-  String get editConversation2 => '编辑会话';
+  String get editConversation2 => '编辑标题';
 
   @override
   String get failedToLoadMessage2 => '无法加载消息';
 
   @override
-  String get cannotEditThisConversation => '无法编辑此会话';
+  String get cannotEditThisConversation => '您无法编辑此消息';
 
   @override
   String get options => '选项';
 
   @override
-  String get conversationOpen => '会话开放';
+  String get conversationOpen => '允许回复';
+
+  @override
+  String get messageTitleHint => '用一句话概括讨论内容…';
+
+  @override
+  String get messageOpenForReplies => '接受新回复';
+
+  @override
+  String get messageClosedForReplies => '已关闭：不接受新回复';
+
+  @override
+  String get messageSentWithoutId => '消息已发送，但论坛未返回该消息。请查看您的消息。';
+
+  @override
+  String get messageCouldNotBeSent => '无法发送消息。';
+
+  @override
+  String get messageIdMissing => '无法打开此消息：缺少 ID。';
+
+  @override
+  String get pleaseAddARecipient => '请至少添加一位收件人';
 
   @override
   String failedToCreateConversation(Object error) {
-    return '无法创建会话：$error';
+    return '无法发送消息：$error';
   }
 
   @override

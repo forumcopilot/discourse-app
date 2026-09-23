@@ -142,7 +142,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get loading => 'Carregando...';
 
   @override
-  String get newConversation => 'Nova conversa';
+  String get newConversation => 'Nova mensagem';
 
   @override
   String get language => 'Idioma';
@@ -235,7 +235,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String usernameHasBeenInvited(String username) {
-    return '$username foi convidado para a conversa';
+    return '$username foi convidado para a mensagem';
   }
 
   @override
@@ -323,14 +323,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get deleteMessages => 'Excluir mensagens';
 
   @override
-  String get deleteConversations => 'Excluir conversas';
+  String get deleteConversations => 'Excluir mensagens';
 
   @override
-  String get noConversations => 'Sem conversas';
+  String get noConversations => 'Você não tem mensagens';
 
   @override
   String get noConversationsMessage =>
-      'Você ainda não tem conversas. Inicie uma nova conversa para começar a enviar mensagens.';
+      'Você ainda não tem mensagens. Escreva uma nova mensagem para começar.';
 
   @override
   String get imageSavedToGallery => 'Imagem salva na galeria!';
@@ -353,7 +353,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get spamCleaner => 'Limpeza de Spam';
 
   @override
-  String get sendMessage => 'Enviar mensagem';
+  String get sendMessage => 'Mensagem';
 
   @override
   String get memberSince => 'Membro Desde';
@@ -374,7 +374,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get cleanSpam => 'Limpar spam';
 
   @override
-  String get failedToSaveConversation => 'Falha ao salvar conversa';
+  String get failedToSaveConversation => 'Não foi possível salvar a mensagem';
 
   @override
   String get members => 'Membros';
@@ -452,21 +452,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get youNeedToBeSignedInToViewConversations =>
-      'Você precisa estar conectado para ver suas conversas.';
+      'Você precisa entrar para ver suas mensagens.';
 
   @override
   String errorLoadingConversations(String error) {
-    return 'Erro ao carregar conversas: $error';
+    return 'Erro ao carregar as mensagens: $error';
   }
 
   @override
   String failedToLeaveConversation(String error) {
-    return 'Falha ao deixar conversa: $error';
+    return 'Não foi possível sair da mensagem: $error';
   }
 
   @override
   String errorLoadingMoreConversations(String error) {
-    return 'Erro ao carregar mais conversas: $error';
+    return 'Erro ao carregar mais mensagens: $error';
   }
 
   @override
@@ -621,7 +621,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get markAsUnread => 'Marcar como não lido';
+  String get markAsUnread => 'Marcar não lido';
 
   @override
   String get invite => 'Convidar';
@@ -745,7 +745,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get spamCleanUser => 'Limpar spam do usuário';
 
   @override
-  String get deletePrivateConversations => 'Excluir conversas privadas';
+  String get deletePrivateConversations => 'Excluir mensagens pessoais';
 
   @override
   String get banTheUserAccount => 'Banir a conta do usuário';
@@ -757,7 +757,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get deletedMessages => 'Mensagens excluídas';
 
   @override
-  String get deletedConversations => 'Conversas excluídas';
+  String get deletedConversations => 'Mensagens excluídas';
 
   @override
   String get bannedUser => 'Usuário banido';
@@ -836,16 +836,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get writeYourReply => 'Escreva sua resposta...';
 
   @override
-  String get conversationCreatedSuccessfully => 'Conversa criada com sucesso';
+  String get conversationCreatedSuccessfully => 'Mensagem enviada';
 
   @override
-  String get conversationMarkedAsUnread => 'Conversa marcada como não lida';
+  String get conversationMarkedAsUnread => 'Mensagem marcada como não lida';
 
   @override
-  String get conversationClosed => 'Conversa fechada';
+  String get conversationClosed => 'Mensagem fechada';
 
   @override
-  String get conversationOpened => 'Conversa aberta';
+  String get conversationOpened => 'Mensagem aberta';
 
   @override
   String get pleaseLoginToLikeMessages =>
@@ -866,17 +866,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String failedToMarkConversationAsUnread(String error) {
-    return 'Falha ao marcar conversa como não lida: $error';
+    return 'Não foi possível marcar a mensagem como não lida: $error';
   }
 
   @override
   String failedToCloseConversation(String error) {
-    return 'Falha ao fechar conversa: $error';
+    return 'Não foi possível fechar a mensagem: $error';
   }
 
   @override
   String failedToOpenConversation(String error) {
-    return 'Falha ao abrir conversa: $error';
+    return 'Não foi possível abrir a mensagem: $error';
   }
 
   @override
@@ -898,7 +898,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get searchUsers => 'Buscar usuários...';
 
   @override
-  String get enterConversationTitle => 'Insira o título da conversa';
+  String get enterConversationTitle => 'Digite o título da mensagem';
 
   @override
   String enterCode(int count) {
@@ -924,8 +924,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get titleCannotBeEmpty => 'O título não pode estar vazio';
 
   @override
-  String get conversationUpdatedSuccessfully =>
-      'Conversa atualizada com sucesso';
+  String get conversationUpdatedSuccessfully => 'Mensagem atualizada';
 
   @override
   String get goBack => 'Voltar';
@@ -1611,87 +1610,110 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get editConversation => 'Editar conversa';
+  String get editConversation => 'Editar título';
 
   @override
-  String get closeConversation => 'Fechar conversa';
+  String get closeConversation => 'Fechar mensagem';
 
   @override
-  String get openConversation => 'Abrir conversa';
+  String get openConversation => 'Abrir mensagem';
 
   @override
-  String get leaveConversation2 => 'Sair da conversa';
+  String get leaveConversation2 => 'Sair da mensagem';
 
   @override
-  String get reportConversation2 => 'Denunciar conversa';
+  String get reportConversation2 => 'Denunciar mensagem';
 
   @override
-  String get closeConversation2 => 'Fechar conversa';
+  String get closeConversation2 => 'Fechar mensagem';
 
   @override
   String get closeConversationConfirmation =>
-      'Tem certeza de que deseja fechar esta conversa? Novas respostas não poderão ser publicadas.';
+      'Fechar esta mensagem? Ela não aceitará mais respostas novas.';
 
   @override
   String get close => 'Fechar';
 
   @override
-  String get openConversation2 => 'Abrir conversa';
+  String get openConversation2 => 'Abrir mensagem';
 
   @override
   String get openConversationConfirmation =>
-      'Tem certeza de que deseja abrir esta conversa? Novas respostas poderão ser publicadas.';
+      'Abrir esta mensagem? Ela voltará a aceitar respostas novas.';
 
   @override
   String get open => 'Abrir';
 
   @override
-  String get leaveConversation3 => 'Sair da conversa';
+  String get leaveConversation3 => 'Sair da mensagem';
 
   @override
   String get leaveConversationConfirmation =>
-      'Tem certeza de que deseja sair desta conversa? Ela será ocultada da sua caixa de entrada.';
+      'Tem certeza de que deseja remover seu nome desta mensagem? Você não poderá mais vê-la nem respondê-la.';
 
   @override
   String errorLoadingConversation(Object error) {
-    return 'Erro ao carregar a conversa: $error';
+    return 'Erro ao carregar a mensagem: $error';
   }
 
   @override
-  String get conversationNotFound => 'Conversa não encontrada';
+  String get conversationNotFound => 'Mensagem não encontrada';
 
   @override
   String get conversationClosedBanner =>
-      'Esta conversa está fechada e não aceita mais respostas';
+      'Esta mensagem está fechada. Não serão aceitas respostas novas';
 
   @override
   String get noMessagesFound => 'Nenhuma mensagem encontrada';
 
   @override
-  String get endOfConversation => 'Fim da conversa';
+  String get endOfConversation => 'Fim da discussão';
 
   @override
   String get jumpToMessage => 'Ir para a mensagem';
 
   @override
-  String get editConversation2 => 'Editar conversa';
+  String get editConversation2 => 'Editar título';
 
   @override
   String get failedToLoadMessage2 => 'Não foi possível carregar a mensagem';
 
   @override
-  String get cannotEditThisConversation =>
-      'Não é possível editar esta conversa';
+  String get cannotEditThisConversation => 'Você não pode editar esta mensagem';
 
   @override
   String get options => 'Opções';
 
   @override
-  String get conversationOpen => 'Conversa aberta';
+  String get conversationOpen => 'Aberta para respostas';
+
+  @override
+  String get messageTitleHint =>
+      'Em algumas palavras, sobre o que é esta discussão?';
+
+  @override
+  String get messageOpenForReplies => 'Aceitando respostas novas';
+
+  @override
+  String get messageClosedForReplies => 'Fechada: sem respostas novas';
+
+  @override
+  String get messageSentWithoutId =>
+      'A mensagem foi enviada, mas o fórum não a retornou. Confira suas mensagens.';
+
+  @override
+  String get messageCouldNotBeSent => 'Não foi possível enviar a mensagem.';
+
+  @override
+  String get messageIdMissing =>
+      'Não é possível abrir esta mensagem: o ID está ausente.';
+
+  @override
+  String get pleaseAddARecipient => 'Adicione pelo menos um destinatário';
 
   @override
   String failedToCreateConversation(Object error) {
-    return 'Não foi possível criar a conversa: $error';
+    return 'Não foi possível enviar a mensagem: $error';
   }
 
   @override

@@ -39,7 +39,7 @@
   "connectionFailed": "Échec de la connexion",
   "failedToConnectToSiteName": "Échec de la connexion à {siteName}",
   "loading": "Chargement...",
-  "newConversation": "Nouvelle conversation",
+  "newConversation": "Nouveau message",
   "language": "Langue",
   "all": "Tout",
   "topicsOnly": "Sujets uniquement",
@@ -68,7 +68,7 @@
   "selectedActions": "Actions sélectionnées :",
   "thisActionCannotBeUndone": "Cette action ne peut pas être annulée.",
   "participantsLabel": "Participants",
-  "usernameHasBeenInvited": "{username} a été invité à la conversation",
+  "usernameHasBeenInvited": "{username} a été invité au message",
   "errorInvitingUser": "Erreur lors de l'invitation de l'utilisateur : {error}",
   "newTopic": "Nouveau sujet",
   "markRead": "Marquer comme lu",
@@ -94,9 +94,9 @@
   "confirmSpamClean": "Confirmer le nettoyage du spam",
   "handleThreads": "Gérer les fils",
   "deleteMessages": "Supprimer les messages",
-  "deleteConversations": "Supprimer les conversations",
-  "noConversations": "Aucune conversation",
-  "noConversationsMessage": "Vous n'avez pas encore de conversations. Démarrez une nouvelle conversation pour commencer à envoyer des messages.",
+  "deleteConversations": "Supprimer les messages",
+  "noConversations": "Vous n'avez aucun message",
+  "noConversationsMessage": "Vous n'avez encore aucun message. Écrivez un nouveau message pour commencer.",
   "imageSavedToGallery": "Image enregistrée dans la galerie !",
   "failedToSaveImage": "Échec de l'enregistrement de l'image : {error}",
   "@failedToSaveImage": {
@@ -111,14 +111,14 @@
   "deletePost": "Supprimer le Message",
   "loginRequired": "Connexion Requise",
   "spamCleaner": "Nettoyeur de spam",
-  "sendMessage": "Envoyer un message",
+  "sendMessage": "Message direct",
   "memberSince": "Membre Depuis",
   "lastActivity": "Dernière Activité",
   "likesReceived": "J'aime Reçus",
   "likesGiven": "J'aime Donnés",
   "showMore": "Afficher plus",
   "cleanSpam": "Nettoyer le spam",
-  "failedToSaveConversation": "Échec de l'enregistrement de la conversation",
+  "failedToSaveConversation": "Impossible d'enregistrer le message",
   "members": "Membres",
   "membersCount": "{count} Membres",
   "@membersCount": {
@@ -165,8 +165,8 @@
     }
   },
   "signInToViewMessages": "Connectez-vous pour voir les messages",
-  "youNeedToBeSignedInToViewConversations": "Vous devez être connecté pour voir vos conversations.",
-  "errorLoadingConversations": "Erreur lors du chargement des conversations : {error}",
+  "youNeedToBeSignedInToViewConversations": "Vous devez être connecté pour voir vos messages.",
+  "errorLoadingConversations": "Erreur lors du chargement des messages : {error}",
   "@errorLoadingConversations": {
     "description": "Error message when loading conversations fails",
     "placeholders": {
@@ -175,7 +175,7 @@
       }
     }
   },
-  "failedToLeaveConversation": "Échec de la sortie de la conversation : {error}",
+  "failedToLeaveConversation": "Impossible de quitter le message : {error}",
   "@failedToLeaveConversation": {
     "description": "Error message when leaving conversation fails",
     "placeholders": {
@@ -184,7 +184,7 @@
       }
     }
   },
-  "errorLoadingMoreConversations": "Erreur lors du chargement de plus de conversations : {error}",
+  "errorLoadingMoreConversations": "Erreur lors du chargement d'autres messages : {error}",
   "@errorLoadingMoreConversations": {
     "description": "Error message when loading more conversations fails",
     "placeholders": {
@@ -397,11 +397,11 @@
   "userUnbannedSuccessfully": "Utilisateur débanni avec succès",
   "failedToUnbanUser": "Échec du débannissement de l'utilisateur",
   "spamCleanUser": "Nettoyer le spam de l'utilisateur",
-  "deletePrivateConversations": "Supprimer les conversations privées",
+  "deletePrivateConversations": "Supprimer les messages directs",
   "banTheUserAccount": "Bannir le compte utilisateur",
   "handledThreads": "Sujets traités",
   "deletedMessages": "Messages supprimés",
-  "deletedConversations": "Conversations supprimées",
+  "deletedConversations": "Messages supprimés",
   "bannedUser": "Utilisateur banni",
   "successfullyCleanedSpam": "Spam nettoyé avec succès pour {username}. Actions: {actions}",
   "@successfullyCleanedSpam": {
@@ -436,10 +436,10 @@
   "cleaningSpam": "Nettoyage du spam...",
   "writeYourMessage": "Écrivez votre message...",
   "writeYourReply": "Écrivez votre réponse...",
-  "conversationCreatedSuccessfully": "Conversation créée avec succès",
-  "conversationMarkedAsUnread": "Conversation marquée comme non lue",
-  "conversationClosed": "Conversation fermée",
-  "conversationOpened": "Conversation ouverte",
+  "conversationCreatedSuccessfully": "Message envoyé",
+  "conversationMarkedAsUnread": "Message marqué comme non lu",
+  "conversationClosed": "Message fermé",
+  "conversationOpened": "Message ouvert",
   "pleaseLoginToLikeMessages": "Veuillez vous connecter pour aimer les messages",
   "loadEarlierMessages": "Charger les messages précédents",
   "failedToLoadQuote": "Échec du chargement de la citation : \n{error}",
@@ -458,7 +458,7 @@
       }
     }
   },
-  "failedToMarkConversationAsUnread": "Échec du marquage de la conversation comme non lue : {error}",
+  "failedToMarkConversationAsUnread": "Impossible de marquer le message comme non lu : {error}",
   "@failedToMarkConversationAsUnread": {
     "placeholders": {
       "error": {
@@ -466,7 +466,7 @@
       }
     }
   },
-  "failedToCloseConversation": "Échec de la fermeture de la conversation : {error}",
+  "failedToCloseConversation": "Impossible de fermer le message : {error}",
   "@failedToCloseConversation": {
     "placeholders": {
       "error": {
@@ -474,7 +474,7 @@
       }
     }
   },
-  "failedToOpenConversation": "Échec de l'ouverture de la conversation : {error}",
+  "failedToOpenConversation": "Impossible d'ouvrir le message : {error}",
   "@failedToOpenConversation": {
     "placeholders": {
       "error": {
@@ -494,7 +494,7 @@
   "goToBottom": "Aller en bas",
   "pleaseLoginToAccessContent": "Veuillez vous connecter pour accéder à ce contenu et interagir avec les publications.",
   "searchUsers": "Rechercher des utilisateurs...",
-  "enterConversationTitle": "Entrez le titre de la conversation",
+  "enterConversationTitle": "Saisissez le titre du message",
   "enterCode": "Entrez le code à {count} chiffres",
   "@enterCode": {
     "placeholders": {
@@ -509,7 +509,7 @@
   "subject": "Sujet",
   "message": "Message",
   "titleCannotBeEmpty": "Le titre ne peut pas être vide",
-  "conversationUpdatedSuccessfully": "Conversation mise à jour avec succès",
+  "conversationUpdatedSuccessfully": "Message mis à jour",
   "goBack": "Retour",
   "failedToLoadPost": "Échec du chargement de la publication : \n{error}",
   "@failedToLoadPost": {
@@ -747,31 +747,38 @@
   "thisDiffIsTooLargeToDisplay": "Ce diff est trop volumineux pour être affiché.",
   "noContentChangesInThisRevision": "Aucune modification de contenu dans cette révision.",
   "revisionOf": "Révision {currentVersion} sur {versionCount}",
-  "editConversation": "Modifier la conversation",
-  "closeConversation": "Fermer la conversation",
-  "openConversation": "Ouvrir la conversation",
-  "leaveConversation2": "Quitter la conversation",
-  "reportConversation2": "Signaler la conversation",
-  "closeConversation2": "Fermer la conversation",
-  "closeConversationConfirmation": "Voulez-vous vraiment fermer cette conversation ? Aucune nouvelle réponse ne pourra être publiée.",
+  "editConversation": "Modifier le titre",
+  "closeConversation": "Fermer le message",
+  "openConversation": "Ouvrir le message",
+  "leaveConversation2": "Quitter le message",
+  "reportConversation2": "Signaler le message",
+  "closeConversation2": "Fermer le message",
+  "closeConversationConfirmation": "Fermer ce message ? Il n'acceptera plus de nouvelles réponses.",
   "close": "Fermer",
-  "openConversation2": "Ouvrir la conversation",
-  "openConversationConfirmation": "Voulez-vous vraiment ouvrir cette conversation ? De nouvelles réponses pourront être publiées.",
+  "openConversation2": "Ouvrir le message",
+  "openConversationConfirmation": "Ouvrir ce message ? Il acceptera de nouveau les réponses.",
   "open": "Ouvrir",
-  "leaveConversation3": "Quitter la conversation",
-  "leaveConversationConfirmation": "Voulez-vous vraiment quitter cette conversation ? Elle sera masquée de votre boîte de réception.",
-  "errorLoadingConversation": "Erreur de chargement de la conversation : {error}",
-  "conversationNotFound": "Conversation introuvable",
-  "conversationClosedBanner": "Cette conversation est fermée et n’accepte plus de réponses",
+  "leaveConversation3": "Quitter le message",
+  "leaveConversationConfirmation": "Voulez-vous vraiment vous retirer de ce message ? Vous ne pourrez plus le voir ni y répondre.",
+  "errorLoadingConversation": "Erreur lors du chargement du message : {error}",
+  "conversationNotFound": "Message introuvable",
+  "conversationClosedBanner": "Ce message est fermé ; il n'accepte plus de nouvelles réponses",
   "noMessagesFound": "Aucun message trouvé",
-  "endOfConversation": "Fin de la conversation",
+  "endOfConversation": "Fin de la discussion",
   "jumpToMessage": "Aller au message",
-  "editConversation2": "Modifier la conversation",
+  "editConversation2": "Modifier le titre",
   "failedToLoadMessage2": "Impossible de charger le message",
-  "cannotEditThisConversation": "Impossible de modifier cette conversation",
+  "cannotEditThisConversation": "Vous ne pouvez pas modifier ce message",
   "options": "Options",
-  "conversationOpen": "Conversation ouverte",
-  "failedToCreateConversation": "Impossible de créer la conversation : {error}",
+  "conversationOpen": "Ouvert aux réponses",
+  "messageTitleHint": "Pouvez-vous résumer le sujet en une courte phrase ?",
+  "messageOpenForReplies": "Accepte de nouvelles réponses",
+  "messageClosedForReplies": "Fermé : aucune nouvelle réponse",
+  "messageSentWithoutId": "Le message a été envoyé, mais le forum ne l'a pas renvoyé. Consultez vos messages.",
+  "messageCouldNotBeSent": "Le message n'a pas pu être envoyé.",
+  "messageIdMissing": "Impossible d'ouvrir ce message : son identifiant est manquant.",
+  "pleaseAddARecipient": "Ajoutez au moins un destinataire",
+  "failedToCreateConversation": "Impossible d'envoyer le message : {error}",
   "maximumAttachmentsAllowed": "Maximum de {count} pièce(s) jointe(s)",
   "noImagesFoundToDisplay": "Aucune image à afficher.",
   "pleaseLoginToViewThisAttachment": "Connectez-vous pour voir cette pièce jointe",

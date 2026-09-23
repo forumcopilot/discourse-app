@@ -47,7 +47,7 @@
     }
   },
   "loading": "Laden...",
-  "newConversation": "Nieuw gesprek",
+  "newConversation": "Nieuw bericht",
   "language": "Taal",
   "all": "Alles",
   "topicsOnly": "Alleen onderwerpen",
@@ -103,7 +103,7 @@
   "@participantsLabel": {
     "description": "Label for participants (without count)"
   },
-  "usernameHasBeenInvited": "{username} is uitgenodigd voor het gesprek",
+  "usernameHasBeenInvited": "{username} is uitgenodigd voor het bericht",
   "@usernameHasBeenInvited": {
     "description": "Message when user is invited to conversation",
     "placeholders": {
@@ -161,9 +161,9 @@
   "confirmSpamClean": "Spam opruimen bevestigen",
   "handleThreads": "Onderwerpen afhandelen",
   "deleteMessages": "Berichten verwijderen",
-  "deleteConversations": "Gesprekken verwijderen",
-  "noConversations": "Geen gesprekken",
-  "noConversationsMessage": "U heeft nog geen gesprekken. Start een nieuw gesprek om te beginnen.",
+  "deleteConversations": "Berichten verwijderen",
+  "noConversations": "Je hebt geen berichten",
+  "noConversationsMessage": "Je hebt nog geen berichten. Schrijf een nieuw bericht om te beginnen.",
   "imageSavedToGallery": "Afbeelding opgeslagen in galerij!",
   "failedToSaveImage": "Kon afbeelding niet opslaan: {error}",
   "@failedToSaveImage": {
@@ -178,14 +178,14 @@
   "deletePost": "Bericht verwijderen",
   "loginRequired": "Inloggen vereist",
   "spamCleaner": "Spam opruimer",
-  "sendMessage": "Bericht verzenden",
+  "sendMessage": "Bericht",
   "memberSince": "Lid sinds",
   "lastActivity": "Laatste activiteit",
   "likesReceived": "Ontvangen likes",
   "likesGiven": "Gegeven likes",
   "showMore": "Meer tonen",
   "cleanSpam": "Spam opruimen",
-  "failedToSaveConversation": "Kon gesprek niet opslaan",
+  "failedToSaveConversation": "Bericht kon niet worden opgeslagen",
   "members": "Leden",
   "membersCount": "{count} leden",
   "@membersCount": {
@@ -232,8 +232,8 @@
     }
   },
   "signInToViewMessages": "Log in om berichten te bekijken",
-  "youNeedToBeSignedInToViewConversations": "U moet ingelogd zijn om uw gesprekken te bekijken.",
-  "errorLoadingConversations": "Fout bij laden van gesprekken: {error}",
+  "youNeedToBeSignedInToViewConversations": "Je moet ingelogd zijn om je berichten te zien.",
+  "errorLoadingConversations": "Fout bij het laden van berichten: {error}",
   "@errorLoadingConversations": {
     "description": "Error message when loading conversations fails",
     "placeholders": {
@@ -242,7 +242,7 @@
       }
     }
   },
-  "failedToLeaveConversation": "Kon gesprek niet verlaten: {error}",
+  "failedToLeaveConversation": "Kon het bericht niet verlaten: {error}",
   "@failedToLeaveConversation": {
     "description": "Error message when leaving conversation fails",
     "placeholders": {
@@ -251,7 +251,7 @@
       }
     }
   },
-  "errorLoadingMoreConversations": "Fout bij laden van meer gesprekken: {error}",
+  "errorLoadingMoreConversations": "Fout bij het laden van meer berichten: {error}",
   "@errorLoadingMoreConversations": {
     "description": "Error message when loading more conversations fails",
     "placeholders": {
@@ -353,7 +353,7 @@
       }
     }
   },
-  "markAsUnread": "Als ongelezen markeren",
+  "markAsUnread": "Markeren als ongelezen",
   "invite": "Uitnodigen",
   "enterKeywordsToSearchTopics": "Voer zoekwoorden in om onderwerpen te zoeken...",
   "undelete": "Verwijdering ongedaan maken",
@@ -506,7 +506,7 @@
   "@spamCleanUser": {
     "description": "Title for spam clean user dialog"
   },
-  "deletePrivateConversations": "Privégesprekken verwijderen",
+  "deletePrivateConversations": "Persoonlijke berichten verwijderen",
   "@deletePrivateConversations": {
     "description": "Option to delete private conversations in spam clean"
   },
@@ -525,7 +525,7 @@
   "@deletedMessages": {
     "description": "Action performed: deleted messages"
   },
-  "deletedConversations": "Gesprekken verwijderd",
+  "deletedConversations": "Verwijderde berichten",
   "@deletedConversations": {
     "description": "Action performed: deleted conversations"
   },
@@ -633,19 +633,19 @@
   "@writeYourReply": {
     "description": "Hint text for writing reply"
   },
-  "conversationCreatedSuccessfully": "Gesprek succesvol aangemaakt",
+  "conversationCreatedSuccessfully": "Bericht verzonden",
   "@conversationCreatedSuccessfully": {
     "description": "Success message after creating conversation"
   },
-  "conversationMarkedAsUnread": "Gesprek als ongelezen gemarkeerd",
+  "conversationMarkedAsUnread": "Bericht gemarkeerd als ongelezen",
   "@conversationMarkedAsUnread": {
     "description": "Success message when marking conversation as unread"
   },
-  "conversationClosed": "Gesprek gesloten",
+  "conversationClosed": "Bericht gesloten",
   "@conversationClosed": {
     "description": "Success message when closing conversation"
   },
-  "conversationOpened": "Gesprek geopend",
+  "conversationOpened": "Bericht geopend",
   "@conversationOpened": {
     "description": "Success message when opening conversation"
   },
@@ -675,7 +675,7 @@
       }
     }
   },
-  "failedToMarkConversationAsUnread": "Kon gesprek niet als ongelezen markeren: {error}",
+  "failedToMarkConversationAsUnread": "Kon bericht niet als ongelezen markeren: {error}",
   "@failedToMarkConversationAsUnread": {
     "description": "Error message when marking conversation as unread fails",
     "placeholders": {
@@ -684,7 +684,7 @@
       }
     }
   },
-  "failedToCloseConversation": "Kon gesprek niet sluiten: {error}",
+  "failedToCloseConversation": "Kon bericht niet sluiten: {error}",
   "@failedToCloseConversation": {
     "description": "Error message when closing conversation fails",
     "placeholders": {
@@ -693,7 +693,7 @@
       }
     }
   },
-  "failedToOpenConversation": "Kon gesprek niet openen: {error}",
+  "failedToOpenConversation": "Kon bericht niet openen: {error}",
   "@failedToOpenConversation": {
     "description": "Error message when opening conversation fails",
     "placeholders": {
@@ -727,7 +727,7 @@
   "@searchUsers": {
     "description": "Hint text for searching users"
   },
-  "enterConversationTitle": "Voer gesprekstitel in",
+  "enterConversationTitle": "Voer de titel van het bericht in",
   "@enterConversationTitle": {
     "description": "Hint text for conversation title field"
   },
@@ -764,7 +764,7 @@
   "@titleCannotBeEmpty": {
     "description": "Validation message when title is empty"
   },
-  "conversationUpdatedSuccessfully": "Gesprek succesvol bijgewerkt",
+  "conversationUpdatedSuccessfully": "Bericht bijgewerkt",
   "@conversationUpdatedSuccessfully": {
     "description": "Success message when conversation is updated"
   },
@@ -1045,31 +1045,38 @@
   "thisDiffIsTooLargeToDisplay": "Dit verschil is te groot om weer te geven.",
   "noContentChangesInThisRevision": "Geen inhoudelijke wijzigingen in deze revisie.",
   "revisionOf": "Revisie {currentVersion} van {versionCount}",
-  "editConversation": "Gesprek bewerken",
-  "closeConversation": "Gesprek sluiten",
-  "openConversation": "Gesprek openen",
-  "leaveConversation2": "Gesprek verlaten",
-  "reportConversation2": "Gesprek melden",
-  "closeConversation2": "Gesprek sluiten",
-  "closeConversationConfirmation": "Weet je zeker dat je dit gesprek wilt sluiten? Er kunnen dan geen nieuwe reacties meer worden geplaatst.",
+  "editConversation": "Titel bewerken",
+  "closeConversation": "Bericht sluiten",
+  "openConversation": "Bericht openen",
+  "leaveConversation2": "Bericht verlaten",
+  "reportConversation2": "Bericht melden",
+  "closeConversation2": "Bericht sluiten",
+  "closeConversationConfirmation": "Dit bericht sluiten? Nieuwe antwoorden zijn dan niet meer mogelijk.",
   "close": "Sluiten",
-  "openConversation2": "Gesprek openen",
-  "openConversationConfirmation": "Weet je zeker dat je dit gesprek wilt openen? Er kunnen dan weer nieuwe reacties worden geplaatst.",
+  "openConversation2": "Bericht openen",
+  "openConversationConfirmation": "Dit bericht openen? Nieuwe antwoorden zijn dan weer mogelijk.",
   "open": "Openen",
-  "leaveConversation3": "Gesprek verlaten",
-  "leaveConversationConfirmation": "Weet je zeker dat je dit gesprek wilt verlaten? Het wordt verborgen in je inbox.",
-  "errorLoadingConversation": "Fout bij laden van gesprek: {error}",
-  "conversationNotFound": "Gesprek niet gevonden",
-  "conversationClosedBanner": "Dit gesprek is gesloten en accepteert geen reacties meer",
+  "leaveConversation3": "Bericht verlaten",
+  "leaveConversationConfirmation": "Weet je zeker dat je jezelf uit dit bericht wilt verwijderen? Je kunt het dan niet meer zien of erop antwoorden.",
+  "errorLoadingConversation": "Fout bij het laden van het bericht: {error}",
+  "conversationNotFound": "Bericht niet gevonden",
+  "conversationClosedBanner": "Dit bericht is gesloten; nieuwe antwoorden zijn niet meer mogelijk",
   "noMessagesFound": "Geen berichten gevonden",
-  "endOfConversation": "Einde van het gesprek",
+  "endOfConversation": "Einde van de discussie",
   "jumpToMessage": "Ga naar bericht",
-  "editConversation2": "Gesprek bewerken",
+  "editConversation2": "Titel bewerken",
   "failedToLoadMessage2": "Bericht laden mislukt",
-  "cannotEditThisConversation": "Dit gesprek kan niet worden bewerkt",
+  "cannotEditThisConversation": "Je kunt dit bericht niet bewerken",
   "options": "Opties",
-  "conversationOpen": "Gesprek open",
-  "failedToCreateConversation": "Gesprek aanmaken mislukt: {error}",
+  "conversationOpen": "Open voor antwoorden",
+  "messageTitleHint": "Waar gaat deze discussie over in één korte zin?",
+  "messageOpenForReplies": "Nieuwe antwoorden zijn mogelijk",
+  "messageClosedForReplies": "Gesloten: geen nieuwe antwoorden",
+  "messageSentWithoutId": "Het bericht is verzonden, maar het forum gaf het niet terug. Bekijk je berichten.",
+  "messageCouldNotBeSent": "Het bericht kon niet worden verzonden.",
+  "messageIdMissing": "Dit bericht kan niet worden geopend: de ID ontbreekt.",
+  "pleaseAddARecipient": "Voeg minstens één ontvanger toe",
+  "failedToCreateConversation": "Kon bericht niet verzenden: {error}",
   "maximumAttachmentsAllowed": "Maximaal {count} bijlage(n) toegestaan",
   "noImagesFoundToDisplay": "Geen afbeeldingen gevonden om weer te geven.",
   "pleaseLoginToViewThisAttachment": "Meld je aan om deze bijlage te bekijken",

@@ -39,7 +39,7 @@
   "connectionFailed": "接続失敗",
   "failedToConnectToSiteName": "{siteName} に接続できませんでした",
   "loading": "読み込み中...",
-  "newConversation": "新しい会話",
+  "newConversation": "新規メッセージ",
   "language": "言語",
   "all": "すべて",
   "topicsOnly": "トピックのみ",
@@ -68,7 +68,7 @@
   "selectedActions": "選択されたアクション:",
   "thisActionCannotBeUndone": "このアクションは元に戻せません。",
   "participantsLabel": "参加者",
-  "usernameHasBeenInvited": "{username} が会話に招待されました",
+  "usernameHasBeenInvited": "{username} をメッセージに招待しました",
   "errorInvitingUser": "ユーザーの招待エラー: {error}",
   "newTopic": "新しいトピック",
   "markRead": "既読にする",
@@ -94,9 +94,9 @@
   "confirmSpamClean": "スパムクリーンを確認",
   "handleThreads": "スレッドを処理",
   "deleteMessages": "メッセージを削除",
-  "deleteConversations": "会話を削除",
-  "noConversations": "会話なし",
-  "noConversationsMessage": "まだ会話がありません。新しい会話を開始してメッセージングを始めましょう。",
+  "deleteConversations": "メッセージを削除",
+  "noConversations": "メッセージはありません",
+  "noConversationsMessage": "まだメッセージはありません。新しいメッセージを書いて始めましょう。",
   "imageSavedToGallery": "画像がギャラリーに保存されました！",
   "failedToSaveImage": "画像の保存に失敗しました: {error}",
   "@failedToSaveImage": {
@@ -111,14 +111,14 @@
   "deletePost": "投稿を削除",
   "loginRequired": "ログインが必要です",
   "spamCleaner": "スパムクリーナー",
-  "sendMessage": "メッセージを送信",
+  "sendMessage": "メッセージ",
   "memberSince": "メンバー登録日",
   "lastActivity": "最終アクティビティ",
   "likesReceived": "受け取ったいいね",
   "likesGiven": "与えたいいね",
   "showMore": "もっと見る",
   "cleanSpam": "スパムをクリーンアップ",
-  "failedToSaveConversation": "会話の保存に失敗しました",
+  "failedToSaveConversation": "メッセージを保存できませんでした",
   "members": "メンバー",
   "membersCount": "{count} メンバー",
   "@membersCount": {
@@ -165,8 +165,8 @@
     }
   },
   "signInToViewMessages": "メッセージを表示するにはログインしてください",
-  "youNeedToBeSignedInToViewConversations": "会話を表示するにはログインする必要があります。",
-  "errorLoadingConversations": "会話の読み込みエラー: {error}",
+  "youNeedToBeSignedInToViewConversations": "メッセージを見るにはサインインが必要です。",
+  "errorLoadingConversations": "メッセージの読み込みエラー: {error}",
   "@errorLoadingConversations": {
     "description": "Error message when loading conversations fails",
     "placeholders": {
@@ -175,7 +175,7 @@
       }
     }
   },
-  "failedToLeaveConversation": "会話を退出できませんでした: {error}",
+  "failedToLeaveConversation": "メッセージから退出できませんでした: {error}",
   "@failedToLeaveConversation": {
     "description": "Error message when leaving conversation fails",
     "placeholders": {
@@ -184,7 +184,7 @@
       }
     }
   },
-  "errorLoadingMoreConversations": "追加の会話の読み込みエラー: {error}",
+  "errorLoadingMoreConversations": "さらにメッセージを読み込む際のエラー: {error}",
   "@errorLoadingMoreConversations": {
     "description": "Error message when loading more conversations fails",
     "placeholders": {
@@ -286,7 +286,7 @@
       }
     }
   },
-  "markAsUnread": "未読としてマーク",
+  "markAsUnread": "未読にする",
   "invite": "招待",
   "enterKeywordsToSearchTopics": "トピックを検索するキーワードを入力...",
   "undelete": "復元",
@@ -397,11 +397,11 @@
   "userUnbannedSuccessfully": "ユーザーの禁止が正常に解除されました",
   "failedToUnbanUser": "ユーザーの禁止解除に失敗しました",
   "spamCleanUser": "ユーザーのスパムをクリーンアップ",
-  "deletePrivateConversations": "プライベート会話を削除",
+  "deletePrivateConversations": "個人メッセージを削除",
   "banTheUserAccount": "ユーザーアカウントを禁止",
   "handledThreads": "処理されたスレッド",
   "deletedMessages": "削除されたメッセージ",
-  "deletedConversations": "削除された会話",
+  "deletedConversations": "削除されたメッセージ",
   "bannedUser": "禁止されたユーザー",
   "successfullyCleanedSpam": "{username}のスパムが正常にクリーンアップされました。アクション: {actions}",
   "@successfullyCleanedSpam": {
@@ -436,10 +436,10 @@
   "cleaningSpam": "スパムをクリーンアップ中...",
   "writeYourMessage": "メッセージを書く...",
   "writeYourReply": "返信を書く...",
-  "conversationCreatedSuccessfully": "会話が正常に作成されました",
-  "conversationMarkedAsUnread": "会話が未読としてマークされました",
-  "conversationClosed": "会話が閉じられました",
-  "conversationOpened": "会話が開かれました",
+  "conversationCreatedSuccessfully": "メッセージを送信しました",
+  "conversationMarkedAsUnread": "メッセージを未読にしました",
+  "conversationClosed": "メッセージをクローズしました",
+  "conversationOpened": "メッセージをオープンしました",
   "pleaseLoginToLikeMessages": "メッセージにいいねするにはログインしてください",
   "loadEarlierMessages": "以前のメッセージを読み込む",
   "failedToLoadQuote": "引用の読み込みに失敗しました: \n{error}",
@@ -458,7 +458,7 @@
       }
     }
   },
-  "failedToMarkConversationAsUnread": "会話を未読としてマークできませんでした: {error}",
+  "failedToMarkConversationAsUnread": "メッセージを未読にできませんでした: {error}",
   "@failedToMarkConversationAsUnread": {
     "placeholders": {
       "error": {
@@ -466,7 +466,7 @@
       }
     }
   },
-  "failedToCloseConversation": "会話を閉じることができませんでした: {error}",
+  "failedToCloseConversation": "メッセージをクローズできませんでした: {error}",
   "@failedToCloseConversation": {
     "placeholders": {
       "error": {
@@ -474,7 +474,7 @@
       }
     }
   },
-  "failedToOpenConversation": "会話を開くことができませんでした: {error}",
+  "failedToOpenConversation": "メッセージをオープンできませんでした: {error}",
   "@failedToOpenConversation": {
     "placeholders": {
       "error": {
@@ -494,7 +494,7 @@
   "goToBottom": "ボトムへ",
   "pleaseLoginToAccessContent": "このコンテンツにアクセスして投稿とやり取りするには、ログインしてください。",
   "searchUsers": "ユーザーを検索...",
-  "enterConversationTitle": "会話のタイトルを入力",
+  "enterConversationTitle": "メッセージのタイトルを入力",
   "enterCode": "{count}桁のコードを入力",
   "@enterCode": {
     "placeholders": {
@@ -509,7 +509,7 @@
   "subject": "件名",
   "message": "メッセージ",
   "titleCannotBeEmpty": "タイトルを入力してください",
-  "conversationUpdatedSuccessfully": "会話が正常に更新されました",
+  "conversationUpdatedSuccessfully": "メッセージを更新しました",
   "goBack": "戻る",
   "failedToLoadPost": "投稿の読み込みに失敗しました: \n{error}",
   "@failedToLoadPost": {
@@ -747,31 +747,38 @@
   "thisDiffIsTooLargeToDisplay": "この差分は大きすぎて表示できません。",
   "noContentChangesInThisRevision": "この版に内容の変更はありません。",
   "revisionOf": "版 {currentVersion} / {versionCount}",
-  "editConversation": "会話を編集",
-  "closeConversation": "会話をクローズ",
-  "openConversation": "会話を再開",
-  "leaveConversation2": "会話から退出",
-  "reportConversation2": "会話を報告",
-  "closeConversation2": "会話をクローズ",
-  "closeConversationConfirmation": "この会話をクローズしますか？新しい返信ができなくなります。",
+  "editConversation": "タイトルを編集",
+  "closeConversation": "メッセージをクローズ",
+  "openConversation": "メッセージをオープン",
+  "leaveConversation2": "メッセージから退出",
+  "reportConversation2": "メッセージを通報",
+  "closeConversation2": "メッセージをクローズ",
+  "closeConversationConfirmation": "このメッセージをクローズしますか？新たに返信できなくなります。",
   "close": "閉じる",
-  "openConversation2": "会話を再開",
-  "openConversationConfirmation": "この会話を再開しますか？新しい返信ができるようになります。",
+  "openConversation2": "メッセージをオープン",
+  "openConversationConfirmation": "このメッセージをオープンしますか？再び返信できるようになります。",
   "open": "開く",
-  "leaveConversation3": "会話から退出",
-  "leaveConversationConfirmation": "この会話から退出しますか？受信トレイに表示されなくなります。",
-  "errorLoadingConversation": "会話の読み込みエラー: {error}",
-  "conversationNotFound": "会話が見つかりません",
-  "conversationClosedBanner": "この会話はクローズされ、返信できません",
+  "leaveConversation3": "メッセージから退出",
+  "leaveConversationConfirmation": "このメッセージから自分自身を削除してもよろしいですか？このメッセージの閲覧または返信を行えなくなります。",
+  "errorLoadingConversation": "メッセージの読み込みエラー: {error}",
+  "conversationNotFound": "メッセージが見つかりません",
+  "conversationClosedBanner": "このメッセージはクローズしています。新たに返信することはできません。",
   "noMessagesFound": "メッセージが見つかりません",
-  "endOfConversation": "会話の終わり",
+  "endOfConversation": "議論の終わり",
   "jumpToMessage": "メッセージへ移動",
-  "editConversation2": "会話を編集",
+  "editConversation2": "タイトルを編集",
   "failedToLoadMessage2": "メッセージを読み込めませんでした",
-  "cannotEditThisConversation": "この会話は編集できません",
+  "cannotEditThisConversation": "このメッセージは編集できません",
   "options": "オプション",
-  "conversationOpen": "会話をオープンにする",
-  "failedToCreateConversation": "会話を作成できませんでした: {error}",
+  "conversationOpen": "返信を受け付ける",
+  "messageTitleHint": "タイトルを入力してください",
+  "messageOpenForReplies": "新しい返信を受け付けています",
+  "messageClosedForReplies": "クローズ: 新しい返信は受け付けません",
+  "messageSentWithoutId": "メッセージは送信されましたが、フォーラムから返されませんでした。メッセージ一覧を確認してください。",
+  "messageCouldNotBeSent": "メッセージを送信できませんでした。",
+  "messageIdMissing": "このメッセージを開けません: ID がありません。",
+  "pleaseAddARecipient": "宛先を 1 人以上追加してください",
+  "failedToCreateConversation": "メッセージを送信できませんでした: {error}",
   "maximumAttachmentsAllowed": "添付ファイルは最大 {count} 件までです",
   "noImagesFoundToDisplay": "表示できる画像がありません。",
   "pleaseLoginToViewThisAttachment": "この添付ファイルを見るにはログインしてください",

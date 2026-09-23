@@ -143,7 +143,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get loading => 'Laden...';
 
   @override
-  String get newConversation => 'Nieuw gesprek';
+  String get newConversation => 'Nieuw bericht';
 
   @override
   String get language => 'Taal';
@@ -234,7 +234,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String usernameHasBeenInvited(String username) {
-    return '$username is uitgenodigd voor het gesprek';
+    return '$username is uitgenodigd voor het bericht';
   }
 
   @override
@@ -322,14 +322,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get deleteMessages => 'Berichten verwijderen';
 
   @override
-  String get deleteConversations => 'Gesprekken verwijderen';
+  String get deleteConversations => 'Berichten verwijderen';
 
   @override
-  String get noConversations => 'Geen gesprekken';
+  String get noConversations => 'Je hebt geen berichten';
 
   @override
   String get noConversationsMessage =>
-      'U heeft nog geen gesprekken. Start een nieuw gesprek om te beginnen.';
+      'Je hebt nog geen berichten. Schrijf een nieuw bericht om te beginnen.';
 
   @override
   String get imageSavedToGallery => 'Afbeelding opgeslagen in galerij!';
@@ -352,7 +352,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get spamCleaner => 'Spam opruimer';
 
   @override
-  String get sendMessage => 'Bericht verzenden';
+  String get sendMessage => 'Bericht';
 
   @override
   String get memberSince => 'Lid sinds';
@@ -373,7 +373,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get cleanSpam => 'Spam opruimen';
 
   @override
-  String get failedToSaveConversation => 'Kon gesprek niet opslaan';
+  String get failedToSaveConversation => 'Bericht kon niet worden opgeslagen';
 
   @override
   String get members => 'Leden';
@@ -451,21 +451,21 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get youNeedToBeSignedInToViewConversations =>
-      'U moet ingelogd zijn om uw gesprekken te bekijken.';
+      'Je moet ingelogd zijn om je berichten te zien.';
 
   @override
   String errorLoadingConversations(String error) {
-    return 'Fout bij laden van gesprekken: $error';
+    return 'Fout bij het laden van berichten: $error';
   }
 
   @override
   String failedToLeaveConversation(String error) {
-    return 'Kon gesprek niet verlaten: $error';
+    return 'Kon het bericht niet verlaten: $error';
   }
 
   @override
   String errorLoadingMoreConversations(String error) {
-    return 'Fout bij laden van meer gesprekken: $error';
+    return 'Fout bij het laden van meer berichten: $error';
   }
 
   @override
@@ -620,7 +620,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get markAsUnread => 'Als ongelezen markeren';
+  String get markAsUnread => 'Markeren als ongelezen';
 
   @override
   String get invite => 'Uitnodigen';
@@ -743,7 +743,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get spamCleanUser => 'Spam opruimen gebruiker';
 
   @override
-  String get deletePrivateConversations => 'Privégesprekken verwijderen';
+  String get deletePrivateConversations => 'Persoonlijke berichten verwijderen';
 
   @override
   String get banTheUserAccount => 'Gebruikersaccount blokkeren';
@@ -755,7 +755,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get deletedMessages => 'Berichten verwijderd';
 
   @override
-  String get deletedConversations => 'Gesprekken verwijderd';
+  String get deletedConversations => 'Verwijderde berichten';
 
   @override
   String get bannedUser => 'Gebruiker geblokkeerd';
@@ -834,16 +834,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get writeYourReply => 'Schrijf uw antwoord...';
 
   @override
-  String get conversationCreatedSuccessfully => 'Gesprek succesvol aangemaakt';
+  String get conversationCreatedSuccessfully => 'Bericht verzonden';
 
   @override
-  String get conversationMarkedAsUnread => 'Gesprek als ongelezen gemarkeerd';
+  String get conversationMarkedAsUnread => 'Bericht gemarkeerd als ongelezen';
 
   @override
-  String get conversationClosed => 'Gesprek gesloten';
+  String get conversationClosed => 'Bericht gesloten';
 
   @override
-  String get conversationOpened => 'Gesprek geopend';
+  String get conversationOpened => 'Bericht geopend';
 
   @override
   String get pleaseLoginToLikeMessages => 'Log in om berichten te liken';
@@ -863,17 +863,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String failedToMarkConversationAsUnread(String error) {
-    return 'Kon gesprek niet als ongelezen markeren: $error';
+    return 'Kon bericht niet als ongelezen markeren: $error';
   }
 
   @override
   String failedToCloseConversation(String error) {
-    return 'Kon gesprek niet sluiten: $error';
+    return 'Kon bericht niet sluiten: $error';
   }
 
   @override
   String failedToOpenConversation(String error) {
-    return 'Kon gesprek niet openen: $error';
+    return 'Kon bericht niet openen: $error';
   }
 
   @override
@@ -895,7 +895,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get searchUsers => 'Gebruikers zoeken...';
 
   @override
-  String get enterConversationTitle => 'Voer gesprekstitel in';
+  String get enterConversationTitle => 'Voer de titel van het bericht in';
 
   @override
   String enterCode(int count) {
@@ -921,7 +921,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get titleCannotBeEmpty => 'Titel mag niet leeg zijn';
 
   @override
-  String get conversationUpdatedSuccessfully => 'Gesprek succesvol bijgewerkt';
+  String get conversationUpdatedSuccessfully => 'Bericht bijgewerkt';
 
   @override
   String get goBack => 'Terug';
@@ -1610,87 +1610,110 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get editConversation => 'Gesprek bewerken';
+  String get editConversation => 'Titel bewerken';
 
   @override
-  String get closeConversation => 'Gesprek sluiten';
+  String get closeConversation => 'Bericht sluiten';
 
   @override
-  String get openConversation => 'Gesprek openen';
+  String get openConversation => 'Bericht openen';
 
   @override
-  String get leaveConversation2 => 'Gesprek verlaten';
+  String get leaveConversation2 => 'Bericht verlaten';
 
   @override
-  String get reportConversation2 => 'Gesprek melden';
+  String get reportConversation2 => 'Bericht melden';
 
   @override
-  String get closeConversation2 => 'Gesprek sluiten';
+  String get closeConversation2 => 'Bericht sluiten';
 
   @override
   String get closeConversationConfirmation =>
-      'Weet je zeker dat je dit gesprek wilt sluiten? Er kunnen dan geen nieuwe reacties meer worden geplaatst.';
+      'Dit bericht sluiten? Nieuwe antwoorden zijn dan niet meer mogelijk.';
 
   @override
   String get close => 'Sluiten';
 
   @override
-  String get openConversation2 => 'Gesprek openen';
+  String get openConversation2 => 'Bericht openen';
 
   @override
   String get openConversationConfirmation =>
-      'Weet je zeker dat je dit gesprek wilt openen? Er kunnen dan weer nieuwe reacties worden geplaatst.';
+      'Dit bericht openen? Nieuwe antwoorden zijn dan weer mogelijk.';
 
   @override
   String get open => 'Openen';
 
   @override
-  String get leaveConversation3 => 'Gesprek verlaten';
+  String get leaveConversation3 => 'Bericht verlaten';
 
   @override
   String get leaveConversationConfirmation =>
-      'Weet je zeker dat je dit gesprek wilt verlaten? Het wordt verborgen in je inbox.';
+      'Weet je zeker dat je jezelf uit dit bericht wilt verwijderen? Je kunt het dan niet meer zien of erop antwoorden.';
 
   @override
   String errorLoadingConversation(Object error) {
-    return 'Fout bij laden van gesprek: $error';
+    return 'Fout bij het laden van het bericht: $error';
   }
 
   @override
-  String get conversationNotFound => 'Gesprek niet gevonden';
+  String get conversationNotFound => 'Bericht niet gevonden';
 
   @override
   String get conversationClosedBanner =>
-      'Dit gesprek is gesloten en accepteert geen reacties meer';
+      'Dit bericht is gesloten; nieuwe antwoorden zijn niet meer mogelijk';
 
   @override
   String get noMessagesFound => 'Geen berichten gevonden';
 
   @override
-  String get endOfConversation => 'Einde van het gesprek';
+  String get endOfConversation => 'Einde van de discussie';
 
   @override
   String get jumpToMessage => 'Ga naar bericht';
 
   @override
-  String get editConversation2 => 'Gesprek bewerken';
+  String get editConversation2 => 'Titel bewerken';
 
   @override
   String get failedToLoadMessage2 => 'Bericht laden mislukt';
 
   @override
-  String get cannotEditThisConversation =>
-      'Dit gesprek kan niet worden bewerkt';
+  String get cannotEditThisConversation => 'Je kunt dit bericht niet bewerken';
 
   @override
   String get options => 'Opties';
 
   @override
-  String get conversationOpen => 'Gesprek open';
+  String get conversationOpen => 'Open voor antwoorden';
+
+  @override
+  String get messageTitleHint =>
+      'Waar gaat deze discussie over in één korte zin?';
+
+  @override
+  String get messageOpenForReplies => 'Nieuwe antwoorden zijn mogelijk';
+
+  @override
+  String get messageClosedForReplies => 'Gesloten: geen nieuwe antwoorden';
+
+  @override
+  String get messageSentWithoutId =>
+      'Het bericht is verzonden, maar het forum gaf het niet terug. Bekijk je berichten.';
+
+  @override
+  String get messageCouldNotBeSent => 'Het bericht kon niet worden verzonden.';
+
+  @override
+  String get messageIdMissing =>
+      'Dit bericht kan niet worden geopend: de ID ontbreekt.';
+
+  @override
+  String get pleaseAddARecipient => 'Voeg minstens één ontvanger toe';
 
   @override
   String failedToCreateConversation(Object error) {
-    return 'Gesprek aanmaken mislukt: $error';
+    return 'Kon bericht niet verzenden: $error';
   }
 
   @override

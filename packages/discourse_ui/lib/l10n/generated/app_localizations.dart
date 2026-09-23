@@ -677,7 +677,7 @@ abstract class AppLocalizations {
   /// No description provided for @noConversations.
   ///
   /// In en, this message translates to:
-  /// **'No messages'**
+  /// **'You don\'t have any messages'**
   String get noConversations;
 
   /// No description provided for @noConversationsMessage.
@@ -725,7 +725,7 @@ abstract class AppLocalizations {
   /// Button to send a message to a user
   ///
   /// In en, this message translates to:
-  /// **'Send Message'**
+  /// **'Message'**
   String get sendMessage;
 
   /// No description provided for @memberSince.
@@ -911,7 +911,7 @@ abstract class AppLocalizations {
   /// Error message when leaving conversation fails
   ///
   /// In en, this message translates to:
-  /// **'Failed to leave message: {error}'**
+  /// **'Could not leave the message: {error}'**
   String failedToLeaveConversation(String error);
 
   /// Error message when loading more conversations fails
@@ -1193,7 +1193,7 @@ abstract class AppLocalizations {
   /// No description provided for @markAsUnread.
   ///
   /// In en, this message translates to:
-  /// **'Mark as unread'**
+  /// **'Mark unread'**
   String get markAsUnread;
 
   /// No description provided for @invite.
@@ -1589,7 +1589,7 @@ abstract class AppLocalizations {
   /// Success message after creating conversation
   ///
   /// In en, this message translates to:
-  /// **'Message created successfully'**
+  /// **'Message sent'**
   String get conversationCreatedSuccessfully;
 
   /// Success message when marking conversation as unread
@@ -1733,7 +1733,7 @@ abstract class AppLocalizations {
   /// Success message when conversation is updated
   ///
   /// In en, this message translates to:
-  /// **'Message updated successfully'**
+  /// **'Message updated'**
   String get conversationUpdatedSuccessfully;
 
   /// Button text to go back
@@ -2828,46 +2828,46 @@ abstract class AppLocalizations {
   /// **'Revision {currentVersion} of {versionCount}'**
   String revisionOf(Object currentVersion, Object versionCount);
 
-  /// UI text: Edit conversation
+  /// UI text: Edit title
   ///
   /// In en, this message translates to:
-  /// **'Edit conversation'**
+  /// **'Edit title'**
   String get editConversation;
 
-  /// UI text: Close conversation
+  /// UI text: Close message
   ///
   /// In en, this message translates to:
-  /// **'Close conversation'**
+  /// **'Close message'**
   String get closeConversation;
 
-  /// UI text: Open conversation
+  /// UI text: Open message
   ///
   /// In en, this message translates to:
-  /// **'Open conversation'**
+  /// **'Open message'**
   String get openConversation;
 
-  /// UI text: Leave conversation
+  /// UI text: Leave message
   ///
   /// In en, this message translates to:
-  /// **'Leave conversation'**
+  /// **'Leave message'**
   String get leaveConversation2;
 
-  /// UI text: Report conversation
+  /// UI text: Report message
   ///
   /// In en, this message translates to:
-  /// **'Report conversation'**
+  /// **'Report message'**
   String get reportConversation2;
 
-  /// UI text: Close Conversation
+  /// UI text: Close message
   ///
   /// In en, this message translates to:
-  /// **'Close Conversation'**
+  /// **'Close message'**
   String get closeConversation2;
 
-  /// UI text: Are you sure you want to close this conversation? This will
+  /// UI text: Close this message? It will no longer accept new replies.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to close this conversation? This will prevent new replies from being posted.'**
+  /// **'Close this message? It will no longer accept new replies.'**
   String get closeConversationConfirmation;
 
   /// UI text: Close
@@ -2876,16 +2876,16 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get close;
 
-  /// UI text: Open Conversation
+  /// UI text: Open message
   ///
   /// In en, this message translates to:
-  /// **'Open Conversation'**
+  /// **'Open message'**
   String get openConversation2;
 
-  /// UI text: Are you sure you want to open this conversation? This will a
+  /// UI text: Open this message? It will accept new replies again.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to open this conversation? This will allow new replies to be posted.'**
+  /// **'Open this message? It will accept new replies again.'**
   String get openConversationConfirmation;
 
   /// UI text: Open
@@ -2894,34 +2894,34 @@ abstract class AppLocalizations {
   /// **'Open'**
   String get open;
 
-  /// UI text: Leave Conversation
+  /// UI text: Leave message
   ///
   /// In en, this message translates to:
-  /// **'Leave Conversation'**
+  /// **'Leave message'**
   String get leaveConversation3;
 
-  /// UI text: Are you sure you want to leave this conversation? This will
+  /// UI text: Are you sure you want to remove yourself from this message? You will no longer be able to see or reply to it.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to leave this conversation? This will hide it from your inbox.'**
+  /// **'Are you sure you want to remove yourself from this message? You will no longer be able to see or reply to it.'**
   String get leaveConversationConfirmation;
 
-  /// UI text: Error loading conversation: {error}
+  /// UI text: Error loading message: {error}
   ///
   /// In en, this message translates to:
-  /// **'Error loading conversation: {error}'**
+  /// **'Error loading message: {error}'**
   String errorLoadingConversation(Object error);
 
-  /// UI text: Conversation not found
+  /// UI text: Message not found
   ///
   /// In en, this message translates to:
-  /// **'Conversation not found'**
+  /// **'Message not found'**
   String get conversationNotFound;
 
-  /// UI text: This conversation is closed and no longer accepting replies
+  /// UI text: This message is closed; it no longer accepts new replies
   ///
   /// In en, this message translates to:
-  /// **'This conversation is closed and no longer accepting replies'**
+  /// **'This message is closed; it no longer accepts new replies'**
   String get conversationClosedBanner;
 
   /// UI text: No messages found
@@ -2930,10 +2930,10 @@ abstract class AppLocalizations {
   /// **'No messages found'**
   String get noMessagesFound;
 
-  /// UI text: End of conversation
+  /// UI text: End of the discussion
   ///
   /// In en, this message translates to:
-  /// **'End of conversation'**
+  /// **'End of the discussion'**
   String get endOfConversation;
 
   /// UI text: Jump to Message
@@ -2942,10 +2942,10 @@ abstract class AppLocalizations {
   /// **'Jump to Message'**
   String get jumpToMessage;
 
-  /// UI text: Edit Conversation
+  /// UI text: Edit title
   ///
   /// In en, this message translates to:
-  /// **'Edit Conversation'**
+  /// **'Edit title'**
   String get editConversation2;
 
   /// UI text: Failed to load message
@@ -2954,10 +2954,10 @@ abstract class AppLocalizations {
   /// **'Failed to load message'**
   String get failedToLoadMessage2;
 
-  /// UI text: Cannot edit this conversation
+  /// UI text: You can't edit this message
   ///
   /// In en, this message translates to:
-  /// **'Cannot edit this conversation'**
+  /// **'You can\'t edit this message'**
   String get cannotEditThisConversation;
 
   /// UI text: Options
@@ -2966,16 +2966,58 @@ abstract class AppLocalizations {
   /// **'Options'**
   String get options;
 
-  /// UI text: Conversation Open
+  /// UI text: Open for replies
   ///
   /// In en, this message translates to:
-  /// **'Conversation Open'**
+  /// **'Open for replies'**
   String get conversationOpen;
 
-  /// UI text: Failed to create conversation: {toString}
+  /// UI text: What is this discussion about in one brief sentence?
   ///
   /// In en, this message translates to:
-  /// **'Failed to create conversation: {error}'**
+  /// **'What is this discussion about in one brief sentence?'**
+  String get messageTitleHint;
+
+  /// UI text: Accepting new replies
+  ///
+  /// In en, this message translates to:
+  /// **'Accepting new replies'**
+  String get messageOpenForReplies;
+
+  /// UI text: Closed: no new replies
+  ///
+  /// In en, this message translates to:
+  /// **'Closed: no new replies'**
+  String get messageClosedForReplies;
+
+  /// UI text: The message was sent, but the forum didn't return it. Check your messages.
+  ///
+  /// In en, this message translates to:
+  /// **'The message was sent, but the forum didn\'t return it. Check your messages.'**
+  String get messageSentWithoutId;
+
+  /// UI text: The message could not be sent.
+  ///
+  /// In en, this message translates to:
+  /// **'The message could not be sent.'**
+  String get messageCouldNotBeSent;
+
+  /// UI text: This message can't be opened: its ID is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'This message can\'t be opened: its ID is missing.'**
+  String get messageIdMissing;
+
+  /// UI text: Please add at least one recipient
+  ///
+  /// In en, this message translates to:
+  /// **'Please add at least one recipient'**
+  String get pleaseAddARecipient;
+
+  /// UI text: Failed to send message: {error}
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send message: {error}'**
   String failedToCreateConversation(Object error);
 
   /// UI text: Maximum of {count} attachment(s) allowed

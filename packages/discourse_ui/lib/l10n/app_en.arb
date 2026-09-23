@@ -150,7 +150,7 @@
   "handleThreads": "Handle topics",
   "deleteMessages": "Delete Messages",
   "deleteConversations": "Delete Messages",
-  "noConversations": "No messages",
+  "noConversations": "You don't have any messages",
   "noConversationsMessage": "You have no messages yet. Start a new message to begin.",
   "imageSavedToGallery": "Image saved to gallery!",
   "failedToSaveImage": "Failed to save image: {error}",
@@ -166,7 +166,7 @@
   "deletePost": "Delete Post",
   "loginRequired": "Login Required",
   "spamCleaner": "Spam Cleaner",
-  "sendMessage": "Send Message",
+  "sendMessage": "Message",
   "memberSince": "Member Since",
   "lastActivity": "Last Activity",
   "likesReceived": "Likes Received",
@@ -230,7 +230,7 @@
       }
     }
   },
-  "failedToLeaveConversation": "Failed to leave message: {error}",
+  "failedToLeaveConversation": "Could not leave the message: {error}",
   "@failedToLeaveConversation": {
     "description": "Error message when leaving conversation fails",
     "placeholders": {
@@ -341,7 +341,7 @@
       }
     }
   },
-  "markAsUnread": "Mark as unread",
+  "markAsUnread": "Mark unread",
   "invite": "Invite",
   "enterKeywordsToSearchTopics": "Enter keywords to search topics...",
   "undelete": "Undelete",
@@ -657,7 +657,7 @@
   "@writeYourReply": {
     "description": "Hint text for writing reply"
   },
-  "conversationCreatedSuccessfully": "Message created successfully",
+  "conversationCreatedSuccessfully": "Message sent",
   "@conversationCreatedSuccessfully": {
     "description": "Success message after creating conversation"
   },
@@ -788,7 +788,7 @@
   "@titleCannotBeEmpty": {
     "description": "Validation message when title is empty"
   },
-  "conversationUpdatedSuccessfully": "Message updated successfully",
+  "conversationUpdatedSuccessfully": "Message updated",
   "@conversationUpdatedSuccessfully": {
     "description": "Success message when conversation is updated"
   },
@@ -1749,110 +1749,138 @@
       }
     }
   },
-  "editConversation": "Edit conversation",
+  "editConversation": "Edit title",
   "@editConversation": {
-    "description": "UI text: Edit conversation"
+    "description": "UI text: Edit title"
   },
-  "closeConversation": "Close conversation",
+  "closeConversation": "Close message",
   "@closeConversation": {
-    "description": "UI text: Close conversation"
+    "description": "UI text: Close message"
   },
-  "openConversation": "Open conversation",
+  "openConversation": "Open message",
   "@openConversation": {
-    "description": "UI text: Open conversation"
+    "description": "UI text: Open message"
   },
-  "leaveConversation2": "Leave conversation",
+  "leaveConversation2": "Leave message",
   "@leaveConversation2": {
-    "description": "UI text: Leave conversation"
+    "description": "UI text: Leave message"
   },
-  "reportConversation2": "Report conversation",
+  "reportConversation2": "Report message",
   "@reportConversation2": {
-    "description": "UI text: Report conversation"
+    "description": "UI text: Report message"
   },
-  "closeConversation2": "Close Conversation",
+  "closeConversation2": "Close message",
   "@closeConversation2": {
-    "description": "UI text: Close Conversation"
+    "description": "UI text: Close message"
   },
-  "closeConversationConfirmation": "Are you sure you want to close this conversation? This will prevent new replies from being posted.",
+  "closeConversationConfirmation": "Close this message? It will no longer accept new replies.",
   "@closeConversationConfirmation": {
-    "description": "UI text: Are you sure you want to close this conversation? This will "
+    "description": "UI text: Close this message? It will no longer accept new replies."
   },
   "close": "Close",
   "@close": {
     "description": "UI text: Close"
   },
-  "openConversation2": "Open Conversation",
+  "openConversation2": "Open message",
   "@openConversation2": {
-    "description": "UI text: Open Conversation"
+    "description": "UI text: Open message"
   },
-  "openConversationConfirmation": "Are you sure you want to open this conversation? This will allow new replies to be posted.",
+  "openConversationConfirmation": "Open this message? It will accept new replies again.",
   "@openConversationConfirmation": {
-    "description": "UI text: Are you sure you want to open this conversation? This will a"
+    "description": "UI text: Open this message? It will accept new replies again."
   },
   "open": "Open",
   "@open": {
     "description": "UI text: Open"
   },
-  "leaveConversation3": "Leave Conversation",
+  "leaveConversation3": "Leave message",
   "@leaveConversation3": {
-    "description": "UI text: Leave Conversation"
+    "description": "UI text: Leave message"
   },
-  "leaveConversationConfirmation": "Are you sure you want to leave this conversation? This will hide it from your inbox.",
+  "leaveConversationConfirmation": "Are you sure you want to remove yourself from this message? You will no longer be able to see or reply to it.",
   "@leaveConversationConfirmation": {
-    "description": "UI text: Are you sure you want to leave this conversation? This will "
+    "description": "UI text: Are you sure you want to remove yourself from this message? You will no longer be able to see or reply to it."
   },
-  "errorLoadingConversation": "Error loading conversation: {error}",
+  "errorLoadingConversation": "Error loading message: {error}",
   "@errorLoadingConversation": {
-    "description": "UI text: Error loading conversation: {error}",
+    "description": "UI text: Error loading message: {error}",
     "placeholders": {
       "error": {
         "type": "Object"
       }
     }
   },
-  "conversationNotFound": "Conversation not found",
+  "conversationNotFound": "Message not found",
   "@conversationNotFound": {
-    "description": "UI text: Conversation not found"
+    "description": "UI text: Message not found"
   },
-  "conversationClosedBanner": "This conversation is closed and no longer accepting replies",
+  "conversationClosedBanner": "This message is closed; it no longer accepts new replies",
   "@conversationClosedBanner": {
-    "description": "UI text: This conversation is closed and no longer accepting replies"
+    "description": "UI text: This message is closed; it no longer accepts new replies"
   },
   "noMessagesFound": "No messages found",
   "@noMessagesFound": {
     "description": "UI text: No messages found"
   },
-  "endOfConversation": "End of conversation",
+  "endOfConversation": "End of the discussion",
   "@endOfConversation": {
-    "description": "UI text: End of conversation"
+    "description": "UI text: End of the discussion"
   },
   "jumpToMessage": "Jump to Message",
   "@jumpToMessage": {
     "description": "UI text: Jump to Message"
   },
-  "editConversation2": "Edit Conversation",
+  "editConversation2": "Edit title",
   "@editConversation2": {
-    "description": "UI text: Edit Conversation"
+    "description": "UI text: Edit title"
   },
   "failedToLoadMessage2": "Failed to load message",
   "@failedToLoadMessage2": {
     "description": "UI text: Failed to load message"
   },
-  "cannotEditThisConversation": "Cannot edit this conversation",
+  "cannotEditThisConversation": "You can't edit this message",
   "@cannotEditThisConversation": {
-    "description": "UI text: Cannot edit this conversation"
+    "description": "UI text: You can't edit this message"
   },
   "options": "Options",
   "@options": {
     "description": "UI text: Options"
   },
-  "conversationOpen": "Conversation Open",
+  "conversationOpen": "Open for replies",
   "@conversationOpen": {
-    "description": "UI text: Conversation Open"
+    "description": "UI text: Open for replies"
   },
-  "failedToCreateConversation": "Failed to create conversation: {error}",
+  "messageTitleHint": "What is this discussion about in one brief sentence?",
+  "@messageTitleHint": {
+    "description": "UI text: What is this discussion about in one brief sentence?"
+  },
+  "messageOpenForReplies": "Accepting new replies",
+  "@messageOpenForReplies": {
+    "description": "UI text: Accepting new replies"
+  },
+  "messageClosedForReplies": "Closed: no new replies",
+  "@messageClosedForReplies": {
+    "description": "UI text: Closed: no new replies"
+  },
+  "messageSentWithoutId": "The message was sent, but the forum didn't return it. Check your messages.",
+  "@messageSentWithoutId": {
+    "description": "UI text: The message was sent, but the forum didn't return it. Check your messages."
+  },
+  "messageCouldNotBeSent": "The message could not be sent.",
+  "@messageCouldNotBeSent": {
+    "description": "UI text: The message could not be sent."
+  },
+  "messageIdMissing": "This message can't be opened: its ID is missing.",
+  "@messageIdMissing": {
+    "description": "UI text: This message can't be opened: its ID is missing."
+  },
+  "pleaseAddARecipient": "Please add at least one recipient",
+  "@pleaseAddARecipient": {
+    "description": "UI text: Please add at least one recipient"
+  },
+  "failedToCreateConversation": "Failed to send message: {error}",
   "@failedToCreateConversation": {
-    "description": "UI text: Failed to create conversation: {toString}",
+    "description": "UI text: Failed to send message: {error}",
     "placeholders": {
       "error": {
         "type": "Object"

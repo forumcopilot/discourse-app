@@ -39,7 +39,7 @@
   "connectionFailed": "Verbindungsfehler",
   "failedToConnectToSiteName": "Verbindung zu {siteName} fehlgeschlagen",
   "loading": "Wird geladen...",
-  "newConversation": "Neue Unterhaltung",
+  "newConversation": "Neue Nachricht",
   "language": "Sprache",
   "all": "Alle",
   "topicsOnly": "Nur Themen",
@@ -68,7 +68,7 @@
   "selectedActions": "Ausgewählte Aktionen:",
   "thisActionCannotBeUndone": "Diese Aktion kann nicht rückgängig gemacht werden.",
   "participantsLabel": "Teilnehmer",
-  "usernameHasBeenInvited": "{username} wurde zur Unterhaltung eingeladen",
+  "usernameHasBeenInvited": "{username} wurde zur Nachricht eingeladen",
   "errorInvitingUser": "Fehler beim Einladen des Benutzers: {error}",
   "newTopic": "Neues Thema",
   "markRead": "Als gelesen markieren",
@@ -94,9 +94,9 @@
   "confirmSpamClean": "Spam-Bereinigung bestätigen",
   "handleThreads": "Threads verwalten",
   "deleteMessages": "Nachrichten löschen",
-  "deleteConversations": "Unterhaltungen löschen",
-  "noConversations": "Keine Unterhaltungen",
-  "noConversationsMessage": "Sie haben noch keine Unterhaltungen. Starten Sie eine neue Unterhaltung, um mit dem Messaging zu beginnen.",
+  "deleteConversations": "Nachrichten löschen",
+  "noConversations": "Du hast keine Nachrichten",
+  "noConversationsMessage": "Du hast noch keine Nachrichten. Schreib eine neue Nachricht, um loszulegen.",
   "imageSavedToGallery": "Bild in Galerie gespeichert!",
   "failedToSaveImage": "Fehler beim Speichern des Bildes: {error}",
   "@failedToSaveImage": {
@@ -111,14 +111,14 @@
   "deletePost": "Beitrag Löschen",
   "loginRequired": "Anmeldung Erforderlich",
   "spamCleaner": "Spam-Bereinigung",
-  "sendMessage": "Nachricht senden",
+  "sendMessage": "Nachricht",
   "memberSince": "Mitglied Seit",
   "lastActivity": "Letzte Aktivität",
   "likesReceived": "Erhaltene Likes",
   "likesGiven": "Gegebene Likes",
   "showMore": "Mehr anzeigen",
   "cleanSpam": "Spam bereinigen",
-  "failedToSaveConversation": "Speichern der Unterhaltung fehlgeschlagen",
+  "failedToSaveConversation": "Nachricht konnte nicht gespeichert werden",
   "members": "Mitglieder",
   "membersCount": "{count} Mitglieder",
   "@membersCount": {
@@ -165,8 +165,8 @@
     }
   },
   "signInToViewMessages": "Melden Sie sich an, um Nachrichten anzuzeigen",
-  "youNeedToBeSignedInToViewConversations": "Sie müssen angemeldet sein, um Ihre Unterhaltungen anzuzeigen.",
-  "errorLoadingConversations": "Fehler beim Laden der Unterhaltungen: {error}",
+  "youNeedToBeSignedInToViewConversations": "Du musst angemeldet sein, um deine Nachrichten zu sehen.",
+  "errorLoadingConversations": "Fehler beim Laden der Nachrichten: {error}",
   "@errorLoadingConversations": {
     "description": "Error message when loading conversations fails",
     "placeholders": {
@@ -175,7 +175,7 @@
       }
     }
   },
-  "failedToLeaveConversation": "Fehler beim Verlassen der Unterhaltung: {error}",
+  "failedToLeaveConversation": "Nachricht konnte nicht verlassen werden: {error}",
   "@failedToLeaveConversation": {
     "description": "Error message when leaving conversation fails",
     "placeholders": {
@@ -184,7 +184,7 @@
       }
     }
   },
-  "errorLoadingMoreConversations": "Fehler beim Laden weiterer Unterhaltungen: {error}",
+  "errorLoadingMoreConversations": "Fehler beim Laden weiterer Nachrichten: {error}",
   "@errorLoadingMoreConversations": {
     "description": "Error message when loading more conversations fails",
     "placeholders": {
@@ -397,11 +397,11 @@
   "userUnbannedSuccessfully": "Benutzer erfolgreich entsperrt",
   "failedToUnbanUser": "Benutzer konnte nicht entsperrt werden",
   "spamCleanUser": "Spam des Benutzers bereinigen",
-  "deletePrivateConversations": "Private Unterhaltungen löschen",
+  "deletePrivateConversations": "Persönliche Nachrichten löschen",
   "banTheUserAccount": "Benutzerkonto sperren",
   "handledThreads": "Behandelte Themen",
   "deletedMessages": "Gelöschte Nachrichten",
-  "deletedConversations": "Gelöschte Unterhaltungen",
+  "deletedConversations": "Gelöschte Nachrichten",
   "bannedUser": "Gesperrter Benutzer",
   "successfullyCleanedSpam": "Spam erfolgreich bereinigt für {username}. Aktionen: {actions}",
   "@successfullyCleanedSpam": {
@@ -436,10 +436,10 @@
   "cleaningSpam": "Spam bereinigen...",
   "writeYourMessage": "Schreiben Sie Ihre Nachricht...",
   "writeYourReply": "Schreiben Sie Ihre Antwort...",
-  "conversationCreatedSuccessfully": "Unterhaltung erfolgreich erstellt",
-  "conversationMarkedAsUnread": "Unterhaltung als ungelesen markiert",
-  "conversationClosed": "Unterhaltung geschlossen",
-  "conversationOpened": "Unterhaltung geöffnet",
+  "conversationCreatedSuccessfully": "Nachricht gesendet",
+  "conversationMarkedAsUnread": "Nachricht als ungelesen markiert",
+  "conversationClosed": "Nachricht geschlossen",
+  "conversationOpened": "Nachricht geöffnet",
   "pleaseLoginToLikeMessages": "Bitte melden Sie sich an, um Nachrichten zu mögen",
   "loadEarlierMessages": "Frühere Nachrichten laden",
   "failedToLoadQuote": "Zitat konnte nicht geladen werden: \n{error}",
@@ -458,7 +458,7 @@
       }
     }
   },
-  "failedToMarkConversationAsUnread": "Unterhaltung konnte nicht als ungelesen markiert werden: {error}",
+  "failedToMarkConversationAsUnread": "Nachricht konnte nicht als ungelesen markiert werden: {error}",
   "@failedToMarkConversationAsUnread": {
     "placeholders": {
       "error": {
@@ -466,7 +466,7 @@
       }
     }
   },
-  "failedToCloseConversation": "Unterhaltung konnte nicht geschlossen werden: {error}",
+  "failedToCloseConversation": "Nachricht konnte nicht geschlossen werden: {error}",
   "@failedToCloseConversation": {
     "placeholders": {
       "error": {
@@ -474,7 +474,7 @@
       }
     }
   },
-  "failedToOpenConversation": "Unterhaltung konnte nicht geöffnet werden: {error}",
+  "failedToOpenConversation": "Nachricht konnte nicht geöffnet werden: {error}",
   "@failedToOpenConversation": {
     "placeholders": {
       "error": {
@@ -494,7 +494,7 @@
   "goToBottom": "Nach unten",
   "pleaseLoginToAccessContent": "Bitte melden Sie sich an, um auf diesen Inhalt zuzugreifen und mit Beiträgen zu interagieren.",
   "searchUsers": "Benutzer suchen...",
-  "enterConversationTitle": "Geben Sie den Titel der Unterhaltung ein",
+  "enterConversationTitle": "Titel der Nachricht eingeben",
   "enterCode": "Geben Sie den {count}-stelligen Code ein",
   "@enterCode": {
     "placeholders": {
@@ -509,7 +509,7 @@
   "subject": "Betreff",
   "message": "Nachricht",
   "titleCannotBeEmpty": "Der Titel darf nicht leer sein",
-  "conversationUpdatedSuccessfully": "Unterhaltung erfolgreich aktualisiert",
+  "conversationUpdatedSuccessfully": "Nachricht aktualisiert",
   "goBack": "Zurück",
   "failedToLoadPost": "Beitrag konnte nicht geladen werden: \n{error}",
   "@failedToLoadPost": {
@@ -747,31 +747,38 @@
   "thisDiffIsTooLargeToDisplay": "Dieser Unterschied ist zu groß zur Anzeige.",
   "noContentChangesInThisRevision": "Keine Inhaltsänderungen in dieser Version.",
   "revisionOf": "Version {currentVersion} von {versionCount}",
-  "editConversation": "Unterhaltung bearbeiten",
-  "closeConversation": "Unterhaltung schließen",
-  "openConversation": "Unterhaltung öffnen",
-  "leaveConversation2": "Unterhaltung verlassen",
-  "reportConversation2": "Unterhaltung melden",
-  "closeConversation2": "Unterhaltung schließen",
-  "closeConversationConfirmation": "Diese Unterhaltung wirklich schließen? Es können keine neuen Antworten mehr geschrieben werden.",
+  "editConversation": "Titel bearbeiten",
+  "closeConversation": "Nachricht schließen",
+  "openConversation": "Nachricht öffnen",
+  "leaveConversation2": "Nachricht verlassen",
+  "reportConversation2": "Nachricht melden",
+  "closeConversation2": "Nachricht schließen",
+  "closeConversationConfirmation": "Diese Nachricht schließen? Danach sind keine neuen Antworten mehr möglich.",
   "close": "Schließen",
-  "openConversation2": "Unterhaltung öffnen",
-  "openConversationConfirmation": "Diese Unterhaltung wirklich öffnen? Es können wieder neue Antworten geschrieben werden.",
+  "openConversation2": "Nachricht öffnen",
+  "openConversationConfirmation": "Diese Nachricht öffnen? Danach sind wieder neue Antworten möglich.",
   "open": "Öffnen",
-  "leaveConversation3": "Unterhaltung verlassen",
-  "leaveConversationConfirmation": "Diese Unterhaltung wirklich verlassen? Sie wird aus deinem Posteingang ausgeblendet.",
-  "errorLoadingConversation": "Fehler beim Laden der Unterhaltung: {error}",
-  "conversationNotFound": "Unterhaltung nicht gefunden",
-  "conversationClosedBanner": "Diese Unterhaltung ist geschlossen und nimmt keine Antworten mehr an",
+  "leaveConversation3": "Nachricht verlassen",
+  "leaveConversationConfirmation": "Bist du sicher, dass du dich aus dieser Nachricht entfernen möchtest? Dann wirst du sie nicht mehr sehen oder darauf antworten können.",
+  "errorLoadingConversation": "Fehler beim Laden der Nachricht: {error}",
+  "conversationNotFound": "Nachricht nicht gefunden",
+  "conversationClosedBanner": "Diese Nachricht ist geschlossen. Das Antworten ist nicht mehr möglich.",
   "noMessagesFound": "Keine Nachrichten gefunden",
-  "endOfConversation": "Ende der Unterhaltung",
+  "endOfConversation": "Ende der Diskussion",
   "jumpToMessage": "Zu Nachricht springen",
-  "editConversation2": "Unterhaltung bearbeiten",
+  "editConversation2": "Titel bearbeiten",
   "failedToLoadMessage2": "Nachricht konnte nicht geladen werden",
-  "cannotEditThisConversation": "Diese Unterhaltung kann nicht bearbeitet werden",
+  "cannotEditThisConversation": "Du kannst diese Nachricht nicht bearbeiten",
   "options": "Optionen",
-  "conversationOpen": "Unterhaltung offen",
-  "failedToCreateConversation": "Unterhaltung konnte nicht erstellt werden: {error}",
+  "conversationOpen": "Offen für Antworten",
+  "messageTitleHint": "Um was geht es in dieser Diskussion? Schreib einen kurzen Satz.",
+  "messageOpenForReplies": "Neue Antworten sind möglich",
+  "messageClosedForReplies": "Geschlossen: keine neuen Antworten",
+  "messageSentWithoutId": "Die Nachricht wurde gesendet, aber das Forum hat sie nicht zurückgegeben. Sieh in deinen Nachrichten nach.",
+  "messageCouldNotBeSent": "Die Nachricht konnte nicht gesendet werden.",
+  "messageIdMissing": "Diese Nachricht kann nicht geöffnet werden: Ihre ID fehlt.",
+  "pleaseAddARecipient": "Füge mindestens einen Empfänger hinzu",
+  "failedToCreateConversation": "Nachricht konnte nicht gesendet werden: {error}",
   "maximumAttachmentsAllowed": "Maximal {count} Anhänge erlaubt",
   "noImagesFoundToDisplay": "Keine Bilder zum Anzeigen gefunden.",
   "pleaseLoginToViewThisAttachment": "Bitte anmelden, um diesen Anhang zu sehen",

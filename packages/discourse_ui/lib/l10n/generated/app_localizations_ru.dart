@@ -143,7 +143,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get loading => 'Загрузка...';
 
   @override
-  String get newConversation => 'Новый разговор';
+  String get newConversation => 'Новое сообщение';
 
   @override
   String get language => 'Язык';
@@ -233,7 +233,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String usernameHasBeenInvited(String username) {
-    return '$username был приглашен в разговор';
+    return '$username приглашён(а) в сообщение';
   }
 
   @override
@@ -321,14 +321,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deleteMessages => 'Удалить сообщения';
 
   @override
-  String get deleteConversations => 'Удалить разговоры';
+  String get deleteConversations => 'Удалить сообщения';
 
   @override
-  String get noConversations => 'Нет разговоров';
+  String get noConversations => 'У вас нет сообщений';
 
   @override
   String get noConversationsMessage =>
-      'У вас пока нет разговоров. Начните новый разговор, чтобы начать обмен сообщениями.';
+      'У вас пока нет сообщений. Напишите новое сообщение, чтобы начать.';
 
   @override
   String get imageSavedToGallery => 'Изображение сохранено в галерею!';
@@ -351,7 +351,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get spamCleaner => 'Очистка спама';
 
   @override
-  String get sendMessage => 'Отправить сообщение';
+  String get sendMessage => 'Сообщение';
 
   @override
   String get memberSince => 'Участник С';
@@ -372,7 +372,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cleanSpam => 'Очистить спам';
 
   @override
-  String get failedToSaveConversation => 'Не удалось сохранить разговор';
+  String get failedToSaveConversation => 'Не удалось сохранить сообщение';
 
   @override
   String get members => 'Участники';
@@ -450,21 +450,21 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get youNeedToBeSignedInToViewConversations =>
-      'Вам нужно войти, чтобы просмотреть ваши разговоры.';
+      'Войдите, чтобы увидеть свои сообщения.';
 
   @override
   String errorLoadingConversations(String error) {
-    return 'Ошибка при загрузке разговоров: $error';
+    return 'Ошибка загрузки сообщений: $error';
   }
 
   @override
   String failedToLeaveConversation(String error) {
-    return 'Ошибка при выходе из разговора: $error';
+    return 'Не удалось покинуть сообщение: $error';
   }
 
   @override
   String errorLoadingMoreConversations(String error) {
-    return 'Ошибка при загрузке дополнительных разговоров: $error';
+    return 'Ошибка загрузки других сообщений: $error';
   }
 
   @override
@@ -741,7 +741,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get spamCleanUser => 'Очистить спам пользователя';
 
   @override
-  String get deletePrivateConversations => 'Удалить приватные разговоры';
+  String get deletePrivateConversations => 'Удалить личные сообщения';
 
   @override
   String get banTheUserAccount => 'Заблокировать учётную запись пользователя';
@@ -753,7 +753,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deletedMessages => 'Удалённые сообщения';
 
   @override
-  String get deletedConversations => 'Удалённые разговоры';
+  String get deletedConversations => 'Удалённые сообщения';
 
   @override
   String get bannedUser => 'Заблокированный пользователь';
@@ -832,16 +832,17 @@ class AppLocalizationsRu extends AppLocalizations {
   String get writeYourReply => 'Напишите ваш ответ...';
 
   @override
-  String get conversationCreatedSuccessfully => 'Разговор успешно создан';
+  String get conversationCreatedSuccessfully => 'Сообщение отправлено';
 
   @override
-  String get conversationMarkedAsUnread => 'Разговор отмечен как непрочитанный';
+  String get conversationMarkedAsUnread =>
+      'Сообщение отмечено как непрочитанное';
 
   @override
-  String get conversationClosed => 'Разговор закрыт';
+  String get conversationClosed => 'Сообщение закрыто';
 
   @override
-  String get conversationOpened => 'Разговор открыт';
+  String get conversationOpened => 'Сообщение открыто';
 
   @override
   String get pleaseLoginToLikeMessages =>
@@ -862,17 +863,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String failedToMarkConversationAsUnread(String error) {
-    return 'Не удалось отметить разговор как непрочитанный: $error';
+    return 'Не удалось отметить сообщение как непрочитанное: $error';
   }
 
   @override
   String failedToCloseConversation(String error) {
-    return 'Не удалось закрыть разговор: $error';
+    return 'Не удалось закрыть сообщение: $error';
   }
 
   @override
   String failedToOpenConversation(String error) {
-    return 'Не удалось открыть разговор: $error';
+    return 'Не удалось открыть сообщение: $error';
   }
 
   @override
@@ -894,7 +895,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get searchUsers => 'Поиск пользователей...';
 
   @override
-  String get enterConversationTitle => 'Введите заголовок разговора';
+  String get enterConversationTitle => 'Введите заголовок сообщения';
 
   @override
   String enterCode(int count) {
@@ -920,7 +921,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get titleCannotBeEmpty => 'Заголовок не может быть пустым';
 
   @override
-  String get conversationUpdatedSuccessfully => 'Разговор успешно обновлён';
+  String get conversationUpdatedSuccessfully => 'Сообщение обновлено';
 
   @override
   String get goBack => 'Назад';
@@ -1607,86 +1608,110 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get editConversation => 'Изменить беседу';
+  String get editConversation => 'Изменить заголовок';
 
   @override
-  String get closeConversation => 'Закрыть беседу';
+  String get closeConversation => 'Закрыть сообщение';
 
   @override
-  String get openConversation => 'Открыть беседу';
+  String get openConversation => 'Открыть сообщение';
 
   @override
-  String get leaveConversation2 => 'Покинуть беседу';
+  String get leaveConversation2 => 'Покинуть сообщение';
 
   @override
-  String get reportConversation2 => 'Пожаловаться на беседу';
+  String get reportConversation2 => 'Пожаловаться на сообщение';
 
   @override
-  String get closeConversation2 => 'Закрыть беседу';
+  String get closeConversation2 => 'Закрыть сообщение';
 
   @override
   String get closeConversationConfirmation =>
-      'Закрыть эту беседу? Новые ответы будут невозможны.';
+      'Закрыть это сообщение? В нём больше нельзя будет отвечать.';
 
   @override
   String get close => 'Закрыть';
 
   @override
-  String get openConversation2 => 'Открыть беседу';
+  String get openConversation2 => 'Открыть сообщение';
 
   @override
   String get openConversationConfirmation =>
-      'Открыть эту беседу? Снова можно будет отвечать.';
+      'Открыть это сообщение? В нём снова можно будет отвечать.';
 
   @override
   String get open => 'Открыть';
 
   @override
-  String get leaveConversation3 => 'Покинуть беседу';
+  String get leaveConversation3 => 'Покинуть сообщение';
 
   @override
   String get leaveConversationConfirmation =>
-      'Покинуть эту беседу? Она будет скрыта из входящих.';
+      'Вы уверены, что хотите выйти из этого сообщения? Вы больше не сможете видеть его или отвечать в нём.';
 
   @override
   String errorLoadingConversation(Object error) {
-    return 'Ошибка загрузки беседы: $error';
+    return 'Ошибка загрузки сообщения: $error';
   }
 
   @override
-  String get conversationNotFound => 'Беседа не найдена';
+  String get conversationNotFound => 'Сообщение не найдено';
 
   @override
   String get conversationClosedBanner =>
-      'Беседа закрыта и больше не принимает ответы';
+      'Сообщение закрыто; в нём больше нельзя отвечать';
 
   @override
   String get noMessagesFound => 'Сообщения не найдены';
 
   @override
-  String get endOfConversation => 'Конец беседы';
+  String get endOfConversation => 'Конец обсуждения';
 
   @override
   String get jumpToMessage => 'Перейти к сообщению';
 
   @override
-  String get editConversation2 => 'Изменить беседу';
+  String get editConversation2 => 'Изменить заголовок';
 
   @override
   String get failedToLoadMessage2 => 'Не удалось загрузить сообщение';
 
   @override
-  String get cannotEditThisConversation => 'Эту беседу нельзя изменить';
+  String get cannotEditThisConversation =>
+      'Вы не можете изменить это сообщение';
 
   @override
   String get options => 'Параметры';
 
   @override
-  String get conversationOpen => 'Беседа открыта';
+  String get conversationOpen => 'Открыто для ответов';
+
+  @override
+  String get messageTitleHint => 'Название: суть коротким предложением';
+
+  @override
+  String get messageOpenForReplies => 'Можно отвечать';
+
+  @override
+  String get messageClosedForReplies => 'Закрыто: отвечать нельзя';
+
+  @override
+  String get messageSentWithoutId =>
+      'Сообщение отправлено, но форум его не вернул. Проверьте свои сообщения.';
+
+  @override
+  String get messageCouldNotBeSent => 'Не удалось отправить сообщение.';
+
+  @override
+  String get messageIdMissing =>
+      'Не удаётся открыть сообщение: отсутствует его ID.';
+
+  @override
+  String get pleaseAddARecipient => 'Добавьте хотя бы одного получателя';
 
   @override
   String failedToCreateConversation(Object error) {
-    return 'Не удалось создать беседу: $error';
+    return 'Не удалось отправить сообщение: $error';
   }
 
   @override

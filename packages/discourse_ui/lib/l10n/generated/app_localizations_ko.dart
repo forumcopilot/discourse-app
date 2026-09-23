@@ -135,7 +135,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get loading => '로드 중...';
 
   @override
-  String get newConversation => '새 대화';
+  String get newConversation => '새 메시지';
 
   @override
   String get language => '언어';
@@ -219,7 +219,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String usernameHasBeenInvited(String username) {
-    return '$username님이 대화에 초대되었습니다';
+    return '$username님을 메시지에 초대했습니다';
   }
 
   @override
@@ -304,13 +304,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get deleteMessages => '메시지 삭제';
 
   @override
-  String get deleteConversations => '대화 삭제';
+  String get deleteConversations => '메시지 삭제';
 
   @override
-  String get noConversations => '대화 없음';
+  String get noConversations => '메시지가 없습니다';
 
   @override
-  String get noConversationsMessage => '아직 대화가 없습니다. 새 대화를 시작하여 메시징을 시작하세요.';
+  String get noConversationsMessage => '아직 메시지가 없습니다. 새 메시지를 작성해 시작하세요.';
 
   @override
   String get imageSavedToGallery => '이미지가 갤러리에 저장되었습니다!';
@@ -333,7 +333,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get spamCleaner => '스팸 정리';
 
   @override
-  String get sendMessage => '메시지 보내기';
+  String get sendMessage => '메시지';
 
   @override
   String get memberSince => '회원 가입일';
@@ -354,7 +354,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get cleanSpam => '스팸 정리';
 
   @override
-  String get failedToSaveConversation => '대화 저장 실패';
+  String get failedToSaveConversation => '메시지를 저장하지 못했습니다';
 
   @override
   String get members => '회원';
@@ -431,21 +431,21 @@ class AppLocalizationsKo extends AppLocalizations {
   String get signInToViewMessages => '메시지를 보려면 로그인하세요';
 
   @override
-  String get youNeedToBeSignedInToViewConversations => '대화를 보려면 로그인해야 합니다.';
+  String get youNeedToBeSignedInToViewConversations => '메시지를 보려면 로그인해야 합니다.';
 
   @override
   String errorLoadingConversations(String error) {
-    return '대화 로드 오류: $error';
+    return '메시지를 불러오는 중 오류: $error';
   }
 
   @override
   String failedToLeaveConversation(String error) {
-    return '대화 나가기 실패: $error';
+    return '메시지에서 나가지 못했습니다: $error';
   }
 
   @override
   String errorLoadingMoreConversations(String error) {
-    return '추가 대화 로드 오류: $error';
+    return '메시지를 더 불러오는 중 오류: $error';
   }
 
   @override
@@ -716,7 +716,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get spamCleanUser => '사용자 스팸 정리';
 
   @override
-  String get deletePrivateConversations => '비공개 대화 삭제';
+  String get deletePrivateConversations => '개인 메시지 삭제';
 
   @override
   String get banTheUserAccount => '사용자 계정 차단';
@@ -728,7 +728,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get deletedMessages => '삭제된 메시지';
 
   @override
-  String get deletedConversations => '삭제된 대화';
+  String get deletedConversations => '삭제된 메시지';
 
   @override
   String get bannedUser => '차단된 사용자';
@@ -806,16 +806,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get writeYourReply => '답장 작성...';
 
   @override
-  String get conversationCreatedSuccessfully => '대화가 성공적으로 생성되었습니다';
+  String get conversationCreatedSuccessfully => '메시지를 보냈습니다';
 
   @override
-  String get conversationMarkedAsUnread => '대화가 읽지 않음으로 표시되었습니다';
+  String get conversationMarkedAsUnread => '메시지를 읽지 않음으로 표시했습니다';
 
   @override
-  String get conversationClosed => '대화가 닫혔습니다';
+  String get conversationClosed => '메시지를 잠갔습니다';
 
   @override
-  String get conversationOpened => '대화가 열렸습니다';
+  String get conversationOpened => '메시지를 열었습니다';
 
   @override
   String get pleaseLoginToLikeMessages => '메시지에 좋아요를 누르려면 로그인하세요';
@@ -835,17 +835,17 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String failedToMarkConversationAsUnread(String error) {
-    return '대화를 읽지 않음으로 표시하지 못했습니다: $error';
+    return '메시지를 읽지 않음으로 표시하지 못했습니다: $error';
   }
 
   @override
   String failedToCloseConversation(String error) {
-    return '대화를 닫지 못했습니다: $error';
+    return '메시지를 잠그지 못했습니다: $error';
   }
 
   @override
   String failedToOpenConversation(String error) {
-    return '대화를 열지 못했습니다: $error';
+    return '메시지를 열지 못했습니다: $error';
   }
 
   @override
@@ -866,7 +866,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get searchUsers => '사용자 검색...';
 
   @override
-  String get enterConversationTitle => '대화 제목 입력';
+  String get enterConversationTitle => '메시지 제목 입력';
 
   @override
   String enterCode(int count) {
@@ -892,7 +892,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get titleCannotBeEmpty => '제목을 입력하세요';
 
   @override
-  String get conversationUpdatedSuccessfully => '대화가 성공적으로 업데이트되었습니다';
+  String get conversationUpdatedSuccessfully => '메시지를 수정했습니다';
 
   @override
   String get goBack => '돌아가기';
@@ -1553,82 +1553,106 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get editConversation => '대화 편집';
+  String get editConversation => '제목 수정';
 
   @override
-  String get closeConversation => '대화 닫기';
+  String get closeConversation => '메시지 잠금';
 
   @override
-  String get openConversation => '대화 열기';
+  String get openConversation => '메시지 열기';
 
   @override
-  String get leaveConversation2 => '대화 나가기';
+  String get leaveConversation2 => '메시지에서 나가기';
 
   @override
-  String get reportConversation2 => '대화 신고';
+  String get reportConversation2 => '메시지 신고';
 
   @override
-  String get closeConversation2 => '대화 닫기';
+  String get closeConversation2 => '메시지 잠금';
 
   @override
-  String get closeConversationConfirmation => '이 대화를 닫을까요? 새 답글을 작성할 수 없게 됩니다.';
+  String get closeConversationConfirmation =>
+      '이 메시지를 잠글까요? 더 이상 새 답글을 받을 수 없습니다.';
 
   @override
   String get close => '닫기';
 
   @override
-  String get openConversation2 => '대화 열기';
+  String get openConversation2 => '메시지 열기';
 
   @override
-  String get openConversationConfirmation => '이 대화를 열까요? 새 답글을 작성할 수 있게 됩니다.';
+  String get openConversationConfirmation => '이 메시지를 열까요? 다시 새 답글을 받을 수 있습니다.';
 
   @override
   String get open => '열기';
 
   @override
-  String get leaveConversation3 => '대화 나가기';
+  String get leaveConversation3 => '메시지에서 나가기';
 
   @override
-  String get leaveConversationConfirmation => '이 대화에서 나갈까요? 받은편지함에서 숨겨집니다.';
+  String get leaveConversationConfirmation =>
+      '이 메시지에서 자신을 제거할까요? 더 이상 보거나 답글을 달 수 없습니다.';
 
   @override
   String errorLoadingConversation(Object error) {
-    return '대화 불러오기 오류: $error';
+    return '메시지를 불러오는 중 오류: $error';
   }
 
   @override
-  String get conversationNotFound => '대화를 찾을 수 없습니다';
+  String get conversationNotFound => '메시지를 찾을 수 없습니다';
 
   @override
-  String get conversationClosedBanner => '이 대화는 닫혀 더 이상 답글을 받지 않습니다';
+  String get conversationClosedBanner =>
+      '이 메시지는 잠겨 있습니다. 더 이상 새 답글을 올릴 수 없습니다.';
 
   @override
   String get noMessagesFound => '메시지가 없습니다';
 
   @override
-  String get endOfConversation => '대화 끝';
+  String get endOfConversation => '토론 끝';
 
   @override
   String get jumpToMessage => '메시지로 이동';
 
   @override
-  String get editConversation2 => '대화 편집';
+  String get editConversation2 => '제목 수정';
 
   @override
   String get failedToLoadMessage2 => '메시지를 불러오지 못했습니다';
 
   @override
-  String get cannotEditThisConversation => '이 대화는 편집할 수 없습니다';
+  String get cannotEditThisConversation => '이 메시지를 수정할 수 없습니다';
 
   @override
   String get options => '옵션';
 
   @override
-  String get conversationOpen => '대화 열림';
+  String get conversationOpen => '답글 허용';
+
+  @override
+  String get messageTitleHint => '토론 주제를 한 문장으로 적으세요';
+
+  @override
+  String get messageOpenForReplies => '새 답글을 받을 수 있습니다';
+
+  @override
+  String get messageClosedForReplies => '잠김: 새 답글을 받지 않습니다';
+
+  @override
+  String get messageSentWithoutId => '메시지를 보냈지만 포럼이 반환하지 않았습니다. 메시지함을 확인하세요.';
+
+  @override
+  String get messageCouldNotBeSent => '메시지를 보내지 못했습니다.';
+
+  @override
+  String get messageIdMissing => '이 메시지를 열 수 없습니다: ID가 없습니다.';
+
+  @override
+  String get pleaseAddARecipient => '받는 사람을 한 명 이상 추가하세요';
 
   @override
   String failedToCreateConversation(Object error) {
-    return '대화를 만들 수 없습니다: $error';
+    return '메시지를 보내지 못했습니다: $error';
   }
 
   @override

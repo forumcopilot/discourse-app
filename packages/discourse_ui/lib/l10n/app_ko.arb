@@ -47,7 +47,7 @@
     }
   },
   "loading": "로드 중...",
-  "newConversation": "새 대화",
+  "newConversation": "새 메시지",
   "language": "언어",
   "all": "전체",
   "topicsOnly": "주제만",
@@ -100,7 +100,7 @@
   "selectedActions": "선택한 작업:",
   "thisActionCannotBeUndone": "이 작업은 취소할 수 없습니다.",
   "participantsLabel": "참가자",
-  "usernameHasBeenInvited": "{username}님이 대화에 초대되었습니다",
+  "usernameHasBeenInvited": "{username}님을 메시지에 초대했습니다",
   "@usernameHasBeenInvited": {
     "description": "Message when user is invited to conversation",
     "placeholders": {
@@ -158,9 +158,9 @@
   "confirmSpamClean": "스팸 정리 확인",
   "handleThreads": "스레드 관리",
   "deleteMessages": "메시지 삭제",
-  "deleteConversations": "대화 삭제",
-  "noConversations": "대화 없음",
-  "noConversationsMessage": "아직 대화가 없습니다. 새 대화를 시작하여 메시징을 시작하세요.",
+  "deleteConversations": "메시지 삭제",
+  "noConversations": "메시지가 없습니다",
+  "noConversationsMessage": "아직 메시지가 없습니다. 새 메시지를 작성해 시작하세요.",
   "imageSavedToGallery": "이미지가 갤러리에 저장되었습니다!",
   "failedToSaveImage": "이미지 저장 실패: {error}",
   "@failedToSaveImage": {
@@ -175,14 +175,14 @@
   "deletePost": "게시물 삭제",
   "loginRequired": "로그인 필요",
   "spamCleaner": "스팸 정리",
-  "sendMessage": "메시지 보내기",
+  "sendMessage": "메시지",
   "memberSince": "회원 가입일",
   "lastActivity": "마지막 활동",
   "likesReceived": "받은 좋아요",
   "likesGiven": "준 좋아요",
   "showMore": "더 보기",
   "cleanSpam": "스팸 정리",
-  "failedToSaveConversation": "대화 저장 실패",
+  "failedToSaveConversation": "메시지를 저장하지 못했습니다",
   "members": "회원",
   "membersCount": "{count}명",
   "@membersCount": {
@@ -229,8 +229,8 @@
     }
   },
   "signInToViewMessages": "메시지를 보려면 로그인하세요",
-  "youNeedToBeSignedInToViewConversations": "대화를 보려면 로그인해야 합니다.",
-  "errorLoadingConversations": "대화 로드 오류: {error}",
+  "youNeedToBeSignedInToViewConversations": "메시지를 보려면 로그인해야 합니다.",
+  "errorLoadingConversations": "메시지를 불러오는 중 오류: {error}",
   "@errorLoadingConversations": {
     "description": "Error message when loading conversations fails",
     "placeholders": {
@@ -239,7 +239,7 @@
       }
     }
   },
-  "failedToLeaveConversation": "대화 나가기 실패: {error}",
+  "failedToLeaveConversation": "메시지에서 나가지 못했습니다: {error}",
   "@failedToLeaveConversation": {
     "description": "Error message when leaving conversation fails",
     "placeholders": {
@@ -248,7 +248,7 @@
       }
     }
   },
-  "errorLoadingMoreConversations": "추가 대화 로드 오류: {error}",
+  "errorLoadingMoreConversations": "메시지를 더 불러오는 중 오류: {error}",
   "@errorLoadingMoreConversations": {
     "description": "Error message when loading more conversations fails",
     "placeholders": {
@@ -397,11 +397,11 @@
   "userUnbannedSuccessfully": "사용자 차단 해제 성공",
   "failedToUnbanUser": "사용자 차단 해제 실패",
   "spamCleanUser": "사용자 스팸 정리",
-  "deletePrivateConversations": "비공개 대화 삭제",
+  "deletePrivateConversations": "개인 메시지 삭제",
   "banTheUserAccount": "사용자 계정 차단",
   "handledThreads": "처리된 스레드",
   "deletedMessages": "삭제된 메시지",
-  "deletedConversations": "삭제된 대화",
+  "deletedConversations": "삭제된 메시지",
   "bannedUser": "차단된 사용자",
   "successfullyCleanedSpam": "{username}의 스팸이 성공적으로 정리되었습니다. 작업: {actions}",
   "@successfullyCleanedSpam": {
@@ -436,10 +436,10 @@
   "cleaningSpam": "스팸 정리 중...",
   "writeYourMessage": "메시지 작성...",
   "writeYourReply": "답장 작성...",
-  "conversationCreatedSuccessfully": "대화가 성공적으로 생성되었습니다",
-  "conversationMarkedAsUnread": "대화가 읽지 않음으로 표시되었습니다",
-  "conversationClosed": "대화가 닫혔습니다",
-  "conversationOpened": "대화가 열렸습니다",
+  "conversationCreatedSuccessfully": "메시지를 보냈습니다",
+  "conversationMarkedAsUnread": "메시지를 읽지 않음으로 표시했습니다",
+  "conversationClosed": "메시지를 잠갔습니다",
+  "conversationOpened": "메시지를 열었습니다",
   "pleaseLoginToLikeMessages": "메시지에 좋아요를 누르려면 로그인하세요",
   "loadEarlierMessages": "이전 메시지 불러오기",
   "failedToLoadQuote": "인용문을 불러오지 못했습니다: \n{error}",
@@ -458,7 +458,7 @@
       }
     }
   },
-  "failedToMarkConversationAsUnread": "대화를 읽지 않음으로 표시하지 못했습니다: {error}",
+  "failedToMarkConversationAsUnread": "메시지를 읽지 않음으로 표시하지 못했습니다: {error}",
   "@failedToMarkConversationAsUnread": {
     "placeholders": {
       "error": {
@@ -466,7 +466,7 @@
       }
     }
   },
-  "failedToCloseConversation": "대화를 닫지 못했습니다: {error}",
+  "failedToCloseConversation": "메시지를 잠그지 못했습니다: {error}",
   "@failedToCloseConversation": {
     "placeholders": {
       "error": {
@@ -474,7 +474,7 @@
       }
     }
   },
-  "failedToOpenConversation": "대화를 열지 못했습니다: {error}",
+  "failedToOpenConversation": "메시지를 열지 못했습니다: {error}",
   "@failedToOpenConversation": {
     "placeholders": {
       "error": {
@@ -494,7 +494,7 @@
   "goToBottom": "맨 아래로",
   "pleaseLoginToAccessContent": "이 콘텐츠에 액세스하고 게시물과 상호 작용하려면 로그인하세요.",
   "searchUsers": "사용자 검색...",
-  "enterConversationTitle": "대화 제목 입력",
+  "enterConversationTitle": "메시지 제목 입력",
   "enterCode": "{count}자리 코드 입력",
   "@enterCode": {
     "placeholders": {
@@ -509,7 +509,7 @@
   "subject": "제목",
   "message": "메시지",
   "titleCannotBeEmpty": "제목을 입력하세요",
-  "conversationUpdatedSuccessfully": "대화가 성공적으로 업데이트되었습니다",
+  "conversationUpdatedSuccessfully": "메시지를 수정했습니다",
   "goBack": "돌아가기",
   "failedToLoadPost": "게시물을 불러오지 못했습니다: \n{error}",
   "@failedToLoadPost": {
@@ -747,31 +747,38 @@
   "thisDiffIsTooLargeToDisplay": "이 변경 내용은 너무 커서 표시할 수 없습니다.",
   "noContentChangesInThisRevision": "이 수정본에는 내용 변경이 없습니다.",
   "revisionOf": "수정본 {currentVersion}/{versionCount}",
-  "editConversation": "대화 편집",
-  "closeConversation": "대화 닫기",
-  "openConversation": "대화 열기",
-  "leaveConversation2": "대화 나가기",
-  "reportConversation2": "대화 신고",
-  "closeConversation2": "대화 닫기",
-  "closeConversationConfirmation": "이 대화를 닫을까요? 새 답글을 작성할 수 없게 됩니다.",
+  "editConversation": "제목 수정",
+  "closeConversation": "메시지 잠금",
+  "openConversation": "메시지 열기",
+  "leaveConversation2": "메시지에서 나가기",
+  "reportConversation2": "메시지 신고",
+  "closeConversation2": "메시지 잠금",
+  "closeConversationConfirmation": "이 메시지를 잠글까요? 더 이상 새 답글을 받을 수 없습니다.",
   "close": "닫기",
-  "openConversation2": "대화 열기",
-  "openConversationConfirmation": "이 대화를 열까요? 새 답글을 작성할 수 있게 됩니다.",
+  "openConversation2": "메시지 열기",
+  "openConversationConfirmation": "이 메시지를 열까요? 다시 새 답글을 받을 수 있습니다.",
   "open": "열기",
-  "leaveConversation3": "대화 나가기",
-  "leaveConversationConfirmation": "이 대화에서 나갈까요? 받은편지함에서 숨겨집니다.",
-  "errorLoadingConversation": "대화 불러오기 오류: {error}",
-  "conversationNotFound": "대화를 찾을 수 없습니다",
-  "conversationClosedBanner": "이 대화는 닫혀 더 이상 답글을 받지 않습니다",
+  "leaveConversation3": "메시지에서 나가기",
+  "leaveConversationConfirmation": "이 메시지에서 자신을 제거할까요? 더 이상 보거나 답글을 달 수 없습니다.",
+  "errorLoadingConversation": "메시지를 불러오는 중 오류: {error}",
+  "conversationNotFound": "메시지를 찾을 수 없습니다",
+  "conversationClosedBanner": "이 메시지는 잠겨 있습니다. 더 이상 새 답글을 올릴 수 없습니다.",
   "noMessagesFound": "메시지가 없습니다",
-  "endOfConversation": "대화 끝",
+  "endOfConversation": "토론 끝",
   "jumpToMessage": "메시지로 이동",
-  "editConversation2": "대화 편집",
+  "editConversation2": "제목 수정",
   "failedToLoadMessage2": "메시지를 불러오지 못했습니다",
-  "cannotEditThisConversation": "이 대화는 편집할 수 없습니다",
+  "cannotEditThisConversation": "이 메시지를 수정할 수 없습니다",
   "options": "옵션",
-  "conversationOpen": "대화 열림",
-  "failedToCreateConversation": "대화를 만들 수 없습니다: {error}",
+  "conversationOpen": "답글 허용",
+  "messageTitleHint": "토론 주제를 한 문장으로 적으세요",
+  "messageOpenForReplies": "새 답글을 받을 수 있습니다",
+  "messageClosedForReplies": "잠김: 새 답글을 받지 않습니다",
+  "messageSentWithoutId": "메시지를 보냈지만 포럼이 반환하지 않았습니다. 메시지함을 확인하세요.",
+  "messageCouldNotBeSent": "메시지를 보내지 못했습니다.",
+  "messageIdMissing": "이 메시지를 열 수 없습니다: ID가 없습니다.",
+  "pleaseAddARecipient": "받는 사람을 한 명 이상 추가하세요",
+  "failedToCreateConversation": "메시지를 보내지 못했습니다: {error}",
   "maximumAttachmentsAllowed": "최대 {count}개의 첨부 파일만 허용됩니다",
   "noImagesFoundToDisplay": "표시할 이미지가 없습니다.",
   "pleaseLoginToViewThisAttachment": "이 첨부 파일을 보려면 로그인하세요",

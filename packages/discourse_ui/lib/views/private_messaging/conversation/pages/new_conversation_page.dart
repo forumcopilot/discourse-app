@@ -93,15 +93,17 @@ class _NewConversationPageState extends State<NewConversationPage> {
   Future<bool> _handleSubmit(String title, String content) async {
     try {
       if (_toRecipients.isEmpty) {
-        throw Exception('Please add at least one recipient');
+        throw Exception(AppLocalizations.of(context)!.pleaseAddARecipient);
       }
       if (title.trim().isEmpty) {
-        throw Exception('Please enter a subject');
+        throw Exception(AppLocalizations.of(context)!.pleaseEnterTitle);
       }
       if (content.trim().isEmpty) {
-        throw Exception('Please enter a message');
+        throw Exception(AppLocalizations.of(context)!.pleaseEnterContent);
       }
 
+      // Read before the await below: the context is not safe to use after it.
+      final l10n = AppLocalizations.of(context)!;
       final conversationProxy = SiteProxyFactory.getPrivateConversationProxy();
 
       // Create new conversation
@@ -120,7 +122,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
       if (result.result) {
         if (result.convId.isEmpty) {
           print('⚠️  [NewConversationPage] WARNING: Conversation creation succeeded but convId is empty!');
-          throw Exception('Conversation created but no conversation ID returned');
+          throw Exception(l10n.messageSentWithoutId);
         }
         print('✅ [NewConversationPage] Conversation created successfully with ID: ${result.convId}');
         // Store the conversation ID for navigation
@@ -135,7 +137,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
         if (errorMessage != null && errorMessage.isNotEmpty) {
           throw Exception(errorMessage);
         } else {
-          throw Exception('Failed to create conversation');
+          throw Exception(l10n.messageCouldNotBeSent);
         }
       }
     } catch (e) {
@@ -440,7 +442,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            AppLocalizations.of(context)!.subject,
+                            AppLocalizations.of(context)!.title,
                             style: textTheme.titleSmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                               fontWeight: DesignTokens.fontWeightMedium,
@@ -450,7 +452,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                           TextField(
                             controller: _titleController,
                             decoration: InputDecoration(
-                              hintText: 'Enter subject',
+                              hintText: AppLocalizations.of(context)!.messageTitleHint,
                               hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                               filled: true,
                               fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
