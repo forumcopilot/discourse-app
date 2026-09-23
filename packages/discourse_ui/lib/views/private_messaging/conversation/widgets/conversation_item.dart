@@ -15,6 +15,7 @@ import '../../../../theme/style_builders.dart';
 import '../../../../utils/avatar_cache_utils.dart';
 import '../../../listitems/post_list_item_attachment.dart';
 import '../../../widgets/full_screen_image_viewer.dart';
+import '../../../../utils/cooked_content.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
@@ -78,6 +79,11 @@ class ConversationHeaderItem extends StatelessWidget {
     }).toList();
 
     final callbacks = PostContentCallbacks(
+      // Without this the renderer draws message images with no tap handler
+      // at all, so a PM image could not be opened full screen.
+      onImageTap: (imageUrl, tapContext, heroTag) =>
+          _buildAttachmentActions(context)
+              .onShowImage(imageUrl, tapContext, heroTag),
       onUrlTap: (url) async {
         AppLogger.debug('ConversationHeaderItem: BBCode URL tapped: $url');
         // Check if URL might be a mention link (contains @username pattern)
@@ -490,11 +496,24 @@ class _ConversationAttachmentActions {
   });
 
   void onShowImage(String imageUrl, BuildContext context, String heroTag) {
-    // Collect all image attachments from this message
     final List<String> allImageUrls = [];
     final List<String> allHeroTags = [];
     int tappedIndex = 0;
     int currentIndex = 0;
+
+    // Discourse embeds a message's images in its cooked HTML; the XenForo-era
+    // attachment list below is always empty there. Same source and order as
+    // the topic view's gallery (ImageActions).
+    final bodyImages = CookedContent.parse(
+      message.textBody,
+      forumBaseUrl: siteContext.site.url,
+    ).imageUrls;
+    for (final url in bodyImages) {
+      allImageUrls.add(url);
+      allHeroTags.add('${message.messageId}_image_$currentIndex');
+      if (url == imageUrl) tappedIndex = currentIndex;
+      currentIndex++;
+    }
 
     for (var att in message.attachments) {
       final isImage = att.isImage || (att.contentType?.startsWith('image/') ?? false);
@@ -605,6 +624,11 @@ class ConversationItem extends StatelessWidget {
     }).toList();
 
     final callbacks = PostContentCallbacks(
+      // Without this the renderer draws message images with no tap handler
+      // at all, so a PM image could not be opened full screen.
+      onImageTap: (imageUrl, tapContext, heroTag) =>
+          _buildAttachmentActions(context)
+              .onShowImage(imageUrl, tapContext, heroTag),
       onUrlTap: (url) async {
         AppLogger.debug('ConversationItem: BBCode URL tapped: $url');
         // Check if URL might be a mention link (contains @username pattern)
