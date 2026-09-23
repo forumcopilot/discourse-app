@@ -19,7 +19,7 @@ import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
-import 'package:discourse_core/discourse_core.dart' show DiscourseMessagePermissions;
+import 'package:discourse_core/discourse_core.dart' show DiscourseMessageDetails, DiscourseMessageGroup;
 import '../../../login_page.dart';
 
 class ConversationPage extends StatefulWidget {
@@ -166,6 +166,42 @@ class _ConversationPageState extends State<ConversationPage> {
     }
 
     await _loadConversation(loadMore: true, loadOlder: true);
+  }
+
+  /// What the last load said about this message beyond the SDK result:
+  /// whether the viewer may leave it, whether it is archived, its groups.
+  DiscourseMessageDetails? get _details =>
+      DiscourseMessageDetails.forTopic(widget.conversationId);
+
+  List<DiscourseMessageGroup> get _groups => _details?.groups ?? const [];
+
+  /// Archive the message, or move it back to the inbox. Either way it leaves
+  /// the list it was opened from (inbox and sent never show archived
+  /// messages), so the screen closes with `true`, which the list reads as
+  /// "remove this row" — as Discourse web returns to the list after archiving.
+  Future<void> _setArchived(bool archive) async {
+    final proxy = SiteProxyFactory.getPrivateConversationProxy();
+    final r = archive
+        ? await proxy.archiveConversationAsync(widget.conversationId)
+        : await proxy.unarchiveConversationAsync(widget.conversationId);
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    if (!r.result) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(archive
+              ? l10n.failedToArchiveMessage(r.resultText ?? '')
+              : l10n.failedToMoveMessageToInbox(r.resultText ?? '')),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+    Navigator.of(context).pop(true);
+    messenger.showSnackBar(
+      SnackBar(content: Text(archive ? l10n.messageArchived : l10n.messageMovedToInbox)),
+    );
   }
 
   /// Post numbers already reported to the read tracker for this message.
@@ -933,12 +969,15 @@ class _ConversationPageState extends State<ConversationPage> {
         title: _conversation?.convTitle ?? widget.subject,
         siteContext: widget.siteContext,
         // Discourse only lets some people remove themselves (see
-        // DiscourseMessagePermissions.canLeave); Leave was offered to all.
-        onLeave: DiscourseMessagePermissions.forTopic(widget.conversationId)?.canLeave == true
+        // DiscourseMessageDetails.canLeave); Leave was offered to all.
+        onLeave: DiscourseMessageDetails.forTopic(widget.conversationId)?.canLeave == true
             ? _leaveConversation
             : null,
         onMarkUnread: _markAsUnread,
-        participantCount: _conversation?.participantCount ?? 0,
+        participantCount: (_conversation?.participantCount ?? 0) + _groups.length,
+        groups: _groups,
+        onArchive: _details?.isArchived == false ? () => _setArchived(true) : null,
+        onMoveToInbox: _details?.isArchived == true ? () => _setArchived(false) : null,
         canEdit: _conversation?.canEdit ?? false,
         canClose: _conversation?.canClose ?? false,
         isClosed: _conversation?.isClosed ?? false,
@@ -1075,7 +1114,8 @@ class _ConversationPageState extends State<ConversationPage> {
                       ConversationHeaderWidget(
                         title: _conversation!.convTitle ?? widget.subject,
                         participants: _conversation!.participants,
-                        participantCount: _conversation!.participantCount ?? 0,
+                        participantCount: (_conversation!.participantCount ?? 0) + _groups.length,
+                        groups: _groups,
                         siteContext: widget.siteContext,
                         canInvite: _conversation!.canInvite ?? false,
                         conversationId: widget.conversationId,

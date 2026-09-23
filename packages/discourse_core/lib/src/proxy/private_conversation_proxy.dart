@@ -8,7 +8,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_like.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 
 import '../base_discourse_proxy.dart';
-import '../data/message/discourse_message_permissions.dart';
+import '../data/message/discourse_message_details.dart';
 import '../context/discourse_site_context_extension.dart';
 
 /// Discourse implementation of [IFCPrivateConversationProxy].
@@ -211,7 +211,39 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
 
   @override
   Future<FCConversationsResult> getConversationsAsync(
-      int startNum, int lastNum) async {
+      int startNum, int lastNum) {
+    // Discourse splits PMs into separate listing endpoints:
+    //   /topics/private-messages/{u}        → received only
+    //   /topics/private-messages-sent/{u}   → sent only
+    // For a unified WhatsApp-style "all conversations" view, fetch both
+    // in parallel and merge (dedup + sort by last activity). Neither lists
+    // archived messages (TopicQuery::PrivateMessageLists#not_archived);
+    // those are [getArchivedConversationsAsync].
+    return _listMessages(
+      const ['private-messages', 'private-messages-sent'],
+      startNum,
+      lastNum,
+    );
+  }
+
+  /// Discourse-only: the viewer's archived messages — Discourse web's
+  /// Archive list (/topics/private-messages-archive/{u}). Not on
+  /// IFCPrivateConversationProxy, which has no notion of an archive; the app
+  /// reaches it by type, as it does whispers on DiscoursePostProxy.
+  Future<FCConversationsResult> getArchivedConversationsAsync(
+      int startNum, int lastNum) {
+    return _listMessages(
+      const ['private-messages-archive'],
+      startNum,
+      lastNum,
+    );
+  }
+
+  /// One window of the merged lists at [lists] (the path segment after
+  /// /topics/), newest activity first. The first list must succeed; the
+  /// others are best-effort.
+  Future<FCConversationsResult> _listMessages(
+      List<String> lists, int startNum, int lastNum) async {
     final username = siteContext.currentUsername;
     if (username == null || username.isEmpty) {
       return FCConversationsResult(
@@ -224,11 +256,6 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       );
     }
     try {
-      // Discourse splits PMs into separate listing endpoints:
-      //   /topics/private-messages/{u}        → received only
-      //   /topics/private-messages-sent/{u}   → sent only
-      // For a unified WhatsApp-style "all conversations" view, fetch both
-      // in parallel and merge (dedup + sort by last activity).
       final encUser = Uri.encodeComponent(username);
       // The caller's n-th window is Discourse's page n. Discourse pages hold
       // 30 topics whatever the caller asks for, and this used to divide the
@@ -239,12 +266,12 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       final pageQuery = <String, dynamic>{
         if (page > 0) 'page': page.toString(),
       };
+      Future<Map<String, dynamic>> fetch(String list) =>
+          apiGet('/topics/$list/$encUser.json', query: pageQuery);
       final responses = await Future.wait([
-        apiGet('/topics/private-messages/$encUser.json', query: pageQuery),
-        apiGet(
-          '/topics/private-messages-sent/$encUser.json',
-          query: pageQuery,
-        ).catchError((_) => <String, dynamic>{}),
+        fetch(lists.first),
+        for (final list in lists.skip(1))
+          fetch(list).catchError((_) => <String, dynamic>{}),
       ]);
 
       final byId = <String, FCConversationSummary>{};
@@ -290,6 +317,26 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
         canUpload: false,
         list: const [],
       );
+    }
+  }
+
+  /// Discourse-only: add a group to a message (POST /t/{id}/invite-group,
+  /// TopicsController#invite_group). [inviteParticipantAsync] sends a user
+  /// invite, which Discourse cannot resolve for a group name, so picking a
+  /// group in the invite search used to fail.
+  Future<FCInviteParticipantResult> inviteGroupAsync(
+      String conversationId, String groupName) async {
+    try {
+      await apiPost('/t/$conversationId/invite-group.json', body: {
+        'group': groupName,
+      });
+      return FCInviteParticipantResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCInviteParticipantResult(
+          result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCInviteParticipantResult(
+          result: false, resultText: describeApiError(e));
     }
   }
 
@@ -663,10 +710,15 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       final details = (t['details'] as Map<String, dynamic>?) ?? const {};
       final participants = _participantsFrom(details);
       final canEdit = (details['can_edit'] as bool?) ?? false;
-      DiscourseMessagePermissions.store(
+      DiscourseMessageDetails.store(
         conversationId,
-        DiscourseMessagePermissions(
+        DiscourseMessageDetails(
           canLeave: details.containsKey('can_remove_self_id'),
+          isArchived: t['message_archived'] == true,
+          groups: [
+            for (final g in (details['allowed_groups'] as List?) ?? const [])
+              if (DiscourseMessageGroup.fromJson(g) case final group?) group,
+          ],
         ),
       );
 

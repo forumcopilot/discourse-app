@@ -1,3 +1,4 @@
+import 'package:discourse_core/discourse_core.dart' show DiscourseMessageGroup, DiscoursePrivateConversationProxy;
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/views/appbars/base_forum_app_bar.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -29,8 +30,19 @@ class ConversationAppBar extends BaseForumAppBar {
     this.onClose,
     this.onUnclose,
     this.onEdit,
+    this.onArchive,
+    this.onMoveToInbox,
+    this.groups = const [],
     super.key,
   }) : super(title: title);
+
+  /// File the message away (Discourse's Archive), or bring it back from the
+  /// archive. Exactly one is set, by the message's archived state.
+  final VoidCallback? onArchive;
+  final VoidCallback? onMoveToInbox;
+
+  /// Groups on the message, listed ahead of people as Discourse does.
+  final List<DiscourseMessageGroup> groups;
 
   final VoidCallback? onLeave;
   final VoidCallback? onMarkUnread;
@@ -67,6 +79,7 @@ class ConversationAppBar extends BaseForumAppBar {
               canInvite: canInvite,
               conversationId: conversationId,
               onInviteSuccess: onInviteSuccess,
+              groups: groups,
             );
           },
         ),
@@ -101,9 +114,38 @@ class ConversationAppBar extends BaseForumAppBar {
             case 'leave':
               if (onLeave != null) onLeave!();
               break;
+            case 'archive':
+              onArchive?.call();
+              break;
+            case 'inbox':
+              onMoveToInbox?.call();
+              break;
           }
         },
         itemBuilder: (BuildContext context) => [
+          // Archive / Move to Inbox — how a Discourse user files a message.
+          if (onArchive != null || onMoveToInbox != null)
+            PopupMenuItem<String>(
+              value: onArchive != null ? 'archive' : 'inbox',
+              child: Row(
+                children: [
+                  Icon(
+                    onArchive != null ? Icons.archive_outlined : Icons.move_to_inbox_outlined,
+                    color: colorScheme.onSurface,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    onArchive != null
+                        ? AppLocalizations.of(context)!.archiveMessage
+                        : AppLocalizations.of(context)!.moveToInbox,
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           // Edit conversation (only for Discourse and if canEdit is true)
           if (canEdit && siteContext.siteType == 'discourse' && onEdit != null)
             PopupMenuItem<String>(
@@ -201,6 +243,7 @@ class ConversationAppBar extends BaseForumAppBar {
     bool canInvite = false,
     String? conversationId,
     VoidCallback? onInviteSuccess,
+    List<DiscourseMessageGroup> groups = const [],
   }) {
     showModalBottomSheet(
       context: context,
@@ -243,9 +286,43 @@ class ConversationAppBar extends BaseForumAppBar {
                   Expanded(
                     child: ListView.builder(
                       controller: scrollController,
-                      itemCount: participants.length,
+                      itemCount: groups.length + participants.length,
                       itemBuilder: (context, index) {
-                        final participant = participants[index];
+                        if (index < groups.length) {
+                          final group = groups[index];
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: DesignTokens.avatarRadiusM,
+                                  backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                                  child: Icon(
+                                    Icons.groups_rounded,
+                                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                  ),
+                                ),
+                                SizedBox(width: DesignTokens.spacingM),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(group.label, style: Theme.of(context).textTheme.bodyLarge),
+                                      if (group.label != group.name)
+                                        Text(
+                                          '@${group.name}',
+                                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        final participant = participants[index - groups.length];
                         return Padding(
                           padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
                           child: GestureDetector(
@@ -320,6 +397,9 @@ class ConversationAppBar extends BaseForumAppBar {
 
     if (result != null && result['username'] != null) {
       final username = result['username'] as String;
+      // A group from the search is invited to the message as a group;
+      // Discourse's user invite cannot resolve a group name.
+      final isGroup = result['isGroup'] == true;
 
       // Show loading indicator
       if (!context.mounted) return;
@@ -331,11 +411,13 @@ class ConversationAppBar extends BaseForumAppBar {
 
       try {
         final conversationProxy = SiteProxyFactory.getPrivateConversationProxy();
-        final inviteResult = await conversationProxy.inviteParticipantAsync(
-          [username],
-          conversationId,
-          null, // No reason for now
-        );
+        final inviteResult = isGroup && conversationProxy is DiscoursePrivateConversationProxy
+            ? await conversationProxy.inviteGroupAsync(conversationId, username)
+            : await conversationProxy.inviteParticipantAsync(
+                [username],
+                conversationId,
+                null, // No reason for now
+              );
 
         if (!context.mounted) return;
         Navigator.pop(context); // Close loading dialog
@@ -347,7 +429,9 @@ class ConversationAppBar extends BaseForumAppBar {
           // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)!.usernameHasBeenInvited(username)),
+              content: Text(isGroup
+                  ? AppLocalizations.of(context)!.groupHasBeenInvited(username)
+                  : AppLocalizations.of(context)!.usernameHasBeenInvited(username)),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );

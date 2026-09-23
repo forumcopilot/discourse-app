@@ -1638,6 +1638,55 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pleaseAddARecipient => '请至少添加一位收件人';
 
   @override
+  String get archiveMessage => '归档';
+
+  @override
+  String get moveToInbox => '移至收件箱';
+
+  @override
+  String get messageInbox => '收件箱';
+
+  @override
+  String get messageArchive => '归档';
+
+  @override
+  String get messageArchived => '消息已归档';
+
+  @override
+  String get messageMovedToInbox => '已移至收件箱';
+
+  @override
+  String failedToArchiveMessage(Object error) {
+    return '无法归档消息：$error';
+  }
+
+  @override
+  String failedToMoveMessageToInbox(Object error) {
+    return '无法将消息移至收件箱：$error';
+  }
+
+  @override
+  String get noArchivedMessages => '您没有已归档的消息';
+
+  @override
+  String get noArchivedMessagesHint => '在消息的 ⋮ 菜单中选择归档，即可存放在这里。';
+
+  @override
+  String groupHasBeenInvited(String group) {
+    return '已邀请 $group 加入消息';
+  }
+
+  @override
+  String participantCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 位参与者',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String failedToCreateConversation(Object error) {
     return '无法发送消息：$error';
   }

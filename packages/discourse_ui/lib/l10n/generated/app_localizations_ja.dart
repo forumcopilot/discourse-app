@@ -1655,6 +1655,55 @@ class AppLocalizationsJa extends AppLocalizations {
   String get pleaseAddARecipient => '宛先を 1 人以上追加してください';
 
   @override
+  String get archiveMessage => 'アーカイブ';
+
+  @override
+  String get moveToInbox => '受信トレイに移動';
+
+  @override
+  String get messageInbox => '受信トレイ';
+
+  @override
+  String get messageArchive => 'アーカイブ';
+
+  @override
+  String get messageArchived => 'メッセージをアーカイブしました';
+
+  @override
+  String get messageMovedToInbox => '受信トレイに移動しました';
+
+  @override
+  String failedToArchiveMessage(Object error) {
+    return 'メッセージをアーカイブできませんでした: $error';
+  }
+
+  @override
+  String failedToMoveMessageToInbox(Object error) {
+    return 'メッセージを受信トレイに移動できませんでした: $error';
+  }
+
+  @override
+  String get noArchivedMessages => 'アーカイブしたメッセージはありません';
+
+  @override
+  String get noArchivedMessagesHint => 'メッセージの ⋮ メニューからアーカイブすると、ここに保管されます。';
+
+  @override
+  String groupHasBeenInvited(String group) {
+    return '$group をメッセージに招待しました';
+  }
+
+  @override
+  String participantCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '参加者 $count 人',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'メッセージを送信できませんでした: $error';
   }

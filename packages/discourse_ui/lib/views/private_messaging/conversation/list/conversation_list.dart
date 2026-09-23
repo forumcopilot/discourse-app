@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:forumcopilot_sdk/interfaces/i_fc_private_conversation_proxy.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscoursePrivateConversationProxy;
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:discourse_ui/views/widgets/not_signed_in_view.dart';
@@ -13,7 +15,15 @@ import 'conversation_list_item.dart';
 class ConversationList extends StatefulWidget {
   final SiteContext siteContext;
 
-  const ConversationList({super.key, required this.siteContext});
+  /// Show the viewer's archived messages (Discourse's Archive list) instead
+  /// of the inbox. Inbox and sent never include archived messages.
+  final bool archived;
+
+  const ConversationList({
+    super.key,
+    required this.siteContext,
+    this.archived = false,
+  });
 
   @override
   ConversationListState createState() => ConversationListState();
@@ -193,13 +203,23 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
     }
   }
 
+  /// The inbox, or the archive — which only Discourse has, so it is reached
+  /// on the Discourse proxy rather than through the shared interface.
+  Future<FCConversationsResult> _fetch(
+      IFCPrivateConversationProxy proxy, int startNum, int lastNum) {
+    if (widget.archived && proxy is DiscoursePrivateConversationProxy) {
+      return proxy.getArchivedConversationsAsync(startNum, lastNum);
+    }
+    return proxy.getConversationsAsync(startNum, lastNum);
+  }
+
   Future<void> _loadConversations() async {
     final startNum = _currentPage * _itemsPerPage;
     final lastNum = startNum + _itemsPerPage - 1;
     AppLogger.debug('[ConversationList] Loading conversations (page $_currentPage, startNum: $startNum, lastNum: $lastNum)');
     final conversationProxy = SiteProxyFactory.getPrivateConversationProxy();
 
-    final conversationsData = await conversationProxy.getConversationsAsync(startNum, lastNum);
+    final conversationsData = await _fetch(conversationProxy, startNum, lastNum);
     AppLogger.debug('[ConversationList] Conversations received: ${conversationsData.list.length} conversations');
 
     if (!conversationsData.result) {
@@ -411,13 +431,15 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.inbox_outlined,
+                          widget.archived ? Icons.archive_outlined : Icons.inbox_outlined,
                           size: 80,
                           color: colorScheme.primary,
                         ),
                         const SizedBox(height: DesignTokens.spacingXL),
                         Text(
-                          AppLocalizations.of(context)?.noConversations ?? "No conversations",
+                          widget.archived
+                              ? AppLocalizations.of(context)!.noArchivedMessages
+                              : AppLocalizations.of(context)!.noConversations,
                           style: textTheme.headlineSmall?.copyWith(
                             color: colorScheme.onSurface,
                             fontWeight: DesignTokens.fontWeightBold,
@@ -426,7 +448,9 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
                         ),
                         const SizedBox(height: DesignTokens.spacingS),
                         Text(
-                          AppLocalizations.of(context)?.noConversationsMessage ?? 'You have no messages yet. Start a new message to begin.',
+                          widget.archived
+                              ? AppLocalizations.of(context)!.noArchivedMessagesHint
+                              : AppLocalizations.of(context)!.noConversationsMessage,
                           style: textTheme.bodyLarge?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -518,7 +542,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
     final nextPage = _currentPage + 1;
     final startNum = nextPage * _itemsPerPage;
     final lastNum = startNum + _itemsPerPage - 1;
-    final conversationsData = await conversationProxy.getConversationsAsync(startNum, lastNum);
+    final conversationsData = await _fetch(conversationProxy, startNum, lastNum);
     AppLogger.debug('[ConversationList] More conversations received: ${conversationsData.list.length} conversations');
 
     if (!conversationsData.result) {

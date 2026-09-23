@@ -1712,6 +1712,57 @@ class AppLocalizationsNl extends AppLocalizations {
   String get pleaseAddARecipient => 'Voeg minstens één ontvanger toe';
 
   @override
+  String get archiveMessage => 'Archiveren';
+
+  @override
+  String get moveToInbox => 'Verplaatsen naar inbox';
+
+  @override
+  String get messageInbox => 'Inbox';
+
+  @override
+  String get messageArchive => 'Archief';
+
+  @override
+  String get messageArchived => 'Bericht gearchiveerd';
+
+  @override
+  String get messageMovedToInbox => 'Verplaatst naar inbox';
+
+  @override
+  String failedToArchiveMessage(Object error) {
+    return 'Kon het bericht niet archiveren: $error';
+  }
+
+  @override
+  String failedToMoveMessageToInbox(Object error) {
+    return 'Kon het bericht niet naar de inbox verplaatsen: $error';
+  }
+
+  @override
+  String get noArchivedMessages => 'Je hebt geen gearchiveerde berichten';
+
+  @override
+  String get noArchivedMessagesHint =>
+      'Archiveer een bericht via het ⋮-menu om het hier te bewaren.';
+
+  @override
+  String groupHasBeenInvited(String group) {
+    return '$group is uitgenodigd voor het bericht';
+  }
+
+  @override
+  String participantCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count deelnemers',
+      one: '1 deelnemer',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Kon bericht niet verzenden: $error';
   }

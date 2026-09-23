@@ -1878,6 +1878,74 @@
   "@pleaseAddARecipient": {
     "description": "UI text: Please add at least one recipient"
   },
+  "archiveMessage": "Archive",
+  "@archiveMessage": {
+    "description": "UI text: Archive"
+  },
+  "moveToInbox": "Move to Inbox",
+  "@moveToInbox": {
+    "description": "UI text: Move to Inbox"
+  },
+  "messageInbox": "Inbox",
+  "@messageInbox": {
+    "description": "UI text: Inbox"
+  },
+  "messageArchive": "Archive",
+  "@messageArchive": {
+    "description": "UI text: Archive"
+  },
+  "messageArchived": "Message archived",
+  "@messageArchived": {
+    "description": "UI text: Message archived"
+  },
+  "messageMovedToInbox": "Moved to Inbox",
+  "@messageMovedToInbox": {
+    "description": "UI text: Moved to Inbox"
+  },
+  "failedToArchiveMessage": "Could not archive the message: {error}",
+  "@failedToArchiveMessage": {
+    "description": "UI text: Could not archive the message: {error}",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "failedToMoveMessageToInbox": "Could not move the message to Inbox: {error}",
+  "@failedToMoveMessageToInbox": {
+    "description": "UI text: Could not move the message to Inbox: {error}",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "noArchivedMessages": "You don't have any archived messages",
+  "@noArchivedMessages": {
+    "description": "UI text: You don't have any archived messages"
+  },
+  "noArchivedMessagesHint": "Archive a message from its ⋮ menu to file it here.",
+  "@noArchivedMessagesHint": {
+    "description": "UI text: Archive a message from its \u22ee menu to file it here."
+  },
+  "groupHasBeenInvited": "{group} has been invited to the message",
+  "@groupHasBeenInvited": {
+    "description": "UI text: {group} has been invited to the message",
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "participantCount": "{count, plural, =1{1 participant} other{{count} participants}}",
+  "@participantCount": {
+    "description": "UI text: N participants",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "failedToCreateConversation": "Failed to send message: {error}",
   "@failedToCreateConversation": {
     "description": "UI text: Failed to send message: {error}",

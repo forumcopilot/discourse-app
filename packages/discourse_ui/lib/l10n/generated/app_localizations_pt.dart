@@ -1712,6 +1712,57 @@ class AppLocalizationsPt extends AppLocalizations {
   String get pleaseAddARecipient => 'Adicione pelo menos um destinatário';
 
   @override
+  String get archiveMessage => 'Arquivar';
+
+  @override
+  String get moveToInbox => 'Mover para caixa de entrada';
+
+  @override
+  String get messageInbox => 'Caixa de entrada';
+
+  @override
+  String get messageArchive => 'Arquivo';
+
+  @override
+  String get messageArchived => 'Mensagem arquivada';
+
+  @override
+  String get messageMovedToInbox => 'Movida para a caixa de entrada';
+
+  @override
+  String failedToArchiveMessage(Object error) {
+    return 'Não foi possível arquivar a mensagem: $error';
+  }
+
+  @override
+  String failedToMoveMessageToInbox(Object error) {
+    return 'Não foi possível mover a mensagem para a caixa de entrada: $error';
+  }
+
+  @override
+  String get noArchivedMessages => 'Você não tem mensagens arquivadas';
+
+  @override
+  String get noArchivedMessagesHint =>
+      'Arquive uma mensagem pelo menu ⋮ para guardá-la aqui.';
+
+  @override
+  String groupHasBeenInvited(String group) {
+    return '$group foi convidado para a mensagem';
+  }
+
+  @override
+  String participantCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count participantes',
+      one: '1 participante',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Não foi possível enviar a mensagem: $error';
   }

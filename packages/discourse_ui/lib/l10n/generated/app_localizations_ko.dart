@@ -1651,6 +1651,55 @@ class AppLocalizationsKo extends AppLocalizations {
   String get pleaseAddARecipient => '받는 사람을 한 명 이상 추가하세요';
 
   @override
+  String get archiveMessage => '보관';
+
+  @override
+  String get moveToInbox => '받은 편지함으로 이동';
+
+  @override
+  String get messageInbox => '받은 편지함';
+
+  @override
+  String get messageArchive => '보관';
+
+  @override
+  String get messageArchived => '메시지를 보관했습니다';
+
+  @override
+  String get messageMovedToInbox => '받은 편지함으로 이동했습니다';
+
+  @override
+  String failedToArchiveMessage(Object error) {
+    return '메시지를 보관하지 못했습니다: $error';
+  }
+
+  @override
+  String failedToMoveMessageToInbox(Object error) {
+    return '메시지를 받은 편지함으로 이동하지 못했습니다: $error';
+  }
+
+  @override
+  String get noArchivedMessages => '보관한 메시지가 없습니다';
+
+  @override
+  String get noArchivedMessagesHint => '메시지의 ⋮ 메뉴에서 보관하면 여기에 모입니다.';
+
+  @override
+  String groupHasBeenInvited(String group) {
+    return '$group 그룹을 메시지에 초대했습니다';
+  }
+
+  @override
+  String participantCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '참여자 $count명',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String failedToCreateConversation(Object error) {
     return '메시지를 보내지 못했습니다: $error';
   }

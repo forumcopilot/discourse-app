@@ -9,7 +9,7 @@ void main() {
   late _RecordingPmProxy proxy;
 
   setUp(() {
-    DiscourseMessagePermissions.clear();
+    DiscourseMessageDetails.clear();
     proxy = _RecordingPmProxy();
   });
 
@@ -32,6 +32,23 @@ void main() {
       'GET /topics/private-messages/me.json {page: 1}',
       'GET /topics/private-messages/me.json {page: 2}',
     ]);
+  });
+
+  test('the archive is its own list, paged the same way', () async {
+    proxy.nextGet = const {'topic_list': {'topics': []}};
+    await proxy.getArchivedConversationsAsync(0, 19);
+    await proxy.getArchivedConversationsAsync(20, 39);
+    expect(proxy.calls, [
+      'GET /topics/private-messages-archive/me.json {}',
+      'GET /topics/private-messages-archive/me.json {page: 1}',
+    ]);
+  });
+
+  test('a group is invited as a group', () async {
+    final r = await proxy.inviteGroupAsync('401970', 'moderators');
+    expect(r.result, isTrue);
+    expect(proxy.calls.single,
+        'POST /t/401970/invite-group.json {group: moderators}');
   });
 
   group('a loaded message', () {
@@ -61,13 +78,31 @@ void main() {
       expect((await proxy.getConversationAsync('7', 0, 19, true)).canClose, isTrue);
     });
 
+    test('records whether it is archived, and its groups', () async {
+      proxy.nextGet = {
+        ...topic(const {
+          'allowed_groups': [
+            {'id': 3, 'name': 'moderators', 'display_name': 'Site Moderators', 'user_count': 4},
+            {'id': 9, 'name': ''},
+          ],
+        }),
+        'message_archived': true,
+      };
+      await proxy.getConversationAsync('7', 0, 19, true);
+      final details = DiscourseMessageDetails.forTopic('7')!;
+      expect(details.isArchived, isTrue);
+      expect(details.groups.map((g) => g.label), ['Site Moderators'],
+          reason: 'a group without a name cannot be shown or invited');
+      expect(details.groups.single.name, 'moderators');
+    });
+
     test('can be left only when can_remove_self_id is sent', () async {
       proxy.nextGet = topic(const {});
       await proxy.getConversationAsync('7', 0, 19, true);
-      expect(DiscourseMessagePermissions.forTopic('7')?.canLeave, isFalse);
+      expect(DiscourseMessageDetails.forTopic('7')?.canLeave, isFalse);
       proxy.nextGet = topic(const {'can_remove_self_id': 42});
       await proxy.getConversationAsync('7', 0, 19, true);
-      expect(DiscourseMessagePermissions.forTopic('7')?.canLeave, isTrue);
+      expect(DiscourseMessageDetails.forTopic('7')?.canLeave, isTrue);
     });
   });
 }
@@ -84,6 +119,13 @@ class _RecordingPmProxy extends DiscoursePrivateConversationProxy {
       {Map<String, dynamic>? query}) async {
     calls.add('GET $path ${query ?? {}}');
     return nextGet;
+  }
+
+  @override
+  Future<Map<String, dynamic>> apiPost(String path,
+      {Map<String, dynamic>? query, Object? body}) async {
+    calls.add('POST $path ${body ?? {}}');
+    return const {};
   }
 
   @override

@@ -1,3 +1,5 @@
+import 'package:discourse_core/discourse_core.dart' show DiscourseMessageGroup;
+import '../../../../l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -20,11 +22,16 @@ class ConversationHeaderWidget extends StatelessWidget {
   final String? conversationId;
   final VoidCallback? onInviteSuccess;
 
+  /// Groups on the message; counted with the people and listed first in
+  /// the participants sheet.
+  final List<DiscourseMessageGroup> groups;
+
   const ConversationHeaderWidget({
     super.key,
     required this.title,
     this.participants,
     this.participantCount = 0,
+    this.groups = const [],
     this.siteContext,
     this.canInvite = false,
     this.conversationId,
@@ -228,13 +235,14 @@ class ConversationHeaderWidget extends StatelessWidget {
                                 canInvite: canInvite,
                                 conversationId: conversationId,
                                 onInviteSuccess: onInviteSuccess,
+                                groups: groups,
                               );
                             },
                             borderRadius: BorderRadius.circular(4),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               child: Text(
-                                '$participantCount ${participantCount == 1 ? 'participant' : 'participants'}',
+                                AppLocalizations.of(context)!.participantCount(participantCount),
                                 style: textTheme.bodyMedium?.copyWith(
                                   color: colorScheme.onSurface,
                                   fontSize: DesignTokens.fontSizeS,
@@ -244,7 +252,7 @@ class ConversationHeaderWidget extends StatelessWidget {
                             ),
                           )
                         : Text(
-                            '$participantCount ${participantCount == 1 ? 'participant' : 'participants'}',
+                            AppLocalizations.of(context)!.participantCount(participantCount),
                             style: textTheme.bodyMedium?.copyWith(
                               color: colorScheme.onSurface,
                               fontSize: DesignTokens.fontSizeS,

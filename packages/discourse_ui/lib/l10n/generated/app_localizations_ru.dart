@@ -1710,6 +1710,59 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pleaseAddARecipient => 'Добавьте хотя бы одного получателя';
 
   @override
+  String get archiveMessage => 'Архивировать';
+
+  @override
+  String get moveToInbox => 'Переместить во входящие';
+
+  @override
+  String get messageInbox => 'Входящие';
+
+  @override
+  String get messageArchive => 'Архив';
+
+  @override
+  String get messageArchived => 'Сообщение перемещено в архив';
+
+  @override
+  String get messageMovedToInbox => 'Перемещено во входящие';
+
+  @override
+  String failedToArchiveMessage(Object error) {
+    return 'Не удалось переместить сообщение в архив: $error';
+  }
+
+  @override
+  String failedToMoveMessageToInbox(Object error) {
+    return 'Не удалось переместить сообщение во входящие: $error';
+  }
+
+  @override
+  String get noArchivedMessages => 'У вас нет сообщений в архиве';
+
+  @override
+  String get noArchivedMessagesHint =>
+      'Переместите сообщение в архив через меню ⋮, и оно появится здесь.';
+
+  @override
+  String groupHasBeenInvited(String group) {
+    return 'Группа $group приглашена в сообщение';
+  }
+
+  @override
+  String participantCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count участника',
+      many: '$count участников',
+      few: '$count участника',
+      one: '$count участник',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Не удалось отправить сообщение: $error';
   }

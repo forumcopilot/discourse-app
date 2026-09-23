@@ -1704,6 +1704,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseAddARecipient => 'Please add at least one recipient';
 
   @override
+  String get archiveMessage => 'Archive';
+
+  @override
+  String get moveToInbox => 'Move to Inbox';
+
+  @override
+  String get messageInbox => 'Inbox';
+
+  @override
+  String get messageArchive => 'Archive';
+
+  @override
+  String get messageArchived => 'Message archived';
+
+  @override
+  String get messageMovedToInbox => 'Moved to Inbox';
+
+  @override
+  String failedToArchiveMessage(Object error) {
+    return 'Could not archive the message: $error';
+  }
+
+  @override
+  String failedToMoveMessageToInbox(Object error) {
+    return 'Could not move the message to Inbox: $error';
+  }
+
+  @override
+  String get noArchivedMessages => 'You don\'t have any archived messages';
+
+  @override
+  String get noArchivedMessagesHint =>
+      'Archive a message from its ⋮ menu to file it here.';
+
+  @override
+  String groupHasBeenInvited(String group) {
+    return '$group has been invited to the message';
+  }
+
+  @override
+  String participantCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count participants',
+      one: '1 participant',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Failed to send message: $error';
   }

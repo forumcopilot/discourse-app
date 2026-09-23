@@ -256,6 +256,9 @@ class _UserSearchPageState extends State<UserSearchPage> {
                     Navigator.of(context).pop({
                       'username': user.username,
                       'iconUrl': user.iconUrl,
+                      // Callers that act on the pick (inviting to a message)
+                      // must treat a group differently from a person.
+                      'isGroup': isGroup,
                     });
                   },
           ),

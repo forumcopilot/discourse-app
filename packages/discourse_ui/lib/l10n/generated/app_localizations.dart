@@ -3014,6 +3014,78 @@ abstract class AppLocalizations {
   /// **'Please add at least one recipient'**
   String get pleaseAddARecipient;
 
+  /// UI text: Archive
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get archiveMessage;
+
+  /// UI text: Move to Inbox
+  ///
+  /// In en, this message translates to:
+  /// **'Move to Inbox'**
+  String get moveToInbox;
+
+  /// UI text: Inbox
+  ///
+  /// In en, this message translates to:
+  /// **'Inbox'**
+  String get messageInbox;
+
+  /// UI text: Archive
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get messageArchive;
+
+  /// UI text: Message archived
+  ///
+  /// In en, this message translates to:
+  /// **'Message archived'**
+  String get messageArchived;
+
+  /// UI text: Moved to Inbox
+  ///
+  /// In en, this message translates to:
+  /// **'Moved to Inbox'**
+  String get messageMovedToInbox;
+
+  /// UI text: Could not archive the message: {error}
+  ///
+  /// In en, this message translates to:
+  /// **'Could not archive the message: {error}'**
+  String failedToArchiveMessage(Object error);
+
+  /// UI text: Could not move the message to Inbox: {error}
+  ///
+  /// In en, this message translates to:
+  /// **'Could not move the message to Inbox: {error}'**
+  String failedToMoveMessageToInbox(Object error);
+
+  /// UI text: You don't have any archived messages
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have any archived messages'**
+  String get noArchivedMessages;
+
+  /// UI text: Archive a message from its ⋮ menu to file it here.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive a message from its ⋮ menu to file it here.'**
+  String get noArchivedMessagesHint;
+
+  /// UI text: {group} has been invited to the message
+  ///
+  /// In en, this message translates to:
+  /// **'{group} has been invited to the message'**
+  String groupHasBeenInvited(String group);
+
+  /// UI text: N participants
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 participant} other{{count} participants}}'**
+  String participantCount(int count);
+
   /// UI text: Failed to send message: {error}
   ///
   /// In en, this message translates to:
