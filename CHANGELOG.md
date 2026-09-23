@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.22] - 2026-09-23
+
 Thread rendering, batch 3: content that disappeared from posts. Covered by `packages/discourse_ui/test/post_media_rendering_test.dart` and `embed_links_test.dart`, and checked before/after on the Pixel in light and dark themes.
 
 ### Fixed
