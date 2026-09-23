@@ -766,7 +766,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
     }
   }
 
-  void _handleImageAttachment() async {
+  void _handleImageAttachment({bool fromCamera = false}) async {
     // Get constraints and check count limit before showing picker
     final siteContext = getCurrentSiteContext();
     final constraints = getAttachmentConstraintsFromSiteContext(siteContext);
@@ -790,7 +790,9 @@ class _NewConversationPageState extends State<NewConversationPage> {
       return;
     }
 
-    final XFile? image = await FilePickerUtils.pickImage();
+    final XFile? image = fromCamera
+        ? await FilePickerUtils.takePhoto()
+        : await FilePickerUtils.pickImage();
     if (image != null) {
       // Hide keyboard when image is selected to focus on upload progress
       FocusScope.of(context).unfocus();
@@ -889,6 +891,16 @@ class _NewConversationPageState extends State<NewConversationPage> {
                   ),
                   tooltip: 'Upload Image',
                   onPressed: _handleImageAttachment,
+                ),
+              // Camera button
+              if (_canUpload && FilePickerUtils.canTakePhoto)
+                IconButton(
+                  icon: Icon(
+                    Icons.photo_camera,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  tooltip: AppLocalizations.of(context)!.takePhoto,
+                  onPressed: () => _handleImageAttachment(fromCamera: true),
                 ),
               // Formatting button
               PopupMenuButton<String>(

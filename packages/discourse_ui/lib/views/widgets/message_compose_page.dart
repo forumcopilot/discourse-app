@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseMediaOptimizationContext;
 import '../../utils/discourse_markup.dart';
 import 'package:flutter/foundation.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -14,6 +16,7 @@ import 'dart:io';
 import 'package:discourse_ui/utils/file_utils.dart';
 import '../../theme/design_tokens.dart';
 import '../../settings_context.dart';
+import '../../utils/image_optimize.dart';
 import '../../utils/image_shrink.dart';
 import 'oversized_image_sheet.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
@@ -279,9 +282,16 @@ class _MessageComposePageState extends State<MessageComposePage> {
   /// Returns the file to upload (the original when it already fits), or
   /// null when the user declined or it cannot be made to fit.
   Future<XFile?> _prepareImageForUpload(
-    XFile image,
+    XFile picked,
     FCAttachmentConstraints constraints,
   ) async {
+    // First as the forum's own composer would prepare it (a photo scaled to
+    // 1920 px and recompressed, when the forum asks for that); only an image
+    // still over the limit after that gets the resize question.
+    var image = picked;
+    final optimized = await optimizePhotoForForum(
+        File(picked.path), getCurrentSiteContext()?.mediaOptimization);
+    if (optimized != null) image = XFile(optimized.path);
     final maxBytes = constraints.size;
     final pickedBytes = await File(image.path).length();
     // Anything within the limit is uploaded exactly as picked. The old
@@ -585,7 +595,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
     }
   }
 
-  void _handleImageUpload() async {
+  void _handleImageUpload({bool fromCamera = false}) async {
     if (widget.onFileUpload == null) return;
     try {
       // Get constraints from SiteContext (image-sized: Discourse caps
@@ -626,7 +636,11 @@ class _MessageComposePageState extends State<MessageComposePage> {
       // 20 MB file was silently rewritten to 2.2 MB and slipped under a
       // 10 MB limit that could therefore never fire for an image.
       // Upload what the user picked; let the server's limits be real.
-      List<XFile> selectedImages = await FilePickerUtils.pickMultiImage();
+      // A camera photo takes the same path as a picked one: uploaded as
+      // taken, resized only if it is over the forum's limit.
+      List<XFile> selectedImages = fromCamera
+          ? [if (await FilePickerUtils.takePhoto() case final photo?) photo]
+          : await FilePickerUtils.pickMultiImage();
 
       // Limit to remaining slots if there's a limit
       if (remainingSlots != null && selectedImages.length > remainingSlots) {
@@ -1461,6 +1475,20 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     ),
                     tooltip: AppLocalizations.of(context)?.uploadImage ?? 'Upload Image',
                     onPressed: _handleImageUpload,
+                  ),
+                ),
+              // Camera button - same as above, straight from the camera
+              if (widget.onFileUpload != null && FilePickerUtils.canTakePhoto)
+                Semantics(
+                  label: AppLocalizations.of(context)?.takePhoto ?? 'Take photo',
+                  button: true,
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.photo_camera,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    tooltip: AppLocalizations.of(context)?.takePhoto ?? 'Take photo',
+                    onPressed: () => _handleImageUpload(fromCamera: true),
                   ),
                 ),
               // Formatting button

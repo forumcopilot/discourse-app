@@ -299,6 +299,17 @@ extension DiscourseSiteContextExtension on SiteContext {
     _chatPublicChannels[_prefsPrefix()] = enabled;
   }
 
+  /// `chat_allow_uploads` (`client: true`): whether chat messages may carry
+  /// files. Discourse turns it off itself when secure uploads are on
+  /// (Chat::SecureUploadsCompatibility). Defaults to true until read.
+  bool get chatAllowUploads => _chatAllowUploads[_prefsPrefix()] ?? true;
+
+  static final Map<String, bool> _chatAllowUploads = <String, bool>{};
+
+  void setChatAllowUploads(bool allowed) {
+    _chatAllowUploads[_prefsPrefix()] = allowed;
+  }
+
   /// Whether the signed-in user may start chat direct messages: staff, or
   /// `can_direct_message` on the current user (member of
   /// `direct_message_enabled_groups`) — Discourse's `userCanDirectMessage`.
@@ -334,6 +345,7 @@ extension DiscourseSiteContextExtension on SiteContext {
     _chatProbe.clear();
     _chatPublicChannels.clear();
     _chatCanDirectMessage.clear();
+    _chatAllowUploads.clear();
   }
 
   /// Key prefix under which this forum's Discourse state lives in

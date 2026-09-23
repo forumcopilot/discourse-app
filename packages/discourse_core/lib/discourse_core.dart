@@ -69,6 +69,7 @@ export 'src/data/post/discourse_suggested_topic.dart';
 export 'src/data/moderation/discourse_reviewable.dart';
 export 'src/data/user/discourse_do_not_disturb.dart';
 export 'src/data/user/discourse_user_summary.dart';
+export 'src/data/attachment/discourse_media_optimization.dart';
 export 'src/data/attachment/discourse_upload_limits.dart';
 
 // Converter layer removed: the XF-shaped Discourse→FC converters had no

@@ -1777,6 +1777,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chatNotAvailable => '此论坛不提供聊天。';
 
   @override
+  String get chatAttachFile => '附加文件';
+
+  @override
+  String get chatRemoveUpload => '移除文件';
+
+  @override
+  String get takePhoto => '拍照';
+
+  @override
   String failedToCreateConversation(Object error) {
     return '无法发送消息：$error';
   }

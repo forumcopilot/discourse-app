@@ -156,12 +156,16 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     );
   }
 
+  /// [uploadIds] are files already uploaded from the chat composer
+  /// (`/uploads.json`, `upload_type: chat-composer`). With them the text may
+  /// be empty, as Chat::CreateMessage allows.
   @override
   Future<FCChatMessageResult> sendMessageAsync(
     int channelId,
-    String message,
-  ) async {
-    if (message.trim().isEmpty) {
+    String message, {
+    List<int> uploadIds = const [],
+  }) async {
+    if (message.trim().isEmpty && uploadIds.isEmpty) {
       return FCChatMessageResult(
         result: false,
         resultText: 'Message is empty',
@@ -172,6 +176,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       // lives outside the API namespace for legacy reasons.
       final response = await apiPost('/chat/$channelId', body: {
         'message': message,
+        if (uploadIds.isNotEmpty) 'upload_ids': uploadIds,
       });
       // Response shape: success_json.merge(message_id:) — i.e.
       // { success: "OK", message_id: 123 }
@@ -184,6 +189,10 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
           result: false,
           resultText: 'Server returned no message id',
         );
+      }
+      if (uploadIds.isNotEmpty) {
+        DiscourseChatUploads.store(siteContext.site.url, messageId,
+            DiscourseChatUploads.takeUploads(siteContext.site.url, uploadIds));
       }
       return FCChatMessageResult(
         result: true,
@@ -547,40 +556,8 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     );
   }
 
-  FCAttachment _uploadFrom(Map<String, dynamic> u) {
-    String? abs(Object? url) {
-      final s = url?.toString();
-      if (s == null || s.isEmpty) return null;
-      if (s.startsWith('http')) return s;
-      // Protocol-relative (Discourse's `url` for an original): take the
-      // forum's own scheme, as a browser would. Forcing https broke images on
-      // a forum served over http.
-      if (s.startsWith('//')) {
-        return '${Uri.parse(siteContext.site.url).scheme}:$s';
-      }
-      return '${siteContext.site.url}$s';
-    }
-
-    final url = abs(u['url']) ?? '';
-    final ext = (u['extension'] ?? '').toString().toLowerCase();
-    final isImage = u['width'] != null ||
-        const {'jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif', 'avif', 'svg'}
-            .contains(ext);
-    final thumb = (u['thumbnail'] as Map?)?['url'];
-    return FCAttachment(
-      id: (u['id'] ?? '').toString(),
-      filename: (u['original_filename'] ?? 'file${ext.isEmpty ? '' : '.$ext'}').toString(),
-      contentType: isImage ? 'image/${ext.isEmpty ? 'jpeg' : ext}' : null,
-      fileSize: (u['filesize'] as num?)?.toInt() ?? 0,
-      url: url,
-      thumbnailUrl: isImage ? (abs(thumb) ?? url) : null,
-      isImage: isImage,
-      // The attachment widgets draw a lock and refuse the tap unless these
-      // are set; a chat upload is always viewable by whoever sees the message.
-      canViewUrl: true,
-      canViewThumbnailUrl: true,
-    );
-  }
+  FCAttachment _uploadFrom(Map<String, dynamic> u) =>
+      DiscourseChatUploads.fromJson(siteContext.site.url, u);
 
   FCChatMessage _messageFromJson(Map<String, dynamic> json) {
     // The message serializer omits `reactions` entirely when there are

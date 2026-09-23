@@ -1794,6 +1794,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get chatNotAvailable => 'このフォーラムではチャットを利用できません。';
 
   @override
+  String get chatAttachFile => 'ファイルを添付する';
+
+  @override
+  String get chatRemoveUpload => 'ファイルを削除する';
+
+  @override
+  String get takePhoto => '写真を撮る';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'メッセージを送信できませんでした: $error';
   }

@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/models/results/fc_config_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
+import '../data/attachment/discourse_media_optimization.dart';
 import '../data/attachment/discourse_upload_limits.dart';
 import '../data/site/discourse_site_capabilities.dart';
 
@@ -154,6 +155,10 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       final settings = await apiGet('/site/settings.json');
       siteContext
           .setUploadLimits(DiscourseUploadLimits.fromClientSettings(settings));
+      // …and how the forum wants photos prepared before upload, which its
+      // own composer does in the browser.
+      siteContext.setMediaOptimization(
+          DiscourseMediaOptimization.fromClientSettings(settings));
       // `min_search_term_length` is `client: true`
       // (config/site_settings.yml:3465-3467, default 3, locale-dependent —
       // 1 for zh_CN/zh_TW), so the real value ships in this same payload.
@@ -184,6 +189,8 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       if (publicChannels is bool) {
         siteContext.setChatPublicChannelsEnabled(publicChannels);
       }
+      final chatUploads = settings['chat_allow_uploads'];
+      if (chatUploads is bool) siteContext.setChatAllowUploads(chatUploads);
     } catch (e) {
       // ignore: avoid_print
       print('⚠️ [DISCOURSE_CONFIG] /site/settings.json failed '

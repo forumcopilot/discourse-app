@@ -132,6 +132,42 @@ class FilePickerUtils {
     }
   }
 
+  /// Whether [takePhoto] can open a camera: image_picker has none on desktop.
+  static bool get canTakePhoto => Platform.isAndroid || Platform.isIOS;
+
+  /// Take a photo with the camera (iOS/Android). The photo is uploaded as
+  /// taken: no imageQuality, which would make image_picker re-encode it
+  /// (see pickMultiImage). Returns null if the user cancels or there is no
+  /// camera.
+  static Future<XFile?> takePhoto() async {
+    if (!canTakePhoto) return null;
+    final XFile? photo;
+    try {
+      photo = await ImagePicker().pickImage(source: ImageSource.camera);
+    } catch (e) {
+      debugPrint('❌ [FILE_PICKER] Camera failed: $e');
+      return null;
+    }
+    if (photo == null) return null;
+    // image_picker names a capture with a UUID, which a post then shows as
+    // the image's description. Name it the way a phone camera does, in a
+    // directory of its own so two photos in the same second cannot collide.
+    try {
+      final now = DateTime.now();
+      String two(int n) => n.toString().padLeft(2, '0');
+      final name = 'IMG_${now.year}${two(now.month)}${two(now.day)}_'
+          '${two(now.hour)}${two(now.minute)}${two(now.second)}'
+          '${path.extension(photo.path).toLowerCase()}';
+      final dir = Directory(path.join(File(photo.path).parent.path,
+          'camera_${now.microsecondsSinceEpoch}'));
+      await dir.create();
+      final renamed = await File(photo.path).rename(path.join(dir.path, name));
+      return XFile(renamed.path);
+    } catch (_) {
+      return photo;
+    }
+  }
+
   /// Pick multiple images - uses image_picker on mobile (iOS 14+ / Android 4.3+),
   /// file_picker on desktop platforms
   /// Returns empty list if user cancels or an error occurs

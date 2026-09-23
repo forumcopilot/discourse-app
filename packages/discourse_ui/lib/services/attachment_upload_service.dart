@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseMediaOptimizationContext;
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
 
@@ -10,6 +12,7 @@ import '../settings_context.dart';
 import '../utils/attachment_constraints_utils.dart';
 import '../utils/attachment_validation_utils.dart';
 import '../utils/file_utils.dart';
+import '../utils/image_optimize.dart';
 import '../utils/image_shrink.dart';
 import '../views/widgets/oversized_image_sheet.dart';
 
@@ -21,6 +24,7 @@ import '../views/widgets/oversized_image_sheet.dart';
 class AttachmentUploadOutcome {
   const AttachmentUploadOutcome({
     this.shortUrl,
+    this.uploadId,
     this.errorMessage,
     this.fileName,
     this.fileSize,
@@ -29,6 +33,9 @@ class AttachmentUploadOutcome {
 
   final String? shortUrl;
   final String? errorMessage;
+
+  /// The upload's id — what a chat message names its files by.
+  final int? uploadId;
 
   /// The name and size as actually uploaded — which may differ from what
   /// was picked, if the file had to be resized to fit.
@@ -59,9 +66,10 @@ class AttachmentUploadService {
   /// Validates, resizes if the user agrees, and uploads [file].
   ///
   /// [uploadType] and [targetId] are the SDK's `uploadAttachmentAsync`
-  /// coordinates ("post" plus the forum/topic id). [groupId] threads
-  /// Discourse's upload group through consecutive uploads in one
-  /// composer session; pass what the previous call returned.
+  /// coordinates ("post" plus the forum/topic id; "chat" for a chat
+  /// message's files). [groupId] threads Discourse's upload group through
+  /// consecutive uploads in one composer session; pass what the previous
+  /// call returned.
   static Future<AttachmentUploadOutcome> upload({
     required BuildContext context,
     required XFile file,
@@ -84,10 +92,18 @@ class AttachmentUploadService {
       );
     }
 
+    // A photo is first prepared the way the forum's own composer prepares
+    // it (scaled to 1920 px and recompressed, when the forum asks for that);
+    // the checks below then apply to what will actually be uploaded.
     var toUpload = file;
+    if (isImage && siteContext != null) {
+      final optimized = await optimizePhotoForForum(
+          File(file.path), siteContext.mediaOptimization);
+      if (optimized != null) toUpload = XFile(optimized.path);
+    }
     if (constraints != null) {
       final validation = await validateFile(
-        file,
+        toUpload,
         constraints,
         isImage,
         currentAttachmentCount: currentAttachmentCount,
@@ -99,7 +115,7 @@ class AttachmentUploadService {
       }
 
       if (isImage) {
-        final prepared = await _prepareImage(context, file, constraints);
+        final prepared = await _prepareImage(context, toUpload, constraints);
         if (prepared == null) {
           return const AttachmentUploadOutcome(cancelled: true);
         }
@@ -133,6 +149,7 @@ class AttachmentUploadService {
       }
       return AttachmentUploadOutcome(
         shortUrl: shortUrl,
+        uploadId: int.tryParse(result.attachmentId ?? ''),
         fileName: toUpload.name,
         fileSize: bytes.length,
       );

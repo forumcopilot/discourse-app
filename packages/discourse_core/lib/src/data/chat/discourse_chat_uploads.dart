@@ -36,6 +36,60 @@ class DiscourseChatUploads {
           if (int.tryParse(u.id) case final id?) id,
       ];
 
+  /// A chat upload from Discourse's UploadSerializer JSON — a message's
+  /// `uploads` entry, or the `/uploads.json` answer to a chat-composer upload.
+  static FCAttachment fromJson(String siteUrl, Map<String, dynamic> u) {
+    String? abs(Object? url) {
+      final s = url?.toString();
+      if (s == null || s.isEmpty) return null;
+      if (s.startsWith('http')) return s;
+      // Protocol-relative (Discourse's `url` for an original): take the
+      // forum's own scheme, as a browser would. Forcing https broke images on
+      // a forum served over http.
+      if (s.startsWith('//')) return '${Uri.parse(siteUrl).scheme}:$s';
+      return '$siteUrl$s';
+    }
+
+    final url = abs(u['url']) ?? '';
+    final ext = (u['extension'] ?? '').toString().toLowerCase();
+    final isImage = u['width'] != null ||
+        const {'jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif', 'avif', 'svg'}
+            .contains(ext);
+    final thumb = (u['thumbnail'] as Map?)?['url'];
+    return FCAttachment(
+      id: (u['id'] ?? '').toString(),
+      filename: (u['original_filename'] ?? 'file${ext.isEmpty ? '' : '.$ext'}').toString(),
+      contentType: isImage ? 'image/${ext.isEmpty ? 'jpeg' : ext}' : null,
+      fileSize: (u['filesize'] as num?)?.toInt() ?? 0,
+      url: url,
+      thumbnailUrl: isImage ? (abs(thumb) ?? url) : null,
+      isImage: isImage,
+      // The attachment widgets draw a lock and refuse the tap unless these
+      // are set; a chat upload is always viewable by whoever sees the message.
+      canViewUrl: true,
+      canViewThumbnailUrl: true,
+    );
+  }
+
+  /// Files uploaded from the chat composer, by upload id, until the message
+  /// carrying them is sent. The create call answers with only the new
+  /// message's id, so without these the sender's own copy of an image-only
+  /// message is an empty bubble until the server's copy arrives.
+  static final Map<String, FCAttachment> _awaitingMessage = {};
+
+  static void rememberUpload(String siteUrl, FCAttachment upload) {
+    _awaitingMessage[_key(siteUrl, int.tryParse(upload.id) ?? -1)] = upload;
+  }
+
+  /// The remembered uploads among [uploadIds], forgotten as they are taken.
+  static List<FCAttachment> takeUploads(String siteUrl, List<int> uploadIds) => [
+        for (final id in uploadIds)
+          if (_awaitingMessage.remove(_key(siteUrl, id)) case final u?) u,
+      ];
+
   /// Only for tests and sign-out.
-  static void clear() => _byMessage.clear();
+  static void clear() {
+    _byMessage.clear();
+    _awaitingMessage.clear();
+  }
 }

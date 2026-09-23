@@ -182,9 +182,33 @@ class _ProfileViewState extends State<ProfileView> {
         image =
             await FilePickerUtils.pickImage(imageQuality: ImageQuality.high);
       } else {
+        // Camera or library. An avatar is shown small, so unlike a post's
+        // images it is scaled and recompressed on the way.
+        final l10n = AppLocalizations.of(context)!;
+        final source = await showModalBottomSheet<ImageSource>(
+          context: context,
+          builder: (sheet) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.photo_camera_outlined),
+                  title: Text(l10n.takePhoto),
+                  onTap: () => Navigator.pop(sheet, ImageSource.camera),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_outlined),
+                  title: Text(l10n.uploadImage),
+                  onTap: () => Navigator.pop(sheet, ImageSource.gallery),
+                ),
+              ],
+            ),
+          ),
+        );
+        if (source == null) return;
         final ImagePicker picker = ImagePicker();
         image = await picker.pickImage(
-          source: ImageSource.gallery,
+          source: source,
           maxWidth: 1024,
           maxHeight: 1024,
           imageQuality: 85,

@@ -1790,6 +1790,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get chatNotAvailable => '이 포럼에서는 채팅을 사용할 수 없습니다.';
 
   @override
+  String get chatAttachFile => '파일 첨부';
+
+  @override
+  String get chatRemoveUpload => '파일 제거';
+
+  @override
+  String get takePhoto => '사진 촬영';
+
+  @override
   String failedToCreateConversation(Object error) {
     return '메시지를 보내지 못했습니다: $error';
   }

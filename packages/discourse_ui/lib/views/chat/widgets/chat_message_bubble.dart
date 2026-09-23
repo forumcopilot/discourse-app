@@ -116,20 +116,23 @@ class ChatMessageBubble extends StatelessWidget {
                       const SizedBox(height: 2),
                     ],
                     // Chat cooked content is much smaller than a topic
-                    // post (no images / attachments expected in v1), so
-                    // we pipe it through the same flutter_html renderer
-                    // for mentions + emoji + oneboxes.
-                    DefaultTextStyle(
-                      style: textTheme.bodyMedium
-                              ?.copyWith(color: textColor) ??
-                          TextStyle(color: textColor),
-                      child: RichTextContent(
-                        siteContext: siteContext,
-                        content: message.cooked.isNotEmpty
-                            ? message.cooked
-                            : message.message,
+                    // post (its files come separately, below), so we pipe
+                    // it through the same flutter_html renderer for
+                    // mentions + emoji + oneboxes. A message may be files
+                    // alone, with no text to draw.
+                    if (message.cooked.trim().isNotEmpty ||
+                        message.message.trim().isNotEmpty)
+                      DefaultTextStyle(
+                        style: textTheme.bodyMedium
+                                ?.copyWith(color: textColor) ??
+                            TextStyle(color: textColor),
+                        child: RichTextContent(
+                          siteContext: siteContext,
+                          content: message.cooked.isNotEmpty
+                              ? message.cooked
+                              : message.message,
+                        ),
                       ),
-                    ),
                     // Images and files travel in the message's `uploads`,
                     // not its cooked HTML; an upload-only message used to be
                     // an empty bubble. Same widget as a topic post's.

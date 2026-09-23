@@ -12,6 +12,7 @@ import '../base_discourse_proxy.dart';
 import '../data/attachment/discourse_upload_metadata.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../data/attachment/discourse_upload_limits.dart';
+import '../data/chat/discourse_chat_uploads.dart';
 
 /// Discourse implementation of [IFCAttachmentProxy].
 ///
@@ -51,7 +52,9 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
       _upload(
         attachmentName,
         attachmentBytes,
-        uploadType: 'composer',
+        // A chat message's files go up as `chat-composer`, as Discourse's
+        // chat composer sends them; the message then names them by id.
+        uploadType: type == 'chat' ? 'chat-composer' : 'composer',
         forPrivateMessage: type == 'pm',
       );
 
@@ -168,6 +171,10 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
       final body = data is String
           ? jsonDecode(data) as Map<String, dynamic>
           : (data as Map<String, dynamic>?) ?? const <String, dynamic>{};
+      if (uploadType == 'chat-composer') {
+        DiscourseChatUploads.rememberUpload(siteContext.site.url,
+            DiscourseChatUploads.fromJson(siteContext.site.url, body));
+      }
       // Keep the parts of the response the SDK result has nowhere to
       // put, so the Markdown builder can name the file the way web does
       // instead of writing a generic "image" / "file".

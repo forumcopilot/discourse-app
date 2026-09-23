@@ -1870,6 +1870,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'La discussion n\'est pas disponible sur ce forum.';
 
   @override
+  String get chatAttachFile => 'Joindre un fichier';
+
+  @override
+  String get chatRemoveUpload => 'Supprimer le fichier';
+
+  @override
+  String get takePhoto => 'Prendre une photo';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Impossible d\'envoyer le message : $error';
   }

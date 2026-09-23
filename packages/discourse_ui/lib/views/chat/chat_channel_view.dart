@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:discourse_core/discourse_core.dart' show DiscourseChatPermissions;
+import 'package:cross_file/cross_file.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseChatPermissions, DiscourseSiteContextExtension;
 import '../widgets/empty_state_view.dart';
 import '../../utils/error_message.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
@@ -9,6 +11,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/chat_channel_controller.dart';
+import '../../services/attachment_upload_service.dart';
 import '../../theme/design_tokens.dart';
 import 'widgets/chat_composer.dart';
 import 'widgets/chat_message_bubble.dart';
@@ -55,6 +58,11 @@ class _ChatChannelViewState extends State<ChatChannelView> {
   /// scroll when a genuinely newer message arrived.
   int _lastAutoScrolledId = 0;
 
+  /// Whether the reader is at the newest message, so the list should stay
+  /// there as the content below grows — an image or reaction laying out
+  /// after the scroll to a new message used to leave it half off screen.
+  bool _atBottom = true;
+
   /// The target message's row, for scrolling to it.
   final _targetKey = GlobalKey();
   bool _jumpedToTarget = false;
@@ -96,6 +104,7 @@ class _ChatChannelViewState extends State<ChatChannelView> {
         final index = list.indexWhere((m) => (m as FCChatMessage).id == target);
         if (index >= 0) {
           _jumpedToTarget = true;
+          _atBottom = false;
           _jumpTo(index, list.length, target);
           return;
         }
@@ -145,11 +154,16 @@ class _ChatChannelViewState extends State<ChatChannelView> {
   }
 
   void _onScroll() {
+    final position = _scroll.position;
+    // Only the reader's own scrolling moves them off (or back onto) the
+    // newest message; growth below them does not.
+    if (position.userScrollDirection != ScrollDirection.idle) {
+      _atBottom = position.pixels >= position.maxScrollExtent - 48;
+    }
     // Load older messages when the reader scrolls up to near the top. Only a
     // scroll toward the start counts: with fewer messages than fill the
     // screen the list always sits at the top, and the automatic scroll to a
     // newly arrived message asked for older ones every time.
-    final position = _scroll.position;
     if (position.pixels <= 50 &&
         position.userScrollDirection == ScrollDirection.forward &&
         !_controller.isLoadingOlder.value) {
@@ -198,72 +212,89 @@ class _ChatChannelViewState extends State<ChatChannelView> {
             }
             final currentUserId =
                 widget.siteContext.loginDataOutput?.user?.id;
-            return ListView.builder(
-              controller: _scroll,
-              padding: const EdgeInsets.symmetric(
-                  vertical: DesignTokens.spacingS),
-              itemCount: _controller.messages.length +
-                  (_controller.isLoadingOlder.value ? 1 : 0),
-              itemBuilder: (_, i) {
-                if (_controller.isLoadingOlder.value && i == 0) {
-                  return const Padding(
-                    padding: EdgeInsets.all(DesignTokens.spacingS),
-                    child: Center(
-                      child: SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    ),
-                  );
+            return NotificationListener<ScrollMetricsNotification>(
+              onNotification: (n) {
+                // Content grew under a reader at the newest message: keep
+                // them there.
+                final p = n.metrics;
+                if (_atBottom &&
+                    _scroll.hasClients &&
+                    p.pixels < p.maxScrollExtent) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (_scroll.hasClients && _atBottom) {
+                      _scroll.jumpTo(_scroll.position.maxScrollExtent);
+                    }
+                  });
                 }
-                final idx =
-                    i - (_controller.isLoadingOlder.value ? 1 : 0);
-                final m = _controller.messages[idx];
-                final isSelf =
-                    currentUserId != null &&
-                    m.authorId.toString() == currentUserId;
-                // Discourse's rules (see DiscourseChatPermissions): only in a
-                // channel the viewer may write in; edit your own; delete your
-                // own or, as a moderator, anyone's. This offered edit and
-                // delete on your own messages everywhere, and nothing else.
-                final perms = _permissions;
-                final status = _controller.channel.value?.status ?? 'open';
-                final canWrite = perms?.canWriteIn(status) ?? (status == 'open');
-                final canEdit = canWrite && isSelf;
-                final canDelete = canWrite &&
-                    (isSelf
-                        ? (perms?.canDeleteSelf ?? true)
-                        : (perms?.canDeleteOthers ?? false));
-                final loggedIn = widget.siteContext.isLoggedIn;
-                final bubble = ChatMessageBubble(
-                  message: m,
-                  siteContext: widget.siteContext,
-                  isSelf: isSelf,
-                  // Long-press opens the reaction picker for everyone
-                  // logged in; edit/delete rows only for own messages.
-                  onLongPress: loggedIn
-                      ? () => _showMessageActions(m,
-                          canEdit: canEdit, canDelete: canDelete)
-                      : null,
-                  onToggleReaction: loggedIn
-                      ? (emoji, {required bool add}) =>
-                          _controller.toggleReaction(m.id, emoji, add: add)
-                      : null,
-                );
-                final isTarget = m.id == widget.targetMessageId;
-                final highlighted = m.id == _highlightedId;
-                if (!isTarget && !highlighted) return bubble;
-                return AnimatedContainer(
-                  key: isTarget ? _targetKey : null,
-                  duration: const Duration(milliseconds: 400),
-                  color: highlighted
-                      ? theme.colorScheme.primaryContainer
-                          .withValues(alpha: 0.5)
-                      : Colors.transparent,
-                  child: bubble,
-                );
+                return false;
               },
+              child: ListView.builder(
+                controller: _scroll,
+                padding: const EdgeInsets.symmetric(
+                    vertical: DesignTokens.spacingS),
+                itemCount: _controller.messages.length +
+                    (_controller.isLoadingOlder.value ? 1 : 0),
+                itemBuilder: (_, i) {
+                  if (_controller.isLoadingOlder.value && i == 0) {
+                    return const Padding(
+                      padding: EdgeInsets.all(DesignTokens.spacingS),
+                      child: Center(
+                        child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    );
+                  }
+                  final idx =
+                      i - (_controller.isLoadingOlder.value ? 1 : 0);
+                  final m = _controller.messages[idx];
+                  final isSelf =
+                      currentUserId != null &&
+                      m.authorId.toString() == currentUserId;
+                  // Discourse's rules (see DiscourseChatPermissions): only in a
+                  // channel the viewer may write in; edit your own; delete your
+                  // own or, as a moderator, anyone's. This offered edit and
+                  // delete on your own messages everywhere, and nothing else.
+                  final perms = _permissions;
+                  final status = _controller.channel.value?.status ?? 'open';
+                  final canWrite = perms?.canWriteIn(status) ?? (status == 'open');
+                  final canEdit = canWrite && isSelf;
+                  final canDelete = canWrite &&
+                      (isSelf
+                          ? (perms?.canDeleteSelf ?? true)
+                          : (perms?.canDeleteOthers ?? false));
+                  final loggedIn = widget.siteContext.isLoggedIn;
+                  final bubble = ChatMessageBubble(
+                    message: m,
+                    siteContext: widget.siteContext,
+                    isSelf: isSelf,
+                    // Long-press opens the reaction picker for everyone
+                    // logged in; edit/delete rows only for own messages.
+                    onLongPress: loggedIn
+                        ? () => _showMessageActions(m,
+                            canEdit: canEdit, canDelete: canDelete)
+                        : null,
+                    onToggleReaction: loggedIn
+                        ? (emoji, {required bool add}) =>
+                            _controller.toggleReaction(m.id, emoji, add: add)
+                        : null,
+                  );
+                  final isTarget = m.id == widget.targetMessageId;
+                  final highlighted = m.id == _highlightedId;
+                  if (!isTarget && !highlighted) return bubble;
+                  return AnimatedContainer(
+                    key: isTarget ? _targetKey : null,
+                    duration: const Duration(milliseconds: 400),
+                    color: highlighted
+                        ? theme.colorScheme.primaryContainer
+                            .withValues(alpha: 0.5)
+                        : Colors.transparent,
+                    child: bubble,
+                  );
+                },
+              ),
             );
           }),
         ),
@@ -282,7 +313,13 @@ class _ChatChannelViewState extends State<ChatChannelView> {
           return ChatComposer(
             enabled: !readonly,
             hintText: _composerHint(ch, readonly),
-            onSend: _controller.send,
+            onSend: (text, uploadIds) =>
+                _controller.send(text, uploadIds: uploadIds),
+            onUpload: ch != null &&
+                    !readonly &&
+                    widget.siteContext.chatAllowUploads
+                ? _upload
+                : null,
           );
         }),
       ],
@@ -312,6 +349,31 @@ class _ChatChannelViewState extends State<ChatChannelView> {
     }
     // Discourse names the channel with its hash: "Chat in #general".
     return l10n.chatPlaceholderChannel('#${ch.title}');
+  }
+
+  /// Uploads a file picked in the composer as a chat upload; says why when
+  /// it could not.
+  Future<int?> _upload(XFile file, int alreadyAttached) async {
+    final outcome = await AttachmentUploadService.upload(
+      context: context,
+      file: file,
+      uploadType: 'chat',
+      targetId: '${widget.channelId}',
+      groupId: '',
+      currentAttachmentCount: alreadyAttached,
+    );
+    if (outcome.cancelled) return null;
+    final id = outcome.uploadId;
+    if (!outcome.succeeded || id == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(outcome.errorMessage ??
+              AppLocalizations.of(context)!.failedToUploadFilePleaseTryAgain),
+        ));
+      }
+      return null;
+    }
+    return id;
   }
 
   DiscourseChatPermissions? get _permissions => DiscourseChatPermissions.forChannel(

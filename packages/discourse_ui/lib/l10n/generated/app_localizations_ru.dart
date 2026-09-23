@@ -1860,6 +1860,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get chatNotAvailable => 'Чат недоступен на этом форуме.';
 
   @override
+  String get chatAttachFile => 'Прикрепить файл';
+
+  @override
+  String get chatRemoveUpload => 'Удалить файл';
+
+  @override
+  String get takePhoto => 'Сделать фото';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Не удалось отправить сообщение: $error';
   }

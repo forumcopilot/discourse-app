@@ -1862,6 +1862,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get chatNotAvailable => 'O chat não está disponível neste fórum.';
 
   @override
+  String get chatAttachFile => 'Anexar arquivo';
+
+  @override
+  String get chatRemoveUpload => 'Remover arquivo';
+
+  @override
+  String get takePhoto => 'Tirar foto';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Não foi possível enviar a mensagem: $error';
   }

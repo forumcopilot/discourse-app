@@ -100,6 +100,43 @@ void main() {
         reason: 'without upload_ids Discourse detaches the image');
   });
 
+  test('files go with the message by id, and the sender sees them at once',
+      () async {
+    // What the chat-composer upload answered (UploadSerializer).
+    DiscourseChatUploads.rememberUpload(
+      'https://forum.example',
+      DiscourseChatUploads.fromJson('https://forum.example', {
+        'id': 31,
+        'url': '/uploads/default/original/1X/cat.png',
+        'original_filename': 'cat.png',
+        'filesize': 2048,
+        'width': 640,
+        'height': 480,
+        'extension': 'png',
+      }),
+    );
+    proxy.nextPost = {'success': 'OK', 'message_id': 90};
+    final sent = await proxy.sendMessageAsync(5, '', uploadIds: [31]);
+    expect(sent.result, isTrue, reason: 'files alone are a message');
+    expect(proxy.calls.single, 'POST /chat/5');
+    expect(proxy.lastBody, {'message': '', 'upload_ids': [31]});
+    final shown = DiscourseChatUploads.forMessage('https://forum.example', 90);
+    expect(shown.single.filename, 'cat.png');
+    expect(shown.single.url,
+        'https://forum.example/uploads/default/original/1X/cat.png');
+    // Taken once: a later message does not pick the same file up again.
+    expect(DiscourseChatUploads.takeUploads('https://forum.example', [31]),
+        isEmpty);
+
+    proxy.calls.clear();
+    proxy.nextPost = {'success': 'OK', 'message_id': 91};
+    await proxy.sendMessageAsync(5, 'just words');
+    expect(proxy.lastBody, {'message': 'just words'},
+        reason: 'no upload_ids key without files');
+    final empty = await proxy.sendMessageAsync(5, '  ');
+    expect(empty.result, isFalse);
+  });
+
   test('opening on a message asks for the messages around it', () async {
     proxy.nextGet = const {'messages': []};
     await proxy.getMessagesAsync(5, targetMessageId: 70, direction: '');

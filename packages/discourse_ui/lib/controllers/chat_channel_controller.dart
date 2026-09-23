@@ -386,12 +386,16 @@ class ChatChannelController extends GetxController
 
   // ---- actions ---------------------------------------------------------
 
-  Future<bool> send(String text) async {
-    if (text.trim().isEmpty) return false;
+  /// Sends [text] with any files already uploaded from the composer
+  /// ([uploadIds]); either may be empty, not both.
+  Future<bool> send(String text, {List<int> uploadIds = const []}) async {
+    if (text.trim().isEmpty && uploadIds.isEmpty) return false;
     isSending.value = true;
     try {
-      final result =
-          await SiteProxyService.getChatProxy().sendMessageAsync(channelId, text);
+      final proxy = SiteProxyService.getChatProxy();
+      final result = proxy is DiscourseChatProxy
+          ? await proxy.sendMessageAsync(channelId, text, uploadIds: uploadIds)
+          : await proxy.sendMessageAsync(channelId, text);
       if (!result.result || result.message == null) {
         lastError.value = result.resultText?.isNotEmpty == true
             ? result.resultText!

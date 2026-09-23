@@ -2073,6 +2073,18 @@
   "@chatNotAvailable": {
     "description": "UI text (Discourse chat): Chat is not available on this forum."
   },
+  "chatAttachFile": "Attach a file",
+  "@chatAttachFile": {
+    "description": "Chat composer button that attaches images or files (Discourse chat.upload)."
+  },
+  "chatRemoveUpload": "Remove file",
+  "@chatRemoveUpload": {
+    "description": "Removes a picked file from the chat composer before sending (Discourse chat.remove_upload)."
+  },  "takePhoto": "Take photo",
+  "@takePhoto": {
+    "description": "Opens the camera to take a photo to attach."
+  },
+
   "failedToCreateConversation": "Failed to send message: {error}",
   "@failedToCreateConversation": {
     "description": "UI text: Failed to send message: {error}",

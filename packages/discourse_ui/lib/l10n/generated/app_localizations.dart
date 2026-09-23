@@ -3254,6 +3254,24 @@ abstract class AppLocalizations {
   /// **'Chat is not available on this forum.'**
   String get chatNotAvailable;
 
+  /// Chat composer button that attaches images or files (Discourse chat.upload).
+  ///
+  /// In en, this message translates to:
+  /// **'Attach a file'**
+  String get chatAttachFile;
+
+  /// Removes a picked file from the chat composer before sending (Discourse chat.remove_upload).
+  ///
+  /// In en, this message translates to:
+  /// **'Remove file'**
+  String get chatRemoveUpload;
+
+  /// Opens the camera to take a photo to attach.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get takePhoto;
+
   /// UI text: Failed to send message: {error}
   ///
   /// In en, this message translates to:
