@@ -59,6 +59,14 @@ class PostController extends DiscourseGlobalLoaderController with ErrorHandlingM
     return minPn - 1;
   }
 
+  /// The proxies report a failed load as `result: false` with the reason in
+  /// `resultText` and no posts. Applied as data, that rendered as an empty
+  /// topic — "1 / 0" and "End of the discussion" for a PM the reader could
+  /// not open — so a failure is raised here and the list shows it as one.
+  static void _throwIfFailed(bool result, String? resultText) {
+    if (!result) throw ThreadLoadException(resultText ?? '');
+  }
+
   /// 1-based post number of the last loaded post (used for [ThreadViewData.position]).
   static int _lastPostNumber(List<FCPost> posts, int startNum0Based) {
     if (posts.isEmpty) return startNum0Based;
@@ -74,6 +82,7 @@ class PostController extends DiscourseGlobalLoaderController with ErrorHandlingM
 
       var postProxy = SiteProxyService.getPostProxy();
       var threadsResult = await postProxy.getThreadAsync(topicId, startNum, lastNum, returnHtml);
+      _throwIfFailed(threadsResult.result, threadsResult.resultText);
 
       // The proxy now returns FCPost objects directly, no conversion needed
       final fcPosts = threadsResult.posts;
@@ -126,6 +135,7 @@ class PostController extends DiscourseGlobalLoaderController with ErrorHandlingM
     try {
       var postProxy = SiteProxyService.getPostProxy();
       var threadsResult = await postProxy.getThreadByUnreadAsync(topicId, postsPerRequest, returnHtml);
+      _throwIfFailed(threadsResult.result, threadsResult.resultText);
       AppLogger.debug('getThreadByUnreadAsync result: ${threadsResult.toString()}');
 
       // Set post_level for each post
@@ -166,6 +176,7 @@ class PostController extends DiscourseGlobalLoaderController with ErrorHandlingM
       AppLogger.debug('🔍 [PostController] getThreadByPostAsync called: postId=$postId, postsPerRequest=$postsPerRequest');
       var postProxy = SiteProxyService.getPostProxy();
       var threadsResult = await postProxy.getThreadByPostAsync(postId, postsPerRequest, returnHtml);
+      _throwIfFailed(threadsResult.result, threadsResult.resultText);
       AppLogger.debug('🔍 [PostController] getThreadByPostAsync result: ${threadsResult.toString()}');
 
       // Set post_level for each post
@@ -267,4 +278,16 @@ class PostController extends DiscourseGlobalLoaderController with ErrorHandlingM
 
     super.onClose();
   }
+}
+
+/// A topic load the forum refused or that failed outright, carrying the
+/// proxy's reason (already worded for a reader, e.g. Discourse's "You are not
+/// permitted to view the requested resource.").
+class ThreadLoadException implements Exception {
+  const ThreadLoadException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
 }

@@ -24,6 +24,8 @@ import 'package:discourse_ui/services/site_proxy_service.dart';
 import '../../theme/design_tokens.dart';
 import '../../theme/style_builders.dart';
 import '../../utils/error_dialog.dart';
+import '../../utils/error_message.dart';
+import '../widgets/empty_state_view.dart';
 
 class PostsList extends StatefulWidget {
   const PostsList({
@@ -128,6 +130,14 @@ class _PostsState extends State<PostsList> {
 
   // Add scroll loading control flag
   bool _isScrollLoadingEnabled = false;
+
+  /// Why the initial load failed, shown in place of the list. Cleared when a
+  /// load starts. Before this, a refused load (a PM opened while signed out)
+  /// rendered as an empty topic with "End of the discussion" and "1 / 0".
+  Object? _initialLoadError;
+
+  /// Repeats the initial load that failed, with the same arguments.
+  VoidCallback? _retryInitialLoad;
 
   // Track paging direction to render shimmer in correct place
   _PagingDirection _pagingDirection = _PagingDirection.none;
@@ -259,6 +269,9 @@ class _PostsState extends State<PostsList> {
 
     // Clear the controller's data first to prevent showing old posts during loading
     _postsController.threadDataOutput.value = null;
+    if (_initialLoadError != null) {
+      setState(() => _initialLoadError = null);
+    }
 
     // Disable scroll loading during initial load
     _isScrollLoadingEnabled = false;
@@ -498,9 +511,30 @@ class _PostsState extends State<PostsList> {
 
       // This method is typically called fire-and-forget (initState, jump
       // dialogs), so don't rethrow — surface the error to the user instead.
+      // The list was cleared when the load started, so the error takes its
+      // place rather than a snackbar over an empty topic.
       AppLogger.error('PostsList: initial load failed: $e');
-      _showErrorSnackBar(e);
+      if (mounted) {
+        setState(() {
+          _initialLoadError = e;
+          _retryInitialLoad =
+              () => _loadInitialPosts(startNum, lastNum, mode, gotoPost: gotoPost);
+        });
+      }
     }
+  }
+
+  Widget _buildInitialLoadError(BuildContext context) {
+    return EmptyStateView.error(
+      message: describeError(_initialLoadError),
+      // Most refusals a signed-out reader meets are content that needs an
+      // account — a PM from a notification, a restricted category.
+      hint: widget.siteContext.isLoggedIn
+          ? null
+          : AppLocalizations.of(context)?.pleaseLoginToAccessContent,
+      onRetry: _retryInitialLoad,
+      scrollable: true,
+    );
   }
 
   /// Shows the list's floating error snackbar (initial load and paging
@@ -1462,6 +1496,9 @@ class _PostsState extends State<PostsList> {
   Widget build(BuildContext context) {
     return Obx(() {
       final data = _postsController.threadDataOutput.value;
+      if (data == null && _initialLoadError != null) {
+        return _buildInitialLoadError(context);
+      }
       if (_postsController.isInitialized.value && data != null) {
         var postsList = data.posts;
         if (postsList.isEmpty && data.totalPosts > 0) {
