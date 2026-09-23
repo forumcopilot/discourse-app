@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
+
 import 'package:forumcopilot_sdk/network/fc_web_call.dart';
 import 'package:forumcopilot_sdk/network/fc_web_call_info.dart';
 
@@ -182,6 +184,17 @@ class NotificationKeyService {
     );
   }
 
+  /// Sent instead of the SDK's default browser user agent, which on Android
+  /// claims to be Chrome 131. Our backend is an API, not a page, and a
+  /// Cloudflare custom rule on betterdiscourse.app challenges outdated
+  /// Chrome versions — so every Android upload met a managed challenge, the
+  /// interceptor replayed the POST in a WebView without its body, and the
+  /// backend answered 400 (verified on a Pixel 4a, 2026-09-22). iOS claimed
+  /// Safari and passed, which is why only Android failed.
+  @visibleForTesting
+  static String get userAgent =>
+      'DiscourseApp-Notifications/1 (${Platform.operatingSystem})';
+
   static Future<bool> _send(
     String method,
     String path,
@@ -202,7 +215,7 @@ class NotificationKeyService {
         method,
         jsonEncode(body),
         'application/json',
-        FCWebCallInfo(),
+        FCWebCallInfo()..extraHeaders['User-Agent'] = userAgent,
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
