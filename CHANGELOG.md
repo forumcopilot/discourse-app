@@ -6,6 +6,29 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.16] - 2026-09-23
+
+Private messages, reviewed end to end against Discourse and tested on an iPhone 17 and a Pixel 4a against meta.discourse.org.
+
+### Added
+- **Archive and Move to Inbox.** Discourse files messages by archiving them — there is no user-level delete — and the app had the calls but no way to reach them. The message menu now offers Archive (or Move to Inbox for an archived message), and the Messages tab has an **Inbox | Archive** switch backed by `/topics/private-messages-archive/{username}`.
+- **Groups on a message.** A message's groups are listed first in the participants sheet and counted in the header, as Discourse web shows them, and a group picked in the invite search is invited as a group (`POST /t/{id}/invite-group`) — it used to go to the user invite and fail.
+
+### Fixed
+- **A private message can be replied to.** Reply and Quote refused unless the topic had a category, answering "Please wait for the topic to load"; a Discourse PM never has one. Whether you may reply now comes from Discourse's own `details.can_create_post`.
+- **Images attached to a PM reach the message.** New message, reply and edit posted the text alone, so an uploaded image never appeared.
+- **Tapping an image in a message opens it full screen**, as it already did in topics.
+- **Participants include the author and everyone who posted.** Discourse leaves out of `allowed_users` anyone covered by one of the message's groups, which removed `system` from system messages ("1 participant").
+- **Mark unread works** (`DELETE /t/{id}/timings?last=1`, as Discourse web does); it reported success without a request. **Opening a message marks it read** (`POST /topics/timings`); it never did.
+- **Leave is offered only when Discourse allows it** (`can_remove_self_id`) and a refusal is shown; **Close/Open only to those who may** (`can_close_topic`); **Edit title no longer fails** for regular users by also sending the open state.
+- Discourse's system entries in a message ("left", "invited") no longer render as empty bubbles; the fake green "online" dot and an unreachable "Report conversation" entry are gone.
+- The message list no longer shows its first page twice (Discourse pages hold 30, the list asked in 20s), and the Archive list no longer spins forever (two list widgets shared one VisibilityDetector key).
+- **Notifications on Android.** The grant upload was challenged by a Cloudflare rule on the notifications backend that targets outdated Chrome user agents — the SDK's Android agent claims Chrome 131 — and the challenge replay lost the request body. `NotificationKeyService` now sends its own `DiscourseApp-Notifications/1` user agent.
+
+### Changed
+- **Private messages speak Discourse, not XenForo.** "Conversation" is gone from the PM screens in all eleven languages, which now follow Discourse's own noun and, wherever one exists, Discourse's official translation (`config/locales/client.*.yml`). The Leave confirmation now says what leaving does — "You will no longer be able to see or reply to it" — instead of claiming it only hides the message. The participant count is a proper plural in every locale.
+- `DiscourseMessageDetails` (discourse_core) carries per-message facts the shared SDK cannot: whether the viewer may leave, whether it is archived, and its groups. `DiscoursePrivateConversationProxy` gains `getArchivedConversationsAsync` and `inviteGroupAsync`.
+
 ## [1.0.15] - 2026-09-22
 
 ### Fixed
