@@ -6,6 +6,15 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+Thread rendering, batch 2: forums that turned the app away now open.
+
+### Fixed
+- **The app sends the phone's real WebView User-Agent** instead of a hard-coded "Chrome/131" string. That string, chosen years ago to pass Cloudflare, had become the reason forums refused the app: community.home-assistant.io answered it with a Cloudflare 403 and forum.codefloe.com with "Browser Update Required", while both accept the phone's actual WebView User-Agent. The value is read once from the system WebView (`WebViewUserAgent`, in the shared SDK), cached across launches so start-up does not wait for the WebView, and refreshed in the background for the next launch; the in-app Cloudflare challenge uses the same string, so its clearance cookie stays valid. Platforms without a system WebView fall back to a current browser string. Also applies to the ForumCopilot app, which shares the SDK.
+- **A rate limit on one forum no longer pauses the others.** The 429 cooldown was one app-wide value; in a multi-forum app, forum A's cooldown stalled every request to forum B. It is now kept per forum.
+
+### Changed
+- The vendored `forumcopilot_sdk` is synced with the canonical copy again, which also brings its fix that stops a legacy login field from persisting a password copy in local storage.
+
 ## [1.0.20] - 2026-09-23
 
 Thread rendering, batch 1 of the audit that opened the first 50 topics of all 924 ABDA directory forums on a Pixel 4a and compared posts with the web (292k posts rendered). Every fix below is covered by `test/post_body_rendering_test.dart` and was checked before/after on the Pixel in light and dark themes.

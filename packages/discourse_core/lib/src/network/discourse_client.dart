@@ -172,7 +172,7 @@ class DiscourseClient {
     required String? encodedBody,
     required Map<String, dynamic>? effectiveQuery,
   }) async {
-    await _awaitRateLimitClearance();
+    await _awaitRateLimitClearance(url);
 
     if (kDebugMode) {
       _requestCount++;
@@ -269,37 +269,40 @@ class DiscourseClient {
     _inFlight.clear();
   }
 
-  /// When the server last told us to back off, and until when.
+  /// When each forum last told us to back off, and until when, keyed by the
+  /// forum's origin (scheme, host, port).
   ///
-  /// Shared across every request because Discourse's limiter is per User API
-  /// Key and the app has exactly one — so "this request was rate limited"
-  /// really means "the app is rate limited".
-  static DateTime? _rateLimitedUntil;
+  /// Per forum, because Discourse's limiters are per IP and per User API Key
+  /// on that server: a request rate limited by one forum says nothing about
+  /// another. It used to be one app-wide value, which was right for a
+  /// single-forum app but in a multi-forum host (ABDA) let a cooldown on
+  /// forum A stall every request to forum B.
+  static final Map<String, DateTime> _rateLimitedUntil = {};
+
+  static String _originOf(Uri url) => '${url.scheme}://${url.authority}';
 
   /// Blocks until any server-imposed cooldown has elapsed.
   ///
   /// Capped by [_maxAutoRetryDelay] so a hostile or nonsensical `Retry-After`
   /// cannot wedge the app; past that the request goes out and is allowed to
   /// fail honestly.
-  static Future<void> _awaitRateLimitClearance() async {
-    final until = _rateLimitedUntil;
+  static Future<void> _awaitRateLimitClearance(Uri url) async {
+    final origin = _originOf(url);
+    final until = _rateLimitedUntil[origin];
     if (until == null) return;
 
     final remaining = until.difference(DateTime.now());
-    if (remaining <= Duration.zero) {
-      _rateLimitedUntil = null;
-      return;
-    }
-    if (remaining > _maxAutoRetryDelay) {
-      _rateLimitedUntil = null;
+    if (remaining <= Duration.zero || remaining > _maxAutoRetryDelay) {
+      _rateLimitedUntil.remove(origin);
       return;
     }
 
     if (kDebugMode) {
-      debugPrint('🌐 [HTTP holding ${remaining.inSeconds}s] rate limited');
+      debugPrint('🌐 [HTTP holding ${remaining.inSeconds}s] $origin rate limited');
     }
     await Future<void>.delayed(remaining);
-    _rateLimitedUntil = null;
+    // A newer 429 may have extended the hold while we waited.
+    if (_rateLimitedUntil[origin] == until) _rateLimitedUntil.remove(origin);
   }
 
   Future<FCCallResult> _send(
@@ -341,10 +344,10 @@ class DiscourseClient {
 
       if (result.statusCode != 429) return result;
 
-      // Hold every request, but ONLY for a limit that actually governs every
-      // request. A global limit (per IP, or per User API Key — the app shares
-      // one key) means the next caller would spend budget it does not have,
-      // so make it wait. An action-scoped limit governs one post's like
+      // Hold every request to this forum, but ONLY for a limit that actually
+      // governs every request. A global limit (per IP, or per User API Key —
+      // one key per forum) means the next caller would spend budget it does
+      // not have, so make it wait. An action-scoped limit governs one post's like
       // button and nothing else; freezing reads and navigation over it would
       // be a self-inflicted outage. See [_isGlobalRateLimit].
       final wait = _retryAfter(result);
@@ -354,9 +357,11 @@ class DiscourseClient {
             '$method ${url.path} wait=${wait?.inSeconds ?? '?'}s');
       }
       if (wait != null && isGlobal) {
+        final origin = _originOf(url);
         final until = DateTime.now().add(wait);
-        if (_rateLimitedUntil == null || until.isAfter(_rateLimitedUntil!)) {
-          _rateLimitedUntil = until;
+        final current = _rateLimitedUntil[origin];
+        if (current == null || until.isAfter(current)) {
+          _rateLimitedUntil[origin] = until;
         }
       }
 
