@@ -18,12 +18,34 @@ import '../data/site/discourse_site_capabilities.dart';
 class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy {
   DiscourseConfigProxy(SiteContext context) : super(context);
 
+  /// Throws [DiscourseApiException] with status 0 when the forum does not
+  /// answer at all. Every other failure is soft.
   @override
   Future<FCConfigResult> getConfig(String url, {bool forceRefresh = false}) async {
+    // Four independent reads, so they go out together: entering a forum
+    // waits for the slowest of them, not for their sum. Future.wait rather
+    // than a record's `.wait`, which would wrap the one error that can
+    // escape (from _readAbout) in a ParallelWaitError.
+    final about = _readAbout();
+    final settings = _readClientSettings();
+    await Future.wait<void>(
+        [about, _probeChat(), _readSiteCapabilities(), settings]);
+    final (version, isOpen) = await about;
+    final minSearchLength = await settings;
+    return _buildResult(
+      url,
+      version: version,
+      isOpen: isOpen,
+      minSearchLength: minSearchLength,
+    );
+  }
+
+  /// The forum's version, and whether it accepts writes.
+  Future<(String, bool)> _readAbout() async {
     String version = 'discourse';
     bool isOpen = true;
     try {
-      final about = await apiGet('/about.json');
+      final (about, headers) = await apiGetWithHeaders('/about.json');
       final aboutInner = (about['about'] as Map<String, dynamic>?) ?? const {};
       final v = aboutInner['version'] as String?;
       if (v != null && v.isNotEmpty) version = v;
@@ -31,15 +53,24 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       // Discourse signals it with a `Discourse-Readonly: true` response
       // header on every request (lib/read_only_mixin.rb). Check the
       // response we just received.
-      final headers =
-          siteContext.lastCallResponse?.headers ?? const <String, String>{};
       isOpen = !headers.entries.any((h) =>
           h.key.toLowerCase() == 'discourse-readonly' &&
           h.value.toLowerCase() == 'true');
+    } on DiscourseApiException catch (e) {
+      // No response at all: offline, DNS failure, connection refused. The
+      // forum is unreachable, and carrying on would open an empty home as
+      // if it had no topics. Any answer, even an error, means it is up.
+      if (e.statusCode == 0) rethrow;
+      // ignore: avoid_print
+      print('⚠️ [DISCOURSE_CONFIG] /about.json failed (continuing): $e');
     } catch (e) {
       // ignore: avoid_print
       print('⚠️ [DISCOURSE_CONFIG] /about.json failed (continuing): $e');
     }
+    return (version, isOpen);
+  }
+
+  Future<void> _probeChat() async {
     // Phase 5.18a — probe the chat plugin via its `/chat/api/me/channels`
     // route. Discourse's `/site.json` doesn't expose `enabled_plugins`
     // for anonymous viewers, so a route-probe is the most portable
@@ -85,6 +116,9 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
         // lifetime of the process.
       }
     }
+  }
+
+  Future<void> _readSiteCapabilities() async {
     // Site capabilities (`/site.json`). Resolved once per forum for the
     // same reason as the chat probe above: these describe the forum, not
     // the session, so re-asking on every getConfig would spend rate-limit
@@ -101,6 +135,10 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
             '(optional capabilities unavailable): $e');
       }
     }
+  }
+
+  /// Reads the forum's client settings; returns its minimum search length.
+  Future<int?> _readClientSettings() async {
     // Upload limits — Discourse publishes every `client: true` site setting
     // at `/site/settings.json` (SiteController#settings →
     // SiteSetting.client_settings_json). That's where the upload caps live:
@@ -145,12 +183,7 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       print('⚠️ [DISCOURSE_CONFIG] /site/settings.json failed '
           '(upload limits unavailable, uploads fail open): $e');
     }
-    return _buildResult(
-      url,
-      version: version,
-      isOpen: isOpen,
-      minSearchLength: minSearchLength,
-    );
+    return minSearchLength;
   }
 
   FCConfigResult _buildResult(

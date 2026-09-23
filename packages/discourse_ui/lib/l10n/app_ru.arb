@@ -669,6 +669,7 @@
   "reset": "Сбросить",
   "resizeAndUpload": "Уменьшить и загрузить",
   "retryConnection": "Повторить подключение",
+  "checkConnectionAndRetry": "Проверьте подключение к интернету и повторите попытку.",
   "reviewQueue": "Очередь на проверку",
   "revoke": "Отозвать",
   "revokeInviteQuestion": "Отозвать приглашение?",

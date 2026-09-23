@@ -33,6 +33,20 @@ abstract class BaseDiscourseProxy {
     return _decode(result, method: 'GET', path: path);
   }
 
+  /// [apiGet], plus the headers of this response.
+  ///
+  /// For a caller that reads a header while other requests are in flight:
+  /// [SiteContext.lastCallResponse] is shared by every request on the
+  /// context, so by the time the caller resumes it may name a different
+  /// response.
+  Future<(Map<String, dynamic>, Map<String, String>)> apiGetWithHeaders(
+    String path, {
+    Map<String, dynamic>? query,
+  }) async {
+    final result = await _client.get(siteContext, path, query: query);
+    return (_decode(result, method: 'GET', path: path), result.headers);
+  }
+
   Future<Map<String, dynamic>> apiPost(
     String path, {
     Map<String, dynamic>? query,

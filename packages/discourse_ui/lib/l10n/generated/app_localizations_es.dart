@@ -1337,6 +1337,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get retryConnection => 'Reintentar conexión';
 
   @override
+  String get checkConnectionAndRetry =>
+      'Comprueba tu conexión a internet e inténtalo de nuevo.';
+
+  @override
   String get reviewQueue => 'Cola de revisión';
 
   @override

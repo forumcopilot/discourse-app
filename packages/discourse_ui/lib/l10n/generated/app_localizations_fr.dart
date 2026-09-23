@@ -1341,6 +1341,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get retryConnection => 'Réessayer la connexion';
 
   @override
+  String get checkConnectionAndRetry =>
+      'Vérifiez votre connexion Internet et réessayez.';
+
+  @override
   String get reviewQueue => 'File de modération';
 
   @override

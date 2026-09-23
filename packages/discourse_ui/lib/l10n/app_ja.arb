@@ -669,6 +669,7 @@
   "reset": "リセット",
   "resizeAndUpload": "縮小してアップロード",
   "retryConnection": "再接続",
+  "checkConnectionAndRetry": "インターネット接続を確認して、もう一度お試しください。",
   "reviewQueue": "レビューキュー",
   "revoke": "取り消す",
   "revokeInviteQuestion": "招待を取り消しますか？",

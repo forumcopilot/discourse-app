@@ -19,34 +19,35 @@ class SiteInitializationResult {
   final bool success;
   final String? errorMessage;
 
+  /// The forum did not answer — no response at all, or none in time — as
+  /// opposed to answering in a way initialization could not use.
+  final bool unreachable;
+
   SiteInitializationResult({
     this.siteContext,
     required this.success,
     this.errorMessage,
+    this.unreachable = false,
   });
 }
 
-/// Callback for progress updates during initialization
-typedef ProgressCallback = void Function(String message);
+/// The forum did not answer.
+class _ForumUnreachable implements Exception {
+  const _ForumUnreachable(this.reason);
 
-/// Function to localize message keys
-typedef LocalizeFunction = String Function(String key, [String? fallback]);
+  final String reason;
 
-/// Centralized service for site initialization with progress tracking
+  @override
+  String toString() => 'Failed to connect to forum: $reason';
+}
+
+/// Centralized service for site initialization
 class SiteInitializationService {
-  /// Initialize a site with progress callbacks
+  /// Initialize a site
   /// Returns SiteInitializationResult with success status and context or error
-  static Future<SiteInitializationResult> initializeSite(
-    Site site, {
-    required ProgressCallback onProgress,
-    LocalizeFunction? localize,
-  }) async {
+  static Future<SiteInitializationResult> initializeSite(Site site) async {
     try {
       AppLogger.info('SiteInitializationService: Starting initialization for ${site.name}');
-
-      // Get domain name for progress message
-      final domainName = Uri.tryParse(site.url)?.host ?? site.url;
-      onProgress('Connecting to $domainName...');
 
       // Get DiscourseSiteController
       if (!Get.isRegistered<DiscourseSiteController>()) {
@@ -88,10 +89,14 @@ class SiteInitializationService {
         AppLogger.info('Forum configuration retrieved successfully');
       } on TimeoutException {
         AppLogger.error('getConfig timed out after 10 seconds');
-        throw Exception('Failed to connect to forum: Connection timed out. Please check your internet connection and try again.');
+        throw const _ForumUnreachable('Connection timed out.');
       } catch (e) {
         AppLogger.error('Failed to get forum configuration: $e');
-        throw Exception('Failed to connect to forum: Unable to retrieve configuration. Please check if the forum plugin is installed and the server is running.');
+        // Discourse's getConfig throws only when the forum sent no response.
+        if (e is DiscourseApiException && e.statusCode == 0) {
+          throw const _ForumUnreachable('No response from the forum.');
+        }
+        throw Exception('Failed to connect to forum: Unable to retrieve configuration.');
       }
 
       // CRITICAL: Verify configData was successfully retrieved
@@ -162,7 +167,6 @@ class SiteInitializationService {
 
       if (hasCredentials) {
         AppLogger.info('🔍 [INIT_SERVICE] Attempting automatic login...');
-        onProgress(localize?.call('loggingIn', 'Logging in...') ?? 'Logging in...');
 
         if (!Get.isRegistered<DiscourseLoginController>()) {
           Get.put(DiscourseLoginController());
@@ -210,9 +214,13 @@ class SiteInitializationService {
             // Attach this device to any notifications grant stored for this
             // forum. Done here because it is the first point where a signed-in
             // context and (usually) an FCM token both exist — the grant itself
-            // is often made while FCM is still initializing.
-            await DiscourseLoginService(siteContext)
-                .syncNotificationDeviceToken();
+            // is often made while FCM is still initializing. Not awaited: an
+            // FCM token read plus a push-backend call, and nothing on screen
+            // depends on either.
+            unawaited(DiscourseLoginService(siteContext)
+                .syncNotificationDeviceToken()
+                .catchError((Object e) => AppLogger.warning(
+                    'SiteInitializationService: Could not sync device token: $e')));
           }
         } catch (e) {
           AppLogger.warning(
@@ -220,10 +228,11 @@ class SiteInitializationService {
         }
       }
 
-      // Record this visit in the history
-      AppLogger.debug('Recording visit for site: ${site.name}');
-      await SiteVisitTracker.instance.recordVisit(site);
-      AppLogger.debug('Visit recorded successfully');
+      // Record this visit in the history. Bookkeeping, so the forum opens
+      // without waiting for it.
+      unawaited(SiteVisitTracker.instance.recordVisit(site).catchError(
+          (Object e) => AppLogger.warning(
+              'SiteInitializationService: Could not record visit: $e')));
 
       AppLogger.info('SiteInitializationService: Site initialization completed successfully for ${site.name}');
 
@@ -236,6 +245,7 @@ class SiteInitializationService {
       return SiteInitializationResult(
         success: false,
         errorMessage: e.toString(),
+        unreachable: e is _ForumUnreachable,
       );
     }
   }

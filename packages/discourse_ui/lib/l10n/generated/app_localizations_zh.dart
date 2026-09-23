@@ -1284,6 +1284,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get retryConnection => '重试连接';
 
   @override
+  String get checkConnectionAndRetry => '请检查网络连接，然后重试。';
+
+  @override
   String get reviewQueue => '审核队列';
 
   @override

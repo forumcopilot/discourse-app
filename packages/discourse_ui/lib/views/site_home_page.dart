@@ -42,11 +42,18 @@ class SiteHomePage extends StatefulWidget {
   /// arrives — and ignored on a forum that does not have it.
   final SiteHomeTab? initialTab;
 
+  /// True when the caller has just initialized the site, as
+  /// [SingleForumBootstrapPage] does. The page then opens on the site
+  /// controller's context straight away, instead of fetching the forum's
+  /// config a second time behind an empty scaffold.
+  final bool siteVerified;
+
   const SiteHomePage({
     super.key,
     this.siteToInitialize,
     this.showGlobalLoader = true,
     this.initialTab,
+    this.siteVerified = false,
   });
 
   // Static flag to trigger autoShowLogin in ProfileTab after registration
@@ -236,7 +243,17 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
         final currentContext = siteController.currentSiteContext.value;
         final currentSite = siteController.currentSite.value;
 
-        if (currentContext != null && currentSite != null) {
+        if (currentContext != null && currentSite != null && widget.siteVerified) {
+          SiteProxyService.initialize(currentContext);
+          _siteContext = currentContext;
+          _setupLoginStateListener();
+          _loadBoardStats();
+          if (currentContext.isLoggedIn) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) _fetchInboxStat();
+            });
+          }
+        } else if (currentContext != null && currentSite != null) {
           // Show loading state while verifying
           setState(() {
             _waitingForInitialization = true;

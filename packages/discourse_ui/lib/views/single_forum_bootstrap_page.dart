@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/domain/site.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/config/app_forum_config.dart';
@@ -7,12 +9,21 @@ import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/controllers/site_controller.dart';
 import 'package:discourse_ui/controllers/topic_controller.dart';
 import 'package:discourse_ui/services/user_state_service.dart';
+import 'package:discourse_ui/theme/design_tokens.dart';
+import 'package:discourse_ui/views/appbars/topics_tab_app_bar.dart';
 import 'package:discourse_ui/views/site_home_page.dart';
 import 'package:discourse_ui/services/site_initialization_service.dart';
-import 'package:discourse_ui/views/widgets/progress_dialog.dart';
+import 'package:discourse_ui/views/widgets/forum_header_widget.dart';
+import 'package:discourse_ui/views/widgets/topic_list_skeleton.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../l10n/generated/app_localizations.dart';
 
+/// Opens a forum.
+///
+/// While the forum initializes, this draws what its home will look like —
+/// header, topic filters, topic list — as placeholders, and then swaps the
+/// real [SiteHomePage] in on the same route. Opening a forum reads as one
+/// screen filling in, rather than a loading screen followed by another.
 class SingleForumBootstrapPage extends StatefulWidget {
   /// Site to connect to. When null (the standalone single-forum app),
   /// the compile-time [AppForumConfig] binding is used. Host apps that
@@ -27,8 +38,14 @@ class SingleForumBootstrapPage extends StatefulWidget {
 }
 
 class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
+  late final Site _site = widget.site ?? AppForumConfig.buildSite();
+  late final SiteContext _placeholderContext =
+      SiteContext(siteType: _site.siteType, site: _site);
+
   bool _isInitializing = false;
+  bool _ready = false;
   String? _errorMessage;
+  bool _unreachable = false;
 
   @override
   void initState() {
@@ -79,39 +96,20 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
       _errorMessage = null;
     });
 
-    final site = widget.site ?? AppForumConfig.buildSite();
-    final domain = Uri.tryParse(site.url)?.host ?? site.url;
-    final progress = ProgressDialog.showWithUpdater(
-      context,
-      'Connecting to $domain...',
-    );
-
     try {
-      final result = await SiteInitializationService.initializeSite(
-        site,
-        onProgress: (message) {
-          progress.messageNotifier.value = message;
-        },
-      );
-
-      await progress.close();
-
+      final result = await SiteInitializationService.initializeSite(_site);
       if (!mounted) return;
 
       if (result.success && result.siteContext != null) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => const SiteHomePage(siteToInitialize: null),
-          ),
-        );
+        setState(() => _ready = true);
         return;
       }
 
       setState(() {
         _errorMessage = result.errorMessage ?? 'Failed to connect to forum.';
+        _unreachable = result.unreachable;
       });
     } catch (error, stackTrace) {
-      await progress.close();
       if (!mounted) return;
 
       AppLogger.error(
@@ -121,6 +119,7 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
       );
       setState(() {
         _errorMessage = error.toString();
+        _unreachable = false;
       });
     } finally {
       if (mounted) {
@@ -133,75 +132,200 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final configuredSite = widget.site ?? AppForumConfig.buildSite();
-    final configuredDomain =
-        Uri.tryParse(configuredSite.url)?.host ?? configuredSite.url;
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      // The home fades in over the placeholder, which stays opaque beneath
+      // it. Fading both would let the route underneath show through halfway.
+      transitionBuilder: (child, animation) => child is SiteHomePage
+          ? FadeTransition(opacity: animation, child: child)
+          : child,
+      child: _ready
+          ? const SiteHomePage(siteVerified: true)
+          : _ForumEntryPlaceholder(
+              site: _site,
+              siteContext: _placeholderContext,
+              errorMessage: _isInitializing ? null : _errorMessage,
+              unreachable: _unreachable,
+              onRetry: _initializeForum,
+            ),
+    );
+  }
+}
 
+/// [SiteHomePage]'s first frame, before the forum has answered: the same app
+/// bar and header, the filter bar and topic list as placeholders — or, when
+/// the forum could not be reached, why, with a way to try again.
+class _ForumEntryPlaceholder extends StatelessWidget {
+  const _ForumEntryPlaceholder({
+    required this.site,
+    required this.siteContext,
+    required this.errorMessage,
+    required this.unreachable,
+    required this.onRetry,
+  });
+
+  final Site site;
+  final SiteContext siteContext;
+  final String? errorMessage;
+  final bool unreachable;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final error = errorMessage;
+    // The home's leading slot holds its drawer button. A pushed route keeps
+    // its back button meanwhile, so a slow forum can still be left; a root
+    // route reserves the slot, so the title does not jump when the home
+    // takes over.
+    final canPop = ModalRoute.of(context)?.canPop ?? false;
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 520),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.forum_outlined,
-                    size: 56,
-                    color: colorScheme.primary,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    configuredSite.name,
-                    style: textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurface,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    configuredDomain,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 28),
-                  if (_isInitializing) ...[
-                    const CircularProgressIndicator(),
-                    const SizedBox(height: 16),
-                    Text(
-                      AppLocalizations.of(context)!.initializingForum,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ] else ...[
-                    if (_errorMessage != null) ...[
-                      Text(
-                        _errorMessage!,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.error,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                    FilledButton.icon(
-                      onPressed: _initializeForum,
-                      icon: const Icon(Icons.refresh),
-                      label: Text(AppLocalizations.of(context)!.retryConnection),
-                    ),
-                  ],
-                ],
+      appBar: TopicsTabAppBar(
+        siteContext: siteContext,
+        leading: canPop
+            ? null
+            : const IconButton(onPressed: null, icon: Icon(Icons.menu)),
+      ),
+      body: Column(
+        children: [
+          ForumHeaderWidget(pendingSite: site, extendUnderAppBar: true),
+          if (error == null) ...[
+            const _FilterBarPlaceholder(),
+            Expanded(
+              child: Semantics(
+                label: AppLocalizations.of(context)!.initializingForum,
+                liveRegion: true,
+                child: const ExcludeSemantics(child: TopicListSkeleton()),
               ),
             ),
+          ] else
+            Expanded(
+              child: _ConnectionError(
+                site: site,
+                message: error,
+                unreachable: unreachable,
+                onRetry: onRetry,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// [FilterChipBar]'s footprint. Which filters a forum offers is part of what
+/// is still loading, so the chips are drawn as blocks.
+class _FilterBarPlaceholder extends StatelessWidget {
+  const _FilterBarPlaceholder();
+
+  static const _chipWidths = [86.0, 66.0, 71.0, 90.0];
+
+  @override
+  Widget build(BuildContext context) {
+    final block = Theme.of(context).colorScheme.surfaceContainerHighest;
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: DesignTokens.spacingL,
+        vertical: DesignTokens.spacingM,
+      ),
+      child: SizedBox(
+        height: 40,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          physics: const NeverScrollableScrollPhysics(),
+          // Latest, Hot, New, Unread as FilterChipBar draws them in
+          // English, so the fade to the real bar lines up.
+          itemCount: _chipWidths.length,
+          separatorBuilder: (_, __) => SizedBox(width: DesignTokens.spacingS),
+          itemBuilder: (_, index) => Center(
+            child: Container(
+              width: _chipWidths[index],
+              height: 38,
+              decoration: BoxDecoration(
+                color: block,
+                borderRadius: BorderRadius.circular(DesignTokens.radiusL),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ConnectionError extends StatelessWidget {
+  const _ConnectionError({
+    required this.site,
+    required this.message,
+    required this.unreachable,
+    required this.onRetry,
+  });
+
+  final Site site;
+  final String message;
+
+  /// The forum did not answer, so the likely fix is the user's connection.
+  final bool unreachable;
+  final VoidCallback onRetry;
+
+  /// The service reports `Exception: Failed to connect to forum: <reason>`,
+  /// and the heading above the reason already says the first half.
+  static String _reason(String raw) {
+    var text = raw;
+    for (final prefix in const ['Exception: ', 'Failed to connect to forum: ']) {
+      if (text.startsWith(prefix)) text = text.substring(prefix.length);
+    }
+    return text;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    // Offline is worth a sentence in the user's language. Anything else is
+    // a failure they cannot act on beyond Retry; its English reason is kept
+    // for debug builds.
+    final detail = unreachable
+        ? l10n.checkConnectionAndRetry
+        : (kDebugMode ? _reason(message) : null);
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.cloud_off_outlined,
+                size: 48,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.failedToConnectToSiteName(site.name),
+                style: textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              if (detail != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  detail,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh),
+                label: Text(l10n.retryConnection),
+              ),
+            ],
           ),
         ),
       ),

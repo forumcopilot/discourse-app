@@ -967,6 +967,7 @@
   "reset": "Herstellen",
   "resizeAndUpload": "Verkleinen en uploaden",
   "retryConnection": "Verbinding opnieuw proberen",
+  "checkConnectionAndRetry": "Controleer uw internetverbinding en probeer het opnieuw.",
   "reviewQueue": "Beoordelingswachtrij",
   "revoke": "Intrekken",
   "revokeInviteQuestion": "Uitnodiging intrekken?",

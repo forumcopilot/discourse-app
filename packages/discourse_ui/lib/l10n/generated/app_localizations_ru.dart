@@ -1336,6 +1336,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get retryConnection => 'Повторить подключение';
 
   @override
+  String get checkConnectionAndRetry =>
+      'Проверьте подключение к интернету и повторите попытку.';
+
+  @override
   String get reviewQueue => 'Очередь на проверку';
 
   @override

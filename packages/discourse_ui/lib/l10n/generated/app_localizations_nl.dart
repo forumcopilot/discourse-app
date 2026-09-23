@@ -1332,6 +1332,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get retryConnection => 'Verbinding opnieuw proberen';
 
   @override
+  String get checkConnectionAndRetry =>
+      'Controleer uw internetverbinding en probeer het opnieuw.';
+
+  @override
   String get reviewQueue => 'Beoordelingswachtrij';
 
   @override

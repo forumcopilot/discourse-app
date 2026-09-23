@@ -1379,6 +1379,10 @@
   "@retryConnection": {
     "description": "UI text: Retry connection"
   },
+  "checkConnectionAndRetry": "Check your internet connection and try again.",
+  "@checkConnectionAndRetry": {
+    "description": "Shown when a forum being opened did not answer at all (offline, or no response in time), under the failed-to-connect heading and above the Retry button."
+  },
   "reviewQueue": "Review queue",
   "@reviewQueue": {
     "description": "UI text: Review queue"

@@ -168,7 +168,12 @@ void main() {
     await dead.close(force: true);
 
     final deadContext = contextFor(deadUrl);
-    await DiscourseConfigProxy(deadContext).getConfig(deadUrl, forceRefresh: true);
+    // getConfig itself fails — the forum did not answer — but the probe has
+    // run to completion by then (the reads go out together).
+    await expectLater(
+      DiscourseConfigProxy(deadContext).getConfig(deadUrl, forceRefresh: true),
+      throwsA(isA<DiscourseApiException>()),
+    );
 
     // Nothing was learned, so nothing is recorded: a later getConfig, once
     // the network is back, must be free to ask again rather than serve a

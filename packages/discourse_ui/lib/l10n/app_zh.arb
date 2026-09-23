@@ -669,6 +669,7 @@
   "reset": "重置",
   "resizeAndUpload": "缩小并上传",
   "retryConnection": "重试连接",
+  "checkConnectionAndRetry": "请检查网络连接，然后重试。",
   "reviewQueue": "审核队列",
   "revoke": "撤销",
   "revokeInviteQuestion": "撤销邀请？",

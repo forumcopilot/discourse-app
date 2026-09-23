@@ -6,6 +6,12 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Changed
+- **Opening a forum goes straight into the forum.** It used to show a "Connecting to…" dialog stacked on a second spinner, hiding the forum's name, then a blank page while the home fetched the forum's config a second time. Now `SingleForumBootstrapPage` draws the home's own layout while the forum initializes — app bar, the forum's header, the filter bar and topic list as placeholders — and the real home replaces it in place with a short fade. The placeholder keeps the home's geometry (stats lines, chip sizes, wordmark height) so nothing moves when it hands over, and it shows no brand until the forum's config has given one. When initialization fails, that page says so, with Retry; Back works throughout.
+- **Offline, opening a forum says so.** A forum that does not answer — offline, DNS failure, connection refused, or no response within the timeout — used to open into an empty home that looked like a forum with no topics. It now gets the failure page, telling the user to check their connection (new `checkConnectionAndRetry` string, all eleven languages). `DiscourseConfigProxy.getConfig` throws when `/about.json` gets no response at all; any answer, even an error, still counts as the forum being up.
+- **Entering a forum waits on fewer round trips.** `DiscourseConfigProxy.getConfig` sends its four reads (`/about.json`, the chat probe, `/site.json`, `/site/settings.json`) together rather than one after another, and the push-token sync and the visit record no longer hold the forum back.
+- `SiteHomePage(siteVerified: true)` skips the redundant config check, `ForumHeaderWidget(pendingSite:)` draws a forum that is still initializing, `TopicsTabAppBar` takes a `leading`, and `BaseDiscourseProxy.apiGetWithHeaders` returns a response's own headers. `SiteInitializationService.initializeSite` no longer takes progress callbacks, and `ProgressDialog` is removed.
+
 ## [1.0.16] - 2026-09-23
 
 Private messages, reviewed end to end against Discourse and tested on an iPhone 17 and a Pixel 4a against meta.discourse.org.

@@ -1292,6 +1292,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get retryConnection => '다시 연결';
 
   @override
+  String get checkConnectionAndRetry => '인터넷 연결을 확인한 후 다시 시도하세요.';
+
+  @override
   String get reviewQueue => '검토 대기열';
 
   @override

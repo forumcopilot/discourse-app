@@ -669,6 +669,7 @@
   "reset": "Réinitialiser",
   "resizeAndUpload": "Redimensionner et envoyer",
   "retryConnection": "Réessayer la connexion",
+  "checkConnectionAndRetry": "Vérifiez votre connexion Internet et réessayez.",
   "reviewQueue": "File de modération",
   "revoke": "Révoquer",
   "revokeInviteQuestion": "Révoquer l’invitation ?",

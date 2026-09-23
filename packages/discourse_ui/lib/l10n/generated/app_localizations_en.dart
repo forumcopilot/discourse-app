@@ -1325,6 +1325,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retryConnection => 'Retry connection';
 
   @override
+  String get checkConnectionAndRetry =>
+      'Check your internet connection and try again.';
+
+  @override
   String get reviewQueue => 'Review queue';
 
   @override

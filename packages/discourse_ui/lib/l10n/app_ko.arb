@@ -669,6 +669,7 @@
   "reset": "초기화",
   "resizeAndUpload": "크기 조정 후 업로드",
   "retryConnection": "다시 연결",
+  "checkConnectionAndRetry": "인터넷 연결을 확인한 후 다시 시도하세요.",
   "reviewQueue": "검토 대기열",
   "revoke": "취소",
   "revokeInviteQuestion": "초대를 취소할까요?",

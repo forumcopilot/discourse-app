@@ -669,6 +669,7 @@
   "reset": "Zurücksetzen",
   "resizeAndUpload": "Verkleinern und hochladen",
   "retryConnection": "Verbindung erneut versuchen",
+  "checkConnectionAndRetry": "Überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
   "reviewQueue": "Prüfwarteschlange",
   "revoke": "Widerrufen",
   "revokeInviteQuestion": "Einladung widerrufen?",

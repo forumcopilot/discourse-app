@@ -1342,6 +1342,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get retryConnection => 'Verbindung erneut versuchen';
 
   @override
+  String get checkConnectionAndRetry =>
+      'Überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.';
+
+  @override
   String get reviewQueue => 'Prüfwarteschlange';
 
   @override

@@ -1297,6 +1297,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get retryConnection => '再接続';
 
   @override
+  String get checkConnectionAndRetry => 'インターネット接続を確認して、もう一度お試しください。';
+
+  @override
   String get reviewQueue => 'レビューキュー';
 
   @override

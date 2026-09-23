@@ -16,10 +16,16 @@ class ForumHeaderWidget extends StatelessWidget {
   final forumcopilot_sdk.FCBoardStatResult? boardStats;
   final bool extendUnderAppBar;
 
+  /// Drawn until the site controller has a current site: the forum being
+  /// opened, while it is still initializing. A header given one also keeps
+  /// room for the stats it does not have yet.
+  final forumcopilot_sdk.Site? pendingSite;
+
   const ForumHeaderWidget({
     Key? key,
     this.boardStats,
     this.extendUnderAppBar = false,
+    this.pendingSite,
   }) : super(key: key);
 
   String? _getDomain(String? url) {
@@ -49,6 +55,19 @@ class ForumHeaderWidget extends StatelessWidget {
       );
     }
     return _buildLogoTile(context, squareLogo, siteName);
+  }
+
+  /// Where the logo will go, at the wordmark's height: most forums have one,
+  /// and [_buildLogoBlock] draws it 44 tall.
+  Widget _buildLogoPlaceholder(BuildContext context) {
+    return Container(
+      width: 132,
+      height: 44,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+      ),
+    );
   }
 
   Widget _buildLogoTile(BuildContext context, String? logoUrl, String siteName) {
@@ -185,7 +204,7 @@ class ForumHeaderWidget extends StatelessWidget {
     final siteController = Get.put(DiscourseSiteController());
 
     return Obx(() {
-      final site = siteController.currentSite.value;
+      final site = siteController.currentSite.value ?? pendingSite;
       // The forum's own logo, from /site/settings.json. AppForumConfig
       // ships logoUrl as null — a fork is expected to hardcode one — so
       // without this the header always fell back to a generated initial
@@ -204,6 +223,11 @@ class ForumHeaderWidget extends StatelessWidget {
       // (/site.json colour scheme, /site/settings.json logos). A forum on
       // the stock scheme has no colours; it keeps our pattern background.
       final caps = DiscourseSiteCapabilities.forSite(site?.pluginUrl ?? '');
+      // The forum being opened, before its config has said how it looks.
+      // Draw the header's shape rather than guess at its brand: a generated
+      // initial on a name-tinted pattern would flash up, then be replaced by
+      // the real wordmark on the real colour.
+      final awaitingBrand = pendingSite != null && !caps.resolved;
       // Wordmarks are transparent artwork drawn for one background. A forum
       // that ships a dark-mode logo gets its dark header colours in dark
       // mode; one that does not keeps its light colours even in dark mode,
@@ -221,6 +245,11 @@ class ForumHeaderWidget extends StatelessWidget {
                   ? Colors.white
                   : Colors.black87));
       final domain = _getDomain(site?.url);
+      final statsLineStyle = TextStyle(
+        color: fg.withValues(alpha: DesignTokens.opacityHigh),
+        fontWeight: DesignTokens.fontWeightMedium,
+        fontSize: DesignTokens.fontSizeXS,
+      );
 
       // Calculate padding based on whether it should extend under app bar
       final topPadding = extendUnderAppBar ? DesignTokens.spacingXL : DesignTokens.spacingL;
@@ -273,6 +302,8 @@ class ForumHeaderWidget extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if (awaitingBrand)
+                      Container(color: colorScheme.surfaceContainerLow),
                     if (brandBg != null) Container(color: brandBg),
                     // Network background (only shown if URL exists and loads successfully)
                     Builder(
@@ -321,7 +352,9 @@ class ForumHeaderWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _buildLogoBlock(context, wideLogo, logoUrl, siteName),
+                    awaitingBrand
+                        ? _buildLogoPlaceholder(context)
+                        : _buildLogoBlock(context, wideLogo, logoUrl, siteName),
                     SizedBox(height: DesignTokens.spacingS),
                     Text(
                       site?.name ?? 'Forum',
@@ -368,11 +401,7 @@ class ForumHeaderWidget extends StatelessWidget {
                           if ((boardStats?.total_posts ?? 0) > 0)
                             Text(
                               AppLocalizations.of(context)!.postsCount(formatNumber(context, boardStats?.total_posts ?? 0)),
-                              style: TextStyle(
-                                color: fg.withValues(alpha: DesignTokens.opacityHigh),
-                                fontWeight: DesignTokens.fontWeightMedium,
-                                fontSize: DesignTokens.fontSizeXS,
-                              ),
+                              style: statsLineStyle,
                               textAlign: TextAlign.left,
                             ),
                           if ((boardStats?.total_posts ?? 0) > 0 && (boardStats?.total_members ?? 0) > 0)
@@ -380,14 +409,29 @@ class ForumHeaderWidget extends StatelessWidget {
                           if ((boardStats?.total_members ?? 0) > 0)
                             Text(
                               AppLocalizations.of(context)?.membersCount(boardStats?.total_members ?? 0) ?? '${formatNumber(context, boardStats?.total_members ?? 0)} Members',
-                              style: TextStyle(
-                                color: fg.withValues(alpha: DesignTokens.opacityHigh),
-                                fontWeight: DesignTokens.fontWeightMedium,
-                                fontSize: DesignTokens.fontSizeXS,
-                              ),
+                              style: statsLineStyle,
                               textAlign: TextAlign.left,
                             ),
                         ],
+                      ),
+                    ] else if (pendingSite != null && boardStats == null) ...[
+                      // Room for the two stats lines. The forum's home has
+                      // them from its first frame (they come from the
+                      // /about.json the initialization has just read), so
+                      // a placeholder without them would jump when it hands
+                      // over.
+                      Visibility(
+                        visible: false,
+                        maintainSize: true,
+                        maintainAnimation: true,
+                        maintainState: true,
+                        child: Column(
+                          children: [
+                            Text('0', style: statsLineStyle),
+                            SizedBox(height: DesignTokens.spacingXS / 2),
+                            Text('0', style: statsLineStyle),
+                          ],
+                        ),
                       ),
                     ],
                   ],

@@ -2360,6 +2360,12 @@ abstract class AppLocalizations {
   /// **'Retry connection'**
   String get retryConnection;
 
+  /// Shown when a forum being opened did not answer at all (offline, or no response in time), under the failed-to-connect heading and above the Retry button.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your internet connection and try again.'**
+  String get checkConnectionAndRetry;
+
   /// UI text: Review queue
   ///
   /// In en, this message translates to:

@@ -8,9 +8,14 @@ import 'package:discourse_ui/theme/design_tokens.dart';
 class TopicsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isLoggedIn;
   final SiteContext siteContext;
+
+  /// Overrides the implied leading widget (the drawer's hamburger).
+  final Widget? leading;
+
   const TopicsTabAppBar({
     required this.siteContext,
     this.isLoggedIn = false,
+    this.leading,
     super.key,
   });
 
@@ -28,6 +33,7 @@ class TopicsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
       // hamburger renders as the leading icon. Chat moved out of the
       // AppBar actions because it lives in the primary bottom nav now
       // (when the plugin is enabled).
+      leading: leading,
       title: Text(
         AppLocalizations.of(context)?.home ?? 'Home',
         style: textTheme.titleLarge?.copyWith(
