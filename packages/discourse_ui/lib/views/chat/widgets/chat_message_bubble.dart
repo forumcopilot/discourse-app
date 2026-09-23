@@ -7,6 +7,10 @@ import '../../../utils/time_utils.dart';
 import '../../user_profile_page.dart';
 import '../../widgets/rich_text_content.dart';
 import '../../widgets/user_avatar.dart';
+import '../../widgets/full_screen_image_viewer.dart';
+import '../../listitems/post_list_item_attachment.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseChatUploads;
+import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import 'chat_reaction_chips.dart';
 import '../../../l10n/generated/app_localizations.dart';
 
@@ -51,6 +55,8 @@ class ChatMessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final uploads =
+        DiscourseChatUploads.forMessage(siteContext.site.url, message.id);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -124,6 +130,16 @@ class ChatMessageBubble extends StatelessWidget {
                             : message.message,
                       ),
                     ),
+                    // Images and files travel in the message's `uploads`,
+                    // not its cooked HTML; an upload-only message used to be
+                    // an empty bubble. Same widget as a topic post's.
+                    if (uploads.isNotEmpty)
+                      PostListItemAttachment(
+                        attachments: uploads,
+                        actions: _ChatUploadActions(uploads),
+                        context: context,
+                        isInline: true,
+                      ),
                     // Reaction chips — fed straight from the message's
                     // own reactions list, refreshed whenever the poll
                     // cycle re-parses this message (the parent Obx
@@ -164,4 +180,28 @@ class ChatMessageBubble extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Opens a chat message's images full screen, as a gallery.
+class _ChatUploadActions {
+  _ChatUploadActions(this.uploads);
+
+  final List<FCAttachment> uploads;
+
+  void onShowImage(String imageUrl, BuildContext context, String heroTag) {
+    final images = uploads.where((u) => u.isImage).toList();
+    if (images.isEmpty) return;
+    final index = images.indexWhere(
+        (u) => u.url == imageUrl || u.thumbnailUrl == imageUrl || u.id == heroTag);
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => FullScreenImageViewer(
+        imageUrls: [for (final u in images) u.url],
+        initialIndex: index < 0 ? 0 : index,
+        heroTag: heroTag,
+      ),
+    ));
+  }
+
+  // Chat is only reachable signed in.
+  void onLoginRequired(BuildContext context) {}
 }

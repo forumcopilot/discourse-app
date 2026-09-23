@@ -70,6 +70,8 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
   static const int _ntChatInvitation = 31;
   static const int _ntChatGroupMention = 32;
   static const int _ntChatQuoted = 33;
+  // A new message in a chat thread the user watches (Notification.types).
+  static const int _ntChatWatchedThread = 40;
   static const int _ntAssigned = 34;
   static const int _ntQuestionAnswerUserCommented = 35;
   static const int _ntWatchingCategoryOrTag = 36;
@@ -441,7 +443,11 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       contentId: contentId,
       topicId: topicId,
       position: postNumber,
-      postId: null,
+      // For chat, the message the notification is about, so the channel can
+      // open on it rather than at its end (`data.chat_message_id`).
+      postId: contentType == 'chat_channel'
+          ? data['chat_message_id']?.toString()
+          : null,
       // Whatever _alertTarget decided is a conversation — so an invite-to-PM
       // routes the same as the PM itself, rather than only type 6 doing so.
       conversationId: contentType == 'conversation_message' ? topicId : null,
@@ -613,6 +619,11 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         return 'Your group was mentioned in chat';
       case _ntChatQuoted:
         return '$from quoted you in chat';
+      case _ntChatWatchedThread:
+        final channel = s('chat_channel_title');
+        return channel.isNotEmpty
+            ? 'New reply in a thread in #$channel'
+            : 'New reply in a chat thread';
       case _ntAssigned:
         return '"$topic" was assigned to you';
       case _ntQuestionAnswerUserCommented:
@@ -688,6 +699,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       case _ntChatInvitation:
       case _ntChatGroupMention:
       case _ntChatQuoted:
+      case _ntChatWatchedThread:
         // Chat lives outside the topic tree, addressed by channel.
         final channelId = data['chat_channel_id'];
         if (channelId != null) {

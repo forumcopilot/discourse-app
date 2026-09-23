@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert' show HtmlEscape;
 
 import 'package:discourse_core/discourse_core.dart'
     show
@@ -34,10 +35,15 @@ class ChatChannelController extends GetxController
     with WidgetsBindingObserver {
   ChatChannelController({
     required this.channelId,
+    this.targetMessageId,
     this.fallbackPollInterval = const Duration(seconds: 30),
   });
 
   final int channelId;
+
+  /// Open on this message (from a notification): the first load fetches the
+  /// messages around it rather than the newest.
+  final int? targetMessageId;
   final Duration fallbackPollInterval;
 
   // ---- observable state ------------------------------------------------
@@ -48,6 +54,10 @@ class ChatChannelController extends GetxController
   final isLoadingOlder = false.obs;
   final isSending = false.obs;
   final lastError = ''.obs;
+
+  /// True when the first load failed and nothing is on screen: the view
+  /// shows the error with Retry instead of an empty channel.
+  final loadFailed = false.obs;
 
   // ---- internal --------------------------------------------------------
 
@@ -128,7 +138,10 @@ class ChatChannelController extends GetxController
     try {
       final proxy = SiteProxyService.getChatProxy();
       final channelFuture = proxy.getChannelAsync(channelId);
-      final messagesFuture = proxy.getMessagesAsync(channelId, pageSize: 50);
+      final messagesFuture = targetMessageId != null && !_bootstrapped
+          ? proxy.getMessagesAsync(channelId,
+              pageSize: 50, targetMessageId: targetMessageId, direction: '')
+          : proxy.getMessagesAsync(channelId, pageSize: 50);
       final channelResult = await channelFuture;
       final messagesResult = await messagesFuture;
       final ch = channelResult.channel;
@@ -151,6 +164,7 @@ class ChatChannelController extends GetxController
         unawaited(markRead());
       }
       _bootstrapped = channelResult.result && messagesResult.result;
+      loadFailed.value = !_bootstrapped && messages.isEmpty;
       if (_bootstrapped) {
         // Live updates start from the position the channel fetch recorded,
         // so nothing published after these messages loaded is missed.
@@ -165,6 +179,7 @@ class ChatChannelController extends GetxController
     } catch (e) {
       AppLogger.error('ChatChannelController bootstrap error: $e');
       lastError.value = e.toString();
+      loadFailed.value = messages.isEmpty;
       _retryBootstrapLater();
     } finally {
       isLoadingInitial.value = false;
@@ -172,6 +187,12 @@ class ChatChannelController extends GetxController
   }
 
   // ---- live updates -----------------------------------------------------
+
+  /// Retry a failed first load now (the view's Retry button).
+  Future<void> retry() {
+    _bootstrapRetry?.cancel();
+    return _bootstrap();
+  }
 
   /// The view is showing this channel: keep it current. Before the first
   /// load has succeeded, live updates wait for it (see [_bootstrap]).
@@ -405,25 +426,17 @@ class ChatChannelController extends GetxController
             : 'Failed to edit message.';
         return false;
       }
-      // Optimistic update — replace the message body locally.
+      // Show the new text now. The bubble draws `cooked` first, and the old
+      // copy kept the previous cooked HTML, so the edit never appeared; this
+      // one is the text as plain paragraphs until the server's rendering
+      // arrives (the live `edit`/`processed` event, or the next fetch).
+      // copyWith keeps the reactions, which a rebuilt message dropped.
       final idx = messages.indexWhere((m) => m.id == messageId);
       if (idx >= 0) {
-        final old = messages[idx];
-        messages[idx] = FCChatMessage(
-          id: old.id,
-          channelId: old.channelId,
-          threadId: old.threadId,
+        messages[idx] = messages[idx].copyWith(
           message: text,
-          cooked: old.cooked,
-          excerpt: old.excerpt,
-          authorId: old.authorId,
-          authorUsername: old.authorUsername,
-          authorName: old.authorName,
-          authorAvatarUrl: old.authorAvatarUrl,
-          createdAt: old.createdAt,
+          cooked: _plainCooked(text),
           edited: true,
-          deleted: old.deleted,
-          streaming: old.streaming,
         );
       }
       return true;
@@ -434,6 +447,14 @@ class ChatChannelController extends GetxController
       isSending.value = false;
     }
   }
+
+  /// [text] as HTML paragraphs, escaped — a stand-in for the server's
+  /// rendering.
+  static String _plainCooked(String text) => text
+      .split(RegExp(r'\n{2,}'))
+      .map((p) =>
+          '<p>${const HtmlEscape().convert(p).replaceAll('\n', '<br>')}</p>')
+      .join();
 
   Future<bool> deleteMessage(int messageId) async {
     isSending.value = true;

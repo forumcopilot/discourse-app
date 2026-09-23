@@ -749,18 +749,19 @@ class _ProfileViewState extends State<ProfileView> {
               colorScheme: colorScheme,
             ),
           ),
-          // Web offers Message *and* Chat on a profile. Gated on the
-          // server's `can_chat_user`, not on whether the chat plugin is
-          // installed: those are different questions, and only the server
-          // knows whether this viewer may chat with this person.
-          if (_userInfo.canChatUser) ...[
-            SizedBox(width: DesignTokens.spacingM),
-            OutlinedButton.icon(
-              onPressed: _isStartingChat ? null : _handleStartChat,
-              icon: Icon(Icons.forum_outlined, size: DesignTokens.iconSizeM),
-              label: Text(AppLocalizations.of(context)?.chatWithUser ?? 'Chat'),
-            ),
-          ],
+        ],
+        // Web offers Message *and* Chat on a profile. Gated on the server's
+        // `can_chat_user`, not on whether the chat plugin is installed:
+        // those are different questions, and only the server knows whether
+        // this viewer may chat with this person. It no longer sits inside
+        // the personal-message block — someone can take chats and not PMs.
+        if (_userInfo.canChatUser) ...[
+          SizedBox(width: DesignTokens.spacingM),
+          OutlinedButton.icon(
+            onPressed: _isStartingChat ? null : _handleStartChat,
+            icon: Icon(Icons.forum_outlined, size: DesignTokens.iconSizeM),
+            label: Text(AppLocalizations.of(context)?.chatWithUser ?? 'Chat'),
+          ),
         ],
       ],
     );

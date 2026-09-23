@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseChatPermissions;
+import '../widgets/empty_state_view.dart';
+import '../../utils/error_message.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_chat_channel.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
 import 'package:get/get.dart';
 
@@ -23,11 +27,19 @@ class ChatChannelView extends StatefulWidget {
     required this.siteContext,
     required this.channelId,
     this.isActive = true,
+    this.targetMessageId,
+    this.onChannelLoaded,
   });
 
   final SiteContext siteContext;
   final int channelId;
   final bool isActive;
+
+  /// Open scrolled to this message, highlighted (from a notification).
+  final int? targetMessageId;
+
+  /// Called once the channel's details load, for a title.
+  final void Function(FCChatChannel channel)? onChannelLoaded;
 
   @override
   State<ChatChannelView> createState() => _ChatChannelViewState();
@@ -43,15 +55,32 @@ class _ChatChannelViewState extends State<ChatChannelView> {
   /// scroll when a genuinely newer message arrived.
   int _lastAutoScrolledId = 0;
 
-  String get _tag => 'chatChannel-${widget.channelId}';
+  /// The target message's row, for scrolling to it.
+  final _targetKey = GlobalKey();
+  bool _jumpedToTarget = false;
+
+  /// The message shown highlighted, briefly, after jumping to it.
+  int? _highlightedId;
+
+  // One controller per view: the same channel opened twice (a notification
+  // over the list) used to share one, and closing the top one tore down the
+  // one underneath.
+  late final String _tag =
+      'chatChannel-${widget.channelId}-${identityHashCode(this)}';
 
   @override
   void initState() {
     super.initState();
     _controller = Get.put(
-      ChatChannelController(channelId: widget.channelId),
+      ChatChannelController(
+        channelId: widget.channelId,
+        targetMessageId: widget.targetMessageId,
+      ),
       tag: _tag,
     );
+    ever<FCChatChannel?>(_controller.channel, (ch) {
+      if (ch != null) widget.onChannelLoaded?.call(ch);
+    });
     if (widget.isActive) {
       _controller.start();
     }
@@ -61,6 +90,16 @@ class _ChatChannelViewState extends State<ChatChannelView> {
           list.isEmpty ? 0 : (list.last as FCChatMessage).id;
       if (lastId <= _lastAutoScrolledId) return;
       _lastAutoScrolledId = lastId;
+      // Opened on a message: go there instead of to the end, once.
+      final target = widget.targetMessageId;
+      if (target != null && !_jumpedToTarget) {
+        final index = list.indexWhere((m) => (m as FCChatMessage).id == target);
+        if (index >= 0) {
+          _jumpedToTarget = true;
+          _jumpTo(index, list.length, target);
+          return;
+        }
+      }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scroll.hasClients) {
           _scroll.animateTo(
@@ -82,6 +121,27 @@ class _ChatChannelViewState extends State<ChatChannelView> {
     } else if (!widget.isActive && old.isActive) {
       _controller.stop();
     }
+  }
+
+  /// Bring the message at [index] into view and highlight it. The list is
+  /// built lazily, so first jump to its estimated offset (so its row
+  /// exists), then let ensureVisible place it exactly.
+  void _jumpTo(int index, int count, int id) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted || !_scroll.hasClients) return;
+      final max = _scroll.position.maxScrollExtent;
+      _scroll.jumpTo(count <= 1 ? 0 : max * index / (count - 1));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      final ctx = _targetKey.currentContext;
+      if (ctx != null && ctx.mounted) {
+        await Scrollable.ensureVisible(ctx,
+            alignment: 0.3, duration: const Duration(milliseconds: 200));
+      }
+      if (!mounted) return;
+      setState(() => _highlightedId = id);
+      await Future<void>.delayed(const Duration(seconds: 2));
+      if (mounted) setState(() => _highlightedId = null);
+    });
   }
 
   void _onScroll() {
@@ -115,6 +175,14 @@ class _ChatChannelViewState extends State<ChatChannelView> {
             if (_controller.isLoadingInitial.value &&
                 _controller.messages.isEmpty) {
               return const Center(child: CircularProgressIndicator());
+            }
+            if (_controller.messages.isEmpty && _controller.loadFailed.value) {
+              // Used to fall through to "No messages yet — say hi", which
+              // invited writing into a channel that had not loaded.
+              return EmptyStateView.error(
+                message: describeError(_controller.lastError.value),
+                onRetry: _controller.retry,
+              );
             }
             if (_controller.messages.isEmpty) {
               return Center(
@@ -155,9 +223,20 @@ class _ChatChannelViewState extends State<ChatChannelView> {
                 final isSelf =
                     currentUserId != null &&
                     m.authorId.toString() == currentUserId;
-                final canEditOrDelete = isSelf;
+                // Discourse's rules (see DiscourseChatPermissions): only in a
+                // channel the viewer may write in; edit your own; delete your
+                // own or, as a moderator, anyone's. This offered edit and
+                // delete on your own messages everywhere, and nothing else.
+                final perms = _permissions;
+                final status = _controller.channel.value?.status ?? 'open';
+                final canWrite = perms?.canWriteIn(status) ?? (status == 'open');
+                final canEdit = canWrite && isSelf;
+                final canDelete = canWrite &&
+                    (isSelf
+                        ? (perms?.canDeleteSelf ?? true)
+                        : (perms?.canDeleteOthers ?? false));
                 final loggedIn = widget.siteContext.isLoggedIn;
-                return ChatMessageBubble(
+                final bubble = ChatMessageBubble(
                   message: m,
                   siteContext: widget.siteContext,
                   isSelf: isSelf,
@@ -165,12 +244,24 @@ class _ChatChannelViewState extends State<ChatChannelView> {
                   // logged in; edit/delete rows only for own messages.
                   onLongPress: loggedIn
                       ? () => _showMessageActions(m,
-                          canEditOrDelete: canEditOrDelete)
+                          canEdit: canEdit, canDelete: canDelete)
                       : null,
                   onToggleReaction: loggedIn
                       ? (emoji, {required bool add}) =>
                           _controller.toggleReaction(m.id, emoji, add: add)
                       : null,
+                );
+                final isTarget = m.id == widget.targetMessageId;
+                final highlighted = m.id == _highlightedId;
+                if (!isTarget && !highlighted) return bubble;
+                return AnimatedContainer(
+                  key: isTarget ? _targetKey : null,
+                  duration: const Duration(milliseconds: 400),
+                  color: highlighted
+                      ? theme.colorScheme.primaryContainer
+                          .withValues(alpha: 0.5)
+                      : Colors.transparent,
+                  child: bubble,
                 );
               },
             );
@@ -185,7 +276,9 @@ class _ChatChannelViewState extends State<ChatChannelView> {
         }),
         Obx(() {
           final ch = _controller.channel.value;
-          final readonly = ch != null && !ch.isOpen;
+          // Staff may still post in a closed channel; nobody while silenced.
+          final readonly = ch != null &&
+              !(_permissions?.canWriteIn(ch.status) ?? ch.isOpen);
           final isDm = ch?.chatableType == 'DirectMessage';
           return ChatComposer(
             enabled: !readonly,
@@ -202,7 +295,11 @@ class _ChatChannelViewState extends State<ChatChannelView> {
     );
   }
 
-  void _showMessageActions(FCChatMessage m, {required bool canEditOrDelete}) {
+  DiscourseChatPermissions? get _permissions => DiscourseChatPermissions.forChannel(
+      widget.siteContext.site.url, widget.channelId);
+
+  void _showMessageActions(FCChatMessage m,
+      {required bool canEdit, required bool canDelete}) {
     showModalBottomSheet(
       context: context,
       builder: (_) => SafeArea(
@@ -237,8 +334,8 @@ class _ChatChannelViewState extends State<ChatChannelView> {
                 ],
               ),
             ),
-            if (canEditOrDelete) ...[
-              const Divider(height: 1),
+            if (canEdit || canDelete) const Divider(height: 1),
+            if (canEdit)
               ListTile(
                 leading: const Icon(Icons.edit),
                 title: Text(AppLocalizations.of(context)!.edit),
@@ -247,6 +344,7 @@ class _ChatChannelViewState extends State<ChatChannelView> {
                   _showEditDialog(m.id, m.message);
                 },
               ),
+            if (canDelete)
               ListTile(
                 leading: const Icon(Icons.delete_outline),
                 title: Text(AppLocalizations.of(context)!.delete),
@@ -256,7 +354,6 @@ class _ChatChannelViewState extends State<ChatChannelView> {
                   if (ok) await _controller.deleteMessage(m.id);
                 },
               ),
-            ],
           ],
         ),
       ),
@@ -346,6 +443,55 @@ class _ErrorBanner extends StatelessWidget {
             onPressed: onDismiss,
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// How a channel is titled: `#name` for a channel, the members for a DM.
+String chatChannelTitle(FCChatChannel ch) {
+  if (ch.chatableType == 'DirectMessage') {
+    return ch.title.isNotEmpty ? ch.title : 'Direct message';
+  }
+  return '#${ch.title.isNotEmpty ? ch.title : 'channel ${ch.id}'}';
+}
+
+/// A channel as a full screen, titled from the channel once it loads — what
+/// the channel list and a chat notification open. The notification list used
+/// to title it with the whole notification sentence.
+class ChatChannelScreen extends StatefulWidget {
+  const ChatChannelScreen({
+    super.key,
+    required this.siteContext,
+    required this.channelId,
+    this.initialTitle = '',
+    this.targetMessageId,
+  });
+
+  final SiteContext siteContext;
+  final int channelId;
+  final String initialTitle;
+  final int? targetMessageId;
+
+  @override
+  State<ChatChannelScreen> createState() => _ChatChannelScreenState();
+}
+
+class _ChatChannelScreenState extends State<ChatChannelScreen> {
+  late String _title = widget.initialTitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(_title)),
+      body: ChatChannelView(
+        siteContext: widget.siteContext,
+        channelId: widget.channelId,
+        targetMessageId: widget.targetMessageId,
+        onChannelLoaded: (ch) {
+          final t = chatChannelTitle(ch);
+          if (mounted && t != _title) setState(() => _title = t);
+        },
       ),
     );
   }

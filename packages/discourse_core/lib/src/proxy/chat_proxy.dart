@@ -8,6 +8,10 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import '../base_discourse_proxy.dart';
 import '../data/chat/discourse_chat_event.dart';
+import '../data/chat/discourse_chatable.dart';
+import '../data/chat/discourse_chat_uploads.dart';
+import '../data/chat/discourse_chat_permissions.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import '../network/discourse_message_bus.dart';
 
 /// Discourse implementation of [IFCChatProxy] (Phase 5.39 — lifted
@@ -105,9 +109,11 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       // AROUND the target" (Chat::MessagesQuery#query_around_target),
       // which re-delivers old messages — with `direction` it paginates
       // strictly past/future of the target as intended.
+      // An empty [direction] with a target asks for the messages AROUND
+      // it, for opening a channel on one message (a notification).
       final query = <String, String>{
         'page_size': pageSize.toString(),
-        'direction': direction,
+        if (direction.isNotEmpty) 'direction': direction,
         if (targetMessageId != null)
           'target_message_id': targetMessageId.toString(),
       };
@@ -217,7 +223,12 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     try {
       await apiPut(
         '/chat/api/channels/$channelId/messages/$messageId',
-        body: {'message': message},
+        body: {
+          'message': message,
+          // Without these Discourse detaches the message's images and files
+          // (Chat::UpdateMessage#modify_message reads a missing list as none).
+          'upload_ids': DiscourseChatUploads.idsFor(siteContext.site.url, messageId),
+        },
       );
       return FCChatActionResult(result: true);
     } on DiscourseApiException catch (e) {
@@ -291,19 +302,25 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
   /// Policy failures (DMs disabled, a target doesn't accept DMs, too
   /// many members) come back as 400/422 with a readable message,
   /// surfaced via `resultText`.
+  ///
+  /// [groups] are sent as `target_groups` — they used to go in
+  /// `target_usernames`, where Discourse cannot resolve them.
   Future<FCChatChannelResult> createDirectMessageChannelAsync(
     List<String> usernames, {
+    List<String> groups = const [],
     bool upsert = false,
   }) async {
     final targets = usernames.where((u) => u.trim().isNotEmpty).toList();
-    if (targets.isEmpty) {
+    final targetGroups = groups.where((g) => g.trim().isNotEmpty).toList();
+    if (targets.isEmpty && targetGroups.isEmpty) {
       return FCChatChannelResult(
           result: false, resultText: 'No usernames supplied');
     }
     try {
       final response =
           await apiPost('/chat/api/direct-message-channels', body: {
-        'target_usernames': targets,
+        if (targets.isNotEmpty) 'target_usernames': targets,
+        if (targetGroups.isNotEmpty) 'target_groups': targetGroups,
         if (upsert) 'upsert': true,
       });
       final ch = (response['channel'] as Map?)?.cast<String, dynamic>();
@@ -351,6 +368,58 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       return FCChatActionResult(result: false, resultText: e.userMessage);
     } catch (e) {
       return FCChatActionResult(result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Discourse-only: people and groups a chat can be started with, from the
+  /// chat plugin's own search (GET /chat/api/chatables). Unlike the general
+  /// user search it says whether each can actually chat, so a pick that
+  /// Discourse would silently drop — and that could leave a DM with only
+  /// yourself — is never offered as available.
+  Future<List<DiscourseChatable>> searchChatablesAsync(String term) async {
+    final t = term.trim().replaceFirst(RegExp(r'^@'), '');
+    if (t.isEmpty) return const [];
+    try {
+      final response = await apiGet('/chat/api/chatables.json', query: {
+        'term': t,
+        'include_users': 'true',
+        'include_groups': 'true',
+        'include_category_channels': 'false',
+        'include_direct_message_channels': 'false',
+      });
+      final out = <DiscourseChatable>[];
+      for (final entry in ((response['users'] as List?) ?? const []).whereType<Map>()) {
+        final m = (entry['model'] as Map?)?.cast<String, dynamic>();
+        final username = m?['username']?.toString();
+        if (m == null || username == null || username.isEmpty) continue;
+        final tpl = m['avatar_template']?.toString();
+        String? avatar;
+        if (tpl != null && tpl.isNotEmpty) {
+          final filled = tpl.replaceAll('{size}', '60');
+          avatar = filled.startsWith('http') ? filled : '${siteContext.site.url}$filled';
+        }
+        out.add(DiscourseChatable(
+          isGroup: false,
+          name: username,
+          label: (m['name'] as String?)?.isNotEmpty == true ? m['name'] as String : null,
+          avatarUrl: avatar,
+          canChat: m['can_chat'] == true && m['has_chat_enabled'] == true,
+        ));
+      }
+      for (final entry in ((response['groups'] as List?) ?? const []).whereType<Map>()) {
+        final m = (entry['model'] as Map?)?.cast<String, dynamic>();
+        final name = m?['name']?.toString();
+        if (m == null || name == null || name.isEmpty) continue;
+        out.add(DiscourseChatable(
+          isGroup: true,
+          name: name,
+          label: (m['full_name'] as String?)?.isNotEmpty == true ? m['full_name'] as String : null,
+          canChat: m['can_chat'] == true,
+        ));
+      }
+      return out;
+    } catch (_) {
+      return const [];
     }
   }
 
@@ -438,6 +507,18 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     final membership =
         (json['current_user_membership'] as Map?)?.cast<String, dynamic>();
     final meta = (json['meta'] as Map?)?.cast<String, dynamic>();
+    if (meta != null && meta.containsKey('can_delete_self')) {
+      DiscourseChatPermissions.store(
+        siteContext.site.url,
+        (json['id'] as num).toInt(),
+        DiscourseChatPermissions(
+          canDeleteSelf: meta['can_delete_self'] == true,
+          canDeleteOthers: meta['can_delete_others'] == true,
+          canModerate: meta['can_moderate'] == true,
+          silenced: meta['user_silenced'] == true,
+        ),
+      );
+    }
     final lastMessage =
         (json['last_message'] as Map?)?.cast<String, dynamic>();
     return FCChatChannel(
@@ -463,6 +544,41 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
               lastMessage?['created_at']?.toString() ?? '') ??
           DateTime.tryParse(
               json['last_message_sent_at']?.toString() ?? ''),
+    );
+  }
+
+  FCAttachment _uploadFrom(Map<String, dynamic> u) {
+    String? abs(Object? url) {
+      final s = url?.toString();
+      if (s == null || s.isEmpty) return null;
+      if (s.startsWith('http')) return s;
+      // Protocol-relative (Discourse's `url` for an original): take the
+      // forum's own scheme, as a browser would. Forcing https broke images on
+      // a forum served over http.
+      if (s.startsWith('//')) {
+        return '${Uri.parse(siteContext.site.url).scheme}:$s';
+      }
+      return '${siteContext.site.url}$s';
+    }
+
+    final url = abs(u['url']) ?? '';
+    final ext = (u['extension'] ?? '').toString().toLowerCase();
+    final isImage = u['width'] != null ||
+        const {'jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif', 'avif', 'svg'}
+            .contains(ext);
+    final thumb = (u['thumbnail'] as Map?)?['url'];
+    return FCAttachment(
+      id: (u['id'] ?? '').toString(),
+      filename: (u['original_filename'] ?? 'file${ext.isEmpty ? '' : '.$ext'}').toString(),
+      contentType: isImage ? 'image/${ext.isEmpty ? 'jpeg' : ext}' : null,
+      fileSize: (u['filesize'] as num?)?.toInt() ?? 0,
+      url: url,
+      thumbnailUrl: isImage ? (abs(thumb) ?? url) : null,
+      isImage: isImage,
+      // The attachment widgets draw a lock and refuse the tap unless these
+      // are set; a chat upload is always viewable by whoever sees the message.
+      canViewUrl: true,
+      canViewThumbnailUrl: true,
     );
   }
 
@@ -494,8 +610,13 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       avatarUrl =
           filled.startsWith('http') ? filled : '${siteContext.site.url}$filled';
     }
+    final id = (json['id'] as num).toInt();
+    DiscourseChatUploads.store(siteContext.site.url, id, [
+      for (final raw in ((json['uploads'] as List?) ?? const []).whereType<Map>())
+        _uploadFrom(raw.cast<String, dynamic>()),
+    ]);
     return FCChatMessage(
-      id: (json['id'] as num).toInt(),
+      id: id,
       channelId: (json['chat_channel_id'] as num?)?.toInt() ?? 0,
       threadId: (json['thread_id'] as num?)?.toInt(),
       message: (json['message'] ?? '').toString(),

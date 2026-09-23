@@ -444,12 +444,11 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Scaffold(
-            appBar: AppBar(title: Text(alert.message)),
-            body: ChatChannelView(
-              siteContext: widget.siteContext,
-              channelId: channelId,
-            ),
+          builder: (context) => ChatChannelScreen(
+            siteContext: widget.siteContext,
+            channelId: channelId,
+            // Open on the message the notification is about.
+            targetMessageId: int.tryParse(alert.postId ?? ''),
           ),
         ),
       );

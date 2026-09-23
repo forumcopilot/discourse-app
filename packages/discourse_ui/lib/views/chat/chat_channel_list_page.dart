@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:discourse_core/discourse_core.dart' show DiscourseChatProxy;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseChatProxy, DiscourseChatable;
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_chat_channel.dart';
-import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 
 import '../../theme/design_tokens.dart';
 import '../widgets/empty_state_view.dart';
@@ -154,24 +154,22 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     }
   }
 
-  void _open(FCChatChannel ch) {
+  Future<void> _open(FCChatChannel ch) async {
     final title = _channelDisplayTitle(ch);
-    Navigator.of(context).push(
+    await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => Scaffold(
+        builder: (_) => ChatChannelScreen(
+          siteContext: widget.siteContext,
+          channelId: ch.id,
           // DM titles are usernames — the '#' prefix only fits
           // category/topic channels.
-          appBar: AppBar(
-              title: Text(ch.chatableType == 'DirectMessage'
-                  ? title
-                  : '#$title')),
-          body: ChatChannelView(
-            siteContext: widget.siteContext,
-            channelId: ch.id,
-          ),
+          initialTitle: ch.chatableType == 'DirectMessage' ? title : '#$title',
         ),
       ),
     );
+    // Back from the channel: its messages are now read (and others may have
+    // moved), so the badges shown before opening it are stale.
+    if (mounted) unawaited(_load());
   }
 
   Future<void> _startNewDm() async {
@@ -334,7 +332,14 @@ class _ChannelTile extends StatelessWidget {
           if (!channel.isOpen) ...[
             const SizedBox(width: 6),
             Icon(
-              channel.isReadOnly ? Icons.lock_outline : Icons.archive_outlined,
+              // Discourse's status icons: closed is a lock, read-only a
+              // crossed-out comment, archived a box. Closed channels used to
+              // get the archive icon.
+              channel.isClosed
+                  ? Icons.lock_outline
+                  : channel.isReadOnly
+                      ? Icons.comments_disabled_outlined
+                      : Icons.archive_outlined,
               size: 14,
               color: colorScheme.onSurfaceVariant,
             ),
@@ -411,8 +416,8 @@ class _NewDmSheet extends StatefulWidget {
 
 class _NewDmSheetState extends State<_NewDmSheet> {
   final _input = TextEditingController();
-  final _selected = <FCSearchUser>[];
-  List<FCSearchUser> _suggestions = const [];
+  final _selected = <DiscourseChatable>[];
+  List<DiscourseChatable> _suggestions = const [];
   Timer? _debounce;
   bool _searching = false;
   bool _creating = false;
@@ -456,14 +461,15 @@ class _NewDmSheetState extends State<_NewDmSheet> {
   Future<void> _search(String term) async {
     setState(() => _searching = true);
     try {
-      final result =
-          await SiteProxyService.getUserProxy().searchUserAsync(term, 1, 10);
+      // The chat plugin's own search: it says who can actually chat, which
+      // the general user search (used here before) does not.
+      final proxy = SiteProxyService.getChatProxy();
+      if (proxy is! DiscourseChatProxy) return;
+      final found = await proxy.searchChatablesAsync(term);
       if (!mounted || term != _currentTerm()) return;
-      final picked = {for (final u in _selected) u.username.toLowerCase()};
+      final picked = {for (final c in _selected) _key(c)};
       setState(() {
-        _suggestions = result.list
-            .where((u) => !picked.contains(u.username.toLowerCase()))
-            .toList();
+        _suggestions = found.where((c) => !picked.contains(_key(c))).toList();
       });
     } catch (_) {
       // Suggestions are best-effort — typing a raw username still works.
@@ -472,9 +478,13 @@ class _NewDmSheetState extends State<_NewDmSheet> {
     }
   }
 
-  void _pick(FCSearchUser user) {
+  static String _key(DiscourseChatable c) =>
+      '${c.isGroup ? 'g' : 'u'}:${c.name.toLowerCase()}';
+
+  void _pick(DiscourseChatable chatable) {
+    if (!chatable.canChat) return;
     setState(() {
-      _selected.add(user);
+      _selected.add(chatable);
       // Keep any comma-separated names typed before the current
       // fragment; only the fragment was consumed by the pick.
       final raw = _input.text;
@@ -485,24 +495,6 @@ class _NewDmSheetState extends State<_NewDmSheet> {
   }
 
   Future<void> _create() async {
-    final usernames = <String>[];
-    final seen = <String>{};
-    void addName(String name) {
-      final n = name.trim().replaceFirst(RegExp(r'^@'), '');
-      if (n.isEmpty || !seen.add(n.toLowerCase())) return;
-      usernames.add(n);
-    }
-
-    for (final u in _selected) {
-      addName(u.username);
-    }
-    for (final part in _input.text.split(RegExp(r'[,\s]+'))) {
-      addName(part);
-    }
-    if (usernames.isEmpty) {
-      setState(() => _error = 'Enter at least one username.');
-      return;
-    }
     final proxy = SiteProxyService.getChatProxy();
     if (proxy is! DiscourseChatProxy) {
       setState(() => _error = 'Direct messages are not available.');
@@ -512,12 +504,54 @@ class _NewDmSheetState extends State<_NewDmSheet> {
       _creating = true;
       _error = null;
     });
+
+    // Names typed without picking a suggestion are resolved first, by exact
+    // match against the chat search. Discourse drops a name it cannot use
+    // without saying so, and a request left with nobody else in it opens a
+    // DM with yourself — so an unknown name, or someone who cannot chat,
+    // stops here and nothing is created.
+    final chosen = [..._selected];
+    final seen = {for (final c in chosen) _key(c)};
+    final problems = <String>[];
+    for (final part in _input.text.split(RegExp(r'[,\s]+'))) {
+      final name = part.trim().replaceFirst(RegExp(r'^@'), '');
+      if (name.isEmpty) continue;
+      if (seen.contains('u:${name.toLowerCase()}') ||
+          seen.contains('g:${name.toLowerCase()}')) {
+        continue;
+      }
+      final matches = await proxy.searchChatablesAsync(name);
+      final exact = matches
+          .where((c) => c.name.toLowerCase() == name.toLowerCase())
+          .toList();
+      final usable = exact.where((c) => c.canChat).toList();
+      if (usable.isEmpty) {
+        problems.add(exact.isEmpty ? '@$name not found' : '@$name can\'t chat');
+        continue;
+      }
+      chosen.add(usable.first);
+      seen.add(_key(usable.first));
+    }
+    if (!mounted) return;
+    if (problems.isNotEmpty || chosen.isEmpty) {
+      setState(() {
+        _creating = false;
+        _error = chosen.isEmpty && problems.isEmpty
+            ? 'Enter at least one username.'
+            : problems.join(' · ');
+      });
+      return;
+    }
+
     try {
+      final users = [for (final c in chosen) if (!c.isGroup) c.name];
+      final groups = [for (final c in chosen) if (c.isGroup) c.name];
       final result = await proxy.createDirectMessageChannelAsync(
-        usernames,
+        users,
+        groups: groups,
         // Reuse an existing group DM with the same member set instead
         // of minting a duplicate (1:1 DMs are reused automatically).
-        upsert: usernames.length > 1,
+        upsert: users.length + groups.length > 1,
       );
       if (!mounted) return;
       final channel = result.channel;
@@ -572,12 +606,14 @@ class _NewDmSheetState extends State<_NewDmSheet> {
               children: [
                 for (final u in _selected)
                   InputChip(
-                    avatar: UserAvatar(
-                      username: u.username,
-                      iconUrl: u.iconUrl,
-                      radius: 12,
-                    ),
-                    label: Text(u.username),
+                    avatar: u.isGroup
+                        ? const Icon(Icons.groups_rounded, size: 18)
+                        : UserAvatar(
+                            username: u.name,
+                            iconUrl: u.avatarUrl,
+                            radius: 12,
+                          ),
+                    label: Text(u.name),
                     onDeleted: _creating
                         ? null
                         : () => setState(() => _selected.remove(u)),
@@ -617,13 +653,17 @@ class _NewDmSheetState extends State<_NewDmSheet> {
               // Same row the user directory and the message recipient picker
               // use, so a person looks identical wherever you pick them.
               for (final u in _suggestions.take(5))
-                UserListRow(
-                  username: u.username,
-                  subtitle: u.displayText,
-                  avatarUrl: u.iconUrl,
-                  leadingIcon:
-                      u.userType == 'group' ? Icons.groups_rounded : null,
-                  onTap: () => _pick(u),
+                Opacity(
+                  // Someone who cannot chat stays visible, so the reader
+                  // learns why, but cannot be picked.
+                  opacity: u.canChat ? 1 : DesignTokens.opacityDisabled,
+                  child: UserListRow(
+                    username: u.name,
+                    subtitle: u.canChat ? u.label : "Can't chat",
+                    avatarUrl: u.avatarUrl,
+                    leadingIcon: u.isGroup ? Icons.groups_rounded : null,
+                    onTap: u.canChat ? () => _pick(u) : null,
+                  ),
                 ),
           ],
           if (_error != null) ...[
