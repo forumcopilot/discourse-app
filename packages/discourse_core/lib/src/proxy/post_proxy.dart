@@ -176,7 +176,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
                 (t['notification_level'] as int?) ??
                 1) >=
             2,
-        canReply: !(t['closed'] == true || t['archived'] == true),
+        canReply: _canReply(t),
         // Optimistic, with no per-topic signal in the payload: the topic
         // view serializer's `details` has can_edit/can_delete/etc. for
         // MODERATION, but nothing for flag/upload/like at topic level
@@ -274,7 +274,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         authorUserType: '',
         timestamp:
             DateTime.tryParse(t['created_at']?.toString() ?? '') ?? DateTime.now(),
-        canReply: !(t['closed'] == true || t['archived'] == true),
+        canReply: _canReply(t),
         // Optimistic — see the sibling mapper above; no per-topic
         // flag/upload signal exists in this payload.
         canReport: true,
@@ -380,7 +380,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         authorUserType: '',
         timestamp:
             DateTime.tryParse(t['created_at']?.toString() ?? '') ?? DateTime.now(),
-        canReply: !(t['closed'] == true || t['archived'] == true),
+        canReply: _canReply(t),
         // Optimistic — see the sibling mapper above; no per-topic
         // flag/upload signal exists in this payload.
         canReport: true,
@@ -1788,6 +1788,18 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // read as a real "just now" thread if anything rendered it.
       timestamp: _noTimestamp,
     );
+  }
+
+  /// Whether the signed-in user may reply, as Discourse decides it:
+  /// `details.can_create_post` is the guardian's `can_create?(Post, topic)`
+  /// and is only serialized when true. It covers what "not closed, not
+  /// archived" did and also PM membership, silencing and category rules, so
+  /// the Reply button no longer appears for a reply the server would refuse.
+  /// A payload without `details` at all keeps the old approximation.
+  static bool _canReply(Map<String, dynamic> t) {
+    final details = t['details'];
+    if (details is Map) return details['can_create_post'] == true;
+    return !(t['closed'] == true || t['archived'] == true);
   }
 
   FCThreadByPostResult _emptyThreadByPost({required String message}) {

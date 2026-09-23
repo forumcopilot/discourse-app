@@ -85,39 +85,14 @@ class PostActionsHandler {
       return;
     }
 
-    // Use forumId from threadDataOutput, or fallback to the provided forumId (only if not empty)
-    final forumId = data?.topic.forumId ?? (fallbackForumId != null && fallbackForumId!.isNotEmpty ? fallbackForumId : null);
-    if (forumId == null || forumId.isEmpty) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(
-                Icons.error_outline,
-                color: Theme.of(context).colorScheme.onErrorContainer,
-              ),
-              const SizedBox(width: DesignTokens.spacingM),
-              Text(
-                AppLocalizations.of(context)!.pleaseWaitForThreadToLoad,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onErrorContainer,
-                    ),
-              ),
-            ],
-          ),
-          backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-          ),
-          margin: DesignTokens.paddingS,
-          padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
-          duration: const Duration(seconds: 4),
-        ),
-      );
-      return;
-    }
+    // The topic's category, passed along for the composer's upload target.
+    // Not required: a Discourse reply is `POST /posts` with `topic_id` alone,
+    // and a private message has no category at all — requiring one (a
+    // XenForo-era rule, where every reply named its forum) refused every PM
+    // reply with "Please wait for the topic to load".
+    final forumId = (data?.topic.forumId.isNotEmpty ?? false)
+        ? data!.topic.forumId
+        : (fallbackForumId ?? '');
 
     // Use actual topicId from threadDataOutput if available
     // Only use the parameter topicId as fallback if threadDataOutput is null (not in thread_by_post mode)
@@ -299,27 +274,14 @@ class PostActionsHandler {
       AppLogger.debug('   - threadDataOutput.topic.forumId: ${data.topic.forumId}');
     }
     
-    // Use forumId from threadDataOutput, or fallback to the provided forumId (only if not empty)
-    final forumId = data?.topic.forumId ?? (fallbackForumId != null && fallbackForumId!.isNotEmpty ? fallbackForumId : null);
-    AppLogger.debug('🔵 [POST_ACTIONS] Resolved forumId: $forumId');
-    if (forumId == null || forumId.isEmpty) {
-      AppLogger.debug('⚠️ [POST_ACTIONS] forumId is null or empty - showing error');
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.pleaseWaitForTheThreadToLoad,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onInverseSurface,
-                ),
-          ),
-          backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(8),
-        ),
-      );
-      return;
-    }
+    // The topic's category, passed along for the composer's upload target.
+    // Not required: a Discourse reply is `POST /posts` with `topic_id` alone,
+    // and a private message has no category at all — requiring one (a
+    // XenForo-era rule, where every reply named its forum) refused every PM
+    // reply with "Please wait for the topic to load".
+    final forumId = (data?.topic.forumId.isNotEmpty ?? false)
+        ? data!.topic.forumId
+        : (fallbackForumId ?? '');
 
     // Use actual topicId from threadDataOutput if available
     // Only use the parameter topicId as fallback if threadDataOutput is null (not in thread_by_post mode)
