@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_config_proxy.dart';
 import 'package:forumcopilot_sdk/models/results/fc_config_result.dart';
@@ -10,14 +12,42 @@ import '../data/site/discourse_site_capabilities.dart';
 
 /// Discourse implementation of [IFCConfigProxy].
 ///
-/// Hits `/about.json` and maps a small set of fields onto the
-/// XenForo-shaped [FCConfigResult].
+/// Reads `/about.json`, `/site/settings.json` and `/site.json` and maps a
+/// small set of fields onto the XenForo-shaped [FCConfigResult].
 /// The SDK's `FCConfigResult` was modeled on the XenForo plugin's
 /// `getConfig` response and carries ~100 capability flags that don't have a
 /// 1:1 in Discourse — for those we return sensible defaults (Discourse's REST
 /// API supports the operation, so the flag is `true`).
 class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy {
-  DiscourseConfigProxy(SiteContext context) : super(context);
+  DiscourseConfigProxy(
+    super.context, {
+    super.client,
+    Duration aboutTimeout = defaultAboutTimeout,
+  }) : _aboutTimeout = aboutTimeout;
+
+  /// How long entering a forum waits for `/about.json`.
+  ///
+  /// It is the one optional read here: all config takes from it is the
+  /// version string, which nothing downstream reads beyond "not empty", and
+  /// the read-only header, which `/site/settings.json` carries as well.
+  /// forum.cfx.re was seen (2026-09-23) answering `/site.json` and
+  /// `/site/settings.json` in ~0.3 s while `/about.json` hung past 30 s, and
+  /// without a budget of its own that hang ran into the UI's 10 s getConfig
+  /// timeout and reported the whole forum unreachable.
+  static const Duration defaultAboutTimeout = Duration(seconds: 4);
+
+  final Duration _aboutTimeout;
+
+  /// Forums whose `/about.json` outlived [_aboutTimeout] and still has not
+  /// come back.
+  ///
+  /// A cold launch calls getConfig several times (see [_probeChat]). The
+  /// later calls would coalesce onto the same hung request in
+  /// DiscourseClient and each wait out the full budget again. While that
+  /// request is unresolved there is nothing new to learn, so they skip it.
+  /// Nothing is pinned: once it resolves the next getConfig asks again, and
+  /// a success is served from the read cache.
+  static final Set<String> _aboutStillPending = <String>{};
 
   /// Throws [DiscourseApiException] with status 0 when the forum does not
   /// answer at all. Every other failure is soft.
@@ -31,32 +61,54 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
     final settings = _readClientSettings();
     await Future.wait<void>(
         [about, _probeChat(), _readSiteCapabilities(), settings]);
-    final (version, isOpen) = await about;
-    final minSearchLength = await settings;
+    final aboutRead = await about;
+    final settingsRead = await settings;
+    // No word from /about.json in time, so it cannot say whether the forum
+    // is up; /site/settings.json can. Without this a forum whose every read
+    // failed would open as an empty home.
+    if (aboutRead == null && settingsRead.noResponse != null) {
+      throw settingsRead.noResponse!;
+    }
     return _buildResult(
       url,
-      version: version,
-      isOpen: isOpen,
-      minSearchLength: minSearchLength,
+      version: aboutRead?.version ?? 'discourse',
+      // Discourse sends the header on every response, so either reply is
+      // enough to know.
+      isOpen: !((aboutRead?.readOnly ?? false) || settingsRead.readOnly),
+      minSearchLength: settingsRead.minSearchLength,
     );
   }
 
-  /// The forum's version, and whether it accepts writes.
-  Future<(String, bool)> _readAbout() async {
+  /// The forum's version, and whether it is in read-only mode; null when
+  /// `/about.json` did not answer within [_aboutTimeout].
+  Future<({String version, bool readOnly})?> _readAbout() async {
+    final forum = siteContext.site.pluginUrl;
+    if (_aboutStillPending.contains(forum)) {
+      // ignore: avoid_print
+      print('⚠️ [DISCOURSE_CONFIG] /about.json still has not answered an '
+          'earlier request (continuing without it)');
+      return null;
+    }
     String version = 'discourse';
-    bool isOpen = true;
+    bool readOnly = false;
+    final request = apiGetWithHeaders('/about.json');
     try {
-      final (about, headers) = await apiGetWithHeaders('/about.json');
+      final (about, headers) = await request.timeout(_aboutTimeout);
       final aboutInner = (about['about'] as Map<String, dynamic>?) ?? const {};
       final v = aboutInner['version'] as String?;
       if (v != null && v.isNotEmpty) version = v;
-      // Read-only mode is not a /site.json or /about.json body field —
-      // Discourse signals it with a `Discourse-Readonly: true` response
-      // header on every request (lib/read_only_mixin.rb). Check the
-      // response we just received.
-      isOpen = !headers.entries.any((h) =>
-          h.key.toLowerCase() == 'discourse-readonly' &&
-          h.value.toLowerCase() == 'true');
+      readOnly = _isReadOnly(headers);
+    } on TimeoutException {
+      _aboutStillPending.add(forum);
+      // The request is not cancelled; drop the marker when it settles.
+      // `.then(onError:)` also keeps its late failure from going unhandled.
+      unawaited(request
+          .then<void>((_) {}, onError: (Object _) {})
+          .whenComplete(() => _aboutStillPending.remove(forum)));
+      // ignore: avoid_print
+      print('⚠️ [DISCOURSE_CONFIG] /about.json did not answer in '
+          '${_aboutTimeout.inMilliseconds} ms (continuing without it)');
+      return null;
     } on DiscourseApiException catch (e) {
       // No response at all: offline, DNS failure, connection refused. The
       // forum is unreachable, and carrying on would open an empty home as
@@ -68,8 +120,18 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       // ignore: avoid_print
       print('⚠️ [DISCOURSE_CONFIG] /about.json failed (continuing): $e');
     }
-    return (version, isOpen);
+    return (version: version, readOnly: readOnly);
   }
+
+  /// Read-only mode is not a response body field — Discourse signals it
+  /// with a `Discourse-Readonly: true` header on every response
+  /// (ApplicationController `after_action :add_readonly_header`,
+  /// lib/read_only_mixin.rb). Read it off the response in hand:
+  /// [SiteContext.lastCallResponse] may name another of the parallel reads.
+  static bool _isReadOnly(Map<String, String> headers) =>
+      headers.entries.any((h) =>
+          h.key.toLowerCase() == 'discourse-readonly' &&
+          h.value.toLowerCase() == 'true');
 
   Future<void> _probeChat() async {
     // Phase 5.18a — probe the chat plugin via its `/chat/api/me/channels`
@@ -138,8 +200,16 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
     }
   }
 
-  /// Reads the forum's client settings; returns its minimum search length.
-  Future<int?> _readClientSettings() async {
+  /// Reads the forum's client settings; returns its minimum search length,
+  /// whether the reply said read-only, and — when the forum sent no reply
+  /// at all — that failure, for [getConfig] to raise if `/about.json` could
+  /// not vouch for the forum either.
+  Future<
+      ({
+        int? minSearchLength,
+        bool readOnly,
+        DiscourseApiException? noResponse,
+      })> _readClientSettings() async {
     // Upload limits — Discourse publishes every `client: true` site setting
     // at `/site/settings.json` (SiteController#settings →
     // SiteSetting.client_settings_json). That's where the upload caps live:
@@ -151,8 +221,12 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
     // Fail soft: on any error the cache stays null and uploads fall back
     // to server-side validation only.
     int? minSearchLength;
+    bool readOnly = false;
+    DiscourseApiException? noResponse;
     try {
-      final settings = await apiGet('/site/settings.json');
+      final (settings, headers) =
+          await apiGetWithHeaders('/site/settings.json');
+      readOnly = _isReadOnly(headers);
       siteContext
           .setUploadLimits(DiscourseUploadLimits.fromClientSettings(settings));
       // …and how the forum wants photos prepared before upload, which its
@@ -192,11 +266,16 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       final chatUploads = settings['chat_allow_uploads'];
       if (chatUploads is bool) siteContext.setChatAllowUploads(chatUploads);
     } catch (e) {
+      if (e is DiscourseApiException && e.statusCode == 0) noResponse = e;
       // ignore: avoid_print
       print('⚠️ [DISCOURSE_CONFIG] /site/settings.json failed '
           '(upload limits unavailable, uploads fail open): $e');
     }
-    return minSearchLength;
+    return (
+      minSearchLength: minSearchLength,
+      readOnly: readOnly,
+      noResponse: noResponse,
+    );
   }
 
   FCConfigResult _buildResult(
