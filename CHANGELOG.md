@@ -6,6 +6,14 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+Thread rendering, batch 5: link previews. Covered by `packages/discourse_ui/test/onebox_rendering_test.dart` and checked before/after on the Pixel in light and dark themes.
+
+### Fixed
+- **Link previews are cards, as on the web** (11,479 posts on 825 forums in the audit). The forum's onebox was drawn as raw markup: favicons at full size, thumbnails across the whole column, the title as an underlined link, no card. It is now a bordered card with the site's 16px icon and name, the title in the link colour, the excerpt, and a small thumbnail beside the text; tapping opens the link. No request is made that the forum did not already make.
+- **GitHub previews** show an issue, pull-request or commit icon, the title, "opened … by …" with the date in the reader's time zone and a short excerpt; file previews show their path and code (older previews' numbered lines now read one per line). An inline GitHub avatar is no longer drawn at 48px.
+- **PDF previews** show a PDF tile, the file name as a reader would write it (no `%20`) and its size; **tweets** the author's avatar, name and handle, the text, photos or video, and the date with like and retweet counts.
+- Links, local dates, code and videos inside a preview keep working: the preview's body is rendered by the same renderer as the post.
+
 ## [1.0.23] - 2026-09-23
 
 Thread rendering, batch 4: what Discourse's plugins draw with JavaScript on the web. Covered by `packages/discourse_ui/test/discourse_blocks_rendering_test.dart`, `local_dates_test.dart` and `packages/discourse_core/test/post_kinds_and_polls_test.dart`, and checked before/after on the Pixel in light and dark themes.

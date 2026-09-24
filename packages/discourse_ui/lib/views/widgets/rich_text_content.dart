@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'brand_image.dart';
 import 'discourse_blocks.dart';
 import 'embed_cards.dart';
+import 'onebox_card.dart';
 import 'post_content_callbacks.dart' show PostContentCallbacks;
 import 'post_table.dart';
 import 'twitter_card.dart';
@@ -133,6 +134,18 @@ class RichTextContent extends StatelessWidget {
         PostTableExtension(colorScheme: colorScheme),
         _EmbedExtension(resolve: _resolveUrl, onOpen: openEmbed),
         DiscourseBlocksExtension(onOpen: openEmbed, pollBuilder: pollBuilder),
+        // Link previews: a native card; what is inside the preview's body is
+        // rendered by a nested RichTextContent, so it keeps every rule here.
+        OneboxExtension(
+          resolve: _resolveUrl,
+          onOpen: openEmbed,
+          renderHtml: (html) => RichTextContent(
+            siteContext: siteContext,
+            content: html,
+            callbacks: callbacks,
+            webUrl: webUrl,
+          ),
+        ),
         // Discourse renders a non-image upload as
         // `<a class="attachment">name</a> (117 Bytes)`, and styles it with
         // a download glyph via CSS ::before — which flutter_html cannot
@@ -166,7 +179,11 @@ class RichTextContent extends StatelessWidget {
         TagExtension(
           tagsToExtend: {'pre'},
           builder: (extensionContext) {
-            final code = extensionContext.element?.text ?? '';
+            // Older GitHub code previews put each line in an `ol.lines li`.
+            final lines = extensionContext.element?.querySelectorAll('ol.lines > li') ?? const [];
+            final code = lines.isNotEmpty
+                ? lines.map((li) => li.text).join('\n')
+                : extensionContext.element?.text ?? '';
             if (code.isEmpty) return const SizedBox.shrink();
             final codeBlock = Container(
               width: double.infinity,
@@ -269,7 +286,7 @@ class RichTextContent extends StatelessWidget {
             // A onebox's avatar (a tweet's author, a GitHub user) is a small
             // square beside the text on the web; at its own 400×400 it
             // would fill the post.
-            if (classes.contains('onebox-avatar')) {
+            if (classes.split(RegExp(r'\s+')).contains('onebox-avatar')) {
               return ClipRRect(
                 borderRadius: BorderRadius.circular(6),
                 child: Image.network(
