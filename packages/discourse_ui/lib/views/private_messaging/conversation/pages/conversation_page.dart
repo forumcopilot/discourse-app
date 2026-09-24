@@ -226,6 +226,12 @@ class _ConversationPageState extends State<ConversationPage> {
       final n = m.messageNumber;
       if (n != null && _reportedMessageNumbers.add(n)) fresh.add(n);
     }
+    // The small actions among them ("invited …"), which have no row here:
+    // a message notification can point at one, and stayed unread — so the
+    // Messages badge stayed lit — until it was timed too.
+    for (final n in DiscourseMessageDetails.hiddenPostNumbers(widget.conversationId)) {
+      if (_reportedMessageNumbers.add(n)) fresh.add(n);
+    }
     if (fresh.isEmpty) return;
     SiteProxyService.getTopicProxy()
         .markPostsReadAsync(topicId: widget.conversationId, postNumbers: fresh)

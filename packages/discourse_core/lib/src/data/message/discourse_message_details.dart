@@ -38,8 +38,27 @@ class DiscourseMessageDetails {
   static DiscourseMessageDetails? forTopic(String topicId) =>
       topicId.isEmpty ? null : _byTopicId[topicId];
 
+  /// Post numbers of the small actions ("invited …", "left", "closed this")
+  /// in the loaded windows of message [topicId]. The message view shows no
+  /// row for them, but they are posts: a message notification points at the
+  /// reader's first unread post, which may be one, and only its timing
+  /// clears the notification (Notification.mark_posts_read). They are
+  /// reported read with the messages around them.
+  static Set<int> hiddenPostNumbers(String topicId) =>
+      _hiddenByTopicId[topicId] ?? const {};
+
+  static void addHiddenPostNumbers(String topicId, Iterable<int> numbers) {
+    if (topicId.isEmpty || numbers.isEmpty) return;
+    (_hiddenByTopicId[topicId] ??= <int>{}).addAll(numbers);
+  }
+
+  static final Map<String, Set<int>> _hiddenByTopicId = {};
+
   /// Only for tests and sign-out; one small entry per message opened.
-  static void clear() => _byTopicId.clear();
+  static void clear() {
+    _byTopicId.clear();
+    _hiddenByTopicId.clear();
+  }
 }
 
 /// A group a private message is addressed to (BasicGroupSerializer).

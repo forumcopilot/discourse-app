@@ -445,9 +445,14 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       position: postNumber,
       // For chat, the message the notification is about, so the channel can
       // open on it rather than at its end (`data.chat_message_id`).
+      // The post a topic or message notification is about
+      // (`data.original_post_id`, set by PostAlerter for replies, mentions,
+      // quotes, likes and messages), so a tap opens at it rather than at
+      // the reader's last-read point. For chat, the message instead
+      // (`data.chat_message_id`), so the channel opens on it.
       postId: contentType == 'chat_channel'
           ? data['chat_message_id']?.toString()
-          : null,
+          : data['original_post_id']?.toString(),
       // Whatever _alertTarget decided is a conversation — so an invite-to-PM
       // routes the same as the PM itself, rather than only type 6 doing so.
       conversationId: contentType == 'conversation_message' ? topicId : null,

@@ -707,6 +707,11 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       // A message is a topic: Copy link gives its /t/{slug}/{id}/{n}.
       DiscourseTopicSlugs.store(siteContext.site.url, conversationId, t['slug']);
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
+      DiscourseMessageDetails.addHiddenPostNumbers(conversationId, [
+        for (final m in ((stream['posts'] as List?) ?? const []).whereType<Map>())
+          if (m['post_type'] == 3 && m['post_number'] is int)
+            m['post_number'] as int,
+      ]);
       final messages = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
           // Post type 3 is Discourse's small action — "left the message",
@@ -743,10 +748,11 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
         // `can_invite_to` only when the guardian grants them
         // (app/serializers/topic_view_details_serializer.rb:11-13,
         // :127-128, :135-137), so presence IS the permission and absence
-        // is a real "no". Prefer them over the closed/archived guess;
-        // fall back to the guess only if `details` came back without the
-        // key at all.
-        canReply: details.containsKey('can_create_post')
+        // is a real "no" — which the old key-missing fallback to a
+        // closed/archived guess turned back into a yes (a silenced member got
+        // a reply box the server refused). The guess is kept only for a
+        // payload with no `details` at all.
+        canReply: details.isNotEmpty
             ? details['can_create_post'] == true
             : (!((t['closed'] as bool?) ?? false) &&
                 !((t['archived'] as bool?) ?? false)),
@@ -759,7 +765,14 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
         // Close action used to be offered with canEdit and then refused.
         canClose: details['can_close_topic'] == true,
         isClosed: (t['closed'] as bool?) ?? false,
-        totalMessageNum: (t['posts_count'] as int?) ?? messages.length,
+        // The last post NUMBER, which the message view pages up to — not
+        // posts_count: in a message that leaves out small actions and
+        // deleted posts while the numbering still counts them (a live one:
+        // posts_count 3, highest_post_number 9), so the newest messages
+        // could not be reached.
+        totalMessageNum: (t['highest_post_number'] as int?) ??
+            (t['posts_count'] as int?) ??
+            messages.length,
         lastRead: (t['last_read_post_number'] as int?) ?? 0,
         // Optimistic: Discourse gates uploads globally (trust level +
         // authorized_extensions / max_*_size_kb, cached on the site

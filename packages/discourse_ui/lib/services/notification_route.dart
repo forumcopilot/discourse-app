@@ -35,6 +35,11 @@ enum NotificationRouteKind {
   /// the page containing that post.
   topicPage,
 
+  /// A personal message (topic id), optionally at a post: opened in the
+  /// message screen, with its archive, leave and participants actions,
+  /// rather than the topic reader.
+  conversation,
+
   /// Nothing to open. The notification list is the honest destination.
   notificationsTab,
 }
@@ -82,6 +87,21 @@ class DiscourseNotificationRoute {
     final postId = _intFrom(data['content_id']);
     final postNumber = _intFrom(data['post_number']);
     final siteUrl = _stringFrom(data['site_url']);
+
+    // A personal message (private_message 6, invited_to_private_message 7)
+    // opens where the notifications tab opens it: the message screen. The
+    // backend passes Discourse's notification_type along; this used to be
+    // ignored, so a message push landed in the topic reader.
+    final type = _intFrom(data['notification_type']);
+    if (topicId != null && (type == 6 || type == 7)) {
+      return DiscourseNotificationRoute(
+        kind: NotificationRouteKind.conversation,
+        topicId: topicId.toString(),
+        postId: postId?.toString(),
+        postNumber: postNumber,
+        siteUrl: siteUrl,
+      );
+    }
 
     // A post id is the better anchor: Discourse resolves it to its exact
     // position, where a post number only gets us to the surrounding page.

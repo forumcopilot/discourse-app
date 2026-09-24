@@ -8,6 +8,7 @@ import '../l10n/generated/app_localizations.dart';
 import '../utils/snackbar_helper.dart';
 import '../views/lists/posts_list.dart';
 import '../views/post_page.dart';
+import '../views/private_messaging/conversation/pages/conversation_page.dart';
 import '../views/site_home_tab.dart';
 import 'notification_route.dart';
 
@@ -57,6 +58,16 @@ class DiscourseRouteNavigator {
                   ? PostsListMode.first_unread
                   : PostsListMode.normal);
         }
+      case NotificationRouteKind.conversation:
+        final topicId = route.topicId;
+        if (topicId == null) return;
+        AppLogger.debug('🧭 [DiscourseRouteNavigator] Message $topicId');
+        Get.to(() => ConversationPage(
+              siteContext: siteContext,
+              conversationId: topicId,
+              subject: '', // The page shows the message's own title once loaded.
+              anchorMessageId: route.postId,
+            ));
       case NotificationRouteKind.notificationsTab:
         if (Get.isRegistered<DiscourseSiteController>()) {
           Get.find<DiscourseSiteController>()

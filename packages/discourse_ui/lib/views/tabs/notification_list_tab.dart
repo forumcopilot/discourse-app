@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../services/notification_route.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
@@ -379,16 +380,45 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
         return;
       }
 
+      // At the post the notification is about, as the web links it
+      // (postUrl(slug, topic_id, post_number)): by its id when the
+      // notification carries one, else by its number. Only a notification
+      // naming no post opens at the reader's first unread; this did that
+      // for all of them, so "liked your post #2" in a read topic opened at
+      // the end.
+      final postId = alert.postId;
+      final postNumber = alert.position ?? 0;
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PostPage(
-            siteContext: widget.siteContext,
-            topicId: topicId,
-            title: _extractTopicTitleFromMessage(alert.message),
-            mode: PostsListMode.first_unread,
-            forumId: '', // Forum ID may not be available
-          ),
+          builder: (context) => postId != null && postId.isNotEmpty
+              ? PostPage(
+                  siteContext: widget.siteContext,
+                  topicId: topicId,
+                  title: _extractTopicTitleFromMessage(alert.message),
+                  mode: PostsListMode.thread_by_post,
+                  anchorPostId: postId,
+                  forumId: '',
+                )
+              : postNumber > 0
+                  ? PostPage(
+                      siteContext: widget.siteContext,
+                      topicId: topicId,
+                      title: _extractTopicTitleFromMessage(alert.message),
+                      mode: PostsListMode.goto_page,
+                      gotoPage: ((postNumber - 1) ~/
+                              DiscourseNotificationRoute.postsPerPage) +
+                          1,
+                      gotoPostNumber: postNumber,
+                      forumId: '',
+                    )
+                  : PostPage(
+                      siteContext: widget.siteContext,
+                      topicId: topicId,
+                      title: _extractTopicTitleFromMessage(alert.message),
+                      mode: PostsListMode.first_unread,
+                      forumId: '', // Forum ID may not be available
+                    ),
         ),
       );
     } else if (contentType == 'conversation_message') {
@@ -401,7 +431,11 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
 
       // For conversation_message type, contentId is the message ID
       // Use it to navigate to the specific message in the conversation
-      final messageId = alert.content_id?.isNotEmpty == true ? alert.content_id : null;
+      // The message the notification is about (original_post_id); a
+      // message's posts are addressed by post id.
+      final messageId = alert.postId?.isNotEmpty == true
+          ? alert.postId
+          : (alert.content_id?.isNotEmpty == true ? alert.content_id : null);
 
       Navigator.push(
         context,
