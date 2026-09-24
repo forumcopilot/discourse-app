@@ -106,8 +106,16 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
         'filter': 'unread',
         'operation': {'type': 'dismiss_posts'},
       };
-      if (forumId.isNotEmpty) {
-        body['category_id'] = int.tryParse(forumId) ?? forumId;
+      // Every category unless one is named. The app bars pass '0', the
+      // XenForo "all forums" id; sent as category_id 0 it narrowed the
+      // selection to a category that does not exist, so nothing was marked
+      // read while the app reported success. A named category takes its
+      // subcategories with it, as "Dismiss" does on the web
+      // (TopicsController#bulk_unread_topic_ids).
+      final categoryId = int.tryParse(forumId);
+      if (categoryId != null && categoryId > 0) {
+        body['category_id'] = categoryId;
+        body['include_subcategories'] = true;
       }
       await apiPut('/topics/bulk', body: body);
       return FCMarkAllAsReadResult(result: true, resultText: '');

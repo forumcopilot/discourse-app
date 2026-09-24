@@ -24,6 +24,10 @@ class ReplyPage extends StatefulWidget {
   final String? postId;
   final bool isQuote;
 
+  /// The post this reply answers (null for a reply to the topic): sent as
+  /// Discourse's reply_to_post_number, so that post's author is notified.
+  final int? replyToPostNumber;
+
   const ReplyPage({
     super.key,
     required this.siteContext,
@@ -35,6 +39,7 @@ class ReplyPage extends StatefulWidget {
     this.quoteAuthor,
     this.postId,
     this.isQuote = false,
+    this.replyToPostNumber,
   });
 
   @override
@@ -180,6 +185,18 @@ class _ReplyPageState extends State<ReplyPage> {
           content,
           attachmentIds: _attachmentIds.isNotEmpty ? _attachmentIds : null,
           returnHtml: false,
+          replyToPostNumber: widget.replyToPostNumber,
+        );
+      } else if (postProxy is DiscoursePostProxy) {
+        result = await postProxy.replyPostAsync(
+          forumIdParam,
+          threadIdParam,
+          "", // Subject is optional for replies
+          content,
+          _attachmentIds.isNotEmpty ? _attachmentIds : null,
+          _groupId,
+          false, // Don't need HTML return
+          replyToPostNumber: widget.replyToPostNumber,
         );
       } else {
         result = await postProxy.replyPostAsync(

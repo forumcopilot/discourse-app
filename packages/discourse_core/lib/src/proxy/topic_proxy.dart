@@ -116,20 +116,23 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
   }) =>
       _topicListInForum(forumId, startNum, filter: filter);
 
-  /// Discourse-only: site-wide Top feed, optionally scoped to a time
-  /// [period]. Maps to `/top.json` (all-time) or `/top/{period}.json`
-  /// (`all` / `yearly` / `quarterly` / `monthly` / `weekly` / `daily`).
+  /// Discourse-only: site-wide Top feed for a time [period] (`all` /
+  /// `yearly` / `quarterly` / `monthly` / `weekly` / `daily`), 0-based
+  /// [page].
+  ///
+  /// Always `/top.json?period=`: `/top/{period}.json` answers with a 301 to
+  /// that URL and drops `page` on the way, so every page after the first
+  /// was the first again; and `/top.json` with no period is not all-time
+  /// but ListController.best_period_for the reader's last visit.
   ///
   /// Used by the Home tab's Top sub-segment (Phase 5.17c).
   Future<FCLatestTopicResult> getTopTopicsGlobalAsync({
     String period = 'all',
     int page = 0,
   }) async {
-    final path = period == 'all'
-        ? '/top.json'
-        : '/top/${Uri.encodeComponent(period)}.json';
     try {
-      final list = await _listTopics(path, page: page);
+      final list = await _listTopics('/top.json',
+          page: page, extraQuery: {'period': period});
       return FCLatestTopicResult(
         result: true,
         resultText: '',
@@ -531,8 +534,10 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     String path, {
     int page = 0,
     bool filterPinnedGlobally = false,
+    Map<String, String> extraQuery = const {},
   }) async {
     final responseFuture = apiGet(path, query: {
+      ...extraQuery,
       if (page > 0) 'page': page.toString(),
     });
     final catNamesFuture = _loadCategoryNames();

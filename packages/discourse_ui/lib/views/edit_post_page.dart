@@ -36,6 +36,10 @@ class _EditPostPageState extends State<EditPostPage> {
   late final TextEditingController _contentController;
   bool _controllersInitialized = false;
 
+  /// Whether this is the topic's first post and the title field is shown:
+  /// only then is a title sent with the edit.
+  bool _canEditTitle = false;
+
   // Cache the future to prevent FutureBuilder from recreating it on every build
   late final Future<FCRawPostResult> _rawPostFuture;
 
@@ -60,12 +64,11 @@ class _EditPostPageState extends State<EditPostPage> {
     try {
       var postProxy = SiteProxyFactory.getPostProxy();
 
-      // Handle empty title case - use topic title with "Re:" prefix if title is empty
-      String finalTitle = title.trim();
-      if (finalTitle.isEmpty) {
-        // For replies or posts without titles, use the topic title with "Re:" prefix
-        finalTitle = widget.topicTitle.startsWith('Re:') ? widget.topicTitle : 'Re: ${widget.topicTitle}';
-      }
+      // The topic's title rides along only when editing its first post (the
+      // field is shown only then); for a reply there is no title to send.
+      // This used to invent "Re: <topic>" for replies, a XenForo habit
+      // Discourse has no place for.
+      final finalTitle = _canEditTitle ? title.trim() : '';
 
       // Send empty array instead of null to explicitly disassociate all attachments
       // If we send null, the server might associate all attachments in the groupId
@@ -201,6 +204,7 @@ class _EditPostPageState extends State<EditPostPage> {
           final data = snapshot.data!;
           _titleController.text = data.postTitle ?? '';
           _contentController.text = data.postContent ?? '';
+          _canEditTitle = data.canEditTitle ?? false;
           _controllersInitialized = true;
         }
 

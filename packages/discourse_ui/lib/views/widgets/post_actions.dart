@@ -39,6 +39,18 @@ class PostActionsHandler {
 
   /// [onRefresh] may be called with no args (refresh current page) or with [scrollToPostId]
   /// to refresh by loading the thread at that post and scrolling to it (used after reply to stay on same screen).
+  /// The number of the loaded post [postId], which a reply to it must name
+  /// (reply_to_post_number). Null for a reply to the topic ('' from the
+  /// bottom bar) or a post not in the loaded window.
+  int? _postNumberOf(String postId) {
+    if (postId.isEmpty) return null;
+    final posts = _postsController.threadDataOutput.value?.posts ?? const [];
+    for (final p in posts) {
+      if (p.id == postId) return p.postNumber;
+    }
+    return null;
+  }
+
   Future<void> handleReply(BuildContext context, String postId, String topicId, String topicTitle, void Function([String? scrollToPostId]) onRefresh) async {
     AppLogger.debug('🔵 [POST_ACTIONS] handleReply called');
     AppLogger.debug('   - postId: $postId');
@@ -187,6 +199,7 @@ class PostActionsHandler {
           topicTitle: topicTitle,
           postId: postId,
           isQuote: false,
+          replyToPostNumber: _postNumberOf(postId),
         ),
       ),
     );
@@ -352,6 +365,7 @@ class PostActionsHandler {
           topicTitle: topicTitle,
           postId: postId,
           isQuote: true,
+          replyToPostNumber: _postNumberOf(postId),
         ),
       ),
     );

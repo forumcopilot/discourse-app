@@ -64,7 +64,9 @@ class _NewTopicPageState extends State<NewTopicPage> {
       contentController: _contentController,
       extraData: {
         'action': 'createTopic',
-        if (widget.forumId.isNotEmpty) 'categoryId': widget.forumId,
+        // A number, as Discourse's own composer stores it.
+        if (widget.forumId.isNotEmpty)
+          'categoryId': int.tryParse(widget.forumId) ?? widget.forumId,
       },
     );
     // Prefill the category's topic template — but never over a draft.

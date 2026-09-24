@@ -102,7 +102,9 @@ class TopTopicsListState extends FCStatefulWidget<TopTopicsList>
       }
       final result = await proxy.getTopTopicsGlobalAsync(
         period: _period.apiName,
-        page: reset ? 0 : _page + 1,
+        // _page is already the next page: it counts the pages loaded.
+        // Asking for _page + 1 skipped every other page.
+        page: reset ? 0 : _page,
       );
       if (!mounted) return;
       setState(() {

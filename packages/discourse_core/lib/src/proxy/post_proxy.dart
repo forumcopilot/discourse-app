@@ -406,6 +406,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     }
   }
 
+  /// [replyToPostNumber] (Discourse-only) is the post this answers, as the
+  /// web composer sends it whenever you reply to a post rather than the
+  /// topic. Without it the reply is not linked to that post: its author is
+  /// not notified ("replied" notification), and it is missing from that
+  /// post's replies.
   @override
   Future<FCReplyPostResult> replyPostAsync(
     String forumId,
@@ -414,8 +419,9 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     String textBody,
     List<String>? attachmentIds,
     String? groupId,
-    bool returnHtml,
-  ) async {
+    bool returnHtml, {
+    int? replyToPostNumber,
+  }) async {
     try {
       // Phase 5.19 — append Markdown image/file refs for each
       // uploaded attachment before posting. See `appendAttachmentMarkdown`
@@ -428,6 +434,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         'topic_id': int.tryParse(topicId) ?? topicId,
         'raw': rawWithAttachments,
         'archetype': 'regular',
+        if (replyToPostNumber != null) 'reply_to_post_number': replyToPostNumber,
       });
       return FCReplyPostResult(
         result: true,
@@ -459,6 +466,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     String textBody, {
     List<String>? attachmentIds,
     bool returnHtml = true,
+    int? replyToPostNumber,
   }) async {
     try {
       final rawWithAttachments =
@@ -468,6 +476,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         'raw': rawWithAttachments,
         'archetype': 'regular',
         'whisper': 'true',
+        if (replyToPostNumber != null) 'reply_to_post_number': replyToPostNumber,
       });
       return FCReplyPostResult(
         result: true,
@@ -567,17 +576,23 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
           'raw': rawWithAttachments,
           if (reason != null && reason.isNotEmpty) 'edit_reason': reason,
         },
+        // Discourse takes the topic's new title with the edit of its first
+        // post (PostsController#update, top-level `title`; ignored for any
+        // other post). It was never sent, so renaming a topic silently did
+        // nothing. The caller passes a title only for a first post.
+        if (postTitle.trim().isNotEmpty) 'title': postTitle.trim(),
       };
       final response = await apiPut('/posts/$postId.json', body: body);
-      // If editing the first post and a title was provided, update topic title.
-      // Skipped here because the SDK only knows `postTitle` exists when the
-      // first post is being edited; the caller decides.
+      // The answer nests the post: {post: {raw, cooked, ...}}.
+      final post = response['post'] is Map
+          ? (response['post'] as Map).cast<String, dynamic>()
+          : response;
       return FCSaveRawPostResult(
         result: true,
         resultText: '',
         postContent: returnHtml
-            ? response['cooked']?.toString()
-            : response['raw']?.toString(),
+            ? post['cooked']?.toString()
+            : post['raw']?.toString(),
       );
     } catch (e) {
       return FCSaveRawPostResult(result: false, resultText: describeApiError(e));

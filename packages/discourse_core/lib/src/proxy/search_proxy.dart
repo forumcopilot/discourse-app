@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_search_proxy.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
@@ -306,12 +307,26 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
   ///
   /// Throws on network/API errors so callers can surface them and
   /// offer a retry.
+  /// [filters] as Discourse search operators.
+  ///
+  /// The shared SDK spells the "I liked" filter `in:liked`, but Discourse's
+  /// operator is `in:likes` (Search advanced_filter /\Ain:(likes)\z/); an
+  /// unknown `in:` is searched as plain text, so the filter returned topics
+  /// containing the word "liked". Corrected here until the canonical SDK's
+  /// FCSearchPersonal.liked token is fixed.
+  @visibleForTesting
+  static String discourseSearchFragment(FCSearchFilters filters) =>
+      filters.toQueryFragment().replaceAllMapped(
+            RegExp(r'(^|\s)in:liked(?=\s|$)'),
+            (m) => '${m[1]}in:likes',
+          );
+
   Future<DiscourseSearchResult> searchWithFiltersAsync({
     required String keywords,
     FCSearchFilters filters = const FCSearchFilters(),
     int page = 1,
   }) async {
-    final fragment = filters.toQueryFragment();
+    final fragment = discourseSearchFragment(filters);
     final q = [keywords.trim(), fragment]
         .where((p) => p.isNotEmpty)
         .join(' ')

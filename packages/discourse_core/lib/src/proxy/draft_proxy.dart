@@ -81,7 +81,7 @@ class DiscourseDraftProxy extends BaseDiscourseProxy implements IFCDraftProxy {
         sequence: seq,
         data: data,
         title: data['title']?.toString(),
-        categoryId: (data['categoryId'] as num?)?.toInt(),
+        categoryId: _intOf(data['categoryId']),
       );
       return FCLoadDraftResult(result: true, draft: draft);
     } on DiscourseApiException catch (e) {
@@ -196,11 +196,17 @@ class DiscourseDraftProxy extends BaseDiscourseProxy implements IFCDraftProxy {
       // reply drafts used to report null despite the server saying
       // otherwise.
       categoryId: (json['category_id'] as num?)?.toInt() ??
-          (parsed['categoryId'] as num?)?.toInt(),
+          _intOf(parsed['categoryId']),
       // DraftSerializer has no `updated_at` — `created_at` is the only
       // timestamp Discourse exposes for a draft, and Discourse bumps it
       // on each save. Mapped onto the SDK's updatedAt for that reason.
       updatedAt: DateTime.tryParse(json['created_at']?.toString() ?? ''),
     );
   }
+
+  /// The draft blob's `categoryId`: a number from Discourse's web composer,
+  /// but a string in drafts this app saved before it stored numbers. A
+  /// plain `as num?` threw on those and took the whole Drafts page down.
+  static int? _intOf(Object? value) =>
+      value is num ? value.toInt() : int.tryParse(value?.toString() ?? '');
 }
