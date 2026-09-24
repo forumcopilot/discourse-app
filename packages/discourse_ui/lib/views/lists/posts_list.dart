@@ -1212,7 +1212,9 @@ class _PostsState extends State<PostsList> {
         onAvatarTap: (userId, userName) => avatarActions.handleAvatarTap(context, widget.siteContext, userId, userName, postActionsHandler: postActionsHandler, onRefresh: _refreshCurrentPage),
         post: post,
         threadId: widget.topicId,
-        topicTitle: widget.topicTitle,
+        // The loaded topic's title, so a rename shows once the topic
+        // reloads; the one the list opened it with is only a fallback.
+        topicTitle: data.topic.title.isNotEmpty ? data.topic.title : widget.topicTitle,
         // Category and tags belong to the topic, so they ride with the
         // opening post — where web puts them, directly under the title.
         topicCategory: post.postNumber == 1 ? data.topic.forumName : '',

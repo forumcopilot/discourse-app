@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseSiteCapabilities;
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_draft.dart';
@@ -134,7 +136,13 @@ class _DraftsListPageState extends State<DraftsListPage> {
           builder: (_) => NewTopicPage(
             siteContext: widget.siteContext,
             forumId: (draft.categoryId ?? '').toString(),
-            forumName: '',
+            // Named, so the category chip does not come back blank.
+            forumName: draft.categoryId == null
+                ? ''
+                : DiscourseSiteCapabilities.forSite(
+                            widget.siteContext.site.pluginUrl)
+                        .categoryNameFor(draft.categoryId.toString()) ??
+                    '',
           ),
         ),
       );
