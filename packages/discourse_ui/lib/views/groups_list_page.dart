@@ -82,7 +82,12 @@ class _GroupsListPageState extends State<GroupsListPage> {
         } else {
           _groups.addAll(result.groups);
           _page = fetchedPage;
-          if (result.groups.length < 36) _hasMore = false;
+          // Done when the list holds all the forum reports. This compared
+          // the page with 36, but a phone gets 15 a page, so it stopped
+          // after one page.
+          _hasMore = result.total > 0
+              ? _groups.length < result.total
+              : result.hasMore;
         }
         _loading = false;
       });

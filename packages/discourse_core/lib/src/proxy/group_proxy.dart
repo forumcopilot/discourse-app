@@ -25,8 +25,11 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
   @override
   Future<FCGroupListResult> getGroupsAsync({int page = 1}) async {
     try {
+      // The SDK's page is 1-based, Discourse's 0-based
+      // (GroupsController#index): sending page 1 for the second page asked
+      // for the server's second page first, so its first page never showed.
       final response = await apiGet('/groups.json', query: {
-        if (page > 1) 'page': page.toString(),
+        if (page > 1) 'page': (page - 1).toString(),
       });
       final raw = (response['groups'] as List?) ?? const [];
       final groups = raw
@@ -41,14 +44,12 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
       // `load_more_groups` is emitted UNCONDITIONALLY (always a
       // groups_path string), so its presence alone can't mean "more" —
       // Discourse's own client loads it and stops when a page comes back
-      // empty. Derive hasMore precisely from the authoritative total
-      // instead: there is more when the total exceeds what we've paged
-      // through so far. `page` is 1-based here; the server pages 0-based
-      // at 36/page (15 on mobile UAs — we send a desktop UA).
+      // empty. The page size is the server's choice: 36, or 15 for a
+      // User-Agent containing "Mobile" — which the app's real WebView UA
+      // does — so it cannot be assumed here. A non-empty page may have a
+      // successor; the caller compares what it holds with `total`.
       final total = (response['total_rows_groups'] as num?)?.toInt() ?? 0;
-      const pageSize = 36;
-      final loadedThrough = page * pageSize;
-      final hasMore = groups.isNotEmpty && total > loadedThrough;
+      final hasMore = groups.isNotEmpty;
       return FCGroupListResult(
         result: true,
         groups: groups,

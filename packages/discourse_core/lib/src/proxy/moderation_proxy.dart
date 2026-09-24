@@ -279,14 +279,15 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
           resultText: 'User not found: $userName',
           isLoginMod: true);
     }
-    // banExpires semantics: SDK passes seconds-from-now or 0 for
-    // permanent. Discourse expects an absolute ISO-8601 timestamp, so
-    // the DateTime.now() below is a legitimate relative→absolute
-    // conversion, not an invented server value. Discourse has no
-    // "forever" sentinel for suspend_until, so permanent bans use the
-    // year-3000 convention Discourse's own admin UI uses.
+    // banExpires is the end as a Unix timestamp in seconds, or 0 for
+    // permanent — the SDK's convention (XenForo's proxy reads it the same
+    // way, and the profile page sends the picked end date's epoch). This
+    // used to add it to now as a duration, so a week's suspension lasted
+    // about 56 years. Discourse has no "forever" sentinel for
+    // suspend_until, so permanent uses the year-3000 convention Discourse's
+    // own admin UI uses.
     final until = banExpires > 0
-        ? DateTime.now().add(Duration(seconds: banExpires)).toUtc()
+        ? DateTime.fromMillisecondsSinceEpoch(banExpires * 1000, isUtc: true)
         : DateTime.utc(3000, 1, 1);
     try {
       await apiPut('/admin/users/$userId/suspend.json', body: {
@@ -508,7 +509,14 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
               in ((bundle['action_ids'] as List?) ?? const [])) {
             final a = actionDetails[actionId] ?? const <String, dynamic>{};
             out.add(DiscourseReviewableAction(
-              id: actionId.toString(),
+              // The action to perform, not the side-loaded id: that is
+              // prefixed with the target type ("post-disagree") while
+              // /review/:id/perform/:action_id only accepts [a-z_]+, so every
+              // flagged post, user and chat message action 404'd. Discourse
+              // sends it as server_action (Reviewable::Actions::Action =
+              // the id's last "-" part).
+              id: (a['server_action'] ?? actionId.toString().split('-').last)
+                  .toString(),
               bundleId: bundleId.toString(),
               label: (a['label'] ?? bundle['label'])?.toString(),
               icon: (a['icon'] ?? bundle['icon'])?.toString(),

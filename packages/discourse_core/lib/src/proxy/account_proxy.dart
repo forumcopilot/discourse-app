@@ -201,8 +201,15 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
           result: false, resultText: 'Not logged in');
     }
     try {
+      // By email: with hide_email_address_taken (on by default) Discourse
+      // accepts only an email address here and answered the username with
+      // 400 "invalid parameters: login" (SessionController#forgot_password),
+      // so no reset email was ever sent. The user's own address is on
+      // /u/{username}/emails.json; the username is kept only as a fallback
+      // for a forum that allows it.
+      final login = await _ownEmail(username) ?? username;
       await apiPost('/session/forgot_password.json', body: {
-        'login': username,
+        'login': login,
       });
       return FCUpdatePasswordResult(
         result: true,
@@ -212,6 +219,18 @@ class DiscourseAccountProxy extends BaseDiscourseProxy
       );
     } catch (e) {
       return FCUpdatePasswordResult(result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// The signed-in user's primary email, or null if the forum does not say.
+  Future<String?> _ownEmail(String username) async {
+    try {
+      final r =
+          await apiGet('/u/${Uri.encodeComponent(username)}/emails.json');
+      final email = r['email']?.toString() ?? '';
+      return email.contains('@') ? email : null;
+    } catch (_) {
+      return null;
     }
   }
 
