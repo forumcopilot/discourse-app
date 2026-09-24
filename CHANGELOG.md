@@ -12,6 +12,23 @@ Found by re-crawling every directory forum on the Pixel after batch 6. Covered b
 - **A table with a linked image in a cell no longer fails to draw** (introduced in 1.0.22). Email-style signatures and sponsor blocks put a linked logo in a table; the table's column sizing asked the image for a text baseline it cannot give, and the table was left blank with a layout error. Post images now report having no baseline, as they already do in normal layout.
 - **Inline maths wider than the screen scrolls sideways** instead of overflowing its line, as display maths already did.
 - **A forum whose `/about.json` hangs now opens** instead of failing with "Failed to connect". forum.cfx.re answered every other read in a fraction of a second but sometimes left `/about.json` hanging, and that one optional read ran the whole configuration load into its 10 s timeout. It now gets 4 s of its own; past that the forum opens without it, taking read-only mode from `/site/settings.json` instead. Only the post and member counts in the forum header still wait for it. Covered by `packages/discourse_core/test/config_about_timeout_test.dart`.
+- **A topic no longer sits on its loading placeholders until you touch the screen.** Loaded posts were published on the next frame without asking for one; since the placeholders stopped animating (the scroll audit), a topic whose posts arrived after the page-open animation stayed blank — a local topic waited over a minute for a 274 ms answer. `PostController.applyOnNextFrame` now requests the frame. Covered by `packages/discourse_ui/test/post_controller_next_frame_test.dart`.
+
+Full review, batch 1: requests that could not do what the app said they did, each checked against a local Discourse with the app's own User API Key scopes, as a member and as an admin. Covered by `packages/discourse_core/test/topic_post_requests_test.dart`, `message_notification_requests_test.dart` and `staff_account_requests_test.dart`.
+
+- **Mark all as read works.** The app bars pass XenForo's "all forums" id `0`, which went out as `category_id: 0` and marked nothing while the app reported success. No category now means every category, and a category takes its subcategories.
+- **A reply to a post is linked to it** (`reply_to_post_number`, also for quote replies and whispers), so its author gets a "replied" notification and the reply is listed under that post.
+- **Editing a topic's title saves it** — the title goes with the first post's edit — and editing a reply no longer sends an invented "Re: …" title.
+- **The Drafts page no longer fails** once a new-topic draft has a category (stored as a string, read as a number). New drafts store the number, as the web does; older ones still load.
+- **"I liked" in search finds what you liked**: Discourse's operator is `in:likes`; `in:liked` searched for the word.
+- **The Top list pages**: every other page was skipped and later pages repeated the first (`/top/{period}.json` redirects and drops `page`), and "All" was not all time. It always asks `/top.json?period=`.
+- **The message list loads past its first 30**: "more" is Discourse's `more_topics_url`, not a count compared with 20.
+- **"You are now a member of …" opens the group** instead of "Username is missing".
+- **People pickers offer only groups you can use**: groups you may message for recipients and invites (all visible groups were offered, then refused), groups you may mention for @mentions, and people only in the member directory (a group there opened a profile that could not load).
+- **Review-queue actions on flagged posts, users and chat messages work** — they sent the target-prefixed action id and got "not found"; they send the server action.
+- **A temporary suspension ends on the chosen date**, not about 56 years later.
+- **"Change password" sends the reset email**: the request goes by the account's email address, which Discourse requires with its default settings.
+- **The groups list shows every group**: it started on the server's second page and, on a phone (15 a page), stopped after one.
 
 ## [1.0.25] - 2026-09-23
 
