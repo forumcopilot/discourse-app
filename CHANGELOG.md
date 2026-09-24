@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.25] - 2026-09-23
+
 Thread rendering, batch 6: how a post reads. Covered by `packages/discourse_ui/test/post_polish_test.dart`, `packages/discourse_core/test/api_exception_test.dart` and `post_kinds_and_polls_test.dart`, and checked before/after on the Pixel in light and dark themes.
 
 ### Changed
