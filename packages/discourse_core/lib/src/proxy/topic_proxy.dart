@@ -9,6 +9,8 @@ import '../base_discourse_proxy.dart';
 import '../data/site/discourse_site_capabilities.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../util/html_text.dart';
+import '../data/topic/discourse_topic_slugs.dart';
+import '../util/discourse_link.dart';
 
 /// Discourse implementation of [IFCTopicProxy].
 ///
@@ -734,6 +736,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
 
     final id = (t['id'] ?? '').toString();
     final slug = t['slug']?.toString();
+    DiscourseTopicSlugs.store(siteContext.site.url, id, slug);
     final categoryIdInt = t['category_id'] as int?;
     final categoryId = (t['category_id'] ?? '').toString();
     final participatedUserIds = posters
@@ -766,9 +769,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       isClosed: (t['closed'] as bool?) ?? false,
       isSubscribed: (t['notification_level'] as int? ?? 1) >= 2,
       canSubscribe: true,
-      url: slug != null && slug.isNotEmpty
-          ? '${siteContext.site.url}/t/$slug/$id'
-          : '${siteContext.site.url}/t/$id',
+      url: DiscourseLink.webUrl(siteContext.site.url, topicId: id, slug: slug),
       // Some inherited UI does `topic.shortContent!.isNotEmpty` (XF assumed
       // non-null); keep this string non-null so we don't trip the null check.
       // Excerpts are entity-encoded ("&hellip;", "&amp;") — flatten

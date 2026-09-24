@@ -43,6 +43,10 @@ class ConversationHeaderItem extends StatelessWidget {
   final bool isHighlighted;
   final bool isClosed;
 
+  /// This message's address on the forum's website, for Copy link. Null
+  /// hides the entry.
+  final String? linkUrl;
+
   const ConversationHeaderItem({
     Key? key,
     required this.siteContext,
@@ -54,6 +58,7 @@ class ConversationHeaderItem extends StatelessWidget {
     this.onEdit,
     this.isHighlighted = false,
     this.isClosed = false,
+    this.linkUrl,
   }) : super(key: key);
 
   Widget _buildBottomDivider(ColorScheme colorScheme) {
@@ -285,6 +290,9 @@ class ConversationHeaderItem extends StatelessWidget {
                       ),
                       onSelected: (value) {
                         switch (value) {
+                          case 'copy_link':
+                            _copyMessageLink(context, linkUrl);
+                            break;
                           case 'edit':
                             if (onEdit != null) onEdit!();
                             break;
@@ -370,6 +378,9 @@ class ConversationHeaderItem extends StatelessWidget {
   List<PopupMenuEntry<String>> _buildPopupMenuItems(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final items = <PopupMenuEntry<String>>[];
+
+    // Copy link, as the web offers on every message.
+    if (linkUrl != null) items.add(_copyLinkMenuItem(context));
     
     // Edit button (only for Discourse and if canEdit is true)
     if ((message.canEdit ?? false) && siteContext.siteType == 'discourse' && onEdit != null) {
@@ -469,6 +480,29 @@ class ConversationHeaderItem extends StatelessWidget {
 }
 
 /// Attachment actions for conversation messages
+PopupMenuItem<String> _copyLinkMenuItem(BuildContext context) =>
+    PopupMenuItem<String>(
+      value: 'copy_link',
+      child: Row(
+        children: [
+          Icon(Icons.link,
+              size: DesignTokens.iconSizeM,
+              color: Theme.of(context).colorScheme.secondary),
+          const SizedBox(width: DesignTokens.spacingM),
+          Text(AppLocalizations.of(context)!.copyLink),
+        ],
+      ),
+    );
+
+Future<void> _copyMessageLink(BuildContext context, String? url) async {
+  if (url == null) return;
+  await UrlUtils.copyUrlToClipboard(url);
+  if (!context.mounted) return;
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(AppLocalizations.of(context)!.linkCopied)),
+  );
+}
+
 class _ConversationAttachmentActions {
   final FCConversationMessage message;
   final BuildContext context;
@@ -573,6 +607,10 @@ class ConversationItem extends StatelessWidget {
   final bool isHighlighted;
   final bool isClosed;
 
+  /// This message's address on the forum's website, for Copy link. Null
+  /// hides the entry.
+  final String? linkUrl;
+
   const ConversationItem({
     Key? key,
     required this.siteContext,
@@ -584,6 +622,7 @@ class ConversationItem extends StatelessWidget {
     this.onEdit,
     this.isHighlighted = false,
     this.isClosed = false,
+    this.linkUrl,
   }) : super(key: key);
 
   Widget _buildBottomDivider(ColorScheme colorScheme) {
@@ -815,6 +854,9 @@ class ConversationItem extends StatelessWidget {
                       ),
                       onSelected: (value) {
                         switch (value) {
+                          case 'copy_link':
+                            _copyMessageLink(context, linkUrl);
+                            break;
                           case 'edit':
                             if (onEdit != null) onEdit!();
                             break;
@@ -909,6 +951,9 @@ class ConversationItem extends StatelessWidget {
   List<PopupMenuEntry<String>> _buildPopupMenuItems(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final items = <PopupMenuEntry<String>>[];
+
+    // Copy link, as the web offers on every message.
+    if (linkUrl != null) items.add(_copyLinkMenuItem(context));
     
     // Edit button (only for Discourse and if canEdit is true)
     if ((message.canEdit ?? false) && siteContext.siteType == 'discourse' && onEdit != null) {

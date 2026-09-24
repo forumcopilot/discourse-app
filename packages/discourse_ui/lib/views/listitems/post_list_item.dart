@@ -1,7 +1,12 @@
 import 'dart:async';
 
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseAcceptedAnswer, DiscoursePostProxy, stripHtmlToText;
+    show
+        DiscourseAcceptedAnswer,
+        DiscourseLink,
+        DiscoursePostProxy,
+        DiscourseTopicSlugs,
+        stripHtmlToText;
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/views/widgets/solution_summary_card.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -1293,19 +1298,21 @@ class _PostListItemState extends State<PostListItem> {
     return items;
   }
 
-  /// This post's permalink.
-  ///
-  /// `/t/{topic_id}/{post_number}` — Discourse resolves the numeric form
-  /// and redirects to the slug URL, so the post does not need to carry a
-  /// slug the API never gave it. Null when the post has no number, which
-  /// is the one case there is nothing to link to.
+  /// This post's address on the forum's website — what its own share
+  /// button gives: `/t/{slug}/{topic_id}/{post_number}`, or the topic's
+  /// address for the first post. The slug comes from the topic payload that
+  /// loaded this thread ([DiscourseTopicSlugs]). Null when the post has no
+  /// number, which is the one case there is nothing to link to.
   String? get _postUrl {
     final number = widget.post.postNumber;
     final topicId = widget.post.topicId;
     if (number == null || number <= 0 || topicId.isEmpty) return null;
-    final base = widget.siteContext.site.url.replaceAll(RegExp(r'/+$'), '');
+    final base = widget.siteContext.site.url;
     if (base.isEmpty) return null;
-    return '$base/t/$topicId/$number';
+    return DiscourseLink.webUrl(base,
+        topicId: topicId,
+        slug: DiscourseTopicSlugs.of(base, topicId),
+        postNumber: number);
   }
 
   void _handleShare() async {

@@ -14,6 +14,8 @@ import '../base_discourse_proxy.dart';
 import '../data/site/discourse_site_capabilities.dart';
 import '../data/post/discourse_accepted_answer.dart';
 import '../data/post/discourse_valid_reactions.dart';
+import '../data/topic/discourse_topic_slugs.dart';
+import '../util/discourse_link.dart';
 import '../util/quote_markup.dart';
 import '../data/post/discourse_post_revision.dart';
 import '../data/post/discourse_suggested_topic.dart';
@@ -199,7 +201,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         userVoted: t['user_voted'] == true,
         isPinned: (t['pinned'] as bool?) ?? false,
         isAnnouncement: (t['pinned_globally'] as bool?) ?? false,
-        url: '${siteContext.site.url}/t/$id',
+        url: _topicWebUrl(t, id),
         shortContent: posts.isNotEmpty ? posts.first.content : '',
         poll: poll,
       );
@@ -265,6 +267,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         // window (filter_posts_near centers the chunk on it).
         position: postNumber,
         id: topicId,
+        url: _topicWebUrl(t, topicId),
         title: (t['title'] ?? '').toString(),
         forumId: (t['category_id'] ?? '').toString(),
         forumName: _categoryName((t['category_id'] ?? '').toString()),
@@ -371,6 +374,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         // returned postNumbers.)
         position: unreadAnchor,
         id: (t['id'] ?? topicId).toString(),
+        url: _topicWebUrl(t, (t['id'] ?? topicId).toString()),
         title: (t['title'] ?? '').toString(),
         forumId: (t['category_id'] ?? '').toString(),
         forumName: _categoryName((t['category_id'] ?? '').toString()),
@@ -1578,6 +1582,16 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   }
 
   // ===== Helpers =====
+
+  /// The topic's address on the forum's website, as its own share button
+  /// gives it, and the slug recorded so a post's Copy link can say the
+  /// same (see [DiscourseTopicSlugs]).
+  String _topicWebUrl(Map<String, dynamic> t, String topicId) {
+    final forumUrl = siteContext.site.url;
+    DiscourseTopicSlugs.store(forumUrl, topicId, t['slug']);
+    return DiscourseLink.webUrl(forumUrl,
+        topicId: topicId, slug: DiscourseTopicSlugs.of(forumUrl, topicId));
+  }
 
   FCPost _postFrom(
     Map<String, dynamic> p, {

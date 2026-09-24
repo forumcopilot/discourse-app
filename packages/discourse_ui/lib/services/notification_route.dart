@@ -16,11 +16,19 @@
 /// FCM data payloads are string-to-string, so every number arrives as text;
 /// the parsing here is deliberately forgiving about that (and about the
 /// `"580.0"` spelling some senders produce).
+///
+/// Links into a forum — pasted, shared from a browser, or tapped — name the
+/// same destinations, so [DiscourseNotificationRoute.fromLink] reads a
+/// [DiscourseLink] into a route and one navigator serves both
+/// (`DiscourseRouteNavigator`).
 library;
+
+import 'package:discourse_core/discourse_core.dart' show DiscourseLink;
 
 /// What kind of destination a payload names.
 enum NotificationRouteKind {
-  /// A specific post, by id: the topic can be opened centred on it.
+  /// A specific post, by id: the topic can be opened centred on it. A post
+  /// short link (`/p/{id}`) names no topic; the navigator asks the forum.
   post,
 
   /// A topic and a post number, but no post id: the topic can be opened at
@@ -107,6 +115,31 @@ class DiscourseNotificationRoute {
     return DiscourseNotificationRoute(
       kind: NotificationRouteKind.notificationsTab,
       siteUrl: siteUrl,
+    );
+  }
+
+  /// Where a link into the forum leads: a post short link to that post, a
+  /// topic link to its post number when it has one, else to the topic.
+  /// Null when the link names only the forum — its home, a category, a
+  /// user, a tag — and the forum's home is the destination.
+  static DiscourseNotificationRoute? fromLink(DiscourseLink link) {
+    final postId = link.postId;
+    if (postId != null) {
+      return DiscourseNotificationRoute(
+        kind: NotificationRouteKind.post,
+        postId: postId.toString(),
+        siteUrl: link.forumUrl,
+      );
+    }
+    final topicId = link.topicId;
+    if (topicId == null) return null;
+    final postNumber = link.postNumber;
+    return DiscourseNotificationRoute(
+      kind: NotificationRouteKind.topicPage,
+      topicId: topicId.toString(),
+      postNumber: postNumber,
+      page: postNumber == null ? 1 : ((postNumber - 1) ~/ postsPerPage) + 1,
+      siteUrl: link.forumUrl,
     );
   }
 

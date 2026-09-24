@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseLink, DiscourseTopicSlugs;
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -347,8 +349,11 @@ class UrlUtils {
         break;
 
       case ForumTemplate.discourse:
-        // Slugless topic route: /t/{topic_id} (config/routes.rb).
-        topicUrl = '${_stripTrailingSlash(cleanForumUrl)}/t/$threadId';
+        // The topic's address as the forum's website shares it:
+        // /t/{slug}/{topic_id}, the slug as the topic payload gave it.
+        topicUrl = DiscourseLink.webUrl(cleanForumUrl,
+            topicId: threadId,
+            slug: DiscourseTopicSlugs.of(cleanForumUrl, threadId));
         break;
 
       case ForumTemplate.unknown:

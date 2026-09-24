@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/models/results/fc_forum_result.dart';
 import '../base_discourse_proxy.dart';
 import '../data/site/discourse_site_capabilities.dart';
 import '../util/html_text.dart';
+import '../util/discourse_link.dart';
 
 /// Discourse implementation of [IFCForumProxy].
 ///
@@ -138,39 +139,58 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
 
   @override
   Future<FCIdByUrlResult> getIdByUrl(String url) async {
-    // /t/{slug}/{topic_id}                  → topic
-    // /t/{slug}/{topic_id}/{post_number}    → post within topic
-    // /c/{slug}/{category_id}               → category
-    final uri = Uri.tryParse(url);
-    if (uri == null) {
+    // /t/{slug}/{topic_id}(/{post_number}), /t/{topic_id}(/{post_number})
+    //                                        → topic, and a post within it
+    // /p/{post_id}                           → post, and its topic
+    // /c/{slug}/{category_id}                → category
+    // Parsed by DiscourseLink, which also reads subfolder installs.
+    final link = DiscourseLink.parse(url);
+    if (link == null) {
       return FCIdByUrlResult(result: false, resultText: 'Invalid URL');
     }
-    final segments = uri.pathSegments.where((s) => s.isNotEmpty).toList();
-    if (segments.length >= 3 && segments[0] == 't') {
-      final topicId = segments[2];
+    final linkedPost = link.postId;
+    if (linkedPost != null) {
+      // A short link names only the post; the post knows its topic.
+      try {
+        final p = await apiGet('/posts/$linkedPost.json');
+        final topicId = p['topic_id']?.toString();
+        if (topicId == null || topicId.isEmpty) {
+          return FCIdByUrlResult(result: false, resultText: 'Post has no topic');
+        }
+        return FCIdByUrlResult(
+          result: true,
+          resultText: '',
+          topicId: topicId,
+          postId: linkedPost.toString(),
+        );
+      } catch (e) {
+        return FCIdByUrlResult(result: false, resultText: describeApiError(e));
+      }
+    }
+    final linkedTopic = link.topicId;
+    if (linkedTopic != null) {
+      final topicId = linkedTopic.toString();
       String? postId;
-      if (segments.length >= 4) {
-        // The URL's 4th segment is a post_number (position in the topic),
+      final postNumber = link.postNumber;
+      if (postNumber != null) {
+        // The URL's post segment is a post_number (position in the topic),
         // NOT a post id. Resolve the real id via the topic view, which
         // centers its post_stream chunk on the requested post_number.
-        final postNumber = int.tryParse(segments[3]);
-        if (postNumber != null) {
-          try {
-            final t = await apiGet('/t/$topicId/$postNumber.json');
-            final stream =
-                (t['post_stream'] as Map<String, dynamic>?) ?? const {};
-            final posts = (stream['posts'] as List?) ?? const [];
-            for (final raw in posts.whereType<Map>()) {
-              if (raw['post_number'] == postNumber) {
-                postId = raw['id']?.toString();
-                break;
-              }
+        try {
+          final t = await apiGet('/t/$topicId/$postNumber.json');
+          final stream =
+              (t['post_stream'] as Map<String, dynamic>?) ?? const {};
+          final posts = (stream['posts'] as List?) ?? const [];
+          for (final raw in posts.whereType<Map>()) {
+            if (raw['post_number'] == postNumber) {
+              postId = raw['id']?.toString();
+              break;
             }
-          } catch (_) {
-            // Topic still resolved; leave postId null rather than
-            // returning a post_number that callers would mistake for
-            // a post id.
           }
+        } catch (_) {
+          // Topic still resolved; leave postId null rather than
+          // returning a post_number that callers would mistake for
+          // a post id.
         }
       }
       return FCIdByUrlResult(
@@ -180,7 +200,10 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
         postId: postId,
       );
     }
-    if (segments.length >= 3 && segments[0] == 'c') {
+    final uri = Uri.parse(url);
+    final segments = uri.pathSegments.where((s) => s.isNotEmpty).toList();
+    final c = segments.indexOf('c');
+    if (c >= 0 && segments.length >= c + 3) {
       return FCIdByUrlResult(
         result: true,
         resultText: '',

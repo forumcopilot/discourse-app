@@ -1,6 +1,7 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import '../data/message/discourse_conversations_result.dart';
+import '../data/topic/discourse_topic_slugs.dart';
 import '../util/html_text.dart';
 import '../util/quote_markup.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_private_conversation_proxy.dart';
@@ -703,6 +704,8 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
           ? '/t/$conversationId/$anchorPostNumber.json'
           : '/t/$conversationId.json';
       final t = await apiGet(path);
+      // A message is a topic: Copy link gives its /t/{slug}/{id}/{n}.
+      DiscourseTopicSlugs.store(siteContext.site.url, conversationId, t['slug']);
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       final messages = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()

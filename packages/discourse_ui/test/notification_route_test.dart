@@ -1,3 +1,4 @@
+import 'package:discourse_core/discourse_core.dart' show DiscourseLink;
 import 'package:discourse_ui/services/notification_route.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -130,6 +131,47 @@ void main() {
           {'type': 'discourse_notification', 'topic_id': '3'});
       expect(route.siteUrl, isNull);
       expect(route.kind, NotificationRouteKind.topicPage);
+    });
+  });
+  group('fromLink — links name the same destinations', () {
+    DiscourseNotificationRoute? route(String url) =>
+        DiscourseNotificationRoute.fromLink(DiscourseLink.parse(url)!);
+
+    test('a topic link opens the topic', () {
+      final r = route('https://forum.example/t/some-topic/88')!;
+      expect(r.kind, NotificationRouteKind.topicPage);
+      expect(r.topicId, '88');
+      expect(r.postNumber, isNull);
+      expect(r.page, 1);
+      expect(r.siteUrl, 'https://forum.example');
+    });
+
+    test('a post number opens its page, and names the post', () {
+      final r = route('https://forum.example/t/some-topic/88/45')!;
+      expect(r.kind, NotificationRouteKind.topicPage);
+      expect(r.topicId, '88');
+      expect(r.postNumber, 45);
+      expect(r.page, 3, reason: '20 posts a page: 41–60 is page 3');
+    });
+
+    test('slugless and subfolder links', () {
+      expect(route('https://forum.example/t/88/2')!.postNumber, 2);
+      final sub = route('https://example.com/forum/t/x/88/2')!;
+      expect(sub.topicId, '88');
+      expect(sub.siteUrl, 'https://example.com/forum');
+    });
+
+    test('a post short link opens that post; the topic is looked up', () {
+      final r = route('https://forum.example/p/1234')!;
+      expect(r.kind, NotificationRouteKind.post);
+      expect(r.postId, '1234');
+      expect(r.topicId, isNull);
+    });
+
+    test('a link to the forum, a category or a user opens the forum', () {
+      expect(route('https://forum.example'), isNull);
+      expect(route('https://forum.example/c/help/4'), isNull);
+      expect(route('https://forum.example/u/alice'), isNull);
     });
   });
 }

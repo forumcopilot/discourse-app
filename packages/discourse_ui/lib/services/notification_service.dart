@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/services.dart';
 import 'package:discourse_ui/config/app_forum_config.dart';
-import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/domain/site.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'device_service.dart';
@@ -25,7 +24,7 @@ import '../views/user_profile_page.dart';
 import '../core/errors/error_handling_mixins.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../host/discourse_host.dart';
-import '../views/site_home_tab.dart';
+import 'discourse_route_navigator.dart';
 import 'notification_route.dart';
 
 class NotificationService with ServiceErrorHandlingMixin {
@@ -562,6 +561,14 @@ class NotificationService with ServiceErrorHandlingMixin {
         (siteController?.isInitialized.value ?? false) &&
         siteController?.currentSiteContext.value != null;
     if (!alreadyHere) {
+      // A multi-forum host opens the forum itself, the same way it opens
+      // one from its chooser or from a link, and the route with it.
+      final hostOpen = DiscourseHost.openForum;
+      if (hostOpen != null) {
+        AppLogger.debug('🔔 [NotificationService] Host opens ${targetForum.url} at $route');
+        await hostOpen(targetForum, route);
+        return;
+      }
       await _resetToHomeIfNeeded();
     }
 
@@ -580,23 +587,8 @@ class NotificationService with ServiceErrorHandlingMixin {
       AppLogger.debug('🔔 [NotificationService] Opening the destination signed out');
     }
 
-    switch (route.kind) {
-      case NotificationRouteKind.post:
-        AppLogger.debug('✅ [NotificationService] Opening topic ${route.topicId} at post ${route.postId}');
-        _openTopic(siteContext,
-            topicId: route.topicId!,
-            mode: PostsListMode.thread_by_post,
-            anchorPostId: route.postId);
-      case NotificationRouteKind.topicPage:
-        AppLogger.debug('✅ [NotificationService] Opening topic ${route.topicId} at page ${route.page}');
-        _openTopic(siteContext,
-            topicId: route.topicId!,
-            mode: PostsListMode.goto_page,
-            gotoPage: route.page);
-      case NotificationRouteKind.notificationsTab:
-        AppLogger.debug('✅ [NotificationService] Nothing to open — showing the notification list');
-        siteController?.requestHomeTab(SiteHomeTab.notifications);
-    }
+    AppLogger.debug('✅ [NotificationService] Opening $route');
+    await DiscourseRouteNavigator.open(siteContext, route);
   }
 
   /// The forum a backend notification belongs to.
@@ -620,29 +612,6 @@ class NotificationService with ServiceErrorHandlingMixin {
       }
     }
     return forum;
-  }
-
-  /// Open a topic, replacing the one on screen rather than stacking onto it.
-  void _openTopic(
-    SiteContext siteContext, {
-    required String topicId,
-    required PostsListMode mode,
-    String? anchorPostId,
-    int? gotoPage,
-  }) {
-    postPageBuilder() => PostPage(
-          siteContext: siteContext,
-          topicId: topicId,
-          title: '', // PostPage loads the real title with the thread.
-          mode: mode,
-          anchorPostId: anchorPostId,
-          gotoPage: gotoPage,
-        );
-    if (Get.currentRoute == '/PostPage') {
-      Get.off(postPageBuilder);
-    } else {
-      Get.to(postPageBuilder);
-    }
   }
 
   /// Whether two [Site]s are the same forum: by id when both have one, by

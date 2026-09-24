@@ -20,6 +20,7 @@ class PostPage extends StatefulWidget {
     this.mode = PostsListMode.normal,
     this.anchorPostId,
     this.gotoPage,
+    this.gotoPostNumber,
     this.forumId,
     this.isAnnouncement = false,
     super.key,
@@ -31,6 +32,10 @@ class PostPage extends StatefulWidget {
   final PostsListMode mode;
   final String? anchorPostId;
   final int? gotoPage;
+
+  /// With [PostsListMode.goto_page], the post to land on — see
+  /// [PostsList.gotoPostNumber].
+  final int? gotoPostNumber;
   final String? forumId;
   final bool isAnnouncement;
 
@@ -999,6 +1004,7 @@ class _PostPageState extends State<PostPage> {
                   mode: widget.mode,
                   anchorPostId: widget.anchorPostId,
                   gotoPage: widget.gotoPage,
+                  gotoPostNumber: widget.gotoPostNumber,
                   isAnnouncement: widget.isAnnouncement,
                   forumId: _forumId,
                   onForumIdAvailable: (forumId) {

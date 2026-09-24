@@ -42,6 +42,7 @@ class PostsList extends StatefulWidget {
     this.mode = PostsListMode.normal,
     this.anchorPostId,
     this.gotoPage,
+    this.gotoPostNumber,
     this.isAnnouncement = false,
     this.onCanSubscribeChanged,
     this.onCanCloseChanged,
@@ -68,6 +69,12 @@ class PostsList extends StatefulWidget {
   final PostsListMode mode;
   final String? anchorPostId;
   final int? gotoPage;
+
+  /// In [PostsListMode.goto_page], the post to land on, by its number in
+  /// the topic — a link's `/t/{slug}/{id}/{post_number}`, or a notification
+  /// that names a position but no post id. Without it the list lands on
+  /// the first post of [gotoPage].
+  final int? gotoPostNumber;
   final bool isAnnouncement;
   final String? forumId;
 
@@ -184,8 +191,8 @@ class _PostsState extends State<PostsList> {
     // Calculate gotoPost based on mode
     int gotoPost = 0;
     if (widget.mode == PostsListMode.goto_page && widget.gotoPage != null) {
-      // For goto_page mode, we want to land on the first post of that page
-      gotoPost = (widget.gotoPage! - 1) * _pageSize + 1;
+      // For goto_page mode, land on the named post, else the page's first
+      gotoPost = widget.gotoPostNumber ?? (widget.gotoPage! - 1) * _pageSize + 1;
     } else if (widget.mode == PostsListMode.thread_by_post && _anchorPostId != null) {
       // For thread_by_post mode, pass the anchor post ID
       gotoPost = int.tryParse(_anchorPostId!) ?? 0;
@@ -201,7 +208,8 @@ class _PostsState extends State<PostsList> {
     // Check if topicId changed OR if anchorPostId/gotoPage changed (for same topic navigation)
     final topicIdChanged = oldWidget.topicId != widget.topicId;
     final anchorPostIdChanged = oldWidget.anchorPostId != widget.anchorPostId;
-    final gotoPageChanged = oldWidget.gotoPage != widget.gotoPage;
+    final gotoPageChanged = oldWidget.gotoPage != widget.gotoPage ||
+        oldWidget.gotoPostNumber != widget.gotoPostNumber;
     final modeChanged = oldWidget.mode != widget.mode;
 
     if (topicIdChanged || anchorPostIdChanged || gotoPageChanged || modeChanged) {
@@ -246,8 +254,8 @@ class _PostsState extends State<PostsList> {
       // Calculate gotoPost based on mode
       int gotoPost = 0;
       if (widget.mode == PostsListMode.goto_page && widget.gotoPage != null) {
-        // For goto_page mode, we want to land on the first post of that page
-        gotoPost = (widget.gotoPage! - 1) * _pageSize + 1;
+        // For goto_page mode, land on the named post, else the page's first
+        gotoPost = widget.gotoPostNumber ?? (widget.gotoPage! - 1) * _pageSize + 1;
       } else if (widget.mode == PostsListMode.thread_by_post && widget.anchorPostId != null) {
         // For thread_by_post mode, pass the anchor post ID
         gotoPost = int.tryParse(widget.anchorPostId!) ?? 0;
@@ -307,9 +315,16 @@ class _PostsState extends State<PostsList> {
         if (_anchorPostId == null) throw Exception('anchorPostId is required for thread_by_post mode');
         await _postsController.getThreadByPostAsync(_anchorPostId!, _pageSize, _retriveHtml);
       } else if (mode == PostsListMode.goto_page) {
-        // Jump to a specific page using the special API
+        // Load the window around the post we are going to. Discourse's
+        // /t/{id}/{n}.json centres its chunk on post n (filter_posts_near),
+        // so the target is always in it; a window starting at the page's
+        // first post held the page's later posts only by luck — a jump to
+        // post 40 loaded posts 16–35 and landed on 16.
         if (_gotoPage == null) throw Exception('gotoPage is required for goto_page mode');
-        await _postsController.getThreadByPageAsync(widget.topicId, _gotoPage!, _pageSize, false);
+        final anchor = gotoPost > 0 ? gotoPost : (_gotoPage! - 1) * _pageSize + 1;
+        await _postsController.getThreadAsync(
+            widget.topicId, anchor, anchor + _pageSize - 1, _retriveHtml,
+            mode: LoadMode.initial);
       } else {
         // Normal initial load
         // startNum and lastNum are 0-based, but getThreadAsync expects 1-based for the API
@@ -965,14 +980,16 @@ class _PostsState extends State<PostsList> {
       return;
     }
 
-    // Not in the loaded window — reload anchored at the answer.
+    // Not in the loaded window — reload around the answer (the chunk is
+    // centred on it, so it is always in the window; see goto_page).
     final topicId = _actualTopicId ?? widget.topicId;
     _postsController
-        .getThreadByPageAsync(
+        .getThreadAsync(
       topicId,
-      ((postNumber - 1) ~/ _pageSize) + 1,
-      _pageSize,
-      false,
+      postNumber,
+      postNumber + _pageSize - 1,
+      _retriveHtml,
+      mode: LoadMode.initial,
     )
         .then((_) {
       if (!mounted) return;

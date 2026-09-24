@@ -19,7 +19,12 @@ import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
-import 'package:discourse_core/discourse_core.dart' show DiscourseMessageDetails, DiscourseMessageGroup;
+import 'package:discourse_core/discourse_core.dart'
+    show
+        DiscourseLink,
+        DiscourseMessageDetails,
+        DiscourseMessageGroup,
+        DiscourseTopicSlugs;
 import '../../../login_page.dart';
 
 class ConversationPage extends StatefulWidget {
@@ -962,6 +967,19 @@ class _ConversationPageState extends State<ConversationPage> {
     }
   }
 
+  /// A message's address on the forum's website — a message is a topic,
+  /// so `/t/{slug}/{id}/{post_number}` as for any post. Null without a
+  /// post number, the one case there is nothing to link to.
+  String? _messageUrl(FCConversationMessage message) {
+    final number = message.messageNumber;
+    if (number == null || number <= 0) return null;
+    final base = widget.siteContext.site.url;
+    return DiscourseLink.webUrl(base,
+        topicId: widget.conversationId,
+        slug: DiscourseTopicSlugs.of(base, widget.conversationId),
+        postNumber: number);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1152,6 +1170,7 @@ class _ConversationPageState extends State<ConversationPage> {
                           onEdit: () => _onEditMessage(_conversation!.list[0]),
                           isHighlighted: _highlightedMessageId == _conversation!.list[0].messageId,
                           isClosed: _conversation!.isClosed ?? false,
+                          linkUrl: _messageUrl(_conversation!.list[0]),
                         ),
                       // Individual reply messages
                       if (_conversation!.list.length > 1)
@@ -1167,6 +1186,7 @@ class _ConversationPageState extends State<ConversationPage> {
                             onEdit: () => _onEditMessage(msg),
                             isHighlighted: _highlightedMessageId == msg.messageId,
                             isClosed: _conversation!.isClosed ?? false,
+                            linkUrl: _messageUrl(msg),
                           );
                         }),
                       // Show message if no messages found

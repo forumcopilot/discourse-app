@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 
+import '../services/notification_route.dart';
+
 /// What a multi-forum host app (ForumCopilot, ABDA) can plug into the
 /// module. Everything here is optional: the single-forum template sets
 /// nothing and behaves exactly as before.
@@ -21,4 +23,15 @@ class DiscourseHost {
   /// null to fall back to the module's own single-forum resolution.
   static Future<Site?> Function(int siteId, Map<String, dynamic> data)?
       resolveForum;
+
+  /// Opens [forum] the way the host opens any of its forums — typically
+  /// back to its chooser, then `SingleForumBootstrapPage(site: forum,
+  /// route: route)` — and takes the reader to [route] inside it (null: the
+  /// forum's home). A push notification for a forum other than the one on
+  /// screen goes through this when it is set; without it the module
+  /// replaces the whole navigation stack with its own single-forum
+  /// bootstrap page, which in a multi-forum host is the configured
+  /// template forum rather than the host's chooser.
+  static Future<void> Function(Site forum, DiscourseNotificationRoute? route)?
+      openForum;
 }

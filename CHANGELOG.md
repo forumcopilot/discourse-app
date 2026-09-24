@@ -6,6 +6,20 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+Links in and out of a forum. Covered by `packages/discourse_core/test/discourse_link_test.dart`, `forum_link_requests_test.dart` and `packages/discourse_ui/test/notification_route_test.dart`.
+
+### Changed
+- **Copy link and Share give the forum's own address** — `/t/{slug}/{topic_id}/{post_number}`, the first post as the topic, as the forum's website shares them — instead of the slugless `/t/{topic_id}/{post_number}`. This covers a post's Copy link and Share, the topic's Share and View on web, and every topic address in lists and search. The share credit the web adds for signed-in readers (`?u=username`) is left off: it depends on site settings the API does not expose, and it would put the reader's username in every link they copy.
+- **Copy link on messages**, as the web has on every post of a message.
+- **A link or notification that names a post lands on that post**, not on the first post of its page: the topic loads around the post (`PostPage.gotoPostNumber`). The jump-to-post dialog, "jump to last" and the accepted answer's "Post #N" load the same way, so a target late in a page is no longer missed.
+- A notification for a topic with no position opens where a tap on the topic would: the first unread post when signed in.
+
+### Added
+- `DiscourseLink` (discourse_core): reads a URL as a link into a Discourse forum — topic, post number, post short link, subfolder installs, query, fragment — and writes a topic's web address. `DiscourseNotificationRoute.fromLink` turns one into the route a notification would name, and `DiscourseRouteNavigator` takes the reader there for both. `getIdByUrl` uses it: it read slugless `/t/{id}/{n}` links as topic `n`, and now resolves `/p/{post_id}` short links.
+- `SingleForumBootstrapPage(route:)` opens a forum at a topic or post, for hosts that open links.
+- `DiscourseHost.openForum`: a notification for a forum other than the one on screen is opened by the host, the way it opens any forum. Without it the module replaced the whole navigation stack with its single-forum bootstrap page — in a multi-forum host, the template forum rather than the host's chooser.
+- `DiscourseTopicSlugs` (discourse_core): topic slugs recorded from the topic payloads the app already fetches, per forum.
+
 ## [1.0.26] - 2026-09-24
 
 Found by re-crawling every directory forum on the Pixel after batch 6. Covered by `packages/discourse_ui/test/render_regressions_test.dart`.

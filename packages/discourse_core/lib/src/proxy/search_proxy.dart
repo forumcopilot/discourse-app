@@ -10,6 +10,8 @@ import 'package:forumcopilot_sdk/models/results/fc_search_result.dart';
 import 'package:forumcopilot_sdk/models/search/fc_search_filters.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/topic/discourse_topic_slugs.dart';
+import '../util/discourse_link.dart';
 
 /// Discourse implementation of [IFCSearchProxy].
 ///
@@ -455,6 +457,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
   FCTopic _topicFromSearchResult(Map<String, dynamic> t) {
     final id = (t['id'] ?? '').toString();
     final slug = t['slug']?.toString();
+    DiscourseTopicSlugs.store(siteContext.site.url, id, slug);
     final categoryId = (t['category_id'] ?? '').toString();
     return FCTopic(
       id: id,
@@ -478,9 +481,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       // (listable_topic_serializer.rb:25); >= 2 is tracking/watching.
       isSubscribed: (t['notification_level'] as int? ?? 1) >= 2,
       canSubscribe: true,
-      url: slug != null && slug.isNotEmpty
-          ? '${siteContext.site.url}/t/$slug/$id'
-          : '${siteContext.site.url}/t/$id',
+      url: DiscourseLink.webUrl(siteContext.site.url, topicId: id, slug: slug),
       shortContent: (t['excerpt'] as String?) ?? '',
       isPinned: (t['pinned'] as bool?) ?? false,
       isAnnouncement: false,

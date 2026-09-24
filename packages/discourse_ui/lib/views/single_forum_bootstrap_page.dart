@@ -13,6 +13,8 @@ import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:discourse_ui/views/appbars/topics_tab_app_bar.dart';
 import 'package:discourse_ui/views/site_home_page.dart';
 import 'package:discourse_ui/services/site_initialization_service.dart';
+import 'package:discourse_ui/services/discourse_route_navigator.dart';
+import 'package:discourse_ui/services/notification_route.dart';
 import 'package:discourse_ui/views/widgets/forum_header_widget.dart';
 import 'package:discourse_ui/views/widgets/topic_list_skeleton.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -30,7 +32,12 @@ class SingleForumBootstrapPage extends StatefulWidget {
   /// manage multiple sites pass the tapped site in.
   final Site? site;
 
-  const SingleForumBootstrapPage({super.key, this.site});
+  /// Where to take the reader once the forum is open — a topic or a post,
+  /// when the host opened the forum from a link. The forum's home is
+  /// underneath it, so Back lands there. Null opens the home.
+  final DiscourseNotificationRoute? route;
+
+  const SingleForumBootstrapPage({super.key, this.site, this.route});
 
   @override
   State<SingleForumBootstrapPage> createState() =>
@@ -46,6 +53,7 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
   bool _ready = false;
   String? _errorMessage;
   bool _unreachable = false;
+  bool _routeOpened = false;
 
   @override
   void initState() {
@@ -102,6 +110,7 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
 
       if (result.success && result.siteContext != null) {
         setState(() => _ready = true);
+        _openRoute(result.siteContext!);
         return;
       }
 
@@ -128,6 +137,18 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
         });
       }
     }
+  }
+
+  /// Opens [SingleForumBootstrapPage.route] over the home, once: after a
+  /// failed first attempt it waits for the Retry that succeeds.
+  void _openRoute(SiteContext siteContext) {
+    final route = widget.route;
+    if (route == null || _routeOpened) return;
+    _routeOpened = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      DiscourseRouteNavigator.open(siteContext, route);
+    });
   }
 
   @override
