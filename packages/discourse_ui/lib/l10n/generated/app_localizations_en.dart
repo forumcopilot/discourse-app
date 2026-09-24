@@ -1861,6 +1861,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get takePhoto => 'Take photo';
 
   @override
+  String get postNeedsApprovalTitle => 'Post Needs Approval';
+
+  @override
+  String get postNeedsApprovalBody =>
+      'We\'ve received your new post but it needs to be approved by a moderator before it will appear. Please be patient.';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Failed to send message: $error';
   }

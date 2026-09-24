@@ -821,6 +821,8 @@
   "chatAttachFile": "ファイルを添付する",
   "chatRemoveUpload": "ファイルを削除する",
   "takePhoto": "写真を撮る",
+  "postNeedsApprovalTitle": "承認待ちの投稿",
+  "postNeedsApprovalBody": "あなたの新しい投稿を受領しましたが、表示するにはモデレーターの承認が必要です。しばらくお待ちください。",
   "failedToCreateConversation": "メッセージを送信できませんでした: {error}",
   "maximumAttachmentsAllowed": "添付ファイルは最大 {count} 件までです",
   "noImagesFoundToDisplay": "表示できる画像がありません。",

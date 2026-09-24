@@ -821,6 +821,8 @@
   "chatAttachFile": "Datei anhängen",
   "chatRemoveUpload": "Datei löschen",
   "takePhoto": "Foto aufnehmen",
+  "postNeedsApprovalTitle": "Beitrag muss genehmigt werden",
+  "postNeedsApprovalBody": "Wir haben deinen neuen Beitrag erhalten. Dieser muss jedoch von einem Moderator genehmigt werden, bevor er angezeigt wird. Bitte habe etwas Geduld.",
   "failedToCreateConversation": "Nachricht konnte nicht gesendet werden: {error}",
   "maximumAttachmentsAllowed": "Maximal {count} Anhänge erlaubt",
   "noImagesFoundToDisplay": "Keine Bilder zum Anzeigen gefunden.",

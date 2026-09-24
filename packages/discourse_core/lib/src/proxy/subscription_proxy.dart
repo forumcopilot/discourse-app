@@ -281,19 +281,26 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
           query: {'include_subcategories': 'true'});
       final list = (response['category_list'] as Map<String, dynamic>?) ??
           const <String, dynamic>{};
-      final cats = ((list['categories'] as List?) ?? const [])
-          .whereType<Map>();
-      for (final raw in cats) {
-        final c = raw.cast<String, dynamic>();
-        if (c['id'].toString() == categoryId) {
-          final lvl = c['notification_level'] as int?;
-          return FCNotificationLevelResult(
-            result: true,
-            level: lvl != null ? FCNotificationLevel.fromInt(lvl) : null,
-          );
+      // Subcategories come nested under their parent's `subcategory_list`
+      // and are not repeated at the top level, so a flat scan never found
+      // one and its level read as unknown.
+      Map<String, dynamic>? find(Iterable<Map> cats) {
+        for (final raw in cats) {
+          final c = raw.cast<String, dynamic>();
+          if (c['id'].toString() == categoryId) return c;
+          final sub = find(((c['subcategory_list'] as List?) ?? const [])
+              .whereType<Map>());
+          if (sub != null) return sub;
         }
+        return null;
       }
-      return FCNotificationLevelResult(result: true);
+
+      final c = find(((list['categories'] as List?) ?? const []).whereType<Map>());
+      final lvl = c?['notification_level'] as int?;
+      return FCNotificationLevelResult(
+        result: true,
+        level: lvl != null ? FCNotificationLevel.fromInt(lvl) : null,
+      );
     } on DiscourseApiException catch (e) {
       return FCNotificationLevelResult(
           result: false, resultText: e.userMessage);

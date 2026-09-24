@@ -1882,6 +1882,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get takePhoto => 'Foto aufnehmen';
 
   @override
+  String get postNeedsApprovalTitle => 'Beitrag muss genehmigt werden';
+
+  @override
+  String get postNeedsApprovalBody =>
+      'Wir haben deinen neuen Beitrag erhalten. Dieser muss jedoch von einem Moderator genehmigt werden, bevor er angezeigt wird. Bitte habe etwas Geduld.';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Nachricht konnte nicht gesendet werden: $error';
   }

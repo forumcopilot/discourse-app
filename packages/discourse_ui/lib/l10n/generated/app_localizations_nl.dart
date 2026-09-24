@@ -1870,6 +1870,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get takePhoto => 'Foto maken';
 
   @override
+  String get postNeedsApprovalTitle => 'Bericht vereist goedkeuring';
+
+  @override
+  String get postNeedsApprovalBody =>
+      'We hebben je nieuwe bericht ontvangen, maar dit moet eerst door een moderator worden goedgekeurd voordat het zichtbaar wordt. Heb geduld.';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Kon bericht niet verzenden: $error';
   }

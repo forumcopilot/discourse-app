@@ -821,6 +821,8 @@
   "chatAttachFile": "Adjuntar un archivo",
   "chatRemoveUpload": "Eliminar archivo",
   "takePhoto": "Tomar foto",
+  "postNeedsApprovalTitle": "La publicación requiere aprobación",
+  "postNeedsApprovalBody": "Hemos recibido tu nueva publicación, pero debe ser aprobada por un moderador antes de que aparezca. Por favor, ten paciencia.",
   "failedToCreateConversation": "No se pudo enviar el mensaje: {error}",
   "maximumAttachmentsAllowed": "Máximo de {count} adjunto(s) permitido(s)",
   "noImagesFoundToDisplay": "No se encontraron imágenes para mostrar.",

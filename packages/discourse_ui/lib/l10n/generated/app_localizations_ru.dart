@@ -1869,6 +1869,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get takePhoto => 'Сделать фото';
 
   @override
+  String get postNeedsApprovalTitle => 'Сообщение требует одобрения';
+
+  @override
+  String get postNeedsApprovalBody =>
+      'Сообщение получено, но оно требует проверки и утверждения модератором перед публикацией. Будьте терпеливы.';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Не удалось отправить сообщение: $error';
   }

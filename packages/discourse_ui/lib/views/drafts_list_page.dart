@@ -110,6 +110,12 @@ class _DraftsListPageState extends State<DraftsListPage> {
     }
   }
 
+  /// A new topic's draft: `new_topic`, or `new_topic_<timestamp>` as the web
+  /// keys them (one per topic being written). Only the first was recognised,
+  /// so a draft started on the web showed as a reply and tapping did nothing.
+  static bool _isNewTopicDraft(FCDraft draft) =>
+      draft.draftKey == 'new_topic' || draft.draftKey.startsWith('new_topic_');
+
   void _resume(FCDraft draft) {
     // Reply drafts → ReplyPage anchored on the topic.
     // New-topic drafts → NewTopicPage in the saved category (or "" if
@@ -130,11 +136,12 @@ class _DraftsListPageState extends State<DraftsListPage> {
       );
       return;
     }
-    if (draft.draftKey == 'new_topic') {
+    if (_isNewTopicDraft(draft)) {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => NewTopicPage(
             siteContext: widget.siteContext,
+            draftKey: draft.draftKey,
             forumId: (draft.categoryId ?? '').toString(),
             // Named, so the category chip does not come back blank.
             forumName: draft.categoryId == null
@@ -201,7 +208,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
             ),
             itemBuilder: (_, i) {
               final d = drafts[i];
-              final title = d.isNewTopic
+              final title = (_isNewTopicDraft(d) || d.draftKey == 'new_private_message')
                   ? (d.topicTitle?.isNotEmpty ?? false
                       ? d.topicTitle!
                       : '(untitled new topic)')
@@ -212,7 +219,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
               return ListTile(
                 onTap: () => _resume(d),
                 leading: Icon(
-                  d.isNewTopic ? Icons.fiber_new : Icons.reply,
+                  (_isNewTopicDraft(d) || d.draftKey == 'new_private_message') ? Icons.fiber_new : Icons.reply,
                   color: colorScheme.onSurfaceVariant,
                 ),
                 title: Text(

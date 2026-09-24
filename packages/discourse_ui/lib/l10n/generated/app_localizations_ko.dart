@@ -1799,6 +1799,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get takePhoto => '사진 촬영';
 
   @override
+  String get postNeedsApprovalTitle => '승인이 필요한 게시물';
+
+  @override
+  String get postNeedsApprovalBody =>
+      '새 게시물이 있습니다. 그러나 이 게시물이 보여지려면 운영자의 승인이 필요합니다. 잠시 기다려 주세요.';
+
+  @override
   String failedToCreateConversation(Object error) {
     return '메시지를 보내지 못했습니다: $error';
   }

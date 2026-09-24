@@ -1879,6 +1879,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get takePhoto => 'Prendre une photo';
 
   @override
+  String get postNeedsApprovalTitle => 'Ce message doit être approuvé';
+
+  @override
+  String get postNeedsApprovalBody =>
+      'Votre nouveau message a bien été envoyé, mais il doit être accepté par un modérateur avant d\'apparaître publiquement. Merci de votre patience.';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'Impossible d\'envoyer le message : $error';
   }

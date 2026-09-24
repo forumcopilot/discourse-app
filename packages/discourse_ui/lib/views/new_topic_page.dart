@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/post_needs_approval_dialog.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -16,6 +17,12 @@ class NewTopicPage extends StatefulWidget {
   final String forumId;
   final String forumName;
 
+  /// The server draft this composer saves to and restores from. `new_topic`
+  /// for one started here; a draft resumed from Drafts passes its own key —
+  /// the web keys new topics `new_topic_<timestamp>` (one draft each), and
+  /// resuming one under `new_topic` opened a different draft or none.
+  final String draftKey;
+
   /// Fired the moment the server confirms the topic was created. More
   /// reliable than the pop result: it still reaches the opener when a
   /// post-creation step throws and the page is later popped without a
@@ -32,6 +39,7 @@ class NewTopicPage extends StatefulWidget {
     required this.siteContext,
     required this.forumId,
     required this.forumName,
+    this.draftKey = 'new_topic',
     this.onTopicCreated,
   });
 
@@ -59,7 +67,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
     _titleController = TextEditingController();
     _contentController = TextEditingController();
     _draftController = DiscourseDraftController(
-      draftKey: 'new_topic',
+      draftKey: widget.draftKey,
       titleController: _titleController,
       contentController: _contentController,
       extraData: {
@@ -122,6 +130,11 @@ class _NewTopicPageState extends State<NewTopicPage> {
       debugPrint('   - groupId passed: "$_groupId"');
 
       if (result.result) {
+        if (result.state == 1) {
+          // Queued for a moderator: there is no topic to open yet.
+          if (mounted) await showPostNeedsApproval(context);
+          return true;
+        }
         widget.onTopicCreated?.call(result.topicId.trim(), title);
         return true;
       } else {
@@ -239,7 +252,10 @@ class _NewTopicPageState extends State<NewTopicPage> {
           });
         }
       },
-      showSignatureToggle: true,
+      // No "Sent from <forum> mobile app" line: a Tapatalk-era habit with no
+      // Discourse equivalent, and it was on by default, stamping every new
+      // topic from the app.
+      showSignatureToggle: false,
       onError: (error) {
         if (context.mounted) {
           // Extract the clean message from the exception

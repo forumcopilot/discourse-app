@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:discourse_ui/views/appbars/forum_topics_app_bar.dart';
@@ -125,9 +124,9 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
       await NotificationLevelSheet.showForCategory(
         context: context,
         categoryId: widget.forum.id,
-        currentLevel: widget.forum.isSubscribed
-            ? FCNotificationLevel.tracking
-            : FCNotificationLevel.normal,
+        // Read by the sheet: a guess from the subscribed flag showed
+        // Watching as Tracking and Muted as Normal.
+        currentLevel: null,
         onChanged: () {
           if (!mounted) return;
           if (_refreshCallback != null) _refreshCallback!();

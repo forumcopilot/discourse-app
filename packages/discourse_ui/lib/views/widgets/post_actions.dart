@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/errors/action_refused.dart';
 import 'package:discourse_ui/utils/like_cooldown.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
@@ -490,93 +491,32 @@ class PostActionsHandler {
 
   Future<void> handleDelete(BuildContext context, String postId) async {
     AppLogger.debug('Handling delete of post: $postId');
-
-    final TextEditingController reasonController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-    int deleteMode = 1; // Default to soft delete
-
-    final result = await showDialog<Map<String, dynamic>?>(
+    // A plain confirmation. This was XenForo's dialog — "soft" or "hard"
+    // (permanent) delete and a required reason — but Discourse has one
+    // delete (DELETE /posts/:id: the author's post shows "(post deleted by
+    // author)", staff can recover it) and takes no reason, so both choices
+    // were ignored. The web asks nothing; one tap on a phone is too easy.
+    final confirmed = await showDialog<bool>(
       context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text(AppLocalizations.of(context)?.deletePost ?? 'Delete Post'),
-              content: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    RadioGroup<int>(
-                      groupValue: deleteMode,
-                      onChanged: (value) {
-                        setState(() {
-                          deleteMode = value!;
-                        });
-                      },
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                    RadioListTile<int>(
-                      title: Text(AppLocalizations.of(context)!.softDelete),
-                      subtitle: Text(AppLocalizations.of(context)!.postCanBeRestoredLater),
-                      value: 1,
-                    ),
-                    RadioListTile<int>(
-                      title: Text(AppLocalizations.of(context)!.hardDelete),
-                      subtitle: Text(AppLocalizations.of(context)!.postWillBePermanentlyDeleted),
-                      value: 2,
-                    ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: DesignTokens.spacingL),
-                    TextFormField(
-                      controller: reasonController,
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.reasonForDeletion,
-                        hintText: AppLocalizations.of(context)!.enterReasonForDeletingPost,
-                        border: OutlineInputBorder(),
-                      ),
-                      maxLines: 3,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return AppLocalizations.of(context)!.pleaseEnterReasonForDeletion;
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(null),
-                  child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
-                ),
-                FilledButton(
-                  onPressed: () {
-                    if (formKey.currentState?.validate() ?? false) {
-                      Navigator.of(context).pop({
-                        'reason': reasonController.text.trim(),
-                        'mode': deleteMode,
-                      });
-                    }
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.error,
-                    foregroundColor: Theme.of(context).colorScheme.onError,
-                  ),
-                  child: Text(AppLocalizations.of(context)?.deletePost ?? 'Delete Post'),
-                ),
-              ],
-            );
-          },
-        );
-      },
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)?.deletePost ?? 'Delete Post'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
+            child: Text(AppLocalizations.of(context)?.deletePost ?? 'Delete Post'),
+          ),
+        ],
+      ),
     );
-
+    final result = confirmed == true ? const <String, dynamic>{} : null;
     if (result != null && context.mounted) {
       // Show loading indicator
       ScaffoldMessenger.of(context).showSnackBar(
@@ -613,11 +553,12 @@ class PostActionsHandler {
 
       try {
         final moderationProxy = SiteProxyFactory.getModerationProxy();
-        await moderationProxy.deletePostAsync(
-          postId,
-          result['mode'] as int,
-          result['reason'] as String,
-        );
+        final deleted = await moderationProxy.deletePostAsync(postId, 1, '');
+        // The server can refuse (someone else's post, too old to delete):
+        // say so instead of reporting success.
+        if (!deleted.result) {
+          throw ActionRefused(deleted.resultText ?? '');
+        }
 
         if (context.mounted) {
           // Hide loading snackbar

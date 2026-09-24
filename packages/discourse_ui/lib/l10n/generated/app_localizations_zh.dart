@@ -1786,6 +1786,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get takePhoto => '拍照';
 
   @override
+  String get postNeedsApprovalTitle => '帖子需要审批';
+
+  @override
+  String get postNeedsApprovalBody => '我们已收到您的帖子，不过需要由版主批准才能显示。请耐心等待。';
+
+  @override
   String failedToCreateConversation(Object error) {
     return '无法发送消息：$error';
   }

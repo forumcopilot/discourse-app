@@ -3272,6 +3272,18 @@ abstract class AppLocalizations {
   /// **'Take photo'**
   String get takePhoto;
 
+  /// Title of the notice shown when a new post is held for moderator approval (Discourse review.approval.title).
+  ///
+  /// In en, this message translates to:
+  /// **'Post Needs Approval'**
+  String get postNeedsApprovalTitle;
+
+  /// Body of that notice (Discourse review.approval.description).
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve received your new post but it needs to be approved by a moderator before it will appear. Please be patient.'**
+  String get postNeedsApprovalBody;
+
   /// UI text: Failed to send message: {error}
   ///
   /// In en, this message translates to:

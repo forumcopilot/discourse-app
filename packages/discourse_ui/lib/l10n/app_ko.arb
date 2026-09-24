@@ -821,6 +821,8 @@
   "chatAttachFile": "파일 첨부",
   "chatRemoveUpload": "파일 제거",
   "takePhoto": "사진 촬영",
+  "postNeedsApprovalTitle": "승인이 필요한 게시물",
+  "postNeedsApprovalBody": "새 게시물이 있습니다. 그러나 이 게시물이 보여지려면 운영자의 승인이 필요합니다. 잠시 기다려 주세요.",
   "failedToCreateConversation": "메시지를 보내지 못했습니다: {error}",
   "maximumAttachmentsAllowed": "최대 {count}개의 첨부 파일만 허용됩니다",
   "noImagesFoundToDisplay": "표시할 이미지가 없습니다.",

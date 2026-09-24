@@ -821,6 +821,8 @@
   "chatAttachFile": "Joindre un fichier",
   "chatRemoveUpload": "Supprimer le fichier",
   "takePhoto": "Prendre une photo",
+  "postNeedsApprovalTitle": "Ce message doit être approuvé",
+  "postNeedsApprovalBody": "Votre nouveau message a bien été envoyé, mais il doit être accepté par un modérateur avant d'apparaître publiquement. Merci de votre patience.",
   "failedToCreateConversation": "Impossible d'envoyer le message : {error}",
   "maximumAttachmentsAllowed": "Maximum de {count} pièce(s) jointe(s)",
   "noImagesFoundToDisplay": "Aucune image à afficher.",

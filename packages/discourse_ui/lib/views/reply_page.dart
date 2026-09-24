@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart' as forumcopilot_sdk;
 import 'package:discourse_core/discourse_core.dart' show DiscoursePostProxy;
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
+import 'package:discourse_ui/views/widgets/post_needs_approval_dialog.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
@@ -219,9 +220,10 @@ class _ReplyPageState extends State<ReplyPage> {
       if (result.result) {
         // Check if post needs moderation (state = 1)
         if (result.state == 1) {
-          // Don't store postId if post needs moderation - it won't be visible yet
+          // Queued for a moderator: nothing to scroll to yet, and the reader
+          // must be told, or the reply just seems to vanish.
           _createdPostId = null;
-          debugPrint('🔍 [REPLY] Post submitted but needs moderation, postId not stored');
+          if (mounted) await showPostNeedsApproval(context);
         } else {
           // Store the postId synchronously for immediate use in onSuccess callback
           // Only store if postId is not null and not empty

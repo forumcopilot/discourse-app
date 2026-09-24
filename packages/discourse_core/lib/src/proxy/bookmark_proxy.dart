@@ -325,7 +325,12 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
   }
 
   FCBookmark _bookmarkFromDiscourseJson(Map<String, dynamic> json) {
-    final avatarTemplate = json['avatar_template']?.toString();
+    // The bookmarked post's author comes nested under `user`
+    // (UserBookmarkBaseSerializer#user); the row has no top-level username
+    // or avatar, so every bookmark showed without either.
+    final user = (json['user'] as Map?)?.cast<String, dynamic>() ?? const {};
+    final avatarTemplate = (user['avatar_template'] ?? json['avatar_template'])
+        ?.toString();
     return FCBookmark(
       id: (json['id'] as num).toInt(),
       bookmarkableType: json['bookmarkable_type']?.toString(),
@@ -341,7 +346,7 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
           json['topic_title']?.toString()),
       excerpt: _plain(json['excerpt']?.toString()),
       name: json['name']?.toString(),
-      username: json['username']?.toString(),
+      username: (user['username'] ?? json['username'])?.toString(),
       avatarUrl: _resolveAvatarUrl(avatarTemplate),
       createdAt: DateTime.tryParse(json['created_at']?.toString() ?? ''),
       // Reminder metadata (user_bookmark_base_serializer.rb): when the

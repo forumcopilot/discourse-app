@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import '../core/errors/action_refused.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseSubscriptionProxy;
 import 'widgets/notification_level_sheet.dart';
 import '../theme/design_tokens.dart';
@@ -44,6 +44,16 @@ class PostPage extends StatefulWidget {
 }
 
 class _PostPageState extends State<PostPage> {
+  /// Where the topic opens. Asked for no particular post, a signed-in reader
+  /// lands after their last read post, as a topic title link does on the web
+  /// (Topic#lastUnreadUrl); only Latest used to, so Unread, New, Top, Hot,
+  /// category, tag and suggested topics opened at post 1 — New and Unread
+  /// being exactly the lists read to catch up. Guests start at the top.
+  PostsListMode get _openingMode =>
+      widget.mode == PostsListMode.normal && widget.siteContext.isLoggedIn
+          ? PostsListMode.first_unread
+          : widget.mode;
+
   String? _forumId;
   /// Refresh callback from PostsList. When [scrollToPostId] is passed (e.g. after reply),
   /// the list refreshes by loading the thread at that post and scrolling to it in place.
@@ -187,9 +197,10 @@ class _PostPageState extends State<PostPage> {
       await NotificationLevelSheet.showForTopic(
         context: context,
         topicId: widget.topicId,
-        currentLevel: _isSubscribed
-            ? FCNotificationLevel.watching
-            : FCNotificationLevel.normal,
+        // Left for the sheet to read (the topic's own level): a guess from
+        // the subscribed flag showed Tracking as Watching and Muted as
+        // Normal.
+        currentLevel: null,
         onChanged: () {
           if (!mounted) return;
           // Refresh /t/{id}.json so the subscribed banner + bell icon
@@ -254,11 +265,12 @@ class _PostPageState extends State<PostPage> {
   void _handleClose() async {
     final moderationProxy = SiteProxyFactory.getModerationProxy();
     try {
-      if (_isClosed) {
-        await moderationProxy.uncloseTopicAsync(widget.topicId);
-      } else {
-        await moderationProxy.closeTopicAsync(widget.topicId);
-      }
+      final r = _isClosed
+          ? await moderationProxy.uncloseTopicAsync(widget.topicId)
+          : await moderationProxy.closeTopicAsync(widget.topicId);
+      // A refusal (not staff, not the topic's owner) went on to say the
+      // topic was closed or opened.
+      if (!r.result) throw ActionRefused(r.resultText ?? '');
       if (mounted) {
         setState(() {
           _isClosed = !_isClosed;
@@ -328,11 +340,11 @@ class _PostPageState extends State<PostPage> {
   void _handleSticky() async {
     final moderationProxy = SiteProxyFactory.getModerationProxy();
     try {
-      if (_isSticky) {
-        await moderationProxy.unstickTopicAsync(widget.topicId);
-      } else {
-        await moderationProxy.stickTopicAsync(widget.topicId);
-      }
+      final r = _isSticky
+          ? await moderationProxy.unstickTopicAsync(widget.topicId)
+          : await moderationProxy.stickTopicAsync(widget.topicId);
+      // As for close: a refusal must not read as success.
+      if (!r.result) throw ActionRefused(r.resultText ?? '');
       if (mounted) {
         setState(() {
           _isSticky = !_isSticky;
@@ -647,7 +659,8 @@ class _PostPageState extends State<PostPage> {
     // Handle undelete with simple confirmation (already handled in app bar)
     if (_isDeleted) {
       try {
-        await moderationProxy.undeleteTopicAsync(widget.topicId, '');
+        final r = await moderationProxy.undeleteTopicAsync(widget.topicId, '');
+        if (!r.result) throw ActionRefused(r.resultText ?? '');
         if (mounted) {
           setState(() {
             _isDeleted = false;
@@ -1001,7 +1014,7 @@ class _PostPageState extends State<PostPage> {
                   siteContext: widget.siteContext,
                   topicId: widget.topicId,
                   topicTitle: widget.title,
-                  mode: widget.mode,
+                  mode: _openingMode,
                   anchorPostId: widget.anchorPostId,
                   gotoPage: widget.gotoPage,
                   gotoPostNumber: widget.gotoPostNumber,

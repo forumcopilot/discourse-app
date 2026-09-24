@@ -821,6 +821,8 @@
   "chatAttachFile": "Прикрепить файл",
   "chatRemoveUpload": "Удалить файл",
   "takePhoto": "Сделать фото",
+  "postNeedsApprovalTitle": "Сообщение требует одобрения",
+  "postNeedsApprovalBody": "Сообщение получено, но оно требует проверки и утверждения модератором перед публикацией. Будьте терпеливы.",
   "failedToCreateConversation": "Не удалось отправить сообщение: {error}",
   "maximumAttachmentsAllowed": "Не более {count} вложений",
   "noImagesFoundToDisplay": "Нет изображений для показа.",

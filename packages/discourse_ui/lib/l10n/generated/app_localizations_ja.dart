@@ -1803,6 +1803,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get takePhoto => '写真を撮る';
 
   @override
+  String get postNeedsApprovalTitle => '承認待ちの投稿';
+
+  @override
+  String get postNeedsApprovalBody =>
+      'あなたの新しい投稿を受領しましたが、表示するにはモデレーターの承認が必要です。しばらくお待ちください。';
+
+  @override
   String failedToCreateConversation(Object error) {
     return 'メッセージを送信できませんでした: $error';
   }

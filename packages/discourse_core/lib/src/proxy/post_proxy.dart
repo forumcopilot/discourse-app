@@ -50,6 +50,14 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
               .categoryNameFor(categoryId) ??
           '');
 
+  /// The viewer's notification level on topic payload [t]: under `details`
+  /// in the topic view (TopicViewDetailsSerializer), top-level in lists;
+  /// 1 (Normal) when absent.
+  static int _topicNotificationLevel(Map<String, dynamic> t) =>
+      ((t['details'] as Map?)?['notification_level'] as int?) ??
+      (t['notification_level'] as int?) ??
+      1;
+
   /// The topic's tags, as plain names.
   ///
   /// Discourse sends this two ways depending on the route and the
@@ -297,6 +305,18 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         voteCount: (t['vote_count'] as int?) ?? 0,
         canVote: t['can_vote'] == true,
         userVoted: t['user_voted'] == true,
+        // The topic's state, read as the sibling mapper reads it. Every
+        // signed-in open from a list, a notification, search or a bookmark
+        // comes through here or the by-unread builder, and these used to
+        // stay false: no closed banner, the staff Close/Open toggle
+        // inverted, pinned topics not shown as pinned.
+        isClosed: (t['closed'] as bool?) ?? false,
+        isSubscribed: _topicNotificationLevel(t) >= 2,
+        isPinned: (t['pinned'] as bool?) ?? false,
+        isAnnouncement: (t['pinned_globally'] as bool?) ?? false,
+        replyCount: (((t['posts_count'] as int?) ?? 1) - 1).clamp(0, 1 << 30),
+        isLiked: (t['liked'] as bool?) ?? false,
+        canLike: true,
         poll: poll,
       );
     } catch (e) {
@@ -329,7 +349,14 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // It is site-level, not topic-level, so any topic load teaches the
       // picker what this forum accepts — see DiscourseValidReactions.
       DiscourseValidReactions.store(t['valid_reactions']);
-      final unreadAnchor = (t['last_read_post_number'] as int?) ?? 1;
+      // The post after the last one read, capped at the newest — what the
+      // web opens (Topic#lastUnreadUrl); post 1 for a topic never opened.
+      // This anchored on the last read post itself, one post early.
+      final lastRead = t['last_read_post_number'] as int?;
+      final highest = t['highest_post_number'] as int?;
+      var unreadAnchor = lastRead == null ? 1 : lastRead + 1;
+      if (highest != null && unreadAnchor > highest) unreadAnchor = highest;
+      if (unreadAnchor < 1) unreadAnchor = 1;
       var stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       var rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
@@ -403,6 +430,18 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         voteCount: (t['vote_count'] as int?) ?? 0,
         canVote: t['can_vote'] == true,
         userVoted: t['user_voted'] == true,
+        // The topic's state, read as the sibling mapper reads it. Every
+        // signed-in open from a list, a notification, search or a bookmark
+        // comes through here or the by-unread builder, and these used to
+        // stay false: no closed banner, the staff Close/Open toggle
+        // inverted, pinned topics not shown as pinned.
+        isClosed: (t['closed'] as bool?) ?? false,
+        isSubscribed: _topicNotificationLevel(t) >= 2,
+        isPinned: (t['pinned'] as bool?) ?? false,
+        isAnnouncement: (t['pinned_globally'] as bool?) ?? false,
+        replyCount: (((t['posts_count'] as int?) ?? 1) - 1).clamp(0, 1 << 30),
+        isLiked: (t['liked'] as bool?) ?? false,
+        canLike: true,
         poll: poll,
       );
     } catch (e) {
@@ -440,11 +479,14 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         'archetype': 'regular',
         if (replyToPostNumber != null) 'reply_to_post_number': replyToPostNumber,
       });
+      // Held for a moderator: {action: "enqueued", pending_post}, no post
+      // yet. State 1 = awaiting moderation, which the composer reports.
+      final queued = response['action']?.toString() == 'enqueued';
       return FCReplyPostResult(
         result: true,
         resultText: '',
-        postId: (response['id'] ?? '').toString(),
-        state: 0,
+        postId: queued ? '' : (response['id'] ?? '').toString(),
+        state: queued ? 1 : 0,
         postContent:
             returnHtml ? response['cooked']?.toString() : response['raw']?.toString(),
         canEdit: response['can_edit'] == true,
@@ -482,11 +524,14 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         'whisper': 'true',
         if (replyToPostNumber != null) 'reply_to_post_number': replyToPostNumber,
       });
+      // Held for a moderator: {action: "enqueued", pending_post}, no post
+      // yet. State 1 = awaiting moderation, which the composer reports.
+      final queued = response['action']?.toString() == 'enqueued';
       return FCReplyPostResult(
         result: true,
         resultText: '',
-        postId: (response['id'] ?? '').toString(),
-        state: 0,
+        postId: queued ? '' : (response['id'] ?? '').toString(),
+        state: queued ? 1 : 0,
         postContent: returnHtml
             ? response['cooked']?.toString()
             : response['raw']?.toString(),

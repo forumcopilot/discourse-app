@@ -135,6 +135,9 @@ class _PostsState extends State<PostsList> {
   /// overlaps. Reset when the widget switches to a different thread.
   final Set<int> _reportedPostNumbers = {};
 
+  /// Waits for scrolling to settle before reporting what is on screen.
+  Timer? _readReportTimer;
+
   // Add scroll loading control flag
   bool _isScrollLoadingEnabled = false;
 
@@ -365,7 +368,7 @@ class _PostsState extends State<PostsList> {
         widget.onThreadUrlAvailable?.call(data?.topic.url);
       });
       _updateHasMorePosts();
-      _reportPostsRead();
+      _scheduleReadReport();
 
       // Determine the target post position to scroll to
       int targetPosition = 0;
@@ -610,6 +613,7 @@ class _PostsState extends State<PostsList> {
   void _trackVisiblePost() {
     final data = _postsController.threadDataOutput.value;
     if (data == null) return;
+    _scheduleReadReport();
     final positions = _itemPositionsListener.itemPositions.value;
     if (positions.isEmpty) return;
     ItemPosition? best;
@@ -702,17 +706,22 @@ class _PostsState extends State<PostsList> {
     _hasMorePosts = maxLoaded < data.totalPosts;
   }
 
-  /// Phase 5.45 — report the currently loaded post window to the
-  /// server's read-tracker (`IFCTopicProxy.markPostsReadAsync`, i.e.
-  /// Discourse `POST /topics/timings`). This is what advances
-  /// `last_read_post_number` so unread badges and the Unread tab
-  /// clear after reading in the app.
+  /// Phase 5.45 — report the posts the reader has seen to the server's
+  /// read-tracker (`IFCTopicProxy.markPostsReadAsync`, i.e. Discourse
+  /// `POST /topics/timings`). This is what advances
+  /// `last_read_post_number` so unread badges and the Unread tab clear
+  /// after reading in the app.
   ///
-  /// Called after every successful fetch (initial, paging, refresh).
+  /// Only posts on screen count, as on the web (ScreenTrack times the posts
+  /// in the viewport). This used to report every post of each fetched
+  /// chunk — about 20 at a time, the moment they loaded — so opening a topic
+  /// marked posts read that were never shown. Reported when scrolling
+  /// settles (see [_scheduleReadReport]), after a load, and on leaving.
   /// Fire-and-forget — read tracking must never disturb reading, so
   /// failures are only debug-logged. [_reportedPostNumbers] dedupes
   /// across the thread's lifetime in this widget.
   void _reportPostsRead() {
+    _readReportTimer?.cancel();
     if (!widget.siteContext.isLoggedIn) return;
     final data = _postsController.threadDataOutput.value;
     if (data == null || data.posts.isEmpty) return;
@@ -721,9 +730,14 @@ class _PostsState extends State<PostsList> {
         : (_actualTopicId ?? widget.topicId);
     if (topicId.isEmpty) return;
 
+    final offset =
+        (_isLoadingMore && _pagingDirection == _PagingDirection.earlier) ? 1 : 0;
     final fresh = <int>[];
-    for (final post in data.posts) {
-      final n = post.postNumber;
+    for (final position in _itemPositionsListener.itemPositions.value) {
+      final onScreen = position.itemTrailingEdge > 0 && position.itemLeadingEdge < 1;
+      final i = position.index - offset;
+      if (!onScreen || i < 0 || i >= data.posts.length) continue;
+      final n = data.posts[i].postNumber;
       if (n != null && _reportedPostNumbers.add(n)) fresh.add(n);
     }
     if (fresh.isEmpty) return;
@@ -737,6 +751,16 @@ class _PostsState extends State<PostsList> {
       }
     }).catchError((e) {
       AppLogger.debug('PostsList: read-tracking report error: $e');
+    });
+  }
+
+  /// Report what is on screen once it has stayed there for a second: after
+  /// a load (the list has to lay out first) and whenever scrolling stops.
+  /// A post flung past is not counted.
+  void _scheduleReadReport() {
+    _readReportTimer?.cancel();
+    _readReportTimer = Timer(const Duration(seconds: 1), () {
+      if (mounted) _reportPostsRead();
     });
   }
 
@@ -802,7 +826,7 @@ class _PostsState extends State<PostsList> {
       await _postsController.getThreadAsync(topicIdToUse, startNum1Based, lastNum1Based, _retriveHtml, mode: LoadMode.earlier);
       // --- End normal paging ---
       _updateHasMorePosts();
-      _reportPostsRead();
+      _scheduleReadReport();
 
       // Restore scroll position to the post that was visible before loading
       // Find the post by ID in the new list and scroll to it
@@ -889,7 +913,7 @@ class _PostsState extends State<PostsList> {
       await _postsController.getThreadAsync(topicIdToUse, startNum1Based, lastNum1Based, _retriveHtml, mode: LoadMode.later);
       // --- End normal paging ---
       _updateHasMorePosts();
-      _reportPostsRead();
+      _scheduleReadReport();
     } catch (e) {
       // Fire-and-forget loader: don't rethrow (would be an unhandled-zone
       // exception). Log + snackbar; the finally block re-enables scroll
@@ -940,7 +964,7 @@ class _PostsState extends State<PostsList> {
       final lastNum1Based = lastNum0Based + 1; // Convert to 1-based
       await _postsController.getThreadAsync(topicIdToUse, startNum1Based, lastNum1Based, _retriveHtml, mode: LoadMode.initial);
       _updateHasMorePosts();
-      _reportPostsRead();
+      _scheduleReadReport();
     } catch (e) {
       // Also called fire-and-forget (refresh callbacks): don't rethrow.
       AppLogger.error('PostsList: refresh failed: $e');
@@ -1047,7 +1071,7 @@ class _PostsState extends State<PostsList> {
         _actualTopicId = data.topic.id;
       }
       _updateHasMorePosts();
-      _reportPostsRead();
+      _scheduleReadReport();
       if (data != null && data.posts.isNotEmpty) {
         final index = data.posts.indexWhere((p) => p.id == postId);
         if (index >= 0) {
@@ -1716,6 +1740,9 @@ class _PostsState extends State<PostsList> {
     _visiblePostIndex.dispose();
     _itemPositionsListener.itemPositions.removeListener(_onScroll);
     _itemPositionsListener.itemPositions.removeListener(_trackVisiblePost);
+    // What is on screen as the reader leaves counts as read.
+    if (_readReportTimer?.isActive ?? false) _reportPostsRead();
+    _readReportTimer?.cancel();
     _highlightTimer?.cancel(); // Cancel timer on dispose
     // Dispose the controller to prevent memory leaks
     _postsController.dispose();

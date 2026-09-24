@@ -115,7 +115,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
   bool _ownsTitleController = false;
   bool _ownsContentController = false;
   bool _isContentFieldFocused = false; // Track if content field has focus
-  bool _includeSignature = true; // Default to enabled
+  bool _includeSignature = false; // Opt-in where a page offers it
   bool _isWhisper = false; // Discourse staff whisper mode
 
   // Cache the attachment processing future to prevent reprocessing on rebuilds

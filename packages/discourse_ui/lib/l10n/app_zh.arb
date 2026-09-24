@@ -821,6 +821,8 @@
   "chatAttachFile": "附加文件",
   "chatRemoveUpload": "移除文件",
   "takePhoto": "拍照",
+  "postNeedsApprovalTitle": "帖子需要审批",
+  "postNeedsApprovalBody": "我们已收到您的帖子，不过需要由版主批准才能显示。请耐心等待。",
   "failedToCreateConversation": "无法发送消息：{error}",
   "maximumAttachmentsAllowed": "最多允许 {count} 个附件",
   "noImagesFoundToDisplay": "没有可显示的图片。",

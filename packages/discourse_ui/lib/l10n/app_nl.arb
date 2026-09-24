@@ -1119,6 +1119,8 @@
   "chatAttachFile": "Voeg een bestand toe",
   "chatRemoveUpload": "Bestand verwijderen",
   "takePhoto": "Foto maken",
+  "postNeedsApprovalTitle": "Bericht vereist goedkeuring",
+  "postNeedsApprovalBody": "We hebben je nieuwe bericht ontvangen, maar dit moet eerst door een moderator worden goedgekeurd voordat het zichtbaar wordt. Heb geduld.",
   "failedToCreateConversation": "Kon bericht niet verzenden: {error}",
   "maximumAttachmentsAllowed": "Maximaal {count} bijlage(n) toegestaan",
   "noImagesFoundToDisplay": "Geen afbeeldingen gevonden om weer te geven.",

@@ -821,6 +821,8 @@
   "chatAttachFile": "Allega un file",
   "chatRemoveUpload": "Rimuovi file",
   "takePhoto": "Scatta una foto",
+  "postNeedsApprovalTitle": "Messaggio Da Approvare",
+  "postNeedsApprovalBody": "Abbiamo ricevuto il tuo messaggio ma prima che appaia deve essere approvato da un moderatore. Attendi.",
   "failedToCreateConversation": "Impossibile inviare il messaggio: {error}",
   "maximumAttachmentsAllowed": "Massimo {count} allegati consentiti",
   "noImagesFoundToDisplay": "Nessuna immagine da mostrare.",

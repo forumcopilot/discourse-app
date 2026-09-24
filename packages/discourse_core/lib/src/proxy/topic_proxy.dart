@@ -415,11 +415,15 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         body['tags'] = tags;
       }
       final response = await apiPost('/posts.json', body: body);
+      // Held for a moderator: Discourse answers {action: "enqueued",
+      // pending_post} with no topic yet. State 1 is the SDK's "awaiting
+      // moderation" (Tapatalk's convention), which the composer reports.
+      final queued = response['action']?.toString() == 'enqueued';
       return FCNewTopicResult(
         result: true,
         resultText: '',
-        topicId: (response['topic_id'] ?? '').toString(),
-        state: 0,
+        topicId: queued ? '' : (response['topic_id'] ?? '').toString(),
+        state: queued ? 1 : 0,
       );
     } on DiscourseApiException catch (e) {
       return FCNewTopicResult(
