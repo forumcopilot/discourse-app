@@ -54,6 +54,9 @@ dependencies:
   package_info_plus: ^8.3.0
   passkeys: ^2.17.4
   video_player: ^2.10.0
+  flutter_math_fork: ^0.7.4 # discourse-math: TeX in posts
+  intl: ^0.20.2 # already in the graph via flutter_localizations
+  timezone: ^0.10.1 # already in the graph via flutter_local_notifications; local dates, events
 
 dev_dependencies:
   flutter_test:

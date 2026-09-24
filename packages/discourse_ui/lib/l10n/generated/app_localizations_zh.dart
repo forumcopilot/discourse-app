@@ -2144,4 +2144,193 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get couldNotTurnOffNotifications => '无法关闭通知。请稍后再试。';
+
+  @override
+  String actionCodeTopicCreated(String when) {
+    return 'Created this topic $when';
+  }
+
+  @override
+  String actionCodePublicTopic(String when) {
+    return '$when将此话题设为公开';
+  }
+
+  @override
+  String actionCodeOpenTopic(String when) {
+    return '$when将此转换为话题';
+  }
+
+  @override
+  String actionCodePrivateTopic(String when) {
+    return '$when将此话题转换为个人消息';
+  }
+
+  @override
+  String actionCodeSplitTopic(String when) {
+    return '$when拆分了此话题';
+  }
+
+  @override
+  String actionCodeInvitedUser(String who, String when) {
+    return '$when邀请了 $who';
+  }
+
+  @override
+  String actionCodeInvitedGroup(String who, String when) {
+    return '$when邀请了 $who';
+  }
+
+  @override
+  String actionCodeUserLeft(String who, String when) {
+    return '$who 在 $when将自己从此消息中移除';
+  }
+
+  @override
+  String actionCodeRemovedUser(String who, String when) {
+    return '$when移除了 $who';
+  }
+
+  @override
+  String actionCodeRemovedGroup(String who, String when) {
+    return '$when移除了 $who';
+  }
+
+  @override
+  String actionCodeAutobumped(String when) {
+    return '$when自动顶帖';
+  }
+
+  @override
+  String actionCodeTagsChanged(String when) {
+    return '标签 $when更新';
+  }
+
+  @override
+  String actionCodeCategoryChanged(String when) {
+    return '类别 $when更新';
+  }
+
+  @override
+  String get actionCodeForwarded => '转发了上述电子邮件';
+
+  @override
+  String actionCodeAutoclosedEnabled(String when) {
+    return '$when关闭';
+  }
+
+  @override
+  String actionCodeAutoclosedDisabled(String when) {
+    return '$when打开';
+  }
+
+  @override
+  String actionCodeClosedEnabled(String when) {
+    return '$when关闭';
+  }
+
+  @override
+  String actionCodeClosedDisabled(String when) {
+    return '$when打开';
+  }
+
+  @override
+  String actionCodeArchivedEnabled(String when) {
+    return '$when归档';
+  }
+
+  @override
+  String actionCodeArchivedDisabled(String when) {
+    return '$when取消归档';
+  }
+
+  @override
+  String actionCodePinnedEnabled(String when) {
+    return '$when置顶';
+  }
+
+  @override
+  String actionCodePinnedDisabled(String when) {
+    return '$when取消置顶';
+  }
+
+  @override
+  String actionCodePinnedGloballyEnabled(String when) {
+    return '$when全站置顶';
+  }
+
+  @override
+  String actionCodePinnedGloballyDisabled(String when) {
+    return '$when取消置顶';
+  }
+
+  @override
+  String actionCodeVisibleEnabled(String when) {
+    return '$when公开';
+  }
+
+  @override
+  String actionCodeVisibleDisabled(String when) {
+    return '$when取消公开';
+  }
+
+  @override
+  String actionCodeBannerEnabled(String when) {
+    return '$when将此设置为横幅。在用户忽略前，它将显示在每个页面的顶部。';
+  }
+
+  @override
+  String actionCodeBannerDisabled(String when) {
+    return '$when移除了此横幅。它将不再显示在每个页面的顶部。';
+  }
+
+  @override
+  String actionCodeAssigned(String who, String when) {
+    return '于 $when指定给 $who';
+  }
+
+  @override
+  String actionCodeUnassigned(String who, String when) {
+    return '于 $when取消指定 $who';
+  }
+
+  @override
+  String actionCodeReassigned(String who, String when) {
+    return '于 $when重新指定 $who';
+  }
+
+  @override
+  String localDateToday(String time) {
+    return '今天 $time';
+  }
+
+  @override
+  String localDateTomorrow(String time) {
+    return '明天 $time';
+  }
+
+  @override
+  String localDateYesterday(String time) {
+    return '昨天 $time';
+  }
+
+  @override
+  String get eventExpired => '已过期';
+
+  @override
+  String get eventEveryDay => '每天';
+
+  @override
+  String get eventEveryWeekday => '每个工作日';
+
+  @override
+  String get eventEveryWeek => '每周的这个工作日';
+
+  @override
+  String get eventEveryTwoWeeks => '每两周的这个工作日';
+
+  @override
+  String get eventEveryFourWeeks => '每四周的这个工作日';
+
+  @override
+  String get eventEveryMonth => '每个月的这个工作日';
 }

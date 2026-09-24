@@ -2260,4 +2260,194 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get couldNotTurnOffNotifications =>
       'No se pudieron desactivar las notificaciones. Inténtalo de nuevo más tarde.';
+
+  @override
+  String actionCodeTopicCreated(String when) {
+    return 'Created this topic $when';
+  }
+
+  @override
+  String actionCodePublicTopic(String when) {
+    return 'Hizo este tema público $when';
+  }
+
+  @override
+  String actionCodeOpenTopic(String when) {
+    return 'Convirtió esto en un tema $when';
+  }
+
+  @override
+  String actionCodePrivateTopic(String when) {
+    return 'Hizo este tema un mensaje personal $when';
+  }
+
+  @override
+  String actionCodeSplitTopic(String when) {
+    return 'Separó este tema $when';
+  }
+
+  @override
+  String actionCodeInvitedUser(String who, String when) {
+    return 'Invitó a $who $when';
+  }
+
+  @override
+  String actionCodeInvitedGroup(String who, String when) {
+    return 'Invitó a $who $when';
+  }
+
+  @override
+  String actionCodeUserLeft(String who, String when) {
+    return '$who se eliminó a sí mismo de este mensaje $when';
+  }
+
+  @override
+  String actionCodeRemovedUser(String who, String when) {
+    return 'Eliminó a $who $when';
+  }
+
+  @override
+  String actionCodeRemovedGroup(String who, String when) {
+    return 'Eliminó a $who $when';
+  }
+
+  @override
+  String actionCodeAutobumped(String when) {
+    return 'Reflotado automáticamente $when';
+  }
+
+  @override
+  String actionCodeTagsChanged(String when) {
+    return 'Etiquetas actualizadas $when';
+  }
+
+  @override
+  String actionCodeCategoryChanged(String when) {
+    return 'Categoría actualizada $when';
+  }
+
+  @override
+  String get actionCodeForwarded => 'Reenvió el correo electrónico de arriba';
+
+  @override
+  String actionCodeAutoclosedEnabled(String when) {
+    return 'Cerrado $when';
+  }
+
+  @override
+  String actionCodeAutoclosedDisabled(String when) {
+    return 'Abierto $when';
+  }
+
+  @override
+  String actionCodeClosedEnabled(String when) {
+    return 'Cerrado $when';
+  }
+
+  @override
+  String actionCodeClosedDisabled(String when) {
+    return 'Abierto $when';
+  }
+
+  @override
+  String actionCodeArchivedEnabled(String when) {
+    return 'Archivado $when';
+  }
+
+  @override
+  String actionCodeArchivedDisabled(String when) {
+    return 'Desarchivado $when';
+  }
+
+  @override
+  String actionCodePinnedEnabled(String when) {
+    return 'Anclado $when';
+  }
+
+  @override
+  String actionCodePinnedDisabled(String when) {
+    return 'Desanclado $when';
+  }
+
+  @override
+  String actionCodePinnedGloballyEnabled(String when) {
+    return 'Anclado globalmente $when';
+  }
+
+  @override
+  String actionCodePinnedGloballyDisabled(String when) {
+    return 'Desanclado $when';
+  }
+
+  @override
+  String actionCodeVisibleEnabled(String when) {
+    return 'Listado $when';
+  }
+
+  @override
+  String actionCodeVisibleDisabled(String when) {
+    return 'Quitado de la lista $when';
+  }
+
+  @override
+  String actionCodeBannerEnabled(String when) {
+    return 'Hizo esto un banner $when. Aparecerá en la parte superior de cada página hasta que el usuario lo descarte.';
+  }
+
+  @override
+  String actionCodeBannerDisabled(String when) {
+    return 'Quitó este banner $when. Ya no aparecerá en la parte superior de cada página.';
+  }
+
+  @override
+  String actionCodeAssigned(String who, String when) {
+    return 'Asignó a $who el $when';
+  }
+
+  @override
+  String actionCodeUnassigned(String who, String when) {
+    return 'Anuló la asignación de $who el $when';
+  }
+
+  @override
+  String actionCodeReassigned(String who, String when) {
+    return 'Reasignó a $who $when';
+  }
+
+  @override
+  String localDateToday(String time) {
+    return 'Hoy $time';
+  }
+
+  @override
+  String localDateTomorrow(String time) {
+    return 'Mañana $time';
+  }
+
+  @override
+  String localDateYesterday(String time) {
+    return 'Ayer $time';
+  }
+
+  @override
+  String get eventExpired => 'Caducado';
+
+  @override
+  String get eventEveryDay => 'Cada día';
+
+  @override
+  String get eventEveryWeekday => 'Todos los días de la semana';
+
+  @override
+  String get eventEveryWeek => 'Todas las semanas en este día de la semana';
+
+  @override
+  String get eventEveryTwoWeeks => 'Cada dos semanas en este día de la semana';
+
+  @override
+  String get eventEveryFourWeeks =>
+      'Cada cuatro semanas en este día de la semana';
+
+  @override
+  String get eventEveryMonth => 'Todos los meses en este día de la semana';
 }

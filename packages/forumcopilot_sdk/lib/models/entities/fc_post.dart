@@ -2,6 +2,7 @@ import 'package:dart_mappable/dart_mappable.dart';
 import 'package:forumcopilot_sdk/models/mapping/hooks.dart';
 import 'fc_attachment.dart';
 import 'fc_like.dart';
+import 'fc_poll.dart';
 import 'fc_post_reaction.dart';
 import 'fc_post_vote.dart';
 import 'fc_thanks.dart';
@@ -159,6 +160,31 @@ class FCPost with FCPostMappable {
   /// concept leave false.
   bool isWiki;
 
+  /// Every poll in this post, in the order its body shows them (Discourse:
+  /// the post's `polls` array; a post may hold several, each named by
+  /// `data-poll-name` where it sits in the body). Empty on platforms that
+  /// attach a poll to the topic instead ([FCTopic.poll]).
+  List<FCPoll> polls;
+
+  /// For a post that records an action rather than saying something — the
+  /// topic was closed, pinned, split, someone invited — the action's code
+  /// (Discourse: `action_code` on a small-action post, e.g.
+  /// `closed.enabled`, `invited_user`). Null for ordinary posts. The UI
+  /// shows such a post as a one-line notice, as the web does.
+  String? actionCode;
+
+  /// Who [actionCode] names, when it names someone (Discourse:
+  /// `action_code_who`, e.g. the invited user or group). Null otherwise.
+  String? actionCodeWho;
+
+  /// Whether this is a moderator's official post in the topic (Discourse:
+  /// `post_type` 2), which the web sets off with a tint.
+  bool isModeratorAction;
+
+  /// Whether the post is hidden because the community flagged it
+  /// (Discourse: `hidden`). Its body may be withheld from the viewer.
+  bool isHidden;
+
   FCPost(
       {required this.id,
       required this.title,
@@ -202,6 +228,11 @@ class FCPost with FCPostMappable {
       this.vote,
       this.editVersion,
       this.isWiki = false,
+      this.polls = const [],
+      this.actionCode,
+      this.actionCodeWho,
+      this.isModeratorAction = false,
+      this.isHidden = false,
       this.replyToPostNumber,
       this.replyToUsername,
       this.replyToIconUrl,

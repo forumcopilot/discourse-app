@@ -955,14 +955,38 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   }
 
   void _trackRecentPoll(FCPoll poll) {
-    // Cap the recent-polls list at a small size; this is only a fallback
-    // for the Expando lookup path.
     _recentPolls.removeWhere((e) => e.poll.pollId == poll.pollId &&
         e.poll.topicId == poll.topicId);
     _recentPolls.insert(0, _RecentPoll(poll));
-    if (_recentPolls.length > 20) {
-      _recentPolls.removeRange(20, _recentPolls.length);
+    // Every poll of every post on screen is parsed now, not just the first
+    // post's; the cap must hold a busy thread's worth, or a vote in an
+    // older poll would fall back to the first post's.
+    if (_recentPolls.length > 200) {
+      _recentPolls.removeRange(200, _recentPolls.length);
     }
+  }
+
+  /// Every poll in a Discourse post payload, with the viewer's votes.
+  List<FCPoll> _pollsFromPost(Map<String, dynamic> p, {required String topicId}) {
+    final polls = (p['polls'] as List?) ?? const [];
+    final postId = (p['id'] as num?)?.toInt();
+    if (polls.isEmpty || postId == null) return const [];
+    final votesByPoll = (p['polls_votes'] as Map?)?.cast<String, dynamic>();
+    final out = <FCPoll>[];
+    for (final raw in polls.whereType<Map>()) {
+      final json = raw.cast<String, dynamic>();
+      final name = (json['name'] ?? 'poll').toString();
+      final poll = _pollFromJson(
+        json,
+        topicId: topicId,
+        postId: postId,
+        viewerVotes: ((votesByPoll?[name] as List?) ?? const [])
+            .whereType<String>()
+            .toList(),
+      );
+      if (poll != null) out.add(poll);
+    }
+    return out;
   }
 
   /// Extract the first poll from a Discourse post payload, if any.
@@ -1627,7 +1651,22 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       thanksInfo: <FCThanks>[],
       reactions: reactions,
       vote: vote,
+      // Every poll in the post, for the UI to draw where the body names it
+      // (`div.poll[data-poll-name]`) — not only the first post's first.
+      polls: _pollsFromPost(p, topicId: topicId),
+      // post_type: 1 regular, 2 moderator action, 3 small action, 4 whisper
+      // (Post.types). A small action records an event — closed, pinned,
+      // user invited — in `action_code`, with no body of its own.
+      actionCode: p['post_type'] == 3 ? _nonEmpty(p['action_code']) : null,
+      actionCodeWho: _nonEmpty(p['action_code_who']),
+      isModeratorAction: p['post_type'] == 2,
+      isHidden: p['hidden'] == true,
     );
+  }
+
+  static String? _nonEmpty(Object? value) {
+    final s = value?.toString().trim();
+    return (s == null || s.isEmpty) ? null : s;
   }
 
   /// Resolve an `avatar_template` into an absolute avatar URL.

@@ -2255,4 +2255,193 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get couldNotTurnOffNotifications =>
       'Не удалось отключить уведомления. Повторите попытку позже.';
+
+  @override
+  String actionCodeTopicCreated(String when) {
+    return 'Эта тема создана $when';
+  }
+
+  @override
+  String actionCodePublicTopic(String when) {
+    return 'Сделал(а) тему публичной $when';
+  }
+
+  @override
+  String actionCodeOpenTopic(String when) {
+    return 'Преобразовал(а) это в тему $when';
+  }
+
+  @override
+  String actionCodePrivateTopic(String when) {
+    return 'Сделал(а) тему личным сообщением $when';
+  }
+
+  @override
+  String actionCodeSplitTopic(String when) {
+    return 'Разделил(а) эту тему $when';
+  }
+
+  @override
+  String actionCodeInvitedUser(String who, String when) {
+    return 'Пригласил(а) $who $when';
+  }
+
+  @override
+  String actionCodeInvitedGroup(String who, String when) {
+    return 'Пригласил(а) $who $when';
+  }
+
+  @override
+  String actionCodeUserLeft(String who, String when) {
+    return '$who удалил(а) себя из этого сообщения $when';
+  }
+
+  @override
+  String actionCodeRemovedUser(String who, String when) {
+    return 'Удалил(а) $who $when';
+  }
+
+  @override
+  String actionCodeRemovedGroup(String who, String when) {
+    return 'Удалил(а) $who $when';
+  }
+
+  @override
+  String actionCodeAutobumped(String when) {
+    return 'Автоматически поднято $when';
+  }
+
+  @override
+  String actionCodeTagsChanged(String when) {
+    return 'Теги обновлены $when';
+  }
+
+  @override
+  String actionCodeCategoryChanged(String when) {
+    return 'Категория обновлена $when';
+  }
+
+  @override
+  String get actionCodeForwarded => 'Переадресовал(а) вышеуказанное письмо';
+
+  @override
+  String actionCodeAutoclosedEnabled(String when) {
+    return 'Закрыл(а) тему $when';
+  }
+
+  @override
+  String actionCodeAutoclosedDisabled(String when) {
+    return 'Открыл(а) тему $when';
+  }
+
+  @override
+  String actionCodeClosedEnabled(String when) {
+    return 'Закрыл(а) тему $when';
+  }
+
+  @override
+  String actionCodeClosedDisabled(String when) {
+    return 'Открыл(а) тему $when';
+  }
+
+  @override
+  String actionCodeArchivedEnabled(String when) {
+    return 'Архивировал(а) тему $when';
+  }
+
+  @override
+  String actionCodeArchivedDisabled(String when) {
+    return 'Разархивировал(а) тему $when';
+  }
+
+  @override
+  String actionCodePinnedEnabled(String when) {
+    return 'Закрепил(а) тему $when';
+  }
+
+  @override
+  String actionCodePinnedDisabled(String when) {
+    return 'Открепил(а) тему глобально $when';
+  }
+
+  @override
+  String actionCodePinnedGloballyEnabled(String when) {
+    return 'Закрепил(а) тему глобально $when';
+  }
+
+  @override
+  String actionCodePinnedGloballyDisabled(String when) {
+    return 'Открепил(а) тему глобально $when';
+  }
+
+  @override
+  String actionCodeVisibleEnabled(String when) {
+    return 'Включил(а) отображение темы $when';
+  }
+
+  @override
+  String actionCodeVisibleDisabled(String when) {
+    return 'Выключил(а) отображение темы $when';
+  }
+
+  @override
+  String actionCodeBannerEnabled(String when) {
+    return 'Создал(а) баннер $when, который будет отображаться сверху на всех страницах, пока пользователь не скроет его.';
+  }
+
+  @override
+  String actionCodeBannerDisabled(String when) {
+    return 'Удалил(а) баннер $when. Он не будет отображаться вверху каждой страницы.';
+  }
+
+  @override
+  String actionCodeAssigned(String who, String when) {
+    return 'Назначил(а) ответственным $who $when';
+  }
+
+  @override
+  String actionCodeUnassigned(String who, String when) {
+    return 'Снял(а) ответственного $who $when';
+  }
+
+  @override
+  String actionCodeReassigned(String who, String when) {
+    return 'Переназначено: $who $when';
+  }
+
+  @override
+  String localDateToday(String time) {
+    return 'Сегодня $time';
+  }
+
+  @override
+  String localDateTomorrow(String time) {
+    return 'Завтра $time';
+  }
+
+  @override
+  String localDateYesterday(String time) {
+    return 'Вчера $time';
+  }
+
+  @override
+  String get eventExpired => 'Истекший срок';
+
+  @override
+  String get eventEveryDay => 'Каждый день';
+
+  @override
+  String get eventEveryWeekday => 'Каждый будний день';
+
+  @override
+  String get eventEveryWeek => 'Каждую неделю в этот будний день';
+
+  @override
+  String get eventEveryTwoWeeks => 'Каждые две недели в этот будний день';
+
+  @override
+  String get eventEveryFourWeeks => 'Каждые четыре недели в этот будний день';
+
+  @override
+  String get eventEveryMonth => 'Каждый месяц в этот будний день';
 }

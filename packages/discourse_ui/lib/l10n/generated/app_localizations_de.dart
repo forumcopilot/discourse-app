@@ -2271,4 +2271,193 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get couldNotTurnOffNotifications =>
       'Benachrichtigungen konnten nicht ausgeschaltet werden. Versuche es später erneut.';
+
+  @override
+  String actionCodeTopicCreated(String when) {
+    return 'Created this topic $when';
+  }
+
+  @override
+  String actionCodePublicTopic(String when) {
+    return 'Hat dieses Thema öffentlich gemacht, $when';
+  }
+
+  @override
+  String actionCodeOpenTopic(String when) {
+    return 'Hat dies in ein Thema umgewandelt, $when';
+  }
+
+  @override
+  String actionCodePrivateTopic(String when) {
+    return 'Hat dieses Thema in eine Nachricht umgewandelt, $when';
+  }
+
+  @override
+  String actionCodeSplitTopic(String when) {
+    return 'Hat dieses Thema aufgeteilt, $when';
+  }
+
+  @override
+  String actionCodeInvitedUser(String who, String when) {
+    return 'Hat $who eingeladen, $when';
+  }
+
+  @override
+  String actionCodeInvitedGroup(String who, String when) {
+    return 'Hat $who eingeladen, $when';
+  }
+
+  @override
+  String actionCodeUserLeft(String who, String when) {
+    return '$who hat sich selbst von dieser Nachricht entfernt, $when';
+  }
+
+  @override
+  String actionCodeRemovedUser(String who, String when) {
+    return 'Hat $who entfernt, $when';
+  }
+
+  @override
+  String actionCodeRemovedGroup(String who, String when) {
+    return 'Hat $who entfernt, $when';
+  }
+
+  @override
+  String actionCodeAutobumped(String when) {
+    return 'Thema wurde automatisch nach oben geschoben, $when';
+  }
+
+  @override
+  String actionCodeTagsChanged(String when) {
+    return 'Schlagwörter aktualisiert $when';
+  }
+
+  @override
+  String actionCodeCategoryChanged(String when) {
+    return 'Kategorie aktualisiert $when';
+  }
+
+  @override
+  String get actionCodeForwarded => 'Hat die obige E-Mail weitergeleitet';
+
+  @override
+  String actionCodeAutoclosedEnabled(String when) {
+    return 'Geschlossen, $when';
+  }
+
+  @override
+  String actionCodeAutoclosedDisabled(String when) {
+    return 'Geöffnet, $when';
+  }
+
+  @override
+  String actionCodeClosedEnabled(String when) {
+    return 'Geschlossen, $when';
+  }
+
+  @override
+  String actionCodeClosedDisabled(String when) {
+    return 'Geöffnet, $when';
+  }
+
+  @override
+  String actionCodeArchivedEnabled(String when) {
+    return 'Archiviert, $when';
+  }
+
+  @override
+  String actionCodeArchivedDisabled(String when) {
+    return 'Aus dem Archiv geholt, $when';
+  }
+
+  @override
+  String actionCodePinnedEnabled(String when) {
+    return 'Angeheftet, $when';
+  }
+
+  @override
+  String actionCodePinnedDisabled(String when) {
+    return 'Losgelöst, $when';
+  }
+
+  @override
+  String actionCodePinnedGloballyEnabled(String when) {
+    return 'Global angeheftet, $when';
+  }
+
+  @override
+  String actionCodePinnedGloballyDisabled(String when) {
+    return 'Losgelöst, $when';
+  }
+
+  @override
+  String actionCodeVisibleEnabled(String when) {
+    return 'Sichtbar gemacht, $when';
+  }
+
+  @override
+  String actionCodeVisibleDisabled(String when) {
+    return 'Unsichtbar gemacht, $when';
+  }
+
+  @override
+  String actionCodeBannerEnabled(String when) {
+    return 'Hat dieses Banner erstellt, $when. Es wird oberhalb jeder Seite angezeigt, bis es vom Benutzer weggeklickt wird.';
+  }
+
+  @override
+  String actionCodeBannerDisabled(String when) {
+    return 'Hat dieses Banner entfernt, $when. Es wird nicht mehr oberhalb jeder Seite angezeigt.';
+  }
+
+  @override
+  String actionCodeAssigned(String who, String when) {
+    return '$who zugeordnet $when';
+  }
+
+  @override
+  String actionCodeUnassigned(String who, String when) {
+    return 'Zuordnung von $who aufgehoben $when';
+  }
+
+  @override
+  String actionCodeReassigned(String who, String when) {
+    return '$who $when erneut zugeordnet';
+  }
+
+  @override
+  String localDateToday(String time) {
+    return 'Heute $time';
+  }
+
+  @override
+  String localDateTomorrow(String time) {
+    return 'Morgen $time';
+  }
+
+  @override
+  String localDateYesterday(String time) {
+    return 'Gestern $time';
+  }
+
+  @override
+  String get eventExpired => 'Abgelaufen';
+
+  @override
+  String get eventEveryDay => 'Täglich';
+
+  @override
+  String get eventEveryWeekday => 'Jeden Wochentag';
+
+  @override
+  String get eventEveryWeek => 'Jede Woche an diesem Wochentag';
+
+  @override
+  String get eventEveryTwoWeeks => 'Alle zwei Wochen an diesem Wochentag';
+
+  @override
+  String get eventEveryFourWeeks => 'Alle vier Wochen an diesem Wochentag';
+
+  @override
+  String get eventEveryMonth => 'Jeden Monat an diesem Wochentag';
 }

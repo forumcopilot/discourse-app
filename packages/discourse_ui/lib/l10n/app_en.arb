@@ -2618,5 +2618,358 @@
   "couldNotTurnOffNotifications": "Couldn't turn off notifications. Try again later.",
   "@couldNotTurnOffNotifications": {
     "description": "Snackbar when the notifications backend rejected the revoke"
+  },
+  "actionCodeTopicCreated": "Created this topic {when}",
+  "@actionCodeTopicCreated": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.topic_created). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodePublicTopic": "Made this topic public {when}",
+  "@actionCodePublicTopic": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.public_topic). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeOpenTopic": "Converted this to a topic {when}",
+  "@actionCodeOpenTopic": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.open_topic). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodePrivateTopic": "Made this topic a personal message {when}",
+  "@actionCodePrivateTopic": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.private_topic). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeSplitTopic": "Split this topic {when}",
+  "@actionCodeSplitTopic": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.split_topic). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeInvitedUser": "Invited {who} {when}",
+  "@actionCodeInvitedUser": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.invited_user). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeInvitedGroup": "Invited {who} {when}",
+  "@actionCodeInvitedGroup": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.invited_group). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeUserLeft": "{who} removed themselves from this message {when}",
+  "@actionCodeUserLeft": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.user_left). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeRemovedUser": "Removed {who} {when}",
+  "@actionCodeRemovedUser": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.removed_user). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeRemovedGroup": "Removed {who} {when}",
+  "@actionCodeRemovedGroup": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.removed_group). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeAutobumped": "Automatically bumped {when}",
+  "@actionCodeAutobumped": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.autobumped). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeTagsChanged": "Tags updated {when}",
+  "@actionCodeTagsChanged": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.tags_changed). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeCategoryChanged": "Category updated {when}",
+  "@actionCodeCategoryChanged": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.category_changed). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeForwarded": "Forwarded the above email",
+  "@actionCodeForwarded": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.forwarded). {when} is a relative date; {who} a username."
+  },
+  "actionCodeAutoclosedEnabled": "Closed {when}",
+  "@actionCodeAutoclosedEnabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.autoclosed.enabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeAutoclosedDisabled": "Opened {when}",
+  "@actionCodeAutoclosedDisabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.autoclosed.disabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeClosedEnabled": "Closed {when}",
+  "@actionCodeClosedEnabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.closed.enabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeClosedDisabled": "Opened {when}",
+  "@actionCodeClosedDisabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.closed.disabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeArchivedEnabled": "Archived {when}",
+  "@actionCodeArchivedEnabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.archived.enabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeArchivedDisabled": "Unarchived {when}",
+  "@actionCodeArchivedDisabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.archived.disabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodePinnedEnabled": "Pinned {when}",
+  "@actionCodePinnedEnabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.pinned.enabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodePinnedDisabled": "Unpinned {when}",
+  "@actionCodePinnedDisabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.pinned.disabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodePinnedGloballyEnabled": "Pinned globally {when}",
+  "@actionCodePinnedGloballyEnabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.pinned_globally.enabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodePinnedGloballyDisabled": "Unpinned {when}",
+  "@actionCodePinnedGloballyDisabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.pinned_globally.disabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeVisibleEnabled": "Listed {when}",
+  "@actionCodeVisibleEnabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.visible.enabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeVisibleDisabled": "Unlisted {when}",
+  "@actionCodeVisibleDisabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.visible.disabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeBannerEnabled": "Made this a banner {when}. It will appear at the top of every page until it is dismissed by the user.",
+  "@actionCodeBannerEnabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.banner.enabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeBannerDisabled": "Removed this banner {when}. It will no longer appear at the top of every page.",
+  "@actionCodeBannerDisabled": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.banner.disabled). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeAssigned": "Assigned {who} {when}",
+  "@actionCodeAssigned": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.assigned). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeUnassigned": "Unassigned {who} {when}",
+  "@actionCodeUnassigned": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.unassigned). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCodeReassigned": "Reassigned {who} {when}",
+  "@actionCodeReassigned": {
+    "description": "One-line notice for a post that records a topic action, as Discourse words it (action_codes.reassigned). {when} is a relative date; {who} a username.",
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "localDateToday": "Today {time}",
+  "@localDateToday": {
+    "description": "A date shown in the reader's time zone, relative to today (discourse-local-dates relative_dates.today). {time} is the time.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "localDateTomorrow": "Tomorrow {time}",
+  "@localDateTomorrow": {
+    "description": "A date shown in the reader's time zone, relative to today (discourse-local-dates relative_dates.tomorrow). {time} is the time.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "localDateYesterday": "Yesterday {time}",
+  "@localDateYesterday": {
+    "description": "A date shown in the reader's time zone, relative to today (discourse-local-dates relative_dates.yesterday). {time} is the time.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "eventExpired": "Expired",
+  "@eventExpired": {
+    "description": "Calendar event card label (discourse-calendar expired)."
+  },
+  "eventEveryDay": "Every day",
+  "@eventEveryDay": {
+    "description": "Calendar event card label (discourse-calendar every_day)."
+  },
+  "eventEveryWeekday": "Every weekday",
+  "@eventEveryWeekday": {
+    "description": "Calendar event card label (discourse-calendar every_weekday)."
+  },
+  "eventEveryWeek": "Every week at this weekday",
+  "@eventEveryWeek": {
+    "description": "Calendar event card label (discourse-calendar every_week)."
+  },
+  "eventEveryTwoWeeks": "Every two weeks at this weekday",
+  "@eventEveryTwoWeeks": {
+    "description": "Calendar event card label (discourse-calendar every_two_weeks)."
+  },
+  "eventEveryFourWeeks": "Every four weeks at this weekday",
+  "@eventEveryFourWeeks": {
+    "description": "Calendar event card label (discourse-calendar every_four_weeks)."
+  },
+  "eventEveryMonth": "Every month at this weekday",
+  "@eventEveryMonth": {
+    "description": "Calendar event card label (discourse-calendar every_month)."
   }
 }

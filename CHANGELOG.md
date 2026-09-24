@@ -6,6 +6,22 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+Thread rendering, batch 4: what Discourse's plugins draw with JavaScript on the web. Covered by `packages/discourse_ui/test/discourse_blocks_rendering_test.dart`, `local_dates_test.dart` and `packages/discourse_core/test/post_kinds_and_polls_test.dart`, and checked before/after on the Pixel in light and dark themes.
+
+### Fixed
+- **Moderator actions are one-line notices**, as on the web ("🔒 Closed 3 days ago", "Invited @sam …"), instead of a full post with an author and an empty body (4,076 posts on 643 forums in the audit). The wording is Discourse's own `action_codes`, core and discourse-assign, in all eleven app languages; a moderator's note on the action is shown under it.
+- **Spoilers are blurred until tapped**; they were printed in clear. Links inside stay inert until revealed.
+- **Local dates show in the reader's time zone** — "Today 3:00 PM", "September 18, 2026 11:12 AM", the post's own format, and the zone's name when the post pins another — instead of the UTC text Discourse writes for email. Also inside GitHub oneboxes.
+- **Polls appear once, where the author put them, in every post.** The first post's poll was drawn above the text while the cooked option list, with a vote count frozen at cook time, stayed below; polls in replies had only that list. A vote in a reply's poll, or in a post's second poll, now reaches that poll.
+- **Calendar events are a card** — date badge, name, time range in the reader's zone (the next occurrence for a repeating event), place, repeat rule, "Expired" when over — instead of the description alone.
+- **Math is typeset** (`flutter_math_fork`) instead of printed as TeX; TeX it cannot parse is shown as its source.
+- **Mermaid diagrams** are labelled and offer "View on Web", where the diagram is drawn.
+- **Moderator posts are tinted and flag-hidden posts faded**, as on the web.
+
+### Changed
+- `FCPost` carries the post's `polls`, its `actionCode`/`actionCodeWho`, `isModeratorAction` and `isHidden` (canonical SDK tapatalk_flutter `4b6ae948`, synced).
+- Added `flutter_math_fork`; `intl` and `timezone`, already in the dependency graph, are now direct dependencies.
+
 ## [1.0.22] - 2026-09-23
 
 Thread rendering, batch 3: content that disappeared from posts. Covered by `packages/discourse_ui/test/post_media_rendering_test.dart` and `embed_links_test.dart`, and checked before/after on the Pixel in light and dark themes.

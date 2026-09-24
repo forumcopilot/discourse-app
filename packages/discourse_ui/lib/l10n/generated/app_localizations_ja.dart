@@ -2172,4 +2172,193 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get couldNotTurnOffNotifications => '通知をオフにできませんでした。後でもう一度お試しください。';
+
+  @override
+  String actionCodeTopicCreated(String when) {
+    return 'Created this topic $when';
+  }
+
+  @override
+  String actionCodePublicTopic(String when) {
+    return 'トピックを公開しました: $when';
+  }
+
+  @override
+  String actionCodeOpenTopic(String when) {
+    return 'これをトピックに変換しました: $when';
+  }
+
+  @override
+  String actionCodePrivateTopic(String when) {
+    return 'このトピックを個人メッセージにしました: $when';
+  }
+
+  @override
+  String actionCodeSplitTopic(String when) {
+    return 'このトピックを分割しました: $when';
+  }
+
+  @override
+  String actionCodeInvitedUser(String who, String when) {
+    return '$who を招待しました: $when';
+  }
+
+  @override
+  String actionCodeInvitedGroup(String who, String when) {
+    return '$who を招待しました: $when';
+  }
+
+  @override
+  String actionCodeUserLeft(String who, String when) {
+    return '$who は $when にこのメッセージから退出しました';
+  }
+
+  @override
+  String actionCodeRemovedUser(String who, String when) {
+    return '$who を削除しました: $when';
+  }
+
+  @override
+  String actionCodeRemovedGroup(String who, String when) {
+    return '$who を削除しました: $when';
+  }
+
+  @override
+  String actionCodeAutobumped(String when) {
+    return '自動的にバンプされました: $when';
+  }
+
+  @override
+  String actionCodeTagsChanged(String when) {
+    return 'タグが更新されました: $when';
+  }
+
+  @override
+  String actionCodeCategoryChanged(String when) {
+    return 'カテゴリが更新されました: $when';
+  }
+
+  @override
+  String get actionCodeForwarded => '上記のメールを転送しました';
+
+  @override
+  String actionCodeAutoclosedEnabled(String when) {
+    return 'クローズされました: $when';
+  }
+
+  @override
+  String actionCodeAutoclosedDisabled(String when) {
+    return 'オープンされました: $when';
+  }
+
+  @override
+  String actionCodeClosedEnabled(String when) {
+    return 'クローズされました: $when';
+  }
+
+  @override
+  String actionCodeClosedDisabled(String when) {
+    return 'オープンされました: $when';
+  }
+
+  @override
+  String actionCodeArchivedEnabled(String when) {
+    return 'アーカイブされました: $when';
+  }
+
+  @override
+  String actionCodeArchivedDisabled(String when) {
+    return 'アーカイブを解除されました: $when';
+  }
+
+  @override
+  String actionCodePinnedEnabled(String when) {
+    return '固定しました: $when';
+  }
+
+  @override
+  String actionCodePinnedDisabled(String when) {
+    return '固定解除しました: $when';
+  }
+
+  @override
+  String actionCodePinnedGloballyEnabled(String when) {
+    return '全体に固定しました: $when';
+  }
+
+  @override
+  String actionCodePinnedGloballyDisabled(String when) {
+    return '固定解除しました: $when';
+  }
+
+  @override
+  String actionCodeVisibleEnabled(String when) {
+    return '表示: $when';
+  }
+
+  @override
+  String actionCodeVisibleDisabled(String when) {
+    return '非表示: $when';
+  }
+
+  @override
+  String actionCodeBannerEnabled(String when) {
+    return '$whenにこれをバナーにしました。ユーザーが閉じるまで各ページの上部に表示されます。';
+  }
+
+  @override
+  String actionCodeBannerDisabled(String when) {
+    return '$whenにこのバナーを削除しました。今後ページの上部に表示されることはありません。';
+  }
+
+  @override
+  String actionCodeAssigned(String who, String when) {
+    return '$who を割り当てました: $when';
+  }
+
+  @override
+  String actionCodeUnassigned(String who, String when) {
+    return '$who の割り当てを解除しました: $when';
+  }
+
+  @override
+  String actionCodeReassigned(String who, String when) {
+    return '$who を再割り当てしました: $when';
+  }
+
+  @override
+  String localDateToday(String time) {
+    return '今日 $time';
+  }
+
+  @override
+  String localDateTomorrow(String time) {
+    return '明日 $time';
+  }
+
+  @override
+  String localDateYesterday(String time) {
+    return '昨日 $time';
+  }
+
+  @override
+  String get eventExpired => '期限切れ';
+
+  @override
+  String get eventEveryDay => '毎日';
+
+  @override
+  String get eventEveryWeekday => 'すべての平日';
+
+  @override
+  String get eventEveryWeek => '毎週この平日';
+
+  @override
+  String get eventEveryTwoWeeks => '隔週この平日';
+
+  @override
+  String get eventEveryFourWeeks => '4 週間ごとのこの平日';
+
+  @override
+  String get eventEveryMonth => '毎月この平日';
 }

@@ -2267,4 +2267,195 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get couldNotTurnOffNotifications =>
       'Impossible de désactiver les notifications. Réessayez plus tard.';
+
+  @override
+  String actionCodeTopicCreated(String when) {
+    return 'Created this topic $when';
+  }
+
+  @override
+  String actionCodePublicTopic(String when) {
+    return 'A rendu ce sujet public ($when)';
+  }
+
+  @override
+  String actionCodeOpenTopic(String when) {
+    return 'A converti ceci en sujet ($when)';
+  }
+
+  @override
+  String actionCodePrivateTopic(String when) {
+    return 'A fait de ce sujet un message direct ($when)';
+  }
+
+  @override
+  String actionCodeSplitTopic(String when) {
+    return 'A scindé ce sujet ($when)';
+  }
+
+  @override
+  String actionCodeInvitedUser(String who, String when) {
+    return 'A invité $who ($when)';
+  }
+
+  @override
+  String actionCodeInvitedGroup(String who, String when) {
+    return 'A invité $who ($when)';
+  }
+
+  @override
+  String actionCodeUserLeft(String who, String when) {
+    return '$who a quitté cette conversation $when';
+  }
+
+  @override
+  String actionCodeRemovedUser(String who, String when) {
+    return 'A retiré $who ($when)';
+  }
+
+  @override
+  String actionCodeRemovedGroup(String who, String when) {
+    return 'A retiré $who ($when)';
+  }
+
+  @override
+  String actionCodeAutobumped(String when) {
+    return 'Remonté automatiquement dans la liste ($when)';
+  }
+
+  @override
+  String actionCodeTagsChanged(String when) {
+    return 'Étiquettes mises à jour $when';
+  }
+
+  @override
+  String actionCodeCategoryChanged(String when) {
+    return 'Catégorie mise à jour $when';
+  }
+
+  @override
+  String get actionCodeForwarded => 'A transmis l\'e-mail ci-dessus';
+
+  @override
+  String actionCodeAutoclosedEnabled(String when) {
+    return 'A fermé ce sujet ($when)';
+  }
+
+  @override
+  String actionCodeAutoclosedDisabled(String when) {
+    return 'A ouvert ce sujet ($when)';
+  }
+
+  @override
+  String actionCodeClosedEnabled(String when) {
+    return 'A fermé ce sujet ($when)';
+  }
+
+  @override
+  String actionCodeClosedDisabled(String when) {
+    return 'A ouvert ce sujet ($when)';
+  }
+
+  @override
+  String actionCodeArchivedEnabled(String when) {
+    return 'A archivé ce sujet ($when)';
+  }
+
+  @override
+  String actionCodeArchivedDisabled(String when) {
+    return 'A désarchivé ce sujet ($when)';
+  }
+
+  @override
+  String actionCodePinnedEnabled(String when) {
+    return 'A épinglé ce sujet ($when)';
+  }
+
+  @override
+  String actionCodePinnedDisabled(String when) {
+    return 'A désépinglé ce sujet ($when)';
+  }
+
+  @override
+  String actionCodePinnedGloballyEnabled(String when) {
+    return 'A épinglé ce sujet globalement ($when)';
+  }
+
+  @override
+  String actionCodePinnedGloballyDisabled(String when) {
+    return 'A désépinglé ce sujet ($when)';
+  }
+
+  @override
+  String actionCodeVisibleEnabled(String when) {
+    return 'A rendu ce sujet visible ($when)';
+  }
+
+  @override
+  String actionCodeVisibleDisabled(String when) {
+    return 'A rendu ce sujet invisible ($when)';
+  }
+
+  @override
+  String actionCodeBannerEnabled(String when) {
+    return 'A mis ce sujet à la une ($when). Il sera affiché en haut de chaque page jusqu\'à ce qu\'il soit ignoré par l\'utilisateur.';
+  }
+
+  @override
+  String actionCodeBannerDisabled(String when) {
+    return 'A supprimé ce sujet de la une ($when). Il ne sera plus affiché en haut de chaque page.';
+  }
+
+  @override
+  String actionCodeAssigned(String who, String when) {
+    return 'Attribué à $who le $when';
+  }
+
+  @override
+  String actionCodeUnassigned(String who, String when) {
+    return 'Annulation de l\'attribution à $who le $when';
+  }
+
+  @override
+  String actionCodeReassigned(String who, String when) {
+    return 'Réattribution à $who le $when';
+  }
+
+  @override
+  String localDateToday(String time) {
+    return 'Aujourd\'hui $time';
+  }
+
+  @override
+  String localDateTomorrow(String time) {
+    return 'Demain $time';
+  }
+
+  @override
+  String localDateYesterday(String time) {
+    return 'Hier $time';
+  }
+
+  @override
+  String get eventExpired => 'Expiré';
+
+  @override
+  String get eventEveryDay => 'Tous les jours';
+
+  @override
+  String get eventEveryWeekday => 'Chaque jour de la semaine';
+
+  @override
+  String get eventEveryWeek => 'Chaque semaine en ce jour de la semaine';
+
+  @override
+  String get eventEveryTwoWeeks =>
+      'Toutes les deux semaines en ce jour de la semaine';
+
+  @override
+  String get eventEveryFourWeeks =>
+      'Toutes les quatre semaines en ce jour de la semaine';
+
+  @override
+  String get eventEveryMonth => 'Chaque mois en ce jour de la semaine';
 }

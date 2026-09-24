@@ -6,11 +6,13 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'brand_image.dart';
+import 'discourse_blocks.dart';
 import 'embed_cards.dart';
 import 'post_content_callbacks.dart' show PostContentCallbacks;
 import 'post_table.dart';
 import 'twitter_card.dart';
 import '../../core/cache/lru_cache.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/embed_links.dart';
 import '../../utils/emoji_shortcodes.dart';
@@ -33,11 +35,21 @@ class RichTextContent extends StatelessWidget {
   final String content;
   final PostContentCallbacks? callbacks;
 
+  /// The live poll a `div.poll[data-poll-name]` stands for, drawn in its
+  /// place. Null leaves the cooked markup (no poll data here).
+  final Widget? Function(String pollName)? pollBuilder;
+
+  /// The post on the web, for what the app cannot draw itself (a Mermaid
+  /// diagram offers to open it there).
+  final String? webUrl;
+
   const RichTextContent({
     super.key,
     required this.siteContext,
     required this.content,
     this.callbacks,
+    this.pollBuilder,
+    this.webUrl,
   });
 
   /// Extracts the username from a Discourse profile href
@@ -120,6 +132,7 @@ class RichTextContent extends StatelessWidget {
       extensions: [
         PostTableExtension(colorScheme: colorScheme),
         _EmbedExtension(resolve: _resolveUrl, onOpen: openEmbed),
+        DiscourseBlocksExtension(onOpen: openEmbed, pollBuilder: pollBuilder),
         // Discourse renders a non-image upload as
         // `<a class="attachment">name</a> (117 Bytes)`, and styles it with
         // a download glyph via CSS ::before — which flutter_html cannot
@@ -155,7 +168,7 @@ class RichTextContent extends StatelessWidget {
           builder: (extensionContext) {
             final code = extensionContext.element?.text ?? '';
             if (code.isEmpty) return const SizedBox.shrink();
-            return Container(
+            final codeBlock = Container(
               width: double.infinity,
               margin: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
@@ -181,6 +194,38 @@ class RichTextContent extends StatelessWidget {
                   ),
                 ),
               ),
+            );
+            // A Mermaid diagram is drawn by JavaScript on the web; the app
+            // shows its source, says what it is, and offers the web.
+            if (extensionContext.attributes['data-code-wrap'] != 'mermaid') {
+              return codeBlock;
+            }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row(
+                    children: [
+                      Icon(Icons.account_tree_outlined, size: 18, color: mutedColor),
+                      const SizedBox(width: 6),
+                      Text('Mermaid',
+                          style: body.copyWith(color: mutedColor, fontWeight: FontWeight.w600)),
+                      const Spacer(),
+                      if (webUrl != null)
+                        Builder(
+                          builder: (context) => TextButton.icon(
+                            onPressed: () => openEmbed(webUrl!),
+                            icon: const Icon(Icons.open_in_new, size: 16),
+                            label: Text(AppLocalizations.of(context)?.viewOnWeb ?? 'View on Web'),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                codeBlock,
+              ],
             );
           },
         ),
@@ -867,6 +912,9 @@ Map<String, Style> _stylesFor(ColorScheme colorScheme, TextStyle body,
       fontWeight: FontWeight.bold,
       margin: Margins.only(top: 8, bottom: 4),
     ),
+    // A cooked poll's summary line carries the vote count as of cooking;
+    // where the live poll cannot be drawn, better none than a wrong one.
+    'div.poll-info': Style(display: Display.none),
     'img.emoji': Style(
       width: Width(20),
       height: Height(20),

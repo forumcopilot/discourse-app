@@ -3891,6 +3891,252 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t turn off notifications. Try again later.'**
   String get couldNotTurnOffNotifications;
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.topic_created). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Created this topic {when}'**
+  String actionCodeTopicCreated(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.public_topic). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Made this topic public {when}'**
+  String actionCodePublicTopic(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.open_topic). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Converted this to a topic {when}'**
+  String actionCodeOpenTopic(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.private_topic). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Made this topic a personal message {when}'**
+  String actionCodePrivateTopic(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.split_topic). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Split this topic {when}'**
+  String actionCodeSplitTopic(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.invited_user). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Invited {who} {when}'**
+  String actionCodeInvitedUser(String who, String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.invited_group). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Invited {who} {when}'**
+  String actionCodeInvitedGroup(String who, String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.user_left). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'{who} removed themselves from this message {when}'**
+  String actionCodeUserLeft(String who, String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.removed_user). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed {who} {when}'**
+  String actionCodeRemovedUser(String who, String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.removed_group). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed {who} {when}'**
+  String actionCodeRemovedGroup(String who, String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.autobumped). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically bumped {when}'**
+  String actionCodeAutobumped(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.tags_changed). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags updated {when}'**
+  String actionCodeTagsChanged(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.category_changed). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Category updated {when}'**
+  String actionCodeCategoryChanged(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.forwarded). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Forwarded the above email'**
+  String get actionCodeForwarded;
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.autoclosed.enabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed {when}'**
+  String actionCodeAutoclosedEnabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.autoclosed.disabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Opened {when}'**
+  String actionCodeAutoclosedDisabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.closed.enabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed {when}'**
+  String actionCodeClosedEnabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.closed.disabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Opened {when}'**
+  String actionCodeClosedDisabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.archived.enabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived {when}'**
+  String actionCodeArchivedEnabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.archived.disabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Unarchived {when}'**
+  String actionCodeArchivedDisabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.pinned.enabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned {when}'**
+  String actionCodePinnedEnabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.pinned.disabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpinned {when}'**
+  String actionCodePinnedDisabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.pinned_globally.enabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned globally {when}'**
+  String actionCodePinnedGloballyEnabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.pinned_globally.disabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpinned {when}'**
+  String actionCodePinnedGloballyDisabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.visible.enabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Listed {when}'**
+  String actionCodeVisibleEnabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.visible.disabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlisted {when}'**
+  String actionCodeVisibleDisabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.banner.enabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Made this a banner {when}. It will appear at the top of every page until it is dismissed by the user.'**
+  String actionCodeBannerEnabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.banner.disabled). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed this banner {when}. It will no longer appear at the top of every page.'**
+  String actionCodeBannerDisabled(String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.assigned). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned {who} {when}'**
+  String actionCodeAssigned(String who, String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.unassigned). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Unassigned {who} {when}'**
+  String actionCodeUnassigned(String who, String when);
+
+  /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.reassigned). {when} is a relative date; {who} a username.
+  ///
+  /// In en, this message translates to:
+  /// **'Reassigned {who} {when}'**
+  String actionCodeReassigned(String who, String when);
+
+  /// A date shown in the reader's time zone, relative to today (discourse-local-dates relative_dates.today). {time} is the time.
+  ///
+  /// In en, this message translates to:
+  /// **'Today {time}'**
+  String localDateToday(String time);
+
+  /// A date shown in the reader's time zone, relative to today (discourse-local-dates relative_dates.tomorrow). {time} is the time.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow {time}'**
+  String localDateTomorrow(String time);
+
+  /// A date shown in the reader's time zone, relative to today (discourse-local-dates relative_dates.yesterday). {time} is the time.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday {time}'**
+  String localDateYesterday(String time);
+
+  /// Calendar event card label (discourse-calendar expired).
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get eventExpired;
+
+  /// Calendar event card label (discourse-calendar every_day).
+  ///
+  /// In en, this message translates to:
+  /// **'Every day'**
+  String get eventEveryDay;
+
+  /// Calendar event card label (discourse-calendar every_weekday).
+  ///
+  /// In en, this message translates to:
+  /// **'Every weekday'**
+  String get eventEveryWeekday;
+
+  /// Calendar event card label (discourse-calendar every_week).
+  ///
+  /// In en, this message translates to:
+  /// **'Every week at this weekday'**
+  String get eventEveryWeek;
+
+  /// Calendar event card label (discourse-calendar every_two_weeks).
+  ///
+  /// In en, this message translates to:
+  /// **'Every two weeks at this weekday'**
+  String get eventEveryTwoWeeks;
+
+  /// Calendar event card label (discourse-calendar every_four_weeks).
+  ///
+  /// In en, this message translates to:
+  /// **'Every four weeks at this weekday'**
+  String get eventEveryFourWeeks;
+
+  /// Calendar event card label (discourse-calendar every_month).
+  ///
+  /// In en, this message translates to:
+  /// **'Every month at this weekday'**
+  String get eventEveryMonth;
 }
 
 class _AppLocalizationsDelegate

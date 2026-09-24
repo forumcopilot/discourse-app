@@ -2166,4 +2166,193 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get couldNotTurnOffNotifications => '알림을 끌 수 없습니다. 나중에 다시 시도해 주세요.';
+
+  @override
+  String actionCodeTopicCreated(String when) {
+    return 'Created this topic $when';
+  }
+
+  @override
+  String actionCodePublicTopic(String when) {
+    return '이 글을 $when에 공개';
+  }
+
+  @override
+  String actionCodeOpenTopic(String when) {
+    return '$when에 글로 변경됨';
+  }
+
+  @override
+  String actionCodePrivateTopic(String when) {
+    return '$when에 이 글을 개인 메시지로 변경';
+  }
+
+  @override
+  String actionCodeSplitTopic(String when) {
+    return '이 글을 $when에 분리';
+  }
+
+  @override
+  String actionCodeInvitedUser(String who, String when) {
+    return '$when에 $who님이 초대됨';
+  }
+
+  @override
+  String actionCodeInvitedGroup(String who, String when) {
+    return '$when에 $who님이 초대됨';
+  }
+
+  @override
+  String actionCodeUserLeft(String who, String when) {
+    return '$who 님이 $when에 이 메시지에서 자신을 제거함';
+  }
+
+  @override
+  String actionCodeRemovedUser(String who, String when) {
+    return '$when에 $who님이 삭제됨';
+  }
+
+  @override
+  String actionCodeRemovedGroup(String who, String when) {
+    return '$when에 $who님이 삭제됨';
+  }
+
+  @override
+  String actionCodeAutobumped(String when) {
+    return '$when에 자동으로 끌어 올려짐';
+  }
+
+  @override
+  String actionCodeTagsChanged(String when) {
+    return '$when에 태그 업데이트됨';
+  }
+
+  @override
+  String actionCodeCategoryChanged(String when) {
+    return '$when에 카테고리 업데이트됨';
+  }
+
+  @override
+  String get actionCodeForwarded => '위의 이메일을 전달했습니다.';
+
+  @override
+  String actionCodeAutoclosedEnabled(String when) {
+    return '$when에 닫힘';
+  }
+
+  @override
+  String actionCodeAutoclosedDisabled(String when) {
+    return '$when에 열림';
+  }
+
+  @override
+  String actionCodeClosedEnabled(String when) {
+    return '$when에 닫힘';
+  }
+
+  @override
+  String actionCodeClosedDisabled(String when) {
+    return '$when에 열림';
+  }
+
+  @override
+  String actionCodeArchivedEnabled(String when) {
+    return '$when에 보관됨';
+  }
+
+  @override
+  String actionCodeArchivedDisabled(String when) {
+    return '$when에 보관 취소됨';
+  }
+
+  @override
+  String actionCodePinnedEnabled(String when) {
+    return '$when에 고정됨';
+  }
+
+  @override
+  String actionCodePinnedDisabled(String when) {
+    return '$when에 고정 해제됨';
+  }
+
+  @override
+  String actionCodePinnedGloballyEnabled(String when) {
+    return '$when에 전체적으로 고정됨';
+  }
+
+  @override
+  String actionCodePinnedGloballyDisabled(String when) {
+    return '$when에 고정 해제됨';
+  }
+
+  @override
+  String actionCodeVisibleEnabled(String when) {
+    return '$when에 목록에 게시';
+  }
+
+  @override
+  String actionCodeVisibleDisabled(String when) {
+    return '$when에 목록에서 감춤';
+  }
+
+  @override
+  String actionCodeBannerEnabled(String when) {
+    return '$when에 배너를 만들었습니다. 사용자가 닫을 때까지 모든 페이지의 상단에 표시됩니다.';
+  }
+
+  @override
+  String actionCodeBannerDisabled(String when) {
+    return '$when에 이 배너를 제거했습니다. 더 이상 모든 페이지의 상단에 표시되지 않습니다.';
+  }
+
+  @override
+  String actionCodeAssigned(String who, String when) {
+    return '할당 된 $who $when';
+  }
+
+  @override
+  String actionCodeUnassigned(String who, String when) {
+    return '할당되지 않은 $who $when';
+  }
+
+  @override
+  String actionCodeReassigned(String who, String when) {
+    return 'Reassigned $who $when';
+  }
+
+  @override
+  String localDateToday(String time) {
+    return '오늘 $time';
+  }
+
+  @override
+  String localDateTomorrow(String time) {
+    return '내일 $time';
+  }
+
+  @override
+  String localDateYesterday(String time) {
+    return '어제 $time';
+  }
+
+  @override
+  String get eventExpired => '만료됨';
+
+  @override
+  String get eventEveryDay => '매일';
+
+  @override
+  String get eventEveryWeekday => 'Every weekday';
+
+  @override
+  String get eventEveryWeek => 'Every week at this weekday';
+
+  @override
+  String get eventEveryTwoWeeks => 'Every two weeks at this weekday';
+
+  @override
+  String get eventEveryFourWeeks => 'Every four weeks at this weekday';
+
+  @override
+  String get eventEveryMonth => 'Every month at this weekday';
 }

@@ -21,6 +21,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../utils/like_cooldown.dart';
 import '../widgets/post_actions.dart';
 import '../widgets/thread_poll_card.dart';
+import 'small_action_notice.dart';
 import '../../controllers/post_controller.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import '../../utils/cooked_content.dart';
@@ -780,11 +781,14 @@ class _PostListItemState extends State<PostListItem> {
             _buildReplyToIndicator(context, colorScheme, textTheme),
             const SizedBox(height: DesignTokens.spacingS),
           ],
-          // Poll card (first post only): below the title, above body. onVoteSuccess updates
-          // the thread's poll in PostController so the UI reflects the new vote without reloading.
+          // Polls are drawn where the author put them, by RichTextContent
+          // (see _pollWidget). Only a topic poll whose post body has no
+          // poll markup to stand in for (should not happen on Discourse)
+          // still gets the card above the text.
           if (widget.post.postNumber == 1 &&
               widget.poll != null &&
-              widget.onVoteSuccess != null) ...[
+              widget.onVoteSuccess != null &&
+              !data.html.contains('data-poll-name')) ...[
             ThreadPollCard(
               poll: widget.poll!,
               topicId: widget.threadId,
@@ -849,10 +853,15 @@ class _PostListItemState extends State<PostListItem> {
           // Discourse posts arrive as server-rendered HTML in the
           // `cooked` field, so we render it directly with flutter_html
           // via RichTextContent, which also draws the embeds in place.
-          RichTextContent(
-            siteContext: widget.siteContext,
-            content: data.html,
-            callbacks: callbacks,
+          _moderatorTint(
+            colorScheme,
+            RichTextContent(
+              siteContext: widget.siteContext,
+              content: data.html,
+              callbacks: callbacks,
+              pollBuilder: _pollWidget,
+              webUrl: _webUrl,
+            ),
           ),
           // Reaction chips — the single like/reaction surface. On
           // plugin-less forums the proxy synthesizes one heart entry
@@ -926,6 +935,17 @@ class _PostListItemState extends State<PostListItem> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    // A post that records an action (closed, pinned, invited…) is one line,
+    // as on the web, not a post with an author and an empty body.
+    if (widget.post.actionCode != null) {
+      return SmallActionNotice(
+        post: widget.post,
+        siteContext: widget.siteContext,
+        onAvatarTap: widget.onAvatarTap == null
+            ? null
+            : () => widget.onAvatarTap!(widget.post.authorId, widget.post.authorName),
+      );
+    }
     // Parsed once per post instance, not per frame: the parse is a full
     // HTML DOM build plus six selector sweeps, and this build runs for
     // every visible post whenever the list rebuilds.
@@ -967,15 +987,77 @@ class _PostListItemState extends State<PostListItem> {
         ],
       ),
     );
+    // A post the community flagged and hid is shown faded, as on the web
+    // (viewers who may not see it get Discourse's notice as its body).
+    final shown = widget.post.isHidden ? Opacity(opacity: 0.5, child: body) : body;
     if (widget.isHighlighted) {
       return AnimatedContainer(
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
         color: backgroundColor,
-        child: body,
+        child: shown,
       );
     }
-    return ColoredBox(color: backgroundColor, child: body);
+    return ColoredBox(color: backgroundColor, child: shown);
+  }
+
+  /// The post on the web (Discourse's `/p/{id}` short link).
+  String get _webUrl {
+    var base = widget.siteContext.site.url;
+    while (base.endsWith('/')) {
+      base = base.substring(0, base.length - 1);
+    }
+    return '$base/p/${widget.post.id}';
+  }
+
+  /// A moderator's official post (Discourse post_type 2) has its body set
+  /// off with the highlight colour, as on the web.
+  Widget _moderatorTint(ColorScheme colorScheme, Widget content) {
+    if (!widget.post.isModeratorAction) return content;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(DesignTokens.spacingS),
+      decoration: BoxDecoration(
+        color: Color.alphaBlend(
+          const Color(0xFFFFD54F).withValues(alpha: dark ? 0.12 : 0.22),
+          colorScheme.surface,
+        ),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
+      ),
+      child: content,
+    );
+  }
+
+  /// The live poll named [name] in this post, for RichTextContent to draw
+  /// where the body places it. The first post's topic poll comes from the
+  /// thread (kept current by the mini poll bar too); any other poll from
+  /// the post itself, updated in place after a vote.
+  Widget? _pollWidget(String name) {
+    final topicPoll = widget.post.postNumber == 1 &&
+            widget.poll != null &&
+            widget.poll!.pollId == name
+        ? widget.poll
+        : null;
+    final polls = widget.post.polls;
+    final index = polls.indexWhere((p) => p.pollId == name);
+    final poll = topicPoll ?? (index < 0 ? null : polls[index]);
+    if (poll == null) return null;
+    return ThreadPollCard(
+      key: ValueKey('poll-${widget.post.id}-$name'),
+      poll: poll,
+      topicId: widget.threadId,
+      siteContext: widget.siteContext,
+      onVoteSuccess: (updated) {
+        final i = widget.post.polls.indexWhere((p) => p.pollId == name);
+        if (i >= 0) {
+          final next = List.of(widget.post.polls)..[i] = updated;
+          widget.post.polls = next;
+        }
+        if (topicPoll != null) widget.onVoteSuccess?.call(updated);
+        if (mounted) setState(() {});
+      },
+    );
   }
 
   Widget _buildReplyButtonWithMenu(
