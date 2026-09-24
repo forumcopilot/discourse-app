@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseUserProxy, DiscourseUserSearchGroups;
 import 'widgets/filter_chip_bar.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -177,8 +179,13 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
 
     setState(() => _searching = true);
     try {
-      final result =
-          await SiteProxyService.getUserProxy().searchUserAsync(q, 1, 20);
+      // People only: this is the member directory, and a group row opened
+      // a profile page that could only 404 (/u/<group>.json).
+      final proxy = SiteProxyService.getUserProxy();
+      final result = proxy is DiscourseUserProxy
+          ? await proxy.searchUsersAsync(q,
+              groups: DiscourseUserSearchGroups.none)
+          : await proxy.searchUserAsync(q, 1, 20);
       if (!mounted || q != _query) return;
       setState(() {
         _searchResults = result.list;
@@ -340,7 +347,6 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
           username: u.username,
           subtitle: u.displayText,
           avatarUrl: u.iconUrl,
-          leadingIcon: u.userType == 'group' ? Icons.groups_rounded : null,
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => UserProfilePage(

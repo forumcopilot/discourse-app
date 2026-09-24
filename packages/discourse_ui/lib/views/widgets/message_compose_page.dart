@@ -1280,6 +1280,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
             _contentFocusNode.requestFocus();
           },
           selectedUsers: const [],
+          forMention: true,
         ),
       ),
     );

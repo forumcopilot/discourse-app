@@ -878,9 +878,30 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     siteContext.resetOnLogout();
   }
 
+  /// People (and, for [groups] other than [DiscourseUserSearchGroups.none],
+  /// groups) matching [keywords] — Discourse's /u/search/users typeahead.
+  ///
+  /// Which groups is a question of purpose, and Discourse answers it with one
+  /// flag each (UsersController#search_users): the groups the viewer may
+  /// message, for a message's recipients or invites; the groups they may
+  /// mention, for an @mention. `include_groups` — every visible group — offered
+  /// trust_level_0…4 as message recipients, which the server then refused
+  /// (422 on send, 403 on invite).
+  Future<FCSearchUserResult> searchUsersAsync(
+    String keywords, {
+    DiscourseUserSearchGroups groups = DiscourseUserSearchGroups.messageable,
+  }) =>
+      _searchUsers(keywords, groups);
+
+  /// For a message's recipients (the SDK's only user picker): people and
+  /// the groups the viewer may message.
   @override
   Future<FCSearchUserResult> searchUserAsync(
-      String keywords, int page, int perpage) async {
+          String keywords, int page, int perpage) =>
+      _searchUsers(keywords, DiscourseUserSearchGroups.messageable);
+
+  Future<FCSearchUserResult> _searchUsers(
+      String keywords, DiscourseUserSearchGroups groupScope) async {
     // Discourse user typeahead. The `topic_allowed_users=true` flag is
     // important for PM-recipient pickers — it filters out users who can't
     // be added to PMs (suspended, etc.). The endpoint returns up to 5
@@ -900,9 +921,12 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         'topic_allowed_users': 'true',
         // Discourse messages can be addressed to a group, not just to people —
         // `target_recipients` on POST /posts.json accepts group names alongside
-        // usernames. This was 'false', so messaging a group was impossible from
-        // the app even though the platform supports it.
-        'include_groups': 'true',
+        // usernames — but only groups the viewer may message; see
+        // [searchUsersAsync].
+        if (groupScope == DiscourseUserSearchGroups.messageable)
+          'include_messageable_groups': 'true',
+        if (groupScope == DiscourseUserSearchGroups.mentionable)
+          'include_mentionable_groups': 'true',
       });
       final users = (response['users'] as List?) ?? const [];
       final list = users.whereType<Map>().map((u) {
@@ -1295,4 +1319,16 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       FCRecommendedUserResult(
           result: false,
           resultText: 'Recommended users are not supported on Discourse');
+}
+
+/// Which groups a user search may return alongside people.
+enum DiscourseUserSearchGroups {
+  /// People only (a member directory).
+  none,
+
+  /// Groups the viewer may send a message to (recipients, invites).
+  messageable,
+
+  /// Groups the viewer may @mention.
+  mentionable,
 }

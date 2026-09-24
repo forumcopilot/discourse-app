@@ -718,12 +718,16 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
 
       case _ntGroupMessageSummary:
       case _ntMembershipRequestConsolidated:
+      // "You are now a member of X": data is {group_id, group_name}
+      // (Group#send_membership_notification), with no user —
+      // routed to 'user' it could only say "Username is missing". The web
+      // opens the group.
+      case _ntMembershipRequestAccepted:
         final groupName = (data['group_name'] ?? '').toString();
         if (groupName.isNotEmpty) return (type: 'group', id: groupName);
         break;
 
       case _ntInviteeAccepted:
-      case _ntMembershipRequestAccepted:
       case _ntLikedConsolidated:
       case _ntLinkedConsolidated:
         // About a person rather than a place. Consolidated likes/links name no single

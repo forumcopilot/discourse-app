@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseUserProxy, DiscourseUserSearchGroups;
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:discourse_ui/views/widgets/search_text_field.dart';
 import 'package:discourse_ui/views/widgets/empty_state_widget.dart';
@@ -16,11 +18,16 @@ class UserSearchPage extends StatefulWidget {
   final Function(String username, String? iconUrl) onUserSelected;
   final List<String> selectedUsers;
 
+  /// Picking someone to @mention rather than to message: offers the groups
+  /// the viewer may mention instead of those they may message.
+  final bool forMention;
+
   const UserSearchPage({
     Key? key,
     required this.siteContext,
     required this.onUserSelected,
     this.selectedUsers = const [],
+    this.forMention = false,
   }) : super(key: key);
 
   @override
@@ -88,11 +95,14 @@ class _UserSearchPageState extends State<UserSearchPage> {
 
     try {
       final userProxy = SiteProxyFactory.getUserProxy();
-      final result = await userProxy.searchUserAsync(
-        query,
-        _currentPage,
-        _pageSize,
-      );
+      final result = widget.forMention && userProxy is DiscourseUserProxy
+          ? await userProxy.searchUsersAsync(query,
+              groups: DiscourseUserSearchGroups.mentionable)
+          : await userProxy.searchUserAsync(
+              query,
+              _currentPage,
+              _pageSize,
+            );
 
       if (!mounted) return;
 

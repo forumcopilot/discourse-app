@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_private_conversation_proxy.dart';
-import 'package:discourse_core/discourse_core.dart' show DiscoursePrivateConversationProxy;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseConversationsResult, DiscoursePrivateConversationProxy;
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:discourse_ui/views/widgets/not_signed_in_view.dart';
@@ -218,6 +219,14 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
 
   /// The inbox, or the archive — which only Discourse has, so it is reached
   /// on the Discourse proxy rather than through the shared interface.
+  /// Whether another window follows. Discourse says so for each list; the
+  /// row count cannot tell — each window is inbox and sent merged, up to 30
+  /// of each, and this compared it with 20 using `==`, so a first window of
+  /// 30 or more rows ended the list.
+  bool _moreAfter(FCConversationsResult data) => data is DiscourseConversationsResult
+      ? data.hasMore
+      : data.list.length >= _itemsPerPage;
+
   Future<FCConversationsResult> _fetch(
       IFCPrivateConversationProxy proxy, int startNum, int lastNum) {
     if (widget.archived && proxy is DiscoursePrivateConversationProxy) {
@@ -252,7 +261,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
           _conversations = [...(_conversations ?? []), ...conversationsData.list];
         }
         _isLoading = false;
-        _hasMoreData = conversationsData.list.length == _itemsPerPage;
+        _hasMoreData = _moreAfter(conversationsData);
       });
       AppLogger.debug('   - State updated: conversations=${_conversations?.length ?? "null"}, isLoading=$_isLoading');
     } else {
@@ -575,7 +584,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
         _conversations!.addAll(
             conversationsData.list.where((c) => seen.add(c.conv_id)));
         _currentPage = nextPage;
-        _hasMoreData = conversationsData.list.length >= _itemsPerPage;
+        _hasMoreData = _moreAfter(conversationsData);
       });
     }
   }

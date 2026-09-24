@@ -1,5 +1,6 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
+import '../data/message/discourse_conversations_result.dart';
 import '../util/html_text.dart';
 import '../util/quote_markup.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_private_conversation_proxy.dart';
@@ -276,10 +277,13 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
 
       final byId = <String, FCConversationSummary>{};
       var unread = 0;
+      var hasMore = false;
       for (final response in responses) {
         final users = _usersById(response);
         final list = (response['topic_list'] as Map<String, dynamic>?) ??
             const <String, dynamic>{};
+        // Discourse says when a list has a further page.
+        if (list['more_topics_url'] != null) hasMore = true;
         for (final raw
             in ((list['topics'] as List?) ?? const []).whereType<Map>()) {
           final t = raw.cast<String, dynamic>();
@@ -298,7 +302,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
           return bt.compareTo(at);
         });
 
-      return FCConversationsResult(
+      return DiscourseConversationsResult(
         result: true,
         resultText: '',
         conversationCount: summaries.length,
@@ -307,6 +311,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
         // exists on Discourse; the real gate is DiscourseUploadLimits.
         canUpload: true,
         list: summaries,
+        hasMore: hasMore,
       );
     } catch (e) {
       return FCConversationsResult(
