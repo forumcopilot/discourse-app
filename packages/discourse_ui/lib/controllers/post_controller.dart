@@ -21,14 +21,30 @@ class PostController extends DiscourseGlobalLoaderController with ErrorHandlingM
 
   /// Applies thread data and isInitialized in the next frame to avoid
   /// setState/markNeedsBuild while the widget tree is locked (e.g. after route pop).
-  Future<void> _applyThreadDataOnNextFrame(ThreadViewData data) async {
+  Future<void> _applyThreadDataOnNextFrame(ThreadViewData data) =>
+      applyOnNextFrame(() {
+        threadDataOutput.value = data;
+        isInitialized.value = true;
+      });
+
+  /// Runs [apply] after the next frame, and makes sure there is one.
+  ///
+  /// Adding a post-frame callback does not ask for a frame. While the
+  /// loading placeholders animated, they drew one every tick and the
+  /// callback always ran; since they became static blocks (the scroll
+  /// audit), nothing else redraws a loading topic. Posts that arrived after
+  /// the page-open animation ended then waited, loaded but unshown, until a
+  /// touch or Back drew a frame: a topic sat on its placeholders for over a
+  /// minute while the server had answered in 274 ms.
+  @visibleForTesting
+  static Future<void> applyOnNextFrame(void Function() apply) {
     final completer = Completer<void>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      threadDataOutput.value = data;
-      isInitialized.value = true;
+      apply();
       if (!completer.isCompleted) completer.complete();
     });
-    await completer.future;
+    WidgetsBinding.instance.ensureVisualUpdate();
+    return completer.future;
   }
 
   /// Merges [existing] and [incoming] posts, deduping by post id and keeping
@@ -237,9 +253,7 @@ class PostController extends DiscourseGlobalLoaderController with ErrorHandlingM
       currentStartNum: current.currentStartNum,
       position: current.position,
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      threadDataOutput.value = newData;
-    });
+    applyOnNextFrame(() => threadDataOutput.value = newData);
   }
 
   /// Loads a specific page of posts by page number (1-based).
