@@ -74,13 +74,13 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
   bool _wasLoggedIn = false;
   String? _lastLoadedUsername;
   late final VoidCallback _authStateListener;
+  bool _initialLoadStarted = false;
 
   @override
   void initState() {
     super.initState();
     _wasLoggedIn = widget.siteContext.isLoggedIn;
     _lastLoadedUsername = widget.siteContext.loginDataOutput?.user?.username;
-    _load();
 
     _authStateListener = () {
       if (!mounted) return;
@@ -93,6 +93,18 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
       }
     };
     widget.siteContext.isLoggedInNotifier.addListener(_authStateListener);
+  }
+
+  /// The first load starts here, not in initState: signed out, _load()
+  /// reads AppLocalizations synchronously, and inherited widgets may not be
+  /// read until initState has returned (a debug assertion). This still runs
+  /// before the first build, so the first frame is the same as before.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialLoadStarted) return;
+    _initialLoadStarted = true;
+    _load();
   }
 
   @override
