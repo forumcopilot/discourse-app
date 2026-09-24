@@ -6,7 +6,11 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+Found by re-crawling every directory forum on the Pixel after batch 6. Covered by `packages/discourse_ui/test/render_regressions_test.dart`.
+
 ### Fixed
+- **A table with a linked image in a cell no longer fails to draw** (introduced in 1.0.22). Email-style signatures and sponsor blocks put a linked logo in a table; the table's column sizing asked the image for a text baseline it cannot give, and the table was left blank with a layout error. Post images now report having no baseline, as they already do in normal layout.
+- **Inline maths wider than the screen scrolls sideways** instead of overflowing its line, as display maths already did.
 - **A forum whose `/about.json` hangs now opens** instead of failing with "Failed to connect". forum.cfx.re answered every other read in a fraction of a second but sometimes left `/about.json` hanging, and that one optional read ran the whole configuration load into its 10 s timeout. It now gets 4 s of its own; past that the forum opens without it, taking read-only mode from `/site/settings.json` instead. Only the post and member counts in the forum header still wait for it. Covered by `packages/discourse_core/test/config_about_timeout_test.dart`.
 
 ## [1.0.25] - 2026-09-23

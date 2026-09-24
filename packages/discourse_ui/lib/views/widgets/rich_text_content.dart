@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:html/dom.dart' as dom;
@@ -306,7 +307,7 @@ class RichTextContent extends StatelessWidget {
             // square beside the text on the web; at its own 400×400 it
             // would fill the post.
             if (classes.split(RegExp(r'\s+')).contains('onebox-avatar')) {
-              return ClipRRect(
+              return _NoBaseline(child: ClipRRect(
                 borderRadius: BorderRadius.circular(6),
                 child: Image.network(
                   resolved,
@@ -315,7 +316,7 @@ class RichTextContent extends StatelessWidget {
                   fit: BoxFit.cover,
                   errorBuilder: (context, _, __) => const SizedBox(width: 48, height: 48),
                 ),
-              );
+              ));
             }
             // Image.network cannot decode SVG (uploads, badges, GitHub's
             // favicon) and showed the alt text instead. BrandImage draws it
@@ -354,11 +355,13 @@ class RichTextContent extends StatelessWidget {
             // Route content-image taps to the in-app viewer (emoji stay
             // plain inline glyphs/images).
             final onImageTap = callbacks?.onImageTap;
-            if (isEmoji || onImageTap == null) return image;
-            return Builder(
-              builder: (imageContext) => GestureDetector(
-                onTap: () => onImageTap(resolved, imageContext, resolved),
-                child: image,
+            if (isEmoji || onImageTap == null) return _NoBaseline(child: image);
+            return _NoBaseline(
+              child: Builder(
+                builder: (imageContext) => GestureDetector(
+                  onTap: () => onImageTap(resolved, imageContext, resolved),
+                  child: image,
+                ),
               ),
             );
           },
@@ -982,4 +985,26 @@ Map<String, Style> _stylesFor(ColorScheme colorScheme, TextStyle body,
       verticalAlign: VerticalAlign.middle,
     ),
   });
+}
+
+/// An inline picture has no text baseline; this says so when asked "dry",
+/// as it already does in real layout.
+///
+/// flutter_html places a linked image in a baseline-aligned placeholder.
+/// A paragraph measuring its intrinsic width (a table sizing its columns)
+/// asks such children for a dry baseline, which RenderImage cannot give:
+/// it threw, and the table cell was never laid out.
+class _NoBaseline extends SingleChildRenderObjectWidget {
+  const _NoBaseline({required super.child});
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => _RenderNoBaseline();
+}
+
+class _RenderNoBaseline extends RenderProxyBox {
+  @override
+  double? computeDryBaseline(BoxConstraints constraints, TextBaseline baseline) => null;
+
+  @override
+  double? computeDistanceToActualBaseline(TextBaseline baseline) => null;
 }

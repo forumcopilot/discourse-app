@@ -80,7 +80,12 @@ class DiscourseBlocksExtension extends HtmlExtension {
             Text(tex, style: style.copyWith(fontFamily: 'monospace')),
       );
       if (!block) {
-        return WidgetSpan(alignment: PlaceholderAlignment.middle, child: math);
+        // A formula wider than the line scrolls sideways instead of
+        // overflowing it; a narrow one keeps its own width.
+        return WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: math),
+        );
       }
       return WidgetSpan(
         child: SizedBox(
