@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.23] - 2026-09-23
+
 Thread rendering, batch 4: what Discourse's plugins draw with JavaScript on the web. Covered by `packages/discourse_ui/test/discourse_blocks_rendering_test.dart`, `local_dates_test.dart` and `packages/discourse_core/test/post_kinds_and_polls_test.dart`, and checked before/after on the Pixel in light and dark themes.
 
 ### Fixed
