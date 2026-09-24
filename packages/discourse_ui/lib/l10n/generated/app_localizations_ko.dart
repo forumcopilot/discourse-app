@@ -1862,7 +1862,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      '계정 삭제는 포럼에서 처리합니다. 계속을 눌러 사이트를 열고 스태프에게 문의하세요 — Discourse 포럼은 자체 정책에 따라 삭제를 처리합니다.';
+      '계정은 포럼 웹사이트에서 삭제합니다. 포럼이 허용하면 계정 설정에서, 그렇지 않으면 운영진이 삭제합니다.';
 
   @override
   String get verificationEmailSent => '확인 이메일을 보냈습니다 — 링크를 클릭하여 새 주소를 확인하세요.';
@@ -2386,4 +2386,21 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get errorForumDown => '포럼이 지금 응답하지 않습니다. 나중에 다시 시도하세요.';
+
+  @override
+  String get deleteSpammer => '스팸 사용자 삭제';
+
+  @override
+  String get yesDeleteSpammer => '예, 스팸 사용자를 삭제합니다';
+
+  @override
+  String get deleteSpammerConfirm =>
+      '이 사용자의 게시물 및 주제를 삭제하고, 사용자의 계정을 제거하고, 해당 IP 주소의 가입을 차단하고, 해당 이메일 주소를 영구 차단 목록에 추가하려 합니다. 이 사용자가 정말 스팸 사용자인가요?';
+
+  @override
+  String get userWasDeleted => '사용자가 삭제되었습니다.';
+
+  @override
+  String get deleteAccountSelfServeBody =>
+      '포럼 웹사이트의 계정 설정에서 계정을 삭제할 수 있습니다. \'계속\'을 누르면 브라우저에서 해당 페이지가 열립니다. 로그인하라는 메시지가 나오면 로그인하세요.';
 }

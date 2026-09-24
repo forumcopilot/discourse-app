@@ -46,10 +46,38 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
   int _total = 0;
   static const int _pageSize = 20;
 
+  /// The profile's scroll view, which this feed sits inside as a sliver.
+  ScrollPosition? _hostScroll;
+
   @override
   void initState() {
     super.initState();
     _fetchRecentPosts();
+  }
+
+  // The feed follows the scroll view it is in. Only the Replies tab was
+  // told about scrolling (by a GlobalKey on one host), so Likes, Bookmarks
+  // and Solved never got past their first page.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final position = Scrollable.maybeOf(context)?.position;
+    if (position != _hostScroll) {
+      _hostScroll?.removeListener(_onHostScroll);
+      _hostScroll = position?..addListener(_onHostScroll);
+    }
+  }
+
+  void _onHostScroll() {
+    final position = _hostScroll;
+    if (position == null || !position.hasContentDimensions) return;
+    checkAndLoadMore(position.pixels, position.maxScrollExtent);
+  }
+
+  @override
+  void dispose() {
+    _hostScroll?.removeListener(_onHostScroll);
+    super.dispose();
   }
 
   @override
@@ -114,14 +142,13 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
             _recentPosts = [...(_recentPosts ?? []), ...result.posts];
           } else {
             _recentPosts = result.posts;
-            _total = result.total;
           }
+          // What the proxy has seen so far, plus one while pages come back
+          // full: an empty or failed page ends the feed instead of being
+          // asked for again on every scroll.
+          _total = result.total;
           _isLoading = false;
           _isLoadingMore = false;
-          // Update total if we got a new value
-          if (result.total > _total) {
-            _total = result.total;
-          }
         });
       }
     } catch (e, stack) {

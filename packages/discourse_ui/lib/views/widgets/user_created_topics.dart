@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/views/post_page.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseUserProxy;
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
@@ -12,8 +13,9 @@ import 'profile_section.dart';
 
 /// Phase 5.24 — sibling of `UserRepliedPosts` that lists topics
 /// **created** by the given user, backed by
-/// `DiscourseUserProxy.getUserTopicAsync` (which hits
-/// `/user_actions.json?filter=4`).
+/// `DiscourseUserProxy.getUserCreatedTopicsAsync` (which hits
+/// `/user_actions.json?filter=4`), a page at a time as the profile
+/// scrolls.
 ///
 /// Lives alongside the existing replies feed on user-profile pages.
 /// The parent (`UserProfilePage` or `ProfileTab`) owns the
@@ -40,12 +42,71 @@ class UserCreatedTopics extends StatefulWidget {
 class _UserCreatedTopicsState extends State<UserCreatedTopics> {
   List<FCUserTopic>? _topics;
   bool _loading = false;
+  bool _loadingMore = false;
   String? _error;
+
+  /// At least this many topics exist (see DiscourseUserProxy's paged
+  /// `total`); more load while fewer are shown.
+  int _total = 0;
+
+  /// The profile's scroll view, which this feed sits inside as a sliver.
+  ScrollPosition? _hostScroll;
 
   @override
   void initState() {
     super.initState();
     _fetch();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final position = Scrollable.maybeOf(context)?.position;
+    if (position != _hostScroll) {
+      _hostScroll?.removeListener(_onHostScroll);
+      _hostScroll = position?..addListener(_onHostScroll);
+    }
+  }
+
+  @override
+  void dispose() {
+    _hostScroll?.removeListener(_onHostScroll);
+    super.dispose();
+  }
+
+  void _onHostScroll() {
+    final position = _hostScroll;
+    if (position == null || !position.hasContentDimensions) return;
+    if (position.pixels >= position.maxScrollExtent - 300) _fetchMore();
+  }
+
+  Future<void> _fetchMore() async {
+    final topics = _topics;
+    final proxy = SiteProxyFactory.getUserProxy();
+    if (topics == null ||
+        _loading ||
+        _loadingMore ||
+        topics.length >= _total ||
+        proxy is! DiscourseUserProxy) {
+      return;
+    }
+    setState(() => _loadingMore = true);
+    final result =
+        await proxy.getUserCreatedTopicsAsync(topics.length, widget.userName);
+    if (!mounted) return;
+    setState(() {
+      _loadingMore = false;
+      if (!result.result) {
+        _total = topics.length; // stop; the first page is still shown
+        return;
+      }
+      final seen = {for (final t in topics) t.topicId};
+      _topics = [
+        ...topics,
+        ...result.list.where((t) => seen.add(t.topicId)),
+      ];
+      _total = result.list.isEmpty ? _topics!.length : result.total;
+    });
   }
 
   @override
@@ -78,6 +139,7 @@ class _UserCreatedTopicsState extends State<UserCreatedTopics> {
       if (!mounted) return;
       setState(() {
         _topics = result.list;
+        _total = result.total;
         _loading = false;
         if (!result.result &&
             (result.resultText?.isNotEmpty ?? false)) {
@@ -116,19 +178,29 @@ class _UserCreatedTopicsState extends State<UserCreatedTopics> {
         message: 'No topics started yet.',
       );
     }
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: topics.length,
-      separatorBuilder: (_, __) => const ProfileRowDivider(),
-      itemBuilder: (_, i) => ActivityRow(
-        title: topics[i].topicTitle,
-        excerpt: topics[i].shortContent,
-        time: topics[i].postTime,
-        replyCount: topics[i].replyCount,
-        viewCount: topics[i].viewCount,
-        onTap: () => _open(topics[i]),
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: topics.length,
+          separatorBuilder: (_, __) => const ProfileRowDivider(),
+          itemBuilder: (_, i) => ActivityRow(
+            title: topics[i].topicTitle,
+            excerpt: topics[i].shortContent,
+            time: topics[i].postTime,
+            replyCount: topics[i].replyCount,
+            viewCount: topics[i].viewCount,
+            onTap: () => _open(topics[i]),
+          ),
+        ),
+        if (_loadingMore)
+          const Padding(
+            padding: DesignTokens.paddingL,
+            child: Center(child: CircularProgressIndicator()),
+          ),
+      ],
     );
   }
 

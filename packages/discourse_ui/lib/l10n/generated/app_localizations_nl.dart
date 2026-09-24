@@ -1939,7 +1939,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'Het verwijderen van je account gebeurt op het forum. Ga verder om de site te openen en contact op te nemen met de staf — Discourse-forums verwerken verwijderingen volgens hun eigen beleid.';
+      'Accounts worden verwijderd op de website van het forum: via je accountvoorkeuren als het forum dat toestaat, anders door de staf.';
 
   @override
   String get verificationEmailSent =>
@@ -2484,4 +2484,21 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get errorForumDown =>
       'Het forum reageert momenteel niet. Probeer het later opnieuw.';
+
+  @override
+  String get deleteSpammer => 'Spammer verwijderen';
+
+  @override
+  String get yesDeleteSpammer => 'Ja, spammer verwijderen';
+
+  @override
+  String get deleteSpammerConfirm =>
+      'Je staat op het punt de berichten en topics van deze gebruiker te verwijderen, diens account te verwijderen, registraties vanaf diens IP-adres te blokkeren en diens e-mailadres toe te voegen aan een permanente blokkeerlijst. Weet je zeker dat deze gebruiker echt een spammer is?';
+
+  @override
+  String get userWasDeleted => 'De gebruiker is verwijderd.';
+
+  @override
+  String get deleteAccountSelfServeBody =>
+      'Je kunt je account verwijderen via je accountvoorkeuren op de website van het forum. \'Doorgaan\' opent die pagina in je browser. Log daar in als daarom wordt gevraagd.';
 }

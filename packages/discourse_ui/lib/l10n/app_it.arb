@@ -839,7 +839,7 @@
   "manageAccountSubtitle": "Profilo, e-mail, password, sicurezza, impostazioni avanzate",
   "changePasswordSubtitle": "Invia un’e-mail di reimpostazione password al tuo indirizzo attuale",
   "ignoredUsersSubtitle": "Vedi e gestisci gli utenti i cui post ti sono nascosti",
-  "deleteAccountExplanation": "La rimozione dell’account avviene sul forum. Continua per aprire il sito e contattare lo staff — i forum Discourse gestiscono le cancellazioni secondo le proprie regole.",
+  "deleteAccountExplanation": "Gli account si eliminano sul sito del forum: dalle preferenze del tuo account se il forum lo consente, altrimenti dallo staff.",
   "verificationEmailSent": "E-mail di verifica inviata — clicca sul link per confermare il nuovo indirizzo.",
   "passwordResetExplanation": "Ti invieremo un link per reimpostare la password. Cliccalo per sceglierne una nuova — la modifica avviene sul forum, non in questa app.",
   "sendResetEmail": "Invia e-mail di reimpostazione",
@@ -973,5 +973,10 @@
   "errorNotAllowed": "Non hai accesso a questo contenuto. Accedere potrebbe aiutare.",
   "errorNotFound": "Questo contenuto non esiste o è stato rimosso.",
   "errorRateLimited": "Stai facendo questa operazione troppo spesso. Attendi un momento e riprova.",
-  "errorForumDown": "Il forum non risponde al momento. Riprova più tardi."
+  "errorForumDown": "Il forum non risponde al momento. Riprova più tardi.",
+  "deleteSpammer": "Cancella spammer",
+  "yesDeleteSpammer": "Sì, cancella lo spammer",
+  "deleteSpammerConfirm": "Stai per cancellare i messaggi e gli argomenti di questo utente, rimuovere il suo account, bloccare le registrazioni dal suo indirizzo IP e aggiungere il suo indirizzo email a un elenco di indirizzi bloccati permanente. Sei sicuro che questo utente sia veramente uno spammer?",
+  "userWasDeleted": "L'utente è stato cancellato.",
+  "deleteAccountSelfServeBody": "Puoi eliminare il tuo account dalle preferenze del tuo account sul sito del forum. «Continua» apre quella pagina nel browser. Accedi lì se richiesto."
 }

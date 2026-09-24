@@ -511,7 +511,10 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         // `scope.can_ignore_user?(object)` — false for guests, self,
         // and staff targets. Gates the Ignore/Unignore menu item.
         canIgnore: user['can_ignore_user'] == true,
-        canSpamClean: canModerateTarget,
+        // Delete spammer: the guardian check the DELETE itself makes
+        // (UserSerializer staff attribute can_be_deleted). Moderators may
+        // not delete established users, admins no admins.
+        canSpamClean: user['can_be_deleted'] == true,
         // Discourse has no per-user report action (reportUserAsync
         // intentionally returns guidance to flag posts instead), so
         // don't advertise one. Post-level flagging stays fully wired.
@@ -538,7 +541,10 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         displayText: user['name']?.toString(),
         email: null,
         location: user['location']?.toString(),
-        website: user['website_name']?.toString() ?? user['website']?.toString(),
+        // The address as entered: the edit form is filled from this, and
+        // website_name (host + path) saved back rewrote it. The profile
+        // shortens it for display itself.
+        website: user['website']?.toString() ?? user['website_name']?.toString(),
         signature: null,
         // Prefer the full markdown bio; the cooked/excerpt fallbacks
         // are HTML fragments that need flattening (Phase 5.47 —
@@ -570,6 +576,17 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       String? username,
       String? userId) =>
       getUserActionsAsync(startNum, username, actionFilter: 5);
+
+  /// Rows per `/user_actions.json` page (UserActionsController#index's
+  /// default limit).
+  static const int userActionsPageSize = 30;
+
+  /// The `total` a user_actions page reports: Discourse sends no count, so
+  /// it is what is loaded so far, plus one while pages come back full — a
+  /// feed shows more while it has fewer than `total`. Reporting the page
+  /// length stopped every feed after its first 30 rows.
+  static int _userActionsTotal(int offset, int pageLength) =>
+      offset + pageLength + (pageLength >= userActionsPageSize ? 1 : 0);
 
   /// Discourse-only: any `/user_actions.json` feed for a user.
   ///
@@ -652,9 +669,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       return FCUserReplyResult(
         result: true,
         resultText: '',
-        // Page length, not a grand total — UserActionsController#index
-        // returns no count (app/controllers/user_actions_controller.rb:35-43).
-        total: replyList.length,
+        total: _userActionsTotal(startNum, actions.length),
         list: replyList,
       );
     } on DiscourseApiException catch (e) {
@@ -676,7 +691,14 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
 
   @override
   Future<FCUserTopicResult> getUserTopicAsync(
-      String? username, String? userId) async {
+          String? username, String? userId) =>
+      getUserCreatedTopicsAsync(0, username);
+
+  /// Discourse-only: a page of the topics a user started, from [offset].
+  /// The SDK's getUserTopicAsync has no paging, so the profile's Topics
+  /// tab stopped at the first 30.
+  Future<FCUserTopicResult> getUserCreatedTopicsAsync(
+      int offset, String? username) async {
     if (username == null || username.isEmpty) {
       return FCUserTopicResult(
         result: false,
@@ -690,6 +712,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       final response = await apiGet('/user_actions.json', query: {
         'username': username,
         'filter': '4',
+        if (offset > 0) 'offset': offset.toString(),
       });
       final actions = ((response['user_actions'] as List?) ?? const [])
           .whereType<Map>()
@@ -720,9 +743,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       return FCUserTopicResult(
         result: true,
         resultText: '',
-        // Page length after topic-dedupe, not a grand total — see
-        // getUserReplyAsync.
-        total: topics.length,
+        total: _userActionsTotal(offset, actions.length),
         list: topics,
       );
     } on DiscourseApiException catch (e) {
@@ -1133,6 +1154,21 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     } catch (e) {
       return DiscourseDoNotDisturbResult(
           result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Whether the signed-in user may delete their own account on the forum
+  /// (`current_user.can_delete_account`: sent only when true — Discourse
+  /// Connect off and no more posts than delete_user_self_max_post_count).
+  /// Null when it could not be checked.
+  Future<bool?> canDeleteOwnAccountAsync() async {
+    if (!siteContext.isLoggedIn) return false;
+    try {
+      final response = await apiGet('/session/current.json');
+      final user = (response['current_user'] as Map?) ?? const {};
+      return user['can_delete_account'] == true;
+    } catch (_) {
+      return null;
     }
   }
 

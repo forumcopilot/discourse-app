@@ -839,7 +839,7 @@
   "manageAccountSubtitle": "Perfil, e-mail, senha, segurança, configurações avançadas",
   "changePasswordSubtitle": "Envia um e-mail de redefinição de senha para o endereço atual",
   "ignoredUsersSubtitle": "Veja e gerencie usuários cujas postagens estão ocultas para você",
-  "deleteAccountExplanation": "A remoção da conta é feita no fórum. Continue para abrir o site e contatar a equipe — fóruns Discourse processam exclusões conforme sua própria política.",
+  "deleteAccountExplanation": "As contas são excluídas no site do fórum: nas preferências da sua conta, se o fórum permitir; caso contrário, pela equipe.",
   "verificationEmailSent": "E-mail de verificação enviado — clique no link para confirmar o novo endereço.",
   "passwordResetExplanation": "Enviaremos um link de redefinição de senha por e-mail. Clique nele para escolher uma nova senha — a alteração é feita no fórum, não neste app.",
   "sendResetEmail": "Enviar e-mail de redefinição",
@@ -973,5 +973,10 @@
   "errorNotAllowed": "Sem acesso a este conteúdo. Entrar na conta pode ajudar.",
   "errorNotFound": "Isto não existe ou foi removido.",
   "errorRateLimited": "Essa ação está sendo feita com muita frequência. Aguarde um momento e tente novamente.",
-  "errorForumDown": "O fórum não está respondendo no momento. Tente novamente mais tarde."
+  "errorForumDown": "O fórum não está respondendo no momento. Tente novamente mais tarde.",
+  "deleteSpammer": "Excluir remetente de spam",
+  "yesDeleteSpammer": "Sim, excluir remetente de spam",
+  "deleteSpammerConfirm": "Você está prestes a excluir as postagens e tópicos deste(a) usuário(a), remover sua conta, bloquear cadastros a partir do seu endereço IP e adicionar seu endereço de e-mail a uma lista de bloqueio permanente. Você tem certeza que este(a) usuário(a) é realmente remetente de spam?",
+  "userWasDeleted": "O(a) usuário(a) foi excluído(a).",
+  "deleteAccountSelfServeBody": "Você pode excluir sua conta nas preferências da sua conta no site do fórum. “Continuar” abre essa página no navegador. Entre lá se for solicitado."
 }

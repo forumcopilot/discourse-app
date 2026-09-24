@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/models/results/fc_moderation_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../data/moderation/discourse_reviewable.dart';
+import '../util/html_text.dart';
 
 /// Discourse implementation of [IFCModerationProxy].
 ///
@@ -352,6 +353,13 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
     }
   }
 
+  /// Discourse's "Delete spammer" (admin-tools.js deleteAsSpammer): one
+  /// `DELETE /admin/users/{id}.json` that removes the account and its posts
+  /// and blocks the email, IP address and posted links from coming back.
+  ///
+  /// The flags are XenForo's spam-cleaner options and have no Discourse
+  /// counterpart; they are ignored. This used to silence the user and only
+  /// delete anything when a flag was set, which left the spam in place.
   @override
   Future<FCSpamCleanUserResult> spamCleanUserAsync({
     String? userId,
@@ -370,24 +378,26 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
       );
     }
     try {
-      // First silence (or suspend, if banUser=true).
-      if (banUser) {
-        await apiPut('/admin/users/$id/suspend.json', body: {
-          'suspend_until': DateTime.utc(3000, 1, 1).toIso8601String(),
-          'reason': 'Spam cleanup',
-        });
-      } else {
-        await apiPut('/admin/users/$id/silence.json', body: {
-          'reason': 'Spam cleanup',
-        });
+      final response = await apiDelete('/admin/users/$id.json', query: {
+        'delete_posts': 'true',
+        'block_email': 'true',
+        'block_urls': 'true',
+        'block_ip': 'true',
+        'delete_as_spammer': 'true',
+        // Recorded in the staff action log, where the website puts the
+        // page it was done from.
+        if (username != null && username.isNotEmpty)
+          'context': '/u/${Uri.encodeComponent(username)}',
+      });
+      // `deleted: false` (with the user) when UserDestroyer declined.
+      if (response['deleted'] != true) {
+        return FCSpamCleanUserResult(
+          result: false,
+          resultText: response['message']?.toString() ?? '',
+        );
       }
-      // Then delete the account with their posts when requested.
-      if (actionThreads || deleteMessages || deleteConversations) {
-        await apiDelete('/admin/users/$id.json', query: {
-          'delete_posts': 'true',
-        });
-      }
-      return FCSpamCleanUserResult(result: true, resultText: '');
+      return FCSpamCleanUserResult(
+          result: true, resultText: '', username: username);
     } on DiscourseApiException catch (e) {
       return FCSpamCleanUserResult(result: false, resultText: e.userMessage);
     } catch (e) {
@@ -498,6 +508,17 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
       final topics = byId('topics');
       final bundles = byId('bundled_actions');
       final actionDetails = byId('actions');
+      final scores = byId('reviewable_scores');
+      // Score types side-load with a `title`; meta.score_types lists every
+      // type with a `name`. Either names the flag.
+      final scoreTypes = <Object?, String>{
+        for (final t in ((((response['meta'] as Map?)?['score_types']) as List?) ??
+                const [])
+            .whereType<Map>())
+          t['id']: (t['name'] ?? '').toString(),
+        for (final t in byId('score_types').values)
+          t['id']: (t['title'] ?? t['name'] ?? '').toString(),
+      };
 
       List<DiscourseReviewableAction> actionsFor(Map<String, dynamic> row) {
         final out = <DiscourseReviewableAction>[];
@@ -518,12 +539,14 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
               id: (a['server_action'] ?? actionId.toString().split('-').last)
                   .toString(),
               bundleId: bundleId.toString(),
+              bundleLabel: bundle['label']?.toString(),
               label: (a['label'] ?? bundle['label'])?.toString(),
               icon: (a['icon'] ?? bundle['icon'])?.toString(),
               buttonClass: a['button_class']?.toString(),
               description: a['description']?.toString(),
               confirmMessage: a['confirm_message']?.toString(),
               requireRejectReason: a['require_reject_reason'] == true,
+              completedMessage: a['completed_message']?.toString(),
             ));
           }
         }
@@ -537,6 +560,8 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
             final topic = topics[r['topic_id']];
             String? usernameOf(Object? userId) =>
                 users[userId]?['username']?.toString();
+            final payload =
+                (r['payload'] as Map?)?.cast<String, dynamic>() ?? const {};
             return DiscourseReviewable(
               id: (r['id'] as num?)?.toInt() ?? 0,
               type: (r['type'] ?? '').toString(),
@@ -555,8 +580,20 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
               createdByUsername: usernameOf(r['created_by_id']),
               targetCreatedByUsername:
                   usernameOf(r['target_created_by_id']),
-              payload:
-                  (r['payload'] as Map?)?.cast<String, dynamic>() ?? const {},
+              payload: payload,
+              raw: (payload['raw'] ?? r['raw'])?.toString(),
+              scores: [
+                for (final id in ((r['reviewable_score_ids'] as List?) ??
+                    const []))
+                  if (scores[id] case final score?)
+                    DiscourseReviewableScore(
+                      type: scoreTypes[score['score_type_id']] ?? '',
+                      username: usernameOf(score['user_id']),
+                      reason: score['reason'] == null
+                          ? null
+                          : stripHtmlToText(score['reason'].toString()),
+                    ),
+              ],
               actions: actionsFor(r),
             );
           })
@@ -590,10 +627,15 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
   /// flags that case with `conflict: true` so the UI can re-fetch the
   /// row. When [version] is null, the current version is looked up via
   /// `GET /review/{id}.json` first (one extra request).
+  ///
+  /// [rejectReason] goes with the actions that ask for one
+  /// (`require_reject_reason`): rejecting a user sign-up, where
+  /// ReviewableUser.additional_args reads it and emails it to them.
   Future<DiscourseReviewablePerformResult> performReviewableActionAsync(
     int reviewableId,
     String actionId, {
     int? version,
+    String? rejectReason,
   }) async {
     try {
       var v = version;
@@ -606,7 +648,11 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
       final response = await apiPut(
         '/review/$reviewableId/perform/'
         '${Uri.encodeComponent(actionId)}.json',
-        query: {'version': v.toString()},
+        query: {
+          'version': v.toString(),
+          if (rejectReason != null && rejectReason.isNotEmpty)
+            'reject_reason': rejectReason,
+        },
       );
       // ReviewablePerformResultSerializer, nested under
       // `reviewable_perform_result`.

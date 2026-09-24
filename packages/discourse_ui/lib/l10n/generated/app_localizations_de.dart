@@ -1951,7 +1951,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'Das Entfernen deines Kontos erfolgt im Forum. Mit „Weiter“ öffnest du die Seite und kontaktierst das Team — Discourse-Foren bearbeiten Löschungen nach ihren eigenen Regeln.';
+      'Konten werden auf der Website des Forums gelöscht – in deinen Kontoeinstellungen, wenn das Forum es erlaubt, sonst vom Team.';
 
   @override
   String get verificationEmailSent =>
@@ -2498,4 +2498,21 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get errorForumDown =>
       'Das Forum antwortet gerade nicht. Bitte versuchen Sie es später erneut.';
+
+  @override
+  String get deleteSpammer => 'Spammer löschen';
+
+  @override
+  String get yesDeleteSpammer => 'Ja, lösche den Spammer';
+
+  @override
+  String get deleteSpammerConfirm =>
+      'Du wirst die Beiträge und Themen dieses Benutzers löschen, sein Konto entfernen, seine IP-Adresse für Neuanmeldungen sperren und seine E-Mail-Adresse auf eine permanente Sperrliste setzen. Bist du dir sicher, dass dieser Benutzer wirklich ein Spammer ist?';
+
+  @override
+  String get userWasDeleted => 'Der Benutzer wurde gelöscht.';
+
+  @override
+  String get deleteAccountSelfServeBody =>
+      'Du kannst dein Konto in deinen Kontoeinstellungen auf der Website des Forums löschen. „Fortfahren“ öffnet diese Seite im Browser. Melde dich dort an, falls du dazu aufgefordert wirst.';
 }

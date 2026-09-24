@@ -3383,7 +3383,7 @@ abstract class AppLocalizations {
   /// UI text: Removing your account is handled on the forum. Continue to o
   ///
   /// In en, this message translates to:
-  /// **'Removing your account is handled on the forum. Continue to open the site and contact the staff team — Discourse forums process deletions per their own policy.'**
+  /// **'Accounts are deleted on the forum\'s website — from your account preferences if the forum allows it, otherwise by its staff.'**
   String get deleteAccountExplanation;
 
   /// UI text: Verification email sent — click the link to confirm your new
@@ -4197,6 +4197,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The forum isn\'t responding right now. Please try again later.'**
   String get errorForumDown;
+
+  /// Staff action on a profile: delete the account and posts, block its email, IP and links (Discourse's Delete Spammer)
+  ///
+  /// In en, this message translates to:
+  /// **'Delete spammer'**
+  String get deleteSpammer;
+
+  /// No description provided for @yesDeleteSpammer.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, delete spammer'**
+  String get yesDeleteSpammer;
+
+  /// Confirmation before Delete spammer (Discourse flagging.delete_confirm_MF, without the counts)
+  ///
+  /// In en, this message translates to:
+  /// **'You are about to delete this user\'s posts and topics, remove their account, block signups from their IP address, and add their email address to a permanent block list. Are you sure this user is really a spammer?'**
+  String get deleteSpammerConfirm;
+
+  /// No description provided for @userWasDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'The user was deleted.'**
+  String get userWasDeleted;
+
+  /// Shown before opening the forum's account preferences, where Discourse lets members delete their own account (current_user.can_delete_account)
+  ///
+  /// In en, this message translates to:
+  /// **'You can delete your account from your account preferences on the forum\'s website. Continue opens that page in your browser. Sign in there if it asks.'**
+  String get deleteAccountSelfServeBody;
 }
 
 class _AppLocalizationsDelegate

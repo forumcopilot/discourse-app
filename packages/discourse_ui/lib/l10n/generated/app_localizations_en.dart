@@ -1930,7 +1930,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'Removing your account is handled on the forum. Continue to open the site and contact the staff team — Discourse forums process deletions per their own policy.';
+      'Accounts are deleted on the forum\'s website — from your account preferences if the forum allows it, otherwise by its staff.';
 
   @override
   String get verificationEmailSent =>
@@ -2473,4 +2473,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorForumDown =>
       'The forum isn\'t responding right now. Please try again later.';
+
+  @override
+  String get deleteSpammer => 'Delete spammer';
+
+  @override
+  String get yesDeleteSpammer => 'Yes, delete spammer';
+
+  @override
+  String get deleteSpammerConfirm =>
+      'You are about to delete this user\'s posts and topics, remove their account, block signups from their IP address, and add their email address to a permanent block list. Are you sure this user is really a spammer?';
+
+  @override
+  String get userWasDeleted => 'The user was deleted.';
+
+  @override
+  String get deleteAccountSelfServeBody =>
+      'You can delete your account from your account preferences on the forum\'s website. Continue opens that page in your browser. Sign in there if it asks.';
 }

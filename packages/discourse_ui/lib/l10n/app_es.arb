@@ -839,7 +839,7 @@
   "manageAccountSubtitle": "Perfil, correo, contraseña, seguridad, ajustes avanzados",
   "changePasswordSubtitle": "Envía un correo de restablecimiento de contraseña a tu dirección actual",
   "ignoredUsersSubtitle": "Ver y gestionar usuarios cuyas publicaciones están ocultas para ti",
-  "deleteAccountExplanation": "La eliminación de tu cuenta se gestiona en el foro. Continúa para abrir el sitio y contactar al equipo: los foros Discourse procesan las eliminaciones según su propia política.",
+  "deleteAccountExplanation": "Las cuentas se eliminan en el sitio web del foro: desde las preferencias de tu cuenta si el foro lo permite; si no, lo hace su equipo.",
   "verificationEmailSent": "Correo de verificación enviado: haz clic en el enlace para confirmar tu nueva dirección.",
   "passwordResetExplanation": "Te enviaremos un enlace para restablecer la contraseña. Haz clic para elegir una nueva: el cambio se gestiona en el foro, no en esta app.",
   "sendResetEmail": "Enviar correo de restablecimiento",
@@ -973,5 +973,10 @@
   "errorNotAllowed": "No tienes acceso a esto. Iniciar sesión podría ayudar.",
   "errorNotFound": "Esto no existe o se ha eliminado.",
   "errorRateLimited": "Estás haciendo eso con demasiada frecuencia. Espera un momento e inténtalo de nuevo.",
-  "errorForumDown": "El foro no responde en este momento. Inténtalo más tarde."
+  "errorForumDown": "El foro no responde en este momento. Inténtalo más tarde.",
+  "deleteSpammer": "Eliminar spammer",
+  "yesDeleteSpammer": "Sí, eliminar spammer",
+  "deleteSpammerConfirm": "Estás a punto de eliminar las publicaciones y temas de este usuario, también eliminarás su cuenta, bloquearás registros desde su dirección IP y añadirás su correo electrónico a una lista de bloqueos permanentes. ¿Seguro que el usuario es de verdad un spammer?",
+  "userWasDeleted": "El usuario se eliminó.",
+  "deleteAccountSelfServeBody": "Puedes eliminar tu cuenta desde las preferencias de tu cuenta en el sitio web del foro. «Continuar» abre esa página en tu navegador. Inicia sesión allí si te lo pide."
 }

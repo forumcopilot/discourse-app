@@ -258,10 +258,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     value: 'spamCleaner',
                     child: Row(
                       children: [
-                        Icon(Icons.cleaning_services, color: colorScheme.error),
+                        Icon(Icons.warning_amber_rounded, color: colorScheme.error),
                         const SizedBox(width: DesignTokens.spacingM),
                         Text(
-                          AppLocalizations.of(context)?.spamCleaner ?? 'Spam Cleaner',
+                          AppLocalizations.of(context)!.deleteSpammer,
                           style: textTheme.titleMedium?.copyWith(
                             color: colorScheme.onSurface,
                           ),
@@ -1117,467 +1117,54 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
+  /// Discourse's "Delete spammer": removes the account and every post, and
+  /// blocks the email address, IP address and links from coming back. The
+  /// confirmation is the website's (flagging.delete_confirm_MF).
   Future<void> _handleSpamCleanUser(BuildContext context) async {
-    if (_userInfo == null) return;
+    final user = _userInfo;
+    if (user == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    AppLogger.debug('Handling spam clean of user: ${_userInfo!.id}');
-
-    // Initialize all checkboxes to true (checked)
-    bool actionThreads = true;
-    bool deleteMessages = true;
-    bool deleteConversations = true;
-    bool banUser = true;
-
-    final result = await showDialog<Map<String, bool>?>(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            final colorScheme = Theme.of(context).colorScheme;
-            final textTheme = Theme.of(context).textTheme;
-
-            return AlertDialog(
-              title: Text(
-                AppLocalizations.of(context)?.spamCleanUser ?? 'Spam Clean User',
-                style: textTheme.titleLarge?.copyWith(
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.spamClean(_userInfo!.username),
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: DesignTokens.spacingL),
-                    Text(
-                      AppLocalizations.of(context)?.selectActionsToPerform ?? 'Select the actions to perform:',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: DesignTokens.spacingM),
-                    CheckboxListTile(
-                      title: Text(
-                        AppLocalizations.of(context)?.handleThreads ?? 'Handle Threads',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      subtitle: Text(
-                        AppLocalizations.of(context)?.moveOrDeleteThreadsBasedOnAdminSettings ?? 'Move or delete threads based on admin settings',
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      value: actionThreads,
-                      onChanged: (value) {
-                        setState(() {
-                          actionThreads = value ?? true;
-                        });
-                      },
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    CheckboxListTile(
-                      title: Text(
-                        AppLocalizations.of(context)?.deleteMessages ?? 'Delete Messages',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      subtitle: Text(
-                        AppLocalizations.of(context)!.deletePostsProfilePostsAndComments,
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      value: deleteMessages,
-                      onChanged: (value) {
-                        setState(() {
-                          deleteMessages = value ?? true;
-                        });
-                      },
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    CheckboxListTile(
-                      title: Text(
-                        AppLocalizations.of(context)?.deleteConversations ?? 'Delete Messages',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      subtitle: Text(
-                        AppLocalizations.of(context)?.deletePrivateConversations ?? 'Delete personal messages',
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      value: deleteConversations,
-                      onChanged: (value) {
-                        setState(() {
-                          deleteConversations = value ?? true;
-                        });
-                      },
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    CheckboxListTile(
-                      title: Text(
-                        AppLocalizations.of(context)!.banUser,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      subtitle: Text(
-                        AppLocalizations.of(context)?.banTheUserAccount ?? 'Ban the user account',
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      value: banUser,
-                      onChanged: (value) {
-                        setState(() {
-                          banUser = value ?? true;
-                        });
-                      },
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    const SizedBox(height: DesignTokens.spacingL),
-                    Text(
-                      AppLocalizations.of(context)!.thisActionCannotBeUndone,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.error,
-                        fontWeight: DesignTokens.fontWeightMedium,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(null),
-                  child: Text(
-                    AppLocalizations.of(context)!.cancel,
-                    style: TextStyle(color: colorScheme.onSurfaceVariant),
-                  ),
-                ),
-                FilledButton(
-                  onPressed: () {
-                    Navigator.of(context).pop({
-                      'actionThreads': actionThreads,
-                      'deleteMessages': deleteMessages,
-                      'deleteConversations': deleteConversations,
-                      'banUser': banUser,
-                    });
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: colorScheme.error,
-                    foregroundColor: colorScheme.onError,
-                  ),
-                  child: Text(AppLocalizations.of(context)?.cleanSpam ?? 'Clean Spam'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-
-    if (result == null || !context.mounted) return;
-
-    // Show confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (BuildContext context) {
-        final colorScheme = Theme.of(context).colorScheme;
-        final textTheme = Theme.of(context).textTheme;
-
-        final selectedActions = <String>[];
-        final l10n = AppLocalizations.of(context)!;
-        if (result['actionThreads'] == true) selectedActions.add(l10n.handleThreads);
-        if (result['deleteMessages'] == true) selectedActions.add(l10n.deleteMessages);
-        if (result['deleteConversations'] == true) selectedActions.add(l10n.deleteConversations);
-        if (result['banUser'] == true) selectedActions.add(l10n.banUser);
-
-        return AlertDialog(
-          title: Text(
-            AppLocalizations.of(context)!.confirmSpamClean,
-            style: textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-            ),
+      builder: (context) => AlertDialog(
+        icon: Icon(Icons.warning_amber_rounded, color: colorScheme.error),
+        title: Text(l10n.deleteSpammer),
+        content: Text(l10n.deleteSpammerConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppLocalizations.of(context)!.spamCleanConfirmation(_userInfo!.username),
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              if (selectedActions.isNotEmpty) ...[
-                const SizedBox(height: DesignTokens.spacingL),
-                Text(
-                  AppLocalizations.of(context)!.selectedActions,
-                  style: textTheme.titleSmall?.copyWith(
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: DesignTokens.spacingS),
-                ...selectedActions.map((action) => Padding(
-                      padding: const EdgeInsets.only(left: DesignTokens.spacingM, bottom: DesignTokens.spacingXS),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle_outline,
-                            size: DesignTokens.iconSizeS,
-                            color: colorScheme.primary,
-                          ),
-                          const SizedBox(width: DesignTokens.spacingS),
-                          Text(
-                            action,
-                            style: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )),
-              ],
-              const SizedBox(height: DesignTokens.spacingL),
-              Text(
-                AppLocalizations.of(context)!.thisActionCannotBeUndone,
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.error,
-                  fontWeight: DesignTokens.fontWeightMedium,
-                ),
-              ),
-            ],
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.error,
+              foregroundColor: colorScheme.onError,
+            ),
+            child: Text(l10n.yesDeleteSpammer),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(
-                AppLocalizations.of(context)!.cancel,
-                style: TextStyle(color: colorScheme.onSurfaceVariant),
-              ),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.error,
-                foregroundColor: colorScheme.onError,
-              ),
-              child: Text(AppLocalizations.of(context)?.confirm ?? 'Confirm'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (confirmed != true || !context.mounted) return;
-
-    // Show loading indicator
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            SizedBox(
-              width: DesignTokens.iconSizeM,
-              height: DesignTokens.iconSizeM,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Theme.of(context).colorScheme.onInverseSurface,
-                ),
-              ),
-            ),
-            const SizedBox(width: DesignTokens.spacingM),
-            Text(
-              AppLocalizations.of(context)?.cleaningSpam ?? 'Cleaning spam...',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onInverseSurface,
-                  ),
-            ),
-          ],
-        ),
-        backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-        ),
-        margin: DesignTokens.paddingS,
-        padding: EdgeInsets.symmetric(
-          horizontal: DesignTokens.spacingL,
-          vertical: DesignTokens.spacingM,
-        ),
-        duration: const Duration(seconds: 30),
+        ],
       ),
     );
+    if (confirmed != true || !context.mounted) return;
 
-    try {
-      AppLogger.debug('Spam cleaning user: ${_userInfo!.username} (${_userInfo!.id}) with actions: $result');
-      final moderationProxy = SiteProxyService.getModerationProxy();
-      final spamCleanResult = await moderationProxy.spamCleanUserAsync(
-        userId: _userInfo!.id,
-        username: _userInfo!.username,
-        actionThreads: result['actionThreads'] ?? false,
-        deleteMessages: result['deleteMessages'] ?? false,
-        deleteConversations: result['deleteConversations'] ?? false,
-        banUser: result['banUser'] ?? false,
-      );
-
-      AppLogger.debug('Spam clean result: ${spamCleanResult.result}, resultText: ${spamCleanResult.resultText}');
-
-      if (context.mounted) {
-        // Hide loading snackbar
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-        // Check if the spam clean was successful
-        if (spamCleanResult.result) {
-          AppLogger.debug('User spam cleaned successfully: ${_userInfo!.id}');
-
-          // Build success message with actions performed
-          final actionsPerformed = <String>[];
-          final l10n = AppLocalizations.of(context);
-          if (spamCleanResult.actions != null) {
-            if (spamCleanResult.actions!['action_threads'] == true) {
-              actionsPerformed.add(l10n?.handledThreads ?? 'Handled threads');
-            }
-            if (spamCleanResult.actions!['delete_messages'] == true) {
-              actionsPerformed.add(l10n?.deletedMessages ?? 'Deleted messages');
-            }
-            if (spamCleanResult.actions!['delete_conversations'] == true) {
-              actionsPerformed.add(l10n?.deletedConversations ?? 'Deleted messages');
-            }
-            if (spamCleanResult.actions!['ban_user'] == true) {
-              actionsPerformed.add(l10n?.bannedUser ?? 'Banned user');
-            }
-          }
-
-          final successMessage = actionsPerformed.isNotEmpty
-              ? (l10n?.successfullyCleanedSpam(spamCleanResult.username ?? _userInfo!.username, actionsPerformed.join(', ')) ??
-                  'Successfully cleaned spam for ${spamCleanResult.username ?? _userInfo!.username}. Actions: ${actionsPerformed.join(', ')}')
-              : 'Successfully cleaned spam for ${spamCleanResult.username ?? _userInfo!.username}';
-
-          // Show success message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(
-                    Icons.check_circle_outline,
-                    color: Theme.of(context).colorScheme.onInverseSurface,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Expanded(
-                    child: Text(
-                      successMessage,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onInverseSurface,
-                          ),
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-              ),
-              margin: DesignTokens.paddingS,
-              padding: EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingL,
-                vertical: DesignTokens.spacingM,
-              ),
-              duration: const Duration(seconds: 5),
-            ),
-          );
-          // Refresh entire page state to reflect all changes
-          // This will cause all widgets including UserRepliedPosts to rebuild and fetch fresh data
-          if (context.mounted) {
-            await _refreshProfile();
-          }
-        } else {
-          final errorMessage = (spamCleanResult.resultText != null && spamCleanResult.resultText!.isNotEmpty) ? spamCleanResult.resultText! : 'Failed to clean spam';
-          AppLogger.debug('Spam clean failed for user: ${_userInfo!.id}, error: $errorMessage');
-          // Show error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Expanded(
-                    child: Text(
-                      errorMessage,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                          ),
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-              ),
-              margin: DesignTokens.paddingS,
-              padding: EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingL,
-                vertical: DesignTokens.spacingM,
-              ),
-              duration: const Duration(seconds: 5),
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      AppLogger.debug('Exception occurred while spam cleaning user: ${_userInfo!.id}, error: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  color: Theme.of(context).colorScheme.onErrorContainer,
-                ),
-                const SizedBox(width: DesignTokens.spacingM),
-                Expanded(
-                  child: Text(
-                    AppLocalizations.of(context)!.failedToCleanSpam(e.toString()),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onErrorContainer,
-                        ),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
-            margin: DesignTokens.paddingS,
-            padding: EdgeInsets.symmetric(
-              horizontal: DesignTokens.spacingL,
-              vertical: DesignTokens.spacingM,
-            ),
-            duration: const Duration(seconds: 5),
-          ),
-        );
-      }
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final result = await SiteProxyService.getModerationProxy()
+        .spamCleanUserAsync(userId: user.id, username: user.username);
+    if (!mounted) return;
+    if (result.result) {
+      // The profile belongs to an account that no longer exists.
+      navigator.pop();
+      messenger.showSnackBar(SnackBar(content: Text(l10n.userWasDeleted)));
+      return;
     }
+    messenger.showSnackBar(SnackBar(
+      content: Text(result.resultText?.trim().isNotEmpty == true
+          ? result.resultText!.trim()
+          : l10n.errorTitle),
+    ));
   }
 }

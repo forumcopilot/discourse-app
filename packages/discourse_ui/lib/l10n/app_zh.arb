@@ -839,7 +839,7 @@
   "manageAccountSubtitle": "资料、邮箱、密码、安全、高级设置",
   "changePasswordSubtitle": "向当前邮箱发送密码重置邮件",
   "ignoredUsersSubtitle": "查看和管理其帖子对你隐藏的用户",
-  "deleteAccountExplanation": "账户删除由论坛处理。点击“继续”打开站点并联系管理团队 — Discourse 论坛按各自的政策处理删除。",
+  "deleteAccountExplanation": "账户需在论坛网站上删除：如果论坛允许，可在账户偏好设置中删除，否则由论坛管理人员删除。",
   "verificationEmailSent": "验证邮件已发送 — 请点击链接确认新地址。",
   "passwordResetExplanation": "我们会向你发送密码重置链接。点击链接设置新密码 — 更改在论坛中完成，而非本应用。",
   "sendResetEmail": "发送重置邮件",
@@ -973,5 +973,10 @@
   "errorNotAllowed": "你无权访问此内容。登录后或许可以查看。",
   "errorNotFound": "该内容不存在或已被删除。",
   "errorRateLimited": "操作过于频繁，请稍候再试。",
-  "errorForumDown": "论坛暂时没有响应，请稍后再试。"
+  "errorForumDown": "论坛暂时没有响应，请稍后再试。",
+  "deleteSpammer": "删除垃圾信息发布者",
+  "yesDeleteSpammer": "是，删除垃圾信息发布者",
+  "deleteSpammerConfirm": "您将删除此用户的帖子和话题，移除他们的帐户，禁止其 IP 地址再次注册，同时将其电子邮件地址加入永久屏蔽名单。确定此用户是垃圾信息发布者吗？",
+  "userWasDeleted": "该用户已被删除。",
+  "deleteAccountSelfServeBody": "您可以在论坛网站的账户偏好设置中删除您的账户。点击“继续”将在浏览器中打开该页面。如有提示，请在那里登录。"
 }

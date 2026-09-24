@@ -839,7 +839,7 @@
   "manageAccountSubtitle": "프로필, 이메일, 비밀번호, 보안, 고급 설정",
   "changePasswordSubtitle": "현재 주소로 비밀번호 재설정 이메일을 보냅니다",
   "ignoredUsersSubtitle": "게시물이 숨겨진 사용자를 보고 관리",
-  "deleteAccountExplanation": "계정 삭제는 포럼에서 처리합니다. 계속을 눌러 사이트를 열고 스태프에게 문의하세요 — Discourse 포럼은 자체 정책에 따라 삭제를 처리합니다.",
+  "deleteAccountExplanation": "계정은 포럼 웹사이트에서 삭제합니다. 포럼이 허용하면 계정 설정에서, 그렇지 않으면 운영진이 삭제합니다.",
   "verificationEmailSent": "확인 이메일을 보냈습니다 — 링크를 클릭하여 새 주소를 확인하세요.",
   "passwordResetExplanation": "비밀번호 재설정 링크를 이메일로 보냅니다. 링크를 클릭해 새 비밀번호를 정하세요 — 변경은 이 앱이 아니라 포럼에서 처리됩니다.",
   "sendResetEmail": "재설정 이메일 보내기",
@@ -967,5 +967,10 @@
   "errorNotAllowed": "이 항목에 접근할 권한이 없습니다. 로그인하면 볼 수 있을 수도 있습니다.",
   "errorNotFound": "존재하지 않거나 삭제되었습니다.",
   "errorRateLimited": "너무 자주 시도하고 있습니다. 잠시 후 다시 시도하세요.",
-  "errorForumDown": "포럼이 지금 응답하지 않습니다. 나중에 다시 시도하세요."
+  "errorForumDown": "포럼이 지금 응답하지 않습니다. 나중에 다시 시도하세요.",
+  "deleteSpammer": "스팸 사용자 삭제",
+  "yesDeleteSpammer": "예, 스팸 사용자를 삭제합니다",
+  "deleteSpammerConfirm": "이 사용자의 게시물 및 주제를 삭제하고, 사용자의 계정을 제거하고, 해당 IP 주소의 가입을 차단하고, 해당 이메일 주소를 영구 차단 목록에 추가하려 합니다. 이 사용자가 정말 스팸 사용자인가요?",
+  "userWasDeleted": "사용자가 삭제되었습니다.",
+  "deleteAccountSelfServeBody": "포럼 웹사이트의 계정 설정에서 계정을 삭제할 수 있습니다. '계속'을 누르면 브라우저에서 해당 페이지가 열립니다. 로그인하라는 메시지가 나오면 로그인하세요."
 }

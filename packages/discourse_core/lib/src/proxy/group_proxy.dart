@@ -92,41 +92,38 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
           'limit': limit.toString(),
         },
       );
-      // Discourse returns `members: [...]` plus `owners: [...]` for
-      // group admins — and `members` already INCLUDES the owners, so a
-      // plain concat duplicates every owner row. Dedupe by user id while
-      // iterating owners first, which keeps owners at the top (their
-      // owner entry wins over the duplicate member entry).
+      // `members` is the page, owners first (GroupsController#members
+      // orders by `NOT group_users.owner`). `owners` is every owner again,
+      // unpaged, on every page: putting those on top repeated the owners
+      // on each page and pushed the next offset past members never shown.
       final members = <FCDirectoryItem>[];
       final seenIds = <int>{};
-      for (final key in const ['owners', 'members']) {
-        final list = (response[key] as List?) ?? const [];
-        for (final raw in list.whereType<Map>()) {
-          final user = raw.cast<String, dynamic>();
-          // Skip rows with no usable id instead of minting user 0 — a
-          // fabricated id 0 renders as a real member row whose profile
-          // link goes nowhere, and several of them can appear at once
-          // because they can't be deduped.
-          final id = (user['id'] as num?)?.toInt();
-          if (id == null || !seenIds.add(id)) continue;
-          String avatarUrl = '';
-          final tpl = user['avatar_template'] as String?;
-          if (tpl != null && tpl.isNotEmpty) {
-            final filled = tpl.replaceAll('{size}', '90');
-            avatarUrl = filled.startsWith('http')
-                ? filled
-                : '${siteContext.site.url}$filled';
-          }
-          members.add(FCDirectoryItem(
-            id: id,
-            username: (user['username'] ?? '').toString(),
-            name: (user['name'] as String?)?.trim().isNotEmpty == true
-                ? user['name'] as String
-                : null,
-            avatarUrl: avatarUrl,
-            trustLevel: (user['trust_level'] as num?)?.toInt(),
-          ));
+      final list = (response['members'] as List?) ?? const [];
+      for (final raw in list.whereType<Map>()) {
+        final user = raw.cast<String, dynamic>();
+        // Skip rows with no usable id instead of minting user 0 — a
+        // fabricated id 0 renders as a real member row whose profile
+        // link goes nowhere, and several of them can appear at once
+        // because they can't be deduped.
+        final id = (user['id'] as num?)?.toInt();
+        if (id == null || !seenIds.add(id)) continue;
+        String avatarUrl = '';
+        final tpl = user['avatar_template'] as String?;
+        if (tpl != null && tpl.isNotEmpty) {
+          final filled = tpl.replaceAll('{size}', '90');
+          avatarUrl = filled.startsWith('http')
+              ? filled
+              : '${siteContext.site.url}$filled';
         }
+        members.add(FCDirectoryItem(
+          id: id,
+          username: (user['username'] ?? '').toString(),
+          name: (user['name'] as String?)?.trim().isNotEmpty == true
+              ? user['name'] as String
+              : null,
+          avatarUrl: avatarUrl,
+          trustLevel: (user['trust_level'] as num?)?.toInt(),
+        ));
       }
       // `GroupsController#members` returns the real member count in
       // `meta.total` (groups_controller.rb:94). Populate `total` from it

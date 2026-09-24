@@ -3,7 +3,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseSiteCapabilities;
+    show DiscourseSiteCapabilities, DiscourseUserProxy;
 
 import '../theme/design_tokens.dart';
 import 'change_email_page.dart';
@@ -354,12 +354,20 @@ class ForumSettingsPage extends StatelessWidget {
     }
   }
 
-  void _showDeleteAccountDialog(
+  /// Deleting an account happens on the forum. Where Discourse lets the
+  /// member do it (`can_delete_account`), Continue opens their account
+  /// preferences, which carry its Delete My Account button; otherwise the
+  /// forum, to ask its staff.
+  Future<void> _showDeleteAccountDialog(
     BuildContext context,
     ColorScheme colorScheme,
     TextTheme textTheme,
-  ) {
-    showDialog(
+  ) async {
+    final proxy = SiteProxyFactory.getUserProxy();
+    final selfServe = proxy is DiscourseUserProxy &&
+        await proxy.canDeleteOwnAccountAsync() == true;
+    if (!context.mounted) return;
+    await showDialog(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
@@ -372,7 +380,9 @@ class ForumSettingsPage extends StatelessWidget {
             ),
           ),
           content: Text(
-            AppLocalizations.of(context)!.deleteAccountDialogBody,
+            selfServe
+                ? AppLocalizations.of(context)!.deleteAccountSelfServeBody
+                : AppLocalizations.of(context)!.deleteAccountDialogBody,
             style: textTheme.bodyLarge?.copyWith(
               color: colorScheme.onSurface,
             ),
@@ -390,7 +400,8 @@ class ForumSettingsPage extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
-                await _openForumHomePage(context);
+                await _openForumHomePage(context,
+                    path: selfServe ? '/my/preferences/account' : null);
               },
               child: Text(
                 AppLocalizations.of(context)!.continueButton,
@@ -405,13 +416,16 @@ class ForumSettingsPage extends StatelessWidget {
     );
   }
 
-  Future<void> _openForumHomePage(BuildContext context) async {
+  Future<void> _openForumHomePage(BuildContext context, {String? path}) async {
     final url = siteContext.site.url;
     if (url.isEmpty) {
       _toast(context, 'Forum URL is unavailable.');
       return;
     }
-    final uri = Uri.parse(url);
+    // /my/… is Discourse's route for "the signed-in user's own page".
+    final uri = Uri.parse(path == null
+        ? url
+        : '${url.endsWith('/') ? url.substring(0, url.length - 1) : url}$path');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {

@@ -1942,7 +1942,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'La eliminación de tu cuenta se gestiona en el foro. Continúa para abrir el sitio y contactar al equipo: los foros Discourse procesan las eliminaciones según su propia política.';
+      'Las cuentas se eliminan en el sitio web del foro: desde las preferencias de tu cuenta si el foro lo permite; si no, lo hace su equipo.';
 
   @override
   String get verificationEmailSent =>
@@ -2488,4 +2488,21 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get errorForumDown =>
       'El foro no responde en este momento. Inténtalo más tarde.';
+
+  @override
+  String get deleteSpammer => 'Eliminar spammer';
+
+  @override
+  String get yesDeleteSpammer => 'Sí, eliminar spammer';
+
+  @override
+  String get deleteSpammerConfirm =>
+      'Estás a punto de eliminar las publicaciones y temas de este usuario, también eliminarás su cuenta, bloquearás registros desde su dirección IP y añadirás su correo electrónico a una lista de bloqueos permanentes. ¿Seguro que el usuario es de verdad un spammer?';
+
+  @override
+  String get userWasDeleted => 'El usuario se eliminó.';
+
+  @override
+  String get deleteAccountSelfServeBody =>
+      'Puedes eliminar tu cuenta desde las preferencias de tu cuenta en el sitio web del foro. «Continuar» abre esa página en tu navegador. Inicia sesión allí si te lo pide.';
 }

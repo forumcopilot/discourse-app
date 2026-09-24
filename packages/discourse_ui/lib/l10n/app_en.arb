@@ -1930,7 +1930,7 @@
   },
   "noArchivedMessagesHint": "Archive a message from its ⋮ menu to file it here.",
   "@noArchivedMessagesHint": {
-    "description": "UI text: Archive a message from its \u22ee menu to file it here."
+    "description": "UI text: Archive a message from its ⋮ menu to file it here."
   },
   "groupHasBeenInvited": "{group} has been invited to the message",
   "@groupHasBeenInvited": {
@@ -2080,10 +2080,12 @@
   "chatRemoveUpload": "Remove file",
   "@chatRemoveUpload": {
     "description": "Removes a picked file from the chat composer before sending (Discourse chat.remove_upload)."
-  },  "takePhoto": "Take photo",
+  },
+  "takePhoto": "Take photo",
   "@takePhoto": {
     "description": "Opens the camera to take a photo to attach."
-  },  "postNeedsApprovalTitle": "Post Needs Approval",
+  },
+  "postNeedsApprovalTitle": "Post Needs Approval",
   "@postNeedsApprovalTitle": {
     "description": "Title of the notice shown when a new post is held for moderator approval (Discourse review.approval.title)."
   },
@@ -2091,8 +2093,6 @@
   "@postNeedsApprovalBody": {
     "description": "Body of that notice (Discourse review.approval.description)."
   },
-
-
   "failedToCreateConversation": "Failed to send message: {error}",
   "@failedToCreateConversation": {
     "description": "UI text: Failed to send message: {error}",
@@ -2167,7 +2167,7 @@
   "@ignoredUsersSubtitle": {
     "description": "UI text: See and manage users whose posts are hidden from you"
   },
-  "deleteAccountExplanation": "Removing your account is handled on the forum. Continue to open the site and contact the staff team — Discourse forums process deletions per their own policy.",
+  "deleteAccountExplanation": "Accounts are deleted on the forum's website — from your account preferences if the forum allows it, otherwise by its staff.",
   "@deleteAccountExplanation": {
     "description": "UI text: Removing your account is handled on the forum. Continue to o"
   },
@@ -3011,5 +3011,19 @@
   "errorForumDown": "The forum isn't responding right now. Please try again later.",
   "@errorForumDown": {
     "description": "Error: 5xx, the forum is down or failing."
+  },
+  "deleteSpammer": "Delete spammer",
+  "@deleteSpammer": {
+    "description": "Staff action on a profile: delete the account and posts, block its email, IP and links (Discourse's Delete Spammer)"
+  },
+  "yesDeleteSpammer": "Yes, delete spammer",
+  "deleteSpammerConfirm": "You are about to delete this user's posts and topics, remove their account, block signups from their IP address, and add their email address to a permanent block list. Are you sure this user is really a spammer?",
+  "@deleteSpammerConfirm": {
+    "description": "Confirmation before Delete spammer (Discourse flagging.delete_confirm_MF, without the counts)"
+  },
+  "userWasDeleted": "The user was deleted.",
+  "deleteAccountSelfServeBody": "You can delete your account from your account preferences on the forum's website. Continue opens that page in your browser. Sign in there if it asks.",
+  "@deleteAccountSelfServeBody": {
+    "description": "Shown before opening the forum's account preferences, where Discourse lets members delete their own account (current_user.can_delete_account)"
   }
 }

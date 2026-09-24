@@ -1947,7 +1947,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'La suppression de votre compte se fait sur le forum. Continuez pour ouvrir le site et contacter l’équipe — les forums Discourse traitent les suppressions selon leur propre politique.';
+      'Les comptes se suppriment sur le site du forum : depuis les préférences de votre compte si le forum le permet, sinon par son équipe.';
 
   @override
   String get verificationEmailSent =>
@@ -2496,4 +2496,21 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get errorForumDown =>
       'Le forum ne répond pas pour le moment. Veuillez réessayer plus tard.';
+
+  @override
+  String get deleteSpammer => 'Supprimer le spammeur';
+
+  @override
+  String get yesDeleteSpammer => 'Oui, supprimer le spammeur';
+
+  @override
+  String get deleteSpammerConfirm =>
+      'Vous êtes sur le point de supprimer les publications et sujets de cet utilisateur, supprimer son compte, bloquer les inscriptions depuis son adresse IP et ajouter son adresse e-mail à une liste de blocage permanent. Êtes-vous sûr(e) que cet utilisateur est un spammeur ?';
+
+  @override
+  String get userWasDeleted => 'L\'utilisateur a été supprimé.';
+
+  @override
+  String get deleteAccountSelfServeBody =>
+      'Vous pouvez supprimer votre compte depuis les préférences de votre compte sur le site du forum. « Continuer » ouvre cette page dans votre navigateur. Connectez-vous-y si elle vous le demande.';
 }

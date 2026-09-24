@@ -41,6 +41,17 @@ import '../settings_page.dart';
 import '../user_profile_page.dart';
 import '../private_messaging/conversation/pages/new_conversation_page.dart';
 
+/// A website address as Discourse's profile shows it (UserSerializer
+/// #website_name): host without "www." plus the path, no scheme.
+@visibleForTesting
+String websiteDisplayName(String website) {
+  final uri = Uri.tryParse(website.contains('://') ? website : 'https://$website');
+  if (uri == null || uri.host.isEmpty) return website;
+  final host = uri.host.replaceFirst(RegExp(r'^www\.'), '');
+  final path = uri.path == '/' ? '' : uri.path;
+  return '$host$path';
+}
+
 /// The one shared profile experience ("subtraction model").
 ///
 /// Renders the FULL profile — avatar block (with camera-upload badge in
@@ -953,7 +964,7 @@ class _ProfileViewState extends State<ProfileView> {
               context,
               icon: Icons.language,
               title: AppLocalizations.of(context)?.website ?? 'Website',
-              subtitle: _userInfo.website!,
+              subtitle: websiteDisplayName(_userInfo.website!),
               onTap: () async {
                 final url = _userInfo.website!;
                 final uri = Uri.parse(

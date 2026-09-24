@@ -1866,7 +1866,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'アカウントの削除はフォーラム側で行います。「続行」でサイトを開き、スタッフに連絡してください — Discourse フォーラムは各自のポリシーで削除を処理します。';
+      'アカウントはフォーラムのウェブサイトで削除します。フォーラムが許可していればアカウント設定から、そうでなければスタッフが削除します。';
 
   @override
   String get verificationEmailSent =>
@@ -2393,4 +2393,21 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get errorForumDown => 'フォーラムが現在応答していません。しばらくしてからもう一度お試しください。';
+
+  @override
+  String get deleteSpammer => '迷惑行為者を削除';
+
+  @override
+  String get yesDeleteSpammer => 'はい、迷惑行為者を削除する';
+
+  @override
+  String get deleteSpammerConfirm =>
+      'このユーザーの投稿とトピックを削除し、アカウントを削除し、IP アドレスからの登録をブロックし、メールアドレスを永久ブロックリストに追加しようとしています。このユーザーは本当に迷惑行為者ですか？';
+
+  @override
+  String get userWasDeleted => 'ユーザーが削除されました。';
+
+  @override
+  String get deleteAccountSelfServeBody =>
+      'フォーラムのウェブサイトのアカウント設定からアカウントを削除できます。「続ける」でそのページをブラウザで開きます。ログインを求められたらログインしてください。';
 }

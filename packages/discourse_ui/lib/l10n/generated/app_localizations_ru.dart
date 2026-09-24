@@ -1938,7 +1938,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'Удаление аккаунта выполняется на форуме. Нажмите «Продолжить», чтобы открыть сайт и связаться с персоналом — форумы Discourse обрабатывают удаления по своим правилам.';
+      'Аккаунты удаляются на сайте форума: в настройках аккаунта, если форум это разрешает, иначе — командой форума.';
 
   @override
   String get verificationEmailSent =>
@@ -2481,4 +2481,21 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get errorForumDown =>
       'Форум сейчас не отвечает. Повторите попытку позже.';
+
+  @override
+  String get deleteSpammer => 'Удалить спамера';
+
+  @override
+  String get yesDeleteSpammer => 'Да, удалить спамера';
+
+  @override
+  String get deleteSpammerConfirm =>
+      'Вы собираетесь удалить сообщения и темы этого пользователя, а также удалить его аккаунт, добавить его IP-адрес и его почтовый адрес в черный список. Вы действительно уверены, что этот пользователь — спамер?';
+
+  @override
+  String get userWasDeleted => 'Пользователь удалён.';
+
+  @override
+  String get deleteAccountSelfServeBody =>
+      'Вы можете удалить аккаунт в настройках аккаунта на сайте форума. «Продолжить» откроет эту страницу в браузере. Войдите там, если потребуется.';
 }

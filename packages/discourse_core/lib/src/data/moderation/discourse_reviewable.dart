@@ -17,6 +17,13 @@ class DiscourseReviewableAction {
   /// The bundle this action belongs to (Discourse renders one button
   /// per bundle, with the bundle's extra actions in a dropdown).
   final String bundleId;
+
+  /// The bundle's own label ("Yes" / "No" on a flagged post), which
+  /// Discourse shows on the dropdown when a bundle holds several actions.
+  /// Two bundles can hold actions with the same label ("Keep post" agrees
+  /// in one and disagrees in the other), so the bundle is what tells them
+  /// apart.
+  final String? bundleLabel;
   final String? label;
   final String? icon;
   final String? buttonClass;
@@ -28,15 +35,42 @@ class DiscourseReviewableAction {
   /// True when the server expects a reject reason with this action.
   final bool requireRejectReason;
 
+  /// What the forum says once the action is done ("Post hidden, user has
+  /// been notified.").
+  final String? completedMessage;
+
   DiscourseReviewableAction({
     required this.id,
     required this.bundleId,
+    this.bundleLabel,
     this.label,
     this.icon,
     this.buttonClass,
     this.description,
     this.confirmMessage,
     this.requireRejectReason = false,
+    this.completedMessage,
+  });
+}
+
+/// Why something is in the queue: one flag (or one automatic reason) from
+/// `reviewable_scores[]`, joined with its side-loaded score type and user.
+class DiscourseReviewableScore {
+  /// The score type's name: "Spam", "Off-Topic", "Something Else",
+  /// "Needs Approval".
+  final String type;
+
+  /// The flagger; null for the system.
+  final String? username;
+
+  /// Discourse's explanation when the system put it there ("New users
+  /// must have their first posts approved"), as plain text.
+  final String? reason;
+
+  const DiscourseReviewableScore({
+    required this.type,
+    this.username,
+    this.reason,
   });
 }
 
@@ -78,6 +112,14 @@ class DiscourseReviewable {
   /// whatever the concrete reviewable serializer exposes.
   final Map<String, dynamic> payload;
 
+  /// The text under review: a queued post's `payload.raw`, or a flagged
+  /// post's own `raw`, which ReviewableFlaggedPostSerializer sends at the
+  /// top level of the row.
+  final String? raw;
+
+  /// Every flag or reason behind the row, oldest first.
+  final List<DiscourseReviewableScore> scores;
+
   final List<DiscourseReviewableAction> actions;
 
   DiscourseReviewable({
@@ -96,6 +138,8 @@ class DiscourseReviewable {
     this.createdByUsername,
     this.targetCreatedByUsername,
     this.payload = const {},
+    this.raw,
+    this.scores = const [],
     this.actions = const [],
   });
 

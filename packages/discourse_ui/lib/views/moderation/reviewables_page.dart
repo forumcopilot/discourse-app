@@ -5,7 +5,8 @@ import 'package:discourse_core/discourse_core.dart'
     show
         DiscourseModerationProxy,
         DiscourseReviewable,
-        DiscourseReviewableAction;
+        DiscourseReviewableAction,
+        DiscourseReviewableScore;
 
 import '../../theme/design_tokens.dart';
 import '../../utils/time_utils.dart';
@@ -161,15 +162,12 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
     if (proxy == null) return;
 
     // Confirmation gate: the server's confirm_message when it has one,
-    // and a reject-reason prompt when the action expects one. The perform
-    // proxy has no reason parameter (and stock `/review/{id}/perform`
-    // ignores extra params for most reviewables), so the typed reason is
-    // collected purely as a deliberate-confirmation step and NOT sent —
-    // extend DiscourseModerationProxy.performReviewableActionAsync first
-    // if the reason should reach the server.
+    // and a reject-reason prompt when the action expects one (rejecting a
+    // sign-up: Discourse emails the reason to the person).
+    String? rejectReason;
     if (action.requireRejectReason) {
-      final reason = await _promptRejectReason(action);
-      if (reason == null) return; // cancelled
+      rejectReason = await _promptRejectReason(action);
+      if (rejectReason == null) return; // cancelled
     } else if (action.confirmMessage?.trim().isNotEmpty == true) {
       final confirmed = await _confirm(action);
       if (confirmed != true) return;
@@ -181,6 +179,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
       reviewable.id,
       action.id,
       version: reviewable.version,
+      rejectReason: rejectReason,
     );
     if (!mounted) return;
     setState(() => _performing.remove(reviewable.id));
@@ -209,7 +208,9 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
       _reviewables.removeWhere((r) => removed.contains(r.id));
       if (_total > 0) _total = _total - removed.length;
     });
-    _showSnackBar('${action.label ?? action.id} — done');
+    _showSnackBar(action.completedMessage?.trim().isNotEmpty == true
+        ? action.completedMessage!.trim()
+        : '${action.label ?? action.id} — done');
   }
 
   Future<bool?> _confirm(DiscourseReviewableAction action) {
@@ -233,9 +234,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
   }
 
   /// Reject-reason dialog. Returns the (possibly empty) reason on
-  /// confirm, null on cancel. See the comment in [_performAction]: the
-  /// reason is not transmitted because the perform API has no parameter
-  /// for it.
+  /// confirm, null on cancel.
   Future<String?> _promptRejectReason(DiscourseReviewableAction action) {
     final controller = TextEditingController();
     return showDialog<String>(
@@ -451,7 +450,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
   Widget _buildReviewableCard(DiscourseReviewable reviewable,
       ColorScheme colorScheme, TextTheme textTheme) {
     final isBusy = _performing.contains(reviewable.id);
-    final payloadRaw = reviewable.payload['raw']?.toString().trim();
+    final payloadRaw = reviewable.raw?.trim();
     final isPending = reviewable.status == 0;
 
     return Card(
@@ -536,6 +535,8 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
                 ),
               ),
             ],
+            for (final score in reviewable.scores)
+              _buildScoreRow(score, colorScheme, textTheme),
             const SizedBox(height: DesignTokens.spacingS),
             Wrap(
               spacing: DesignTokens.spacingM,
@@ -545,7 +546,9 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
                     true)
                   _metaText(AppLocalizations.of(context)!.reviewableBy(reviewable.targetCreatedByUsername!),
                       textTheme, colorScheme),
-                if (reviewable.createdByUsername?.isNotEmpty == true)
+                // Each flagger is on their reason's row above.
+                if (reviewable.scores.isEmpty &&
+                    reviewable.createdByUsername?.isNotEmpty == true)
                   _metaText(AppLocalizations.of(context)!.reportedBy(reviewable.createdByUsername!),
                       textTheme, colorScheme),
                 _metaText(
@@ -563,13 +566,8 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
                 spacing: DesignTokens.spacingS,
                 runSpacing: DesignTokens.spacingS,
                 children: [
-                  for (final action in reviewable.actions)
-                    FilledButton.tonal(
-                      onPressed: isBusy
-                          ? null
-                          : () => _performAction(reviewable, action),
-                      child: Text(action.label ?? action.id),
-                    ),
+                  for (final bundle in _bundles(reviewable.actions))
+                    _buildBundleButton(reviewable, bundle, isBusy),
                 ],
               ),
             ],
@@ -579,6 +577,109 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  /// One flag or reason: "Spam", who raised it, and the forum's
+  /// explanation when the system put the item here.
+  Widget _buildScoreRow(DiscourseReviewableScore score,
+      ColorScheme colorScheme, TextTheme textTheme) {
+    return Padding(
+      padding: const EdgeInsets.only(top: DesignTokens.spacingS),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(Icons.flag_outlined,
+                size: 14, color: colorScheme.error),
+          ),
+          const SizedBox(width: DesignTokens.spacingXS),
+          Expanded(
+            child: Text.rich(
+              TextSpan(children: [
+                TextSpan(
+                  text: score.type,
+                  style: const TextStyle(
+                      fontWeight: DesignTokens.fontWeightMedium),
+                ),
+                if (score.username?.isNotEmpty == true)
+                  TextSpan(
+                      text:
+                          ' · ${AppLocalizations.of(context)!.reportedBy(score.username!)}'),
+                if (score.reason?.trim().isNotEmpty == true)
+                  TextSpan(text: '\n${score.reason!.trim()}'),
+              ]),
+              style: textTheme.bodySmall
+                  ?.copyWith(color: colorScheme.onSurfaceVariant),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Actions grouped by bundle, in the order Discourse sends them.
+  List<List<DiscourseReviewableAction>> _bundles(
+      List<DiscourseReviewableAction> actions) {
+    final byBundle = <String, List<DiscourseReviewableAction>>{};
+    for (final action in actions) {
+      byBundle.putIfAbsent(action.bundleId, () => []).add(action);
+    }
+    return byBundle.values.toList();
+  }
+
+  /// A bundle as Discourse's queue shows it: one button when it holds a
+  /// single action, otherwise a dropdown under the bundle's label ("Yes" /
+  /// "No"). Flat buttons put "Keep post" twice on a flagged post, one
+  /// agreeing with the flag and one disagreeing, with nothing to tell
+  /// them apart.
+  Widget _buildBundleButton(DiscourseReviewable reviewable,
+      List<DiscourseReviewableAction> bundle, bool isBusy) {
+    if (bundle.length == 1) {
+      final action = bundle.single;
+      return FilledButton.tonal(
+        onPressed: isBusy ? null : () => _performAction(reviewable, action),
+        child: Text(action.label ?? action.id),
+      );
+    }
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    return MenuAnchor(
+      menuChildren: [
+        for (final action in bundle)
+          MenuItemButton(
+            onPressed: () => _performAction(reviewable, action),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 280),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: DesignTokens.spacingXS),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(action.label ?? action.id),
+                    if (action.description?.trim().isNotEmpty == true)
+                      Text(
+                        action.description!.trim(),
+                        style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
+      builder: (context, controller, _) => FilledButton.tonalIcon(
+        onPressed: isBusy
+            ? null
+            : () => controller.isOpen ? controller.close() : controller.open(),
+        iconAlignment: IconAlignment.end,
+        icon: const Icon(Icons.arrow_drop_down),
+        label: Text(bundle.first.bundleLabel ?? bundle.first.label ?? ''),
       ),
     );
   }

@@ -839,7 +839,7 @@
   "manageAccountSubtitle": "Profil, E-Mail, Passwort, Sicherheit, erweiterte Einstellungen",
   "changePasswordSubtitle": "Sendet eine E-Mail zum Zurücksetzen des Passworts an deine aktuelle Adresse",
   "ignoredUsersSubtitle": "Benutzer anzeigen und verwalten, deren Beiträge für dich ausgeblendet sind",
-  "deleteAccountExplanation": "Das Entfernen deines Kontos erfolgt im Forum. Mit „Weiter“ öffnest du die Seite und kontaktierst das Team — Discourse-Foren bearbeiten Löschungen nach ihren eigenen Regeln.",
+  "deleteAccountExplanation": "Konten werden auf der Website des Forums gelöscht – in deinen Kontoeinstellungen, wenn das Forum es erlaubt, sonst vom Team.",
   "verificationEmailSent": "Bestätigungs-E-Mail gesendet — klicke auf den Link, um deine neue Adresse zu bestätigen.",
   "passwordResetExplanation": "Wir senden dir einen Link zum Zurücksetzen des Passworts. Klicke darauf, um ein neues Passwort zu wählen — die Änderung erfolgt im Forum, nicht in dieser App.",
   "sendResetEmail": "Reset-E-Mail senden",
@@ -973,5 +973,10 @@
   "errorNotAllowed": "Sie haben keinen Zugriff darauf. Eine Anmeldung könnte helfen.",
   "errorNotFound": "Das existiert nicht oder wurde entfernt.",
   "errorRateLimited": "Sie tun das zu oft. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
-  "errorForumDown": "Das Forum antwortet gerade nicht. Bitte versuchen Sie es später erneut."
+  "errorForumDown": "Das Forum antwortet gerade nicht. Bitte versuchen Sie es später erneut.",
+  "deleteSpammer": "Spammer löschen",
+  "yesDeleteSpammer": "Ja, lösche den Spammer",
+  "deleteSpammerConfirm": "Du wirst die Beiträge und Themen dieses Benutzers löschen, sein Konto entfernen, seine IP-Adresse für Neuanmeldungen sperren und seine E-Mail-Adresse auf eine permanente Sperrliste setzen. Bist du dir sicher, dass dieser Benutzer wirklich ein Spammer ist?",
+  "userWasDeleted": "Der Benutzer wurde gelöscht.",
+  "deleteAccountSelfServeBody": "Du kannst dein Konto in deinen Kontoeinstellungen auf der Website des Forums löschen. „Fortfahren“ öffnet diese Seite im Browser. Melde dich dort an, falls du dazu aufgefordert wirst."
 }

@@ -1940,7 +1940,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'A remoção da conta é feita no fórum. Continue para abrir o site e contatar a equipe — fóruns Discourse processam exclusões conforme sua própria política.';
+      'As contas são excluídas no site do fórum: nas preferências da sua conta, se o fórum permitir; caso contrário, pela equipe.';
 
   @override
   String get verificationEmailSent =>
@@ -2486,4 +2486,21 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get errorForumDown =>
       'O fórum não está respondendo no momento. Tente novamente mais tarde.';
+
+  @override
+  String get deleteSpammer => 'Excluir remetente de spam';
+
+  @override
+  String get yesDeleteSpammer => 'Sim, excluir remetente de spam';
+
+  @override
+  String get deleteSpammerConfirm =>
+      'Você está prestes a excluir as postagens e tópicos deste(a) usuário(a), remover sua conta, bloquear cadastros a partir do seu endereço IP e adicionar seu endereço de e-mail a uma lista de bloqueio permanente. Você tem certeza que este(a) usuário(a) é realmente remetente de spam?';
+
+  @override
+  String get userWasDeleted => 'O(a) usuário(a) foi excluído(a).';
+
+  @override
+  String get deleteAccountSelfServeBody =>
+      'Você pode excluir sua conta nas preferências da sua conta no site do fórum. “Continuar” abre essa página no navegador. Entre lá se for solicitado.';
 }

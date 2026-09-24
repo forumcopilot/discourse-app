@@ -45,6 +45,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
   bool _loadingMembers = false;
   bool _hasMore = true;
   int _offset = 0;
+  int _membersTotal = 0;
   String? _error;
 
   /// Phase 5.44 — membership-action state. [_membershipBusy] guards
@@ -106,8 +107,8 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
         _membersRestricted =
             groupResult.result && !membersResult.result;
         _offset = membersResult.members.length;
-        _hasMore = membersResult.result &&
-            membersResult.members.length >= _pageSize;
+        _membersTotal = membersResult.total;
+        _hasMore = membersResult.result && _moreMembers(membersResult.members);
         _loadingGroup = false;
       });
     } catch (e) {
@@ -117,6 +118,15 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
         _error = describeError(e);
       });
     }
+  }
+
+  /// Whether another page exists after [page]: fewer than Discourse's
+  /// `meta.total` shown, or — without a total — a full page came back.
+  bool _moreMembers(List<Object?> page) {
+    if (page.isEmpty) return false;
+    return _membersTotal > 0
+        ? _members.length < _membersTotal
+        : page.length >= _pageSize;
   }
 
   Future<void> _loadMore() async {
@@ -135,7 +145,8 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
       setState(() {
         _members.addAll(result.members);
         _offset += result.members.length;
-        if (result.members.length < _pageSize) _hasMore = false;
+        if (result.total > 0) _membersTotal = result.total;
+        _hasMore = result.result && _moreMembers(result.members);
         _loadingMembers = false;
       });
     } catch (_) {

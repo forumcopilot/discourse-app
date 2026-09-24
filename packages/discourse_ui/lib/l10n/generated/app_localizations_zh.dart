@@ -1846,7 +1846,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      '账户删除由论坛处理。点击“继续”打开站点并联系管理团队 — Discourse 论坛按各自的政策处理删除。';
+      '账户需在论坛网站上删除：如果论坛允许，可在账户偏好设置中删除，否则由论坛管理人员删除。';
 
   @override
   String get verificationEmailSent => '验证邮件已发送 — 请点击链接确认新地址。';
@@ -2363,4 +2363,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get errorForumDown => '论坛暂时没有响应，请稍后再试。';
+
+  @override
+  String get deleteSpammer => '删除垃圾信息发布者';
+
+  @override
+  String get yesDeleteSpammer => '是，删除垃圾信息发布者';
+
+  @override
+  String get deleteSpammerConfirm =>
+      '您将删除此用户的帖子和话题，移除他们的帐户，禁止其 IP 地址再次注册，同时将其电子邮件地址加入永久屏蔽名单。确定此用户是垃圾信息发布者吗？';
+
+  @override
+  String get userWasDeleted => '该用户已被删除。';
+
+  @override
+  String get deleteAccountSelfServeBody =>
+      '您可以在论坛网站的账户偏好设置中删除您的账户。点击“继续”将在浏览器中打开该页面。如有提示，请在那里登录。';
 }

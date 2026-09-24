@@ -839,7 +839,7 @@
   "manageAccountSubtitle": "Profil, e-mail, mot de passe, sécurité, paramètres avancés",
   "changePasswordSubtitle": "Envoie un e-mail de réinitialisation du mot de passe à votre adresse actuelle",
   "ignoredUsersSubtitle": "Voir et gérer les utilisateurs dont les messages vous sont masqués",
-  "deleteAccountExplanation": "La suppression de votre compte se fait sur le forum. Continuez pour ouvrir le site et contacter l’équipe — les forums Discourse traitent les suppressions selon leur propre politique.",
+  "deleteAccountExplanation": "Les comptes se suppriment sur le site du forum : depuis les préférences de votre compte si le forum le permet, sinon par son équipe.",
   "verificationEmailSent": "E-mail de vérification envoyé — cliquez sur le lien pour confirmer votre nouvelle adresse.",
   "passwordResetExplanation": "Nous vous enverrons un lien de réinitialisation. Cliquez dessus pour choisir un nouveau mot de passe — le changement se fait sur le forum, pas dans cette application.",
   "sendResetEmail": "Envoyer l’e-mail de réinitialisation",
@@ -973,5 +973,10 @@
   "errorNotAllowed": "Vous n'avez pas accès à ce contenu. Se connecter pourrait aider.",
   "errorNotFound": "Ce contenu n'existe pas ou a été supprimé.",
   "errorRateLimited": "Vous faites cela trop souvent. Patientez un instant et réessayez.",
-  "errorForumDown": "Le forum ne répond pas pour le moment. Veuillez réessayer plus tard."
+  "errorForumDown": "Le forum ne répond pas pour le moment. Veuillez réessayer plus tard.",
+  "deleteSpammer": "Supprimer le spammeur",
+  "yesDeleteSpammer": "Oui, supprimer le spammeur",
+  "deleteSpammerConfirm": "Vous êtes sur le point de supprimer les publications et sujets de cet utilisateur, supprimer son compte, bloquer les inscriptions depuis son adresse IP et ajouter son adresse e-mail à une liste de blocage permanent. Êtes-vous sûr(e) que cet utilisateur est un spammeur ?",
+  "userWasDeleted": "L'utilisateur a été supprimé.",
+  "deleteAccountSelfServeBody": "Vous pouvez supprimer votre compte depuis les préférences de votre compte sur le site du forum. « Continuer » ouvre cette page dans votre navigateur. Connectez-vous-y si elle vous le demande."
 }

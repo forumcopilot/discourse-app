@@ -1944,7 +1944,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'La rimozione dell’account avviene sul forum. Continua per aprire il sito e contattare lo staff — i forum Discourse gestiscono le cancellazioni secondo le proprie regole.';
+      'Gli account si eliminano sul sito del forum: dalle preferenze del tuo account se il forum lo consente, altrimenti dallo staff.';
 
   @override
   String get verificationEmailSent =>
@@ -2493,4 +2493,21 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get errorForumDown =>
       'Il forum non risponde al momento. Riprova più tardi.';
+
+  @override
+  String get deleteSpammer => 'Cancella spammer';
+
+  @override
+  String get yesDeleteSpammer => 'Sì, cancella lo spammer';
+
+  @override
+  String get deleteSpammerConfirm =>
+      'Stai per cancellare i messaggi e gli argomenti di questo utente, rimuovere il suo account, bloccare le registrazioni dal suo indirizzo IP e aggiungere il suo indirizzo email a un elenco di indirizzi bloccati permanente. Sei sicuro che questo utente sia veramente uno spammer?';
+
+  @override
+  String get userWasDeleted => 'L\'utente è stato cancellato.';
+
+  @override
+  String get deleteAccountSelfServeBody =>
+      'Puoi eliminare il tuo account dalle preferenze del tuo account sul sito del forum. «Continua» apre quella pagina nel browser. Accedi lì se richiesto.';
 }

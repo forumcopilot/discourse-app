@@ -28,7 +28,10 @@ class DiscourseInviteProxy extends BaseDiscourseProxy {
   /// what makes Discourse mint a redeemable-by-anyone link invite
   /// (`invites_controller#create` → `Invite.generate`). Optional knobs:
   ///   * [maxRedemptions] → `max_redemptions_allowed` (how many signups the
-  ///     link is good for; server clamps per site settings).
+  ///     link is good for). Omitted, it is what the forum's own invite
+  ///     dialog offers — see [defaultLinkRedemptions] — not the server's
+  ///     bare default of 1, which made a link for sharing stop working
+  ///     after the first signup.
   ///   * [expiresAt]      → `expires_at`, an ISO-8601 date/time string.
   ///     Omitted = server default (`invite_expiry_days`).
   ///   * [topicId]        → `topic_id`, so redeemers land on that topic.
@@ -44,9 +47,10 @@ class DiscourseInviteProxy extends BaseDiscourseProxy {
       return DiscourseInviteResult(result: false, resultText: 'Not signed in');
     }
     try {
+      final redemptions = maxRedemptions ?? await defaultLinkRedemptions();
       final response = await apiPost('/invites.json', body: {
         'skip_email': true,
-        if (maxRedemptions != null) 'max_redemptions_allowed': maxRedemptions,
+        'max_redemptions_allowed': redemptions,
         if (expiresAt != null) 'expires_at': expiresAt,
         if (topicId != null) 'topic_id': topicId,
       });
@@ -59,6 +63,30 @@ class DiscourseInviteProxy extends BaseDiscourseProxy {
     } catch (e) {
       return DiscourseInviteResult(result: false, resultText: describeApiError(e));
     }
+  }
+
+  /// How many signups a new link allows unless told otherwise, as the
+  /// forum's invite dialog sets it (create-invite.gjs
+  /// defaultRedemptionsAllowed): 100 for staff and 10 for everyone else,
+  /// capped by the forum's limit for that kind of user
+  /// (`invite_link_max_redemptions_limit` / `_limit_users`, client
+  /// settings) — above it Invite#ensure_max_redemptions_allowed refuses
+  /// the invite.
+  Future<int> defaultLinkRedemptions() async {
+    final userType = siteContext.loginDataOutput?.user?.userType;
+    final staff = userType == 'admin' || userType == 'moderator';
+    final wanted = staff ? 100 : 10;
+    try {
+      final settings = await apiGet('/site/settings.json');
+      final raw = settings[staff
+          ? 'invite_link_max_redemptions_limit'
+          : 'invite_link_max_redemptions_limit_users'];
+      final limit = raw is num ? raw.toInt() : int.tryParse('$raw');
+      if (limit != null && limit > 0 && limit < wanted) return limit;
+    } catch (_) {
+      // The defaults are within Discourse's default limits (5000 / 10).
+    }
+    return wanted;
   }
 
   /// Invites [email] by sending them an invite email.
