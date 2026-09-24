@@ -6,6 +6,28 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+Links in posts open inside the app. Of the links into the same forum in 10,835 recent posts on 219 directory forums, about 70% were topics or posts, 13% categories (mostly the badge in a quote header), then users, tags and hashtags; each of those used to open the browser, lose the post number, or open with a blank title. Covered by `packages/discourse_core/test/discourse_link_test.dart`, `category_slug_lookup_test.dart` and `packages/discourse_ui/test/discourse_link_handler_test.dart`, and checked on the Pixel against meta.discourse.org.
+
+### Changed
+- **A link to this forum opens on the app's own screen**, from posts, messages, chat, link previews, the accepted answer and edit history alike (`DiscourseLinkHandler`, one handler where there were four): a topic at the post the link names; a category, titled with its name; a tag (also the `/tag/{name}/{id}` form newer forums write); a user, group or badge; a chat channel at its message; a search; the tag, user, group and badge lists; `/latest`, `/categories` and the forum itself back on the home's tabs; and `/my/…` pages for the signed-in reader. Uploads, raw posts, invites, sign-in and pages the app has no screen for (about, terms, admin) still go to the browser, as Discourse's own web client sends them to the server.
+- **A link to another post of the topic on screen scrolls to it**, as the web does, instead of opening the topic again from its first post.
+- **A link from one topic to another stacks**, so Back returns to the post it was tapped in.
+
+### Fixed
+- A same-forum link written with or without `www.`, or over http, was treated as another site.
+- On a forum installed in a subfolder, the forum's own relative links (`/forum/t/…`, `/forum/uploads/…`) resolved to `/forum/forum/…`.
+- Tapping a heading's anchor opened the forum's home in the browser.
+- In a message, any link with an `@` in it (a `mailto:`, medium.com/@author) opened a user profile.
+- A `/p/{id}` link opened its topic with the post id in place of the topic id, and the page's topic actions (subscribe, close, rename) used it; the topic is looked up first.
+
+### Added
+- `DiscourseLink` reads every Discourse route (`DiscourseLinkKind`: topic, post, category, tag, user, group, badge, chat, search, lists, `/my/`, server-side paths, pages), and `DiscourseLink.inForum(forumUrl, href)` reads a forum's own hrefs against its base path.
+- `DiscourseSiteCapabilities.categoryIdForSlugs` finds a category from a hand-written `/c/{slug}` link.
+- `SearchPage(initialQuery:)`; `DiscourseRouteNavigator.open(replaceTopic:)`; `DiscourseSiteController.homeRoute`, set by `SiteHomePage`, so a link can return to the forum's home in a host whose first route is not the forum.
+
+### Removed
+- `UrlUtils.handleUrlTapWithForumDetection` and its XenForo-era parser, and the unused `LinkPreviewCard`.
+
 Full review, batch 2: things that worked, but not the way Discourse does. Each was checked against a local Discourse with the app's own User API Key scopes. Covered by `packages/discourse_core/test/topic_behaviour_test.dart`, `message_behaviour_test.dart`, `users_staff_behaviour_test.dart` and `packages/discourse_ui/test/notification_route_conversation_test.dart`, `website_display_name_test.dart`.
 
 ### Fixed

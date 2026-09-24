@@ -192,6 +192,42 @@ class DiscourseSiteCapabilities {
     return null;
   }
 
+  /// The id of the category a slug path names — `['hardware', 'arduino']`
+  /// for `/c/hardware/arduino` — or null when no category matches. A link
+  /// Discourse writes carries the id; a hand-written one may not.
+  ///
+  /// The last slug names the category and the ones before it its parents,
+  /// so a subcategory slug shared by two parents resolves to the right one.
+  /// Discourse also accepts a category's id in place of its slug.
+  int? categoryIdForSlugs(List<String> slugs) {
+    if (slugs.isEmpty) return null;
+    Map<String, dynamic>? find(String slug, int? parentId) {
+      final wanted = slug.toLowerCase();
+      for (final c in categories) {
+        final cSlug = (c['slug'] as String?)?.toLowerCase();
+        final cId = c['id'];
+        final matches = cSlug == wanted || '$cId' == wanted;
+        if (matches && c['parent_category_id'] == parentId) return c;
+      }
+      return null;
+    }
+
+    int? parent;
+    Map<String, dynamic>? found;
+    for (final slug in slugs) {
+      found = find(slug, parent);
+      if (found == null) break;
+      parent = found['id'] as int?;
+    }
+    if (found != null) return found['id'] as int?;
+    // A link that leaves out the parent: match the last slug alone.
+    final wanted = slugs.last.toLowerCase();
+    for (final c in categories) {
+      if ((c['slug'] as String?)?.toLowerCase() == wanted) return c['id'] as int?;
+    }
+    return null;
+  }
+
   /// The composer template a category defines, or null.
   ///
   /// Discourse lets a category ship a skeleton — a bug-report form, a

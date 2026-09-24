@@ -38,6 +38,12 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
   /// Ask the home page to open on [tab]. Safe to call before the page exists.
   void requestHomeTab(SiteHomeTab tab) => requestedHomeTab.value = tab;
 
+  /// The route [SiteHomePage] is shown on, so code with no reference to the
+  /// page can go back to it — a link to the forum's `/latest` tapped in a
+  /// post. Set by the page; in a multi-forum host it is not the navigator's
+  /// first route.
+  Route<dynamic>? homeRoute;
+
   // Timeout configuration (in seconds)
   static const int _defaultTimeoutSeconds = 30;
 

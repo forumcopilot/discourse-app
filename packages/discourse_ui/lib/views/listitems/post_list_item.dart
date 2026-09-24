@@ -8,10 +8,10 @@ import 'package:discourse_core/discourse_core.dart'
         DiscourseTopicSlugs,
         stripHtmlToText;
 import 'package:flutter/material.dart';
+import '../../services/discourse_link_handler.dart';
 import 'package:discourse_ui/views/widgets/solution_summary_card.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_vote.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
@@ -40,16 +40,10 @@ import 'post_list_item_attachment.dart';
 import 'post_list_item_social.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../user_profile_page.dart';
-import '../forum_topics_page.dart';
-import 'package:get/get.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_bookmark.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseBookmarkProxy, DiscourseBookmarkAutoDelete;
 import '../widgets/bookmark_reminder_sheet.dart';
-import '../../controllers/login_controller.dart';
-import '../login_page.dart';
-import '../post_page.dart';
-import '../lists/posts_list.dart';
 import '../../services/site_proxy_service.dart';
 
 class _PostContentData {
@@ -251,30 +245,6 @@ class _PostListItemState extends State<PostListItem> {
       }
       _reactions = List.of(widget.post.reactions, growable: false);
       _vote = widget.post.vote;
-    }
-  }
-
-  /// Returns the username when [url] is a same-forum `/u/{username}` (or
-  /// `/users/{username}`) profile link — i.e. a genuine Discourse mention
-  /// target. Returns null for everything else (mailto:, external hosts like
-  /// medium.com/@author, deeper user sub-paths, ...).
-  String? _mentionUsernameFromUrl(String url) {
-    try {
-      final uri = Uri.parse(url.trim());
-      if (uri.scheme.isNotEmpty &&
-          uri.scheme != 'http' &&
-          uri.scheme != 'https') {
-        return null; // mailto:, tel:, ...
-      }
-      if (uri.hasAuthority) {
-        final forumHost = Uri.parse(widget.siteContext.site.url).host;
-        if (uri.host != forumHost) return null;
-      }
-      final match =
-          RegExp(r'^/u(?:sers)?/([^/?#]+)/?$').firstMatch(uri.path);
-      return match?.group(1);
-    } catch (_) {
-      return null;
     }
   }
 
@@ -555,104 +525,15 @@ class _PostListItemState extends State<PostListItem> {
   Widget _buildPostContent(BuildContext context, _PostContentData data,
       ColorScheme colorScheme, TextTheme textTheme) {
     final callbacks = PostContentCallbacks(
-      onUrlTap: (url) {
-        AppLogger.debug('BBCode URL tapped: $url');
-        // Only treat the link as a mention when it is a genuine same-forum
-        // /u/{username} profile URL. (A bare `@(\w+)` match on the whole URL
-        // would hijack mailto: links, medium.com/@author, etc. Mention-class
-        // anchors are already routed to onMentionTap by RichTextContent.)
-        final mentionUsername = _mentionUsernameFromUrl(url);
-        if (mentionUsername != null && mentionUsername.isNotEmpty) {
-          AppLogger.debug(
-              'PostListItem: same-forum profile link, username: $mentionUsername');
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => UserProfilePage(
-                siteContext: widget.siteContext,
-                userName: mentionUsername,
-              ),
-            ),
-          );
-          return;
-        }
-        final cleanUrl = url.trim().replaceAll('"', '');
-        final site = widget.siteContext.site;
-        final forumUrl = site.pluginUrl;
-        final forumType = widget.siteContext.ConfigData.forumType;
-        UrlUtils.handleUrlTapWithForumDetection(
-          widget.siteContext,
-          cleanUrl,
-          context,
-          forumUrl: forumUrl,
-          forumType: forumType,
-          onForumNavigation: (topicId, postId, forumId) {
-            Future.microtask(() async {
-              if (!mounted) return;
-              if (!widget.siteContext.isLoggedIn) {
-                if (!Get.isRegistered<DiscourseLoginController>()) {
-                  Get.put(DiscourseLoginController());
-                }
-                final loginController = Get.find<DiscourseLoginController>();
-                final loginResult = await loginController
-                    .attemptAutomaticLogin(widget.siteContext);
-                if (!loginResult.success &&
-                    loginResult.hadCredentials &&
-                    Get.currentRoute != '/LoginPage') {
-                  await Get.to(
-                      () => LoginPage(siteContext: widget.siteContext));
-                }
-                if (!widget.siteContext.isLoggedIn) {
-                  AppLogger.debug(
-                      'PostListItem: proceeding to thread as guest after login screen');
-                }
-              }
-              if (postId != null) {
-                final String effectiveTopicId =
-                    topicId.isNotEmpty ? topicId : postId;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PostPage(
-                      siteContext: widget.siteContext,
-                      topicId: effectiveTopicId,
-                      title: '',
-                      mode: PostsListMode.thread_by_post,
-                      anchorPostId: postId,
-                      forumId: forumId,
-                    ),
-                  ),
-                );
-              } else if (topicId.isNotEmpty) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PostPage(
-                      siteContext: widget.siteContext,
-                      topicId: topicId,
-                      title: '',
-                      mode: PostsListMode.normal,
-                      forumId: forumId,
-                    ),
-                  ),
-                );
-              } else if (forumId != null && forumId.isNotEmpty) {
-                // Category link (Discourse /c/{slug}/{id}) — open the
-                // category's topic list. ForumTopicsPage only needs the id.
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ForumTopicsPage(
-                      siteContext: widget.siteContext,
-                      forum: FCForum(id: forumId, name: ''),
-                    ),
-                  ),
-                );
-              }
-            });
-          },
-        );
-      },
+      // This forum's pages open on the app's own screens; another post of
+      // this topic is scrolled to in place, as the web does.
+      onUrlTap: (url) => DiscourseLinkHandler.open(
+        context,
+        widget.siteContext,
+        url,
+        currentTopicId: widget.post.topicId,
+        onJumpToPost: widget.onJumpToPost,
+      ),
       onImageTap: (String imageUrl, BuildContext context, String heroTag) {
         if (widget.actions?.onShowImage != null) {
           widget.actions!.onShowImage!(imageUrl, context, heroTag);

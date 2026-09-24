@@ -22,10 +22,15 @@ import 'notification_route.dart';
 class DiscourseRouteNavigator {
   DiscourseRouteNavigator._();
 
+  /// A topic opened while another is on screen replaces it by default —
+  /// a notification is a new destination, not a step from the one on
+  /// screen. [replaceTopic] false stacks it instead, so Back returns: a
+  /// link followed from a post.
   static Future<void> open(
     SiteContext siteContext,
-    DiscourseNotificationRoute route,
-  ) async {
+    DiscourseNotificationRoute route, {
+    bool replaceTopic = true,
+  }) async {
     switch (route.kind) {
       case NotificationRouteKind.post:
         final postId = route.postId;
@@ -36,7 +41,8 @@ class DiscourseRouteNavigator {
         _openTopic(siteContext,
             topicId: topicId,
             mode: PostsListMode.thread_by_post,
-            anchorPostId: postId);
+            anchorPostId: postId,
+            replace: replaceTopic);
       case NotificationRouteKind.topicPage:
         final topicId = route.topicId;
         if (topicId == null) return;
@@ -47,7 +53,8 @@ class DiscourseRouteNavigator {
               topicId: topicId,
               mode: PostsListMode.goto_page,
               gotoPage: route.page ?? ((postNumber - 1) ~/ DiscourseNotificationRoute.postsPerPage) + 1,
-              gotoPostNumber: postNumber);
+              gotoPostNumber: postNumber,
+              replace: replaceTopic);
         } else {
           // No position: where a tap on the topic in a list would go — the
           // reader's first unread post when signed in, as on the web.
@@ -56,7 +63,8 @@ class DiscourseRouteNavigator {
               topicId: topicId,
               mode: siteContext.isLoggedIn
                   ? PostsListMode.first_unread
-                  : PostsListMode.normal);
+                  : PostsListMode.normal,
+              replace: replaceTopic);
         }
       case NotificationRouteKind.conversation:
         final topicId = route.topicId;
@@ -104,7 +112,8 @@ class DiscourseRouteNavigator {
     return null;
   }
 
-  /// Open a topic, replacing the one on screen rather than stacking onto it.
+  /// Open a topic, replacing the one on screen when [replace] is set rather
+  /// than stacking onto it.
   static void _openTopic(
     SiteContext siteContext, {
     required String topicId,
@@ -112,6 +121,7 @@ class DiscourseRouteNavigator {
     String? anchorPostId,
     int? gotoPage,
     int? gotoPostNumber,
+    bool replace = true,
   }) {
     postPageBuilder() => PostPage(
           siteContext: siteContext,
@@ -122,10 +132,12 @@ class DiscourseRouteNavigator {
           gotoPage: gotoPage,
           gotoPostNumber: gotoPostNumber,
         );
-    if (Get.currentRoute == '/PostPage') {
+    if (replace && Get.currentRoute == '/PostPage') {
       Get.off(postPageBuilder);
     } else {
-      Get.to(postPageBuilder);
+      // GetX drops a push of the page type already on top unless told
+      // otherwise, and a link from one topic to another is exactly that.
+      Get.to(postPageBuilder, preventDuplicates: false);
     }
   }
 }

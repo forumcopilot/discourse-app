@@ -21,7 +21,12 @@ import 'widgets/search_filters_sheet.dart';
 
 class SearchPage extends StatefulWidget {
   final SiteContext siteContext;
-  const SearchPage({super.key, required this.siteContext});
+
+  /// A search to run on open — a `/search?q=…` link in a post — instead of
+  /// waiting for the reader to type.
+  final String? initialQuery;
+
+  const SearchPage({super.key, required this.siteContext, this.initialQuery});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -93,8 +98,14 @@ class _SearchPageState extends State<SearchPage> {
     // went nowhere and the user had to tap the field they had just
     // navigated to. Post-frame because the focus node is not attached
     // to the TextField until the first build.
+    final initial = widget.initialQuery?.trim() ?? '';
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _searchFocusNode.requestFocus();
+      if (!mounted) return;
+      if (initial.isNotEmpty) {
+        _performSearch(initial);
+      } else {
+        _searchFocusNode.requestFocus();
+      }
     });
   }
 

@@ -4,7 +4,6 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as html_parser;
-import 'package:url_launcher/url_launcher_string.dart';
 
 import 'brand_image.dart';
 import 'code_block.dart';
@@ -23,6 +22,7 @@ import '../../utils/emoji_shortcodes.dart';
 import '../../utils/file_utils.dart';
 import '../../utils/html_colors.dart';
 import '../../utils/url_utils.dart';
+import '../../services/discourse_link_handler.dart';
 
 /// Renders post content. The data we get from Discourse's `/t/{id}.json`
 /// post stream is the `cooked` HTML field — i.e. server-rendered Markdown
@@ -97,7 +97,7 @@ class RichTextContent extends StatelessWidget {
         return;
       }
       // ignore: discarded_futures
-      launchUrlString(resolved, mode: LaunchMode.externalApplication);
+      DiscourseLinkHandler.open(context, siteContext, resolved);
     }
 
     return PostBodyFallback(
@@ -106,6 +106,10 @@ class RichTextContent extends StatelessWidget {
       data: html,
       onLinkTap: (url, attributes, _) {
         if (url == null || url.isEmpty) return;
+        // Discourse puts an in-page anchor beside every heading
+        // (`<a class="anchor" href="#p-123-heading">`); resolved against the
+        // forum it read as a link to the forum's home.
+        if (url.startsWith('#')) return;
         final resolved = _resolveUrl(url);
         final classes =
             (attributes['class'] ?? '').split(RegExp(r'\s+'));
@@ -125,14 +129,17 @@ class RichTextContent extends StatelessWidget {
           callbacks!.onImageTap!(resolved, context, resolved);
           return;
         }
-        // Everything else goes through the URL callback (which handles
-        // same-forum topic/post links in-app and external launch itself).
+        // Everything else goes through the URL callback when the host
+        // wants a say (a post moves within its own topic), and otherwise
+        // to the link handler: in-app for this forum's pages, the browser
+        // for the rest. Chat, the accepted answer and edit history rely on
+        // the default; they used to send every link to the browser.
         if (callbacks?.onUrlTap != null) {
           callbacks!.onUrlTap!(resolved);
           return;
         }
         // ignore: discarded_futures
-        launchUrlString(resolved, mode: LaunchMode.externalApplication);
+        DiscourseLinkHandler.open(context, siteContext, resolved);
       },
       style: _stylesFor(colorScheme, body, bodyColor, mutedColor, accent),
       // Resolve relative URLs (img src, a href) to absolute against the
@@ -191,7 +198,7 @@ class RichTextContent extends StatelessWidget {
               return;
             }
             // ignore: discarded_futures
-            launchUrlString(resolved, mode: LaunchMode.externalApplication);
+            DiscourseLinkHandler.open(context, siteContext, resolved);
           },
           colorScheme: colorScheme,
           textTheme: Theme.of(context).textTheme,
@@ -439,7 +446,20 @@ class RichTextContent extends StatelessWidget {
     while (base.endsWith('/')) {
       base = base.substring(0, base.length - 1);
     }
-    if (url.startsWith('/')) return '$base$url';
+    if (url.startsWith('/')) {
+      // Discourse writes a subfolder install's own paths with the
+      // subfolder in them (`/forum/t/…`, `/forum/uploads/…`); joined to the
+      // base they came out as /forum/forum/….
+      final forum = Uri.tryParse(base);
+      final basePath = forum?.path ?? '';
+      if (forum != null &&
+          forum.hasAuthority &&
+          basePath.isNotEmpty &&
+          (url == basePath || url.startsWith('$basePath/'))) {
+        return '${forum.origin}$url';
+      }
+      return '$base$url';
+    }
     return '$base/$url';
   }
 }

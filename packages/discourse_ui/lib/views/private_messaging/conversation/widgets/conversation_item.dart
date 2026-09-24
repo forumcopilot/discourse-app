@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_ui/services/discourse_link_handler.dart';
 import 'package:discourse_ui/views/widgets/discourse_report_dialog.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
@@ -17,11 +18,6 @@ import '../../../listitems/post_list_item_attachment.dart';
 import '../../../widgets/full_screen_image_viewer.dart';
 import '../../../../utils/cooked_content.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
-import 'package:get/get.dart';
-import 'package:discourse_ui/controllers/login_controller.dart';
-import 'package:discourse_ui/views/login_page.dart';
-import 'package:discourse_ui/views/post_page.dart';
-import 'package:discourse_ui/views/lists/posts_list.dart';
 
 /// The sender's name for display.
 ///
@@ -89,85 +85,9 @@ class ConversationHeaderItem extends StatelessWidget {
       onImageTap: (imageUrl, tapContext, heroTag) =>
           _buildAttachmentActions(context)
               .onShowImage(imageUrl, tapContext, heroTag),
-      onUrlTap: (url) async {
-        AppLogger.debug('ConversationHeaderItem: BBCode URL tapped: $url');
-        // Check if URL might be a mention link (contains @username pattern)
-        final mentionMatch = RegExp(r'@(\w+)').firstMatch(url);
-        if (mentionMatch != null) {
-          final username = mentionMatch.group(1);
-          AppLogger.debug('ConversationHeaderItem: URL contains mention pattern, username: $username');
-          if (username != null && username.isNotEmpty) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => UserProfilePage(
-                  siteContext: siteContext,
-                  userName: username,
-                ),
-              ),
-            );
-            return;
-          }
-        }
-        final cleanUrl = url.trim().replaceAll('"', '');
-        final site = siteContext.site;
-        final forumUrl = site.pluginUrl;
-        final forumType = siteContext.ConfigData.forumType;
-        await UrlUtils.handleUrlTapWithForumDetection(
-          siteContext,
-          cleanUrl,
-          context,
-          forumUrl: forumUrl,
-          forumType: forumType,
-          onForumNavigation: (topicId, postId, forumId) {
-            Future.microtask(() async {
-              if (!context.mounted) return;
-              if (!siteContext.isLoggedIn) {
-                if (!Get.isRegistered<DiscourseLoginController>()) {
-                  Get.put(DiscourseLoginController());
-                }
-                final loginController = Get.find<DiscourseLoginController>();
-                final loginResult = await loginController.attemptAutomaticLogin(siteContext);
-                if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
-                  await Get.to(() => LoginPage(siteContext: siteContext));
-                }
-                if (!siteContext.isLoggedIn) {
-                  AppLogger.debug('ConversationHeaderItem: proceeding to thread as guest after login screen');
-                }
-              }
-              if (postId != null) {
-                final String effectiveTopicId = topicId.isNotEmpty ? topicId : postId;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PostPage(
-                      siteContext: siteContext,
-                      topicId: effectiveTopicId,
-                      title: '',
-                      mode: PostsListMode.thread_by_post,
-                      anchorPostId: postId,
-                      forumId: forumId,
-                    ),
-                  ),
-                );
-              } else if (topicId.isNotEmpty) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PostPage(
-                      siteContext: siteContext,
-                      topicId: topicId,
-                      title: '',
-                      mode: PostsListMode.normal,
-                      forumId: forumId,
-                    ),
-                  ),
-                );
-              }
-            });
-          },
-        );
-      },
+      // This forum's pages open on the app's own screens, the rest in the
+      // browser (DiscourseLinkHandler).
+      onUrlTap: (url) => DiscourseLinkHandler.open(context, siteContext, url),
       onMentionTap: (username) {
         AppLogger.debug('ConversationHeaderItem: BBCode Mention tapped: $username');
         Navigator.push(
@@ -653,85 +573,9 @@ class ConversationItem extends StatelessWidget {
       onImageTap: (imageUrl, tapContext, heroTag) =>
           _buildAttachmentActions(context)
               .onShowImage(imageUrl, tapContext, heroTag),
-      onUrlTap: (url) async {
-        AppLogger.debug('ConversationItem: BBCode URL tapped: $url');
-        // Check if URL might be a mention link (contains @username pattern)
-        final mentionMatch = RegExp(r'@(\w+)').firstMatch(url);
-        if (mentionMatch != null) {
-          final username = mentionMatch.group(1);
-          AppLogger.debug('ConversationItem: URL contains mention pattern, username: $username');
-          if (username != null && username.isNotEmpty) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => UserProfilePage(
-                  siteContext: siteContext,
-                  userName: username,
-                ),
-              ),
-            );
-            return;
-          }
-        }
-        final cleanUrl = url.trim().replaceAll('"', '');
-        final site = siteContext.site;
-        final forumUrl = site.pluginUrl;
-        final forumType = siteContext.ConfigData.forumType;
-        await UrlUtils.handleUrlTapWithForumDetection(
-          siteContext,
-          cleanUrl,
-          context,
-          forumUrl: forumUrl,
-          forumType: forumType,
-          onForumNavigation: (topicId, postId, forumId) {
-            Future.microtask(() async {
-              if (!context.mounted) return;
-              if (!siteContext.isLoggedIn) {
-                if (!Get.isRegistered<DiscourseLoginController>()) {
-                  Get.put(DiscourseLoginController());
-                }
-                final loginController = Get.find<DiscourseLoginController>();
-                final loginResult = await loginController.attemptAutomaticLogin(siteContext);
-                if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
-                  await Get.to(() => LoginPage(siteContext: siteContext));
-                }
-                if (!siteContext.isLoggedIn) {
-                  AppLogger.debug('ConversationItem: proceeding to thread as guest after login screen');
-                }
-              }
-              if (postId != null) {
-                final String effectiveTopicId = topicId.isNotEmpty ? topicId : postId;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PostPage(
-                      siteContext: siteContext,
-                      topicId: effectiveTopicId,
-                      title: '',
-                      mode: PostsListMode.thread_by_post,
-                      anchorPostId: postId,
-                      forumId: forumId,
-                    ),
-                  ),
-                );
-              } else if (topicId.isNotEmpty) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PostPage(
-                      siteContext: siteContext,
-                      topicId: topicId,
-                      title: '',
-                      mode: PostsListMode.normal,
-                      forumId: forumId,
-                    ),
-                  ),
-                );
-              }
-            });
-          },
-        );
-      },
+      // This forum's pages open on the app's own screens, the rest in the
+      // browser (DiscourseLinkHandler).
+      onUrlTap: (url) => DiscourseLinkHandler.open(context, siteContext, url),
       onMentionTap: (username) {
         Navigator.push(
           context,

@@ -274,4 +274,144 @@ void main() {
       expect(link.postNumber, 3);
     });
   });
+  group('inForum — a link in the forum’s own content', () {
+    const forum = 'https://forum.example.com';
+    DiscourseLink? inForum(String href, [String at = forum]) =>
+        DiscourseLink.inForum(at, href);
+
+    test('relative and absolute hrefs to this forum', () {
+      expect(inForum('/t/x/12/3')!.kind, DiscourseLinkKind.topic);
+      expect(inForum('/t/x/12/3')!.url, 'https://forum.example.com/t/x/12/3');
+      expect(inForum('https://forum.example.com/t/x/12')!.topicId, 12);
+      expect(inForum('//forum.example.com/t/x/12')!.topicId, 12);
+      expect(inForum('t/x/12')!.topicId, 12, reason: 'relative to the base');
+    });
+
+    test('www and http are the same forum', () {
+      expect(inForum('https://www.forum.example.com/t/x/12')?.topicId, 12);
+      expect(inForum('http://forum.example.com/t/x/12')?.topicId, 12);
+      expect(inForum('https://forum.example.com/u/a', 'https://www.forum.example.com')
+          ?.username, 'a');
+    });
+
+    test('anything else is not this forum', () {
+      expect(inForum('https://other.example.com/t/x/12'), isNull);
+      expect(inForum('https://example.com/t/x/12'), isNull);
+      expect(inForum('mailto:someone@forum.example.com'), isNull);
+      expect(inForum('tel:+123'), isNull);
+      expect(inForum(''), isNull);
+    });
+
+    test('a subfolder forum: its own links carry the base path', () {
+      const sub = 'https://example.com/forum';
+      final link = inForum('/forum/t/x/12/3', sub)!;
+      expect(link.topicId, 12);
+      expect(link.postNumber, 3);
+      expect(link.url, 'https://example.com/forum/t/x/12/3',
+          reason: 'not /forum/forum/…');
+      expect(inForum('https://example.com/forum/c/help/4', sub)!.categoryId, 4);
+      expect(inForum('/t/x/12', sub)!.url, 'https://example.com/forum/t/x/12',
+          reason: 'a rooted path without the base is taken under it');
+      expect(inForum('https://example.com/blog/post', sub), isNull,
+          reason: 'the rest of the host is not the forum');
+      expect(inForum('https://example.com/forum', sub)!.kind,
+          DiscourseLinkKind.forum);
+    });
+  });
+
+  group('kinds', () {
+    DiscourseLink k(String path) =>
+        DiscourseLink.inForum('https://f.example', path)!;
+
+    test('topics and posts', () {
+      expect(k('/t/x/1').kind, DiscourseLinkKind.topic);
+      expect(k('/t/x/1/9').postNumber, 9);
+      expect(k('/p/77').kind, DiscourseLinkKind.post);
+      expect(k('/p/77').postId, 77);
+      expect(k('/t/only-a-slug').kind, DiscourseLinkKind.page);
+    });
+
+    test('categories, with and without an id', () {
+      final c = k('/c/hardware/arduino/12');
+      expect(c.kind, DiscourseLinkKind.category);
+      expect(c.categoryId, 12);
+      expect(c.categorySlugs, ['hardware', 'arduino']);
+      expect(k('/c/hardware/12/l/top').categoryId, 12);
+      expect(k('/c/hardware/12/none').categoryId, 12);
+      final bySlug = k('/c/hardware');
+      expect(bySlug.categoryId, isNull);
+      expect(bySlug.categorySlugs, ['hardware']);
+      expect(k('/c').kind, DiscourseLinkKind.list);
+      expect(k('/c').listName, 'categories');
+    });
+
+    test('tags', () {
+      expect(k('/tag/flutter').tagName, 'flutter');
+      expect(k('/tag/c%2B%2B').tagName, 'c++');
+      expect(k('/tag/flutter/l/top').tagName, 'flutter');
+      expect(k('/tags/c/dev/5/flutter').tagName, 'flutter');
+      expect(k('/tags/intersection/a/b').tagName, 'a');
+      expect(k('/tags').kind, DiscourseLinkKind.tags);
+      expect(k('/tag').kind, DiscourseLinkKind.tags);
+    });
+
+    test('users, groups and badges', () {
+      final u = k('/u/alice/activity/likes-given');
+      expect(u.kind, DiscourseLinkKind.user);
+      expect(u.username, 'alice');
+      expect(u.userTab, 'activity/likes-given');
+      expect(k('/users/bob').username, 'bob');
+      expect(k('/u').kind, DiscourseLinkKind.users);
+      expect(k('/g/staff').groupName, 'staff');
+      expect(k('/groups').kind, DiscourseLinkKind.groups);
+      expect(k('/badges/3/welcome').badgeId, 3);
+      expect(k('/badges').kind, DiscourseLinkKind.badges);
+    });
+
+    test('chat', () {
+      final m = k('/chat/c/general/2/345');
+      expect(m.kind, DiscourseLinkKind.chat);
+      expect(m.chatChannelId, 2);
+      expect(m.chatMessageId, 345);
+      expect(k('/chat/c/-/2').chatChannelId, 2);
+      expect(k('/chat/c/general/2/t/9').chatMessageId, isNull,
+          reason: 'a thread opens its channel');
+      expect(k('/chat').chatChannelId, isNull);
+    });
+
+    test('search, lists and my pages', () {
+      expect(k('/search?q=hello%20world%20in%3Atitle').searchQuery,
+          'hello world in:title');
+      expect(k('/search').searchQuery, isNull);
+      expect(k('/latest').listName, 'latest');
+      expect(k('/top?period=weekly').listName, 'top');
+      expect(k('/categories').listName, 'categories');
+      expect(k('/my/messages').myPath, 'messages');
+      expect(k('/my/activity/bookmarks').myPath, 'activity/bookmarks');
+    });
+
+    test('what the server answers stays with the browser', () {
+      for (final path in [
+        '/uploads/default/original/1X/abc.pdf',
+        '/secure-uploads/x.png',
+        '/raw/12/3',
+        '/posts/5/raw',
+        '/invites/abc',
+        '/t/x/12.json',
+        '/latest.rss',
+        '/session/sso',
+        '/auth/google',
+      ]) {
+        expect(k(path).kind, DiscourseLinkKind.serverSide, reason: path);
+      }
+    });
+
+    test('pages with no screen of their own', () {
+      for (final path in ['/about', '/faq', '/guidelines', '/tos', '/privacy',
+          '/review', '/admin/users', '/something-custom']) {
+        expect(k(path).kind, DiscourseLinkKind.page, reason: path);
+      }
+      expect(k('/').kind, DiscourseLinkKind.forum);
+    });
+  });
 }

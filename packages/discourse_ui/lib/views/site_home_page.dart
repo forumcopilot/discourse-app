@@ -1090,8 +1090,28 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     }
   }
 
+  /// The route this page is on, told to the site controller so a link to
+  /// the forum's home, one of its lists or the inbox can return here
+  /// (`DiscourseLinkHandler`).
+  ModalRoute<dynamic>? _homeRoute;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null && route != _homeRoute &&
+        Get.isRegistered<DiscourseSiteController>()) {
+      _homeRoute = route;
+      Get.find<DiscourseSiteController>().homeRoute = route;
+    }
+  }
+
   @override
   void dispose() {
+    if (Get.isRegistered<DiscourseSiteController>()) {
+      final controller = Get.find<DiscourseSiteController>();
+      if (controller.homeRoute == _homeRoute) controller.homeRoute = null;
+    }
     // Cancel login state debounce timer
     _loginStateDebounceTimer?.cancel();
     _loginStateDebounceTimer = null;
