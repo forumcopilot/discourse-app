@@ -29,6 +29,8 @@ Full review, batch 1: requests that could not do what the app said they did, eac
 - **A temporary suspension ends on the chosen date**, not about 56 years later.
 - **"Change password" sends the reset email**: the request goes by the account's email address, which Discourse requires with its default settings.
 - **The groups list shows every group**: it started on the server's second page and, on a phone (15 a page), stopped after one.
+- **A renamed topic shows its new title in the opening post too**, not only in the header.
+- **A draft resumed from Drafts names its category** instead of showing a blank category chip.
 
 ## [1.0.25] - 2026-09-23
 
