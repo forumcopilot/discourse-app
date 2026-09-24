@@ -752,8 +752,10 @@ class _PostsState extends State<PostsList> {
     _isScrollLoadingEnabled = false;
     _pagingDirection = _PagingDirection.earlier;
 
-    // Track the post ID that's currently visible so we can restore to it after prepending
+    // Track the post ID that's currently visible, and where its top edge
+    // sits, so the reader stays put after posts are prepended above it.
     String? currentVisiblePostId;
+    double currentVisibleEdge = 0;
     try {
       final itemPositions = _itemPositionsListener.itemPositions.value;
       final data = _postsController.threadDataOutput.value;
@@ -765,6 +767,7 @@ class _PostsState extends State<PostsList> {
         final postIndex = firstVisibleIndex - (_isLoadingMore && _pagingDirection == _PagingDirection.earlier ? 1 : 0);
         if (postIndex >= 0 && postIndex < data.posts.length) {
           currentVisiblePostId = data.posts[postIndex].id;
+          currentVisibleEdge = firstVisibleItem.itemLeadingEdge;
         }
       }
     } catch (e) {
@@ -780,13 +783,17 @@ class _PostsState extends State<PostsList> {
     try {
       final data = _postsController.threadDataOutput.value;
       if (data == null || data.posts.isEmpty) return;
-      // Request the window right before the actual lowest loaded postNumber
-      // (1-based). The controller dedupes on merge, so a server window that
-      // overlaps ours is harmless.
+      // Request the window that ends at the lowest loaded postNumber
+      // (1-based). Discourse centres /t/{id}/{n}.json on post n — 5 posts
+      // before it, 14 after (filter_posts_near) — so asking for the post a
+      // whole page back returned a window that stopped 5 short of ours: from
+      // posts 35–54, asking for 15 gave 9–30 and 31–34 were never shown.
+      // Asking for the post half a page back returns the 15 before ours plus
+      // a few we have; the controller dedupes the overlap on merge.
       final minLoaded = data.posts.first.postNumber ?? (data.currentStartNum + 1);
       final lastNum1Based = minLoaded - 1;
       if (lastNum1Based < 1) return;
-      final startNum1Based = (minLoaded - _pageSize).clamp(1, lastNum1Based);
+      final startNum1Based = (minLoaded - _pageSize ~/ 2).clamp(1, lastNum1Based);
 
       // --- Always use normal loading for paging (earlier) ---
       // Even if initial load was unread or anchor, paging uses getThreadAsync for correct merging.
@@ -809,12 +816,14 @@ class _PostsState extends State<PostsList> {
               if (postIndex >= 0) {
                 // When loading earlier posts, list has a loading card at index 0, so offset by 1.
                 final scrollIndex = postIndex + (_isLoadingMore && _pagingDirection == _PagingDirection.earlier ? 1 : 0);
-                // Scroll to the post without forcing alignment - this should maintain visual position better
-                // Using a very short duration for smooth transition
-                _itemScrollController.scrollTo(
+                // Put the post back exactly where it was on screen. The
+                // 50 ms animated scroll used here did not hold: the list was
+                // still near the top when paging re-enabled, loaded another
+                // page, and a link to post 40 of meta.discourse.org/t/411337
+                // ended on post 16 (Pixel, 2026-09-24).
+                _itemScrollController.jumpTo(
                   index: scrollIndex,
-                  duration: const Duration(milliseconds: 50),
-                  curve: Curves.easeOut,
+                  alignment: currentVisibleEdge,
                 );
                 AppLogger.debug('PostsList: Restored scroll to post $currentVisiblePostId at index $scrollIndex');
               } else {

@@ -14,6 +14,9 @@ Links in and out of a forum. Covered by `packages/discourse_core/test/discourse_
 - **A link or notification that names a post lands on that post**, not on the first post of its page: the topic loads around the post (`PostPage.gotoPostNumber`). The jump-to-post dialog, "jump to last" and the accepted answer's "Post #N" load the same way, so a target late in a page is no longer missed.
 - A notification for a topic with no position opens where a tap on the topic would: the first unread post when signed in.
 
+### Fixed
+- **Scrolling up after entering a topic mid-way no longer skips posts or loses your place.** Loading earlier posts asked for the post a whole page back, and Discourse centres that window on it, so the page came back 5 posts short: from posts 35–54 it loaded 9–30, and 31–34 were never shown. It now asks for the post half a page back. And the reader is put back exactly where they were once the earlier posts are in, rather than by a short animated scroll that did not hold — a link to a post near the top of its window had gone on to load page after page and ended 24 posts above the one it named.
+
 ### Added
 - `DiscourseLink` (discourse_core): reads a URL as a link into a Discourse forum — topic, post number, post short link, subfolder installs, query, fragment — and writes a topic's web address. `DiscourseNotificationRoute.fromLink` turns one into the route a notification would name, and `DiscourseRouteNavigator` takes the reader there for both. `getIdByUrl` uses it: it read slugless `/t/{id}/{n}` links as topic `n`, and now resolves `/p/{post_id}` short links.
 - `SingleForumBootstrapPage(route:)` opens a forum at a topic or post, for hosts that open links.
