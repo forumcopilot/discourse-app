@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.27] - 2026-09-24
+
 Links in and out of a forum. Covered by `packages/discourse_core/test/discourse_link_test.dart`, `forum_link_requests_test.dart` and `packages/discourse_ui/test/notification_route_test.dart`.
 
 ### Changed
