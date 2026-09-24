@@ -6,6 +6,24 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+Full review, batch 2: things that worked, but not the way Discourse does. Each was checked against a local Discourse with the app's own User API Key scopes. Covered by `packages/discourse_core/test/topic_behaviour_test.dart`, `message_behaviour_test.dart`, `users_staff_behaviour_test.dart` and `packages/discourse_ui/test/notification_route_conversation_test.dart`, `website_display_name_test.dart`.
+
+### Fixed
+- **A topic knows it is closed, pinned and watched however you open it.** Opening at your first unread post or at a linked post built the topic without those flags, so a closed topic showed no closed banner, the staff close and pin toggles offered the opposite action, and the bell showed "Normal" on a watched topic.
+- **A topic opens after the last post you read**, as on the website (last read + 1, capped at the newest post). A plain tap on a topic while signed in opens there too, instead of at the top.
+- **Only posts that were on screen are reported as read**, a second after they appear, instead of every post the app had loaded.
+- **A post held for moderation says so.** Discourse answers "enqueued" for a post that needs approval; the app announced it as posted and tried to open a post that did not exist yet. It now shows Discourse's "Post Needs Approval" notice.
+- **Delete, close, pin and undelete report a refusal** instead of claiming success, and deleting a post asks the plain question Discourse asks.
+- A subcategory's notification level is found (subcategories are nested in `/categories.json`), a bookmark shows its post's author, a resumed new-topic draft keeps its own draft, and the signature box starts off, since Discourse has no signatures.
+- **The Messages badge clears.** A message's small-action entries ("added alice") were never reported as read, and Discourse ties the new-reply notification to them, so it stayed unread. Message notifications now open the message at the reply that caused them (`original_post_id`), a message's post count is its highest post number, and the reply box follows `can_create_post`.
+- **Saving your profile no longer rewrites your website.** The edit form was filled from Discourse's shortened display form (`website_name`, host and path), which was then saved back as the address. The profile shortens it for display itself.
+- **Review queue cards show what is being reviewed**: the flagged post's text (sent at the top level of the row, not in `payload`), each flag's reason and who raised it. Actions are grouped the way the website groups them, with a "Yes" and a "No" dropdown. Before, two identical "Keep post" buttons sat side by side, one agreeing with the flag and one disagreeing. The forum's own confirmation is shown when an action is done, and a reject reason reaches the server (Discourse emails it to a rejected sign-up).
+- **Profile activity keeps loading past the first 30.** Only the Replies tab was told when you scrolled, and every feed took the page length as the total, so Likes, Bookmarks, Solved and Replies all stopped at one page, and Topics had no paging at all. Every tab now follows the profile's scroll, a full page means there is more, and Topics pages by offset.
+- **Group members no longer repeat the owners on every page or skip members.** Discourse re-sends the full owner list with each page; the app put it at the top of every page and counted it into the next offset.
+- **Invite links work for more than one person.** The app sent no redemption count, so the server's default of one applied to a link meant for sharing. It now asks for what the forum's own invite dialog does: 10, or 100 for staff, within the forum's limit.
+- **Spam Cleaner is Discourse's Delete spammer.** XenForo's four options did not map to Discourse: the app silenced the user and deleted nothing unless an option was ticked. It is now the website's single action, which deletes the account and every post and blocks the email address, IP address and posted links. It is offered only where Discourse would allow it (`can_be_deleted`: moderators cannot delete established members).
+- **Delete account opens your account preferences** on the forum when it lets members delete their own account (`can_delete_account`). There Discourse has its own Delete My Account button. Otherwise the app still points you to the forum's staff.
+
 ## [1.0.27] - 2026-09-24
 
 Links in and out of a forum. Covered by `packages/discourse_core/test/discourse_link_test.dart`, `forum_link_requests_test.dart` and `packages/discourse_ui/test/notification_route_test.dart`.
