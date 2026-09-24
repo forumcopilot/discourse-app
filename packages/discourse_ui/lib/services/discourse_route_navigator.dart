@@ -62,12 +62,18 @@ class DiscourseRouteNavigator {
         final topicId = route.topicId;
         if (topicId == null) return;
         AppLogger.debug('🧭 [DiscourseRouteNavigator] Message $topicId');
-        Get.to(() => ConversationPage(
-              siteContext: siteContext,
-              conversationId: topicId,
-              subject: '', // The page shows the message's own title once loaded.
-              anchorMessageId: route.postId,
-            ));
+        // preventDuplicates off: GetX drops a push whose page type is the
+        // one on top, so a message notification tapped while another
+        // message is open did nothing.
+        Get.to(
+          () => ConversationPage(
+            siteContext: siteContext,
+            conversationId: topicId,
+            subject: '', // The page shows the message's own title once loaded.
+            anchorMessageId: route.postId,
+          ),
+          preventDuplicates: false,
+        );
       case NotificationRouteKind.notificationsTab:
         if (Get.isRegistered<DiscourseSiteController>()) {
           Get.find<DiscourseSiteController>()
