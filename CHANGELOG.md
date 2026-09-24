@@ -6,6 +6,9 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Fixed
+- **A forum whose `/about.json` hangs now opens** instead of failing with "Failed to connect". forum.cfx.re answered every other read in a fraction of a second but sometimes left `/about.json` hanging, and that one optional read ran the whole configuration load into its 10 s timeout. It now gets 4 s of its own; past that the forum opens without it, taking read-only mode from `/site/settings.json` instead. Only the post and member counts in the forum header still wait for it. Covered by `packages/discourse_core/test/config_about_timeout_test.dart`.
+
 ## [1.0.25] - 2026-09-23
 
 Thread rendering, batch 6: how a post reads. Covered by `packages/discourse_ui/test/post_polish_test.dart`, `packages/discourse_core/test/api_exception_test.dart` and `post_kinds_and_polls_test.dart`, and checked before/after on the Pixel in light and dark themes.
