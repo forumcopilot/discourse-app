@@ -18,6 +18,7 @@ Links in posts open inside the app. Of the links into the same forum in 10,835 r
 - On a forum installed in a subfolder, the forum's own relative links (`/forum/t/…`, `/forum/uploads/…`) resolved to `/forum/forum/…`.
 - Tapping a heading's anchor opened the forum's home in the browser.
 - In a message, any link with an `@` in it (a `mailto:`, medium.com/@author) opened a user profile.
+- **A push notification tapped while reading a topic opens its topic** instead of nothing. The topic on screen is replaced with `Get.off`, which, like `Get.to`, drops a page of the type already on top unless told not to — and replacing only happens when a topic is on top.
 - A `/p/{id}` link opened its topic with the post id in place of the topic id, and the page's topic actions (subscribe, close, rename) used it; the topic is looked up first.
 
 ### Added

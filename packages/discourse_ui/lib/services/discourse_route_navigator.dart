@@ -132,11 +132,14 @@ class DiscourseRouteNavigator {
           gotoPage: gotoPage,
           gotoPostNumber: gotoPostNumber,
         );
+    // GetX drops a push, and a replace, of the page type already on top
+    // unless told otherwise (get 4.7.3: `preventDuplicates` defaults to
+    // true in to() and off()). Opening a topic from a topic is exactly that
+    // case: the replace below only runs when a PostPage is on top, so a
+    // notification tapped while reading a topic opened nothing.
     if (replace && Get.currentRoute == '/PostPage') {
-      Get.off(postPageBuilder);
+      Get.off(postPageBuilder, preventDuplicates: false);
     } else {
-      // GetX drops a push of the page type already on top unless told
-      // otherwise, and a link from one topic to another is exactly that.
       Get.to(postPageBuilder, preventDuplicates: false);
     }
   }
