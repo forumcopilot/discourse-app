@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.24] - 2026-09-23
+
 Thread rendering, batch 5: link previews. Covered by `packages/discourse_ui/test/onebox_rendering_test.dart` and checked before/after on the Pixel in light and dark themes.
 
 ### Fixed
