@@ -2361,4 +2361,29 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get eventEveryMonth => '毎月この平日';
+
+  @override
+  String get errorNoConnection => 'フォーラムに接続できませんでした。接続を確認して、もう一度お試しください。';
+
+  @override
+  String get errorTimedOut => 'フォーラムの応答に時間がかかりすぎています。もう一度お試しください。';
+
+  @override
+  String get errorPaywalled => 'このコンテンツはフォーラムの有料会員限定です。';
+
+  @override
+  String get errorBlocked =>
+      'フォーラムのファイアウォールによってアプリがブロックされました。しばらくしてから再度お試しいただくか、ブラウザでフォーラムを開いてください。';
+
+  @override
+  String get errorNotAllowed => 'アクセスする権限がありません。ログインすると閲覧できる場合があります。';
+
+  @override
+  String get errorNotFound => '存在しないか、削除されています。';
+
+  @override
+  String get errorRateLimited => '操作の頻度が高すぎます。しばらく待ってからもう一度お試しください。';
+
+  @override
+  String get errorForumDown => 'フォーラムが現在応答していません。しばらくしてからもう一度お試しください。';
 }

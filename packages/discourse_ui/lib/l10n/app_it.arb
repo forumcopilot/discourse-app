@@ -963,5 +963,13 @@
   "eventEveryWeek": "Ogni settimana in questo giorno feriale",
   "eventEveryTwoWeeks": "Ogni due settimane in questo giorno feriale",
   "eventEveryFourWeeks": "Ogni quattro settimane in questo giorno feriale",
-  "eventEveryMonth": "Ogni mese in questo giorno feriale"
+  "eventEveryMonth": "Ogni mese in questo giorno feriale",
+  "errorNoConnection": "Impossibile raggiungere il forum. Controlla la connessione e riprova.",
+  "errorTimedOut": "Il forum ha impiegato troppo tempo a rispondere. Riprova.",
+  "errorPaywalled": "Questo contenuto è riservato ai membri paganti del forum.",
+  "errorBlocked": "Il firewall del forum ha bloccato l'app. Riprova più tardi o apri il forum in un browser.",
+  "errorNotAllowed": "Non hai accesso a questo contenuto. Accedere potrebbe aiutare.",
+  "errorNotFound": "Questo contenuto non esiste o è stato rimosso.",
+  "errorRateLimited": "Stai facendo questa operazione troppo spesso. Attendi un momento e riprova.",
+  "errorForumDown": "Il forum non risponde al momento. Riprova più tardi."
 }

@@ -963,5 +963,13 @@
   "eventEveryWeek": "毎週この平日",
   "eventEveryTwoWeeks": "隔週この平日",
   "eventEveryFourWeeks": "4 週間ごとのこの平日",
-  "eventEveryMonth": "毎月この平日"
+  "eventEveryMonth": "毎月この平日",
+  "errorNoConnection": "フォーラムに接続できませんでした。接続を確認して、もう一度お試しください。",
+  "errorTimedOut": "フォーラムの応答に時間がかかりすぎています。もう一度お試しください。",
+  "errorPaywalled": "このコンテンツはフォーラムの有料会員限定です。",
+  "errorBlocked": "フォーラムのファイアウォールによってアプリがブロックされました。しばらくしてから再度お試しいただくか、ブラウザでフォーラムを開いてください。",
+  "errorNotAllowed": "アクセスする権限がありません。ログインすると閲覧できる場合があります。",
+  "errorNotFound": "存在しないか、削除されています。",
+  "errorRateLimited": "操作の頻度が高すぎます。しばらく待ってからもう一度お試しください。",
+  "errorForumDown": "フォーラムが現在応答していません。しばらくしてからもう一度お試しください。"
 }

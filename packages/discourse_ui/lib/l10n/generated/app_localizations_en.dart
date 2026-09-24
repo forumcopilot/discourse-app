@@ -2436,4 +2436,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventEveryMonth => 'Every month at this weekday';
+
+  @override
+  String get errorNoConnection =>
+      'Couldn\'t reach the forum. Check your connection and try again.';
+
+  @override
+  String get errorTimedOut =>
+      'The forum took too long to answer. Please try again.';
+
+  @override
+  String get errorPaywalled => 'This is only for the forum\'s paying members.';
+
+  @override
+  String get errorBlocked =>
+      'The forum\'s firewall blocked the app. Try again later, or open the forum in a browser.';
+
+  @override
+  String get errorNotAllowed =>
+      'You don\'t have access to this. Signing in may help.';
+
+  @override
+  String get errorNotFound => 'This doesn\'t exist, or it was removed.';
+
+  @override
+  String get errorRateLimited =>
+      'You\'re doing that too often. Please wait a moment and try again.';
+
+  @override
+  String get errorForumDown =>
+      'The forum isn\'t responding right now. Please try again later.';
 }

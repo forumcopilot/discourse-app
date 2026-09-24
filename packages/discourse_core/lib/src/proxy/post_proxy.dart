@@ -1661,7 +1661,25 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       actionCodeWho: _nonEmpty(p['action_code_who']),
       isModeratorAction: p['post_type'] == 2,
       isHidden: p['hidden'] == true,
+      // The author's full name; empty when the forum turns names off.
+      authorDisplayName: _nonEmpty(p['name']),
+      linkClicks: _linkClicks(p['link_counts']),
     );
+  }
+
+  /// `link_counts` → clicks by URL, for the links in this post that were
+  /// followed at least once. Reflections (links *to* this topic from
+  /// elsewhere) are not in the post's body, so they are left out.
+  static Map<String, int> _linkClicks(Object? raw) {
+    if (raw is! List) return const {};
+    final out = <String, int>{};
+    for (final l in raw.whereType<Map>()) {
+      if (l['reflection'] == true) continue;
+      final url = l['url']?.toString();
+      final clicks = (l['clicks'] as num?)?.toInt() ?? 0;
+      if (url != null && url.isNotEmpty && clicks > 0) out[url] = clicks;
+    }
+    return out;
   }
 
   static String? _nonEmpty(Object? value) {

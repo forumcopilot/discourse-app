@@ -128,6 +128,8 @@ class ChatMessageBubble extends StatelessWidget {
                             TextStyle(color: textColor),
                         child: RichTextContent(
                           siteContext: siteContext,
+                          // Chat stays at its denser size; 16 is for posts.
+                          baseFontSize: 14,
                           content: message.cooked.isNotEmpty
                               ? message.cooked
                               : message.message,

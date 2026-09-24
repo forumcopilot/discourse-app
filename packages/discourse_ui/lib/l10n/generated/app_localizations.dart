@@ -4137,6 +4137,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Every month at this weekday'**
   String get eventEveryMonth;
+
+  /// Error: no response from the forum (offline, DNS, refused).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t reach the forum. Check your connection and try again.'**
+  String get errorNoConnection;
+
+  /// Error: the forum did not answer in time.
+  ///
+  /// In en, this message translates to:
+  /// **'The forum took too long to answer. Please try again.'**
+  String get errorTimedOut;
+
+  /// Error: HTTP 402, content reserved for paying members.
+  ///
+  /// In en, this message translates to:
+  /// **'This is only for the forum\'s paying members.'**
+  String get errorPaywalled;
+
+  /// Error: a firewall/bot check answered instead of the forum.
+  ///
+  /// In en, this message translates to:
+  /// **'The forum\'s firewall blocked the app. Try again later, or open the forum in a browser.'**
+  String get errorBlocked;
+
+  /// Error: 401/403 from the forum itself.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have access to this. Signing in may help.'**
+  String get errorNotAllowed;
+
+  /// Error: 404/410.
+  ///
+  /// In en, this message translates to:
+  /// **'This doesn\'t exist, or it was removed.'**
+  String get errorNotFound;
+
+  /// Error: 429 rate limit.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re doing that too often. Please wait a moment and try again.'**
+  String get errorRateLimited;
+
+  /// Error: 5xx, the forum is down or failing.
+  ///
+  /// In en, this message translates to:
+  /// **'The forum isn\'t responding right now. Please try again later.'**
+  String get errorForumDown;
 }
 
 class _AppLocalizationsDelegate

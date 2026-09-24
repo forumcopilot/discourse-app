@@ -198,6 +198,65 @@ abstract class BaseDiscourseProxy {
 /// rate-limit JSON blob or an entire CDN HTML error page ended up on screen.
 /// Discourse's own sentence ("You've performed this action too many
 /// times…") is right there in the payload; this surfaces that instead.
+/// What went wrong with a request, in terms a reader can act on. The UI
+/// words each kind in the reader's language (see [discourseErrorKindOf]);
+/// anything else keeps the forum's own message.
+enum DiscourseErrorKind {
+  /// No response at all: offline, DNS, refused.
+  noConnection,
+
+  /// The forum did not answer in time.
+  timedOut,
+
+  /// HTTP 402: the forum reserves this for paying members.
+  paywalled,
+
+  /// A firewall or bot check (Cloudflare and the like) answered instead of
+  /// the forum.
+  blocked,
+
+  /// 401/403 from the forum itself: private, or needs signing in.
+  notAllowed,
+
+  /// 404/410.
+  notFound,
+
+  /// 429.
+  rateLimited,
+
+  /// 5xx: the forum is down or failing.
+  forumDown,
+}
+
+/// The plain sentence for each kind, in English. These are also the
+/// `resultText` a failed proxy call carries, which is how the UI recognises
+/// the kind after it crossed the SDK as text ([discourseErrorKindOf]).
+const Map<DiscourseErrorKind, String> discourseErrorMessages = {
+  DiscourseErrorKind.noConnection: "Couldn't reach the forum. Check your connection and try again.",
+  DiscourseErrorKind.timedOut: 'The forum took too long to answer. Please try again.',
+  DiscourseErrorKind.paywalled: "This is only for the forum's paying members.",
+  DiscourseErrorKind.blocked:
+      "The forum's firewall blocked the app. Try again later, or open the forum in a browser.",
+  DiscourseErrorKind.notAllowed: "You don't have access to this. Signing in may help.",
+  DiscourseErrorKind.notFound: "This doesn't exist, or it was removed.",
+  DiscourseErrorKind.rateLimited: "You're doing that too often. Please wait a moment and try again.",
+  DiscourseErrorKind.forumDown: "The forum isn't responding right now. Please try again later.",
+};
+
+/// The kind of [error] — a [DiscourseApiException], or the `resultText` a
+/// proxy built from one — or null when it is something else (a message the
+/// forum itself wrote, say), which the UI should show as it is.
+DiscourseErrorKind? discourseErrorKindOf(Object? error) {
+  if (error is DiscourseApiException) return error.kind;
+  final text = error?.toString().trim();
+  if (text == null || text.isEmpty) return null;
+  for (final e in discourseErrorMessages.entries) {
+    if (text == e.value) return e.key;
+  }
+  if (text.startsWith("You're doing that too often.")) return DiscourseErrorKind.rateLimited;
+  return null;
+}
+
 String describeApiError(Object? error) {
   if (error is DiscourseApiException) return error.userMessage;
   if (error == null) return 'Something went wrong. Please try again.';
@@ -221,6 +280,36 @@ class DiscourseApiException implements Exception {
     required this.body,
   });
 
+  /// What went wrong, for the kinds a reader can act on; null otherwise.
+  DiscourseErrorKind? get kind {
+    if (statusCode == 0) {
+      return body.contains('Timeout') ? DiscourseErrorKind.timedOut : DiscourseErrorKind.noConnection;
+    }
+    if (statusCode == 402) return DiscourseErrorKind.paywalled;
+    if (isFirewallPage) return DiscourseErrorKind.blocked;
+    if (statusCode == 429) return DiscourseErrorKind.rateLimited;
+    if (statusCode == 404 || statusCode == 410) return DiscourseErrorKind.notFound;
+    if (statusCode == 401 || statusCode == 403) return DiscourseErrorKind.notAllowed;
+    if (statusCode >= 500) return DiscourseErrorKind.forumDown;
+    return null;
+  }
+
+  static final RegExp _firewallMarkers = RegExp(
+    r'cf-chl|challenge-platform|Just a moment|Attention Required|cf-error|cloudflare|'
+    r'captcha|Access denied|Request blocked|Browser Update Required|ddos-guard|sucuri',
+    caseSensitive: false,
+  );
+
+  /// The response is a firewall's or bot check's HTML page rather than the
+  /// forum's JSON: Cloudflare's challenge, "Access denied", or a forum
+  /// turning away the browser ("Browser Update Required").
+  bool get isFirewallPage {
+    if (statusCode < 400 || statusCode == 404) return false;
+    final head = body.length > 4000 ? body.substring(0, 4000) : body;
+    if (head.trimLeft().startsWith('{')) return false;
+    return _firewallMarkers.hasMatch(head);
+  }
+
   /// True when Discourse rejected the request with 401/403 — the User API
   /// Key has likely been revoked or never had the requested scope. The
   /// caller should clear stored credentials and trigger a re-handshake.
@@ -231,6 +320,16 @@ class DiscourseApiException implements Exception {
   /// Fallback shapes: `{"error": "..."}`, `{"message": "..."}`, or a raw
   /// status-code string.
   String get userMessage {
+    // Where the forum's own words would not help — a firewall page, no
+    // answer, a paywall, a server error — say plainly what happened.
+    final k = kind;
+    if (k == DiscourseErrorKind.blocked ||
+        k == DiscourseErrorKind.noConnection ||
+        k == DiscourseErrorKind.timedOut ||
+        k == DiscourseErrorKind.paywalled ||
+        k == DiscourseErrorKind.forumDown) {
+      return discourseErrorMessages[k]!;
+    }
     if (body.isNotEmpty) {
       try {
         final decoded = jsonDecode(body);
@@ -248,11 +347,9 @@ class DiscourseApiException implements Exception {
         // not JSON — fall through.
       }
     }
-    if (statusCode == 0) return 'Network error';
-    if (statusCode == 401 || statusCode == 403) {
-      return 'Not authorized (HTTP $statusCode)';
+    if (k == DiscourseErrorKind.notAllowed || k == DiscourseErrorKind.notFound) {
+      return discourseErrorMessages[k]!;
     }
-    if (statusCode == 404) return 'Not found';
     if (statusCode == 422) return 'Request rejected (HTTP 422)';
     // Discourse's middleware rate limiter answers text/plain, so there is no
     // `errors` array to read above — only the header tells us how long.
@@ -263,7 +360,6 @@ class DiscourseApiException implements Exception {
           : "You're doing that too often. Please wait $wait "
               "second${wait == 1 ? '' : 's'} and try again.";
     }
-    if (statusCode >= 500) return 'Server error (HTTP $statusCode)';
     if (statusCode >= 300 && statusCode < 400) {
       return 'The forum redirected this request (HTTP $statusCode).';
     }

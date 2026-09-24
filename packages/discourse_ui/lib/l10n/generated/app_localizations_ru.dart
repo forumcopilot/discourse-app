@@ -2444,4 +2444,34 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get eventEveryMonth => 'Каждый месяц в этот будний день';
+
+  @override
+  String get errorNoConnection =>
+      'Не удалось подключиться к форуму. Проверьте соединение и повторите попытку.';
+
+  @override
+  String get errorTimedOut =>
+      'Форум слишком долго не отвечает. Повторите попытку.';
+
+  @override
+  String get errorPaywalled => 'Это доступно только платным участникам форума.';
+
+  @override
+  String get errorBlocked =>
+      'Брандмауэр форума заблокировал приложение. Повторите попытку позже или откройте форум в браузере.';
+
+  @override
+  String get errorNotAllowed =>
+      'У вас нет доступа к этому. Возможно, поможет вход в аккаунт.';
+
+  @override
+  String get errorNotFound => 'Этого не существует, или это было удалено.';
+
+  @override
+  String get errorRateLimited =>
+      'Вы делаете это слишком часто. Подождите немного и повторите попытку.';
+
+  @override
+  String get errorForumDown =>
+      'Форум сейчас не отвечает. Повторите попытку позже.';
 }

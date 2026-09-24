@@ -2446,4 +2446,35 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get eventEveryMonth => 'Elke maand op deze weekdag';
+
+  @override
+  String get errorNoConnection =>
+      'Het forum is niet bereikbaar. Controleer je verbinding en probeer het opnieuw.';
+
+  @override
+  String get errorTimedOut =>
+      'Het forum reageerde te traag. Probeer het opnieuw.';
+
+  @override
+  String get errorPaywalled =>
+      'Dit is alleen voor betalende leden van het forum.';
+
+  @override
+  String get errorBlocked =>
+      'De firewall van het forum heeft de app geblokkeerd. Probeer het later opnieuw of open het forum in een browser.';
+
+  @override
+  String get errorNotAllowed =>
+      'Je hebt hier geen toegang toe. Inloggen kan helpen.';
+
+  @override
+  String get errorNotFound => 'Dit bestaat niet of is verwijderd.';
+
+  @override
+  String get errorRateLimited =>
+      'Je doet dat te vaak. Wacht even en probeer het opnieuw.';
+
+  @override
+  String get errorForumDown =>
+      'Het forum reageert momenteel niet. Probeer het later opnieuw.';
 }

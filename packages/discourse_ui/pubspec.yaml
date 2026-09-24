@@ -57,6 +57,8 @@ dependencies:
   flutter_math_fork: ^0.7.4 # discourse-math: TeX in posts
   intl: ^0.20.2 # already in the graph via flutter_localizations
   timezone: ^0.10.1 # already in the graph via flutter_local_notifications; local dates, events
+  flutter_highlight: ^0.7.0
+  highlight: ^0.7.0
 
 dev_dependencies:
   flutter_test:

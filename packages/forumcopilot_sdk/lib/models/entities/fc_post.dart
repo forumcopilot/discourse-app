@@ -185,6 +185,16 @@ class FCPost with FCPostMappable {
   /// (Discourse: `hidden`). Its body may be withheld from the viewer.
   bool isHidden;
 
+  /// The author's full name, beside [authorName] (the username) as the web
+  /// shows it (Discourse: `name`; absent when the forum turns names off or
+  /// the author set none).
+  String? authorDisplayName;
+
+  /// How many times each link in the post was followed, by URL, for links
+  /// that were (Discourse: `link_counts[].clicks`). The web shows the count
+  /// as a small badge after the link.
+  Map<String, int> linkClicks;
+
   FCPost(
       {required this.id,
       required this.title,
@@ -233,6 +243,8 @@ class FCPost with FCPostMappable {
       this.actionCodeWho,
       this.isModeratorAction = false,
       this.isHidden = false,
+      this.authorDisplayName,
+      this.linkClicks = const {},
       this.replyToPostNumber,
       this.replyToUsername,
       this.replyToIconUrl,

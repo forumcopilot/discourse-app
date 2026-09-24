@@ -526,7 +526,7 @@ class _PostsState extends State<PostsList> {
 
   Widget _buildInitialLoadError(BuildContext context) {
     return EmptyStateView.error(
-      message: describeError(_initialLoadError),
+      message: describeError(_initialLoadError, context: context),
       // Most refusals a signed-out reader meets are content that needs an
       // account — a PM from a notification, a restricted category.
       hint: widget.siteContext.isLoggedIn

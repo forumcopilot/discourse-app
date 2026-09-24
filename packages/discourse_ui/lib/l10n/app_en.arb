@@ -2971,5 +2971,37 @@
   "eventEveryMonth": "Every month at this weekday",
   "@eventEveryMonth": {
     "description": "Calendar event card label (discourse-calendar every_month)."
+  },
+  "errorNoConnection": "Couldn't reach the forum. Check your connection and try again.",
+  "@errorNoConnection": {
+    "description": "Error: no response from the forum (offline, DNS, refused)."
+  },
+  "errorTimedOut": "The forum took too long to answer. Please try again.",
+  "@errorTimedOut": {
+    "description": "Error: the forum did not answer in time."
+  },
+  "errorPaywalled": "This is only for the forum's paying members.",
+  "@errorPaywalled": {
+    "description": "Error: HTTP 402, content reserved for paying members."
+  },
+  "errorBlocked": "The forum's firewall blocked the app. Try again later, or open the forum in a browser.",
+  "@errorBlocked": {
+    "description": "Error: a firewall/bot check answered instead of the forum."
+  },
+  "errorNotAllowed": "You don't have access to this. Signing in may help.",
+  "@errorNotAllowed": {
+    "description": "Error: 401/403 from the forum itself."
+  },
+  "errorNotFound": "This doesn't exist, or it was removed.",
+  "@errorNotFound": {
+    "description": "Error: 404/410."
+  },
+  "errorRateLimited": "You're doing that too often. Please wait a moment and try again.",
+  "@errorRateLimited": {
+    "description": "Error: 429 rate limit."
+  },
+  "errorForumDown": "The forum isn't responding right now. Please try again later.",
+  "@errorForumDown": {
+    "description": "Error: 5xx, the forum is down or failing."
   }
 }

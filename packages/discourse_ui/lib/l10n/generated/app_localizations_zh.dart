@@ -2333,4 +2333,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get eventEveryMonth => '每个月的这个工作日';
+
+  @override
+  String get errorNoConnection => '无法连接到论坛。请检查网络连接后重试。';
+
+  @override
+  String get errorTimedOut => '论坛响应超时，请重试。';
+
+  @override
+  String get errorPaywalled => '此内容仅限论坛付费会员查看。';
+
+  @override
+  String get errorBlocked => '论坛的防火墙拦截了本应用。请稍后重试，或在浏览器中打开论坛。';
+
+  @override
+  String get errorNotAllowed => '你无权访问此内容。登录后或许可以查看。';
+
+  @override
+  String get errorNotFound => '该内容不存在或已被删除。';
+
+  @override
+  String get errorRateLimited => '操作过于频繁，请稍候再试。';
+
+  @override
+  String get errorForumDown => '论坛暂时没有响应，请稍后再试。';
 }

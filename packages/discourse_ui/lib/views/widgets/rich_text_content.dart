@@ -6,9 +6,11 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'brand_image.dart';
+import 'code_block.dart';
 import 'discourse_blocks.dart';
 import 'embed_cards.dart';
 import 'onebox_card.dart';
+import 'post_body_extensions.dart';
 import 'post_content_callbacks.dart' show PostContentCallbacks;
 import 'post_table.dart';
 import 'twitter_card.dart';
@@ -44,6 +46,10 @@ class RichTextContent extends StatelessWidget {
   /// diagram offers to open it there).
   final String? webUrl;
 
+  /// Body text size. Posts use Discourse's 16 (the web's size on phones);
+  /// denser surfaces such as chat pass their own.
+  final double? baseFontSize;
+
   const RichTextContent({
     super.key,
     required this.siteContext,
@@ -51,6 +57,7 @@ class RichTextContent extends StatelessWidget {
     this.callbacks,
     this.pollBuilder,
     this.webUrl,
+    this.baseFontSize,
   });
 
   /// Extracts the username from a Discourse profile href
@@ -69,7 +76,10 @@ class RichTextContent extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final body = textTheme.bodyMedium ?? const TextStyle();
+    // 16 with 1.5 line spacing, as Discourse sets post text; the app used
+    // Material's 14/1.4, which made long posts read noticeably denser.
+    final body = (textTheme.bodyMedium ?? const TextStyle())
+        .copyWith(fontSize: baseFontSize ?? 16);
     final bodyColor = body.color ?? colorScheme.onSurface;
     final mutedColor = colorScheme.onSurfaceVariant;
     final accent = colorScheme.primary;
@@ -132,6 +142,23 @@ class RichTextContent extends StatelessWidget {
       // PNG for forum-custom emoji that aren't in standard Unicode.
       extensions: [
         PostTableExtension(colorScheme: colorScheme),
+        MentionExtension(onTap: (href, isGroup) {
+          if (!isGroup && callbacks?.onMentionTap != null) {
+            final username = _usernameFromHref(href);
+            if (username != null && username.isNotEmpty) {
+              callbacks!.onMentionTap!(username);
+              return;
+            }
+          }
+          openEmbed(href);
+        }),
+        const DetailsExtension(),
+        ImageGridExtension(
+          resolve: _resolveUrl,
+          onImageTap: callbacks?.onImageTap == null
+              ? null
+              : (full, imageContext) => callbacks!.onImageTap!(full, imageContext, full),
+        ),
         _EmbedExtension(resolve: _resolveUrl, onOpen: openEmbed),
         DiscourseBlocksExtension(onOpen: openEmbed, pollBuilder: pollBuilder),
         // Link previews: a native card; what is inside the preview's body is
@@ -185,31 +212,18 @@ class RichTextContent extends StatelessWidget {
                 ? lines.map((li) => li.text).join('\n')
                 : extensionContext.element?.text ?? '';
             if (code.isEmpty) return const SizedBox.shrink();
-            final codeBlock = Container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.all(12),
-                // Plain Text, not SelectableText: SelectableText claims
-                // horizontal drags for text selection, which swallows the
-                // scroll gesture and leaves the block clipped with no way
-                // to reach the rest of the line. Scrolling matters more
-                // here than selecting.
-                child: Text(
-                  // Trailing newlines are common in cooked <pre> and would
-                  // otherwise leave a blank band inside the block.
-                  code.replaceAll(RegExp(r'\n+$'), ''),
-                  style: body.copyWith(
-                    fontFamily: 'monospace',
-                    fontSize: (body.fontSize ?? 14) * 0.92,
-                    height: 1.35,
-                  ),
-                ),
+            final language = RegExp(r'(?:^|\s)lang-([\w+#-]+)')
+                .firstMatch(extensionContext.element?.querySelector('code')?.className ?? '')
+                ?.group(1);
+            final codeBlock = CodeBlock(
+              // Trailing newlines are common in cooked <pre> and would
+              // otherwise leave a blank band inside the block.
+              code: code.replaceAll(RegExp(r'\n+$'), ''),
+              language: extensionContext.attributes['data-code-wrap'] == 'mermaid' ? null : language,
+              textStyle: body.copyWith(
+                fontFamily: 'monospace',
+                fontSize: (body.fontSize ?? 14) * 0.85,
+                height: 1.4,
               ),
             );
             // A Mermaid diagram is drawn by JavaScript on the web; the app
@@ -253,6 +267,7 @@ class RichTextContent extends StatelessWidget {
             final alt = extensionContext.attributes['alt'] ?? '';
             final classes = (extensionContext.attributes['class'] ?? '');
             final isEmoji = classes.contains('emoji');
+            final onlyEmoji = classes.split(RegExp(r'\s+')).contains('only-emoji');
 
             if (isEmoji) {
               // alt is `:name:` or `:name:tN:` for a skin-toned emoji.
@@ -264,8 +279,10 @@ class RichTextContent extends StatelessWidget {
                   return Text(
                     unicode,
                     style: body.copyWith(
-                      // Bump emoji slightly so they sit nicely with text.
-                      fontSize: (body.fontSize ?? 14) * 1.15,
+                      // Bump emoji slightly so they sit nicely with text; a
+                      // post of nothing but emoji shows them large, as the
+                      // web does (`img.emoji.only-emoji`, 32px).
+                      fontSize: onlyEmoji ? 28 : (body.fontSize ?? 14) * 1.15,
                       height: 1.0,
                     ),
                   );
@@ -277,12 +294,14 @@ class RichTextContent extends StatelessWidget {
 
             if (src == null || src.isEmpty) return const SizedBox.shrink();
             final resolved = _resolveUrl(src);
-            final w = double.tryParse(
-                    extensionContext.attributes['width'] ?? '') ??
-                (isEmoji ? 20 : null);
-            final h = double.tryParse(
-                    extensionContext.attributes['height'] ?? '') ??
-                (isEmoji ? 20 : null);
+            final w = onlyEmoji
+                ? 32.0
+                : double.tryParse(extensionContext.attributes['width'] ?? '') ??
+                    (isEmoji ? 20 : null);
+            final h = onlyEmoji
+                ? 32.0
+                : double.tryParse(extensionContext.attributes['height'] ?? '') ??
+                    (isEmoji ? 20 : null);
             // A onebox's avatar (a tweet's author, a GitHub user) is a small
             // square beside the text on the web; at its own 400×400 it
             // would fill the post.
@@ -357,6 +376,29 @@ class RichTextContent extends StatelessWidget {
                 height: 1,
                 thickness: 1,
                 color: colorScheme.outlineVariant,
+              ),
+            ),
+          ),
+        ),
+        // A followed link's click count, as the web's small grey badge.
+        MatcherExtension.inline(
+          matcher: (c) => c.elementName == 'span' && c.classes.contains('link-clicks'),
+          builder: (c) => WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: Container(
+              margin: const EdgeInsets.only(left: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                c.element?.text ?? '',
+                style: body.copyWith(
+                  fontSize: (body.fontSize ?? 14) * 0.7,
+                  color: mutedColor,
+                  height: 1.2,
+                ),
               ),
             ),
           ),
@@ -840,15 +882,16 @@ Map<String, Style> _stylesFor(ColorScheme colorScheme, TextStyle body,
       padding: HtmlPaddings.zero,
       fontSize: FontSize(body.fontSize ?? 14),
       color: bodyColor,
-      lineHeight: const LineHeight(1.4),
+      lineHeight: const LineHeight(1.5),
     ),
     'p': Style(
-      margin: Margins.only(bottom: 8),
+      margin: Margins.only(bottom: 12),
       padding: HtmlPaddings.zero,
     ),
+    // The web marks links by colour alone.
     'a': Style(
       color: accent,
-      textDecoration: TextDecoration.underline,
+      textDecoration: TextDecoration.none,
     ),
     'a.mention': Style(
       color: accent,

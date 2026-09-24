@@ -304,7 +304,12 @@ class _PostListItemState extends State<PostListItem> {
     // in place by RichTextContent, where the web shows them, and plain
     // links get no preview — web shows only what the forum oneboxed.
     return _PostContentData(
-      html: content.html,
+      // The web's click-count badges after followed links.
+      html: CookedContent.withLinkClicks(
+        content.html,
+        widget.post.linkClicks,
+        forumBaseUrl: widget.siteContext.site.url,
+      ),
       attachments: nonInlineAttachments,
       inlineAttachments: widget.post.inlineAttachments,
     );

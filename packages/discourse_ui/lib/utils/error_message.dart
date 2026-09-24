@@ -1,4 +1,9 @@
-import 'package:discourse_core/discourse_core.dart' show DiscourseApiException;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseApiException, DiscourseErrorKind, discourseErrorKindOf;
+import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
+
+import '../l10n/generated/app_localizations.dart';
 
 /// Turns a caught error into something worth showing a person.
 ///
@@ -9,7 +14,32 @@ import 'package:discourse_core/discourse_core.dart' show DiscourseApiException;
 ///
 /// Every user-facing error string should go through here. Keep raw `$e` for
 /// `AppLogger`, where the detail is the point.
-String describeError(Object? error, {String? fallback}) {
+///
+/// What a reader can act on — no connection, a timeout, a paywall, the
+/// forum's firewall, no access, not found, too many requests, the forum
+/// down — is said plainly in their language ([DiscourseErrorKind]), instead
+/// of "Payment Required", "Not authorized (HTTP 403)" or "An unexpected
+/// error occurred". Anything else keeps the forum's own message.
+String describeError(Object? error, {String? fallback, BuildContext? context}) {
+  final text = _describe(error, fallback: fallback);
+  final kind = error is DiscourseApiException ? error.kind : discourseErrorKindOf(text);
+  if (kind == null) return text;
+  final ctx = context ?? Get.context;
+  final l10n = ctx == null ? null : AppLocalizations.of(ctx);
+  if (l10n == null) return text;
+  return switch (kind) {
+    DiscourseErrorKind.noConnection => l10n.errorNoConnection,
+    DiscourseErrorKind.timedOut => l10n.errorTimedOut,
+    DiscourseErrorKind.paywalled => l10n.errorPaywalled,
+    DiscourseErrorKind.blocked => l10n.errorBlocked,
+    DiscourseErrorKind.notAllowed => l10n.errorNotAllowed,
+    DiscourseErrorKind.notFound => l10n.errorNotFound,
+    DiscourseErrorKind.rateLimited => l10n.errorRateLimited,
+    DiscourseErrorKind.forumDown => l10n.errorForumDown,
+  };
+}
+
+String _describe(Object? error, {String? fallback}) {
   if (error == null) {
     return fallback ?? 'Something went wrong. Please try again.';
   }

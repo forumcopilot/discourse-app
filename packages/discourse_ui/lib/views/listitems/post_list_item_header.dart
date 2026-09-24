@@ -129,6 +129,21 @@ class PostListItemHeader extends StatelessWidget {
                         ),
                       ),
                     ),
+                    // The full name after the username, as the web shows
+                    // it — unless it only restates the username.
+                    if (_showsDisplayName(post)) ...[
+                      SizedBox(width: DesignTokens.spacingS),
+                      Flexible(
+                        child: Text(
+                          post.authorDisplayName!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
                     // Title / group flair beside the name, as web does.
                     // Preferring the title when both exist matches
                     // Discourse: the title is the more specific statement
@@ -321,5 +336,14 @@ class PostListItemHeader extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Whether [post]'s full name says more than its username ("Noah Kim"
+  /// beside "noahkim" does not).
+  static bool _showsDisplayName(FCPost post) {
+    final name = post.authorDisplayName?.trim();
+    if (name == null || name.isEmpty) return false;
+    String norm(String s) => s.toLowerCase().replaceAll(RegExp(r'[^\p{L}\p{N}]', unicode: true), '');
+    return norm(name) != norm(post.authorName);
   }
 }

@@ -93,6 +93,7 @@ class SolutionSummaryCard extends StatelessWidget {
                     child: ClipRect(
                       child: RichTextContent(
                         content: answer.excerptHtml!,
+                        baseFontSize: 14,
                         siteContext: siteContext,
                       ),
                     ),

@@ -2455,4 +2455,35 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get eventEveryMonth => 'Ogni mese in questo giorno feriale';
+
+  @override
+  String get errorNoConnection =>
+      'Impossibile raggiungere il forum. Controlla la connessione e riprova.';
+
+  @override
+  String get errorTimedOut =>
+      'Il forum ha impiegato troppo tempo a rispondere. Riprova.';
+
+  @override
+  String get errorPaywalled =>
+      'Questo contenuto è riservato ai membri paganti del forum.';
+
+  @override
+  String get errorBlocked =>
+      'Il firewall del forum ha bloccato l\'app. Riprova più tardi o apri il forum in un browser.';
+
+  @override
+  String get errorNotAllowed =>
+      'Non hai accesso a questo contenuto. Accedere potrebbe aiutare.';
+
+  @override
+  String get errorNotFound => 'Questo contenuto non esiste o è stato rimosso.';
+
+  @override
+  String get errorRateLimited =>
+      'Stai facendo questa operazione troppo spesso. Attendi un momento e riprova.';
+
+  @override
+  String get errorForumDown =>
+      'Il forum non risponde al momento. Riprova più tardi.';
 }

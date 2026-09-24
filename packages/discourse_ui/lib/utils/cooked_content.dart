@@ -201,6 +201,58 @@ class CookedContent {
     );
   }
 
+  /// [html] with the web's click-count badge after each link that was
+  /// followed (`link_counts`; see FCPost.linkClicks): a
+  /// `<span class="link-clicks">1.2k</span>` RichTextContent draws as a
+  /// small pill. Mentions, hashtags, images, attachments and the links
+  /// inside quotes and previews get none, as on the web.
+  static String withLinkClicks(String html, Map<String, int> clicks, {required String forumBaseUrl}) {
+    if (clicks.isEmpty || html.isEmpty) return html;
+    final origin = _origin(forumBaseUrl);
+    String norm(String u) {
+      var a = _absolute(u.trim(), origin);
+      while (a.endsWith('/')) {
+        a = a.substring(0, a.length - 1);
+      }
+      return a;
+    }
+
+    final byUrl = {for (final e in clicks.entries) norm(e.key): e.value};
+    final fragment = html_parser.parseFragment(html);
+    var changed = false;
+    for (final a in fragment.querySelectorAll('a[href]')) {
+      final c = _classes(a);
+      if (c.contains('mention') || c.contains('mention-group') || c.contains('hashtag-cooked') ||
+          c.contains('lightbox') || c.contains('attachment') || c.contains('onebox')) {
+        continue;
+      }
+      if (_hasAncestorMatching(a, (e) => e.localName == 'aside')) continue;
+      final n = byUrl[norm(a.attributes['href']!)];
+      if (n == null || n <= 0) continue;
+      final badge = dom.Element.tag('span')
+        ..classes.add('link-clicks')
+        ..text = formatClickCount(n);
+      final parent = a.parentNode;
+      if (parent == null) continue;
+      parent.nodes.insert(parent.nodes.indexOf(a) + 1, badge);
+      changed = true;
+    }
+    return changed ? fragment.outerHtml : html;
+  }
+
+  /// 253 → "253", 1234 → "1.2k", 12345 → "12k", 1234567 → "1.2M" — the
+  /// web's short number format.
+  static String formatClickCount(int n) {
+    String short(double v, String unit) {
+      final s = v >= 10 ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
+      return '${s.endsWith('.0') ? s.substring(0, s.length - 2) : s}$unit';
+    }
+
+    if (n >= 1000000) return short(n / 1000000, 'M');
+    if (n >= 1000) return short(n / 1000, 'k');
+    return '$n';
+  }
+
   CookedContent copyWithHtml(String newHtml) => CookedContent(
         html: newHtml,
         linkUrls: linkUrls,

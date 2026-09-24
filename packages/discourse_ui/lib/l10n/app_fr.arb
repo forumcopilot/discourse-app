@@ -963,5 +963,13 @@
   "eventEveryWeek": "Chaque semaine en ce jour de la semaine",
   "eventEveryTwoWeeks": "Toutes les deux semaines en ce jour de la semaine",
   "eventEveryFourWeeks": "Toutes les quatre semaines en ce jour de la semaine",
-  "eventEveryMonth": "Chaque mois en ce jour de la semaine"
+  "eventEveryMonth": "Chaque mois en ce jour de la semaine",
+  "errorNoConnection": "Impossible de joindre le forum. Vérifiez votre connexion et réessayez.",
+  "errorTimedOut": "Le forum a mis trop de temps à répondre. Veuillez réessayer.",
+  "errorPaywalled": "Ce contenu est réservé aux membres payants du forum.",
+  "errorBlocked": "Le pare-feu du forum a bloqué l'application. Réessayez plus tard ou ouvrez le forum dans un navigateur.",
+  "errorNotAllowed": "Vous n'avez pas accès à ce contenu. Se connecter pourrait aider.",
+  "errorNotFound": "Ce contenu n'existe pas ou a été supprimé.",
+  "errorRateLimited": "Vous faites cela trop souvent. Patientez un instant et réessayez.",
+  "errorForumDown": "Le forum ne répond pas pour le moment. Veuillez réessayer plus tard."
 }

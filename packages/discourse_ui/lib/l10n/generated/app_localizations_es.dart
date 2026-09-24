@@ -2450,4 +2450,35 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get eventEveryMonth => 'Todos los meses en este día de la semana';
+
+  @override
+  String get errorNoConnection =>
+      'No se pudo conectar con el foro. Comprueba tu conexión e inténtalo de nuevo.';
+
+  @override
+  String get errorTimedOut =>
+      'El foro tardó demasiado en responder. Inténtalo de nuevo.';
+
+  @override
+  String get errorPaywalled =>
+      'Esto es solo para los miembros de pago del foro.';
+
+  @override
+  String get errorBlocked =>
+      'El cortafuegos del foro bloqueó la aplicación. Inténtalo más tarde o abre el foro en un navegador.';
+
+  @override
+  String get errorNotAllowed =>
+      'No tienes acceso a esto. Iniciar sesión podría ayudar.';
+
+  @override
+  String get errorNotFound => 'Esto no existe o se ha eliminado.';
+
+  @override
+  String get errorRateLimited =>
+      'Estás haciendo eso con demasiada frecuencia. Espera un momento e inténtalo de nuevo.';
+
+  @override
+  String get errorForumDown =>
+      'El foro no responde en este momento. Inténtalo más tarde.';
 }

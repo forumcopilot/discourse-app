@@ -98,4 +98,50 @@ void main() {
       expect(_ex(302, '').isAuthFailure, isFalse);
     });
   });
+
+  group('kind: what a reader can act on, said plainly', () {
+    test('402 is a paywall, whatever the body says', () {
+      final e = _ex(402, jsonEncode({'errors': ['Payment Required']}), method: 'GET', path: '/t/5.json');
+      expect(e.kind, DiscourseErrorKind.paywalled);
+      expect(e.userMessage, discourseErrorMessages[DiscourseErrorKind.paywalled]);
+    });
+
+    test('a firewall page is "blocked", not "not authorized"', () {
+      const cloudflare = '<!DOCTYPE html><html><head><title>Just a moment...</title></head>'
+          '<body><div id="challenge-platform"></div></body></html>';
+      final e = _ex(403, cloudflare, method: 'GET', path: '/latest.json');
+      expect(e.kind, DiscourseErrorKind.blocked);
+      expect(e.userMessage, contains('firewall'));
+      final browserGate = _ex(403, '<html><h1>Browser Update Required</h1></html>', method: 'GET');
+      expect(browserGate.kind, DiscourseErrorKind.blocked);
+    });
+
+    test('the forum\'s own 403 keeps its words; its kind is "not allowed"', () {
+      final e = _ex(403, jsonEncode({'errors': ['You are not permitted to view the requested resource.']}),
+          method: 'GET', path: '/t/5.json');
+      expect(e.kind, DiscourseErrorKind.notAllowed);
+      expect(e.userMessage, 'You are not permitted to view the requested resource.');
+    });
+
+    test('5xx is "forum down"; no answer is "no connection" or "timed out"', () {
+      expect(_ex(503, '<html>Service Unavailable</html>').kind, DiscourseErrorKind.forumDown);
+      expect(_ex(502, '').userMessage, discourseErrorMessages[DiscourseErrorKind.forumDown]);
+      expect(_ex(0, jsonEncode({'error': 'x', 'type': 'DioExceptionType.connectionError'})).kind,
+          DiscourseErrorKind.noConnection);
+      expect(_ex(0, jsonEncode({'error': 'x', 'type': 'DioExceptionType.receiveTimeout'})).kind,
+          DiscourseErrorKind.timedOut);
+      expect(_ex(404, '').kind, DiscourseErrorKind.notFound);
+      expect(_ex(422, jsonEncode({'errors': ['Body is too short']})).kind, isNull);
+    });
+
+    test('the kind survives the trip through a result\'s text', () {
+      for (final e in discourseErrorMessages.entries) {
+        expect(discourseErrorKindOf(e.value), e.key);
+      }
+      expect(discourseErrorKindOf("You're doing that too often. Please wait 3 seconds and try again."),
+          DiscourseErrorKind.rateLimited);
+      expect(discourseErrorKindOf('Title seems unclear'), isNull);
+      expect(discourseErrorKindOf(null), isNull);
+    });
+  });
 }

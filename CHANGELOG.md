@@ -6,6 +6,21 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+Thread rendering, batch 6: how a post reads. Covered by `packages/discourse_ui/test/post_polish_test.dart`, `packages/discourse_core/test/api_exception_test.dart` and `post_kinds_and_polls_test.dart`, and checked before/after on the Pixel in light and dark themes.
+
+### Changed
+- **Post text is 16 with 1.5 line spacing**, Discourse's size on phones, instead of Material's 14/1.4 (long posts read noticeably denser). Chat and the solved-answer excerpt keep their 14.
+- **Links are marked by colour alone**, as on the web; they were underlined.
+- **@mentions are pills** (rounded, on a light background), as on the web, instead of bold link-coloured text.
+- **A post of nothing but emoji shows it large** (`only-emoji`, 32px on the web).
+- **Authors' full names show beside their usernames**, as on the web, when the forum has names and the name says more than the username.
+- **Followed links show their click count**, the web's small grey badge ("253", "1.2k").
+- **Code is coloured by its language and has a copy button.** The a11y palettes are used, with every token colour then held to 4.5:1 contrast on the block in both themes (stock palettes put comments and annotations in greys under 2.5:1); `lang-auto` is detected for short blocks, unknown languages stay plain.
+- **`<details>` is discourse-details' ▶ summary** on a light background, not a Material ExpansionTile.
+- **Image grids are two masonry columns**, as the web lays them out on a phone (or a sideways carousel for carousel grids), instead of a stack.
+- **Errors say what happened, in the reader's language**: no connection, timed out, only for paying members, blocked by the forum's firewall, no access, not found, too many requests, forum not responding — instead of "Payment Required", "Not authorized (HTTP 403)" or "An unexpected error occurred", both on the thread page and in the error dialog (which also drops its Retry where retrying cannot help). A message the forum wrote itself is still shown as it is. `DiscourseErrorKind` in discourse_core classifies; the UI words it.
+- `FCPost` carries `authorDisplayName` and `linkClicks` (canonical SDK tapatalk_flutter `615cd205`, synced). Added `flutter_highlight` and `highlight`.
+
 ## [1.0.24] - 2026-09-23
 
 Thread rendering, batch 5: link previews. Covered by `packages/discourse_ui/test/onebox_rendering_test.dart` and checked before/after on the Pixel in light and dark themes.

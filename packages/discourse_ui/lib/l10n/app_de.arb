@@ -963,5 +963,13 @@
   "eventEveryWeek": "Jede Woche an diesem Wochentag",
   "eventEveryTwoWeeks": "Alle zwei Wochen an diesem Wochentag",
   "eventEveryFourWeeks": "Alle vier Wochen an diesem Wochentag",
-  "eventEveryMonth": "Jeden Monat an diesem Wochentag"
+  "eventEveryMonth": "Jeden Monat an diesem Wochentag",
+  "errorNoConnection": "Das Forum ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+  "errorTimedOut": "Das Forum hat zu lange nicht geantwortet. Bitte versuchen Sie es erneut.",
+  "errorPaywalled": "Dies ist nur für zahlende Mitglieder des Forums verfügbar.",
+  "errorBlocked": "Die Firewall des Forums hat die App blockiert. Versuchen Sie es später erneut oder öffnen Sie das Forum im Browser.",
+  "errorNotAllowed": "Sie haben keinen Zugriff darauf. Eine Anmeldung könnte helfen.",
+  "errorNotFound": "Das existiert nicht oder wurde entfernt.",
+  "errorRateLimited": "Sie tun das zu oft. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+  "errorForumDown": "Das Forum antwortet gerade nicht. Bitte versuchen Sie es später erneut."
 }

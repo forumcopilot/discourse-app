@@ -1261,5 +1261,13 @@
   "eventEveryWeek": "Elke week op deze weekdag",
   "eventEveryTwoWeeks": "Elke twee weken op deze weekdag",
   "eventEveryFourWeeks": "Elke vier weken op deze weekdag",
-  "eventEveryMonth": "Elke maand op deze weekdag"
+  "eventEveryMonth": "Elke maand op deze weekdag",
+  "errorNoConnection": "Het forum is niet bereikbaar. Controleer je verbinding en probeer het opnieuw.",
+  "errorTimedOut": "Het forum reageerde te traag. Probeer het opnieuw.",
+  "errorPaywalled": "Dit is alleen voor betalende leden van het forum.",
+  "errorBlocked": "De firewall van het forum heeft de app geblokkeerd. Probeer het later opnieuw of open het forum in een browser.",
+  "errorNotAllowed": "Je hebt hier geen toegang toe. Inloggen kan helpen.",
+  "errorNotFound": "Dit bestaat niet of is verwijderd.",
+  "errorRateLimited": "Je doet dat te vaak. Wacht even en probeer het opnieuw.",
+  "errorForumDown": "Het forum reageert momenteel niet. Probeer het later opnieuw."
 }

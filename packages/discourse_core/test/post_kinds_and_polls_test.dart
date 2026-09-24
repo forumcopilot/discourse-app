@@ -24,7 +24,7 @@ void main() {
   Map<String, dynamic> thread() => {
         'id': 7,
         'title': 'A thread',
-        'posts_count': 4,
+        'posts_count': 5,
         'details': <String, dynamic>{},
         'post_stream': {
           'posts': [
@@ -46,6 +46,15 @@ void main() {
               'cooked': '<p>Please keep it civil.</p>', 'hidden': true,
               'polls': [poll('first', ['b1', 'b2']), poll('second', ['c1', 'c2'])],
               'polls_votes': {'second': ['c2']},
+            },
+            {
+              'id': 105, 'post_number': 5, 'post_type': 1, 'username': 'noahk', 'name': 'Noah Kim',
+              'cooked': '<p><a href="https://example.org/a">a</a></p>',
+              'link_counts': [
+                {'url': 'https://example.org/a', 'internal': false, 'reflection': false, 'clicks': 253},
+                {'url': 'https://example.org/b', 'internal': false, 'reflection': false, 'clicks': 0},
+                {'url': 'https://forum.example/t/x/9', 'internal': true, 'reflection': true, 'clicks': 4},
+              ],
             },
           ],
         },
@@ -77,6 +86,16 @@ void main() {
     expect(posts[3].isModeratorAction, isTrue);
     expect(posts[3].isHidden, isTrue);
     expect(posts[0].isModeratorAction, isFalse);
+  });
+
+  test('the author\'s full name and the links\' click counts', () async {
+    proxy.nextGet = thread();
+    final posts = (await proxy.getThreadAsync('7', 1, 20, true)).posts;
+    expect(posts[4].authorName, 'noahk');
+    expect(posts[4].authorDisplayName, 'Noah Kim');
+    expect(posts[4].linkClicks, {'https://example.org/a': 253});
+    expect(posts[0].authorDisplayName, isNull);
+    expect(posts[0].linkClicks, isEmpty);
   });
 
   test('a vote in a reply\'s second poll goes to that post and poll', () async {

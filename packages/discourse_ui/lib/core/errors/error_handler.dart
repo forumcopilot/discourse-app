@@ -3,7 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:get/get.dart';
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseApiException, DiscourseErrorKind, discourseErrorKindOf;
 import 'app_exceptions.dart';
+import '../../controllers/post_controller.dart' show ThreadLoadException;
+import '../../utils/error_message.dart';
 import '../../controllers/global_loader_controller.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 
@@ -213,11 +217,22 @@ class ErrorHandler {
     dynamic error,
     String? context,
   ) async {
+    final l10n = Get.context == null ? null : AppLocalizations.of(Get.context!);
     String message = 'An unexpected error occurred. Please try again.';
-    String title = 'Error';
+    String title = l10n?.errorTitle ?? 'Error';
     bool showRetry = true;
 
-    if (error is AppException) {
+    // What the forum reported — a failed thread load, an API error — is
+    // said plainly in the reader's language when it is a kind they can act
+    // on (a paywall, the forum's firewall, the forum down…), or in the
+    // forum's own words; "an unexpected error" only for the unexpected.
+    final kind = discourseErrorKindOf(error is DiscourseApiException ? error : error?.toString());
+    if (kind != null || error is DiscourseApiException || error is ThreadLoadException) {
+      message = describeError(error, fallback: message);
+      showRetry = kind != DiscourseErrorKind.paywalled &&
+          kind != DiscourseErrorKind.notAllowed &&
+          kind != DiscourseErrorKind.notFound;
+    } else if (error is AppException) {
       message = error.message;
 
       // Customize title and retry option based on error type
