@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.30] - 2026-09-24
+
 ### Added
 - **The app wears the forum's own colours.** Its light and dark Discourse colour schemes (`/site.json`'s `default_light_color_scheme` / `default_dark_color_scheme`) become the app's theme: the forum's page and text colours, its accent on buttons, links and the selected filter, its `danger`, its `selected` behind chips and the bottom bar, and Material's greys mixed from its own page and text the way Discourse mixes `primary-low`. A colour that would not be legible is left to a scheme seeded from the forum's accent, and so is a mode the forum has no scheme for — a light-only forum still gets a dark mode in its accent, and a dark-only one (forum.obsidian.md, freeCodeCamp) a light one. Outside a forum (ABDA's forum list) the host keeps its own colours. Palettes are remembered on the device, so a forum opens in its colours at once; the forum's page wears them from its first frame. Checked on the Pixel 4a in ABDA: Let's Encrypt's own dark scheme, Asana's light scheme and the dark mode derived from it, Python's stock Light, and the forum list back in ABDA's colours. Covered by `packages/discourse_ui/test/forum_theme_test.dart`.
 - **The like heart and "Solved" use the forum's `love` and `success` colours** (`ForumColors`, a theme extension also carrying `highlight`, `quaternary` and the header colours), instead of Material's error red and a fixed green.
