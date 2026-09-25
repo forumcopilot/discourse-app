@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.32] - 2026-09-25
+
 ### Changed
 - **A forum opened over a host's forum list no longer opens its drawer from the edge.** There the left edge means Back: iOS's swipe and Android's system gesture both take it, and on Android 13 and older a finger resting at the edge first opened the drawer instead. The drawer opens from ☰ only, so a swipe from the edge always goes back to the list.
 - **In the single-forum app the edge swipe opens the drawer on Android with gesture navigation too.** Its forum home has nothing behind it, so the edge keeps opening the drawer, but the drawer's strip lay under Android's own Back strip, where every swipe went to Android (which closes the app from there). The strip now starts where the system's ends (`MediaQuery.systemGestureInsets`); a swipe from the very edge is still Android's Back. Elsewhere the inset is zero and nothing changes.
