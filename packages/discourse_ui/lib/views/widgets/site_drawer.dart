@@ -23,6 +23,7 @@ import '../../host/discourse_host.dart';
 import '../../settings_context.dart';
 import 'appearance_sheet.dart';
 import 'brand_image.dart';
+import '../../theme/forum_brand_style.dart';
 
 /// Phase 5.18a — hamburger drawer ("More" menu).
 ///
@@ -324,16 +325,15 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final isLoggedIn = siteContext.isLoggedIn;
     final username = siteContext.loginDataOutput?.user?.username;
     final caps = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl);
-    // Same rule as the forum header: a dark-mode logo only if the forum
-    // ships one; the header block is our primaryContainer either way.
-    final wideLogo = caps.wideLogoFor(
-      dark: Theme.of(context).brightness == Brightness.dark && caps.hasDarkLogo,
-    );
+    // The same identity as the forum's home card: its colour as a
+    // gradient, the logo variant for that colour, adapted if it would
+    // still vanish.
+    final brand = ForumBrandStyle.of(context);
+    final wideLogo = caps.wideLogoFor(dark: brand.isDark);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(
@@ -342,9 +342,7 @@ class _Header extends StatelessWidget {
         DesignTokens.spacingL,
         DesignTokens.spacingL,
       ),
-      decoration: BoxDecoration(
-        color: colorScheme.primaryContainer,
-      ),
+      decoration: BoxDecoration(gradient: brand.gradient),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -368,6 +366,8 @@ class _Header extends StatelessWidget {
                   height: 32,
                   fit: BoxFit.contain,
                   alignment: Alignment.centerLeft,
+                  background: brand.base,
+                  designedFor: ForumBrandStyle.logoDesignedFor(caps, wideLogo),
                   fallback: _nameRow,
                 ),
               ),
@@ -380,8 +380,7 @@ class _Header extends StatelessWidget {
                 ? AppLocalizations.of(context)!.signedInAs(username)
                 : AppLocalizations.of(context)!.notSignedIn,
             style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onPrimaryContainer
-                  .withValues(alpha: DesignTokens.opacityHigh),
+              color: brand.foreground.withValues(alpha: DesignTokens.opacityHigh),
             ),
           ),
           // Sign in where the state is announced, not at the end of the
@@ -429,7 +428,7 @@ extension _HeaderFallback on _Header {
           child: Text(
             siteContext.site.name,
             style: textTheme.titleMedium?.copyWith(
-              color: colorScheme.onPrimaryContainer,
+              color: ForumBrandStyle.of(context).foreground,
               fontWeight: DesignTokens.fontWeightSemiBold,
             ),
             overflow: TextOverflow.ellipsis,

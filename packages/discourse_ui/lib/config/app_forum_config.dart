@@ -155,6 +155,25 @@ class AppForumConfig {
   static bool get isNotificationsGrantEnabled =>
       notificationsApiBaseUrl.trim().isNotEmpty;
 
+  /// Whether the app wears the forum's own colours — its light and dark
+  /// Discourse colour schemes from `/site.json`: background, text, accent,
+  /// selection, the like heart. Off, the app uses `AppTheme.seedColor`
+  /// throughout, for a fork that wants its own brand over the forum's.
+  ///
+  /// A fork edits [defaultUseForumColors]; a host app calls
+  /// [setUseForumColors] at startup. Read [useForumColors].
+  static const bool defaultUseForumColors = true;
+
+  static bool? _useForumColorsOverride;
+
+  static bool get useForumColors =>
+      _useForumColorsOverride ?? defaultUseForumColors;
+
+  /// Turns forum colours on or off for this process; null restores the
+  /// compile-time default.
+  static void setUseForumColors(bool? value) =>
+      _useForumColorsOverride = value;
+
   /// Optional branding metadata.
   static const String forumDescription =
       'Discourse demo forum — try.discourse.org';

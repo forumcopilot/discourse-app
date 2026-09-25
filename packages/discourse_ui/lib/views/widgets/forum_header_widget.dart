@@ -9,7 +9,8 @@ import 'package:forumcopilot_sdk/forumcopilot_sdk.dart' as forumcopilot_sdk;
 import 'package:discourse_ui/utils/safe_image.dart';
 import 'package:discourse_ui/utils/avatar_color_utils.dart';
 import '../../theme/design_tokens.dart';
-import '../../utils/discourse_color.dart';
+import '../../services/forum_theme.dart';
+import '../../theme/forum_brand_style.dart';
 import 'brand_image.dart';
 import '../../utils/initials.dart';
 
@@ -41,8 +42,9 @@ class ForumHeaderWidget extends StatelessWidget {
 
   /// The wordmark, contained, at header height — never squeezed into a
   /// square. Falls back to the square tile when the forum has no wide logo.
-  Widget _buildLogoBlock(
-      BuildContext context, String? wideLogo, String? squareLogo, String siteName) {
+  Widget _buildLogoBlock(BuildContext context, String? wideLogo,
+      String? squareLogo, String siteName, Color cardColor,
+      DiscourseSiteCapabilities caps) {
     if (wideLogo != null && wideLogo.isNotEmpty) {
       return ConstrainedBox(
         constraints: const BoxConstraints(maxHeight: 44, maxWidth: 260),
@@ -51,11 +53,15 @@ class ForumHeaderWidget extends StatelessWidget {
           height: 44,
           fit: BoxFit.contain,
           alignment: Alignment.centerLeft,
-          fallback: (context) => _buildLogoTile(context, squareLogo, siteName),
+          // Drawn straight on the card, so it must read on the card.
+          background: cardColor,
+          designedFor: ForumBrandStyle.logoDesignedFor(caps, wideLogo),
+          fallback: (context) =>
+              _buildLogoTile(context, squareLogo, siteName, caps),
         ),
       );
     }
-    return _buildLogoTile(context, squareLogo, siteName);
+    return _buildLogoTile(context, squareLogo, siteName, caps);
   }
 
   /// Where the logo will go, at the wordmark's height: most forums have one,
@@ -71,7 +77,8 @@ class ForumHeaderWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoTile(BuildContext context, String? logoUrl, String siteName) {
+  Widget _buildLogoTile(BuildContext context, String? logoUrl, String siteName,
+      DiscourseSiteCapabilities caps) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: 60,
@@ -89,17 +96,21 @@ class ForumHeaderWidget extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-        child: _buildLogoContent(context, logoUrl, siteName),
+        child: _buildLogoContent(context, logoUrl, siteName, caps),
       ),
     );
   }
 
-  Widget _buildLogoContent(BuildContext context, String? logoUrl, String siteName) {
+  Widget _buildLogoContent(BuildContext context, String? logoUrl,
+      String siteName, DiscourseSiteCapabilities caps) {
     if (logoUrl != null && logoUrl.isNotEmpty) {
       return BrandImage(
         logoUrl,
         width: 60,
         height: 60,
+        // The tile is the page colour (see _buildLogoTile).
+        background: Theme.of(context).colorScheme.surface,
+        designedFor: ForumBrandStyle.logoDesignedFor(caps, logoUrl),
         // contain, not cover: a forum logo is artwork with a fixed aspect
         // ratio, and cropping it to fill a square cuts the wordmark in half.
         fit: BoxFit.contain,
@@ -148,56 +159,6 @@ class ForumHeaderWidget extends StatelessWidget {
     );
   }
 
-  /// Gets the primary color for the background based on whether a logo is present
-  /// If no logo, uses the avatar's base color to match the default logo
-  Color _getBackgroundThemeColor(BuildContext context, String? logoUrl, String siteName) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
-    // If logo URL exists and is not empty, use theme primary color
-    if (logoUrl != null && logoUrl.isNotEmpty) {
-      return colorScheme.primary;
-    }
-    
-    // If no logo, extract a vibrant primary color from the avatar's color scheme
-    // This ensures the background matches the default avatar logo color
-    if (siteName.isEmpty) {
-      return colorScheme.primary;
-    }
-    
-    final isLightTheme = Theme.of(context).brightness == Brightness.light;
-    
-    // Get gradient colors to extract the base color family
-    final gradientColors = AvatarColorUtils.getGradientColors(
-      siteName,
-      isLightTheme: isLightTheme,
-    );
-    
-    if (gradientColors.isEmpty) {
-      return colorScheme.primary;
-    }
-    
-    // Use the more saturated color from the gradient for background tinting
-    // For light mode: gradient goes shade100 -> shade300, use shade300 (more visible)
-    // For dark mode: gradient goes shade700 -> shade500, use shade500 (more vibrant)
-    // This will create a cohesive look with the default avatar logo
-    return gradientColors.length >= 2 ? gradientColors[1] : gradientColors[0];
-  }
-
-  /// Darkens a color by blending it with black
-  /// [color] The color to darken
-  /// [amount] Amount to darken (0.0 to 1.0), where 1.0 is completely black
-  Color _darkenColor(Color color, double amount) {
-    assert(amount >= 0.0 && amount <= 1.0);
-    final hsl = HSLColor.fromColor(color);
-    return hsl.withLightness((hsl.lightness * (1 - amount)).clamp(0.0, 1.0)).toColor();
-  }
-
-  /// Gets a darker version of the color for dark mode pattern
-  Color _getDarkModePatternColor(Color baseColor) {
-    // Darken the color significantly for dark mode (about 60-70% darker)
-    return _darkenColor(baseColor, 0.65);
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -213,38 +174,41 @@ class ForumHeaderWidget extends StatelessWidget {
       // along, on a payload already being read for the upload limits.
       // A hardcoded config value still wins: that is the fork's override.
       final configuredLogo = site?.logoUrl;
+      // The square logo sits on its own page-coloured tile.
       final logoUrl = (configuredLogo != null && configuredLogo.isNotEmpty)
           ? configuredLogo
           : DiscourseSiteCapabilities.forSite(site?.pluginUrl ?? '').logoFor(
-              dark: Theme.of(context).brightness == Brightness.dark,
+              dark: isDarkMode,
             );
       final siteName = site?.name ?? (AppLocalizations.of(context)?.forum ?? 'Forum');
-      // The forum's own header: its wordmark on its header colour, the way
-      // the browser shows it. Both come from payloads already fetched
-      // (/site.json colour scheme, /site/settings.json logos). A forum on
-      // the stock scheme has no colours; it keeps our pattern background.
+      // The forum's identity card: its wordmark on a gradient in its own
+      // colour — its web header when that is branded, else its accent
+      // (ForumBrandStyle). Colours come from the theme, which is the forum's
+      // own scheme inside a forum; logos from /site/settings.json.
       final caps = DiscourseSiteCapabilities.forSite(site?.pluginUrl ?? '');
+      final brand = ForumBrandStyle.of(context);
       // The forum being opened, before its config has said how it looks.
       // Draw the header's shape rather than guess at its brand: a generated
       // initial on a name-tinted pattern would flash up, then be replaced by
       // the real wordmark on the real colour.
       final awaitingBrand = pendingSite != null && !caps.resolved;
-      // Wordmarks are transparent artwork drawn for one background. A forum
-      // that ships a dark-mode logo gets its dark header colours in dark
-      // mode; one that does not keeps its light colours even in dark mode,
-      // so a black wordmark never lands on a near-black strip.
-      final useDarkBrand = isDarkMode && caps.hasDarkLogo;
+      // A remembered palette already knows the card's colour; only the
+      // logo is still to come.
+      final colourKnown = !awaitingBrand ||
+          ForumTheme.paletteFor(site?.pluginUrl ?? '') != null;
+      // Wordmarks are transparent artwork drawn for one background, so the
+      // variant follows the card, not the app's mode: the dark-mode logo
+      // on a dark card, the normal one on a light card. One that still
+      // would not show (a forum with no dark logo) is inverted by
+      // BrandImage.
       final wideLogo = (configuredLogo != null && configuredLogo.isNotEmpty)
           ? configuredLogo
-          : caps.wideLogoFor(dark: useDarkBrand);
-      final brandBg = parseDiscourseHex(caps.headerBackgroundFor(dark: useDarkBrand) ?? '');
-      final brandFgParsed = parseDiscourseHex(caps.headerPrimaryFor(dark: useDarkBrand) ?? '');
-      final fg = brandFgParsed ??
-          (brandBg == null
-              ? colorScheme.onSurface
-              : (ThemeData.estimateBrightnessForColor(brandBg) == Brightness.dark
-                  ? Colors.white
-                  : Colors.black87));
+          : caps.wideLogoFor(dark: brand.isDark);
+      // A host-configured banner photo sits under a page-coloured veil
+      // (below), so text and logo belong to the page there, not the brand.
+      final hasBanner = (site?.backgroundUrl ?? '').isNotEmpty;
+      final cardColor = hasBanner ? colorScheme.surface : brand.base;
+      final fg = hasBanner ? colorScheme.onSurface : brand.foreground;
       final domain = _getDomain(site?.url);
       final statsLineStyle = TextStyle(
         color: fg.withValues(alpha: DesignTokens.opacityHigh),
@@ -271,41 +235,13 @@ class ForumHeaderWidget extends StatelessWidget {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                    // Default background with theme color applied
-                    Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        // Base background color
-                        Container(
-                          color: colorScheme.surfaceContainerHighest,
-                        ),
-                        // Pattern image with theme color tint
-                        // Matches default logo color when no logo is present
-                        // Tint via the image paint (Image.color +
-                        // colorBlendMode), not a ColorFiltered layer: the
-                        // layer was a full-header saveLayer every frame.
-                        Image.asset(
-                          'packages/discourse_ui/assets/forum_header_bg.png',
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                          color: (isDarkMode
-                                  ? _getDarkModePatternColor(_getBackgroundThemeColor(context, logoUrl, siteName))
-                                  : _getBackgroundThemeColor(context, logoUrl, siteName))
-                              .withValues(alpha: isDarkMode ? 0.75 : 0.5),
-                          colorBlendMode: isDarkMode ? BlendMode.multiply : BlendMode.color,
-                        ),
-                        // Text readability overlay - darker in dark mode to make pattern more subtle
-                        Container(
-                          color: isDarkMode 
-                            ? Colors.black.withValues(alpha: 0.5)
-                            : Colors.white.withValues(alpha: 0.6),
-                        ),
-                      ],
-                    ),
-                    if (awaitingBrand)
-                      Container(color: colorScheme.surfaceContainerLow),
-                    if (brandBg != null) Container(color: brandBg),
+                    // The forum's colour, as a gradient; a quiet placeholder
+                    // while a forum opened for the first time has not yet
+                    // said what its colour is.
+                    colourKnown
+                        ? DecoratedBox(
+                            decoration: BoxDecoration(gradient: brand.gradient))
+                        : ColoredBox(color: colorScheme.surfaceContainerLow),
                     // Network background (only shown if URL exists and loads successfully)
                     Builder(
                       builder: (context) {
@@ -355,7 +291,8 @@ class ForumHeaderWidget extends StatelessWidget {
                   children: [
                     awaitingBrand
                         ? _buildLogoPlaceholder(context)
-                        : _buildLogoBlock(context, wideLogo, logoUrl, siteName),
+                        : _buildLogoBlock(context, wideLogo, logoUrl,
+                            siteName, cardColor, caps),
                     SizedBox(height: DesignTokens.spacingS),
                     Text(
                       site?.name ?? 'Forum',

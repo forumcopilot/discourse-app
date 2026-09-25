@@ -45,6 +45,7 @@ import 'package:discourse_core/discourse_core.dart'
     show DiscourseBookmarkProxy, DiscourseBookmarkAutoDelete;
 import '../widgets/bookmark_reminder_sheet.dart';
 import '../../services/site_proxy_service.dart';
+import '../../theme/forum_colors.dart';
 
 class _PostContentData {
   /// Cooked HTML ready for `RichTextContent`, which draws the post's
@@ -608,10 +609,10 @@ class _PostListItemState extends State<PostListItem> {
               ),
               margin: EdgeInsets.only(bottom: DesignTokens.spacingS),
               decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.12),
+                color: ForumColors.of(context).success.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
                 border: Border.all(
-                  color: Colors.green.withValues(alpha: 0.45),
+                  color: ForumColors.of(context).success.withValues(alpha: 0.45),
                   width: 0.75,
                 ),
               ),
@@ -620,14 +621,14 @@ class _PostListItemState extends State<PostListItem> {
                 children: [
                   Icon(
                     Icons.check_circle,
-                    color: Colors.green.shade700,
+                    color: ForumColors.of(context).success,
                     size: DesignTokens.iconSizeS,
                   ),
                   const SizedBox(width: DesignTokens.spacingXS),
                   Text(
                     AppLocalizations.of(context)!.solution,
                     style: textTheme.labelMedium?.copyWith(
-                      color: Colors.green.shade800,
+                      color: ForumColors.of(context).success,
                       fontWeight: DesignTokens.fontWeightBold,
                     ),
                   ),
@@ -646,17 +647,18 @@ class _PostListItemState extends State<PostListItem> {
                 fontWeight: DesignTokens.fontWeightBold,
               ),
             ),
-            if (widget.topicCategory.isNotEmpty ||
-                widget.topicTags.isNotEmpty) ...[
-              const SizedBox(height: DesignTokens.spacingS),
-              // Where the topic lives. The page named the topic and
-              // nothing else, so the one thing Discourse organises
-              // everything by was invisible until you went back out.
+            // Where the topic lives. The page named the topic and
+            // nothing else, so the one thing Discourse organises
+            // everything by was invisible until you went back out.
+            if (widget.topicCategory.isNotEmpty || widget.topicTags.isNotEmpty)
               TopicTaxonomyChips(
-                category: widget.topicCategory,
+                siteContext: widget.siteContext,
+                categoryId: widget.forumId ?? '',
+                categoryName: widget.topicCategory,
                 tags: widget.topicTags,
+                large: true,
+                padding: const EdgeInsets.only(top: DesignTokens.spacingS),
               ),
-            ],
             const SizedBox(height: DesignTokens.spacingM),
           ],
           // "in reply to X" — Discourse's defining reading affordance. Without

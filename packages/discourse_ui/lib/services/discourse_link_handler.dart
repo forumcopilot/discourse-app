@@ -2,7 +2,6 @@ import 'package:discourse_core/discourse_core.dart'
     show DiscourseLink, DiscourseLinkKind, DiscourseSiteCapabilities;
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
 import 'package:get/get.dart';
 
 import '../controllers/login_controller.dart';
@@ -26,6 +25,7 @@ import '../views/widgets/badge_detail_sheet.dart';
 import 'discourse_route_navigator.dart';
 import 'notification_route.dart';
 import 'site_proxy_service.dart';
+import '../views/widgets/category_badge.dart';
 
 /// What a tapped link leads to.
 enum LinkDestinationKind {
@@ -238,9 +238,11 @@ class DiscourseLinkHandler {
         await DiscourseRouteNavigator.open(siteContext, to.route!,
             replaceTopic: false);
       case LinkDestinationKind.category:
+        // With its colours from /site.json, so its header is not blank.
         push(ForumTopicsPage(
           siteContext: siteContext,
-          forum: FCForum(id: to.categoryId!, name: to.categoryName ?? ''),
+          forum: categoryForum(siteContext, to.categoryId!,
+              fallbackName: to.categoryName ?? ''),
         ));
       case LinkDestinationKind.tag:
         push(TagTopicsPage(siteContext: siteContext, tag: to.tagName!));

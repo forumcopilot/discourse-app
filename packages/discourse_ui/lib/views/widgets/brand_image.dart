@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../utils/logo_tone.dart';
+
 /// A forum's logo from the network, whatever format the admin uploaded.
 ///
 /// Discourse serves wordmarks and icons as PNG, JPEG or — for a good share
@@ -28,6 +30,8 @@ class BrandImage extends StatelessWidget {
     this.fit = BoxFit.contain,
     this.alignment = Alignment.centerLeft,
     required this.fallback,
+    this.background,
+    this.designedFor = const Color(0xFFFFFFFF),
   });
 
   final String url;
@@ -37,6 +41,19 @@ class BrandImage extends StatelessWidget {
   final Alignment alignment;
   final Widget Function(BuildContext) fallback;
 
+  /// What the logo is drawn on, when that is not the forum's own header.
+  /// Given it, a logo that would vanish there is helped — inverted if it is
+  /// one-tone (a black wordmark on a dark card), on a small backing of its
+  /// own tone if not; see [LogoTone.fixOn]. The logo waits for that
+  /// measurement rather than flashing the wrong way.
+  final Color? background;
+
+  /// The background the logo was drawn for: the forum's header colour for
+  /// this variant (white for most light-mode logos). The logo is only
+  /// helped when it fares clearly worse on [background] than here, and a
+  /// backing is drawn in this colour.
+  final Color designedFor;
+
   static bool isSvg(String url) {
     final path = Uri.tryParse(url)?.path.toLowerCase() ?? url.toLowerCase();
     return path.endsWith('.svg');
@@ -44,6 +61,49 @@ class BrandImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final background = this.background;
+    if (background == null || kIsWeb) return _image(context);
+    if (LogoTone.isKnown(url)) {
+      return _adapted(context, LogoTone.known(url), background);
+    }
+    return FutureBuilder<LogoTone?>(
+      future: LogoTone.of(url),
+      builder: (context, snapshot) =>
+          snapshot.connectionState == ConnectionState.done
+              ? _adapted(context, snapshot.data, background)
+              : SizedBox(width: width, height: height),
+    );
+  }
+
+  Widget _adapted(BuildContext context, LogoTone? tone, Color background) {
+    final image = _image(context);
+    switch (tone?.fixOn(background, designedFor: designedFor) ?? LogoFix.none) {
+      case LogoFix.none:
+        return image;
+      case LogoFix.invert:
+        return ColorFiltered(colorFilter: LogoTone.invertLightness, child: image);
+      case LogoFix.plate:
+        // Hugs the artwork, even in a full-width slot: the logo keeps its
+        // own aspect ratio inside the loose constraints Align gives it.
+        return Align(
+          alignment: alignment,
+          widthFactor: 1,
+          heightFactor: 1,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: designedFor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: image,
+            ),
+          ),
+        );
+    }
+  }
+
+  Widget _image(BuildContext context) {
     if (isSvg(url)) return _svg(context);
     return CachedNetworkImage(
       imageUrl: url,

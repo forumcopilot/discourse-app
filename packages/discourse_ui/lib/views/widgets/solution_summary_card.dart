@@ -6,6 +6,7 @@ import '../../theme/design_tokens.dart';
 import 'rich_text_content.dart';
 import 'user_avatar.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../theme/forum_colors.dart';
 
 /// The accepted-answer panel shown under the FIRST post of a solved topic.
 ///
@@ -38,9 +39,9 @@ class SolutionSummaryCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    // Green reads as "resolved" and matches the badge already used on the answer post
-    // itself, so the two are recognisably the same concept.
-    const accent = Colors.green;
+    // The forum's `success` colour, as on the answer post's own badge, so
+    // the two are recognisably the same concept.
+    final accent = ForumColors.of(context).success;
 
     return Container(
       margin: EdgeInsets.only(top: DesignTokens.spacingM),

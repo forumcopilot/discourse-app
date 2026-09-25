@@ -11,6 +11,7 @@ import '../../theme/design_tokens.dart';
 import '../../utils/emoji_shortcodes.dart';
 import '../user_profile_page.dart';
 import 'user_avatar.dart';
+import '../../theme/forum_colors.dart';
 
 /// Bottom sheet listing the real users who reacted to a post.
 ///
@@ -177,7 +178,6 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final glyph = _glyphFor(widget.reactionId);
     final title = widget.title ??
@@ -207,7 +207,7 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
                         style:
                             const TextStyle(fontSize: DesignTokens.fontSizeL))
                   else
-                    Icon(Icons.favorite, color: colorScheme.error),
+                    Icon(Icons.favorite, color: ForumColors.of(context).love),
                   SizedBox(width: DesignTokens.spacingS),
                   Expanded(
                     child: Text(title, style: textTheme.titleMedium),

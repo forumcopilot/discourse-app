@@ -228,6 +228,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
           : null,
       onFileUpload: (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false) ? _handleFileUpload : null,
       forumName: widget.forumName,
+      forumId: widget.forumId,
       onRemoveAttachment: (attachmentId) async {
         // Remove the attachment ID from the list and call API to delete from server
         // Call API to remove attachment from server

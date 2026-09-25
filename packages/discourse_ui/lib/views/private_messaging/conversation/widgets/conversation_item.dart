@@ -18,6 +18,7 @@ import '../../../listitems/post_list_item_attachment.dart';
 import '../../../widgets/full_screen_image_viewer.dart';
 import '../../../../utils/cooked_content.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import 'package:discourse_ui/theme/forum_colors.dart';
 
 /// The sender's name for display.
 ///
@@ -374,7 +375,7 @@ class ConversationHeaderItem extends StatelessWidget {
             AccessibilityHelpers.accessibleIconButton(
               icon: Icon(
                 Icons.favorite,
-                color: isLiked ? colorScheme.error : iconColor,
+                color: isLiked ? ForumColors.of(context).love : iconColor,
                 size: DesignTokens.iconSizeMedium,
               ),
               onTap: onLike,
@@ -871,7 +872,7 @@ class ConversationItem extends StatelessWidget {
             AccessibilityHelpers.accessibleIconButton(
               icon: Icon(
                 Icons.favorite,
-                color: isLiked ? colorScheme.error : iconColor,
+                color: isLiked ? ForumColors.of(context).love : iconColor,
                 size: DesignTokens.iconSizeMedium,
               ),
               onTap: onLike,

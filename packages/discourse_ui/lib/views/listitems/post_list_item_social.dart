@@ -6,6 +6,7 @@ import '../../utils/accessibility_helpers.dart';
 import 'package:discourse_ui/views/widgets/post_action_button.dart';
 import '../../theme/design_tokens.dart';
 import '../widgets/reaction_glyph.dart';
+import '../../theme/forum_colors.dart';
 
 /// Action row under a post: reply / like / bookmark / accept-answer.
 ///
@@ -119,7 +120,7 @@ class PostListItemSocial extends StatelessWidget {
                         icon: Icons.favorite_border,
                         activeIcon: Icons.favorite,
                         active: isLiked,
-                        activeColor: colorScheme.error,
+                        activeColor: ForumColors.of(context).love,
                         onTap: onLike,
                         onLongPress: onLongPressLike,
                         semanticLabel:

@@ -111,6 +111,15 @@ class DiscourseSiteCapabilities {
   String? headerBackgroundDarkHex;
   String? headerPrimaryDarkHex;
 
+  /// The forum's default light and dark colour schemes in full —
+  /// `{name: hex}` for `primary`, `secondary`, `tertiary`, … as
+  /// `/site.json` resolves them (base colours filled in, six-digit hex
+  /// without '#'). Null when the payload has no such scheme: for the light
+  /// one that means the stock Discourse "Light", for the dark one that the
+  /// forum has no dark mode.
+  Map<String, String>? lightScheme;
+  Map<String, String>? darkScheme;
+
   /// True when the admin uploaded any dark-mode logo variant.
   bool get hasDarkLogo => [logoDarkUrl, mobileLogoDarkUrl, smallLogoDarkUrl]
       .any((u) => u != null && u.isNotEmpty);
@@ -168,6 +177,8 @@ class DiscourseSiteCapabilities {
         .toList(growable: false);
     final light = _schemeColors(site['default_light_color_scheme']);
     final dark = _schemeColors(site['default_dark_color_scheme']);
+    caps.lightScheme = light.isEmpty ? null : light;
+    caps.darkScheme = dark.isEmpty ? null : dark;
     caps.headerBackgroundHex = light['header_background'];
     caps.headerPrimaryHex = light['header_primary'];
     caps.headerBackgroundDarkHex = dark['header_background'];
@@ -176,6 +187,24 @@ class DiscourseSiteCapabilities {
     caps.privacyPolicyUrl = (site['privacy_policy_url'] as String?)?.trim();
     caps.resolved = true;
   }
+
+  /// How the category with [categoryId] presents itself — its badge — or
+  /// null when this forum's payload has not been parsed or has no such
+  /// category.
+  DiscourseCategoryStyle? categoryStyleFor(String categoryId) {
+    final id = int.tryParse(categoryId.trim());
+    if (id == null) return null;
+    for (final c in categories) {
+      if (c['id'] == id) return DiscourseCategoryStyle.fromSiteJson(c);
+    }
+    return null;
+  }
+
+  /// True for the forum's "Uncategorized" category, whose badge Discourse
+  /// hides (`suppress_uncategorized_badge`, on by default).
+  bool isUncategorized(String categoryId) =>
+      uncategorizedCategoryId != null &&
+      int.tryParse(categoryId.trim()) == uncategorizedCategoryId;
 
   /// A category's display name, or null when this forum's payload has
   /// not been parsed or has no such category.
@@ -289,4 +318,55 @@ Map<String, String> _schemeColors(Object? scheme) {
     out[name] = hex.length == 3 ? hex.split('').map((ch) => ch + ch).join() : hex;
   }
   return out;
+}
+
+/// A category's badge as `/site.json` describes it: name, colours, parent,
+/// and whether it is drawn as a coloured square, an icon or an emoji
+/// (`style_type`, Discourse 3.4+; older forums send none and mean square).
+class DiscourseCategoryStyle {
+  const DiscourseCategoryStyle({
+    required this.id,
+    required this.name,
+    this.colorHex,
+    this.textColorHex,
+    this.parentId,
+    this.styleType = 'square',
+    this.emoji,
+    this.icon,
+  });
+
+  final int id;
+  final String name;
+
+  /// Hex without '#', 3 or 6 digits as the admin typed it; null if unset.
+  final String? colorHex;
+  final String? textColorHex;
+  final int? parentId;
+
+  /// `square`, `icon` or `emoji`.
+  final String styleType;
+
+  /// Emoji name (`blue_book`) when [styleType] is `emoji`.
+  final String? emoji;
+
+  /// Font Awesome icon name when [styleType] is `icon`.
+  final String? icon;
+
+  factory DiscourseCategoryStyle.fromSiteJson(Map<String, dynamic> c) {
+    String? str(Object? v) {
+      final s = v?.toString().trim();
+      return (s == null || s.isEmpty) ? null : s;
+    }
+
+    return DiscourseCategoryStyle(
+      id: c['id'] as int,
+      name: str(c['name']) ?? '',
+      colorHex: str(c['color']),
+      textColorHex: str(c['text_color']),
+      parentId: c['parent_category_id'] as int?,
+      styleType: str(c['style_type']) ?? 'square',
+      emoji: str(c['emoji']),
+      icon: str(c['icon']),
+    );
+  }
 }

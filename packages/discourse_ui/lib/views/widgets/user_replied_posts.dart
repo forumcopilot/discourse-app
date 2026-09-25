@@ -332,6 +332,8 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
       // replies — /user_actions.json has no reply count to give.
       postNumber: post.replyNumber,
       attribution: _attributionFor(post),
+      siteContext: widget.siteContext,
+      categoryId: post.forumId,
       onTap: () => _navigateToPost(post),
     );
   }

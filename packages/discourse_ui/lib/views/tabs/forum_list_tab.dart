@@ -1,3 +1,4 @@
+import 'package:discourse_core/discourse_core.dart' show DiscourseSiteCapabilities;
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/views/widgets/resettable_widget.dart';
@@ -10,6 +11,7 @@ import '../listitems/forum_list_item.dart';
 
 import '../widgets/forum_header_widget.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import '../widgets/category_badge.dart';
 
 class ForumListTab extends StatefulWidget {
   final SiteContext siteContext;
@@ -132,10 +134,24 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
 
       if (mounted) {
         setState(() {
+          // The subscription payload names each category but carries
+          // no colour; take it from /site.json, or these tiles fell back
+          // to name-hashed colours while the same categories below wore
+          // their real ones.
+          final caps = DiscourseSiteCapabilities.forSite(
+              widget.siteContext.site.pluginUrl);
           _subscribedForums = subscribedForums.forums
               .map((subscribedForum) => FCForum(
                     id: subscribedForum.forum_id ?? '',
                     name: subscribedForum.forum_name ?? '',
+                    color: caps
+                            .categoryStyleFor(subscribedForum.forum_id ?? '')
+                            ?.colorHex ??
+                        '',
+                    textColor: caps
+                            .categoryStyleFor(subscribedForum.forum_id ?? '')
+                            ?.textColorHex ??
+                        'FFFFFF',
                     logoUrl: subscribedForum.icon_url,
                     isProtected: subscribedForum.is_protected ?? false,
                     hasNewPosts: subscribedForum.new_post ?? false,
@@ -509,14 +525,29 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
               DesignTokens.spacingL,
               DesignTokens.spacingM,
             ),
-            child: Text(
-              forum.name,
-              style: StyleBuilders.titleTextStyle(
-                colorScheme: Theme.of(context).colorScheme,
-                textTheme: Theme.of(context).textTheme,
-                fontSize: DesignTokens.fontSizeM,
-                fontWeight: DesignTokens.fontWeightMedium,
-              ),
+            // The parent's colour mark ahead of its name, as its badge
+            // shows it everywhere else.
+            child: Row(
+              children: [
+                CategoryMark(
+                  style: DiscourseSiteCapabilities.forSite(
+                          widget.siteContext.site.pluginUrl)
+                      .categoryStyleFor(forum.id),
+                  size: 12,
+                ),
+                const SizedBox(width: DesignTokens.spacingS),
+                Expanded(
+                  child: Text(
+                    forum.name,
+                    style: StyleBuilders.titleTextStyle(
+                      colorScheme: Theme.of(context).colorScheme,
+                      textTheme: Theme.of(context).textTheme,
+                      fontSize: DesignTokens.fontSizeM,
+                      fontWeight: DesignTokens.fontWeightMedium,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );

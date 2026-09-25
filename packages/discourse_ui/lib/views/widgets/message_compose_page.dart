@@ -20,6 +20,7 @@ import '../../utils/image_optimize.dart';
 import '../../utils/image_shrink.dart';
 import 'oversized_image_sheet.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
+import 'category_badge.dart';
 
 class MessageComposePage extends StatefulWidget {
   final SiteContext siteContext;
@@ -36,6 +37,10 @@ class MessageComposePage extends StatefulWidget {
   final bool showAppBar;
   final bool autoFocusContent;
   final String? forumName;
+
+  /// The category's id, when known, so the header shows its badge — its
+  /// colour and emoji — rather than a generic chip.
+  final String? forumId;
   final String? topicTitle;
   final void Function(Exception error)? onError;
   final TextEditingController? titleController;
@@ -82,6 +87,7 @@ class MessageComposePage extends StatefulWidget {
     this.showAppBar = true,
     this.autoFocusContent = true,
     this.forumName,
+    this.forumId,
     this.topicTitle,
     this.onError,
     this.titleController,
@@ -1779,7 +1785,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            if (widget.forumName != null) ...[
+                            if ((widget.forumName ?? '').isNotEmpty) ...[
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -1795,23 +1801,30 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                     spacing: DesignTokens.spacingS,
                                     runSpacing: 8,
                                     children: [
-                                      Chip(
-                                        avatar: CircleAvatar(
-                                          backgroundColor: colorScheme.primaryContainer,
-                                          child: Icon(
-                                            Icons.forum,
-                                            size: 18,
-                                            color: colorScheme.onPrimaryContainer,
+                                      // The category's badge, as on every
+                                      // topic row: the one mark a reader
+                                      // knows the category by.
+                                      DecoratedBox(
+                                        decoration: BoxDecoration(
+                                          color: colorScheme.surfaceContainerHighest
+                                              .withValues(alpha: DesignTokens.opacityLow),
+                                          borderRadius: BorderRadius.circular(
+                                              DesignTokens.radiusS),
+                                          border: Border.all(
+                                            color: colorScheme.outlineVariant,
+                                            width: DesignTokens.borderWidthThin,
                                           ),
                                         ),
-                                        label: Text(widget.forumName!),
-                                        backgroundColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
-                                        labelStyle: textTheme.bodyMedium?.copyWith(
-                                          color: colorScheme.onSurface,
-                                        ),
-                                        side: BorderSide(
-                                          color: colorScheme.outlineVariant,
-                                          width: DesignTokens.borderWidthThin,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 12, vertical: 8),
+                                          child: CategoryBadge(
+                                            siteContext: widget.siteContext,
+                                            categoryId: widget.forumId ?? '',
+                                            fallbackName: widget.forumName!,
+                                            large: true,
+                                            tappable: false,
+                                          ),
                                         ),
                                       ),
                                     ],

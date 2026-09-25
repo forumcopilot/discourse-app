@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'theme/app_theme.dart';
 import 'services/appearance_sync.dart';
+import 'services/forum_theme.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'dart:ui' as ui;
 
@@ -42,6 +43,8 @@ class SettingsContext {
       // Also when nothing is saved: Android persists the per-app night
       // mode itself, and a stale one must not outlive a reinstall of prefs.
       AppearanceSync.apply(themeMode.value);
+      // Before the first frame, so a forum opens in its own colours.
+      await ForumTheme.loadRemembered();
 
       // Load page_per_size
       final int? loadedPagePerSize = prefs.getInt('page_per_size');

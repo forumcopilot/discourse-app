@@ -192,6 +192,8 @@ class _UserCreatedTopicsState extends State<UserCreatedTopics> {
             time: topics[i].postTime,
             replyCount: topics[i].replyCount,
             viewCount: topics[i].viewCount,
+            siteContext: widget.siteContext,
+            categoryId: topics[i].forumId,
             onTap: () => _open(topics[i]),
           ),
         ),

@@ -1,3 +1,4 @@
+import 'package:discourse_core/discourse_core.dart' show DiscourseSiteCapabilities;
 import 'package:flutter/material.dart';
 import '../core/errors/action_refused.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -11,6 +12,7 @@ import 'lists/posts_list.dart';
 import 'widgets/delete_topic_dialog.dart';
 import 'appbars/posts_page_app_bar.dart';
 import '../utils/url_utils.dart';
+import 'widgets/category_badge.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({
@@ -532,8 +534,13 @@ class _PostPageState extends State<PostPage> {
                     itemBuilder: (_, i) {
                       final c = categories[i];
                       return ListTile(
-                        leading: Icon(Icons.folder_outlined,
-                            color: colorScheme.onSurfaceVariant),
+                        // Each category's own mark, as its badge shows it.
+                        leading: CategoryMark(
+                          style: DiscourseSiteCapabilities.forSite(
+                                  widget.siteContext.site.pluginUrl)
+                              .categoryStyleFor(c.id),
+                          size: 14,
+                        ),
                         title: Text(c.name),
                         onTap: () =>
                             Navigator.of(sheetContext).pop(c.id),

@@ -8,6 +8,7 @@ import '../../utils/avatar_color_utils.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'forum_icon_widget.dart';
 import '../../utils/discourse_color.dart';
+import '../../theme/forum_brand_style.dart';
 
 /// Widget that displays subforum icon, name, and description
 /// Used in the subforum view page below the breadcrumb
@@ -66,26 +67,25 @@ class SubforumHeaderWidget extends StatelessWidget {
     return gradientColors.length >= 2 ? gradientColors[1] : gradientColors[0];
   }
 
-  /// Darkens a color by blending it with black
-  /// [color] The color to darken
-  /// [amount] Amount to darken (0.0 to 1.0), where 1.0 is completely black
-  Color _darkenColor(Color color, double amount) {
-    assert(amount >= 0.0 && amount <= 1.0);
-    final hsl = HSLColor.fromColor(color);
-    return hsl.withLightness((hsl.lightness * (1 - amount)).clamp(0.0, 1.0)).toColor();
-  }
-
-  /// Gets a darker version of the color for dark mode pattern
-  Color _getDarkModePatternColor(Color baseColor) {
-    // Darken the color significantly for dark mode (about 60-70% darker)
-    return _darkenColor(baseColor, 0.65);
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    // The category's colour as a gradient — the forum card's treatment, so
+    // a forum's home and its categories read as one family. A configured
+    // background photo sits under a page-coloured veil instead, and text
+    // follows the page there.
+    final hasPhoto = (forum.backgroundUrl ?? '').isNotEmpty;
+    final style = ForumBrandStyle.forColor(
+      _getBackgroundThemeColor(context),
+      preferredText: parseDiscourseHex(forum.textColor ?? ''),
+      brightness: Theme.of(context).brightness,
+    );
+    final fg = hasPhoto ? colorScheme.onSurface : style.foreground;
+    final fgMuted = hasPhoto
+        ? colorScheme.onSurfaceVariant
+        : style.foreground.withValues(alpha: DesignTokens.opacityHigh);
 
     return ClipRect(
       child: Container(
@@ -106,42 +106,8 @@ class SubforumHeaderWidget extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    // Default background with theme color applied
-                    Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        // Base background color
-                        Container(
-                          color: colorScheme.surfaceContainerHighest,
-                        ),
-                        // Pattern image with theme color tint
-                        // Matches default logo color when no logo is present
-                        ColorFiltered(
-                          colorFilter: ColorFilter.mode(
-                            (isDarkMode 
-                              ? _getDarkModePatternColor(_getBackgroundThemeColor(context))
-                              : _getBackgroundThemeColor(context)
-                            ).withValues(alpha: isDarkMode ? DesignTokens.opacityHigh : DesignTokens.opacityMediumLow,  // Much higher opacity in dark mode for darker effect
-                            ),
-                            isDarkMode 
-                              ? BlendMode.multiply  // Darker blend for dark mode - makes pattern more visible
-                              : BlendMode.color,   // Stronger color application for light mode
-                          ),
-                          child: Image.asset(
-                            'packages/discourse_ui/assets/forum_header_bg.png',
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
-                        ),
-                        // Text readability overlay - darker in dark mode to make pattern more subtle
-                        Container(
-                          color: isDarkMode 
-                            ? Colors.black.withValues(alpha: DesignTokens.opacityMediumLow)
-                            : Colors.white.withValues(alpha: DesignTokens.opacityMedium),
-                        ),
-                      ],
-                    ),
+                    DecoratedBox(
+                        decoration: BoxDecoration(gradient: style.gradient)),
                     // Network background (only shown if URL exists and loads successfully)
                     Builder(
                       builder: (context) {
@@ -192,11 +158,10 @@ class SubforumHeaderWidget extends StatelessWidget {
                     logoUrl: forum.logoUrl,
                     fallbackIcon: Icons.forum_rounded,
                     forumName: forum.name,
-                    // Same colour the category list row and every topic
-                    // badge use, so the tile does not change hue between
-                    // the list and the page it opens.
-                    backgroundColor: parseDiscourseHex(forum.color ?? ''),
-                    iconColor: parseDiscourseHex(forum.textColor ?? 'FFFFFF'),
+                    // On the category's own colour now, so a translucent
+                    // disc of the text colour sets the mark apart.
+                    backgroundColor: fg.withValues(alpha: 0.16),
+                    iconColor: fg,
                   ),
                   // Spacing between icon and name
                   const SizedBox(height: DesignTokens.spacingL),
@@ -210,7 +175,7 @@ class SubforumHeaderWidget extends StatelessWidget {
                         textTheme: textTheme,
                         fontSize: DesignTokens.fontSizeXL,
                         fontWeight: DesignTokens.fontWeightSemiBold,
-                      ),
+                      ).copyWith(color: fg),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -222,7 +187,7 @@ class SubforumHeaderWidget extends StatelessWidget {
                       child: Text(
                         forum.description!,
                         style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+                          color: fgMuted,
                           height: DesignTokens.lineHeightRelaxed,
                         ),
                         textAlign: TextAlign.center,
@@ -241,8 +206,14 @@ class SubforumHeaderWidget extends StatelessWidget {
                       onPressed: onNewTopic,
                       icon: const Icon(Icons.post_add_rounded),
                       label: Text(AppLocalizations.of(context)?.newTopic ?? 'New Topic'),
+                      // Inverse of the header, so it reads on any category
+                      // colour.
                       style: StyleBuilders.extendedFilledButtonStyle(
                         colorScheme: colorScheme,
+                      ).copyWith(
+                        backgroundColor: WidgetStatePropertyAll(fg),
+                        foregroundColor: WidgetStatePropertyAll(
+                            hasPhoto ? colorScheme.surface : style.base),
                       ),
                     ),
                   ],

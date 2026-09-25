@@ -857,6 +857,15 @@ class _SearchPageState extends State<SearchPage> {
       itemBuilder: (context, index) {
         if (index < _posts.length) {
           final p = _posts[index];
+          // A post result carries no category; the same search's topic
+          // results do. Empty when the topic is not among them — the id
+          // passed here used to be the topic's, which the category badge
+          // would have read as some unrelated category.
+          final categoryId = _topics
+                  .where((t) => t.id == p.topicId)
+                  .firstOrNull
+                  ?.forumId ??
+              '';
           return TopicListItem(
             siteContext: widget.siteContext,
             topic: FCTopic(
@@ -868,8 +877,8 @@ class _SearchPageState extends State<SearchPage> {
               authorName: p.authorName,
               authorIconUrl: p.authorIconUrl ?? '',
               authorUserType: p.authorUserType,
-              forumId: p.topicId, // Use topicId as forumId for now
-              forumName: '', // No forum name in FCPost
+              forumId: categoryId,
+              forumName: '',
               replyCount: 0,
               isPinned: false,
               isAnnouncement: false,
@@ -895,7 +904,7 @@ class _SearchPageState extends State<SearchPage> {
                     title: p.topicTitle ?? p.title,
                     mode: PostsListMode.thread_by_post,
                     anchorPostId: p.id,
-                    forumId: p.topicId,
+                    forumId: categoryId.isEmpty ? null : categoryId,
                   ),
                 ),
               );

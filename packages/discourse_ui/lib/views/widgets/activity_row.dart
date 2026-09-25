@@ -1,9 +1,11 @@
+import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:flutter/material.dart';
 
 import '../../theme/design_tokens.dart';
 import '../../utils/emoji_shortcodes.dart';
 import '../../utils/time_utils.dart';
 import 'user_avatar.dart';
+import 'category_badge.dart';
 
 /// The person a row names, when naming one says something.
 ///
@@ -54,6 +56,8 @@ class ActivityRow extends StatelessWidget {
     this.replyCount,
     this.viewCount,
     this.postNumber,
+    this.siteContext,
+    this.categoryId,
   });
 
   final String title;
@@ -73,6 +77,12 @@ class ActivityRow extends StatelessWidget {
   /// feeds carry no reply count at all (`reply_count` is null on every
   /// row), so there was nothing true for that icon to show.
   final int? postNumber;
+
+  /// The topic's category, badged under the title as on every topic row.
+  /// The action feeds carry `category_id` but no name; the badge takes both
+  /// the name and the colour from the forum's /site.json.
+  final SiteContext? siteContext;
+  final String? categoryId;
 
   @override
   Widget build(BuildContext context) {
@@ -142,6 +152,16 @@ class ActivityRow extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
+              if (siteContext != null &&
+                  (categoryId ?? '').isNotEmpty &&
+                  CategoryBadge.shows(siteContext!, categoryId!)) ...[
+                SizedBox(height: DesignTokens.spacingXS),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: CategoryBadge(
+                      siteContext: siteContext!, categoryId: categoryId!),
+                ),
+              ],
               if (excerptText != null && excerptText.isNotEmpty) ...[
                 SizedBox(height: DesignTokens.spacingXS),
                 Text(

@@ -9,11 +9,13 @@ import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/controllers/site_controller.dart';
 import 'package:discourse_ui/controllers/topic_controller.dart';
 import 'package:discourse_ui/services/user_state_service.dart';
+import 'package:discourse_ui/theme/app_theme.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:discourse_ui/views/appbars/topics_tab_app_bar.dart';
 import 'package:discourse_ui/views/site_home_page.dart';
 import 'package:discourse_ui/services/site_initialization_service.dart';
 import 'package:discourse_ui/services/discourse_route_navigator.dart';
+import 'package:discourse_ui/services/forum_theme.dart';
 import 'package:discourse_ui/services/notification_route.dart';
 import 'package:discourse_ui/views/widgets/forum_header_widget.dart';
 import 'package:discourse_ui/views/widgets/topic_list_skeleton.dart';
@@ -59,9 +61,18 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
   void initState() {
     super.initState();
     _ensureModuleSingletons();
+    // The forum's colours from the first frame when they are remembered;
+    // refreshed from /site.json once it opens.
+    ForumTheme.enter(_site.pluginUrl);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeForum();
     });
+  }
+
+  @override
+  void dispose() {
+    ForumTheme.leave(_site.pluginUrl);
+    super.dispose();
   }
 
   /// The standalone app registers these in its own main/root widget; a
@@ -109,6 +120,7 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
       if (!mounted) return;
 
       if (result.success && result.siteContext != null) {
+        ForumTheme.updateFromCapabilities(_site.pluginUrl);
         setState(() => _ready = true);
         _openRoute(result.siteContext!);
         return;
@@ -153,7 +165,7 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSwitcher(
+    final home = AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
       // The home fades in over the placeholder, which stays opaque beneath
       // it. Fading both would let the route underneath show through halfway.
@@ -169,6 +181,18 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
               unreachable: _unreachable,
               onRetry: _initializeForum,
             ),
+    );
+    // The app-wide theme follows ForumTheme a frame later (it cannot change
+    // mid-build); this page wears the forum's colours from its first frame,
+    // and keeps them while it animates out after leave().
+    // Always wrapped, so the palette arriving does not reshape the tree
+    // and rebuild the home from scratch.
+    final palette = ForumTheme.paletteFor(_site.pluginUrl);
+    return Theme(
+      data: palette == null
+          ? Theme.of(context)
+          : AppTheme.themeFor(Theme.of(context).brightness, palette),
+      child: home,
     );
   }
 }

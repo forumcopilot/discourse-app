@@ -1,3 +1,4 @@
+import 'package:discourse_core/discourse_core.dart' show DiscourseSiteCapabilities;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -23,6 +24,7 @@ import '../../utils/file_utils.dart';
 import '../../utils/html_colors.dart';
 import '../../utils/url_utils.dart';
 import '../../services/discourse_link_handler.dart';
+import 'category_badge.dart';
 
 /// Renders post content. The data we get from Discourse's `/t/{id}.json`
 /// post stream is the `cooked` HTML field — i.e. server-rendered Markdown
@@ -161,6 +163,7 @@ class RichTextContent extends StatelessWidget {
           openEmbed(href);
         }),
         const DetailsExtension(),
+        _CategoryHashtagMarkExtension(siteContext),
         ImageGridExtension(
           resolve: _resolveUrl,
           onImageTap: callbacks?.onImageTap == null
@@ -757,6 +760,55 @@ class _EmbedExtension extends HtmlExtension {
 /// anchors keep the default handling. That is why this is a custom
 /// [HtmlExtension] with its own [matches] instead of a TagExtension on
 /// `a`, which would have swallowed all four.
+/// The icon slot in a category hashtag. Discourse cooks `#site-feedback` as
+/// a link with an empty `span.hashtag-icon-placeholder`, which the web fills
+/// with the category's square or emoji; this fills it with the same
+/// [CategoryMark] the category's badge uses everywhere else.
+class _CategoryHashtagMarkExtension extends HtmlExtension {
+  const _CategoryHashtagMarkExtension(this.siteContext);
+
+  final SiteContext siteContext;
+
+  @override
+  Set<String> get supportedTags => {'span'};
+
+  @override
+  bool matches(ExtensionContext context) {
+    if (context.elementName != 'span' ||
+        !context.classes.contains('hashtag-icon-placeholder')) {
+      return false;
+    }
+    final link = context.element?.parent;
+    return link != null &&
+        link.localName == 'a' &&
+        link.attributes['data-type'] == 'category';
+  }
+
+  @override
+  InlineSpan build(ExtensionContext context) {
+    final link = context.element!.parent!;
+    final caps = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl);
+    // data-id since Discourse 3.1; the slug before that.
+    final slug = link.attributes['data-slug'];
+    final id = link.attributes['data-id'] ??
+        (slug == null ? null : caps.categoryIdForSlugs([slug])?.toString()) ??
+        '';
+    final style = caps.categoryStyleFor(id);
+    final parentId = style?.parentId;
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 3),
+        child: CategoryMark(
+          style: style,
+          parent: parentId == null ? null : caps.categoryStyleFor('$parentId'),
+          size: 11,
+        ),
+      ),
+    );
+  }
+}
+
 class _AttachmentLinkExtension extends HtmlExtension {
   const _AttachmentLinkExtension({
     required this.onTap,

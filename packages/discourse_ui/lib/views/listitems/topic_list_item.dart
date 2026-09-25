@@ -5,10 +5,11 @@ import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 import 'package:discourse_ui/utils/time_utils.dart';
 import 'package:discourse_ui/utils/number_utils.dart';
 import 'package:discourse_ui/views/widgets/user_avatar.dart';
-import 'package:discourse_ui/views/tag_topics_page.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/emoji_shortcodes.dart';
 import '../../theme/style_builders.dart';
+import '../../theme/forum_colors.dart';
+import '../widgets/topic_taxonomy_chips.dart';
 
 /// Widget para representar un ítem de la lista de foros
 class TopicListItem extends StatelessWidget {
@@ -228,116 +229,23 @@ class TopicListItem extends StatelessWidget {
                 ],
               ),
             ),
-            // Topic tags (chips below the title). Topics without tags
-            // hide the row entirely.
-            Builder(
-              builder: (context) {
-                final tags = topic.tags;
-                // Discourse's information architecture is category-first,
-                // and the row showed no category at all — you could not
-                // tell where a topic lived without opening it. Web puts the
-                // category badge on every row, ahead of the tags.
-                // Suppressed inside a category: the header two rows up
-                // already says where you are, so repeating it on every
-                // row is noise the eye has to filter out.
-                final category = showCategory ? topic.forumName.trim() : '';
-                if (tags.isEmpty && category.isEmpty) {
-                  return const SizedBox.shrink();
-                }
-                return Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    DesignTokens.spacingL,
-                    0.0,
-                    DesignTokens.spacingL,
-                    DesignTokens.spacingS,
-                  ),
-                  child: Wrap(
-                    spacing: DesignTokens.spacingXS,
-                    runSpacing: DesignTokens.spacingXS,
-                    children: [
-                      if (category.isNotEmpty)
-                        // A DecoratedBox, not a clipped Material: an
-                        // antialiased clip is a saveLayer per chip per row.
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: colorScheme.secondaryContainer,
-                            borderRadius:
-                                BorderRadius.circular(DesignTokens.radiusS),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            child: Text(
-                              category,
-                              style: textTheme.labelSmall?.copyWith(
-                                color: colorScheme.onSecondaryContainer,
-                                fontWeight: DesignTokens.fontWeightSemiBold,
-                                letterSpacing: DesignTokens.letterSpacingWide,
-                              ),
-                            ),
-                          ),
-                        ),
-                      // Two tags and a "+N": a row is a glance, not an
-                      // index, and every chip is layout and paint.
-                      ...tags.take(2).map((tag) {
-                      final chipShape = RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(DesignTokens.radiusS),
-                      );
-                      return DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceContainerHighest,
-                          borderRadius:
-                              BorderRadius.circular(DesignTokens.radiusS),
-                          border: Border.all(
-                            color: colorScheme.outlineVariant,
-                            width: 0.5,
-                          ),
-                        ),
-                        child: InkWell(
-                          customBorder: chipShape,
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => TagTopicsPage(
-                                siteContext: siteContext,
-                                tag: tag,
-                              ),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            child: Text(
-                              tag,
-                              style: textTheme.labelSmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                                letterSpacing: DesignTokens.letterSpacingWide,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                      if (tags.length > 2)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 4, vertical: 2),
-                          child: Text(
-                            '+${tags.length - 2}',
-                            style: textTheme.labelSmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                              letterSpacing: DesignTokens.letterSpacingWide,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                );
-              },
+            // The category badge and tags below the title. Discourse's
+            // information architecture is category-first, and web puts the
+            // badge on every row, ahead of the tags. Suppressed inside a
+            // category: the header two rows up already says where you are.
+            // Nothing drawn (no padding either) when there is neither.
+            TopicTaxonomyChips(
+              siteContext: siteContext,
+              categoryId: showCategory ? topic.forumId : '',
+              categoryName: showCategory ? topic.forumName : '',
+              tags: topic.tags,
+              maxTags: 2,
+              padding: EdgeInsets.fromLTRB(
+                DesignTokens.spacingL,
+                0.0,
+                DesignTokens.spacingL,
+                DesignTokens.spacingS,
+              ),
             ),
             // Short content if available
             if (topic.shortContent!.isNotEmpty && !topic.isAnnouncement) ...[
@@ -400,7 +308,7 @@ class _MetaRow extends StatelessWidget {
     final (IconData, String, Color)? badge = topicIcon != null
         ? (topicIcon!, l10n?.announcement ?? 'Announcement', metaColor)
         : topic.isSolved
-            ? (Icons.check_circle, l10n?.solved ?? 'Solved', Colors.green.shade600)
+            ? (Icons.check_circle, l10n?.solved ?? 'Solved', ForumColors.of(context).success)
             : topic.isClosed
                 ? (Icons.lock_outlined, l10n?.locked ?? 'Locked', metaColor)
                 : topic.isHot
