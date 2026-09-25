@@ -158,3 +158,22 @@ FCForum categoryForum(SiteContext siteContext, String id,
     textColor: style?.textColorHex ?? 'FFFFFF',
   );
 }
+
+/// The logo to draw for [forum], a category, on a light or [dark] page:
+/// the dark-mode upload when the admin made one, else its logo. The
+/// category's `/site.json` entry carries both; the list payload only one.
+String? categoryLogoUrl(SiteContext siteContext, FCForum forum,
+        {required bool dark}) =>
+    DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
+        .categoryStyleFor(forum.id)
+        ?.logoFor(dark: dark) ??
+    forum.logoUrl;
+
+/// The background image for [forum] on a light or [dark] page, likewise.
+String? categoryBackgroundUrl(SiteContext siteContext, FCForum forum,
+        {required bool dark}) =>
+    DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
+        .categoryStyleFor(forum.id)
+        ?.backgroundFor(dark: dark) ??
+    forum.backgroundUrl;
+

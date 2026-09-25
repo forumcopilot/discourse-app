@@ -12,6 +12,7 @@ import 'package:forumcopilot_sdk/models/search/fc_search_filters.dart';
 import '../base_discourse_proxy.dart';
 import '../data/topic/discourse_topic_slugs.dart';
 import '../util/discourse_link.dart';
+import '../util/site_url.dart';
 
 /// Discourse implementation of [IFCSearchProxy].
 ///
@@ -533,9 +534,7 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
     String? avatarUrl;
     if (tpl != null && tpl.isNotEmpty) {
       final filled = tpl.replaceAll('{size}', '90');
-      avatarUrl = filled.startsWith('http')
-          ? filled
-          : '${siteContext.site.url}$filled';
+      avatarUrl = absoluteSiteUrl(siteContext.site.url, filled);
     }
     final topicId = (p['topic_id'] ?? '').toString();
     return FCPost(

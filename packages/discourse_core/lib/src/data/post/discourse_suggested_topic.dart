@@ -1,3 +1,5 @@
+import '../../util/site_url.dart';
+
 /// A single entry from `/t/{id}.json`'s `suggested_topics` array.
 /// Discourse returns a richer object than what we surface — this model
 /// keeps just the fields needed to render the "Suggested Topics" footer
@@ -42,6 +44,6 @@ class DiscourseSuggestedTopic {
     final tpl = lastPosterAvatarTemplate;
     if (tpl == null || tpl.isEmpty) return null;
     final filled = tpl.replaceAll('{size}', size.toString());
-    return filled.startsWith('http') ? filled : '$forumBaseUrl$filled';
+    return absoluteSiteUrl(forumBaseUrl, filled);
   }
 }

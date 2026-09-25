@@ -11,6 +11,7 @@ import '../context/discourse_site_context_extension.dart';
 import '../util/html_text.dart';
 import '../data/topic/discourse_topic_slugs.dart';
 import '../util/discourse_link.dart';
+import '../util/site_url.dart';
 
 /// Discourse implementation of [IFCTopicProxy].
 ///
@@ -674,9 +675,7 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     final template = avatarTemplate as String?;
     if (template == null || template.isEmpty) return null;
     final filled = template.replaceAll('{size}', '120');
-    return filled.startsWith('http')
-        ? filled
-        : '${siteContext.site.url}$filled';
+    return absoluteSiteUrl(siteContext.site.url, filled);
   }
 
   /// summary form returned in /latest.json (and friends) and for the fuller

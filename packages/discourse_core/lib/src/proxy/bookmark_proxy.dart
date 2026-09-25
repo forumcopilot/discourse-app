@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/models/results/fc_bookmark_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../util/html_text.dart';
+import '../util/site_url.dart';
 
 /// Discourse implementation of [IFCBookmarkProxy] (Phase 5.33 — lifted
 /// off `DiscoursePostProxy`).
@@ -364,8 +365,7 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
   String? _resolveAvatarUrl(String? template, {int size = 90}) {
     if (template == null || template.isEmpty) return null;
     final filled = template.replaceAll('{size}', size.toString());
-    if (filled.startsWith('http')) return filled;
-    return '${siteContext.site.url}$filled';
+    return absoluteSiteUrl(siteContext.site.url, filled);
   }
 }
 

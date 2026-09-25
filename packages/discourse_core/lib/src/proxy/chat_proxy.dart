@@ -13,6 +13,7 @@ import '../data/chat/discourse_chat_uploads.dart';
 import '../data/chat/discourse_chat_permissions.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import '../network/discourse_message_bus.dart';
+import '../util/site_url.dart';
 
 /// Discourse implementation of [IFCChatProxy] (Phase 5.39 — lifted
 /// off the `DiscourseChatProxy.forCurrentSite()` sidecar).
@@ -405,7 +406,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
         String? avatar;
         if (tpl != null && tpl.isNotEmpty) {
           final filled = tpl.replaceAll('{size}', '60');
-          avatar = filled.startsWith('http') ? filled : '${siteContext.site.url}$filled';
+          avatar = absoluteSiteUrl(siteContext.site.url, filled);
         }
         out.add(DiscourseChatable(
           isGroup: false,
@@ -585,7 +586,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     if (tpl != null && tpl.isNotEmpty) {
       final filled = tpl.replaceAll('{size}', '60');
       avatarUrl =
-          filled.startsWith('http') ? filled : '${siteContext.site.url}$filled';
+          absoluteSiteUrl(siteContext.site.url, filled);
     }
     final id = (json['id'] as num).toInt();
     DiscourseChatUploads.store(siteContext.site.url, id, [

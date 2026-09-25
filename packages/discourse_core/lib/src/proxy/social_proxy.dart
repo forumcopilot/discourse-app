@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/models/results/fc_social_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../util/html_text.dart';
+import '../util/site_url.dart';
 
 /// Discourse implementation of [IFCSocialProxy].
 ///
@@ -427,7 +428,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     if (actingTpl.isNotEmpty) {
       final filled = actingTpl.replaceAll('{size}', '120');
       actorIconUrl =
-          filled.startsWith('http') ? filled : '${siteContext.site.url}$filled';
+          absoluteSiteUrl(siteContext.site.url, filled);
     }
 
     return FCAlert(
@@ -488,9 +489,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         ? ''
         : (() {
             final filled = avatarTpl.replaceAll('{size}', '120');
-            return filled.startsWith('http')
-                ? filled
-                : '${siteContext.site.url}$filled';
+            return absoluteSiteUrl(siteContext.site.url, filled);
           })();
     return FCActivity(
       userId: (a['acting_user_id'] ?? a['user_id'] ?? '').toString(),

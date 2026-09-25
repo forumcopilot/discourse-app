@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/models/results/fc_notification_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_subscription_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../util/site_url.dart';
 
 /// Discourse implementation of [IFCSubscriptionProxy].
 ///
@@ -374,9 +375,7 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
     String? avatarUrl;
     if (tpl != null && tpl.isNotEmpty) {
       final filled = tpl.replaceAll('{size}', '90');
-      avatarUrl = filled.startsWith('http')
-          ? filled
-          : '${siteContext.site.url}$filled';
+      avatarUrl = absoluteSiteUrl(siteContext.site.url, filled);
     }
 
     return FCSubscribedTopic(
@@ -412,7 +411,6 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
 
   String? _absoluteUrl(String? maybeRelative) {
     if (maybeRelative == null || maybeRelative.isEmpty) return null;
-    if (maybeRelative.startsWith('http')) return maybeRelative;
-    return '${siteContext.site.url}$maybeRelative';
+    return absoluteSiteUrl(siteContext.site.url, maybeRelative);
   }
 }

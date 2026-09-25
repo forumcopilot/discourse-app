@@ -6,6 +6,7 @@ import '../../theme/design_tokens.dart';
 import '../../utils/discourse_color.dart';
 import '../../theme/style_builders.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../widgets/category_badge.dart';
 
 /// Parse a Discourse hex string like "BF1E2E" (no leading `#`) into a
 /// Color. Returns null on bad input so the UI can hide the stripe.
@@ -87,7 +88,8 @@ class ForumListItem extends StatelessWidget {
                             : CrossAxisAlignment.center,
                         children: [
                   ForumListItemIconWidget(
-                    logoUrl: forum.logoUrl,
+                    logoUrl: categoryLogoUrl(siteContext, forum,
+                        dark: Theme.of(context).brightness == Brightness.dark),
                     // The category's own colour, not a hash of its name.
                     // ForumListItemIconWidget falls back to
                     // AvatarColorUtils — fine for a person, wrong for a

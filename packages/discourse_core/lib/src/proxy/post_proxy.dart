@@ -20,6 +20,7 @@ import '../util/quote_markup.dart';
 import '../data/post/discourse_post_revision.dart';
 import '../data/post/discourse_suggested_topic.dart';
 import '../util/html_text.dart';
+import '../util/site_url.dart';
 
 /// Discourse implementation of [IFCPostProxy].
 ///
@@ -145,9 +146,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       final tpl = createdBy['avatar_template'] as String?;
       if (tpl != null && tpl.isNotEmpty) {
         final filled = tpl.replaceAll('{size}', '120');
-        avatarUrl = filled.startsWith('http')
-            ? filled
-            : '${siteContext.site.url}$filled';
+        avatarUrl = absoluteSiteUrl(siteContext.site.url, filled);
       }
 
       return FCThreadResult(
@@ -1768,7 +1767,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   String? _avatarFromTemplate(String? tpl) {
     if (tpl == null || tpl.isEmpty) return null;
     final filled = tpl.replaceAll('{size}', '90');
-    return filled.startsWith('http') ? filled : '${siteContext.site.url}$filled';
+    return absoluteSiteUrl(siteContext.site.url, filled);
   }
 
   /// The `actions_summary` row for the like action

@@ -7,6 +7,7 @@ import '../base_discourse_proxy.dart';
 import '../data/site/discourse_site_capabilities.dart';
 import '../util/html_text.dart';
 import '../util/discourse_link.dart';
+import '../util/site_url.dart';
 
 /// Discourse implementation of [IFCForumProxy].
 ///
@@ -471,8 +472,7 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
 
   String? _absoluteUrl(String? maybeRelative) {
     if (maybeRelative == null || maybeRelative.isEmpty) return null;
-    if (maybeRelative.startsWith('http')) return maybeRelative;
-    return '${siteContext.site.url}$maybeRelative';
+    return absoluteSiteUrl(siteContext.site.url, maybeRelative);
   }
 }
 

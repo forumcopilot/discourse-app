@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/models/results/fc_group_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../util/html_text.dart';
+import '../util/site_url.dart';
 
 /// Discourse implementation of [IFCGroupProxy] (Phase 5.40 — lifted
 /// off the old `forCurrentSite()` sidecar, which is now gone; Phase 5.44
@@ -111,9 +112,7 @@ class DiscourseGroupProxy extends BaseDiscourseProxy implements IFCGroupProxy {
         final tpl = user['avatar_template'] as String?;
         if (tpl != null && tpl.isNotEmpty) {
           final filled = tpl.replaceAll('{size}', '90');
-          avatarUrl = filled.startsWith('http')
-              ? filled
-              : '${siteContext.site.url}$filled';
+          avatarUrl = absoluteSiteUrl(siteContext.site.url, filled);
         }
         members.add(FCDirectoryItem(
           id: id,

@@ -206,7 +206,6 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
       appBar: ForumTopicsAppBar(
         title: widget.forum.name,
         forumId: widget.forum.id,
-        onNewTopic: widget.siteContext.isLoggedIn && widget.forum.canPost ? _handleNewTopic : null,
         onSubscribe: widget.siteContext.isLoggedIn && widget.forum.canSubscribe ? _handleSubscribe : null,
         onMarkRead: widget.siteContext.isLoggedIn ? _handleMarkRead : null,
         isSubscribed: widget.forum.isSubscribed,
@@ -226,6 +225,17 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
         filter: _activeFilter.route,
         headerTrailing: _buildFilterTabs(context),
       ),
+      // Where a thumb is, in the forum's accent (the app's FAB theme), and
+      // always reachable — it used to sit in the category header, which
+      // scrolls away with the first topics.
+      floatingActionButton:
+          widget.siteContext.isLoggedIn && widget.forum.canPost
+              ? FloatingActionButton.extended(
+                  onPressed: _handleNewTopic,
+                  icon: const Icon(Icons.edit_outlined),
+                  label: Text(AppLocalizations.of(context)!.newTopic),
+                )
+              : null,
     );
   }
 }

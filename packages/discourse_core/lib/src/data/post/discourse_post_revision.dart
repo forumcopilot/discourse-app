@@ -1,3 +1,5 @@
+import '../../util/site_url.dart';
+
 /// A single edit revision of a post, from
 /// `/posts/{id}/revisions/latest.json` or `/posts/{id}/revisions/{rev}.json`
 /// (`PostRevisionSerializer`). Discourse numbers revisions starting at 2 —
@@ -84,6 +86,6 @@ class DiscoursePostRevision {
     final tpl = avatarTemplate;
     if (tpl == null || tpl.isEmpty) return null;
     final filled = tpl.replaceAll('{size}', size.toString());
-    return filled.startsWith('http') ? filled : '$forumBaseUrl$filled';
+    return absoluteSiteUrl(forumBaseUrl, filled);
   }
 }

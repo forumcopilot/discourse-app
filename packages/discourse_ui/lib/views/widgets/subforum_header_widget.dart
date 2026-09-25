@@ -5,34 +5,36 @@ import '../../theme/design_tokens.dart';
 import '../../theme/style_builders.dart';
 import '../../utils/safe_image.dart';
 import '../../utils/avatar_color_utils.dart';
-import '../../l10n/generated/app_localizations.dart';
 import 'forum_icon_widget.dart';
 import '../../utils/discourse_color.dart';
 import '../../theme/forum_brand_style.dart';
+import 'category_badge.dart';
 
 /// Widget that displays subforum icon, name, and description
 /// Used in the subforum view page below the breadcrumb
 class SubforumHeaderWidget extends StatelessWidget {
   final FCForum forum;
   final SiteContext? siteContext;
-  final VoidCallback? onNewTopic;
 
   const SubforumHeaderWidget({
     super.key,
     required this.forum,
     this.siteContext,
-    this.onNewTopic,
   });
+
+  // The category's uploads for this page's mode: its dark-mode logo and
+  // background when the admin made them.
+  String? _logoUrl(bool dark) => siteContext == null
+      ? forum.logoUrl
+      : categoryLogoUrl(siteContext!, forum, dark: dark);
+  String? _backgroundUrl(bool dark) => siteContext == null
+      ? forum.backgroundUrl
+      : categoryBackgroundUrl(siteContext!, forum, dark: dark);
 
   /// Gets the primary color for the background based on whether a logo is present
   /// If no logo, uses the avatar's base color to match the default logo
   Color _getBackgroundThemeColor(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
-    // If logo URL exists and is not empty, use theme primary color
-    if (forum.logoUrl != null && forum.logoUrl!.isNotEmpty) {
-      return colorScheme.primary;
-    }
     
     // The category's own colour, when Discourse gave us one. This header
     // was tinting itself from a hash of the category *name*, so
@@ -76,7 +78,8 @@ class SubforumHeaderWidget extends StatelessWidget {
     // a forum's home and its categories read as one family. A configured
     // background photo sits under a page-coloured veil instead, and text
     // follows the page there.
-    final hasPhoto = (forum.backgroundUrl ?? '').isNotEmpty;
+    final backgroundUrl = _backgroundUrl(isDarkMode);
+    final hasPhoto = (backgroundUrl ?? '').isNotEmpty;
     final style = ForumBrandStyle.forColor(
       _getBackgroundThemeColor(context),
       preferredText: parseDiscourseHex(forum.textColor ?? ''),
@@ -111,7 +114,6 @@ class SubforumHeaderWidget extends StatelessWidget {
                     // Network background (only shown if URL exists and loads successfully)
                     Builder(
                       builder: (context) {
-                        final backgroundUrl = forum.backgroundUrl;
                         if (backgroundUrl != null && backgroundUrl.isNotEmpty) {
                           return Stack(
                             fit: StackFit.expand,
@@ -155,7 +157,7 @@ class SubforumHeaderWidget extends StatelessWidget {
                 children: [
                   // Centered icon
                   ForumListItemIconWidget(
-                    logoUrl: forum.logoUrl,
+                    logoUrl: _logoUrl(isDarkMode),
                     fallbackIcon: Icons.forum_rounded,
                     forumName: forum.name,
                     // On the category's own colour now, so a translucent
@@ -193,27 +195,6 @@ class SubforumHeaderWidget extends StatelessWidget {
                         textAlign: TextAlign.center,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                  // New Topic button (if user is logged in and can post)
-                  if (siteContext != null && 
-                      siteContext!.isLoggedIn && 
-                      forum.canPost && 
-                      onNewTopic != null) ...[
-                    const SizedBox(height: DesignTokens.spacingL),
-                    FilledButton.icon(
-                      onPressed: onNewTopic,
-                      icon: const Icon(Icons.post_add_rounded),
-                      label: Text(AppLocalizations.of(context)?.newTopic ?? 'New Topic'),
-                      // Inverse of the header, so it reads on any category
-                      // colour.
-                      style: StyleBuilders.extendedFilledButtonStyle(
-                        colorScheme: colorScheme,
-                      ).copyWith(
-                        backgroundColor: WidgetStatePropertyAll(fg),
-                        foregroundColor: WidgetStatePropertyAll(
-                            hasPhoto ? colorScheme.surface : style.base),
                       ),
                     ),
                   ],

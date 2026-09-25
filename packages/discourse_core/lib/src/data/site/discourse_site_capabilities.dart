@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart' show visibleForTesting;
 
+import '../../util/site_url.dart';
+
 /// What `/site.json` says this forum offers.
 ///
 /// The app read *nothing* from `/site.json` before this — every capability
@@ -12,7 +14,11 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 /// not of a session or a context object, and re-fetching them on every
 /// `getConfig` would spend rate-limit budget re-asking a settled question.
 class DiscourseSiteCapabilities {
-  DiscourseSiteCapabilities._();
+  DiscourseSiteCapabilities._([this._siteKey = '']);
+
+  /// The forum these describe (`site.pluginUrl`), against which the
+  /// category uploads' relative URLs resolve.
+  final String _siteKey;
 
   static final Map<String, DiscourseSiteCapabilities> _bySite = {};
 
@@ -166,7 +172,7 @@ class DiscourseSiteCapabilities {
         .whereType<String>()
         .toList(growable: false);
     if (menu.isEmpty) return;
-    final caps = _bySite.putIfAbsent(pluginUrl, DiscourseSiteCapabilities._);
+    final caps = _bySite.putIfAbsent(pluginUrl, () => DiscourseSiteCapabilities._(pluginUrl));
     caps.topMenuItems = menu;
     caps.canTagTopics = site['can_tag_topics'] == true;
     caps.canCreateTag = site['can_create_tag'] == true;
@@ -195,7 +201,9 @@ class DiscourseSiteCapabilities {
     final id = int.tryParse(categoryId.trim());
     if (id == null) return null;
     for (final c in categories) {
-      if (c['id'] == id) return DiscourseCategoryStyle.fromSiteJson(c);
+      if (c['id'] == id) {
+        return DiscourseCategoryStyle.fromSiteJson(c, siteUrl: _siteKey);
+      }
     }
     return null;
   }
@@ -288,7 +296,7 @@ class DiscourseSiteCapabilities {
     String? smallLogoUrl,
     String? smallLogoDarkUrl,
   }) {
-    final caps = _bySite.putIfAbsent(pluginUrl, DiscourseSiteCapabilities._);
+    final caps = _bySite.putIfAbsent(pluginUrl, () => DiscourseSiteCapabilities._(pluginUrl));
     caps.logoUrl = logoUrl?.trim();
     caps.logoDarkUrl = logoDarkUrl?.trim();
     caps.mobileLogoUrl = mobileLogoUrl?.trim();
@@ -333,6 +341,10 @@ class DiscourseCategoryStyle {
     this.styleType = 'square',
     this.emoji,
     this.icon,
+    this.logoUrl,
+    this.logoDarkUrl,
+    this.backgroundUrl,
+    this.backgroundDarkUrl,
   });
 
   final int id;
@@ -352,10 +364,35 @@ class DiscourseCategoryStyle {
   /// Font Awesome icon name when [styleType] is `icon`.
   final String? icon;
 
-  factory DiscourseCategoryStyle.fromSiteJson(Map<String, dynamic> c) {
+  /// The category's uploaded logo and background, absolute, each with the
+  /// variant an admin may upload for dark mode (`uploaded_logo_dark`,
+  /// `uploaded_background_dark`). Null when not uploaded.
+  final String? logoUrl;
+  final String? logoDarkUrl;
+  final String? backgroundUrl;
+  final String? backgroundDarkUrl;
+
+  /// The logo for a light or [dark] page: the dark variant when there is
+  /// one, else the only one.
+  String? logoFor({required bool dark}) =>
+      (dark ? logoDarkUrl : null) ?? logoUrl;
+
+  /// The background for a light or [dark] page, likewise.
+  String? backgroundFor({required bool dark}) =>
+      (dark ? backgroundDarkUrl : null) ?? backgroundUrl;
+
+  factory DiscourseCategoryStyle.fromSiteJson(Map<String, dynamic> c,
+      {String siteUrl = ''}) {
     String? str(Object? v) {
       final s = v?.toString().trim();
       return (s == null || s.isEmpty) ? null : s;
+    }
+
+    // Uploads come as {url, width, height}; the url is often
+    // protocol-relative (S3/CDN).
+    String? upload(Object? v) {
+      final url = v is Map ? str(v['url']) : null;
+      return url == null ? null : absoluteSiteUrl(siteUrl, url);
     }
 
     return DiscourseCategoryStyle(
@@ -367,6 +404,10 @@ class DiscourseCategoryStyle {
       styleType: str(c['style_type']) ?? 'square',
       emoji: str(c['emoji']),
       icon: str(c['icon']),
+      logoUrl: upload(c['uploaded_logo']),
+      logoDarkUrl: upload(c['uploaded_logo_dark']),
+      backgroundUrl: upload(c['uploaded_background']),
+      backgroundDarkUrl: upload(c['uploaded_background_dark']),
     );
   }
 }

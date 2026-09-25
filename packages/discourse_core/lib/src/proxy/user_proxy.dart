@@ -12,6 +12,7 @@ import '../context/discourse_site_context_extension.dart';
 import '../data/user/discourse_do_not_disturb.dart';
 import '../data/user/discourse_user_summary.dart';
 import '../util/html_text.dart';
+import '../util/site_url.dart';
 
 /// Discourse implementation of IFCUserProxy
 /// Handles user operations and profile management for Discourse forums
@@ -33,9 +34,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       final tpl = user['avatar_template'] as String?;
       if (tpl == null || tpl.isEmpty) return '';
       final filled = tpl.replaceAll('{size}', '120');
-      return filled.startsWith('http')
-          ? filled
-          : '${siteContext.site.url}$filled';
+      return absoluteSiteUrl(siteContext.site.url, filled);
     } catch (_) {
       return '';
     }
@@ -186,9 +185,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         final tpl = user['avatar_template'] as String?;
         if (tpl != null && tpl.isNotEmpty) {
           final filled = tpl.replaceAll('{size}', '90');
-          avatarUrl = filled.startsWith('http')
-              ? filled
-              : '${siteContext.site.url}$filled';
+          avatarUrl = absoluteSiteUrl(siteContext.site.url, filled);
         }
         return FCOnlineUser(
           id: (user['id'] ?? '').toString(),
@@ -311,7 +308,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     if (tpl != null && tpl.isNotEmpty) {
       final filled = tpl.replaceAll('{size}', '90');
       avatarUrl =
-          filled.startsWith('http') ? filled : '${siteContext.site.url}$filled';
+          absoluteSiteUrl(siteContext.site.url, filled);
     }
     int statAt(String key) {
       final raw = json[key] ?? user[key];
@@ -399,9 +396,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       final avatarTemplate = user['avatar_template'] as String?;
       if (avatarTemplate != null && avatarTemplate.isNotEmpty) {
         final filled = avatarTemplate.replaceAll('{size}', '240');
-        avatarUrl = filled.startsWith('http')
-            ? filled
-            : '${siteContext.site.url}$filled';
+        avatarUrl = absoluteSiteUrl(siteContext.site.url, filled);
       }
 
       DateTime? parseTs(Object? raw) {
@@ -623,9 +618,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       String? absoluteAvatar(String? template) {
         if (template == null || template.isEmpty) return null;
         final filled = template.replaceAll('{size}', '90');
-        return filled.startsWith('http')
-            ? filled
-            : '${siteContext.site.url}$filled';
+        return absoluteSiteUrl(siteContext.site.url, filled);
       }
 
       final replyList = actions.map((a) {
@@ -956,9 +949,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         final tpl = m['avatar_template'] as String?;
         if (tpl != null && tpl.isNotEmpty) {
           final filled = tpl.replaceAll('{size}', '90');
-          avatarUrl = filled.startsWith('http')
-              ? filled
-              : '${siteContext.site.url}$filled';
+          avatarUrl = absoluteSiteUrl(siteContext.site.url, filled);
         }
         return FCSearchUser(
           id: (m['id'] ?? '').toString(),
@@ -1367,9 +1358,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
   String _resolveAvatar(String? tpl, int size) {
     if (tpl == null || tpl.isEmpty) return '';
     final filled = tpl.replaceAll('{size}', size.toString());
-    return filled.startsWith('http')
-        ? filled
-        : '${siteContext.site.url}$filled';
+    return absoluteSiteUrl(siteContext.site.url, filled);
   }
 
   @override

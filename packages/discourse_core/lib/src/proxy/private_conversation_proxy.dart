@@ -12,6 +12,7 @@ import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.d
 import '../base_discourse_proxy.dart';
 import '../data/message/discourse_message_details.dart';
 import '../context/discourse_site_context_extension.dart';
+import '../util/site_url.dart';
 
 /// Discourse implementation of [IFCPrivateConversationProxy].
 ///
@@ -950,9 +951,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     String? avatarUrl;
     if (tpl != null && tpl.isNotEmpty) {
       final filled = tpl.replaceAll('{size}', '90');
-      avatarUrl = filled.startsWith('http')
-          ? filled
-          : '${siteContext.site.url}$filled';
+      avatarUrl = absoluteSiteUrl(siteContext.site.url, filled);
     }
     final actions = (p['actions_summary'] as List?) ?? const [];
     final likeAction = actions.whereType<Map>().firstWhere(
@@ -1039,9 +1038,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     String? avatarUrl;
     if (tpl != null && tpl.isNotEmpty) {
       final filled = tpl.replaceAll('{size}', '90');
-      avatarUrl = filled.startsWith('http')
-          ? filled
-          : '${siteContext.site.url}$filled';
+      avatarUrl = absoluteSiteUrl(siteContext.site.url, filled);
     }
     return FCParticipant(
       userId: (u['id'] ?? '').toString(),

@@ -46,6 +46,14 @@ void main() {
         {'id': 6, 'name': 'Arduino', 'color': 'E45735', 'parent_category_id': 5},
         {'id': 4, 'name': 'General', 'color': '25AAE2', 'style_type': 'emoji', 'emoji': 'blue_book'},
         {'id': 9, 'name': 'Night', 'color': '111111'},
+        {
+          'id': 18,
+          'name': 'Product Announcements',
+          'color': 'FCBD01',
+          'uploaded_logo': {'url': '//cdn.example/rocket.png'},
+          'uploaded_logo_dark': {'url': '/uploads/rocket-dark.png'},
+          'uploaded_background': {'url': '//cdn.example/bg.jpg'},
+        },
       ],
     });
   });
@@ -174,4 +182,28 @@ void main() {
     expect(find.byType(CategoryMark), findsOneWidget);
     expect(markOf(tester).color, const Color(0xFF0E76A8));
   });
+
+  // The category page picks its uploads for the page's mode; the list
+  // payload's FCForum carries only the light logo.
+  test("a category's logo and background follow light and dark", () {
+    final forum = FCForum(id: '18', name: 'Product Announcements');
+    expect(categoryLogoUrl(_ctx, forum, dark: false), 'https://cdn.example/rocket.png');
+    expect(categoryLogoUrl(_ctx, forum, dark: true),
+        '$_forum/uploads/rocket-dark.png');
+    // No dark background uploaded: the one background serves both.
+    expect(categoryBackgroundUrl(_ctx, forum, dark: true), 'https://cdn.example/bg.jpg');
+    // A category /site.json does not know keeps what the list gave it.
+    final other = FCForum(id: '404', name: 'X', logoUrl: 'https://l.example/x.png');
+    expect(categoryLogoUrl(_ctx, other, dark: true), 'https://l.example/x.png');
+  });
+
+  test("floating buttons are the forum's accent", () {
+    for (final theme in [AppTheme.lightTheme, AppTheme.darkTheme]) {
+      expect(theme.floatingActionButtonTheme.backgroundColor,
+          theme.colorScheme.primary);
+      expect(theme.floatingActionButtonTheme.foregroundColor,
+          theme.colorScheme.onPrimary);
+    }
+  });
 }
+

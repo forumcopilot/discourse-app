@@ -137,6 +137,12 @@ class AppTheme {
         centerTitle: true,
         elevation: DesignTokens.elevationNone,
       ),
+      // Floating buttons (New Topic, New Message) in the forum's accent —
+      // its buttons' colour on the web — not Material's tonal container.
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+      ),
       cardTheme: StyleBuilders.cardTheme(
         colorScheme: colorScheme,
         elevation: DesignTokens.elevationMedium,

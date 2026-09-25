@@ -9,7 +9,6 @@ import 'package:discourse_core/discourse_core.dart' show DiscourseTopicProxy;
 import 'package:get/get.dart';
 import 'package:discourse_ui/utils/forum_navigation.dart';
 import 'package:discourse_ui/views/post_page.dart';
-import 'package:discourse_ui/views/new_topic_page.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/views/login_page.dart';
 import '../listitems/topic_list_item.dart';
@@ -271,63 +270,7 @@ class _ForumTopicListState extends State<ForumTopicList> {
     }
   }
 
-  Future<void> _handleNewTopic() async {
-    if (!widget.siteContext.isLoggedIn) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.pleaseLoginToCreateANewTopic,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onInverseSurface,
-                ),
-          ),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          margin: const EdgeInsets.all(8),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-      return;
-    }
 
-    var topicCreated = false;
-    String? newTopicId;
-    var newTopicTitle = '';
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => NewTopicPage(
-          siteContext: widget.siteContext,
-          forumId: widget.forum.id,
-          forumName: widget.forum.name,
-          onTopicCreated: (topicId, title) {
-            topicCreated = true;
-            if (topicId.isNotEmpty) {
-              newTopicId = topicId;
-              newTopicTitle = title;
-            }
-          },
-        ),
-      ),
-    );
-
-    if (result == true || topicCreated) {
-      _loadTopics();
-    }
-
-    // Open what was just created, as web does. This list owns the header's
-    // New Topic button, so the navigation belongs here as well as on the
-    // page's app-bar action — the two entry points are separate.
-    if (newTopicId != null && mounted) {
-      await Get.to(() => PostPage(
-            siteContext: widget.siteContext,
-            topicId: newTopicId!,
-            // The topic's title, not the category's — the first post
-            // renders whatever is passed here as its heading.
-            title: newTopicTitle,
-            forumId: widget.forum.id,
-          ));
-    }
-  }
 
   Future<void> _handleSubscription(String forumId, bool subscribe) async {
     // Check if user is logged in before proceeding with subscription
@@ -432,7 +375,6 @@ class _ForumTopicListState extends State<ForumTopicList> {
             SubforumHeaderWidget(
               forum: widget.forum,
               siteContext: widget.siteContext,
-              onNewTopic: _handleNewTopic,
             ),
           if (widget.headerTrailing != null) widget.headerTrailing!,
           // Show permission message if user cannot view content
@@ -572,6 +514,9 @@ class _ForumTopicListState extends State<ForumTopicList> {
               padding: DesignTokens.paddingS,
               child: Center(child: CircularProgressIndicator()),
             ),
+          // Room for the category page's New Topic button, so the last
+          // topic can scroll clear of it.
+          if (widget.showSubforumHeader) const SizedBox(height: 88),
         ],
       ),
     );
