@@ -1951,7 +1951,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'Konten werden auf der Website des Forums gelöscht – in deinen Kontoeinstellungen, wenn das Forum es erlaubt, sonst vom Team.';
+      'Lösche dein Konto und deine Beiträge, sofern das Forum es erlaubt. Andernfalls kann das Team es für dich entfernen.';
 
   @override
   String get verificationEmailSent =>
@@ -2513,6 +2513,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get userWasDeleted => 'Der Benutzer wurde gelöscht.';
 
   @override
-  String get deleteAccountSelfServeBody =>
-      'Du kannst dein Konto in deinen Kontoeinstellungen auf der Website des Forums löschen. „Fortfahren“ öffnet diese Seite im Browser. Melde dich dort an, falls du dazu aufgefordert wirst.';
+  String get deleteMyAccount => 'Lösche mein Benutzerkonto';
+
+  @override
+  String get deleteAccountConfirm =>
+      'Möchtest du wirklich dein Benutzerkonto permanent löschen? Diese Aktion kann nicht rückgängig gemacht werden!';
+
+  @override
+  String get deletedYourself =>
+      'Dein Benutzerkonto wurde erfolgreich gelöscht.';
+
+  @override
+  String get deleteYourselfNotAllowed =>
+      'Bitte kontaktiere ein Team-Mitglied, wenn du möchtest, dass dein Konto gelöscht wird.';
 }

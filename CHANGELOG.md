@@ -22,7 +22,9 @@ Full review, batch 2: things that worked, but not the way Discourse does. Each w
 - **Group members no longer repeat the owners on every page or skip members.** Discourse re-sends the full owner list with each page; the app put it at the top of every page and counted it into the next offset.
 - **Invite links work for more than one person.** The app sent no redemption count, so the server's default of one applied to a link meant for sharing. It now asks for what the forum's own invite dialog does: 10, or 100 for staff, within the forum's limit.
 - **Spam Cleaner is Discourse's Delete spammer.** XenForo's four options did not map to Discourse: the app silenced the user and deleted nothing unless an option was ticked. It is now the website's single action, which deletes the account and every post and blocks the email address, IP address and posted links. It is offered only where Discourse would allow it (`can_be_deleted`: moderators cannot delete established members).
-- **Delete account opens your account preferences** on the forum when it lets members delete their own account (`can_delete_account`). There Discourse has its own Delete My Account button. Otherwise the app still points you to the forum's staff.
+
+### Added
+- **Delete your account in the app**, where the forum lets members do it (`can_delete_account`: Discourse Connect off and few enough posts). It is the website's Delete My Account, with the same confirmation and messages: the account and its posts are deleted (`DELETE /u/{username}.json`) and the app signs out. On forums that don't allow it, Delete account still points you to the staff.
 
 ## [1.0.27] - 2026-09-24
 

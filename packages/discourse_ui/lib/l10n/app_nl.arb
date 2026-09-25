@@ -1137,7 +1137,7 @@
   "manageAccountSubtitle": "Profiel, e-mail, wachtwoord, beveiliging, geavanceerde instellingen",
   "changePasswordSubtitle": "Stuurt een e-mail voor wachtwoordherstel naar je huidige adres",
   "ignoredUsersSubtitle": "Bekijk en beheer gebruikers van wie de berichten voor jou verborgen zijn",
-  "deleteAccountExplanation": "Accounts worden verwijderd op de website van het forum: via je accountvoorkeuren als het forum dat toestaat, anders door de staf.",
+  "deleteAccountExplanation": "Verwijder je account en je berichten, als het forum dat toestaat. Anders kan de staf het voor je verwijderen.",
   "verificationEmailSent": "Verificatie-e-mail verzonden — klik op de link om je nieuwe adres te bevestigen.",
   "passwordResetExplanation": "We mailen je een link voor wachtwoordherstel. Klik erop om een nieuw wachtwoord te kiezen — de wijziging gebeurt op het forum, niet in deze app.",
   "sendResetEmail": "Herstel-e-mail verzenden",
@@ -1276,5 +1276,8 @@
   "yesDeleteSpammer": "Ja, spammer verwijderen",
   "deleteSpammerConfirm": "Je staat op het punt de berichten en topics van deze gebruiker te verwijderen, diens account te verwijderen, registraties vanaf diens IP-adres te blokkeren en diens e-mailadres toe te voegen aan een permanente blokkeerlijst. Weet je zeker dat deze gebruiker echt een spammer is?",
   "userWasDeleted": "De gebruiker is verwijderd.",
-  "deleteAccountSelfServeBody": "Je kunt je account verwijderen via je accountvoorkeuren op de website van het forum. 'Doorgaan' opent die pagina in je browser. Log daar in als daarom wordt gevraagd."
+  "deleteMyAccount": "Mijn account verwijderen",
+  "deleteAccountConfirm": "Weet je zeker dat je je account definitief wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt!",
+  "deletedYourself": "Je account is verwijderd.",
+  "deleteYourselfNotAllowed": "Neem contact op met een medewerker als je wilt dat je account wordt verwijderd."
 }

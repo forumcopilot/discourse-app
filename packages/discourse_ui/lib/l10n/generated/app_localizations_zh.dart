@@ -1845,8 +1845,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ignoredUsersSubtitle => '查看和管理其帖子对你隐藏的用户';
 
   @override
-  String get deleteAccountExplanation =>
-      '账户需在论坛网站上删除：如果论坛允许，可在账户偏好设置中删除，否则由论坛管理人员删除。';
+  String get deleteAccountExplanation => '如果论坛允许，您可以删除您的账户及帖子；否则可以请论坛管理人员为您删除。';
 
   @override
   String get verificationEmailSent => '验证邮件已发送 — 请点击链接确认新地址。';
@@ -2378,6 +2377,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get userWasDeleted => '该用户已被删除。';
 
   @override
-  String get deleteAccountSelfServeBody =>
-      '您可以在论坛网站的账户偏好设置中删除您的账户。点击“继续”将在浏览器中打开该页面。如有提示，请在那里登录。';
+  String get deleteMyAccount => '删除我的帐户';
+
+  @override
+  String get deleteAccountConfirm => '确定要永久删除您的帐户吗？此操作无法撤消！';
+
+  @override
+  String get deletedYourself => '您的帐户已被成功删除。';
+
+  @override
+  String get deleteYourselfNotAllowed => '如果您希望删除您的帐户，请联系管理人员。';
 }

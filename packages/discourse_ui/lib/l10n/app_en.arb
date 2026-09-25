@@ -2167,7 +2167,7 @@
   "@ignoredUsersSubtitle": {
     "description": "UI text: See and manage users whose posts are hidden from you"
   },
-  "deleteAccountExplanation": "Accounts are deleted on the forum's website — from your account preferences if the forum allows it, otherwise by its staff.",
+  "deleteAccountExplanation": "Delete your account and your posts, if the forum allows it. Otherwise its staff can remove it for you.",
   "@deleteAccountExplanation": {
     "description": "UI text: Removing your account is handled on the forum. Continue to o"
   },
@@ -3022,8 +3022,14 @@
     "description": "Confirmation before Delete spammer (Discourse flagging.delete_confirm_MF, without the counts)"
   },
   "userWasDeleted": "The user was deleted.",
-  "deleteAccountSelfServeBody": "You can delete your account from your account preferences on the forum's website. Continue opens that page in your browser. Sign in there if it asks.",
-  "@deleteAccountSelfServeBody": {
-    "description": "Shown before opening the forum's account preferences, where Discourse lets members delete their own account (current_user.can_delete_account)"
+  "deleteMyAccount": "Delete My Account",
+  "@deleteMyAccount": {
+    "description": "Confirms deleting your own account (Discourse user.delete_account)"
+  },
+  "deleteAccountConfirm": "Are you sure you want to permanently delete your account? This action cannot be undone!",
+  "deletedYourself": "Your account has been deleted successfully.",
+  "deleteYourselfNotAllowed": "Please contact a staff member if you wish your account to be deleted.",
+  "@deleteYourselfNotAllowed": {
+    "description": "When the forum refuses to let you delete your own account (Discourse user.delete_yourself_not_allowed)"
   }
 }

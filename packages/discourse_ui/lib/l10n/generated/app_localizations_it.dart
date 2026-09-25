@@ -1944,7 +1944,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'Gli account si eliminano sul sito del forum: dalle preferenze del tuo account se il forum lo consente, altrimenti dallo staff.';
+      'Elimina il tuo account e i tuoi messaggi, se il forum lo consente. Altrimenti lo staff può rimuoverlo per te.';
 
   @override
   String get verificationEmailSent =>
@@ -2508,6 +2508,17 @@ class AppLocalizationsIt extends AppLocalizations {
   String get userWasDeleted => 'L\'utente è stato cancellato.';
 
   @override
-  String get deleteAccountSelfServeBody =>
-      'Puoi eliminare il tuo account dalle preferenze del tuo account sul sito del forum. «Continua» apre quella pagina nel browser. Accedi lì se richiesto.';
+  String get deleteMyAccount => 'Cancella il mio account';
+
+  @override
+  String get deleteAccountConfirm =>
+      'Vuoi cancellare il tuo account in modo permanente? Questa azione non può essere annullata!';
+
+  @override
+  String get deletedYourself =>
+      'Il tuo account è stato eliminato con successo.';
+
+  @override
+  String get deleteYourselfNotAllowed =>
+      'Contattare un membro dello staff per richiedere l\'eliminazione del proprio account';
 }

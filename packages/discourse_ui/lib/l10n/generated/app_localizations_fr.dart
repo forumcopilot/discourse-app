@@ -1947,7 +1947,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'Les comptes se suppriment sur le site du forum : depuis les préférences de votre compte si le forum le permet, sinon par son équipe.';
+      'Supprimez votre compte et vos publications, si le forum le permet. Sinon, son équipe peut le supprimer pour vous.';
 
   @override
   String get verificationEmailSent =>
@@ -2511,6 +2511,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get userWasDeleted => 'L\'utilisateur a été supprimé.';
 
   @override
-  String get deleteAccountSelfServeBody =>
-      'Vous pouvez supprimer votre compte depuis les préférences de votre compte sur le site du forum. « Continuer » ouvre cette page dans votre navigateur. Connectez-vous-y si elle vous le demande.';
+  String get deleteMyAccount => 'Supprimer mon compte';
+
+  @override
+  String get deleteAccountConfirm =>
+      'Voulez-vous vraiment supprimer définitivement votre compte ? Cette action est irréversible !';
+
+  @override
+  String get deletedYourself => 'Votre compte a été supprimé avec succès.';
+
+  @override
+  String get deleteYourselfNotAllowed =>
+      'Veuillez contacter un responsable si vous souhaitez supprimer votre compte.';
 }

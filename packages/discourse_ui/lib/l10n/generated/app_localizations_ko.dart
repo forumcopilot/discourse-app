@@ -1862,7 +1862,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      '계정은 포럼 웹사이트에서 삭제합니다. 포럼이 허용하면 계정 설정에서, 그렇지 않으면 운영진이 삭제합니다.';
+      '포럼이 허용하면 계정과 게시물을 삭제할 수 있습니다. 허용하지 않으면 운영진이 대신 삭제해 드릴 수 있습니다.';
 
   @override
   String get verificationEmailSent => '확인 이메일을 보냈습니다 — 링크를 클릭하여 새 주소를 확인하세요.';
@@ -2401,6 +2401,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get userWasDeleted => '사용자가 삭제되었습니다.';
 
   @override
-  String get deleteAccountSelfServeBody =>
-      '포럼 웹사이트의 계정 설정에서 계정을 삭제할 수 있습니다. \'계속\'을 누르면 브라우저에서 해당 페이지가 열립니다. 로그인하라는 메시지가 나오면 로그인하세요.';
+  String get deleteMyAccount => '내 계정 삭제';
+
+  @override
+  String get deleteAccountConfirm => '계정을 영구적으로 삭제할까요? 이 작업은 취소할 수 없습니다!';
+
+  @override
+  String get deletedYourself => '계정이 삭제되었습니다.';
+
+  @override
+  String get deleteYourselfNotAllowed => '계정 삭제를 원하시면 운영진에게 문의하세요.';
 }

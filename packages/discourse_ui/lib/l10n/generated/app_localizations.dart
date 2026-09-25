@@ -3383,7 +3383,7 @@ abstract class AppLocalizations {
   /// UI text: Removing your account is handled on the forum. Continue to o
   ///
   /// In en, this message translates to:
-  /// **'Accounts are deleted on the forum\'s website — from your account preferences if the forum allows it, otherwise by its staff.'**
+  /// **'Delete your account and your posts, if the forum allows it. Otherwise its staff can remove it for you.'**
   String get deleteAccountExplanation;
 
   /// UI text: Verification email sent — click the link to confirm your new
@@ -4222,11 +4222,29 @@ abstract class AppLocalizations {
   /// **'The user was deleted.'**
   String get userWasDeleted;
 
-  /// Shown before opening the forum's account preferences, where Discourse lets members delete their own account (current_user.can_delete_account)
+  /// Confirms deleting your own account (Discourse user.delete_account)
   ///
   /// In en, this message translates to:
-  /// **'You can delete your account from your account preferences on the forum\'s website. Continue opens that page in your browser. Sign in there if it asks.'**
-  String get deleteAccountSelfServeBody;
+  /// **'Delete My Account'**
+  String get deleteMyAccount;
+
+  /// No description provided for @deleteAccountConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently delete your account? This action cannot be undone!'**
+  String get deleteAccountConfirm;
+
+  /// No description provided for @deletedYourself.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been deleted successfully.'**
+  String get deletedYourself;
+
+  /// When the forum refuses to let you delete your own account (Discourse user.delete_yourself_not_allowed)
+  ///
+  /// In en, this message translates to:
+  /// **'Please contact a staff member if you wish your account to be deleted.'**
+  String get deleteYourselfNotAllowed;
 }
 
 class _AppLocalizationsDelegate

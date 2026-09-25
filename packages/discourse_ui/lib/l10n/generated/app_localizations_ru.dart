@@ -1938,7 +1938,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'Аккаунты удаляются на сайте форума: в настройках аккаунта, если форум это разрешает, иначе — командой форума.';
+      'Удалите свой аккаунт и сообщения, если форум это разрешает. Иначе его может удалить команда форума.';
 
   @override
   String get verificationEmailSent =>
@@ -2496,6 +2496,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get userWasDeleted => 'Пользователь удалён.';
 
   @override
-  String get deleteAccountSelfServeBody =>
-      'Вы можете удалить аккаунт в настройках аккаунта на сайте форума. «Продолжить» откроет эту страницу в браузере. Войдите там, если потребуется.';
+  String get deleteMyAccount => 'Удалить мой аккаунт';
+
+  @override
+  String get deleteAccountConfirm =>
+      'Действительно удалить аккаунт? Отменить удаление будет невозможно!';
+
+  @override
+  String get deletedYourself => 'Ваш аккаунт удален.';
+
+  @override
+  String get deleteYourselfNotAllowed =>
+      'Чтобы удалить аккаунт, свяжитесь с администрацией сайта.';
 }

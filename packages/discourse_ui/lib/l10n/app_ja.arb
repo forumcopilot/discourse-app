@@ -839,7 +839,7 @@
   "manageAccountSubtitle": "プロフィール、メール、パスワード、セキュリティ、詳細設定",
   "changePasswordSubtitle": "現在のメールアドレスにパスワード再設定メールを送ります",
   "ignoredUsersSubtitle": "投稿が非表示になっているユーザーを確認・管理",
-  "deleteAccountExplanation": "アカウントはフォーラムのウェブサイトで削除します。フォーラムが許可していればアカウント設定から、そうでなければスタッフが削除します。",
+  "deleteAccountExplanation": "フォーラムが許可していれば、アカウントと投稿を削除できます。許可していない場合は、スタッフに削除を依頼できます。",
   "verificationEmailSent": "確認メールを送信しました — リンクをクリックして新しいアドレスを確認してください。",
   "passwordResetExplanation": "パスワード再設定リンクをメールで送ります。リンクから新しいパスワードを設定してください — 変更はこのアプリではなくフォーラム側で行われます。",
   "sendResetEmail": "再設定メールを送信",
@@ -978,5 +978,8 @@
   "yesDeleteSpammer": "はい、迷惑行為者を削除する",
   "deleteSpammerConfirm": "このユーザーの投稿とトピックを削除し、アカウントを削除し、IP アドレスからの登録をブロックし、メールアドレスを永久ブロックリストに追加しようとしています。このユーザーは本当に迷惑行為者ですか？",
   "userWasDeleted": "ユーザーが削除されました。",
-  "deleteAccountSelfServeBody": "フォーラムのウェブサイトのアカウント設定からアカウントを削除できます。「続ける」でそのページをブラウザで開きます。ログインを求められたらログインしてください。"
+  "deleteMyAccount": "アカウントを削除",
+  "deleteAccountConfirm": "アカウントを永久に削除してもよろしいですか？この操作は元に戻せません！",
+  "deletedYourself": "あなたのアカウントは正常に削除されました。",
+  "deleteYourselfNotAllowed": "アカウントの削除を希望する場合は、スタッフメンバーに連絡をしてください。"
 }

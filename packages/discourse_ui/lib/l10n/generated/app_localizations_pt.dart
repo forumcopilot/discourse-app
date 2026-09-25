@@ -1940,7 +1940,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'As contas são excluídas no site do fórum: nas preferências da sua conta, se o fórum permitir; caso contrário, pela equipe.';
+      'Exclua sua conta e suas postagens, se o fórum permitir. Caso contrário, a equipe pode removê-la para você.';
 
   @override
   String get verificationEmailSent =>
@@ -2501,6 +2501,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get userWasDeleted => 'O(a) usuário(a) foi excluído(a).';
 
   @override
-  String get deleteAccountSelfServeBody =>
-      'Você pode excluir sua conta nas preferências da sua conta no site do fórum. “Continuar” abre essa página no navegador. Entre lá se for solicitado.';
+  String get deleteMyAccount => 'Excluir minha conta';
+
+  @override
+  String get deleteAccountConfirm =>
+      'Você tem certeza de que deseja excluir a sua conta permanentemente? Essa ação não pode ser desfeita!';
+
+  @override
+  String get deletedYourself => 'Sua conta foi excluída com êxito.';
+
+  @override
+  String get deleteYourselfNotAllowed =>
+      'Entre em contato com um membro da equipe se você deseja que a sua conta seja excluída.';
 }

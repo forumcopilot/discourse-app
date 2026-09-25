@@ -1172,6 +1172,31 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     }
   }
 
+  /// Deletes the signed-in user's own account with its posts, as the
+  /// website's Delete My Account does (`DELETE /u/{username}.json`,
+  /// users#destroy → UserDestroyer). The server allows it when
+  /// [canDeleteOwnAccountAsync] is true and refuses otherwise. The User API
+  /// Key goes with the account, so the caller signs out locally afterwards.
+  Future<({bool deleted, String message})> deleteOwnAccountAsync() async {
+    final username = siteContext.loginDataOutput?.user?.username;
+    if (!siteContext.isLoggedIn || username == null || username.isEmpty) {
+      return (deleted: false, message: 'Not signed in');
+    }
+    try {
+      final response = await apiDelete(
+        '/u/${Uri.encodeComponent(username)}.json',
+        // Recorded with the deletion, where the website puts the page it
+        // was done from.
+        query: {'context': '/u/$username/preferences/account'},
+      );
+      return (deleted: response['success'] == 'OK', message: '');
+    } on DiscourseApiException catch (e) {
+      return (deleted: false, message: e.userMessage);
+    } catch (e) {
+      return (deleted: false, message: describeApiError(e));
+    }
+  }
+
   /// Reads the current do-not-disturb state.
   ///
   /// Discourse has no dedicated status endpoint — the DND deadline is

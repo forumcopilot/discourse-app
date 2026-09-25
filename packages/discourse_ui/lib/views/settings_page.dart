@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
+import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteCapabilities, DiscourseUserProxy;
 
+import '../controllers/login_controller.dart';
 import '../theme/design_tokens.dart';
 import 'change_email_page.dart';
 import 'ignored_users_page.dart';
@@ -354,18 +356,21 @@ class ForumSettingsPage extends StatelessWidget {
     }
   }
 
-  /// Deleting an account happens on the forum. Where Discourse lets the
-  /// member do it (`can_delete_account`), Continue opens their account
-  /// preferences, which carry its Delete My Account button; otherwise the
-  /// forum, to ask its staff.
+  /// Deleting an account. Where Discourse lets the member do it
+  /// (`can_delete_account`), the app deletes it the way the website's
+  /// Delete My Account does, then signs out. Otherwise the forum is
+  /// opened, to ask its staff.
   Future<void> _showDeleteAccountDialog(
     BuildContext context,
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) async {
     final proxy = SiteProxyFactory.getUserProxy();
-    final selfServe = proxy is DiscourseUserProxy &&
-        await proxy.canDeleteOwnAccountAsync() == true;
+    if (proxy is DiscourseUserProxy &&
+        await proxy.canDeleteOwnAccountAsync() == true) {
+      if (context.mounted) await _deleteOwnAccount(context, proxy);
+      return;
+    }
     if (!context.mounted) return;
     await showDialog(
       context: context,
@@ -380,9 +385,7 @@ class ForumSettingsPage extends StatelessWidget {
             ),
           ),
           content: Text(
-            selfServe
-                ? AppLocalizations.of(context)!.deleteAccountSelfServeBody
-                : AppLocalizations.of(context)!.deleteAccountDialogBody,
+            AppLocalizations.of(context)!.deleteAccountDialogBody,
             style: textTheme.bodyLarge?.copyWith(
               color: colorScheme.onSurface,
             ),
@@ -400,8 +403,7 @@ class ForumSettingsPage extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
-                await _openForumHomePage(context,
-                    path: selfServe ? '/my/preferences/account' : null);
+                await _openForumHomePage(context);
               },
               child: Text(
                 AppLocalizations.of(context)!.continueButton,
@@ -416,16 +418,88 @@ class ForumSettingsPage extends StatelessWidget {
     );
   }
 
-  Future<void> _openForumHomePage(BuildContext context, {String? path}) async {
+  /// The website's Delete My Account: its confirmation, the delete, and its
+  /// messages (preferences/account.js). The account's key goes with it, so
+  /// the app signs out and returns to the forum's first screen.
+  Future<void> _deleteOwnAccount(
+      BuildContext context, DiscourseUserProxy proxy) async {
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        icon: Icon(Icons.warning_amber_rounded, color: colorScheme.error),
+        title: Text(l10n.deleteAccount),
+        content: Text(l10n.deleteAccountConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.error,
+              foregroundColor: colorScheme.onError,
+            ),
+            child: Text(l10n.deleteMyAccount),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final navigator = Navigator.of(context);
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const PopScope(
+        canPop: false,
+        child: Center(child: CircularProgressIndicator()),
+      ),
+    );
+    final result = await proxy.deleteOwnAccountAsync();
+    if (result.deleted) {
+      final loginController = Get.isRegistered<DiscourseLoginController>()
+          ? Get.find<DiscourseLoginController>()
+          : Get.put(DiscourseLoginController());
+      await loginController.handleLogout(siteContext);
+    }
+    navigator.pop(); // the progress indicator
+    if (result.deleted) {
+      navigator.popUntil((route) => route.isFirst);
+      await Get.dialog<void>(AlertDialog(
+        content: Text(l10n.deletedYourself),
+        actions: [
+          TextButton(onPressed: Get.back, child: Text(l10n.okButton)),
+        ],
+      ));
+      return;
+    }
+    if (!context.mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        content: Text(result.message.trim().isNotEmpty
+            ? result.message.trim()
+            : l10n.deleteYourselfNotAllowed),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(l10n.okButton),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openForumHomePage(BuildContext context) async {
     final url = siteContext.site.url;
     if (url.isEmpty) {
       _toast(context, 'Forum URL is unavailable.');
       return;
     }
-    // /my/… is Discourse's route for "the signed-in user's own page".
-    final uri = Uri.parse(path == null
-        ? url
-        : '${url.endsWith('/') ? url.substring(0, url.length - 1) : url}$path');
+    final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {

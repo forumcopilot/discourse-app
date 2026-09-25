@@ -839,7 +839,7 @@
   "manageAccountSubtitle": "Profilo, e-mail, password, sicurezza, impostazioni avanzate",
   "changePasswordSubtitle": "Invia un’e-mail di reimpostazione password al tuo indirizzo attuale",
   "ignoredUsersSubtitle": "Vedi e gestisci gli utenti i cui post ti sono nascosti",
-  "deleteAccountExplanation": "Gli account si eliminano sul sito del forum: dalle preferenze del tuo account se il forum lo consente, altrimenti dallo staff.",
+  "deleteAccountExplanation": "Elimina il tuo account e i tuoi messaggi, se il forum lo consente. Altrimenti lo staff può rimuoverlo per te.",
   "verificationEmailSent": "E-mail di verifica inviata — clicca sul link per confermare il nuovo indirizzo.",
   "passwordResetExplanation": "Ti invieremo un link per reimpostare la password. Cliccalo per sceglierne una nuova — la modifica avviene sul forum, non in questa app.",
   "sendResetEmail": "Invia e-mail di reimpostazione",
@@ -978,5 +978,8 @@
   "yesDeleteSpammer": "Sì, cancella lo spammer",
   "deleteSpammerConfirm": "Stai per cancellare i messaggi e gli argomenti di questo utente, rimuovere il suo account, bloccare le registrazioni dal suo indirizzo IP e aggiungere il suo indirizzo email a un elenco di indirizzi bloccati permanente. Sei sicuro che questo utente sia veramente uno spammer?",
   "userWasDeleted": "L'utente è stato cancellato.",
-  "deleteAccountSelfServeBody": "Puoi eliminare il tuo account dalle preferenze del tuo account sul sito del forum. «Continua» apre quella pagina nel browser. Accedi lì se richiesto."
+  "deleteMyAccount": "Cancella il mio account",
+  "deleteAccountConfirm": "Vuoi cancellare il tuo account in modo permanente? Questa azione non può essere annullata!",
+  "deletedYourself": "Il tuo account è stato eliminato con successo.",
+  "deleteYourselfNotAllowed": "Contattare un membro dello staff per richiedere l'eliminazione del proprio account"
 }

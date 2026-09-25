@@ -1930,7 +1930,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'Accounts are deleted on the forum\'s website — from your account preferences if the forum allows it, otherwise by its staff.';
+      'Delete your account and your posts, if the forum allows it. Otherwise its staff can remove it for you.';
 
   @override
   String get verificationEmailSent =>
@@ -2488,6 +2488,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get userWasDeleted => 'The user was deleted.';
 
   @override
-  String get deleteAccountSelfServeBody =>
-      'You can delete your account from your account preferences on the forum\'s website. Continue opens that page in your browser. Sign in there if it asks.';
+  String get deleteMyAccount => 'Delete My Account';
+
+  @override
+  String get deleteAccountConfirm =>
+      'Are you sure you want to permanently delete your account? This action cannot be undone!';
+
+  @override
+  String get deletedYourself => 'Your account has been deleted successfully.';
+
+  @override
+  String get deleteYourselfNotAllowed =>
+      'Please contact a staff member if you wish your account to be deleted.';
 }

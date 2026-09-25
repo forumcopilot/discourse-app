@@ -1866,7 +1866,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'アカウントはフォーラムのウェブサイトで削除します。フォーラムが許可していればアカウント設定から、そうでなければスタッフが削除します。';
+      'フォーラムが許可していれば、アカウントと投稿を削除できます。許可していない場合は、スタッフに削除を依頼できます。';
 
   @override
   String get verificationEmailSent =>
@@ -2408,6 +2408,14 @@ class AppLocalizationsJa extends AppLocalizations {
   String get userWasDeleted => 'ユーザーが削除されました。';
 
   @override
-  String get deleteAccountSelfServeBody =>
-      'フォーラムのウェブサイトのアカウント設定からアカウントを削除できます。「続ける」でそのページをブラウザで開きます。ログインを求められたらログインしてください。';
+  String get deleteMyAccount => 'アカウントを削除';
+
+  @override
+  String get deleteAccountConfirm => 'アカウントを永久に削除してもよろしいですか？この操作は元に戻せません！';
+
+  @override
+  String get deletedYourself => 'あなたのアカウントは正常に削除されました。';
+
+  @override
+  String get deleteYourselfNotAllowed => 'アカウントの削除を希望する場合は、スタッフメンバーに連絡をしてください。';
 }

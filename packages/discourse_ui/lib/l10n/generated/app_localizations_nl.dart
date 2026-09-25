@@ -1939,7 +1939,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get deleteAccountExplanation =>
-      'Accounts worden verwijderd op de website van het forum: via je accountvoorkeuren als het forum dat toestaat, anders door de staf.';
+      'Verwijder je account en je berichten, als het forum dat toestaat. Anders kan de staf het voor je verwijderen.';
 
   @override
   String get verificationEmailSent =>
@@ -2499,6 +2499,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get userWasDeleted => 'De gebruiker is verwijderd.';
 
   @override
-  String get deleteAccountSelfServeBody =>
-      'Je kunt je account verwijderen via je accountvoorkeuren op de website van het forum. \'Doorgaan\' opent die pagina in je browser. Log daar in als daarom wordt gevraagd.';
+  String get deleteMyAccount => 'Mijn account verwijderen';
+
+  @override
+  String get deleteAccountConfirm =>
+      'Weet je zeker dat je je account definitief wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt!';
+
+  @override
+  String get deletedYourself => 'Je account is verwijderd.';
+
+  @override
+  String get deleteYourselfNotAllowed =>
+      'Neem contact op met een medewerker als je wilt dat je account wordt verwijderd.';
 }

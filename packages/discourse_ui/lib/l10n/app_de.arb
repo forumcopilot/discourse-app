@@ -839,7 +839,7 @@
   "manageAccountSubtitle": "Profil, E-Mail, Passwort, Sicherheit, erweiterte Einstellungen",
   "changePasswordSubtitle": "Sendet eine E-Mail zum Zurücksetzen des Passworts an deine aktuelle Adresse",
   "ignoredUsersSubtitle": "Benutzer anzeigen und verwalten, deren Beiträge für dich ausgeblendet sind",
-  "deleteAccountExplanation": "Konten werden auf der Website des Forums gelöscht – in deinen Kontoeinstellungen, wenn das Forum es erlaubt, sonst vom Team.",
+  "deleteAccountExplanation": "Lösche dein Konto und deine Beiträge, sofern das Forum es erlaubt. Andernfalls kann das Team es für dich entfernen.",
   "verificationEmailSent": "Bestätigungs-E-Mail gesendet — klicke auf den Link, um deine neue Adresse zu bestätigen.",
   "passwordResetExplanation": "Wir senden dir einen Link zum Zurücksetzen des Passworts. Klicke darauf, um ein neues Passwort zu wählen — die Änderung erfolgt im Forum, nicht in dieser App.",
   "sendResetEmail": "Reset-E-Mail senden",
@@ -978,5 +978,8 @@
   "yesDeleteSpammer": "Ja, lösche den Spammer",
   "deleteSpammerConfirm": "Du wirst die Beiträge und Themen dieses Benutzers löschen, sein Konto entfernen, seine IP-Adresse für Neuanmeldungen sperren und seine E-Mail-Adresse auf eine permanente Sperrliste setzen. Bist du dir sicher, dass dieser Benutzer wirklich ein Spammer ist?",
   "userWasDeleted": "Der Benutzer wurde gelöscht.",
-  "deleteAccountSelfServeBody": "Du kannst dein Konto in deinen Kontoeinstellungen auf der Website des Forums löschen. „Fortfahren“ öffnet diese Seite im Browser. Melde dich dort an, falls du dazu aufgefordert wirst."
+  "deleteMyAccount": "Lösche mein Benutzerkonto",
+  "deleteAccountConfirm": "Möchtest du wirklich dein Benutzerkonto permanent löschen? Diese Aktion kann nicht rückgängig gemacht werden!",
+  "deletedYourself": "Dein Benutzerkonto wurde erfolgreich gelöscht.",
+  "deleteYourselfNotAllowed": "Bitte kontaktiere ein Team-Mitglied, wenn du möchtest, dass dein Konto gelöscht wird."
 }

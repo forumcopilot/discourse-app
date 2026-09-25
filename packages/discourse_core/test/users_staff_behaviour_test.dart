@@ -54,6 +54,29 @@ void main() {
     });
   });
 
+  group('deleting your own account', () {
+    test("is the website's Delete My Account call", () async {
+      final users = _Users(const {});
+      final result = await users.deleteOwnAccountAsync();
+      expect(result.deleted, isTrue);
+      expect(users.deletes.single, '/u/alice.json');
+      expect(users.lastDeleteQuery,
+          {'context': '/u/alice/preferences/account'});
+    });
+
+    test('a refusal is reported, not taken for success', () async {
+      final users = _Users(const {})
+        ..deleteError = DiscourseApiException(
+            statusCode: 403,
+            method: 'DELETE',
+            path: '/u/alice.json',
+            body: '{"errors":["You are not permitted to view the requested resource."]}');
+      final result = await users.deleteOwnAccountAsync();
+      expect(result.deleted, isFalse);
+      expect(result.message, isNotEmpty);
+    });
+  });
+
   group('activity feeds', () {
     Map<String, dynamic> actions(int n, {int filter = 5}) => {
           'user_actions': [
@@ -280,11 +303,23 @@ class _Users extends DiscourseUserProxy {
   _Users(this.byPath) : super(_signedIn());
   final Map<String, Map<String, dynamic>> byPath;
   final List<Map<String, dynamic>> queries = [];
+  final List<String> deletes = [];
+  Map<String, dynamic>? lastDeleteQuery;
+  DiscourseApiException? deleteError;
   @override
   Future<Map<String, dynamic>> apiGet(String path,
       {Map<String, dynamic>? query}) async {
     queries.add({...?query});
     return byPath[path] ?? const {};
+  }
+
+  @override
+  Future<Map<String, dynamic>> apiDelete(String path,
+      {Map<String, dynamic>? query, Object? body}) async {
+    deletes.add(path);
+    lastDeleteQuery = query;
+    if (deleteError != null) throw deleteError!;
+    return const {'success': 'OK'}; // users#destroy's success_json
   }
 }
 
