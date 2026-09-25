@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.28] - 2026-09-24
+
 Links in posts open inside the app. Of the links into the same forum in 10,835 recent posts on 219 directory forums, about 70% were topics or posts, 13% categories (mostly the badge in a quote header), then users, tags and hashtags; each of those used to open the browser, lose the post number, or open with a blank title. Covered by `packages/discourse_core/test/discourse_link_test.dart`, `category_slug_lookup_test.dart` and `packages/discourse_ui/test/discourse_link_handler_test.dart`, and checked on the Pixel against meta.discourse.org.
 
 ### Changed
