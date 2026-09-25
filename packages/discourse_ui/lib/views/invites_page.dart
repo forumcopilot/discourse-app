@@ -423,7 +423,10 @@ class _InvitesPageState extends State<InvitesPage> {
   }
 
   Widget _buildFilterChips() {
-    return Padding(
+    // Scrolls sideways: with their counts, the three chips are wider than
+    // a phone (the last one overflowed on a Pixel 4a).
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
       padding: EdgeInsets.symmetric(
         horizontal: DesignTokens.spacingL,
         vertical: DesignTokens.spacingS,
