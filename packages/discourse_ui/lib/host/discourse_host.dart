@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 
 import '../services/notification_route.dart';
@@ -12,10 +11,6 @@ import '../services/notification_route.dart';
 /// not a forum, so they are set once at startup.
 class DiscourseHost {
   DiscourseHost._();
-
-  /// Called from the drawer's "Switch forum" entry. When null the entry is
-  /// not shown. A host typically pops back to its forum chooser.
-  static VoidCallback? switchForum;
 
   /// Resolves the forum a push notification belongs to. Receives the
   /// notification's `site_id` (the host directory's id, if any) and the raw

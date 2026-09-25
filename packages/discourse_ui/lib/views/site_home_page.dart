@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/controllers/site_controller.dart';
@@ -789,6 +791,17 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     }
   }
 
+  /// How far in from the edge a swipe opens the drawer: Flutter's 20 beyond
+  /// the safe area, or beyond the system's gesture strip when that is wider.
+  static double _drawerEdgeDragWidth(BuildContext context) {
+    final padding = MediaQuery.paddingOf(context);
+    final gestures = MediaQuery.systemGestureInsetsOf(context);
+    final taken = Directionality.of(context) == TextDirection.rtl
+        ? math.max(padding.right, gestures.right)
+        : math.max(padding.left, gestures.left);
+    return 20 + taken;
+  }
+
   @override
   Widget build(BuildContext context) {
     // Don't build the main UI until initialization is complete
@@ -876,6 +889,18 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
       // every tab's AppBar can open it via the auto-imply leading
       // hamburger.
       drawer: SiteDrawer(siteContext: _siteContext!),
+      // Pushed over a host's forum list, the home's left edge means Back:
+      // iOS's swipe and Android's system gesture both claim it, except that
+      // on older Android a finger resting at the edge first opened the drawer
+      // instead. One meaning per edge, so there the drawer opens from its
+      // button only. A root home (the single-forum app) has nothing behind
+      // it, so its edge opens the drawer.
+      drawerEnableOpenDragGesture: !(ModalRoute.canPopOf(context) ?? false),
+      // Android's gesture navigation keeps the outermost strip of the edge
+      // for its own Back, which from a root home would close the app. The
+      // drawer's strip starts where the system's ends; without gesture
+      // navigation that inset is zero and this is Flutter's default.
+      drawerEdgeDragWidth: _drawerEdgeDragWidth(context),
       body: IndexedStack(
         index: _tabController.index,
         children: _buildTabWidgets(),

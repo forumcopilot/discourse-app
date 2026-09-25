@@ -2206,9 +2206,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get couldNotLoadCategories => 'Categorieën laden mislukt.';
 
   @override
-  String get switchForum => 'Ander forum';
-
-  @override
   String get explore => 'Ontdekken';
 
   @override

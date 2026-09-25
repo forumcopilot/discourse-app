@@ -2117,9 +2117,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get couldNotLoadCategories => '카테고리를 불러오지 못했습니다.';
 
   @override
-  String get switchForum => '포럼 전환';
-
-  @override
   String get explore => '탐색';
 
   @override

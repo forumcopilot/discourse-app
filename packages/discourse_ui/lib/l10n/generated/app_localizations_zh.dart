@@ -2094,9 +2094,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get couldNotLoadCategories => '无法加载分类。';
 
   @override
-  String get switchForum => '切换论坛';
-
-  @override
   String get explore => '探索';
 
   @override

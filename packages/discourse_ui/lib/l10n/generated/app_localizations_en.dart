@@ -2196,9 +2196,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get couldNotLoadCategories => 'Couldn\'t load categories.';
 
   @override
-  String get switchForum => 'Switch forum';
-
-  @override
   String get explore => 'Explore';
 
   @override

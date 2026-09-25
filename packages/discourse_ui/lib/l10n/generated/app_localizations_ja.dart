@@ -2123,9 +2123,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get couldNotLoadCategories => 'カテゴリを読み込めませんでした。';
 
   @override
-  String get switchForum => 'フォーラムを切り替え';
-
-  @override
   String get explore => '探索';
 
   @override

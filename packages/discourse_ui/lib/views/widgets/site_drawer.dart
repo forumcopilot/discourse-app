@@ -65,27 +65,9 @@ class SiteDrawer extends StatelessWidget {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  // Only inside a multi-forum host: the way back to its
-                  // list. A host says so through DiscourseHost.switchForum;
-                  // failing that, a route below this shell means we were
-                  // pushed on top of one. Standalone builds show nothing.
-                  if (DiscourseHost.switchForum != null ||
-                      Navigator.of(context).canPop()) ...[
-                    _DrawerRow(
-                      icon: Icons.grid_view_rounded,
-                      title: AppLocalizations.of(context)!.switchForum,
-                      onTap: () {
-                        Navigator.of(context).pop(); // close drawer
-                        final hook = DiscourseHost.switchForum;
-                        if (hook != null) {
-                          hook();
-                        } else {
-                          Navigator.of(context).popUntil((route) => route.isFirst);
-                        }
-                      },
-                    ),
-                    const Divider(height: 1),
-                  ],
+                  // No way back to a host's forum list here: a forum pushed
+                  // over one is left the way any page is, by Back or the
+                  // edge swipe (see SiteHomePage's drawer settings).
                   _SectionLabel(label: AppLocalizations.of(context)!.explore),
                   _DrawerRow(
                     icon: Icons.label_outline,

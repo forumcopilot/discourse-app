@@ -2204,9 +2204,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get couldNotLoadCategories => 'Не удалось загрузить категории.';
 
   @override
-  String get switchForum => 'Сменить форум';
-
-  @override
   String get explore => 'Обзор';
 
   @override

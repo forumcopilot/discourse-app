@@ -2220,9 +2220,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Kategorien konnten nicht geladen werden.';
 
   @override
-  String get switchForum => 'Forum wechseln';
-
-  @override
   String get explore => 'Entdecken';
 
   @override
