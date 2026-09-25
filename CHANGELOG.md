@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.31] - 2026-09-24
+
 ### Fixed
 - **Category logos and backgrounds show on forums Discourse hosts.** Uploads kept on S3 or a CDN come as protocol-relative URLs (`//cdck-file-uploads…/logo.png`), which were glued onto the forum's address as a path (`https://forum.asana.com//cdck…`, a 404), so the app drew an initial where the web shows the logo — on Asana, Product Announcements' rocket. One helper (`absoluteSiteUrl`) now resolves every upload and avatar URL the converters build. Covered by `packages/discourse_core/test/site_url_test.dart`; checked on the Pixel 4a in ABDA.
 
