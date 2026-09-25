@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.29] - 2026-09-24
+
 ### Added
 - **Appearance: System default, Light or Dark**, in the drawer's Account section (shown signed out too). The choice applies at once and is remembered. It was loadable all along (`theme_mode`), but the picker went with the XenForo-era settings page.
 - **Web views follow the app's mode, not the phone's.** Forum pages (the sign-in grant, the Cloudflare challenge) get Discourse's own `forced_color_mode` cookie, which the server reads to pick the light or dark stylesheet, so they open in the right mode on first paint; other sites and native UI follow through the new `discourse_appearance` plugin (window style on iOS, `NSApp.appearance` on macOS, per-app night mode on Android 12+). Web views no longer flash white before their first frame in dark mode. Checked on the Pixel 4a (Android 13) with the phone in dark mode: in-app Light gave a light forum page, a light `prefers-color-scheme` page and a light status bar. iOS and macOS build; not yet checked on an iPhone. Covered by `packages/discourse_ui/test/appearance_test.dart` and `packages/discourse_appearance/test/`.
