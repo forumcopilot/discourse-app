@@ -373,6 +373,8 @@
   "enterKeywordsToFindTopicsAndPosts": "Введите ключевые слова для поиска тем и сообщений",
   "light": "Светлая",
   "dark": "Тёмная",
+  "appearance": "Оформление",
+  "appearanceSystem": "Как в системе",
   "version": "версия {version} ({buildNumber})",
   "@version": {
     "placeholders": {

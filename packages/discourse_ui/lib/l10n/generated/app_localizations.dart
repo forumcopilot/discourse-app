@@ -1328,6 +1328,18 @@ abstract class AppLocalizations {
   /// **'Dark'**
   String get dark;
 
+  /// Drawer row and sheet title for choosing light, dark or the device's setting
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// Appearance option that follows the device's light/dark setting
+  ///
+  /// In en, this message translates to:
+  /// **'System default'**
+  String get appearanceSystem;
+
   /// App version display
   ///
   /// In en, this message translates to:

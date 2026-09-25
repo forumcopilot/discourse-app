@@ -373,6 +373,8 @@
   "enterKeywordsToFindTopicsAndPosts": "Geben Sie Schlüsselwörter ein, um Themen und Beiträge zu finden",
   "light": "Hell",
   "dark": "Dunkel",
+  "appearance": "Darstellung",
+  "appearanceSystem": "Systemstandard",
   "version": "Version {version} ({buildNumber})",
   "@version": {
     "placeholders": {

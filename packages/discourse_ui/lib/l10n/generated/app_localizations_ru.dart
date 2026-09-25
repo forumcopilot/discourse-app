@@ -696,6 +696,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dark => 'Тёмная';
 
   @override
+  String get appearance => 'Оформление';
+
+  @override
+  String get appearanceSystem => 'Как в системе';
+
+  @override
   String version(String version, String buildNumber) {
     return 'версия $version ($buildNumber)';
   }

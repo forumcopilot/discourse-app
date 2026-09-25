@@ -665,6 +665,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dark => '深色';
 
   @override
+  String get appearance => '外观';
+
+  @override
+  String get appearanceSystem => '跟随系统';
+
+  @override
   String version(String version, String buildNumber) {
     return '版本 $version ($buildNumber)';
   }

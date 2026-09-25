@@ -193,6 +193,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.1"
+  discourse_appearance:
+    dependency: "direct main"
+    description:
+      path: "../discourse_appearance"
+      relative: true
+    source: path
+    version: "0.1.0"
   discourse_core:
     dependency: "direct main"
     description:

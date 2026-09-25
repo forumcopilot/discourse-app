@@ -19,6 +19,8 @@ dependencies:
     path: ../forumcopilot_sdk
   discourse_core:
     path: ../discourse_core
+  discourse_appearance:
+    path: ../discourse_appearance
   xml: ^6.3.0
   dart_mappable: ^4.3.1
   get: ^4.7.3

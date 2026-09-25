@@ -373,6 +373,8 @@
   "enterKeywordsToFindTopicsAndPosts": "Ingresa palabras clave para encontrar temas y publicaciones",
   "light": "Claro",
   "dark": "Oscuro",
+  "appearance": "Apariencia",
+  "appearanceSystem": "Sistema",
   "version": "versión {version} ({buildNumber})",
   "@version": {
     "placeholders": {

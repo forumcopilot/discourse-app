@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
+import 'widgets/themed_web_view.dart';
+
 /// In-app webview that hosts the Discourse User API Key authorization page.
 ///
 /// Discourse handles the entire login + grant UI itself (passkey, 2FA, SSO,
@@ -61,8 +63,8 @@ class _DiscourseLoginWebViewPageState extends State<DiscourseLoginWebViewPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: InAppWebView(
-        initialUrlRequest: URLRequest(url: WebUri(widget.url)),
+      body: ThemedWebView(
+        url: widget.url,
         initialSettings: InAppWebViewSettings(
           // Cookies/session aren't shared with the system browser, so the
           // user logs in fresh inside the webview every time. That's the

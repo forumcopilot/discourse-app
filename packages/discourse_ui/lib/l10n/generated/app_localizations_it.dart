@@ -699,6 +699,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dark => 'Scuro';
 
   @override
+  String get appearance => 'Aspetto';
+
+  @override
+  String get appearanceSystem => 'Sistema';
+
+  @override
   String version(String version, String buildNumber) {
     return 'versione $version ($buildNumber)';
   }

@@ -22,6 +22,7 @@ Flutter `^3.6.1` / Dart `^3.6.1`. Targets Android, iOS, macOS, Windows, Linux, w
 - `packages/discourse_ui/` — the whole UI layer: `config/app_forum_config.dart` (**the file a fork normally edits**: forum name, base URL, optional push backend, passkey identifiers), `controllers/` (GetX), `services/`, `views/`, `core/` (errors/logging/memory/cache/async), `l10n/`, `theme/`.
 - `packages/forumcopilot_sdk/` — local package. Forum-agnostic abstractions: `IFC*Proxy` interfaces, `FC*Result` response wrappers, `SiteContext`, `SiteProxyFactory`, networking (Dio with persistent cookies, Cloudflare hooks). Uses `dart_mappable` + `json_annotation` codegen.
 - `packages/discourse_core/` — local package. Discourse implementation of the SDK proxies (`DiscourseProxyFactory` + per-area proxies) against stock Discourse REST + User API Keys (`network/discourse_client.dart`, `network/discourse_auth_manager.dart`).
+- `packages/discourse_appearance/` — small Flutter plugin (Android/iOS/macOS) that forces the platform appearance to the in-app light/dark choice, so web views' `prefers-color-scheme` and system UI match. `discourse_ui` depends on it by relative path, so host apps get it transitively.
 - `docs/guides/` — platform-specific setup notes (macOS file picker entitlements, splash, icons, reset).
 
 ## Architecture in one paragraph
@@ -55,7 +56,7 @@ flutter pub get
                        # Windows: buildlib.bat
 ```
 
-`buildlib.sh` first runs `dart pub get` inside each of the three nested packages — root `flutter pub get` writes no `package_config` for them, and without it the analyzer reports hundreds of unresolved imports on a fresh clone — then `dart run build_runner build --delete-conflicting-outputs` inside `packages/forumcopilot_sdk`, then `flutter gen-l10n`. **Re-run it whenever** you change ARB files, or any `dart_mappable` / `json_annotation` annotated class in the SDK. Only the SDK has generated code; `discourse_core` and `discourse_ui` have none.
+`buildlib.sh` first runs `dart pub get` inside each nested package — root `flutter pub get` writes no `package_config` for them, and without it the analyzer reports hundreds of unresolved imports on a fresh clone — then `dart run build_runner build --delete-conflicting-outputs` inside `packages/forumcopilot_sdk`, then `flutter gen-l10n`. **Re-run it whenever** you change ARB files, or any `dart_mappable` / `json_annotation` annotated class in the SDK. Only the SDK has generated code; `discourse_core` and `discourse_ui` have none.
 
 Run / build:
 
@@ -71,10 +72,11 @@ Tests:
 flutter test                          # app-level (just test/widget_test.dart)
 (cd packages/discourse_core && flutter test)   # proxies, auth handshake, credential persistence, upload markdown
 (cd packages/discourse_ui && flutter test)     # markup, cooked content, emoji, widget tests
+(cd packages/discourse_appearance && flutter test)  # the appearance plugin's channel contract
 flutter test test/widget_test.dart -p chrome              # single file / single platform
 ```
 
-`packages/forumcopilot_sdk` ships no tests here (the canonical SDK's `test/` is excluded from the vendored copy, see *Canonical SDK* above); CI skips that package. CI (`.github/workflows/ci.yml`) runs analyze (`--no-fatal-infos`; errors and warnings fatal) and the three runnable test sets on every push, plus a debug APK and `buildlib.bat` on Windows.
+`packages/forumcopilot_sdk` ships no tests here (the canonical SDK's `test/` is excluded from the vendored copy, see *Canonical SDK* above); CI skips that package. CI (`.github/workflows/ci.yml`) runs analyze (`--no-fatal-infos`; errors and warnings fatal) and the four runnable test sets on every push, plus a debug APK and `buildlib.bat` on Windows.
 
 macOS-only utilities:
 
@@ -88,6 +90,7 @@ macOS-only utilities:
 - **Adding a UI string.** Edit `packages/discourse_ui/lib/l10n/app_en.arb` (template) plus the per-locale ARBs you want translated, then `flutter gen-l10n` **from `packages/discourse_ui`** (where `l10n.yaml` lives — at the root it aborts), or rerun `buildlib.sh`. Supported locales are declared in `main.dart`.
 - **Adding/changing an SDK model or proxy.** Update the interface in `packages/forumcopilot_sdk/lib/interfaces/`, the result/entity in `models/`, then implement on the Discourse side in `packages/discourse_core/lib/` (proxy + converter). Re-run `build_runner` in the SDK (`./buildlib.sh` does it) — that is the only package with generated code.
 - **Push.** Disabled by default (`AppForumConfig.pushApiBaseUrl = ''`). Client wiring is complete (see Phase 3 above): setting `pushApiBaseUrl` makes the next login request the `push` scope with `push_url = <pushApiBaseUrl>/discourse/push`; Discourse POSTs notifications there and the relay forwards to FCM/APNs keyed by the `client_id` in each payload. Existing logins predate the grant and must re-login (a key's scopes/push_url are immutable) — the notification settings page surfaces this. Contract docs live on `AppForumConfig.discoursePushUrl`.
+- **Appearance (light/dark).** One value: `SettingsContext.themeMode` *is* `AppTheme.themeMode` (host shells pass the latter to `MaterialApp.themeMode`). Change it only through `SettingsContext.setThemeMode`, which also calls `AppearanceSync.apply`: that forces the native appearance (`discourse_appearance`) and writes Discourse's `forced_color_mode` cookie (`light`/`dark`/`auto`) for every forum origin registered by `DiscourseSiteController.initializeSite`, so forum pages in web views render in the app's mode server-side. New web views should use `ThemedWebView`, which waits for that cookie and covers the white first frame. Appearance is an app setting, so a host with a screen outside the forums sets `DiscourseHost.showAppearanceSetting = false`: ABDA embeds `AppearanceChoices` in its own Settings page (forum list ⋮ menu); a host with its own theme setting (ForumCopilot) calls `AppearanceSync.apply` itself.
 - **Cloudflare interceptor.** `ForumcopilotSdk.ensureInitialized` takes `onCloudflareStart`/`onCloudflareEnd` callbacks; the app uses them to hide/show the global spinner so the Cloudflare challenge UI is visible. Preserve this when refactoring init.
 - **Linting.** `analysis_options.yaml` extends `package:flutter_lints/flutter.yaml` and excludes `Original/**`.
 

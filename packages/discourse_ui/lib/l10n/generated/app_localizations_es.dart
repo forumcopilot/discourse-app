@@ -700,6 +700,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dark => 'Oscuro';
 
   @override
+  String get appearance => 'Apariencia';
+
+  @override
+  String get appearanceSystem => 'Sistema';
+
+  @override
   String version(String version, String buildNumber) {
     return 'versión $version ($buildNumber)';
   }

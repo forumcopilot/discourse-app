@@ -697,6 +697,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dark => 'Donker';
 
   @override
+  String get appearance => 'Weergave';
+
+  @override
+  String get appearanceSystem => 'Systeemstandaard';
+
+  @override
   String version(String version, String buildNumber) {
     return 'versie $version ($buildNumber)';
   }

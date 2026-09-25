@@ -703,6 +703,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dark => 'Sombre';
 
   @override
+  String get appearance => 'Apparence';
+
+  @override
+  String get appearanceSystem => 'Système';
+
+  @override
   String version(String version, String buildNumber) {
     return 'version $version ($buildNumber)';
   }

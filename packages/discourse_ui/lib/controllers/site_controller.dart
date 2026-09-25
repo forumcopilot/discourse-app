@@ -9,6 +9,7 @@ import 'package:forumcopilot_sdk/models/domain/site.dart';
 import 'package:forumcopilot_sdk/models/results/fc_config_result.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/settings_context.dart';
+import 'package:discourse_ui/services/appearance_sync.dart';
 import 'package:discourse_ui/core/errors/error_handling_mixins.dart';
 import 'package:discourse_ui/core/errors/app_exceptions.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -157,6 +158,9 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
         DiscourseGlobalLoaderController.to.show();
       }
       currentSite.value = site;
+      // Before any request: the SDK's Cloudflare challenge is a web view
+      // onto this forum, and it should open in the app's light/dark mode.
+      AppearanceSync.registerForum(site.url);
       AppLogger.debug('Setting currentSite: ${site.name}, backgroundUrl: ${site.backgroundUrl}, logoUrl: ${site.logoUrl}');
       // Clear any previous errors
       hasError.value = false;

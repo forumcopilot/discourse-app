@@ -412,6 +412,8 @@
     "description": "Light theme option"
   },
   "dark": "Donker",
+  "appearance": "Weergave",
+  "appearanceSystem": "Systeemstandaard",
   "@dark": {
     "description": "Dark theme option"
   },

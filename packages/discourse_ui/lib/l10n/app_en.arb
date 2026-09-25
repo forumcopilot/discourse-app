@@ -439,6 +439,14 @@
   "@dark": {
     "description": "Dark theme option"
   },
+  "appearance": "Appearance",
+  "@appearance": {
+    "description": "Drawer row and sheet title for choosing light, dark or the device's setting"
+  },
+  "appearanceSystem": "System default",
+  "@appearanceSystem": {
+    "description": "Appearance option that follows the device's light/dark setting"
+  },
   "version": "version {version} ({buildNumber})",
   "@version": {
     "description": "App version display",

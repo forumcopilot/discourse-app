@@ -672,6 +672,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get dark => '다크';
 
   @override
+  String get appearance => '테마';
+
+  @override
+  String get appearanceSystem => '시스템 기본값';
+
+  @override
   String version(String version, String buildNumber) {
     return '버전 $version ($buildNumber)';
   }

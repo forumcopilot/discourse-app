@@ -373,6 +373,8 @@
   "enterKeywordsToFindTopicsAndPosts": "키워드를 입력하여 주제와 게시물 찾기",
   "light": "라이트",
   "dark": "다크",
+  "appearance": "테마",
+  "appearanceSystem": "시스템 기본값",
   "version": "버전 {version} ({buildNumber})",
   "@version": {
     "placeholders": {

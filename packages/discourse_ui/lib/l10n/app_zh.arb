@@ -373,6 +373,8 @@
   "enterKeywordsToFindTopicsAndPosts": "输入关键词以查找主题和帖子",
   "light": "浅色",
   "dark": "深色",
+  "appearance": "外观",
+  "appearanceSystem": "跟随系统",
   "version": "版本 {version} ({buildNumber})",
   "@version": {
     "placeholders": {

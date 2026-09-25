@@ -34,4 +34,15 @@ class DiscourseHost {
   /// template forum rather than the host's chooser.
   static Future<void> Function(Site forum, DiscourseNotificationRoute? route)?
       openForum;
+
+  /// Whether the forum drawer offers the Appearance (System / Light / Dark)
+  /// row. It is an app setting, not a forum one, so a host with a screen
+  /// outside the forums turns this off and puts it there instead:
+  ///
+  /// * a host whose `MaterialApp` reads `AppTheme.themeMode` (ABDA) embeds
+  ///   `AppearanceChoices` in its own settings screen;
+  /// * a host with its own theme setting (ForumCopilot) calls
+  ///   `AppearanceSync.apply(mode)` when that setting changes, so forum
+  ///   pages in web views and native UI still follow it.
+  static bool showAppearanceSetting = true;
 }

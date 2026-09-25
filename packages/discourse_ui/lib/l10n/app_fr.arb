@@ -373,6 +373,8 @@
   "enterKeywordsToFindTopicsAndPosts": "Entrez des mots-clés pour trouver des sujets et des messages",
   "light": "Clair",
   "dark": "Sombre",
+  "appearance": "Apparence",
+  "appearanceSystem": "Système",
   "version": "version {version} ({buildNumber})",
   "@version": {
     "placeholders": {

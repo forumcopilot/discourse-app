@@ -676,6 +676,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dark => 'ダーク';
 
   @override
+  String get appearance => '外観';
+
+  @override
+  String get appearanceSystem => '端末の設定';
+
+  @override
   String version(String version, String buildNumber) {
     return 'バージョン $version ($buildNumber)';
   }

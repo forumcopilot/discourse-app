@@ -189,7 +189,7 @@ The grant redirect defaults to `discourse://auth_redirect` — the universal sch
 
 ### Codegen
 
-`buildlib.sh` resolves each nested package (`dart pub get` in all three — root `flutter pub get` does not do this, and skipping it leaves the analyzer with hundreds of unresolved imports), runs `build_runner` inside `packages/forumcopilot_sdk`, then `flutter gen-l10n`. **Re-run it after** editing an ARB file or any `dart_mappable` / `json_annotation` annotated class in the SDK. The SDK is the only package with generated code.
+`buildlib.sh` resolves each nested package (`dart pub get` in each — root `flutter pub get` does not do this, and skipping it leaves the analyzer with hundreds of unresolved imports), runs `build_runner` inside `packages/forumcopilot_sdk`, then `flutter gen-l10n`. **Re-run it after** editing an ARB file or any `dart_mappable` / `json_annotation` annotated class in the SDK. The SDK is the only package with generated code.
 
 > ⚠ On Dart 3.10 the `dart_mappable` build hook fails with `'dart compile' does not support build hooks`. Until that's fixed upstream, hand-edit the affected `.mapper.dart` — recent commits show the pattern.
 
@@ -249,6 +249,8 @@ packages/discourse_core/                  # the Discourse implementation
 ├─ lib/src/data/                          # typed Discourse models
 ├─ lib/src/network/                       # Dio client + User API Key handshake
 └─ lib/src/converter/                     # Discourse JSON → FC* entities
+
+packages/discourse_appearance/            # plugin: in-app light/dark → native UI + web views
 
 scripts/                                  # local dev helpers (demo seeding)
 docs/guides/                              # platform setup notes (icons, splash, macOS picker)

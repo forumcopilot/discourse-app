@@ -3,14 +3,14 @@
 # annotated SDK class.
 #
 # Root `flutter pub get` resolves the app but writes no package_config for
-# the three nested packages, and the analyzer needs each one — a fresh
+# the nested packages, and the analyzer needs each one — a fresh
 # clone that skipped this step showed 289 errors, every one of them an
 # unresolved import. build_runner used to paper over it for the SDK alone
 # by pub-getting implicitly; the other two packages got nothing.
 set -e
 cd "$(dirname "$0")"
 
-for pkg in forumcopilot_sdk discourse_core discourse_ui; do
+for pkg in forumcopilot_sdk discourse_core discourse_appearance discourse_ui; do
   echo "Resolving packages/$pkg..."
   (cd "packages/$pkg" && dart pub get)
 done

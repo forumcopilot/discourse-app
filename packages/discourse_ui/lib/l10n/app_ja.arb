@@ -373,6 +373,8 @@
   "enterKeywordsToFindTopicsAndPosts": "キーワードを入力してトピックと投稿を検索",
   "light": "ライト",
   "dark": "ダーク",
+  "appearance": "外観",
+  "appearanceSystem": "端末の設定",
   "version": "バージョン {version} ({buildNumber})",
   "@version": {
     "placeholders": {

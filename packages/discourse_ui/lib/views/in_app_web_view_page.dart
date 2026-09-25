@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
+import 'widgets/themed_web_view.dart';
 
 /// Full-screen in-app web view for opening URLs (e.g. link forum external links).
 class InAppWebViewPage extends StatelessWidget {
@@ -22,9 +23,7 @@ class InAppWebViewPage extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: InAppWebView(
-        initialUrlRequest: URLRequest(url: WebUri(url)),
-      ),
+      body: ThemedWebView(url: url),
     );
   }
 }

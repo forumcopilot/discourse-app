@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'theme/app_theme.dart';
+import 'services/appearance_sync.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'dart:ui' as ui;
 
@@ -10,7 +11,13 @@ class SettingsContext {
   static SettingsContext get instance => _instance ??= SettingsContext();
 
   // Observable settings
-  final Rx<ThemeMode> themeMode = ThemeMode.system.obs;
+
+  /// The Appearance choice. The same observable as [AppTheme.themeMode],
+  /// which the app shell (here and in host apps) passes to
+  /// `MaterialApp.themeMode` — one value, two names, so they can't drift.
+  /// Change it through [setThemeMode] so it is saved and reaches the
+  /// native layer and web views.
+  Rx<ThemeMode> get themeMode => AppTheme.themeMode;
   final RxInt pagePerSize = 20.obs; // Default page size for paging
   final Rx<Locale?> locale = Rx<Locale?>(null); // null = use system locale
 
@@ -30,10 +37,11 @@ class SettingsContext {
           (mode) => mode.toString() == themeModeStr,
           orElse: () => ThemeMode.system,
         );
-        // Update both SettingsContext and AppTheme
         themeMode.value = loadedThemeMode;
-        AppTheme.themeMode.value = loadedThemeMode;
       }
+      // Also when nothing is saved: Android persists the per-app night
+      // mode itself, and a stale one must not outlive a reinstall of prefs.
+      AppearanceSync.apply(themeMode.value);
 
       // Load page_per_size
       final int? loadedPagePerSize = prefs.getInt('page_per_size');
@@ -67,6 +75,19 @@ class SettingsContext {
     }
   }
 
+  /// Switches the app to [mode] now — Flutter UI, native UI and Discourse
+  /// pages in web views — and remembers it.
+  Future<void> setThemeMode(ThemeMode mode) async {
+    themeMode.value = mode;
+    AppearanceSync.apply(mode);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('theme_mode', mode.toString());
+    } catch (e) {
+      AppLogger.debug('Failed to persist theme mode: $e');
+    }
+  }
+
   // Save settings to device
   Future<void> saveToDevice() async {
     try {
@@ -97,6 +118,7 @@ class SettingsContext {
   // Reset settings to defaults
   Future<void> resetToDefaults() async {
     themeMode.value = ThemeMode.system;
+    AppearanceSync.apply(ThemeMode.system);
     pagePerSize.value = 20;
     locale.value = null; // Use system locale
     await saveToDevice();

@@ -20,6 +20,8 @@ import '../users_directory_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../host/discourse_host.dart';
+import '../../settings_context.dart';
+import 'appearance_sheet.dart';
 import 'brand_image.dart';
 
 /// Phase 5.18a — hamburger drawer ("More" menu).
@@ -36,8 +38,8 @@ import 'brand_image.dart';
 ///   • Community — Users / Groups / Badges directories (5.18c lands
 ///     the real screens; currently placeholder rows so the IA is
 ///     visible in 5.18a).
-///   • Account — Settings, Privacy & Terms (5.18b adds this), Sign
-///     in / Sign out.
+///   • Account — Settings, Appearance, Privacy & Terms (5.18b adds
+///     this), Sign in / Sign out.
 ///
 /// Each tap closes the drawer first (so the page transition is on top
 /// of the closed-drawer state) and then pushes a `MaterialPageRoute`
@@ -180,6 +182,20 @@ class SiteDrawer extends StatelessWidget {
                       const NotificationSettingsPage(),
                     ),
                   ),
+                  // A device setting, not an account one, so it shows
+                  // signed out too.
+                  if (DiscourseHost.showAppearanceSetting)
+                    _DrawerRow(
+                      icon: Icons.brightness_6_outlined,
+                      title: AppLocalizations.of(context)!.appearance,
+                      trailing: Obx(() => Text(
+                            appearanceLabel(context,
+                                SettingsContext.instance.themeMode.value),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: colorScheme.onSurfaceVariant),
+                          )),
+                      onTap: () => showAppearanceSheet(context),
+                    ),
                   // Real links, not a "coming soon" snackbar. /site.json
                   // has carried tos_url and privacy_policy_url all along —
                   // the connector was already parsing both into
@@ -455,12 +471,14 @@ class _DrawerRow extends StatelessWidget {
   final IconData icon;
   final String title;
   final Color? iconColor;
+  final Widget? trailing;
   final VoidCallback onTap;
 
   const _DrawerRow({
     required this.icon,
     required this.title,
     this.iconColor,
+    this.trailing,
     required this.onTap,
   });
 
@@ -474,6 +492,7 @@ class _DrawerRow extends StatelessWidget {
         title,
         style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
       ),
+      trailing: trailing,
       onTap: onTap,
     );
   }

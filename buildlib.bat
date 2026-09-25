@@ -5,7 +5,7 @@ REM its own pub get: root `flutter pub get` writes no package_config for them.
 setlocal
 cd /d "%~dp0"
 
-for %%p in (forumcopilot_sdk discourse_core discourse_ui) do (
+for %%p in (forumcopilot_sdk discourse_core discourse_appearance discourse_ui) do (
   echo Resolving packages\%%p...
   pushd packages\%%p
   call dart pub get
