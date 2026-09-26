@@ -5,7 +5,6 @@ import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_draft.dart';
 
-import '../theme/design_tokens.dart';
 import '../utils/time_utils.dart';
 import 'lists/posts_list.dart';
 import 'new_topic_page.dart';
@@ -201,10 +200,11 @@ class _DraftsListPageState extends State<DraftsListPage> {
           }
           return ListView.separated(
             itemCount: drafts.length,
+            // Inset to the text: 16 start + 24 icon + 16 gap.
             separatorBuilder: (_, __) => Divider(
               height: 1,
-              color: colorScheme.outlineVariant
-                  .withValues(alpha: DesignTokens.opacityDivider),
+              indent: 56,
+              color: colorScheme.outlineVariant,
             ),
             itemBuilder: (_, i) {
               final d = drafts[i];
@@ -224,8 +224,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
                 ),
                 title: Text(
                   title,
-                  style: textTheme.titleSmall?.copyWith(
-                      fontWeight: DesignTokens.fontWeightSemiBold),
+                  style: textTheme.titleMedium,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -234,7 +233,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
                         excerpt,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: textTheme.bodySmall?.copyWith(
+                        style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
                       )
@@ -245,7 +244,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
                     if (d.updatedAt != null)
                       Text(
                         formatTimeAgo(d.updatedAt!, context),
-                        style: textTheme.labelSmall?.copyWith(
+                        style: textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),

@@ -216,9 +216,14 @@ class _UserSearchPageState extends State<UserSearchPage> {
       );
     }
 
-    return ListView.builder(
+    return ListView.separated(
       controller: _scrollController,
       itemCount: _users.length + (_hasMore ? 1 : 0),
+      separatorBuilder: (_, __) => Divider(
+        height: 1,
+        indent: 72,
+        color: colorScheme.outlineVariant,
+      ),
       itemBuilder: (context, index) {
         if (index == _users.length) {
           return Center(

@@ -10,6 +10,7 @@ import '../../utils/time_utils.dart';
 import '../lists/posts_list.dart';
 import '../post_page.dart';
 import 'user_avatar.dart';
+import 'unread_badge.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// "Suggested Topics" footer card, rendered at the bottom of every
@@ -144,7 +145,9 @@ class _SuggestedTopicsCardState extends State<SuggestedTopicsCard> {
             if (i > 0)
               Divider(
                 height: 1,
-                color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityDivider),
+                thickness: 1,
+                indent: 72,
+                color: colorScheme.outlineVariant,
               ),
             _SuggestedTopicTile(
               siteContext: widget.siteContext,
@@ -179,104 +182,83 @@ class _SuggestedTopicTile extends StatelessWidget {
     final avatarUrl = topic.avatarUrl(siteContext.site.url);
     final replyCount = (topic.postsCount ?? 1) - 1;
 
+    final unread = topic.hasUnread || topic.isNew;
+    final metaStyle =
+        textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant);
+
+    // The topic list's row, without the category line (suggested topics
+    // arrive without one): same avatar, headline and meta sizes, so a
+    // topic looks the same wherever it's listed. It was 28dp / 14sp / 11sp.
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: DesignTokens.spacingL,
-          vertical: DesignTokens.spacingM,
+        padding: const EdgeInsets.fromLTRB(
+          DesignTokens.spacingL,
+          DesignTokens.spacingM,
+          DesignTokens.spacingL,
+          DesignTokens.spacingM,
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (username != null && username.isNotEmpty) ...[
-              UserAvatar(
-                username: username,
-                iconUrl: avatarUrl,
-                radius: 14,
-              ),
-              const SizedBox(width: DesignTokens.spacingM),
-            ],
+            UserAvatar(
+              username: username ?? '',
+              iconUrl: avatarUrl,
+              radius: DesignTokens.avatarRadiusM,
+            ),
+            const SizedBox(width: DesignTokens.spacingL),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      if (topic.isNew)
-                        Container(
-                          margin: const EdgeInsets.only(
-                              right: DesignTokens.spacingXS),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 4, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: colorScheme.primary,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                          child: Text(
-                            AppLocalizations.of(context)!.newLabel,
-                            style: textTheme.labelSmall?.copyWith(
-                              color: colorScheme.onPrimary,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        )
-                      else if (topic.hasUnread)
-                        Container(
-                          margin: const EdgeInsets.only(
-                              right: DesignTokens.spacingXS),
-                          height: 6,
-                          width: 6,
-                          decoration: BoxDecoration(
-                            color: colorScheme.primary,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      Expanded(
-                        child: Text(
-                          topic.title,
-                          style: textTheme.bodyMedium?.copyWith(
-                            fontWeight: topic.hasUnread || topic.isNew
-                                ? FontWeight.w600
-                                : FontWeight.normal,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    topic.title,
+                    style: textTheme.titleMedium?.copyWith(
+                      color: unread
+                          ? colorScheme.onSurface
+                          : colorScheme.onSurfaceVariant,
+                      fontWeight: unread
+                          ? DesignTokens.fontWeightMedium
+                          : DesignTokens.fontWeightNormal,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: DesignTokens.spacingXS),
                   Row(
                     children: [
                       Icon(
-                        Icons.forum_outlined,
-                        size: 12,
+                        Icons.comment_outlined,
+                        size: DesignTokens.iconSizeS,
                         color: colorScheme.onSurfaceVariant,
                       ),
-                      const SizedBox(width: 2),
-                      Text(
-                        '$replyCount',
-                        style: textTheme.labelSmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
+                      const SizedBox(width: DesignTokens.spacingXS),
+                      Text('$replyCount', style: metaStyle),
                       if (lastActivity != null) ...[
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(
-                          formatTimeAgo(lastActivity, context),
-                          style: textTheme.labelSmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
+                        const SizedBox(width: DesignTokens.spacingM),
+                        Text(formatTimeAgo(lastActivity, context),
+                            style: metaStyle),
                       ],
                     ],
                   ),
                 ],
               ),
             ),
+            if (topic.isNew)
+              Padding(
+                padding: const EdgeInsets.only(
+                    left: DesignTokens.spacingS, top: 6),
+                child: Badge(
+                  label: Text(AppLocalizations.of(context)!.newLabel),
+                  backgroundColor: colorScheme.primary,
+                  textColor: colorScheme.onPrimary,
+                ),
+              )
+            else if (topic.hasUnread)
+              const Padding(
+                padding: EdgeInsets.only(left: DesignTokens.spacingS, top: 8),
+                child: UnreadBadge(),
+              ),
           ],
         ),
       ),

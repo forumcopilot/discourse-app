@@ -339,8 +339,14 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
         message: 'No users match that name.',
       );
     }
-    return ListView.builder(
+    final colorScheme = Theme.of(context).colorScheme;
+    return ListView.separated(
       itemCount: _searchResults.length,
+      separatorBuilder: (_, __) => Divider(
+        height: 1,
+        indent: 72,
+        color: colorScheme.outlineVariant,
+      ),
       itemBuilder: (_, i) {
         final u = _searchResults[i];
         return UserListRow(
@@ -389,8 +395,7 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
         separatorBuilder: (_, __) => Divider(
           height: 1,
           indent: 72,
-          color: colorScheme.outlineVariant
-              .withValues(alpha: DesignTokens.opacityDivider),
+          color: colorScheme.outlineVariant,
         ),
         itemBuilder: (_, i) {
           if (i >= _items.length) {

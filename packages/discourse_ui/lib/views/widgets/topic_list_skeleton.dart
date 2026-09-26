@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import '../../theme/design_tokens.dart';
 
 /// Shimmer placeholder that mirrors `TopicListItem`'s footprint: leading
-/// circular avatar, two stacked title lines, a meta-row, and a bottom
-/// divider. Renders a fixed [rowCount] of placeholder rows wrapped in a
+/// circular avatar, a two-line title, the category/tag chips, the activity
+/// line and an inset divider — the same height as a real row, so the list
+/// doesn't jump when the topics arrive. Renders a fixed [rowCount] of placeholder rows wrapped in a
 /// single [Shimmer.fromColors] so the gradient sweep stays in sync
 /// across rows.
 ///
@@ -38,8 +39,8 @@ class TopicListSkeleton extends StatelessWidget {
         separatorBuilder: (_, __) => Divider(
           height: 1,
           thickness: 1,
-          color: colorScheme.outlineVariant
-              .withValues(alpha: DesignTokens.opacityLow),
+          indent: 72,
+          color: colorScheme.outlineVariant,
         ),
         itemBuilder: (context, _) => const _TopicSkeletonRow(),
     );
@@ -66,17 +67,27 @@ class _TopicSkeletonRow extends StatelessWidget {
             radius: DesignTokens.avatarRadiusM,
             backgroundColor: block,
           ),
-          const SizedBox(width: DesignTokens.spacingM),
-          // Title + meta placeholder
+          const SizedBox(width: DesignTokens.spacingL),
+          // Title, chips and activity placeholders, at the real row's
+          // line heights.
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _ShimmerBar(width: double.infinity, height: 14, color: block),
-                const SizedBox(height: DesignTokens.spacingXS + 2),
-                _ShimmerBar(width: 220, height: 14, color: block),
-                const SizedBox(height: DesignTokens.spacingM),
-                _ShimmerBar(width: 140, height: 10, color: block),
+                const SizedBox(height: DesignTokens.spacingXS),
+                _ShimmerBar(width: double.infinity, height: 16, color: block),
+                const SizedBox(height: DesignTokens.spacingS),
+                _ShimmerBar(width: 200, height: 16, color: block),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    _ShimmerBar(width: 88, height: 20, color: block),
+                    const SizedBox(width: DesignTokens.spacingS),
+                    _ShimmerBar(width: 56, height: 20, color: block),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                _ShimmerBar(width: 180, height: 12, color: block),
               ],
             ),
           ),

@@ -201,16 +201,8 @@ class _BookmarksPageState extends State<BookmarksPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.bookmark, size: 20),
-            SizedBox(width: 8),
-            Text(AppLocalizations.of(context)!.bookmarks),
-          ],
-        ),
-      ),
+      // A plain title, as every other screen has.
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.bookmarks)),
       body: RefreshIndicator(
         onRefresh: _refresh,
         child: _buildBody(),
@@ -257,7 +249,8 @@ class _BookmarksPageState extends State<BookmarksPage> {
       itemCount: _entries.length + (_hasMore || _isLoading ? 1 : 0),
       separatorBuilder: (_, __) => Divider(
         height: 1,
-        color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityDivider),
+        indent: 72,
+        color: colorScheme.outlineVariant,
       ),
       itemBuilder: (context, index) {
         if (index == _entries.length) {
@@ -369,16 +362,14 @@ class _BookmarkTile extends StatelessWidget {
               iconUrl: avatarUrl,
               radius: DesignTokens.avatarRadiusM,
             ),
-            const SizedBox(width: DesignTokens.spacingM),
+            const SizedBox(width: DesignTokens.spacingL),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: textTheme.titleMedium,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -386,7 +377,7 @@ class _BookmarkTile extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       excerpt,
-                      style: textTheme.bodySmall?.copyWith(
+                      style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
                       maxLines: 2,
@@ -403,7 +394,7 @@ class _BookmarkTile extends StatelessWidget {
                       if (username.isNotEmpty) ...[
                         Text(
                           '@$username',
-                          style: textTheme.labelSmall?.copyWith(
+                          style: textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
                         ),
@@ -412,7 +403,7 @@ class _BookmarkTile extends StatelessWidget {
                       if (created != null)
                         Text(
                           formatTimeAgo(created, context),
-                          style: textTheme.labelSmall?.copyWith(
+                          style: textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
                         ),

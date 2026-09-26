@@ -3,7 +3,7 @@ import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.d
 import 'package:discourse_ui/views/widgets/user_avatar.dart';
 import '../../../../utils/time_utils.dart';
 import '../../../../theme/design_tokens.dart';
-import '../../../../theme/style_builders.dart';
+import '../../../widgets/unread_badge.dart';
 
 class ConversationListItem extends StatelessWidget {
   final FCConversationSummary conversation;
@@ -16,14 +16,6 @@ class ConversationListItem extends StatelessWidget {
     this.onTap,
     this.onDelete,
   }) : super(key: key);
-
-  Widget _buildBottomDivider(ColorScheme colorScheme) {
-    return Divider(
-      height: 1,
-      thickness: 1,
-      color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,186 +57,109 @@ class ConversationListItem extends StatelessWidget {
         ) ??
         DateTime.now();
 
+    final unreadCount = conversation.unreadMessageCount ?? 0;
+    final metaColor = colorScheme.onSurfaceVariant;
+    final metaStyle = textTheme.bodySmall?.copyWith(color: metaColor);
+    Widget meta(IconData icon, String text) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: DesignTokens.iconSizeS, color: metaColor),
+            const SizedBox(width: DesignTokens.spacingXS),
+            Text(text, style: metaStyle),
+          ],
+        );
+
+    // Like an inbox: the subject is the headline, with who wrote last and
+    // how many are in it underneath, and the time and unread badge at the
+    // end. It opened with the last poster's name in the same 16sp as the
+    // subject, and took ~140dp a row.
     return Material(
       color: colorScheme.surface,
       child: InkWell(
         onTap: onTap,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header section with avatar, username, timestamp, and unread indicator
             Padding(
-              padding: EdgeInsets.all(DesignTokens.spacingL),
+              padding: const EdgeInsets.fromLTRB(
+                DesignTokens.spacingL,
+                DesignTokens.spacingM,
+                DesignTokens.spacingL,
+                DesignTokens.spacingM,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Avatar
                   UserAvatar(
                     username: displayUsername,
                     iconUrl: displayAvatar,
-                    radius: 20,
+                    radius: DesignTokens.avatarRadiusM,
                   ),
-                  SizedBox(width: DesignTokens.spacingL),
-                  // Author info and title
+                  const SizedBox(width: DesignTokens.spacingL),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                displayUsername.isNotEmpty ? displayUsername : "Unknown",
-                                style: textTheme.titleMedium?.copyWith(
-                                  color: hasNewPosts ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
-                                  fontWeight: hasNewPosts ? DesignTokens.fontWeightSemiBold : DesignTokens.fontWeightMedium,
-                                  letterSpacing: DesignTokens.letterSpacingMedium,
-                                ),
-                              ),
-                            ),
-                            // Unread indicator on the right side
-                            if (hasNewPosts) ...[
-                              SizedBox(width: DesignTokens.spacingS),
-                              // Show unread count badge if available and > 0, otherwise show dot indicator
-                              (conversation.unreadMessageCount != null && conversation.unreadMessageCount! > 0)
-                                  ? Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: conversation.unreadMessageCount! > 99 
-                                            ? DesignTokens.spacingXS 
-                                            : DesignTokens.spacingS,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: colorScheme.primary,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        conversation.unreadMessageCount! > 99 
-                                            ? '99+'
-                                            : '${conversation.unreadMessageCount}',
-                                        style: textTheme.labelSmall?.copyWith(
-                                          color: colorScheme.onPrimary,
-                                          fontWeight: DesignTokens.fontWeightBold,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    )
-                                  : Container(
-                                      width: 8,
-                                      height: 8,
-                                      margin: EdgeInsets.only(top: 6),
-                                      decoration: BoxDecoration(
-                                        color: colorScheme.primary,
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                            ],
-                          ],
-                        ),
-                        SizedBox(height: DesignTokens.spacingXS),
                         Text(
-                          formatSmartDateTime(lastTime, context),
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                            letterSpacing: DesignTokens.letterSpacingWide,
+                          conversation.conv_subject ?? 'No subject',
+                          style: textTheme.titleMedium?.copyWith(
+                            color: hasNewPosts
+                                ? colorScheme.onSurface
+                                : colorScheme.onSurfaceVariant,
+                            fontWeight: hasNewPosts
+                                ? DesignTokens.fontWeightMedium
+                                : DesignTokens.fontWeightNormal,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: DesignTokens.spacingXS),
+                        Wrap(
+                          spacing: DesignTokens.spacingM,
+                          runSpacing: DesignTokens.spacingXS,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              displayUsername.isNotEmpty
+                                  ? displayUsername
+                                  : 'Unknown',
+                              style: metaStyle,
+                            ),
+                            if ((conversation.participant_count ?? 0) > 0)
+                              meta(Icons.people_outline,
+                                  '${conversation.participant_count}'),
+                            if (totalMessages > 0)
+                              meta(Icons.mail_outline, '$totalMessages'),
+                            if (conversation.isClosed == true)
+                              Icon(Icons.lock_outlined,
+                                  size: DesignTokens.iconSizeS,
+                                  color: metaColor),
+                          ],
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(width: DesignTokens.spacingS),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(formatSmartDateTime(lastTime, context),
+                          style: metaStyle),
+                      if (hasNewPosts) ...[
+                        const SizedBox(height: DesignTokens.spacingS),
+                        UnreadBadge(count: unreadCount),
+                      ],
+                    ],
+                  ),
                 ],
               ),
             ),
-            // Title row
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                DesignTokens.spacingL,
-                0.0,
-                DesignTokens.spacingL,
-                DesignTokens.spacingS,
-              ),
-              child: Text(
-                conversation.conv_subject ?? 'No subject',
-                style: StyleBuilders.titleTextStyle(
-                  colorScheme: colorScheme,
-                  textTheme: textTheme,
-                  fontSize: DesignTokens.fontSizeTopicTitle,
-                  fontWeight: hasNewPosts ? DesignTokens.fontWeightBold : DesignTokens.fontWeightMedium,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
+            Divider(
+              height: 1,
+              thickness: 1,
+              indent: 72,
+              color: colorScheme.outlineVariant,
             ),
-            // Metadata row
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                DesignTokens.spacingL,
-                0.0,
-                DesignTokens.spacingL,
-                DesignTokens.spacingL,
-              ),
-              child: Wrap(
-                spacing: DesignTokens.spacingL,
-                runSpacing: DesignTokens.spacingXS,
-                children: [
-                  if ((conversation.participant_count ?? 0) > 0) ...[
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.people_rounded,
-                          size: textTheme.bodySmall?.fontSize ?? 12,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        SizedBox(width: DesignTokens.spacingXS),
-                        Text(
-                          '${conversation.participant_count}',
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                            letterSpacing: DesignTokens.letterSpacingWide,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  if (totalMessages > 0) ...[
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.message_outlined,
-                          size: textTheme.bodySmall?.fontSize ?? 12,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        SizedBox(width: DesignTokens.spacingXS),
-                        Text(
-                          '$totalMessages',
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                            letterSpacing: DesignTokens.letterSpacingWide,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  if (conversation.isClosed == true) ...[
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.lock_outlined,
-                          size: textTheme.bodySmall?.fontSize ?? 12,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            // Bottom divider
-            _buildBottomDivider(colorScheme),
           ],
         ),
       ),

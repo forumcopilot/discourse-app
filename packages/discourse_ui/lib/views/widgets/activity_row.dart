@@ -134,7 +134,6 @@ class ActivityRow extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: textTheme.labelLarge?.copyWith(
                           color: colorScheme.onSurfaceVariant,
-                          fontWeight: DesignTokens.fontWeightSemiBold,
                         ),
                       ),
                     ),
@@ -145,9 +144,8 @@ class ActivityRow extends StatelessWidget {
               Text(
                 withEmojiShortcodes(title),
                 textAlign: TextAlign.start,
-                style: textTheme.titleSmall?.copyWith(
+                style: textTheme.titleMedium?.copyWith(
                   color: colorScheme.onSurface,
-                  fontWeight: DesignTokens.fontWeightSemiBold,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -167,7 +165,7 @@ class ActivityRow extends StatelessWidget {
                 Text(
                   excerptText,
                   textAlign: TextAlign.start,
-                  style: textTheme.bodySmall?.copyWith(
+                  style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
                   maxLines: 2,
@@ -209,7 +207,7 @@ class _MetaRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final style = textTheme.labelSmall?.copyWith(
+    final style = textTheme.bodySmall?.copyWith(
       color: colorScheme.onSurfaceVariant,
     );
 

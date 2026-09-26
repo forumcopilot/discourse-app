@@ -4,7 +4,7 @@ import 'package:discourse_ui/utils/time_utils.dart';
 import 'package:discourse_ui/utils/number_utils.dart';
 import 'package:discourse_ui/views/widgets/user_avatar.dart';
 import '../../theme/design_tokens.dart';
-import '../../theme/style_builders.dart';
+import '../widgets/unread_badge.dart';
 
 /// Phase 5.20c — map a notification's "action verb" (from
 /// `social_proxy._alertActionVerb`) to a Material icon for the
@@ -158,33 +158,33 @@ class NotificationListItem extends StatelessWidget {
     this.isUnread = false,
   }) : super(key: key);
 
-  Widget _buildBottomDivider(ColorScheme colorScheme) {
-    return Divider(
-      height: 1,
-      thickness: 1,
-      color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final metaStyle =
+        textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant);
+    Widget metaIcon(IconData icon) => Icon(icon,
+        size: DesignTokens.iconSizeS, color: colorScheme.onSurfaceVariant);
 
+    // A Material 3 list item like every other list's: 40dp avatar, the
+    // message as the headline, a meta line, and unread shown by the shared
+    // badge and the headline's weight. It had a 56dp avatar, a tinted
+    // background, a leading dot and bold text for unread.
     return Material(
-      // Unread rows get a faint primary-container wash; read rows stay
-      // on plain surface (mirrors Discourse web's unread styling).
-      color: isUnread
-          ? colorScheme.primaryContainer
-              .withValues(alpha: DesignTokens.opacityLow / 2)
-          : colorScheme.surface,
+      color: colorScheme.surface,
       child: InkWell(
         onTap: onTap,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: EdgeInsets.all(DesignTokens.spacingL),
+              padding: const EdgeInsets.fromLTRB(
+                DesignTokens.spacingL,
+                DesignTokens.spacingM,
+                DesignTokens.spacingL,
+                DesignTokens.spacingM,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -195,127 +195,78 @@ class NotificationListItem extends StatelessWidget {
                   _AvatarWithBadge(
                     username: topic.authorName,
                     iconUrl: topic.authorIconUrl,
-                    radius: DesignTokens.spacingXL + DesignTokens.spacingXS,
+                    radius: DesignTokens.avatarRadiusM,
                     badgeStyle: NotificationBadgeStyle.forAction(action),
                   ),
-                  SizedBox(width: DesignTokens.spacingL),
-                  // Message and metadata on the right
+                  const SizedBox(width: DesignTokens.spacingL),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Message text (flexible wrapping). Unread
-                        // rows lead with a primary dot + semibold text.
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (isUnread)
-                              Container(
-                                width: 8,
-                                height: 8,
-                                margin: const EdgeInsets.only(
-                                  top: 6,
-                                  right: DesignTokens.spacingS,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: colorScheme.primary,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            Expanded(
-                              child: Text(
-                                topic.title,
-                                style: StyleBuilders.titleTextStyle(
-                                  colorScheme: colorScheme,
-                                  textTheme: textTheme,
-                                  fontSize: DesignTokens.fontSizeS,
-                                  fontWeight: isUnread
-                                      ? DesignTokens.fontWeightSemiBold
-                                      : DesignTokens.fontWeightMedium,
-                                ),
-                                // No maxLines restriction — wraps freely
-                              ),
-                            ),
-                          ],
+                        Text(
+                          topic.title,
+                          style: textTheme.bodyLarge?.copyWith(
+                            color: isUnread
+                                ? colorScheme.onSurface
+                                : colorScheme.onSurfaceVariant,
+                            fontWeight: isUnread
+                                ? DesignTokens.fontWeightMedium
+                                : DesignTokens.fontWeightNormal,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        // Metadata row at the bottom
-                        SizedBox(height: DesignTokens.spacingS),
+                        const SizedBox(height: DesignTokens.spacingXS),
                         Wrap(
                           spacing: DesignTokens.spacingM,
                           runSpacing: DesignTokens.spacingXS,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            if (topic.replyCount > 0) ...[
+                            if (topic.timestamp !=
+                                DateTime.fromMillisecondsSinceEpoch(0))
+                              Text(
+                                formatSmartDateTime(topic.timestamp, context),
+                                style: metaStyle,
+                              ),
+                            if (topic.replyCount > 0)
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(
-                                    Icons.comment_outlined,
-                                    size: DesignTokens.iconSizeS,
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
-                                  SizedBox(width: DesignTokens.spacingXS),
+                                  metaIcon(Icons.comment_outlined),
+                                  const SizedBox(width: DesignTokens.spacingXS),
                                   Text(
                                     formatNumber(context, topic.replyCount),
-                                    style: StyleBuilders.smallTextStyle(
-                                      colorScheme: colorScheme,
-                                      textTheme: textTheme,
-                                    ),
+                                    style: metaStyle,
                                   ),
                                 ],
                               ),
-                            ],
-                            if (topic.timestamp != DateTime.fromMillisecondsSinceEpoch(0)) ...[
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.schedule,
-                                    size: DesignTokens.iconSizeS,
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
-                                  SizedBox(width: DesignTokens.spacingXS),
-                                  Text(
-                                    formatSmartDateTime(topic.timestamp, context),
-                                    style: StyleBuilders.smallTextStyle(
-                                      colorScheme: colorScheme,
-                                      textTheme: textTheme,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                            if (topicIcon != null) ...[
-                              Icon(
-                                topicIcon!,
-                                size: DesignTokens.iconSizeS,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ],
-                            if (topic.isPinned) ...[
-                              Icon(
-                                Icons.push_pin_outlined,
-                                size: DesignTokens.iconSizeS,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ],
-                            if (topic.isSubscribed) ...[
-                              Icon(
-                                Icons.watch_outlined,
-                                size: DesignTokens.iconSizeS,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ],
+                            if (topicIcon != null) metaIcon(topicIcon!),
+                            if (topic.isPinned)
+                              metaIcon(Icons.push_pin_outlined),
+                            if (topic.isSubscribed)
+                              metaIcon(Icons.watch_outlined),
                           ],
                         ),
                       ],
                     ),
                   ),
+                  if (isUnread)
+                    const Padding(
+                      padding: EdgeInsets.only(
+                        left: DesignTokens.spacingS,
+                        top: DesignTokens.spacingS,
+                      ),
+                      child: UnreadBadge(),
+                    ),
                 ],
               ),
             ),
-            // Bottom divider
-            _buildBottomDivider(colorScheme),
+            Divider(
+              height: 1,
+              thickness: 1,
+              indent: 72,
+              color: colorScheme.outlineVariant,
+            ),
           ],
         ),
       ),

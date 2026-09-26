@@ -1042,15 +1042,9 @@ class _ProfileViewState extends State<ProfileView> {
     final textTheme = Theme.of(context).textTheme;
 
     return ListTile(
-      dense: true,
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: DesignTokens.spacingL,
-        vertical: DesignTokens.spacingXS,
-      ),
       leading: Icon(
         icon,
-        size: DesignTokens.iconSizeM,
-        color: colorScheme.primary,
+        color: colorScheme.onSurfaceVariant,
       ),
       title: Text(
         title,
@@ -1060,7 +1054,7 @@ class _ProfileViewState extends State<ProfileView> {
       ),
       subtitle: Text(
         subtitle,
-        style: textTheme.bodyMedium?.copyWith(
+        style: textTheme.bodyLarge?.copyWith(
           color: onTap != null ? colorScheme.primary : colorScheme.onSurface,
           decoration: onTap != null ? TextDecoration.underline : null,
         ),
@@ -1434,9 +1428,8 @@ class _SummaryTopicRow extends StatelessWidget {
             children: [
               Text(
                 data.title,
-                style: textTheme.titleSmall?.copyWith(
+                style: textTheme.titleMedium?.copyWith(
                   color: colorScheme.onSurface,
-                  fontWeight: DesignTokens.fontWeightSemiBold,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

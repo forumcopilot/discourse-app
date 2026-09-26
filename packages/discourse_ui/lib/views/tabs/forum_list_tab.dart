@@ -402,28 +402,26 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
             extendUnderAppBar: true,
           ),
           if (widget.siteContext.isLoggedIn && _subscribedForums != null && _subscribedForums!.isNotEmpty) ...[
+            // The same group heading as the parent categories below it
+            // (titleMedium); it was 20sp beside their 16.
             Padding(
               padding: EdgeInsets.fromLTRB(
                 DesignTokens.spacingL,
-                DesignTokens.spacingS,
+                DesignTokens.spacingM,
                 DesignTokens.spacingL,
-                DesignTokens.spacingS,
+                DesignTokens.spacingM,
               ),
               child: Row(
                 children: [
                   Icon(
                     Icons.watch_rounded,
-                    size: DesignTokens.iconSizeM,
+                    size: DesignTokens.iconSizeS,
                     color: colorScheme.primary,
                   ),
                   const SizedBox(width: DesignTokens.spacingS),
                   Text(
                     AppLocalizations.of(context)!.subscribedForums,
-                    style: StyleBuilders.titleTextStyle(
-                      colorScheme: colorScheme,
-                      textTheme: textTheme,
-                      fontWeight: DesignTokens.fontWeightMedium,
-                    ),
+                    style: textTheme.titleMedium,
                   ),
                 ],
               ),
@@ -488,12 +486,7 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
                 Expanded(
                   child: Text(
                     forum.name,
-                    style: StyleBuilders.titleTextStyle(
-                      colorScheme: Theme.of(context).colorScheme,
-                      textTheme: Theme.of(context).textTheme,
-                      fontSize: DesignTokens.fontSizeM,
-                      fontWeight: DesignTokens.fontWeightMedium,
-                    ),
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
               ],

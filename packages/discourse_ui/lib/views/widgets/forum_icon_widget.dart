@@ -203,6 +203,9 @@ class ForumListItemIconWidget extends StatelessWidget {
   final Color? backgroundColor;
   final Color? iconColor;
 
+  /// 56 for a header; list rows use 40, Material 3's leading size.
+  final double size;
+
   const ForumListItemIconWidget({
     super.key,
     this.logoUrl,
@@ -210,6 +213,7 @@ class ForumListItemIconWidget extends StatelessWidget {
     this.forumName,
     this.backgroundColor,
     this.iconColor,
+    this.size = 56,
   });
 
   @override
@@ -217,8 +221,8 @@ class ForumListItemIconWidget extends StatelessWidget {
     return ForumIconWidget(
       logoUrl: logoUrl,
       fallbackIcon: fallbackIcon,
-      size: 56,
-      borderRadius: BorderRadius.circular(12),
+      size: size,
+      borderRadius: BorderRadius.circular(size >= 56 ? 12 : 8),
       context: 'subforum',
       siteName: forumName,
       backgroundColor: backgroundColor,

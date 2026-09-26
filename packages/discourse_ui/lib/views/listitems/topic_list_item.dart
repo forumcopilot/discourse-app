@@ -10,6 +10,7 @@ import '../../utils/emoji_shortcodes.dart';
 import '../../theme/style_builders.dart';
 import '../../theme/forum_colors.dart';
 import '../widgets/topic_taxonomy_chips.dart';
+import '../widgets/unread_badge.dart';
 
 /// Widget para representar un ítem de la lista de foros
 class TopicListItem extends StatelessWidget {
@@ -42,234 +43,158 @@ class TopicListItem extends StatelessWidget {
     onTap?.call();
   }
 
-  Widget _buildBottomDivider(ColorScheme colorScheme) {
-    return Divider(
-      height: 1,
-      thickness: 1,
-      color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final unread = topic.hasNewPosts;
+    final excerpt = topic.shortContent ?? '';
 
+    // A Material 3 list item, title first: the author's avatar leading, the
+    // title as the headline, then where the topic lives and what happened
+    // last. It used to open with a three-line author block and put the
+    // title under it, at ~200dp a row; this is ~90–115dp.
     return Material(
       color: colorScheme.surface,
       child: InkWell(
         onTap: _handleTap,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header section with avatar, username, and timestamp
             Padding(
-              padding: EdgeInsets.all(DesignTokens.spacingL),
+              padding: const EdgeInsets.fromLTRB(
+                DesignTokens.spacingL,
+                DesignTokens.spacingM,
+                DesignTokens.spacingL,
+                DesignTokens.spacingM,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Avatar
                   UserAvatar(
                     username: topic.authorName,
                     iconUrl: topic.authorIconUrl,
-                    radius: 20,
+                    radius: DesignTokens.avatarRadiusM,
                   ),
-                  SizedBox(width: DesignTokens.spacingL),
-                  // Author info
+                  const SizedBox(width: DesignTokens.spacingL),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          topic.authorName.isNotEmpty ? topic.authorName : "Unknown",
-                          style: textTheme.titleMedium?.copyWith(
-                            color: topic.hasNewPosts ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
-                            fontWeight: topic.hasNewPosts ? DesignTokens.fontWeightSemiBold : DesignTokens.fontWeightMedium,
-                            letterSpacing: DesignTokens.letterSpacingMedium,
-                          ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (topic.isDeleted) ...[
+                              const Padding(
+                                padding: EdgeInsets.only(top: 2),
+                                child: _DeletedBadge(),
+                              ),
+                              const SizedBox(width: DesignTokens.spacingS),
+                            ],
+                            Expanded(
+                              child: Text(
+                                withEmojiShortcodes(topic.title),
+                                // Unread titles in full strength; read ones
+                                // step back, as visited topics do on web.
+                                style: textTheme.titleMedium?.copyWith(
+                                  color: unread
+                                      ? colorScheme.onSurface
+                                      : colorScheme.onSurfaceVariant,
+                                  fontWeight: unread
+                                      ? DesignTokens.fontWeightMedium
+                                      : DesignTokens.fontWeightNormal,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (unread)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  left: DesignTokens.spacingS,
+                                  top: 6,
+                                ),
+                                child: UnreadBadge(count: topic.unreadCount),
+                              ),
+                          ],
                         ),
-                        if (topic.timestamp != DateTime.fromMillisecondsSinceEpoch(0)) ...[
-                          SizedBox(height: DesignTokens.spacingXS),
-                          Text(
-                            formatSmartDateTime(topic.timestamp, context),
-                            style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                              letterSpacing: DesignTokens.letterSpacingWide,
+                        if (excerpt.isNotEmpty && !topic.isAnnouncement)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                top: DesignTokens.spacingXS),
+                            child: Text(
+                              withEmojiShortcodes(excerpt),
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ],
-                        // "alice replied 3 hours ago" — web leads its rows
-                        // with this because on a busy list the last voice is
-                        // the reason to open a topic, and the person who
-                        // started it usually is not. Null until someone has
-                        // actually replied, so the opening post is never
-                        // described as a reply to itself.
-                        if (topic.lastPosterName != null &&
-                            topic.lastPostedAt != null) ...[
-                          SizedBox(height: DesignTokens.spacingXS),
-                          Text(
-                            AppLocalizations.of(context)?.topicLastReplyBy(
-                                  topic.lastPosterName!,
-                                  formatSmartDateTime(
-                                      topic.lastPostedAt!, context),
-                                ) ??
-                                '${topic.lastPosterName} replied '
-                                    '${formatSmartDateTime(topic.lastPostedAt!, context)}',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                              letterSpacing: DesignTokens.letterSpacingWide,
-                            ),
-                          ),
-                        ],
+                        // The category badge and tags. Discourse's
+                        // information architecture is category-first, and
+                        // web puts the badge on every row, ahead of the
+                        // tags. Suppressed inside a category, whose header
+                        // already says where you are; draws nothing when
+                        // there is neither.
+                        TopicTaxonomyChips(
+                          siteContext: siteContext,
+                          categoryId: showCategory ? topic.forumId : '',
+                          categoryName: showCategory ? topic.forumName : '',
+                          tags: topic.tags,
+                          maxTags: 2,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              top: DesignTokens.spacingXS),
+                          child: _MetaRow(topic: topic, topicIcon: topicIcon),
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-            // Title row with badges (on its own line)
-            Padding(
-              padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingS),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (topic.hasNewPosts) ...[
-                    // Phase 5.47 — when the server tells us how many
-                    // posts are unread, show the count; otherwise fall
-                    // back to the plain new-posts dot.
-                    if (topic.unreadCount > 0)
-                      Container(
-                        margin: EdgeInsets.only(
-                          top: DesignTokens.spacingXS,
-                          right: DesignTokens.spacingS,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 1,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary,
-                          borderRadius:
-                              BorderRadius.circular(DesignTokens.radiusM),
-                        ),
-                        child: Text(
-                          topic.unreadCount > 99
-                              ? '99+'
-                              : '${topic.unreadCount}',
-                          style: textTheme.labelSmall?.copyWith(
-                            color: colorScheme.onPrimary,
-                            fontWeight: DesignTokens.fontWeightSemiBold,
-                            fontSize: DesignTokens.fontSizeXS - 1,
-                          ),
-                        ),
-                      )
-                    else
-                      Container(
-                        width: 8,
-                        height: 8,
-                        margin: EdgeInsets.only(
-                          top: DesignTokens.spacingM - DesignTokens.spacingXS,
-                          right: DesignTokens.spacingS,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                  ],
-                  if (topic.isDeleted) ...[
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: DesignTokens.spacingM - DesignTokens.spacingXS,
-                        vertical: DesignTokens.spacingXS / 2,
-                      ),
-                      decoration: StyleBuilders.badgeDecoration(
-                        colorScheme: colorScheme,
-                        backgroundColor: colorScheme.outline.withValues(alpha: DesignTokens.opacityLow),
-                        borderRadius: DesignTokens.radiusS,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.delete_outline,
-                            size: DesignTokens.fontSizeXS,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          SizedBox(width: DesignTokens.spacingXS),
-                          Text(
-                            AppLocalizations.of(context)!.deleted,
-                            style: StyleBuilders.smallTextStyle(
-                              colorScheme: colorScheme,
-                              textTheme: textTheme,
-                              color: colorScheme.onSurfaceVariant,
-                              fontWeight: DesignTokens.fontWeightBold,
-                            ).copyWith(fontSize: DesignTokens.fontSizeXS - 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: DesignTokens.spacingS),
-                  ],
-                  Expanded(
-                    child: Text(
-                      withEmojiShortcodes(topic.title),
-                      style: StyleBuilders.titleTextStyle(
-                        colorScheme: colorScheme,
-                        textTheme: textTheme,
-                        fontSize: DesignTokens.fontSizeTopicTitle,
-                        fontWeight: topic.hasNewPosts ? DesignTokens.fontWeightBold : DesignTokens.fontWeightMedium,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+            // Inset to the text, as Material 3's list dividers are.
+            Divider(
+              height: 1,
+              thickness: 1,
+              indent: 72,
+              color: colorScheme.outlineVariant,
             ),
-            // The category badge and tags below the title. Discourse's
-            // information architecture is category-first, and web puts the
-            // badge on every row, ahead of the tags. Suppressed inside a
-            // category: the header two rows up already says where you are.
-            // Nothing drawn (no padding either) when there is neither.
-            TopicTaxonomyChips(
-              siteContext: siteContext,
-              categoryId: showCategory ? topic.forumId : '',
-              categoryName: showCategory ? topic.forumName : '',
-              tags: topic.tags,
-              maxTags: 2,
-              padding: EdgeInsets.fromLTRB(
-                DesignTokens.spacingL,
-                0.0,
-                DesignTokens.spacingL,
-                DesignTokens.spacingS,
-              ),
-            ),
-            // Short content if available
-            if (topic.shortContent!.isNotEmpty && !topic.isAnnouncement) ...[
-              Padding(
-                padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingS),
-                child: Text(
-                  withEmojiShortcodes(topic.shortContent!),
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-            // Metadata row: the three counts (plus votes where a forum runs
-            // topic voting) and one status badge. It was two Wraps of up
-            // to nine items; the counts are what a row is scanned for, and
-            // one badge says the one thing that matters about a topic.
-            _MetaRow(topic: topic, topicIcon: topicIcon),
-            // Bottom divider
-            _buildBottomDivider(colorScheme),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _DeletedBadge extends StatelessWidget {
+  const _DeletedBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: StyleBuilders.badgeDecoration(
+        colorScheme: colorScheme,
+        backgroundColor: colorScheme.outline.withValues(alpha: DesignTokens.opacityLow),
+        borderRadius: DesignTokens.radiusS,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.delete_outline, size: 12, color: colorScheme.onSurfaceVariant),
+          const SizedBox(width: DesignTokens.spacingXS),
+          Text(
+            AppLocalizations.of(context)!.deleted,
+            style: StyleBuilders.badgeTextStyle(
+              colorScheme: colorScheme,
+              textTheme: Theme.of(context).textTheme,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -285,24 +210,39 @@ class _MetaRow extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
-    final metaColor = colorScheme.onSurfaceVariant.withValues(alpha: 0.72);
-    final size = textTheme.bodySmall?.fontSize ?? 12;
-    final style = textTheme.bodySmall?.copyWith(
-      color: metaColor,
-      letterSpacing: DesignTokens.letterSpacingWide,
-    );
+    final metaColor = colorScheme.onSurfaceVariant;
+    final style = textTheme.bodySmall?.copyWith(color: metaColor);
+    const iconSize = DesignTokens.iconSizeS;
 
     Widget count(IconData icon, String text) => Padding(
-          padding: EdgeInsets.only(right: DesignTokens.spacingL),
+          padding: const EdgeInsets.only(left: DesignTokens.spacingM),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: size, color: metaColor),
-              SizedBox(width: DesignTokens.spacingXS),
+              Icon(icon, size: iconSize, color: metaColor),
+              const SizedBox(width: DesignTokens.spacingXS),
               Text(text, style: style),
             ],
           ),
         );
+
+    // "alice replied 3 hours ago" — web leads with the last voice, because
+    // on a busy list it is the reason to open a topic. Before anyone has
+    // replied: who started it, and when.
+    final hasTime = topic.timestamp != DateTime.fromMillisecondsSinceEpoch(0);
+    final String activity;
+    if (topic.lastPosterName != null && topic.lastPostedAt != null) {
+      activity = l10n?.topicLastReplyBy(topic.lastPosterName!,
+              formatSmartDateTime(topic.lastPostedAt!, context)) ??
+          '${topic.lastPosterName} replied '
+              '${formatSmartDateTime(topic.lastPostedAt!, context)}';
+    } else {
+      final author =
+          topic.authorName.isNotEmpty ? topic.authorName : 'Unknown';
+      activity = hasTime
+          ? '$author · ${formatSmartDateTime(topic.timestamp, context)}'
+          : author;
+    }
 
     // One badge, by how much it changes what the reader should expect.
     final (IconData, String, Color)? badge = topicIcon != null
@@ -321,33 +261,45 @@ class _MetaRow extends StatelessWidget {
                                 ? (Icons.watch_outlined, l10n?.subscribedLabel ?? 'Watching', metaColor)
                                 : null;
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingL),
-      child: Row(
-        children: [
-          if (topic.replyCount > 0)
-            count(Icons.comment_outlined, formatNumber(context, topic.replyCount)),
-          if (topic.likeCount > 0)
-            count(Icons.favorite_border, formatNumber(context, topic.likeCount)),
-          if (topic.voteCount > 0)
-            count(Icons.arrow_upward, l10n?.nVotes(topic.voteCount) ?? '${topic.voteCount} votes'),
-          if (topic.viewCount > 0)
-            count(Icons.visibility_outlined, formatNumber(context, topic.viewCount)),
-          if (badge != null) ...[
-            const Spacer(),
-            Icon(badge.$1, size: size, color: badge.$3),
-            SizedBox(width: DesignTokens.spacingXS),
-            Flexible(
-              child: Text(
-                badge.$2,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: style?.copyWith(color: badge.$3),
+    // The activity text gives way to the counts beside it, and both to the
+    // badge at the end. (A Flexible and a Spacer in one Row split the free
+    // space evenly, which cut the activity off at half the width.)
+    return Row(
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  activity,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: style,
+                ),
               ),
-            ),
-          ],
+              if (topic.replyCount > 0)
+                count(Icons.comment_outlined,
+                    formatNumber(context, topic.replyCount)),
+              if (topic.likeCount > 0)
+                count(Icons.favorite_border,
+                    formatNumber(context, topic.likeCount)),
+              if (topic.voteCount > 0)
+                count(Icons.arrow_upward,
+                    formatNumber(context, topic.voteCount)),
+            ],
+          ),
+        ),
+        if (badge != null) ...[
+          const SizedBox(width: DesignTokens.spacingS),
+          Icon(badge.$1, size: iconSize, color: badge.$3),
+          const SizedBox(width: DesignTokens.spacingXS),
+          Text(
+            badge.$2,
+            maxLines: 1,
+            style: style?.copyWith(color: badge.$3),
+          ),
         ],
-      ),
+      ],
     );
   }
 }

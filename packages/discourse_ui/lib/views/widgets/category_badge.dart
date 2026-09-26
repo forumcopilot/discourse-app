@@ -68,10 +68,8 @@ class CategoryBadge extends StatelessWidget {
         Flexible(
           child: Text(
             style?.name ?? fallbackName.trim(),
-            style: (large ? textTheme.labelLarge : textTheme.labelSmall)?.copyWith(
+            style: (large ? textTheme.labelLarge : textTheme.labelMedium)?.copyWith(
               color: colorScheme.onSurfaceVariant,
-              fontWeight: DesignTokens.fontWeightSemiBold,
-              letterSpacing: DesignTokens.letterSpacingWide,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -88,8 +86,9 @@ class CategoryBadge extends StatelessWidget {
           forum: categoryForum(siteContext, categoryId, fallbackName: fallbackName),
         ),
       )),
+      // 32dp high to tap (it was ~20).
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
+        padding: const EdgeInsets.symmetric(vertical: 6),
         child: badge,
       ),
     );

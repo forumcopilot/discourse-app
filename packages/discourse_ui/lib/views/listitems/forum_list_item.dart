@@ -4,7 +4,6 @@ import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
 import 'package:discourse_ui/views/widgets/forum_icon_widget.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/discourse_color.dart';
-import '../../theme/style_builders.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../widgets/category_badge.dart';
 
@@ -37,15 +36,6 @@ class ForumListItem extends StatelessWidget {
   // stays as information.
   void _handleTap(BuildContext context) => onTap?.call();
 
-  Widget _buildBottomDivider(ColorScheme colorScheme) {
-    return Divider(
-      height: 1,
-      thickness: 1,
-      color: colorScheme.outlineVariant
-          .withValues(alpha: DesignTokens.opacityDivider),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -68,43 +58,57 @@ class ForumListItem extends StatelessWidget {
         colorHex.isNotEmpty ? parseDiscourseHex(colorHex) : null;
     final topicCount = forum.topicCount;
 
+    final metaColor = colorScheme.onSurfaceVariant;
+    final metaStyle = textTheme.bodySmall?.copyWith(color: metaColor);
+    Widget meta(IconData icon, String? text, {Color? color}) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: DesignTokens.iconSizeS, color: color ?? metaColor),
+            if (text != null) ...[
+              const SizedBox(width: DesignTokens.spacingXS),
+              Text(text, style: metaStyle?.copyWith(color: color)),
+            ],
+          ],
+        );
+
+    // The app's list row: 40dp leading tile in the category's colour, the
+    // name as the headline, the description, then a meta line like the
+    // topic rows' — instead of 56dp tiles, 16sp w600 names and tonal count
+    // pills at 92–140dp a row.
     return Material(
       color: colorScheme.surface,
       child: InkWell(
         onTap: () => _handleTap(context),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            IntrinsicHeight(
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                DesignTokens.spacingL,
+                DesignTokens.spacingM,
+                DesignTokens.spacingL,
+                DesignTokens.spacingM,
+              ),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: hasDescription
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        crossAxisAlignment: hasDescription
-                            ? CrossAxisAlignment.start
-                            : CrossAxisAlignment.center,
-                        children: [
                   ForumListItemIconWidget(
                     logoUrl: categoryLogoUrl(siteContext, forum,
                         dark: Theme.of(context).brightness == Brightness.dark),
-                    // The category's own colour, not a hash of its name.
-                    // ForumListItemIconWidget falls back to
-                    // AvatarColorUtils — fine for a person, wrong for a
-                    // category, which has a colour the admin chose and
-                    // which web shows as its swatch. Two different colours
-                    // for one category (hashed tile, real stripe) read as
-                    // two unrelated signals.
+                    // The category's own colour, not a hash of its name:
+                    // a category has a colour its admin chose, which web
+                    // shows as its swatch.
                     backgroundColor: categoryColor,
                     iconColor: categoryColor == null
                         ? null
                         : parseDiscourseHex(forum.textColor ?? 'FFFFFF'),
                     fallbackIcon: Icons.forum_rounded,
                     forumName: forum.name,
+                    size: 40,
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: DesignTokens.spacingL),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,155 +118,56 @@ class ForumListItem extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 forum.name,
-                                style: StyleBuilders.titleTextStyle(
-                                  colorScheme: colorScheme,
-                                  textTheme: textTheme,
-                                  fontSize: DesignTokens.fontSizeTopicTitle,
-                                  fontWeight: DesignTokens.fontWeightSemiBold,
-                                ),
+                                style: textTheme.titleMedium,
                               ),
                             ),
                             if (forum.isLinkForum)
                               Icon(
                                 Icons.open_in_new,
                                 size: DesignTokens.iconSizeS,
-                                color: colorScheme.onSurfaceVariant,
+                                color: metaColor,
                               ),
                           ],
                         ),
-                        if (forum.description != null && forum.description!.isNotEmpty) ...[
-                          const SizedBox(height: 8),
+                        if (hasDescription) ...[
+                          const SizedBox(height: DesignTokens.spacingXS),
                           Text(
                             forum.description!,
                             style: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
+                              color: metaColor,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
-                        if (topicCount > 0 || forum.childForums.isNotEmpty || forum.isProtected) ...[
-                          const SizedBox(height: 8),
+                        if (topicCount > 0 ||
+                            forum.childForums.isNotEmpty ||
+                            forum.isProtected ||
+                            forum.isSubscribed) ...[
+                          const SizedBox(height: DesignTokens.spacingXS),
                           Wrap(
-                            spacing: DesignTokens.spacingS,
+                            spacing: DesignTokens.spacingM,
                             runSpacing: DesignTokens.spacingXS,
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
+                              if (topicCount > 0)
+                                meta(Icons.forum_outlined,
+                                    _formatCount(topicCount)),
+                              if (forum.childForums.isNotEmpty)
+                                meta(Icons.folder_outlined,
+                                    forum.childForums.length.toString()),
                               // Watching / tracking, as web marks on a
                               // category. FCForum flattens Discourse's
                               // five levels to a boolean (>= Tracking), so
                               // this is one icon rather than web's
                               // per-level glyph.
-                              if (forum.isSubscribed) ...[
-                                Icon(
-                                  Icons.notifications_active_outlined,
-                                  size: textTheme.bodySmall?.fontSize ?? 12,
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                                const SizedBox(width: 12),
-                              ],
-                              if (topicCount > 0)
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: DesignTokens.spacingS,
-                                    vertical: DesignTokens.spacingXS,
-                                  ),
-                                  decoration: StyleBuilders.badgeDecoration(
-                                    colorScheme: colorScheme,
-                                    backgroundColor: colorScheme
-                                        .surfaceContainerHighest
-                                        .withValues(alpha: DesignTokens.opacityMedium),
-                                    borderRadius: DesignTokens.radiusM,
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.forum_outlined,
-                                        size: DesignTokens.iconSizeS,
-                                        color: colorScheme.onSurfaceVariant,
-                                      ),
-                                      const SizedBox(
-                                          width: DesignTokens.spacingXS),
-                                      Text(
-                                        _formatCount(topicCount),
-                                        style: StyleBuilders.smallTextStyle(
-                                          colorScheme: colorScheme,
-                                          textTheme: textTheme,
-                                          color: colorScheme.onSurfaceVariant,
-                                          fontWeight:
-                                              DesignTokens.fontWeightMedium,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              if ((forum.childForums.length) != 0) ...[
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: DesignTokens.spacingS,
-                                    vertical: DesignTokens.spacingXS,
-                                  ),
-                                  decoration: StyleBuilders.badgeDecoration(
-                                    colorScheme: colorScheme,
-                                    backgroundColor: colorScheme.surfaceContainerHighest
-                                        .withValues(alpha: DesignTokens.opacityMediumLow),
-                                    borderRadius: DesignTokens.radiusM,
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.folder_outlined,
-                                        size: DesignTokens.iconSizeS,
-                                        color: colorScheme.onSurfaceVariant,
-                                      ),
-                                      const SizedBox(width: DesignTokens.spacingXS),
-                                      Text(
-                                        (forum.childForums.length).toString(),
-                                        style: StyleBuilders.smallTextStyle(
-                                          colorScheme: colorScheme,
-                                          textTheme: textTheme,
-                                          color: colorScheme.onSurfaceVariant,
-                                          fontWeight: DesignTokens.fontWeightMedium,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                              if (forum.isSubscribed)
+                                meta(Icons.notifications_active_outlined,
+                                    null),
                               if (forum.isProtected)
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: DesignTokens.spacingS,
-                                    vertical: DesignTokens.spacingXS,
-                                  ),
-                                  decoration: StyleBuilders.badgeDecoration(
-                                    colorScheme: colorScheme,
-                                    backgroundColor: colorScheme.errorContainer
-                                        .withValues(alpha: DesignTokens.opacityMediumLow),
-                                    borderRadius: DesignTokens.radiusM,
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.lock_outline,
-                                        size: DesignTokens.iconSizeS,
-                                        color: colorScheme.onErrorContainer,
-                                      ),
-                                      const SizedBox(width: DesignTokens.spacingXS),
-                                      Text(
-                                        AppLocalizations.of(context)!.protected,
-                                        style: StyleBuilders.smallTextStyle(
-                                          colorScheme: colorScheme,
-                                          textTheme: textTheme,
-                                          color: colorScheme.onErrorContainer,
-                                          fontWeight: DesignTokens.fontWeightMedium,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                meta(Icons.lock_outline,
+                                    AppLocalizations.of(context)!.protected,
+                                    color: colorScheme.error),
                             ],
                           ),
                         ],
@@ -272,11 +177,12 @@ class ForumListItem extends StatelessWidget {
                 ],
               ),
             ),
-                  ), // close outer Expanded (Phase 5.17a stripe wrapper)
-                ], // close outer Row children
-              ), // close outer Row
-            ), // close IntrinsicHeight
-            _buildBottomDivider(colorScheme),
+            Divider(
+              height: 1,
+              thickness: 1,
+              indent: 72,
+              color: colorScheme.outlineVariant,
+            ),
           ],
         ),
       ),

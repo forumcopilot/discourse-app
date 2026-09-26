@@ -310,6 +310,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
   }
 
   Widget _buildBody() {
+    final colorScheme = Theme.of(context).colorScheme;
     if (_loadingGroup && _members.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -321,9 +322,17 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
     }
     return RefreshIndicator(
       onRefresh: _load,
-      child: ListView.builder(
+      child: ListView.separated(
         controller: _scrollController,
         itemCount: 1 + _members.length + (_hasMore ? 1 : 0),
+        // The header draws its own bottom border, so no divider under it.
+        separatorBuilder: (_, i) => i == 0
+            ? const SizedBox.shrink()
+            : Divider(
+                height: 1,
+                indent: 72,
+                color: colorScheme.outlineVariant,
+              ),
         itemBuilder: (_, i) {
           if (i == 0) {
             return Column(
@@ -608,24 +617,19 @@ class _MemberRow extends StatelessWidget {
     return ListTile(
       onTap: onTap,
       leading: RemoteCircleAvatar(
-        radius: DesignTokens.avatarRadiusS,
+        radius: DesignTokens.avatarRadiusM,
         backgroundColor: colorScheme.surfaceContainerHighest,
         imageUrl: item.avatarUrl,
-        fallback: Icon(Icons.person,
-            color: colorScheme.onSurfaceVariant,
-            size: DesignTokens.iconSizeSMedium),
+        fallback: Icon(Icons.person, color: colorScheme.onSurfaceVariant),
       ),
       title: Text(
         item.username,
-        style: textTheme.bodyLarge?.copyWith(
-          color: colorScheme.onSurface,
-          fontWeight: DesignTokens.fontWeightMedium,
-        ),
+        style: textTheme.titleMedium?.copyWith(color: colorScheme.onSurface),
       ),
       subtitle: item.name != null
           ? Text(
               item.name!,
-              style: textTheme.bodySmall
+              style: textTheme.bodyMedium
                   ?.copyWith(color: colorScheme.onSurfaceVariant),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

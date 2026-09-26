@@ -128,8 +128,7 @@ class _GroupsListPageState extends State<GroupsListPage> {
         separatorBuilder: (_, __) => Divider(
           height: 1,
           indent: 72,
-          color: colorScheme.outlineVariant
-              .withValues(alpha: DesignTokens.opacityDivider),
+          color: colorScheme.outlineVariant,
         ),
         itemBuilder: (_, i) {
           if (i >= _groups.length) {
@@ -185,16 +184,13 @@ class _GroupRow extends StatelessWidget {
       ),
       title: Text(
         group.displayName,
-        style: textTheme.titleSmall?.copyWith(
-          color: colorScheme.onSurface,
-          fontWeight: DesignTokens.fontWeightSemiBold,
-        ),
+        style: textTheme.titleMedium?.copyWith(color: colorScheme.onSurface),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(
         group.automatic ? 'Built-in group' : '@${group.name}',
-        style: textTheme.bodySmall
+        style: textTheme.bodyMedium
             ?.copyWith(color: colorScheme.onSurfaceVariant),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
@@ -208,15 +204,13 @@ class _GroupRow extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.person_outline,
-                    size: DesignTokens.iconSizeXS,
+                    size: DesignTokens.iconSizeS,
                     color: colorScheme.onSurfaceVariant),
                 const SizedBox(width: DesignTokens.spacingXS),
                 Text(
                   group.memberCount.toString(),
-                  style: textTheme.labelMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: DesignTokens.fontWeightSemiBold,
-                  ),
+                  style: textTheme.labelMedium
+                      ?.copyWith(color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),

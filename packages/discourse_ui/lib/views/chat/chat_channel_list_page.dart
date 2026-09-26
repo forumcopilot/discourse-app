@@ -14,6 +14,7 @@ import '../widgets/user_list_row.dart';
 import '../widgets/resettable_widget.dart';
 import '../widgets/user_avatar.dart';
 import 'chat_channel_view.dart';
+import '../widgets/unread_badge.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// DM channel titles come back from the serializer already filled with
@@ -377,8 +378,9 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
           ? const SizedBox.shrink()
           : Divider(
               height: 1,
-              color: colorScheme.outlineVariant
-                  .withValues(alpha: DesignTokens.opacityDivider),
+              thickness: 1,
+              indent: 72,
+              color: colorScheme.outlineVariant,
             ),
       itemBuilder: (_, i) {
         if (i == 0) return header;
@@ -423,7 +425,6 @@ class _ChannelTile extends StatelessWidget {
         child: Icon(
           _iconFor(),
           color: colorScheme.onSurfaceVariant,
-          size: DesignTokens.iconSizeM,
         ),
       ),
       title: Row(
@@ -431,8 +432,14 @@ class _ChannelTile extends StatelessWidget {
           Expanded(
             child: Text(
               _channelDisplayTitle(context, channel),
-              style: textTheme.titleSmall?.copyWith(
-                fontWeight: hasUnread ? FontWeight.w700 : FontWeight.w500,
+              // The list-row headline every list uses; unread by weight.
+              style: textTheme.titleMedium?.copyWith(
+                color: hasUnread
+                    ? colorScheme.onSurface
+                    : colorScheme.onSurfaceVariant,
+                fontWeight: hasUnread
+                    ? DesignTokens.fontWeightMedium
+                    : DesignTokens.fontWeightNormal,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -449,7 +456,7 @@ class _ChannelTile extends StatelessWidget {
                   : channel.isReadOnly
                       ? Icons.comments_disabled_outlined
                       : Icons.archive_outlined,
-              size: 14,
+              size: DesignTokens.iconSizeS,
               color: colorScheme.onSurfaceVariant,
             ),
           ],
@@ -460,48 +467,21 @@ class _ChannelTile extends StatelessWidget {
               channel.description!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: textTheme.bodySmall?.copyWith(
+              style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
             )
           : null,
+      // Mentions in Material 3's error badge, unread in the app's shared
+      // unread badge.
       trailing: hasUnread || hasMention
           ? Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (hasMention)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: colorScheme.error,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '@${channel.mentionCount}',
-                      style: textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onError,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
+                if (hasMention) Badge(label: Text('@${channel.mentionCount}')),
                 if (hasUnread) ...[
-                  if (hasMention) const SizedBox(width: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      channel.unreadCount.toString(),
-                      style: textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
+                  if (hasMention) const SizedBox(width: DesignTokens.spacingXS),
+                  UnreadBadge(count: channel.unreadCount),
                 ],
               ],
             )

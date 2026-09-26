@@ -57,7 +57,7 @@ class TopicTaxonomyChips extends StatelessWidget {
       padding: padding,
       child: Wrap(
         spacing: DesignTokens.spacingS,
-        runSpacing: DesignTokens.spacingXS,
+        runSpacing: 0,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           if (showCategory)
@@ -71,9 +71,8 @@ class TopicTaxonomyChips extends StatelessWidget {
           if (limit != null && tags.length > limit)
             Text(
               '+${tags.length - limit}',
-              style: textTheme.labelSmall?.copyWith(
+              style: textTheme.labelMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
-                letterSpacing: DesignTokens.letterSpacingWide,
               ),
             ),
         ],
@@ -96,26 +95,29 @@ class TagChip extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final radius = BorderRadius.circular(DesignTokens.radiusS);
-    // A DecoratedBox, not a clipped Material: an antialiased clip is a
-    // saveLayer per chip per row.
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: radius,
-        border: Border.all(color: colorScheme.outlineVariant, width: 0.5),
-      ),
-      child: InkWell(
-        borderRadius: radius,
-        onTap: () => Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => TagTopicsPage(siteContext: siteContext, tag: tag),
-        )),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          child: Text(
-            tag,
-            style: textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              letterSpacing: DesignTokens.letterSpacingWide,
+    // The chip stays compact; the tap area around it is 32dp high (it was
+    // the chip's own ~20dp). A DecoratedBox, not a clipped Material: an
+    // antialiased clip is a saveLayer per chip per row.
+    return InkWell(
+      borderRadius: radius,
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => TagTopicsPage(siteContext: siteContext, tag: tag),
+      )),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerHighest,
+            borderRadius: radius,
+            border: Border.all(color: colorScheme.outlineVariant, width: 0.5),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            child: Text(
+              tag,
+              style: textTheme.labelMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ),

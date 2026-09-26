@@ -151,12 +151,13 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
         separatorBuilder: (_, __) => Divider(
           height: 1,
           indent: 72,
-          color: colorScheme.outlineVariant
-              .withValues(alpha: DesignTokens.opacityDivider),
+          color: colorScheme.outlineVariant,
         ),
         itemBuilder: (_, i) {
           final user = users[i];
           final busy = _busy.contains(user.username);
+          // `ignored_usernames` is a bare list of names, so there is no
+          // avatar to show: the person glyph stands in at avatar size.
           return ListTile(
             leading: CircleAvatar(
               radius: DesignTokens.avatarRadiusM,
@@ -165,10 +166,10 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
             ),
             title: Text(
               user.username,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: DesignTokens.fontWeightSemiBold,
-                  ),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(color: colorScheme.onSurface),
             ),
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(
@@ -189,13 +190,7 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
                         color: colorScheme.primary,
                       ),
                     )
-                  : Text(
-                      AppLocalizations.of(context)!.unignore,
-                      style: TextStyle(
-                        color: colorScheme.primary,
-                        fontWeight: DesignTokens.fontWeightSemiBold,
-                      ),
-                    ),
+                  : Text(AppLocalizations.of(context)!.unignore),
             ),
           );
         },

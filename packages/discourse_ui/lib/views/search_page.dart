@@ -11,7 +11,6 @@ import 'package:discourse_core/discourse_core.dart'
     show DiscourseSearchProxy;
 import 'package:forumcopilot_sdk/models/search/fc_search_filters.dart';
 import '../theme/design_tokens.dart';
-import '../theme/style_builders.dart';
 import 'listitems/topic_list_item.dart';
 import 'lists/posts_list.dart';
 import 'post_page.dart';
@@ -632,32 +631,20 @@ class _SearchPageState extends State<SearchPage> {
       padding: DesignTokens.paddingVerticalS,
       itemCount: _filteredHistory.length,
       itemBuilder: (context, index) {
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingXS),
-          child: ListTile(
-            contentPadding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingS),
-            leading: Icon(
-              Icons.history_rounded,
-              color: colorScheme.onSurfaceVariant,
-              size: DesignTokens.iconSizeM,
-            ),
-            title: Text(
-              _filteredHistory[index],
-              style: StyleBuilders.bodyTextStyle(
-                colorScheme: colorScheme,
-                textTheme: textTheme,
-              ),
-            ),
-            trailing: Icon(
-              Icons.arrow_upward_rounded,
-              color: colorScheme.onSurfaceVariant,
-              size: DesignTokens.iconSizeS,
-            ),
-            onTap: () => _performSearch(_filteredHistory[index]),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-            ),
+        // A plain one-line list item at the screen's 16dp margin; it was a
+        // ListTile inside another 16dp of padding, 32dp in.
+        return ListTile(
+          leading: Icon(
+            Icons.history_rounded,
+            color: colorScheme.onSurfaceVariant,
           ),
+          title: Text(_filteredHistory[index]),
+          trailing: Icon(
+            Icons.north_west_rounded,
+            color: colorScheme.onSurfaceVariant,
+            size: DesignTokens.iconSizeS,
+          ),
+          onTap: () => _performSearch(_filteredHistory[index]),
         );
       },
     );

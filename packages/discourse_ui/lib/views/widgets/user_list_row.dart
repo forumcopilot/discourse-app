@@ -64,14 +64,12 @@ class UserListRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(statIcon,
-              size: DesignTokens.iconSizeXS, color: colorScheme.onSurfaceVariant),
+              size: DesignTokens.iconSizeS, color: colorScheme.onSurfaceVariant),
           const SizedBox(width: DesignTokens.spacingXS),
           Text(
             statLabel!,
-            style: textTheme.labelMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: DesignTokens.fontWeightSemiBold,
-            ),
+            style: textTheme.labelMedium
+                ?.copyWith(color: colorScheme.onSurfaceVariant),
           ),
         ],
       );
@@ -91,10 +89,8 @@ class UserListRow extends StatelessWidget {
           Expanded(
             child: Text(
               username,
-              style: textTheme.titleSmall?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: DesignTokens.fontWeightSemiBold,
-              ),
+              style: textTheme.titleMedium
+                  ?.copyWith(color: colorScheme.onSurface),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -108,7 +104,7 @@ class UserListRow extends StatelessWidget {
       subtitle: subtitle != null && subtitle!.isNotEmpty
           ? Text(
               subtitle!,
-              style: textTheme.bodySmall
+              style: textTheme.bodyMedium
                   ?.copyWith(color: colorScheme.onSurfaceVariant),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

@@ -216,13 +216,10 @@ class _TagTopicsPageState extends State<TagTopicsPage> {
       );
     }
 
-    return ListView.separated(
+    // TopicListItem draws its own divider; a separator here doubled it.
+    return ListView.builder(
       controller: _scrollController,
       itemCount: _topics.length + (_hasMore || _isLoading ? 1 : 0),
-      separatorBuilder: (_, __) => Divider(
-        height: 1,
-        color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityDivider),
-      ),
       itemBuilder: (context, index) {
         if (index == _topics.length) {
           return const Padding(

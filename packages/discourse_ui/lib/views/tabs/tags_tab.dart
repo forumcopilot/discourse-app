@@ -313,84 +313,74 @@ class _TagTile extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final hasDescription =
         tag.description != null && tag.description!.isNotEmpty;
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityDivider),
-              width: 0.5,
+    // A standard list item, so the heights (56 one-line, 72 with a
+    // description), the 24dp leading icon and the 16dp gaps come from
+    // ListTile rather than from hand-set padding; the divider is inset to
+    // the text (16 start + 24 icon + 16 gap).
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          onTap: onTap,
+          leading: Icon(Icons.tag, color: colorScheme.onSurfaceVariant),
+          title: Text(
+            tag.name,
+            style: textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurface,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-        ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: DesignTokens.spacingL,
-          vertical: DesignTokens.spacingM,
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.tag, size: 18, color: colorScheme.onSurfaceVariant),
-            const SizedBox(width: DesignTokens.spacingS),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    tag.name,
-                    style: textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: colorScheme.onSurface,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+          subtitle: hasDescription
+              ? Text(
+                  tag.description!,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
-                  if (hasDescription) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      tag.description!,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(width: DesignTokens.spacingM),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                _formatCount(tag.count),
-                style: textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontFeatures: const [FontFeature.tabularFigures()],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )
+              : null,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  _formatCount(tag.count),
+                  style: textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
                 ),
               ),
-            ),
-            if (onBellTap != null) ...[
-              const SizedBox(width: 2),
-              IconButton(
-                icon: Icon(Icons.notifications_none,
-                    size: 18, color: colorScheme.onSurfaceVariant),
-                tooltip: 'Notification level',
-                visualDensity: VisualDensity.compact,
-                onPressed: onBellTap,
-              ),
+              if (onBellTap != null) ...[
+                const SizedBox(width: 2),
+                IconButton(
+                  icon: Icon(Icons.notifications_none,
+                      color: colorScheme.onSurfaceVariant),
+                  tooltip: 'Notification level',
+                  onPressed: onBellTap,
+                ),
+              ],
+              const SizedBox(width: 6),
+              Icon(Icons.chevron_right,
+                  size: 18, color: colorScheme.onSurfaceVariant),
             ],
-            const SizedBox(width: 6),
-            Icon(Icons.chevron_right,
-                size: 18, color: colorScheme.onSurfaceVariant),
-          ],
+          ),
         ),
-      ),
+        Divider(
+          height: 1,
+          indent: 56,
+          color: colorScheme.outlineVariant,
+        ),
+      ],
     );
   }
 
