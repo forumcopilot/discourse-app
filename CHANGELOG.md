@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.34] - 2026-09-26
+
 ### Changed
 - **Empty, error and signed-out screens share one design** (`EmptyStateView`): a 48dp icon, a `titleMedium` headline, a `bodyMedium` line under it, then Retry or the screen's actions, centred, and scrolling instead of overflowing at a large text size. About 25 screens had drawn their own, from an 80dp icon with a 24sp bold headline to one grey line of text, some with raw exception text and many with no way to try again. `EmptyStateWidget`, `ErrorStateWidget` and `ErrorOrChild` are removed.
   - **Every error offers Try again** where the screen can reload: Hot, New, Top, category and tag lists, Tags, review queue, edit history, search, user search, reactions, notification settings.
