@@ -166,9 +166,9 @@ class _UserCreatedTopicsState extends State<UserCreatedTopics> {
       );
     }
     if (_error != null && (_topics == null || _topics!.isEmpty)) {
-      return EmptyStateView(
-        icon: Icons.topic_outlined,
+      return EmptyStateView.error(
         message: _error!,
+        onRetry: _fetch,
       );
     }
     final topics = _topics ?? const [];

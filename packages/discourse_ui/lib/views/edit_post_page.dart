@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
 import 'package:image_picker/image_picker.dart';
 import '../theme/design_tokens.dart';
+import 'widgets/empty_state_view.dart';
 import '../services/attachment_upload_service.dart';
 
 class EditPostPage extends StatefulWidget {
@@ -41,7 +42,7 @@ class _EditPostPageState extends State<EditPostPage> {
   bool _canEditTitle = false;
 
   // Cache the future to prevent FutureBuilder from recreating it on every build
-  late final Future<FCRawPostResult> _rawPostFuture;
+  late Future<FCRawPostResult> _rawPostFuture;
 
   @override
   void initState() {
@@ -51,6 +52,12 @@ class _EditPostPageState extends State<EditPostPage> {
     _contentController = TextEditingController();
     // Cache the future so it doesn't recreate on every build
     _rawPostFuture = SiteProxyFactory.getPostProxy().getRawPostAsync(widget.postId);
+  }
+
+  void _retryLoad() {
+    setState(() {
+      _rawPostFuture = SiteProxyFactory.getPostProxy().getRawPostAsync(widget.postId);
+    });
   }
 
   @override
@@ -251,23 +258,20 @@ class _EditPostPageState extends State<EditPostPage> {
         final canEditTitle = (!isLoading && !hasError) ? (snapshot.data?.canEditTitle ?? false) : false;
 
         // Show loading indicator first, then compose page once data is ready
+        // Loading and failure keep the app bar, so there is always a way back.
         if (isLoading) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            appBar: AppBar(title: const Text('Edit Post')),
+            body: const Center(child: CircularProgressIndicator()),
           );
         }
 
         if (hasError) {
           return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
-                  const SizedBox(height: 16),
-                  Text(AppLocalizations.of(context)?.failedToLoadPost(snapshot.error.toString()) ?? 'Failed to load post: \n${snapshot.error}'),
-                ],
-              ),
+            appBar: AppBar(title: const Text('Edit Post')),
+            body: EmptyStateView.error(
+              message: AppLocalizations.of(context)?.failedToLoadPost(snapshot.error.toString()) ?? 'Failed to load post: \n${snapshot.error}',
+              onRetry: _retryLoad,
             ),
           );
         }

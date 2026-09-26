@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../services/attachment_upload_service.dart';
+import '../../../widgets/empty_state_view.dart';
 
 class EditConversationMessagePage extends StatefulWidget {
   final SiteContext siteContext;
@@ -31,7 +32,7 @@ class _EditConversationMessagePageState extends State<EditConversationMessagePag
   bool _controllersInitialized = false;
 
   // Cache the future to prevent FutureBuilder from recreating it on every build
-  late final Future<FCRawMessageResult> _rawMessageFuture;
+  late Future<FCRawMessageResult> _rawMessageFuture;
 
   @override
   void initState() {
@@ -40,6 +41,12 @@ class _EditConversationMessagePageState extends State<EditConversationMessagePag
     _contentController = TextEditingController();
     // Cache the future so it doesn't recreate on every build
     _rawMessageFuture = SiteProxyFactory.getPrivateConversationProxy().getRawMessageAsync(widget.messageId);
+  }
+
+  void _retryLoad() {
+    setState(() {
+      _rawMessageFuture = SiteProxyFactory.getPrivateConversationProxy().getRawMessageAsync(widget.messageId);
+    });
   }
 
   @override
@@ -231,38 +238,30 @@ class _EditConversationMessagePageState extends State<EditConversationMessagePag
         }
 
         // Show loading indicator first, then compose page once data is ready
+        // Loading and failure keep the app bar, so there is always a way back.
+        final title = AppLocalizations.of(context)?.editMessage ?? 'Edit Message';
         if (isLoading) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            appBar: AppBar(title: Text(title)),
+            body: const Center(child: CircularProgressIndicator()),
           );
         }
 
         if (hasError) {
           return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
-                  const SizedBox(height: 16),
-                  Text(AppLocalizations.of(context)?.failedToLoadMessage(snapshot.error.toString()) ?? 'Failed to load message: \n${snapshot.error}'),
-                ],
-              ),
+            appBar: AppBar(title: Text(title)),
+            body: EmptyStateView.error(
+              message: AppLocalizations.of(context)?.failedToLoadMessage(snapshot.error.toString()) ?? 'Failed to load message: \n${snapshot.error}',
+              onRetry: _retryLoad,
             ),
           );
         }
 
         if (!snapshot.hasData || !snapshot.data!.result) {
           return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
-                  const SizedBox(height: 16),
-                  Text(AppLocalizations.of(context)!.cannotEditMessage(snapshot.data?.resultText ?? AppLocalizations.of(context)!.anErrorOccurred)),
-                ],
-              ),
+            appBar: AppBar(title: Text(title)),
+            body: EmptyStateView.error(
+              message: AppLocalizations.of(context)!.cannotEditMessage(snapshot.data?.resultText ?? AppLocalizations.of(context)!.anErrorOccurred),
             ),
           );
         }
@@ -272,7 +271,7 @@ class _EditConversationMessagePageState extends State<EditConversationMessagePag
         return MessageComposePage(
           key: const ValueKey('edit_conversation_message_compose'),
           siteContext: widget.siteContext,
-          title: AppLocalizations.of(context)?.editMessage ?? 'Edit Message',
+          title: title,
           showTitleField: false, // Messages don't have titles
           requireTitle: false,
           contentController: _contentController,

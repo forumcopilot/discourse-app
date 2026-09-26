@@ -47,6 +47,7 @@ class NotificationLevelSheet extends StatefulWidget {
     if (!context.mounted) return;
     await showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -83,6 +84,7 @@ class NotificationLevelSheet extends StatefulWidget {
     if (!context.mounted) return;
     await showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -125,6 +127,7 @@ class NotificationLevelSheet extends StatefulWidget {
     if (!context.mounted) return;
     await showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -218,8 +221,10 @@ class _NotificationLevelSheetState extends State<NotificationLevelSheet> {
       ),
     ];
 
+    // Scrolls, and may grow past the default 9/16 of the screen: at a
+    // larger text size or on a short phone the options no longer fit.
     return SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
         child: Column(
           mainAxisSize: MainAxisSize.min,

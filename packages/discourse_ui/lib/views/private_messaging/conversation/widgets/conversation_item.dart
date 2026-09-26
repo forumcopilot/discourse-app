@@ -104,20 +104,53 @@ class ConversationHeaderItem extends StatelessWidget {
     );
     return Material(
       color: isHighlighted ? colorScheme.primaryContainer.withValues(alpha: 0.3) : (message.isUnread == true ? colorScheme.primaryContainer.withValues(alpha: 0.1) : colorScheme.surface),
-      child: InkWell(
-        onTap: () {},
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header section with avatar, username, and timestamp
-            Padding(
-              padding: EdgeInsets.all(DesignTokens.spacingL),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Avatar. (The green "online" dot is gone: Discourse sends no presence
-                  // here, and the dot only ever meant "this is you".)
-                  Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header section with avatar, username, and timestamp
+          Padding(
+            padding: EdgeInsets.all(DesignTokens.spacingL),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Avatar. (The green "online" dot is gone: Discourse sends no presence
+                // here, and the dot only ever meant "this is you".)
+                Stack(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UserProfilePage(
+                              siteContext: siteContext,
+                              userId: message.userId,
+                              userName: _senderName(message),
+                              profilePictureUrl: message.iconUrl,
+                            ),
+                          ),
+                        );
+                      },
+                      child: UserAvatar(
+                        username: _senderName(message),
+                        iconUrl: message.iconUrl,
+                        radius: DesignTokens.avatarRadiusM,
+                        cacheKey: message.iconUrl != null && message.iconUrl!.isNotEmpty
+                            ? AvatarCacheUtils.generateAvatarCacheKey(
+                                userId: message.userId,
+                                username: _senderName(message),
+                                avatarUrl: message.iconUrl!,
+                              )
+                            : null,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(width: DesignTokens.spacingL),
+                // Author Info and Post Date
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       GestureDetector(
                         onTap: () {
@@ -133,165 +166,129 @@ class ConversationHeaderItem extends StatelessWidget {
                             ),
                           );
                         },
-                        child: UserAvatar(
-                          username: _senderName(message),
-                          iconUrl: message.iconUrl,
-                          radius: DesignTokens.avatarRadiusM,
-                          cacheKey: message.iconUrl != null && message.iconUrl!.isNotEmpty
-                              ? AvatarCacheUtils.generateAvatarCacheKey(
-                                  userId: message.userId,
-                                  username: _senderName(message),
-                                  avatarUrl: message.iconUrl!,
-                                )
-                              : null,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: DesignTokens.spacingL),
-                  // Author Info and Post Date
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => UserProfilePage(
-                                  siteContext: siteContext,
-                                  userId: message.userId,
-                                  userName: _senderName(message),
-                                  profilePictureUrl: message.iconUrl,
-                                ),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            _senderName(message),
-                            style: textTheme.titleMedium?.copyWith(
-                              color: colorScheme.onSurface,
-                              fontWeight: DesignTokens.fontWeightMedium,
-                              letterSpacing: DesignTokens.letterSpacingMedium,
-                            ),
+                        child: Text(
+                          _senderName(message),
+                          style: textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontWeight: DesignTokens.fontWeightMedium,
+                            letterSpacing: DesignTokens.letterSpacingMedium,
                           ),
                         ),
-                        SizedBox(height: DesignTokens.spacingXS),
-                        Row(
-                          children: [
-                            if (message.messageNumber != null) ...[
-                              Text(
-                                '#${message.messageNumber}',
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                  letterSpacing: DesignTokens.letterSpacingWide,
-                                ),
-                              ),
-                              SizedBox(width: DesignTokens.spacingS),
-                            ],
+                      ),
+                      SizedBox(height: DesignTokens.spacingXS),
+                      Row(
+                        children: [
+                          if (message.messageNumber != null) ...[
                             Text(
-                              formatSmartDateTime(parseTimestampString(message.messageTime) ?? DateTime.now(), context),
+                              '#${message.messageNumber}',
                               style: textTheme.bodySmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                                 letterSpacing: DesignTokens.letterSpacingWide,
                               ),
                             ),
+                            SizedBox(width: DesignTokens.spacingS),
                           ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Menu Button
-                  if (_buildPopupMenuItems(context).isNotEmpty)
-                    PopupMenuButton<String>(
-                      icon: Icon(
-                        Icons.more_vert_rounded,
-                        color: colorScheme.onSurfaceVariant,
+                          Text(
+                            formatSmartDateTime(parseTimestampString(message.messageTime) ?? DateTime.now(), context),
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              letterSpacing: DesignTokens.letterSpacingWide,
+                            ),
+                          ),
+                        ],
                       ),
-                      onSelected: (value) {
-                        switch (value) {
-                          case 'copy_link':
-                            _copyMessageLink(context, linkUrl);
-                            break;
-                          case 'edit':
-                            if (onEdit != null) onEdit!();
-                            break;
-                          case 'report':
-                            // A Discourse PM message IS a post, so the same flag
-                            // endpoint and type ids apply. This case previously fell
-                            // straight through to `break`, so the menu item rendered
-                            // and tapping it did nothing at all.
-                            showDiscourseReportDialog(
-                              context,
-                              postId: message.messageId,
-                            );
-                            break;
-                        }
-                      },
-                      itemBuilder: (context) => _buildPopupMenuItems(context),
+                    ],
+                  ),
+                ),
+                // Menu Button
+                if (_buildPopupMenuItems(context).isNotEmpty)
+                  PopupMenuButton<String>(
+                    icon: Icon(
+                      Icons.more_vert_rounded,
+                      color: colorScheme.onSurfaceVariant,
                     ),
-                ],
+                    onSelected: (value) {
+                      switch (value) {
+                        case 'copy_link':
+                          _copyMessageLink(context, linkUrl);
+                          break;
+                        case 'edit':
+                          if (onEdit != null) onEdit!();
+                          break;
+                        case 'report':
+                          // A Discourse PM message IS a post, so the same flag
+                          // endpoint and type ids apply. This case previously fell
+                          // straight through to `break`, so the menu item rendered
+                          // and tapping it did nothing at all.
+                          showDiscourseReportDialog(
+                            context,
+                            postId: message.messageId,
+                          );
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) => _buildPopupMenuItems(context),
+                  ),
+              ],
+            ),
+          ),
+          // Message content
+          Padding(
+            padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingXL),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Discourse PMs come as cooked HTML in textBody.
+                RichTextContent(
+                  siteContext: siteContext,
+                  content: message.textBody,
+                  callbacks: callbacks,
+                ),
+              ],
+            ),
+          ),
+          // Attachments - filter out attachments that are already displayed inline
+          if (nonInlineAttachments.isNotEmpty) ...[
+            Padding(
+              padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingM),
+              child: PostListItemAttachment(
+                attachments: nonInlineAttachments,
+                actions: _buildAttachmentActions(context),
+                context: context,
+                isInline: false,
+                title: 'Attachments',
               ),
             ),
-            // Message content
+          ],
+          // Like count. Discourse exposes no reaction actor list for
+          // private messages, so this is a plain count — not a
+          // tappable avatar stack fabricated from placeholder
+          // `likesInfo` entries.
+          if (message.likeCount > 0)
             Padding(
-              padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingXL),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: EdgeInsets.fromLTRB(DesignTokens.spacingL,
+                  DesignTokens.spacingM, DesignTokens.spacingL, 0.0),
+              child: Row(
                 children: [
-                  // Discourse PMs come as cooked HTML in textBody.
-                  RichTextContent(
-                    siteContext: siteContext,
-                    content: message.textBody,
-                    callbacks: callbacks,
+                  Icon(Icons.favorite,
+                      size: DesignTokens.iconSizeS, color: colorScheme.error),
+                  SizedBox(width: DesignTokens.spacingXS),
+                  Text(
+                    message.likeCount == 1
+                        ? '1 Like'
+                        : '${message.likeCount} Likes',
+                    style: textTheme.bodySmall
+                        ?.copyWith(color: colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),
             ),
-            // Attachments - filter out attachments that are already displayed inline
-            if (nonInlineAttachments.isNotEmpty) ...[
-              Padding(
-                padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingM),
-                child: PostListItemAttachment(
-                  attachments: nonInlineAttachments,
-                  actions: _buildAttachmentActions(context),
-                  context: context,
-                  isInline: false,
-                  title: 'Attachments',
-                ),
-              ),
-            ],
-            // Like count. Discourse exposes no reaction actor list for
-            // private messages, so this is a plain count — not a
-            // tappable avatar stack fabricated from placeholder
-            // `likesInfo` entries.
-            if (message.likeCount > 0)
-              Padding(
-                padding: EdgeInsets.fromLTRB(DesignTokens.spacingL,
-                    DesignTokens.spacingM, DesignTokens.spacingL, 0.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.favorite,
-                        size: DesignTokens.iconSizeS, color: colorScheme.error),
-                    SizedBox(width: DesignTokens.spacingXS),
-                    Text(
-                      message.likeCount == 1
-                          ? '1 Like'
-                          : '${message.likeCount} Likes',
-                      style: textTheme.bodySmall
-                          ?.copyWith(color: colorScheme.onSurfaceVariant),
-                    ),
-                  ],
-                ),
-              ),
-            // Social actions (like and quote buttons)
-            SizedBox(height: DesignTokens.spacingM),
-            _buildSocialActions(context, colorScheme, textTheme),
-            // Bottom divider
-            _buildBottomDivider(colorScheme),
-          ],
-        ),
+          // Social actions (like and quote buttons)
+          SizedBox(height: DesignTokens.spacingM),
+          _buildSocialActions(context, colorScheme, textTheme),
+          // Bottom divider
+          _buildBottomDivider(colorScheme),
+        ],
       ),
     );
   }
@@ -592,20 +589,53 @@ class ConversationItem extends StatelessWidget {
 
     return Material(
       color: isHighlighted ? colorScheme.primaryContainer.withValues(alpha: 0.3) : (message.isUnread == true ? colorScheme.primaryContainer.withValues(alpha: 0.1) : colorScheme.surface),
-      child: InkWell(
-        onTap: () {},
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header section with avatar, username, and timestamp
-            Padding(
-              padding: EdgeInsets.all(DesignTokens.spacingL),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Avatar. (The green "online" dot is gone: Discourse sends no presence
-                  // here, and the dot only ever meant "this is you".)
-                  Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header section with avatar, username, and timestamp
+          Padding(
+            padding: EdgeInsets.all(DesignTokens.spacingL),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Avatar. (The green "online" dot is gone: Discourse sends no presence
+                // here, and the dot only ever meant "this is you".)
+                Stack(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UserProfilePage(
+                              siteContext: siteContext,
+                              userId: message.userId,
+                              userName: _senderName(message),
+                              profilePictureUrl: message.iconUrl,
+                            ),
+                          ),
+                        );
+                      },
+                      child: UserAvatar(
+                        username: _senderName(message),
+                        iconUrl: message.iconUrl,
+                        radius: DesignTokens.avatarRadiusM,
+                        cacheKey: message.iconUrl != null && message.iconUrl!.isNotEmpty
+                            ? AvatarCacheUtils.generateAvatarCacheKey(
+                                userId: message.userId,
+                                username: _senderName(message),
+                                avatarUrl: message.iconUrl!,
+                              )
+                            : null,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(width: DesignTokens.spacingL),
+                // Author Info and Post Date
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       GestureDetector(
                         onTap: () {
@@ -621,165 +651,129 @@ class ConversationItem extends StatelessWidget {
                             ),
                           );
                         },
-                        child: UserAvatar(
-                          username: _senderName(message),
-                          iconUrl: message.iconUrl,
-                          radius: DesignTokens.avatarRadiusM,
-                          cacheKey: message.iconUrl != null && message.iconUrl!.isNotEmpty
-                              ? AvatarCacheUtils.generateAvatarCacheKey(
-                                  userId: message.userId,
-                                  username: _senderName(message),
-                                  avatarUrl: message.iconUrl!,
-                                )
-                              : null,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: DesignTokens.spacingL),
-                  // Author Info and Post Date
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => UserProfilePage(
-                                  siteContext: siteContext,
-                                  userId: message.userId,
-                                  userName: _senderName(message),
-                                  profilePictureUrl: message.iconUrl,
-                                ),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            _senderName(message),
-                            style: textTheme.titleMedium?.copyWith(
-                              color: colorScheme.onSurface,
-                              fontWeight: DesignTokens.fontWeightMedium,
-                              letterSpacing: DesignTokens.letterSpacingMedium,
-                            ),
+                        child: Text(
+                          _senderName(message),
+                          style: textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontWeight: DesignTokens.fontWeightMedium,
+                            letterSpacing: DesignTokens.letterSpacingMedium,
                           ),
                         ),
-                        SizedBox(height: DesignTokens.spacingXS),
-                        Row(
-                          children: [
-                            if (message.messageNumber != null) ...[
-                              Text(
-                                '#${message.messageNumber}',
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                  letterSpacing: DesignTokens.letterSpacingWide,
-                                ),
-                              ),
-                              SizedBox(width: DesignTokens.spacingS),
-                            ],
+                      ),
+                      SizedBox(height: DesignTokens.spacingXS),
+                      Row(
+                        children: [
+                          if (message.messageNumber != null) ...[
                             Text(
-                              formatSmartDateTime(parseTimestampString(message.messageTime) ?? DateTime.now(), context),
+                              '#${message.messageNumber}',
                               style: textTheme.bodySmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                                 letterSpacing: DesignTokens.letterSpacingWide,
                               ),
                             ),
+                            SizedBox(width: DesignTokens.spacingS),
                           ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Menu Button
-                  if (_buildPopupMenuItems(context).isNotEmpty)
-                    PopupMenuButton<String>(
-                      icon: Icon(
-                        Icons.more_vert_rounded,
-                        color: colorScheme.onSurfaceVariant,
+                          Text(
+                            formatSmartDateTime(parseTimestampString(message.messageTime) ?? DateTime.now(), context),
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              letterSpacing: DesignTokens.letterSpacingWide,
+                            ),
+                          ),
+                        ],
                       ),
-                      onSelected: (value) {
-                        switch (value) {
-                          case 'copy_link':
-                            _copyMessageLink(context, linkUrl);
-                            break;
-                          case 'edit':
-                            if (onEdit != null) onEdit!();
-                            break;
-                          case 'report':
-                            // A Discourse PM message IS a post, so the same flag
-                            // endpoint and type ids apply. This case previously fell
-                            // straight through to `break`, so the menu item rendered
-                            // and tapping it did nothing at all.
-                            showDiscourseReportDialog(
-                              context,
-                              postId: message.messageId,
-                            );
-                            break;
-                        }
-                      },
-                      itemBuilder: (context) => _buildPopupMenuItems(context),
+                    ],
+                  ),
+                ),
+                // Menu Button
+                if (_buildPopupMenuItems(context).isNotEmpty)
+                  PopupMenuButton<String>(
+                    icon: Icon(
+                      Icons.more_vert_rounded,
+                      color: colorScheme.onSurfaceVariant,
                     ),
-                ],
+                    onSelected: (value) {
+                      switch (value) {
+                        case 'copy_link':
+                          _copyMessageLink(context, linkUrl);
+                          break;
+                        case 'edit':
+                          if (onEdit != null) onEdit!();
+                          break;
+                        case 'report':
+                          // A Discourse PM message IS a post, so the same flag
+                          // endpoint and type ids apply. This case previously fell
+                          // straight through to `break`, so the menu item rendered
+                          // and tapping it did nothing at all.
+                          showDiscourseReportDialog(
+                            context,
+                            postId: message.messageId,
+                          );
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) => _buildPopupMenuItems(context),
+                  ),
+              ],
+            ),
+          ),
+          // Message content
+          Padding(
+            padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingXL),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Discourse PMs come as cooked HTML in textBody.
+                RichTextContent(
+                  siteContext: siteContext,
+                  content: message.textBody,
+                  callbacks: callbacks,
+                ),
+              ],
+            ),
+          ),
+          // Attachments - filter out attachments that are already displayed inline
+          if (nonInlineAttachments.isNotEmpty) ...[
+            Padding(
+              padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingM),
+              child: PostListItemAttachment(
+                attachments: nonInlineAttachments,
+                actions: _buildAttachmentActions(context),
+                context: context,
+                isInline: false,
+                title: 'Attachments',
               ),
             ),
-            // Message content
+          ],
+          // Like count. Discourse exposes no reaction actor list for
+          // private messages, so this is a plain count — not a
+          // tappable avatar stack fabricated from placeholder
+          // `likesInfo` entries.
+          if (message.likeCount > 0)
             Padding(
-              padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingXL),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: EdgeInsets.fromLTRB(DesignTokens.spacingL,
+                  DesignTokens.spacingM, DesignTokens.spacingL, 0.0),
+              child: Row(
                 children: [
-                  // Discourse PMs come as cooked HTML in textBody.
-                  RichTextContent(
-                    siteContext: siteContext,
-                    content: message.textBody,
-                    callbacks: callbacks,
+                  Icon(Icons.favorite,
+                      size: DesignTokens.iconSizeS, color: colorScheme.error),
+                  SizedBox(width: DesignTokens.spacingXS),
+                  Text(
+                    message.likeCount == 1
+                        ? '1 Like'
+                        : '${message.likeCount} Likes',
+                    style: textTheme.bodySmall
+                        ?.copyWith(color: colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),
             ),
-            // Attachments - filter out attachments that are already displayed inline
-            if (nonInlineAttachments.isNotEmpty) ...[
-              Padding(
-                padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0.0, DesignTokens.spacingL, DesignTokens.spacingM),
-                child: PostListItemAttachment(
-                  attachments: nonInlineAttachments,
-                  actions: _buildAttachmentActions(context),
-                  context: context,
-                  isInline: false,
-                  title: 'Attachments',
-                ),
-              ),
-            ],
-            // Like count. Discourse exposes no reaction actor list for
-            // private messages, so this is a plain count — not a
-            // tappable avatar stack fabricated from placeholder
-            // `likesInfo` entries.
-            if (message.likeCount > 0)
-              Padding(
-                padding: EdgeInsets.fromLTRB(DesignTokens.spacingL,
-                    DesignTokens.spacingM, DesignTokens.spacingL, 0.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.favorite,
-                        size: DesignTokens.iconSizeS, color: colorScheme.error),
-                    SizedBox(width: DesignTokens.spacingXS),
-                    Text(
-                      message.likeCount == 1
-                          ? '1 Like'
-                          : '${message.likeCount} Likes',
-                      style: textTheme.bodySmall
-                          ?.copyWith(color: colorScheme.onSurfaceVariant),
-                    ),
-                  ],
-                ),
-              ),
-            // Social actions (like and quote buttons)
-            SizedBox(height: DesignTokens.spacingM),
-            _buildSocialActions(context, colorScheme, textTheme),
-            // Bottom divider
-            _buildBottomDivider(colorScheme),
-          ],
-        ),
+          // Social actions (like and quote buttons)
+          SizedBox(height: DesignTokens.spacingM),
+          _buildSocialActions(context, colorScheme, textTheme),
+          // Bottom divider
+          _buildBottomDivider(colorScheme),
+        ],
       ),
     );
   }

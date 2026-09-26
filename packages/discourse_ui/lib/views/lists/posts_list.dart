@@ -1476,68 +1476,58 @@ class _PostsState extends State<PostsList> {
     );
   }
 
+  /// A Material 3 bottom app bar in its own space under the list, not
+  /// floating over it: posts don't show through it, and the last post and
+  /// "End of the discussion" always scroll clear of it.
   Widget _buildBottomBar(BuildContext context, ThreadViewData data) {
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 4,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: DesignTokens.spacingL,
-              vertical: DesignTokens.spacingS,
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_upward),
-                  onPressed: _jumpToFirstPost,
-                  tooltip: AppLocalizations.of(context)?.goToTop ?? 'Go to top',
+    return Material(
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: DesignTokens.spacingL,
+            vertical: DesignTokens.spacingS,
+          ),
+          child: Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_upward),
+                onPressed: _jumpToFirstPost,
+                tooltip: AppLocalizations.of(context)?.goToTop ?? 'Go to top',
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_downward),
+                onPressed: _jumpToLastPost,
+                tooltip: AppLocalizations.of(context)?.goToBottom ?? 'Go to bottom',
+              ),
+              // The only way into Jump to post, so a real button with a
+              // 48dp target rather than a tappable label.
+              TextButton(
+                onPressed: () {
+                  _showJumpToPostDialog(context, data);
+                },
+                child: ValueListenableBuilder<int>(
+                  valueListenable: _visiblePostIndex,
+                  builder: (context, index, _) => Text(
+                    '${index + 1} / ${data.totalPosts}',
+                  ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.arrow_downward),
-                  onPressed: _jumpToLastPost,
-                  tooltip: AppLocalizations.of(context)?.goToBottom ?? 'Go to bottom',
-                ),
-                SizedBox(width: DesignTokens.spacingS),
-                GestureDetector(
-                  onTap: () {
-                    _showJumpToPostDialog(context, data);
+              ),
+              const Spacer(),
+              if (widget.siteContext.isLoggedIn && data.topic.canReply)
+                FilledButton.icon(
+                  onPressed: () {
+                    final postActionsHandler = PostActionsHandler(_postsController, widget.siteContext, fallbackForumId: widget.forumId);
+                    postActionsHandler.handleReply(context, "", widget.topicId, widget.topicTitle, _refreshWithOptionalScrollToPost);
                   },
-                  child: ValueListenableBuilder<int>(
-                    valueListenable: _visiblePostIndex,
-                    builder: (context, index, _) => Text(
-                      '${index + 1} / ${data.totalPosts}',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+                  icon: const Icon(Icons.reply),
+                  label: Text(AppLocalizations.of(context)?.reply ?? 'Reply'),
+                  style: StyleBuilders.extendedFilledButtonStyle(
+                    colorScheme: Theme.of(context).colorScheme,
                   ),
                 ),
-                const Spacer(),
-                if (widget.siteContext.isLoggedIn && data.topic.canReply)
-                  FilledButton.icon(
-                    onPressed: () {
-                      final postActionsHandler = PostActionsHandler(_postsController, widget.siteContext, fallbackForumId: widget.forumId);
-                      postActionsHandler.handleReply(context, "", widget.topicId, widget.topicTitle, _refreshWithOptionalScrollToPost);
-                    },
-                    icon: const Icon(Icons.reply),
-                    label: Text(AppLocalizations.of(context)?.reply ?? 'Reply'),
-                    style: StyleBuilders.extendedFilledButtonStyle(
-                      colorScheme: Theme.of(context).colorScheme,
-                    ),
-                  ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
@@ -1561,73 +1551,79 @@ class _PostsState extends State<PostsList> {
         final showMiniPollBar = data.topic.hasPoll &&
             data.topic.poll != null &&
             (data.currentStartNum > 0 || !_isFirstPostVisible);
-        final stack = Stack(
+        final stack = Column(
           children: [
-            RefreshIndicator(
-              onRefresh: _refreshCurrentPage,
-              child: ScrollablePositionedList.builder(
-                itemScrollController: _itemScrollController,
-                itemPositionsListener: _itemPositionsListener,
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: postsList.length + 1 + (_isLoadingMore && _hasMoreEarlier() ? 1 : 0),
-                itemBuilder: (context, index) {
-                  int offset = 0;
-                  if (_isLoadingMore && _pagingDirection == _PagingDirection.earlier && index == offset) {
-                    return _buildLoadingCard(context);
-                  }
-                  int postIndex = index - (_isLoadingMore && _pagingDirection == _PagingDirection.earlier ? 1 : 0);
-                  if (postIndex == postsList.length) {
-                    if (_isLoadingMore && _pagingDirection == _PagingDirection.later) {
-                      return _buildLoadingCard(context);
-                    } else if (_hasMorePosts) {
+            Expanded(
+              child: Stack(
+                children: [
+                RefreshIndicator(
+                  onRefresh: _refreshCurrentPage,
+                  child: ScrollablePositionedList.builder(
+                    itemScrollController: _itemScrollController,
+                    itemPositionsListener: _itemPositionsListener,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: postsList.length + 1 + (_isLoadingMore && _hasMoreEarlier() ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      int offset = 0;
+                      if (_isLoadingMore && _pagingDirection == _PagingDirection.earlier && index == offset) {
+                        return _buildLoadingCard(context);
+                      }
+                      int postIndex = index - (_isLoadingMore && _pagingDirection == _PagingDirection.earlier ? 1 : 0);
+                      if (postIndex == postsList.length) {
+                        if (_isLoadingMore && _pagingDirection == _PagingDirection.later) {
+                          return _buildLoadingCard(context);
+                        } else if (_hasMorePosts) {
+                          return const SizedBox.shrink();
+                        } else {
+                          // End of discussion indicator
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: Center(
+                              child: Text(
+                                AppLocalizations.of(context)!.endOfTheDiscussion,
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                      if (postIndex < postsList.length) {
+                        final post = postsList[postIndex];
+                        final isHighlighted = _highlightedPostId == post.id;
+                        final item = _buildPostItem(context, post, postIndex, postsList.length, data, isHighlighted: isHighlighted);
+                        // "3 months later" between posts far apart in time, so a
+                        // topic revived after a long silence does not read as one
+                        // continuous conversation. Compared against the post
+                        // actually above in the rendered list, not post_number:
+                        // the loaded window can start mid-topic.
+                        final gap = _timeGapBefore(postsList, postIndex);
+                        if (gap == null) return item;
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [PostTimeGap(daysSince: gap), item],
+                        );
+                      }
                       return const SizedBox.shrink();
-                    } else {
-                      // End of discussion indicator
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: Center(
-                          child: Text(
-                            AppLocalizations.of(context)!.endOfTheDiscussion,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                          ),
-                        ),
-                      );
-                    }
-                  }
-                  if (postIndex < postsList.length) {
-                    final post = postsList[postIndex];
-                    final isHighlighted = _highlightedPostId == post.id;
-                    final item = _buildPostItem(context, post, postIndex, postsList.length, data, isHighlighted: isHighlighted);
-                    // "3 months later" between posts far apart in time, so a
-                    // topic revived after a long silence does not read as one
-                    // continuous conversation. Compared against the post
-                    // actually above in the rendered list, not post_number:
-                    // the loaded window can start mid-topic.
-                    final gap = _timeGapBefore(postsList, postIndex);
-                    if (gap == null) return item;
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [PostTimeGap(daysSince: gap), item],
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
+                    },
+                  ),
+                ),
+                if (showMiniPollBar && data.topic.poll != null)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    child: ThreadPollMiniCard(
+                      poll: data.topic.poll!,
+                      onTap: _jumpToFirstPost,
+                    ),
+                  ),
+                ],
               ),
             ),
-            if (showMiniPollBar && data.topic.poll != null)
-              Positioned(
-                left: 0,
-                right: 0,
-                top: 0,
-                child: ThreadPollMiniCard(
-                  poll: data.topic.poll!,
-                  onTap: _jumpToFirstPost,
-                ),
-              ),
             _buildBottomBar(context, data),
           ],
         );

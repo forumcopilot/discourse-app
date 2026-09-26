@@ -918,7 +918,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           }
         },
         selectedIndex: _tabController.index,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         destinations: _buildNavigationDestinations(),
       ),
       floatingActionButton: shouldShowFAB
@@ -986,31 +986,34 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     }).toList();
   }
 
-  // Build navigation destinations based on enabled tabs
+  // Build navigation destinations based on enabled tabs. Labelled, as
+  // Material 3 shows them: three of the icons are speech bubbles, and an
+  // empty label left screen readers with nothing to say.
   List<NavigationDestination> _buildNavigationDestinations() {
+    final l10n = AppLocalizations.of(context)!;
     return _enabledTabs.map((tabType) {
       switch (tabType) {
         case _topicsTab:
-          return const NavigationDestination(
-            selectedIcon: Icon(Icons.chat_bubble),
-            icon: Icon(Icons.chat_bubble_outline),
-            label: '',
+          return NavigationDestination(
+            selectedIcon: const Icon(Icons.chat_bubble),
+            icon: const Icon(Icons.chat_bubble_outline),
+            label: l10n.home,
           );
         case _forumsTab:
-          return const NavigationDestination(
-            selectedIcon: Icon(Icons.forum),
-            icon: Icon(Icons.forum_outlined),
-            label: '',
+          return NavigationDestination(
+            selectedIcon: const Icon(Icons.forum),
+            icon: const Icon(Icons.forum_outlined),
+            label: l10n.forums,
           );
         case _chatTab:
           // Phase 5.18a — distinct icon from Topics' chat_bubble so
           // users can tell the two surfaces apart. Forum chat lives
           // under the chat-launch icon (chat_outlined / chat_rounded);
           // Topics is a single "speech bubble".
-          return const NavigationDestination(
-            selectedIcon: Icon(Icons.chat_rounded),
-            icon: Icon(Icons.chat_outlined),
-            label: '',
+          return NavigationDestination(
+            selectedIcon: const Icon(Icons.chat_rounded),
+            icon: const Icon(Icons.chat_outlined),
+            label: l10n.chat,
           );
         case _messagesTab:
           return NavigationDestination(
@@ -1020,7 +1023,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
               isLabelVisible: _unreadConversationsCount > 0,
               child: const Icon(Icons.mail_outline),
             ),
-            label: '',
+            label: l10n.messages,
           );
         case _notificationsTab:
           return NavigationDestination(
@@ -1030,13 +1033,13 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
               isLabelVisible: _unreadAlertsCount > 0,
               child: const Icon(Icons.notifications_outlined),
             ),
-            label: '',
+            label: l10n.notifications,
           );
         case _profileTab:
-          return const NavigationDestination(
-            selectedIcon: Icon(Icons.person),
-            icon: Icon(Icons.person_outlined),
-            label: '',
+          return NavigationDestination(
+            selectedIcon: const Icon(Icons.person),
+            icon: const Icon(Icons.person_outlined),
+            label: l10n.profile,
           );
         default:
           throw ArgumentError('Unknown tab type: $tabType');

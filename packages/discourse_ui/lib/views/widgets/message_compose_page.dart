@@ -233,33 +233,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
     return ['gif', 'jpg', 'jpeg', 'jpe', 'pjpeg', 'png', 'ico', 'webp'].contains(extension);
   }
 
-  /// Shows a dialog asking the user how to insert the image (thumbnail or full size)
-  Future<String?> _showInsertImageDialog() async {
-    return showDialog<String>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)?.insertImage ?? 'Insert Image'),
-          content: Text(AppLocalizations.of(context)?.howWouldYouLikeToInsertImage ?? 'How would you like to insert this image?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop('thumbnail'),
-              child: Text(AppLocalizations.of(context)?.thumbnail ?? 'Thumbnail'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop('full'),
-              child: Text(AppLocalizations.of(context)?.fullSize ?? 'Full Size'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   /// Inserts an attachment reference at the current cursor position.
   ///
   /// Phase 5.19 — previously emitted XenForo `[ATTACH=full]id[/ATTACH]`
@@ -275,10 +248,10 @@ class _MessageComposePageState extends State<MessageComposePage> {
   /// post proxy on send; the proxy's `appendAttachmentMarkdown` dedups
   /// against what's already inline so refs aren't doubled.
   ///
-  /// `insertType` is retained for API compatibility but no longer
-  /// branches on `full` vs `thumb` — Discourse Markdown doesn't have
-  /// that distinction; the rendered size is governed by the post's
-  /// site/category settings.
+  /// Tapping an uploaded image inserts it straight away: Discourse
+  /// Markdown has no thumbnail vs full-size distinction (the rendered
+  /// size is governed by the post's site/category settings), so the
+  /// composer no longer asks.
   /// Prepares a picked image for upload, asking before rewriting it.
   ///
   /// Shared by both pickers. They used to carry separate copies of this
@@ -380,7 +353,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
     );
   }
 
-  void _insertAttachmentRef(String attachmentRef, String insertType) {
+  void _insertAttachmentRef(String attachmentRef) {
     // Ensure content field has focus
     if (!_contentFocusNode.hasFocus) {
       _contentFocusNode.requestFocus();
@@ -995,12 +968,9 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                   color: Colors.transparent,
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(8),
-                                    onTap: () async {
+                                    onTap: () {
                                       if (attachmentId != null && _isInsertableImage(attachment.name)) {
-                                        final result = await _showInsertImageDialog();
-                                        if (result != null) {
-                                          _insertAttachmentRef(attachmentId, result);
-                                        }
+                                        _insertAttachmentRef(attachmentId);
                                       }
                                     },
                                     child: Padding(
@@ -1144,12 +1114,9 @@ class _MessageComposePageState extends State<MessageComposePage> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
-          onTap: () async {
+          onTap: () {
             if (_isInsertableImage(attachment.filename)) {
-              final result = await _showInsertImageDialog();
-              if (result != null) {
-                _insertAttachmentRef(attachment.id, result);
-              }
+              _insertAttachmentRef(attachment.id);
             }
           },
           child: Padding(
@@ -1785,6 +1752,33 @@ class _MessageComposePageState extends State<MessageComposePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
+                            // Which topic this reply goes to: callers always
+                            // passed it, but nothing showed it.
+                            if (!widget.showTitleField &&
+                                (widget.topicTitle ?? '').isNotEmpty) ...[
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    Icons.reply_rounded,
+                                    size: DesignTokens.iconSizeM,
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: DesignTokens.spacingS),
+                                  Expanded(
+                                    child: Text(
+                                      widget.topicTitle!,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: textTheme.bodyMedium?.copyWith(
+                                        color: colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: DesignTokens.spacingL),
+                            ],
                             if ((widget.forumName ?? '').isNotEmpty) ...[
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

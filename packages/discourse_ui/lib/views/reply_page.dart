@@ -62,6 +62,19 @@ class _ReplyPageState extends State<ReplyPage> {
   /// `replyWhisperAsync` (visible to staff + whisper-allowed groups only).
   bool _isWhisper = false;
 
+  bool _quoteErrorShown = false;
+
+  /// A failed quote no longer traps the composer behind a barrier: say so
+  /// once and let the reader write the reply without it.
+  void _reportQuoteError(String message) {
+    if (_quoteErrorShown) return;
+    _quoteErrorShown = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    });
+  }
+
   /// Whether the signed-in user is Discourse staff (admin or moderator).
   /// `DiscourseLoginService` maps `current_user.admin`/`moderator` onto
   /// `FCUser.userType` / `canModerate` at login. The whisper toggle is
@@ -380,13 +393,8 @@ class _ReplyPageState extends State<ReplyPage> {
               ],
             );
           } else if (hasError) {
-            return Stack(
-              children: [
-                compose,
-                ModalBarrier(dismissible: false, color: Colors.black.withValues(alpha: 0.2)),
-                Center(child: Text(AppLocalizations.of(context)?.failedToLoadQuote(snapshot.error.toString()) ?? 'Failed to load quote: \n${snapshot.error}')),
-              ],
-            );
+            _reportQuoteError(AppLocalizations.of(context)?.failedToLoadQuote(snapshot.error.toString()) ?? 'Failed to load quote: \n${snapshot.error}');
+            return compose;
           } else {
             return compose;
           }

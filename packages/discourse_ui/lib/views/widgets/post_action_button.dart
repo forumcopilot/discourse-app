@@ -90,7 +90,7 @@ class PostActionButton extends StatelessWidget {
         : colorScheme.onSurfaceVariant
             .withValues(alpha: DesignTokens.opacityMediumLow);
 
-    final button = AccessibilityHelpers.accessibleIconButton(
+    return AccessibilityHelpers.accessibleIconButton(
       icon: Icon(
         iconData,
         color: color,
@@ -101,19 +101,7 @@ class PostActionButton extends StatelessWidget {
       hint: semanticHint,
       isSelected: active,
       context: context,
+      onLongPress: onLongPress,
     );
-
-    if (onLongPress != null) {
-      return GestureDetector(
-        // Behavior translucent so the gesture detector still fills
-        // the 48x48 target supplied by `accessibleIconButton` and
-        // hits empty space too — without it the long-press only
-        // works on the icon pixel itself.
-        behavior: HitTestBehavior.translucent,
-        onLongPress: onLongPress,
-        child: button,
-      );
-    }
-    return button;
   }
 }

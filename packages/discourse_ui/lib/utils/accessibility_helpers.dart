@@ -16,6 +16,10 @@ class AccessibilityHelpers {
   /// [hint] - Optional accessibility hint
   /// [isSelected] - Whether the button is in a selected state
   /// [context] - BuildContext for localization
+  /// [onLongPress] - Optional long-press handler, hit on the same target
+  ///
+  /// The whole [minSize] square takes the tap, not just the icon's pixels,
+  /// and shows the press as an unbounded ripple the way [IconButton] does.
   static Widget accessibleIconButton({
     required Widget icon,
     required VoidCallback? onTap,
@@ -24,17 +28,22 @@ class AccessibilityHelpers {
     bool isSelected = false,
     BuildContext? context,
     double? minSize,
+    VoidCallback? onLongPress,
   }) {
     final effectiveMinSize = minSize ?? 48.0; // Minimum touch target size
-    
+
     return Semantics(
       label: label,
       hint: hint,
       button: true,
       enabled: onTap != null,
       selected: isSelected,
-      child: GestureDetector(
+      // InkResponse hit-tests opaquely: a bare GestureDetector over a
+      // colourless Container only answers on the icon itself.
+      child: InkResponse(
         onTap: onTap,
+        onLongPress: onLongPress,
+        radius: effectiveMinSize / 2,
         child: Container(
           constraints: BoxConstraints(
             minWidth: effectiveMinSize,

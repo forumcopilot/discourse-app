@@ -21,6 +21,7 @@ class TrustLevelSheet extends StatelessWidget {
   }) {
     return showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -67,8 +68,10 @@ class TrustLevelSheet extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    // Scrolls, and may grow past the default 9/16 of the screen: at a
+    // larger text size or on a short phone the options no longer fit.
     return SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
         child: Column(
           mainAxisSize: MainAxisSize.min,

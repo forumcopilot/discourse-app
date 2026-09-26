@@ -646,120 +646,24 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
         ],
       );
     }
+    // The All | Unread filter stays above every state: an empty Unread
+    // list is exactly when the reader needs the way back to All.
     if (_error != null) {
-      final colorScheme = Theme.of(context).colorScheme;
-      final textTheme = Theme.of(context).textTheme;
-      return RefreshIndicator(
-        onRefresh: _onRefresh,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Center(
-                  child: Padding(
-                    padding: DesignTokens.paddingScreen,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.error_outline_rounded,
-                          size: 80,
-                          color: colorScheme.error,
-                        ),
-                        const SizedBox(height: DesignTokens.spacingXL),
-                        Text(
-                          AppLocalizations.of(context)!.errorLoadingNotifications,
-                          style: textTheme.headlineSmall?.copyWith(
-                            color: colorScheme.onSurface,
-                            fontWeight: DesignTokens.fontWeightBold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: DesignTokens.spacingS),
-                        Text(
-                          '$_error',
-                          style: textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: DesignTokens.spacingL),
-                        Text(
-                          AppLocalizations.of(context)!.pullDownToRefresh,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+      return Column(
+        children: [
+          _buildFilterBar(),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: EmptyStateView.error(
+                message: AppLocalizations.of(context)!.errorLoadingNotifications,
+                hint: '$_error',
+                onRetry: _onRefresh,
+                scrollable: true,
               ),
-            );
-          },
-        ),
-      );
-    }
-    if (_topics.isEmpty) {
-      final colorScheme = Theme.of(context).colorScheme;
-      final textTheme = Theme.of(context).textTheme;
-      return RefreshIndicator(
-        onRefresh: _onRefresh,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Center(
-                  child: Padding(
-                    padding: DesignTokens.paddingScreen,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.notifications_none_rounded,
-                          size: 80,
-                          color: colorScheme.primary,
-                        ),
-                        const SizedBox(height: DesignTokens.spacingXL),
-                        Text(
-                          "All caught up!",
-                          style: textTheme.headlineSmall?.copyWith(
-                            color: colorScheme.onSurface,
-                            fontWeight: DesignTokens.fontWeightBold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: DesignTokens.spacingS),
-                        Text(
-                          AppLocalizations.of(context)!.noNewNotificationsExplanation,
-                          style: textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: DesignTokens.spacingL),
-                        Text(
-                          AppLocalizations.of(context)!.pullDownToRefresh,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
+            ),
+          ),
+        ],
       );
     }
     if (_topics.isEmpty) {
@@ -767,12 +671,15 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
         children: [
           _buildFilterBar(),
           Expanded(
-            child: EmptyStateView.scrollable(
-              icon: Icons.notifications_none,
-              message: _unreadOnly ? 'No unread notifications' : 'No notifications yet',
-              hint: _unreadOnly
-                  ? "You're all caught up."
-                  : 'Replies, mentions and likes will show up here.',
+            child: RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: EmptyStateView.scrollable(
+                icon: Icons.notifications_none,
+                message: _unreadOnly ? 'No unread notifications' : 'No notifications yet',
+                hint: _unreadOnly
+                    ? "You're all caught up."
+                    : AppLocalizations.of(context)!.noNewNotificationsExplanation,
+              ),
             ),
           ),
         ],

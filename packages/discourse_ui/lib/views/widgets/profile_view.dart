@@ -736,69 +736,67 @@ class _ProfileViewState extends State<ProfileView> {
 
   Widget _buildOtherActionRow(
       BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Follow / Unfollow toggle (Discourse 3.x). acceptsFollowers
-        // is wired off `can_follow` — we only show the button when
-        // the target permits follows.
-        if (_userInfo.acceptsFollowers) ...[
-          OutlinedButton.icon(
-            onPressed: _isTogglingFollow ? null : _handleToggleFollow,
-            icon: Icon(
-              _userInfo.isFollowing
-                  ? Icons.person_remove
-                  : Icons.person_add,
-              size: DesignTokens.iconSizeM,
-            ),
-            label: Text(
-              _userInfo.isFollowing ? 'Unfollow' : 'Follow',
-            ),
-          ),
-        ],
-        if (_userInfo.acceptsPM) ...[
-          SizedBox(width: DesignTokens.spacingM),
-          FilledButton.icon(
-            onPressed: () {
-              // Discourse PMs are always conversations.
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NewConversationPage(
-                    siteContext: widget.siteContext,
-                    initialRecipient: _userInfo.username,
-                    initialRecipientIconUrl: _avatarUrl,
-                  ),
-                ),
-              );
-            },
-            icon: Icon(Icons.message, size: DesignTokens.iconSizeM),
-            label: Text(
-              AppLocalizations.of(context)?.sendMessage ?? 'Send Message',
-              style: textTheme.titleMedium?.copyWith(
-                color: colorScheme.onPrimary,
-                fontWeight: DesignTokens.fontWeightBold,
+    // Wraps rather than overflowing a phone when Follow, Message and Chat
+    // are all offered; one button size for all three.
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: DesignTokens.spacingS,
+        runSpacing: DesignTokens.spacingS,
+        children: [
+          // Follow / Unfollow toggle (Discourse 3.x). acceptsFollowers
+          // is wired off `can_follow` — we only show the button when
+          // the target permits follows.
+          if (_userInfo.acceptsFollowers) ...[
+            OutlinedButton.icon(
+              onPressed: _isTogglingFollow ? null : _handleToggleFollow,
+              icon: Icon(
+                _userInfo.isFollowing
+                    ? Icons.person_remove
+                    : Icons.person_add,
+                size: DesignTokens.iconSizeM,
+              ),
+              label: Text(
+                _userInfo.isFollowing ? 'Unfollow' : 'Follow',
               ),
             ),
-            style: StyleBuilders.extendedFilledButtonStyle(
-              colorScheme: colorScheme,
+          ],
+          if (_userInfo.acceptsPM) ...[
+            FilledButton.icon(
+              onPressed: () {
+                // Discourse PMs are always conversations.
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NewConversationPage(
+                      siteContext: widget.siteContext,
+                      initialRecipient: _userInfo.username,
+                      initialRecipientIconUrl: _avatarUrl,
+                    ),
+                  ),
+                );
+              },
+              icon: Icon(Icons.message, size: DesignTokens.iconSizeM),
+              label: Text(
+                AppLocalizations.of(context)?.sendMessage ?? 'Send Message',
+              ),
             ),
-          ),
+          ],
+          // Web offers Message *and* Chat on a profile. Gated on the server's
+          // `can_chat_user`, not on whether the chat plugin is installed:
+          // those are different questions, and only the server knows whether
+          // this viewer may chat with this person. It no longer sits inside
+          // the personal-message block — someone can take chats and not PMs.
+          if (_userInfo.canChatUser) ...[
+            OutlinedButton.icon(
+              onPressed: _isStartingChat ? null : _handleStartChat,
+              icon: Icon(Icons.forum_outlined, size: DesignTokens.iconSizeM),
+              label: Text(AppLocalizations.of(context)?.chatWithUser ?? 'Chat'),
+            ),
+          ],
         ],
-        // Web offers Message *and* Chat on a profile. Gated on the server's
-        // `can_chat_user`, not on whether the chat plugin is installed:
-        // those are different questions, and only the server knows whether
-        // this viewer may chat with this person. It no longer sits inside
-        // the personal-message block — someone can take chats and not PMs.
-        if (_userInfo.canChatUser) ...[
-          SizedBox(width: DesignTokens.spacingM),
-          OutlinedButton.icon(
-            onPressed: _isStartingChat ? null : _handleStartChat,
-            icon: Icon(Icons.forum_outlined, size: DesignTokens.iconSizeM),
-            label: Text(AppLocalizations.of(context)?.chatWithUser ?? 'Chat'),
-          ),
-        ],
-      ],
+      ),
     );
   }
 

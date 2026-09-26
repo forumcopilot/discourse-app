@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseUserProxy;
 import 'package:discourse_ui/views/widgets/activity_row.dart';
 import 'package:discourse_ui/views/widgets/profile_section.dart';
+import 'package:discourse_ui/views/widgets/empty_state_view.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/views/post_page.dart';
@@ -171,16 +172,21 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
 
   @override
   Widget build(BuildContext context) {
-    // Hide the entire section if there's an error or no posts (and not loading)
+    // A failed feed says so and offers a retry, as the Topics feed does:
+    // rendering nothing read as "this person has none".
+    if (_error != null) {
+      return EmptyStateView.error(message: _error!, onRetry: _fetchRecentPosts);
+    }
+    // Hide the entire section if there are no posts (and not loading)
     final isEmpty =
         !_isLoading && (_recentPosts == null || _recentPosts!.isEmpty);
-    if (_error != null || isEmpty) {
+    if (isEmpty) {
       // Rendering nothing was fine while Replies was the only feed — an
       // empty profile simply had no section. With tabs it is not: tapping
       // Likes or Solved and getting a blank page reads as broken rather
       // than as "none yet". Say so when the caller gave us the wording.
       final label = widget.emptyLabel;
-      if (_error == null && label != null) {
+      if (label != null) {
         return Padding(
           padding: DesignTokens.paddingL,
           child: Text(

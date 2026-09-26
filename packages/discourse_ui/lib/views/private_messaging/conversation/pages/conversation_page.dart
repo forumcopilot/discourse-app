@@ -1124,138 +1124,133 @@ class _ConversationPageState extends State<ConversationPage> {
           ),
         // Messages list
         Expanded(
-          child: Stack(
-            children: [
-              RefreshIndicator(
-                onRefresh: _loadConversation,
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Conversation header with overlapping avatars, title, and participant count
-                      ConversationHeaderWidget(
-                        title: _conversation!.convTitle ?? widget.subject,
-                        participants: _conversation!.participants,
-                        participantCount: (_conversation!.participantCount ?? 0) + _groups.length,
-                        groups: _groups,
-                        siteContext: widget.siteContext,
-                        canInvite: _conversation!.canInvite ?? false,
-                        conversationId: widget.conversationId,
-                        onInviteSuccess: () => _loadConversation(),
-                      ),
-                      // Load Earlier Messages button
-                      if (_currentStartNum > 1 && !_isLoadingMore)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                          child: OutlinedButton.icon(
-                            onPressed: () => _loadOlderMessages(),
-                            icon: const Icon(Icons.arrow_upward),
-                            label: Text(AppLocalizations.of(context)?.loadEarlierMessages ?? 'Load Earlier Messages'),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                            ),
-                          ),
-                        ),
-                      // Loading indicator when loading older messages
-                      if (_isLoadingMore && _currentStartNum > 1)
-                        const Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Center(child: CircularProgressIndicator()),
-                        ),
-                      // Header (first message) - only show if messages exist
-                      if (_conversation!.list.isNotEmpty)
-                        ConversationHeaderItem(
-                          siteContext: widget.siteContext,
-                          message: _conversation!.list[0],
-                          subject: _conversation!.convTitle ?? '',
-                          participants: _conversation!.participants,
-                          onQuote: () => _onQuoteMessage(_conversation!.list[0]),
-                          onLike: () => _onLikeMessage(_conversation!.list[0]),
-                          onEdit: () => _onEditMessage(_conversation!.list[0]),
-                          isHighlighted: _highlightedMessageId == _conversation!.list[0].messageId,
-                          isClosed: _conversation!.isClosed ?? false,
-                          linkUrl: _messageUrl(_conversation!.list[0]),
-                        ),
-                      // Individual reply messages
-                      if (_conversation!.list.length > 1)
-                        ...List.generate(_conversation!.list.length - 1, (i) {
-                          final msg = _conversation!.list[i + 1];
-                          return ConversationItem(
-                            siteContext: widget.siteContext,
-                            message: msg,
-                            isFirst: false,
-                            isLast: i == _conversation!.list.length - 2,
-                            onQuote: () => _onQuoteMessage(msg),
-                            onLike: () => _onLikeMessage(msg),
-                            onEdit: () => _onEditMessage(msg),
-                            isHighlighted: _highlightedMessageId == msg.messageId,
-                            isClosed: _conversation!.isClosed ?? false,
-                            linkUrl: _messageUrl(msg),
-                          );
-                        }),
-                      // Show message if no messages found
-                      if (_conversation!.list.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Center(
-                            child: Text(
-                              AppLocalizations.of(context)!.noMessagesFound,
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  ),
-                            ),
-                          ),
-                        ),
-                      // Loading indicator for more messages
-                      if (_isLoadingMore)
-                        const Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Center(child: CircularProgressIndicator()),
-                        ),
-                      // End of conversation indicator
-                      if (!_isLoadingMore && _conversation!.list.isNotEmpty)
-                        Builder(
-                          builder: (context) {
-                            final totalMessages = _conversation!.totalMessageNum ?? _conversation!.list.length;
-                            // Only claim the end has been reached when the
-                            // highest actually-loaded messageNumber covers
-                            // the conversation total (falling back to the
-                            // derived window bound when messages carry no
-                            // positions).
-                            final highestLoaded = _conversation!.list
-                                .map((m) => m.messageNumber)
-                                .whereType<int>()
-                                .fold<int>(0, math.max);
-                            final isAtEnd = (highestLoaded > 0 ? highestLoaded : _currentLastNum) >= totalMessages;
-
-                            if (isAtEnd) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                                child: Center(
-                                  child: Text(
-                                    AppLocalizations.of(context)!.endOfConversation,
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                          fontStyle: FontStyle.italic,
-                                        ),
-                                  ),
-                                ),
-                              );
-                            }
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                      const SizedBox(height: 80), // for bottom bar spacing
-                    ],
+          child: RefreshIndicator(
+            onRefresh: _loadConversation,
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Conversation header with overlapping avatars, title, and participant count
+                  ConversationHeaderWidget(
+                    title: _conversation!.convTitle ?? widget.subject,
+                    participants: _conversation!.participants,
+                    participantCount: (_conversation!.participantCount ?? 0) + _groups.length,
+                    groups: _groups,
+                    siteContext: widget.siteContext,
+                    canInvite: _conversation!.canInvite ?? false,
+                    conversationId: widget.conversationId,
+                    onInviteSuccess: () => _loadConversation(),
                   ),
-                ),
+                  // Load Earlier Messages button
+                  if (_currentStartNum > 1 && !_isLoadingMore)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                      child: OutlinedButton.icon(
+                        onPressed: () => _loadOlderMessages(),
+                        icon: const Icon(Icons.arrow_upward),
+                        label: Text(AppLocalizations.of(context)?.loadEarlierMessages ?? 'Load Earlier Messages'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                        ),
+                      ),
+                    ),
+                  // Loading indicator when loading older messages
+                  if (_isLoadingMore && _currentStartNum > 1)
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  // Header (first message) - only show if messages exist
+                  if (_conversation!.list.isNotEmpty)
+                    ConversationHeaderItem(
+                      siteContext: widget.siteContext,
+                      message: _conversation!.list[0],
+                      subject: _conversation!.convTitle ?? '',
+                      participants: _conversation!.participants,
+                      onQuote: () => _onQuoteMessage(_conversation!.list[0]),
+                      onLike: () => _onLikeMessage(_conversation!.list[0]),
+                      onEdit: () => _onEditMessage(_conversation!.list[0]),
+                      isHighlighted: _highlightedMessageId == _conversation!.list[0].messageId,
+                      isClosed: _conversation!.isClosed ?? false,
+                      linkUrl: _messageUrl(_conversation!.list[0]),
+                    ),
+                  // Individual reply messages
+                  if (_conversation!.list.length > 1)
+                    ...List.generate(_conversation!.list.length - 1, (i) {
+                      final msg = _conversation!.list[i + 1];
+                      return ConversationItem(
+                        siteContext: widget.siteContext,
+                        message: msg,
+                        isFirst: false,
+                        isLast: i == _conversation!.list.length - 2,
+                        onQuote: () => _onQuoteMessage(msg),
+                        onLike: () => _onLikeMessage(msg),
+                        onEdit: () => _onEditMessage(msg),
+                        isHighlighted: _highlightedMessageId == msg.messageId,
+                        isClosed: _conversation!.isClosed ?? false,
+                        linkUrl: _messageUrl(msg),
+                      );
+                    }),
+                  // Show message if no messages found
+                  if (_conversation!.list.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Center(
+                        child: Text(
+                          AppLocalizations.of(context)!.noMessagesFound,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
+                        ),
+                      ),
+                    ),
+                  // Loading indicator for more messages
+                  if (_isLoadingMore)
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  // End of conversation indicator
+                  if (!_isLoadingMore && _conversation!.list.isNotEmpty)
+                    Builder(
+                      builder: (context) {
+                        final totalMessages = _conversation!.totalMessageNum ?? _conversation!.list.length;
+                        // Only claim the end has been reached when the
+                        // highest actually-loaded messageNumber covers
+                        // the conversation total (falling back to the
+                        // derived window bound when messages carry no
+                        // positions).
+                        final highestLoaded = _conversation!.list
+                            .map((m) => m.messageNumber)
+                            .whereType<int>()
+                            .fold<int>(0, math.max);
+                        final isAtEnd = (highestLoaded > 0 ? highestLoaded : _currentLastNum) >= totalMessages;
+
+                        if (isAtEnd) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: Center(
+                              child: Text(
+                                AppLocalizations.of(context)!.endOfConversation,
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                              ),
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                ],
               ),
-              _buildBottomBar(context),
-            ],
+            ),
           ),
         ),
+        _buildBottomBar(context),
       ],
     );
   }
@@ -1640,80 +1635,67 @@ class _ConversationPageState extends State<ConversationPage> {
   Widget _buildBottomBar(BuildContext context) {
     if (_conversation == null) return const SizedBox.shrink();
 
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 4,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: DesignTokens.spacingL,
-              vertical: DesignTokens.spacingS,
-            ),
-            child: Row(
-              children: [
-                Semantics(
-                  label: AppLocalizations.of(context)?.goToTop ?? 'Go to top',
-                  hint: 'Jump to first message',
-                  button: true,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_upward),
-                    onPressed: _jumpToFirstMessage,
-                    tooltip: AppLocalizations.of(context)?.goToTop ?? 'Go to top',
+    // In its own space below the list, as on the topic page: messages
+    // don't show through it and the last one scrolls clear of it.
+    return Material(
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: DesignTokens.spacingL,
+            vertical: DesignTokens.spacingS,
+          ),
+          child: Row(
+            children: [
+              Semantics(
+                label: AppLocalizations.of(context)?.goToTop ?? 'Go to top',
+                hint: 'Jump to first message',
+                button: true,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_upward),
+                  onPressed: _jumpToFirstMessage,
+                  tooltip: AppLocalizations.of(context)?.goToTop ?? 'Go to top',
+                ),
+              ),
+              Semantics(
+                label: AppLocalizations.of(context)?.goToBottom ?? 'Go to bottom',
+                hint: 'Jump to last message',
+                button: true,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_downward),
+                  onPressed: _jumpToLastMessage,
+                  tooltip: AppLocalizations.of(context)?.goToBottom ?? 'Go to bottom',
+                ),
+              ),
+              Semantics(
+                label: 'Message ${_currentVisibleMessagePosition} of ${_conversation!.totalMessageNum ?? _conversation!.list.length}',
+                hint: 'Tap to jump to a specific message',
+                button: true,
+                child: TextButton(
+                  onPressed: () {
+                    _showJumpToMessageDialog(context);
+                  },
+                  child: Text(
+                    '${_currentVisibleMessagePosition} / ${_conversation!.totalMessageNum ?? _conversation!.list.length}',
                   ),
                 ),
+              ),
+              const Spacer(),
+              if ((_conversation!.canReply ?? true) && !(_conversation!.isClosed ?? false))
                 Semantics(
-                  label: AppLocalizations.of(context)?.goToBottom ?? 'Go to bottom',
-                  hint: 'Jump to last message',
+                  label: AccessibilityHelpers.getReplyButtonLabel(context),
                   button: true,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_downward),
-                    onPressed: _jumpToLastMessage,
-                    tooltip: AppLocalizations.of(context)?.goToBottom ?? 'Go to bottom',
-                  ),
-                ),
-                SizedBox(width: DesignTokens.spacingS),
-                Semantics(
-                  label: 'Message ${_currentVisibleMessagePosition} of ${_conversation!.totalMessageNum ?? _conversation!.list.length}',
-                  hint: 'Tap to jump to a specific message',
-                  button: true,
-                  child: GestureDetector(
-                    onTap: () {
-                      _showJumpToMessageDialog(context);
-                    },
-                    child: Text(
-                      '${_currentVisibleMessagePosition} / ${_conversation!.totalMessageNum ?? _conversation!.list.length}',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                  child: FilledButton.icon(
+                    onPressed: _onReplyPressed,
+                    icon: const Icon(Icons.reply),
+                    label: Text(AppLocalizations.of(context)?.reply ?? 'Reply'),
+                    style: StyleBuilders.extendedFilledButtonStyle(
+                      colorScheme: Theme.of(context).colorScheme,
                     ),
                   ),
                 ),
-                const Spacer(),
-                if ((_conversation!.canReply ?? true) && !(_conversation!.isClosed ?? false))
-                  Semantics(
-                    label: AccessibilityHelpers.getReplyButtonLabel(context),
-                    button: true,
-                    child: FilledButton.icon(
-                      onPressed: _onReplyPressed,
-                      icon: const Icon(Icons.reply),
-                      label: Text(AppLocalizations.of(context)?.reply ?? 'Reply'),
-                      style: StyleBuilders.extendedFilledButtonStyle(
-                        colorScheme: Theme.of(context).colorScheme,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+            ],
           ),
         ),
       ),

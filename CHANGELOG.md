@@ -6,6 +6,21 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Fixed
+- **A post's Reply, Like, Bookmark and Accept buttons answer anywhere in their 48dp target.** Only the ~22dp icon took a tap: the shared `accessibleIconButton` wrapped it in a `GestureDetector` over a colourless `Container`, which hit-tests on the icon alone. It is now an `InkResponse`, which also shows the press. The message page's Quote and Like use the same helper and are fixed with it.
+- **Notifications keeps its All | Unread filter when the list is empty or fails.** With Unread chosen and nothing unread, an early "All caught up!" branch returned without the filter bar, so there was no way back to All; the error state dropped it too. Both now sit under the bar, through `EmptyStateView`, with Retry on the error.
+- **The topic and message pages' ↑ ↓ bar has its own space.** It floated over the list at 80% opacity, so posts showed through it and the last one could sit underneath. It is now a Material 3 bottom bar below the list, and the "2 / 7" position (the way into Jump to post) is a button with a full-size target instead of a small tappable label.
+- **Another member's profile: Follow, Message and Chat are one size and wrap.** Message was a 56dp raised button beside 40dp outlined ones, in a row that could overflow a phone when all three showed.
+- **Reply shows which topic it replies to.** The title was passed to the composer but never displayed.
+- **Edit Post and Edit message keep their app bar while loading and on failure**, so there is always a way back, and a failed load offers Retry.
+- **A quote that fails to load no longer locks the reply composer.** A barrier that could not be dismissed covered the whole screen; now a snackbar says the quote could not be loaded and the reply can be written without it.
+- **A failed message reply's snackbar is readable in the light theme** (its text now uses `onErrorContainer`).
+- **Messages no longer flash a ripple that does nothing when tapped.**
+- **Tapping an uploaded image inserts it straight away.** The composer asked "Thumbnail or Full size?" and then ignored the answer; Discourse Markdown has no such distinction.
+- **The bottom navigation shows its labels** (Home, Categories, Chat, Notifications, Profile). They were empty strings, so screen readers announced nothing, and three of the icons are speech bubbles.
+- **A profile's Replies, Likes and Solved feeds say when they fail to load**, with Retry, instead of showing nothing.
+- **The trust-level and notification-level sheets scroll** instead of overflowing at a larger text size or on a short phone.
+
 ## [1.0.32] - 2026-09-25
 
 ### Changed
