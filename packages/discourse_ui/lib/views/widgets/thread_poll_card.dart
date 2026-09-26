@@ -200,13 +200,17 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.poll.question,
-            style: textTheme.titleMedium?.copyWith(
-              color: colorScheme.onSurface,
+          // Discourse polls usually have no title; an empty question left
+          // a blank band across the top of the card.
+          if (widget.poll.question.trim().isNotEmpty) ...[
+            Text(
+              widget.poll.question,
+              style: textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurface,
+              ),
             ),
-          ),
-          SizedBox(height: DesignTokens.spacingM),
+            SizedBox(height: DesignTokens.spacingM),
+          ],
           ...widget.poll.responses.map((r) => _buildOptionRow(
                 context,
                 r,
@@ -340,7 +344,7 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
                         child: Icon(
                           widget.poll.maxVotes <= 1
                               ? (isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked)
-                              : (isSelected ? Icons.check_box : Icons.check_box_outlined),
+                              : (isSelected ? Icons.check_box : Icons.check_box_outline_blank),
                           size: DesignTokens.iconSizeM,
                           color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
                         ),

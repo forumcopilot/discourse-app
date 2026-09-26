@@ -70,7 +70,10 @@ class ThreadPollMiniCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          poll.question,
+                          // Untitled polls (the usual kind) read "Poll".
+                          poll.question.trim().isNotEmpty
+                              ? poll.question
+                              : (AppLocalizations.of(context)?.poll ?? 'Poll'),
                           style: StyleBuilders.bodyTextStyle(
                             colorScheme: colorScheme,
                             textTheme: textTheme,

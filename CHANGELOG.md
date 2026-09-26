@@ -29,6 +29,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Fixed
 - **Suggested Topics no longer show "?" avatars** (from 1.0.34) when a forum sends suggested topics without a poster; they show a topic glyph in the avatar's place.
+- **Multiple-choice polls show empty boxes until you pick.** Every option was drawn with a ticked box (`Icons.check_box_outlined` is Material's outlined *ticked* box), so a poll looked already answered.
+- **An untitled poll no longer opens with a blank band.** Discourse polls usually have no title, and the card kept a line and a gap for one; the pinned poll bar says "Poll" for them instead of nothing.
 
 ## [1.0.34] - 2026-09-26
 
