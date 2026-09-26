@@ -309,7 +309,7 @@ class ConversationHeaderItem extends StatelessWidget {
             children: [
               Icon(
                 Icons.edit_outlined,
-                color: colorScheme.primary,
+                color: colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)?.edit ?? 'Edit'),
@@ -328,7 +328,7 @@ class ConversationHeaderItem extends StatelessWidget {
             children: [
               Icon(
                 Icons.flag_outlined,
-                color: colorScheme.secondary,
+                color: colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)?.report ?? 'Report'),
@@ -402,7 +402,7 @@ PopupMenuItem<String> _copyLinkMenuItem(BuildContext context) =>
       child: Row(
         children: [
           Icon(Icons.link,
-              color: Theme.of(context).colorScheme.secondary),
+              color: Theme.of(context).colorScheme.onSurfaceVariant),
           const SizedBox(width: DesignTokens.spacingM),
           Text(AppLocalizations.of(context)!.copyLink),
         ],
@@ -796,7 +796,7 @@ class ConversationItem extends StatelessWidget {
             children: [
               Icon(
                 Icons.edit_outlined,
-                color: colorScheme.primary,
+                color: colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)?.edit ?? 'Edit'),
@@ -815,7 +815,7 @@ class ConversationItem extends StatelessWidget {
             children: [
               Icon(
                 Icons.flag_outlined,
-                color: colorScheme.secondary,
+                color: colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)?.report ?? 'Report'),

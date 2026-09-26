@@ -206,7 +206,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           _userInfo!.isIgnored
                               ? Icons.notifications_active_outlined
                               : Icons.notifications_off_outlined,
-                          color: colorScheme.onSurface,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(width: DesignTokens.spacingM),
                         Text(

@@ -1442,7 +1442,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     value: 'B',
                     child: Row(
                       children: [
-                        Icon(Icons.format_bold, color: colorScheme.onSurface),
+                        Icon(Icons.format_bold, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(AppLocalizations.of(context)?.bold ?? 'Bold'),
                       ],
@@ -1452,7 +1452,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     value: 'I',
                     child: Row(
                       children: [
-                        Icon(Icons.format_italic, color: colorScheme.onSurface),
+                        Icon(Icons.format_italic, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(AppLocalizations.of(context)?.italic ?? 'Italic'),
                       ],
@@ -1462,7 +1462,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     value: 'U',
                     child: Row(
                       children: [
-                        Icon(Icons.format_underline, color: colorScheme.onSurface),
+                        Icon(Icons.format_underline, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(AppLocalizations.of(context)?.underline ?? 'Underline'),
                       ],
@@ -1472,7 +1472,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     value: 'S',
                     child: Row(
                       children: [
-                        Icon(Icons.strikethrough_s, color: colorScheme.onSurface),
+                        Icon(Icons.strikethrough_s, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(AppLocalizations.of(context)?.strikethrough ?? 'Strikethrough'),
                       ],
@@ -1484,7 +1484,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     value: 'URL',
                     child: Row(
                       children: [
-                        Icon(Icons.link, color: colorScheme.onSurface),
+                        Icon(Icons.link, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(AppLocalizations.of(context)?.link ?? 'Link'),
                       ],
@@ -1494,7 +1494,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     value: 'IMG',
                     child: Row(
                       children: [
-                        Icon(Icons.image, color: colorScheme.onSurface),
+                        Icon(Icons.image, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(AppLocalizations.of(context)?.image ?? 'Image'),
                       ],
@@ -1504,7 +1504,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     value: 'VIDEO',
                     child: Row(
                       children: [
-                        Icon(Icons.videocam, color: colorScheme.onSurface),
+                        Icon(Icons.videocam, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(AppLocalizations.of(context)?.video ?? 'Video'),
                       ],
@@ -1516,7 +1516,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     value: 'QUOTE',
                     child: Row(
                       children: [
-                        Icon(Icons.format_quote, color: colorScheme.onSurface),
+                        Icon(Icons.format_quote, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(AppLocalizations.of(context)?.quote ?? 'Quote'),
                       ],
@@ -1526,7 +1526,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     value: 'CODE',
                     child: Row(
                       children: [
-                        Icon(Icons.code, color: colorScheme.onSurface),
+                        Icon(Icons.code, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(AppLocalizations.of(context)?.code ?? 'Code'),
                       ],
@@ -1536,7 +1536,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     value: 'SPOILER',
                     child: Row(
                       children: [
-                        Icon(Icons.visibility_off, color: colorScheme.onSurface),
+                        Icon(Icons.visibility_off, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(AppLocalizations.of(context)?.spoiler ?? 'Spoiler'),
                       ],
@@ -1548,7 +1548,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     value: 'LIST',
                     child: Row(
                       children: [
-                        Icon(Icons.format_list_bulleted, color: colorScheme.onSurface),
+                        Icon(Icons.format_list_bulleted, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(AppLocalizations.of(context)?.bulletList ?? 'Bullet List'),
                       ],
@@ -1558,7 +1558,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     value: 'LIST=1',
                     child: Row(
                       children: [
-                        Icon(Icons.format_list_numbered, color: colorScheme.onSurface),
+                        Icon(Icons.format_list_numbered, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(AppLocalizations.of(context)?.numberedList ?? 'Numbered List'),
                       ],
@@ -1568,7 +1568,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     value: '*',
                     child: Row(
                       children: [
-                        Icon(Icons.subdirectory_arrow_right, color: colorScheme.onSurface),
+                        Icon(Icons.subdirectory_arrow_right, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(AppLocalizations.of(context)?.listItem ?? 'List Item'),
                       ],

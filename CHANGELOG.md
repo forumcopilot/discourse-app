@@ -45,7 +45,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
   - **Badges on a profile** are 32dp chips with readable tier colours (gold and silver were faint on light backgrounds), and "+N more" is a full-size chip.
   - **The profile's side margin is 16dp** like every other screen (it was 24, as was the forum header's), and the avatar's camera button is a 48dp target (was 36).
   - **Small text is 12sp**: `StyleBuilders.smallTextStyle` forced 14 onto it, and the translated-post label, the profile's like counts, bookmark reminder hints and the drawer's footer were 11sp (the footer also faded).
-  - **Menu icons are the standard 24dp** in the post, message and bookmark menus (several were 20).
+  - **Menu icons are Material's: 24dp in `onSurfaceVariant`**, red only for destructive items. Menus mixed 20 and 24dp icons in primary, secondary, onSurface and onSurfaceVariant (the message menu's Copy link and Report were blue).
   - **The review queue's topic link** is a 48dp target (it was the text's line).
 
 ### Fixed

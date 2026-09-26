@@ -1041,7 +1041,7 @@ class _PostListItemState extends State<PostListItem> {
           child: Row(
             children: [
               Icon(Icons.share_outlined,
-                  color: Theme.of(context).colorScheme.secondary),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)!.share),
             ],
@@ -1054,7 +1054,7 @@ class _PostListItemState extends State<PostListItem> {
           child: Row(
             children: [
               Icon(Icons.link,
-                  color: Theme.of(context).colorScheme.secondary),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)!.copyLink),
             ],
@@ -1069,7 +1069,7 @@ class _PostListItemState extends State<PostListItem> {
           child: Row(
             children: [
               Icon(Icons.edit,
-                  color: Theme.of(context).colorScheme.primary),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)?.edit ?? 'Edit'),
             ],
@@ -1099,7 +1099,7 @@ class _PostListItemState extends State<PostListItem> {
           child: Row(
             children: [
               Icon(Icons.flag,
-                  color: Theme.of(context).colorScheme.secondary),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)?.report ?? 'Report'),
             ],
@@ -1120,7 +1120,7 @@ class _PostListItemState extends State<PostListItem> {
           child: Row(
             children: [
               Icon(isWiki ? Icons.edit_off : Icons.edit_note,
-                  color: Theme.of(context).colorScheme.secondary),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: DesignTokens.spacingM),
               Text(isWiki ? 'Remove wiki' : 'Make wiki'),
             ],
@@ -1139,7 +1139,7 @@ class _PostListItemState extends State<PostListItem> {
           child: Row(
             children: [
               Icon(Icons.history,
-                  color: Theme.of(context).colorScheme.secondary),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)!.editHistory),
             ],

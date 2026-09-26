@@ -168,7 +168,14 @@ class _ReportDialogState extends State<_ReportDialog> {
               RadioListTile<_FlagOption>(
                 value: option,
                 contentPadding: EdgeInsets.zero,
-                title: Text(option.label),
+                // The radio beside the label, not centred on the block: its
+                // 40dp box is placed at the tile's top, so the label moves
+                // down 8dp to share its centre line.
+                titleAlignment: ListTileTitleAlignment.top,
+                title: Padding(
+                  padding: const EdgeInsets.only(top: DesignTokens.spacingS),
+                  child: Text(option.label),
+                ),
                 subtitle: Text(option.description),
               ),
 

@@ -434,7 +434,7 @@ class _BookmarkTile extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(Icons.alarm,
-                          color: colorScheme.primary),
+                          color: colorScheme.onSurfaceVariant),
                       const SizedBox(width: DesignTokens.spacingM),
                       Text(bookmark.reminderAt != null
                           ? 'Edit reminder'

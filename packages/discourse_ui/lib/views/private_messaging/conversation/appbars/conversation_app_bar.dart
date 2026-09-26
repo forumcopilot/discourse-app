@@ -131,7 +131,7 @@ class ConversationAppBar extends BaseForumAppBar {
                 children: [
                   Icon(
                     onArchive != null ? Icons.archive_outlined : Icons.move_to_inbox_outlined,
-                    color: colorScheme.onSurface,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 12),
                   Text(
@@ -150,7 +150,7 @@ class ConversationAppBar extends BaseForumAppBar {
                 children: [
                   Icon(
                     Icons.edit_outlined,
-                    color: colorScheme.onSurface,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 12),
                   Text(
@@ -167,7 +167,7 @@ class ConversationAppBar extends BaseForumAppBar {
                 children: [
                   Icon(
                     Icons.lock_outline,
-                    color: colorScheme.onSurface,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 12),
                   Text(
@@ -183,7 +183,7 @@ class ConversationAppBar extends BaseForumAppBar {
                 children: [
                   Icon(
                     Icons.lock_open_outlined,
-                    color: colorScheme.onSurface,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 12),
                   Text(
