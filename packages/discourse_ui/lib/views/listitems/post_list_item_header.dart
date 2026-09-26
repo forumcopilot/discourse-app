@@ -93,7 +93,10 @@ class PostListItemHeader extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    GestureDetector(
+                    // Flexible, so a long name gives way to the full name
+                    // and badges beside it instead of overflowing the row.
+                    Flexible(
+                      child: GestureDetector(
                       onTap: () {
                         // Check if user is logged in
                         if (!siteContext.isLoggedIn) {
@@ -122,12 +125,13 @@ class PostListItemHeader extends StatelessWidget {
                       },
                       child: Text(
                         post.authorName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: textTheme.titleMedium?.copyWith(
                           color: colorScheme.onSurface,
-                          fontWeight: DesignTokens.fontWeightMedium,
-                          letterSpacing: DesignTokens.letterSpacingMedium,
                         ),
                       ),
+                    ),
                     ),
                     // The full name after the username, as the web shows
                     // it — unless it only restates the username.
@@ -259,13 +263,20 @@ class PostListItemHeader extends StatelessWidget {
                     // the post was edited. Tapping routes to the same
                     // edit-history action as the overflow menu.
                     if ((post.editVersion ?? 1) > 1) ...[
-                      SizedBox(width: DesignTokens.spacingS),
-                      GestureDetector(
+                      SizedBox(width: DesignTokens.spacingXS),
+                      // A wider tap than the 12dp glyph it was; the same
+                      // action is in the post's menu for anyone who misses.
+                      InkResponse(
                         onTap: () => onMenuSelected('history'),
-                        child: Icon(
-                          Icons.edit_outlined,
-                          size: DesignTokens.iconSizeXS,
-                          color: colorScheme.onSurfaceVariant,
+                        radius: 16,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: DesignTokens.spacingS),
+                          child: Icon(
+                            Icons.edit_outlined,
+                            size: DesignTokens.iconSizeS,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ),
                     ],

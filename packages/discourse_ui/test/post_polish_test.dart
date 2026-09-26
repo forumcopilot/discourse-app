@@ -115,17 +115,18 @@ void main() {
     await _render(tester,
         '<p><img src="/images/emoji/twitter/tada.png" title=":tada:" class="emoji only-emoji" alt=":tada:" width="20" height="20"></p>');
     final emoji = tester.widget<Text>(find.text('🎉'));
-    expect(emoji.style?.fontSize, 28);
+    // 32, the size an image emoji gets in the same post.
+    expect(emoji.style?.fontSize, 32);
   });
 
   testWidgets('<details> is ▶ summary, contents on tap; `open` starts open', (tester) async {
     await _render(tester, '<details><summary>Spoiler-free notes</summary><p>Hidden body</p></details>');
     expect(find.byType(DetailsBlock), findsOneWidget);
-    expect(find.text('▶'), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right), findsOneWidget);
     expect(find.textContaining('Hidden body', findRichText: true), findsNothing);
     await tester.tap(find.textContaining('Spoiler-free notes', findRichText: true));
     await tester.pump();
-    expect(find.text('▼'), findsOneWidget);
+    expect(find.byIcon(Icons.expand_more), findsOneWidget);
     expect(find.textContaining('Hidden body', findRichText: true), findsOneWidget);
 
     await _render(tester, '<details open=""><summary>Open one</summary><p>Visible body</p></details>');

@@ -31,10 +31,8 @@ import '../../controllers/post_controller.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import '../../utils/cooked_content.dart';
 import '../../utils/url_utils.dart';
-import '../../utils/file_utils.dart';
 import '../../theme/design_tokens.dart';
 import '../widgets/topic_taxonomy_chips.dart';
-import '../../theme/style_builders.dart';
 import 'post_list_item_header.dart';
 import 'post_list_item_attachment.dart';
 import 'post_list_item_social.dart';
@@ -320,11 +318,14 @@ class _PostListItemState extends State<PostListItem> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // A 48dp target in a text button's type, where it was a ~26dp
+          // line of 12sp text.
           InkWell(
             onTap: _isLoadingReplies ? null : _toggleReplies,
             borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingXS),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                  minHeight: kMinInteractiveDimension),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -332,15 +333,14 @@ class _PostListItemState extends State<PostListItem> {
                     _repliesExpanded
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
-                    size: 18,
+                    size: DesignTokens.iconSizeSMedium,
                     color: colorScheme.primary,
                   ),
                   SizedBox(width: DesignTokens.spacingXS),
                   Text(
                     label,
-                    style: textTheme.bodySmall?.copyWith(
+                    style: textTheme.labelLarge?.copyWith(
                       color: colorScheme.primary,
-                      fontWeight: DesignTokens.fontWeightMedium,
                     ),
                   ),
                   if (_isLoadingReplies) ...[
@@ -474,11 +474,10 @@ class _PostListItemState extends State<PostListItem> {
           ? null
           : () => widget.onJumpToPost!(target),
       borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: DesignTokens.spacingXS,
-          horizontal: DesignTokens.spacingXS,
-        ),
+      // 48dp high to tap (it was ~24).
+      child: ConstrainedBox(
+        constraints:
+            const BoxConstraints(minHeight: kMinInteractiveDimension),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -498,10 +497,7 @@ class _PostListItemState extends State<PostListItem> {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: textTheme.bodySmall?.copyWith(
-                  color: color,
-                  letterSpacing: DesignTokens.letterSpacingWide,
-                ),
+                style: textTheme.bodySmall?.copyWith(color: color),
               ),
             ),
           ],
@@ -555,25 +551,12 @@ class _PostListItemState extends State<PostListItem> {
         );
       },
     );
-    // Check if attachments/images are the last items - if so, reduce bottom padding
-    // to avoid excessive white space between images and social buttons
-    // Attachments and filteredInlineAttachments always come last (after text, videos, links)
-    final bool hasAttachments =
-        data.attachments.isNotEmpty || data.inlineAttachments.isNotEmpty;
-    // Check if attachments are all images (using same logic as PostListItemAttachment)
-    final bool allAttachmentsAreImages = hasAttachments &&
-        (data.attachments.isEmpty ||
-            data.attachments.every((att) => isImageFile(att.filename))) &&
-        (data.inlineAttachments.isEmpty ||
-            data.inlineAttachments.every((att) => isImageFile(att.filename)));
-    // Reduce bottom padding when images are the last items since PostListItemSocial
-    // already adds spacingM (12px) before the social buttons
-    final double bottomPadding = allAttachmentsAreImages
-        ? DesignTokens.spacingM
-        : DesignTokens.spacingXL;
+    // No padding of its own under the body: PostListItemSocial opens with
+    // 12dp, and the body no longer ends in a paragraph margin. Text posts
+    // had 24dp here as well, ~60dp between the last line and the actions.
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-          DesignTokens.spacingL, 0.0, DesignTokens.spacingL, bottomPadding),
+      padding: const EdgeInsets.fromLTRB(
+          DesignTokens.spacingL, 0.0, DesignTokens.spacingL, 0.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -629,7 +612,6 @@ class _PostListItemState extends State<PostListItem> {
                     AppLocalizations.of(context)!.solution,
                     style: textTheme.labelMedium?.copyWith(
                       color: ForumColors.of(context).success,
-                      fontWeight: DesignTokens.fontWeightBold,
                     ),
                   ),
                 ],
@@ -638,13 +620,12 @@ class _PostListItemState extends State<PostListItem> {
           ],
           // Show topic title for the first post (topic starter)
           if (widget.post.postNumber == 1 && widget.topicTitle.isNotEmpty) ...[
+            // The page's headline: titleLarge, as the app bar sets the
+            // same title (it was 16sp w700, smaller than the bar's).
             Text(
               widget.topicTitle,
-              style: StyleBuilders.titleTextStyle(
-                colorScheme: colorScheme,
-                textTheme: textTheme,
-                fontSize: DesignTokens.fontSizeTopicTitle,
-                fontWeight: DesignTokens.fontWeightBold,
+              style: textTheme.titleLarge?.copyWith(
+                color: colorScheme.onSurface,
               ),
             ),
             // Where the topic lives. The page named the topic and
@@ -815,12 +796,13 @@ class _PostListItemState extends State<PostListItem> {
     );
   }
 
+  // Posts are full-width; one 1dp full-strength rule between them, the
+  // same weight as the app's other dividers (was 2dp at 30%).
   Widget _buildBottomDivider(ColorScheme colorScheme) {
-    return StyleBuilders.divider(
-      colorScheme: colorScheme,
-      opacity: DesignTokens.opacityLow,
-      thickness: 2.0,
-      height: 2.0,
+    return Divider(
+      height: 1,
+      thickness: 1,
+      color: colorScheme.outlineVariant,
     );
   }
 

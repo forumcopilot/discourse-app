@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
+import 'broken_image_widget.dart';
 import 'cached_redirect_image.dart';
+import 'post_body_extensions.dart' show ImageGrid;
 import '../../theme/design_tokens.dart';
 
 /// A grid widget for displaying image attachments in big thumbnail mode
-/// Dynamically sizes thumbnails based on screen width, maintaining aspect ratios
+/// Dynamically sizes thumbnails based on screen width, maintaining aspect ratios.
+/// Drawn like a post's own image grid ([ImageGrid]): the same gap and corner
+/// radius, no frame; the file name under each picture.
 class AttachmentBigThumbnailGrid extends StatelessWidget {
   final List<FCAttachment> attachments;
   final Function(String imageUrl, BuildContext context, String heroTag)? onImageTap;
@@ -35,7 +39,7 @@ class AttachmentBigThumbnailGrid extends StatelessWidget {
         
         // Calculate optimal item size based on available width
         // Aim for 2-3 items per row on phones, more on tablets
-        final spacing = DesignTokens.spacingM;
+        const spacing = ImageGrid.gap;
         final minItemWidth = 120.0; // Minimum width for readability
         final maxItemWidth = 200.0; // Maximum width for consistency
         final preferredItemWidth = (availableWidth - spacing * 2) / 3; // Try for 3 columns
@@ -44,19 +48,23 @@ class AttachmentBigThumbnailGrid extends StatelessWidget {
         // Set max dimension to ensure consistent sizing across portrait/landscape
         final maxDimension = screenSize.width * 0.4;
 
-        return Wrap(
-          spacing: spacing,
-          runSpacing: spacing,
-          children: attachments.map((attachment) {
-            return _buildThumbnailItem(
-              context,
-              attachment,
-              itemWidth,
-              maxDimension,
-              colorScheme,
-              textTheme,
-            );
-          }).toList(),
+        // The gap above is the one the file list under a post has too.
+        return Padding(
+          padding: const EdgeInsets.only(top: DesignTokens.spacingS),
+          child: Wrap(
+            spacing: spacing,
+            runSpacing: spacing,
+            children: attachments.map((attachment) {
+              return _buildThumbnailItem(
+                context,
+                attachment,
+                itemWidth,
+                maxDimension,
+                colorScheme,
+                textTheme,
+              );
+            }).toList(),
+          ),
         );
       },
     );
@@ -78,17 +86,8 @@ class AttachmentBigThumbnailGrid extends StatelessWidget {
     // Calculate actual width (don't exceed maxDimension)
     final actualWidth = preferredWidth < maxDimension ? preferredWidth : maxDimension;
 
-    return Container(
-      margin: EdgeInsets.only(top: DesignTokens.spacingS),
-      padding: DesignTokens.paddingS,
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
-        borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
-          width: DesignTokens.borderWidthThin,
-        ),
-      ),
+    return SizedBox(
+      width: actualWidth,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -99,107 +98,59 @@ class AttachmentBigThumbnailGrid extends StatelessWidget {
               maxWidth: maxDimension,
               maxHeight: maxDimension,
             ),
-            child: Container(
-              width: actualWidth,
-              constraints: BoxConstraints(
-                maxWidth: maxDimension,
-                maxHeight: maxDimension,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(DesignTokens.radiusS),
-                  topRight: Radius.circular(DesignTokens.radiusS),
-                ),
-                color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(DesignTokens.radiusS),
-                  topRight: Radius.circular(DesignTokens.radiusS),
-                ),
-                child: Stack(
-                  children: [
-                    // Image - respects aspect ratio, fits within max dimension
-                    // The image will size itself to fit within both width and height constraints
-                    // while maintaining its natural aspect ratio
-                    GestureDetector(
-                      onTap: attachment.canViewUrl == true
-                          ? () => onImageTap?.call(attachment.url, context, attachment.id)
-                          : () => onLoginRequired?.call(context),
-                      child: CachedRedirectImage(
-                        imageUrl: imageUrl,
-                        width: actualWidth,
-                        fit: BoxFit.contain, // Maintains aspect ratio, fits within constraints
-                        errorWidget: (context, error, stackTrace) {
-                          return Container(
-                            width: actualWidth,
-                            height: actualWidth, // Square fallback
-                            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                            child: Icon(
-                              Icons.broken_image,
-                              size: 32,
-                              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                            ),
-                          );
-                        },
-                      ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(ImageGrid.radius),
+              child: Stack(
+                children: [
+                  // Image - respects aspect ratio, fits within max dimension
+                  // The image will size itself to fit within both width and height constraints
+                  // while maintaining its natural aspect ratio
+                  GestureDetector(
+                    onTap: attachment.canViewUrl == true
+                        ? () => onImageTap?.call(attachment.url, context, attachment.id)
+                        : () => onLoginRequired?.call(context),
+                    child: CachedRedirectImage(
+                      imageUrl: imageUrl,
+                      width: actualWidth,
+                      fit: BoxFit.contain, // Maintains aspect ratio, fits within constraints
+                      errorWidget: (context, error, stackTrace) {
+                        // Square, the same broken-image box as in a post.
+                        return BrokenImagePlaceholder(
+                          width: actualWidth,
+                          height: actualWidth,
+                        );
+                      },
                     ),
-                    // Lock overlay if can't view
-                    if (attachment.canViewUrl != true)
-                      Positioned(
-                        top: 6,
-                        right: 6,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: colorScheme.error.withValues(alpha: 0.9),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Icon(
-                            Icons.lock,
-                            size: 14,
-                            color: colorScheme.onError,
-                          ),
+                  ),
+                  // Lock overlay if can't view
+                  if (attachment.canViewUrl != true)
+                    Positioned(
+                      top: DesignTokens.spacingS,
+                      right: DesignTokens.spacingS,
+                      child: Container(
+                        padding: const EdgeInsets.all(DesignTokens.spacingXS),
+                        decoration: BoxDecoration(
+                          color: colorScheme.error.withValues(alpha: 0.9),
+                          borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
+                        ),
+                        child: Icon(
+                          Icons.lock,
+                          size: 14,
+                          color: colorScheme.onError,
                         ),
                       ),
-                  ],
-                ),
+                    ),
+                ],
               ),
             ),
           ),
-          // Filename (less prominent - smaller, lighter color, lower opacity)
-          // Constrain filename width to match thumbnail width
-          SizedBox(
-            width: actualWidth,
-            child: Builder(
-              builder: (context) {
-                // Optimize for dark mode - use higher opacity in dark mode for better visibility
-                final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-                final backgroundColor = isDarkMode
-                    ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5) // Higher opacity in dark mode
-                    : colorScheme.surfaceContainerHighest.withValues(alpha: 0.3); // Lower opacity in light mode
-                
-                return Container(
-                  decoration: BoxDecoration(
-                    color: backgroundColor,
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(DesignTokens.radiusS),
-                      bottomRight: Radius.circular(DesignTokens.radiusS),
-                    ),
-                  ),
-                  padding: EdgeInsets.all(DesignTokens.spacingXS),
-                  child: _buildFilenameWithExtension(
-                    attachment.filename,
-                    textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                      fontSize: DesignTokens.fontSizeXXS,
-                    ) ?? TextStyle(
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                      fontSize: DesignTokens.fontSizeXXS,
-                    ),
-                  ),
-                );
-              },
+          // The file name, as a caption: bodySmall in onSurfaceVariant.
+          Padding(
+            padding: const EdgeInsets.only(top: DesignTokens.spacingXS),
+            child: _buildFilenameWithExtension(
+              attachment.filename,
+              textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant) ??
+                  TextStyle(color: colorScheme.onSurfaceVariant),
             ),
           ),
         ],

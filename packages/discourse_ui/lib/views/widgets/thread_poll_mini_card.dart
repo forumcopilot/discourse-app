@@ -3,6 +3,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../theme/style_builders.dart';
+import 'post_body_extensions.dart';
 
 /// Compact fixed header showing a mini version of the thread poll when the user
 /// is not on the first page. Tapping jumps to the first post to show the full poll.
@@ -31,88 +32,79 @@ class ThreadPollMiniCard extends StatelessWidget {
 
     final viewFullPoll = l10n?.viewFullPoll ?? 'View full poll';
 
+    // The poll card's recipe (EmbeddedCard), inset from the screen edge
+    // outside the card so the ripple stays within its rounded shape.
     return Tooltip(
       message: viewFullPoll,
       child: Semantics(
         label: viewFullPoll,
         hint: l10n?.goToTop ?? 'Go to top',
         button: true,
-        child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-        child: Container(
-          margin: EdgeInsets.fromLTRB(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
             DesignTokens.spacingL,
             DesignTokens.spacingS,
             DesignTokens.spacingL,
             DesignTokens.spacingS,
           ),
-          padding: EdgeInsets.symmetric(
-            horizontal: DesignTokens.spacingM,
-            vertical: DesignTokens.spacingS,
-          ),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-            border: Border.all(
-              color: colorScheme.outlineVariant,
-              width: DesignTokens.borderWidthThin,
+          child: EmbeddedCard(
+            onTap: onTap,
+            padding: EdgeInsets.symmetric(
+              horizontal: DesignTokens.spacingM,
+              vertical: DesignTokens.spacingS,
             ),
-          ),
-          child: SafeArea(
-            top: false,
-            bottom: false,
-            child: Row(
-              children: [
-                Icon(
-                  Icons.poll_outlined,
-                  size: DesignTokens.iconSizeL,
-                  color: colorScheme.primary,
-                ),
-                SizedBox(width: DesignTokens.spacingM),
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        poll.question,
-                        style: StyleBuilders.bodyTextStyle(
-                          colorScheme: colorScheme,
-                          textTheme: textTheme,
-                          fontWeight: DesignTokens.fontWeightMedium,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: DesignTokens.spacingXS),
-                      Text(
-                        subtitle,
-                        style: StyleBuilders.smallTextStyle(
-                          colorScheme: colorScheme,
-                          textTheme: textTheme,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+            child: SafeArea(
+              top: false,
+              bottom: false,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.poll_outlined,
+                    size: DesignTokens.iconSizeL,
+                    color: colorScheme.primary,
                   ),
-                ),
-                SizedBox(width: DesignTokens.spacingS),
-                Icon(
-                  Icons.arrow_upward,
-                  size: DesignTokens.iconSizeM,
-                  color: colorScheme.primary,
-                ),
-              ],
+                  SizedBox(width: DesignTokens.spacingM),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          poll.question,
+                          style: StyleBuilders.bodyTextStyle(
+                            colorScheme: colorScheme,
+                            textTheme: textTheme,
+                            fontWeight: DesignTokens.fontWeightMedium,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: DesignTokens.spacingXS),
+                        Text(
+                          subtitle,
+                          style: StyleBuilders.smallTextStyle(
+                            colorScheme: colorScheme,
+                            textTheme: textTheme,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: DesignTokens.spacingS),
+                  Icon(
+                    Icons.arrow_upward,
+                    size: DesignTokens.iconSizeM,
+                    color: colorScheme.primary,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
-    ),
-    ),
     );
   }
 }

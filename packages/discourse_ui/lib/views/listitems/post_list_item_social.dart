@@ -237,37 +237,40 @@ class _ReactionClusterButton extends StatelessWidget {
         onTap: onTap,
         onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: DesignTokens.spacingXS,
-            vertical: DesignTokens.spacingXS,
+        // The like control on any post that has reactions, so it takes the
+        // same 48dp as the action buttons beside it (it was ~26dp).
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: kMinInteractiveDimension,
+            minWidth: kMinInteractiveDimension,
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (final r in shown) ...[
-                ReactionGlyph(
-                  reactionId: r.id,
-                  size: DesignTokens.iconSizeS,
-                  siteContext: siteContext,
-                ),
-                SizedBox(width: DesignTokens.spacingXS / 2),
-              ],
-              SizedBox(width: DesignTokens.spacingXS / 2),
-              Text(
-                '$total',
-                style: textTheme.bodySmall?.copyWith(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+                horizontal: DesignTokens.spacingS),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final r in shown) ...[
+                  ReactionGlyph(
+                    reactionId: r.id,
+                    size: DesignTokens.iconSizeSMedium,
+                    siteContext: siteContext,
+                  ),
+                  const SizedBox(width: 2),
+                ],
+                const SizedBox(width: DesignTokens.spacingXS),
+                Text(
+                  '$total',
                   // The viewer's own participation is the one thing a bare
                   // count cannot convey, so carry it in the colour.
-                  color: viewerReacted
-                      ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant,
-                  fontWeight: viewerReacted
-                      ? DesignTokens.fontWeightBold
-                      : DesignTokens.fontWeightSemiBold,
+                  style: textTheme.labelLarge?.copyWith(
+                    color: viewerReacted
+                        ? colorScheme.primary
+                        : colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

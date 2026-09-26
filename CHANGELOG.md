@@ -6,6 +6,30 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Changed
+- **The topic page around the posts follows the same spec:**
+  - **The first post's title** is `titleLarge` (22sp), the size the app bar gives it, instead of 16sp w700.
+  - **The reaction cluster** (the like control on any post with reactions) is a 48dp target like the Reply, Like and Bookmark buttons beside it, with 18dp glyphs and a 14sp count; it was ~26dp high with 16dp glyphs and a bold 12sp count.
+  - **"N replies" and "in reply to …"** take a 48dp tap (they were ~24–26dp lines of 12sp text), and "N replies" reads like a text button.
+  - **Less space between a post's text and its actions**: the body no longer adds 24dp of its own on top of the actions row's 12 (about 60dp of gap on text posts).
+  - **One 1dp rule between posts** (was 2dp at 30% opacity).
+  - **Banners** (closed, pinned, deleted, subscribed, the message page's closed banner and the account-state banner) are 56dp for one line with full 48dp close buttons; the close buttons were squeezed to ~20dp.
+  - **Vote arrows** are full 48dp buttons (were ~36×40); the author's name gives way instead of overflowing next to a long full name and badges; the edited pencil is 16dp with a wider tap.
+  - **The solved-answer card** has 12dp corners like other cards and shows four whole lines of the answer (a fifth was cut in half).
+  - **The image viewer** titles itself "2 / 5" when a post has several images (it showed the image's URL) and uses standard icon sizes.
+- **Post bodies (posts, messages and chat) share one rhythm and one card:**
+  - **One 12dp gap between blocks** of every kind (paragraphs, lists, headings, quotes, code, tables, previews, polls, images), and none after the last one. Lists were glued to the paragraph after them (4dp), blocks drawn by the app had 20dp above and 8 below, and every post and quote ended in 12dp of empty space.
+  - **Headings h1–h6** are 24, 22, 20, 18, 16 and 16sp, medium weight, never smaller than the text around them (h5 and h6 were 13 and 11sp).
+  - **Code** is one 14sp size for blocks and inline code (inline was larger than blocks, and chat code was 12sp); blocks have 12dp corners, inline code is a small rounded chip, and the copy button no longer shows text through it.
+  - **One card for embedded things** (`EmbeddedCard`: 12dp corners, 12dp padding, a 1dp outline): link previews, embeds, tweets (one design instead of two), events, details, polls, audio and file attachments. There were seven corner radii and several paddings and fills. Images and grids have 8dp corners and an 8dp gap, and a failed image looks the same everywhere (`BrokenImagePlaceholder`).
+  - **Quotes** have 12dp padding on every side (they were 8 above and ~20 below) and a medium-weight attribution line.
+  - **Polls** sit at the post's margin (they were inset twice), options are 48dp rows that wrap instead of truncating, and Vote is a standard button. The details toggle is a 48dp row with a chevron.
+  - **Chat text is 16sp** like posts and messages (it was 14); the sender's name is 14sp and the time 12sp (both were 11sp), and reaction chips are Material 3 chips with 48dp targets (were 22dp).
+  - **Nothing readable below 12sp**: link click counts (were 11 and 10sp) and upload captions (10sp).
+
+### Fixed
+- **Suggested Topics no longer show "?" avatars** (from 1.0.34) when a forum sends suggested topics without a poster; they show a topic glyph in the avatar's place.
+
 ## [1.0.34] - 2026-09-26
 
 ### Changed

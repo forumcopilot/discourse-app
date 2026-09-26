@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
 import '../../l10n/generated/app_localizations.dart';
+import 'post_body_extensions.dart';
 import 'sheet_title.dart';
 import 'user_avatar.dart';
 
@@ -193,44 +194,32 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
     final showVoters =
         isDiscoursePolls && showResults && widget.poll.publicVotes;
 
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: DesignTokens.spacingL,
-        vertical: DesignTokens.spacingS,
-      ),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
-        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
-          width: DesignTokens.borderWidthThin,
-        ),
-      ),
-      child: Padding(
-        padding: DesignTokens.paddingCard,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.poll.question,
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: DesignTokens.fontWeightSemiBold,
-                color: colorScheme.onSurface,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+    // The one card recipe, at the post's own margin (no inset of its own);
+    // the gap to the next block is the post body's.
+    return EmbeddedCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.poll.question,
+            style: textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurface,
             ),
-            SizedBox(height: DesignTokens.spacingM),
-            ...widget.poll.responses.map((r) => _buildOptionRow(
-                  context,
-                  r,
-                  showResults: showResults,
-                  canVote: canVote,
-                  voterCount: voterCount,
-                )),
-            SizedBox(height: DesignTokens.spacingM),
-            if (canVote) ...[
-              FilledButton(
+          ),
+          SizedBox(height: DesignTokens.spacingM),
+          ...widget.poll.responses.map((r) => _buildOptionRow(
+                context,
+                r,
+                showResults: showResults,
+                canVote: canVote,
+                voterCount: voterCount,
+              )),
+          SizedBox(height: DesignTokens.spacingM),
+          if (canVote) ...[
+            // A standard FilledButton, across the card.
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
                 onPressed: (_selectedIds.isNotEmpty && !_isSubmitting) ? _submitVote : null,
                 child: _isSubmitting
                     ? SizedBox(
@@ -242,44 +231,41 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
                         ),
                       )
                     : Text(l10n.vote),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 44),
-                ),
               ),
-              SizedBox(height: DesignTokens.spacingS),
-            ],
-            if (showRemoveVote || showVoters)
-              Row(
-                children: [
-                  if (showRemoveVote)
-                    TextButton.icon(
-                      onPressed: _isRemovingVote ? null : _removeVote,
-                      icon: _isRemovingVote
-                          ? SizedBox(
-                              height: 14,
-                              width: 14,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: colorScheme.primary,
-                              ),
-                            )
-                          : Icon(Icons.undo, size: DesignTokens.iconSizeS),
-                      label: Text(AppLocalizations.of(context)!.removeVote),
-                    ),
-                  if (showRemoveVote && showVoters)
-                    SizedBox(width: DesignTokens.spacingS),
-                  if (showVoters)
-                    TextButton.icon(
-                      onPressed: _showVoters,
-                      icon: Icon(Icons.people_outline,
-                          size: DesignTokens.iconSizeS),
-                      label: Text(AppLocalizations.of(context)!.showVoters),
-                    ),
-                ],
-              ),
-            _buildFooter(l10n, colorScheme, textTheme),
+            ),
+            SizedBox(height: DesignTokens.spacingS),
           ],
-        ),
+          if (showRemoveVote || showVoters)
+            Row(
+              children: [
+                if (showRemoveVote)
+                  TextButton.icon(
+                    onPressed: _isRemovingVote ? null : _removeVote,
+                    icon: _isRemovingVote
+                        ? SizedBox(
+                            height: DesignTokens.iconSizeSMedium,
+                            width: DesignTokens.iconSizeSMedium,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: colorScheme.primary,
+                            ),
+                          )
+                        : Icon(Icons.undo, size: DesignTokens.iconSizeSMedium),
+                    label: Text(AppLocalizations.of(context)!.removeVote),
+                  ),
+                if (showRemoveVote && showVoters)
+                  SizedBox(width: DesignTokens.spacingS),
+                if (showVoters)
+                  TextButton.icon(
+                    onPressed: _showVoters,
+                    icon: Icon(Icons.people_outline,
+                        size: DesignTokens.iconSizeSMedium),
+                    label: Text(AppLocalizations.of(context)!.showVoters),
+                  ),
+              ],
+            ),
+          _buildFooter(l10n, colorScheme, textTheme),
+        ],
       ),
     );
   }
@@ -310,9 +296,12 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
           onTap: canVote ? () => _toggleOption(r.id) : null,
           borderRadius: BorderRadius.circular(DesignTokens.radiusS),
           child: Container(
+            // A 48dp choice row however short its text.
+            constraints: const BoxConstraints(minHeight: 48),
+            alignment: AlignmentDirectional.centerStart,
             padding: EdgeInsets.symmetric(
               horizontal: DesignTokens.spacingM,
-              vertical: DesignTokens.spacingS + DesignTokens.spacingXS,
+              vertical: DesignTokens.spacingM,
             ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(DesignTokens.radiusS),
@@ -356,15 +345,15 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
                           color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
                         ),
                       ),
+                    // The whole option, wrapped: an option cut off cannot be
+                    // chosen knowingly.
                     Expanded(
                       child: Text(
                         r.text,
-                        style: textTheme.bodyMedium?.copyWith(
+                        style: textTheme.bodyLarge?.copyWith(
                           color: colorScheme.onSurface,
-                          fontWeight: r.viewerVotedFor ? DesignTokens.fontWeightSemiBold : null,
+                          fontWeight: r.viewerVotedFor ? DesignTokens.fontWeightMedium : null,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (percent != null)
@@ -584,7 +573,6 @@ class _PollVotersSheetState extends State<_PollVotersSheet> {
                             _optionText(optionId),
                             style: textTheme.labelLarge?.copyWith(
                               color: colorScheme.primary,
-                              fontWeight: FontWeight.w600,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,

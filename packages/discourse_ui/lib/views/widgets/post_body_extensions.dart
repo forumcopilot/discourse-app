@@ -3,6 +3,237 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:html/dom.dart' as dom;
 
 import '../../theme/design_tokens.dart';
+import 'broken_image_widget.dart';
+
+/// The one gap between consecutive blocks of a post body — paragraphs,
+/// lists, quotes, code, tables, previews, polls, images, details. Blocks
+/// take it below themselves and nothing above, so any two blocks are this
+/// far apart whatever they are.
+const double kPostBlockGap = DesignTokens.spacingM;
+
+/// [child], a block drawn by an extension, with the bottom margin its
+/// element was left with once flutter_html collapsed margins: the block gap
+/// before the next block, none when the block ends its post, quote or
+/// paragraph (whose own margin then applies once).
+///
+/// flutter_html only draws the margins of the boxes it builds itself, so an
+/// extension's widget has to draw its own.
+Widget withBlockGap(ExtensionContext context, Widget child) {
+  final gap = context.styledElement?.style.margin?.bottom?.value ?? 0;
+  if (gap <= 0) return child;
+  return Padding(padding: EdgeInsets.only(bottom: gap), child: child);
+}
+
+/// Keeps the block gap *between* blocks: the first block in a post body,
+/// quote, details, event or table cell starts flush with its box and the
+/// last one ends flush, all the way down (a list's last item, a quote's
+/// last paragraph). Otherwise flutter_html collapsed the last paragraph's
+/// 12dp into the body and every post, message and preview ended in a blank
+/// band, and quotes sat 8dp from their top edge but 20dp from the bottom.
+class PostBlockRhythmExtension extends HtmlExtension {
+  const PostBlockRhythmExtension();
+
+  @override
+  Set<String> get supportedTags => const {};
+
+  @override
+  bool matches(ExtensionContext context) {
+    // Only trims margins; the element is prepared and built as usual.
+    if (context.currentStep != CurrentStep.preProcessing) return false;
+    switch (context.elementName) {
+      case 'body':
+      case 'blockquote':
+      case 'details':
+      case 'td':
+      case 'th':
+        return true;
+      case 'aside':
+        return context.classes.contains('quote');
+      case 'div':
+        return context.classes.contains('discourse-post-event');
+    }
+    return false;
+  }
+
+  @override
+  void beforeProcessing(ExtensionContext context) {
+    final element = context.styledElement;
+    if (element == null) return;
+    for (var e = _edge(element, last: false); e != null; e = _edge(e, last: false)) {
+      e.style.margin = (e.style.margin ?? const Margins()).copyWith(top: Margin.zero());
+      if ((e.style.padding?.top?.value ?? 0) > 0) break;
+    }
+    for (var e = _edge(element, last: true); e != null; e = _edge(e, last: true)) {
+      e.style.margin = (e.style.margin ?? const Margins()).copyWith(bottom: Margin.zero());
+      if ((e.style.padding?.bottom?.value ?? 0) > 0) break;
+    }
+  }
+
+  /// The first (or last) child that can carry a block margin, skipping the
+  /// whitespace between blocks and hidden elements; null when text is at
+  /// the edge.
+  static StyledElement? _edge(StyledElement parent, {required bool last}) {
+    for (final c in last ? parent.children.reversed : parent.children) {
+      if (c is TextContentElement) {
+        if ((c.text ?? '').trim().isEmpty) continue;
+        return null;
+      }
+      if (c is EmptyContentElement || c.style.display == Display.none) continue;
+      return c;
+    }
+    return null;
+  }
+}
+
+/// The one container every card-like block in a post uses — link previews,
+/// embeds, tweets, polls, events, details, file rows: radius 12, padding 12,
+/// a 1dp outlineVariant border on surfaceContainerLow. With [onTap] the
+/// whole card is the target, its ripple clipped to the card.
+class EmbeddedCard extends StatelessWidget {
+  const EmbeddedCard({
+    super.key,
+    required this.child,
+    this.onTap,
+    this.padding = const EdgeInsets.all(DesignTokens.spacingM),
+  });
+
+  final Widget child;
+  final VoidCallback? onTap;
+  final EdgeInsetsGeometry padding;
+
+  static const double radius = DesignTokens.radiusM;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final content = Padding(padding: padding, child: child);
+    return Material(
+      color: colorScheme.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radius),
+        side: BorderSide(
+          color: colorScheme.outlineVariant,
+          width: DesignTokens.borderWidthThin,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: onTap == null ? content : InkWell(onTap: onTap, child: content),
+    );
+  }
+}
+
+/// One row for a file or an embedded page — a cooked attachment, an
+/// upload, a Spotify track: a 48dp leading tile, the name over its details,
+/// and any actions, 12 apart inside 12 of padding.
+class FileRow extends StatelessWidget {
+  const FileRow({
+    super.key,
+    required this.leading,
+    required this.title,
+    this.subtitle,
+    this.trailing = const [],
+    this.padding = const EdgeInsets.all(DesignTokens.spacingM),
+  });
+
+  final Widget leading;
+  final Widget title;
+  final Widget? subtitle;
+  final List<Widget> trailing;
+  final EdgeInsetsGeometry padding;
+
+  /// The name: a card title.
+  static TextStyle? titleStyle(BuildContext context) => Theme.of(context)
+      .textTheme
+      .titleMedium
+      ?.copyWith(color: Theme.of(context).colorScheme.onSurface);
+
+  /// The type, size or site under the name.
+  static TextStyle? subtitleStyle(BuildContext context) => Theme.of(context)
+      .textTheme
+      .bodySmall
+      ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: padding,
+      child: Row(
+        children: [
+          SizedBox(width: 48, height: 48, child: leading),
+          const SizedBox(width: DesignTokens.spacingM),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DefaultTextStyle.merge(style: titleStyle(context), child: title),
+                if (subtitle != null) ...[
+                  const SizedBox(height: DesignTokens.spacingXS / 2),
+                  DefaultTextStyle.merge(style: subtitleStyle(context), child: subtitle!),
+                ],
+              ],
+            ),
+          ),
+          ...trailing,
+        ],
+      ),
+    );
+  }
+}
+
+/// `aside.quote` and a plain `blockquote`: flutter_html draws the box from
+/// the style sheet (its padding, fill and accent bar); this rounds it and
+/// draws its bottom margin outside the rounded box, where CSS puts it.
+class QuoteExtension extends HtmlExtension {
+  const QuoteExtension();
+
+  @override
+  Set<String> get supportedTags => const {};
+
+  @override
+  bool matches(ExtensionContext context) {
+    if (context.currentStep != CurrentStep.preparing &&
+        context.currentStep != CurrentStep.building) {
+      return false;
+    }
+    switch (context.elementName) {
+      case 'aside':
+        return context.classes.contains('quote');
+      case 'blockquote':
+        // A quote's own blockquote is drawn by the quote (see the
+        // `aside.quote blockquote` style).
+        for (var p = context.node.parent; p != null; p = p.parent) {
+          if (p.localName == 'aside' && p.classes.contains('quote')) {
+            return false;
+          }
+        }
+        return true;
+    }
+    return false;
+  }
+
+  @override
+  StyledElement prepare(ExtensionContext context, List<StyledElement> children) =>
+      context.parser.prepareFromExtension(context, children, extensionsToIgnore: {this});
+
+  @override
+  InlineSpan build(ExtensionContext context) {
+    final style = context.style ?? Style();
+    return WidgetSpan(
+      child: withBlockGap(
+        context,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+          child: CssBoxWidget.withInlineSpanChildren(
+            style: style.copyWith(margin: Margins.zero),
+            shrinkWrap: context.parser.shrinkWrap,
+            children: context.inlineSpanChildren ?? [],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 /// `a.mention` / `a.mention-group` as the web's pill: a rounded tag in the
 /// text colour on a light background, slightly smaller than the text.
@@ -59,7 +290,7 @@ class _MentionPill extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: size * 0.34, vertical: size * 0.2),
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(size * 0.6),
+            borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
           ),
           child: Text(
             text,
@@ -78,8 +309,8 @@ class _MentionPill extends StatelessWidget {
   }
 }
 
-/// `<details>` as discourse-details draws it: ▶ and the summary on a light
-/// background, ▼ and the contents below once opened. flutter_html used a
+/// `<details>` as discourse-details draws it: a disclosure arrow and the
+/// summary, the contents below once opened, in a card. flutter_html used a
 /// Material ExpansionTile (chevron on the right, list-tile padding).
 class DetailsExtension extends HtmlExtension {
   const DetailsExtension();
@@ -106,11 +337,14 @@ class DetailsExtension extends HtmlExtension {
     return WidgetSpan(
       child: SizedBox(
         width: double.infinity,
-        child: DetailsBlock(
-          summary: summarySpan,
-          content: rest,
-          initiallyOpen: context.attributes.containsKey('open'),
-          boxed: context.classes.contains('details__boxed'),
+        child: withBlockGap(
+          context,
+          DetailsBlock(
+            summary: summarySpan,
+            content: rest,
+            initiallyOpen: context.attributes.containsKey('open'),
+            boxed: context.classes.contains('details__boxed'),
+          ),
         ),
       ),
     );
@@ -142,10 +376,8 @@ class _DetailsBlockState extends State<DetailsBlock> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final summary = widget.summary;
-    return Container(
-      margin: const EdgeInsets.only(bottom: DesignTokens.spacingS),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+    return EmbeddedCard(
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -155,33 +387,46 @@ class _DetailsBlockState extends State<DetailsBlock> {
             expanded: _open,
             child: InkWell(
               onTap: () => setState(() => _open = !_open),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 6, top: 2),
-                      child: Text(_open ? '▼' : '▶',
-                          style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant)),
-                    ),
-                    Expanded(
-                      child: summary == null
-                          ? const SizedBox.shrink()
-                          : DefaultTextStyle.merge(
-                              style: TextStyle(
-                                  fontWeight: widget.boxed ? FontWeight.bold : null),
-                              child: Text.rich(TextSpan(children: [summary])),
-                            ),
-                    ),
-                  ],
+              // A 48dp target however short the summary.
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 48),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: DesignTokens.spacingM,
+                    vertical: DesignTokens.spacingM,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        _open ? Icons.expand_more : Icons.chevron_right,
+                        size: DesignTokens.iconSizeL,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: DesignTokens.spacingS),
+                      Expanded(
+                        child: summary == null
+                            ? const SizedBox.shrink()
+                            : DefaultTextStyle.merge(
+                                style: TextStyle(
+                                    fontWeight: widget.boxed ? FontWeight.w500 : null),
+                                child: Text.rich(TextSpan(children: [summary])),
+                              ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
           if (_open && widget.content.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.fromLTRB(
+                DesignTokens.spacingM,
+                0,
+                DesignTokens.spacingM,
+                DesignTokens.spacingM,
+              ),
               child: Text.rich(TextSpan(children: widget.content)),
             ),
         ],
@@ -218,10 +463,13 @@ class ImageGridExtension extends HtmlExtension {
     return WidgetSpan(
       child: SizedBox(
         width: double.infinity,
-        child: ImageGrid(
-          items: items,
-          carousel: context.attributes['data-mode'] == 'carousel',
-          onImageTap: onImageTap,
+        child: withBlockGap(
+          context,
+          ImageGrid(
+            items: items,
+            carousel: context.attributes['data-mode'] == 'carousel',
+            onImageTap: onImageTap,
+          ),
         ),
       ),
     );
@@ -271,19 +519,20 @@ class ImageGrid extends StatelessWidget {
   final bool carousel;
   final void Function(String full, BuildContext context)? onImageTap;
 
-  static const double gap = 6;
+  /// The gap between pictures, here and in the upload grid under a post.
+  static const double gap = DesignTokens.spacingS;
+
+  /// The corner radius of every picture in a post.
+  static const double radius = DesignTokens.radiusS;
 
   Widget _tile(BuildContext context, GridImage item, {double? height}) {
     final picture = ClipRRect(
-      borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
+      borderRadius: BorderRadius.circular(radius),
       child: Image.network(
         item.src,
         fit: BoxFit.cover,
         height: height,
-        errorBuilder: (c, _, __) => ColoredBox(
-          color: Theme.of(c).colorScheme.surfaceContainerHighest,
-          child: const SizedBox.expand(),
-        ),
+        errorBuilder: (c, _, __) => const BrokenImagePlaceholder(),
       ),
     );
     final framed = height != null
@@ -298,16 +547,13 @@ class ImageGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (carousel) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
-        child: SizedBox(
-          height: 240,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: items.length,
-            separatorBuilder: (_, __) => const SizedBox(width: gap),
-            itemBuilder: (c, i) => _tile(c, items[i], height: 240),
-          ),
+      return SizedBox(
+        height: 240,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: items.length,
+          separatorBuilder: (_, __) => const SizedBox(width: gap),
+          itemBuilder: (c, i) => _tile(c, items[i], height: 240),
         ),
       );
     }
@@ -324,26 +570,23 @@ class ImageGrid extends StatelessWidget {
       heights[shortest] += 1 / (item.ratio ?? 1);
       lists[shortest].add(item);
     }
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (var c = 0; c < columns; c++) ...[
-            if (c > 0) const SizedBox(width: gap),
-            Expanded(
-              child: Column(
-                children: [
-                  for (var i = 0; i < lists[c].length; i++) ...[
-                    if (i > 0) const SizedBox(height: gap),
-                    _tile(context, lists[c][i]),
-                  ],
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var c = 0; c < columns; c++) ...[
+          if (c > 0) const SizedBox(width: gap),
+          Expanded(
+            child: Column(
+              children: [
+                for (var i = 0; i < lists[c].length; i++) ...[
+                  if (i > 0) const SizedBox(height: gap),
+                  _tile(context, lists[c][i]),
                 ],
-              ),
+              ],
             ),
-          ],
+          ),
         ],
-      ),
+      ],
     );
   }
 }

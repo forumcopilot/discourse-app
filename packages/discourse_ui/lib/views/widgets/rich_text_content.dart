@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:discourse_core/discourse_core.dart' show DiscourseSiteCapabilities;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -7,6 +9,7 @@ import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as html_parser;
 
 import 'brand_image.dart';
+import 'broken_image_widget.dart';
 import 'code_block.dart';
 import 'discourse_blocks.dart';
 import 'embed_cards.dart';
@@ -49,9 +52,13 @@ class RichTextContent extends StatelessWidget {
   /// diagram offers to open it there).
   final String? webUrl;
 
-  /// Body text size. Posts use Discourse's 16 (the web's size on phones);
-  /// denser surfaces such as chat pass their own.
+  /// Body text size: 16, Discourse's size on phones, for posts, messages
+  /// and chat alike. A preview's excerpt passes its smaller card size.
   final double? baseFontSize;
+
+  /// Body text colour, for text on a coloured surface (your own chat
+  /// message on primaryContainer); the theme's onSurface otherwise.
+  final Color? textColor;
 
   const RichTextContent({
     super.key,
@@ -61,6 +68,7 @@ class RichTextContent extends StatelessWidget {
     this.pollBuilder,
     this.webUrl,
     this.baseFontSize,
+    this.textColor,
   });
 
   /// Extracts the username from a Discourse profile href
@@ -83,7 +91,14 @@ class RichTextContent extends StatelessWidget {
     // Material's 14/1.4, which made long posts read noticeably denser.
     final body = (textTheme.bodyMedium ?? const TextStyle())
         .copyWith(fontSize: baseFontSize ?? 16);
-    final bodyColor = body.color ?? colorScheme.onSurface;
+    final bodyColor = textColor ?? body.color ?? colorScheme.onSurface;
+    // One monospace size for code blocks and inline code, on every surface.
+    final codeStyle = body.copyWith(
+      fontFamily: 'monospace',
+      fontSize: _codeFontSize,
+      height: 1.4,
+      color: bodyColor,
+    );
     final mutedColor = colorScheme.onSurfaceVariant;
     final accent = colorScheme.primary;
 
@@ -104,6 +119,7 @@ class RichTextContent extends StatelessWidget {
 
     return PostBodyFallback(
       html: html,
+      style: body.copyWith(color: bodyColor, height: 1.5),
       child: Html(
       data: html,
       onLinkTap: (url, attributes, _) {
@@ -151,6 +167,8 @@ class RichTextContent extends StatelessWidget {
       // the OS, works offline, no network round-trips. Falls back to the
       // PNG for forum-custom emoji that aren't in standard Unicode.
       extensions: [
+        const PostBlockRhythmExtension(),
+        const QuoteExtension(),
         PostTableExtension(colorScheme: colorScheme),
         MentionExtension(onTap: (href, isGroup) {
           if (!isGroup && callbacks?.onMentionTap != null) {
@@ -173,15 +191,18 @@ class RichTextContent extends StatelessWidget {
         _EmbedExtension(resolve: _resolveUrl, onOpen: openEmbed),
         DiscourseBlocksExtension(onOpen: openEmbed, pollBuilder: pollBuilder),
         // Link previews: a native card; what is inside the preview's body is
-        // rendered by a nested RichTextContent, so it keeps every rule here.
+        // rendered by a nested RichTextContent, so it keeps every rule here,
+        // at the size and colour the card gives its excerpt.
         OneboxExtension(
           resolve: _resolveUrl,
           onOpen: openEmbed,
-          renderHtml: (html) => RichTextContent(
+          renderHtml: (html, {fontSize, color}) => RichTextContent(
             siteContext: siteContext,
             content: html,
             callbacks: callbacks,
             webUrl: webUrl,
+            baseFontSize: fontSize ?? baseFontSize,
+            textColor: color ?? textColor,
           ),
         ),
         // Discourse renders a non-image upload as
@@ -204,7 +225,6 @@ class RichTextContent extends StatelessWidget {
             DiscourseLinkHandler.open(context, siteContext, resolved);
           },
           colorScheme: colorScheme,
-          textTheme: Theme.of(context).textTheme,
         ),
         // Code blocks scroll sideways; they must never wrap. flutter_html
         // wraps by default, which broke shared code rather than merely
@@ -231,43 +251,39 @@ class RichTextContent extends StatelessWidget {
               // otherwise leave a blank band inside the block.
               code: code.replaceAll(RegExp(r'\n+$'), ''),
               language: extensionContext.attributes['data-code-wrap'] == 'mermaid' ? null : language,
-              textStyle: body.copyWith(
-                fontFamily: 'monospace',
-                fontSize: (body.fontSize ?? 14) * 0.85,
-                height: 1.4,
-              ),
+              textStyle: codeStyle,
             );
             // A Mermaid diagram is drawn by JavaScript on the web; the app
             // shows its source, says what it is, and offers the web.
             if (extensionContext.attributes['data-code-wrap'] != 'mermaid') {
-              return codeBlock;
+              return withBlockGap(extensionContext, codeBlock);
             }
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Row(
+            return withBlockGap(
+              extensionContext,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
                     children: [
-                      Icon(Icons.account_tree_outlined, size: 18, color: mutedColor),
-                      const SizedBox(width: 6),
+                      Icon(Icons.account_tree_outlined, size: DesignTokens.iconSizeSMedium, color: mutedColor),
+                      const SizedBox(width: DesignTokens.spacingS),
                       Text('Mermaid',
-                          style: body.copyWith(color: mutedColor, fontWeight: FontWeight.w600)),
+                          style: body.copyWith(color: mutedColor, fontWeight: FontWeight.w500)),
                       const Spacer(),
                       if (webUrl != null)
                         Builder(
                           builder: (context) => TextButton.icon(
                             onPressed: () => openEmbed(webUrl!),
-                            icon: const Icon(Icons.open_in_new, size: 16),
+                            icon: const Icon(Icons.open_in_new, size: DesignTokens.iconSizeSMedium),
                             label: Text(AppLocalizations.of(context)?.viewOnWeb ?? 'View on Web'),
                           ),
                         ),
                     ],
                   ),
-                ),
-                codeBlock,
-              ],
+                  codeBlock,
+                ],
+              ),
             );
           },
         ),
@@ -292,8 +308,9 @@ class RichTextContent extends StatelessWidget {
                     style: body.copyWith(
                       // Bump emoji slightly so they sit nicely with text; a
                       // post of nothing but emoji shows them large, as the
-                      // web does (`img.emoji.only-emoji`, 32px).
-                      fontSize: onlyEmoji ? 28 : (body.fontSize ?? 14) * 1.15,
+                      // web does (`img.emoji.only-emoji`, 32px) — the same
+                      // size as an image emoji there.
+                      fontSize: onlyEmoji ? _onlyEmojiSize : (body.fontSize ?? 14) * 1.15,
                       height: 1.0,
                     ),
                   );
@@ -306,11 +323,11 @@ class RichTextContent extends StatelessWidget {
             if (src == null || src.isEmpty) return const SizedBox.shrink();
             final resolved = _resolveUrl(src);
             final w = onlyEmoji
-                ? 32.0
+                ? _onlyEmojiSize
                 : double.tryParse(extensionContext.attributes['width'] ?? '') ??
                     (isEmoji ? 20 : null);
             final h = onlyEmoji
-                ? 32.0
+                ? _onlyEmojiSize
                 : double.tryParse(extensionContext.attributes['height'] ?? '') ??
                     (isEmoji ? 20 : null);
             // A onebox's avatar (a tweet's author, a GitHub user) is a small
@@ -318,7 +335,7 @@ class RichTextContent extends StatelessWidget {
             // would fill the post.
             if (classes.split(RegExp(r'\s+')).contains('onebox-avatar')) {
               return _NoBaseline(child: ClipRRect(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(DesignTokens.radiusS),
                 child: Image.network(
                   resolved,
                   width: 48,
@@ -333,8 +350,11 @@ class RichTextContent extends StatelessWidget {
             // with flutter_svg from the disk cache, falling back the same way
             // when the file is missing or not SVG.
             final isSvg = BrandImage.isSvg(resolved);
-            Widget fallback(BuildContext _) =>
-                Text(alt, style: TextStyle(color: mutedColor));
+            // An emoji that fails reads as its `:name:`; a picture gets the
+            // same broken-image box as everywhere else.
+            Widget fallback(BuildContext _) => isEmoji
+                ? Text(alt, style: TextStyle(color: mutedColor))
+                : BrokenImagePlaceholder(alt: alt);
             Widget picture({double? width, double? height}) => isSvg
                 ? BrandImage(
                     resolved,
@@ -362,6 +382,16 @@ class RichTextContent extends StatelessWidget {
                     child: AspectRatio(aspectRatio: w / h, child: picture()),
                   )
                 : picture(width: w, height: h);
+            // A person's avatar (a quote's author) is round, as everywhere
+            // else in the app, and is not a picture to open.
+            if (classes.split(RegExp(r'\s+')).contains('avatar')) {
+              return _NoBaseline(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: DesignTokens.spacingXS),
+                  child: ClipOval(child: image),
+                ),
+              );
+            }
             // Route content-image taps to the in-app viewer (emoji stay
             // plain inline glyphs/images).
             final onImageTap = callbacks?.onImageTap;
@@ -378,20 +408,48 @@ class RichTextContent extends StatelessWidget {
         ),
         // Web draws <hr> as a thin rule in the border colour. flutter_html's
         // default is a black Border.all box with auto margins, which in a
-        // post left a heavy rule and ~280dp of blank space under it.
-        TagExtension(
+        // post left a heavy rule and ~280dp of blank space under it. Like any
+        // block it has the block gap below it (the one above is the previous
+        // block's), and it is centred in its line, which is taller than both.
+        TagExtension.inline(
           tagsToExtend: {'hr'},
-          builder: (_) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
-            child: SizedBox(
-              width: double.infinity,
-              child: Divider(
-                height: 1,
-                thickness: 1,
-                color: colorScheme.outlineVariant,
+          builder: (extensionContext) => WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: withBlockGap(
+              extensionContext,
+              SizedBox(
+                width: double.infinity,
+                child: Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: colorScheme.outlineVariant,
+                ),
               ),
             ),
           ),
+        ),
+        // Inline code as a small rounded chip, in the one code size. Code in
+        // a link stays text (see the `code` style), so the link still taps.
+        MatcherExtension.inline(
+          matcher: (c) =>
+              c.elementName == 'code' && !_hasAncestor(c.node, const {'pre', 'a'}),
+          builder: (c) {
+            final style = c.styledElement?.style.generateTextStyle() ?? codeStyle;
+            return WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingXS),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
+                ),
+                child: Text(
+                  c.element?.text ?? '',
+                  style: style.copyWith(height: 1.4, backgroundColor: Colors.transparent),
+                ),
+              ),
+            );
+          },
         ),
         // A followed link's click count, as the web's small grey badge.
         MatcherExtension.inline(
@@ -399,19 +457,15 @@ class RichTextContent extends StatelessWidget {
           builder: (c) => WidgetSpan(
             alignment: PlaceholderAlignment.middle,
             child: Container(
-              margin: const EdgeInsets.only(left: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              margin: const EdgeInsets.only(left: DesignTokens.spacingXS),
+              padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingXS),
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
               ),
               child: Text(
                 c.element?.text ?? '',
-                style: body.copyWith(
-                  fontSize: (body.fontSize ?? 14) * 0.7,
-                  color: mutedColor,
-                  height: 1.2,
-                ),
+                style: textTheme.labelMedium?.copyWith(color: mutedColor),
               ),
             ),
           ),
@@ -467,6 +521,20 @@ class RichTextContent extends StatelessWidget {
   }
 }
 
+/// Code's one size, block and inline, in posts, messages and chat.
+const double _codeFontSize = 14;
+
+/// A post of nothing but emoji: glyph and image emoji alike, as the web's
+/// `img.emoji.only-emoji`.
+const double _onlyEmojiSize = 32;
+
+/// Whether [node] sits inside any of [tags].
+bool _hasAncestor(dom.Node node, Set<String> tags) {
+  for (var p = node.parent; p != null; p = p.parent) {
+    if (tags.contains(p.localName)) return true;
+  }
+  return false;
+}
 
 /// Author colours (`<font color>`, normalised to `#rrggbb` by CookedContent)
 /// adjusted to stay readable on [surface]: black text turns light grey in
@@ -498,9 +566,13 @@ String _readableAuthorColours(String html, Color surface) {
 /// plain text instead, so an unexpected construct degrades to something
 /// readable.
 class PostBodyFallback extends InheritedWidget {
-  const PostBodyFallback({super.key, required this.html, required super.child});
+  const PostBodyFallback({super.key, required this.html, this.style, required super.child});
 
   final String html;
+
+  /// The body text's style, so the fallback reads at the post's size;
+  /// bodyLarge when not given.
+  final TextStyle? style;
 
   static PostBodyFallback? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<PostBodyFallback>();
@@ -538,7 +610,8 @@ class _PostBodyErrorView extends StatelessWidget {
     final insideRenderedHtml =
         context.findAncestorWidgetOfExactType<CssBoxWidget>() != null;
     if (fallback != null && !insideRenderedHtml) {
-      return Text(fallback.plainText, style: Theme.of(context).textTheme.bodyMedium);
+      return Text(fallback.plainText,
+          style: fallback.style ?? Theme.of(context).textTheme.bodyLarge);
     }
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 200),
@@ -667,7 +740,9 @@ class _EmbedExtension extends HtmlExtension {
     final card = _card(context);
     // Markup that did not yield a card renders as it would have otherwise.
     if (card == null) return TextSpan(children: context.inlineSpanChildren);
-    return WidgetSpan(child: SizedBox(width: double.infinity, child: card));
+    return WidgetSpan(
+      child: SizedBox(width: double.infinity, child: withBlockGap(context, card)),
+    );
   }
 
   Widget? _card(ExtensionContext context) {
@@ -814,13 +889,11 @@ class _AttachmentLinkExtension extends HtmlExtension {
     required this.onTap,
     required this.onShare,
     required this.colorScheme,
-    required this.textTheme,
   });
 
   final void Function(String href) onTap;
   final void Function(String href) onShare;
   final ColorScheme colorScheme;
-  final TextTheme textTheme;
 
   @override
   Set<String> get supportedTags => {'a'};
@@ -835,6 +908,7 @@ class _AttachmentLinkExtension extends HtmlExtension {
     final name = context.element?.text.trim() ?? '';
     final size = context.attributes['data-size'];
     final label = name.isEmpty ? 'Attachment' : name;
+    final l10n = context.buildContext == null ? null : AppLocalizations.of(context.buildContext!);
 
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
@@ -845,87 +919,45 @@ class _AttachmentLinkExtension extends HtmlExtension {
         constraints: const BoxConstraints(minWidth: double.infinity),
         child: Padding(
         padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingXS),
-        child: Material(
-          color: colorScheme.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            side: BorderSide(
-              color: colorScheme.outlineVariant
-                  .withValues(alpha: DesignTokens.opacityDivider),
-              width: DesignTokens.borderWidthThin,
-            ),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: href.isEmpty ? null : () => onTap(href),
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingS,
-                vertical: 6,
+        child: EmbeddedCard(
+          onTap: href.isEmpty ? null : () => onTap(href),
+          padding: EdgeInsets.zero,
+          child: FileRow(
+            // Same 48px type tile the composer draws, from the same
+            // helpers, so an attachment looks identical whether you are
+            // about to post it or reading it back.
+            leading: DecoratedBox(
+              decoration: BoxDecoration(
+                color: getFileTypeColor(label),
+                borderRadius: BorderRadius.circular(DesignTokens.radiusS),
               ),
-              child: Row(
-                children: [
-                  // Same 48px type tile the composer draws, from the same
-                  // helpers, so an attachment looks identical whether you
-                  // are about to post it or reading it back.
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: getFileTypeColor(label),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      getFileIcon(getFileType(label)),
-                      size: 24,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: textTheme.bodyMedium
-                              ?.copyWith(color: colorScheme.onSurface),
-                        ),
-                        SizedBox(height: DesignTokens.spacingXS / 2),
-                        Text(
-                          [
-                            getFileType(label).toUpperCase(),
-                            if (size != null && size.isNotEmpty) size,
-                          ].join(' • '),
-                          style: textTheme.bodySmall
-                              ?.copyWith(color: colorScheme.onSurfaceVariant),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: DesignTokens.spacingXS),
-                  IconButton(
-                    tooltip: 'Share',
-                    visualDensity: VisualDensity.compact,
-                    onPressed: href.isEmpty ? null : () => onShare(href),
-                    icon: Icon(Icons.share_outlined,
-                        size: DesignTokens.iconSizeM,
-                        color: colorScheme.onSurfaceVariant),
-                  ),
-                  IconButton(
-                    tooltip: 'Download',
-                    visualDensity: VisualDensity.compact,
-                    onPressed: href.isEmpty ? null : () => onTap(href),
-                    icon: Icon(Icons.download_rounded,
-                        size: DesignTokens.iconSizeM,
-                        color: colorScheme.primary),
-                  ),
-                ],
+              child: Icon(
+                getFileIcon(getFileType(label)),
+                size: DesignTokens.iconSizeL,
+                color: Colors.white,
               ),
             ),
+            title: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+            subtitle: Text([
+              getFileType(label).toUpperCase(),
+              if (size != null && size.isNotEmpty) size,
+            ].join(' • ')),
+            trailing: [
+              IconButton(
+                tooltip: l10n?.share ?? 'Share',
+                onPressed: href.isEmpty ? null : () => onShare(href),
+                icon: Icon(Icons.share_outlined,
+                    size: DesignTokens.iconSizeM,
+                    color: colorScheme.onSurfaceVariant),
+              ),
+              IconButton(
+                tooltip: 'Download',
+                onPressed: href.isEmpty ? null : () => onTap(href),
+                icon: Icon(Icons.download_rounded,
+                    size: DesignTokens.iconSizeM,
+                    color: colorScheme.primary),
+              ),
+            ],
           ),
         ),
         ),
@@ -951,17 +983,53 @@ Map<String, Style> _stylesFor(ColorScheme colorScheme, TextStyle body,
     colorScheme.surfaceContainerHighest.toARGB32(),
     body.fontSize ?? 14,
   );
+  final base = body.fontSize ?? 16;
+
+  // Headings on the type scale — h1 headlineSmall 24/32 down to h5/h6
+  // bodyLarge 16/24 — never smaller than the body text, medium weight,
+  // with more room above (16, none as a first block) than below (8).
+  Style heading(double size, double lineHeight, {Color? color}) => Style(
+        fontSize: FontSize(math.max(size, base)),
+        lineHeight: LineHeight(lineHeight / size),
+        fontWeight: FontWeight.w500,
+        color: color,
+        margin: Margins.only(top: DesignTokens.spacingL, bottom: DesignTokens.spacingS),
+      );
+
+  // A quote is a filled block with the accent bar, padded evenly; the
+  // corners are rounded by QuoteExtension.
+  Style quote() => Style(
+        display: Display.block,
+        margin: Margins.only(bottom: kPostBlockGap),
+        padding: HtmlPaddings.all(DesignTokens.spacingM),
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        border: Border(
+          left: BorderSide(color: accent, width: 3),
+        ),
+      );
+
   return _styleCache.putIfAbsent(key, () => {
     'body': Style(
       margin: Margins.zero,
       padding: HtmlPaddings.zero,
-      fontSize: FontSize(body.fontSize ?? 14),
+      fontSize: FontSize(base),
       color: bodyColor,
       lineHeight: const LineHeight(1.5),
     ),
+    // Every block takes the one block gap below itself and none above;
+    // PostBlockRhythmExtension drops it after the last block of a post,
+    // quote or details.
     'p': Style(
-      margin: Margins.only(bottom: 12),
+      margin: Margins.only(bottom: kPostBlockGap),
       padding: HtmlPaddings.zero,
+    ),
+    // Blocks drawn natively (code, previews, embeds, tables, pictures,
+    // polls, events, details, rules) take the same gap; withBlockGap draws
+    // what is left of it once margins have collapsed.
+    'pre, hr, table, details, iframe, video, audio, aside.onebox, a.onebox, '
+        'div.lazy-video-container, div.lazyYT, div.video-placeholder-container, '
+        'div.d-image-grid, div.poll, div.discourse-post-event, div.math': Style(
+      margin: Margins(bottom: Margin(kPostBlockGap)),
     ),
     // The web marks links by colour alone.
     'a': Style(
@@ -970,7 +1038,7 @@ Map<String, Style> _stylesFor(ColorScheme colorScheme, TextStyle body,
     ),
     'a.mention': Style(
       color: accent,
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeight.w500,
       textDecoration: TextDecoration.none,
     ),
     'a.hashtag-cooked': Style(
@@ -978,28 +1046,16 @@ Map<String, Style> _stylesFor(ColorScheme colorScheme, TextStyle body,
       fontWeight: FontWeight.w500,
       textDecoration: TextDecoration.none,
     ),
-    'aside.quote': Style(
-      margin: Margins.symmetric(vertical: 8),
-      padding: HtmlPaddings.symmetric(horizontal: 12, vertical: 8),
-      backgroundColor: colorScheme.surfaceContainerHighest,
-      border: Border(
-        left: BorderSide(color: accent, width: 3),
-      ),
-    ),
+    'aside.quote': quote(),
+    // labelLarge, 14/20 medium.
     'aside.quote .title': Style(
-      fontSize: FontSize(13),
-      fontWeight: FontWeight.w600,
+      fontSize: FontSize(14),
+      lineHeight: const LineHeight(20 / 14),
+      fontWeight: FontWeight.w500,
       color: mutedColor,
-      margin: Margins.only(bottom: 4),
+      margin: Margins.only(bottom: DesignTokens.spacingXS),
     ),
-    'blockquote': Style(
-      margin: Margins.symmetric(vertical: 8),
-      padding: HtmlPaddings.symmetric(horizontal: 12, vertical: 8),
-      backgroundColor: colorScheme.surfaceContainerHighest,
-      border: Border(
-        left: BorderSide(color: accent, width: 3),
-      ),
-    ),
+    'blockquote': quote(),
     // After 'blockquote': flutter_html merges matching rules in map order,
     // so this one has to come later to win. The quote's aside already draws
     // the bar and the fill; the blockquote inside it must not draw them a
@@ -1010,43 +1066,29 @@ Map<String, Style> _stylesFor(ColorScheme colorScheme, TextStyle body,
       backgroundColor: Colors.transparent,
       border: const Border(),
     ),
+    // Inline code is drawn as a rounded chip (see the `code` extension);
+    // the fill here is for code inside a link, which stays text. Blocks
+    // (`pre`) are CodeBlock, in the same size.
     'code': Style(
       backgroundColor: colorScheme.surfaceContainerHighest,
-      padding: HtmlPaddings.symmetric(horizontal: 4, vertical: 2),
-      fontSize: FontSize((body.fontSize ?? 14) * 0.92),
+      fontSize: FontSize(_codeFontSize),
       fontFamily: 'monospace',
-    ),
-    'pre': Style(
-      margin: Margins.symmetric(vertical: 8),
-      padding: HtmlPaddings.all(12),
-      backgroundColor: colorScheme.surfaceContainerHighest,
-      fontSize: FontSize((body.fontSize ?? 14) * 0.92),
-      fontFamily: 'monospace',
-    ),
-    'pre code': Style(
-      backgroundColor: Colors.transparent,
-      padding: HtmlPaddings.zero,
     ),
     'ul, ol': Style(
-      margin: Margins.symmetric(vertical: 4),
+      margin: Margins.only(bottom: kPostBlockGap),
       padding: HtmlPaddings.only(left: 24),
     ),
-    'li': Style(margin: Margins.only(bottom: 2)),
-    'h1': Style(
-      fontSize: FontSize((body.fontSize ?? 14) * 1.7),
-      fontWeight: FontWeight.bold,
-      margin: Margins.only(top: 12, bottom: 6),
-    ),
-    'h2': Style(
-      fontSize: FontSize((body.fontSize ?? 14) * 1.45),
-      fontWeight: FontWeight.bold,
-      margin: Margins.only(top: 10, bottom: 4),
-    ),
-    'h3': Style(
-      fontSize: FontSize((body.fontSize ?? 14) * 1.25),
-      fontWeight: FontWeight.bold,
-      margin: Margins.only(top: 8, bottom: 4),
-    ),
+    'li': Style(margin: Margins.only(bottom: DesignTokens.spacingXS)),
+    // The list's own gap follows its last item; a list inside an item sits
+    // tight in it.
+    'li:last-child': Style(margin: Margins(bottom: Margin.zero())),
+    'li > ul, li > ol': Style(margin: Margins.zero),
+    'h1': heading(24, 32),
+    'h2': heading(22, 28),
+    'h3': heading(20, 28),
+    'h4': heading(18, 26),
+    'h5': heading(16, 24),
+    'h6': heading(16, 24, color: mutedColor),
     // A cooked poll's summary line carries the vote count as of cooking;
     // where the live poll cannot be drawn, better none than a wrong one.
     'div.poll-info': Style(display: Display.none),

@@ -10,6 +10,8 @@ import 'package:discourse_ui/utils/network_utils.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 
+import 'broken_image_widget.dart';
+
 /// Handles all the behind-the-scenes work of loading and storing images
 class ImageLoader {
   /// Gets an image from the internet or from local storage if we've seen it before
@@ -233,17 +235,35 @@ class _CachedRedirectImageState extends State<CachedRedirectImage> {
         // While loading image data, show placeholder or use network image
         if (imageDataSnapshot.connectionState == ConnectionState.waiting) {
           return widget.placeholder?.call(context, widget.imageUrl) ??
-              Container(
-                width: widget.width,
-                height: widget.height,
-                color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey.shade200,
-                child: const Center(child: CircularProgressIndicator()),
-              );
+              _loading(context);
         }
 
         // If image data fetch failed, fall back to network loading
         return _buildNetworkImage();
       },
+    );
+  }
+
+  /// The box an image loads into: the theme's placeholder fill, with a
+  /// spinner no bigger than 20dp, and none in a slot too small for one to
+  /// read (avatars, 48dp attachment tiles).
+  Widget _loading(BuildContext context) {
+    final w = widget.width;
+    final h = widget.height;
+    final roomy = (w == null || w >= 64) && (h == null || h >= 64);
+    return Container(
+      width: w,
+      height: h,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      child: roomy
+          ? const Center(
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          : null,
     );
   }
 
@@ -255,24 +275,14 @@ class _CachedRedirectImageState extends State<CachedRedirectImage> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return widget.placeholder?.call(context, widget.imageUrl) ??
-              Container(
-                width: widget.width,
-                height: widget.height,
-                color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey.shade200,
-                child: const Center(child: CircularProgressIndicator()),
-              );
+              _loading(context);
         }
 
         if (snapshot.hasError || !snapshot.hasData) {
           return Builder(
             builder: (context) {
               return widget.errorWidget?.call(context, widget.imageUrl, snapshot.error) ??
-                  Container(
-                    width: widget.width,
-                    height: widget.height,
-                    color: Colors.grey.shade200,
-                    child: const Center(child: Icon(Icons.error)),
-                  );
+                  BrokenImagePlaceholder(width: widget.width, height: widget.height);
             },
           );
         }

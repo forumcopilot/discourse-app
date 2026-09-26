@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import '../widgets/cached_redirect_image.dart';
+import '../../theme/design_tokens.dart';
 import '../../utils/file_utils.dart';
+import 'post_body_extensions.dart' show FileRow;
 
-/// A reusable widget for rendering individual attachment items.
+/// A reusable widget for rendering individual attachment items: the file
+/// row a cooked attachment and an embed use too ([FileRow]).
 class AttachmentItemWidget extends StatelessWidget {
   final dynamic attachment;
   final VoidCallback? onTap;
@@ -59,118 +62,94 @@ class AttachmentItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final isImage = isImageFile(attachment.filename);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 4),
+      margin: const EdgeInsets.only(bottom: DesignTokens.spacingXS),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(DesignTokens.radiusS),
           onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: isImage
-                        ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
-                        : getFileTypeColor(attachment.filename),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Stack(
-                    children: [
-                      // Main content
-                      isImage
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: CachedRedirectImage(
-                                // Use thumbnail if available, otherwise use full image (similar to carousel)
-                                // Don't check canViewThumbnailUrl - just try to use thumbnail if it exists
-                                imageUrl: attachment.thumbnailUrl?.isNotEmpty == true
-                                    ? attachment.thumbnailUrl!
-                                    : attachment.url,
-                                width: 48,
-                                height: 48,
-                                fit: BoxFit.cover,
-                                errorWidget: (context, error, stackTrace) {
-                                  return Center(
-                                    child: Icon(
-                                      getFileIcon(attachment.filename),
-                                      size: 24,
-                                      color: Colors.white,
-                                    ),
-                                  );
-                                },
-                              ),
-                            )
-                          : Center(
-                              child: Icon(
-                                getFileIcon(attachment.filename),
-                                size: 24,
-                                color: Colors.white,
-                              ),
-                            ),
-                      // Lock icon overlay if can't view URL (for all attachment types)
-                      if (attachment.canViewUrl != true)
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              color: colorScheme.error.withValues(alpha: 0.9),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Icon(
-                              Icons.lock,
-                              size: 12,
-                              color: colorScheme.onError,
-                            ),
+          child: FileRow(
+            leading: Container(
+              decoration: BoxDecoration(
+                color: isImage
+                    ? colorScheme.surfaceContainerHighest
+                    : getFileTypeColor(attachment.filename),
+                borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+              ),
+              child: Stack(
+                children: [
+                  // Main content
+                  isImage
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+                          child: CachedRedirectImage(
+                            // Use thumbnail if available, otherwise use full image (similar to carousel)
+                            // Don't check canViewThumbnailUrl - just try to use thumbnail if it exists
+                            imageUrl: attachment.thumbnailUrl?.isNotEmpty == true
+                                ? attachment.thumbnailUrl!
+                                : attachment.url,
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.cover,
+                            errorWidget: (context, error, stackTrace) {
+                              return Center(
+                                child: Icon(
+                                  getFileIcon(attachment.filename),
+                                  size: DesignTokens.iconSizeL,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      : Center(
+                          child: Icon(
+                            getFileIcon(attachment.filename),
+                            size: DesignTokens.iconSizeL,
+                            color: Colors.white,
                           ),
                         ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Flexible(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 300),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildFilenameWithExtension(
-                          attachment.filename,
-                          textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface,
-                          ) ?? const TextStyle(),
+                  // Lock icon overlay if can't view URL (for all attachment types)
+                  if (attachment.canViewUrl != true)
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: colorScheme.error.withValues(alpha: 0.9),
+                          borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${getFileType(attachment.filename)} • ${formatFileSize(attachment.fileSize)}',
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                        child: Icon(
+                          Icons.lock,
+                          size: 12,
+                          color: colorScheme.onError,
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                if (!isImage && !isInline && showDownloadIcon && attachment.canViewUrl == true) ...[
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.download,
-                    size: 20,
-                    color: colorScheme.primary,
-                  ),
                 ],
-              ],
+              ),
             ),
+            title: _buildFilenameWithExtension(
+              attachment.filename,
+              FileRow.titleStyle(context) ?? const TextStyle(),
+            ),
+            subtitle: Text(
+              '${getFileType(attachment.filename)} • ${formatFileSize(attachment.fileSize)}',
+            ),
+            trailing: [
+              if (!isImage && !isInline && showDownloadIcon && attachment.canViewUrl == true) ...[
+                const SizedBox(width: DesignTokens.spacingS),
+                Icon(
+                  Icons.download,
+                  size: DesignTokens.iconSizeM,
+                  color: colorScheme.primary,
+                ),
+              ],
+            ],
           ),
         ),
       ),

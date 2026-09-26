@@ -83,11 +83,17 @@ class _UserStateBannerState extends State<UserStateBanner> {
           final textColor = userStateService.getTextColorForState(userState, context);
           final canDismiss = userStateService.canDismissBanner(userState);
 
+          // 56dp for one line, with room for a full 48dp dismiss button,
+          // like the topic page's banners.
           return Container(
             width: double.infinity,
-            padding: EdgeInsets.symmetric(
-              horizontal: DesignTokens.spacingL,
-              vertical: DesignTokens.spacingM,
+            constraints: const BoxConstraints(minHeight: 56),
+            alignment: AlignmentDirectional.centerStart,
+            padding: const EdgeInsetsDirectional.fromSTEB(
+              DesignTokens.spacingL,
+              DesignTokens.spacingXS,
+              DesignTokens.spacingXS,
+              DesignTokens.spacingXS,
             ),
             color: backgroundColor,
             child: SafeArea(
@@ -103,10 +109,8 @@ class _UserStateBannerState extends State<UserStateBanner> {
                   Expanded(
                     child: Text(
                       message,
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: textColor,
-                        fontSize: DesignTokens.fontSizeS,
-                        fontWeight: DesignTokens.fontWeightMedium,
                       ),
                     ),
                   ),
@@ -123,8 +127,6 @@ class _UserStateBannerState extends State<UserStateBanner> {
                         color: textColor,
                         size: DesignTokens.iconSizeM,
                       ),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ],

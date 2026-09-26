@@ -1,13 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../theme/design_tokens.dart';
-import '../../theme/style_builders.dart';
 import '../../l10n/generated/app_localizations.dart';
 
+/// A picture that failed to load, the same wherever it was — in a post, an
+/// image grid, the uploads under a post, an avatar: a surfaceContainerHighest
+/// box with radius 8, a 24dp broken-image icon, and the picture's alt text
+/// when it has one. It fills the space the picture was given, and is only
+/// as big as its contents when given none.
+class BrokenImagePlaceholder extends StatelessWidget {
+  const BrokenImagePlaceholder({super.key, this.alt, this.width, this.height});
+
+  final String? alt;
+  final double? width;
+  final double? height;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final label = alt?.trim() ?? '';
+    return Container(
+      width: width,
+      height: height,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(DesignTokens.spacingS),
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+      ),
+      // A Wrap, not a Column: in a box smaller than its contents it is
+      // clipped instead of reporting an overflow.
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: DesignTokens.spacingS,
+        runSpacing: DesignTokens.spacingXS,
+        children: [
+          Icon(Icons.broken_image, size: DesignTokens.iconSizeL, color: colorScheme.onSurfaceVariant),
+          if (label.isNotEmpty)
+            Text(
+              label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: colorScheme.onSurfaceVariant),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A broken picture with a link to open it elsewhere: [BrokenImagePlaceholder]'s
+/// box and icon, the picture's address as a button, or "Image not available".
 class BrokenImageWidget extends StatelessWidget {
   final double width;
   final double height;
+
+  /// Kept for callers; the icon is always the placeholder's 24dp.
   final double iconSize;
+
+  /// Kept for callers; the text is always bodySmall (12), the smallest
+  /// readable size.
   final double fontSize;
   final String? imageUrl;
   final VoidCallback? onTap;
@@ -87,109 +145,71 @@ class BrokenImageWidget extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final small = textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant);
+
     return Container(
       width: width,
       height: height,
-      decoration: StyleBuilders.cardLikeDecoration(
-        colorScheme: colorScheme,
-        borderRadius: DesignTokens.radiusS,
-        borderOpacity: 0.2,
-      ).copyWith(
-        color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusS),
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Padding(
-            padding: DesignTokens.paddingM,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.broken_image_rounded,
-                  size: iconSize,
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                ),
-                const SizedBox(height: 8),
-                if (imageUrl != null) ...[
-                  GestureDetector(
-                    onTap: onTap ??
-                        () async {
-                          try {
-                            final uri = Uri.parse(imageUrl!);
-                            if (await canLaunchUrl(uri)) {
-                              await launchUrl(uri, mode: LaunchMode.externalApplication);
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(AppLocalizations.of(context)?.couldNotOpenLink(e.toString()) ?? 'Could not open link: ${e.toString()}'),
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: colorScheme.primary.withValues(alpha: 0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.link,
-                            size: fontSize,
-                            color: colorScheme.primary,
-                          ),
-                          const SizedBox(width: 4),
-                          Flexible(
-                            child: Text(
-                              shortenUrl(imageUrl!),
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.primary,
-                                fontSize: fontSize,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    AppLocalizations.of(context)!.tapToOpen,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                      fontSize: fontSize - 1,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ] else ...[
-                  Text(
-                    AppLocalizations.of(context)!.imageNotAvailable,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
-                      fontSize: fontSize,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ],
+      child: Padding(
+        padding: DesignTokens.paddingM,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.broken_image,
+              size: DesignTokens.iconSizeL,
+              color: colorScheme.onSurfaceVariant,
             ),
-          );
-        },
+            const SizedBox(height: DesignTokens.spacingS),
+            if (imageUrl != null) ...[
+              // A standard text button: a 48dp target, where the old chip
+              // was about 20dp tall.
+              TextButton.icon(
+                onPressed: onTap ??
+                    () async {
+                      try {
+                        final uri = Uri.parse(imageUrl!);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context)?.couldNotOpenLink(e.toString()) ?? 'Could not open link: ${e.toString()}'),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                icon: const Icon(Icons.link, size: DesignTokens.iconSizeSMedium),
+                label: Text(
+                  shortenUrl(imageUrl!),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                AppLocalizations.of(context)!.tapToOpen,
+                style: small,
+                textAlign: TextAlign.center,
+              ),
+            ] else ...[
+              Text(
+                AppLocalizations.of(context)!.imageNotAvailable,
+                style: small,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

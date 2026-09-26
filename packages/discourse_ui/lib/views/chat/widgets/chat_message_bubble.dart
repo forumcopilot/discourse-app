@@ -64,7 +64,9 @@ class ChatMessageBubble extends StatelessWidget {
     final bubbleColor =
         isSelf ? colorScheme.primaryContainer : colorScheme.surfaceContainerHighest;
     final textColor = isSelf ? colorScheme.onPrimaryContainer : colorScheme.onSurface;
-    final mutedTextColor = textColor.withValues(alpha: 0.7);
+    // Meta text in its role colour, not a faded text colour.
+    final mutedTextColor =
+        isSelf ? colorScheme.onPrimaryContainer : colorScheme.onSurfaceVariant;
 
     final avatarUrl = message.authorAvatarUrl;
     final avatar = UserAvatar(
@@ -108,32 +110,25 @@ class ChatMessageBubble extends StatelessWidget {
                     if (!isSelf) ...[
                       Text(
                         message.authorUsername,
-                        style: textTheme.labelSmall?.copyWith(
+                        style: textTheme.titleSmall?.copyWith(
                           color: colorScheme.primary,
-                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: DesignTokens.spacingXS),
                     ],
                     // Chat cooked content is much smaller than a topic
                     // post (its files come separately, below), so we pipe
                     // it through the same flutter_html renderer for
-                    // mentions + emoji + oneboxes. A message may be files
-                    // alone, with no text to draw.
+                    // mentions + emoji + oneboxes, at the posts' 16/24. A
+                    // message may be files alone, with no text to draw.
                     if (message.cooked.trim().isNotEmpty ||
                         message.message.trim().isNotEmpty)
-                      DefaultTextStyle(
-                        style: textTheme.bodyMedium
-                                ?.copyWith(color: textColor) ??
-                            TextStyle(color: textColor),
-                        child: RichTextContent(
-                          siteContext: siteContext,
-                          // Chat stays at its denser size; 16 is for posts.
-                          baseFontSize: 14,
-                          content: message.cooked.isNotEmpty
-                              ? message.cooked
-                              : message.message,
-                        ),
+                      RichTextContent(
+                        siteContext: siteContext,
+                        textColor: textColor,
+                        content: message.cooked.isNotEmpty
+                            ? message.cooked
+                            : message.message,
                       ),
                     // Images and files travel in the message's `uploads`,
                     // not its cooked HTML; an upload-only message used to be
@@ -160,7 +155,7 @@ class ChatMessageBubble extends StatelessWidget {
                         if (message.edited) ...[
                           Text(
                             AppLocalizations.of(context)!.edited,
-                            style: textTheme.labelSmall?.copyWith(
+                            style: textTheme.bodySmall?.copyWith(
                               color: mutedTextColor,
                               fontStyle: FontStyle.italic,
                             ),
@@ -170,7 +165,7 @@ class ChatMessageBubble extends StatelessWidget {
                         Text(
                           timeLabel,
                           style:
-                              textTheme.labelSmall?.copyWith(color: mutedTextColor),
+                              textTheme.bodySmall?.copyWith(color: mutedTextColor),
                         ),
                       ],
                     ),

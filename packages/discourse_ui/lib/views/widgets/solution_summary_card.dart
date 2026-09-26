@@ -47,14 +47,14 @@ class SolutionSummaryCard extends StatelessWidget {
       margin: EdgeInsets.only(top: DesignTokens.spacingM),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
         border: Border.all(color: accent.withValues(alpha: 0.40), width: 0.75),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onJumpToAnswer,
-          borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+          borderRadius: BorderRadius.circular(DesignTokens.radiusM),
           child: Padding(
             padding: EdgeInsets.all(DesignTokens.spacingM),
             child: Column(
@@ -67,10 +67,7 @@ class SolutionSummaryCard extends StatelessWidget {
                     SizedBox(width: DesignTokens.spacingS),
                     Text(
                       AppLocalizations.of(context)!.solution,
-                      style: textTheme.titleSmall?.copyWith(
-                        color: accent,
-                        fontWeight: DesignTokens.fontWeightSemiBold,
-                      ),
+                      style: textTheme.titleSmall?.copyWith(color: accent),
                     ),
                     const Spacer(),
                     if (onJumpToAnswer != null)
@@ -89,8 +86,10 @@ class SolutionSummaryCard extends StatelessWidget {
                   // solved_quote_length and offers expand/collapse; clipping to a few
                   // lines keeps the panel a summary, and the whole card taps through
                   // to the full post.
+                  // Four whole lines at 14/21; 96 cut the fifth in half.
                   ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 96),
+                    constraints: BoxConstraints(
+                        maxHeight: MediaQuery.textScalerOf(context).scale(84)),
                     child: ClipRect(
                       child: RichTextContent(
                         content: answer.excerptHtml!,
@@ -107,7 +106,7 @@ class SolutionSummaryCard extends StatelessWidget {
                     UserAvatar(
                       username: answer.username,
                       iconUrl: _avatarUrl(),
-                      radius: DesignTokens.iconSizeS,
+                      radius: DesignTokens.avatarSizeM / 2,
                     ),
                     SizedBox(width: DesignTokens.spacingS),
                     Expanded(

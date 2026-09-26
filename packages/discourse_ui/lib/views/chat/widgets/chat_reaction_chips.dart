@@ -140,46 +140,34 @@ class _ChatReactionChipsState extends State<ChatReactionChips> {
   Widget build(BuildContext context) {
     final chips = _effective();
     if (chips.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(top: DesignTokens.spacingXS),
-      child: Wrap(
-        spacing: DesignTokens.spacingXS,
-        runSpacing: DesignTokens.spacingXS,
-        children: [
-          for (final (emoji, count, reacted, usernames) in chips)
-            _chip(context, emoji, count, reacted, usernames),
-        ],
-      ),
+    // Each chip's 48dp target already keeps the rows apart.
+    return Wrap(
+      spacing: DesignTokens.spacingS,
+      children: [
+        for (final (emoji, count, reacted, usernames) in chips)
+          _chip(context, emoji, count, reacted, usernames),
+      ],
     );
   }
 
+  /// A Material 3 filter chip: 32dp tall in a 48dp target, radius 8, the
+  /// label in labelMedium; your own reaction is the selected (filled) one.
   Widget _chip(BuildContext context, String emoji, int count, bool reacted,
       List<String> usernames) {
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final chip = InkWell(
-      borderRadius: BorderRadius.circular(10),
-      onTap: widget.onToggle == null ? null : () => _toggle(emoji, reacted),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        decoration: BoxDecoration(
-          color: reacted
-              ? colorScheme.primary.withValues(alpha: 0.15)
-              : colorScheme.surface.withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: reacted ? colorScheme.primary : colorScheme.outlineVariant,
-          ),
-        ),
-        child: Text(
-          '${chatEmojiLabel(emoji)} $count',
-          style: textTheme.labelSmall?.copyWith(
-            fontWeight: reacted ? FontWeight.w700 : FontWeight.w500,
-          ),
-        ),
+    return FilterChip(
+      selected: reacted,
+      showCheckmark: false,
+      onSelected: widget.onToggle == null ? null : (_) => _toggle(emoji, reacted),
+      tooltip: usernames.isEmpty ? null : usernames.join(', '),
+      materialTapTargetSize: MaterialTapTargetSize.padded,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusS),
       ),
+      padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingS),
+      labelPadding: EdgeInsets.zero,
+      labelStyle: textTheme.labelMedium,
+      label: Text('${chatEmojiLabel(emoji)} $count'),
     );
-    if (usernames.isEmpty) return chip;
-    return Tooltip(message: usernames.join(', '), child: chip);
   }
 }

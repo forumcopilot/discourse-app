@@ -201,11 +201,22 @@ class _SuggestedTopicTile extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            UserAvatar(
-              username: username ?? '',
-              iconUrl: avatarUrl,
-              radius: DesignTokens.avatarRadiusM,
-            ),
+            // Suggested topics can arrive without a poster; a topic glyph
+            // in the avatar's place keeps the rows aligned (an avatar with
+            // no name drew a "?").
+            if (username != null && username.isNotEmpty)
+              UserAvatar(
+                username: username,
+                iconUrl: avatarUrl,
+                radius: DesignTokens.avatarRadiusM,
+              )
+            else
+              CircleAvatar(
+                radius: DesignTokens.avatarRadiusM,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                child: Icon(Icons.forum_outlined,
+                    color: colorScheme.onSurfaceVariant),
+              ),
             const SizedBox(width: DesignTokens.spacingL),
             Expanded(
               child: Column(

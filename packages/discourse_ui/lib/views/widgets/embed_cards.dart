@@ -8,11 +8,13 @@ import '../../utils/embed_links.dart';
 import '../../utils/url_utils.dart';
 import '../../utils/youtube_cache.dart';
 import 'full_screen_video_viewer.dart';
+import 'post_body_extensions.dart';
 
 /// The native preview for an embed in a post (see [EmbedLink]): a video
 /// shows its thumbnail with the site's play button, as Discourse's lazy
 /// videos do on the web; anything else is a row naming the site. Tapping
-/// opens the page — for YouTube, TikTok and the like, in their app.
+/// opens the page — for YouTube, TikTok and the like, in their app. The gap
+/// to the next block is the post body's (see [withBlockGap]).
 class EmbedPreviewCard extends StatelessWidget {
   const EmbedPreviewCard({super.key, required this.link, required this.onOpen});
 
@@ -21,12 +23,9 @@ class EmbedPreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
-      child: link.provider.kind == EmbedKind.video
-          ? _VideoPreview(link: link, onOpen: onOpen)
-          : _EmbedRow(link: link, onOpen: onOpen),
-    );
+    return link.provider.kind == EmbedKind.video
+        ? _VideoPreview(link: link, onOpen: onOpen)
+        : _EmbedRow(link: link, onOpen: onOpen);
   }
 }
 
@@ -86,6 +85,7 @@ class _VideoPreviewState extends State<_VideoPreview> {
     final provider = link.provider;
     final thumbnail = link.thumbnailUrl;
     final title = link.title;
+    final textTheme = Theme.of(context).textTheme;
 
     Widget placeholder() => ColoredBox(
           color: Colors.black,
@@ -94,14 +94,14 @@ class _VideoPreviewState extends State<_VideoPreview> {
               padding: const EdgeInsets.only(top: 72),
               child: Text(
                 provider.name,
-                style: const TextStyle(color: Colors.white70, fontSize: 13),
+                style: textTheme.bodySmall?.copyWith(color: Colors.white70),
               ),
             ),
           ),
         );
 
     final frame = ClipRRect(
-      borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+      borderRadius: BorderRadius.circular(EmbeddedCard.radius),
       child: Material(
         color: Colors.black,
         child: InkWell(
@@ -123,7 +123,12 @@ class _VideoPreviewState extends State<_VideoPreview> {
                   alignment: Alignment.topCenter,
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(14, 10, 14, 22),
+                    padding: const EdgeInsets.fromLTRB(
+                      DesignTokens.spacingM,
+                      DesignTokens.spacingM,
+                      DesignTokens.spacingM,
+                      DesignTokens.spacingXL,
+                    ),
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
@@ -139,11 +144,9 @@ class _VideoPreviewState extends State<_VideoPreview> {
                           title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: textTheme.titleMedium?.copyWith(
                             color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            shadows: [Shadow(blurRadius: 4, color: Colors.black54)],
+                            shadows: const [Shadow(blurRadius: 4, color: Colors.black54)],
                           ),
                         ),
                         if (_channel != null)
@@ -151,7 +154,7 @@ class _VideoPreviewState extends State<_VideoPreview> {
                             _channel!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: Colors.white70, fontSize: 12),
+                            style: textTheme.bodySmall?.copyWith(color: Colors.white70),
                           ),
                       ],
                     ),
@@ -227,70 +230,30 @@ class _EmbedRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final provider = link.provider;
     final badge = provider.brand ?? colorScheme.onSurface;
     final onBadge = provider.brand == null ? colorScheme.surface : Colors.white;
     final title = link.title ?? provider.name;
     final subtitle = link.title != null ? provider.name : _host(link.url);
 
-    return Material(
-      color: colorScheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-        side: BorderSide(
-          color: colorScheme.outlineVariant,
-          width: DesignTokens.borderWidthThin,
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => onOpen(link.url),
-        child: Padding(
-          padding: const EdgeInsets.all(DesignTokens.spacingS),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: badge,
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-                ),
-                child: Icon(provider.icon, color: onBadge, size: 24),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: DesignTokens.spacingXS),
-              Icon(Icons.open_in_new, size: 18, color: colorScheme.onSurfaceVariant),
-            ],
+    // The file row every attachment uses, in the one card recipe.
+    return EmbeddedCard(
+      onTap: () => onOpen(link.url),
+      padding: EdgeInsets.zero,
+      child: FileRow(
+        leading: DecoratedBox(
+          decoration: BoxDecoration(
+            color: badge,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
           ),
+          child: Icon(provider.icon, color: onBadge, size: DesignTokens.iconSizeL),
         ),
+        title: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis),
+        subtitle: Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis),
+        trailing: [
+          const SizedBox(width: DesignTokens.spacingXS),
+          Icon(Icons.open_in_new, size: DesignTokens.iconSizeSMedium, color: colorScheme.onSurfaceVariant),
+        ],
       ),
     );
   }
@@ -329,51 +292,48 @@ class PostVideoCard extends StatelessWidget {
     // No poster: a black frame; the play button says what it is.
     Widget blank() => const ColoredBox(color: Colors.black);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
-      child: Semantics(
-        button: true,
-        label: name ?? 'video',
-        excludeSemantics: true,
-        child: Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 480),
-            child: AspectRatio(
-              aspectRatio: ratio,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-                child: Material(
-                  color: Colors.black,
-                  child: InkWell(
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => FullScreenVideoViewer(videoUrl: src, title: name),
-                    )),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        if (poster != null)
-                          Image.network(
-                            poster!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, _, __) => blank(),
-                          )
-                        else
-                          blank(),
-                        Center(
-                          child: Container(
-                            width: 60,
-                            height: 60,
-                            decoration: const BoxDecoration(
-                              color: Colors.black54,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.play_arrow_rounded,
-                                color: Colors.white, size: 40),
+    return Semantics(
+      button: true,
+      label: name ?? 'video',
+      excludeSemantics: true,
+      child: Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 480),
+          child: AspectRatio(
+            aspectRatio: ratio,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(EmbeddedCard.radius),
+              child: Material(
+                color: Colors.black,
+                child: InkWell(
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => FullScreenVideoViewer(videoUrl: src, title: name),
+                  )),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      if (poster != null)
+                        Image.network(
+                          poster!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, _, __) => blank(),
+                        )
+                      else
+                        blank(),
+                      Center(
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          decoration: const BoxDecoration(
+                            color: Colors.black54,
+                            shape: BoxShape.circle,
                           ),
+                          child: const Icon(Icons.play_arrow_rounded,
+                              color: Colors.white, size: 40),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -458,70 +418,64 @@ class _PostAudioPlayerState extends State<PostAudioPlayer>
     final value = controller?.value;
     final ready = controller != null && value!.isInitialized && !_failed;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingXS),
-      child: Material(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusL),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-          child: Row(
-            children: [
-              if (_loading)
-                const Padding(
-                  padding: EdgeInsets.all(14),
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                )
-              else if (_failed)
-                IconButton(
-                  // It would not play here; the browser may manage.
-                  onPressed: () => UrlUtils.openUrl(widget.src),
-                  icon: Icon(Icons.open_in_new, color: colorScheme.error),
-                )
-              else
-                IconButton(
-                  onPressed: _toggle,
-                  icon: Icon(
-                    (value?.isPlaying ?? false)
-                        ? Icons.pause_rounded
-                        : Icons.play_arrow_rounded,
-                    color: colorScheme.primary,
-                    size: 28,
-                  ),
-                ),
-              Expanded(
-                child: ready
-                    ? VideoProgressIndicator(
-                        controller,
-                        allowScrubbing: true,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        colors: VideoProgressColors(
-                          playedColor: colorScheme.primary,
-                          bufferedColor: colorScheme.primary.withValues(alpha: 0.3),
-                          backgroundColor: colorScheme.outlineVariant,
-                        ),
-                      )
-                    : Container(height: 4, color: colorScheme.outlineVariant),
+    // The card recipe; the play button's own 48dp target is its padding.
+    return EmbeddedCard(
+      padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingXS),
+      child: Row(
+        children: [
+          if (_loading)
+            const Padding(
+              padding: EdgeInsets.all(14),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text(
-                  ready
-                      ? '${_time(value.position)} / ${_time(value.duration)}'
-                      : '0:00',
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
+            )
+          else if (_failed)
+            IconButton(
+              // It would not play here; the browser may manage.
+              onPressed: () => UrlUtils.openUrl(widget.src),
+              icon: Icon(Icons.open_in_new, color: colorScheme.error),
+            )
+          else
+            IconButton(
+              onPressed: _toggle,
+              icon: Icon(
+                (value?.isPlaying ?? false)
+                    ? Icons.pause_rounded
+                    : Icons.play_arrow_rounded,
+                color: colorScheme.primary,
+                size: 28,
               ),
-            ],
+            ),
+          Expanded(
+            child: ready
+                ? VideoProgressIndicator(
+                    controller,
+                    allowScrubbing: true,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    colors: VideoProgressColors(
+                      playedColor: colorScheme.primary,
+                      bufferedColor: colorScheme.primary.withValues(alpha: 0.3),
+                      backgroundColor: colorScheme.outlineVariant,
+                    ),
+                  )
+                : Container(height: 4, color: colorScheme.outlineVariant),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text(
+              ready
+                  ? '${_time(value.position)} / ${_time(value.duration)}'
+                  : '0:00',
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

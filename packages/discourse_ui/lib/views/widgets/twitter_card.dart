@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../utils/twitter_cache.dart';
 import '../../theme/design_tokens.dart';
+import 'post_body_extensions.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 
 class TwitterCard extends StatefulWidget {
@@ -110,103 +111,54 @@ class _TwitterCardState extends State<TwitterCard> with AutomaticKeepAliveClient
       );
     }
 
-    // Show as simple link if API failed or URL doesn't match pattern
+    // Show as simple link if API failed or URL doesn't match pattern: a
+    // link-coloured line, like any post link, in a 48dp target.
     if (_showAsLink) {
-      return Container(
-        margin: DesignTokens.paddingVerticalS,
-        child: InkWell(
-          onTap: _launchUrl,
-          borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingXS),
+      return InkWell(
+        onTap: _launchUrl,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48),
+          child: Align(
+            alignment: AlignmentDirectional.centerStart,
+            widthFactor: 1,
             child: Text(
               widget.url,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.primary,
-                decoration: TextDecoration.underline,
-              ),
+              style: textTheme.bodyLarge?.copyWith(color: colorScheme.primary),
             ),
           ),
         ),
       );
     }
 
-    return Container(
-      margin: EdgeInsets.only(top: DesignTokens.spacingS),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
-        borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
-          width: DesignTokens.borderWidthThin,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: _launchUrl,
-          borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-          child: Padding(
-            padding: DesignTokens.paddingS,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Author info
-                Row(
-                  children: [
-                    // X (Twitter) logo
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(DesignTokens.radiusXL),
-                      ),
-                      child: const Icon(
-                        Icons.close,
-                        color: Colors.white,
-                        size: DesignTokens.iconSizeM,
-                      ),
-                    ),
-                    const SizedBox(width: DesignTokens.spacingM),
-                    // Author name and handle
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _twitterData?.authorName ?? '',
-                            style: textTheme.titleMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                              fontWeight: DesignTokens.fontWeightSemiBold,
-                            ),
-                          ),
-                          if (_twitterData?.authorHandle != null)
-                            Text(
-                              '@${_twitterData!.authorHandle}',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                // Tweet text
-                if (_twitterData?.tweetText != null && _twitterData!.tweetText!.isNotEmpty) ...[
-                  SizedBox(height: DesignTokens.spacingS),
-                  Text(
-                    _twitterData!.tweetText!,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ],
-            ),
+    // The tweet as the link preview draws one (OneboxCard): the card recipe,
+    // the name as the card's title over the handle, the text as its excerpt.
+    final muted = colorScheme.onSurfaceVariant;
+    return EmbeddedCard(
+      onTap: _launchUrl,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _twitterData?.authorName ?? '',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: textTheme.titleMedium?.copyWith(color: colorScheme.onSurface),
           ),
-        ),
+          if (_twitterData?.authorHandle != null)
+            Text(
+              '@${_twitterData!.authorHandle}',
+              style: textTheme.bodySmall?.copyWith(color: muted),
+            ),
+          // Tweet text
+          if (_twitterData?.tweetText != null && _twitterData!.tweetText!.isNotEmpty) ...[
+            const SizedBox(height: DesignTokens.spacingS),
+            Text(
+              _twitterData!.tweetText!,
+              style: textTheme.bodyMedium?.copyWith(color: muted),
+            ),
+          ],
+        ],
       ),
     );
   }

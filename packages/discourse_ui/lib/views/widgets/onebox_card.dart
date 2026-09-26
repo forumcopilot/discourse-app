@@ -4,6 +4,7 @@ import 'package:html/dom.dart' as dom;
 
 import '../../theme/design_tokens.dart';
 import 'brand_image.dart';
+import 'post_body_extensions.dart';
 
 /// A Discourse link preview (`aside.onebox`) as the web draws it: a bordered
 /// card with the site's icon and name, the title in the link colour, the
@@ -16,6 +17,11 @@ import 'brand_image.dart';
 /// of the body (excerpt, GitHub's "opened … by …" line, a file's code, a
 /// tweet's photos) is still rendered as HTML through [renderHtml], so links,
 /// local dates, code blocks and videos inside keep working.
+///
+/// [renderHtml] draws markup at the given text size and colour (the card's
+/// excerpt and metadata roles), or the caller's when not given.
+typedef OneboxHtmlRenderer = Widget Function(String html, {double? fontSize, Color? color});
+
 class OneboxExtension extends HtmlExtension {
   const OneboxExtension({
     required this.renderHtml,
@@ -23,7 +29,7 @@ class OneboxExtension extends HtmlExtension {
     required this.onOpen,
   });
 
-  final Widget Function(String html) renderHtml;
+  final OneboxHtmlRenderer renderHtml;
   final String Function(String url) resolve;
   final void Function(String url) onOpen;
 
@@ -42,7 +48,10 @@ class OneboxExtension extends HtmlExtension {
     return WidgetSpan(
       child: SizedBox(
         width: double.infinity,
-        child: OneboxCard(data: data, renderHtml: renderHtml, onOpen: onOpen),
+        child: withBlockGap(
+          context,
+          OneboxCard(data: data, renderHtml: renderHtml, onOpen: onOpen),
+        ),
       ),
     );
   }
@@ -232,8 +241,14 @@ class OneboxCard extends StatelessWidget {
   });
 
   final OneboxData data;
-  final Widget Function(String html) renderHtml;
+  final OneboxHtmlRenderer renderHtml;
   final void Function(String url) onOpen;
+
+  /// The excerpt's size: bodyMedium, under the card's titleMedium title.
+  static const double excerptSize = 14;
+
+  /// The metadata line's size: bodySmall.
+  static const double metadataSize = 12;
 
   @override
   Widget build(BuildContext context) {
@@ -241,7 +256,6 @@ class OneboxCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final target = data.titleUrl ?? data.url;
     final muted = colorScheme.onSurfaceVariant;
-    final bodySize = textTheme.bodyMedium?.fontSize ?? 14;
 
     final header = data.siteName == null
         ? null
@@ -249,7 +263,7 @@ class OneboxCard extends StatelessWidget {
             children: [
               if (data.siteIconUrl != null) ...[
                 SizedBox(width: 16, height: 16, child: _picture(data.siteIconUrl!, BoxFit.contain)),
-                const SizedBox(width: 6),
+                const SizedBox(width: DesignTokens.spacingS),
               ],
               Expanded(
                 child: Text(
@@ -266,17 +280,16 @@ class OneboxCard extends StatelessWidget {
         ? null
         : Text(
             data.title!,
-            maxLines: 3,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: textTheme.bodyLarge?.copyWith(
+            style: textTheme.titleMedium?.copyWith(
               color: data.kind == OneboxKind.tweet ? colorScheme.onSurface : colorScheme.primary,
-              fontWeight: FontWeight.w600,
-              fontSize: bodySize * 1.1,
-              height: 1.3,
             ),
           );
 
-    final rest = data.restHtml.isEmpty ? null : renderHtml(data.restHtml);
+    final rest = data.restHtml.isEmpty
+        ? null
+        : renderHtml(data.restHtml, fontSize: excerptSize, color: muted);
 
     Widget? leading;
     switch (data.kind) {
@@ -291,21 +304,20 @@ class OneboxCard extends StatelessWidget {
               OneboxKind.githubPullRequest => Icons.merge_type,
               _ => Icons.commit,
             },
-            size: 22,
+            size: DesignTokens.iconSizeL,
             color: muted,
           ),
         );
       case OneboxKind.pdf:
         leading = Container(
-          width: 44,
-          height: 52,
+          width: 48,
+          height: 48,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: const Color(0xFFD32F2F),
-            borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
+            color: colorScheme.error,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
           ),
-          child: const Text('PDF',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13)),
+          child: Text('PDF', style: textTheme.labelSmall?.copyWith(color: colorScheme.onError)),
         );
       case OneboxKind.tweet:
         break;
@@ -332,48 +344,27 @@ class OneboxCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (title != null) title,
-                  if (title != null && rest != null) const SizedBox(height: 6),
+                  if (title != null && rest != null) const SizedBox(height: DesignTokens.spacingXS),
                   if (rest != null) rest,
                 ],
               ),
             ),
           ],
         ),
-      if (data.metadataHtml != null)
-        DefaultTextStyle.merge(
-          style: TextStyle(color: muted, fontSize: bodySize * 0.9),
-          child: renderHtml(data.metadataHtml!),
-        ),
+      if (data.metadataHtml != null) ...[
+        const SizedBox(height: DesignTokens.spacingS),
+        renderHtml(data.metadataHtml!, fontSize: metadataSize, color: muted),
+      ],
     ];
 
-    return Padding(
-      // Room for the ring drawn outside the border.
-      padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingS, horizontal: 3),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-          border: Border.all(color: colorScheme.outlineVariant),
-          // The web's onebox has a soft 4px ring around its border.
-          boxShadow: [
-            BoxShadow(color: colorScheme.surfaceContainerHighest, spreadRadius: 3),
-          ],
-        ),
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            onTap: target == null ? null : () => onOpen(target),
-            child: Padding(
-              padding: const EdgeInsets.all(DesignTokens.spacingM),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: content,
-              ),
-            ),
-          ),
-        ),
+    // The one card recipe, aligned with the other blocks (the web's outer
+    // ring used to inset it by 3dp).
+    return EmbeddedCard(
+      onTap: target == null ? null : () => onOpen(target),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: content,
       ),
     );
   }
@@ -385,6 +376,8 @@ class OneboxCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final muted = colorScheme.onSurfaceVariant;
     final small = textTheme.bodySmall?.copyWith(color: muted);
+    final target = data.titleUrl ?? data.url;
+    final dateUrl = data.dateUrl;
     return [
       Row(
         children: [
@@ -411,11 +404,21 @@ class OneboxCard extends StatelessWidget {
             spacing: DesignTokens.spacingM,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
+              // The card already opens the tweet; a date pointing elsewhere
+              // is its own 48dp target.
               if (data.date != null)
-                GestureDetector(
-                  onTap: data.dateUrl == null ? null : () => onOpen(data.dateUrl!),
-                  child: Text(data.date!, style: small),
-                ),
+                dateUrl == null || dateUrl == target
+                    ? Text(data.date!, style: small)
+                    : InkWell(
+                        onTap: () => onOpen(dateUrl),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(minHeight: 48),
+                          child: Align(
+                            widthFactor: 1,
+                            child: Text(data.date!, style: small),
+                          ),
+                        ),
+                      ),
               if (data.likes != null)
                 Row(mainAxisSize: MainAxisSize.min, children: [
                   Icon(Icons.favorite_border, size: 14, color: muted),
@@ -469,7 +472,7 @@ class _ThumbnailState extends State<_Thumbnail> {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 110, maxHeight: 170),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
+          borderRadius: BorderRadius.circular(DesignTokens.radiusS),
           child: AspectRatio(
             aspectRatio: (widget.ratio ?? 1).clamp(0.5, 2.5),
             child: OneboxCard._picture(widget.url, BoxFit.cover, onError: () {

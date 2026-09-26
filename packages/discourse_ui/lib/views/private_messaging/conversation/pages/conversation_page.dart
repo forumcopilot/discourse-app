@@ -1019,7 +1019,8 @@ class _ConversationPageState extends State<ConversationPage> {
         if ((_conversation?.isClosed ?? false) && _showClosedBanner)
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            // Room for a full 48dp close button, as on the topic page.
+            padding: const EdgeInsetsDirectional.fromSTEB(16, 4, 4, 4),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
               border: Border(
@@ -1030,7 +1031,7 @@ class _ConversationPageState extends State<ConversationPage> {
               ),
             ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Icon(
                   Icons.lock_outline,
@@ -1057,9 +1058,6 @@ class _ConversationPageState extends State<ConversationPage> {
                       _showClosedBanner = false;
                     });
                   },
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  splashRadius: 20,
                 ),
               ],
             ),

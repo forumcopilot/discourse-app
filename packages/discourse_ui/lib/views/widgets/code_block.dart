@@ -5,6 +5,7 @@ import 'package:flutter_highlight/themes/a11y-light.dart';
 import 'package:highlight/highlight.dart' show highlight, Node;
 
 import '../../l10n/generated/app_localizations.dart';
+import '../../theme/design_tokens.dart';
 import '../../utils/html_colors.dart';
 
 /// A code block as the web shows it: coloured by language (the `lang-*`
@@ -43,12 +44,12 @@ class CodeBlock extends StatelessWidget {
     final spans = highlightSpans(
         code, language, readableTheme(dark ? a11yDarkTheme : a11yLightTheme, colorScheme.surfaceContainerHighest));
 
+    // The gap to the next block is the post body's (see withBlockGap).
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
       ),
       child: Stack(
         children: [
@@ -56,7 +57,12 @@ class CodeBlock extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             // Room on the right so the last characters of the first lines
             // are not under the copy button.
-            padding: const EdgeInsets.fromLTRB(12, 12, 44, 12),
+            padding: const EdgeInsets.fromLTRB(
+              DesignTokens.spacingM,
+              DesignTokens.spacingM,
+              DesignTokens.spacingXXXL,
+              DesignTokens.spacingM,
+            ),
             // Plain Text, not SelectableText: SelectableText claims
             // horizontal drags for text selection, which swallows the
             // scroll gesture. The copy button covers the selection use.
@@ -70,9 +76,13 @@ class CodeBlock extends StatelessWidget {
           Positioned(
             top: 0,
             right: 0,
+            // Filled in the block's own colour: a long line scrolls under
+            // the button instead of showing through it.
             child: IconButton(
               tooltip: AppLocalizations.of(context)?.copy ?? 'Copy',
-              visualDensity: VisualDensity.compact,
+              style: IconButton.styleFrom(
+                backgroundColor: colorScheme.surfaceContainerHighest,
+              ),
               icon: Icon(Icons.copy_rounded, size: 18, color: colorScheme.onSurfaceVariant),
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: code));

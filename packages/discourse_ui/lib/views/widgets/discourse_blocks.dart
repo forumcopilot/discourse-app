@@ -9,6 +9,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/local_dates.dart';
 import '../../utils/post_events.dart';
+import 'post_body_extensions.dart';
 
 /// Discourse plugin markup that the web turns into something else with
 /// JavaScript and CSS, drawn natively:
@@ -90,10 +91,9 @@ class DiscourseBlocksExtension extends HtmlExtension {
       return WidgetSpan(
         child: SizedBox(
           width: double.infinity,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
-            child: math,
+          child: withBlockGap(
+            context,
+            SingleChildScrollView(scrollDirection: Axis.horizontal, child: math),
           ),
         ),
       );
@@ -104,10 +104,13 @@ class DiscourseBlocksExtension extends HtmlExtension {
       return WidgetSpan(
         child: SizedBox(
           width: double.infinity,
-          child: PostEventCard(
-            event: event,
-            description: context.inlineSpanChildren ?? const [],
-            onOpen: onOpen,
+          child: withBlockGap(
+            context,
+            PostEventCard(
+              event: event,
+              description: context.inlineSpanChildren ?? const [],
+              onOpen: onOpen,
+            ),
           ),
         ),
       );
@@ -115,7 +118,9 @@ class DiscourseBlocksExtension extends HtmlExtension {
     if (c.contains('poll')) {
       final poll = pollBuilder?.call(context.attributes['data-poll-name']!);
       if (poll == null) return TextSpan(children: context.inlineSpanChildren);
-      return WidgetSpan(child: SizedBox(width: double.infinity, child: poll));
+      return WidgetSpan(
+        child: SizedBox(width: double.infinity, child: withBlockGap(context, poll)),
+      );
     }
     // Spoiler.
     final content = block
@@ -279,24 +284,19 @@ class PostEventCard extends StatelessWidget {
           ),
         );
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
-      padding: const EdgeInsets.all(DesignTokens.spacingM),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-        border: Border.all(color: colorScheme.outlineVariant),
-      ),
+    // The one card recipe; the gap to the next block is the post body's.
+    return EmbeddedCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // The date badge: month over day, as on the web.
+              // The date badge: month over day, as on the web. At least
+              // 48 wide, wider when large text needs it.
               Container(
-                width: 48,
-                padding: const EdgeInsets.symmetric(vertical: 4),
+                constraints: const BoxConstraints(minWidth: 48),
+                padding: const EdgeInsets.all(DesignTokens.spacingXS),
                 decoration: BoxDecoration(
                   color: colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(DesignTokens.radiusXS),
@@ -305,16 +305,15 @@ class PostEventCard extends StatelessWidget {
                   children: [
                     Text(
                       DateFormat.MMM(locale).format(start).toUpperCase(),
-                      style: textTheme.labelSmall?.copyWith(
+                      style: textTheme.labelMedium?.copyWith(
                         color: colorScheme.error,
-                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     Text(
                       '${start.day}',
                       style: textTheme.titleLarge?.copyWith(
                         color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         height: 1.1,
                       ),
                     ),
@@ -331,7 +330,6 @@ class PostEventCard extends StatelessWidget {
                         event.name!,
                         style: textTheme.titleMedium?.copyWith(
                           color: colorScheme.onSurface,
-                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     if (expired)
@@ -344,7 +342,7 @@ class PostEventCard extends StatelessWidget {
                         ),
                         child: Text(
                           l10n?.eventExpired ?? 'Expired',
-                          style: textTheme.labelSmall?.copyWith(color: muted),
+                          style: textTheme.labelMedium?.copyWith(color: muted),
                         ),
                       ),
                   ],
@@ -354,19 +352,35 @@ class PostEventCard extends StatelessWidget {
           ),
           row(Icons.schedule, Text(when.toString(),
               style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface))),
-          if (location != null)
+          if (location != null && locationIsUrl)
+            // A link is its own 48dp target; the slack above it stands in
+            // for the other rows' 8dp gap.
+            Row(
+              children: [
+                Icon(Icons.link, size: 18, color: muted),
+                const SizedBox(width: DesignTokens.spacingS),
+                Expanded(
+                  child: InkWell(
+                    onTap: () => onOpen(location),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 48),
+                      child: Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text(location,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary)),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          else if (location != null)
             row(
-              locationIsUrl ? Icons.link : Icons.place_outlined,
-              locationIsUrl
-                  ? GestureDetector(
-                      onTap: () => onOpen(location),
-                      child: Text(location,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary)),
-                    )
-                  : Text(location,
-                      style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface)),
+              Icons.place_outlined,
+              Text(location,
+                  style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface)),
             ),
           if (recurrence != null)
             row(Icons.repeat, Text(recurrence,

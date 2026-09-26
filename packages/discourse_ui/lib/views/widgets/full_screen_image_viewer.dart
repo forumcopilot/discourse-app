@@ -160,31 +160,21 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+      // The position among the post's images, not the image's URL (which
+      // was the title, in 14sp); the theme's title size and icon sizes.
       appBar: AppBar(
         backgroundColor: Colors.black,
-        elevation: 0,
-        centerTitle: true,
+        foregroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon: const Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(
-          widget.imageUrls[_currentIndex],
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-          ),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-        ),
+        title: widget.imageUrls.length > 1
+            ? Text('${_currentIndex + 1} / ${widget.imageUrls.length}')
+            : null,
         actions: [
           IconButton(
-            icon: Icon(
-              _isSaving ? Icons.downloading : Icons.download,
-              color: Colors.white,
-              size: 30,
-            ),
+            icon: Icon(_isSaving ? Icons.downloading : Icons.download),
             onPressed: _isSaving ? null : _saveImage,
           ),
         ],

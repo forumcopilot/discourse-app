@@ -107,8 +107,10 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
     final downActive = vote.viewerVotedDown;
     final score = vote.voteCount;
 
+    // Full 48dp arrow buttons (they were squeezed to ~36x40 in a 36dp
+    // column).
     return SizedBox(
-      width: 36,
+      width: kMinInteractiveDimension,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -117,8 +119,6 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
             // so the vote column reads at the same visual weight as
             // the Like / Bookmark / Reply row.
             iconSize: DesignTokens.iconSizeMedium,
-            visualDensity: VisualDensity.compact,
-            padding: EdgeInsets.zero,
             tooltip: 'Upvote',
             icon: Icon(
               upActive ? Icons.arrow_drop_up : Icons.arrow_drop_up_outlined,
@@ -137,13 +137,10 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
                   : score < 0
                       ? colorScheme.error
                       : colorScheme.onSurfaceVariant,
-              fontWeight: DesignTokens.fontWeightSemiBold,
             ),
           ),
           IconButton(
             iconSize: DesignTokens.iconSizeMedium,
-            visualDensity: VisualDensity.compact,
-            padding: EdgeInsets.zero,
             tooltip: 'Downvote',
             icon: Icon(
               downActive

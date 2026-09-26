@@ -6,6 +6,9 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:html/dom.dart' as dom;
 
+import '../../theme/design_tokens.dart';
+import 'post_body_extensions.dart';
+
 /// Renders `<table>` in a post body.
 ///
 /// flutter_html 3 has no table support: a table and all the text in it
@@ -93,15 +96,18 @@ class PostTableExtension extends HtmlExtension {
     final element = context.styledElement;
     if (element is _TableElement) {
       return WidgetSpan(
-        child: _PostTable(
-          table: element,
-          builtChildren: context.builtChildrenMap ?? const {},
-          colorScheme: colorScheme,
-          // A table inside a table cell is sized by the outer grid, which
-          // asks its cells for intrinsic sizes; it must not scroll on its
-          // own or measure the screen (a LayoutBuilder cannot answer
-          // intrinsic-size queries).
-          nested: _isInsideTable(context.node),
+        child: withBlockGap(
+          context,
+          _PostTable(
+            table: element,
+            builtChildren: context.builtChildrenMap ?? const {},
+            colorScheme: colorScheme,
+            // A table inside a table cell is sized by the outer grid, which
+            // asks its cells for intrinsic sizes; it must not scroll on its
+            // own or measure the screen (a LayoutBuilder cannot answer
+            // intrinsic-size queries).
+            nested: _isInsideTable(context.node),
+          ),
         ),
       );
     }
@@ -154,8 +160,9 @@ class _CellElement extends StyledElement {
     required super.elementId,
     required super.children,
   }) : super(
-          // Header cells are bold, as in a browser; their text inherits it.
-          style: name == 'th' ? Style(fontWeight: FontWeight.bold) : Style(),
+          // Header cells are set off in medium weight (titleSmall's);
+          // their text inherits it.
+          style: name == 'th' ? Style(fontWeight: FontWeight.w500) : Style(),
         );
 
   int get colspan => _span('colspan');
@@ -236,7 +243,7 @@ class _PostTableState extends State<_PostTable> {
             child: SingleChildScrollView(
               controller: _scroll,
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.only(bottom: DesignTokens.spacingS),
               child: _AtLeastMinContentWidth(
                 minWidth: constraints.maxWidth,
                 child: grid,
@@ -247,23 +254,21 @@ class _PostTableState extends State<_PostTable> {
       );
     }
 
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: widget.nested ? 0 : 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (captionSpan != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text.rich(
-                TextSpan(children: [captionSpan]),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+    // The gap to the next block is the post body's (see withBlockGap).
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (captionSpan != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: DesignTokens.spacingXS),
+            child: Text.rich(
+              TextSpan(children: [captionSpan]),
+              style: const TextStyle(fontWeight: FontWeight.w500),
             ),
-          table,
-        ],
-      ),
+          ),
+        table,
+      ],
     );
   }
 
@@ -346,7 +351,10 @@ class _PostTableState extends State<_PostTable> {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          padding: const EdgeInsets.symmetric(
+            horizontal: DesignTokens.spacingM,
+            vertical: DesignTokens.spacingS,
+          ),
           child: Align(
             alignment: Alignment(horizontal, 0),
             widthFactor: 1,

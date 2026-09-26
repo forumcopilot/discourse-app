@@ -763,9 +763,11 @@ class _PostPageState extends State<PostPage> {
                 if (_isDeleted && _showDeletedBanner)
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: DesignTokens.spacingL,
-                      vertical: DesignTokens.spacingM,
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                      DesignTokens.spacingL,
+                      DesignTokens.spacingXS,
+                      DesignTokens.spacingXS,
+                      DesignTokens.spacingXS,
                     ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: DesignTokens.opacityHigh),
@@ -777,7 +779,7 @@ class _PostPageState extends State<PostPage> {
                       ),
                     ),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.delete_rounded,
@@ -804,9 +806,6 @@ class _PostPageState extends State<PostPage> {
                               _showDeletedBanner = false;
                             });
                           },
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          splashRadius: DesignTokens.iconSizeM,
                         ),
                       ],
                     ),
@@ -815,9 +814,11 @@ class _PostPageState extends State<PostPage> {
                 if (_isClosed && _showClosedBanner)
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: DesignTokens.spacingL,
-                      vertical: DesignTokens.spacingM,
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                      DesignTokens.spacingL,
+                      DesignTokens.spacingXS,
+                      DesignTokens.spacingXS,
+                      DesignTokens.spacingXS,
                     ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.tertiaryContainer.withValues(alpha: DesignTokens.opacityHigh),
@@ -829,7 +830,7 @@ class _PostPageState extends State<PostPage> {
                       ),
                     ),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.lock_rounded,
@@ -856,9 +857,6 @@ class _PostPageState extends State<PostPage> {
                               _showClosedBanner = false;
                             });
                           },
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          splashRadius: DesignTokens.iconSizeM,
                         ),
                       ],
                     ),
@@ -867,9 +865,11 @@ class _PostPageState extends State<PostPage> {
                 if (_isSticky && _showStickyBanner)
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: DesignTokens.spacingL,
-                      vertical: DesignTokens.spacingM,
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                      DesignTokens.spacingL,
+                      DesignTokens.spacingXS,
+                      DesignTokens.spacingXS,
+                      DesignTokens.spacingXS,
                     ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: DesignTokens.opacityHigh),
@@ -881,7 +881,7 @@ class _PostPageState extends State<PostPage> {
                       ),
                     ),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.push_pin_outlined,
@@ -908,9 +908,6 @@ class _PostPageState extends State<PostPage> {
                               _showStickyBanner = false;
                             });
                           },
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          splashRadius: DesignTokens.iconSizeM,
                         ),
                       ],
                     ),
@@ -919,9 +916,11 @@ class _PostPageState extends State<PostPage> {
                 if (_isSubscribed && _showSubscribedBanner)
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: DesignTokens.spacingL,
-                      vertical: DesignTokens.spacingM,
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                      DesignTokens.spacingL,
+                      DesignTokens.spacingXS,
+                      DesignTokens.spacingXS,
+                      DesignTokens.spacingXS,
                     ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: DesignTokens.opacityHigh),
@@ -933,7 +932,7 @@ class _PostPageState extends State<PostPage> {
                       ),
                     ),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.notifications_outlined,
@@ -960,9 +959,6 @@ class _PostPageState extends State<PostPage> {
                               _showSubscribedBanner = false;
                             });
                           },
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          splashRadius: DesignTokens.iconSizeM,
                         ),
                       ],
                     ),
