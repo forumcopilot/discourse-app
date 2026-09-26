@@ -6,6 +6,9 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Changed
+- **New Message is the shared composer** (`MessageComposePage`) with the recipients above the title, instead of a separate copy that had drifted from it. It gains what the other composers have: photos prepared as the forum's own composer would (scaled and recompressed when the forum asks for it, and a question before shrinking one over the size limit; the copy uploaded them as picked), the same attachment rows and toolbar, and a readable reason when a send fails. Once sent it opens the new message, as before and as New Topic does, through `NewConversationPage.open`; the message list under it refreshes. `MessageComposePage` takes a `contentLabel`, and its own error message no longer shows raw "Exception: …" text.
+
 ### Added
 - **Polls in private messages.** A poll in a message is drawn where its author put it, with results, voting, changing or removing a vote and the voters list, as in topics. Messages showed nothing in its place: the SDK's message model had no polls (`FCConversationMessage.polls`, added in the canonical SDK), and `DiscoursePostProxy.pollsFromPostJson` now parses a message's polls the way it parses a post's, so a vote finds its message.
 

@@ -636,12 +636,10 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
 
     // Discourse PMs are always conversations; the XF-style traditional
     // inbox/sent split was removed for discourseapp.
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(
-          builder: (context) =>
-              NewConversationPage(siteContext: _siteContext!)),
-    );
-    if (result == true) {
+    // The new message opens once sent; the list under it refreshes.
+    final sent = await NewConversationPage.open(context,
+        siteContext: _siteContext!);
+    if (sent) {
       _pmListKey.currentState?.resetTab();
     }
   }

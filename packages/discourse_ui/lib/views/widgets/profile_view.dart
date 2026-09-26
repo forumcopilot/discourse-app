@@ -754,16 +754,13 @@ class _ProfileViewState extends State<ProfileView> {
           if (_userInfo.acceptsPM) ...[
             FilledButton.icon(
               onPressed: () {
-                // Discourse PMs are always conversations.
-                Navigator.push(
+                // Discourse PMs are always conversations; the new one
+                // opens once sent.
+                NewConversationPage.open(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => NewConversationPage(
-                      siteContext: widget.siteContext,
-                      initialRecipient: _userInfo.username,
-                      initialRecipientIconUrl: _avatarUrl,
-                    ),
-                  ),
+                  siteContext: widget.siteContext,
+                  initialRecipient: _userInfo.username,
+                  initialRecipientIconUrl: _avatarUrl,
                 );
               },
               icon: Icon(Icons.message, size: DesignTokens.iconSizeM),

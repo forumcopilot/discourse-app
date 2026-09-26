@@ -21,6 +21,7 @@ import '../../utils/image_shrink.dart';
 import 'oversized_image_sheet.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
 import 'category_badge.dart';
+import '../../utils/error_message.dart';
 
 class MessageComposePage extends StatefulWidget {
   final SiteContext siteContext;
@@ -62,6 +63,10 @@ class MessageComposePage extends StatefulWidget {
   /// Save for a [submitIcon] of save, else Send.
   final String? submitLabel;
 
+  /// The body field's label: "Content" unless the page names it (New
+  /// Message says "Message").
+  final String? contentLabel;
+
   // Show signature toggle for new topic editor
   final bool showSignatureToggle;
 
@@ -102,6 +107,7 @@ class MessageComposePage extends StatefulWidget {
     this.onRemoveAttachment,
     this.submitIcon,
     this.submitLabel,
+    this.contentLabel,
     this.showSignatureToggle = false,
     this.extraHeader,
     this.showWhisperToggle = false,
@@ -1327,7 +1333,8 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   const SizedBox(width: DesignTokens.spacingM),
                   Expanded(
                     child: Text(
-                      e.toString(),
+                      // Readable, not "Exception: …" or an API dump.
+                      describeError(e, context: context),
                       style: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onErrorContainer,
                           ),
@@ -1776,7 +1783,9 @@ class _MessageComposePageState extends State<MessageComposePage> {
                               keyboardType: TextInputType.multiline,
                               textCapitalization: TextCapitalization.sentences,
                               decoration: InputDecoration(
-                                labelText: AppLocalizations.of(context)?.content ?? 'Content',
+                                labelText: widget.contentLabel ??
+                                    AppLocalizations.of(context)?.content ??
+                                    'Content',
                                 hintText: widget.contentHint,
                                 alignLabelWithHint: true,
                                 floatingLabelBehavior: FloatingLabelBehavior.always,
