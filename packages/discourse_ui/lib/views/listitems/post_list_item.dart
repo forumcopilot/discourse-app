@@ -712,7 +712,7 @@ class _PostListItemState extends State<PostListItem> {
                             'Translating...')
                         : (AppLocalizations.of(context)?.translated ??
                             'Translated'),
-                    style: textTheme.labelSmall?.copyWith(
+                    style: textTheme.labelMedium?.copyWith(
                       color: widget.isTranslating &&
                               widget.translatedContent == null
                           ? colorScheme.secondary
@@ -1041,7 +1041,6 @@ class _PostListItemState extends State<PostListItem> {
           child: Row(
             children: [
               Icon(Icons.share_outlined,
-                  size: DesignTokens.iconSizeM,
                   color: Theme.of(context).colorScheme.secondary),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)!.share),
@@ -1055,7 +1054,6 @@ class _PostListItemState extends State<PostListItem> {
           child: Row(
             children: [
               Icon(Icons.link,
-                  size: DesignTokens.iconSizeM,
                   color: Theme.of(context).colorScheme.secondary),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)!.copyLink),
@@ -1071,7 +1069,6 @@ class _PostListItemState extends State<PostListItem> {
           child: Row(
             children: [
               Icon(Icons.edit,
-                  size: DesignTokens.iconSizeM,
                   color: Theme.of(context).colorScheme.primary),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)?.edit ?? 'Edit'),
@@ -1087,7 +1084,6 @@ class _PostListItemState extends State<PostListItem> {
           child: Row(
             children: [
               Icon(Icons.delete,
-                  size: DesignTokens.iconSizeM,
                   color: Theme.of(context).colorScheme.error),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)?.delete ?? 'Delete'),
@@ -1103,7 +1099,6 @@ class _PostListItemState extends State<PostListItem> {
           child: Row(
             children: [
               Icon(Icons.flag,
-                  size: DesignTokens.iconSizeM,
                   color: Theme.of(context).colorScheme.secondary),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)?.report ?? 'Report'),
@@ -1125,7 +1120,6 @@ class _PostListItemState extends State<PostListItem> {
           child: Row(
             children: [
               Icon(isWiki ? Icons.edit_off : Icons.edit_note,
-                  size: DesignTokens.iconSizeM,
                   color: Theme.of(context).colorScheme.secondary),
               const SizedBox(width: DesignTokens.spacingM),
               Text(isWiki ? 'Remove wiki' : 'Make wiki'),
@@ -1145,7 +1139,6 @@ class _PostListItemState extends State<PostListItem> {
           child: Row(
             children: [
               Icon(Icons.history,
-                  size: DesignTokens.iconSizeM,
                   color: Theme.of(context).colorScheme.secondary),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)!.editHistory),

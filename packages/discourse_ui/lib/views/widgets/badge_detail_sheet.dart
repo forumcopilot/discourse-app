@@ -156,7 +156,6 @@ class _BadgeDetailSheetState extends State<BadgeDetailSheet> {
                         badge.name,
                         style: textTheme.titleMedium?.copyWith(
                           color: colorScheme.onSurface,
-                          fontWeight: DesignTokens.fontWeightSemiBold,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -195,7 +194,6 @@ class _BadgeDetailSheetState extends State<BadgeDetailSheet> {
                     earnedBits.join(' · '),
                     style: textTheme.bodySmall?.copyWith(
                       color: colorScheme.primary,
-                      fontWeight: DesignTokens.fontWeightSemiBold,
                     ),
                   ),
                 ],

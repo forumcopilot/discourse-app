@@ -90,7 +90,9 @@ class DesignTokens {
   // Specific combinations
   static const EdgeInsets paddingCard = EdgeInsets.all(spacingL);
   static const EdgeInsets paddingScreen = EdgeInsets.all(spacingXL);
-  static const EdgeInsets paddingScreenHorizontal = EdgeInsets.symmetric(horizontal: spacingXL);
+  /// The screen margin: 16dp, as everywhere else (it was 24 on the
+  /// profile and forum header only).
+  static const EdgeInsets paddingScreenHorizontal = EdgeInsets.symmetric(horizontal: spacingL);
   // Material 3 text field: 16 + a 24dp bodyLarge line + 16 = 56dp high.
   static const EdgeInsets paddingInput = EdgeInsets.symmetric(horizontal: spacingL, vertical: spacingL);
 

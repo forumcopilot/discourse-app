@@ -147,9 +147,6 @@ class _ReportDialogState extends State<_ReportDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-
     return AlertDialog(
       title: Text(AppLocalizations.of(context)!.report),
       content: SingleChildScrollView(
@@ -163,36 +160,16 @@ class _ReportDialogState extends State<_ReportDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // M3's radio rows: the label at bodyLarge beside the radio,
+            // the description under it at bodyMedium. The hand-built rows
+            // set the label (14sp w500) above the radio's centre and the
+            // description at 12sp.
             for (final option in _FlagOption.values)
-              InkWell(
-                onTap: () => setState(() {
-                  _selected = option;
-                  _showMessageError = false;
-                }),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: DesignTokens.spacingXS),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Radio<_FlagOption>(value: option),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(option.label, style: textTheme.titleSmall),
-                            Text(
-                              option.description,
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              RadioListTile<_FlagOption>(
+                value: option,
+                contentPadding: EdgeInsets.zero,
+                title: Text(option.label),
+                subtitle: Text(option.description),
               ),
 
             // Only the notify types accept free text, and Discourse rejects them

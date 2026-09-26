@@ -176,9 +176,6 @@ class _NotificationLevelSheetState extends State<NotificationLevelSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
     final entries = <_LevelEntry>[
       const _LevelEntry(
         level: FCNotificationLevel.watching,
@@ -223,35 +220,19 @@ class _NotificationLevelSheetState extends State<NotificationLevelSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SheetTitle(widget.title),
+            // The theme's selected row (primary icon and text) plus a
+            // check, as the trust-level sheet does; the colours and weight
+            // were set by hand here, and the descriptions were 12sp.
             for (final entry in entries)
               ListTile(
-                leading: Icon(
-                  entry.icon,
-                  color: _selected == entry.level
-                      ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant,
-                ),
-                title: Text(
-                  entry.title,
-                  style: textTheme.bodyLarge?.copyWith(
-                    fontWeight: _selected == entry.level
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                    color: _selected == entry.level
-                        ? colorScheme.primary
-                        : null,
-                  ),
-                ),
-                subtitle: Text(
-                  entry.description,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
+                selected: _selected == entry.level,
+                leading: Icon(entry.icon),
+                title: Text(entry.title),
+                subtitle: Text(entry.description),
                 trailing: _saving && _selected != entry.level
                     ? null
                     : (_selected == entry.level
-                        ? Icon(Icons.check, color: colorScheme.primary)
+                        ? const Icon(Icons.check)
                         : null),
                 onTap: _saving ? null : () => _pick(entry.level),
               ),

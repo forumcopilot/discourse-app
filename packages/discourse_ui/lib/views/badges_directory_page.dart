@@ -163,7 +163,6 @@ class _BadgeRow extends StatelessWidget {
         badge.name,
         style: textTheme.titleSmall?.copyWith(
           color: colorScheme.onSurface,
-          fontWeight: DesignTokens.fontWeightSemiBold,
         ),
       ),
       subtitle: badge.description != null && badge.description!.isNotEmpty
@@ -186,7 +185,6 @@ class _BadgeRow extends StatelessWidget {
             _formatCount(badge.grantCount),
             style: textTheme.labelMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
-              fontWeight: DesignTokens.fontWeightSemiBold,
             ),
           ),
         ],

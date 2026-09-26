@@ -231,82 +231,91 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.turnOnNotifications)),
+      // The explanation scrolls and the buttons stay at the bottom. It was
+      // one fixed Column with a Spacer, which overflowed at a large text
+      // size or on a short phone.
       body: SafeArea(
         child: Padding(
           padding: DesignTokens.paddingL,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.notifications_active_outlined,
-                  size: 48, color: colorScheme.primary),
-              const SizedBox(height: DesignTokens.spacingL),
-
-              // Step 1 — only shown when the OS is actually blocking us.
-              if (osBlocked) ...[
-                Container(
-                  padding: DesignTokens.paddingM,
-                  decoration: BoxDecoration(
-                    color: colorScheme.errorContainer
-                        .withValues(alpha: DesignTokens.opacityLow),
-                    borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                  ),
+              Expanded(
+                child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Icon(Icons.error_outline,
-                              color: colorScheme.error, size: 20),
-                          const SizedBox(width: DesignTokens.spacingS),
-                          Expanded(
-                            child: Text(
-                              l10n.notificationsAreTurnedOffForThisApp,
-                              style: textTheme.titleSmall?.copyWith(
-                                color: colorScheme.onSurface,
-                                fontWeight: DesignTokens.fontWeightSemiBold,
-                              ),
-                            ),
+                      Icon(Icons.notifications_active_outlined,
+                          size: 48, color: colorScheme.primary),
+                      const SizedBox(height: DesignTokens.spacingL),
+
+                      // Step 1 — only shown when the OS is actually blocking us.
+                      if (osBlocked) ...[
+                        Container(
+                          padding: DesignTokens.paddingM,
+                          decoration: BoxDecoration(
+                            color: colorScheme.errorContainer
+                                .withValues(alpha: DesignTokens.opacityLow),
+                            borderRadius: BorderRadius.circular(DesignTokens.radiusM),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: DesignTokens.spacingXS),
-                      Text(
-                        l10n.deviceWillNotShowAlertsUntilAllowedInSettings,
-                        style: textTheme.bodySmall
-                            ?.copyWith(color: colorScheme.onSurfaceVariant),
-                      ),
-                      if (NotificationPermission.canOpenSettings) ...[
-                        const SizedBox(height: DesignTokens.spacingS),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: FilledButton.tonal(
-                            onPressed: NotificationPermission.openSettings,
-                            child: Text(l10n.openSettings),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.error_outline,
+                                      color: colorScheme.error, size: 20),
+                                  const SizedBox(width: DesignTokens.spacingS),
+                                  Expanded(
+                                    child: Text(
+                                      l10n.notificationsAreTurnedOffForThisApp,
+                                      style: textTheme.titleSmall?.copyWith(
+                                        color: colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: DesignTokens.spacingXS),
+                              Text(
+                                l10n.deviceWillNotShowAlertsUntilAllowedInSettings,
+                                style: textTheme.bodySmall
+                                    ?.copyWith(color: colorScheme.onSurfaceVariant),
+                              ),
+                              if (NotificationPermission.canOpenSettings) ...[
+                                const SizedBox(height: DesignTokens.spacingS),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: FilledButton.tonal(
+                                    onPressed: NotificationPermission.openSettings,
+                                    child: Text(l10n.openSettings),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
+                        const SizedBox(height: DesignTokens.spacingL),
                       ],
+
+                      // Step 2 — what the next screen will ask, in plain terms.
+                      Text(
+                        l10n.forumWillAskToApproveNotifications(_forumName),
+                        style: textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: DesignTokens.spacingS),
+                      Text(
+                        l10n.approveNotificationsExplanation,
+                        style: textTheme.bodyMedium
+                            ?.copyWith(color: colorScheme.onSurfaceVariant),
+                      ),
                     ],
                   ),
                 ),
-                const SizedBox(height: DesignTokens.spacingL),
-              ],
-
-              // Step 2 — what the next screen will ask, in plain terms.
-              Text(
-                l10n.forumWillAskToApproveNotifications(_forumName),
-                style: textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: DesignTokens.fontWeightSemiBold,
-                ),
               ),
-              const SizedBox(height: DesignTokens.spacingS),
-              Text(
-                l10n.approveNotificationsExplanation,
-                style: textTheme.bodyMedium
-                    ?.copyWith(color: colorScheme.onSurfaceVariant),
-              ),
-
-              const Spacer(),
+              const SizedBox(height: DesignTokens.spacingL),
 
               SizedBox(
                 width: double.infinity,
@@ -334,10 +343,8 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
               const SizedBox(height: DesignTokens.spacingM),
               Text(
                 l10n.forumOwnerPushNote,
-                textAlign: TextAlign.center,
                 style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant
-                      .withValues(alpha: DesignTokens.opacityMedium),
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
             ],

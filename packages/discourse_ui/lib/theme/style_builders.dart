@@ -218,7 +218,8 @@ class StyleBuilders {
         );
   }
 
-  /// Creates a TextStyle for small/secondary text.
+  /// Creates a TextStyle for small/secondary text: `bodySmall` (12sp). It
+  /// used to force 14sp onto it, so "small" text was body-sized.
   static TextStyle smallTextStyle({
     required ColorScheme colorScheme,
     required TextTheme textTheme,
@@ -226,12 +227,11 @@ class StyleBuilders {
     FontWeight? fontWeight,
   }) {
     return textTheme.bodySmall?.copyWith(
-          fontSize: DesignTokens.fontSizeS,
           color: color ?? colorScheme.onSurfaceVariant,
           fontWeight: fontWeight ?? DesignTokens.fontWeightNormal,
         ) ??
         TextStyle(
-          fontSize: DesignTokens.fontSizeS,
+          fontSize: DesignTokens.fontSizeXS,
           color: color ?? colorScheme.onSurfaceVariant,
           fontWeight: fontWeight ?? DesignTokens.fontWeightNormal,
         );

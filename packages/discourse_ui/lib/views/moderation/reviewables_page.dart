@@ -464,18 +464,26 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
               ],
             ),
             if (reviewable.topicTitle?.trim().isNotEmpty == true) ...[
-              const SizedBox(height: DesignTokens.spacingS),
+              // A 48dp target for the topic link; it was the text's own
+              // ~20dp line.
               InkWell(
                 onTap: reviewable.topicId != null
                     ? () => _openTopic(reviewable)
                     : null,
-                child: Text(
-                  reviewable.topicTitle!,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: reviewable.topicId != null
-                        ? colorScheme.primary
-                        : colorScheme.onSurface,
-                    fontWeight: DesignTokens.fontWeightMedium,
+                borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 48),
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      reviewable.topicTitle!,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: reviewable.topicId != null
+                            ? colorScheme.primary
+                            : colorScheme.onSurface,
+                        fontWeight: DesignTokens.fontWeightMedium,
+                      ),
+                    ),
                   ),
                 ),
               ),

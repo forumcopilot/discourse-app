@@ -34,6 +34,19 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
   - **Polls** sit at the post's margin (they were inset twice), options are 48dp rows that wrap instead of truncating, and Vote is a standard button. The details toggle is a 48dp row with a chevron.
   - **Chat text is 16sp** like posts and messages (it was 14); the sender's name is 14sp and the time 12sp (both were 11sp), and reaction chips are Material 3 chips with 48dp targets (were 22dp).
   - **Nothing readable below 12sp**: link click counts (were 11 and 10sp) and upload captions (10sp).
+- **The remaining screens follow the same spec:**
+  - **No bold text outside headings.** Titles, names and labels on the badge, group, profile, drawer, trust-level, search-filter and notification screens drop their w600/w700 for the type scale's own weights; a chosen option is medium weight, as elsewhere.
+  - **Names are headings from the type scale**: the forum's name in its header is `titleLarge` (was a hand-set 20sp bold), a category's `headlineSmall` (a hand-set 24sp w600), a profile's username `headlineSmall` (was `titleLarge`, the size of the text around it) and a group's name `titleLarge` (was `titleMedium` w600).
+  - **The message page's header is the topic page's**: the title on the left at `titleLarge`, then the participants with a 48dp tap to open the list. It was centred over a tinted pattern at 16sp w600.
+  - **Settings** puts dividers between groups, not under every row, and its supporting text is 14sp (was 12). Notification settings show the current choice under the setting's name, as Android does; a long choice squeezed the name onto two or three lines. The explanation moves into the picker.
+  - **The notification-level and trust-level sheets** mark the current level with the theme's selected row and a check, and their descriptions are 14sp (were 12).
+  - **The report dialog** uses standard radio rows: the reason beside its radio at 16sp and the description under it at 14sp (the reason sat above the radio's centre at 14sp w500 and the description was 12sp).
+  - **Turn on notifications** scrolls at large text sizes instead of overflowing, with the buttons kept at the bottom; its footnote is at full contrast and left-aligned.
+  - **Badges on a profile** are 32dp chips with readable tier colours (gold and silver were faint on light backgrounds), and "+N more" is a full-size chip.
+  - **The profile's side margin is 16dp** like every other screen (it was 24, as was the forum header's), and the avatar's camera button is a 48dp target (was 36).
+  - **Small text is 12sp**: `StyleBuilders.smallTextStyle` forced 14 onto it, and the translated-post label, the profile's like counts, bookmark reminder hints and the drawer's footer were 11sp (the footer also faded).
+  - **Menu icons are the standard 24dp** in the post, message and bookmark menus (several were 20).
+  - **The review queue's topic link** is a 48dp target (it was the text's line).
 
 ### Fixed
 - **Suggested Topics no longer show "?" avatars** (from 1.0.34) when a forum sends suggested topics without a poster; they show a topic glyph in the avatar's place.

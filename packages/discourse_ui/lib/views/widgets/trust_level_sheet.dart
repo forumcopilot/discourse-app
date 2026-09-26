@@ -105,9 +105,10 @@ class TrustLevelSheet extends StatelessWidget {
     TextTheme textTheme,
   ) {
     final isCurrent = entry.level == currentLevel;
+    // The theme's selected row, as the notification-level sheet draws the
+    // current level.
     return ListTile(
-      tileColor:
-          isCurrent ? colorScheme.primary.withValues(alpha: 0.08) : null,
+      selected: isCurrent,
       leading: CircleAvatar(
         radius: DesignTokens.avatarRadiusS,
         backgroundColor: isCurrent
@@ -118,26 +119,12 @@ class TrustLevelSheet extends StatelessWidget {
           style: textTheme.labelLarge?.copyWith(
             color:
                 isCurrent ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
-            fontWeight: DesignTokens.fontWeightSemiBold,
           ),
         ),
       ),
-      title: Text(
-        'TL${entry.level} · ${entry.name}',
-        style: textTheme.bodyLarge?.copyWith(
-          fontWeight:
-              isCurrent ? DesignTokens.fontWeightSemiBold : FontWeight.normal,
-          color: isCurrent ? colorScheme.primary : null,
-        ),
-      ),
-      subtitle: Text(
-        entry.summary,
-        style: textTheme.bodySmall?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-        ),
-      ),
-      trailing:
-          isCurrent ? Icon(Icons.check, color: colorScheme.primary) : null,
+      title: Text('TL${entry.level} · ${entry.name}'),
+      subtitle: Text(entry.summary),
+      trailing: isCurrent ? const Icon(Icons.check) : null,
     );
   }
 }

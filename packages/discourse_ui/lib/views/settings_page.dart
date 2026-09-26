@@ -49,9 +49,6 @@ class ForumSettingsPage extends StatelessWidget {
             title: Text(AppLocalizations.of(context)!.notifications),
             subtitle: Text(
               AppLocalizations.of(context)!.emailSettingsSubtitle,
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
             ),
             trailing: Icon(Icons.chevron_right_rounded,
                 color: colorScheme.onSurfaceVariant),
@@ -61,16 +58,12 @@ class ForumSettingsPage extends StatelessWidget {
               ),
             ),
           ),
-          const Divider(height: 1),
           ListTile(
             leading: Icon(Icons.open_in_new_rounded,
                 color: colorScheme.onSurfaceVariant),
             title: Text(AppLocalizations.of(context)!.manageAccountOnWeb),
             subtitle: Text(
               AppLocalizations.of(context)!.manageAccountSubtitle,
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
             ),
             trailing: Icon(Icons.chevron_right_rounded,
                 color: colorScheme.onSurfaceVariant),
@@ -84,39 +77,28 @@ class ForumSettingsPage extends StatelessWidget {
             title: Text(AppLocalizations.of(context)!.changeEmail),
             subtitle: Text(
               "We'll send a verification link to the new address",
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
             ),
             trailing: Icon(Icons.chevron_right_rounded,
                 color: colorScheme.onSurfaceVariant),
             onTap: () => _openChangeEmail(context),
           ),
-          const Divider(height: 1),
           ListTile(
             leading: Icon(Icons.password_rounded,
                 color: colorScheme.onSurfaceVariant),
             title: Text(AppLocalizations.of(context)!.changePassword),
             subtitle: Text(
               AppLocalizations.of(context)!.changePasswordSubtitle,
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
             ),
             trailing: Icon(Icons.chevron_right_rounded,
                 color: colorScheme.onSurfaceVariant),
             onTap: () => _confirmPasswordReset(context),
           ),
-          const Divider(height: 1),
           ListTile(
             leading: Icon(Icons.notifications_off_outlined,
                 color: colorScheme.onSurfaceVariant),
             title: Text(AppLocalizations.of(context)!.ignoredUsers),
             subtitle: Text(
               AppLocalizations.of(context)!.ignoredUsersSubtitle,
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
             ),
             trailing: Icon(Icons.chevron_right_rounded,
                 color: colorScheme.onSurfaceVariant),
@@ -161,8 +143,6 @@ class ForumSettingsPage extends StatelessWidget {
                     AppLocalizations.of(context)!.deleteAccount,
                     style: textTheme.titleMedium?.copyWith(
                       color: colorScheme.onSurface,
-                      fontWeight:
-                          DesignTokens.fontWeightSemiBold,
                     ),
                   ),
                   const SizedBox(height: DesignTokens.spacingS),
@@ -249,10 +229,9 @@ class ForumSettingsPage extends StatelessWidget {
           leading: Icon(e.icon, color: colorScheme.onSurfaceVariant),
           title: Text(e.label),
           trailing: Icon(Icons.open_in_new,
-              size: 18, color: colorScheme.onSurfaceVariant),
+              color: colorScheme.onSurfaceVariant),
           onTap: () => _openForumUrl(context, e.url),
         ),
-        const Divider(height: 1),
       ],
     ];
   }

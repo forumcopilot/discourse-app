@@ -434,7 +434,6 @@ class _BookmarkTile extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(Icons.alarm,
-                          size: DesignTokens.iconSizeM,
                           color: colorScheme.primary),
                       const SizedBox(width: DesignTokens.spacingM),
                       Text(bookmark.reminderAt != null
@@ -449,7 +448,6 @@ class _BookmarkTile extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(Icons.alarm_off,
-                            size: DesignTokens.iconSizeM,
                             color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingM),
                         Text(AppLocalizations.of(context)!.clearReminder),
@@ -461,7 +459,6 @@ class _BookmarkTile extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(Icons.bookmark_remove_outlined,
-                          size: DesignTokens.iconSizeM,
                           color: colorScheme.error),
                       const SizedBox(width: DesignTokens.spacingM),
                       Text(AppLocalizations.of(context)!.removeBookmark),

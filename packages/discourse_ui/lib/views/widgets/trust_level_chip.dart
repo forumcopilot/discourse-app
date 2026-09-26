@@ -30,7 +30,6 @@ class TrustLevelChip extends StatelessWidget {
         'TL$level',
         style: textTheme.labelSmall?.copyWith(
           color: colorScheme.onSurfaceVariant,
-          fontWeight: DesignTokens.fontWeightSemiBold,
         ),
       ),
     );

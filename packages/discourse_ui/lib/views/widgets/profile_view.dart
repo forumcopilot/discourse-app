@@ -437,9 +437,9 @@ class _ProfileViewState extends State<ProfileView> {
           children: [
             Text(
               _userInfo.username,
-              style: textTheme.titleLarge?.copyWith(
+              // The profile's headline (it was 22sp bold).
+              style: textTheme.headlineSmall?.copyWith(
                 color: colorScheme.onSurface,
-                fontWeight: DesignTokens.fontWeightBold,
               ),
             ),
             if (_userInfo.isBanned) ...[
@@ -604,25 +604,19 @@ class _ProfileViewState extends State<ProfileView> {
         // Only show camera icon on the viewer's own profile when the
         // forum allows avatar uploads.
         if (canUploadAvatar)
+          // A filled icon button: a 40dp badge in a 48dp target. The
+          // hand-drawn badge was a 36dp tap area.
           Positioned(
             right: 0,
             bottom: 0,
-            child: GestureDetector(
-              onTap: () => _pickImage(context),
-              child: Container(
-                padding: DesignTokens.paddingS,
-                decoration: BoxDecoration(
-                  color: colorScheme.primary,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: colorScheme.surface,
-                    width: DesignTokens.borderWidthThin,
-                  ),
-                ),
-                child: Icon(
-                  Icons.camera_alt_rounded,
-                  size: DesignTokens.iconSizeM,
-                  color: colorScheme.onPrimary,
+            child: IconButton.filled(
+              onPressed: () => _pickImage(context),
+              tooltip: AppLocalizations.of(context)!.uploadImage,
+              icon: const Icon(Icons.camera_alt_rounded),
+              style: IconButton.styleFrom(
+                side: BorderSide(
+                  color: colorScheme.surface,
+                  width: DesignTokens.borderWidthMedium,
                 ),
               ),
             ),
@@ -1322,7 +1316,6 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
                                   s.value,
                                   style: textTheme.titleMedium?.copyWith(
                                     color: colorScheme.onSurface,
-                                    fontWeight: DesignTokens.fontWeightBold,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -1643,9 +1636,8 @@ class _SummaryPeopleStrip extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
-                        style: textTheme.bodySmall?.copyWith(
+                        style: textTheme.labelMedium?.copyWith(
                           color: colorScheme.onSurface,
-                          fontWeight: DesignTokens.fontWeightSemiBold,
                         ),
                       ),
                       Text(
@@ -1653,7 +1645,7 @@ class _SummaryPeopleStrip extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
-                        style: textTheme.labelSmall?.copyWith(
+                        style: textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),

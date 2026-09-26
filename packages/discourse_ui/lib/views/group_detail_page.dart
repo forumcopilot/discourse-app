@@ -404,9 +404,8 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
                   children: [
                     Text(
                       group?.displayName ?? widget.groupName,
-                      style: textTheme.titleMedium?.copyWith(
+                      style: textTheme.titleLarge?.copyWith(
                         color: colorScheme.onSurface,
-                        fontWeight: DesignTokens.fontWeightSemiBold,
                       ),
                     ),
                     Text(
@@ -427,7 +426,6 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
                   group.memberCount.toString(),
                   style: textTheme.labelMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
-                    fontWeight: DesignTokens.fontWeightSemiBold,
                   ),
                 ),
               ],

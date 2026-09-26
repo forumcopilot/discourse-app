@@ -296,10 +296,9 @@ class ForumHeaderWidget extends StatelessWidget {
                     SizedBox(height: DesignTokens.spacingS),
                     Text(
                       site?.name ?? 'Forum',
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: fg,
-                        fontWeight: DesignTokens.fontWeightBold,
-                        fontSize: DesignTokens.fontSizeL,
+                        fontWeight: DesignTokens.fontWeightMedium,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

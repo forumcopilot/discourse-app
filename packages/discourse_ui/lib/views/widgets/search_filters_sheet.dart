@@ -251,7 +251,6 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
         title,
         style: textTheme.labelLarge?.copyWith(
           color: colorScheme.onSurfaceVariant,
-          fontWeight: FontWeight.w600,
           letterSpacing: 0.5,
         ),
       ),

@@ -412,7 +412,6 @@ extension _HeaderFallback on _Header {
             siteContext.site.name,
             style: textTheme.titleMedium?.copyWith(
               color: ForumBrandStyle.of(context).foreground,
-              fontWeight: DesignTokens.fontWeightSemiBold,
             ),
             overflow: TextOverflow.ellipsis,
           ),
@@ -477,9 +476,8 @@ class _Footer extends StatelessWidget {
       ),
       child: Text(
         '${siteName ?? AppForumConfig.forumName} · v1',
-        style: textTheme.labelSmall?.copyWith(
-          color: colorScheme.onSurfaceVariant
-              .withValues(alpha: DesignTokens.opacityMedium),
+        style: textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
         ),
       ),
     );

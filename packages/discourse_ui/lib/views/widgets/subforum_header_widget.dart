@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../../theme/design_tokens.dart';
-import '../../theme/style_builders.dart';
 import '../../utils/safe_image.dart';
 import '../../utils/avatar_color_utils.dart';
 import 'forum_icon_widget.dart';
@@ -172,12 +171,10 @@ class SubforumHeaderWidget extends StatelessWidget {
                     width: double.infinity,
                     child: Text(
                       forum.name,
-                      style: StyleBuilders.titleTextStyle(
-                        colorScheme: colorScheme,
-                        textTheme: textTheme,
-                        fontSize: DesignTokens.fontSizeXL,
-                        fontWeight: DesignTokens.fontWeightSemiBold,
-                      ).copyWith(color: fg),
+                      style: textTheme.headlineSmall?.copyWith(
+                        color: fg,
+                        fontWeight: DesignTokens.fontWeightMedium,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),

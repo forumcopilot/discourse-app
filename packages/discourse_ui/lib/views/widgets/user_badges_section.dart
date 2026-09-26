@@ -3,6 +3,7 @@ import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_badge.dart';
 
 import '../../theme/design_tokens.dart';
+import '../../utils/html_colors.dart';
 import 'badge_detail_sheet.dart';
 import 'profile_section.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -80,15 +81,19 @@ class _UserBadgesSectionState extends State<UserBadgesSection> {
     }
   }
 
-  Color _fgFor(FCBadgeTier tier) {
+  /// The tier's colour, moved (hue kept) until its text reads at 4.5:1 on
+  /// [surface]: fixed dark gold, grey and brown were ~3.5:1 in dark mode.
+  Color _fgFor(FCBadgeTier tier, Color surface) {
+    final Color base;
     switch (tier) {
       case FCBadgeTier.gold:
-        return const Color(0xFFB78700);
+        base = const Color(0xFFB78700);
       case FCBadgeTier.silver:
-        return const Color(0xFF707070);
+        base = const Color(0xFF707070);
       case FCBadgeTier.bronze:
-        return const Color(0xFF8B5A2B);
+        base = const Color(0xFF8B5A2B);
     }
+    return readableOn(base, surface);
   }
 
   void _showAll(BuildContext context) {
@@ -140,15 +145,13 @@ class _UserBadgesSectionState extends State<UserBadgesSection> {
             _BadgeChip(
               badge: b,
               background: _bgFor(b.tier, colorScheme),
-              foreground: _fgFor(b.tier),
+              foreground: _fgFor(b.tier, Theme.of(context).colorScheme.surface),
               onTap: () => showBadgeDetailSheet(context, b),
             ),
           if (remaining > 0)
             ActionChip(
               label: Text(AppLocalizations.of(context)!.moreBadges(remaining)),
               onPressed: () => _showAll(context),
-              visualDensity: VisualDensity.compact,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
         ],
       ),
@@ -177,17 +180,19 @@ class _BadgeChip extends StatelessWidget {
       message: badge.description ?? badge.name,
       child: Material(
         color: background,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusL),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusS),
         child: InkWell(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusL),
+          borderRadius: BorderRadius.circular(DesignTokens.radiusS),
           onTap: onTap,
           child: Container(
+            // A Material 3 chip's shape: 32dp high, 8dp corners.
+            constraints: const BoxConstraints(minHeight: 32),
             padding: const EdgeInsets.symmetric(
               horizontal: DesignTokens.spacingM,
-              vertical: DesignTokens.spacingS - 2,
+              vertical: DesignTokens.spacingXS,
             ),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusL),
+              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
               border: Border.all(
                   color: foreground.withValues(alpha: 0.4), width: 0.6),
             ),
@@ -201,7 +206,6 @@ class _BadgeChip extends StatelessWidget {
                   badge.name,
                   style: textTheme.labelMedium?.copyWith(
                     color: foreground,
-                    fontWeight: DesignTokens.fontWeightSemiBold,
                   ),
                 ),
                 if (badge.grantCount > 1) ...[

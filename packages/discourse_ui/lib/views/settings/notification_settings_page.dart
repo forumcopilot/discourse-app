@@ -710,40 +710,18 @@ class _EnumTile<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final selected = options.firstWhere(
       (o) => o.value == value,
       orElse: () => options.first,
     );
+    // The current choice is the supporting text, as in Android's settings.
+    // It sat at the end of the row, where a label like "Only when away"
+    // squeezed the title onto two or three lines; the explanation moves
+    // into the picker.
     return ListTile(
       onTap: () => _showPicker(context),
       title: Text(title),
-      subtitle: subtitle != null
-          ? Text(
-              subtitle!,
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            )
-          : null,
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            selected.label,
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.primary,
-              fontWeight: DesignTokens.fontWeightMedium,
-            ),
-          ),
-          const SizedBox(width: DesignTokens.spacingXS),
-          Icon(
-            Icons.chevron_right_rounded,
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ],
-      ),
+      subtitle: Text(selected.label),
     );
   }
 
@@ -763,6 +741,21 @@ class _EnumTile<T> extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SheetTitle(title),
+              if (subtitle != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    DesignTokens.spacingL,
+                    0,
+                    DesignTokens.spacingL,
+                    DesignTokens.spacingS,
+                  ),
+                  child: Text(
+                    subtitle!,
+                    style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(sheetContext).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                ),
               ...options.map((opt) {
                 final isSelected = opt.value == value;
                 return RadioListTile<T>(

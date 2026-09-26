@@ -134,7 +134,7 @@ class _BookmarkReminderSheetBody extends StatelessWidget {
                 if (currentReminderAt != null)
                   Text(
                     _describe(context, currentReminderAt!),
-                    style: textTheme.labelSmall?.copyWith(
+                    style: textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
                   ),
