@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.33] - 2026-09-26
+
 ### Changed
 - **One look per component, from the theme: Material 3's own.** App bars, dialogs, sheets, snackbars, buttons, text fields, menus and filter chips each came in several looks, because screens restyled them one by one. `AppTheme` now sets them once, mostly by leaving Material 3's defaults alone, and ~70 files lost their overrides (about 1,500 lines):
   - **App bars:** every title is `titleLarge` (22sp) aligned to the start, and every bar is flat until content scrolls under it. They were left-aligned 20sp with a permanent shadow on the tabs and lists, centred 22sp on Search, Chat, Reply, Bookmarks and every ABDA screen, and bold on some. Topic and category titles that don't fit one line drop to two lines of `titleMedium` (new `AdaptiveAppBarTitle`), measured at the reader's text size and against the width the title really has.
