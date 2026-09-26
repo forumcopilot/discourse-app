@@ -6,11 +6,13 @@ import 'package:discourse_core/discourse_core.dart'
     show DiscourseConversationsResult, DiscoursePrivateConversationProxy;
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:discourse_ui/views/widgets/empty_state_view.dart';
 import 'package:discourse_ui/views/widgets/not_signed_in_view.dart';
 import '../../../../theme/design_tokens.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../pages/conversation_page.dart';
+import '../../../../utils/error_message.dart';
 import 'conversation_list_item.dart';
 
 class ConversationList extends StatefulWidget {
@@ -412,22 +414,9 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
     }
 
     if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              AppLocalizations.of(context)?.errorLoadingConversations(_error ?? 'Unknown error') ?? 'Error loading messages: $_error',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-            const SizedBox(height: DesignTokens.spacingL),
-            FilledButton(
-              onPressed: loadConversations,
-              child: Text(AppLocalizations.of(context)?.retry ?? 'Retry'),
-            ),
-          ],
-        ),
+      return EmptyStateView.error(
+        message: describeError(_error, context: context),
+        onRetry: loadConversations,
       );
     }
 
@@ -436,56 +425,16 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
     }
 
     if (_conversations!.isEmpty) {
-      final colorScheme = Theme.of(context).colorScheme;
-      final textTheme = Theme.of(context).textTheme;
       return RefreshIndicator(
         onRefresh: loadConversations,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Center(
-                  child: Padding(
-                    padding: DesignTokens.paddingScreen,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          widget.archived ? Icons.archive_outlined : Icons.inbox_outlined,
-                          size: 80,
-                          color: colorScheme.primary,
-                        ),
-                        const SizedBox(height: DesignTokens.spacingXL),
-                        Text(
-                          widget.archived
-                              ? AppLocalizations.of(context)!.noArchivedMessages
-                              : AppLocalizations.of(context)!.noConversations,
-                          style: textTheme.headlineSmall?.copyWith(
-                            color: colorScheme.onSurface,
-                            fontWeight: DesignTokens.fontWeightBold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: DesignTokens.spacingS),
-                        Text(
-                          widget.archived
-                              ? AppLocalizations.of(context)!.noArchivedMessagesHint
-                              : AppLocalizations.of(context)!.noConversationsMessage,
-                          style: textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+        child: EmptyStateView.scrollable(
+          icon: widget.archived ? Icons.archive_outlined : Icons.inbox_outlined,
+          message: widget.archived
+              ? AppLocalizations.of(context)!.noArchivedMessages
+              : AppLocalizations.of(context)!.noConversations,
+          hint: widget.archived
+              ? AppLocalizations.of(context)!.noArchivedMessagesHint
+              : AppLocalizations.of(context)!.noConversationsMessage,
         ),
       );
     }

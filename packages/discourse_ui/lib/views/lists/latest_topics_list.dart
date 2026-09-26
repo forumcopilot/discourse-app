@@ -7,6 +7,7 @@ import 'package:discourse_ui/views/post_page.dart';
 import 'package:discourse_ui/views/listitems/topic_list_item.dart';
 import 'package:discourse_ui/views/lists/posts_list.dart';
 import 'package:discourse_ui/views/widgets/resettable_widget.dart';
+import 'package:discourse_ui/views/widgets/empty_state_view.dart';
 import 'package:discourse_ui/views/widgets/not_signed_in_view.dart';
 import 'package:discourse_ui/views/widgets/topic_list_skeleton.dart';
 import 'package:discourse_ui/views/tabs/topic_list_tab.dart';
@@ -290,42 +291,10 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
     var topicsList = _latestTopicController!.fcTopics;
     if (topicsList.isNotEmpty) return null;
 
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Center(
-      child: SingleChildScrollView(
-        padding: DesignTokens.paddingXXL,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.forum_outlined,
-              size: DesignTokens.avatarSizeXL, // 64px - matches NotSignedInView
-              color: colorScheme.primary,
-            ),
-            SizedBox(height: DesignTokens.spacingXL - DesignTokens.spacingXS), // 20px - matches NotSignedInView
-            Text(
-              AppLocalizations.of(context)!.noLatestTopics,
-              style: textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: DesignTokens.fontWeightBold,
-                fontSize: DesignTokens.fontSizeL, // Match NotSignedInView title size
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: DesignTokens.spacingS), // Match NotSignedInView
-            Text(
-              AppLocalizations.of(context)!.noRecentTopicsToDisplay,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: DesignTokens.fontSizeS, // Match NotSignedInView message size
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateView(
+      icon: Icons.forum_outlined,
+      message: AppLocalizations.of(context)!.noLatestTopics,
+      hint: AppLocalizations.of(context)!.noRecentTopicsToDisplay,
     );
   }
 

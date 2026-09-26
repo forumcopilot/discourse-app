@@ -9,7 +9,9 @@ import '../widgets/filter_chip_bar.dart';
 import '../listitems/topic_list_item.dart';
 import '../tabs/topic_list_tab.dart';
 import '../post_page.dart';
+import '../widgets/empty_state_view.dart';
 import '../widgets/resettable_widget.dart';
+import '../../utils/error_message.dart';
 import '../widgets/topic_list_skeleton.dart';
 
 /// Discourse Top periods. Matches the URL fragments
@@ -205,8 +207,14 @@ class TopTopicsListState extends FCStatefulWidget<TopTopicsList>
     if (!_hasLoaded || (_isLoading && _topics.isEmpty)) {
       return [header, const TopicListSkeleton(shrinkWrap: true)];
     }
+    // The period chips are always a row, so TopicListTab never falls
+    // through to its empty-state sliver for Top: the empty / error state
+    // rides under the chips here, where a period that has nothing can be
+    // switched away from.
+    final emptyState = buildEmptyState();
     return [
       header,
+      if (emptyState != null) emptyState,
       ..._topics.map((t) => TopicListItem(
             siteContext: widget.siteContext,
             topic: t,
@@ -239,25 +247,12 @@ class TopTopicsListState extends FCStatefulWidget<TopTopicsList>
   Widget? buildEmptyState() {
     if (!_hasLoaded || _isLoading) return null;
     if (_topics.isNotEmpty) return null;
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.all(DesignTokens.spacingXL),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.local_fire_department_outlined,
-              size: 48, color: colorScheme.onSurfaceVariant),
-          const SizedBox(height: DesignTokens.spacingM),
-          Text(
-            _error ??
-                'No top topics in the ${_period.label.toLowerCase()} period.',
-            style: textTheme.bodyMedium
-                ?.copyWith(color: colorScheme.onSurfaceVariant),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+    if (_error != null) {
+      return EmptyStateView.error(message: describeError(_error, context: context), onRetry: refreshList);
+    }
+    return EmptyStateView(
+      icon: Icons.local_fire_department_outlined,
+      message: 'No top topics in the ${_period.label.toLowerCase()} period.',
     );
   }
 

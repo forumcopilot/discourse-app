@@ -77,7 +77,6 @@ class ProfileSection extends StatelessWidget {
             title,
             style: textTheme.titleMedium?.copyWith(
               color: colorScheme.onSurface,
-              fontWeight: DesignTokens.fontWeightBold,
             ),
           ),
         ),

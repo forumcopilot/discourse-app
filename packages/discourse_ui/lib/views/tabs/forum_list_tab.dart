@@ -9,8 +9,10 @@ import '../../utils/error_dialog.dart';
 import '../../utils/forum_navigation.dart';
 import '../listitems/forum_list_item.dart';
 
+import '../widgets/empty_state_view.dart';
 import '../widgets/forum_header_widget.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import '../../utils/error_message.dart';
 import '../widgets/category_badge.dart';
 
 class ForumListTab extends StatefulWidget {
@@ -345,40 +347,21 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
     }
 
     if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      // The forum header stays up, as it does over an empty list.
+      return RefreshIndicator(
+        onRefresh: () async {
+          await _loadForums();
+        },
+        child: ListView(
           children: [
-            Icon(
-              Icons.error_outline_rounded,
-              size: 64,
-              color: colorScheme.error,
+            ForumHeaderWidget(
+              boardStats: widget.boardStats,
             ),
-            const SizedBox(height: DesignTokens.spacingL),
-            Text(
-              AppLocalizations.of(context)!.unableToLoadForums,
-              textAlign: TextAlign.center,
-              style: textTheme.titleLarge?.copyWith(
-                color: colorScheme.error,
-                fontWeight: DesignTokens.fontWeightBold,
-              ),
-            ),
-            const SizedBox(height: DesignTokens.spacingS),
-            Padding(
-              padding: DesignTokens.paddingL,
-              child: Text(
-                _error!,
-                textAlign: TextAlign.center,
-                style: textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-            const SizedBox(height: DesignTokens.spacingXL),
-            FilledButton.icon(
-              onPressed: _loadForums,
-              icon: const Icon(Icons.refresh_rounded),
-              label: Text(AppLocalizations.of(context)?.retry ?? 'Retry'),
+            EmptyStateView.error(
+              icon: Icons.error_outline_rounded,
+              message: AppLocalizations.of(context)!.unableToLoadForums,
+              hint: describeError(_error, context: context),
+              onRetry: _loadForums,
             ),
           ],
         ),
@@ -397,38 +380,10 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
               boardStats: widget.boardStats,
             ),
             // Empty state message
-            Center(
-              child: Padding(
-                padding: DesignTokens.paddingXXL,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.forum_outlined,
-                      size: DesignTokens.iconSizeXXL * 1.67, // 80px
-                      color: colorScheme.primary,
-                    ),
-                    const SizedBox(height: DesignTokens.spacingXL),
-                    Text(
-                      "No Forums Available",
-                      style: textTheme.headlineSmall?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: DesignTokens.fontWeightBold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: DesignTokens.spacingS),
-                    Text(
-                      AppLocalizations.of(context)!.noForumsToDisplayExplanation,
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
+            EmptyStateView(
+              icon: Icons.forum_outlined,
+              message: "No Forums Available",
+              hint: AppLocalizations.of(context)!.noForumsToDisplayExplanation,
             ),
           ],
         ),

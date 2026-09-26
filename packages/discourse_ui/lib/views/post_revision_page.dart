@@ -6,6 +6,7 @@ import 'package:discourse_core/discourse_core.dart'
 
 import '../theme/design_tokens.dart';
 import '../utils/time_utils.dart';
+import 'widgets/empty_state_view.dart';
 import 'widgets/rich_text_content.dart';
 import 'widgets/user_avatar.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -106,29 +107,10 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
     if (_revision == null) {
       // First load failed — friendly full-page message (covers "no edit
       // history" 404s and "not visible" 403s from the proxy).
-      return Center(
-        child: Padding(
-          padding: DesignTokens.paddingL,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.history,
-                size: 48,
-                color: colorScheme.onSurfaceVariant
-                    .withValues(alpha: DesignTokens.opacityLow),
-              ),
-              const SizedBox(height: DesignTokens.spacingM),
-              Text(
-                _error ?? 'Failed to load edit history.',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
+      return EmptyStateView.error(
+        icon: Icons.history,
+        message: _error ?? 'Failed to load edit history.',
+        onRetry: _load,
       );
     }
 

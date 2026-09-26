@@ -134,10 +134,9 @@ class _SuggestedTopicsCardState extends State<SuggestedTopicsCard> {
             ),
             child: Text(
               AppLocalizations.of(context)!.suggestedTopics,
-              style: textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onSurfaceVariant,
-                letterSpacing: 0.5,
+              // A page section heading, like the profile's sections.
+              style: textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurface,
               ),
             ),
           ),

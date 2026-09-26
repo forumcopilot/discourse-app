@@ -10,6 +10,7 @@ import 'package:discourse_ui/views/lists/posts_list.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/views/login_page.dart';
 import '../../theme/design_tokens.dart';
+import '../../utils/error_message.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 
 class UserRepliedPosts extends StatefulWidget {
@@ -175,7 +176,7 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
     // A failed feed says so and offers a retry, as the Topics feed does:
     // rendering nothing read as "this person has none".
     if (_error != null) {
-      return EmptyStateView.error(message: _error!, onRetry: _fetchRecentPosts);
+      return EmptyStateView.error(message: describeError(_error, context: context), onRetry: _fetchRecentPosts);
     }
     // Hide the entire section if there are no posts (and not loading)
     final isEmpty =

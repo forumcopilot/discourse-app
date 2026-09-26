@@ -455,7 +455,7 @@ class _InvitesPageState extends State<InvitesPage> {
   Widget _buildList() {
     if (_error != null && (_invites?.isEmpty ?? true)) {
       return EmptyStateView.error(
-        message: _error!,
+        message: describeError(_error, context: context),
         onRetry: _load,
         scrollable: true,
       );

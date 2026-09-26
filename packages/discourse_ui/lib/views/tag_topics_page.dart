@@ -9,6 +9,7 @@ import '../core/logging/app_logger.dart';
 import '../theme/design_tokens.dart';
 import 'listitems/topic_list_item.dart';
 import 'post_page.dart';
+import 'widgets/empty_state_view.dart';
 import 'widgets/notification_level_sheet.dart';
 import '../utils/error_message.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -202,33 +203,16 @@ class _TagTopicsPageState extends State<TagTopicsPage> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_topics.isEmpty && _error != null) {
-      return ListView(
-        padding: const EdgeInsets.all(DesignTokens.spacingL),
-        children: [
-          Center(
-            child: Text(
-              _error!,
-              style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
+      return EmptyStateView.error(
+        message: describeError(_error, context: context),
+        onRetry: _refresh,
+        scrollable: true,
       );
     }
     if (_topics.isEmpty) {
-      return ListView(
-        padding: const EdgeInsets.all(DesignTokens.spacingL),
-        children: [
-          Center(
-            child: Text(
-              AppLocalizations.of(context)!.noTopicsTagged(widget.tag),
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
+      return EmptyStateView.scrollable(
+        icon: Icons.tag,
+        message: AppLocalizations.of(context)!.noTopicsTagged(widget.tag),
       );
     }
 

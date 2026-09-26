@@ -11,6 +11,8 @@ import 'package:discourse_core/discourse_core.dart'
 import '../../theme/design_tokens.dart';
 import '../../utils/time_utils.dart';
 import '../post_page.dart';
+import '../widgets/empty_state_view.dart';
+import '../../utils/error_message.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// Discourse-native moderator review queue (`/review.json`). Staff (and
@@ -372,59 +374,24 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_reviewables.isEmpty && _error != null) {
-      final accessDenied = _looksLikeAccessDenied(_error!);
-      return ListView(
-        padding: const EdgeInsets.all(DesignTokens.spacingL),
-        children: [
-          const SizedBox(height: DesignTokens.spacingXL),
-          Icon(
-            accessDenied ? Icons.shield_outlined : Icons.error_outline,
-            size: 48,
-            color: colorScheme.onSurfaceVariant
-                .withValues(alpha: DesignTokens.opacityLow),
-          ),
-          const SizedBox(height: DesignTokens.spacingM),
-          Center(
-            child: Text(
-              accessDenied ? 'Moderator access required' : _error!,
-              style: textTheme.titleSmall?.copyWith(
-                color: accessDenied
-                    ? colorScheme.onSurfaceVariant
-                    : colorScheme.error,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          if (accessDenied)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(top: DesignTokens.spacingS),
-                child: Text(
-                  AppLocalizations.of(context)!.reviewQueueStaffOnly,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-        ],
+      // Not a failure a retry can fix: the viewer is not staff.
+      if (_looksLikeAccessDenied(_error!)) {
+        return EmptyStateView.scrollable(
+          icon: Icons.shield_outlined,
+          message: 'Moderator access required',
+          hint: AppLocalizations.of(context)!.reviewQueueStaffOnly,
+        );
+      }
+      return EmptyStateView.error(
+        message: describeError(_error, context: context),
+        onRetry: _refresh,
+        scrollable: true,
       );
     }
     if (_reviewables.isEmpty) {
-      return ListView(
-        padding: const EdgeInsets.all(DesignTokens.spacingL),
-        children: [
-          Center(
-            child: Text(
-              AppLocalizations.of(context)!.nothingToReview,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
+      return EmptyStateView.scrollable(
+        icon: Icons.flag_outlined,
+        message: AppLocalizations.of(context)!.nothingToReview,
       );
     }
 

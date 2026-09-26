@@ -116,7 +116,7 @@ class _GroupsListPageState extends State<GroupsListPage> {
     }
     if (_groups.isEmpty && _error != null) {
       return EmptyStateView.error(
-        message: _error!,
+        message: describeError(_error, context: context),
         onRetry: () => _load(reset: true),
       );
     }

@@ -17,6 +17,7 @@ import 'package:discourse_ui/services/site_initialization_service.dart';
 import 'package:discourse_ui/services/discourse_route_navigator.dart';
 import 'package:discourse_ui/services/forum_theme.dart';
 import 'package:discourse_ui/services/notification_route.dart';
+import 'package:discourse_ui/views/widgets/empty_state_view.dart';
 import 'package:discourse_ui/views/widgets/forum_header_widget.dart';
 import 'package:discourse_ui/views/widgets/topic_list_skeleton.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -325,53 +326,21 @@ class _ConnectionError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     // Offline is worth a sentence in the user's language. Anything else is
     // a failure they cannot act on beyond Retry; its English reason is kept
     // for debug builds.
     final detail = unreachable
         ? l10n.checkConnectionAndRetry
         : (kDebugMode ? _reason(message) : null);
+    // Scrolls rather than overflows under the forum header on a short
+    // (landscape) screen.
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.cloud_off_outlined,
-                size: 48,
-                color: colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                l10n.failedToConnectToSiteName(site.name),
-                style: textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              if (detail != null) ...[
-                const SizedBox(height: 8),
-                Text(
-                  detail,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-              const SizedBox(height: 24),
-              FilledButton.icon(
-                onPressed: onRetry,
-                icon: const Icon(Icons.refresh),
-                label: Text(l10n.retryConnection),
-              ),
-            ],
-          ),
+        child: EmptyStateView.error(
+          icon: Icons.cloud_off_outlined,
+          message: l10n.failedToConnectToSiteName(site.name),
+          hint: detail,
+          onRetry: onRetry,
         ),
       ),
     );

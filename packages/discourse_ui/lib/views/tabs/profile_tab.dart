@@ -14,6 +14,7 @@ import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
 import '../login_page.dart';
+import '../../utils/error_message.dart';
 import '../widgets/empty_state_view.dart';
 
 class ProfileTab extends StatefulWidget {
@@ -295,7 +296,7 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab> with FCTabStatefulWid
                 padding: const EdgeInsets.symmetric(
                     vertical: DesignTokens.spacingXXL),
                 child: EmptyStateView.error(
-                  message: _userInfoError!,
+                  message: describeError(_userInfoError, context: context),
                   onRetry: () {
                     setState(() {
                       _userInfoError = null;

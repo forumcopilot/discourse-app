@@ -6,6 +6,7 @@ import 'package:discourse_ui/views/widgets/message_compose_page.dart';
 import 'package:image_picker/image_picker.dart';
 import '../theme/design_tokens.dart';
 import 'widgets/empty_state_view.dart';
+import '../utils/error_message.dart';
 import '../services/attachment_upload_service.dart';
 
 class EditPostPage extends StatefulWidget {
@@ -268,7 +269,7 @@ class _EditPostPageState extends State<EditPostPage> {
           return Scaffold(
             appBar: AppBar(title: const Text('Edit Post')),
             body: EmptyStateView.error(
-              message: AppLocalizations.of(context)?.failedToLoadPost(snapshot.error.toString()) ?? 'Failed to load post: \n${snapshot.error}',
+              message: describeError(snapshot.error, context: context),
               onRetry: _retryLoad,
             ),
           );

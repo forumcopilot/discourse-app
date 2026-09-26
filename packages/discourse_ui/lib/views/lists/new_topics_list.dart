@@ -9,7 +9,9 @@ import '../listitems/topic_list_item.dart';
 import '../tabs/topic_list_tab.dart';
 import '../post_page.dart';
 import '../widgets/not_signed_in_view.dart';
+import '../widgets/empty_state_view.dart';
 import '../widgets/resettable_widget.dart';
+import '../../utils/error_message.dart';
 import '../widgets/topic_list_skeleton.dart';
 
 /// Home tab — **New** sub-segment. Backed by `/new.json` (Discourse-
@@ -186,26 +188,12 @@ class NewTopicsListState extends FCStatefulWidget<NewTopicsList>
   Widget? buildEmptyState() {
     if (!_hasLoaded || _isLoading) return null;
     if (_topics.isNotEmpty) return null;
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(DesignTokens.spacingXL),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.fiber_new,
-                size: 48, color: colorScheme.onSurfaceVariant),
-            const SizedBox(height: DesignTokens.spacingM),
-            Text(
-              _error ?? 'No new topics since your last visit.',
-              style: textTheme.bodyMedium
-                  ?.copyWith(color: colorScheme.onSurfaceVariant),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    if (_error != null) {
+      return EmptyStateView.error(message: describeError(_error, context: context), onRetry: refreshList);
+    }
+    return const EmptyStateView(
+      icon: Icons.fiber_new,
+      message: 'No new topics since your last visit.',
     );
   }
 

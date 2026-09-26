@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import '../../../../theme/design_tokens.dart';
 import '../../../../l10n/generated/app_localizations.dart';
+import '../../../widgets/empty_state_view.dart';
 
 class EditConversationPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -168,82 +169,34 @@ class _EditConversationPageState extends State<EditConversationPage> {
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Padding(
-                padding: DesignTokens.paddingL,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: colorScheme.error,
-                    ),
-                    SizedBox(height: DesignTokens.spacingM),
-                    Text(
-                      AppLocalizations.of(context)!.failedToLoadMessage2,
-                      style: textTheme.titleMedium?.copyWith(
-                        color: colorScheme.error,
-                      ),
-                    ),
-                    SizedBox(height: DesignTokens.spacingS),
-                    Text(
-                      snapshot.error.toString(),
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: DesignTokens.spacingL),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text(AppLocalizations.of(context)?.goBack ?? 'Go Back'),
-                    ),
-                  ],
+            return EmptyStateView(
+              icon: Icons.error_outline,
+              message: AppLocalizations.of(context)!.failedToLoadMessage2,
+              hint: snapshot.error.toString(),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(AppLocalizations.of(context)?.goBack ?? 'Go Back'),
                 ),
-              ),
+              ],
             );
           }
 
           if (!snapshot.hasData || !snapshot.data!.result) {
-            return Center(
-              child: Padding(
-                padding: DesignTokens.paddingL,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: colorScheme.error,
-                    ),
-                    SizedBox(height: DesignTokens.spacingM),
-                    Text(
-                      AppLocalizations.of(context)!.cannotEditThisConversation,
-                      style: textTheme.titleMedium?.copyWith(
-                        color: colorScheme.error,
-                      ),
-                    ),
-                    SizedBox(height: DesignTokens.spacingS),
-                    Text(
-                      snapshot.data?.resultText ?? 'Unknown error',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: DesignTokens.spacingL),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text(AppLocalizations.of(context)?.goBack ?? 'Go Back'),
-                    ),
-                  ],
+            return EmptyStateView(
+              icon: Icons.error_outline,
+              message: AppLocalizations.of(context)!.cannotEditThisConversation,
+              hint: snapshot.data?.resultText ?? 'Unknown error',
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(AppLocalizations.of(context)?.goBack ?? 'Go Back'),
                 ),
-              ),
+              ],
             );
           }
 

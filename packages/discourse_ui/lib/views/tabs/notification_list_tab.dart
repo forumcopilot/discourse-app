@@ -22,6 +22,7 @@ import 'package:discourse_ui/views/widgets/not_signed_in_view.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseSocialProxy;
 import '../widgets/filter_chip_bar.dart';
+import '../../utils/error_message.dart';
 import '../widgets/empty_state_view.dart';
 
 class NotificationListTab extends StatefulWidget {
@@ -201,6 +202,10 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
           ? await socialProxy.getAlertFilteredAsync(_page, _perPage, reset,
               unreadOnly: _unreadOnly)
           : await socialProxy.getAlertAsync(_page, _perPage, reset);
+      // A failed fetch comes back as a result, not an exception. Read as an
+      // empty page, an offline refresh cleared the list and said "No
+      // notifications yet".
+      if (!alertData.result) throw Exception(alertData.resultText);
       final alerts = alertData.items.where((alert) => alert.message.trim().isNotEmpty).toList();
       final topics = alerts
           .map((alert) => FCTopic(
@@ -642,7 +647,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
               onRefresh: _onRefresh,
               child: EmptyStateView.error(
                 message: AppLocalizations.of(context)!.errorLoadingNotifications,
-                hint: '$_error',
+                hint: describeError(_error, context: context),
                 onRetry: _onRefresh,
                 scrollable: true,
               ),

@@ -9,6 +9,7 @@ import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import '../../theme/design_tokens.dart';
 import 'activity_row.dart';
 import 'empty_state_view.dart';
+import '../../utils/error_message.dart';
 import 'profile_section.dart';
 
 /// Phase 5.24 — sibling of `UserRepliedPosts` that lists topics
@@ -167,7 +168,7 @@ class _UserCreatedTopicsState extends State<UserCreatedTopics> {
     }
     if (_error != null && (_topics == null || _topics!.isEmpty)) {
       return EmptyStateView.error(
-        message: _error!,
+        message: describeError(_error, context: context),
         onRetry: _fetch,
       );
     }

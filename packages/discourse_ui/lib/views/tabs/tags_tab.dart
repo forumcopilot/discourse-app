@@ -6,7 +6,9 @@ import 'package:forumcopilot_sdk/models/entities/fc_tag.dart';
 
 import '../../theme/design_tokens.dart';
 import '../tag_topics_page.dart';
+import '../widgets/empty_state_view.dart';
 import '../widgets/notification_level_sheet.dart';
+import '../../utils/error_message.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// Global Tags tab — lists every tag the current user can see, sorted
@@ -88,10 +90,9 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
               : 'Failed to load tags.';
           return;
         }
+        // An empty list is not an error: _buildBody shows it as the
+        // empty state, and keeps the error tone and Retry for failures.
         _allTags = result.items;
-        if (result.items.isEmpty) {
-          _error = 'No tags yet on this forum.';
-        }
       });
     } catch (e) {
       if (!mounted) return;
@@ -178,7 +179,6 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
 
   Widget _buildBody() {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     if (_loading && !_loaded) {
       return const Center(child: CircularProgressIndicator());
@@ -256,39 +256,22 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
         if (_allTags.isEmpty && _error != null)
           SliverFillRemaining(
             hasScrollBody: false,
-            child: Padding(
-              padding: const EdgeInsets.all(DesignTokens.spacingL),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.label_outline,
-                        size: 48, color: colorScheme.onSurfaceVariant),
-                    const SizedBox(height: DesignTokens.spacingM),
-                    Text(
-                      _error!,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
+            child: EmptyStateView.error(message: describeError(_error, context: context), onRetry: _refresh),
+          )
+        else if (_allTags.isEmpty && _loaded)
+          const SliverFillRemaining(
+            hasScrollBody: false,
+            child: EmptyStateView(
+              icon: Icons.label_outline,
+              message: 'No tags yet on this forum.',
             ),
           )
         else if (filtered.isEmpty)
           SliverFillRemaining(
             hasScrollBody: false,
-            child: Padding(
-              padding: const EdgeInsets.all(DesignTokens.spacingL),
-              child: Center(
-                child: Text(
-                  AppLocalizations.of(context)!.noTagsMatch(_filterController.text),
-                  style: textTheme.bodyMedium
-                      ?.copyWith(color: colorScheme.onSurfaceVariant),
-                ),
-              ),
+            child: EmptyStateView(
+              icon: Icons.search_off,
+              message: AppLocalizations.of(context)!.noTagsMatch(_filterController.text),
             ),
           )
         else

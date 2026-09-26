@@ -17,6 +17,11 @@ import '../../l10n/generated/app_localizations.dart';
 ///   • [EmptyStateView.scrollable] — wraps the column in a
 ///     `ListView` so `RefreshIndicator` can still drive a pull-to-
 ///     refresh gesture even when the body is empty.
+///
+/// The one recipe for every empty, error and signed-out state: a 48dp icon,
+/// the [message] as a `titleMedium` headline, the [hint] as `bodyMedium`
+/// under it, then any actions. Screens that sit under a filter bar keep the
+/// bar above this, so a filter that empties the list can be undone.
 class EmptyStateView extends StatelessWidget {
   /// Decorative icon at the top of the column. Rendered at
   /// `iconSizeXXL` (48px) in the muted `onSurfaceVariant` tone.
@@ -44,11 +49,16 @@ class EmptyStateView extends StatelessWidget {
   /// Invoked by the Retry button. Only shown on the error variant.
   final VoidCallback? onRetry;
 
+  /// Buttons under the text (e.g. Sign in / Register), laid out in a row
+  /// that wraps. Not used by the error variant, whose action is Retry.
+  final List<Widget>? actions;
+
   const EmptyStateView({
     super.key,
     required this.icon,
     required this.message,
     this.hint,
+    this.actions,
   })  : _scrollable = false,
         _isError = false,
         onRetry = null;
@@ -63,7 +73,8 @@ class EmptyStateView extends StatelessWidget {
     this.onRetry,
     bool scrollable = false,
   })  : _scrollable = scrollable,
-        _isError = true;
+        _isError = true,
+        actions = null;
 
   /// Use this when the empty view sits inside a `RefreshIndicator`
   /// — the underlying scrollable lets the user pull-to-refresh even
@@ -73,6 +84,7 @@ class EmptyStateView extends StatelessWidget {
     required this.icon,
     required this.message,
     this.hint,
+    this.actions,
   })  : _scrollable = true,
         _isError = false,
         onRetry = null;
@@ -92,11 +104,11 @@ class EmptyStateView extends StatelessWidget {
             size: DesignTokens.iconSizeXXL,
             color: _isError ? colorScheme.error : colorScheme.onSurfaceVariant,
           ),
-          const SizedBox(height: DesignTokens.spacingM),
+          const SizedBox(height: DesignTokens.spacingL),
           Text(
             message,
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
+            style: textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurface,
             ),
             textAlign: TextAlign.center,
           ),
@@ -104,34 +116,50 @@ class EmptyStateView extends StatelessWidget {
             const SizedBox(height: DesignTokens.spacingS),
             Text(
               hint!,
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant
-                    .withValues(alpha: DesignTokens.opacityHigh),
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
           ],
           if (_isError && onRetry != null) ...[
-            const SizedBox(height: DesignTokens.spacingL),
+            const SizedBox(height: DesignTokens.spacingXL),
             OutlinedButton.icon(
               onPressed: onRetry,
-              icon: const Icon(Icons.refresh, size: DesignTokens.iconSizeM),
+              icon: const Icon(Icons.refresh),
               label: Text(AppLocalizations.of(context)!.tryAgain),
+            ),
+          ],
+          if (actions != null && actions!.isNotEmpty) ...[
+            const SizedBox(height: DesignTokens.spacingXL),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: DesignTokens.spacingS,
+              runSpacing: DesignTokens.spacingS,
+              children: actions!,
             ),
           ],
         ],
       ),
     );
     if (_scrollable) {
-      return ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          // Push the column down a bit so it doesn't hug the AppBar.
-          const SizedBox(height: DesignTokens.spacingXXL),
-          column,
-        ],
+      // Centred like the plain variant, and still a scrollable so a
+      // RefreshIndicator around it can take the pull.
+      return LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight:
+                  constraints.hasBoundedHeight ? constraints.maxHeight : 0,
+            ),
+            child: Center(child: column),
+          ),
+        ),
       );
     }
-    return Center(child: column);
+    // Centred while it fits; scrolls on a short screen or at a large text
+    // size instead of overflowing.
+    return Center(child: SingleChildScrollView(child: column));
   }
 }

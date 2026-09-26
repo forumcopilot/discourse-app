@@ -13,8 +13,10 @@ import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/views/login_page.dart';
 import '../listitems/topic_list_item.dart';
 import '../listitems/forum_list_item.dart';
+import '../widgets/empty_state_view.dart';
 import '../widgets/subforum_header_widget.dart';
 import '../../theme/design_tokens.dart';
+import '../../utils/error_message.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 
 class ForumTopicList extends StatefulWidget {
@@ -322,19 +324,22 @@ class _ForumTopicListState extends State<ForumTopicList> {
     }
 
     if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      // The category header and its feed chips stay above the error, as
+      // they sit above the list: a feed that fails (say Hot) can be
+      // switched away from without leaving the category.
+      return RefreshIndicator(
+        onRefresh: _loadTopics,
+        child: ListView(
           children: [
-            Text(
-              AppLocalizations.of(context)!.errorLoadingContent(_error ?? ''),
-              textAlign: TextAlign.center,
-              style: TextStyle(color: colorScheme.error),
-            ),
-            SizedBox(height: DesignTokens.spacingL),
-            FilledButton(
-              onPressed: _loadTopics,
-              child: Text(AppLocalizations.of(context)?.retry ?? 'Retry'),
+            if (widget.showSubforumHeader)
+              SubforumHeaderWidget(
+                forum: widget.forum,
+                siteContext: widget.siteContext,
+              ),
+            if (widget.headerTrailing != null) widget.headerTrailing!,
+            EmptyStateView.error(
+              message: describeError(_error, context: context),
+              onRetry: _loadTopics,
             ),
           ],
         ),
@@ -395,17 +400,9 @@ class _ForumTopicListState extends State<ForumTopicList> {
             ),
           // If there are no forums and no topics, show empty state
           if (forums.isEmpty && topics.isEmpty && canViewContent)
-            Padding(
-              padding: DesignTokens.paddingXXL,
-              child: Center(
-                child: Text(
-                  AppLocalizations.of(context)!.noDiscussionsYet,
-                  style: textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
+            EmptyStateView(
+              icon: Icons.forum_outlined,
+              message: AppLocalizations.of(context)!.noDiscussionsYet,
             ),
           if (forums.isNotEmpty) ...[
             ...forums.map((forum) => ForumListItem(

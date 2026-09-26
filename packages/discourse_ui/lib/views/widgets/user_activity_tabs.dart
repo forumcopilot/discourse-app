@@ -66,7 +66,6 @@ class ActivitySectionHeading extends StatelessWidget {
             AppLocalizations.of(context)!.activity,
             style: textTheme.titleMedium?.copyWith(
               color: colorScheme.onSurface,
-              fontWeight: DesignTokens.fontWeightBold,
             ),
           ),
         ),

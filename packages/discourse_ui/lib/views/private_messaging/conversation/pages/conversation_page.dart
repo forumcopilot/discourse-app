@@ -11,6 +11,7 @@ import 'edit_conversation_page.dart';
 import 'edit_conversation_message_page.dart';
 import '../widgets/conversation_item.dart';
 import '../widgets/conversation_header_widget.dart';
+import '../../../widgets/empty_state_view.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../../../../theme/design_tokens.dart';
 import '../../../../utils/accessibility_helpers.dart';
@@ -24,6 +25,7 @@ import 'package:discourse_core/discourse_core.dart'
         DiscourseMessageDetails,
         DiscourseMessageGroup,
         DiscourseTopicSlugs;
+import '../../../../utils/error_message.dart';
 import '../../../login_page.dart';
 
 class ConversationPage extends StatefulWidget {
@@ -998,33 +1000,16 @@ class _ConversationPageState extends State<ConversationPage> {
     }
 
     if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              AppLocalizations.of(context)!.errorLoadingConversation(_error ?? ''),
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: _loadConversation,
-              child: Text(AppLocalizations.of(context)?.retry ?? 'Retry'),
-            ),
-          ],
-        ),
+      return EmptyStateView.error(
+        message: describeError(_error, context: context),
+        onRetry: _loadConversation,
       );
     }
 
     if (_conversation == null) {
-      return Center(
-        child: Text(
-          AppLocalizations.of(context)!.conversationNotFound,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
+      return EmptyStateView(
+        icon: Icons.mail_outline_rounded,
+        message: AppLocalizations.of(context)!.conversationNotFound,
       );
     }
 
@@ -1149,16 +1134,9 @@ class _ConversationPageState extends State<ConversationPage> {
                     }),
                   // Show message if no messages found
                   if (_conversation!.list.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Center(
-                        child: Text(
-                          AppLocalizations.of(context)!.noMessagesFound,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
-                        ),
-                      ),
+                    EmptyStateView(
+                      icon: Icons.chat_bubble_outline,
+                      message: AppLocalizations.of(context)!.noMessagesFound,
                     ),
                   // Loading indicator for more messages
                   if (_isLoadingMore)

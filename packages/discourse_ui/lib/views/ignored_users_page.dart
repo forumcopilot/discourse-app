@@ -131,7 +131,7 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
     }
     if (_error != null && (_users == null || _users!.isEmpty)) {
       return EmptyStateView.error(
-        message: _error!,
+        message: describeError(_error, context: context),
         onRetry: _load,
       );
     }

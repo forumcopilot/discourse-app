@@ -4,8 +4,7 @@ import 'package:discourse_core/discourse_core.dart'
     show DiscourseUserProxy, DiscourseUserSearchGroups;
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:discourse_ui/views/widgets/search_text_field.dart';
-import 'package:discourse_ui/views/widgets/empty_state_widget.dart';
-import 'package:discourse_ui/views/widgets/error_state_widget.dart';
+import 'package:discourse_ui/views/widgets/empty_state_view.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import '../../theme/design_tokens.dart';
@@ -187,9 +186,11 @@ class _UserSearchPageState extends State<UserSearchPage> {
 
   Widget _buildContent(ColorScheme colorScheme, TextTheme textTheme) {
     if (_error != null) {
-      return ErrorStateWidget(
-        title: AppLocalizations.of(context)?.searchFailed ?? 'Search failed',
-        message: _error!,
+      return EmptyStateView.error(
+        icon: Icons.error_outline_rounded,
+        message: AppLocalizations.of(context)?.searchFailed ?? 'Search failed',
+        hint: describeError(_error, context: context),
+        onRetry: () => _searchUsers(reset: true),
       );
     }
 
@@ -200,18 +201,18 @@ class _UserSearchPageState extends State<UserSearchPage> {
     }
 
     if (_users.isEmpty && _hasSearched) {
-      return EmptyStateWidget(
+      return const EmptyStateView(
         icon: Icons.search_off_rounded,
-        title: 'No users found',
-        description: 'Try searching with a different username',
+        message: 'No users found',
+        hint: 'Try searching with a different username',
       );
     }
 
     if (_users.isEmpty && !_hasSearched) {
-      return EmptyStateWidget(
+      return const EmptyStateView(
         icon: Icons.person_search_rounded,
-        title: 'Search for users',
-        description: 'Enter a username to find and invite users',
+        message: 'Search for users',
+        hint: 'Enter a username to find and invite users',
       );
     }
 

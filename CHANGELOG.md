@@ -6,6 +6,18 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Changed
+- **Empty, error and signed-out screens share one design** (`EmptyStateView`): a 48dp icon, a `titleMedium` headline, a `bodyMedium` line under it, then Retry or the screen's actions, centred, and scrolling instead of overflowing at a large text size. About 25 screens had drawn their own, from an 80dp icon with a 24sp bold headline to one grey line of text, some with raw exception text and many with no way to try again. `EmptyStateWidget`, `ErrorStateWidget` and `ErrorOrChild` are removed.
+  - **Every error offers Try again** where the screen can reload: Hot, New, Top, category and tag lists, Tags, review queue, edit history, search, user search, reactions, notification settings.
+  - **Errors say what went wrong in plain words** ("Couldn't reach the forum…") through `describeError`, instead of "Error loading messages: Exception: …".
+  - **Filters and headers stay above the state.** A failed category list keeps its header and Latest/Hot/New chips, a failed forum list keeps the forum header, and Top shows "No top topics in the week period" under its period chips, where another period can be picked (it showed nothing before).
+  - **Signed out** (`NotSignedInView`, on Notifications, Messages, Chat and more) uses the same design with standard Sign in and Register buttons.
+- **Section headers are Material 3's list subheaders** (new `SectionHeader`): `titleSmall`, sentence case, in the primary colour (the drawer's in `onSurfaceVariant`). The drawer, Account & preferences, Notifications settings and badge tiers had 11sp ALL CAPS labels. Profile sections, Activity and Suggested Topics are `titleMedium` without the extra weight.
+
+### Fixed
+- **Notifications says it couldn't load instead of "No notifications yet"** when the forum can't be reached. The proxy reports a failure as a result rather than an exception, and the tab read it as an empty page.
+- **Hot, New and Tags no longer show a failure as an empty list.** Each used one line of text for both.
+
 ## [1.0.33] - 2026-09-26
 
 ### Changed

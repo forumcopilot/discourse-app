@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/empty_state_view.dart';
 import 'widgets/filter_chip_bar.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
@@ -620,34 +621,10 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget _buildSearchHistory(ColorScheme colorScheme, TextTheme textTheme) {
     if (_filteredHistory.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.search_outlined,
-              size: 64,
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: DesignTokens.spacingL),
-            Text(
-              AppLocalizations.of(context)!.searchForTopics,
-              style: StyleBuilders.titleTextStyle(
-                colorScheme: colorScheme,
-                textTheme: textTheme,
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: DesignTokens.spacingS),
-            Text(
-              AppLocalizations.of(context)?.enterKeywordsToFindTopicsAndPosts ?? 'Enter keywords to find topics and posts',
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+      return EmptyStateView(
+        icon: Icons.search_outlined,
+        message: AppLocalizations.of(context)!.searchForTopics,
+        hint: AppLocalizations.of(context)?.enterKeywordsToFindTopicsAndPosts ?? 'Enter keywords to find topics and posts',
       );
     }
 
@@ -720,33 +697,20 @@ class _SearchPageState extends State<SearchPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
+    // A failed fetch is not "no results": say so, with a retry (the
+    // snackbar that also reports it is gone after a few seconds).
+    if (_topics.isEmpty && _topicsError) {
+      return EmptyStateView.error(
+        message: AppLocalizations.of(context)?.searchFailed ?? 'Search failed',
+        onRetry: _fetchTopics,
+      );
+    }
+
     if (_topics.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.topic_outlined,
-              size: 48,
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: DesignTokens.spacingL),
-            Text(
-              AppLocalizations.of(context)!.noTopicsFound,
-              style: textTheme.titleMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: DesignTokens.spacingS),
-            Text(
-              AppLocalizations.of(context)!.trySearchingWithDifferentKeywords,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+      return EmptyStateView(
+        icon: Icons.topic_outlined,
+        message: AppLocalizations.of(context)!.noTopicsFound,
+        hint: AppLocalizations.of(context)!.trySearchingWithDifferentKeywords,
       );
     }
 
@@ -797,33 +761,20 @@ class _SearchPageState extends State<SearchPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
+    // A failed fetch is not "no results": say so, with a retry (the
+    // snackbar that also reports it is gone after a few seconds).
+    if (_posts.isEmpty && _postsError) {
+      return EmptyStateView.error(
+        message: AppLocalizations.of(context)?.searchFailed ?? 'Search failed',
+        onRetry: _fetchPosts,
+      );
+    }
+
     if (_posts.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.message_outlined,
-              size: 48,
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: DesignTokens.spacingL),
-            Text(
-              AppLocalizations.of(context)!.noPostsFound,
-              style: textTheme.titleMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: DesignTokens.spacingS),
-            Text(
-              AppLocalizations.of(context)!.trySearchingWithDifferentKeywords,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+      return EmptyStateView(
+        icon: Icons.message_outlined,
+        message: AppLocalizations.of(context)!.noPostsFound,
+        hint: AppLocalizations.of(context)!.trySearchingWithDifferentKeywords,
       );
     }
 
@@ -901,33 +852,20 @@ class _SearchPageState extends State<SearchPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
+    // A failed fetch is not "no results": say so, with a retry (the
+    // snackbar that also reports it is gone after a few seconds).
+    if (_titlesOnlyTopics.isEmpty && _titlesOnlyError) {
+      return EmptyStateView.error(
+        message: AppLocalizations.of(context)?.searchFailed ?? 'Search failed',
+        onRetry: _fetchTitlesOnly,
+      );
+    }
+
     if (_titlesOnlyTopics.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.title_outlined,
-              size: 48,
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: DesignTokens.spacingL),
-            Text(
-              AppLocalizations.of(context)!.noTopicsFound,
-              style: textTheme.titleMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: DesignTokens.spacingS),
-            Text(
-              AppLocalizations.of(context)!.trySearchingWithDifferentKeywords,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+      return EmptyStateView(
+        icon: Icons.title_outlined,
+        message: AppLocalizations.of(context)!.noTopicsFound,
+        hint: AppLocalizations.of(context)!.trySearchingWithDifferentKeywords,
       );
     }
 

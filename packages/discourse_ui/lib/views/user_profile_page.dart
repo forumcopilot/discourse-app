@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'package:intl/intl.dart';
 import 'package:discourse_ui/utils/error_dialog.dart';
+import 'widgets/empty_state_view.dart';
 import 'widgets/profile_view.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
@@ -134,7 +135,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -255,46 +255,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? Center(
-                  child: Padding(
-                    padding: DesignTokens.paddingScreen,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline_rounded,
-                          size: 64,
-                          color: colorScheme.error,
-                        ),
-                        const SizedBox(height: DesignTokens.spacingL),
-                        Text(
-                          AppLocalizations.of(context)?.unableToLoadProfile ?? 'Unable to Load Profile',
-                          style: textTheme.titleLarge?.copyWith(
-                            color: colorScheme.error,
-                            fontWeight: DesignTokens.fontWeightBold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: DesignTokens.spacingS),
-                        Text(
-                          _error!,
-                          style: textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: DesignTokens.spacingXL),
-                        FilledButton.icon(
-                          onPressed: _fetchUserInfo,
-                          icon: const Icon(Icons.refresh_rounded),
-                          label: Text(AppLocalizations.of(context)?.tryAgain ?? 'Try Again'),
-                        ),
-                      ],
-                    ),
-                  ),
+              ? EmptyStateView.error(
+                  icon: Icons.error_outline_rounded,
+                  message: AppLocalizations.of(context)?.unableToLoadProfile ?? 'Unable to Load Profile',
+                  hint: describeError(_error, context: context),
+                  onRetry: _fetchUserInfo,
                 )
               : _userInfo == null
-                  ? Center(child: Text(AppLocalizations.of(context)?.userInformationNotAvailable ?? 'User information not available'))
+                  ? EmptyStateView(
+                      icon: Icons.person_off_outlined,
+                      message: AppLocalizations.of(context)?.userInformationNotAvailable ?? 'User information not available',
+                    )
                   : RefreshIndicator(
                       onRefresh: _refreshProfile,
                       // The whole profile body is the shared ProfileView

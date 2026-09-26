@@ -16,6 +16,7 @@ import '../widgets/empty_state_view.dart';
 import '../widgets/simple_list_app_bar.dart';
 import '../../utils/error_message.dart';
 import '../widgets/sheet_title.dart';
+import '../widgets/section_header.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// Phase 5.20b — notification preferences screen, rebuilt to sync
@@ -142,9 +143,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_prefs == null && _error != null) {
-      return EmptyStateView(
-        icon: Icons.notifications_off_outlined,
-        message: _error!,
+      // A failure, not an absence: error tone and a way to try again.
+      return EmptyStateView.error(
+        message: describeError(_error, context: context),
+        onRetry: _load,
       );
     }
     final prefs = _prefs;
@@ -656,26 +658,7 @@ class _Section extends StatelessWidget {
   const _Section({required this.label});
 
   @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        DesignTokens.spacingL,
-        DesignTokens.spacingL,
-        DesignTokens.spacingL,
-        DesignTokens.spacingS,
-      ),
-      child: Text(
-        label.toUpperCase(),
-        style: textTheme.labelSmall?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-          letterSpacing: DesignTokens.letterSpacingExtraWide,
-          fontWeight: DesignTokens.fontWeightSemiBold,
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => SectionHeader(label);
 }
 
 class _BoolTile extends StatelessWidget {

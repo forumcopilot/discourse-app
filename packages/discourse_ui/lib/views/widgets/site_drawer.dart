@@ -23,6 +23,7 @@ import '../../host/discourse_host.dart';
 import '../../settings_context.dart';
 import 'appearance_sheet.dart';
 import 'brand_image.dart';
+import 'section_header.dart';
 import '../../theme/forum_brand_style.dart';
 
 /// Phase 5.18a — hamburger drawer ("More" menu).
@@ -426,26 +427,8 @@ class _SectionLabel extends StatelessWidget {
   const _SectionLabel({required this.label});
 
   @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        DesignTokens.spacingL,
-        DesignTokens.spacingL,
-        DesignTokens.spacingL,
-        DesignTokens.spacingS,
-      ),
-      child: Text(
-        label.toUpperCase(),
-        style: textTheme.labelSmall?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-          letterSpacing: DesignTokens.letterSpacingExtraWide,
-          fontWeight: DesignTokens.fontWeightSemiBold,
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      SectionHeader(label, color: Theme.of(context).colorScheme.onSurfaceVariant);
 }
 
 class _DrawerRow extends StatelessWidget {

@@ -10,6 +10,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/emoji_shortcodes.dart';
 import '../user_profile_page.dart';
+import 'empty_state_view.dart';
 import 'user_avatar.dart';
 import '../../theme/forum_colors.dart';
 
@@ -231,7 +232,6 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
   }
 
   Widget _buildBody(BuildContext context, ScrollController scrollController) {
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     if (_loading) {
@@ -240,37 +240,16 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
 
     final error = _error;
     if (error != null) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline,
-                color: colorScheme.error, size: DesignTokens.iconSizeL),
-            SizedBox(height: DesignTokens.spacingM),
-            Text(
-              error,
-              textAlign: TextAlign.center,
-              style: textTheme.bodyMedium
-                  ?.copyWith(color: colorScheme.onSurfaceVariant),
-            ),
-            SizedBox(height: DesignTokens.spacingM),
-            TextButton.icon(
-              onPressed: () => _load(),
-              icon: const Icon(Icons.refresh),
-              label: Text(AppLocalizations.of(context)?.retry ?? 'Retry'),
-            ),
-          ],
-        ),
+      return EmptyStateView.error(
+        message: error,
+        onRetry: () => _load(),
       );
     }
 
     if (_users.isEmpty) {
-      return Center(
-        child: Text(
-          AppLocalizations.of(context)!.noReactionsYet,
-          style: textTheme.bodyMedium
-              ?.copyWith(color: colorScheme.onSurfaceVariant),
-        ),
+      return EmptyStateView(
+        icon: Icons.favorite_border,
+        message: AppLocalizations.of(context)!.noReactionsYet,
       );
     }
 

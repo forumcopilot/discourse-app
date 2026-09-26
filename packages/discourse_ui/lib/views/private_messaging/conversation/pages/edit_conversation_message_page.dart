@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../services/attachment_upload_service.dart';
+import '../../../../utils/error_message.dart';
 import '../../../widgets/empty_state_view.dart';
 
 class EditConversationMessagePage extends StatefulWidget {
@@ -244,7 +245,7 @@ class _EditConversationMessagePageState extends State<EditConversationMessagePag
           return Scaffold(
             appBar: AppBar(title: Text(title)),
             body: EmptyStateView.error(
-              message: AppLocalizations.of(context)?.failedToLoadMessage(snapshot.error.toString()) ?? 'Failed to load message: \n${snapshot.error}',
+              message: describeError(snapshot.error, context: context),
               onRetry: _retryLoad,
             ),
           );

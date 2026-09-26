@@ -8,6 +8,7 @@ import 'widgets/badge_detail_sheet.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
+import 'widgets/section_header.dart';
 import 'widgets/remote_circle_avatar.dart';
 
 /// Phase 5.18c-3 — Badges directory, third drawer destination under
@@ -84,7 +85,7 @@ class _BadgesDirectoryPageState extends State<BadgesDirectoryPage> {
     }
     if (_badges.isEmpty && _error != null) {
       return EmptyStateView.error(
-        message: _error!,
+        message: describeError(_error, context: context),
         onRetry: _load,
       );
     }
@@ -130,27 +131,10 @@ class _BadgeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            DesignTokens.spacingL,
-            DesignTokens.spacingL,
-            DesignTokens.spacingL,
-            DesignTokens.spacingS,
-          ),
-          child: Text(
-            label.toUpperCase(),
-            style: textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              letterSpacing: DesignTokens.letterSpacingExtraWide,
-              fontWeight: DesignTokens.fontWeightSemiBold,
-            ),
-          ),
-        ),
+        SectionHeader(label),
         ...badges.map((b) => _BadgeRow(badge: b)),
         const SizedBox(height: DesignTokens.spacingS),
       ],

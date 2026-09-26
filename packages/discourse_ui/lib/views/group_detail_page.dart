@@ -315,7 +315,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
     }
     if (_error != null && _members.isEmpty) {
       return EmptyStateView.error(
-        message: _error!,
+        message: describeError(_error, context: context),
         onRetry: _load,
       );
     }
