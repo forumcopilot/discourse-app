@@ -390,7 +390,7 @@
     "description": "Button to reply to a post or message"
   },
   "vote": "Stemmen",
-  "votesCount": "{count} stemmen",
+  "votesCount": "{count, plural, one{{count} stem} other{{count} stemmen}}",
   "pollClosed": "Peiling gesloten",
   "pollEndsOn": "Eindigt op {date}",
   "voteToSeeResults": "Stem om resultaten te zien",

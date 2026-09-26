@@ -363,7 +363,7 @@
   "unstick": "Desfixar",
   "reply": "Responder",
   "vote": "Votar",
-  "votesCount": "{count} votos",
+  "votesCount": "{count, plural, one{{count} voto} other{{count} votos}}",
   "pollClosed": "Enquete encerrada",
   "pollEndsOn": "Termina em {date}",
   "voteToSeeResults": "Vote para ver os resultados",

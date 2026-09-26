@@ -661,7 +661,13 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String votesCount(int count) {
-    return '$count stemmen';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stemmen',
+      one: '$count stem',
+    );
+    return '$_temp0';
   }
 
   @override

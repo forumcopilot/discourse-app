@@ -1271,7 +1271,7 @@ abstract class AppLocalizations {
   /// Poll footer showing total vote count
   ///
   /// In en, this message translates to:
-  /// **'{count} votes'**
+  /// **'{count, plural, one{{count} vote} other{{count} votes}}'**
   String votesCount(int count);
 
   /// Poll footer when poll is closed

@@ -381,7 +381,7 @@
   "@vote": {
     "description": "Button to submit poll vote"
   },
-  "votesCount": "{count} votes",
+  "votesCount": "{count, plural, one{{count} vote} other{{count} votes}}",
   "@votesCount": {
     "description": "Poll footer showing total vote count",
     "placeholders": {

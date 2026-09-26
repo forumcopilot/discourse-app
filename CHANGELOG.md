@@ -6,6 +6,12 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Added
+- **Polls in private messages.** A poll in a message is drawn where its author put it, with results, voting, changing or removing a vote and the voters list, as in topics. Messages showed nothing in its place: the SDK's message model had no polls (`FCConversationMessage.polls`, added in the canonical SDK), and `DiscoursePostProxy.pollsFromPostJson` now parses a message's polls the way it parses a post's, so a vote finds its message.
+
+### Fixed
+- **"1 vote", not "1 votes"**, under a poll, in every language with plural forms.
+
 ## [1.0.35] - 2026-09-26
 
 ### Changed

@@ -19,6 +19,8 @@ import '../../../widgets/full_screen_image_viewer.dart';
 import '../../../../utils/cooked_content.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/theme/forum_colors.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
+import '../../../widgets/thread_poll_card.dart';
 
 /// The sender's name for display.
 ///
@@ -28,6 +30,67 @@ import 'package:discourse_ui/theme/forum_colors.dart';
 /// fallback was there to prevent. Keep the intent, drop the dead operator.
 String _senderName(FCConversationMessage message) =>
     message.username.isNotEmpty ? message.username : 'Unknown';
+
+/// The live poll named [name] in [message], for the body to draw where the
+/// author put it — as a topic post draws its polls. Null when the message
+/// has no poll by that name (the body then shows nothing in its place).
+Widget? _messagePoll(
+    SiteContext siteContext, FCConversationMessage message, String name) {
+  final poll = message.polls.where((p) => p.pollId == name).firstOrNull;
+  if (poll == null) return null;
+  return _MessagePoll(
+    key: ValueKey('poll-${message.messageId}-$name'),
+    siteContext: siteContext,
+    message: message,
+    poll: poll,
+  );
+}
+
+/// A poll in a message body that keeps itself current after a vote: the
+/// message rows are stateless, and [ThreadPollCard] shows the poll it is
+/// given.
+class _MessagePoll extends StatefulWidget {
+  const _MessagePoll({
+    super.key,
+    required this.siteContext,
+    required this.message,
+    required this.poll,
+  });
+
+  final SiteContext siteContext;
+  final FCConversationMessage message;
+  final FCPoll poll;
+
+  @override
+  State<_MessagePoll> createState() => _MessagePollState();
+}
+
+class _MessagePollState extends State<_MessagePoll> {
+  late FCPoll _poll = widget.poll;
+
+  @override
+  void didUpdateWidget(_MessagePoll oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.poll, widget.poll)) _poll = widget.poll;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ThreadPollCard(
+      poll: _poll,
+      topicId: _poll.topicId,
+      siteContext: widget.siteContext,
+      onVoteSuccess: (updated) {
+        // Written back so a rebuilt row (scrolling, a reload of the same
+        // page) shows the vote too.
+        final polls = widget.message.polls;
+        final i = polls.indexWhere((p) => p.pollId == updated.pollId);
+        if (i >= 0) widget.message.polls = List.of(polls)..[i] = updated;
+        setState(() => _poll = updated);
+      },
+    );
+  }
+}
 
 class ConversationHeaderItem extends StatelessWidget {
   final SiteContext siteContext;
@@ -243,6 +306,8 @@ class ConversationHeaderItem extends StatelessWidget {
                   siteContext: siteContext,
                   content: message.textBody,
                   callbacks: callbacks,
+                  pollBuilder: (name) =>
+                      _messagePoll(siteContext, message, name),
                 ),
               ],
             ),
@@ -721,6 +786,8 @@ class ConversationItem extends StatelessWidget {
                   siteContext: siteContext,
                   content: message.textBody,
                   callbacks: callbacks,
+                  pollBuilder: (name) =>
+                      _messagePoll(siteContext, message, name),
                 ),
               ],
             ),

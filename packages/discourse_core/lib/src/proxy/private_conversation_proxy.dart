@@ -8,6 +8,7 @@ import 'package:forumcopilot_sdk/interfaces/i_fc_private_conversation_proxy.dart
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_like.dart';
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
+import 'post_proxy.dart' show DiscoursePostProxy;
 
 import '../base_discourse_proxy.dart';
 import '../data/message/discourse_message_details.dart';
@@ -719,7 +720,8 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
           // "invited …", "closed this" — with no body. The message view has
           // no row for it and drew each one as an empty bubble.
           .where((m) => m['post_type'] != 3)
-          .map((m) => _conversationMessageFrom(m.cast<String, dynamic>()))
+          .map((m) => _conversationMessageFrom(m.cast<String, dynamic>(),
+              topicId: conversationId))
           .toList();
       final details = (t['details'] as Map<String, dynamic>?) ?? const {};
       final participants = _participantsFrom(details);
@@ -946,7 +948,8 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     );
   }
 
-  FCConversationMessage _conversationMessageFrom(Map<String, dynamic> p) {
+  FCConversationMessage _conversationMessageFrom(Map<String, dynamic> p,
+      {String? topicId}) {
     final tpl = p['avatar_template'] as String?;
     String? avatarUrl;
     if (tpl != null && tpl.isNotEmpty) {
@@ -994,6 +997,12 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       isIgnored: false,
       canEdit: p['can_edit'] == true,
       messageNumber: p['post_number'] as int?,
+      // A message is a post: its polls come as a post's do, and parsing
+      // them there lets a vote find its post and poll name.
+      polls: DiscoursePostProxy.pollsFromPostJson(
+        p,
+        topicId: (p['topic_id'] ?? topicId ?? '').toString(),
+      ),
     );
   }
 

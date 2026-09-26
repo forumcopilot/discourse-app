@@ -949,7 +949,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   /// The hosting post's id lands on [FCPoll.postId] (and the poll's
   /// name on [FCPoll.pollId]) so vote/voters calls can be made without
   /// refetching the topic.
-  FCPoll? _pollFromJson(
+  static FCPoll? _pollFromJson(
     Map<String, dynamic> pollJson, {
     required String topicId,
     required int postId,
@@ -1017,7 +1017,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     return poll;
   }
 
-  void _trackRecentPoll(FCPoll poll) {
+  static void _trackRecentPoll(FCPoll poll) {
     _recentPolls.removeWhere((e) => e.poll.pollId == poll.pollId &&
         e.poll.topicId == poll.topicId);
     _recentPolls.insert(0, _RecentPoll(poll));
@@ -1030,7 +1030,12 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   }
 
   /// Every poll in a Discourse post payload, with the viewer's votes.
-  List<FCPoll> _pollsFromPost(Map<String, dynamic> p, {required String topicId}) {
+  ///
+  /// Public for the private-message proxy: a message is a post, its polls
+  /// arrive the same way, and parsing them here records them for
+  /// [votePollAsync]'s option-id lookup.
+  static List<FCPoll> pollsFromPostJson(Map<String, dynamic> p,
+      {required String topicId}) {
     final polls = (p['polls'] as List?) ?? const [];
     final postId = (p['id'] as num?)?.toInt();
     if (polls.isEmpty || postId == null) return const [];
@@ -1726,7 +1731,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       vote: vote,
       // Every poll in the post, for the UI to draw where the body names it
       // (`div.poll[data-poll-name]`) — not only the first post's first.
-      polls: _pollsFromPost(p, topicId: topicId),
+      polls: pollsFromPostJson(p, topicId: topicId),
       // post_type: 1 regular, 2 moderator action, 3 small action, 4 whisper
       // (Post.types). A small action records an event — closed, pinned,
       // user invited — in `action_code`, with no body of its own.

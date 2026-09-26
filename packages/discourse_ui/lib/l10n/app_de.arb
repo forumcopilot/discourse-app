@@ -363,7 +363,7 @@
   "unstick": "Loslösen",
   "reply": "Antworten",
   "vote": "Abstimmen",
-  "votesCount": "{count} Stimmen",
+  "votesCount": "{count, plural, one{{count} Stimme} other{{count} Stimmen}}",
   "pollClosed": "Umfrage geschlossen",
   "pollEndsOn": "Endet am {date}",
   "voteToSeeResults": "Abstimmen, um Ergebnisse zu sehen",

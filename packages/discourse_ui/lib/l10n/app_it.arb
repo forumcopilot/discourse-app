@@ -363,7 +363,7 @@
   "unstick": "Rimuovi appuntamento",
   "reply": "Rispondi",
   "vote": "Vota",
-  "votesCount": "{count} voti",
+  "votesCount": "{count, plural, one{{count} voto} other{{count} voti}}",
   "pollClosed": "Sondaggio chiuso",
   "pollEndsOn": "Scade il {date}",
   "voteToSeeResults": "Vota per vedere i risultati",

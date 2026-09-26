@@ -660,7 +660,15 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String votesCount(int count) {
-    return '$count голосов';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count голоса',
+      many: '$count голосов',
+      few: '$count голоса',
+      one: '$count голос',
+    );
+    return '$_temp0';
   }
 
   @override

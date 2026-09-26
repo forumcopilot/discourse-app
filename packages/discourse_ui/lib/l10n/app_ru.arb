@@ -363,7 +363,7 @@
   "unstick": "Открепить",
   "reply": "Ответить",
   "vote": "Голосовать",
-  "votesCount": "{count} голосов",
+  "votesCount": "{count, plural, one{{count} голос} few{{count} голоса} many{{count} голосов} other{{count} голоса}}",
   "pollClosed": "Опрос закрыт",
   "pollEndsOn": "Заканчивается {date}",
   "voteToSeeResults": "Проголосуйте, чтобы увидеть результаты",

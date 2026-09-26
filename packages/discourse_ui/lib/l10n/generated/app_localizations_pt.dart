@@ -662,7 +662,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String votesCount(int count) {
-    return '$count votos';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count votos',
+      one: '$count voto',
+    );
+    return '$_temp0';
   }
 
   @override
