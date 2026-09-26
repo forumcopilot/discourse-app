@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.35] - 2026-09-26
+
 ### Changed
 - **The topic page around the posts follows the same spec:**
   - **The first post's title** is `titleLarge` (22sp), the size the app bar gives it, instead of 16sp w700.
