@@ -13,7 +13,6 @@ import '../widgets/conversation_item.dart';
 import '../widgets/conversation_header_widget.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../../../../theme/design_tokens.dart';
-import '../../../../theme/style_builders.dart';
 import '../../../../utils/accessibility_helpers.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
@@ -759,38 +758,24 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
   Future<void> _closeConversation() async {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
           AppLocalizations.of(context)!.closeConversation2,
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-          ),
         ),
         content: Text(
           AppLocalizations.of(context)!.closeConversationConfirmation,
-          style: textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              AppLocalizations.of(context)?.cancel ?? 'Cancel',
-              style: TextStyle(color: colorScheme.primary),
-            ),
+            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              AppLocalizations.of(context)!.close,
-              style: TextStyle(color: colorScheme.onPrimary),
-            ),
+            child: Text(AppLocalizations.of(context)!.close),
           ),
         ],
       ),
@@ -833,38 +818,24 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
   Future<void> _uncloseConversation() async {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
           AppLocalizations.of(context)!.openConversation2,
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-          ),
         ),
         content: Text(
           AppLocalizations.of(context)!.openConversationConfirmation,
-          style: textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              AppLocalizations.of(context)?.cancel ?? 'Cancel',
-              style: TextStyle(color: colorScheme.primary),
-            ),
+            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              AppLocalizations.of(context)!.open,
-              style: TextStyle(color: colorScheme.onPrimary),
-            ),
+            child: Text(AppLocalizations.of(context)!.open),
           ),
         ],
       ),
@@ -907,38 +878,24 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
   Future<void> _leaveConversation() async {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
           AppLocalizations.of(context)!.leaveConversation3,
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-          ),
         ),
         content: Text(
           AppLocalizations.of(context)!.leaveConversationConfirmation,
-          style: textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              AppLocalizations.of(context)?.cancel ?? 'Cancel',
-              style: TextStyle(color: colorScheme.primary),
-            ),
+            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              AppLocalizations.of(context)!.leave,
-              style: TextStyle(color: colorScheme.onPrimary),
-            ),
+            child: Text(AppLocalizations.of(context)!.leave),
           ),
         ],
       ),
@@ -1151,9 +1108,6 @@ class _ConversationPageState extends State<ConversationPage> {
                         onPressed: () => _loadOlderMessages(),
                         icon: const Icon(Icons.arrow_upward),
                         label: Text(AppLocalizations.of(context)?.loadEarlierMessages ?? 'Load Earlier Messages'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                        ),
                       ),
                     ),
                   // Loading indicator when loading older messages
@@ -1460,9 +1414,6 @@ class _ConversationPageState extends State<ConversationPage> {
             return AlertDialog(
               title: Text(
                 AppLocalizations.of(context)!.jumpToMessage,
-                style: textTheme.titleLarge?.copyWith(
-                  color: colorScheme.onSurface,
-                ),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1492,20 +1443,14 @@ class _ConversationPageState extends State<ConversationPage> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text(
-                    AppLocalizations.of(context)?.cancel ?? 'Cancel',
-                    style: TextStyle(color: colorScheme.primary),
-                  ),
+                  child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
                 ),
                 TextButton(
                   onPressed: () async {
                     Navigator.of(context).pop();
                     await _jumpToMessagePosition(selectedMessagePosition);
                   },
-                  child: Text(
-                    AppLocalizations.of(context)!.jump,
-                    style: TextStyle(color: colorScheme.primary),
-                  ),
+                  child: Text(AppLocalizations.of(context)!.jump),
                 ),
               ],
             );
@@ -1690,9 +1635,6 @@ class _ConversationPageState extends State<ConversationPage> {
                     onPressed: _onReplyPressed,
                     icon: const Icon(Icons.reply),
                     label: Text(AppLocalizations.of(context)?.reply ?? 'Reply'),
-                    style: StyleBuilders.extendedFilledButtonStyle(
-                      colorScheme: Theme.of(context).colorScheme,
-                    ),
                   ),
                 ),
             ],

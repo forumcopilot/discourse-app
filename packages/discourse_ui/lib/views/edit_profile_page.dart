@@ -246,9 +246,7 @@ class _Field extends StatelessWidget {
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
+            border: const OutlineInputBorder(),
             // Hide the maxLength counter on short fields — it adds
             // visual noise for one-line inputs but is useful on the
             // bio field where users care about the limit.

@@ -104,7 +104,6 @@ class _ReplyConversationPageState extends State<ReplyConversationPage> {
                 // snackbar's inverse default (light on light red).
                 style: TextStyle(color: Theme.of(context).colorScheme.onErrorContainer),
               ),
-              behavior: SnackBarBehavior.floating,
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
             ),
           );
@@ -119,7 +118,6 @@ class _ReplyConversationPageState extends State<ReplyConversationPage> {
                 AppLocalizations.of(context)?.failedToSendReply(e.toString()) ?? 'Failed to send reply: ${e.toString()}',
                 style: TextStyle(color: Theme.of(context).colorScheme.onErrorContainer),
               ),
-              behavior: SnackBarBehavior.floating,
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
             ),
           );
@@ -256,9 +254,7 @@ class _ReplyConversationPageState extends State<ReplyConversationPage> {
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),
             ),
-            behavior: SnackBarBehavior.floating,
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            margin: const EdgeInsets.all(8),
           ),
         );
       }

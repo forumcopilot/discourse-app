@@ -178,8 +178,6 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
                     ),
               ),
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              behavior: SnackBarBehavior.floating,
-              margin: DesignTokens.paddingS,
               duration: const Duration(seconds: 5),
             ),
           );
@@ -274,8 +272,6 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            margin: DesignTokens.paddingS,
             duration: const Duration(seconds: 5),
           ),
         );
@@ -294,9 +290,7 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
           ),
-          behavior: SnackBarBehavior.floating,
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          margin: DesignTokens.paddingS,
           duration: const Duration(seconds: 3),
         ),
       );

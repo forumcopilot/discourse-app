@@ -22,9 +22,11 @@ class FilterChipOption {
 /// third variant — so the same gesture looked different depending on where
 /// you were.
 ///
-/// The Home tab's styling won, being the only one expressed in design
-/// tokens rather than Material defaults. Chips scroll horizontally: a
-/// forum may offer five filters, and they must not squeeze or wrap.
+/// Material 3 filter chips as they come: 32dp, 8dp corners, `labelLarge`,
+/// the selected one filled, each in a 48dp touch target. The row takes its
+/// height from the chips, so a larger text size grows it instead of
+/// clipping them. Chips scroll horizontally: a forum may offer five
+/// filters, and they must not squeeze or wrap.
 class FilterChipBar extends StatelessWidget {
   const FilterChipBar({
     super.key,
@@ -44,60 +46,43 @@ class FilterChipBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Padding(
-      padding: padding ??
-          EdgeInsets.symmetric(
-            horizontal: DesignTokens.spacingL,
-            vertical: DesignTokens.spacingM,
-          ),
-      child: SizedBox(
-        height: 40,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: options.length,
-          separatorBuilder: (_, __) => SizedBox(width: DesignTokens.spacingS),
-          itemBuilder: (context, index) {
-            final option = options[index];
-            final isSelected = index == selectedIndex;
-            return FilterChip(
-              selected: isSelected,
-              avatar: option.icon == null
-                  ? null
-                  : Icon(option.icon, size: DesignTokens.iconSizeS),
-              label: Text(option.label),
-              onSelected: (_) {
-                if (isSelected) return;
-                onSelected(index);
-              },
-              selectedColor: colorScheme.primaryContainer,
-              // No checkmark. Material draws it *over* the avatar slot, so
-              // a selected chip had a tick sitting on top of its own icon;
-              // and the chip already turns the highlight colour, so the
-              // tick was saying a second time what the fill already said.
-              showCheckmark: false,
-              labelStyle: textTheme.labelLarge?.copyWith(
-                color: isSelected
-                    ? colorScheme.onPrimaryContainer
-                    : colorScheme.onSurfaceVariant,
-                fontWeight: isSelected
-                    ? DesignTokens.fontWeightSemiBold
-                    : DesignTokens.fontWeightNormal,
-              ),
-              backgroundColor: colorScheme.surfaceContainerHighest,
-              padding: EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingM,
-                vertical: DesignTokens.spacingS,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusL),
-              ),
-            );
-          },
+    // Start-aligned even in a column that centres its children: a row
+    // narrower than the screen would otherwise shrink to its chips.
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: padding ??
+            const EdgeInsets.symmetric(
+              horizontal: DesignTokens.spacingL,
+              vertical: DesignTokens.spacingS,
+            ),
+        child: Row(
+          children: [
+            for (var index = 0; index < options.length; index++) ...[
+              if (index > 0) const SizedBox(width: DesignTokens.spacingS),
+              _chip(options[index], index == selectedIndex, index),
+            ],
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _chip(FilterChipOption option, bool isSelected, int index) {
+    return FilterChip(
+      selected: isSelected,
+      avatar: option.icon == null
+          ? null
+          : Icon(option.icon, size: DesignTokens.iconSizeSMedium),
+      // Material draws the tick *over* the avatar slot, so a chip with an
+      // icon shows selection by its fill alone.
+      showCheckmark: option.icon == null,
+      label: Text(option.label),
+      onSelected: (_) {
+        if (isSelected) return;
+        onSelected(index);
+      },
     );
   }
 }

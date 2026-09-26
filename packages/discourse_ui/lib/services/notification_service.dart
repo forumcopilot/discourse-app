@@ -988,31 +988,17 @@ class NotificationService with ServiceErrorHandlingMixin {
         context: context,
         barrierDismissible: true,
         builder: (dialogContext) {
-          final colorScheme = Theme.of(dialogContext).colorScheme;
-          final textTheme = Theme.of(dialogContext).textTheme;
           return AlertDialog(
-            backgroundColor: colorScheme.surface,
             title: Text(
               title,
-              style: textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurface,
-              ),
             ),
             content: Text(
               message,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface,
-              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(),
-                child: Text(
-                  'OK',
-                  style: textTheme.labelLarge?.copyWith(
-                    color: colorScheme.primary,
-                  ),
-                ),
+                child: Text('OK'),
               ),
             ],
           );

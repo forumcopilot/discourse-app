@@ -77,8 +77,6 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_error!),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(DesignTokens.spacingS),
         ),
       );
     }
@@ -93,13 +91,7 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
       appBar: AppBar(
         title: Text(
           AppLocalizations.of(context)!.editHistory,
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: DesignTokens.fontWeightMedium,
-          ),
         ),
-        backgroundColor: colorScheme.surface,
-        iconTheme: IconThemeData(color: colorScheme.onSurface),
       ),
       body: _buildBody(colorScheme, textTheme),
       bottomNavigationBar:

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../../settings_context.dart';
+import 'sheet_title.dart';
 import '../../theme/design_tokens.dart';
 
 /// The label for [mode] as the Appearance picker shows it.
@@ -66,20 +67,7 @@ Future<void> showAppearanceSheet(BuildContext context) {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                DesignTokens.spacingL,
-                0,
-                DesignTokens.spacingL,
-                DesignTokens.spacingS,
-              ),
-              child: Text(
-                AppLocalizations.of(sheetContext)!.appearance,
-                style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
-                      fontWeight: DesignTokens.fontWeightSemiBold,
-                    ),
-              ),
-            ),
+            SheetTitle(AppLocalizations.of(sheetContext)!.appearance),
             AppearanceChoices(
               onChanged: (_) => Navigator.of(sheetContext).pop(),
             ),

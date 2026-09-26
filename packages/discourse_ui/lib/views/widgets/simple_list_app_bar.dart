@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/design_tokens.dart';
-
 /// Phase 5.18d — shared AppBar for the directory / detail pages that
 /// don't have their own per-screen actions (Tags, Users, Groups,
 /// Group detail, Badges, Drafts, Chat tab, etc.). Was previously
@@ -9,11 +7,9 @@ import '../../theme/design_tokens.dart';
 /// makes a future visual tweak (e.g. flatter shadow, different
 /// surface tint) a one-line change.
 ///
-/// Matches the `TopicsTabAppBar` / `ForumsTabAppBar` cadence:
-///   • surface bg + elevation 3 + `opacityLow` shadow + surface
-///     tint (so light/dark theme transitions stay smooth)
-///   • title in `titleLarge` on `onSurface`, medium weight, left-
-///     aligned (matches Discourse web's mobile header alignment)
+/// Like every app bar in the app it takes its look from the theme's
+/// `AppBarTheme`: a Material 3 small top app bar, title in `titleLarge`
+/// aligned to the start, flat until content scrolls under it.
 ///   • `automaticallyImplyLeading: true` so the drawer hamburger
 ///     shows when hosted inside a Scaffold with a drawer, and a
 ///     back button shows when pushed as a route.
@@ -35,24 +31,12 @@ class SimpleListAppBar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     return AppBar(
-      backgroundColor: colorScheme.surface,
-      elevation: DesignTokens.elevationHigh - 1, // matches existing 3.0
-      shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
-      surfaceTintColor: colorScheme.surfaceTint,
       title: Text(
         title,
-        style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onSurface,
-          fontWeight: DesignTokens.fontWeightMedium,
-          fontSize: DesignTokens.fontSizeL,
-        ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      centerTitle: false,
       actions: actions,
     );
   }

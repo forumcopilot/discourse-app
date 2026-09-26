@@ -163,74 +163,6 @@ class StyleBuilders {
   }
 
   // ============================================================================
-  // BUTTON STYLE BUILDERS
-  // ============================================================================
-
-  /// Creates a standardized ElevatedButton style.
-  static ButtonStyle elevatedButtonStyle({
-    required ColorScheme colorScheme,
-    EdgeInsetsGeometry? padding,
-    double? borderRadius,
-    double? elevation,
-  }) {
-    return ElevatedButton.styleFrom(
-      elevation: elevation ?? DesignTokens.elevationNone,
-      padding: padding ??
-          EdgeInsets.symmetric(
-            horizontal: DesignTokens.spacingXL,
-            vertical: DesignTokens.spacingM,
-          ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(
-          borderRadius ?? DesignTokens.radiusS,
-        ),
-      ),
-    );
-  }
-
-  /// Creates a standardized TextButton style.
-  static ButtonStyle textButtonStyle({
-    required ColorScheme colorScheme,
-    EdgeInsetsGeometry? padding,
-    double? borderRadius,
-  }) {
-    return TextButton.styleFrom(
-      padding: padding ??
-          EdgeInsets.symmetric(
-            horizontal: DesignTokens.spacingL,
-            vertical: DesignTokens.spacingS,
-          ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(
-          borderRadius ?? DesignTokens.radiusS,
-        ),
-      ),
-    );
-  }
-
-  /// Creates a standardized FilledButton style for extended buttons.
-  /// Matches the style of FloatingActionButton.extended for consistency.
-  /// Automatically adapts to light and dark mode through ColorScheme.
-  static ButtonStyle extendedFilledButtonStyle({
-    required ColorScheme colorScheme,
-    EdgeInsetsGeometry? padding,
-    double? borderRadius,
-    double? elevation,
-  }) {
-    return FilledButton.styleFrom(
-      backgroundColor: colorScheme.primary,
-      foregroundColor: colorScheme.onPrimary,
-      padding: padding ?? DesignTokens.paddingExtendedButton,
-      elevation: elevation ?? DesignTokens.elevationMedium,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(
-          borderRadius ?? DesignTokens.radiusExtendedButton,
-        ),
-      ),
-    );
-  }
-
-  // ============================================================================
   // CONTAINER DECORATION BUILDERS
   // ============================================================================
 
@@ -443,7 +375,9 @@ class StyleBuilders {
     );
   }
 
-  /// Creates a TextStyle for badge text labels (e.g., BANNED, DELETED).
+  /// Creates a TextStyle for badge text labels (e.g., BANNED, DELETED):
+  /// M3's `labelSmall` (11sp w500), the smallest role there is. It was
+  /// 10sp w700, below anything Material sets text in.
   static TextStyle badgeTextStyle({
     required ColorScheme colorScheme,
     required TextTheme textTheme,
@@ -451,14 +385,13 @@ class StyleBuilders {
     FontWeight? fontWeight,
   }) {
     return textTheme.labelSmall?.copyWith(
-          fontSize: DesignTokens.fontSizeXXS,
           color: color ?? colorScheme.onSurfaceVariant,
-          fontWeight: fontWeight ?? DesignTokens.fontWeightBold,
+          fontWeight: fontWeight,
         ) ??
         TextStyle(
-          fontSize: DesignTokens.fontSizeXXS,
+          fontSize: 11,
           color: color ?? colorScheme.onSurfaceVariant,
-          fontWeight: fontWeight ?? DesignTokens.fontWeightBold,
+          fontWeight: fontWeight ?? DesignTokens.fontWeightMedium,
         );
   }
 

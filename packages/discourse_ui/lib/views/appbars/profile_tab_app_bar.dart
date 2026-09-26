@@ -3,7 +3,6 @@ import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:get/get.dart';
-import 'package:discourse_ui/theme/design_tokens.dart';
 
 class ProfileTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isLoggedIn;
@@ -17,25 +16,14 @@ class ProfileTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     return AppBar(
-      backgroundColor: colorScheme.surface,
-      elevation: 3,
-      shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
-      surfaceTintColor: colorScheme.surfaceTint,
       // Phase 5.18a — auto-imply true so the drawer hamburger renders.
       // The sign-out action moved into the drawer's Account section
       // but we keep the AppBar logout icon as a discoverability backup.
       title: Text(
         AppLocalizations.of(context)?.profile ?? 'Profile',
-        style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onSurface,
-          fontWeight: FontWeight.w500,
-          fontSize: DesignTokens.fontSizeL,
-        ),
       ),
-      centerTitle: false,
       actions: [
         // Users lives in the drawer. It was in both places, and the app
         // bar is the wrong one — a people directory is forum-wide
@@ -61,29 +49,16 @@ class ProfileTabAppBar extends StatelessWidget implements PreferredSizeWidget {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          backgroundColor: colorScheme.surface,
           title: Text(
             AppLocalizations.of(context)?.logout ?? 'Logout',
-            style: textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.w500,
-            ),
           ),
           content: Text(
             AppLocalizations.of(context)?.areYouSureYouWantToLogout ?? 'Are you sure you want to logout?',
-            style: textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onSurface,
-            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(
-                AppLocalizations.of(context)?.cancel ?? 'Cancel',
-                style: textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
+              child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
             ),
             TextButton(
               onPressed: () async {

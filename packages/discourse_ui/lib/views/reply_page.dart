@@ -312,9 +312,7 @@ class _ReplyPageState extends State<ReplyPage> {
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),
             ),
-            behavior: SnackBarBehavior.floating,
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            margin: const EdgeInsets.all(8),
           ),
         );
       }
@@ -477,12 +475,6 @@ class _ReplyPageState extends State<ReplyPage> {
                   ],
                 ),
                 backgroundColor: colorScheme.errorContainer,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-                ),
-                margin: DesignTokens.paddingS,
-                padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
                 duration: const Duration(seconds: 4),
                 action: SnackBarAction(
                   label: 'Dismiss',

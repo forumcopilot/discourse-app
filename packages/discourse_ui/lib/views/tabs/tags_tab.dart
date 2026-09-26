@@ -205,15 +205,20 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
                     decoration: InputDecoration(
                       hintText: 'Search tags…',
                       prefixIcon: Icon(Icons.search,
-                          color: colorScheme.onSurfaceVariant, size: 20),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 10),
+                          color: colorScheme.onSurfaceVariant),
+                      // The app's search bar: a filled pill, 56dp high.
                       filled: true,
-                      fillColor:
-                          colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+                      fillColor: colorScheme.surfaceContainerHigh,
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(28)),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(28)),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(28)),
                         borderSide: BorderSide.none,
                       ),
                       suffixIcon: _filterController.text.isNotEmpty

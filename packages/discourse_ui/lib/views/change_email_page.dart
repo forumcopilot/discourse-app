@@ -129,10 +129,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                   labelText: 'New email',
                   hintText: 'you@example.com',
                   prefixIcon: const Icon(Icons.alternate_email_rounded),
-                  border: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(DesignTokens.radiusS),
-                  ),
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   final v = value?.trim() ?? '';

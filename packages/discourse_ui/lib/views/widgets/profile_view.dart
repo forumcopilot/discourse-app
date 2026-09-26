@@ -176,8 +176,6 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(8),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -260,8 +258,6 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                   backgroundColor:
                       Theme.of(context).colorScheme.inverseSurface,
-                  behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.all(8),
                   duration: const Duration(seconds: 2),
                 ),
               );
@@ -296,8 +292,6 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(8),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -410,6 +404,7 @@ class _ProfileViewState extends State<ProfileView> {
           delegate: ActivityChipBarDelegate(
             selected: _activityTab,
             onSelected: (t) => setState(() => _activityTab = t),
+            textScaler: MediaQuery.textScalerOf(context),
           ),
         ),
         SliverToBoxAdapter(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/design_tokens.dart';
+import 'sheet_title.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// Purely informational bottom sheet explaining Discourse's five trust
@@ -22,9 +23,6 @@ class TrustLevelSheet extends StatelessWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (sheetContext) => TrustLevelSheet(currentLevel: currentLevel),
     );
   }
@@ -72,25 +70,12 @@ class TrustLevelSheet extends StatelessWidget {
     // larger text size or on a short phone the options no longer fit.
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
+        padding: const EdgeInsets.only(bottom: DesignTokens.spacingS),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                DesignTokens.spacingL,
-                DesignTokens.spacingM,
-                DesignTokens.spacingL,
-                DesignTokens.spacingXS,
-              ),
-              child: Text(
-                AppLocalizations.of(context)!.trustLevels,
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: DesignTokens.fontWeightSemiBold,
-                ),
-              ),
-            ),
+            SheetTitle(AppLocalizations.of(context)!.trustLevels),
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 DesignTokens.spacingL,

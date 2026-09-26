@@ -22,7 +22,6 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import '../../theme/design_tokens.dart';
-import '../../theme/style_builders.dart';
 import '../../utils/error_dialog.dart';
 import '../../utils/error_message.dart';
 import '../widgets/empty_state_view.dart';
@@ -586,15 +585,6 @@ class _PostsState extends State<PostsList> {
           ],
         ),
         backgroundColor: errorContainerColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-        ),
-        margin: DesignTokens.paddingS,
-        padding: EdgeInsets.symmetric(
-          horizontal: DesignTokens.spacingL,
-          vertical: DesignTokens.spacingL - DesignTokens.spacingXS,
-        ),
         duration: const Duration(seconds: 4),
         action: SnackBarAction(
           label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -1350,9 +1340,6 @@ class _PostsState extends State<PostsList> {
         return AlertDialog(
           title: Text(
             AppLocalizations.of(context)!.jumpToPost,
-            style: textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-            ),
           ),
           content: StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
@@ -1386,10 +1373,7 @@ class _PostsState extends State<PostsList> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text(
-                AppLocalizations.of(context)!.cancel,
-                style: TextStyle(color: colorScheme.primary),
-              ),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () async {
@@ -1465,10 +1449,7 @@ class _PostsState extends State<PostsList> {
                 int lastNum = _pageSize - 1;
                 await _loadInitialPosts(startNum, lastNum, PostsListMode.goto_page, gotoPost: selectedPostIndex);
               },
-              child: Text(
-                AppLocalizations.of(context)!.jump,
-                style: TextStyle(color: colorScheme.primary),
-              ),
+              child: Text(AppLocalizations.of(context)!.jump),
             ),
           ],
         );
@@ -1523,9 +1504,6 @@ class _PostsState extends State<PostsList> {
                   },
                   icon: const Icon(Icons.reply),
                   label: Text(AppLocalizations.of(context)?.reply ?? 'Reply'),
-                  style: StyleBuilders.extendedFilledButtonStyle(
-                    colorScheme: Theme.of(context).colorScheme,
-                  ),
                 ),
             ],
           ),

@@ -695,12 +695,12 @@ class _NewDmSheetState extends State<_NewDmSheet> {
         (_selected.isNotEmpty || _input.text.trim().isNotEmpty);
 
     return Padding(
+      // Under the theme's drag handle, at the app's 16dp margins.
       padding: EdgeInsets.only(
-        left: DesignTokens.spacingM,
-        right: DesignTokens.spacingM,
-        top: DesignTokens.spacingM,
+        left: DesignTokens.spacingL,
+        right: DesignTokens.spacingL,
         bottom:
-            MediaQuery.of(context).viewInsets.bottom + DesignTokens.spacingM,
+            MediaQuery.of(context).viewInsets.bottom + DesignTokens.spacingL,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -708,10 +708,9 @@ class _NewDmSheetState extends State<_NewDmSheet> {
         children: [
           Text(
             AppLocalizations.of(context)!.chatCreatePersonal,
-            style:
-                textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: textTheme.titleMedium,
           ),
-          const SizedBox(height: DesignTokens.spacingM),
+          const SizedBox(height: DesignTokens.spacingS),
           if (_selected.isNotEmpty) ...[
             Wrap(
               spacing: DesignTokens.spacingXS,
@@ -745,10 +744,6 @@ class _NewDmSheetState extends State<_NewDmSheet> {
               hintText: _selected.isEmpty
                   ? AppLocalizations.of(context)!.chatSearchPlaceholder
                   : AppLocalizations.of(context)!.chatAddMorePlaceholder,
-              isDense: true,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-              ),
               suffixIcon: _searching
                   ? const Padding(
                       padding: EdgeInsets.all(12),

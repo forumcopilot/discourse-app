@@ -68,7 +68,6 @@ class _EditConversationPageState extends State<EditConversationPage> {
           SnackBar(
             content: Text(AppLocalizations.of(context)?.titleCannotBeEmpty ?? 'Title cannot be empty'),
             backgroundColor: Theme.of(context).colorScheme.error,
-            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -99,7 +98,6 @@ class _EditConversationPageState extends State<EditConversationPage> {
             SnackBar(
               content: Text(errorMessage ?? AppLocalizations.of(context)?.failedToSaveConversation ?? 'Failed to save message'),
               backgroundColor: Theme.of(context).colorScheme.error,
-              behavior: SnackBarBehavior.floating,
             ),
           );
         }
@@ -111,7 +109,6 @@ class _EditConversationPageState extends State<EditConversationPage> {
           SnackBar(
             content: Text(AppLocalizations.of(context)?.conversationUpdatedSuccessfully ?? 'Message updated successfully'),
             backgroundColor: Theme.of(context).colorScheme.primary,
-            behavior: SnackBarBehavior.floating,
           ),
         );
         Navigator.of(context).pop(true); // Return true to indicate success
@@ -124,7 +121,6 @@ class _EditConversationPageState extends State<EditConversationPage> {
           SnackBar(
             content: Text(AppLocalizations.of(context)!.error(e.toString())),
             backgroundColor: Theme.of(context).colorScheme.error,
-            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -147,19 +143,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
       appBar: AppBar(
         title: Text(
           AppLocalizations.of(context)!.editConversation2,
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: DesignTokens.fontWeightSemiBold,
-          ),
         ),
-        backgroundColor: colorScheme.surface,
-        elevation: 3,
-        shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
-        surfaceTintColor: colorScheme.surfaceTint,
-        iconTheme: IconThemeData(
-          color: colorScheme.onSurface,
-        ),
-        centerTitle: true,
         actions: [
           IconButton(
             icon: _isSubmitting

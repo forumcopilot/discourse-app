@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../users_directory_page.dart';
-import '../../theme/design_tokens.dart';
 
 class MessagesTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   final SiteContext siteContext;
@@ -16,13 +15,8 @@ class MessagesTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     return AppBar(
-      backgroundColor: colorScheme.surface,
-      elevation: 3,
-      shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
-      surfaceTintColor: colorScheme.surfaceTint,
       // Phase 5.18a — auto-imply true is intentional: when this AppBar
       // is hosted in `SiteHomePage`'s Scaffold (Messages-as-bottom-nav-
       // slot path) Flutter inserts the drawer hamburger; when hosted
@@ -32,13 +26,7 @@ class MessagesTabAppBar extends StatelessWidget implements PreferredSizeWidget {
       // contexts.
       title: Text(
         AppLocalizations.of(context)?.messages ?? 'Messages',
-        style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onSurface,
-          fontWeight: FontWeight.w500,
-          fontSize: DesignTokens.fontSizeL,
-        ),
       ),
-      centerTitle: false,
       actions: [
         if (isLoggedIn) _buildMembersButton(context, colorScheme),
       ],

@@ -122,7 +122,6 @@ class PostListItemAttachment extends StatelessWidget {
             ),
           ],
         ),
-        behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -141,7 +140,6 @@ class PostListItemAttachment extends StatelessWidget {
                 AppLocalizations.of(context)?.openingShareSheet(filename) ??
                     'Opening share sheet for $filename',
               ),
-              behavior: SnackBarBehavior.floating,
               backgroundColor: Theme.of(context).colorScheme.primary,
               duration: const Duration(seconds: 2),
             ),
@@ -160,7 +158,6 @@ class PostListItemAttachment extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(locationMessage),
-              behavior: SnackBarBehavior.floating,
               backgroundColor: Theme.of(context).colorScheme.primary,
               duration: const Duration(seconds: 4),
             ),
@@ -175,7 +172,6 @@ class PostListItemAttachment extends StatelessWidget {
             content: Text(AppLocalizations.of(context)
                     ?.errorDownloading(filename, e.toString()) ??
                 'Error downloading $filename: $e'),
-            behavior: SnackBarBehavior.floating,
             backgroundColor: Theme.of(context).colorScheme.error,
             duration: const Duration(seconds: 4),
           ),

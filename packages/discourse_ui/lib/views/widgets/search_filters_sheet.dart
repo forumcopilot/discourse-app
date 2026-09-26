@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/models/search/fc_search_filters.dart';
 
 import '../../theme/design_tokens.dart';
+import 'sheet_title.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// Bottom sheet that lets the user toggle Discourse-native search filters
@@ -26,9 +27,6 @@ class SearchFiltersSheet extends StatefulWidget {
     return showModalBottomSheet<FCSearchFilters>(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (sheetContext) {
         return DraggableScrollableSheet(
           initialChildSize: 0.7,
@@ -116,26 +114,10 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              DesignTokens.spacingL,
-              DesignTokens.spacingM,
-              DesignTokens.spacingS,
-              DesignTokens.spacingS,
-            ),
-            child: Row(
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.searchFilters,
-                  style: textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.w600),
-                ),
-                const Spacer(),
-                TextButton(onPressed: _reset, child: Text(AppLocalizations.of(context)!.reset)),
-              ],
-            ),
+          SheetTitle(
+            AppLocalizations.of(context)!.searchFilters,
+            trailing: TextButton(onPressed: _reset, child: Text(AppLocalizations.of(context)!.reset)),
           ),
-          const Divider(height: 1),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(
@@ -202,7 +184,6 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
                     controller: _tagController,
                     decoration: const InputDecoration(
                       hintText: 'foo bar baz',
-                      isDense: true,
                       helperText:
                           'Space- or comma-separated. Each tag is required.',
                       border: OutlineInputBorder(),

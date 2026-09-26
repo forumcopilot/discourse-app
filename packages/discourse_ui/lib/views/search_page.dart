@@ -522,17 +522,7 @@ class _SearchPageState extends State<SearchPage> {
       appBar: AppBar(
         title: Text(
           AppLocalizations.of(context)?.search ?? 'Search',
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: DesignTokens.fontWeightMedium,
-          ),
         ),
-        backgroundColor: colorScheme.surface,
-        elevation: 3,
-        shadowColor: colorScheme.shadow.withValues(alpha: 0.3),
-        surfaceTintColor: colorScheme.surfaceTint,
-        iconTheme: IconThemeData(color: colorScheme.onSurface),
-        centerTitle: true,
         actions: [
           IconButton(
             icon: Stack(
@@ -599,27 +589,13 @@ class _SearchPageState extends State<SearchPage> {
                               },
                       )
                     : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                  borderSide: BorderSide(
-                    color: colorScheme.outlineVariant,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                  borderSide: BorderSide(
-                    color: colorScheme.outlineVariant,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                  borderSide: BorderSide(
-                    color: colorScheme.primary,
-                    width: DesignTokens.borderWidthMedium,
-                  ),
-                ),
+                // Material 3 search bar: a filled pill, 56dp high, with no outline
+                // in any state.
+                border: _searchBarBorder,
+                enabledBorder: _searchBarBorder,
+                focusedBorder: _searchBarBorder,
                 filled: true,
-                fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
+                fillColor: colorScheme.surfaceContainerHigh,
                 contentPadding: DesignTokens.paddingInput,
               ),
               style: textTheme.bodyLarge?.copyWith(
@@ -997,3 +973,9 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 }
+
+/// The Material 3 search bar's shape: a full pill, no outline.
+const _searchBarBorder = OutlineInputBorder(
+  borderRadius: BorderRadius.all(Radius.circular(28)),
+  borderSide: BorderSide.none,
+);

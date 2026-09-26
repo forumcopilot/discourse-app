@@ -3,6 +3,7 @@ import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/emoji_shortcodes.dart';
+import '../widgets/adaptive_app_bar_title.dart';
 
 class PostsPageAppBar extends StatefulWidget implements PreferredSizeWidget {
   const PostsPageAppBar({
@@ -96,38 +97,8 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
     return AppBar(
-      title: LayoutBuilder(
-        builder: (context, constraints) {
-          // Calculate available width for the title
-          // Subtract space for back button and actions
-          final availableWidth = constraints.maxWidth - 80; // 40 for back button, 40 for actions
-
-          return Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                child: _buildAdaptiveTitle(
-                  _currentTitle,
-                  colorScheme,
-                  textTheme,
-                  availableWidth,
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-      backgroundColor: colorScheme.surface,
-      elevation: 3,
-      shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
-      surfaceTintColor: colorScheme.surfaceTint,
-      iconTheme: IconThemeData(
-        color: colorScheme.onSurface,
-      ),
+      title: AdaptiveAppBarTitle(withEmojiShortcodes(_currentTitle)),
       leading: Builder(
         builder: (context) => IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
@@ -137,53 +108,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
         ),
       ),
       actions: _buildActions(context),
-      centerTitle: false,
     );
-  }
-
-  Widget _buildAdaptiveTitle(String title, ColorScheme colorScheme, TextTheme textTheme, double availableWidth) {
-    // Test if the title fits in one line with font size 20
-    final textSpan = TextSpan(
-      text: title,
-      style: textTheme.titleLarge?.copyWith(
-        color: colorScheme.onSurface,
-        fontWeight: DesignTokens.fontWeightMedium,
-        fontSize: DesignTokens.fontSizeL,
-      ),
-    );
-
-    final textPainter = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.ltr,
-      maxLines: 1,
-    );
-    textPainter.layout(maxWidth: availableWidth);
-
-    if (textPainter.didExceedMaxLines) {
-      // Text is too long, use smaller font size for both lines
-      return Text(
-        withEmojiShortcodes(title),
-        style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onSurface,
-          fontWeight: DesignTokens.fontWeightMedium,
-          fontSize: DesignTokens.fontSizeM,
-        ),
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-      );
-    } else {
-      // Text fits in one line, use regular font size
-      return Text(
-        withEmojiShortcodes(title),
-        style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onSurface,
-          fontWeight: FontWeight.w500,
-          fontSize: DesignTokens.fontSizeL,
-        ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      );
-    }
   }
 
   List<Widget> _buildActions(BuildContext context) {
@@ -211,9 +136,6 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                 const SizedBox(width: DesignTokens.spacingM),
                 Text(
                   AppLocalizations.of(context)?.refresh ?? 'Refresh',
-                  style: textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                  ),
                 ),
               ],
             ),
@@ -235,9 +157,6 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
                     AppLocalizations.of(context)?.subscribe ?? 'Notifications',
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -256,9 +175,6 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                     widget.isClosed 
                         ? (AppLocalizations.of(context)?.unlock ?? 'Unlock')
                         : (AppLocalizations.of(context)?.lock ?? 'Lock'),
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -277,9 +193,6 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                     widget.isSticky 
                         ? (AppLocalizations.of(context)?.unstick ?? 'Unstick')
                         : (AppLocalizations.of(context)?.stick ?? 'Stick'),
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -298,9 +211,6 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
                     widget.isArchived ? 'Unarchive' : 'Archive',
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -319,9 +229,6 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
                     widget.isVisible ? 'Unlist topic' : 'List topic',
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -338,9 +245,6 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
                     AppLocalizations.of(context)!.renameTopic,
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -359,9 +263,6 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
                     AppLocalizations.of(context)!.moveToCategory,
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -379,9 +280,6 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
                     AppLocalizations.of(context)!.mergeIntoTopic,
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -417,9 +315,6 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
                     AppLocalizations.of(context)?.share ?? 'Share',
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -436,9 +331,6 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
                     AppLocalizations.of(context)?.viewOnWeb ?? 'View on Web',
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -504,53 +396,25 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   return AlertDialog(
                     title: Text(
                       widget.isClosed ? 'Unlock Topic' : 'Lock Topic',
-                      style: textTheme.titleLarge?.copyWith(
-                        color: colorScheme.onSurface,
-                      ),
                     ),
                     content: Text(
                       widget.isClosed
                           ? 'Are you sure you want to unlock this topic? Other users will be able to reply and interact with it again.'
                           : 'Are you sure you want to lock this topic? Other users will not be able to reply or interact with it.',
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: Text(
-                          AppLocalizations.of(context)!.cancel,
-                          style: textTheme.labelLarge?.copyWith(
-                            color: colorScheme.primary,
-                          ),
-                        ),
+                        child: Text(AppLocalizations.of(context)!.cancel),
                       ),
                       FilledButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                           widget.onClose?.call();
                         },
-                        style: FilledButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: DesignTokens.spacingXL,
-                            vertical: DesignTokens.spacingM,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(DesignTokens.radiusL),
-                          ),
-                          elevation: DesignTokens.elevationMedium,
-                        ),
-                        child: Text(
-                          widget.isClosed ? 'Unlock' : 'Lock',
-                          style: textTheme.labelLarge?.copyWith(
-                            color: colorScheme.onPrimary,
-                          ),
-                        ),
+                        child: Text(widget.isClosed ? 'Unlock' : 'Lock'),
                       ),
                     ],
                   );
@@ -564,53 +428,25 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   return AlertDialog(
                     title: Text(
                       widget.isSticky ? 'Unstick Topic' : 'Stick Topic',
-                      style: textTheme.titleLarge?.copyWith(
-                        color: colorScheme.primary,
-                      ),
                     ),
                     content: Text(
                       widget.isSticky
                           ? 'Are you sure you want to unstick this topic? It will no longer appear at the top of the forum.'
                           : 'Are you sure you want to stick this topic? It will appear at the top of the forum for all users.',
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: Text(
-                          AppLocalizations.of(context)!.cancel,
-                          style: textTheme.labelLarge?.copyWith(
-                            color: colorScheme.primary,
-                          ),
-                        ),
+                        child: Text(AppLocalizations.of(context)!.cancel),
                       ),
                       FilledButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                           widget.onSticky?.call();
                         },
-                        style: FilledButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: DesignTokens.spacingXL,
-                            vertical: DesignTokens.spacingM,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(DesignTokens.radiusL),
-                          ),
-                          elevation: DesignTokens.elevationMedium,
-                        ),
-                        child: Text(
-                          widget.isSticky ? 'Unstick' : 'Stick',
-                          style: textTheme.labelLarge?.copyWith(
-                            color: colorScheme.onPrimary,
-                          ),
-                        ),
+                        child: Text(widget.isSticky ? 'Unstick' : 'Stick'),
                       ),
                     ],
                   );
@@ -626,27 +462,16 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                     return AlertDialog(
                       title: Text(
                         AppLocalizations.of(context)!.undeleteTopic,
-                        style: textTheme.titleLarge?.copyWith(
-                          color: colorScheme.error,
-                        ),
                       ),
                       content: Text(
                         AppLocalizations.of(context)!.undeleteTopicConfirmation,
-                        style: textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
                       ),
                       actions: [
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
-                          child: Text(
-                            AppLocalizations.of(context)!.cancel,
-                            style: textTheme.labelLarge?.copyWith(
-                              color: colorScheme.primary,
-                            ),
-                          ),
+                          child: Text(AppLocalizations.of(context)!.cancel),
                         ),
                         FilledButton(
                           onPressed: () {
@@ -656,14 +481,6 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                           style: FilledButton.styleFrom(
                             backgroundColor: colorScheme.error,
                             foregroundColor: colorScheme.onError,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: DesignTokens.spacingXL,
-                              vertical: DesignTokens.spacingM,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(DesignTokens.radiusL),
-                            ),
-                            elevation: DesignTokens.elevationMedium,
                           ),
                           child: Text(
                             AppLocalizations.of(context)?.undelete ?? 'Undelete',
@@ -695,18 +512,12 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
     required String confirmLabel,
     required VoidCallback onConfirm,
   }) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     showDialog(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text(title,
-              style: textTheme.titleLarge
-                  ?.copyWith(color: colorScheme.onSurface)),
-          content: Text(body,
-              style: textTheme.bodyLarge
-                  ?.copyWith(color: colorScheme.onSurfaceVariant)),
+          title: Text(title),
+          content: Text(body),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),

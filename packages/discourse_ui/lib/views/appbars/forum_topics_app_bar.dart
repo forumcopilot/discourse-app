@@ -32,7 +32,6 @@ class ForumTopicsAppBar extends BaseForumAppBar {
   @override
   List<Widget> buildActions(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final actions = <Widget>[];
 
     // Check if we have any menu items to show (only if logged in)
@@ -68,7 +67,7 @@ class ForumTopicsAppBar extends BaseForumAppBar {
                   children: [
                     Icon(Icons.post_add_rounded, color: colorScheme.onSurfaceVariant),
                     const SizedBox(width: 12),
-                    Text(AppLocalizations.of(context)!.newTopic, style: textTheme.bodyLarge),
+                    Text(AppLocalizations.of(context)!.newTopic),
                   ],
                 ),
               ),
@@ -84,7 +83,6 @@ class ForumTopicsAppBar extends BaseForumAppBar {
                     const SizedBox(width: 12),
                     Text(
                       isSubscribed ? 'Unsubscribe' : 'Subscribe',
-                      style: textTheme.bodyLarge,
                     ),
                   ],
                 ),
@@ -96,7 +94,7 @@ class ForumTopicsAppBar extends BaseForumAppBar {
                   children: [
                     Icon(Icons.visibility_off_rounded, color: colorScheme.onSurfaceVariant),
                     const SizedBox(width: 12),
-                    Text(AppLocalizations.of(context)!.markRead, style: textTheme.bodyLarge),
+                    Text(AppLocalizations.of(context)!.markRead),
                   ],
                 ),
               ),

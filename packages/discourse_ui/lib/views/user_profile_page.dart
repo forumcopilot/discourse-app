@@ -138,13 +138,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: colorScheme.surface,
-        elevation: DesignTokens.elevationNone,
-        surfaceTintColor: colorScheme.surfaceTint,
-        iconTheme: IconThemeData(
-          color: colorScheme.onSurface,
-          size: DesignTokens.iconSizeL,
-        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.of(context).pop(),
@@ -156,15 +149,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ? const SizedBox.shrink() // Hide title when viewing another user's profile
                     : Text(
                         _userInfo!.username,
-                        style: textTheme.titleLarge?.copyWith(
-                          color: colorScheme.onSurface,
-                          fontWeight: DesignTokens.fontWeightBold,
-                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       )
                 : Text(AppLocalizations.of(context)?.userProfile ?? 'User Profile'),
-        centerTitle: true,
         actions: [
           if (_userInfo != null &&
               widget.siteContext.loginDataOutput != null &&
@@ -225,9 +213,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           _userInfo!.isIgnored
                               ? 'Unignore user'
                               : 'Ignore user',
-                          style: textTheme.titleMedium?.copyWith(
-                            color: colorScheme.onSurface,
-                          ),
                         ),
                       ],
                     ),
@@ -245,9 +230,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         const SizedBox(width: DesignTokens.spacingM),
                         Text(
                           _userInfo!.isBanned ? AppLocalizations.of(context)!.unbanUser : AppLocalizations.of(context)!.banUser,
-                          style: textTheme.titleMedium?.copyWith(
-                            color: colorScheme.onSurface,
-                          ),
                         ),
                       ],
                     ),
@@ -262,9 +244,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         const SizedBox(width: DesignTokens.spacingM),
                         Text(
                           AppLocalizations.of(context)!.deleteSpammer,
-                          style: textTheme.titleMedium?.copyWith(
-                            color: colorScheme.onSurface,
-                          ),
                         ),
                       ],
                     ),
@@ -309,18 +288,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           onPressed: _fetchUserInfo,
                           icon: const Icon(Icons.refresh_rounded),
                           label: Text(AppLocalizations.of(context)?.tryAgain ?? 'Try Again'),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: colorScheme.primary,
-                            foregroundColor: colorScheme.onPrimary,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: DesignTokens.spacingXL,
-                              vertical: DesignTokens.spacingM,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(DesignTokens.radiusL),
-                            ),
-                            elevation: DesignTokens.elevationMedium,
-                          ),
                         ),
                       ],
                     ),
@@ -451,9 +418,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
               return AlertDialog(
                 title: Text(
                   AppLocalizations.of(context)!.banUser,
-                  style: textTheme.titleLarge?.copyWith(
-                    color: colorScheme.onSurface,
-                  ),
                 ),
                 content: Form(
                   key: formKey,
@@ -517,10 +481,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(null),
-                    child: Text(
-                      AppLocalizations.of(context)!.cancel,
-                      style: TextStyle(color: colorScheme.onSurfaceVariant),
-                    ),
+                    child: Text(AppLocalizations.of(context)!.cancel),
                   ),
                   FilledButton(
                     onPressed: selectedReason == null
@@ -534,10 +495,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
                             Navigator.of(context).pop(reason);
                           },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
-                    ),
                     child: Text(AppLocalizations.of(context)?.next ?? 'Next'),
                   ),
                 ],
@@ -564,9 +521,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
               return AlertDialog(
                 title: Text(
                   AppLocalizations.of(context)!.banUser,
-                  style: textTheme.titleLarge?.copyWith(
-                    color: colorScheme.onSurface,
-                  ),
                 ),
                 content: SingleChildScrollView(
                   child: Column(
@@ -689,10 +643,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(null),
-                    child: Text(
-                      AppLocalizations.of(context)?.back ?? 'Back',
-                      style: TextStyle(color: colorScheme.onSurfaceVariant),
-                    ),
+                    child: Text(AppLocalizations.of(context)?.back ?? 'Back'),
                   ),
                   FilledButton(
                     onPressed: () {
@@ -763,15 +714,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ],
           ),
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-          ),
-          margin: DesignTokens.paddingS,
-          padding: EdgeInsets.symmetric(
-            horizontal: DesignTokens.spacingL,
-            vertical: DesignTokens.spacingM,
-          ),
           duration: const Duration(seconds: 30),
         ),
       );
@@ -815,15 +757,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
                 backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-                ),
-                margin: DesignTokens.paddingS,
-                padding: EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingL,
-                  vertical: DesignTokens.spacingM,
-                ),
                 duration: const Duration(seconds: 4),
               ),
             );
@@ -853,15 +786,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-                ),
-                margin: DesignTokens.paddingS,
-                padding: EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingL,
-                  vertical: DesignTokens.spacingM,
-                ),
                 duration: const Duration(seconds: 5),
               ),
             );
@@ -891,15 +815,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ],
               ),
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-              ),
-              margin: DesignTokens.paddingS,
-              padding: EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingL,
-                vertical: DesignTokens.spacingM,
-              ),
               duration: const Duration(seconds: 5),
             ),
           );
@@ -917,36 +832,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
-        final colorScheme = Theme.of(context).colorScheme;
-        final textTheme = Theme.of(context).textTheme;
 
         return AlertDialog(
           title: Text(
             AppLocalizations.of(context)!.unbanUser,
-            style: textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-            ),
           ),
           content: Text(
             AppLocalizations.of(context)!.unbanUserConfirmation(_userInfo!.username),
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface,
-            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(
-                AppLocalizations.of(context)!.cancel,
-                style: TextStyle(color: colorScheme.onSurfaceVariant),
-              ),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-              ),
               child: Text(AppLocalizations.of(context)?.unban ?? 'Unban'),
             ),
           ],
@@ -981,15 +881,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ],
         ),
         backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-        ),
-        margin: DesignTokens.paddingS,
-        padding: EdgeInsets.symmetric(
-          horizontal: DesignTokens.spacingL,
-          vertical: DesignTokens.spacingM,
-        ),
         duration: const Duration(seconds: 30),
       ),
     );
@@ -1027,15 +918,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ],
               ),
               backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-              ),
-              margin: DesignTokens.paddingS,
-              padding: EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingL,
-                vertical: DesignTokens.spacingM,
-              ),
               duration: const Duration(seconds: 4),
             ),
           );
@@ -1066,15 +948,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ],
               ),
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-              ),
-              margin: DesignTokens.paddingS,
-              padding: EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingL,
-                vertical: DesignTokens.spacingM,
-              ),
               duration: const Duration(seconds: 5),
             ),
           );
@@ -1104,12 +977,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ],
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            margin: const EdgeInsets.all(8),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             duration: const Duration(seconds: 5),
           ),
         );

@@ -477,8 +477,6 @@ class _ConversationAttachmentActions {
                 ),
           ),
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(8),
         ),
       );
       return;
@@ -506,8 +504,6 @@ class _ConversationAttachmentActions {
               ),
         ),
         backgroundColor: Theme.of(context).colorScheme.errorContainer,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(8),
       ),
     );
   }

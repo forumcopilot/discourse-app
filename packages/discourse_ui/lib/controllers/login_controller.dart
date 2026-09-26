@@ -1310,9 +1310,6 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
       String message, ColorScheme colorScheme) async {
     await Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
         title: Row(
           children: [
             Icon(
@@ -1324,44 +1321,21 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
             Expanded(
               child: Text(
                 AppLocalizations.of(Get.context!)!.loginInfo,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
-                ),
               ),
             ),
           ],
         ),
         content: Text(
           message,
-          style: TextStyle(
-            color: colorScheme.onSurfaceVariant,
-            height: 1.4,
-          ),
         ),
         actions: [
           FilledButton(
             onPressed: () {
               Get.back();
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(
-              'OK',
-              style: TextStyle(
-                color: colorScheme.onPrimary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            child: Text('OK'),
           ),
         ],
-        backgroundColor: colorScheme.surface,
         elevation: 8,
       ),
     );
@@ -1371,9 +1345,6 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
       String message, ColorScheme colorScheme) async {
     await Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
         title: Row(
           children: [
             Icon(
@@ -1385,44 +1356,21 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
             Expanded(
               child: Text(
                 AppLocalizations.of(Get.context!)!.loginFailed,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
-                ),
               ),
             ),
           ],
         ),
         content: Text(
           message,
-          style: TextStyle(
-            color: colorScheme.onSurfaceVariant,
-            height: 1.4,
-          ),
         ),
         actions: [
           FilledButton(
             onPressed: () {
               Get.back();
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(
-              'OK',
-              style: TextStyle(
-                color: colorScheme.onPrimary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            child: Text('OK'),
           ),
         ],
-        backgroundColor: colorScheme.surface,
         elevation: 8,
       ),
     );

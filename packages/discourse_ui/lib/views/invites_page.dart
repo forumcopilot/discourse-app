@@ -154,9 +154,7 @@ class _InvitesPageState extends State<InvitesPage> {
               children: [
                 Text(
                   AppLocalizations.of(context)!.inviteLinkCreated,
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: DesignTokens.fontWeightSemiBold,
-                  ),
+                  style: textTheme.titleMedium,
                 ),
                 if (invite.expiresAt != null) ...[
                   SizedBox(height: DesignTokens.spacingXS),

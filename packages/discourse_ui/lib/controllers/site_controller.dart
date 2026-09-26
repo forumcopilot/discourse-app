@@ -486,31 +486,20 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
         final textTheme = Theme.of(dialogContext).textTheme;
 
         return AlertDialog(
-          backgroundColor: colorScheme.surface,
           title: Text(
             title,
-            style: textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.w600,
-            ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                message,
-                style: textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurface,
-                ),
-              ),
+              Text(message),
               if (showDetailedError) ...[
                 const SizedBox(height: 8),
                 Text(
                   error,
-                  style: textTheme.bodyMedium?.copyWith(
+                  style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.error,
-                    fontSize: 12,
                   ),
                 ),
               ],
@@ -521,12 +510,7 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
               onPressed: () {
                 Navigator.of(dialogContext).pop();
               },
-              child: Text(
-                'OK',
-                style: textTheme.labelLarge?.copyWith(
-                  color: colorScheme.primary,
-                ),
-              ),
+              child: Text('OK'),
             ),
           ],
         );

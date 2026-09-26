@@ -54,10 +54,6 @@ class ReactionUsersSheet extends StatefulWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(DesignTokens.radiusL)),
-      ),
       builder: (sheetContext) => ReactionUsersSheet(
         siteContext: siteContext,
         postId: postId,
@@ -191,9 +187,11 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
       expand: false,
       builder: (context, scrollController) {
         return Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: DesignTokens.spacingL,
-            horizontal: DesignTokens.spacingL,
+          padding: const EdgeInsets.fromLTRB(
+            DesignTokens.spacingL,
+            0,
+            DesignTokens.spacingL,
+            DesignTokens.spacingL,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

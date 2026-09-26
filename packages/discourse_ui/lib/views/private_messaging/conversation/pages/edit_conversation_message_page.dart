@@ -71,7 +71,6 @@ class _EditConversationMessagePageState extends State<EditConversationMessagePag
             SnackBar(
               content: Text(errorMessage ?? 'Failed to save message'),
               backgroundColor: Theme.of(context).colorScheme.error,
-              behavior: SnackBarBehavior.floating,
             ),
           );
         }
@@ -83,7 +82,6 @@ class _EditConversationMessagePageState extends State<EditConversationMessagePag
           SnackBar(
             content: Text(AppLocalizations.of(context)?.messageUpdatedSuccessfully ?? 'Message updated successfully'),
             backgroundColor: Theme.of(context).colorScheme.primary,
-            behavior: SnackBarBehavior.floating,
           ),
         );
         // Dismiss keyboard before navigating back
@@ -98,7 +96,6 @@ class _EditConversationMessagePageState extends State<EditConversationMessagePag
           SnackBar(
             content: Text('${AppLocalizations.of(context)?.error ?? 'Error'}: ${e.toString()}'),
             backgroundColor: Theme.of(context).colorScheme.error,
-            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -137,7 +134,6 @@ class _EditConversationMessagePageState extends State<EditConversationMessagePag
             SnackBar(
               content: Text(errorMessage ?? 'Failed to remove attachment. Please check your permissions.'),
               backgroundColor: Theme.of(context).colorScheme.error,
-              behavior: SnackBarBehavior.floating,
             ),
           );
         }
@@ -149,7 +145,6 @@ class _EditConversationMessagePageState extends State<EditConversationMessagePag
           SnackBar(
             content: Text(AppLocalizations.of(context)?.failedToRemoveAttachment(e.toString()) ?? 'Failed to remove attachment: ${e.toString()}'),
             backgroundColor: Theme.of(context).colorScheme.error,
-            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -183,9 +178,7 @@ class _EditConversationMessagePageState extends State<EditConversationMessagePag
                     color: Theme.of(context).colorScheme.onErrorContainer,
                   ),
             ),
-            behavior: SnackBarBehavior.floating,
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            margin: const EdgeInsets.all(8),
           ),
         );
       }

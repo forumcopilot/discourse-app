@@ -75,24 +75,7 @@ class NotSignedInView extends StatelessWidget {
                     onPressed: () {
                       Get.to(() => LoginPage(siteContext: siteContext));
                     },
-                    style: FilledButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: DesignTokens.spacingXL,
-                        vertical: DesignTokens.spacingM,
-                      ),
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                      ),
-                    ),
-                    child: Text(
-                      AppLocalizations.of(context)!.loginTitle,
-                      style: textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: DesignTokens.fontWeightBold,
-                      ),
-                    ),
+                    child: Text(AppLocalizations.of(context)!.loginTitle),
                   ),
                 ),
                 SizedBox(width: DesignTokens.spacingM),
@@ -101,27 +84,8 @@ class NotSignedInView extends StatelessWidget {
                     onPressed: () {
                       UrlUtils.openUrl('${siteContext.site.url}/signup');
                     },
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: DesignTokens.spacingXL,
-                        vertical: DesignTokens.spacingM,
-                      ),
-                      foregroundColor: colorScheme.primary,
-                      side: BorderSide(
-                        color: colorScheme.primary,
-                        width: DesignTokens.borderWidthMedium,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(DesignTokens.radiusM),
-                      ),
-                    ),
                     child: Text(
                       AppLocalizations.of(context)?.register ?? 'Register',
-                      style: textTheme.titleMedium?.copyWith(
-                        color: colorScheme.primary,
-                        fontWeight: DesignTokens.fontWeightBold,
-                      ),
                     ),
                   ),
                 ),

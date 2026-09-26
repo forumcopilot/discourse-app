@@ -587,35 +587,20 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
   }
 
   void _showErrorDialog(BuildContext context, String message) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: colorScheme.surface,
           title: Text(
             AppLocalizations.of(context)?.errorTitle ?? 'Error',
-            style: textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: DesignTokens.fontWeightSemiBold,
-            ),
           ),
           content: Text(
             message,
-            style: textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(
-                'OK',
-                style: textTheme.labelLarge?.copyWith(
-                  color: colorScheme.primary,
-                ),
-              ),
+              child: Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },

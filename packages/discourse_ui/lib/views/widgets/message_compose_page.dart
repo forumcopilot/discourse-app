@@ -327,9 +327,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                 .textTheme
                 .bodyMedium
                 ?.copyWith(color: scheme.onErrorContainer)),
-        behavior: SnackBarBehavior.floating,
         backgroundColor: scheme.errorContainer,
-        margin: const EdgeInsets.all(DesignTokens.spacingS),
       ),
     );
   }
@@ -345,10 +343,8 @@ class _MessageComposePageState extends State<MessageComposePage> {
                 .textTheme
                 .bodyMedium
                 ?.copyWith(color: scheme.onSurfaceVariant)),
-        behavior: SnackBarBehavior.floating,
         backgroundColor: scheme.surfaceContainerHighest,
         duration: const Duration(seconds: 5),
-        margin: const EdgeInsets.all(DesignTokens.spacingS),
       ),
     );
   }
@@ -415,9 +411,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       color: Theme.of(context).colorScheme.onErrorContainer,
                     ),
               ),
-              behavior: SnackBarBehavior.floating,
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              margin: const EdgeInsets.all(DesignTokens.spacingS),
             ),
           );
         }
@@ -460,9 +454,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                           color: Theme.of(context).colorScheme.onErrorContainer,
                         ),
                   ),
-                  behavior: SnackBarBehavior.floating,
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                 ),
               );
             }
@@ -515,8 +507,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                         ),
                   ),
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                   duration: const Duration(seconds: 4),
                 ),
               );
@@ -547,8 +537,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       ),
                 ),
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                behavior: SnackBarBehavior.floating,
-                margin: const EdgeInsets.all(DesignTokens.spacingS),
                 duration: const Duration(seconds: 4),
               ),
             );
@@ -566,8 +554,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(DesignTokens.spacingS),
           ),
         );
       }
@@ -594,9 +580,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       color: Theme.of(context).colorScheme.onErrorContainer,
                     ),
               ),
-              behavior: SnackBarBehavior.floating,
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              margin: const EdgeInsets.all(DesignTokens.spacingS),
             ),
           );
         }
@@ -632,9 +616,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
               ),
-              behavior: SnackBarBehavior.floating,
               backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-              margin: const EdgeInsets.all(DesignTokens.spacingS),
             ),
           );
         }
@@ -658,9 +640,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                   ),
-                  behavior: SnackBarBehavior.floating,
                   backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                 ),
               );
             }
@@ -687,9 +667,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                             color: Theme.of(context).colorScheme.onErrorContainer,
                           ),
                     ),
-                    behavior: SnackBarBehavior.floating,
                     backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                    margin: const EdgeInsets.all(DesignTokens.spacingS),
                   ),
                 );
               }
@@ -740,8 +718,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                           ),
                     ),
                     backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                    behavior: SnackBarBehavior.floating,
-                    margin: const EdgeInsets.all(DesignTokens.spacingS),
                     duration: const Duration(seconds: 4),
                   ),
                 );
@@ -770,8 +746,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                         ),
                   ),
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.all(DesignTokens.spacingS),
                   duration: const Duration(seconds: 4),
                 ),
               );
@@ -790,8 +764,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(DesignTokens.spacingS),
           ),
         );
       }
@@ -884,8 +856,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(DesignTokens.spacingS),
           ),
         );
       }
@@ -1270,8 +1240,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                 ),
           ),
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(DesignTokens.spacingS),
         ),
       );
       return;
@@ -1287,8 +1255,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                 ),
           ),
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(DesignTokens.spacingS),
         ),
       );
       return;
@@ -1307,8 +1273,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                 ),
           ),
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(DesignTokens.spacingS),
         ),
       );
       return;
@@ -1373,12 +1337,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                 ],
               ),
               backgroundColor: colorScheme.errorContainer,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-              ),
-              margin: DesignTokens.paddingS,
-              padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
               duration: const Duration(seconds: 4),
               action: SnackBarAction(
                 label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -1402,7 +1360,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
 
   Widget _buildBottomToolbar() {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     return Container(
       decoration: BoxDecoration(
@@ -1488,7 +1445,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_bold, size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.bold ?? 'Bold', style: textTheme.bodyMedium),
+                        Text(AppLocalizations.of(context)?.bold ?? 'Bold'),
                       ],
                     ),
                   ),
@@ -1498,7 +1455,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_italic, size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.italic ?? 'Italic', style: textTheme.bodyMedium),
+                        Text(AppLocalizations.of(context)?.italic ?? 'Italic'),
                       ],
                     ),
                   ),
@@ -1508,7 +1465,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_underline, size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.underline ?? 'Underline', style: textTheme.bodyMedium),
+                        Text(AppLocalizations.of(context)?.underline ?? 'Underline'),
                       ],
                     ),
                   ),
@@ -1518,7 +1475,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.strikethrough_s, size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.strikethrough ?? 'Strikethrough', style: textTheme.bodyMedium),
+                        Text(AppLocalizations.of(context)?.strikethrough ?? 'Strikethrough'),
                       ],
                     ),
                   ),
@@ -1530,7 +1487,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.link, size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.link ?? 'Link', style: textTheme.bodyMedium),
+                        Text(AppLocalizations.of(context)?.link ?? 'Link'),
                       ],
                     ),
                   ),
@@ -1540,7 +1497,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.image, size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.image ?? 'Image', style: textTheme.bodyMedium),
+                        Text(AppLocalizations.of(context)?.image ?? 'Image'),
                       ],
                     ),
                   ),
@@ -1550,7 +1507,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.videocam, size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.video ?? 'Video', style: textTheme.bodyMedium),
+                        Text(AppLocalizations.of(context)?.video ?? 'Video'),
                       ],
                     ),
                   ),
@@ -1562,7 +1519,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_quote, size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.quote ?? 'Quote', style: textTheme.bodyMedium),
+                        Text(AppLocalizations.of(context)?.quote ?? 'Quote'),
                       ],
                     ),
                   ),
@@ -1572,7 +1529,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.code, size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.code ?? 'Code', style: textTheme.bodyMedium),
+                        Text(AppLocalizations.of(context)?.code ?? 'Code'),
                       ],
                     ),
                   ),
@@ -1582,7 +1539,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.visibility_off, size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.spoiler ?? 'Spoiler', style: textTheme.bodyMedium),
+                        Text(AppLocalizations.of(context)?.spoiler ?? 'Spoiler'),
                       ],
                     ),
                   ),
@@ -1594,7 +1551,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_list_bulleted, size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.bulletList ?? 'Bullet List', style: textTheme.bodyMedium),
+                        Text(AppLocalizations.of(context)?.bulletList ?? 'Bullet List'),
                       ],
                     ),
                   ),
@@ -1604,7 +1561,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_list_numbered, size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.numberedList ?? 'Numbered List', style: textTheme.bodyMedium),
+                        Text(AppLocalizations.of(context)?.numberedList ?? 'Numbered List'),
                       ],
                     ),
                   ),
@@ -1614,7 +1571,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.subdirectory_arrow_right, size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.listItem ?? 'List Item', style: textTheme.bodyMedium),
+                        Text(AppLocalizations.of(context)?.listItem ?? 'List Item'),
                       ],
                     ),
                   ),
@@ -1678,17 +1635,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
             ? AppBar(
                 title: Text(
                   widget.title,
-                  style: textTheme.titleLarge?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: DesignTokens.fontWeightMedium,
-                  ),
-                ),
-                backgroundColor: colorScheme.surface,
-                elevation: 3,
-                shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
-                surfaceTintColor: colorScheme.surfaceTint,
-                iconTheme: IconThemeData(
-                  color: colorScheme.onSurface,
                 ),
                 leading: Builder(
                   builder: (context) => IconButton(

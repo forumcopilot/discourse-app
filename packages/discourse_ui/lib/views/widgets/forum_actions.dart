@@ -47,8 +47,6 @@ class ForumActions {
                   ),
                 ),
                 backgroundColor: theme.colorScheme.inverseSurface,
-                behavior: SnackBarBehavior.floating,
-                margin: const EdgeInsets.all(8),
                 duration: const Duration(seconds: 2),
               ),
             );

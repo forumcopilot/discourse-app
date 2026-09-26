@@ -969,14 +969,8 @@ class _PostListItemState extends State<PostListItem> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusL),
-              ),
               title: Text(
                 AppLocalizations.of(context)?.replyOptions ?? 'Reply Options',
-                style: textTheme.titleLarge?.copyWith(
-                  color: colorScheme.onSurface,
-                ),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1344,10 +1338,6 @@ class _PostListItemState extends State<PostListItem> {
     final colorScheme = Theme.of(context).colorScheme;
     final action = await showModalBottomSheet<String>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(DesignTokens.radiusL)),
-      ),
       builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,

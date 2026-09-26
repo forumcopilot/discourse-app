@@ -8,7 +8,6 @@ import '../search_page.dart';
 import '../users_directory_page.dart';
 import '../login_page.dart';
 import '../widgets/forum_actions.dart';
-import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:discourse_ui/utils/url_utils.dart';
 
 class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -27,10 +26,6 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
     final siteController = Get.isRegistered<DiscourseSiteController>() ? Get.find<DiscourseSiteController>() : Get.put(DiscourseSiteController());
 
     return AppBar(
-      backgroundColor: colorScheme.surface,
-      elevation: 3,
-      shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
-      surfaceTintColor: colorScheme.surfaceTint,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_rounded),
         onPressed: () => Navigator.of(context).maybePop(),
@@ -46,11 +41,6 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
           children: [
             Text(
               forumName,
-              style: textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w500,
-                fontSize: DesignTokens.fontSizeL,
-              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -59,7 +49,6 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
                 domain,
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
-                  fontSize: DesignTokens.fontSizeXS,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -67,7 +56,6 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
           ],
         );
       }),
-      centerTitle: false,
       actions: [
         if (isLoggedIn) _buildSearchButton(context, colorScheme),
         if (isLoggedIn) _buildMembersButton(context, colorScheme),
@@ -146,7 +134,7 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
         children: [
           Icon(icon, color: color),
           const SizedBox(width: 12),
-          Text(label, style: textTheme.bodyLarge?.copyWith(color: isDestructive ? colorScheme.error : null)),
+          Text(label, style: isDestructive ? TextStyle(color: colorScheme.error) : null),
         ],
       ),
     );

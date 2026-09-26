@@ -49,9 +49,7 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
           ),
-          behavior: SnackBarBehavior.floating,
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          margin: const EdgeInsets.all(8),
           duration: const Duration(seconds: 3),
         ),
       );
@@ -107,9 +105,7 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
           ),
-          behavior: SnackBarBehavior.floating,
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          margin: const EdgeInsets.all(8),
           duration: const Duration(seconds: 3),
         ),
       );

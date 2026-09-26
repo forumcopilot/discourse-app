@@ -63,14 +63,7 @@ void showErrorDialog(String errorMessage) {
     final l10n = context != null ? AppLocalizations.of(context) : null;
     Get.dialog(
       AlertDialog(
-        backgroundColor: Get.theme.colorScheme.surface,
-        title: Text(
-          l10n?.errorTitle ?? "Error",
-          style: TextStyle(
-            color: Get.theme.colorScheme.error,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        title: Text(l10n?.errorTitle ?? "Error"),
         content: Padding(
           padding: DesignTokens.paddingS,
           child: Column(
@@ -79,9 +72,6 @@ void showErrorDialog(String errorMessage) {
               SelectableText(
                 errorMessage,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Get.theme.colorScheme.onSurface,
-                ),
               ),
               if (kDebugMode) ...[
                 const SizedBox(height: 16),
@@ -90,12 +80,7 @@ void showErrorDialog(String errorMessage) {
                     Icons.copy_rounded,
                     color: Get.theme.colorScheme.onPrimary,
                   ),
-                  label: Text(
-                    l10n?.copyToClipboard ?? "Copy to Clipboard",
-                    style: TextStyle(
-                      color: Get.theme.colorScheme.onPrimary,
-                    ),
-                  ),
+                  label: Text(l10n?.copyToClipboard ?? "Copy to Clipboard"),
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: errorMessage));
                     // Defer snackbar to next frame as well, for safety
@@ -121,12 +106,7 @@ void showErrorDialog(String errorMessage) {
             onPressed: () {
               Get.back(); // Close the dialog
             },
-            child: Text(
-              l10n?.okButton ?? "OK",
-              style: TextStyle(
-                color: Get.theme.colorScheme.primary,
-              ),
-            ),
+            child: Text(l10n?.okButton ?? "OK"),
           ),
         ],
       ),

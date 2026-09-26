@@ -17,9 +17,6 @@ Future<void> showBadgeDetailSheet(BuildContext context, FCBadge badge) {
   return showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-    ),
     builder: (sheetContext) => BadgeDetailSheet(badge: badge),
   );
 }

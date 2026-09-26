@@ -221,8 +221,6 @@ class _LoginPageState extends State<LoginPage> {
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => _popBack(),
         ),
-        backgroundColor: colorScheme.surface,
-        elevation: 0,
       ),
       body: const Center(child: CircularProgressIndicator()),
     );

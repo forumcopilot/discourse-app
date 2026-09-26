@@ -283,9 +283,7 @@ class _ForumTopicListState extends State<ForumTopicList> {
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
           ),
-          behavior: SnackBarBehavior.floating,
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          margin: const EdgeInsets.all(8),
           duration: const Duration(seconds: 3),
         ),
       );
@@ -336,18 +334,6 @@ class _ForumTopicListState extends State<ForumTopicList> {
             SizedBox(height: DesignTokens.spacingL),
             FilledButton(
               onPressed: _loadTopics,
-              style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-                padding: EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingXL,
-                  vertical: DesignTokens.spacingM,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusL),
-                ),
-                elevation: DesignTokens.elevationMedium,
-              ),
               child: Text(AppLocalizations.of(context)?.retry ?? 'Retry'),
             ),
           ],

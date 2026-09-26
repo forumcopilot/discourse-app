@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../theme/design_tokens.dart';
 
 /// Shared helper for the project's three canonical snackbar styles —
 /// error / info / success. Use these instead of building `SnackBar`
@@ -93,8 +92,6 @@ class SnackbarHelper {
               ?.copyWith(color: foregroundColor),
         ),
         backgroundColor: backgroundColor,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(DesignTokens.spacingS),
         action: action,
         duration: duration ?? const Duration(seconds: 4),
       ),

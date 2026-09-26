@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 
@@ -84,9 +86,14 @@ class ActivityChipBar extends StatelessWidget {
   final ActivityTab selected;
   final ValueChanged<ActivityTab> onSelected;
 
-  /// Chip height plus the bar's own padding. Fixed because a pinned
-  /// sliver has to declare its extent up front.
-  static const double height = 64;
+  /// The bar's height at [scaler]: [FilterChipBar]'s 8dp above and below a
+  /// chip's 48dp touch target, or the chip itself (12dp of padding around a
+  /// 20dp label line) once a large text size makes it taller than that. A
+  /// pinned sliver has to declare its extent up front, so it is worked out
+  /// rather than measured; a fixed 64 clipped the chips at larger sizes.
+  static double heightFor(TextScaler scaler) =>
+      2 * DesignTokens.spacingS +
+      math.max(kMinInteractiveDimension, 12 + scaler.scale(20));
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +102,7 @@ class ActivityChipBar extends StatelessWidget {
       // Opaque: pinned, it scrolls *over* the feed, and a transparent bar
       // would show rows sliding underneath the chips.
       color: Theme.of(context).colorScheme.surface,
-      height: height,
+      height: heightFor(MediaQuery.textScalerOf(context)),
       alignment: Alignment.centerLeft,
       child: FilterChipBar(
         options: [
@@ -103,10 +110,6 @@ class ActivityChipBar extends StatelessWidget {
         ],
         selectedIndex: tabs.indexOf(selected),
         onSelected: (i) => onSelected(tabs[i]),
-        padding: EdgeInsets.symmetric(
-          horizontal: DesignTokens.spacingL,
-          vertical: DesignTokens.spacingM,
-        ),
       ),
     );
   }
@@ -121,16 +124,20 @@ class ActivityChipBarDelegate extends SliverPersistentHeaderDelegate {
   const ActivityChipBarDelegate({
     required this.selected,
     required this.onSelected,
+    required this.textScaler,
   });
 
   final ActivityTab selected;
   final ValueChanged<ActivityTab> onSelected;
 
-  @override
-  double get minExtent => ActivityChipBar.height;
+  /// The reader's text scale, which sets the bar's height.
+  final TextScaler textScaler;
 
   @override
-  double get maxExtent => ActivityChipBar.height;
+  double get minExtent => ActivityChipBar.heightFor(textScaler);
+
+  @override
+  double get maxExtent => ActivityChipBar.heightFor(textScaler);
 
   @override
   Widget build(
@@ -145,7 +152,9 @@ class ActivityChipBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(ActivityChipBarDelegate oldDelegate) =>
-      oldDelegate.selected != selected || oldDelegate.onSelected != onSelected;
+      oldDelegate.selected != selected ||
+      oldDelegate.onSelected != onSelected ||
+      oldDelegate.textScaler != textScaler;
 }
 
 /// The feed for the selected tab.

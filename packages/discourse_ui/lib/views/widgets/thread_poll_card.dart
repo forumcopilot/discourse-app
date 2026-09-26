@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
 import '../../l10n/generated/app_localizations.dart';
+import 'sheet_title.dart';
 import 'user_avatar.dart';
 
 /// Twitter/X-style poll card shown at the top of a thread when the thread has a poll.
@@ -76,11 +77,6 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-            behavior: SnackBarBehavior.floating,
-            margin: DesignTokens.paddingS,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -124,11 +120,6 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-            behavior: SnackBarBehavior.floating,
-            margin: DesignTokens.paddingS,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -154,9 +145,6 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (_) => _PollVotersSheet(
         proxy: proxy,
         postId: postId,
@@ -176,11 +164,6 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
               ),
         ),
         backgroundColor: Theme.of(context).colorScheme.errorContainer,
-        behavior: SnackBarBehavior.floating,
-        margin: DesignTokens.paddingS,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-        ),
         duration: const Duration(seconds: 4),
       ),
     );
@@ -261,9 +244,6 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
                     : Text(l10n.vote),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(double.infinity, 44),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-                  ),
                 ),
               ),
               SizedBox(height: DesignTokens.spacingS),
@@ -559,21 +539,7 @@ class _PollVotersSheetState extends State<_PollVotersSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                DesignTokens.spacingL,
-                DesignTokens.spacingM,
-                DesignTokens.spacingL,
-                DesignTokens.spacingS,
-              ),
-              child: Text(
-                AppLocalizations.of(context)!.voters,
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            const Divider(height: 1),
+            SheetTitle(AppLocalizations.of(context)!.voters),
             if (_loading)
               const Padding(
                 padding: EdgeInsets.all(DesignTokens.spacingXL),

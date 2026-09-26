@@ -153,17 +153,7 @@ class _UserSearchPageState extends State<UserSearchPage> {
       appBar: AppBar(
         title: Text(
           AppLocalizations.of(context)!.searchUser,
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: DesignTokens.fontWeightMedium,
-          ),
         ),
-        backgroundColor: colorScheme.surface,
-        elevation: DesignTokens.elevationMedium,
-        shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
-        surfaceTintColor: colorScheme.surfaceTint,
-        iconTheme: IconThemeData(color: colorScheme.onSurface),
-        centerTitle: true,
       ),
       body: Column(
         children: [

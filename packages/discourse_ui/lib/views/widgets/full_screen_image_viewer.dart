@@ -86,8 +86,6 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
                     ),
               ),
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              behavior: SnackBarBehavior.floating,
-              margin: const EdgeInsets.all(8),
               duration: const Duration(seconds: 2),
             ),
           );
@@ -130,8 +128,6 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
             backgroundColor: result.isSuccess
                 ? Theme.of(context).colorScheme.inverseSurface
                 : Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(8),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -147,8 +143,6 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
                     ),
               ),
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              behavior: SnackBarBehavior.floating,
-              margin: const EdgeInsets.all(8),
               duration: const Duration(seconds: 3),
             ),
           );

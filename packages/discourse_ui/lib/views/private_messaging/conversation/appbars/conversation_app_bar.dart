@@ -132,16 +132,12 @@ class ConversationAppBar extends BaseForumAppBar {
                   Icon(
                     onArchive != null ? Icons.archive_outlined : Icons.move_to_inbox_outlined,
                     color: colorScheme.onSurface,
-                    size: 20,
                   ),
                   const SizedBox(width: 12),
                   Text(
                     onArchive != null
                         ? AppLocalizations.of(context)!.archiveMessage
                         : AppLocalizations.of(context)!.moveToInbox,
-                    style: TextStyle(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -155,14 +151,10 @@ class ConversationAppBar extends BaseForumAppBar {
                   Icon(
                     Icons.edit_outlined,
                     color: colorScheme.onSurface,
-                    size: 20,
                   ),
                   const SizedBox(width: 12),
                   Text(
                     AppLocalizations.of(context)!.editConversation,
-                    style: TextStyle(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -176,14 +168,10 @@ class ConversationAppBar extends BaseForumAppBar {
                   Icon(
                     Icons.lock_outline,
                     color: colorScheme.onSurface,
-                    size: 20,
                   ),
                   const SizedBox(width: 12),
                   Text(
                     AppLocalizations.of(context)!.closeConversation,
-                    style: TextStyle(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -196,14 +184,10 @@ class ConversationAppBar extends BaseForumAppBar {
                   Icon(
                     Icons.lock_open_outlined,
                     color: colorScheme.onSurface,
-                    size: 20,
                   ),
                   const SizedBox(width: 12),
                   Text(
                     AppLocalizations.of(context)!.openConversation,
-                    style: TextStyle(
-                      color: colorScheme.onSurface,
-                    ),
                   ),
                 ],
               ),
@@ -219,7 +203,6 @@ class ConversationAppBar extends BaseForumAppBar {
                   Icon(
                     Icons.exit_to_app_rounded,
                     color: colorScheme.error,
-                    size: 20,
                   ),
                   const SizedBox(width: 12),
                   Text(
@@ -248,9 +231,6 @@ class ConversationAppBar extends BaseForumAppBar {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(DesignTokens.radiusL)),
-      ),
       builder: (context) {
         return DraggableScrollableSheet(
           initialChildSize: 0.4,
@@ -259,7 +239,7 @@ class ConversationAppBar extends BaseForumAppBar {
           expand: false,
           builder: (context, scrollController) {
             return Container(
-              padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingL, horizontal: DesignTokens.spacingL),
+              padding: const EdgeInsets.fromLTRB(DesignTokens.spacingL, 0, DesignTokens.spacingL, DesignTokens.spacingL),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,

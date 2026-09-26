@@ -280,17 +280,11 @@ class _TFAInputDialogState extends State<TFAInputDialog> {
       appBar: AppBar(
         title: Text(
           l10n?.twoFactorAuthentication ?? 'Two-Factor Authentication',
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: DesignTokens.fontWeightBold,
-          ),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => Get.back(),
         ),
-        backgroundColor: colorScheme.surface,
-        elevation: 0,
       ),
       backgroundColor: colorScheme.surface,
       body: GestureDetector(
@@ -595,19 +589,6 @@ class _TFAInputDialogState extends State<TFAInputDialog> {
                             constraints: const BoxConstraints(maxWidth: 560),
                             child: FilledButton(
                               onPressed: _handleSubmit,
-                              style: FilledButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: DesignTokens.spacingL,
-                                ),
-                                backgroundColor: colorScheme.primary,
-                                foregroundColor: colorScheme.onPrimary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    DesignTokens.radiusL,
-                                  ),
-                                ),
-                                elevation: DesignTokens.elevationMedium,
-                              ),
                               child: Text(
                                 actionLabel,
                                 style: StyleBuilders.titleTextStyle(

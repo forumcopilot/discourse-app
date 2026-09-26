@@ -128,15 +128,17 @@ class AppTheme {
         : Colors.black;
   }
 
+  /// Material 3's defaults wherever the spec has one. Screens take their
+  /// look from here instead of restyling each component, which is how the
+  /// app bars, dialogs and sheets had drifted into several looks each.
   static ThemeData _build(ColorScheme colorScheme, ForumColors forumColors) {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
       extensions: [forumColors],
-      appBarTheme: AppBarTheme(
-        centerTitle: true,
-        elevation: DesignTokens.elevationNone,
-      ),
+      // Small top app bar: titleLarge, aligned to the start, flat until
+      // content scrolls under it.
+      appBarTheme: const AppBarTheme(centerTitle: false),
       // Floating buttons (New Topic, New Message) in the forum's accent —
       // its buttons' colour on the web — not Material's tonal container.
       floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -148,45 +150,15 @@ class AppTheme {
         elevation: DesignTokens.elevationMedium,
         borderRadius: DesignTokens.radiusM,
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: StyleBuilders.elevatedButtonStyle(
-          colorScheme: colorScheme,
-          elevation: DesignTokens.elevationNone,
-          borderRadius: DesignTokens.radiusS,
-        ),
-      ),
-      textButtonTheme: TextButtonThemeData(
-        style: StyleBuilders.textButtonStyle(
-          colorScheme: colorScheme,
-          borderRadius: DesignTokens.radiusS,
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-        ),
+      // Outlined text field: 4dp corners and 56dp high (see paddingInput).
+      inputDecorationTheme: const InputDecorationTheme(
+        border: OutlineInputBorder(),
         contentPadding: DesignTokens.paddingInput,
       ),
-      dialogTheme: DialogThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-        ),
-        titleTextStyle: TextStyle(
-          fontSize: DesignTokens.fontSizeL,
-          fontWeight: DesignTokens.fontWeightBold,
-          color: colorScheme.onSurface,
-        ),
-        contentTextStyle: TextStyle(
-          fontSize: DesignTokens.fontSizeM,
-          color: colorScheme.onSurface,
-        ),
-      ),
-      bottomSheetTheme: BottomSheetThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(DesignTokens.radiusM),
-          ),
-        ),
+      // Sheets keep M3's 28dp top corners and get its drag handle.
+      bottomSheetTheme: const BottomSheetThemeData(showDragHandle: true),
+      snackBarTheme: const SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }

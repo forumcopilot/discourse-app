@@ -12,7 +12,6 @@ import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.d
 import 'package:get/get.dart';
 import 'package:discourse_core/discourse_core.dart';
 import '../theme/design_tokens.dart';
-import '../theme/style_builders.dart';
 import 'appbars/inbox_tab_app_bar.dart';
 import 'appbars/forum_app_bar.dart';
 import 'appbars/topics_tab_app_bar.dart';
@@ -509,17 +508,11 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final colorScheme = Theme.of(context).colorScheme;
         final textTheme = Theme.of(context).textTheme;
 
         return AlertDialog(
-          backgroundColor: colorScheme.surface,
           title: Text(
             AppLocalizations.of(context)!.connectionFailed,
-            style: textTheme.titleLarge?.copyWith(
-              color: colorScheme.error,
-              fontWeight: DesignTokens.fontWeightSemiBold,
-            ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -527,20 +520,9 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
             children: [
               Text(
                 AppLocalizations.of(context)!.failedToConnectToSiteName(site.name),
-                style: textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurface,
-                ),
               ),
               const SizedBox(height: DesignTokens.spacingS),
-              Text(
-                error,
-                style: StyleBuilders.smallTextStyle(
-                  colorScheme: colorScheme,
-                  textTheme: textTheme,
-                ).copyWith(
-                  fontSize: DesignTokens.fontSizeXS,
-                ),
-              ),
+              Text(error, style: textTheme.bodySmall),
             ],
           ),
           actions: [
@@ -549,12 +531,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
                 Navigator.of(context).pop(); // Close dialog
                 Navigator.of(context).pop(); // Go back to previous page
               },
-              child: Text(
-                AppLocalizations.of(context)!.okButton,
-                style: textTheme.labelLarge?.copyWith(
-                  color: colorScheme.primary,
-                ),
-              ),
+              child: Text(AppLocalizations.of(context)!.okButton),
             ),
           ],
         );

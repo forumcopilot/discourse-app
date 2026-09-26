@@ -12,6 +12,7 @@ import 'lists/posts_list.dart';
 import 'widgets/delete_topic_dialog.dart';
 import 'appbars/posts_page_app_bar.dart';
 import '../utils/url_utils.dart';
+import 'widgets/sheet_title.dart';
 import 'widgets/category_badge.dart';
 
 class PostPage extends StatefulWidget {
@@ -142,11 +143,6 @@ class _PostPageState extends State<PostPage> {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            margin: DesignTokens.paddingS,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
             duration: const Duration(seconds: 3),
             action: SnackBarAction(
               label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -180,12 +176,7 @@ class _PostPageState extends State<PostPage> {
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
           ),
-          behavior: SnackBarBehavior.floating,
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          margin: DesignTokens.paddingS,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-          ),
           duration: const Duration(seconds: 3),
         ),
       );
@@ -244,12 +235,6 @@ class _PostPageState extends State<PostPage> {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
-            margin: DesignTokens.paddingS,
-            padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
             duration: const Duration(seconds: 4),
             action: SnackBarAction(
               label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -288,12 +273,6 @@ class _PostPageState extends State<PostPage> {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
-            margin: DesignTokens.paddingS,
-            padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
             duration: const Duration(seconds: 2),
             action: SnackBarAction(
               label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -319,12 +298,6 @@ class _PostPageState extends State<PostPage> {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
-            margin: DesignTokens.paddingS,
-            padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
             duration: const Duration(seconds: 4),
             action: SnackBarAction(
               label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -362,12 +335,6 @@ class _PostPageState extends State<PostPage> {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
-            margin: DesignTokens.paddingS,
-            padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
             duration: const Duration(seconds: 2),
             action: SnackBarAction(
               label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -393,12 +360,6 @@ class _PostPageState extends State<PostPage> {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
-            margin: DesignTokens.paddingS,
-            padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
             duration: const Duration(seconds: 4),
             action: SnackBarAction(
               label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -485,8 +446,6 @@ class _PostPageState extends State<PostPage> {
   void _handleMoveTopic() async {
     final forumProxy = SiteProxyFactory.getForumProxy();
     final messenger = ScaffoldMessenger.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     final forumResult = await forumProxy.getForumAsync(false, '', false);
     if (!mounted) return;
@@ -510,21 +469,9 @@ class _PostPageState extends State<PostPage> {
           builder: (_, scrollController) => SafeArea(
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    DesignTokens.spacingL, 0,
-                    DesignTokens.spacingL, DesignTokens.spacingS,
-                  ),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      AppLocalizations.of(context)!.moveToCategory,
-                      style: textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: DesignTokens.fontWeightSemiBold,
-                      ),
-                    ),
-                  ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: SheetTitle(AppLocalizations.of(context)!.moveToCategory),
                 ),
                 Expanded(
                   child: ListView.separated(
@@ -769,12 +716,6 @@ class _PostPageState extends State<PostPage> {
                           ),
                     ),
                     backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-                    ),
-                    margin: DesignTokens.paddingS,
-                    padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
                     duration: const Duration(seconds: 4),
                     action: SnackBarAction(
                       label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -822,7 +763,10 @@ class _PostPageState extends State<PostPage> {
                 if (_isDeleted && _showDeletedBanner)
                   Container(
                     width: double.infinity,
-                    padding: DesignTokens.paddingInput,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: DesignTokens.spacingL,
+                      vertical: DesignTokens.spacingM,
+                    ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: DesignTokens.opacityHigh),
                       border: Border(
@@ -871,7 +815,10 @@ class _PostPageState extends State<PostPage> {
                 if (_isClosed && _showClosedBanner)
                   Container(
                     width: double.infinity,
-                    padding: DesignTokens.paddingInput,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: DesignTokens.spacingL,
+                      vertical: DesignTokens.spacingM,
+                    ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.tertiaryContainer.withValues(alpha: DesignTokens.opacityHigh),
                       border: Border(
@@ -920,7 +867,10 @@ class _PostPageState extends State<PostPage> {
                 if (_isSticky && _showStickyBanner)
                   Container(
                     width: double.infinity,
-                    padding: DesignTokens.paddingInput,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: DesignTokens.spacingL,
+                      vertical: DesignTokens.spacingM,
+                    ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: DesignTokens.opacityHigh),
                       border: Border(
@@ -969,7 +919,10 @@ class _PostPageState extends State<PostPage> {
                 if (_isSubscribed && _showSubscribedBanner)
                   Container(
                     width: double.infinity,
-                    padding: DesignTokens.paddingInput,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: DesignTokens.spacingL,
+                      vertical: DesignTokens.spacingM,
+                    ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: DesignTokens.opacityHigh),
                       border: Border(

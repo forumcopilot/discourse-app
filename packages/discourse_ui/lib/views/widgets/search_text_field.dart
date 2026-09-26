@@ -115,27 +115,13 @@ class _SearchTextFieldState extends State<SearchTextField> {
                 onPressed: _handleClear,
               )
             : null,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-          borderSide: BorderSide(
-            color: colorScheme.outlineVariant,
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-          borderSide: BorderSide(
-            color: colorScheme.outlineVariant,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-          borderSide: BorderSide(
-            color: colorScheme.primary,
-            width: DesignTokens.borderWidthMedium,
-          ),
-        ),
+        // Material 3 search bar: a filled pill, 56dp high, with no outline
+        // in any state.
+        border: _searchBarBorder,
+        enabledBorder: _searchBarBorder,
+        focusedBorder: _searchBarBorder,
         filled: true,
-        fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
+        fillColor: colorScheme.surfaceContainerHigh,
         contentPadding: DesignTokens.paddingInput,
       ),
       style: textTheme.bodyLarge?.copyWith(
@@ -147,3 +133,8 @@ class _SearchTextFieldState extends State<SearchTextField> {
   }
 }
 
+/// The Material 3 search bar's shape: a full pill, no outline.
+const _searchBarBorder = OutlineInputBorder(
+  borderRadius: BorderRadius.all(Radius.circular(28)),
+  borderSide: BorderSide.none,
+);

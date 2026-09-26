@@ -3,7 +3,6 @@ import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../search_page.dart';
 import '../widgets/forum_actions.dart';
-import 'package:discourse_ui/theme/design_tokens.dart';
 
 class ForumsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isLoggedIn;
@@ -17,24 +16,13 @@ class ForumsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     return AppBar(
-      backgroundColor: colorScheme.surface,
-      elevation: 3,
-      shadowColor: colorScheme.shadow.withValues(alpha: DesignTokens.opacityLow),
-      surfaceTintColor: colorScheme.surfaceTint,
       // Phase 5.18a — auto-imply true so the parent Scaffold's drawer
       // hamburger renders in the leading slot.
       title: Text(
         AppLocalizations.of(context)?.forums ?? 'Categories',
-        style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onSurface,
-          fontWeight: FontWeight.w500,
-          fontSize: DesignTokens.fontSizeL,
-        ),
       ),
-      centerTitle: false,
       actions: [
         if (isLoggedIn) _buildSearchButton(context, colorScheme),
         if (isLoggedIn) _buildMarkReadButton(context, colorScheme),
@@ -62,41 +50,27 @@ class ForumsTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   void _showMarkReadConfirmation(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
           AppLocalizations.of(context)?.markAllForumsAsRead ?? 'Mark all categories as read?',
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-          ),
         ),
         content: Text(
           AppLocalizations.of(context)?.markAllForumsAsReadMessage ?? 'This will mark all categories and topics as read. This action cannot be undone.',
-          style: textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              AppLocalizations.of(context)?.cancel ?? 'Cancel',
-              style: TextStyle(color: colorScheme.onSurfaceVariant),
-            ),
+            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               ForumActions().markAllAsRead(context, '0');
             },
-            child: Text(
-              AppLocalizations.of(context)?.markAsRead ?? 'Mark as Read',
-              style: TextStyle(color: colorScheme.primary),
-            ),
+            child: Text(AppLocalizations.of(context)?.markAsRead ?? 'Mark as Read'),
           ),
         ],
       ),

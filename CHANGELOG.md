@@ -6,6 +6,19 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Changed
+- **One look per component, from the theme: Material 3's own.** App bars, dialogs, sheets, snackbars, buttons, text fields, menus and filter chips each came in several looks, because screens restyled them one by one. `AppTheme` now sets them once, mostly by leaving Material 3's defaults alone, and ~70 files lost their overrides (about 1,500 lines):
+  - **App bars:** every title is `titleLarge` (22sp) aligned to the start, and every bar is flat until content scrolls under it. They were left-aligned 20sp with a permanent shadow on the tabs and lists, centred 22sp on Search, Chat, Reply, Bookmarks and every ABDA screen, and bold on some. Topic and category titles that don't fit one line drop to two lines of `titleMedium` (new `AdaptiveAppBarTitle`), measured at the reader's text size and against the width the title really has.
+  - **Dialogs:** Material 3's 28dp corners, `headlineSmall` title and `bodyMedium` text, instead of five title styles (20sp bold, coloured, 22sp in three weights) and three confirm-button shapes.
+  - **Sheets:** 28dp top corners and a drag handle on every sheet, with one heading style (new `SheetTitle`, `titleMedium`) directly under it. They had 12dp or 16dp corners, a handle on two of them, and headings at w500–w700 with 12–28dp above.
+  - **Buttons** are Material 3's: 40dp, fully rounded, 14sp labels. The Reply button on topic and message pages, a member's Send Message and the Delete account button were 56dp raised pills with 16sp bold labels; dialog buttons had 8dp or 12dp corners.
+  - **Text fields** are 56dp outlined fields with 4dp corners (were 48dp with 8dp). **Search fields** (topic search, user search, the Tags filter) are Material 3 search bars: a filled 56dp pill.
+  - **Snackbars** float, in one shape, instead of four margin/shape recipes.
+  - **Menus** use one label style (it was `titleMedium`, `bodyLarge`, `bodyMedium` or a raw colour, by screen); a destructive item keeps its red.
+  - **Filter chips** (topic filters, Notifications' All/Unread, the users directory, profile activity, search) are Material 3 filter chips: 32dp with 8dp corners and a tick when selected, no longer a bolder label on the selected one. The row takes its height from the chips, so a larger text size no longer clips them, and the profile's pinned activity bar sizes itself the same way.
+  - **Badges** (BANNED, DELETED) are 11sp `labelSmall`, Material's smallest size, instead of 10sp bold.
+- `StyleBuilders.elevatedButtonStyle`, `textButtonStyle` and `extendedFilledButtonStyle` and the `paddingExtendedButton` / `radiusExtendedButton` tokens are removed. `DesignTokens.paddingInput` is 16dp all round (a 56dp field).
+
 ### Fixed
 - **A post's Reply, Like, Bookmark and Accept buttons answer anywhere in their 48dp target.** Only the ~22dp icon took a tap: the shared `accessibleIconButton` wrapped it in a `GestureDetector` over a colourless `Container`, which hit-tests on the icon alone. It is now an `InkResponse`, which also shows the press. The message page's Quote and Like use the same helper and are fixed with it.
 - **Notifications keeps its All | Unread filter when the list is empty or fails.** With Unread chosen and nothing unread, an early "All caught up!" branch returned without the filter bar, so there was no way back to All; the error state dropped it too. Both now sit under the bar, through `EmptyStateView`, with Retry on the error.

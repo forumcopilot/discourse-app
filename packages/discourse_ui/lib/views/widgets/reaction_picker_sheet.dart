@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 import '../../utils/like_cooldown.dart';
 import '../../theme/design_tokens.dart';
 import 'reaction_glyph.dart';
+import 'sheet_title.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// Bottom-sheet picker for the `discourse-reactions` plugin. Loads the
@@ -37,9 +38,6 @@ class ReactionPickerSheet extends StatefulWidget {
   }) {
     return showModalBottomSheet<List<FCPostReaction>>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (sheetContext) {
         return ReactionPickerSheet(
           siteContext: siteContext,
@@ -120,27 +118,12 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-            vertical: DesignTokens.spacingM,
-            horizontal: DesignTokens.spacingS),
+        padding: const EdgeInsets.only(bottom: DesignTokens.spacingM),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                DesignTokens.spacingM,
-                DesignTokens.spacingS,
-                DesignTokens.spacingM,
-                DesignTokens.spacingS,
-              ),
-              child: Text(
-                AppLocalizations.of(context)!.react,
-                style: textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w600),
-              ),
-            ),
-            const Divider(height: 1),
+            SheetTitle(AppLocalizations.of(context)!.react),
             const SizedBox(height: DesignTokens.spacingS),
             if (_loading && available == null)
               const Padding(
@@ -160,7 +143,7 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
             else
               Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingM,
+                  horizontal: DesignTokens.spacingL,
                   vertical: DesignTokens.spacingS,
                 ),
                 child: Wrap(
@@ -181,7 +164,7 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
             if (_error != null) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingM,
+                  horizontal: DesignTokens.spacingL,
                   vertical: DesignTokens.spacingS,
                 ),
                 child: Row(

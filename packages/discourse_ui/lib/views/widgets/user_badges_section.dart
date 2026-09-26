@@ -97,9 +97,6 @@ class _UserBadgesSectionState extends State<UserBadgesSection> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (sheetContext) {
         return DraggableScrollableSheet(
           initialChildSize: 0.6,
@@ -239,15 +236,20 @@ class _AllBadgesSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return Padding(
-      padding: const EdgeInsets.all(DesignTokens.spacingL),
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.spacingL,
+        0,
+        DesignTokens.spacingL,
+        DesignTokens.spacingL,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             AppLocalizations.of(context)!.badges,
-            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: textTheme.titleMedium,
           ),
-          const SizedBox(height: DesignTokens.spacingM),
+          const SizedBox(height: DesignTokens.spacingS),
           Expanded(
             child: ListView.separated(
               controller: scrollController,

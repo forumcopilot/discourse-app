@@ -28,10 +28,6 @@ class BookmarkReminderSheet {
     return showModalBottomSheet<BookmarkReminderChoice>(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(DesignTokens.radiusL)),
-      ),
       builder: (sheetContext) =>
           _BookmarkReminderSheetBody(
         title: title,
@@ -124,7 +120,7 @@ class _BookmarkReminderSheetBody extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(
               DesignTokens.spacingL,
-              DesignTokens.spacingL,
+              0,
               DesignTokens.spacingL,
               DesignTokens.spacingS,
             ),

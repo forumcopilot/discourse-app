@@ -24,9 +24,6 @@ Future<OversizedImageChoice?> showOversizedImageSheet(
   return showModalBottomSheet<OversizedImageChoice>(
     context: context,
     isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-    ),
     builder: (sheetContext) => _OversizedImageSheet(
       fileName: fileName,
       fileBytes: fileBytes,
@@ -60,7 +57,12 @@ class _OversizedImageSheetState extends State<_OversizedImageSheet> {
 
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.all(DesignTokens.spacingL),
+        padding: const EdgeInsets.fromLTRB(
+          DesignTokens.spacingL,
+          0,
+          DesignTokens.spacingL,
+          DesignTokens.spacingL,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,9 +75,7 @@ class _OversizedImageSheetState extends State<_OversizedImageSheet> {
                 Expanded(
                   child: Text(
                     AppLocalizations.of(context)!.imageIsTooLargeToUpload,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: DesignTokens.fontWeightBold,
-                    ),
+                    style: textTheme.titleMedium,
                   ),
                 ),
               ],

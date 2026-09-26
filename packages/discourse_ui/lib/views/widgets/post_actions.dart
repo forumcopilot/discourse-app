@@ -86,12 +86,6 @@ class PostActionsHandler {
             ],
           ),
           backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-          ),
-          margin: DesignTokens.paddingS,
-          padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
           duration: const Duration(seconds: 4),
         ),
       );
@@ -138,12 +132,6 @@ class PostActionsHandler {
               ],
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
-            margin: DesignTokens.paddingS,
-            padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
             duration: const Duration(seconds: 4),
           ),
         );
@@ -172,12 +160,6 @@ class PostActionsHandler {
               ],
             ),
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            ),
-            margin: DesignTokens.paddingS,
-            padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
             duration: const Duration(seconds: 4),
           ),
         );
@@ -255,12 +237,6 @@ class PostActionsHandler {
             ],
           ),
           backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-          ),
-          margin: DesignTokens.paddingS,
-          padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
           duration: const Duration(seconds: 4),
           action: SnackBarAction(
             label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -318,8 +294,6 @@ class PostActionsHandler {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(8),
           ),
         );
         return;
@@ -340,8 +314,6 @@ class PostActionsHandler {
                   ),
             ),
             backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(8),
           ),
         );
         return;
@@ -470,12 +442,6 @@ class PostActionsHandler {
             ],
           ),
           backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-          ),
-          margin: DesignTokens.paddingS,
-          padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
           duration: const Duration(seconds: 4),
           action: SnackBarAction(
             label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -541,12 +507,6 @@ class PostActionsHandler {
             ],
           ),
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          margin: const EdgeInsets.all(8),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           duration: const Duration(seconds: 30), // Longer duration for loading
         ),
       );
@@ -583,12 +543,6 @@ class PostActionsHandler {
                 ],
               ),
               backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              margin: const EdgeInsets.all(8),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               duration: const Duration(seconds: 4),
             ),
           );
@@ -622,12 +576,6 @@ class PostActionsHandler {
                 ],
               ),
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              margin: const EdgeInsets.all(8),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               duration: const Duration(seconds: 4),
               action: SnackBarAction(
                 label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -734,12 +682,6 @@ class PostActionsHandler {
             ],
           ),
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-          ),
-          margin: DesignTokens.paddingS,
-          padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingL - DesignTokens.spacingXS),
           duration: const Duration(seconds: 30), // Longer duration for loading
         ),
       );
@@ -777,12 +719,6 @@ class PostActionsHandler {
                   ],
                 ),
                 backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                margin: const EdgeInsets.all(8),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 duration: const Duration(seconds: 4),
               ),
             );
@@ -813,12 +749,6 @@ class PostActionsHandler {
                   ],
                 ),
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                margin: const EdgeInsets.all(8),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 duration: const Duration(seconds: 4),
                 action: SnackBarAction(
                   label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -860,12 +790,6 @@ class PostActionsHandler {
                 ],
               ),
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              margin: const EdgeInsets.all(8),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               duration: const Duration(seconds: 4),
               action: SnackBarAction(
                 label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -898,8 +822,6 @@ class PostActionsHandler {
                 ),
           ),
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(8),
         ),
       );
       return;
@@ -959,12 +881,6 @@ class PostActionsHandler {
             ],
           ),
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          margin: const EdgeInsets.all(8),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           duration: const Duration(seconds: 4),
         ),
       );
@@ -992,12 +908,6 @@ class PostActionsHandler {
             ],
           ),
           backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          margin: const EdgeInsets.all(8),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           duration: const Duration(seconds: 4),
           action: SnackBarAction(
             label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
@@ -1174,8 +1084,6 @@ class PostActionsHandler {
 
   /// Shows login prompt for restricted content and handles post refresh after login
   void showPostLoginPrompt(BuildContext context, {VoidCallback? onRefresh}) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     // Use provided callback or default callback
     final refreshCallback = onRefresh ?? _defaultRefreshCallback;
@@ -1185,23 +1093,14 @@ class PostActionsHandler {
       builder: (context) => AlertDialog(
         title: Text(
           AppLocalizations.of(context)!.loginRequired,
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-          ),
         ),
         content: Text(
           AppLocalizations.of(context)?.pleaseLoginToAccessContent ?? 'Please login to access this content and interact with posts.',
-          style: textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface,
-          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
-              AppLocalizations.of(context)!.cancel,
-              style: TextStyle(color: colorScheme.primary),
-            ),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           TextButton(
             onPressed: () async {
@@ -1227,10 +1126,7 @@ class PostActionsHandler {
                 refreshCallback();
               }
             },
-            child: Text(
-              AppLocalizations.of(context)!.loginTitle,
-              style: TextStyle(color: colorScheme.primary),
-            ),
+            child: Text(AppLocalizations.of(context)!.loginTitle),
           ),
         ],
       ),

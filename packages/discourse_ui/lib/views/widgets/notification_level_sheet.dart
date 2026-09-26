@@ -4,6 +4,7 @@ import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
 
 import '../../theme/design_tokens.dart';
+import 'sheet_title.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// A bottom-sheet picker that mirrors Discourse's per-topic / per-category
@@ -48,9 +49,6 @@ class NotificationLevelSheet extends StatefulWidget {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (sheetContext) {
         return NotificationLevelSheet(
           initialLevel: level,
@@ -85,9 +83,6 @@ class NotificationLevelSheet extends StatefulWidget {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (sheetContext) {
         return NotificationLevelSheet(
           initialLevel: level,
@@ -128,9 +123,6 @@ class NotificationLevelSheet extends StatefulWidget {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (sheetContext) {
         return NotificationLevelSheet(
           initialLevel: level,
@@ -225,26 +217,12 @@ class _NotificationLevelSheetState extends State<NotificationLevelSheet> {
     // larger text size or on a short phone the options no longer fit.
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingS),
+        padding: const EdgeInsets.only(bottom: DesignTokens.spacingS),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                DesignTokens.spacingL,
-                DesignTokens.spacingM,
-                DesignTokens.spacingL,
-                DesignTokens.spacingS,
-              ),
-              child: Text(
-                widget.title,
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            const Divider(height: 1),
+            SheetTitle(widget.title),
             for (final entry in entries)
               ListTile(
                 leading: Icon(

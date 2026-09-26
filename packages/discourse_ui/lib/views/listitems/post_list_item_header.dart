@@ -297,41 +297,27 @@ class PostListItemHeader extends StatelessWidget {
   }
 
   void _showSimpleLoginPrompt(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
           AppLocalizations.of(context)!.loginRequired,
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-          ),
         ),
         content: Text(
           AppLocalizations.of(context)!.pleaseLoginToViewUserProfiles,
-          style: textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface,
-          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
-              AppLocalizations.of(context)!.cancel,
-              style: TextStyle(color: colorScheme.primary),
-            ),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               Get.to(() => LoginPage(siteContext: siteContext));
             },
-            child: Text(
-              AppLocalizations.of(context)!.loginTitle,
-              style: TextStyle(color: colorScheme.primary),
-            ),
+            child: Text(AppLocalizations.of(context)!.loginTitle),
           ),
         ],
       ),

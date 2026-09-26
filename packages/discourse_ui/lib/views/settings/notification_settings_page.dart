@@ -15,6 +15,7 @@ import '../enable_notifications_page.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/simple_list_app_bar.dart';
 import '../../utils/error_message.dart';
+import '../widgets/sheet_title.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// Phase 5.20b — notification preferences screen, rebuilt to sync
@@ -568,20 +569,7 @@ class _DoNotDisturbTileState extends State<_DoNotDisturbTile> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  DesignTokens.spacingL,
-                  0,
-                  DesignTokens.spacingL,
-                  DesignTokens.spacingS,
-                ),
-                child: Text(
-                  AppLocalizations.of(context)!.pauseNotificationsFor,
-                  style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
-                        fontWeight: DesignTokens.fontWeightSemiBold,
-                      ),
-                ),
-              ),
+              SheetTitle(AppLocalizations.of(context)!.pauseNotificationsFor),
               ..._durations.map(
                 (d) => ListTile(
                   title: Text(d.label),
@@ -791,20 +779,7 @@ class _EnumTile<T> extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  DesignTokens.spacingL,
-                  0,
-                  DesignTokens.spacingL,
-                  DesignTokens.spacingS,
-                ),
-                child: Text(
-                  title,
-                  style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
-                        fontWeight: DesignTokens.fontWeightSemiBold,
-                      ),
-                ),
-              ),
+              SheetTitle(title),
               ...options.map((opt) {
                 final isSelected = opt.value == value;
                 return RadioListTile<T>(

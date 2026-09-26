@@ -178,12 +178,6 @@ class ForumSettingsPage extends StatelessWidget {
                     style: FilledButton.styleFrom(
                       backgroundColor: colorScheme.error,
                       foregroundColor: colorScheme.onError,
-                      padding: DesignTokens.paddingExtendedButton,
-                      elevation: DesignTokens.elevationMedium,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            DesignTokens.radiusExtendedButton),
-                      ),
                     ),
                     child: Text(AppLocalizations.of(context)!.deleteAccount),
                   ),
@@ -275,7 +269,6 @@ class ForumSettingsPage extends StatelessWidget {
   }
 
   Future<void> _confirmPasswordReset(BuildContext context) async {
-    final colorScheme = Theme.of(context).colorScheme;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
@@ -291,13 +284,7 @@ class ForumSettingsPage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text(
-                AppLocalizations.of(context)!.sendResetEmail,
-                style: TextStyle(
-                  color: colorScheme.primary,
-                  fontWeight: DesignTokens.fontWeightSemiBold,
-                ),
-              ),
+              child: Text(AppLocalizations.of(context)!.sendResetEmail),
             ),
           ],
         );
@@ -376,41 +363,23 @@ class ForumSettingsPage extends StatelessWidget {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: colorScheme.surface,
           title: Text(
             AppLocalizations.of(context)!.deleteAccount,
-            style: textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: DesignTokens.fontWeightMedium,
-            ),
           ),
           content: Text(
             AppLocalizations.of(context)!.deleteAccountDialogBody,
-            style: textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onSurface,
-            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(
-                AppLocalizations.of(context)!.cancel,
-                style: textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
                 await _openForumHomePage(context);
               },
-              child: Text(
-                AppLocalizations.of(context)!.continueButton,
-                style: textTheme.labelLarge?.copyWith(
-                  color: colorScheme.primary,
-                ),
-              ),
+              child: Text(AppLocalizations.of(context)!.continueButton),
             ),
           ],
         );
@@ -518,8 +487,6 @@ class ForumSettingsPage extends StatelessWidget {
               ),
         ),
         backgroundColor: colorScheme.errorContainer,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(8),
       ),
     );
   }

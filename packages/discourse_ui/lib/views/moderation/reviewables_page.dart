@@ -150,8 +150,6 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
         ),
         backgroundColor:
             isError ? colorScheme.errorContainer : colorScheme.inverseSurface,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(DesignTokens.spacingS),
       ),
     );
   }
