@@ -231,91 +231,62 @@ class _NewConversationPageState extends State<NewConversationPage> {
   }
 
   Widget _buildRecipientChip(String username, List<String> recipients, Function(String) onRemove) {
-    return Padding(
-      padding: EdgeInsets.only(right: DesignTokens.spacingS),
-      child: Chip(
-        avatar: UserAvatar(
-          username: username,
-          iconUrl: _recipientIcons[username],
-          radius: DesignTokens.radiusM,
-        ),
-        label: Text(username),
-        deleteIcon: Icon(
-          Icons.close,
-          size: DesignTokens.iconSizeSMedium,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-        labelStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-        onDeleted: () => onRemove(username),
+    // Material's input chip, as the New Topic tags: it had its own fill,
+    // label colour and close glyph, and a padding in place of Wrap spacing.
+    return InputChip(
+      avatar: UserAvatar(
+        username: username,
+        iconUrl: _recipientIcons[username],
+        radius: DesignTokens.radiusM,
       ),
+      label: Text(username),
+      onDeleted: () => onRemove(username),
     );
   }
 
   Widget _buildRecipientField(List<String> recipients, Function(String) onAdd, Function(String) onRemove) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.of(context)!.participantsLabel,
-          style: textTheme.titleSmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: DesignTokens.fontWeightMedium,
-          ),
-        ),
-        SizedBox(height: DesignTokens.spacingS),
-        Wrap(
-          spacing: DesignTokens.spacingXS,
-          runSpacing: DesignTokens.spacingXS,
-          children: [
-            ...recipients.map((username) => _buildRecipientChip(username, recipients, onRemove)),
-            ActionChip(
-              avatar: Icon(
-                Icons.add,
-                size: DesignTokens.iconSizeSMedium,
-                color: colorScheme.primary,
-              ),
-              label: Text(
-                AppLocalizations.of(context)!.add,
-                style: TextStyle(
-                  color: colorScheme.primary,
-                ),
-              ),
-              backgroundColor: colorScheme.primaryContainer.withValues(alpha: DesignTokens.opacityLow),
-              onPressed: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => UserSearchPage(
-                      siteContext: widget.siteContext,
-                      onUserSelected: (username, iconUrl) {
-                        // This callback is no longer used since we're returning data instead
-                      },
-                      selectedUsers: [..._toRecipients],
-                    ),
+    // An outlined field with its label in it, as the title and message
+    // below, holding the recipients as its chips.
+    return InputDecorator(
+      decoration: InputDecoration(
+        labelText: AppLocalizations.of(context)!.participantsLabel,
+      ),
+      child: Wrap(
+        spacing: DesignTokens.spacingS,
+        runSpacing: DesignTokens.spacingS,
+        children: [
+          ...recipients.map((username) => _buildRecipientChip(username, recipients, onRemove)),
+          ActionChip(
+            avatar: const Icon(Icons.add),
+            label: Text(AppLocalizations.of(context)!.add),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UserSearchPage(
+                    siteContext: widget.siteContext,
+                    onUserSelected: (username, iconUrl) {
+                      // This callback is no longer used since we're returning data instead
+                    },
+                    selectedUsers: [..._toRecipients],
                   ),
-                );
+                ),
+              );
 
-                // Handle the returned user data
-                if (result != null && result is Map<String, dynamic>) {
-                  final username = result['username'] as String;
-                  final iconUrl = result['iconUrl'] as String?;
+              // Handle the returned user data
+              if (result != null && result is Map<String, dynamic>) {
+                final username = result['username'] as String;
+                final iconUrl = result['iconUrl'] as String?;
 
-                  if (!recipients.contains(username)) {
-                    onAdd(username);
-                    _recipientIcons[username] = iconUrl;
-                  }
+                if (!recipients.contains(username)) {
+                  onAdd(username);
+                  _recipientIcons[username] = iconUrl;
                 }
-              },
-            ),
-          ],
-        ),
-      ],
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -330,74 +301,79 @@ class _NewConversationPageState extends State<NewConversationPage> {
           AppLocalizations.of(context)!.newConversation,
         ),
         actions: [
-          IconButton(
-            icon: _isSubmitting
-                ? SizedBox(
-                    width: DesignTokens.iconSizeL,
-                    height: DesignTokens.iconSizeL,
-                    child: CircularProgressIndicator(
-                      strokeWidth: DesignTokens.borderWidthMedium,
-                      color: colorScheme.onSurface,
-                    ),
-                  )
-                : Icon(Icons.send_rounded, color: colorScheme.onSurface),
-            onPressed: _isSubmitting
-                ? null
-                : () async {
-                    setState(() {
-                      _isSubmitting = true;
-                    });
-                    try {
-                      // Get the title and content from the MessageComposePage
-                      final title = _titleController.text;
-                      final content = _messageController.text;
+          // A labelled button, as MessageComposePage's: it was an unlabelled
+          // send icon in the same colour as Back.
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: DesignTokens.spacingS),
+            child: FilledButton(
+              onPressed: _isSubmitting
+                  ? null
+                  : () async {
+                      setState(() {
+                        _isSubmitting = true;
+                      });
+                      try {
+                        // Get the title and content from the MessageComposePage
+                        final title = _titleController.text;
+                        final content = _messageController.text;
 
-                      final success = await _handleSubmit(title, content);
-                      if (success && mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(AppLocalizations.of(context)?.conversationCreatedSuccessfully ?? 'Message created successfully'),
-                            backgroundColor: colorScheme.primary,
-                          ),
-                        );
-
-                        // Dismiss keyboard before navigating
-                        FocusScope.of(context).unfocus();
-                        // Navigate to the newly created conversation instead of just popping
-                        if (_createdConversationId != null && _createdConversationId!.isNotEmpty) {
-                          print('🐛 [NewConversationPage] Navigating to newly created conversation: $_createdConversationId');
-                          // Pop the new conversation page first
-                          Navigator.of(context).pop();
-                          // Then navigate to the conversation page
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => ConversationPage(
-                                siteContext: widget.siteContext,
-                                conversationId: _createdConversationId!,
-                                subject: _createdConversationTitle ?? title,
-                              ),
+                        final success = await _handleSubmit(title, content);
+                        if (success && mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context)?.conversationCreatedSuccessfully ?? 'Message created successfully'),
+                              backgroundColor: colorScheme.primary,
                             ),
                           );
-                        } else {
-                          // Fallback: just pop if conversation ID is missing
-                          Navigator.of(context).pop(true);
+
+                          // Dismiss keyboard before navigating
+                          FocusScope.of(context).unfocus();
+                          // Navigate to the newly created conversation instead of just popping
+                          if (_createdConversationId != null && _createdConversationId!.isNotEmpty) {
+                            print('🐛 [NewConversationPage] Navigating to newly created conversation: $_createdConversationId');
+                            // Pop the new conversation page first
+                            Navigator.of(context).pop();
+                            // Then navigate to the conversation page
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => ConversationPage(
+                                  siteContext: widget.siteContext,
+                                  conversationId: _createdConversationId!,
+                                  subject: _createdConversationTitle ?? title,
+                                ),
+                              ),
+                            );
+                          } else {
+                            // Fallback: just pop if conversation ID is missing
+                            Navigator.of(context).pop(true);
+                          }
+                        }
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            _isSubmitting = false;
+                          });
                         }
                       }
-                    } finally {
-                      if (mounted) {
-                        setState(() {
-                          _isSubmitting = false;
-                        });
-                      }
-                    }
-                  },
+                    },
+              child: _isSubmitting
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(AppLocalizations.of(context)!.send),
+            ),
           ),
         ],
       ),
       body: Column(
         children: [
           Expanded(
+            // The toolbar below keeps the bottom inset: here it left a blank
+            // band above the toolbar on phones with a home indicator.
             child: SafeArea(
+              bottom: false,
               child: SingleChildScrollView(
                 child: Padding(
                   padding: DesignTokens.paddingL,
@@ -413,100 +389,30 @@ class _NewConversationPageState extends State<NewConversationPage> {
                         }),
                       ),
                       SizedBox(height: DesignTokens.spacingL),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)!.title,
-                            style: textTheme.titleSmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                              fontWeight: DesignTokens.fontWeightMedium,
-                            ),
-                          ),
-                          SizedBox(height: DesignTokens.spacingS),
-                          TextField(
-                            controller: _titleController,
-                            decoration: InputDecoration(
-                              hintText: AppLocalizations.of(context)!.messageTitleHint,
-                              hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
-                              filled: true,
-                              fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                borderSide: BorderSide(
-                                  color: colorScheme.primary,
-                                  width: DesignTokens.borderWidthMedium,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                borderSide: BorderSide(
-                                  color: colorScheme.error,
-                                  width: DesignTokens.borderWidthMedium,
-                                ),
-                              ),
-                            ),
-                            textInputAction: TextInputAction.next,
-                          ),
-                        ],
+                      // The theme's outlined fields with their labels in
+                      // them, as MessageComposePage's.
+                      TextField(
+                        controller: _titleController,
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.title,
+                          hintText: AppLocalizations.of(context)!.messageTitleHint,
+                        ),
+                        textInputAction: TextInputAction.next,
                       ),
                       SizedBox(height: DesignTokens.spacingL),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)!.message,
-                            style: textTheme.titleSmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                              fontWeight: DesignTokens.fontWeightMedium,
-                            ),
-                          ),
-                          SizedBox(height: DesignTokens.spacingS),
-                          TextField(
-                            controller: _messageController,
-                            focusNode: _messageFocusNode,
-                            decoration: InputDecoration(
-                              hintText: AppLocalizations.of(context)?.writeYourMessage ?? 'Write your message...',
-                              hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
-                              filled: true,
-                              fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                borderSide: BorderSide(
-                                  color: colorScheme.primary,
-                                  width: DesignTokens.borderWidthMedium,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                borderSide: BorderSide(
-                                  color: colorScheme.error,
-                                  width: DesignTokens.borderWidthMedium,
-                                ),
-                              ),
-                            ),
-                            minLines: 5,
-                            maxLines: null,
-                            keyboardType: TextInputType.multiline,
-                            textInputAction: TextInputAction.newline,
-                          ),
-                        ],
+                      TextField(
+                        controller: _messageController,
+                        focusNode: _messageFocusNode,
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.message,
+                          hintText: AppLocalizations.of(context)?.writeYourMessage ?? 'Write your message...',
+                          alignLabelWithHint: true,
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                        ),
+                        minLines: 10,
+                        maxLines: null,
+                        keyboardType: TextInputType.multiline,
+                        textInputAction: TextInputAction.newline,
                       ),
                       if (_attachments.isNotEmpty) ...[
                         SizedBox(height: DesignTokens.spacingL),
@@ -531,7 +437,11 @@ class _NewConversationPageState extends State<NewConversationPage> {
                               padding: DesignTokens.paddingS,
                               decoration: BoxDecoration(
                                 color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
-                                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+                                borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+                                border: Border.all(
+                                  color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
+                                  width: DesignTokens.borderWidthThin,
+                                ),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -554,10 +464,10 @@ class _NewConversationPageState extends State<NewConversationPage> {
                                                       height: 48,
                                                       decoration: BoxDecoration(
                                                         color: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
-                                                        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+                                                        borderRadius: BorderRadius.circular(DesignTokens.radiusS),
                                                       ),
                                                       child: ClipRRect(
-                                                        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+                                                        borderRadius: BorderRadius.circular(DesignTokens.radiusS),
                                                         child: Image.file(
                                                           File(attachment.path),
                                                           width: 48,
@@ -596,7 +506,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                                                   height: 48,
                                                   decoration: BoxDecoration(
                                                     color: getFileTypeColor(attachment.name),
-                                                    borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+                                                    borderRadius: BorderRadius.circular(DesignTokens.radiusS),
                                                   ),
                                                   child: Stack(
                                                     children: [
@@ -626,11 +536,15 @@ class _NewConversationPageState extends State<NewConversationPage> {
                                                     ],
                                                   ),
                                                 ),
-                                          title: Text(attachment.name),
+                                          title: Text(
+                                            attachment.name,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                           subtitle: isUploading
                                               ? Text(AppLocalizations.of(context)?.uploading ?? 'Uploading...', style: textTheme.bodySmall?.copyWith(color: colorScheme.primary))
                                               : attachmentId != null
-                                                  ? Text(AppLocalizations.of(context)?.uploaded ?? 'Uploaded', style: textTheme.bodySmall?.copyWith(color: colorScheme.primary))
+                                                  ? Text(AppLocalizations.of(context)?.uploaded ?? 'Uploaded', style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant))
                                                   : null,
                                           trailing: IconButton(
                                             icon: Icon(Icons.close),
@@ -849,7 +763,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                     Icons.attach_file,
                     color: colorScheme.onSurfaceVariant,
                   ),
-                  tooltip: 'Attach File',
+                  tooltip: AppLocalizations.of(context)!.attachFile,
                   onPressed: _handleFileAttachment,
                 ),
               // Image upload button
@@ -859,7 +773,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                     Icons.image,
                     color: colorScheme.onSurfaceVariant,
                   ),
-                  tooltip: 'Upload Image',
+                  tooltip: AppLocalizations.of(context)!.uploadImage,
                   onPressed: _handleImageAttachment,
                 ),
               // Camera button
@@ -878,7 +792,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                 // See MessageComposePage: this opens the formatting menu,
                 // so it takes the formatting glyph rather than a bold one.
                 icon: Icon(Icons.text_format, color: _isMessageFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
-                tooltip: 'Formatting',
+                tooltip: AppLocalizations.of(context)!.formatting,
                 onSelected: _insertMarkup,
                 itemBuilder: (context) => [
                   // Text formatting
@@ -1018,7 +932,6 @@ class _NewConversationPageState extends State<NewConversationPage> {
                       ],
                     ),
                   ),
-                  const PopupMenuDivider(),
                   // Alignment actions removed: Discourse has no
                   // [left]/[center]/[right] markup, so these posted
                   // literal bracketed text into the message.
@@ -1027,7 +940,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
               // Mention button
               IconButton(
                 icon: Icon(Icons.alternate_email, color: _isMessageFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
-                tooltip: 'Mention User',
+                tooltip: AppLocalizations.of(context)!.mentionUser,
                 onPressed: _isMessageFieldFocused ? _handleMention : null,
               ),
             ],

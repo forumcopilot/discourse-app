@@ -58,6 +58,10 @@ class MessageComposePage extends StatefulWidget {
   // Icon to display in the submit button (defaults to send icon)
   final IconData? submitIcon;
 
+  /// The submit button's label: "Create Topic", "Reply", … Defaults to
+  /// Save for a [submitIcon] of save, else Send.
+  final String? submitLabel;
+
   // Show signature toggle for new topic editor
   final bool showSignatureToggle;
 
@@ -97,6 +101,7 @@ class MessageComposePage extends StatefulWidget {
     this.onRemoveExistingAttachment,
     this.onRemoveAttachment,
     this.submitIcon,
+    this.submitLabel,
     this.showSignatureToggle = false,
     this.extraHeader,
     this.showWhisperToggle = false,
@@ -986,7 +991,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                                   attachment.name,
                                                   maxLines: 1,
                                                   overflow: TextOverflow.ellipsis,
-                                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                                         color: Theme.of(context).colorScheme.onSurface,
                                                       ),
                                                 ),
@@ -1011,9 +1016,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                               color: Theme.of(context).colorScheme.onSurfaceVariant,
                                             ),
                                             onPressed: isUploading ? null : () => _removeAttachment(index),
-                                            padding: EdgeInsets.zero,
-                                            constraints: const BoxConstraints(),
-                                            splashRadius: 20,
                                           ),
                                         ],
                                       ),
@@ -1170,9 +1172,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     color: colorScheme.onSurfaceVariant,
                   ),
                   onPressed: isLoading ? null : () => _removeExistingAttachment(attachment.id),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  splashRadius: 20,
                 ),
               ],
             ),
@@ -1651,34 +1650,33 @@ class _MessageComposePageState extends State<MessageComposePage> {
                         child: Chip(
                           avatar: Icon(
                             Icons.visibility_off,
-                            size: 16,
                             color: colorScheme.onSecondaryContainer,
                           ),
                           label: Text(AppLocalizations.of(context)!.whisper),
-                          labelStyle: textTheme.labelSmall?.copyWith(
-                            color: colorScheme.onSecondaryContainer,
-                          ),
                           backgroundColor: colorScheme.secondaryContainer,
-                          visualDensity: VisualDensity.compact,
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           side: BorderSide.none,
                         ),
                       ),
                     ),
-                  IconButton(
-                    icon: _isSubmitting
-                        ? SizedBox(
-                            width: DesignTokens.iconSizeL,
-                            height: DesignTokens.iconSizeL,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: colorScheme.onSurface,
-                            ),
-                          )
-                        : Icon(widget.submitIcon ?? Icons.send_rounded, color: colorScheme.onSurface),
-                    onPressed: _isSubmitting ? null : _submit,
+                  // A labelled button, as Material 3's full-screen forms have:
+                  // it was an unlabelled icon in the same colour as Back.
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(
+                        end: DesignTokens.spacingS),
+                    child: FilledButton(
+                      onPressed: _isSubmitting ? null : _submit,
+                      child: _isSubmitting
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(widget.submitLabel ??
+                              (widget.submitIcon == Icons.save_rounded
+                                  ? AppLocalizations.of(context)!.save
+                                  : AppLocalizations.of(context)!.send)),
+                    ),
                   ),
-                  const SizedBox(width: DesignTokens.spacingS),
                 ],
               )
             : null,
@@ -1725,49 +1723,27 @@ class _MessageComposePageState extends State<MessageComposePage> {
                               ),
                               const SizedBox(height: DesignTokens.spacingL),
                             ],
+                            // Where the topic goes: a line with the
+                            // category's badge. It was drawn as an outlined
+                            // box, which looked tappable and wasn't.
                             if ((widget.forumName ?? '').isNotEmpty) ...[
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Row(
                                 children: [
                                   Text(
                                     AppLocalizations.of(context)?.forum ?? 'Forum',
-                                    style: textTheme.titleSmall?.copyWith(
+                                    style: textTheme.bodyMedium?.copyWith(
                                       color: colorScheme.onSurfaceVariant,
-                                      fontWeight: DesignTokens.fontWeightMedium,
                                     ),
                                   ),
-                                  SizedBox(height: DesignTokens.spacingS),
-                                  Wrap(
-                                    spacing: DesignTokens.spacingS,
-                                    runSpacing: 8,
-                                    children: [
-                                      // The category's badge, as on every
-                                      // topic row: the one mark a reader
-                                      // knows the category by.
-                                      DecoratedBox(
-                                        decoration: BoxDecoration(
-                                          color: colorScheme.surfaceContainerHighest
-                                              .withValues(alpha: DesignTokens.opacityLow),
-                                          borderRadius: BorderRadius.circular(
-                                              DesignTokens.radiusS),
-                                          border: Border.all(
-                                            color: colorScheme.outlineVariant,
-                                            width: DesignTokens.borderWidthThin,
-                                          ),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 12, vertical: 8),
-                                          child: CategoryBadge(
-                                            siteContext: widget.siteContext,
-                                            categoryId: widget.forumId ?? '',
-                                            fallbackName: widget.forumName!,
-                                            large: true,
-                                            tappable: false,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                  const SizedBox(width: DesignTokens.spacingS),
+                                  Flexible(
+                                    child: CategoryBadge(
+                                      siteContext: widget.siteContext,
+                                      categoryId: widget.forumId ?? '',
+                                      fallbackName: widget.forumName!,
+                                      large: true,
+                                      tappable: false,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -1778,98 +1754,34 @@ class _MessageComposePageState extends State<MessageComposePage> {
                               widget.extraHeader!,
                               SizedBox(height: DesignTokens.spacingL),
                             ],
+                            // The theme's outlined field with its label in
+                            // the field, as every other form in the app.
                             if (widget.showTitleField)
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    AppLocalizations.of(context)!.title,
-                                    style: textTheme.titleSmall?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
-                                      fontWeight: DesignTokens.fontWeightMedium,
-                                    ),
-                                  ),
-                                  SizedBox(height: DesignTokens.spacingS),
-                                  TextField(
-                                    controller: _titleController,
-                                    focusNode: _titleFocusNode,
-                                    decoration: InputDecoration(
-                                      hintText: widget.titleHint,
-                                      hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                        borderSide: BorderSide(
-                                          color: colorScheme.primary,
-                                          width: DesignTokens.borderWidthMedium,
-                                        ),
-                                      ),
-                                      filled: true,
-                                      fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
-                                      contentPadding: DesignTokens.paddingInput,
-                                    ),
-                                    style: textTheme.titleMedium?.copyWith(
-                                      color: colorScheme.onSurface,
-                                    ),
-                                    textCapitalization: TextCapitalization.sentences,
-                                    enabled: !_isSubmitting,
-                                  ),
-                                ],
+                              TextField(
+                                controller: _titleController,
+                                focusNode: _titleFocusNode,
+                                decoration: InputDecoration(
+                                  labelText: AppLocalizations.of(context)!.title,
+                                  hintText: widget.titleHint,
+                                ),
+                                textCapitalization: TextCapitalization.sentences,
+                                enabled: !_isSubmitting,
                               ),
                             if (widget.showTitleField) SizedBox(height: DesignTokens.spacingL),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  AppLocalizations.of(context)?.content ?? 'Content',
-                                  style: textTheme.titleSmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                    fontWeight: DesignTokens.fontWeightMedium,
-                                  ),
-                                ),
-                                SizedBox(height: DesignTokens.spacingS),
-                                TextField(
-                                  controller: _contentController,
-                                  focusNode: _contentFocusNode,
-                                  minLines: 10,
-                                  maxLines: null,
-                                  keyboardType: TextInputType.multiline,
-                                  textCapitalization: TextCapitalization.sentences,
-                                  decoration: InputDecoration(
-                                    hintText: widget.contentHint,
-                                    hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                                      borderSide: BorderSide(
-                                        color: colorScheme.primary,
-                                        width: DesignTokens.borderWidthMedium,
-                                      ),
-                                    ),
-                                    filled: true,
-                                    fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
-                                    contentPadding: DesignTokens.paddingL,
-                                  ),
-                                  style: textTheme.bodyLarge?.copyWith(
-                                    color: colorScheme.onSurface,
-                                  ),
-                                  enabled: !_isSubmitting,
-                                ),
-                              ],
+                            TextField(
+                              controller: _contentController,
+                              focusNode: _contentFocusNode,
+                              minLines: 10,
+                              maxLines: null,
+                              keyboardType: TextInputType.multiline,
+                              textCapitalization: TextCapitalization.sentences,
+                              decoration: InputDecoration(
+                                labelText: AppLocalizations.of(context)?.content ?? 'Content',
+                                hintText: widget.contentHint,
+                                alignLabelWithHint: true,
+                                floatingLabelBehavior: FloatingLabelBehavior.always,
+                              ),
+                              enabled: !_isSubmitting,
                             ),
                             SizedBox(height: DesignTokens.spacingL),
                             _buildAttachmentsList(),

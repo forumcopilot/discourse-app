@@ -976,5 +976,6 @@
   "deleteMyAccount": "내 계정 삭제",
   "deleteAccountConfirm": "계정을 영구적으로 삭제할까요? 이 작업은 취소할 수 없습니다!",
   "deletedYourself": "계정이 삭제되었습니다.",
-  "deleteYourselfNotAllowed": "계정 삭제를 원하시면 운영진에게 문의하세요."
+  "deleteYourselfNotAllowed": "계정 삭제를 원하시면 운영진에게 문의하세요.",
+  "createTopic": "글 작성하기"
 }

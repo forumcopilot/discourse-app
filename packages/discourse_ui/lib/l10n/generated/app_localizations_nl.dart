@@ -2514,4 +2514,7 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get deleteYourselfNotAllowed =>
       'Neem contact op met een medewerker als je wilt dat je account wordt verwijderd.';
+
+  @override
+  String get createTopic => 'Topic maken';
 }

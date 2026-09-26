@@ -217,10 +217,11 @@ class _ChatComposerState extends State<ChatComposer> {
                     minLines: 1,
                     maxLines: 5,
                     textInputAction: TextInputAction.newline,
-                    style: theme.textTheme.bodyMedium,
+                    // 16sp like every other composer (it was 14).
+                    style: theme.textTheme.bodyLarge,
                     decoration: InputDecoration(
                       hintText: widget.hintText,
-                      hintStyle: theme.textTheme.bodyMedium
+                      hintStyle: theme.textTheme.bodyLarge
                           ?.copyWith(color: colorScheme.onSurfaceVariant),
                       border: OutlineInputBorder(
                         borderRadius:
@@ -322,10 +323,12 @@ class _PickedFileTile extends StatelessWidget {
                   child: InkWell(
                     customBorder: const CircleBorder(),
                     onTap: onRemove,
+                    // 28dp, as much as a 64dp tile can spare (it was 18).
                     child: Padding(
-                      padding: const EdgeInsets.all(2),
+                      padding: const EdgeInsets.all(6),
                       child: Icon(Icons.close,
-                          size: 14, color: colorScheme.onInverseSurface),
+                          size: DesignTokens.iconSizeS,
+                          color: colorScheme.onInverseSurface),
                     ),
                   ),
                 ),
@@ -359,7 +362,7 @@ class _FileName extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: theme.textTheme.labelSmall,
+              style: theme.textTheme.bodySmall,
             ),
           ],
         ),
@@ -392,9 +395,10 @@ class _SendButton extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: enabled ? onTap : null,
+        // The chat's most-used control: a full 48dp (it was 44).
         child: SizedBox(
-          width: 44,
-          height: 44,
+          width: kMinInteractiveDimension,
+          height: kMinInteractiveDimension,
           child: Center(
             child: sending
                 ? SizedBox(
@@ -402,7 +406,7 @@ class _SendButton extends StatelessWidget {
                     height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2, color: fg),
                   )
-                : Icon(Icons.send_rounded, size: 20, color: fg),
+                : Icon(Icons.send_rounded, color: fg),
           ),
         ),
       ),

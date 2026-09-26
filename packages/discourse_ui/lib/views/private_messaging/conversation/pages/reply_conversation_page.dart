@@ -144,6 +144,7 @@ class _ReplyConversationPageState extends State<ReplyConversationPage> {
           // Use a stable key based on quotedMessageId to preserve widget state (including attachments)
           Widget compose = MessageComposePage(
             key: ValueKey('reply_with_quote_${widget.quotedMessageId}'),
+            submitLabel: AppLocalizations.of(context)!.reply,
             siteContext: widget.siteContext,
             title: AppLocalizations.of(context)?.reply ?? 'Reply',
             onSubmit: _handleSubmit,
@@ -178,6 +179,7 @@ class _ReplyConversationPageState extends State<ReplyConversationPage> {
       );
     } else {
       return MessageComposePage(
+        submitLabel: AppLocalizations.of(context)!.reply,
         siteContext: widget.siteContext,
         title: AppLocalizations.of(context)?.reply ?? 'Reply',
         onSubmit: _handleSubmit,

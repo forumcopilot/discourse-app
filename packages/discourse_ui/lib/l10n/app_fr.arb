@@ -982,5 +982,6 @@
   "deleteMyAccount": "Supprimer mon compte",
   "deleteAccountConfirm": "Voulez-vous vraiment supprimer définitivement votre compte ? Cette action est irréversible !",
   "deletedYourself": "Votre compte a été supprimé avec succès.",
-  "deleteYourselfNotAllowed": "Veuillez contacter un responsable si vous souhaitez supprimer votre compte."
+  "deleteYourselfNotAllowed": "Veuillez contacter un responsable si vous souhaitez supprimer votre compte.",
+  "createTopic": "Créer le sujet"
 }

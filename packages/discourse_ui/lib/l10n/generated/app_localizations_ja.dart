@@ -2421,4 +2421,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get deleteYourselfNotAllowed => 'アカウントの削除を希望する場合は、スタッフメンバーに連絡をしてください。';
+
+  @override
+  String get createTopic => 'トピックを作成';
 }

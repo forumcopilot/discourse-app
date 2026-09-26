@@ -2516,4 +2516,7 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get deleteYourselfNotAllowed =>
       'Entre em contato com um membro da equipe se você deseja que a sua conta seja excluída.';
+
+  @override
+  String get createTopic => 'Criar Tópico';
 }

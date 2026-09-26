@@ -83,25 +83,20 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     return Scaffold(
       appBar: SimpleListAppBar(
         title: 'Change email',
+        // The same labelled button every form ends its app bar with.
         actions: [
-          TextButton(
-            onPressed: _submitting ? null : _submit,
-            child: _submitting
-                ? SizedBox(
-                    width: DesignTokens.iconSizeS,
-                    height: DesignTokens.iconSizeS,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: colorScheme.primary,
-                    ),
-                  )
-                : Text(
-                    AppLocalizations.of(context)!.send,
-                    style: TextStyle(
-                      color: colorScheme.primary,
-                      fontWeight: DesignTokens.fontWeightSemiBold,
-                    ),
-                  ),
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: DesignTokens.spacingS),
+            child: FilledButton(
+              onPressed: _submitting ? null : _submit,
+              child: _submitting
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(AppLocalizations.of(context)!.send),
+            ),
           ),
         ],
       ),

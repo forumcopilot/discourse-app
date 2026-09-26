@@ -2511,4 +2511,7 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get deleteYourselfNotAllowed =>
       'Чтобы удалить аккаунт, свяжитесь с администрацией сайта.';
+
+  @override
+  String get createTopic => 'Создать тему';
 }

@@ -122,25 +122,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       appBar: SimpleListAppBar(
         title: 'Edit profile',
+        // The same labelled button every form ends its app bar with.
         actions: [
-          TextButton(
-            onPressed: _saving ? null : _save,
-            child: _saving
-                ? SizedBox(
-                    width: DesignTokens.iconSizeS,
-                    height: DesignTokens.iconSizeS,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: colorScheme.primary,
-                    ),
-                  )
-                : Text(
-                    AppLocalizations.of(context)!.save,
-                    style: TextStyle(
-                      color: colorScheme.primary,
-                      fontWeight: DesignTokens.fontWeightSemiBold,
-                    ),
-                  ),
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: DesignTokens.spacingS),
+            child: FilledButton(
+              onPressed: _saving ? null : _save,
+              child: _saving
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(AppLocalizations.of(context)!.save),
+            ),
           ),
         ],
       ),
@@ -220,41 +215,26 @@ class _Field extends StatelessWidget {
     this.validator,
   });
 
+  // The label in the field, as on Change email and in the composers; it was
+  // a separate 14sp w600 line above an outlined box.
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(
-              left: DesignTokens.spacingXS, bottom: DesignTokens.spacingXS),
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: DesignTokens.fontWeightSemiBold,
-                ),
-          ),
-        ),
-        TextFormField(
-          controller: controller,
-          maxLines: maxLines,
-          minLines: minLines,
-          maxLength: maxLength,
-          keyboardType: keyboardType,
-          validator: validator,
-          decoration: InputDecoration(
-            hintText: hint,
-            border: const OutlineInputBorder(),
-            // Hide the maxLength counter on short fields — it adds
-            // visual noise for one-line inputs but is useful on the
-            // bio field where users care about the limit.
-            counterText:
-                (maxLines ?? 1) == 1 || maxLength == null ? '' : null,
-          ),
-        ),
-      ],
+    return TextFormField(
+      controller: controller,
+      maxLines: maxLines,
+      minLines: minLines,
+      maxLength: maxLength,
+      keyboardType: keyboardType,
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        alignLabelWithHint: (maxLines ?? 1) != 1,
+        // Hide the maxLength counter on short fields — it adds
+        // visual noise for one-line inputs but is useful on the
+        // bio field where users care about the limit.
+        counterText: (maxLines ?? 1) == 1 || maxLength == null ? '' : null,
+      ),
     );
   }
 }

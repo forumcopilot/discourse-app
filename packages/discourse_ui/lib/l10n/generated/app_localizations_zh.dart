@@ -2390,4 +2390,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deleteYourselfNotAllowed => '如果您希望删除您的帐户，请联系管理人员。';
+
+  @override
+  String get createTopic => '创建话题';
 }

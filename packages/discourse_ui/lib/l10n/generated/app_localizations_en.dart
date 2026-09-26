@@ -2503,4 +2503,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deleteYourselfNotAllowed =>
       'Please contact a staff member if you wish your account to be deleted.';
+
+  @override
+  String get createTopic => 'Create Topic';
 }

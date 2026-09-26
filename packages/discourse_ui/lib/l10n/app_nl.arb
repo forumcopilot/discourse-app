@@ -1280,5 +1280,6 @@
   "deleteMyAccount": "Mijn account verwijderen",
   "deleteAccountConfirm": "Weet je zeker dat je je account definitief wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt!",
   "deletedYourself": "Je account is verwijderd.",
-  "deleteYourselfNotAllowed": "Neem contact op met een medewerker als je wilt dat je account wordt verwijderd."
+  "deleteYourselfNotAllowed": "Neem contact op met een medewerker als je wilt dat je account wordt verwijderd.",
+  "createTopic": "Topic maken"
 }

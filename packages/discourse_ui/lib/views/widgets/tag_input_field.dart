@@ -149,80 +149,53 @@ class _TagInputFieldState extends State<TagInputField> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final cap = widget.maxTags;
     final atCap = cap != null && _tags.length >= cap;
 
+    // The composer's other fields' look: a full-width outlined field with
+    // its label in it and the count as its counter, the tags as input chips
+    // under it. It was a 200dp-wide dense box under a separate label.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text(
-              widget.label,
-              style: textTheme.labelLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            if (cap != null) ...[
-              const SizedBox(width: 8),
-              Text(
-                '${_tags.length}/$cap',
-                style: textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+        TextField(
+          controller: _controller,
+          focusNode: _focusNode,
+          enabled: !atCap,
+          decoration: InputDecoration(
+            labelText: widget.label,
+            hintText: atCap
+                ? 'Max tags reached'
+                : (_tags.isEmpty ? 'Add a tag…' : '+ tag'),
+            counterText: cap == null ? null : '${_tags.length}/$cap',
+          ),
+          textInputAction: TextInputAction.done,
+          onSubmitted: _commit,
+        ),
+        if (_tags.isNotEmpty) ...[
+          const SizedBox(height: DesignTokens.spacingS),
+          Wrap(
+            spacing: DesignTokens.spacingS,
+            runSpacing: DesignTokens.spacingS,
+            children: [
+              for (final t in _tags)
+                InputChip(
+                  label: Text(t),
+                  onDeleted: () => _remove(t),
                 ),
-              ),
             ],
-          ],
-        ),
-        const SizedBox(height: DesignTokens.spacingS),
-        Wrap(
-          spacing: DesignTokens.spacingXS,
-          runSpacing: DesignTokens.spacingXS,
-          children: [
-            for (final t in _tags)
-              Chip(
-                label: Text(t),
-                onDeleted: () => _remove(t),
-                visualDensity: VisualDensity.compact,
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-            SizedBox(
-              width: 200,
-              child: TextField(
-                controller: _controller,
-                focusNode: _focusNode,
-                enabled: !atCap,
-                decoration: InputDecoration(
-                  hintText: atCap
-                      ? 'Max tags reached'
-                      : (_tags.isEmpty ? 'Add a tag…' : '+ tag'),
-                  isDense: true,
-                  border: const OutlineInputBorder(),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
-                ),
-                textInputAction: TextInputAction.done,
-                onSubmitted: _commit,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
         if (_suggestions.isNotEmpty) ...[
           const SizedBox(height: DesignTokens.spacingS),
           Wrap(
-            spacing: DesignTokens.spacingXS,
-            runSpacing: DesignTokens.spacingXS,
+            spacing: DesignTokens.spacingS,
+            runSpacing: DesignTokens.spacingS,
             children: [
               for (final s in _suggestions)
                 ActionChip(
                   label: Text(s),
                   onPressed: atCap ? null : () => _commit(s),
-                  visualDensity: VisualDensity.compact,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
             ],
           ),

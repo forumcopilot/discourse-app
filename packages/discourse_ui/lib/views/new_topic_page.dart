@@ -201,6 +201,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
   @override
   Widget build(BuildContext context) {
     return MessageComposePage(
+      submitLabel: AppLocalizations.of(context)!.createTopic,
       siteContext: widget.siteContext,
       title: AppLocalizations.of(context)?.newTopic ?? 'New Topic',
       showTitleField: true,

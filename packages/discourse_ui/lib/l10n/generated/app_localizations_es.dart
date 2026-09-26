@@ -2518,4 +2518,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get deleteYourselfNotAllowed =>
       'Contacta con un miembro del equipo si deseas que se elimine tu cuenta.';
+
+  @override
+  String get createTopic => 'Crear tema';
 }

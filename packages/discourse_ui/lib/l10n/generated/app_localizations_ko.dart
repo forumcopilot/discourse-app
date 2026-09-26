@@ -2414,4 +2414,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get deleteYourselfNotAllowed => '계정 삭제를 원하시면 운영진에게 문의하세요.';
+
+  @override
+  String get createTopic => '글 작성하기';
 }

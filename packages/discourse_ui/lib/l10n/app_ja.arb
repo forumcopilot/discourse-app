@@ -982,5 +982,6 @@
   "deleteMyAccount": "アカウントを削除",
   "deleteAccountConfirm": "アカウントを永久に削除してもよろしいですか？この操作は元に戻せません！",
   "deletedYourself": "あなたのアカウントは正常に削除されました。",
-  "deleteYourselfNotAllowed": "アカウントの削除を希望する場合は、スタッフメンバーに連絡をしてください。"
+  "deleteYourselfNotAllowed": "アカウントの削除を希望する場合は、スタッフメンバーに連絡をしてください。",
+  "createTopic": "トピックを作成"
 }

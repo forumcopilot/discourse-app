@@ -17,6 +17,14 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
   - **Vote arrows** are full 48dp buttons (were ~36×40); the author's name gives way instead of overflowing next to a long full name and badges; the edited pencil is 16dp with a wider tap.
   - **The solved-answer card** has 12dp corners like other cards and shows four whole lines of the answer (a fifth was cut in half).
   - **The image viewer** titles itself "2 / 5" when a post has several images (it showed the image's URL) and uses standard icon sizes.
+- **Composers and forms follow one spec** (Reply, New Topic, Edit post, New Message, Edit message and conversation, chat, Edit profile):
+  - **Submit is a labelled button** ("Create Topic", "Reply", "Send", "Save") at the end of the app bar, as Material 3's full-screen forms have it; Edit profile and Change email use the same button. It was an unlabelled icon in the same colour as Back (and a bold text button on those two). `MessageComposePage` takes a `submitLabel`; the new `createTopic` string uses Discourse's own translation in each of the app's languages.
+  - **Fields are the theme's outlined fields with the label in the field**, 56dp for one line and the body at least ten lines. The composer drew its own filled, borderless 12dp boxes under separate labels; the tag field was a 200dp-wide dense box; Edit profile had 14sp w600 labels above its fields.
+  - **The category is a line with its badge**, not an outlined box that looked tappable and wasn't.
+  - **Tags** are a full-width field with a "2/5" counter and the chosen tags as input chips under it; suggestions and tags take a 48dp tap (they were 32dp), and the count is 12sp (was 11).
+  - **Chat** types in 16sp like every other composer (was 14); its send button is 48dp (was 44), an upload's remove button 28dp (was 18) and file names 12sp (were 11).
+  - **Attachment rows** are the same in every composer (48dp thumbnail, 16sp name, a full-size remove button), and the whisper chip is a standard chip.
+  - **New Message follows the same spec** (it is a separate copy of the composer that had drifted): recipients in an outlined field with standard chips, the message box ten lines (was five), translated toolbar tooltips. Folding it back into the shared composer is left for later: it changes how the new conversation opens afterwards.
 - **Post bodies (posts, messages and chat) share one rhythm and one card:**
   - **One 12dp gap between blocks** of every kind (paragraphs, lists, headings, quotes, code, tables, previews, polls, images), and none after the last one. Lists were glued to the paragraph after them (4dp), blocks drawn by the app had 20dp above and 8 below, and every post and quote ended in 12dp of empty space.
   - **Headings h1–h6** are 24, 22, 20, 18, 16 and 16sp, medium weight, never smaller than the text around them (h5 and h6 were 13 and 11sp).

@@ -982,5 +982,6 @@
   "deleteMyAccount": "删除我的帐户",
   "deleteAccountConfirm": "确定要永久删除您的帐户吗？此操作无法撤消！",
   "deletedYourself": "您的帐户已被成功删除。",
-  "deleteYourselfNotAllowed": "如果您希望删除您的帐户，请联系管理人员。"
+  "deleteYourselfNotAllowed": "如果您希望删除您的帐户，请联系管理人员。",
+  "createTopic": "创建话题"
 }

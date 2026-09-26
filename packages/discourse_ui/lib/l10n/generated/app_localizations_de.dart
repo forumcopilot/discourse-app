@@ -2529,4 +2529,7 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get deleteYourselfNotAllowed =>
       'Bitte kontaktiere ein Team-Mitglied, wenn du möchtest, dass dein Konto gelöscht wird.';
+
+  @override
+  String get createTopic => 'Thema erstellen';
 }

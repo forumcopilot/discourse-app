@@ -3035,5 +3035,9 @@
   "deleteYourselfNotAllowed": "Please contact a staff member if you wish your account to be deleted.",
   "@deleteYourselfNotAllowed": {
     "description": "When the forum refuses to let you delete your own account (Discourse user.delete_yourself_not_allowed)"
+  },
+  "createTopic": "Create Topic",
+  "@createTopic": {
+    "description": "The composer's submit button for a new topic (Discourse's own wording)."
   }
 }

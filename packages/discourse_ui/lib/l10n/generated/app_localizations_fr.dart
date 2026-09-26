@@ -2526,4 +2526,7 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get deleteYourselfNotAllowed =>
       'Veuillez contacter un responsable si vous souhaitez supprimer votre compte.';
+
+  @override
+  String get createTopic => 'Créer le sujet';
 }

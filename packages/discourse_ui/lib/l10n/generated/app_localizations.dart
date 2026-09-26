@@ -4251,6 +4251,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please contact a staff member if you wish your account to be deleted.'**
   String get deleteYourselfNotAllowed;
+
+  /// The composer's submit button for a new topic (Discourse's own wording).
+  ///
+  /// In en, this message translates to:
+  /// **'Create Topic'**
+  String get createTopic;
 }
 
 class _AppLocalizationsDelegate

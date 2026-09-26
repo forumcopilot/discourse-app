@@ -982,5 +982,6 @@
   "deleteMyAccount": "Eliminar mi cuenta",
   "deleteAccountConfirm": "¿Quieres eliminar permanentemente tu cuenta? ¡Esta acción no se puede deshacer!",
   "deletedYourself": "Tu cuenta se ha eliminado con éxito.",
-  "deleteYourselfNotAllowed": "Contacta con un miembro del equipo si deseas que se elimine tu cuenta."
+  "deleteYourselfNotAllowed": "Contacta con un miembro del equipo si deseas que se elimine tu cuenta.",
+  "createTopic": "Crear tema"
 }

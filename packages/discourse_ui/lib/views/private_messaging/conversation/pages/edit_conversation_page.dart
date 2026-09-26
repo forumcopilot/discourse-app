@@ -146,18 +146,20 @@ class _EditConversationPageState extends State<EditConversationPage> {
           AppLocalizations.of(context)!.editConversation2,
         ),
         actions: [
-          IconButton(
-            icon: _isSubmitting
-                ? SizedBox(
-                    width: DesignTokens.iconSizeL,
-                    height: DesignTokens.iconSizeL,
-                    child: CircularProgressIndicator(
-                      strokeWidth: DesignTokens.borderWidthMedium,
-                      color: colorScheme.onSurface,
-                    ),
-                  )
-                : Icon(Icons.save_rounded, color: colorScheme.onSurface),
-            onPressed: _isSubmitting ? null : _handleSubmit,
+          // A labelled button, as MessageComposePage's: it was an unlabelled
+          // save icon in the same colour as Back.
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: DesignTokens.spacingS),
+            child: FilledButton(
+              onPressed: _isSubmitting ? null : _handleSubmit,
+              child: _isSubmitting
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(AppLocalizations.of(context)!.save),
+            ),
           ),
         ],
       ),
@@ -223,37 +225,13 @@ class _EditConversationPageState extends State<EditConversationPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Title field
-                Text(
-                  AppLocalizations.of(context)!.title,
-                  style: textTheme.titleSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: DesignTokens.fontWeightMedium,
-                  ),
-                ),
-                SizedBox(height: DesignTokens.spacingS),
+                // Title field: the theme's outlined field with its label in
+                // it, as MessageComposePage's.
                 TextField(
                   controller: _titleController,
                   decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.title,
                     hintText: AppLocalizations.of(context)?.enterConversationTitle ?? 'Enter message title',
-                    hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
-                    filled: true,
-                    fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                      borderSide: BorderSide(
-                        color: colorScheme.primary,
-                        width: DesignTokens.borderWidthMedium,
-                      ),
-                    ),
                   ),
                   textInputAction: TextInputAction.next,
                 ),
@@ -280,22 +258,14 @@ class _EditConversationPageState extends State<EditConversationPage> {
                       ),
                       child: Column(
                         children: [
-                          // Open for replies
+                          // Open for replies: the list tile's own title and
+                          // subtitle styles.
                           SwitchListTile(
-                            title: Text(
-                              AppLocalizations.of(context)!.conversationOpen,
-                              style: textTheme.titleSmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                                fontWeight: DesignTokens.fontWeightMedium,
-                              ),
-                            ),
+                            title: Text(AppLocalizations.of(context)!.conversationOpen),
                             subtitle: Text(
                               _conversationOpen == true
                                   ? AppLocalizations.of(context)!.messageOpenForReplies
                                   : AppLocalizations.of(context)!.messageClosedForReplies,
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
                             ),
                             value: _conversationOpen ?? true,
                             onChanged: (value) {
