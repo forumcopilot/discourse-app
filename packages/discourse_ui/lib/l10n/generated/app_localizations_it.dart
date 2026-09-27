@@ -1746,6 +1746,20 @@ class AppLocalizationsIt extends AppLocalizations {
   String get messageArchive => 'Archiviati';
 
   @override
+  String get messageListUnread => 'Non letti';
+
+  @override
+  String get messageListNew => 'Nuovo';
+
+  @override
+  String get messageListSent => 'Inviati';
+
+  @override
+  String removeFromMessageConfirm(String name) {
+    return 'Vuoi davvero rimuovere $name da questo messaggio?';
+  }
+
+  @override
   String get messageArchived => 'Messaggio archiviato';
 
   @override

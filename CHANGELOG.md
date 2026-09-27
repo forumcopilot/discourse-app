@@ -7,6 +7,12 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 ## [Unreleased]
 
 ### Added
+- **The message lists Discourse has:**
+  - The chip row reads Inbox, Unread, New, Sent and Archive, as the topic filters on Home do. Group inboxes follow when you are in a group with messages. There were only Inbox and Archive.
+  - A search button at the end of the row opens search with `in:messages` filled in; Discourse needs a search term alongside it. Search's filters also offer "My messages" (`FCSearchPersonal.messages` in the canonical SDK).
+  - Each list stays loaded between switches, and reloads when you come back if a message was read, filed or left meanwhile.
+- **Remove people and groups from a message:** a remove button beside each in the participants list, when Discourse allows it (`can_remove_allowed_users`), with Discourse's own confirmation. You leave through Leave, not this button.
+- **Delete a message** from its menu, when Discourse allows it: staff, or its author while it is under a day old with one post.
 - **New messages keep a draft** as you write, as topics and replies do. It is stored the way Discourse's web composer stores one: its own `new_private_message_<time>` key, with the recipients. Drafts started on the web resume in the app, and the other way round. A draft is also saved when you only change the recipients.
   - The Drafts list opens a new-message draft in New Message, with its recipients, title and text. It shows it with a mail icon under its title, or "New Message" if it has none. It used to show "(untitled new topic)" and tapping it did nothing.
   - `DiscourseDraftController` takes an `extraDataBuilder` for fields that change while writing, and a `touch()` to save them. `initialize()` returns the restored draft.

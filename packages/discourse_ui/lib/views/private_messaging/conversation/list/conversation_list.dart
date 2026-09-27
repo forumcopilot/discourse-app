@@ -3,7 +3,10 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_private_conversation_proxy.dart';
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseConversationsResult, DiscoursePrivateConversationProxy;
+    show
+        DiscourseConversationsResult,
+        DiscourseMessageList,
+        DiscoursePrivateConversationProxy;
 import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:discourse_ui/views/widgets/empty_state_view.dart';
@@ -18,19 +21,21 @@ import 'conversation_list_item.dart';
 class ConversationList extends StatefulWidget {
   final SiteContext siteContext;
 
-  /// Show the viewer's archived messages (Discourse's Archive list) instead
-  /// of the inbox. Inbox and sent never include archived messages.
-  final bool archived;
+  /// Which of Discourse's message lists to show (Inbox, Unread, New, Sent,
+  /// Archive, a group's inbox). Only the archive includes archived messages.
+  final DiscourseMessageList list;
 
-  /// A message opened from this list was archived, moved to the inbox or
-  /// left: the other list (inbox or archive) is out of date.
-  final VoidCallback? onMovedOut;
+  bool get archived => list == DiscourseMessageList.archive;
+
+  /// A message opened from this list was read, marked unread, archived,
+  /// moved to the inbox or left: the other lists are out of date.
+  final VoidCallback? onMessagesChanged;
 
   const ConversationList({
     super.key,
     required this.siteContext,
-    this.archived = false,
-    this.onMovedOut,
+    this.list = DiscourseMessageList.inbox,
+    this.onMessagesChanged,
   });
 
   @override
@@ -236,8 +241,8 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
 
   Future<FCConversationsResult> _fetch(
       IFCPrivateConversationProxy proxy, int startNum, int lastNum) {
-    if (widget.archived && proxy is DiscoursePrivateConversationProxy) {
-      return proxy.getArchivedConversationsAsync(startNum, lastNum);
+    if (proxy is DiscoursePrivateConversationProxy) {
+      return proxy.getMessageListAsync(widget.list, startNum, lastNum);
     }
     return proxy.getConversationsAsync(startNum, lastNum);
   }
@@ -327,8 +332,8 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
       setState(() {
         _conversations?.removeWhere((c) => c.conv_id == conversation.conv_id);
       });
-      widget.onMovedOut?.call();
     }
+    widget.onMessagesChanged?.call();
     // Reading it (or marking it unread) changed its row.
     AppLogger.debug('[ConversationList] Refreshing after returning from a message');
     await loadConversations();
@@ -358,7 +363,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
       // Must be unique among live detectors: the inbox and archive lists are
       // both mounted (IndexedStack), and with one shared key the archive's
       // visibility was never reported, so it never loaded and spun forever.
-      key: Key(widget.archived ? 'conversation_list_archive' : 'conversation_list'),
+      key: Key('conversation_list_${widget.list.id}'),
       onVisibilityChanged: (VisibilityInfo info) {
         final isVisible = info.visibleFraction > 0.5;
 
@@ -412,9 +417,12 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
           message: widget.archived
               ? AppLocalizations.of(context)!.noArchivedMessages
               : AppLocalizations.of(context)!.noConversations,
+          // The invitation to write one belongs to the inbox only.
           hint: widget.archived
               ? AppLocalizations.of(context)!.noArchivedMessagesHint
-              : AppLocalizations.of(context)!.noConversationsMessage,
+              : widget.list == DiscourseMessageList.inbox
+                  ? AppLocalizations.of(context)!.noConversationsMessage
+                  : null,
         ),
       );
     }

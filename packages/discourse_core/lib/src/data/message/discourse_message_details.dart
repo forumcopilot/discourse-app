@@ -19,6 +19,8 @@ class DiscourseMessageDetails {
     this.canInvite = false,
     this.canEdit = false,
     this.canClose = false,
+    this.canRemoveParticipants = false,
+    this.canDelete = false,
   });
 
   /// The details of topic payload [t] when it is a private message
@@ -44,6 +46,8 @@ class DiscourseMessageDetails {
       // Closing is for staff, trust level 4 and category moderators
       // (topic_guardian.rb), not whoever may edit the title.
       canClose: details['can_close_topic'] == true,
+      canRemoveParticipants: details['can_remove_allowed_users'] == true,
+      canDelete: details['can_delete'] == true,
     );
   }
 
@@ -111,6 +115,13 @@ class DiscourseMessageDetails {
 
   /// Whether the viewer may close or reopen the message (`can_close_topic`).
   final bool canClose;
+
+  /// Whether the viewer may take people and groups off the message
+  /// (`can_remove_allowed_users`).
+  final bool canRemoveParticipants;
+
+  /// Whether the viewer may delete the message (`can_delete`).
+  final bool canDelete;
 
   /// Whether the viewer may remove themselves. Discourse serializes
   /// `details.can_remove_self_id` only when `can_remove_allowed_users?`
@@ -192,4 +203,34 @@ class DiscourseMessageGroup {
       userCount: json['user_count'] as int?,
     );
   }
+}
+
+/// One of Discourse web's message lists (the user-private-messages routes):
+/// the path segments after `/topics/` it merges, and a group for a group's
+/// inbox.
+class DiscourseMessageList {
+  const DiscourseMessageList._(this.id, this.lists, {this.group});
+
+  /// A stable name, e.g. for remembering the list last shown.
+  final String id;
+  final List<String> lists;
+  final String? group;
+
+  /// Everything the viewer is on that is not archived. The web's "Latest"
+  /// is /private-messages, which leaves out messages the viewer started and
+  /// no one has answered; merging in Sent makes one list of all of them.
+  static const inbox =
+      DiscourseMessageList._('inbox', ['private-messages', 'private-messages-sent']);
+  static const unread =
+      DiscourseMessageList._('unread', ['private-messages-unread']);
+  static const newMessages =
+      DiscourseMessageList._('new', ['private-messages-new']);
+  static const sent = DiscourseMessageList._('sent', ['private-messages-sent']);
+  static const archive =
+      DiscourseMessageList._('archive', ['private-messages-archive']);
+
+  /// A group's inbox.
+  factory DiscourseMessageList.group(String name) => DiscourseMessageList._(
+      'group:$name', const ['private-messages-group'],
+      group: name);
 }

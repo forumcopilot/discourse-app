@@ -1903,6 +1903,23 @@
     "description": "UI text: Inbox"
   },
   "messageArchive": "Archive",
+  "messageListUnread": "Unread",
+  "@messageListUnread": {
+    "description": "Messages list: the viewer's unread messages (Discourse user.messages.unread)"
+  },
+  "messageListNew": "New",
+  "@messageListNew": {
+    "description": "Messages list: new messages (Discourse user.messages.new)"
+  },
+  "messageListSent": "Sent",
+  "@messageListSent": {
+    "description": "Messages list: messages the viewer sent (Discourse user.messages.sent)"
+  },
+  "removeFromMessageConfirm": "Do you really want to remove {name} from this message?",
+  "@removeFromMessageConfirm": {
+    "description": "Confirming taking a person or group off a private message (Discourse private_message_info.remove_allowed_user)",
+    "placeholders": { "name": { "type": "String" } }
+  },
   "@messageArchive": {
     "description": "UI text: Archive"
   },

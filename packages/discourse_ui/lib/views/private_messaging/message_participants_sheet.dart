@@ -26,7 +26,14 @@ class MessageParticipantsSheet {
     String? conversationId,
     VoidCallback? onInviteSuccess,
     List<DiscourseMessageGroup> groups = const [],
+    bool canRemove = false,
   }) {
+    // Anyone but yourself (that is Leave, in the message's menu), when the
+    // viewer may take people off (`can_remove_allowed_users`), as the web's
+    // "×" beside each name.
+    final me = siteContext.currentUsername;
+    bool removable(String username) =>
+        canRemove && conversationId != null && username != me;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -67,6 +74,15 @@ class MessageParticipantsSheet {
                         subtitle: group.label != group.name
                             ? Text('@${group.name}')
                             : null,
+                        trailing: canRemove && conversationId != null
+                            ? IconButton(
+                                icon: const Icon(Icons.group_remove_outlined),
+                                tooltip: l10n.remove,
+                                onPressed: () => _remove(sheet, conversationId,
+                                    group.name, group.label,
+                                    isGroup: true, onRemoved: onInviteSuccess),
+                              )
+                            : null,
                       ),
                     for (final p in participants)
                       ListTile(
@@ -83,6 +99,15 @@ class MessageParticipantsSheet {
                               : null,
                         ),
                         title: Text(p.username),
+                        trailing: removable(p.username)
+                            ? IconButton(
+                                icon: const Icon(Icons.person_remove_outlined),
+                                tooltip: l10n.remove,
+                                onPressed: () => _remove(sheet,
+                                    conversationId!, p.username, p.username,
+                                    isGroup: false, onRemoved: onInviteSuccess),
+                              )
+                            : null,
                         onTap: () {
                           Navigator.pop(sheet);
                           Navigator.push(
@@ -106,6 +131,55 @@ class MessageParticipantsSheet {
         );
       },
     );
+  }
+
+  /// Takes [name] (a user or a group) off the message after asking, then
+  /// closes the sheet and reloads the message.
+  static Future<void> _remove(
+    BuildContext sheet,
+    String conversationId,
+    String name,
+    String label, {
+    required bool isGroup,
+    VoidCallback? onRemoved,
+  }) async {
+    final l10n = AppLocalizations.of(sheet)!;
+    final confirmed = await showDialog<bool>(
+      context: sheet,
+      builder: (dialog) => AlertDialog(
+        content: Text(l10n.removeFromMessageConfirm(label)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialog, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialog, true),
+            child: Text(l10n.remove),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !sheet.mounted) return;
+    final proxy = SiteProxyFactory.getPrivateConversationProxy();
+    if (proxy is! DiscoursePrivateConversationProxy) return;
+    final messenger = ScaffoldMessenger.of(sheet);
+    final errorColor = Theme.of(sheet).colorScheme.error;
+    final r = isGroup
+        ? await proxy.removeGroupAsync(conversationId, name)
+        : await proxy.removeParticipantAsync(conversationId, name);
+    if (!sheet.mounted) return;
+    if (!r.result) {
+      messenger.showSnackBar(SnackBar(
+        content: Text(r.resultText?.isNotEmpty == true
+            ? r.resultText!
+            : l10n.errorInvitingUser('')),
+        backgroundColor: errorColor,
+      ));
+      return;
+    }
+    Navigator.pop(sheet);
+    onRemoved?.call();
   }
 
   static Future<void> _invite(

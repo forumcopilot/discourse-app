@@ -1740,6 +1740,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get messageArchive => 'Arquivo';
 
   @override
+  String get messageListUnread => 'Não Lido';
+
+  @override
+  String get messageListNew => 'Novo';
+
+  @override
+  String get messageListSent => 'Enviado';
+
+  @override
+  String removeFromMessageConfirm(String name) {
+    return 'Deseja mesmo remover $name desta mensagem?';
+  }
+
+  @override
   String get messageArchived => 'Mensagem arquivada';
 
   @override

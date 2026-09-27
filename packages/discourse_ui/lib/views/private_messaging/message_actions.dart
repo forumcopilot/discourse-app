@@ -1,3 +1,5 @@
+import 'package:discourse_core/discourse_core.dart'
+    show DiscoursePrivateConversationProxy;
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
@@ -176,6 +178,43 @@ class MessageActions {
       }
       return false;
     }
+  }
+
+  /// Delete the whole message, after asking.
+  static Future<bool> delete(BuildContext context, String topicId) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: Text(l10n.deleteMessageQuestion),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialog, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(dialog).colorScheme.error,
+              foregroundColor: Theme.of(dialog).colorScheme.onError,
+            ),
+            onPressed: () => Navigator.pop(dialog, true),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return false;
+    final proxy = SiteProxyFactory.getPrivateConversationProxy();
+    if (proxy is! DiscoursePrivateConversationProxy) return false;
+    final r = await proxy.deleteMessageAsync(topicId);
+    if (!context.mounted) return false;
+    if (!r.result) {
+      _fail(context, r.resultText?.isNotEmpty == true
+          ? r.resultText!
+          : l10n.deleteMessageQuestion);
+      return false;
+    }
+    return true;
   }
 
   /// Edit the message's title (and, for those who may, close it).

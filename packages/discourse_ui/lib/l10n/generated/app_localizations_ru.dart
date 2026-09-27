@@ -1740,6 +1740,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get messageArchive => 'Архив';
 
   @override
+  String get messageListUnread => 'Непрочитанные';
+
+  @override
+  String get messageListNew => 'Новые';
+
+  @override
+  String get messageListSent => 'Отправленные';
+
+  @override
+  String removeFromMessageConfirm(String name) {
+    return 'Действительно удалить $name из этого сообщения?';
+  }
+
+  @override
   String get messageArchived => 'Сообщение перемещено в архив';
 
   @override

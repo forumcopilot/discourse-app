@@ -19,6 +19,7 @@ class PostsPageMessageMenu {
     this.isClosed = false,
     this.onClose,
     this.onLeave,
+    this.onDelete,
   });
 
   final int participantCount;
@@ -35,6 +36,7 @@ class PostsPageMessageMenu {
   final bool isClosed;
   final VoidCallback? onClose;
   final VoidCallback? onLeave;
+  final VoidCallback? onDelete;
 }
 
 class PostsPageAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -407,11 +409,14 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                 ],
               ),
             ),
-          if (message?.onLeave != null) ...[
+          if (message?.onLeave != null || message?.onDelete != null)
             const PopupMenuDivider(),
+          if (message?.onLeave != null)
             item('msg_leave', Icons.exit_to_app_rounded, l10n.leaveConversation2,
                 danger: true),
-          ],
+          if (message?.onDelete != null)
+            item('msg_delete', Icons.delete_outline_rounded, l10n.deleteMessage,
+                danger: true),
         ],
         onSelected: (value) {
           switch (value) {
@@ -429,6 +434,9 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
               break;
             case 'msg_leave':
               message?.onLeave?.call();
+              break;
+            case 'msg_delete':
+              message?.onDelete?.call();
               break;
             case 'refresh':
               widget.onRefresh?.call();

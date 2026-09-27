@@ -1676,6 +1676,20 @@ class AppLocalizationsJa extends AppLocalizations {
   String get messageArchive => 'アーカイブ';
 
   @override
+  String get messageListUnread => '未読';
+
+  @override
+  String get messageListNew => '新規';
+
+  @override
+  String get messageListSent => '送信済み';
+
+  @override
+  String removeFromMessageConfirm(String name) {
+    return 'このメッセージから $name を削除してもよろしいですか？';
+  }
+
+  @override
   String get messageArchived => 'メッセージをアーカイブしました';
 
   @override

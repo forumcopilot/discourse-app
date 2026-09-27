@@ -1672,6 +1672,20 @@ class AppLocalizationsKo extends AppLocalizations {
   String get messageArchive => '보관';
 
   @override
+  String get messageListUnread => '읽지 않음';
+
+  @override
+  String get messageListNew => '새글';
+
+  @override
+  String get messageListSent => '전송됨';
+
+  @override
+  String removeFromMessageConfirm(String name) {
+    return '$name 님을 메시지에서 제거할까요?';
+  }
+
+  @override
   String get messageArchived => '메시지를 보관했습니다';
 
   @override

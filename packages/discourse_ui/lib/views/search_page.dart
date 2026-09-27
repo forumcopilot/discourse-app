@@ -26,7 +26,17 @@ class SearchPage extends StatefulWidget {
   /// waiting for the reader to type.
   final String? initialQuery;
 
-  const SearchPage({super.key, required this.siteContext, this.initialQuery});
+  /// Text to start the field with, for the reader to finish, e.g.
+  /// `in:messages ` from the messages list: Discourse finds nothing for a
+  /// filter without a term, so it is not searched yet.
+  final String? prefill;
+
+  const SearchPage({
+    super.key,
+    required this.siteContext,
+    this.initialQuery,
+    this.prefill,
+  });
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -104,6 +114,13 @@ class _SearchPageState extends State<SearchPage> {
       if (initial.isNotEmpty) {
         _performSearch(initial);
       } else {
+        final prefill = widget.prefill;
+        if (prefill != null && prefill.isNotEmpty) {
+          _searchController.value = TextEditingValue(
+            text: prefill,
+            selection: TextSelection.collapsed(offset: prefill.length),
+          );
+        }
         _searchFocusNode.requestFocus();
       }
     });

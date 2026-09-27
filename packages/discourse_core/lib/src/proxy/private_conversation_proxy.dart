@@ -236,18 +236,41 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
   /// reaches it by type, as it does whispers on DiscoursePostProxy.
   Future<FCConversationsResult> getArchivedConversationsAsync(
       int startNum, int lastNum) {
-    return _listMessages(
-      const ['private-messages-archive'],
-      startNum,
-      lastNum,
-    );
+    return getMessageListAsync(DiscourseMessageList.archive, startNum, lastNum);
+  }
+
+  /// Discourse-only: one of the web's message lists (Inbox, Unread, New,
+  /// Sent, Archive, or a group's inbox) — its user-private-messages routes.
+  Future<FCConversationsResult> getMessageListAsync(
+      DiscourseMessageList list, int startNum, int lastNum) {
+    return _listMessages(list.lists, startNum, lastNum, group: list.group);
+  }
+
+  /// Discourse-only: the groups whose messages the viewer can read, for their
+  /// inboxes (the web's `groupsWithMessages`: the viewer's groups with
+  /// `has_messages`).
+  Future<List<DiscourseMessageGroup>> getMessageGroupsAsync() async {
+    final username = siteContext.currentUsername;
+    if (username == null || username.isEmpty) return const [];
+    try {
+      final r = await apiGet('/u/${Uri.encodeComponent(username)}.json');
+      final user = (r['user'] as Map?)?.cast<String, dynamic>() ?? const {};
+      return [
+        for (final g in (user['groups'] as List?) ?? const [])
+          if (g is Map && g['has_messages'] == true)
+            if (DiscourseMessageGroup.fromJson(g) case final group?) group,
+      ];
+    } catch (_) {
+      return const [];
+    }
   }
 
   /// One window of the merged lists at [lists] (the path segment after
   /// /topics/), newest activity first. The first list must succeed; the
-  /// others are best-effort.
+  /// others are best-effort. A [group]'s inbox is under the viewer's name
+  /// (/topics/private-messages-group/{u}/{group}).
   Future<FCConversationsResult> _listMessages(
-      List<String> lists, int startNum, int lastNum) async {
+      List<String> lists, int startNum, int lastNum, {String? group}) async {
     final username = siteContext.currentUsername;
     if (username == null || username.isEmpty) {
       return FCConversationsResult(
@@ -270,8 +293,10 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       final pageQuery = <String, dynamic>{
         if (page > 0) 'page': page.toString(),
       };
+      final groupPart =
+          group == null ? '' : '/${Uri.encodeComponent(group)}';
       Future<Map<String, dynamic>> fetch(String list) =>
-          apiGet('/topics/$list/$encUser.json', query: pageQuery);
+          apiGet('/topics/$list/$encUser$groupPart.json', query: pageQuery);
       final responses = await Future.wait([
         fetch(lists.first),
         for (final list in lists.skip(1))
@@ -419,6 +444,55 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
           result: false, resultText: e.userMessage);
     } catch (e) {
       return FCLeaveConversationResult(result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Discourse-only: take someone off a message (PUT
+  /// /t/{id}/remove-allowed-user) — the web's "×" beside them in the
+  /// participants, offered with `details.can_remove_allowed_users`.
+  Future<FCLeaveConversationResult> removeParticipantAsync(
+      String conversationId, String username) async {
+    try {
+      await apiPut('/t/$conversationId/remove-allowed-user.json',
+          body: {'username': username});
+      return FCLeaveConversationResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCLeaveConversationResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCLeaveConversationResult(
+          result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Discourse-only: take a group off a message (PUT
+  /// /t/{id}/remove-allowed-group).
+  Future<FCLeaveConversationResult> removeGroupAsync(
+      String conversationId, String group) async {
+    try {
+      await apiPut('/t/$conversationId/remove-allowed-group.json',
+          body: {'name': group});
+      return FCLeaveConversationResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCLeaveConversationResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCLeaveConversationResult(
+          result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Discourse-only: delete the message thread (DELETE /t/{id}), offered with
+  /// `details.can_delete` — staff, or its author while it has one post and is
+  /// under a day old (topic_guardian.rb).
+  Future<FCLeaveConversationResult> deleteMessageAsync(
+      String conversationId) async {
+    try {
+      await apiDelete('/t/$conversationId.json');
+      return FCLeaveConversationResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCLeaveConversationResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCLeaveConversationResult(
+          result: false, resultText: describeApiError(e));
     }
   }
 

@@ -3056,6 +3056,30 @@ abstract class AppLocalizations {
   /// **'Archive'**
   String get messageArchive;
 
+  /// Messages list: the viewer's unread messages (Discourse user.messages.unread)
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get messageListUnread;
+
+  /// Messages list: new messages (Discourse user.messages.new)
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get messageListNew;
+
+  /// Messages list: messages the viewer sent (Discourse user.messages.sent)
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get messageListSent;
+
+  /// Confirming taking a person or group off a private message (Discourse private_message_info.remove_allowed_user)
+  ///
+  /// In en, this message translates to:
+  /// **'Do you really want to remove {name} from this message?'**
+  String removeFromMessageConfirm(String name);
+
   /// UI text: Message archived
   ///
   /// In en, this message translates to:

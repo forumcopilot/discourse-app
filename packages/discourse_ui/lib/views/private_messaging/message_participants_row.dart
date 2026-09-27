@@ -91,6 +91,7 @@ class MessageParticipantsRow extends StatelessWidget {
           conversationId: topicId,
           onInviteSuccess: onChanged,
           groups: details.groups,
+          canRemove: details.canRemoveParticipants,
         ),
         borderRadius: BorderRadius.circular(DesignTokens.radiusS),
         child: ConstrainedBox(

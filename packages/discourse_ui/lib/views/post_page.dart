@@ -131,6 +131,7 @@ class _PostPageState extends State<PostPage> {
         conversationId: id,
         onInviteSuccess: () => _refreshCallback?.call(),
         groups: m.groups,
+        canRemove: m.canRemoveParticipants,
       ),
       isArchived: m.isArchived,
       onArchive: () async =>
@@ -157,6 +158,10 @@ class _PostPageState extends State<PostPage> {
       onLeave: m.canLeave
           ? () async => closeWith(
               await MessageActions.leave(context, id), PostPage.messageRemoved)
+          : null,
+      onDelete: m.canDelete
+          ? () async => closeWith(
+              await MessageActions.delete(context, id), PostPage.messageRemoved)
           : null,
     );
   }

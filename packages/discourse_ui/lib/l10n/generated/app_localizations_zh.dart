@@ -1659,6 +1659,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get messageArchive => '归档';
 
   @override
+  String get messageListUnread => '未读';
+
+  @override
+  String get messageListNew => '新';
+
+  @override
+  String get messageListSent => '已发送';
+
+  @override
+  String removeFromMessageConfirm(String name) {
+    return '真的要将 $name 从此消息中移除吗？';
+  }
+
+  @override
   String get messageArchived => '消息已归档';
 
   @override
