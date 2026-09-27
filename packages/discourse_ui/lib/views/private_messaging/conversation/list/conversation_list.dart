@@ -22,10 +22,15 @@ class ConversationList extends StatefulWidget {
   /// of the inbox. Inbox and sent never include archived messages.
   final bool archived;
 
+  /// A message opened from this list was archived, moved to the inbox or
+  /// left: the other list (inbox or archive) is out of date.
+  final VoidCallback? onMovedOut;
+
   const ConversationList({
     super.key,
     required this.siteContext,
     this.archived = false,
+    this.onMovedOut,
   });
 
   @override
@@ -322,6 +327,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
       setState(() {
         _conversations?.removeWhere((c) => c.conv_id == conversation.conv_id);
       });
+      widget.onMovedOut?.call();
     }
     // Reading it (or marking it unread) changed its row.
     AppLogger.debug('[ConversationList] Refreshing after returning from a message');

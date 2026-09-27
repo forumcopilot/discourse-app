@@ -31,6 +31,13 @@ class PrivateMessageListTabState extends FCStatefulWidget<PrivateMessageListTab>
 
   bool _showArchive = false;
 
+  /// Set when a message moved out of the other list into this one (archived
+  /// from the inbox, or moved back from the archive): both lists stay alive,
+  /// so the one shown next is reloaded rather than showing where the message
+  /// used to be.
+  bool _inboxStale = false;
+  bool _archiveStale = false;
+
   @override
   void resetTab() {
     (_showArchive ? _archiveKey : _conversationKey)
@@ -87,11 +94,18 @@ class PrivateMessageListTabState extends FCStatefulWidget<PrivateMessageListTab>
                   showSelectedIcon: false,
                   onSelectionChanged: (selection) {
                     setState(() => _showArchive = selection.first);
-                    if (_showArchive) {
-                      // First visit: start the archive's load directly.
-                      WidgetsBinding.instance.addPostFrameCallback(
-                          (_) => _archiveKey.currentState?.loadIfNeeded());
-                    }
+                    final stale = _showArchive ? _archiveStale : _inboxStale;
+                    _showArchive ? _archiveStale = false : _inboxStale = false;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      final list = (_showArchive ? _archiveKey : _conversationKey)
+                          .currentState;
+                      if (stale) {
+                        list?.loadConversations();
+                      } else if (_showArchive) {
+                        // First visit: start the archive's load directly.
+                        list?.loadIfNeeded();
+                      }
+                    });
                   },
                 ),
               ),
@@ -105,11 +119,13 @@ class PrivateMessageListTabState extends FCStatefulWidget<PrivateMessageListTab>
                   ConversationList(
                     key: _conversationKey,
                     siteContext: widget.siteContext,
+                    onMovedOut: () => _archiveStale = true,
                   ),
                   ConversationList(
                     key: _archiveKey,
                     siteContext: widget.siteContext,
                     archived: true,
+                    onMovedOut: () => _inboxStale = true,
                   ),
                 ],
               ),
