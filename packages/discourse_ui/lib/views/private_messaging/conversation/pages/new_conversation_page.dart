@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/views/user_search_page.dart';
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
 import 'package:discourse_ui/views/widgets/user_avatar.dart';
@@ -12,6 +11,7 @@ import 'package:discourse_ui/views/widgets/user_avatar.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../services/attachment_upload_service.dart';
 import '../../../../theme/design_tokens.dart';
+import '../../../../utils/discourse_draft_controller.dart';
 import '../../../lists/posts_list.dart' show PostsListMode;
 import '../../../post_page.dart';
 
@@ -27,12 +27,23 @@ class NewConversationPage extends StatefulWidget {
   final String? initialRecipient;
   final String? initialRecipientIconUrl;
 
+  /// The server draft to write to, and to resume from. Each new message has
+  /// its own, keyed as the web keys them (`new_private_message_<time>`); the
+  /// drafts list passes an existing one back.
+  final String? draftKey;
+
   const NewConversationPage({
     super.key,
     required this.siteContext,
     this.initialRecipient,
     this.initialRecipientIconUrl,
+    this.draftKey,
   });
+
+  /// Whether [key] names a new message's draft (`new_private_message`, or
+  /// `new_private_message_<time>` as the web keys them).
+  static bool isDraftKey(String key) =>
+      key == 'new_private_message' || key.startsWith('new_private_message_');
 
   /// Opens New Message and, once it is sent, the new message — as New Topic
   /// opens the new topic. Done here rather than inside the composer: the
@@ -44,6 +55,7 @@ class NewConversationPage extends StatefulWidget {
     required SiteContext siteContext,
     String? initialRecipient,
     String? initialRecipientIconUrl,
+    String? draftKey,
   }) async {
     final created =
         await Navigator.of(context).push<({String id, String title})?>(
@@ -52,6 +64,7 @@ class NewConversationPage extends StatefulWidget {
           siteContext: siteContext,
           initialRecipient: initialRecipient,
           initialRecipientIconUrl: initialRecipientIconUrl,
+          draftKey: draftKey,
         ),
       ),
     );
@@ -80,7 +93,9 @@ class _NewConversationPageState extends State<NewConversationPage> {
   final List<String> _recipients = [];
   final Map<String, String?> _recipientIcons = {};
   final List<String> _attachmentIds = [];
-  bool _canUpload = false;
+  final _titleController = TextEditingController();
+  final _contentController = TextEditingController();
+  late final DiscourseDraftController _draft;
 
   /// Set once the message is sent; the composer pops with it.
   ({String id, String title})? _created;
@@ -93,20 +108,43 @@ class _NewConversationPageState extends State<NewConversationPage> {
       _recipients.add(initial);
       _recipientIcons[initial] = widget.initialRecipientIconUrl;
     }
-    _fetchCanUpload();
+    // Saved as the web saves a new message's draft, so either can resume
+    // the other's (models/composer.js: action, archetypeId, recipients).
+    _draft = DiscourseDraftController(
+      draftKey: widget.draftKey ??
+          'new_private_message_${DateTime.now().millisecondsSinceEpoch}',
+      titleController: _titleController,
+      contentController: _contentController,
+      extraData: const {
+        'action': 'privateMessage',
+        'archetypeId': 'private_message',
+      },
+      extraDataBuilder: () => {'recipients': _recipients.join(',')},
+    );
+    _draft.initialize().then((draft) {
+      final saved = draft?.data['recipients']?.toString() ?? '';
+      if (!mounted || saved.isEmpty) return;
+      setState(() {
+        for (final name in saved.split(',').map((n) => n.trim())) {
+          if (name.isNotEmpty && !_recipients.contains(name)) {
+            _recipients.add(name);
+          }
+        }
+      });
+    });
   }
 
-  /// Whether this user may attach files to a message; the message list
-  /// carries it.
-  Future<void> _fetchCanUpload() async {
-    try {
-      final data = await SiteProxyFactory.getPrivateConversationProxy()
-          .getConversationsAsync(0, 0);
-      if (mounted) setState(() => _canUpload = data.canUpload);
-    } catch (e, st) {
-      AppLogger.error('New message: could not read canUpload',
-          error: e, stackTrace: st);
-    }
+  @override
+  void dispose() {
+    _draft.dispose();
+    _titleController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
+
+  void _setRecipients(void Function() change) {
+    setState(change);
+    _draft.touch();
   }
 
   /// Sends the message. Throws with a readable message on failure; the
@@ -132,6 +170,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
     }
     if (result.convId.isEmpty) throw Exception(l10n.messageSentWithoutId);
     _created = (id: result.convId, title: title);
+    await _draft.discard();
     return true;
   }
 
@@ -172,7 +211,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
     if (result is! Map<String, dynamic>) return;
     final username = result['username'] as String;
     if (_recipients.contains(username)) return;
-    setState(() {
+    _setRecipients(() {
       _recipients.add(username);
       _recipientIcons[username] = result['iconUrl'] as String?;
     });
@@ -196,7 +235,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
                 radius: DesignTokens.radiusM,
               ),
               label: Text(username),
-              onDeleted: () => setState(() {
+              onDeleted: () => _setRecipients(() {
                 _recipients.remove(username);
                 _recipientIcons.remove(username);
               }),
@@ -223,9 +262,14 @@ class _NewConversationPageState extends State<NewConversationPage> {
       contentLabel: l10n.message,
       contentHint: l10n.writeYourMessage,
       extraHeader: _recipientField(),
+      titleController: _titleController,
+      contentController: _contentController,
       onSubmit: _submit,
       onSuccess: (_) => _created,
-      onFileUpload: _canUpload ? _upload : null,
+      onFileUpload:
+          (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false)
+              ? _upload
+              : null,
       onRemoveAttachment: (id) async =>
           setState(() => _attachmentIds.remove(id)),
     );

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_draft.dart';
 
 import '../core/logging/app_logger.dart';
 
@@ -32,6 +33,10 @@ class DiscourseDraftController {
   /// tags). The map is shallow-merged into the saved data on every save.
   final Map<String, dynamic> extraData;
 
+  /// Extra fields that change while writing (a message's recipients), read
+  /// at each save and merged over [extraData]. Call [touch] when they change.
+  final Map<String, dynamic> Function()? extraDataBuilder;
+
   Timer? _debounce;
   bool _saving = false;
   bool _pendingFlush = false;
@@ -41,6 +46,7 @@ class DiscourseDraftController {
   int _sequence = 0;
   String _lastSavedReply = '';
   String _lastSavedTitle = '';
+  String _lastSavedExtra = '';
 
   DiscourseDraftController({
     required this.draftKey,
@@ -48,17 +54,30 @@ class DiscourseDraftController {
     required this.contentController,
     this.debounceDuration = const Duration(milliseconds: 1500),
     this.extraData = const {},
+    this.extraDataBuilder,
   });
 
+  Map<String, dynamic> get _extra => {
+        ...extraData,
+        ...?extraDataBuilder?.call(),
+      };
+
+  /// Save soon although the text is unchanged: something in
+  /// [extraDataBuilder] (e.g. the recipients) changed.
+  void touch() => _onChanged();
+
   /// Hydrate the controllers from the server-side draft (if any) and
-  /// start watching for user changes.
-  Future<void> initialize() async {
+  /// start watching for user changes. Returns the draft that was restored,
+  /// for fields beyond the title and text (e.g. a message's recipients).
+  Future<FCDraft?> initialize() async {
+    FCDraft? restored;
     try {
       final result =
           await SiteProxyService.getDraftProxy().loadDraftAsync(draftKey);
-      if (_disposed) return;
+      if (_disposed) return null;
       final draft = result.draft;
       if (result.result && draft != null) {
+        restored = draft;
         _sequence = draft.sequence;
         final reply = draft.reply;
         final title = draft.topicTitle ?? draft.title ?? '';
@@ -80,8 +99,10 @@ class DiscourseDraftController {
     } catch (e) {
       AppLogger.debug('DiscourseDraftController initial load failed: $e');
     }
+    _lastSavedExtra = _extra.toString();
     _loaded = true;
     _attach();
+    return restored;
   }
 
   void _attach() {
@@ -126,7 +147,13 @@ class DiscourseDraftController {
       _pendingFlush = false;
       final reply = contentController.text;
       final title = titleController.text;
-      if (reply == _lastSavedReply && title == _lastSavedTitle) return;
+      final extra = _extra;
+      final extraKey = extra.toString();
+      if (reply == _lastSavedReply &&
+          title == _lastSavedTitle &&
+          extraKey == _lastSavedExtra) {
+        return;
+      }
       // Discourse auto-deletes drafts whose reply text is empty/whitespace,
       // so only POST when we have something worth saving.
       if (reply.trim().isEmpty && title.trim().isEmpty) return;
@@ -134,7 +161,7 @@ class DiscourseDraftController {
         draftKey: draftKey,
         sequence: _sequence,
         data: {
-          ...extraData,
+          ...extra,
           'reply': reply,
           if (title.isNotEmpty) 'title': title,
         },
@@ -142,6 +169,7 @@ class DiscourseDraftController {
       if (result.result) {
         _lastSavedReply = reply;
         _lastSavedTitle = title;
+        _lastSavedExtra = extraKey;
         if (result.sequence != null) _sequence = result.sequence!;
       }
       // Re-run when a flush was requested while this save was in flight.

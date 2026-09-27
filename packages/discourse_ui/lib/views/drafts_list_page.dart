@@ -13,6 +13,7 @@ import 'reply_page.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'private_messaging/conversation/pages/new_conversation_page.dart';
 
 /// Discourse-native drafts list (`/drafts.json`). Surfaces all of the
 /// current user's saved drafts — new topics, replies, and PMs.
@@ -119,8 +120,13 @@ class _DraftsListPageState extends State<DraftsListPage> {
     // Reply drafts → ReplyPage anchored on the topic.
     // New-topic drafts → NewTopicPage in the saved category (or "" if
     //   the draft is uncategorised).
-    // PM drafts (`new_private_message`) — open as a topic-less compose
-    //   for now; deeper PM wiring is a follow-up.
+    // New-message drafts → New Message, with the saved recipients.
+    //   (A reply to a message is a `topic_<id>` draft like any reply.)
+    if (NewConversationPage.isDraftKey(draft.draftKey)) {
+      NewConversationPage.open(context,
+          siteContext: widget.siteContext, draftKey: draft.draftKey);
+      return;
+    }
     if (draft.draftKey.startsWith('topic_')) {
       final topicId = draft.draftKey.substring('topic_'.length);
       if (topicId.isEmpty) return;
@@ -208,18 +214,28 @@ class _DraftsListPageState extends State<DraftsListPage> {
             ),
             itemBuilder: (_, i) {
               final d = drafts[i];
-              final title = (_isNewTopicDraft(d) || d.draftKey == 'new_private_message')
+              final isMessage = NewConversationPage.isDraftKey(d.draftKey);
+              final l10n = AppLocalizations.of(context)!;
+              final title = isMessage
                   ? (d.topicTitle?.isNotEmpty ?? false
                       ? d.topicTitle!
-                      : '(untitled new topic)')
-                  : (d.title?.isNotEmpty ?? false
-                      ? d.title!
-                      : 'Reply draft');
+                      : l10n.newConversation)
+                  : _isNewTopicDraft(d)
+                      ? (d.topicTitle?.isNotEmpty ?? false
+                          ? d.topicTitle!
+                          : '(untitled new topic)')
+                      : (d.title?.isNotEmpty ?? false
+                          ? d.title!
+                          : 'Reply draft');
               final excerpt = d.reply.trim();
               return ListTile(
                 onTap: () => _resume(d),
                 leading: Icon(
-                  (_isNewTopicDraft(d) || d.draftKey == 'new_private_message') ? Icons.fiber_new : Icons.reply,
+                  isMessage
+                      ? Icons.mail_outline
+                      : _isNewTopicDraft(d)
+                          ? Icons.fiber_new
+                          : Icons.reply,
                   color: colorScheme.onSurfaceVariant,
                 ),
                 title: Text(

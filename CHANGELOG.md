@@ -6,6 +6,12 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Added
+- **New messages keep a draft** as you write, as topics and replies do. It is stored the way Discourse's web composer stores one: its own `new_private_message_<time>` key, with the recipients. Drafts started on the web resume in the app, and the other way round. A draft is also saved when you only change the recipients.
+  - The Drafts list opens a new-message draft in New Message, with its recipients, title and text. It shows it with a mail icon under its title, or "New Message" if it has none. It used to show "(untitled new topic)" and tapping it did nothing.
+  - `DiscourseDraftController` takes an `extraDataBuilder` for fields that change while writing, and a `touch()` to save them. `initialize()` returns the restored draft.
+  - New Message no longer loads the inbox to find out whether uploads are allowed. It reads the same permission as the other composers.
+
 ### Changed
 - **Private messages open in the topic page**, from every entry point: the inbox, notifications, push, links, bookmarks and New Message. A Discourse message is a topic, and the app had a separate copy of the reading and composing screens for them, which had fallen behind. The same message opened in one or the other depending on how you got there. Messages now get everything a topic post has:
   - reactions and who reacted, bookmarks with reminders, and reply to a specific message
