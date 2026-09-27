@@ -11,7 +11,7 @@ import 'package:discourse_ui/views/widgets/not_signed_in_view.dart';
 import '../../../../theme/design_tokens.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../../../../l10n/generated/app_localizations.dart';
-import '../pages/conversation_page.dart';
+import '../../../post_page.dart';
 import '../../../../utils/error_message.dart';
 import 'conversation_list_item.dart';
 
@@ -301,57 +301,31 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
     }
   }
 
+  /// Opens the message in the topic page (a Discourse message is a topic)
+  /// at the reader's first unread post, as the web opens it from the inbox.
   Future<void> _onConversationTap(FCConversationSummary conversation) async {
-    // Use messageId if available to navigate directly to the appropriate message
-    // Otherwise, calculate the last page to open at the most recent messages
-    final pageSize = 20;
-    int? lastPageStartNum;
-    
-    if (conversation.messageId != null && conversation.messageId!.isNotEmpty) {
-      // messageId is available - will use getConversationByMessageAsync in ConversationPage
-      // No need to calculate initialStartNum
-    } else {
-      // Fallback: calculate the last page
-      final replyCount = int.tryParse(conversation.reply_count ?? '0') ?? 0;
-      final totalMessages = replyCount + 1; // replies + first message
-      lastPageStartNum = totalMessages > pageSize ? totalMessages - pageSize : 0;
-    }
-
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ConversationPage(
+        builder: (context) => PostPage(
           siteContext: widget.siteContext,
-          conversationId: conversation.conv_id ?? '',
-          subject: conversation.subject ?? (AppLocalizations.of(context)?.noSubject ?? 'No subject'),
-          initialStartNum: lastPageStartNum,
-          anchorMessageId: conversation.messageId, // Use messageId to navigate to specific message
-          onMarkUnread: () {
-            final index = _conversations!.indexWhere((c) => c.conv_id == conversation.conv_id);
-            if (index != -1) {
-              setState(() {
-                _conversations![index] = _conversations![index].copyWith(
-                  newPost: true,
-                );
-              });
-            }
-          },
+          topicId: conversation.conv_id ?? '',
+          title: conversation.subject ??
+              (AppLocalizations.of(context)?.noSubject ?? 'No subject'),
+          forumId: '',
         ),
       ),
     );
-
-    // Refresh the conversation list when returning from conversation page
-    if (mounted) {
-      AppLogger.debug('[ConversationList] Refreshing conversation list after returning from conversation');
-      await loadConversations();
-    }
-
-    // If the conversation was left (result is true), remove it from the list
-    if (result == true && mounted) {
+    if (!mounted) return;
+    // Archived, moved or left: out of this list at once, before the reload.
+    if (result == PostPage.messageRemoved) {
       setState(() {
         _conversations?.removeWhere((c) => c.conv_id == conversation.conv_id);
       });
     }
+    // Reading it (or marking it unread) changed its row.
+    AppLogger.debug('[ConversationList] Refreshing after returning from a message');
+    await loadConversations();
   }
 
   @override

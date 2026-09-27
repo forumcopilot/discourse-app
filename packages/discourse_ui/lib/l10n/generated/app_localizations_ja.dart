@@ -2092,6 +2092,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get suggestedTopics => 'おすすめのトピック';
 
   @override
+  String get suggestedMessages => '推奨メッセージ';
+
+  @override
   String get newLabel => '新着';
 
   @override

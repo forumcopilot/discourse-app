@@ -5,9 +5,42 @@ import '../../theme/design_tokens.dart';
 import '../../utils/emoji_shortcodes.dart';
 import '../widgets/adaptive_app_bar_title.dart';
 
+/// What the app bar offers when the topic page shows a private message (a
+/// Discourse message is a topic): who is on it, and filing it away. Its
+/// callbacks are set by what the viewer may do; a null one hides its item.
+class PostsPageMessageMenu {
+  const PostsPageMessageMenu({
+    required this.participantCount,
+    required this.onParticipants,
+    required this.isArchived,
+    required this.onArchive,
+    required this.onMarkUnread,
+    this.onEditTitle,
+    this.isClosed = false,
+    this.onClose,
+    this.onLeave,
+  });
+
+  final int participantCount;
+  final VoidCallback onParticipants;
+
+  /// Whether the viewer has archived it: [onArchive] then moves it back to
+  /// the inbox.
+  final bool isArchived;
+  final VoidCallback onArchive;
+  final VoidCallback onMarkUnread;
+  final VoidCallback? onEditTitle;
+
+  /// Whether it is closed: [onClose] then opens it again.
+  final bool isClosed;
+  final VoidCallback? onClose;
+  final VoidCallback? onLeave;
+}
+
 class PostsPageAppBar extends StatefulWidget implements PreferredSizeWidget {
   const PostsPageAppBar({
     required this.siteContext,
+    this.message,
     required String title,
     this.onShare,
     this.onViewOnWeb,
@@ -42,6 +75,9 @@ class PostsPageAppBar extends StatefulWidget implements PreferredSizeWidget {
 
   final SiteContext siteContext;
   final String _title;
+
+  /// Set when the page shows a private message.
+  final PostsPageMessageMenu? message;
   final VoidCallback? onShare;
   final VoidCallback? onViewOnWeb;
   final VoidCallback? onSubscribe;
@@ -115,7 +151,30 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final message = widget.message;
+    final l10n = AppLocalizations.of(context)!;
+    PopupMenuItem<String> item(String value, IconData icon, String label,
+            {bool danger = false}) =>
+        PopupMenuItem<String>(
+          value: value,
+          child: Row(
+            children: [
+              Icon(icon,
+                  color: danger ? colorScheme.error : colorScheme.onSurfaceVariant),
+              const SizedBox(width: DesignTokens.spacingM),
+              Text(label,
+                  style: danger ? TextStyle(color: colorScheme.error) : null),
+            ],
+          ),
+        );
+
     return [
+      if (message != null)
+        IconButton(
+          icon: const Icon(Icons.people_outline_rounded),
+          tooltip: l10n.participants(message.participantCount),
+          onPressed: message.onParticipants,
+        ),
       PopupMenuButton<String>(
         icon: Icon(
           Icons.more_vert_rounded,
@@ -161,6 +220,19 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                 ],
               ),
             ),
+          // A message's own actions, as its page used to offer them.
+          if (message != null) ...[
+            message.isArchived
+                ? item('msg_archive', Icons.move_to_inbox_outlined, l10n.moveToInbox)
+                : item('msg_archive', Icons.archive_outlined, l10n.archiveMessage),
+            item('msg_unread', Icons.mark_email_unread_outlined, l10n.markAsUnread),
+            if (message.onEditTitle != null)
+              item('msg_edit', Icons.edit_outlined, l10n.editConversation),
+            if (message.onClose != null)
+              message.isClosed
+                  ? item('msg_close', Icons.lock_open_outlined, l10n.openConversation)
+                  : item('msg_close', Icons.lock_outline, l10n.closeConversation),
+          ],
           if (widget.siteContext.isLoggedIn && widget.canClose)
             PopupMenuItem(
               value: 'lock',
@@ -335,9 +407,29 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                 ],
               ),
             ),
+          if (message?.onLeave != null) ...[
+            const PopupMenuDivider(),
+            item('msg_leave', Icons.exit_to_app_rounded, l10n.leaveConversation2,
+                danger: true),
+          ],
         ],
         onSelected: (value) {
           switch (value) {
+            case 'msg_archive':
+              message?.onArchive();
+              break;
+            case 'msg_unread':
+              message?.onMarkUnread();
+              break;
+            case 'msg_edit':
+              message?.onEditTitle?.call();
+              break;
+            case 'msg_close':
+              message?.onClose?.call();
+              break;
+            case 'msg_leave':
+              message?.onLeave?.call();
+              break;
             case 'refresh':
               widget.onRefresh?.call();
               break;

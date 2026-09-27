@@ -2507,6 +2507,10 @@
     }
   },
   "suggestedTopics": "Suggested Topics",
+  "suggestedMessages": "Suggested Messages",
+  "@suggestedMessages": {
+    "description": "Heading over the messages Discourse suggests at the end of a private message (its suggested_topics.pm_title)"
+  },
   "@suggestedTopics": {
     "description": "UI text: Suggested Topics"
   },

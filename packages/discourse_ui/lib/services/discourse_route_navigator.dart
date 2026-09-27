@@ -8,7 +8,6 @@ import '../l10n/generated/app_localizations.dart';
 import '../utils/snackbar_helper.dart';
 import '../views/lists/posts_list.dart';
 import '../views/post_page.dart';
-import '../views/private_messaging/conversation/pages/conversation_page.dart';
 import '../views/site_home_tab.dart';
 import 'notification_route.dart';
 
@@ -70,18 +69,16 @@ class DiscourseRouteNavigator {
         final topicId = route.topicId;
         if (topicId == null) return;
         AppLogger.debug('🧭 [DiscourseRouteNavigator] Message $topicId');
-        // preventDuplicates off: GetX drops a push whose page type is the
-        // one on top, so a message notification tapped while another
-        // message is open did nothing.
-        Get.to(
-          () => ConversationPage(
-            siteContext: siteContext,
-            conversationId: topicId,
-            subject: '', // The page shows the message's own title once loaded.
-            anchorMessageId: route.postId,
-          ),
-          preventDuplicates: false,
-        );
+        // A message is a topic: the topic page reads it, at the post the
+        // notification names, else where the reader stopped.
+        final postId = route.postId;
+        _openTopic(siteContext,
+            topicId: topicId,
+            mode: postId != null && postId.isNotEmpty
+                ? PostsListMode.thread_by_post
+                : PostsListMode.first_unread,
+            anchorPostId: postId,
+            replace: replaceTopic);
       case NotificationRouteKind.notificationsTab:
         if (Get.isRegistered<DiscourseSiteController>()) {
           Get.find<DiscourseSiteController>()

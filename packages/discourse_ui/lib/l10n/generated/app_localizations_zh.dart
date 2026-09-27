@@ -2064,6 +2064,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get suggestedTopics => '推荐主题';
 
   @override
+  String get suggestedMessages => '建议的消息';
+
+  @override
   String get newLabel => '新';
 
   @override

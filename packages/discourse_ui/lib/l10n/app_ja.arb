@@ -898,6 +898,7 @@
   "searchFilters": "検索フィルター",
   "signOutWarning": "{siteName} からサインアウトします。いつでも再度サインインできます。",
   "suggestedTopics": "おすすめのトピック",
+  "suggestedMessages": "推奨メッセージ",
   "newLabel": "新着",
   "voteRemoved": "投票を取り消しました",
   "voters": "投票者",

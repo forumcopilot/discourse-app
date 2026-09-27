@@ -7,6 +7,17 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 ## [Unreleased]
 
 ### Changed
+- **Private messages open in the topic page**, from every entry point: the inbox, notifications, push, links, bookmarks and New Message. A Discourse message is a topic, and the app had a separate copy of the reading and composing screens for them, which had fallen behind. The same message opened in one or the other depending on how you got there. Messages now get everything a topic post has:
+  - reactions and who reacted, bookmarks with reminders, and reply to a specific message
+  - delete, edit history, wiki, "in reply to" and "N replies"
+  - display names, titles and flair; hidden and moderator posts shown as on the web; link click counts
+  - small actions such as "invited …" or "left", and posts from another point in the message
+  - opening at your first unread message (it always opened at the end), loading earlier messages as you scroll, and time-gap dividers
+  - drafts in replies, and the same composer as topics, which returns you to your new message
+  - "Suggested Messages" at the end
+  - What only messages have moves with them: the participants under the title (tap for the list and Invite), and Archive or Move to Inbox, Mark as unread, Edit title, Close or Open and Leave in the menu. The inbox refreshes afterwards, and drops a message you archived or left. There is no "You are subscribed" banner on messages: every message is watched.
+  - The participants sheet uses the standard sheet title under the drag handle, with Invite beside it, and list rows.
+  - `ConversationPage`, `ConversationItem`, `ConversationHeaderWidget`, `ConversationAppBar`, `ReplyConversationPage` and `EditConversationMessagePage` are removed (about 4,000 lines); `DiscourseMessageDetails` is now filled by the topic loaders too (`fromTopicView`, `isMessage`, participants and the viewer's rights), and uploads in a message's reply or edit are sent as the message's (`for_private_message`).
 - **New Message is the shared composer** (`MessageComposePage`) with the recipients above the title, instead of a separate copy that had drifted from it. It gains what the other composers have: photos prepared as the forum's own composer would (scaled and recompressed when the forum asks for it, and a question before shrinking one over the size limit; the copy uploaded them as picked), the same attachment rows and toolbar, and a readable reason when a send fails. Once sent it opens the new message, as before and as New Topic does, through `NewConversationPage.open`; the message list under it refreshes. `MessageComposePage` takes a `contentLabel`, and its own error message no longer shows raw "Exception: …" text.
 
 ### Added

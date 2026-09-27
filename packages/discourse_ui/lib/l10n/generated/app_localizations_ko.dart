@@ -2086,6 +2086,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get suggestedTopics => '추천 주제';
 
   @override
+  String get suggestedMessages => '제안된 메시지';
+
+  @override
   String get newLabel => '신규';
 
   @override

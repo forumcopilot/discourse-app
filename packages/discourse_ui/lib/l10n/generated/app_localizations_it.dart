@@ -2187,6 +2187,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get suggestedTopics => 'Argomenti suggeriti';
 
   @override
+  String get suggestedMessages => 'Messaggi Suggeriti';
+
+  @override
   String get newLabel => 'NUOVO';
 
   @override

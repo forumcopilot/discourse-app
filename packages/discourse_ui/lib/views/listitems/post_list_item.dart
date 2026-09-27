@@ -4,6 +4,7 @@ import 'package:discourse_core/discourse_core.dart'
     show
         DiscourseAcceptedAnswer,
         DiscourseLink,
+        DiscourseMessageDetails,
         DiscoursePostProxy,
         DiscourseTopicSlugs,
         stripHtmlToText;
@@ -42,6 +43,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_bookmark.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseBookmarkProxy, DiscourseBookmarkAutoDelete;
 import '../widgets/bookmark_reminder_sheet.dart';
+import '../private_messaging/message_participants_row.dart';
 import '../../services/site_proxy_service.dart';
 import '../../theme/forum_colors.dart';
 
@@ -628,10 +630,21 @@ class _PostListItemState extends State<PostListItem> {
                 color: colorScheme.onSurface,
               ),
             ),
+            // A message has no category: who is on it goes here instead.
+            if (DiscourseMessageDetails.forTopic(widget.threadId)
+                case final message?)
+              MessageParticipantsRow(
+                siteContext: widget.siteContext,
+                topicId: widget.threadId,
+                details: message,
+                onChanged: widget.actions?.onRefresh,
+                padding: const EdgeInsets.only(top: DesignTokens.spacingXS),
+              )
             // Where the topic lives. The page named the topic and
             // nothing else, so the one thing Discourse organises
             // everything by was invisible until you went back out.
-            if (widget.topicCategory.isNotEmpty || widget.topicTags.isNotEmpty)
+            else if (widget.topicCategory.isNotEmpty ||
+                widget.topicTags.isNotEmpty)
               TopicTaxonomyChips(
                 siteContext: widget.siteContext,
                 categoryId: widget.forumId ?? '',

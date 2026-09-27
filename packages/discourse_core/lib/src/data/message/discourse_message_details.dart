@@ -1,15 +1,116 @@
-/// What a private message says about itself and the viewer, where
-/// FCConversationResult has no field to carry it.
+import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
+
+import '../../util/site_url.dart';
+
+/// What a private message says about itself and the viewer, where the SDK's
+/// thread and conversation results have no field to carry it.
 ///
-/// Filled from the topic payload each time a message loads
-/// (DiscoursePrivateConversationProxy), read by the message screen — the same
-/// side-channel DiscourseAcceptedAnswers uses for topics.
+/// A message is a topic, and whichever loader reads its `/t/{id}.json` —
+/// the topic loaders in DiscoursePostProxy or the message loader in
+/// DiscoursePrivateConversationProxy — stores this beside the result, the
+/// same side-channel DiscourseAcceptedAnswers uses. Its presence is how the
+/// topic page knows it is showing a message ([isMessage]).
 class DiscourseMessageDetails {
   const DiscourseMessageDetails({
     required this.canLeave,
     this.isArchived = false,
     this.groups = const [],
+    this.participants = const [],
+    this.canInvite = false,
+    this.canEdit = false,
+    this.canClose = false,
   });
+
+  /// The details of topic payload [t] when it is a private message
+  /// (`archetype: private_message`), else null. [siteUrl] resolves avatars.
+  static DiscourseMessageDetails? fromTopicView(
+    Map<String, dynamic> t, {
+    required String siteUrl,
+  }) {
+    if (t['archetype'] != 'private_message') return null;
+    final details = (t['details'] as Map?)?.cast<String, dynamic>() ?? const {};
+    return DiscourseMessageDetails(
+      canLeave: details.containsKey('can_remove_self_id'),
+      isArchived: t['message_archived'] == true,
+      groups: [
+        for (final g in (details['allowed_groups'] as List?) ?? const [])
+          if (DiscourseMessageGroup.fromJson(g) case final group?) group,
+      ],
+      participants: participantsFrom(details, siteUrl: siteUrl),
+      // TopicViewDetailsSerializer emits these only when the guardian grants
+      // them, so presence is the permission.
+      canInvite: details['can_invite_to'] == true,
+      canEdit: details['can_edit'] == true,
+      // Closing is for staff, trust level 4 and category moderators
+      // (topic_guardian.rb), not whoever may edit the title.
+      canClose: details['can_close_topic'] == true,
+    );
+  }
+
+  /// Everyone on the message, author first, de-duplicated by id.
+  ///
+  /// Discourse splits this across three fields of `details`, and reading
+  /// only `allowed_users` lost people: the serializer drops from it anyone
+  /// covered by one of the message's `allowed_groups` (except the viewer),
+  /// which removes `system` — a member of every staff and trust-level group —
+  /// from system messages, so a PM the user had replied to showed
+  /// "1 participant" (topic_view_details_serializer.rb, `allowed_users`).
+  /// `created_by` and `participants` (who has posted) bring them back, and
+  /// the count then agrees with the inbox list, which counts posters too.
+  static List<FCParticipant> participantsFrom(
+    Map<String, dynamic> details, {
+    required String siteUrl,
+  }) {
+    final seen = <String>{};
+    final out = <FCParticipant>[];
+    void add(Object? u) {
+      if (u is! Map) return;
+      final p = participantFrom(u.cast<String, dynamic>(), siteUrl: siteUrl);
+      if (p.userId.isEmpty || !seen.add(p.userId)) return;
+      out.add(p);
+    }
+
+    add(details['created_by']);
+    for (final u in (details['allowed_users'] as List?) ?? const []) {
+      add(u);
+    }
+    for (final u in (details['participants'] as List?) ?? const []) {
+      add(u);
+    }
+    return out;
+  }
+
+  /// One user from a topic or list payload (`id`, `username`,
+  /// `avatar_template`) as a participant, its avatar resolved on [siteUrl].
+  static FCParticipant participantFrom(
+    Map<String, dynamic> u, {
+    required String siteUrl,
+  }) {
+    final tpl = u['avatar_template'] as String?;
+    return FCParticipant(
+      userId: (u['id'] ?? '').toString(),
+      username: (u['username'] ?? '').toString(),
+      iconUrl: tpl == null || tpl.isEmpty
+          ? null
+          : absoluteSiteUrl(siteUrl, tpl.replaceAll('{size}', '90')),
+      isOnline: false,
+    );
+  }
+
+  /// Whether topic [topicId], as last loaded, is a private message.
+  static bool isMessage(String topicId) => forTopic(topicId) != null;
+
+  /// Everyone on the message (people; [groups] are separate).
+  final List<FCParticipant> participants;
+
+  /// Whether the viewer may invite people or groups (`can_invite_to`).
+  final bool canInvite;
+
+  /// Whether the viewer may edit the message's title (`can_edit`).
+  final bool canEdit;
+
+  /// Whether the viewer may close or reopen the message (`can_close_topic`).
+  final bool canClose;
 
   /// Whether the viewer may remove themselves. Discourse serializes
   /// `details.can_remove_self_id` only when `can_remove_allowed_users?`

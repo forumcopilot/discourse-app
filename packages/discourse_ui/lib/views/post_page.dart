@@ -1,4 +1,5 @@
-import 'package:discourse_core/discourse_core.dart' show DiscourseSiteCapabilities;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseMessageDetails, DiscourseSiteCapabilities;
 import 'package:flutter/material.dart';
 import '../core/errors/action_refused.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -14,6 +15,8 @@ import 'appbars/posts_page_app_bar.dart';
 import '../utils/url_utils.dart';
 import 'widgets/sheet_title.dart';
 import 'widgets/category_badge.dart';
+import 'private_messaging/message_actions.dart';
+import 'private_messaging/message_participants_sheet.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({
@@ -41,6 +44,14 @@ class PostPage extends StatefulWidget {
   final int? gotoPostNumber;
   final String? forumId;
   final bool isAnnouncement;
+
+  /// What the page closes with when it showed a private message that was
+  /// archived, moved to the inbox or left — it no longer belongs in the
+  /// list it was opened from.
+  static const messageRemoved = 'message_removed';
+
+  /// … or marked unread.
+  static const messageMarkedUnread = 'message_marked_unread';
 
   @override
   State<PostPage> createState() => _PostPageState();
@@ -85,6 +96,70 @@ class _PostPageState extends State<PostPage> {
   bool _canToggleVisibility = false;
   bool _isRefreshing = false; // Add loading state for refresh
   String _actualTopicTitle = ''; // Track the actual topic title from server
+
+  /// Set once the thread has loaded, when it is a private message: the page
+  /// then offers a message's actions (a Discourse message is a topic, so
+  /// this page reads messages too).
+  DiscourseMessageDetails? _message;
+
+  void _syncMessage() {
+    final message = DiscourseMessageDetails.forTopic(widget.topicId);
+    if (!identical(message, _message) && mounted) {
+      setState(() => _message = message);
+    }
+  }
+
+  /// The app bar's message actions, or null for a topic.
+  PostsPageMessageMenu? _messageMenu() {
+    final m = _message;
+    if (m == null || !widget.siteContext.isLoggedIn) return null;
+    final id = widget.topicId;
+    // Archive, Move to inbox and Leave take the message out of the list it
+    // came from, and Mark unread changes its row: the page closes with
+    // [messageRemoved] or [messageMarkedUnread] for the inbox to act on.
+    void closeWith(bool done, String result) {
+      if (done && mounted) Navigator.of(context).pop(result);
+    }
+
+    return PostsPageMessageMenu(
+      participantCount: m.participants.length + m.groups.length,
+      onParticipants: () => MessageParticipantsSheet.show(
+        context,
+        m.participants,
+        widget.siteContext,
+        canInvite: m.canInvite,
+        conversationId: id,
+        onInviteSuccess: () => _refreshCallback?.call(),
+        groups: m.groups,
+      ),
+      isArchived: m.isArchived,
+      onArchive: () async =>
+          closeWith(await MessageActions.setArchived(context, id, !m.isArchived),
+              PostPage.messageRemoved),
+      onMarkUnread: () async =>
+          closeWith(await MessageActions.markUnread(context, id),
+              PostPage.messageMarkedUnread),
+      onEditTitle: m.canEdit
+          ? () async {
+              final saved = await MessageActions.editTitle(context,
+                  siteContext: widget.siteContext, topicId: id, canClose: m.canClose);
+              if (saved) _refreshCallback?.call();
+            }
+          : null,
+      isClosed: _isClosed,
+      onClose: m.canClose
+          ? () async {
+              if (await MessageActions.setClosed(context, id, !_isClosed)) {
+                _refreshCallback?.call();
+              }
+            }
+          : null,
+      onLeave: m.canLeave
+          ? () async => closeWith(
+              await MessageActions.leave(context, id), PostPage.messageRemoved)
+          : null,
+    );
+  }
   String? _threadUrl; // Track the thread URL from server
 
   // GlobalKey to reference the app bar state
@@ -679,6 +754,7 @@ class _PostPageState extends State<PostPage> {
     return Scaffold(
       appBar: PostsPageAppBar(
         siteContext: widget.siteContext,
+        message: _messageMenu(),
         key: _appBarKey,
         title: widget.title,
         onShare: _handleShare,
@@ -758,7 +834,7 @@ class _PostPageState extends State<PostPage> {
           Column(
             children: [
               // Status banners
-              if ((_isDeleted && _showDeletedBanner) || (_isClosed && _showClosedBanner) || (_isSticky && _showStickyBanner) || (_isSubscribed && _showSubscribedBanner)) ...[
+              if ((_isDeleted && _showDeletedBanner) || (_isClosed && _showClosedBanner) || (_isSticky && _showStickyBanner) || (_isSubscribed && _showSubscribedBanner && _message == null)) ...[
                 // Deleted banner
                 if (_isDeleted && _showDeletedBanner)
                   Container(
@@ -913,7 +989,9 @@ class _PostPageState extends State<PostPage> {
                     ),
                   ),
                 // Subscribed banner
-                if (_isSubscribed && _showSubscribedBanner)
+                // Not for a message: every message is watched, so it
+                // would sit on all of them.
+                if (_isSubscribed && _showSubscribedBanner && _message == null)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsetsDirectional.fromSTEB(
@@ -1034,6 +1112,7 @@ class _PostPageState extends State<PostPage> {
                     });
                   },
                   onTopicTitleLoaded: (topicTitle) {
+                    _syncMessage();
                     if (topicTitle.isNotEmpty && topicTitle != _actualTopicTitle) {
                       setState(() {
                         _actualTopicTitle = topicTitle;

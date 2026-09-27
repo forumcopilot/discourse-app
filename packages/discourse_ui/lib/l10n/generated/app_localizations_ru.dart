@@ -2180,6 +2180,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get suggestedTopics => 'Похожие темы';
 
   @override
+  String get suggestedMessages => 'Похожие сообщения';
+
+  @override
   String get newLabel => 'НОВОЕ';
 
   @override

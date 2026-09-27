@@ -1,5 +1,5 @@
 import 'package:discourse_core/discourse_core.dart'
-    show DiscoursePostProxy, DiscourseSuggestedTopic;
+    show DiscoursePostProxy, DiscourseSuggestedTopic, DiscourseMessageDetails;
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
@@ -134,7 +134,11 @@ class _SuggestedTopicsCardState extends State<SuggestedTopicsCard> {
               DesignTokens.spacingS,
             ),
             child: Text(
-              AppLocalizations.of(context)!.suggestedTopics,
+              // A message's suggestions are other messages (Discourse's
+              // suggested_topics.pm_title).
+              DiscourseMessageDetails.isMessage(widget.topicId)
+                  ? AppLocalizations.of(context)!.suggestedMessages
+                  : AppLocalizations.of(context)!.suggestedTopics,
               // A page section heading, like the profile's sections.
               style: textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurface,

@@ -2193,6 +2193,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get suggestedTopics => 'Vorgeschlagene Themen';
 
   @override
+  String get suggestedMessages => 'Vorgeschlagene Nachrichten';
+
+  @override
   String get newLabel => 'NEU';
 
   @override

@@ -3736,6 +3736,12 @@ abstract class AppLocalizations {
   /// **'Suggested Topics'**
   String get suggestedTopics;
 
+  /// Heading over the messages Discourse suggests at the end of a private message (its suggested_topics.pm_title)
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested Messages'**
+  String get suggestedMessages;
+
   /// UI text: NEW
   ///
   /// In en, this message translates to:

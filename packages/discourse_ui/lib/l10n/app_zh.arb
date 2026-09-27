@@ -898,6 +898,7 @@
   "searchFilters": "搜索筛选",
   "signOutWarning": "你将退出 {siteName}。你可以随时重新登录。",
   "suggestedTopics": "推荐主题",
+  "suggestedMessages": "建议的消息",
   "newLabel": "新",
   "voteRemoved": "已撤销投票",
   "voters": "投票者",

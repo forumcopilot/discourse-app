@@ -2180,6 +2180,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get suggestedTopics => 'Tópicos sugeridos';
 
   @override
+  String get suggestedMessages => 'Mensagens Sugeridas';
+
+  @override
   String get newLabel => 'NOVO';
 
   @override

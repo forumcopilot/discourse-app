@@ -19,7 +19,6 @@ import '../controllers/login_controller.dart';
 import '../views/login_page.dart';
 import '../views/post_page.dart';
 import '../views/lists/posts_list.dart';
-import '../views/private_messaging/conversation/pages/conversation_page.dart';
 import '../views/user_profile_page.dart';
 import '../core/errors/error_handling_mixins.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -903,16 +902,21 @@ class NotificationService with ServiceErrorHandlingMixin {
       AppLogger.debug('✅ [NotificationService] Navigating to conversation $conversationId${messageId != null ? ' (message: $messageId)' : ''}');
 
       // Navigate to the conversation, with optional message ID for highlighting
-      final conversationPageBuilder = () => ConversationPage(
+      // A message is a topic: the topic page reads it.
+      postPageBuilder() => PostPage(
             siteContext: siteController.currentSiteContext.value!,
-            conversationId: conversationId,
-            subject: subject,
-            anchorMessageId: messageId,
+            topicId: conversationId,
+            title: subject,
+            mode: messageId != null && messageId.isNotEmpty
+                ? PostsListMode.thread_by_post
+                : PostsListMode.first_unread,
+            anchorPostId: messageId,
+            forumId: '',
           );
-      if (Get.currentRoute == '/ConversationPage') {
-        Get.off(conversationPageBuilder);
+      if (Get.currentRoute == '/PostPage') {
+        Get.off(postPageBuilder, preventDuplicates: false);
       } else {
-        Get.to(conversationPageBuilder);
+        Get.to(postPageBuilder, preventDuplicates: false);
       }
     } catch (e) {
       AppLogger.debug('❌ [NotificationService] Error handling conversation notification: $e');

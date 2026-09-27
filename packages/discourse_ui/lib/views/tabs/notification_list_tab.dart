@@ -11,7 +11,6 @@ import '../widgets/resettable_widget.dart';
 import '../listitems/notification_list_item.dart';
 import '../post_page.dart';
 import '../lists/posts_list.dart';
-import '../private_messaging/conversation/pages/conversation_page.dart';
 import '../user_profile_page.dart';
 import '../chat/chat_channel_view.dart';
 import '../group_detail_page.dart';
@@ -442,14 +441,19 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
           ? alert.postId
           : (alert.content_id?.isNotEmpty == true ? alert.content_id : null);
 
+      // A message is a topic: the topic page reads it.
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ConversationPage(
+          builder: (context) => PostPage(
             siteContext: widget.siteContext,
-            conversationId: conversationId,
-            subject: _extractSubjectFromMessage(alert.message),
-            anchorMessageId: messageId,
+            topicId: conversationId,
+            title: _extractSubjectFromMessage(alert.message),
+            mode: messageId != null
+                ? PostsListMode.thread_by_post
+                : PostsListMode.first_unread,
+            anchorPostId: messageId,
+            forumId: '',
           ),
         ),
       );

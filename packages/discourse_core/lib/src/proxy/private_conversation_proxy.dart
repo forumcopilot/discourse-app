@@ -726,16 +726,14 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       final details = (t['details'] as Map<String, dynamic>?) ?? const {};
       final participants = _participantsFrom(details);
       final canEdit = (details['can_edit'] as bool?) ?? false;
+      // The same record the topic loaders keep for a message (a payload
+      // without the archetype is still treated as one here).
       DiscourseMessageDetails.store(
         conversationId,
-        DiscourseMessageDetails(
-          canLeave: details.containsKey('can_remove_self_id'),
-          isArchived: t['message_archived'] == true,
-          groups: [
-            for (final g in (details['allowed_groups'] as List?) ?? const [])
-              if (DiscourseMessageGroup.fromJson(g) case final group?) group,
-          ],
-        ),
+        DiscourseMessageDetails.fromTopicView(
+              {...t, 'archetype': 'private_message'},
+              siteUrl: siteContext.site.url,
+            )!,
       );
 
       return FCConversationResult(
@@ -1022,40 +1020,12 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
   List<FCParticipant> participantsFrom(Map<String, dynamic> details) =>
       _participantsFrom(details);
 
-  List<FCParticipant> _participantsFrom(Map<String, dynamic> details) {
-    final seen = <String>{};
-    final out = <FCParticipant>[];
-    void add(Object? u) {
-      if (u is! Map) return;
-      final p = _participantFrom(u.cast<String, dynamic>());
-      if (p.userId.isEmpty || !seen.add(p.userId)) return;
-      out.add(p);
-    }
+  List<FCParticipant> _participantsFrom(Map<String, dynamic> details) =>
+      DiscourseMessageDetails.participantsFrom(details,
+          siteUrl: siteContext.site.url);
 
-    add(details['created_by']);
-    for (final u in (details['allowed_users'] as List?) ?? const []) {
-      add(u);
-    }
-    for (final u in (details['participants'] as List?) ?? const []) {
-      add(u);
-    }
-    return out;
-  }
-
-  FCParticipant _participantFrom(Map<String, dynamic> u) {
-    final tpl = u['avatar_template'] as String?;
-    String? avatarUrl;
-    if (tpl != null && tpl.isNotEmpty) {
-      final filled = tpl.replaceAll('{size}', '90');
-      avatarUrl = absoluteSiteUrl(siteContext.site.url, filled);
-    }
-    return FCParticipant(
-      userId: (u['id'] ?? '').toString(),
-      username: (u['username'] ?? '').toString(),
-      iconUrl: avatarUrl,
-      isOnline: false,
-    );
-  }
+  FCParticipant _participantFrom(Map<String, dynamic> u) =>
+      DiscourseMessageDetails.participantFrom(u, siteUrl: siteContext.site.url);
 
   Map<int, Map<String, dynamic>> _usersById(Map<String, dynamic> response) {
     final users = <int, Map<String, dynamic>>{};

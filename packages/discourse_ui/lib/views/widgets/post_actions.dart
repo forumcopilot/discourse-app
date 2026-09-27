@@ -4,7 +4,6 @@ import 'package:discourse_ui/utils/like_cooldown.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
-import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/post_controller.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscoursePostProxy;
@@ -378,6 +377,7 @@ class PostActionsHandler {
           postId: postId,
           topicTitle: topicTitle,
           forumId: forumId, // Pass forum ID if available
+          topicId: topicId,
         ),
       ),
     );
@@ -1016,70 +1016,6 @@ class PostActionsHandler {
         duration: const Duration(seconds: 2),
       ),
     );
-  }
-
-  // --- Like/Unlike Conversation Message ---
-  Future<void> handleLikeConversationMessage({
-    required BuildContext context,
-    required FCConversationMessage message,
-    required SiteContext siteContext,
-    required VoidCallback onRefresh,
-    required ValueSetter<bool> setIsLiked,
-    required ValueSetter<int> setLikeCount,
-    required bool isLiked,
-  }) async {
-    if (!siteContext.isLoggedIn) {
-      showPostLoginPrompt(context, onRefresh: onRefresh);
-      return;
-    }
-    // In-flight guard: ignore taps while a request for this message is pending.
-    if (_likeInFlight.contains(message.messageId)) return;
-    _likeInFlight.add(message.messageId);
-    // Optimistically update UI — count-driven, same as posts.
-    final wasLiked = isLiked;
-    final previousCount = message.likeCount;
-    setIsLiked(!isLiked);
-    final optimisticCount =
-        wasLiked ? (previousCount > 0 ? previousCount - 1 : 0) : previousCount + 1;
-    message.likeCount = optimisticCount;
-    setLikeCount(optimisticCount);
-    bool ok;
-    String? errText;
-    try {
-      final socialProxy = SiteProxyFactory.getSocialProxy();
-      // Discourse PM messages are just posts under the hood, so the same
-      // like/unlike endpoint handles them. (Stock Discourse PMs don't
-      // support likes — this only fires on forums where the host has
-      // enabled likes in PMs.)
-      if (wasLiked) {
-        final result = await socialProxy.unlikePostAsync(message.messageId);
-        ok = result.result;
-        errText = result.resultText;
-      } else {
-        final result = await socialProxy.likePostAsync(message.messageId);
-        ok = result.result;
-        errText = result.resultText;
-      }
-    } catch (e) {
-      ok = false;
-      errText = e.toString();
-    } finally {
-      _likeInFlight.remove(message.messageId);
-    }
-    if (!ok) {
-      // Revert UI if the request threw OR the server said result=false
-      setIsLiked(wasLiked);
-      message.likeCount = previousCount;
-      setLikeCount(previousCount);
-      if (context.mounted) {
-        final reason = errText?.isNotEmpty == true ? errText! : '';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(wasLiked
-            ? (AppLocalizations.of(context)?.failedToUnlikePost(reason) ?? 'Failed to unlike message: $reason')
-            : (AppLocalizations.of(context)?.failedToLikePost(reason) ?? 'Failed to like message: $reason'))),
-        );
-      }
-    }
   }
 
   /// Shows login prompt for restricted content and handles post refresh after login

@@ -3,6 +3,7 @@ import '../l10n/generated/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseMessageDetails;
 import 'package:image_picker/image_picker.dart';
 import '../theme/design_tokens.dart';
 import 'widgets/empty_state_view.dart';
@@ -15,12 +16,17 @@ class EditPostPage extends StatefulWidget {
   final String topicTitle;
   final String? forumId; // Optional forum ID (can be passed from post data)
 
+  /// The post's topic, when known: in a private message, uploads are sent
+  /// as the message's (Discourse's `for_private_message`).
+  final String? topicId;
+
   const EditPostPage({
     super.key,
     required this.siteContext,
     required this.postId,
     required this.topicTitle,
     this.forumId,
+    this.topicId,
   });
 
   @override
@@ -167,7 +173,9 @@ class _EditPostPageState extends State<EditPostPage> {
     final outcome = await AttachmentUploadService.upload(
       context: context,
       file: file,
-      uploadType: 'post',
+      uploadType: DiscourseMessageDetails.isMessage(widget.topicId ?? '')
+          ? 'pm'
+          : 'post',
       targetId: _forumId ?? '',
       groupId: _groupId ?? '',
       currentAttachmentCount: _attachmentIds.length,

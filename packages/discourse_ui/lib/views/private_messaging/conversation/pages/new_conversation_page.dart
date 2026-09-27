@@ -12,7 +12,8 @@ import 'package:discourse_ui/views/widgets/user_avatar.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../services/attachment_upload_service.dart';
 import '../../../../theme/design_tokens.dart';
-import 'conversation_page.dart';
+import '../../../lists/posts_list.dart' show PostsListMode;
+import '../../../post_page.dart';
 
 /// New Message: the shared composer ([MessageComposePage]) with the
 /// recipients above the title.
@@ -58,10 +59,12 @@ class NewConversationPage extends StatefulWidget {
     if (context.mounted) {
       unawaited(Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => ConversationPage(
+          builder: (_) => PostPage(
             siteContext: siteContext,
-            conversationId: created.id,
-            subject: created.title,
+            topicId: created.id,
+            title: created.title,
+            mode: PostsListMode.normal,
+            forumId: '',
           ),
         ),
       ));

@@ -898,6 +898,7 @@
   "searchFilters": "검색 필터",
   "signOutWarning": "{siteName}에서 로그아웃됩니다. 언제든지 다시 로그인할 수 있습니다.",
   "suggestedTopics": "추천 주제",
+  "suggestedMessages": "제안된 메시지",
   "newLabel": "신규",
   "voteRemoved": "투표를 취소했습니다",
   "voters": "투표자",

@@ -15,6 +15,7 @@ import '../data/site/discourse_site_capabilities.dart';
 import '../data/post/discourse_accepted_answer.dart';
 import '../data/post/discourse_valid_reactions.dart';
 import '../data/topic/discourse_topic_slugs.dart';
+import '../data/message/discourse_message_details.dart';
 import '../util/discourse_link.dart';
 import '../util/quote_markup.dart';
 import '../data/post/discourse_post_revision.dart';
@@ -116,6 +117,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // It is site-level, not topic-level, so any topic load teaches the
       // picker what this forum accepts — see DiscourseValidReactions.
       DiscourseValidReactions.store(t['valid_reactions']);
+      _rememberMessage(topicId, t);
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       final rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
@@ -245,6 +247,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // It is site-level, not topic-level, so any topic load teaches the
       // picker what this forum accepts — see DiscourseValidReactions.
       DiscourseValidReactions.store(t['valid_reactions']);
+      _rememberMessage(topicId, t);
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       final rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
@@ -348,6 +351,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // It is site-level, not topic-level, so any topic load teaches the
       // picker what this forum accepts — see DiscourseValidReactions.
       DiscourseValidReactions.store(t['valid_reactions']);
+      _rememberMessage(topicId, t);
       // The post after the last one read, capped at the newest — what the
       // web opens (Topic#lastUnreadUrl); post 1 for a topic never opened.
       // This anchored on the last read post itself, one post early.
@@ -1027,6 +1031,16 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     if (_recentPolls.length > 200) {
       _recentPolls.removeRange(200, _recentPolls.length);
     }
+  }
+
+  /// Keeps what a private message says about itself (participants, groups,
+  /// archive state, what the viewer may do) beside the thread result, so the
+  /// topic page can show a message as one — see DiscourseMessageDetails.
+  /// A regular topic stores nothing.
+  void _rememberMessage(String topicId, Map<String, dynamic> t) {
+    final details = DiscourseMessageDetails.fromTopicView(t,
+        siteUrl: siteContext.site.url);
+    if (details != null) DiscourseMessageDetails.store(topicId, details);
   }
 
   /// Every poll in a Discourse post payload, with the viewer's votes.

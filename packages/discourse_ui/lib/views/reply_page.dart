@@ -4,7 +4,8 @@ import '../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart' as forumcopilot_sdk;
-import 'package:discourse_core/discourse_core.dart' show DiscoursePostProxy;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseMessageDetails, DiscoursePostProxy;
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
 import 'package:discourse_ui/views/widgets/post_needs_approval_dialog.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -295,7 +296,9 @@ class _ReplyPageState extends State<ReplyPage> {
     final outcome = await AttachmentUploadService.upload(
       context: context,
       file: file,
-      uploadType: 'post',
+      // In a message, uploads are the message's (for_private_message).
+      uploadType:
+          DiscourseMessageDetails.isMessage(widget.threadId) ? 'pm' : 'post',
       targetId: widget.forumId ?? '',
       groupId: _groupId ?? '',
       currentAttachmentCount: _attachmentIds.length,
