@@ -2695,4 +2695,90 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get unmarkAsSolution => 'Снять отметку решения';
+
+  @override
+  String searchForumName(String forum) {
+    return 'Поиск: $forum';
+  }
+
+  @override
+  String countActiveThisMonth(String formatted) {
+    return '$formatted активны в этом месяце';
+  }
+
+  @override
+  String countMembers(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted участника',
+      many: '$formatted участников',
+      few: '$formatted участника',
+      one: '$formatted участник',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String countTopics(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted темы',
+      many: '$formatted тем',
+      few: '$formatted темы',
+      one: '$formatted тема',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String categoryNewThisWeek(int count) {
+    return '$count новых за неделю';
+  }
+
+  @override
+  String get categoriesView => 'Категории';
+
+  @override
+  String get allCategories => 'Все категории';
+
+  @override
+  String get allTags => 'Все теги';
+
+  @override
+  String get myPosts => 'Мои сообщения';
+
+  @override
+  String trustLevelN(int level) {
+    return 'Уровень доверия $level';
+  }
+
+  @override
+  String get filterNew => 'Новые';
+
+  @override
+  String get filterTop => 'Обсуждаемые';
+
+  @override
+  String get levelWatching => 'Наблюдение';
+
+  @override
+  String get levelWatchingFirstPost => 'Наблюдение за первым сообщением';
+
+  @override
+  String get levelTracking => 'Отслеживание';
+
+  @override
+  String get levelNormal => 'Обычный';
+
+  @override
+  String get levelMuted => 'Без уведомлений';
+
+  @override
+  String get chooseCategory => 'Выберите категорию';
+
+  @override
+  String get signInToPostAndGetNotifications =>
+      'Войдите, чтобы писать и получать уведомления';
 }

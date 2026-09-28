@@ -12,21 +12,19 @@ import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.d
 import 'package:get/get.dart';
 import 'package:discourse_core/discourse_core.dart';
 import '../theme/design_tokens.dart';
-import 'appbars/inbox_tab_app_bar.dart';
 import 'appbars/forum_app_bar.dart';
 import 'appbars/topics_tab_app_bar.dart';
-import 'appbars/forums_tab_app_bar.dart';
 import 'appbars/messages_tab_app_bar.dart';
 import 'appbars/notifications_tab_app_bar.dart';
 import 'appbars/profile_tab_app_bar.dart';
 import 'chat/chat_channel_list_page.dart';
-import 'chat_messages_tab.dart';
-import 'tabs/forum_list_tab.dart';
+import 'new_topic_page.dart';
 import 'tabs/topic_list_tab.dart';
 import 'tabs/notification_list_tab.dart';
 import 'tabs/privatemessage_list_tab.dart';
 import 'tabs/profile_tab.dart';
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
+import 'widgets/category_picker_sheet.dart';
 import 'widgets/resettable_widget.dart';
 import 'widgets/site_drawer.dart';
 import 'site_home_tab.dart';
@@ -69,21 +67,12 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
   late TabController _tabController;
   int _previousTabIndex = 0;
 
-  /// Which sub-tab of the shared Chat/Messages slot is showing:
-  /// 0 = Chat, 1 = Messages. Only meaningful when [_isChatEnabled].
-  int _chatMessagesSubTab = 0;
-
-  /// True when the user is looking at private messages — either the Messages
-  /// sub-tab of the shared slot, or the standalone Messages tab on forums with
-  /// no chat plugin. The app bar and new-conversation FAB both key off this.
-  bool get _isViewingMessages => _isChatEnabled
-      ? (_isCurrentTab(_chatTab) &&
-          _chatMessagesSubTab == ChatMessagesTab.messagesIndex)
-      : _isCurrentTab(_messagesTab);
+  /// True when the user is looking at private messages. The
+  /// new-conversation button keys off this.
+  bool get _isViewingMessages => _isCurrentTab(_messagesTab);
 
   // Add keys for each tab
   final GlobalKey<TopicListTabState> _topicListKey = GlobalKey();
-  final GlobalKey<ForumListTabState> _forumListKey = GlobalKey();
   final GlobalKey<PrivateMessageListTabState> _pmListKey = GlobalKey();
   final GlobalKey<NotificationListTabState> _notificationTabKey = GlobalKey();
   final GlobalKey<ProfileTabState> _profileTabKey = GlobalKey();
@@ -131,12 +120,13 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
   String? _tabIdFor(SiteHomeTab tab) {
     switch (tab) {
       case SiteHomeTab.topics:
-        return _topicsTab;
+      // Categories is one of Home's views (see _applyPendingTab).
       case SiteHomeTab.categories:
-        return _forumsTab;
+        return _topicsTab;
       case SiteHomeTab.inbox:
-      case SiteHomeTab.messages:
         return _isChatEnabled ? _chatTab : _messagesTab;
+      case SiteHomeTab.messages:
+        return _messagesTab;
       case SiteHomeTab.notifications:
         return _notificationsTab;
       case SiteHomeTab.profile:
@@ -158,6 +148,15 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     _pendingTab = null;
     if (Get.isRegistered<DiscourseSiteController>()) {
       Get.find<DiscourseSiteController>().requestedHomeTab.value = null;
+    }
+    if (pending == SiteHomeTab.categories) {
+      // Home's Categories view, on the Home tab.
+      if (_topicListKey.currentState != null) {
+        _topicListKey.currentState!.showView(HomeView.categories);
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback(
+            (_) => _topicListKey.currentState?.showView(HomeView.categories));
+      }
     }
     if (_tabController.index == index) return;
 
@@ -593,8 +592,6 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
       switch (tabType) {
         case _topicsTab:
           return _topicListKey.currentState;
-        case _forumsTab:
-          return _forumListKey.currentState;
         case _messagesTab:
           return _pmListKey.currentState;
         case _chatTab:
@@ -647,6 +644,28 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     }
   }
 
+  /// Home's New topic: which category first, then the composer. The
+  /// composer becomes the topic once posted; Home refreshes under it.
+  Future<void> _onNewTopicPressed() async {
+    final siteContext = _siteContext;
+    if (siteContext == null) return;
+    final category = await pickCategoryForNewTopic(context, siteContext);
+    if (category == null || !mounted) return;
+    var created = false;
+    final result = await AppNavigation.pushForm<Object?>(
+      context,
+      NewTopicPage(
+        siteContext: siteContext,
+        forumId: category.id,
+        forumName: category.name,
+        onTopicCreated: (_, __) => created = true,
+      ),
+    );
+    if ((result == true || created) && mounted) {
+      _topicListKey.currentState?.resetTab();
+    }
+  }
+
   /// Phase 5.32 — clears every unread notification on the server via
   /// `IFCSocialProxy.markAllAlertsReadAsync` (Discourse:
   /// `PUT /notifications/mark-read`) and refreshes the visible list so
@@ -678,33 +697,22 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
 
   // Define tab types for better organization
   static const String _topicsTab = 'topics';
-  static const String _forumsTab = 'forums';
   static const String _chatTab = 'chat';
   static const String _messagesTab = 'messages';
   static const String _notificationsTab = 'notifications';
   static const String _profileTab = 'profile';
 
-  /// Phase 5.18a — whether the Discourse Chat plugin is enabled. The
-  /// bottom-nav third slot is Chat when true, Messages when false.
-  /// Resolved from `enabled_plugins` on `/site.json`, cached in
-  /// `DiscourseSiteContextExtension`. Empty list (config not yet
-  /// fetched) → false, so the slot defaults to Messages.
+  /// Whether the forum has chat for this reader (Discourse's Chat plugin,
+  /// on for them). Chat then has a tab of its own beside Messages.
   bool get _isChatEnabled => _siteContext?.chatEnabled ?? false;
 
-  // Get the list of enabled tabs based on user permissions
+  // The bottom bar: what changes and wants a badge. Categories is one of
+  // Home's views (and a list in the drawer), not a tab; Chat and Messages
+  // each have their own, so each can show its unread count.
   List<String> get _enabledTabs {
-    // Phase 5.18a bottom nav: Home / Categories / {Chat + Messages}
-    // / Notifications / Profile. Tags moved out into the hamburger
-    // drawer (Discourse web's mobile IA buries Tags there too).
-    //
-    // The third slot used to be Chat *or* Messages depending on plugin
-    // availability, which meant private messages had no place in the main nav
-    // whenever chat was installed — and the compose FAB, gated on being on the
-    // Messages tab, could then never show. Chat now hosts both behind a sub-tab
-    // bar (see ChatMessagesTab); without the plugin it is Messages alone, where
-    // a two-item sub-tab bar would be noise.
-    final tabs = <String>[_topicsTab, _forumsTab];
-    tabs.add(_isChatEnabled ? _chatTab : _messagesTab);
+    final tabs = <String>[_topicsTab];
+    if (_isChatEnabled) tabs.add(_chatTab);
+    tabs.add(_messagesTab);
     if (_siteContext?.configDataOutput?.alert ?? false) tabs.add(_notificationsTab);
     tabs.add(_profileTab);
     return tabs;
@@ -714,8 +722,9 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
   int _getTabIndex(String tabType) => _enabledTabs.indexOf(tabType);
   bool _isCurrentTab(String tabType) => _tabController.index == _getTabIndex(tabType);
 
-  // Build the appropriate app bar for the current tab
-  PreferredSizeWidget _buildAppBarForCurrentTab(bool isLoggedIn, bool canSendPM) {
+  // Build the appropriate app bar for the current tab. Home has none: its
+  // header is the forum's own, inside the tab's scroll view.
+  PreferredSizeWidget? _buildAppBarForCurrentTab(bool isLoggedIn, bool canSendPM) {
     if (_siteContext == null) {
       return ForumAppBar(
         siteContext: SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
@@ -727,23 +736,9 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
 
     switch (currentTabType) {
       case _topicsTab:
-        return TopicsTabAppBar(
-          siteContext: _siteContext!,
-          isLoggedIn: isLoggedIn,
-        );
-      case _forumsTab:
-        return ForumsTabAppBar(
-          siteContext: _siteContext!,
-          isLoggedIn: isLoggedIn,
-        );
+        return null;
       case _chatTab:
-        // No title: the slot's "Chat | Messages" tab bar is its header (see
-        // InboxTabAppBar — Discourse has no umbrella term, and "Inbox" is its
-        // name for the personal-message folder).
-        return InboxTabAppBar(
-          siteContext: _siteContext!,
-          isLoggedIn: isLoggedIn,
-        );
+        return AppBar(title: Text(AppLocalizations.of(context)!.chat));
       case _messagesTab:
         return MessagesTabAppBar(
           siteContext: _siteContext!,
@@ -864,6 +859,8 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     // appeared anywhere in the app.
     final isOnMessagesTab = _isViewingMessages;
     final shouldShowFAB = isLoggedIn && isOnMessagesTab && canSendPM;
+    // Home's New topic, as the website has one on its home.
+    final showNewTopic = isLoggedIn && _isCurrentTab(_topicsTab);
 
     // Only log FAB visibility when it changes to reduce noise
     if (_lastLoggedShouldShowFAB != shouldShowFAB) {
@@ -892,7 +889,10 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
         // account actions. Drawer is mounted at the Scaffold level so
         // every tab's AppBar can open it via the auto-imply leading
         // hamburger.
-        drawer: SiteDrawer(siteContext: _siteContext!),
+        drawer: SiteDrawer(
+          siteContext: _siteContext!,
+          homeIsCurrent: _isCurrentTab(_topicsTab),
+        ),
         // Pushed over a host's forum list, the home's left edge means Back:
         // iOS's swipe and Android's system gesture both claim it, except that
         // on older Android a finger resting at the edge first opened the drawer
@@ -931,7 +931,13 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
                 icon: const Icon(Icons.post_add_rounded),
                 label: Text(AppLocalizations.of(context)!.newConversation),
               )
-            : null,
+            : showNewTopic
+                ? FloatingActionButton.extended(
+                    onPressed: _onNewTopicPressed,
+                    icon: const Icon(Icons.edit_outlined),
+                    label: Text(AppLocalizations.of(context)!.newTopic),
+                  )
+                : null,
       ),
     );
   }
@@ -946,27 +952,11 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
               isActive: _isCurrentTab(_topicsTab),
               siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
               boardStats: _boardStats);
-        case _forumsTab:
-          return ForumListTab(
-              key: _forumListKey,
-              isActive: _isCurrentTab(_forumsTab),
-              siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
-              boardStats: _boardStats);
         case _chatTab:
-          // Chat and Messages share this slot behind a sub-tab bar. Both lists
-          // are embedded, so our SiteHomePage Scaffold + app bar + drawer
-          // hamburger stay in charge.
-          return ChatMessagesTab(
-            isActive: _isCurrentTab(_chatTab),
-            chatListKey: _chatListKey,
-            messageListKey: _pmListKey,
+          return ChatChannelListPage(
+            key: _chatListKey,
             siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
-            onSubTabChanged: (index) {
-              if (!mounted || _chatMessagesSubTab == index) return;
-              // Rebuild so the app bar and the new-conversation FAB follow the
-              // sub-tab the user just moved to.
-              setState(() => _chatMessagesSubTab = index);
-            },
+            embedded: true,
           );
         case _messagesTab:
           return PrivateMessageListTab(
@@ -1003,12 +993,6 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
             selectedIcon: const Icon(Icons.chat_bubble),
             icon: const Icon(Icons.chat_bubble_outline),
             label: l10n.home,
-          );
-        case _forumsTab:
-          return NavigationDestination(
-            selectedIcon: const Icon(Icons.forum),
-            icon: const Icon(Icons.forum_outlined),
-            label: l10n.forums,
           );
         case _chatTab:
           // Phase 5.18a — distinct icon from Topics' chat_bubble so

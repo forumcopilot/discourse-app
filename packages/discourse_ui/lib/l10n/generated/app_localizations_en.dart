@@ -400,7 +400,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get register => 'Register';
 
   @override
-  String get signIn => 'Sign In';
+  String get signIn => 'Sign in';
 
   @override
   String get markForumRead => 'Mark category read';
@@ -2677,4 +2677,86 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unmarkAsSolution => 'Unmark as solution';
+
+  @override
+  String searchForumName(String forum) {
+    return 'Search $forum';
+  }
+
+  @override
+  String countActiveThisMonth(String formatted) {
+    return '$formatted active this month';
+  }
+
+  @override
+  String countMembers(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted members',
+      one: '$formatted member',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String countTopics(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted topics',
+      one: '$formatted topic',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String categoryNewThisWeek(int count) {
+    return '$count new this week';
+  }
+
+  @override
+  String get categoriesView => 'Categories';
+
+  @override
+  String get allCategories => 'All categories';
+
+  @override
+  String get allTags => 'All tags';
+
+  @override
+  String get myPosts => 'My posts';
+
+  @override
+  String trustLevelN(int level) {
+    return 'Trust level $level';
+  }
+
+  @override
+  String get filterNew => 'New';
+
+  @override
+  String get filterTop => 'Top';
+
+  @override
+  String get levelWatching => 'Watching';
+
+  @override
+  String get levelWatchingFirstPost => 'Watching first post';
+
+  @override
+  String get levelTracking => 'Tracking';
+
+  @override
+  String get levelNormal => 'Normal';
+
+  @override
+  String get levelMuted => 'Muted';
+
+  @override
+  String get chooseCategory => 'Choose a category';
+
+  @override
+  String get signInToPostAndGetNotifications =>
+      'Sign in to post and get notifications';
 }

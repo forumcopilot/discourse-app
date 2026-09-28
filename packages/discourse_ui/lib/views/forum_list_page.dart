@@ -4,10 +4,10 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 
 import '../l10n/generated/app_localizations.dart';
 import '../utils/app_navigation.dart';
-import 'chat_messages_tab.dart';
+import 'chat/chat_channel_list_page.dart';
+import 'lists/categories_list.dart';
 import 'private_messaging/tabs/private_message_list_tab.dart';
 import 'site_home_tab.dart';
-import 'tabs/forum_list_tab.dart';
 import 'tabs/notification_list_tab.dart';
 import 'tabs/topic_list_tab.dart';
 import 'user_profile_page.dart';
@@ -41,19 +41,20 @@ class ForumListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // Chat's list is a page of its own, with its own bar.
+    if (tab == SiteHomeTab.inbox && siteContext.chatEnabled) {
+      return ChatChannelListPage(siteContext: siteContext);
+    }
     final (String title, Widget list) = switch (tab) {
+      // The page's bar names the forum, so no forum header under it.
       SiteHomeTab.topics => (
           siteContext.site.name,
-          TopicListTab(siteContext: siteContext, isActive: true),
+          TopicListTab(
+              siteContext: siteContext, isActive: true, showMasthead: false),
         ),
       SiteHomeTab.categories => (
-          l10n.forums,
-          ForumListTab(siteContext: siteContext, isActive: true),
-        ),
-      // Chat and messages share the home's slot where chat is on.
-      SiteHomeTab.inbox when siteContext.chatEnabled => (
-          l10n.chat,
-          ChatMessagesTab(siteContext: siteContext, isActive: true),
+          l10n.categoriesView,
+          CategoriesList(siteContext: siteContext, standalone: true),
         ),
       SiteHomeTab.inbox || SiteHomeTab.messages => (
           l10n.messages,

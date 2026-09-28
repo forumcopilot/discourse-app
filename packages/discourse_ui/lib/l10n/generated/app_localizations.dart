@@ -815,7 +815,7 @@ abstract class AppLocalizations {
   /// No description provided for @signIn.
   ///
   /// In en, this message translates to:
-  /// **'Sign In'**
+  /// **'Sign in'**
   String get signIn;
 
   /// No description provided for @markForumRead.
@@ -4473,6 +4473,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unmark as solution'**
   String get unmarkAsSolution;
+
+  /// Search field in a forum's header, named after the forum
+  ///
+  /// In en, this message translates to:
+  /// **'Search {forum}'**
+  String searchForumName(String forum);
+
+  /// Forum header stat: members active in the past 30 days, compact number (e.g. 1.9K)
+  ///
+  /// In en, this message translates to:
+  /// **'{formatted} active this month'**
+  String countActiveThisMonth(String formatted);
+
+  /// Member count with a compact number (e.g. 56.8K members)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{{formatted} member} other{{formatted} members}}'**
+  String countMembers(int count, String formatted);
+
+  /// Topic count with a compact number (e.g. 18.5K topics)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{{formatted} topic} other{{formatted} topics}}'**
+  String countTopics(int count, String formatted);
+
+  /// Category card: topics started in the past week
+  ///
+  /// In en, this message translates to:
+  /// **'{count} new this week'**
+  String categoryNewThisWeek(int count);
+
+  /// The Categories view among a forum's Home views (Latest, New, Top, Categories)
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categoriesView;
+
+  /// Drawer link to the full list of categories
+  ///
+  /// In en, this message translates to:
+  /// **'All categories'**
+  String get allCategories;
+
+  /// Drawer link to the full list of tags
+  ///
+  /// In en, this message translates to:
+  /// **'All tags'**
+  String get allTags;
+
+  /// Drawer link to the signed-in user's own posts (Discourse sidebar: My posts)
+  ///
+  /// In en, this message translates to:
+  /// **'My posts'**
+  String get myPosts;
+
+  /// The signed-in user's Discourse trust level, in the drawer's account card
+  ///
+  /// In en, this message translates to:
+  /// **'Trust level {level}'**
+  String trustLevelN(int level);
+
+  /// Home view: topics new since your last visit (Discourse: New)
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get filterNew;
+
+  /// Home view: the most active topics of a period (Discourse: Top)
+  ///
+  /// In en, this message translates to:
+  /// **'Top'**
+  String get filterTop;
+
+  /// Notification level: notified of every new post
+  ///
+  /// In en, this message translates to:
+  /// **'Watching'**
+  String get levelWatching;
+
+  /// Notification level: notified of each new topic's first post
+  ///
+  /// In en, this message translates to:
+  /// **'Watching first post'**
+  String get levelWatchingFirstPost;
+
+  /// Notification level: counts unread, notified when mentioned
+  ///
+  /// In en, this message translates to:
+  /// **'Tracking'**
+  String get levelTracking;
+
+  /// Notification level: notified only when mentioned or replied to
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get levelNormal;
+
+  /// Notification level: never notified, hidden from lists
+  ///
+  /// In en, this message translates to:
+  /// **'Muted'**
+  String get levelMuted;
+
+  /// Title of the sheet that picks a category for a new topic
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a category'**
+  String get chooseCategory;
+
+  /// Drawer account card for a signed-out reader
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to post and get notifications'**
+  String get signInToPostAndGetNotifications;
 }
 
 class _AppLocalizationsDelegate

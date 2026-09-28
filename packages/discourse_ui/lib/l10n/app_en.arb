@@ -190,7 +190,7 @@
   "logout": "Logout",
   "areYouSureYouWantToLogout": "Are you sure you want to logout?",
   "register": "Register",
-  "signIn": "Sign In",
+  "signIn": "Sign in",
   "markForumRead": "Mark category read",
   "notificationTest": "Notification Test",
   "forum": "Category",
@@ -3195,5 +3195,117 @@
   "unmarkAsSolution": "Unmark as solution",
   "@unmarkAsSolution": {
     "description": "Post menu item (discourse-solved): stop treating this reply as the topic's solution"
+  },
+  "searchForumName": "Search {forum}",
+  "@searchForumName": {
+    "description": "Search field in a forum's header, named after the forum",
+    "placeholders": {
+      "forum": {
+        "type": "String"
+      }
+    }
+  },
+  "countActiveThisMonth": "{formatted} active this month",
+  "@countActiveThisMonth": {
+    "description": "Forum header stat: members active in the past 30 days, compact number (e.g. 1.9K)",
+    "placeholders": {
+      "formatted": {
+        "type": "String"
+      }
+    }
+  },
+  "countMembers": "{count, plural, =1{{formatted} member} other{{formatted} members}}",
+  "@countMembers": {
+    "description": "Member count with a compact number (e.g. 56.8K members)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "formatted": {
+        "type": "String"
+      }
+    }
+  },
+  "countTopics": "{count, plural, =1{{formatted} topic} other{{formatted} topics}}",
+  "@countTopics": {
+    "description": "Topic count with a compact number (e.g. 18.5K topics)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "formatted": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryNewThisWeek": "{count} new this week",
+  "@categoryNewThisWeek": {
+    "description": "Category card: topics started in the past week",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "categoriesView": "Categories",
+  "@categoriesView": {
+    "description": "The Categories view among a forum's Home views (Latest, New, Top, Categories)"
+  },
+  "allCategories": "All categories",
+  "@allCategories": {
+    "description": "Drawer link to the full list of categories"
+  },
+  "allTags": "All tags",
+  "@allTags": {
+    "description": "Drawer link to the full list of tags"
+  },
+  "myPosts": "My posts",
+  "@myPosts": {
+    "description": "Drawer link to the signed-in user's own posts (Discourse sidebar: My posts)"
+  },
+  "trustLevelN": "Trust level {level}",
+  "@trustLevelN": {
+    "description": "The signed-in user's Discourse trust level, in the drawer's account card",
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "filterNew": "New",
+  "@filterNew": {
+    "description": "Home view: topics new since your last visit (Discourse: New)"
+  },
+  "filterTop": "Top",
+  "@filterTop": {
+    "description": "Home view: the most active topics of a period (Discourse: Top)"
+  },
+  "levelWatching": "Watching",
+  "@levelWatching": {
+    "description": "Notification level: notified of every new post"
+  },
+  "levelWatchingFirstPost": "Watching first post",
+  "@levelWatchingFirstPost": {
+    "description": "Notification level: notified of each new topic's first post"
+  },
+  "levelTracking": "Tracking",
+  "@levelTracking": {
+    "description": "Notification level: counts unread, notified when mentioned"
+  },
+  "levelNormal": "Normal",
+  "@levelNormal": {
+    "description": "Notification level: notified only when mentioned or replied to"
+  },
+  "levelMuted": "Muted",
+  "@levelMuted": {
+    "description": "Notification level: never notified, hidden from lists"
+  },
+  "chooseCategory": "Choose a category",
+  "@chooseCategory": {
+    "description": "Title of the sheet that picks a category for a new topic"
+  },
+  "signInToPostAndGetNotifications": "Sign in to post and get notifications",
+  "@signInToPostAndGetNotifications": {
+    "description": "Drawer account card for a signed-out reader"
   }
 }

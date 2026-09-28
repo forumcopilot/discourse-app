@@ -1,252 +1,323 @@
 import 'package:flutter/material.dart';
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseSiteCapabilities;
+    show
+        DiscourseSiteCapabilities,
+        DiscourseSiteContextExtension,
+        DiscourseTopicTracking;
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import '../../config/app_forum_config.dart';
-import '../../controllers/login_controller.dart';
-import '../../theme/design_tokens.dart';
+import '../../controllers/site_controller.dart';
+import '../../host/discourse_host.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../settings_context.dart';
+import '../../theme/forum_identity.dart';
 import '../badges_directory_page.dart';
 import '../bookmarks_page.dart';
 import '../drafts_list_page.dart';
+import '../forum_topics_page.dart';
 import '../groups_list_page.dart';
+import '../in_app_web_view_page.dart';
 import '../invites_page.dart';
 import '../login_page.dart';
 import '../moderation/reviewables_page.dart';
 import '../settings/notification_settings_page.dart';
+import '../site_home_tab.dart';
+import '../tag_topics_page.dart';
 import '../tags_page.dart';
+import '../user_profile_page.dart';
 import '../users_directory_page.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../l10n/generated/app_localizations.dart';
-import '../../host/discourse_host.dart';
-import '../../settings_context.dart';
 import 'appearance_sheet.dart';
-import 'brand_image.dart';
-import 'section_header.dart';
-import '../../theme/forum_brand_style.dart';
+import 'category_badge.dart' show categoryForum;
+import 'category_tile_mark.dart';
+import 'forum_icon_tile.dart';
+import 'remote_circle_avatar.dart';
 
-/// Phase 5.18a — hamburger drawer ("More" menu).
+/// The forum's map, as Discourse's sidebar is on its website: who you are
+/// here, then Community, your categories and your tags, each a section that
+/// folds and stays folded. A few settings sit folded at the end.
 ///
-/// Discourse web's mobile view hides utility surfaces under a hamburger
-/// drawer; we follow that pattern so the bottom nav can stay at 5 items
-/// while still exposing Tags, the community directories, and account
-/// actions. The drawer slides over content (default Material drawer
-/// behaviour) and is rooted on `SiteHomePage`'s `Scaffold`.
-///
-/// Sections — ordered by recency of need (frequent on top):
-///   • Header — forum name, logged-in identity or sign-in CTA.
-///   • Explore — Tags (moved out of bottom nav in 5.18a).
-///   • Community — Users / Groups / Badges directories (5.18c lands
-///     the real screens; currently placeholder rows so the IA is
-///     visible in 5.18a).
-///   • Account — Settings, Appearance, Privacy & Terms (5.18b adds
-///     this), Sign in / Sign out.
-///
-/// Each tap closes the drawer first (so the page transition is on top
-/// of the closed-drawer state) and then pushes a `MaterialPageRoute`
-/// to the destination. Destinations that don't exist yet show a
-/// "coming soon" snackbar rather than crashing.
+/// The categories and tags are the reader's own sidebar on the forum (what
+/// they chose on the website), else the forum's defaults for new members,
+/// else its top-level categories and most used tags.
 class SiteDrawer extends StatelessWidget {
   final SiteContext siteContext;
 
-  const SiteDrawer({super.key, required this.siteContext});
+  /// Whether the Home tab is showing, so Topics is marked as the current
+  /// destination.
+  final bool homeIsCurrent;
+
+  const SiteDrawer({
+    super.key,
+    required this.siteContext,
+    this.homeIsCurrent = false,
+  });
+
+  /// How many categories and tags the drawer lists before "All …".
+  static const _maxCategories = 8;
+  static const _maxTags = 5;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+    final signedIn = siteContext.isLoggedIn;
+    final canModerate =
+        signedIn && (siteContext.loginDataOutput?.user?.canModerate ?? false);
+    final username = siteContext.currentUsername;
+
     return Drawer(
-      backgroundColor: colorScheme.surface,
       child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.only(bottom: 24),
           children: [
             _Header(siteContext: siteContext),
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  // No way back to a host's forum list here: a forum pushed
-                  // over one is left the way any page is, by Back or the
-                  // edge swipe (see SiteHomePage's drawer settings).
-                  _SectionLabel(label: AppLocalizations.of(context)!.explore),
-                  _DrawerRow(
-                    icon: Icons.label_outline,
-                    title: AppLocalizations.of(context)!.tags,
+            _Section(
+              id: 'community',
+              label: l10n.community,
+              children: [
+                _Item(
+                  icon: Icons.forum_outlined,
+                  label: l10n.home,
+                  selected: homeIsCurrent,
+                  onTap: () => _goHomeTab(context, SiteHomeTab.topics),
+                ),
+                if (signedIn && username != null)
+                  _Item(
+                    icon: Icons.person_outline,
+                    label: l10n.myPosts,
                     onTap: () => _push(
-                      context,
-                      TagsPage(siteContext: siteContext),
-                    ),
-                  ),
-                  const Divider(height: 1),
-                  _SectionLabel(label: AppLocalizations.of(context)!.community),
-                  _DrawerRow(
-                    icon: Icons.people_outline,
-                    title: AppLocalizations.of(context)!.users,
-                    onTap: () => _push(
-                      context,
-                      UsersDirectoryPage(siteContext: siteContext),
-                    ),
-                  ),
-                  _DrawerRow(
-                    icon: Icons.groups_outlined,
-                    title: AppLocalizations.of(context)!.groups,
-                    onTap: () => _push(
-                      context,
-                      GroupsListPage(siteContext: siteContext),
-                    ),
-                  ),
-                  _DrawerRow(
-                    icon: Icons.emoji_events_outlined,
-                    title: AppLocalizations.of(context)!.badges,
-                    onTap: () => _push(
-                      context,
-                      BadgesDirectoryPage(siteContext: siteContext),
-                    ),
-                  ),
-                  // Invites — Discourse-native shareable invite links /
-                  // email invites. Whether the user may actually invite is
-                  // decided server-side (invite_allowed_groups); the page
-                  // surfaces the 403 case itself, so the row only gates on
-                  // being signed in.
-                  if (siteContext.isLoggedIn)
-                    _DrawerRow(
-                      icon: Icons.person_add_alt_outlined,
-                      title: AppLocalizations.of(context)!.invites,
-                      onTap: () => _push(
                         context,
-                        InvitesPage(siteContext: siteContext),
-                      ),
-                    ),
-                  // Review queue — staff-only surface (flags, queued
-                  // posts). `canModerate` is set at login from the
-                  // current-user payload (`admin || moderator`), which is
-                  // exactly Discourse's "staff" notion.
-                  if (siteContext.isLoggedIn &&
-                      (siteContext.loginDataOutput?.user?.canModerate ??
-                          false))
-                    _DrawerRow(
-                      icon: Icons.fact_check_outlined,
-                      title: AppLocalizations.of(context)!.reviewQueue,
-                      onTap: () => _push(
-                        context,
-                        ReviewablesPage(siteContext: siteContext),
-                      ),
-                    ),
-                  const Divider(height: 1),
-                  _SectionLabel(label: AppLocalizations.of(context)!.account),
-                  // Your own content, above the settings rows — Bookmarks
-                  // and Drafts are things you go *read*, while Notifications
-                  // and Privacy are things you go *configure*. Both moved
-                  // off the Profile tab, which had grown a second nav card
-                  // duplicating this section.
-                  if (siteContext.isLoggedIn) ...[
-                    _DrawerRow(
-                      icon: Icons.bookmark_outline,
-                      title: AppLocalizations.of(context)!.bookmarks,
-                      onTap: () => _push(
-                        context,
-                        BookmarksPage(siteContext: siteContext),
-                      ),
-                    ),
-                    _DrawerRow(
-                      icon: Icons.edit_note_outlined,
-                      title: AppLocalizations.of(context)!.drafts,
-                      onTap: () => _push(
-                        context,
-                        DraftsListPage(siteContext: siteContext),
-                      ),
-                    ),
-                  ],
-                  _DrawerRow(
-                    icon: Icons.settings_outlined,
-                    // Not "Notifications": that is the tab that lists them.
-                    title: AppLocalizations.of(context)!.notificationSettings,
-                    onTap: () => _push(
-                      context,
-                      const NotificationSettingsPage(),
-                    ),
+                        UserProfilePage(
+                            siteContext: siteContext, userName: username)),
                   ),
-                  // A device setting, not an account one, so it shows
-                  // signed out too.
-                  if (DiscourseHost.showAppearanceSetting)
-                    _DrawerRow(
-                      icon: Icons.brightness_6_outlined,
-                      title: AppLocalizations.of(context)!.appearance,
-                      trailing: Obx(() => Text(
-                            appearanceLabel(context,
-                                SettingsContext.instance.themeMode.value),
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(color: colorScheme.onSurfaceVariant),
-                          )),
-                      onTap: () => showAppearanceSheet(context),
-                    ),
-                  // Real links, not a "coming soon" snackbar. /site.json
-                  // has carried tos_url and privacy_policy_url all along —
-                  // the connector was already parsing both into
-                  // DiscourseSiteCapabilities and nothing read them.
-                  _DrawerRow(
-                    icon: Icons.gavel_outlined,
-                    title: AppLocalizations.of(context)!.termsOfService,
-                    onTap: () => _openLegal(context, _legalUrl(
-                      DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
-                          .tosUrl,
-                      '/tos',
-                    )),
+                if (signedIn) ...[
+                  _Item(
+                    icon: Icons.bookmark_outline,
+                    label: l10n.bookmarks,
+                    onTap: () =>
+                        _push(context, BookmarksPage(siteContext: siteContext)),
                   ),
-                  _DrawerRow(
-                    icon: Icons.policy_outlined,
-                    title: AppLocalizations.of(context)!.privacyPolicy,
-                    onTap: () => _openLegal(context, _legalUrl(
-                      DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
-                          .privacyPolicyUrl,
-                      '/privacy',
-                    )),
+                  _Item(
+                    icon: Icons.edit_note_outlined,
+                    label: l10n.drafts,
+                    onTap: () =>
+                        _push(context, DraftsListPage(siteContext: siteContext)),
                   ),
-                  if (siteContext.isLoggedIn)
-                    _DrawerRow(
-                      icon: Icons.logout,
-                      title: AppLocalizations.of(context)!.signOut,
-                      iconColor: colorScheme.error,
-                      onTap: () => _confirmSignOut(context),
-                    )
                 ],
-              ),
+                // Staff only (admin or moderator), as on the website.
+                if (canModerate)
+                  _Item(
+                    icon: Icons.fact_check_outlined,
+                    label: l10n.reviewQueue,
+                    onTap: () => _push(
+                        context, ReviewablesPage(siteContext: siteContext)),
+                  ),
+                _Item(
+                  icon: Icons.people_outline,
+                  label: l10n.users,
+                  onTap: () => _push(
+                      context, UsersDirectoryPage(siteContext: siteContext)),
+                ),
+                _Item(
+                  icon: Icons.groups_outlined,
+                  label: l10n.groups,
+                  onTap: () =>
+                      _push(context, GroupsListPage(siteContext: siteContext)),
+                ),
+                _Item(
+                  icon: Icons.emoji_events_outlined,
+                  label: l10n.badges,
+                  onTap: () => _push(
+                      context, BadgesDirectoryPage(siteContext: siteContext)),
+                ),
+                // Whether one may invite is the server's call
+                // (invite_allowed_groups); the page says so if not.
+                if (signedIn)
+                  _Item(
+                    icon: Icons.person_add_alt_outlined,
+                    label: l10n.invites,
+                    onTap: () =>
+                        _push(context, InvitesPage(siteContext: siteContext)),
+                  ),
+                _Item(
+                  icon: Icons.info_outline,
+                  label: l10n.about,
+                  onTap: () => _push(
+                    context,
+                    InAppWebViewPage(
+                      url: '${_base()}/about',
+                      title: siteContext.site.name,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            // Build / version footer so users can identify which app
-            // build they're on when filing issues. Quiet, low-contrast.
-            _Footer(siteName: siteContext.site.name),
+            _Section(
+              id: 'categories',
+              label: l10n.categoriesView,
+              children: [
+                for (final id in _categoryIds())
+                  _CategoryItem(
+                    siteContext: siteContext,
+                    categoryId: '$id',
+                    onTap: () => _push(
+                      context,
+                      ForumTopicsPage(
+                        siteContext: siteContext,
+                        forum: categoryForum(siteContext, '$id'),
+                      ),
+                    ),
+                  ),
+                _Item(
+                  icon: Icons.list,
+                  label: l10n.allCategories,
+                  onTap: () => _goHomeTab(context, SiteHomeTab.categories),
+                ),
+              ],
+            ),
+            _Section(
+              id: 'tags',
+              label: l10n.tags,
+              children: [
+                for (final tag in _tags())
+                  _Item(
+                    icon: Icons.sell_outlined,
+                    label: tag,
+                    onTap: () => _push(
+                        context, TagTopicsPage(siteContext: siteContext, tag: tag)),
+                  ),
+                _Item(
+                  icon: Icons.list,
+                  label: l10n.allTags,
+                  onTap: () => _push(context, TagsPage(siteContext: siteContext)),
+                ),
+              ],
+            ),
+            _Section(
+              id: 'settings',
+              label: l10n.settings,
+              initiallyOpen: false,
+              children: [
+                if (signedIn)
+                  _Item(
+                    icon: Icons.notifications_none,
+                    label: l10n.notificationSettings,
+                    onTap: () =>
+                        _push(context, const NotificationSettingsPage()),
+                  ),
+                // A device setting, so it shows signed out too; a host with
+                // its own Settings screen keeps it there instead.
+                if (DiscourseHost.showAppearanceSetting)
+                  _Item(
+                    icon: Icons.brightness_6_outlined,
+                    label: l10n.appearance,
+                    trailing: Obx(() => Text(
+                          appearanceLabel(context,
+                              SettingsContext.instance.themeMode.value),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant),
+                        )),
+                    onTap: () => showAppearanceSheet(context),
+                  ),
+                _Item(
+                  icon: Icons.gavel_outlined,
+                  label: l10n.termsOfService,
+                  onTap: () => _openLegal(
+                      context,
+                      _legalUrl(
+                          DiscourseSiteCapabilities.forSite(
+                                  siteContext.site.pluginUrl)
+                              .tosUrl,
+                          '/tos')),
+                ),
+                _Item(
+                  icon: Icons.policy_outlined,
+                  label: l10n.privacyPolicy,
+                  onTap: () => _openLegal(
+                      context,
+                      _legalUrl(
+                          DiscourseSiteCapabilities.forSite(
+                                  siteContext.site.pluginUrl)
+                              .privacyPolicyUrl,
+                          '/privacy')),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
 
-  // Always close the drawer first so the route transition starts from
-  // the closed state — looks cleaner and prevents the drawer being
-  // re-opened by gestures while a destination is animating in.
+  /// The categories to list: the reader's sidebar, else the forum's
+  /// defaults, else its top-level categories in the forum's order.
+  List<int> _categoryIds() {
+    final caps = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl);
+    final known = {
+      for (final c in caps.categories)
+        if (c['id'] is int) c['id'] as int: c,
+    };
+    List<int> usable(Iterable<int> ids) => ids
+        .where((id) => known.containsKey(id) && !caps.isUncategorized('$id'))
+        .take(_maxCategories)
+        .toList();
+    final own = siteContext.sidebarCategoryIds;
+    if (own != null && own.isNotEmpty) return usable(own);
+    if (caps.defaultSidebarCategoryIds.isNotEmpty) {
+      return usable(caps.defaultSidebarCategoryIds);
+    }
+    final topLevel = caps.categories
+        .where((c) => c['parent_category_id'] == null && c['id'] is int)
+        .toList()
+      ..sort((a, b) => ((a['position'] as num?) ?? 0)
+          .compareTo((b['position'] as num?) ?? 0));
+    return usable(topLevel.map((c) => c['id'] as int));
+  }
+
+  /// The tags to list: the reader's sidebar, else the forum's defaults,
+  /// else its most used tags.
+  List<String> _tags() {
+    final caps = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl);
+    final own = siteContext.sidebarTags;
+    final tags = (own != null && own.isNotEmpty)
+        ? own
+        : caps.defaultSidebarTags.isNotEmpty
+            ? caps.defaultSidebarTags
+            : caps.topTags;
+    return tags.take(_maxTags).toList();
+  }
+
+  String _base() => siteContext.site.url.replaceAll(RegExp(r'/+$'), '');
+
+  // Close the drawer first, so the new page arrives over the closed state.
   void _push(BuildContext context, Widget page) {
     Navigator.of(context).pop();
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
   }
 
-  /// Resolves a legal URL from the site setting, falling back to
-  /// Discourse's canonical path.
-  ///
-  /// The setting comes both ways: meta.discourse.org returns "/tos"
-  /// (site-relative) and an absolute "https://www.discourse.org/privacy"
-  /// for the privacy policy, because a hosted forum can point that one at
-  /// the company's own page. Absolute wins as given; relative is joined
-  /// to the forum; empty falls back to the built-in page, which every
+  /// Switches the home to one of its tabs (or Home's Categories view).
+  void _goHomeTab(BuildContext context, SiteHomeTab tab) {
+    Navigator.of(context).pop();
+    if (Get.isRegistered<DiscourseSiteController>()) {
+      Get.find<DiscourseSiteController>().requestedHomeTab.value = tab;
+    }
+  }
+
+  /// A legal page's address from the site setting, which may be absolute
+  /// (a hosted forum's company page) or site-relative, else the page every
   /// Discourse serves.
   String _legalUrl(String? configured, String fallbackPath) {
-    final base = siteContext.site.url.replaceAll(RegExp(r'/+$'), '');
     final value = (configured ?? '').trim();
-    if (value.isEmpty) return '$base$fallbackPath';
+    if (value.isEmpty) return '${_base()}$fallbackPath';
     if (value.startsWith('http://') || value.startsWith('https://')) {
       return value;
     }
-    return '$base${value.startsWith('/') ? '' : '/'}$value';
+    return '${_base()}${value.startsWith('/') ? '' : '/'}$value';
   }
 
   Future<void> _openLegal(BuildContext context, String url) async {
@@ -255,231 +326,313 @@ class SiteDrawer extends StatelessWidget {
     if (uri == null) return;
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
-
-  // ignore: unused_element
-  void _comingSoon(BuildContext context, String label) {
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context)!.comingSoon(label)),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
-  Future<void> _confirmSignOut(BuildContext context) async {
-    Navigator.of(context).pop(); // close drawer first
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) {
-        final colorScheme = Theme.of(dialogContext).colorScheme;
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.signOutQuestion),
-          content: Text(
-            AppLocalizations.of(context)!.signOutWarning(siteContext.site.name),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(AppLocalizations.of(context)!.cancel),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              style: TextButton.styleFrom(foregroundColor: colorScheme.error),
-              child: Text(AppLocalizations.of(context)!.signOut),
-            ),
-          ],
-        );
-      },
-    );
-    if (confirmed != true) return;
-    final loginController = Get.isRegistered<DiscourseLoginController>()
-        ? Get.find<DiscourseLoginController>()
-        : Get.put(DiscourseLoginController());
-    await loginController.handleLogout(siteContext);
-  }
 }
 
-/// Drawer header. Logged in → forum name + username + trust-level chip.
-/// Guest → forum name + "Not signed in" caption (the Sign in row in the
-/// list handles the actual sign-in tap).
+/// The forum, small (its identity is already on the screen behind), then
+/// the reader: an account card that opens their profile, or a way to sign
+/// in.
 class _Header extends StatelessWidget {
-  final SiteContext siteContext;
   const _Header({required this.siteContext});
+
+  final SiteContext siteContext;
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final isLoggedIn = siteContext.isLoggedIn;
-    final username = siteContext.loginDataOutput?.user?.username;
-    final caps = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl);
-    // The same identity as the forum's home card: its colour as a
-    // gradient, the logo variant for that colour, adapted if it would
-    // still vanish.
-    final brand = ForumBrandStyle.of(context);
-    final wideLogo = caps.wideLogoFor(dark: brand.isDark);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(
-        DesignTokens.spacingL,
-        DesignTokens.spacingL,
-        DesignTokens.spacingL,
-        DesignTokens.spacingL,
-      ),
-      decoration: BoxDecoration(gradient: brand.gradient),
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final site = siteContext.site;
+    final identity = ForumIdentity.of(context, site);
+    final host = Uri.tryParse(site.url)?.host ?? site.url;
+    final user = siteContext.loginDataOutput?.user;
+    final signedIn = siteContext.isLoggedIn && user != null;
+    final level = siteContext.trustLevel;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // The forum's wordmark, where web puts it. This slot is
-          // full-width, which is the shape the wide logo is drawn for —
-          // and the wordmark *is* the forum's name as art, so it replaces
-          // the name text rather than sitting beside it and saying the
-          // same thing twice. Forums that publish no logo keep the
-          // icon-and-name treatment.
-          if (wideLogo != null)
-            Align(
-              alignment: Alignment.centerLeft,
-              child: ConstrainedBox(
-                // Height-bounded, width free: Discourse's logo has no
-                // fixed aspect ratio (148×40 here, but arbitrary), so the
-                // only safe constraint is the one web uses — cap the
-                // height and let the width follow.
-                constraints: const BoxConstraints(maxHeight: 32),
-                child: BrandImage(
-                  wideLogo,
-                  height: 32,
-                  fit: BoxFit.contain,
-                  alignment: Alignment.centerLeft,
-                  background: brand.base,
-                  designedFor: ForumBrandStyle.logoDesignedFor(caps, wideLogo),
-                  fallback: _nameRow,
-                ),
+          Row(children: [
+            ForumIconTile(name: site.name, url: identity.icon, size: 40),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(site.name,
+                      style: text.titleMedium,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis),
+                  Text(host,
+                      style: text.bodySmall
+                          ?.copyWith(color: scheme.onSurfaceVariant),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
+                ],
               ),
-            )
-          else
-            _nameRow(context),
-          const SizedBox(height: DesignTokens.spacingM),
-          Text(
-            isLoggedIn && username != null
-                ? AppLocalizations.of(context)!.signedInAs(username)
-                : AppLocalizations.of(context)!.notSignedIn,
-            style: textTheme.bodySmall?.copyWith(
-              color: brand.foreground.withValues(alpha: DesignTokens.opacityHigh),
+            ),
+          ]),
+          const SizedBox(height: 12),
+          Material(
+            color: scheme.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(12),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: signedIn
+                  ? () {
+                      Navigator.of(context).pop();
+                      if (Get.isRegistered<DiscourseSiteController>()) {
+                        Get.find<DiscourseSiteController>()
+                            .requestedHomeTab
+                            .value = SiteHomeTab.profile;
+                      }
+                    }
+                  : null,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+                child: Row(children: [
+                  RemoteCircleAvatar(
+                    radius: 18,
+                    backgroundColor: scheme.surfaceContainerHighest,
+                    imageUrl: signedIn ? user.iconUrl : null,
+                    fallback: Icon(Icons.person_outline,
+                        size: 20, color: scheme.onSurfaceVariant),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          signedIn ? user.username : l10n.notSignedIn,
+                          style: text.titleSmall,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          signedIn
+                              ? (level != null ? l10n.trustLevelN(level) : host)
+                              : l10n.signInToPostAndGetNotifications,
+                          style: text.bodySmall
+                              ?.copyWith(color: scheme.onSurfaceVariant),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (signedIn)
+                    Icon(Icons.chevron_right, color: scheme.onSurfaceVariant)
+                  else
+                    FilledButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        LoginPage.open(siteContext);
+                      },
+                      child: Text(l10n.signIn),
+                    ),
+                ]),
+              ),
             ),
           ),
-          // Sign in where the state is announced, not at the end of the
-          // list. Web keeps its Log In button in the header for the same
-          // reason: it is the first thing a visitor looks for.
-          if (!isLoggedIn) ...[
-            const SizedBox(height: DesignTokens.spacingM),
-            FilledButton.icon(
-              onPressed: () {
-                Navigator.of(context).pop(); // close drawer
-                LoginPage.open(siteContext);
-              },
-              icon: const Icon(Icons.login, size: 18),
-              label: Text(AppLocalizations.of(context)!.signIn),
-            ),
-          ],
         ],
       ),
     );
   }
 }
 
-extension _HeaderFallback on _Header {
-  /// The pre-logo treatment: a generic forum glyph and the site's name.
-  /// Kept as the fallback for forums that publish no logo, and for a logo
-  /// that fails to load.
-  Widget _nameRow(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Row(
+/// A drawer section with a label that folds it. Whether it is open is
+/// remembered across launches (Discourse's sidebar does the same).
+class _Section extends StatefulWidget {
+  const _Section({
+    required this.id,
+    required this.label,
+    required this.children,
+    this.initiallyOpen = true,
+  });
+
+  final String id;
+  final String label;
+  final List<Widget> children;
+  final bool initiallyOpen;
+
+  @override
+  State<_Section> createState() => _SectionState();
+}
+
+class _SectionState extends State<_Section> {
+  late bool _open = widget.initiallyOpen;
+
+  String get _key => 'drawer_section_open_${widget.id}';
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      final saved = prefs.getBool(_key);
+      if (saved != null && mounted && saved != _open) {
+        setState(() => _open = saved);
+      }
+    });
+  }
+
+  void _toggle() {
+    setState(() => _open = !_open);
+    SharedPreferences.getInstance().then((p) => p.setBool(_key, _open));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.children.isEmpty) return const SizedBox.shrink();
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        CircleAvatar(
-          radius: DesignTokens.avatarRadiusM,
-          backgroundColor: colorScheme.primary,
-          child: Icon(
-            Icons.forum,
-            color: colorScheme.onPrimary,
-            size: DesignTokens.iconSizeM,
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 28, vertical: 4),
+          child: Divider(height: 1),
+        ),
+        Semantics(
+          header: true,
+          expanded: _open,
+          child: InkWell(
+            onTap: _toggle,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(28, 12, 20, 8),
+              child: Row(children: [
+                Expanded(
+                  child: Text(widget.label,
+                      style:
+                          text.titleSmall?.copyWith(color: scheme.onSurfaceVariant)),
+                ),
+                Icon(_open ? Icons.expand_less : Icons.expand_more,
+                    size: 20, color: scheme.onSurfaceVariant),
+              ]),
+            ),
           ),
         ),
-        const SizedBox(width: DesignTokens.spacingM),
-        Expanded(
-          child: Text(
-            siteContext.site.name,
-            style: textTheme.titleMedium?.copyWith(
-              color: ForumBrandStyle.of(context).foreground,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 150),
+          alignment: Alignment.topCenter,
+          child: _open
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: widget.children,
+                )
+              : const SizedBox(width: double.infinity),
         ),
       ],
     );
   }
 }
 
-class _SectionLabel extends StatelessWidget {
-  final String label;
-  const _SectionLabel({required this.label});
-
-  @override
-  Widget build(BuildContext context) =>
-      SectionHeader(label, color: Theme.of(context).colorScheme.onSurfaceVariant);
-}
-
-class _DrawerRow extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final Color? iconColor;
-  final Widget? trailing;
-  final VoidCallback onTap;
-
-  const _DrawerRow({
-    required this.icon,
-    required this.title,
-    this.iconColor,
-    this.trailing,
+/// One destination, Material 3's navigation-drawer item: 48dp, a pill
+/// behind the current one.
+class _Item extends StatelessWidget {
+  const _Item({
+    required this.label,
     required this.onTap,
+    this.icon,
+    this.leading,
+    this.trailing,
+    this.selected = false,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return ListTile(
-      leading: Icon(icon, color: iconColor ?? colorScheme.onSurfaceVariant),
-      title: Text(
-        title,
-        style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
-      ),
-      trailing: trailing,
-      onTap: onTap,
-    );
-  }
-}
-
-class _Footer extends StatelessWidget {
-  final String? siteName;
-  const _Footer({this.siteName});
+  final IconData? icon;
+  final Widget? leading;
+  final String label;
+  final Widget? trailing;
+  final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final fg = selected ? scheme.onSecondaryContainer : scheme.onSurfaceVariant;
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: DesignTokens.spacingL,
-        vertical: DesignTokens.spacingS,
-      ),
-      child: Text(
-        '${siteName ?? AppForumConfig.forumName} · v1',
-        style: textTheme.bodySmall?.copyWith(
-          color: colorScheme.onSurfaceVariant,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Material(
+        color: selected ? scheme.secondaryContainer : Colors.transparent,
+        shape: const StadiumBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(children: [
+                SizedBox(
+                  width: 24,
+                  child: Center(child: leading ?? Icon(icon, color: fg)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: text.labelLarge?.copyWith(
+                        color: selected
+                            ? scheme.onSecondaryContainer
+                            : scheme.onSurface),
+                  ),
+                ),
+                if (trailing != null) trailing!,
+              ]),
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
+/// A category in the drawer: its own mark and name, and how many of its
+/// topics are new or unread for the reader.
+class _CategoryItem extends StatelessWidget {
+  const _CategoryItem({
+    required this.siteContext,
+    required this.categoryId,
+    required this.onTap,
+  });
+
+  final SiteContext siteContext;
+  final String categoryId;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final caps = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl);
+    final style = caps.categoryStyleFor(categoryId);
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    Widget counts() {
+      if (!siteContext.isLoggedIn) return const SizedBox.shrink();
+      final id = int.tryParse(categoryId);
+      if (id == null) return const SizedBox.shrink();
+      final tracking = DiscourseTopicTracking.forSite(siteContext);
+      return ListenableBuilder(
+        listenable: tracking,
+        builder: (context, _) {
+          final c =
+              tracking.counts(categoryIds: caps.categoryWithDescendants(id));
+          final n = (c?.newTopics ?? 0) + (c?.unreadTopics ?? 0);
+          if (n == 0) return const SizedBox.shrink();
+          return Text('$n',
+              style: text.labelMedium?.copyWith(color: scheme.primary));
+        },
+      );
+    }
+
+    return _Item(
+      leading: CategoryTileMark(style: style, size: 20),
+      label: style?.name ?? '',
+      trailing: counts(),
+      onTap: onTap,
+    );
+  }
+}

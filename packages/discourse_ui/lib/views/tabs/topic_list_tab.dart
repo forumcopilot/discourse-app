@@ -14,7 +14,9 @@ import 'package:discourse_ui/views/widgets/topic_tracking_live.dart';
 import 'package:discourse_ui/views/lists/new_topics_list.dart';
 import 'package:discourse_ui/views/lists/top_topics_list.dart';
 import 'package:discourse_ui/views/lists/unread_topics_list.dart';
-import 'package:discourse_ui/views/widgets/forum_header_widget.dart';
+import 'package:discourse_ui/views/lists/categories_list.dart';
+import 'package:discourse_ui/views/search_page.dart';
+import 'package:discourse_ui/views/widgets/forum_masthead.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart' as forumcopilot_sdk;
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -56,14 +58,30 @@ class TopicListTab extends StatefulWidget {
   final SiteContext siteContext;
   final bool isActive;
   final forumcopilot_sdk.FCBoardStatResult? boardStats;
-  const TopicListTab({Key? key, required this.siteContext, required this.isActive, this.boardStats}) : super(key: key);
+
+  /// Draws the forum's header above the views. Off where the page has an
+  /// app bar of its own (a list opened from a link).
+  final bool showMasthead;
+
+  /// The view to open on, instead of the forum's homepage.
+  final HomeView? initialView;
+
+  const TopicListTab({
+    Key? key,
+    required this.siteContext,
+    required this.isActive,
+    this.boardStats,
+    this.showMasthead = true,
+    this.initialView,
+  }) : super(key: key);
 
   @override
   TopicListTabState createState() => TopicListTabState();
 }
 
 class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefulWidget<TopicListTab> {
-  int _selectedFilterIndex = 0;
+  /// The view the reader picked; until then, the forum's homepage.
+  HomeView? _chosenView;
   bool _isLoadingMore = false;
 
   // Add keys for each list. Phase 5.17c reshuffled the indices to
@@ -75,6 +93,7 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   final GlobalKey<UnreadTopicsListState> _unreadTopicsKey = GlobalKey();
   final GlobalKey<TopTopicsListState> _topTopicsKey = GlobalKey();
   final GlobalKey<HotTopicsListState> _hotTopicsKey = GlobalKey();
+  final GlobalKey<CategoriesListState> _categoriesKey = GlobalKey();
 
   /// Whether this forum offers `/hot.json`. Appended LAST rather than
   /// placed in web's Latest/Hot/New/Top order on purpose: every index in
@@ -85,25 +104,44 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   bool get _offersHot => DiscourseSiteCapabilities.offersRoute(
       widget.siteContext.site.pluginUrl, 'hot');
 
-  /// The sub-tabs, in Discourse's own order (web: Latest, Hot, New, Top).
-  /// Unread sits before Top because this app surfaces it here rather than
-  /// in a sidebar as web does.
-  ///
-  /// Everything index-driven below reads through this list rather than
-  /// hardcoding positions, so a forum without `/hot.json` simply has a
-  /// shorter list instead of renumbering every branch.
-  List<_HomeFilter> get _filters => [
-        _HomeFilter.latest,
-        if (_offersHot) _HomeFilter.hot,
-        _HomeFilter.newTopics,
-        _HomeFilter.unread,
-        _HomeFilter.top,
-      ];
+  /// The views, as the forum's own navigation bar lists them
+  /// (`top_menu`): its order, its homepage first. New and Unread need a
+  /// session, as on the website; Hot needs the forum to offer the route.
+  /// Every forum gets Latest and Categories, wherever its menu puts them,
+  /// and a forum whose menu is not known yet gets Discourse's defaults.
+  List<HomeView> get _filters {
+    final caps =
+        DiscourseSiteCapabilities.forSite(widget.siteContext.site.pluginUrl);
+    final signedIn = widget.siteContext.isLoggedIn;
+    final menu = caps.topMenu.isNotEmpty
+        ? caps.topMenu
+        : const ['latest', 'hot', 'new', 'unread', 'top', 'categories'];
+    final views = <HomeView>[];
+    for (final item in menu) {
+      final view = HomeView.fromMenuItem(item);
+      if (view == null || views.contains(view)) continue;
+      if (view == HomeView.hot && !_offersHot) continue;
+      if ((view == HomeView.newTopics || view == HomeView.unread) &&
+          !signedIn) {
+        continue;
+      }
+      views.add(view);
+    }
+    if (!views.contains(HomeView.latest)) views.insert(0, HomeView.latest);
+    if (!views.contains(HomeView.categories)) views.add(HomeView.categories);
+    return views;
+  }
 
-  _HomeFilter get _activeFilter {
+  HomeView get _activeFilter {
     final filters = _filters;
-    final i = _selectedFilterIndex;
-    return i >= 0 && i < filters.length ? filters[i] : _HomeFilter.latest;
+    final chosen = _chosenView;
+    return chosen != null && filters.contains(chosen) ? chosen : filters.first;
+  }
+
+  /// Switches to [view] (a link to the forum's categories, say).
+  void showView(HomeView view) {
+    if (!mounted) return;
+    setState(() => _chosenView = view);
   }
 
   // Scroll controller for the main ListView
@@ -116,26 +154,24 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
 
   List<String> _getFilterLabels(
       BuildContext context, DiscourseTopicCounts? counts) {
-    // Discourse-native order: Latest, New, Unread, Top. "Subscribed" /
-    // "Participated" from the old XF-flavored chip set moved out of
-    // this tab in Phase 5.17c; they'll resurface under the Profile
-    // tab as Watching / Posted-in in Phase 5.17d.
     final l10n = AppLocalizations.of(context)!;
     return _filters.map((f) {
       switch (f) {
-        case _HomeFilter.latest:
+        case HomeView.latest:
           return l10n.latest;
-        case _HomeFilter.hot:
-          return 'Hot'; // Discourse's /hot.json
-        case _HomeFilter.newTopics:
+        case HomeView.hot:
+          return l10n.hot;
+        case HomeView.newTopics:
           // Discourse's /new.json, with web's count: "New (5)".
           final n = counts?.newTopics ?? 0;
-          return n > 0 ? l10n.filterNewWithCount(n) : 'New';
-        case _HomeFilter.unread:
+          return n > 0 ? l10n.filterNewWithCount(n) : l10n.filterNew;
+        case HomeView.unread:
           final n = counts?.unreadTopics ?? 0;
           return n > 0 ? l10n.filterUnreadWithCount(n) : l10n.unread;
-        case _HomeFilter.top:
-          return 'Top'; // Discourse's /top.json with period selector
+        case HomeView.top:
+          return l10n.filterTop;
+        case HomeView.categories:
+          return l10n.categoriesView;
       }
     }).toList(growable: false);
   }
@@ -143,6 +179,7 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   @override
   void initState() {
     super.initState();
+    _chosenView = widget.initialView;
     _scrollController.addListener(_onScroll);
 
     // Initialize tracking variables
@@ -168,6 +205,7 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
         _unreadTopicsKey.currentState?.resetList();
         _topTopicsKey.currentState?.resetList();
         _hotTopicsKey.currentState?.resetList();
+        _categoriesKey.currentState?.refreshList();
         TopicTrackingService.refresh(widget.siteContext,
             maxAge: Duration.zero);
       }
@@ -189,23 +227,26 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
     final tabJustBecameActive = !oldWidget.isActive && widget.isActive;
     if (tabJustBecameActive) {
       AppLogger.debug('📋 [TOPIC_LIST_TAB] Tab just became active - refreshing active list');
-      // Trigger refresh on the active topic list. Index map: 0=Latest,
-      // 1=New, 2=Unread, 3=Top.
+      // Trigger refresh on the active view.
       switch (_activeFilter) {
-        case _HomeFilter.latest:
+        case HomeView.latest:
           _latestTopicsKey.currentState?.refreshList();
           break;
-        case _HomeFilter.newTopics:
+        case HomeView.newTopics:
           _newTopicsKey.currentState?.refreshList();
           break;
-        case _HomeFilter.unread:
+        case HomeView.unread:
           _unreadTopicsKey.currentState?.refreshList();
           break;
-        case _HomeFilter.top:
+        case HomeView.top:
           _topTopicsKey.currentState?.refreshList();
           break;
-        case _HomeFilter.hot:
+        case HomeView.hot:
           _hotTopicsKey.currentState?.refreshList();
+          break;
+        case HomeView.categories:
+          // The categories load once; their counts refresh as the view
+          // comes back (CategoriesList.didUpdateWidget).
           break;
       }
       TopicTrackingService.refresh(widget.siteContext);
@@ -239,35 +280,37 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
     try {
       // Call loadMore on the active topic list
       switch (_activeFilter) {
-        case _HomeFilter.latest:
+        case HomeView.latest:
           final state = _latestTopicsKey.currentState;
           if (state != null && state.hasMoreItems) {
             await state.loadMore();
           }
           break;
-        case _HomeFilter.newTopics:
+        case HomeView.newTopics:
           final state = _newTopicsKey.currentState;
           if (state != null && state.hasMoreItems) {
             await state.loadMore();
           }
           break;
-        case _HomeFilter.unread:
+        case HomeView.unread:
           final unreadState = _unreadTopicsKey.currentState;
           if (unreadState != null && unreadState.hasMoreItems) {
             await unreadState.loadMore();
           }
           break;
-        case _HomeFilter.top:
+        case HomeView.top:
           final topState = _topTopicsKey.currentState;
           if (topState != null && topState.hasMoreItems) {
             await topState.loadMore();
           }
           break;
-        case _HomeFilter.hot:
+        case HomeView.hot:
           final hotState = _hotTopicsKey.currentState;
           if (hotState != null && hotState.hasMoreItems) {
             await hotState.loadMore();
           }
+          break;
+        case HomeView.categories:
           break;
       }
     } finally {
@@ -287,9 +330,11 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
     _unreadTopicsKey.currentState?.resetList();
     _topTopicsKey.currentState?.resetList();
 
-    // Reset to first filter if needed
+    _categoriesKey.currentState?.refreshList();
+
+    // Back to the forum's homepage view.
     setState(() {
-      _selectedFilterIndex = 0;
+      _chosenView = null;
     });
 
     // Scroll back to top
@@ -316,8 +361,13 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
             for (final label in _getFilterLabels(context, counts))
               FilterChipOption(label: label),
           ],
-          selectedIndex: _selectedFilterIndex,
-          onSelected: (i) => setState(() => _selectedFilterIndex = i),
+          selectedIndex: _filters.indexOf(_activeFilter),
+          onSelected: (i) {
+            setState(() => _chosenView = _filters[i]);
+            // The chips stay pinned under the header; the new view starts
+            // at its top rather than wherever the last one was scrolled to.
+            _scrollToViewTop();
+          },
         );
     if (!widget.siteContext.isLoggedIn) return chips(null);
     final tracking = DiscourseTopicTracking.forSite(widget.siteContext);
@@ -333,12 +383,12 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   Widget? _buildDismissBar() {
     if (!widget.siteContext.isLoggedIn) return null;
     final (kind, hasTopics, reload) = switch (_activeFilter) {
-      _HomeFilter.newTopics => (
+      HomeView.newTopics => (
           DismissKind.newTopics,
           _newTopicsKey.currentState?.hasTopics ?? false,
           () => _newTopicsKey.currentState?.refreshList(),
         ),
-      _HomeFilter.unread => (
+      HomeView.unread => (
           DismissKind.unread,
           _unreadTopicsKey.currentState?.hasTopics ?? false,
           () => _unreadTopicsKey.currentState?.refreshList(),
@@ -358,48 +408,58 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   // Build topic list items from the active list
   List<Widget> _buildTopicItems() {
     switch (_activeFilter) {
-      case _HomeFilter.latest:
+      case HomeView.latest:
         return _latestTopicsKey.currentState?.buildTopicItems() ?? [];
-      case _HomeFilter.newTopics:
+      case HomeView.newTopics:
         return _newTopicsKey.currentState?.buildTopicItems() ?? [];
-      case _HomeFilter.unread:
+      case HomeView.unread:
         return _unreadTopicsKey.currentState?.buildTopicItems() ?? [];
-      case _HomeFilter.top:
+      case HomeView.top:
         return _topTopicsKey.currentState?.buildTopicItems() ?? [];
-      case _HomeFilter.hot:
+      case HomeView.hot:
         return _hotTopicsKey.currentState?.buildTopicItems() ?? [];
+      case HomeView.categories:
+        final state = _categoriesKey.currentState;
+        if (state == null || state.isLoading) {
+          return const [Center(child: CircularProgressIndicator())];
+        }
+        return state.buildItems();
     }
   }
 
   // Build error/not signed in widget
   Widget? _buildErrorOrNotSignedInWidget() {
     switch (_activeFilter) {
-      case _HomeFilter.latest:
+      case HomeView.latest:
         return _latestTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
-      case _HomeFilter.newTopics:
+      case HomeView.newTopics:
         return _newTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
-      case _HomeFilter.unread:
+      case HomeView.unread:
         return _unreadTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
-      case _HomeFilter.top:
+      case HomeView.top:
         return _topTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
-      case _HomeFilter.hot:
+      case HomeView.hot:
         return _hotTopicsKey.currentState?.buildErrorOrNotSignedInWidget();
+      case HomeView.categories:
+        return _categoriesKey.currentState?.buildErrorWidget();
     }
   }
 
   // Build empty state widget
   Widget? _buildEmptyState() {
     switch (_activeFilter) {
-      case _HomeFilter.latest:
+      case HomeView.latest:
         return _latestTopicsKey.currentState?.buildEmptyState();
-      case _HomeFilter.newTopics:
+      case HomeView.newTopics:
         return _newTopicsKey.currentState?.buildEmptyState();
-      case _HomeFilter.unread:
+      case HomeView.unread:
         return _unreadTopicsKey.currentState?.buildEmptyState();
-      case _HomeFilter.top:
+      case HomeView.top:
         return _topTopicsKey.currentState?.buildEmptyState();
-      case _HomeFilter.hot:
+      case HomeView.hot:
         return _hotTopicsKey.currentState?.buildEmptyState();
+      case HomeView.categories:
+        return _categoriesKey.currentState?.buildEmptyState();
     }
   }
 
@@ -412,39 +472,46 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
     return Offstage(
       offstage: true,
       child: IndexedStack(
-        index: _selectedFilterIndex,
+        index: _filters.indexOf(_activeFilter),
         children: [
           for (final f in _filters)
             switch (f) {
-              _HomeFilter.latest => LatestTopicsList(
+              HomeView.latest => LatestTopicsList(
                   key: _latestTopicsKey,
                   isActive: widget.isActive &&
-                      _activeFilter == _HomeFilter.latest,
+                      _activeFilter == HomeView.latest,
                   siteContext: widget.siteContext,
                 ),
-              _HomeFilter.hot => HotTopicsList(
+              HomeView.hot => HotTopicsList(
                   key: _hotTopicsKey,
                   isActive: widget.isActive &&
-                      _activeFilter == _HomeFilter.hot,
+                      _activeFilter == HomeView.hot,
                   siteContext: widget.siteContext,
                 ),
-              _HomeFilter.newTopics => NewTopicsList(
+              HomeView.newTopics => NewTopicsList(
                   key: _newTopicsKey,
                   isActive: widget.isActive &&
-                      _activeFilter == _HomeFilter.newTopics,
+                      _activeFilter == HomeView.newTopics,
                   siteContext: widget.siteContext,
                 ),
-              _HomeFilter.unread => UnreadTopicsList(
+              HomeView.unread => UnreadTopicsList(
                   key: _unreadTopicsKey,
                   isActive: widget.isActive &&
-                      _activeFilter == _HomeFilter.unread,
+                      _activeFilter == HomeView.unread,
                   siteContext: widget.siteContext,
                 ),
-              _HomeFilter.top => TopTopicsList(
+              HomeView.top => TopTopicsList(
                   key: _topTopicsKey,
                   isActive: widget.isActive &&
-                      _activeFilter == _HomeFilter.top,
+                      _activeFilter == HomeView.top,
                   siteContext: widget.siteContext,
+                ),
+              HomeView.categories => CategoriesList(
+                  key: _categoriesKey,
+                  isActive: widget.isActive &&
+                      _activeFilter == HomeView.categories,
+                  siteContext: widget.siteContext,
+                  onChanged: notifyDataLoaded,
                 ),
             },
         ],
@@ -457,23 +524,63 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
         maxAge: Duration.zero));
     // Trigger refresh on the active topic list
     switch (_activeFilter) {
-      case _HomeFilter.latest:
+      case HomeView.latest:
         await _latestTopicsKey.currentState?.refreshList();
         break;
-      case _HomeFilter.newTopics:
+      case HomeView.newTopics:
         await _newTopicsKey.currentState?.refreshList();
         break;
-      case _HomeFilter.unread:
+      case HomeView.unread:
         await _unreadTopicsKey.currentState?.refreshList();
         break;
-      case _HomeFilter.top:
+      case HomeView.top:
         await _topTopicsKey.currentState?.refreshList();
         break;
-      case _HomeFilter.hot:
+      case HomeView.hot:
         await _hotTopicsKey.currentState?.refreshList();
+        break;
+      case HomeView.categories:
+        await _categoriesKey.currentState?.refreshList();
         break;
     }
   }
+
+  /// Brings the top of the current view up under the pinned chips, if the
+  /// page is scrolled past it.
+  void _scrollToViewTop() {
+    if (!_scrollController.hasClients) return;
+    final collapsedAt = _mastheadCollapseOffset;
+    if (_scrollController.offset > collapsedAt) {
+      _scrollController.jumpTo(collapsedAt);
+    }
+  }
+
+  /// Where the header has finished collapsing into its bar.
+  double get _mastheadCollapseOffset => widget.showMasthead
+      ? ForumMasthead.collapseDistance(
+          context, widget.siteContext, widget.boardStats)
+      : 0;
+
+  void _openSearch() {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => SearchPage(siteContext: widget.siteContext)));
+  }
+
+  List<Widget> _headerSlivers() => [
+        if (widget.showMasthead)
+          ForumMasthead(
+            siteContext: widget.siteContext,
+            boardStats: widget.boardStats,
+            onSearch: _openSearch,
+          ),
+        // The views stay in reach at any depth, pinned under the bar.
+        PinnedHeaderSliver(
+          child: ColoredBox(
+            color: Theme.of(context).colorScheme.surface,
+            child: _buildFilterChips(),
+          ),
+        ),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -485,14 +592,10 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
     if (errorWidget != null) {
       return Stack(
         children: [
-          Column(
-            children: [
-              ForumHeaderWidget(
-                boardStats: widget.boardStats,
-                extendUnderAppBar: true,
-              ),
-              _buildFilterChips(),
-              Expanded(child: errorWidget),
+          CustomScrollView(
+            slivers: [
+              ..._headerSlivers(),
+              SliverFillRemaining(hasScrollBody: false, child: errorWidget),
             ],
           ),
           hiddenWidgets,
@@ -508,17 +611,16 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
       children: [
         RefreshIndicator(
           onRefresh: _handleRefresh,
+          // Under the header's bar, not over the status bar.
+          edgeOffset: widget.showMasthead
+              ? MediaQuery.paddingOf(context).top +
+                  ForumMasthead.toolbarHeight
+              : 0,
           child: CustomScrollView(
             controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
-              SliverToBoxAdapter(
-                child: ForumHeaderWidget(
-                  boardStats: widget.boardStats,
-                  extendUnderAppBar: true,
-                ),
-              ),
-              SliverToBoxAdapter(child: _buildFilterChips()),
+              ..._headerSlivers(),
               if (dismissBar != null) SliverToBoxAdapter(child: dismissBar),
               ..._topicSlivers(context, _buildTopicItems(), _buildEmptyState()),
             ],
@@ -545,7 +647,25 @@ class TopicList extends StatelessWidget {
 }
 
 
-/// The Home tab's sub-filters. Named rather than positional because a
-/// forum can turn `/hot.json` off, and with indices that made every
-/// branch below depend on which tabs happened to exist.
-enum _HomeFilter { latest, hot, newTopics, unread, top }
+/// The views of a forum's Home: the list routes of Discourse's navigation
+/// bar (`top_menu`) the app draws.
+enum HomeView {
+  latest,
+  hot,
+  newTopics,
+  unread,
+  top,
+  categories;
+
+  /// The view a `top_menu` item names, or null for one the app does not
+  /// draw (Bookmarks, Posted, Votes…).
+  static HomeView? fromMenuItem(String item) => switch (item.toLowerCase()) {
+        'latest' => latest,
+        'hot' => hot,
+        'new' => newTopics,
+        'unread' => unread,
+        'top' => top,
+        'categories' => categories,
+        _ => null,
+      };
+}

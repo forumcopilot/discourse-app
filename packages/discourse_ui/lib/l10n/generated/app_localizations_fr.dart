@@ -2700,4 +2700,86 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get unmarkAsSolution => 'Ne plus marquer comme solution';
+
+  @override
+  String searchForumName(String forum) {
+    return 'Rechercher dans $forum';
+  }
+
+  @override
+  String countActiveThisMonth(String formatted) {
+    return '$formatted actifs ce mois-ci';
+  }
+
+  @override
+  String countMembers(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted membres',
+      one: '$formatted membre',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String countTopics(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted sujets',
+      one: '$formatted sujet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String categoryNewThisWeek(int count) {
+    return '$count nouveaux cette semaine';
+  }
+
+  @override
+  String get categoriesView => 'Catégories';
+
+  @override
+  String get allCategories => 'Toutes les catégories';
+
+  @override
+  String get allTags => 'Toutes les étiquettes';
+
+  @override
+  String get myPosts => 'Mes messages';
+
+  @override
+  String trustLevelN(int level) {
+    return 'Niveau de confiance $level';
+  }
+
+  @override
+  String get filterNew => 'Nouveaux';
+
+  @override
+  String get filterTop => 'Top';
+
+  @override
+  String get levelWatching => 'Surveiller';
+
+  @override
+  String get levelWatchingFirstPost => 'Surveiller le premier message';
+
+  @override
+  String get levelTracking => 'Suivre';
+
+  @override
+  String get levelNormal => 'Normal';
+
+  @override
+  String get levelMuted => 'Silencieux';
+
+  @override
+  String get chooseCategory => 'Choisir une catégorie';
+
+  @override
+  String get signInToPostAndGetNotifications =>
+      'Connectez-vous pour publier et recevoir des notifications';
 }

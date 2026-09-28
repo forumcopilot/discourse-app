@@ -2585,4 +2585,83 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get unmarkAsSolution => '解決策のマークを解除';
+
+  @override
+  String searchForumName(String forum) {
+    return '$forumを検索';
+  }
+
+  @override
+  String countActiveThisMonth(String formatted) {
+    return '今月のアクティブ $formatted';
+  }
+
+  @override
+  String countMembers(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'メンバー $formatted',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String countTopics(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'トピック $formatted',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String categoryNewThisWeek(int count) {
+    return '今週の新着 $count';
+  }
+
+  @override
+  String get categoriesView => 'カテゴリ';
+
+  @override
+  String get allCategories => 'すべてのカテゴリ';
+
+  @override
+  String get allTags => 'すべてのタグ';
+
+  @override
+  String get myPosts => '自分の投稿';
+
+  @override
+  String trustLevelN(int level) {
+    return '信頼レベル $level';
+  }
+
+  @override
+  String get filterNew => '新着';
+
+  @override
+  String get filterTop => 'トップ';
+
+  @override
+  String get levelWatching => 'ウォッチ中';
+
+  @override
+  String get levelWatchingFirstPost => '最初の投稿をウォッチ';
+
+  @override
+  String get levelTracking => '追跡中';
+
+  @override
+  String get levelNormal => '通常';
+
+  @override
+  String get levelMuted => 'ミュート';
+
+  @override
+  String get chooseCategory => 'カテゴリを選択';
+
+  @override
+  String get signInToPostAndGetNotifications => 'ログインして投稿や通知を利用';
 }

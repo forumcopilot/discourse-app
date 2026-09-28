@@ -2578,4 +2578,83 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get unmarkAsSolution => '해결책 표시 해제';
+
+  @override
+  String searchForumName(String forum) {
+    return '$forum 검색';
+  }
+
+  @override
+  String countActiveThisMonth(String formatted) {
+    return '이번 달 활동 $formatted명';
+  }
+
+  @override
+  String countMembers(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '회원 $formatted명',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String countTopics(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '주제 $formatted개',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String categoryNewThisWeek(int count) {
+    return '이번 주 새 글 $count개';
+  }
+
+  @override
+  String get categoriesView => '카테고리';
+
+  @override
+  String get allCategories => '모든 카테고리';
+
+  @override
+  String get allTags => '모든 태그';
+
+  @override
+  String get myPosts => '내 게시물';
+
+  @override
+  String trustLevelN(int level) {
+    return '신뢰 수준 $level';
+  }
+
+  @override
+  String get filterNew => '새 글';
+
+  @override
+  String get filterTop => '인기';
+
+  @override
+  String get levelWatching => '지켜보기';
+
+  @override
+  String get levelWatchingFirstPost => '첫 게시물 지켜보기';
+
+  @override
+  String get levelTracking => '추적';
+
+  @override
+  String get levelNormal => '일반';
+
+  @override
+  String get levelMuted => '알림 끔';
+
+  @override
+  String get chooseCategory => '카테고리 선택';
+
+  @override
+  String get signInToPostAndGetNotifications => '로그인하여 글을 쓰고 알림을 받으세요';
 }

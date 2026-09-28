@@ -14,10 +14,15 @@ class CategoryReadCounts extends StatelessWidget {
     super.key,
     required this.siteContext,
     required this.categoryId,
+    this.padding = EdgeInsets.zero,
   });
 
   final SiteContext siteContext;
   final String categoryId;
+
+  /// Around the counts when there are any; nothing is drawn, padding
+  /// included, when there are none.
+  final EdgeInsetsGeometry padding;
 
   @override
   Widget build(BuildContext context) {
@@ -38,14 +43,17 @@ class CategoryReadCounts extends StatelessWidget {
         final l10n = AppLocalizations.of(context)!;
         final style = Theme.of(context).textTheme.bodySmall?.copyWith(
             color: Theme.of(context).colorScheme.primary);
-        return Wrap(
-          spacing: DesignTokens.spacingM,
-          children: [
-            if (newTopics > 0)
-              Text(l10n.categoryNewTopics(newTopics), style: style),
-            if (unreadTopics > 0)
-              Text(l10n.categoryUnreadTopics(unreadTopics), style: style),
-          ],
+        return Padding(
+          padding: padding,
+          child: Wrap(
+            spacing: DesignTokens.spacingM,
+            children: [
+              if (newTopics > 0)
+                Text(l10n.categoryNewTopics(newTopics), style: style),
+              if (unreadTopics > 0)
+                Text(l10n.categoryUnreadTopics(unreadTopics), style: style),
+            ],
+          ),
         );
       },
     );

@@ -2554,4 +2554,83 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get unmarkAsSolution => '取消标记为解决方案';
+
+  @override
+  String searchForumName(String forum) {
+    return '搜索 $forum';
+  }
+
+  @override
+  String countActiveThisMonth(String formatted) {
+    return '本月活跃 $formatted';
+  }
+
+  @override
+  String countMembers(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted 位成员',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String countTopics(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted 个话题',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String categoryNewThisWeek(int count) {
+    return '本周新增 $count';
+  }
+
+  @override
+  String get categoriesView => '类别';
+
+  @override
+  String get allCategories => '所有类别';
+
+  @override
+  String get allTags => '所有标签';
+
+  @override
+  String get myPosts => '我的帖子';
+
+  @override
+  String trustLevelN(int level) {
+    return '信任等级 $level';
+  }
+
+  @override
+  String get filterNew => '新';
+
+  @override
+  String get filterTop => '热门';
+
+  @override
+  String get levelWatching => '关注';
+
+  @override
+  String get levelWatchingFirstPost => '关注第一个帖子';
+
+  @override
+  String get levelTracking => '跟踪';
+
+  @override
+  String get levelNormal => '常规';
+
+  @override
+  String get levelMuted => '免打扰';
+
+  @override
+  String get chooseCategory => '选择类别';
+
+  @override
+  String get signInToPostAndGetNotifications => '登录后即可发帖和接收通知';
 }

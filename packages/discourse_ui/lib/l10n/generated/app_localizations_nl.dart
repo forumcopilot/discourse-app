@@ -2688,4 +2688,86 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get unmarkAsSolution => 'Markering als oplossing opheffen';
+
+  @override
+  String searchForumName(String forum) {
+    return 'Zoeken in $forum';
+  }
+
+  @override
+  String countActiveThisMonth(String formatted) {
+    return '$formatted actief deze maand';
+  }
+
+  @override
+  String countMembers(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted leden',
+      one: '$formatted lid',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String countTopics(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted topics',
+      one: '$formatted topic',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String categoryNewThisWeek(int count) {
+    return '$count nieuw deze week';
+  }
+
+  @override
+  String get categoriesView => 'Categorieën';
+
+  @override
+  String get allCategories => 'Alle categorieën';
+
+  @override
+  String get allTags => 'Alle tags';
+
+  @override
+  String get myPosts => 'Mijn berichten';
+
+  @override
+  String trustLevelN(int level) {
+    return 'Vertrouwensniveau $level';
+  }
+
+  @override
+  String get filterNew => 'Nieuw';
+
+  @override
+  String get filterTop => 'Top';
+
+  @override
+  String get levelWatching => 'Volgen';
+
+  @override
+  String get levelWatchingFirstPost => 'Eerste bericht volgen';
+
+  @override
+  String get levelTracking => 'Volgen (beperkt)';
+
+  @override
+  String get levelNormal => 'Normaal';
+
+  @override
+  String get levelMuted => 'Genegeerd';
+
+  @override
+  String get chooseCategory => 'Kies een categorie';
+
+  @override
+  String get signInToPostAndGetNotifications =>
+      'Log in om te posten en meldingen te krijgen';
 }

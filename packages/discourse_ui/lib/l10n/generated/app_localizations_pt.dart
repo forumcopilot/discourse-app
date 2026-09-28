@@ -2690,4 +2690,86 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get unmarkAsSolution => 'Desmarcar como solução';
+
+  @override
+  String searchForumName(String forum) {
+    return 'Pesquisar em $forum';
+  }
+
+  @override
+  String countActiveThisMonth(String formatted) {
+    return '$formatted ativos este mês';
+  }
+
+  @override
+  String countMembers(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted membros',
+      one: '$formatted membro',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String countTopics(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted tópicos',
+      one: '$formatted tópico',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String categoryNewThisWeek(int count) {
+    return '$count novos esta semana';
+  }
+
+  @override
+  String get categoriesView => 'Categorias';
+
+  @override
+  String get allCategories => 'Todas as categorias';
+
+  @override
+  String get allTags => 'Todas as etiquetas';
+
+  @override
+  String get myPosts => 'Minhas publicações';
+
+  @override
+  String trustLevelN(int level) {
+    return 'Nível de confiança $level';
+  }
+
+  @override
+  String get filterNew => 'Novos';
+
+  @override
+  String get filterTop => 'Top';
+
+  @override
+  String get levelWatching => 'Acompanhando';
+
+  @override
+  String get levelWatchingFirstPost => 'Acompanhar primeira publicação';
+
+  @override
+  String get levelTracking => 'Monitorando';
+
+  @override
+  String get levelNormal => 'Normal';
+
+  @override
+  String get levelMuted => 'Silenciado';
+
+  @override
+  String get chooseCategory => 'Escolha uma categoria';
+
+  @override
+  String get signInToPostAndGetNotifications =>
+      'Entre para publicar e receber notificações';
 }
