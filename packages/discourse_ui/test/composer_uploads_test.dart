@@ -57,34 +57,42 @@ void main() {
     return (text: text, upload: upload, removed: removed);
   }
 
+  /// Lets picking, preparing and uploading run in real time until [done],
+  /// for up to five seconds: a fixed wait was too short on a busy machine.
+  Future<void> settleUntil(WidgetTester tester, bool Function() done) async {
+    for (var i = 0; i < 100 && !done(); i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+      await tester.pump();
+    }
+    // What changed on the last step (or before the first) is built.
+    await tester.pump();
+  }
+
+  /// Taps Upload image and waits for the placeholders to go in.
+  Future<void> pickPhotos(WidgetTester tester, ({TextEditingController text, Completer<String?> upload, List<String> removed}) c) async {
+    await tester.runAsync(() => tester.tap(find.byTooltip('Upload image')));
+    await settleUntil(tester, () => c.text.text.contains('[Uploading:'));
+  }
+
   testWidgets('a photo goes where the cursor is, then becomes its Markdown',
       (tester) async {
     final c = await pumpComposer(tester);
-    await tester.runAsync(() async {
-      await tester.tap(find.byTooltip('Upload image'));
-      await Future<void>.delayed(const Duration(milliseconds: 300));
-    });
-    await tester.pump();
+    await pickPhotos(tester, c);
 
     expect(c.text.text, 'Before\n[Uploading: beach.png…]()\nAfter');
     expect(find.bySemanticsLabel('beach.png'), findsOneWidget);
 
     c.upload.complete('upload://abc.png');
-    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
-    await tester.pump();
+    await settleUntil(tester, () => c.text.text.contains('![image]'));
     expect(c.text.text, 'Before\n![image](upload://abc.png)\nAfter');
   });
 
   testWidgets('removing the tile takes its Markdown out of the text',
       (tester) async {
     final c = await pumpComposer(tester);
-    await tester.runAsync(() async {
-      await tester.tap(find.byTooltip('Upload image'));
-      await Future<void>.delayed(const Duration(milliseconds: 300));
-    });
+    await pickPhotos(tester, c);
     c.upload.complete('upload://abc.png');
-    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
-    await tester.pump();
+    await settleUntil(tester, () => c.text.text.contains('![image]'));
 
     await tester.tap(find.byTooltip('Remove'));
     await tester.pump();
@@ -96,13 +104,9 @@ void main() {
   testWidgets('deleting the Markdown drops the tile and tells the page',
       (tester) async {
     final c = await pumpComposer(tester);
-    await tester.runAsync(() async {
-      await tester.tap(find.byTooltip('Upload image'));
-      await Future<void>.delayed(const Duration(milliseconds: 300));
-    });
+    await pickPhotos(tester, c);
     c.upload.complete('upload://abc.png');
-    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
-    await tester.pump();
+    await settleUntil(tester, () => c.text.text.contains('![image]'));
 
     c.text.text = 'Before\nAfter';
     await tester.pump();
@@ -117,11 +121,7 @@ void main() {
     ];
     FilePicker.platform = _Picker([photo.path, ...more.map((f) => f.path)]);
     final c = await pumpComposer(tester);
-    await tester.runAsync(() async {
-      await tester.tap(find.byTooltip('Upload image'));
-      await Future<void>.delayed(const Duration(milliseconds: 300));
-    });
-    await tester.pump();
+    await pickPhotos(tester, c);
     expect(
         c.text.text,
         'Before\n[grid]\n[Uploading: beach.png…]()\n'
@@ -131,13 +131,9 @@ void main() {
 
   testWidgets('a failed upload takes its placeholder out', (tester) async {
     final c = await pumpComposer(tester);
-    await tester.runAsync(() async {
-      await tester.tap(find.byTooltip('Upload image'));
-      await Future<void>.delayed(const Duration(milliseconds: 300));
-    });
+    await pickPhotos(tester, c);
     c.upload.complete(null); // the page has said why
-    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
-    await tester.pump();
+    await settleUntil(tester, () => !c.text.text.contains('[Uploading:'));
     expect(c.text.text, 'Before\nAfter');
     expect(find.bySemanticsLabel('beach.png'), findsNothing);
   });
