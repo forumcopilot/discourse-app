@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
-import 'package:get/get.dart';
 import 'package:discourse_ui/utils/time_utils.dart';
 import '../user_profile_page.dart';
 // import '../widgets/cached_redirect_image.dart';
@@ -326,7 +325,7 @@ class PostListItemHeader extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Get.to(() => LoginPage(siteContext: siteContext));
+              LoginPage.open(siteContext);
             },
             child: Text(AppLocalizations.of(context)!.loginTitle),
           ),

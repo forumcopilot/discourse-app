@@ -9,12 +9,12 @@ import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteCapabilities;
 import 'package:discourse_ui/views/new_topic_page.dart';
 import 'package:discourse_ui/views/post_page.dart';
-import 'package:get/get.dart';
 import 'package:discourse_ui/views/widgets/forum_actions.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSubscriptionProxy;
 import 'package:discourse_ui/views/widgets/notification_level_sheet.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 class ForumTopicsPage extends StatefulWidget {
   final FCForum forum;
@@ -80,7 +80,7 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
     // did. Done here rather than inside the composer: the composer pops
     // itself on success, which would pop any route it pushed.
     if (newTopicId != null && mounted) {
-      await Get.to(() => PostPage(
+      await AppNavigation.pushGlobal(PostPage(
             siteContext: widget.siteContext,
             topicId: newTopicId!,
             // The topic's title, not the category's — the first post

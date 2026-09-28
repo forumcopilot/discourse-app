@@ -27,7 +27,7 @@ class NotSignedInView extends StatelessWidget {
     if (autoShowLogin) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (Get.currentRoute != '/LoginPage') {
-          Get.to(() => LoginPage(siteContext: siteContext));
+          LoginPage.open(siteContext);
         }
       });
     }
@@ -41,7 +41,7 @@ class NotSignedInView extends StatelessWidget {
       actions: [
         FilledButton(
           onPressed: () {
-            Get.to(() => LoginPage(siteContext: siteContext));
+            LoginPage.open(siteContext);
           },
           child: Text(AppLocalizations.of(context)!.loginTitle),
         ),

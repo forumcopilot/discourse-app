@@ -33,6 +33,7 @@ import 'site_home_tab.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/core/async/async_utils.dart';
 import 'dart:async';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 class SiteHomePage extends StatefulWidget {
   final Site? siteToInitialize;
@@ -464,9 +465,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           });
           // Error dialog should have been shown by DiscourseSiteController, just navigate back
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              Navigator.of(this.context).pop();
-            }
+            if (mounted) this.context.popOwnRoute();
           });
           return null;
         }
@@ -529,7 +528,10 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context).pop(); // Go back to previous page
+                // Then this page, if nothing has closed it yet: two plain
+                // pops here, with the one scheduled when start-up failed,
+                // could close the page under it too.
+                this.context.popOwnRoute();
               },
               child: Text(AppLocalizations.of(context)!.okButton),
             ),

@@ -11,6 +11,7 @@ import '../utils/url_utils.dart';
 import '../views/badges_directory_page.dart';
 import '../views/bookmarks_page.dart';
 import '../views/chat/chat_channel_view.dart';
+import '../views/forum_list_page.dart';
 import '../views/forum_topics_page.dart';
 import '../views/group_detail_page.dart';
 import '../views/groups_list_page.dart';
@@ -235,8 +236,7 @@ class DiscourseLinkHandler {
         onJumpToPost?.call(to.postNumber!);
       case LinkDestinationKind.topic:
         await _restoreSession(context, siteContext);
-        await DiscourseRouteNavigator.open(siteContext, to.route!,
-            replaceTopic: false);
+        await DiscourseRouteNavigator.open(siteContext, to.route!);
       case LinkDestinationKind.category:
         // With its colours from /site.json, so its header is not blank.
         push(ForumTopicsPage(
@@ -271,20 +271,27 @@ class DiscourseLinkHandler {
       case LinkDestinationKind.bookmarks:
         push(BookmarksPage(siteContext: siteContext));
       case LinkDestinationKind.home:
-        _goHome(context, to.homeTab!);
+        await _openList(context, siteContext, to.homeTab!);
     }
   }
 
-  /// Back to the forum's home and on to [tab] — where a link to the
-  /// forum itself, one of its lists, chat or the reader's inbox leads.
-  static void _goHome(BuildContext context, SiteHomeTab tab) {
-    if (!Get.isRegistered<DiscourseSiteController>()) return;
-    final controller = Get.find<DiscourseSiteController>();
-    final homeRoute = controller.homeRoute;
-    if (homeRoute != null && homeRoute.isActive) {
-      Navigator.of(context).popUntil((route) => route == homeRoute);
+  /// Where a link to the forum itself, one of its lists, chat or the
+  /// reader's inbox leads: on the forum's home, that tab; anywhere else, the
+  /// list opens over the page the link was on, so Back returns there.
+  ///
+  /// It used to close every page back to the home, and Back from the list
+  /// then left the forum.
+  static Future<void> _openList(
+      BuildContext context, SiteContext siteContext, SiteHomeTab tab) async {
+    final controller = Get.isRegistered<DiscourseSiteController>()
+        ? Get.find<DiscourseSiteController>()
+        : null;
+    final home = controller?.homeRoute;
+    if (controller != null && home != null && ModalRoute.of(context) == home) {
+      controller.requestHomeTab(tab);
+      return;
     }
-    controller.requestHomeTab(tab);
+    await ForumListPage.open(context, siteContext, tab);
   }
 
   /// A badge link names only the badge's id; the forum's badge list has the
@@ -321,7 +328,7 @@ class DiscourseLinkHandler {
     if (!result.success &&
         result.hadCredentials &&
         Get.currentRoute != '/LoginPage') {
-      await Get.to(() => LoginPage(siteContext: siteContext));
+      await LoginPage.open(siteContext);
     }
   }
 

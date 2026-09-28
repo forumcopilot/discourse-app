@@ -18,6 +18,7 @@ import '../widgets/subforum_header_widget.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/error_message.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 class ForumTopicList extends StatefulWidget {
   final SiteContext siteContext;
@@ -437,10 +438,10 @@ class _ForumTopicListState extends State<ForumTopicList> {
                       final loginController = Get.find<DiscourseLoginController>();
                       final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
                       if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
-                        await Get.to(() => LoginPage(siteContext: widget.siteContext));
+                        await LoginPage.open(widget.siteContext);
                       }
                     }
-                    Get.to(() => PostPage(
+                    AppNavigation.pushGlobal(PostPage(
                           siteContext: widget.siteContext,
                           topicId: topic.id,
                           title: topic.title,
@@ -463,10 +464,10 @@ class _ForumTopicListState extends State<ForumTopicList> {
                       final loginController = Get.find<DiscourseLoginController>();
                       final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
                       if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
-                        await Get.to(() => LoginPage(siteContext: widget.siteContext));
+                        await LoginPage.open(widget.siteContext);
                       }
                     }
-                    Get.to(() => PostPage(siteContext: widget.siteContext, topicId: topic.id, title: topic.title));
+                    AppNavigation.pushGlobal(PostPage(siteContext: widget.siteContext, topicId: topic.id, title: topic.title));
                   },
                 )),
           ],
@@ -485,10 +486,10 @@ class _ForumTopicListState extends State<ForumTopicList> {
                       final loginController = Get.find<DiscourseLoginController>();
                       final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
                       if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
-                        await Get.to(() => LoginPage(siteContext: widget.siteContext));
+                        await LoginPage.open(widget.siteContext);
                       }
                     }
-                    Get.to(() => PostPage(siteContext: widget.siteContext, topicId: topic.id, title: topic.title));
+                    AppNavigation.pushGlobal(PostPage(siteContext: widget.siteContext, topicId: topic.id, title: topic.title));
                   },
                 )),
           ],

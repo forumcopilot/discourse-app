@@ -374,9 +374,7 @@ class _Header extends StatelessWidget {
             FilledButton.icon(
               onPressed: () {
                 Navigator.of(context).pop(); // close drawer
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => LoginPage(siteContext: siteContext),
-                ));
+                LoginPage.open(siteContext);
               },
               icon: const Icon(Icons.login, size: 18),
               label: Text(AppLocalizations.of(context)!.signIn),

@@ -4,15 +4,12 @@ import 'package:discourse_ui/utils/like_cooldown.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
-import 'package:get/get.dart';
 import 'package:discourse_ui/controllers/post_controller.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscoursePostProxy;
 import 'package:discourse_ui/views/reply_page.dart';
 import 'package:discourse_ui/views/edit_post_page.dart';
 import 'package:discourse_ui/views/login_page.dart';
-import 'package:discourse_ui/views/post_page.dart';
 import 'package:discourse_ui/views/post_revision_page.dart';
-import 'package:discourse_ui/views/lists/posts_list.dart';
 // AuthController functionality now in SiteContext
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../../theme/design_tokens.dart';
@@ -365,7 +362,7 @@ class PostActionsHandler {
     }
   }
 
-  Future<void> handleEdit(BuildContext context, String postId, String currentText, String topicTitle, String topicId, String? forumId, VoidCallback onRefresh) async {
+  Future<void> handleEdit(BuildContext context, String postId, String currentText, String topicTitle, String topicId, String? forumId, void Function([String? scrollToPostId]) onRefresh) async {
     AppLogger.debug('Handling edit of post: $postId');
     AppLogger.debug('Current text: $currentText');
 
@@ -385,31 +382,15 @@ class PostActionsHandler {
     if (result != null && context.mounted) {
       // Check if result is a postId (String) or just success (bool)
       if (result is String && result.isNotEmpty) {
-        // Navigate to the edited post using thread_by_post mode
-        // Add a small delay to allow the server to process the update
-        // Schedule navigation after current frame and delay
+        // The topic reloads in place at the edited post and highlights it, as
+        // after a reply. It used to be replaced by a fresh copy of itself
+        // half a second later (`pushReplacement`): a second topic page slid
+        // in over the first, and it replaced whatever page was on top by
+        // then, a menu or a profile opened meanwhile included.
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          // Small delay to ensure the post update is processed on the server
+          // A moment for the server to finish with the edit.
           await Future.delayed(const Duration(milliseconds: 500));
-          if (context.mounted) {
-            // Use Navigator.pushReplacement to ensure the page is properly reloaded
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PostPage(
-                  key: ValueKey('post_${topicId}_${result}'),
-                  siteContext: siteContext,
-                  topicId: topicId,
-                  title: topicTitle,
-                  mode: PostsListMode.thread_by_post,
-                  anchorPostId: result,
-                  forumId: forumId,
-                ),
-              ),
-            );
-          } else {
-            onRefresh();
-          }
+          if (context.mounted) onRefresh(result);
         });
       } else if (result == true) {
         // Fallback: if postId wasn't available, just refresh
@@ -1042,7 +1023,7 @@ class PostActionsHandler {
             onPressed: () async {
               Navigator.pop(context);
               // Navigate to login page and wait for result
-              final result = await Get.to(() => LoginPage(siteContext: siteContext));
+              final result = await LoginPage.open(siteContext);
               // If login was successful, refresh the post view
               if (result == true && refreshCallback != null) {
                 // Wait for authentication state to be fully updated

@@ -179,7 +179,7 @@ class SiteInitializationService {
         } else {
           AppLogger.info('🔍 [INIT_SERVICE] ❌ Automatic login failed: ${loginResult.errorMessage ?? "unknown error"}, hadCredentials=${loginResult.hadCredentials}');
           if (loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
-            await Get.to(() => LoginPage(siteContext: siteContext));
+            await LoginPage.open(siteContext);
           }
         }
       } else {

@@ -11,6 +11,7 @@ import 'package:discourse_ui/views/discourse_login_webview_page.dart';
 import 'package:discourse_ui/views/enable_notifications_page.dart';
 import 'package:discourse_ui/views/site_home_page.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 /// Phase 5.20a — the login page on Discourse is a single
 /// "Sign in with {domain}" CTA that launches the User API Key
@@ -38,6 +39,20 @@ import '../l10n/generated/app_localizations.dart';
 /// page anymore either, but `RegisterPage` still calls it to sign the
 /// user in right after account creation.
 class LoginPage extends StatefulWidget {
+  /// The name sign-in opens under, which `Get.currentRoute` reports while it
+  /// is on top.
+  static const routeName = '/LoginPage';
+
+  /// Opens sign-in for [siteContext] over the current page, unless it is
+  /// already on top, so two prompts never stack. Completes with whether the
+  /// user signed in (null when sign-in was already open).
+  static Future<dynamic> open(SiteContext siteContext) {
+    if (Get.currentRoute == routeName) return Future<dynamic>.value();
+    return AppNavigation.pushGlobal<dynamic>(
+        LoginPage(siteContext: siteContext),
+        name: routeName);
+  }
+
   final SiteContext siteContext;
   const LoginPage({Key? key, required this.siteContext}) : super(key: key);
 
@@ -135,27 +150,10 @@ class _LoginPageState extends State<LoginPage> {
     if (!mounted) return;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      try {
-        if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
-          DiscourseGlobalLoaderController.to.forceHide();
-        }
-        final siteController = Get.find<DiscourseSiteController>();
-        final isSiteInitialized = siteController.isInitialized.value;
-        final navigator = Navigator.of(context, rootNavigator: true);
-        final canPop = navigator.canPop();
-
-        if (isSiteInitialized && canPop) {
-          navigator.pop(true);
-        } else {
-          Get.offAll(() => const SiteHomePage());
-        }
-      } catch (_) {
-        if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
-          DiscourseGlobalLoaderController.to.forceHide();
-        }
-        Get.offAll(() => const SiteHomePage());
+      if (Get.isRegistered<DiscourseGlobalLoaderController>()) {
+        DiscourseGlobalLoaderController.to.forceHide();
       }
+      _close(true);
     });
   }
 
@@ -183,15 +181,27 @@ class _LoginPageState extends State<LoginPage> {
 
   /// Pop this page back to the caller, returning `false` so anything
   /// awaiting the route knows the user didn't sign in.
-  void _popBack() {
+  void _popBack() => _close(false);
+
+  /// Closes this page, and only this page, with [signedIn]. Whoever opened
+  /// it (a forum starting up, a list, a prompt) waits for the answer and
+  /// carries on from there.
+  ///
+  /// Signing in while a forum was still starting used to replace the whole
+  /// stack with a fresh home (`Get.offAll`): the forum's own start-up page
+  /// and its colours went, and in a multi-forum host the host's forum list
+  /// too, so Back closed the app.
+  void _close(bool signedIn) {
     if (!mounted) return;
-    final navigator = Navigator.of(context, rootNavigator: true);
-    if (navigator.canPop()) {
-      navigator.pop(false);
-    } else {
-      // Nothing to pop to — drop the user onto the home page so the
-      // app doesn't end up with a blank stack.
+    final route = ModalRoute.of(context);
+    if (route == null || !route.isActive) return;
+    if (route.isFirst) {
+      // Nothing under it to return to: the forum's home.
       Get.offAll(() => const SiteHomePage());
+    } else if (route.isCurrent) {
+      Navigator.of(context).pop(signedIn);
+    } else {
+      Navigator.of(context).removeRoute(route, signedIn);
     }
   }
 

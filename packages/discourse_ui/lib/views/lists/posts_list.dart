@@ -1276,7 +1276,7 @@ class _PostsState extends State<PostsList> {
           onReply: (postId) => postActionsHandler.handleReply(context, postId, widget.topicId, widget.topicTitle, _refreshWithOptionalScrollToPost),
           onQuote: (postId, authorName, postText) => postActionsHandler.handleQuote(context, postId, authorName, postText, widget.topicId, widget.topicTitle, _refreshWithOptionalScrollToPost),
           onEdit:
-              post.canEdit ? (postId, currentText) => postActionsHandler.handleEdit(context, postId, currentText, widget.topicTitle, widget.topicId, data.topic.forumId, _refreshCurrentPage) : null,
+              post.canEdit ? (postId, currentText) => postActionsHandler.handleEdit(context, postId, currentText, widget.topicTitle, widget.topicId, data.topic.forumId, _refreshWithOptionalScrollToPost) : null,
           onDelete: post.canDelete ? (postId) => postActionsHandler.handleDelete(context, postId) : null,
           onReport: post.canReport ? (postId) => postActionsHandler.handleReport(context, postId) : null,
           onViewHistory: (postId) => postActionsHandler.handleViewHistory(context, postId),

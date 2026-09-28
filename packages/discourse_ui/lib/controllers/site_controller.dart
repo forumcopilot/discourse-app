@@ -358,7 +358,7 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
       if (loginResult.hadCredentials) {
         if (Get.context != null) {
           AppLogger.info('Showing login screen after auto-login failure');
-          await Get.to(() => LoginPage(siteContext: siteContext));
+          await LoginPage.open(siteContext);
         } else {
           AppLogger.warning('No context available to show login screen after auto-login failure');
         }
@@ -411,7 +411,7 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
         if (loginResult.hadCredentials) {
           if (Get.context != null) {
             AppLogger.info('Showing login screen after auto-login failure (initialized site)');
-            await Get.to(() => LoginPage(siteContext: siteContext));
+            await LoginPage.open(siteContext);
           } else {
             AppLogger.warning('No context available to show login screen after auto-login failure (initialized site)');
           }

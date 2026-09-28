@@ -12,6 +12,7 @@ import 'package:discourse_ui/views/login_page.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/error_message.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 class UserRepliedPosts extends StatefulWidget {
   final SiteContext siteContext;
@@ -220,7 +221,7 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
         final loginController = Get.find<DiscourseLoginController>();
         final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
         if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
-          await Get.to(() => LoginPage(siteContext: widget.siteContext));
+          await LoginPage.open(widget.siteContext);
         }
         if (!widget.siteContext.isLoggedIn) {
           AppLogger.debug('UserRepliedPosts: proceeding to thread as guest after login screen');
@@ -235,7 +236,7 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
       // Navigate to the specific post if post_id is available, otherwise use first_unread mode
       if (post.postId.isNotEmpty) {
         AppLogger.debug('Navigating to specific post: ${post.postId} in topic: ${post.topicId}');
-        Get.to(() => PostPage(
+        AppNavigation.pushGlobal(PostPage(
               siteContext: widget.siteContext,
               topicId: post.topicId,
               title: post.topicTitle,
@@ -245,7 +246,7 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
             ));
       } else {
         AppLogger.debug('No post_id available, navigating to latest posts in topic: ${post.topicId}');
-        Get.to(() => PostPage(
+        AppNavigation.pushGlobal(PostPage(
               siteContext: widget.siteContext,
               topicId: post.topicId,
               title: post.topicTitle,

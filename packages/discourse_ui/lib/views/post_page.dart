@@ -17,6 +17,7 @@ import 'widgets/sheet_title.dart';
 import 'widgets/category_badge.dart';
 import 'private_messaging/message_actions.dart';
 import 'private_messaging/message_participants_sheet.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({
@@ -118,7 +119,7 @@ class _PostPageState extends State<PostPage> {
     // came from, and Mark unread changes its row: the page closes with
     // [messageRemoved] or [messageMarkedUnread] for the inbox to act on.
     void closeWith(bool done, String result) {
-      if (done && mounted) Navigator.of(context).pop(result);
+      if (done && mounted) context.popOwnRoute(result);
     }
 
     return PostsPageMessageMenu(
@@ -684,7 +685,7 @@ class _PostPageState extends State<PostPage> {
                 : "Couldn't merge topic"),
       ),
     );
-    if (result.result) Navigator.of(context).pop();
+    if (result.result && mounted) context.popOwnRoute();
   }
 
   void _handleDelete() async {
@@ -746,7 +747,7 @@ class _PostPageState extends State<PostPage> {
 
         // If hard delete was successful, navigate back to previous screen
         if (hardDelete) {
-          Navigator.of(context).pop();
+          context.popOwnRoute();
         }
       }
     } catch (e) {

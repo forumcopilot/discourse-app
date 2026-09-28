@@ -64,7 +64,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         final loginController = Get.find<DiscourseLoginController>();
         final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
         if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
-          await Get.to(() => LoginPage(siteContext: widget.siteContext));
+          await LoginPage.open(widget.siteContext);
         }
       }
       if (!mounted) {

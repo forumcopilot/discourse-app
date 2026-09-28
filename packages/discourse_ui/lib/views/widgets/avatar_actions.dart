@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import 'package:get/get.dart';
 import 'package:discourse_ui/views/user_profile_page.dart';
 import 'package:discourse_ui/views/widgets/post_actions.dart';
 import 'package:discourse_ui/views/login_page.dart';
@@ -55,7 +54,7 @@ class AvatarActions {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Get.to(() => LoginPage(siteContext: siteContext));
+              LoginPage.open(siteContext);
             },
             child: Text(AppLocalizations.of(context)!.loginTitle),
           ),

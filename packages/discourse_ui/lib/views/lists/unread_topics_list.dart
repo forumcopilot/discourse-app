@@ -14,6 +14,7 @@ import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/views/login_page.dart';
 import 'package:discourse_ui/views/widgets/topic_list_skeleton.dart';
 import '../../core/logging/app_logger.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 class UnreadTopicsList extends StatefulWidget {
   final SiteContext siteContext;
@@ -312,10 +313,10 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
               final loginController = Get.find<DiscourseLoginController>();
               final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
               if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
-                await Get.to(() => LoginPage(siteContext: widget.siteContext));
+                await LoginPage.open(widget.siteContext);
               }
             }
-            Get.to(() => PostPage(siteContext: widget.siteContext, topicId: topic.id, title: topic.title, forumId: topic.forumId));
+            AppNavigation.pushGlobal(PostPage(siteContext: widget.siteContext, topicId: topic.id, title: topic.title, forumId: topic.forumId));
           },
           onMarkAsRead: (topicId) {
             controller!.markTopicAsRead(topicId);

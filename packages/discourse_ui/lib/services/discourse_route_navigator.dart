@@ -7,6 +7,8 @@ import '../core/logging/app_logger.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../utils/snackbar_helper.dart';
 import '../views/lists/posts_list.dart';
+import '../utils/app_navigation.dart';
+import '../views/forum_list_page.dart';
 import '../views/post_page.dart';
 import '../views/site_home_tab.dart';
 import 'notification_route.dart';
@@ -21,15 +23,15 @@ import 'notification_route.dart';
 class DiscourseRouteNavigator {
   DiscourseRouteNavigator._();
 
-  /// A topic opened while another is on screen replaces it by default —
-  /// a notification is a new destination, not a step from the one on
-  /// screen. [replaceTopic] false stacks it instead, so Back returns: a
-  /// link followed from a post.
+  /// Every destination opens over the page on screen, so Back returns to
+  /// it. A notification used to replace the topic on screen, but only when
+  /// that topic had been opened one particular way (from Latest, Unread or a
+  /// category, not from Hot, New, Top or search), so whether Back returned to
+  /// the topic being read looked random.
   static Future<void> open(
     SiteContext siteContext,
-    DiscourseNotificationRoute route, {
-    bool replaceTopic = true,
-  }) async {
+    DiscourseNotificationRoute route,
+  ) async {
     switch (route.kind) {
       case NotificationRouteKind.post:
         final postId = route.postId;
@@ -40,8 +42,7 @@ class DiscourseRouteNavigator {
         _openTopic(siteContext,
             topicId: topicId,
             mode: PostsListMode.thread_by_post,
-            anchorPostId: postId,
-            replace: replaceTopic);
+            anchorPostId: postId);
       case NotificationRouteKind.topicPage:
         final topicId = route.topicId;
         if (topicId == null) return;
@@ -52,8 +53,7 @@ class DiscourseRouteNavigator {
               topicId: topicId,
               mode: PostsListMode.goto_page,
               gotoPage: route.page ?? ((postNumber - 1) ~/ DiscourseNotificationRoute.postsPerPage) + 1,
-              gotoPostNumber: postNumber,
-              replace: replaceTopic);
+              gotoPostNumber: postNumber);
         } else {
           // No position: where a tap on the topic in a list would go — the
           // reader's first unread post when signed in, as on the web.
@@ -62,8 +62,7 @@ class DiscourseRouteNavigator {
               topicId: topicId,
               mode: siteContext.isLoggedIn
                   ? PostsListMode.first_unread
-                  : PostsListMode.normal,
-              replace: replaceTopic);
+                  : PostsListMode.normal);
         }
       case NotificationRouteKind.conversation:
         final topicId = route.topicId;
@@ -77,12 +76,21 @@ class DiscourseRouteNavigator {
             mode: postId != null && postId.isNotEmpty
                 ? PostsListMode.thread_by_post
                 : PostsListMode.first_unread,
-            anchorPostId: postId,
-            replace: replaceTopic);
+            anchorPostId: postId);
       case NotificationRouteKind.notificationsTab:
-        if (Get.isRegistered<DiscourseSiteController>()) {
-          Get.find<DiscourseSiteController>()
-              .requestHomeTab(SiteHomeTab.notifications);
+        // On the forum's home, its Notifications tab; anywhere else the
+        // list opens over the page on screen. Only switching the home's
+        // tab looked like nothing happened from deeper in the forum, and
+        // Back later landed on a tab the reader had not chosen.
+        final controller = Get.isRegistered<DiscourseSiteController>()
+            ? Get.find<DiscourseSiteController>()
+            : null;
+        final home = controller?.homeRoute;
+        if (controller != null && home != null && home.isCurrent) {
+          controller.requestHomeTab(SiteHomeTab.notifications);
+        } else {
+          AppNavigation.pushGlobal(ForumListPage(
+              siteContext: siteContext, tab: SiteHomeTab.notifications));
         }
     }
   }
@@ -109,8 +117,7 @@ class DiscourseRouteNavigator {
     return null;
   }
 
-  /// Open a topic, replacing the one on screen when [replace] is set rather
-  /// than stacking onto it.
+  /// Opens a topic over the page on screen.
   static void _openTopic(
     SiteContext siteContext, {
     required String topicId,
@@ -118,9 +125,8 @@ class DiscourseRouteNavigator {
     String? anchorPostId,
     int? gotoPage,
     int? gotoPostNumber,
-    bool replace = true,
   }) {
-    postPageBuilder() => PostPage(
+    AppNavigation.pushGlobal(PostPage(
           siteContext: siteContext,
           topicId: topicId,
           title: '', // PostPage loads the real title with the thread.
@@ -128,16 +134,6 @@ class DiscourseRouteNavigator {
           anchorPostId: anchorPostId,
           gotoPage: gotoPage,
           gotoPostNumber: gotoPostNumber,
-        );
-    // GetX drops a push, and a replace, of the page type already on top
-    // unless told otherwise (get 4.7.3: `preventDuplicates` defaults to
-    // true in to() and off()). Opening a topic from a topic is exactly that
-    // case: the replace below only runs when a PostPage is on top, so a
-    // notification tapped while reading a topic opened nothing.
-    if (replace && Get.currentRoute == '/PostPage') {
-      Get.off(postPageBuilder, preventDuplicates: false);
-    } else {
-      Get.to(postPageBuilder, preventDuplicates: false);
-    }
+        ));
   }
 }

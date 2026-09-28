@@ -25,6 +25,7 @@ import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../host/discourse_host.dart';
 import 'discourse_route_navigator.dart';
 import 'notification_route.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 class NotificationService with ServiceErrorHandlingMixin {
   static final NotificationService _instance = NotificationService._internal();
@@ -683,7 +684,7 @@ class NotificationService with ServiceErrorHandlingMixin {
 
       // Navigate to forum home which will initialize the forum and attempt auto-login
       AppLogger.debug('🚀 [NotificationService] Opening ForumSiteHomePage for forum ${targetForum.name} (${targetForum.id})');
-      Get.to(() => SiteHomePage(
+      AppNavigation.pushGlobal(SiteHomePage(
             siteToInitialize: targetForum,
             showGlobalLoader: false,
           ));
@@ -793,7 +794,7 @@ class NotificationService with ServiceErrorHandlingMixin {
         final loginController = Get.find<DiscourseLoginController>();
         final loginResult = await loginController.attemptAutomaticLogin(siteContext);
         if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
-          await Get.to(() => LoginPage(siteContext: siteContext));
+          await LoginPage.open(siteContext);
         }
         if (!siteContext.isLoggedIn) {
           AppLogger.debug('⚠️ [NotificationService] Proceeding to thread as guest after login screen');
@@ -837,11 +838,8 @@ class NotificationService with ServiceErrorHandlingMixin {
             anchorPostId: postId, // Used by getThreadByPost API
             forumId: forumId,
           );
-      if (Get.currentRoute == '/PostPage') {
-        Get.off(postPageBuilder);
-      } else {
-        Get.to(postPageBuilder);
-      }
+      // Over the page on screen, so Back returns to it.
+      AppNavigation.pushGlobal(postPageBuilder());
     } catch (e) {
       AppLogger.debug('❌ [NotificationService] Error handling post notification: $e');
       _showNotificationError('Unable to open notification', e.toString());
@@ -919,11 +917,8 @@ class NotificationService with ServiceErrorHandlingMixin {
             anchorPostId: messageId,
             forumId: '',
           );
-      if (Get.currentRoute == '/PostPage') {
-        Get.off(postPageBuilder, preventDuplicates: false);
-      } else {
-        Get.to(postPageBuilder, preventDuplicates: false);
-      }
+      // Over the page on screen, so Back returns to it.
+      AppNavigation.pushGlobal(postPageBuilder());
     } catch (e) {
       AppLogger.debug('❌ [NotificationService] Error handling conversation notification: $e');
       _showNotificationError('Unable to open notification', e.toString());
@@ -974,7 +969,7 @@ class NotificationService with ServiceErrorHandlingMixin {
       AppLogger.debug('✅ [NotificationService] Navigating to user profile: $userId');
 
       // Navigate to the user profile
-      Get.to(() => UserProfilePage(
+      AppNavigation.pushGlobal(UserProfilePage(
             siteContext: siteController.currentSiteContext.value!,
             userId: userId,
           ));

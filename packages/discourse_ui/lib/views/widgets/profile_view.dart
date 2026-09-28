@@ -28,7 +28,6 @@ import 'package:discourse_ui/utils/error_message.dart';
 import 'package:discourse_ui/utils/file_picker_utils.dart';
 import 'package:discourse_ui/utils/time_utils.dart';
 import 'package:discourse_ui/views/post_page.dart';
-import 'package:get/get.dart';
 
 import 'full_screen_image_viewer.dart';
 import 'trust_level_sheet.dart';
@@ -40,6 +39,7 @@ import '../edit_profile_page.dart';
 import '../settings_page.dart';
 import '../user_profile_page.dart';
 import '../private_messaging/conversation/pages/new_conversation_page.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 /// A website address as Discourse's profile shows it (UserSerializer
 /// #website_name): host without "www." plus the path, no scheme.
@@ -1218,7 +1218,7 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
                   // Opens the topic, not the exact post: the summary gives a
                   // post_number, while anchoring needs a post id, and
                   // `gotoPage` is a page index — not the same thing.
-                  onTap: () => Get.to(() => PostPage(
+                  onTap: () => AppNavigation.pushGlobal(PostPage(
                         siteContext: widget.siteContext,
                         topicId: r.topicId.toString(),
                         title: r.topicTitle,
@@ -1237,7 +1237,7 @@ class _UserSummarySectionState extends State<_UserSummarySection> {
                   createdAt: t.createdAt,
                   replyCount:
                       t.postsCount == null ? null : (t.postsCount! - 1),
-                  onTap: () => Get.to(() => PostPage(
+                  onTap: () => AppNavigation.pushGlobal(PostPage(
                         siteContext: widget.siteContext,
                         topicId: t.id.toString(),
                         title: t.title,
@@ -1608,7 +1608,7 @@ class _SummaryPeopleStrip extends StatelessWidget {
               width: 84,
               child: InkWell(
                 borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                onTap: () => Get.to(() => UserProfilePage(
+                onTap: () => AppNavigation.pushGlobal(UserProfilePage(
                       siteContext: siteContext,
                       userId: u.id.toString(),
                       userName: u.username,

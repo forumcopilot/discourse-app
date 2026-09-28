@@ -8,6 +8,7 @@ import '../../theme/design_tokens.dart';
 import 'reaction_glyph.dart';
 import 'sheet_title.dart';
 import '../../l10n/generated/app_localizations.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 /// Bottom-sheet picker for the `discourse-reactions` plugin. Loads the
 /// forum's enabled emoji set from `/discourse-reactions/custom-reactions`
@@ -84,7 +85,7 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
         .toggleReactionAsync(widget.postId, reaction);
     if (!mounted) return;
     if (result.result) {
-      Navigator.of(context).pop(result.reactions);
+      context.popOwnRoute(result.reactions);
     } else {
       // The per-post budget (4 actions/minute, likes and unlikes sharing
       // the counter) is now spent through this sheet, so this is where the

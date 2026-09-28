@@ -7,6 +7,7 @@ import '../theme/design_tokens.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 /// Phase 5.22 — inline profile editing.
 ///
@@ -94,7 +95,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         // Pop with `true` so the caller reloads the user info — the
         // PUT response doesn't include the full updated profile, so
         // a re-fetch is the cleanest way to surface the new values.
-        Navigator.of(context).pop(true);
+        context.popOwnRoute(true);
       } else {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(

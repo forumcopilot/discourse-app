@@ -3,6 +3,7 @@ import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import '../../../../theme/design_tokens.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../widgets/empty_state_view.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 class EditConversationPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -112,7 +113,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
-        Navigator.of(context).pop(true); // Return true to indicate success
+        context.popOwnRoute(true); // Return true to indicate success
       }
 
       return true;

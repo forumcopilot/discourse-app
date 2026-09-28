@@ -26,6 +26,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
 import 'category_badge.dart';
 import 'upload_tile.dart';
 import '../../utils/error_message.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 class MessageComposePage extends StatefulWidget {
   final SiteContext siteContext;
@@ -999,9 +1000,9 @@ class _MessageComposePageState extends State<MessageComposePage> {
         FocusScope.of(context).unfocus();
         if (widget.onSuccess != null) {
           final result = widget.onSuccess!(true);
-          Navigator.of(context).pop(result);
+          context.popOwnRoute(result);
         } else {
-          Navigator.of(context).pop(true);
+          context.popOwnRoute(true);
         }
       }
     } catch (e) {

@@ -4,6 +4,7 @@ import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:discourse_ui/theme/style_builders.dart';
 import 'package:discourse_ui/views/widgets/forum_header_widget.dart';
+import 'package:forumcopilot_sdk/forumcopilot_sdk.dart' show globalNavigatorKey;
 import 'package:forumcopilot_sdk/models/entities/fc_tfa_provider.dart';
 import 'package:get/get.dart';
 
@@ -39,14 +40,15 @@ class TFAInputDialog extends StatefulWidget {
     String? defaultProviderId,
     String? errorMessage,
   }) async {
-    return Get.to<TFADialogResult>(
-      () => TFAInputDialog(
-        providers: providers,
-        defaultProviderId: defaultProviderId,
-        errorMessage: errorMessage,
+    return globalNavigatorKey.currentState?.push<TFADialogResult>(
+      MaterialPageRoute<TFADialogResult>(
+        fullscreenDialog: true,
+        builder: (_) => TFAInputDialog(
+          providers: providers,
+          defaultProviderId: defaultProviderId,
+          errorMessage: errorMessage,
+        ),
       ),
-      fullscreenDialog: true,
-      preventDuplicates: false,
     );
   }
 

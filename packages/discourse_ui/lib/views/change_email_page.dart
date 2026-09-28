@@ -6,6 +6,7 @@ import '../theme/design_tokens.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 /// Phase 5.23 — change-email flow.
 ///
@@ -54,7 +55,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       );
       if (!mounted) return;
       if (result.result) {
-        Navigator.of(context).pop(true);
+        context.popOwnRoute(true);
       } else {
         setState(() => _submitting = false);
         ScaffoldMessenger.of(context).showSnackBar(

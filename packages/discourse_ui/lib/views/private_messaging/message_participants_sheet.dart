@@ -12,6 +12,7 @@ import '../user_profile_page.dart';
 import '../user_search_page.dart';
 import '../widgets/sheet_title.dart';
 import '../widgets/user_avatar.dart';
+import '../../utils/app_navigation.dart';
 
 /// Who is on a private message — its groups first, as Discourse lists them,
 /// then its people — with Invite when the viewer may add someone.
@@ -178,7 +179,7 @@ class MessageParticipantsSheet {
       ));
       return;
     }
-    Navigator.pop(sheet);
+    sheet.popOwnRoute();
     onRemoved?.call();
   }
 
@@ -207,20 +208,32 @@ class MessageParticipantsSheet {
     final messenger = ScaffoldMessenger.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
-    showDialog(
+    // The spinner stays until the invite answers: Back does not dismiss it.
+    // It could, and the two pops that follow then closed the sheet and the
+    // message under it. Each pop below now closes only its own route.
+    final navigator = Navigator.of(context);
+    final progress = DialogRoute<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const PopScope(
+        canPop: false,
+        child: Center(child: CircularProgressIndicator()),
+      ),
     );
+    void closeProgress() {
+      if (progress.isActive) navigator.removeRoute(progress);
+    }
+
+    navigator.push(progress);
     try {
       final proxy = SiteProxyFactory.getPrivateConversationProxy();
       final r = isGroup && proxy is DiscoursePrivateConversationProxy
           ? await proxy.inviteGroupAsync(conversationId, username)
           : await proxy.inviteParticipantAsync([username], conversationId, null);
+      closeProgress();
       if (!context.mounted) return;
-      Navigator.pop(context); // the progress dialog
       if (r.result) {
-        Navigator.pop(context); // the sheet
+        context.popOwnRoute(); // the sheet
         messenger.showSnackBar(SnackBar(
           content: Text(isGroup
               ? l10n.groupHasBeenInvited(username)
@@ -234,8 +247,8 @@ class MessageParticipantsSheet {
         ));
       }
     } catch (e) {
+      closeProgress();
       if (!context.mounted) return;
-      Navigator.pop(context); // the progress dialog
       messenger.showSnackBar(SnackBar(
         content: Text(l10n.errorInvitingUser(describeError(e))),
         backgroundColor: colorScheme.error,

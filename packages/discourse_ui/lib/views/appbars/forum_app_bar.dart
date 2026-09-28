@@ -143,7 +143,7 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
   Future<void> _handleMenuAction(BuildContext context, String value) async {
     switch (value) {
       case 'sign_in':
-        Navigator.push(context, MaterialPageRoute(builder: (_) => LoginPage(siteContext: siteContext)));
+        LoginPage.open(siteContext);
         break;
       case 'register':
         // Discourse has no in-app registration (the account proxy says so
