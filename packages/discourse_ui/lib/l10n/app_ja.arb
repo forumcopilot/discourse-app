@@ -995,5 +995,11 @@
   "discardChangesQuestion": "変更を破棄しますか？",
   "discardChanges": "変更を破棄",
   "saveDraft": "下書きを保存",
-  "notificationSettings": "通知設定"
+  "notificationSettings": "通知設定",
+  "topicMapViews": "{count, plural, other{閲覧}}",
+  "topicMapLikes": "{count, plural, other{いいね}}",
+  "topicMapLinks": "{count, plural, other{リンク}}",
+  "topicMapUsers": "{count, plural, other{ユーザー}}",
+  "markAsSolution": "解決策としてマーク",
+  "unmarkAsSolution": "解決策のマークを解除"
 }

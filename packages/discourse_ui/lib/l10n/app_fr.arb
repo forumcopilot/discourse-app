@@ -995,5 +995,11 @@
   "discardChangesQuestion": "Voulez-vous annuler vos modifications ?",
   "discardChanges": "Annuler les modifications",
   "saveDraft": "Enregistrer le brouillon",
-  "notificationSettings": "Paramètres de notification"
+  "notificationSettings": "Paramètres de notification",
+  "topicMapViews": "{count, plural, =1{vue} other{vues}}",
+  "topicMapLikes": "{count, plural, other{j'aime}}",
+  "topicMapLinks": "{count, plural, =1{lien} other{liens}}",
+  "topicMapUsers": "{count, plural, =1{utilisateur} other{utilisateurs}}",
+  "markAsSolution": "Marquer comme solution",
+  "unmarkAsSolution": "Ne plus marquer comme solution"
 }

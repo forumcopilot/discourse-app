@@ -8,24 +8,31 @@ import '../../theme/design_tokens.dart';
 import '../widgets/reaction_glyph.dart';
 import '../../theme/forum_colors.dart';
 
-/// Action row under a post: reply / like / bookmark / accept-answer.
+/// Action row under a post, laid out as Discourse web's post menu: the
+/// "N replies" disclosure ([leading]) on the left, the actions packed on
+/// the right with Reply ([trailing]) last.
+///
+/// Right-aligned rather than left: that is where web puts them, where a
+/// right thumb rests, and packing them as one group reads as a toolbar
+/// where 24dp gaps between 48dp targets read as scattered icons.
+///
+/// Marking the solution (discourse-solved) is not here: it lives in the
+/// post's ⋮ menu for the readers the server lets accept, and the solved
+/// post says so with its "Solution" label above the body. As a button in
+/// this row it showed on the accepted post for every signed-in reader,
+/// looking like a control, and only refused on tap.
 ///
 /// There is deliberately **no** "N Likes + avatars" row here anymore.
 /// A like is just the heart reaction on Discourse, so the reactor
-/// count and actor list live on `ReactionChipsRow` (rendered above by
-/// `PostListItem`) — rendering both duplicated the same server data,
-/// and the avatar stack was drawn from placeholder `likesInfo` entries
-/// that had no username, avatar or user id.
+/// count and actor list live on the reaction cluster — rendering both
+/// duplicated the same server data, and the avatar stack was drawn from
+/// placeholder `likesInfo` entries that had no username, avatar or user
+/// id.
 class PostListItemSocial extends StatelessWidget {
   final FCPost post;
   final bool isLiked;
   final int likeCount;
 
-  /// The reaction id the viewer has on this post, or null when they have
-  /// not reacted. When set, the react button renders that reaction's glyph
-  /// in place of the outline heart, so "did I react, and with what?" is
-  /// answerable from the action row instead of by hunting for the
-  /// highlighted chip.
   /// Every reaction on the post, so the react control can show the same
   /// combined cluster the web page does (`❤️😮 5`) instead of a separate
   /// chips row stacked above the action row.
@@ -42,7 +49,8 @@ class PostListItemSocial extends StatelessWidget {
   final bool isLoggedIn;
   final VoidCallback? onLike;
 
-  /// Long-press on the reaction cluster: who reacted.
+  /// Who reacted: long-press on the cluster, and its tap for a reader who
+  /// may not react.
   final VoidCallback? onShowReactors;
   /// Optional long-press on the like button. Used on Discourse to open
   /// the discourse-reactions picker so the user can pick any emoji
@@ -56,13 +64,12 @@ class PostListItemSocial extends StatelessWidget {
   /// the bookmark.
   final VoidCallback? onLongPressBookmark;
 
-  /// Phase 5.31 — Discourse-solved plugin. When the viewer can
-  /// accept this post as the topic's answer (`post.canAcceptAnswer`)
-  /// a green check button appears in the action row. Tapping flips
-  /// the topic-wide accepted-answer state via
-  /// `IFCPostProxy.acceptAnswerAsync`/`unacceptAnswerAsync`. The
-  /// active state (post.isSolution) renders the filled check.
-  final VoidCallback? onToggleAcceptAnswer;
+  /// Start of the row: the "N replies" disclosure, when the post has
+  /// replies worth disclosing. Squeezed (never the actions) when the row
+  /// runs out of width.
+  final Widget? leading;
+
+  /// End of the row: the Reply button.
   final Widget? trailing;
 
   const PostListItemSocial({
@@ -80,7 +87,7 @@ class PostListItemSocial extends StatelessWidget {
     this.isBookmarked = false,
     this.onBookmark,
     this.onLongPressBookmark,
-    this.onToggleAcceptAnswer,
+    this.leading,
     this.trailing,
   });
 
@@ -88,109 +95,92 @@ class PostListItemSocial extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    // The heart is the zero-state affordance only — see the class doc.
-    // Always present when the viewer may react at all. It used to be
-    // hidden the moment any chip existed, which left the action row with
-    // no reaction control and no indication of the viewer's own reaction.
-    final showLike = isLoggedIn && post.canLike;
+    // Whether the viewer may react — not whether reactions are shown.
+    // Discourse leaves `can_act` off your own post, off a guest's view and
+    // off a plain like past its undo window, and web still shows all of
+    // those readers the post's reactions; gating the cluster on it hid
+    // every reaction on your own posts.
+    final canReact = isLoggedIn && post.canLike;
     final showBookmark = isLoggedIn && onBookmark != null;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Like/Thank button row
-        SizedBox(height: DesignTokens.spacingM),
-        Row(
-          children: [
-            // Reply button (trailing widget)
-            if (trailing != null) trailing!,
-            // Phase 5.29 — Like / Bookmark both use the shared
-            // PostActionButton recipe (48x48 target, iconSizeMedium,
-            // opacityMediumLow inactive). Spacing between buttons is
-            // a uniform `spacingXL` (24px).
-            // Zero-state affordance only: once the post has any
-            // reaction the chips row carries both the toggle (tap a
-            // chip) and the picker (trailing "+" chip), so the heart
-            // would be a second control for the same thing.
-            if (showLike) ...[
-              if (trailing != null) SizedBox(width: DesignTokens.spacingXL),
-              Opacity(
-                opacity: likeCooldownSeconds > 0 ? 0.5 : 1.0,
-                child: reactions.isEmpty
-                    ? PostActionButton(
-                        icon: Icons.favorite_border,
-                        activeIcon: Icons.favorite,
-                        active: isLiked,
-                        activeColor: ForumColors.of(context).love,
-                        onTap: onLike,
-                        onLongPress: onLongPressLike,
-                        semanticLabel:
-                            AccessibilityHelpers.getLikeButtonLabel(
-                                context, isLiked, likeCount),
-                      )
-                    : _ReactionClusterButton(
-                        reactions: reactions,
-                        siteContext: reactionSiteContext,
-                        onTap: onLike,
-                        onLongPress: onShowReactors,
-                      ),
-              ),
-              if (likeCooldownSeconds > 0) ...[
-                SizedBox(width: DesignTokens.spacingXS),
-                Text(
-                  '${likeCooldownSeconds}s',
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ],
-            if (showBookmark) ...[
-              // Only pad when something precedes this button, otherwise
-              // hiding the heart leaves a dangling left gap.
-              if (trailing != null || showLike)
-                SizedBox(width: DesignTokens.spacingXL),
-              PostActionButton(
-                icon: Icons.bookmark_border,
-                activeIcon: Icons.bookmark,
-                active: isBookmarked,
-                onTap: onBookmark,
-                // Long-press opens the bookmark-reminder sheet when
-                // wired (Discourse); plain tap still toggles.
-                onLongPress: onLongPressBookmark,
-                semanticLabel: isBookmarked
-                    ? 'Remove bookmark'
-                    : 'Bookmark post',
-              ),
-            ],
-            // Phase 5.31 — Accept answer (discourse-solved). Two
-            // independent gating conditions: the viewer can accept
-            // (canAcceptAnswer, set by the proxy from topic-level
-            // `can_accept_answer`) OR the post is already the answer
-            // (so the topic OP can unmark it). When neither is true
-            // the button is hidden.
-            if (isLoggedIn &&
-                onToggleAcceptAnswer != null &&
-                (post.canAcceptAnswer || post.isSolution)) ...[
-              if (trailing != null || showLike || showBookmark)
-                SizedBox(width: DesignTokens.spacingXL),
-              PostActionButton(
-                icon: Icons.check_circle_outline,
-                activeIcon: Icons.check_circle,
-                active: post.isSolution,
-                activeColor: colorScheme.tertiary,
-                onTap: onToggleAcceptAnswer,
-                semanticLabel: post.isSolution
-                    ? 'Unmark as accepted answer'
-                    : 'Mark as accepted answer',
-              ),
-            ],
-          ],
+
+    // Dimmed, with a countdown, while the post's like budget is spent.
+    Widget cooling(Widget child) {
+      if (!canReact || likeCooldownSeconds <= 0) return child;
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Opacity(opacity: 0.5, child: child),
+          SizedBox(width: DesignTokens.spacingXS),
+          Text(
+            '${likeCooldownSeconds}s',
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      );
+    }
+
+    final actions = <Widget>[
+      if (reactions.isNotEmpty)
+        cooling(_ReactionClusterButton(
+          reactions: reactions,
+          siteContext: reactionSiteContext,
+          // The picker for a reader who may react; for anyone else, who
+          // reacted — what a tap on web's count shows.
+          onTap: canReact ? onLike : onShowReactors,
+          onLongPress: onShowReactors,
+        ))
+      else if (canReact)
+        // The zero-state affordance: nothing to show yet, so a heart.
+        cooling(PostActionButton(
+          icon: Icons.favorite_border,
+          activeIcon: Icons.favorite,
+          active: isLiked,
+          activeColor: ForumColors.of(context).love,
+          onTap: onLike,
+          onLongPress: onLongPressLike,
+          semanticLabel:
+              AccessibilityHelpers.getLikeButtonLabel(context, isLiked, likeCount),
+        )),
+      if (showBookmark)
+        PostActionButton(
+          icon: Icons.bookmark_border,
+          activeIcon: Icons.bookmark,
+          active: isBookmarked,
+          onTap: onBookmark,
+          // Long-press opens the bookmark-reminder sheet when
+          // wired (Discourse); plain tap still toggles.
+          onLongPress: onLongPressBookmark,
+          semanticLabel: isBookmarked ? 'Remove bookmark' : 'Bookmark post',
         ),
-      ],
+      if (trailing != null) trailing!,
+    ];
+
+    // Nothing to show (a guest on an unreacted post): keep the body's
+    // breathing room above the divider, without an empty 48dp row.
+    if (leading == null && actions.isEmpty) {
+      return SizedBox(height: DesignTokens.spacingM);
+    }
+
+    return Padding(
+      padding: EdgeInsets.only(top: DesignTokens.spacingS),
+      child: Row(
+        children: [
+          Expanded(
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: leading ?? const SizedBox.shrink(),
+            ),
+          ),
+          for (var i = 0; i < actions.length; i++) ...[
+            if (i > 0) SizedBox(width: DesignTokens.spacingXS),
+            actions[i],
+          ],
+        ],
+      ),
     );
   }
-
-
 }
 
 
@@ -253,7 +243,8 @@ class _ReactionClusterButton extends StatelessWidget {
                 for (final r in shown) ...[
                   ReactionGlyph(
                     reactionId: r.id,
-                    size: DesignTokens.iconSizeSMedium,
+                    size: PostActionButton.iconSizeOf(
+                        context, DesignTokens.iconSizeM),
                     siteContext: siteContext,
                   ),
                   const SizedBox(width: 2),

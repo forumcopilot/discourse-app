@@ -4,36 +4,39 @@ import '../../theme/design_tokens.dart';
 import '../../utils/accessibility_helpers.dart';
 
 /// Phase 5.29 — shared action-button widget for the bottom row of a
-/// post (Like / Bookmark / Reply, plus any future ones).
+/// post (Reply / Like / Bookmark / Accept).
 ///
 /// **Style guide** for post-level action buttons. Every button in
 /// the trailing row should use this widget so they share:
 ///
 /// * **Touch target**: 48×48 minimum (wraps
 ///   `AccessibilityHelpers.accessibleIconButton` which centres the
-///   icon inside a Container of that minimum size). Critical for
-///   reachability on mobile.
-/// * **Icon size**: `DesignTokens.iconSizeMedium` (22px) for every
-///   button. Anything bigger fights with the header avatar; anything
-///   smaller feels accidental.
-/// * **Active color**: caller-supplied semantic role
-///   — `colorScheme.error` for Like (heart fills red), `primary` for
-///   Bookmark and Reply. The active icon shape can also differ
-///   (`Icons.favorite` vs `Icons.favorite_border`).
-/// * **Inactive color**: `onSurfaceVariant` at
-///   `DesignTokens.opacityMediumLow` (0.5). The same value across
-///   light + dark themes — the 0.4 / 0.5 dark-vs-light branching
-///   the legacy code did was vestigial; `onSurfaceVariant` already
-///   adapts per theme, so a single opacity reads cleanly in both.
+///   icon inside a Container of that minimum size), growing with the
+///   icon.
+/// * **Icon size**: Material's 24dp ([baseIconSize]), scaled with the
+///   reader's text size up to [maxIconScale] — see [iconSizeOf]. Icons
+///   do not follow the text scale by themselves, so on a phone set to
+///   large text the body grew to ~20pt while the row stayed at 22dp and
+///   read as an afterthought.
+/// * **Active color**: caller-supplied semantic role — `ForumColors.love`
+///   for Like, `primary` for Bookmark, `tertiary` for Accept. The active
+///   icon shape can also differ (`Icons.favorite` vs
+///   `Icons.favorite_border`).
+/// * **Inactive color**: `onSurfaceVariant` at full strength, as
+///   Material 3 draws a standard icon button. It used to be faded to
+///   50%, a hair above the 38% Material uses for *disabled*, so every
+///   post's actions looked switched off. [emphasized] buttons (Reply)
+///   use `onSurface`, as web draws its reply button in `primary-high`
+///   against the other controls' `primary-low-mid`.
 /// * **Long-press**: optional, used by Like to open the reaction
 ///   picker. The press swallows the long-press up the tree so the
 ///   parent's row-long-press doesn't fire.
 /// * **Semantics**: forwarded to `accessibleIconButton`, so screen
 ///   readers get a meaningful label / selection state.
 ///
-/// **Spacing between buttons** is the caller's responsibility — the
-/// established pattern is `SizedBox(width: DesignTokens.spacingXL)`
-/// (24px) between adjacent buttons in the trailing row.
+/// **Spacing between buttons** is the caller's responsibility:
+/// `PostListItemSocial` packs them `DesignTokens.spacingXS` apart, as the
+/// 48dp targets already hold the icons ~24dp apart.
 class PostActionButton extends StatelessWidget {
   /// Icon shown when `active` is false. The outline-style variant
   /// (e.g. `Icons.favorite_border`, `Icons.bookmark_border`,
@@ -69,6 +72,25 @@ class PostActionButton extends StatelessWidget {
   /// Optional supplementary hint for screen readers.
   final String? semanticHint;
 
+  /// The row's primary action (Reply): drawn in `onSurface` rather than
+  /// the muted `onSurfaceVariant` while inactive.
+  final bool emphasized;
+
+  /// Material's standard icon-button glyph.
+  static const double baseIconSize = DesignTokens.iconSizeL;
+
+  /// How far the icons follow the reader's text size. Enough to keep pace
+  /// with large text, short of letting four buttons crowd a narrow phone.
+  static const double maxIconScale = 1.3;
+
+  /// The action-row icon size under the ambient text scale. Shared with
+  /// the reaction cluster so its glyphs keep pace with the buttons.
+  static double iconSizeOf(BuildContext context,
+          [double base = baseIconSize]) =>
+      MediaQuery.textScalerOf(context)
+          .clamp(maxScaleFactor: maxIconScale)
+          .scale(base);
+
   const PostActionButton({
     super.key,
     required this.icon,
@@ -79,6 +101,7 @@ class PostActionButton extends StatelessWidget {
     this.onLongPress,
     required this.semanticLabel,
     this.semanticHint,
+    this.emphasized = false,
   });
 
   @override
@@ -87,14 +110,13 @@ class PostActionButton extends StatelessWidget {
     final iconData = (active && activeIcon != null) ? activeIcon! : icon;
     final color = active
         ? (activeColor ?? colorScheme.primary)
-        : colorScheme.onSurfaceVariant
-            .withValues(alpha: DesignTokens.opacityMediumLow);
+        : (emphasized ? colorScheme.onSurface : colorScheme.onSurfaceVariant);
 
     return AccessibilityHelpers.accessibleIconButton(
       icon: Icon(
         iconData,
         color: color,
-        size: DesignTokens.iconSizeMedium,
+        size: iconSizeOf(context),
       ),
       onTap: onTap,
       label: semanticLabel,

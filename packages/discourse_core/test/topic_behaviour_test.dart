@@ -46,6 +46,35 @@ void main() {
     }
   });
 
+  test("the topic summary's faces ride with its participant ids", () async {
+    Map<String, dynamic> withParticipants() => topic()
+      ..['details'] = {
+        'created_by': {'id': 1, 'username': 'a'},
+        'participants': [
+          {'id': 1, 'username': 'a', 'avatar_template': '/user_avatar/forum.example/a/{size}/1_2.png'},
+          {'id': 2, 'username': 'b', 'avatar_template': 'https://cdn.example/b/{size}/2.png'},
+          {'id': 3, 'username': 'c'},
+        ],
+      };
+    final proxy = _Posts({
+      '/t/26.json': withParticipants(),
+      '/posts/103.json': {'topic_id': 26, 'post_number': 3},
+      '/t/26/3.json': withParticipants(),
+    });
+    for (final t in [
+      await proxy.getThreadAsync('26', 1, 20, true),
+      await proxy.getThreadByUnreadAsync('26', 20, true),
+      await proxy.getThreadByPostAsync('103', 20, true),
+    ]) {
+      expect(t.participatedUserIds, ['1', '2', '3']);
+      expect(t.participantIconUrls, [
+        'https://forum.example/user_avatar/forum.example/a/90/1_2.png',
+        'https://cdn.example/b/90/2.png',
+        '',
+      ], reason: 'parallel to the ids; a missing template keeps its slot');
+    }
+  });
+
   test('a topic opens after the last post read, as on the web', () async {
     Future<int> anchor(int? lastRead) async => (await _Posts({
           '/t/26.json': topic(lastRead: lastRead),

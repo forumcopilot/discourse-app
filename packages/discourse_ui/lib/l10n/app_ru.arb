@@ -996,5 +996,11 @@
   "discardChangesQuestion": "Отменить изменения?",
   "discardChanges": "Отменить изменения",
   "saveDraft": "Сохранить черновик",
-  "notificationSettings": "Настройки уведомлений"
+  "notificationSettings": "Настройки уведомлений",
+  "topicMapViews": "{count, plural, one{просмотр} few{просмотра} many{просмотров} other{просмотра}}",
+  "topicMapLikes": "{count, plural, one{лайк} few{лайка} many{лайков} other{лайка}}",
+  "topicMapLinks": "{count, plural, one{ссылка} few{ссылки} many{ссылок} other{ссылки}}",
+  "topicMapUsers": "{count, plural, one{пользователь} few{пользователя} many{пользователей} other{пользователя}}",
+  "markAsSolution": "Отметить как решение",
+  "unmarkAsSolution": "Снять отметку решения"
 }

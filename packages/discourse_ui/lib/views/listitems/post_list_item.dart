@@ -151,6 +151,17 @@ class PostListItem extends StatefulWidget {
   /// Whether translation is currently in progress for this thread.
   final bool isTranslating;
 
+  /// Whether the post rendered directly below this one replies to it.
+  /// With a single reply that is already on screen, the "1 reply"
+  /// disclosure is noise — Discourse's `suppress_reply_directly_below`
+  /// (on by default) hides it, the counterpart of the "in reply to" row's
+  /// `suppress_reply_directly_above`.
+  final bool replyDirectlyBelow;
+
+  /// The rule under the post. Off for the opening post, which the list
+  /// closes with the topic summary and a section gap instead.
+  final bool showBottomDivider;
+
   const PostListItem({
     super.key,
     required this.siteContext,
@@ -171,6 +182,8 @@ class PostListItem extends StatefulWidget {
     this.onVoteSuccess,
     this.translatedContent,
     this.isTranslating = false,
+    this.replyDirectlyBelow = false,
+    this.showBottomDivider = true,
   });
 
   @override
@@ -297,76 +310,93 @@ class _PostListItemState extends State<PostListItem> {
   /// payload names no user — Discourse omits `reply_to_user` when the target
   /// is the opening post, so a missing name is not a missing parent.
 
-  /// "2 Replies" disclosure, as web shows under a post that was answered.
+  /// "2 replies ⌄" disclosure, as web shows under a post that was
+  /// answered — at the start of the action row, where web puts it, rather
+  /// than on a line of its own that made every answered post's footer two
+  /// rows tall. The previews it expands render below the row
+  /// ([_buildReplyPreviews]).
   ///
-  /// The counterpart to the "in reply to" row above: that one walks a
-  /// conversation upwards, this one walks it down. Together they are what
-  /// makes a Discourse topic navigable as a conversation rather than a
-  /// list.
+  /// The counterpart to the "in reply to" row above the body: that one
+  /// walks a conversation upwards, this one walks it down. Together they
+  /// are what makes a Discourse topic navigable as a conversation rather
+  /// than a list.
   ///
   /// Collapsed by default and fetched only on expand — a topic can have
   /// dozens of answered posts, and pre-loading every child would cost a
   /// request each for replies most readers never open.
-  Widget _buildRepliesDisclosure(
+  Widget? _buildRepliesToggle(
       BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
-    if (widget.post.replyCount <= 0) return const SizedBox.shrink();
-    final l10n = AppLocalizations.of(context);
     final count = widget.post.replyCount;
+    if (count <= 0) return null;
+    // The one reply is the next post: already on screen.
+    if (count == 1 && widget.replyDirectlyBelow) return null;
+    final l10n = AppLocalizations.of(context);
     final label = l10n?.nReplies(count) ?? (count == 1 ? '1 reply' : '$count replies');
 
+    return Semantics(
+      button: true,
+      expanded: _repliesExpanded,
+      child: InkWell(
+        onTap: _isLoadingReplies ? null : _toggleReplies,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+        child: ConstrainedBox(
+          constraints:
+              const BoxConstraints(minHeight: kMinInteractiveDimension),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Squeezed first when the actions need the width.
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.fade,
+                  style: textTheme.labelLarge?.copyWith(
+                    color: colorScheme.primary,
+                  ),
+                ),
+              ),
+              if (_isLoadingReplies)
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: DesignTokens.spacingXS),
+                  child: SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+              else
+                Icon(
+                  _repliesExpanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  size: DesignTokens.iconSizeM,
+                  color: colorScheme.primary,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// What the replies disclosure expands to: the replies themselves, or
+  /// why they could not be loaded.
+  Widget _buildReplyPreviews(ColorScheme colorScheme, TextTheme textTheme) {
+    if (!_repliesExpanded) return const SizedBox.shrink();
     return Padding(
-      padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0,
-          DesignTokens.spacingL, DesignTokens.spacingS),
+      padding: EdgeInsets.only(bottom: DesignTokens.spacingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // A 48dp target in a text button's type, where it was a ~26dp
-          // line of 12sp text.
-          InkWell(
-            onTap: _isLoadingReplies ? null : _toggleReplies,
-            borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                  minHeight: kMinInteractiveDimension),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    _repliesExpanded
-                        ? Icons.keyboard_arrow_up
-                        : Icons.keyboard_arrow_down,
-                    size: DesignTokens.iconSizeSMedium,
-                    color: colorScheme.primary,
-                  ),
-                  SizedBox(width: DesignTokens.spacingXS),
-                  Text(
-                    label,
-                    style: textTheme.labelLarge?.copyWith(
-                      color: colorScheme.primary,
-                    ),
-                  ),
-                  if (_isLoadingReplies) ...[
-                    SizedBox(width: DesignTokens.spacingS),
-                    SizedBox(
-                      width: 12,
-                      height: 12,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ],
-                ],
-              ),
+          if (_repliesError != null)
+            Text(
+              _repliesError!,
+              style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
             ),
-          ),
-          if (_repliesExpanded && _repliesError != null)
-            Padding(
-              padding: EdgeInsets.only(top: DesignTokens.spacingXS),
-              child: Text(
-                _repliesError!,
-                style: textTheme.bodySmall
-                    ?.copyWith(color: colorScheme.error),
-              ),
-            ),
-          if (_repliesExpanded && _replies != null)
+          if (_replies != null)
             for (final reply in _replies!)
               _buildReplyPreview(reply, colorScheme, textTheme),
         ],
@@ -793,17 +823,14 @@ class _PostListItemState extends State<PostListItem> {
             // Long-press opens the Discourse bookmark-reminder sheet
             // (create with reminder / edit reminder / remove).
             onLongPressBookmark: _handleBookmarkLongPress,
-            // Phase 5.31 — discourse-solved accept/unaccept. Gated
-            // inside PostListItemSocial on `post.canAcceptAnswer` or
-            // `post.isSolution` so the button only renders when
-            // meaningful.
-            onToggleAcceptAnswer: _handleToggleAcceptAnswer,
+            leading: _buildRepliesToggle(context, colorScheme, textTheme),
             trailing: (widget.siteContext.isLoggedIn &&
                     (_postsController.threadDataOutput.value?.topic.canReply ??
                         false))
                 ? _buildReplyButtonWithMenu(context, colorScheme, textTheme)
                 : null,
           ),
+          _buildReplyPreviews(colorScheme, textTheme),
         ],
       ),
     );
@@ -858,9 +885,11 @@ class _PostListItemState extends State<PostListItem> {
           // own plugin uses (post_number === 1 && topic.accepted_answer) and the same
           // position (immediately after the cooked content).
           if (widget.post.postNumber == 1 && widget.acceptedAnswer != null)
+            // Bottom gap: the topic summary's rule follows, and would
+            // otherwise sit on the card's edge.
             Padding(
-              padding:
-                  EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+              padding: EdgeInsets.fromLTRB(DesignTokens.spacingL, 0,
+                  DesignTokens.spacingL, DesignTokens.spacingM),
               child: SolutionSummaryCard(
                 siteContext: widget.siteContext,
                 answer: widget.acceptedAnswer!,
@@ -870,8 +899,7 @@ class _PostListItemState extends State<PostListItem> {
                         widget.acceptedAnswer!.postNumber),
               ),
             ),
-          _buildRepliesDisclosure(context, colorScheme, textTheme),
-          _buildBottomDivider(colorScheme),
+          if (widget.showBottomDivider) _buildBottomDivider(colorScheme),
         ],
       ),
     );
@@ -951,12 +979,12 @@ class _PostListItemState extends State<PostListItem> {
   Widget _buildReplyButtonWithMenu(
       BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
     // Phase 5.29 — Reply uses the same PostActionButton recipe as
-    // Like and Bookmark so all three buttons share the 48×48 touch
-    // target + 22px icon + `opacityMediumLow` inactive tint. Tap
-    // opens the Reply / Reply-with-Quote chooser dialog; there's no
-    // active state.
+    // Like and Bookmark (48×48 target, text-scaled icon), emphasized as
+    // the row's primary action, last in the row as on web. Tap opens the
+    // Reply / Reply-with-Quote chooser dialog; there's no active state.
     return PostActionButton(
       icon: Icons.reply_rounded,
+      emphasized: true,
       semanticLabel:
           AppLocalizations.of(context)?.reply ?? 'Reply',
       onTap: () {
@@ -1029,6 +1057,10 @@ class _PostListItemState extends State<PostListItem> {
       case 'history':
         _handleViewHistory();
         break;
+      case 'accept_answer':
+      case 'unaccept_answer':
+        _handleToggleAcceptAnswer();
+        break;
       case 'make_wiki':
         _handleToggleWiki(true);
         break;
@@ -1070,6 +1102,36 @@ class _PostListItemState extends State<PostListItem> {
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: DesignTokens.spacingM),
               Text(AppLocalizations.of(context)!.copyLink),
+            ],
+          ),
+        ),
+      );
+    }
+    // discourse-solved: mark or unmark this reply as the topic's solution.
+    // Offered only where the server says this reader may (the topic's
+    // owner and staff: the plugin's per-post `can_accept_answer`), which
+    // covers unmarking too — web gates its unaccept button the same way.
+    if (widget.siteContext.isLoggedIn && widget.post.canAcceptAnswer) {
+      final solved = widget.post.isSolution;
+      final l10n = AppLocalizations.of(context);
+      items.add(
+        PopupMenuItem<String>(
+          value: solved ? 'unaccept_answer' : 'accept_answer',
+          child: Row(
+            children: [
+              Icon(solved ? Icons.remove_done : Icons.check_circle_outline,
+                  color: solved
+                      ? Theme.of(context).colorScheme.onSurfaceVariant
+                      : ForumColors.of(context).success),
+              const SizedBox(width: DesignTokens.spacingM),
+              // Wraps rather than overflows: the menu is at most 280dp,
+              // and "Lösungsmarkierung entfernen" at a large text size is
+              // wider than that.
+              Flexible(
+                child: Text(solved
+                    ? (l10n?.unmarkAsSolution ?? 'Unmark as solution')
+                    : (l10n?.markAsSolution ?? 'Mark as solution')),
+              ),
             ],
           ),
         ),
@@ -1497,7 +1559,13 @@ class _PostListItemState extends State<PostListItem> {
           ? await proxy.unacceptAnswerAsync(widget.post.id)
           : await proxy.acceptAnswerAsync(widget.post.id);
       if (!mounted) return;
-      if (!result.result) {
+      if (result.result) {
+        // The change reaches beyond this post: the opening post's
+        // solution card, and the post that was the solution before (the
+        // server unmarks it). Reload so they follow, as web updates the
+        // whole topic.
+        widget.actions?.onRefresh?.call();
+      } else {
         setState(() {
           widget.post.isSolution = wasSolution;
         });

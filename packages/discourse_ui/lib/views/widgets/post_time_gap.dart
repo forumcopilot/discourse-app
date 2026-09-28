@@ -46,7 +46,10 @@ class PostTimeGap extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color = theme.colorScheme.onSurfaceVariant;
-    final rule = theme.dividerColor.withValues(alpha: 0.5);
+    // The post above draws no rule of its own where this follows, so these
+    // rules are the boundary between the two posts: the same weight as the
+    // rule between any other two.
+    final rule = theme.colorScheme.outlineVariant;
 
     return Padding(
       padding: EdgeInsets.symmetric(

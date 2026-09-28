@@ -201,6 +201,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         isLiked: (t['liked'] as bool?) ?? false,
         likeCount: (t['like_count'] as int?) ?? 0,
         participatedUserIds: _participantIds(details),
+        participantIconUrls: _participantIconUrls(details),
         participantCount: (t['participant_count'] as int?) ?? 0,
         // The topic summary bar's link count. Only the topic-view payload
         // carries details.links; list rows do not.
@@ -300,6 +301,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         viewCount: (t['views'] as int?) ?? 0,
         likeCount: (t['like_count'] as int?) ?? 0,
         participatedUserIds: _participantIds(details),
+        participantIconUrls: _participantIconUrls(details),
         participantCount: (t['participant_count'] as int?) ?? 0,
         // The topic summary bar's link count. Only the topic-view payload
         // carries details.links; list rows do not.
@@ -426,6 +428,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         viewCount: (t['views'] as int?) ?? 0,
         likeCount: (t['like_count'] as int?) ?? 0,
         participatedUserIds: _participantIds(details),
+        participantIconUrls: _participantIconUrls(details),
         participantCount: (t['participant_count'] as int?) ?? 0,
         // The topic summary bar's link count. Only the topic-view payload
         // carries details.links; list rows do not.
@@ -1924,6 +1927,18 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
           .whereType<Map>()
           .map((p) => (p['id'] ?? '').toString())
           .where((s) => s.isNotEmpty)
+          .toList(growable: false);
+
+  /// Avatar URLs for [_participantIds], in the same order: the faces the
+  /// topic summary shows. The same `details.participants` entries carry
+  /// `avatar_template`, so the faces cost no request of their own. Kept
+  /// parallel to the ids — an entry without a template gets `''`, which
+  /// the avatar widgets draw as their fallback.
+  List<String> _participantIconUrls(Map<String, dynamic> details) =>
+      ((details['participants'] as List?) ?? const [])
+          .whereType<Map>()
+          .where((p) => (p['id'] ?? '').toString().isNotEmpty)
+          .map((p) => _avatarFromTemplate(p['avatar_template'] as String?) ?? '')
           .toList(growable: false);
 
   FCThreadResult _emptyThread({required String message}) {

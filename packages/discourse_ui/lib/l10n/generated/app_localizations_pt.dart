@@ -2640,4 +2640,54 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dismissedTopics => 'Dismissed';
+
+  @override
+  String topicMapViews(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'visualizações',
+      one: 'visualização',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'curtidas',
+      one: 'curtida',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapLinks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'links',
+      one: 'link',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapUsers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'usuários',
+      one: 'usuário',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get markAsSolution => 'Marcar como solução';
+
+  @override
+  String get unmarkAsSolution => 'Desmarcar como solução';
 }

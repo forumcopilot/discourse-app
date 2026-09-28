@@ -995,5 +995,11 @@
   "discardChangesQuestion": "Você deseja descartar suas alterações?",
   "discardChanges": "Descartar alterações",
   "saveDraft": "Salvar rascunho",
-  "notificationSettings": "Configurações de notificação"
+  "notificationSettings": "Configurações de notificação",
+  "topicMapViews": "{count, plural, =1{visualização} other{visualizações}}",
+  "topicMapLikes": "{count, plural, =1{curtida} other{curtidas}}",
+  "topicMapLinks": "{count, plural, =1{link} other{links}}",
+  "topicMapUsers": "{count, plural, =1{usuário} other{usuários}}",
+  "markAsSolution": "Marcar como solução",
+  "unmarkAsSolution": "Desmarcar como solução"
 }
