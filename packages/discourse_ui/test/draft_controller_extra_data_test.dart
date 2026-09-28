@@ -141,6 +141,9 @@ void main() {
     expect(c.changedSinceOpened, isFalse);
     recipients.add('carol');
     expect(c.changedSinceOpened, isTrue);
+    // Emptied: nothing left to lose.
+    c.contentController.text = '';
+    expect(c.changedSinceOpened, isFalse);
     c.dispose();
   });
 }

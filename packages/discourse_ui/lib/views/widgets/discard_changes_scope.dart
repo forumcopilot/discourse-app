@@ -65,6 +65,10 @@ class _DiscardChangesScopeState extends State<DiscardChangesScope> {
     final choice = await showDialog<_Choice>(
       context: context,
       builder: (dialog) => AlertDialog(
+        // When the three choices do not fit side by side they stack, with
+        // the action at the top and Cancel at the bottom, as Material 3
+        // stacks a dialog's buttons.
+        actionsOverflowDirection: VerticalDirection.up,
         content: Text(widget.isEdit
             ? l10n.discardChangesQuestion
             : l10n.discardPostQuestion),

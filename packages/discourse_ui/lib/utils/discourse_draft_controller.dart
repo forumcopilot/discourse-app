@@ -117,10 +117,12 @@ class DiscourseDraftController {
 
   /// Whether the writer has changed anything since the composer opened:
   /// what closing it should ask about. Before the draft has loaded, any
-  /// text counts.
+  /// text counts. A composer emptied of everything has nothing left to
+  /// lose (its draft is deleted as it empties), so it does not count.
   bool get changedSinceOpened {
     final reply = contentController.text;
     final title = titleController.text;
+    if (reply.trim().isEmpty && title.trim().isEmpty) return false;
     final openedReply = _openedReply;
     if (openedReply == null) {
       return reply.trim().isNotEmpty || title.trim().isNotEmpty;
