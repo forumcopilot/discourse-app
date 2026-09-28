@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.37] - 2026-09-27
+
 ### Changed
 - **Signing in opens the system's browser sign-in sheet** (ASWebAuthenticationSession on iOS and macOS, Chrome's Auth Tab on Android), as the official Discourse app does. It used to open a web view inside the app. New `DiscourseAuthSession`, using `flutter_web_auth_2`.
   - The forum's saved password and passkeys fill as they do in the browser, and a new password can be saved. Neither worked in the app's web view: iOS fills only for domains tied to the app, and Android's password managers hold back from another site's page inside an app.
