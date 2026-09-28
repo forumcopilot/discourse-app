@@ -440,10 +440,30 @@ class DiscourseLoginService {
   /// absent `has_chat_enabled` means no chat: turned off for the forum, not
   /// allowed for this user, or turned off in their own preferences.
   void _applyChatFlags(Map<String, dynamic> cu) {
+    _applyNavigation(cu);
     siteContext.setChatEnabled(cu['has_chat_enabled'] == true);
     siteContext.setChatCanDirectMessage(cu['can_direct_message'] == true ||
         cu['admin'] == true ||
         cu['moderator'] == true);
+  }
+
+  /// The reader's own sidebar (their categories and tags) and trust level,
+  /// which the drawer shows. Read with the chat flags, from the same
+  /// `current_user`, wherever the session is (re)read.
+  void _applyNavigation(Map<String, dynamic> cu) {
+    final ids = (cu['sidebar_category_ids'] as List?)
+        ?.map((e) => e is int ? e : int.tryParse('$e'))
+        .whereType<int>()
+        .toList();
+    // Current Discourse sends `{name, pm_only, …}`; older versions names.
+    final tags = (cu['sidebar_tags'] as List?)
+        ?.map((t) => t is Map ? t['name']?.toString() : t?.toString())
+        .whereType<String>()
+        .where((t) => t.isNotEmpty)
+        .toList();
+    siteContext.setSidebar(categoryIds: ids, tags: tags);
+    final tl = cu['trust_level'];
+    siteContext.setTrustLevel(tl is int ? tl : int.tryParse('${tl ?? ''}'));
   }
 
   /// Build the [FCLoginResult] stored on the [SiteContext] (and cached as

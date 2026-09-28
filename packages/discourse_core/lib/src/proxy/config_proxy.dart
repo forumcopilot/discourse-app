@@ -252,6 +252,9 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
         smallLogoUrl: settings['site_logo_small_url'] as String?,
         smallLogoDarkUrl: settings['site_logo_small_dark_url'] as String?,
       );
+      // …the forum's own navigation bar and default sidebar.
+      DiscourseSiteCapabilities.storeClientSettings(
+          siteContext.site.pluginUrl, settings);
       // Same payload carries the topic time-gap threshold (default 7).
       final gapRaw = settings['show_time_gap_days'];
       siteContext.setShowTimeGapDays(gapRaw is num

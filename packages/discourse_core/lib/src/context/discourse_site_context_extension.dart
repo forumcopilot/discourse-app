@@ -108,6 +108,9 @@ extension DiscourseSiteContextExtension on SiteContext {
     data.remove('userApiKey');
     data.remove('userApiClientId');
     data.remove('userApiPushEnabled');
+    // The reader's sidebar and trust level go with the session.
+    setSidebar();
+    setTrustLevel(null);
 
     final prefs = await SharedPreferences.getInstance();
     final prefix = _prefsPrefix();
@@ -322,6 +325,43 @@ extension DiscourseSiteContextExtension on SiteContext {
 
   void setChatCanDirectMessage(bool allowed) {
     _chatCanDirectMessage[_prefsPrefix()] = allowed;
+  }
+
+  /// The signed-in reader's own sidebar on the forum: the categories and
+  /// tags they chose (`sidebar_category_ids`, `sidebar_tags` on the current
+  /// user). Null for a guest or until the current user is read; the drawer
+  /// then falls back to the forum's defaults.
+  List<int>? get sidebarCategoryIds => _sidebarCategories[_prefsPrefix()];
+  List<String>? get sidebarTags => _sidebarTags[_prefsPrefix()];
+
+  static final Map<String, List<int>> _sidebarCategories = {};
+  static final Map<String, List<String>> _sidebarTags = {};
+
+  void setSidebar({List<int>? categoryIds, List<String>? tags}) {
+    final key = _prefsPrefix();
+    if (categoryIds == null) {
+      _sidebarCategories.remove(key);
+    } else {
+      _sidebarCategories[key] = List.unmodifiable(categoryIds);
+    }
+    if (tags == null) {
+      _sidebarTags.remove(key);
+    } else {
+      _sidebarTags[key] = List.unmodifiable(tags);
+    }
+  }
+
+  /// The signed-in reader's trust level (0–4), or null when unknown.
+  int? get trustLevel => _trustLevel[_prefsPrefix()];
+
+  static final Map<String, int> _trustLevel = {};
+
+  void setTrustLevel(int? level) {
+    if (level == null) {
+      _trustLevel.remove(_prefsPrefix());
+    } else {
+      _trustLevel[_prefsPrefix()] = level;
+    }
   }
 
   /// `show_time_gap_days` from `/site/settings.json`.

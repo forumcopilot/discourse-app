@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show visibleForTesting;
 
+import '../../util/html_text.dart';
 import '../../util/site_url.dart';
 
 /// What `/site.json` says this forum offers.
@@ -26,6 +27,27 @@ class DiscourseSiteCapabilities {
   /// "hot", "unread", …). Empty when unknown, which callers must treat as
   /// "don't know" rather than "offers nothing".
   List<String> topMenuItems = const [];
+
+  /// The forum's own navigation bar: `top_menu` from `/site/settings.json`
+  /// ("categories|latest|new|unread|top"), in the admin's order. Its first
+  /// item is the forum's homepage. Not the same as [topMenuItems], which
+  /// lists every filter the server knows. Empty until read.
+  List<String> topMenu = const [];
+
+  /// The categories and tags a member's sidebar starts with
+  /// (`default_navigation_menu_categories` / `_tags`), for readers without a
+  /// sidebar of their own. Empty when the forum set none.
+  List<int> defaultSidebarCategoryIds = const [];
+  List<String> defaultSidebarTags = const [];
+
+  /// The forum's most used tags, as its sidebar lists them for guests
+  /// (`navigation_menu_site_top_tags` in `/site.json`).
+  List<String> topTags = const [];
+
+  /// Topics started in each category in the past week (`topics_week` from
+  /// `/categories.json`), by category id. A category that response left out
+  /// has no entry: "unknown", not zero.
+  Map<int, int> topicsThisWeek = const {};
 
   /// Whether the current user may tag topics (`can_tag_topics`). The
   /// composer offers tagging without this and lets the server refuse.
@@ -189,6 +211,12 @@ class DiscourseSiteCapabilities {
     caps.headerPrimaryHex = light['header_primary'];
     caps.headerBackgroundDarkHex = dark['header_background'];
     caps.headerPrimaryDarkHex = dark['header_primary'];
+    // Current Discourse sends `{id, name, …}`; older versions sent names.
+    caps.topTags = ((site['navigation_menu_site_top_tags'] as List?) ?? const [])
+        .map((t) => t is Map ? t['name']?.toString() : t?.toString())
+        .whereType<String>()
+        .where((t) => t.isNotEmpty)
+        .toList(growable: false);
     caps.tosUrl = (site['tos_url'] as String?)?.trim();
     caps.privacyPolicyUrl = (site['privacy_policy_url'] as String?)?.trim();
     caps.resolved = true;
@@ -304,6 +332,50 @@ class DiscourseSiteCapabilities {
     return null;
   }
 
+  /// Records what `/site/settings.json` says about navigation: the forum's
+  /// [topMenu] and its default sidebar. Separate from [store] for the same
+  /// reason as [storeLogos].
+  static void storeClientSettings(
+      String pluginUrl, Map<String, dynamic> settings) {
+    List<String> split(Object? v) => (v?.toString() ?? '')
+        .split('|')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList(growable: false);
+    final caps = _bySite.putIfAbsent(
+        pluginUrl, () => DiscourseSiteCapabilities._(pluginUrl));
+    caps.topMenu = split(settings['top_menu'])
+        .map((e) => e.toLowerCase())
+        .toList(growable: false);
+    caps.defaultSidebarCategoryIds = split(
+            settings['default_navigation_menu_categories'])
+        .map(int.tryParse)
+        .whereType<int>()
+        .toList(growable: false);
+    caps.defaultSidebarTags =
+        split(settings['default_navigation_menu_tags']);
+  }
+
+  /// Records each category's topics of the past week from a
+  /// `/categories.json` list, subcategory lists included.
+  static void storeCategoryActivity(
+      String pluginUrl, Iterable<Map<String, dynamic>> categories) {
+    final caps = _bySite.putIfAbsent(
+        pluginUrl, () => DiscourseSiteCapabilities._(pluginUrl));
+    final week = Map<int, int>.of(caps.topicsThisWeek);
+    void add(Map<String, dynamic> c) {
+      final id = c['id'];
+      final n = c['topics_week'];
+      if (id is int && n is num) week[id] = n.toInt();
+      for (final sub in (c['subcategory_list'] as List?) ?? const []) {
+        if (sub is Map) add(sub.cast<String, dynamic>());
+      }
+    }
+
+    categories.forEach(add);
+    caps.topicsThisWeek = week;
+  }
+
   /// Records the forum's logos. Separate from [store] because they come
   /// from `/site/settings.json`, not `/site.json`, and the two are read at
   /// different points — so this must not depend on the other having run.
@@ -365,6 +437,10 @@ class DiscourseCategoryStyle {
     this.logoDarkUrl,
     this.backgroundUrl,
     this.backgroundDarkUrl,
+    this.description,
+    this.topicCount = 0,
+    this.postCount = 0,
+    this.subcategoryListStyle,
   });
 
   final int id;
@@ -391,6 +467,24 @@ class DiscourseCategoryStyle {
   final String? logoDarkUrl;
   final String? backgroundUrl;
   final String? backgroundDarkUrl;
+
+  /// The description as plain text (`description_text`, entities decoded),
+  /// or null when the category has none.
+  final String? description;
+
+  /// Topics and posts in the category (`topic_count`, `post_count`).
+  final int topicCount;
+  final int postCount;
+
+  /// How the forum lists this category's subcategories: `rows`,
+  /// `rows_with_featured_topics`, `boxes` or `boxes_with_featured_topics`.
+  /// Null when the forum did not say.
+  final String? subcategoryListStyle;
+
+  /// Whether the forum shows this category's subcategories as boxes of
+  /// their own rather than as rows under it.
+  bool get subcategoriesAsBoxes =>
+      subcategoryListStyle?.startsWith('boxes') ?? false;
 
   /// The logo for a light or [dark] page: the dark variant when there is
   /// one, else the only one.
@@ -428,6 +522,15 @@ class DiscourseCategoryStyle {
       logoDarkUrl: upload(c['uploaded_logo_dark']),
       backgroundUrl: upload(c['uploaded_background']),
       backgroundDarkUrl: upload(c['uploaded_background_dark']),
+      description: () {
+        final raw = str(c['description_text']);
+        if (raw == null) return null;
+        final text = stripHtmlToText(raw).trim();
+        return text.isEmpty ? null : text;
+      }(),
+      topicCount: (c['topic_count'] as num?)?.toInt() ?? 0,
+      postCount: (c['post_count'] as num?)?.toInt() ?? 0,
+      subcategoryListStyle: str(c['subcategory_list_style']),
     );
   }
 }

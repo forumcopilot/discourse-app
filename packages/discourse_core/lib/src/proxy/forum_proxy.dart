@@ -33,6 +33,9 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
       final list = (response['category_list'] as Map<String, dynamic>?) ??
           const <String, dynamic>{};
       final raw = (list['categories'] as List?) ?? const [];
+      // Each category's "N new this week", which only this list carries.
+      DiscourseSiteCapabilities.storeCategoryActivity(
+          siteContext.site.pluginUrl, raw.whereType<Map<String, dynamic>>());
       final cats = _withSubcategories(
           raw.whereType<Map<String, dynamic>>().toList(growable: false));
 
