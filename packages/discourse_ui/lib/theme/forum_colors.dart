@@ -39,22 +39,37 @@ class ForumColors extends ThemeExtension<ForumColors> {
   /// From [scheme], with [love] (icons) and [success] (icons and text,
   /// "Solution") nudged until they read on [surface] — a forum's green can
   /// be too pale for a white page.
+  ///
+  /// [brand] and [onBrand] default to [scheme]'s accent at full strength,
+  /// for a host's own theme that names none (ABDA's own screens).
   factory ForumColors.from(
     DiscourseScheme scheme, {
     required Color surface,
-    required Color brand,
-    required Color onBrand,
-  }) =>
-      ForumColors(
-        love: readableOn(scheme.love, surface, minContrast: 3),
-        success: readableOn(scheme.success, surface),
-        highlight: scheme.highlight,
-        quaternary: scheme.quaternary,
-        headerBackground: scheme.headerBackground,
-        headerPrimary: scheme.headerPrimary,
-        brand: brand,
-        onBrand: onBrand,
+    Color? brand,
+    Color? onBrand,
+  }) {
+    if (brand == null || onBrand == null) {
+      final full = ColorScheme.fromSeed(
+        seedColor: scheme.tertiary,
+        brightness: surface.computeLuminance() < 0.18
+            ? Brightness.dark
+            : Brightness.light,
+        dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
       );
+      brand ??= full.primaryContainer;
+      onBrand ??= full.onPrimaryContainer;
+    }
+    return ForumColors(
+      love: readableOn(scheme.love, surface, minContrast: 3),
+      success: readableOn(scheme.success, surface),
+      highlight: scheme.highlight,
+      quaternary: scheme.quaternary,
+      headerBackground: scheme.headerBackground,
+      headerPrimary: scheme.headerPrimary,
+      brand: brand,
+      onBrand: onBrand,
+    );
+  }
 
   /// The theme's forum colours; Discourse's stock ones when the theme
   /// carries none (a host's own theme, a test).

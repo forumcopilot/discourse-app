@@ -250,6 +250,15 @@ void main() {
       expect(cs.surface, const Color(0xFFEBEBEB));
     });
 
+    test("a host's own theme can name no brand: the accent at full strength",
+        () {
+      // ABDA builds ForumColors for its own screens without one.
+      final fc = ForumColors.from(DiscourseScheme.stock(Brightness.light),
+          surface: Colors.white);
+      expect(hue(fc.brand), closeTo(hue(DiscourseScheme.light.tertiary), 10));
+      expect(contrastRatio(fc.onBrand, fc.brand), greaterThanOrEqualTo(4.5));
+    });
+
     test('the banner keeps the accent at full strength', () {
       final theme = AppTheme.themeFor(Brightness.light,
           ForumPalette.fromHex(light: {'tertiary': 'ff0054'}));
