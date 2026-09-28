@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
 
 import '../../theme/design_tokens.dart';
 import '../../utils/discourse_color.dart';
+import '../../utils/discourse_icons.dart';
 import '../../utils/emoji_shortcodes.dart';
 import '../../utils/html_colors.dart';
 import '../forum_topics_page.dart';
@@ -113,13 +114,18 @@ class CategoryMark extends StatelessWidget {
         return Text(glyph, style: TextStyle(fontSize: size + 2, height: 1));
       }
     }
-    // An `icon` category names a Font Awesome icon, which the app does not
-    // carry; the square in the category's colour says the same thing.
     final surface = Theme.of(context).colorScheme.surface;
     final outline = Theme.of(context).colorScheme.outline;
     Color tone(DiscourseCategoryStyle? s) => categoryMarkColor(
         parseDiscourseHex(s?.colorHex ?? '') ?? outline, surface);
     final own = tone(style);
+    // An `icon` category names a Font Awesome icon: the closest Material
+    // one in the category's colour, as the website draws it; one the app
+    // has no match for keeps the square.
+    if (style != null && style.styleType == 'icon') {
+      final icon = materialIconForDiscourseIcon(style.icon);
+      if (icon != null) return Icon(icon, size: size + 2, color: own);
+    }
     return Container(
       width: size,
       height: size,
@@ -142,9 +148,9 @@ class CategoryMark extends StatelessWidget {
 Color categoryMarkColor(Color color, Color surface) =>
     readableOn(color, surface, minContrast: 1.8);
 
-/// The category [id] as an [FCForum] to open, with its name and colours
-/// from the forum's `/site.json` — a category opened from a badge or a link
-/// then gets its coloured header, not a blank one.
+/// The category [id] as an [FCForum] to open, with its name, colours,
+/// description and counts from the forum's `/site.json` — a category opened
+/// from a badge, a link or the drawer then gets its full header.
 FCForum categoryForum(SiteContext siteContext, String id,
     {String fallbackName = ''}) {
   final style = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
@@ -152,6 +158,14 @@ FCForum categoryForum(SiteContext siteContext, String id,
   return FCForum(
     id: id,
     name: style?.name ?? fallbackName,
+    // What its page's header shows, as a category opened from the list
+    // would have it.
+    description: style?.description,
+    logoUrl: style?.logoUrl,
+    backgroundUrl: style?.backgroundUrl,
+    topicCount: style?.topicCount ?? 0,
+    postCount: style?.postCount ?? 0,
+    slug: style?.slug,
     parentId: style?.parentId?.toString(),
     color: style?.colorHex ?? '',
     textColor: style?.textColorHex ?? 'FFFFFF',

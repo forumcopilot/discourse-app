@@ -441,10 +441,14 @@ class DiscourseCategoryStyle {
     this.topicCount = 0,
     this.postCount = 0,
     this.subcategoryListStyle,
+    this.slug,
   });
 
   final int id;
   final String name;
+
+  /// The category's slug (`python-help`), or null.
+  final String? slug;
 
   /// Hex without '#', 3 or 6 digits as the admin typed it; null if unset.
   final String? colorHex;
@@ -531,6 +535,7 @@ class DiscourseCategoryStyle {
       topicCount: (c['topic_count'] as num?)?.toInt() ?? 0,
       postCount: (c['post_count'] as num?)?.toInt() ?? 0,
       subcategoryListStyle: str(c['subcategory_list_style']),
+      slug: str(c['slug']),
     );
   }
 }

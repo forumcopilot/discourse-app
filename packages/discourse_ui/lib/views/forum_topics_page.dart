@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
-import 'package:discourse_ui/views/appbars/forum_topics_app_bar.dart';
 import 'package:discourse_ui/views/lists/forum_topic_list.dart';
+import 'package:discourse_ui/views/listitems/category_card.dart'
+    show SubcategoryChip;
+import 'package:discourse_ui/views/search_page.dart';
+import 'package:discourse_ui/views/widgets/category_badge.dart'
+    show categoryForum;
+import 'package:discourse_ui/views/widgets/category_masthead.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
 import 'package:discourse_ui/views/widgets/filter_chip_bar.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteCapabilities, DiscourseTopicCounts, DiscourseTopicTracking;
@@ -34,12 +40,62 @@ class ForumTopicsPage extends StatefulWidget {
 class _ForumTopicsPageState extends State<ForumTopicsPage> {
   VoidCallback? _refreshCallback;
 
+  /// The reader's notification level here, shown on the header's bell;
+  /// null until read, and for a guest.
+  FCNotificationLevel? _level;
+
   @override
   void initState() {
     super.initState();
     // The counts on the New and Unread chips.
     WidgetsBinding.instance.addPostFrameCallback(
         (_) => TopicTrackingService.refresh(widget.siteContext));
+    _loadLevel();
+  }
+
+  Future<void> _loadLevel() async {
+    if (!widget.siteContext.isLoggedIn) return;
+    try {
+      final result = await SiteProxyFactory.getSubscriptionProxy()
+          .getCategoryNotificationLevelAsync(widget.forum.id);
+      if (mounted && result.result) setState(() => _level = result.level);
+    } catch (_) {
+      // The bell then reads Normal until changed.
+    }
+  }
+
+  /// The category's subcategories, from the forum's `/site.json` (so a
+  /// category opened from a badge or link has them too), else the list's.
+  List<FCForum> get _subcategories {
+    final id = int.tryParse(widget.forum.id);
+    final caps =
+        DiscourseSiteCapabilities.forSite(widget.siteContext.site.pluginUrl);
+    final fromSite = id == null
+        ? const <FCForum>[]
+        : [
+            for (final c in caps.categories)
+              if (c['parent_category_id'] == id && c['id'] is int)
+                categoryForum(widget.siteContext, '${c['id']}'),
+          ];
+    return fromSite.isNotEmpty ? fromSite : widget.forum.childForums;
+  }
+
+  /// Search opens with Discourse's filter for this category (`#slug`, or
+  /// `#parent:child` for a subcategory) for the reader to finish.
+  void _openSearch() {
+    final caps =
+        DiscourseSiteCapabilities.forSite(widget.siteContext.site.pluginUrl);
+    final style = caps.categoryStyleFor(widget.forum.id);
+    final slug = style?.slug ?? widget.forum.slug;
+    final parentSlug = style?.parentId == null
+        ? null
+        : caps.categoryStyleFor('${style!.parentId}')?.slug;
+    final filter = slug == null
+        ? null
+        : '#${parentSlug == null ? '' : '$parentSlug:'}$slug ';
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) =>
+            SearchPage(siteContext: widget.siteContext, prefill: filter)));
   }
 
   /// This category and every one below it: what web counts as in it.
@@ -110,11 +166,13 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
       await NotificationLevelSheet.showForCategory(
         context: context,
         categoryId: widget.forum.id,
-        // Read by the sheet: a guess from the subscribed flag showed
-        // Watching as Tracking and Muted as Normal.
-        currentLevel: null,
+        // The level the bell shows, when it has been read; otherwise the
+        // sheet reads it (a guess from the subscribed flag showed Watching
+        // as Tracking and Muted as Normal).
+        currentLevel: _level,
         onChanged: () {
           if (!mounted) return;
+          _loadLevel();
           if (_refreshCallback != null) _refreshCallback!();
         },
       );
@@ -179,104 +237,155 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
 
   _CategoryFilter _activeFilter = _CategoryFilter.latest;
 
-  Widget? _buildFilterTabs(BuildContext context) {
-    final filters = _filters;
-    // A lone tab is a label, not a choice.
-    if (filters.length < 2) return null;
-    final l10n = AppLocalizations.of(context)!;
-    String label(_CategoryFilter f, DiscourseTopicCounts? counts) {
-      final n = switch (f) {
-        _CategoryFilter.newTopics => counts?.newTopics ?? 0,
-        _CategoryFilter.unread => counts?.unreadTopics ?? 0,
-        _ => 0,
-      };
-      return switch (f) {
-        _CategoryFilter.newTopics when n > 0 => l10n.filterNewWithCount(n),
-        _CategoryFilter.unread when n > 0 => l10n.filterUnreadWithCount(n),
-        _CategoryFilter.unread => l10n.unread,
-        _ => f.label,
-      };
-    }
+  String _chipLabel(
+      AppLocalizations l10n, _CategoryFilter f, DiscourseTopicCounts? counts) {
+    final n = switch (f) {
+      _CategoryFilter.newTopics => counts?.newTopics ?? 0,
+      _CategoryFilter.unread => counts?.unreadTopics ?? 0,
+      _ => 0,
+    };
+    return switch (f) {
+      _CategoryFilter.latest => l10n.latest,
+      _CategoryFilter.hot => l10n.hot,
+      _CategoryFilter.newTopics when n > 0 => l10n.filterNewWithCount(n),
+      _CategoryFilter.newTopics => l10n.filterNew,
+      _CategoryFilter.unread when n > 0 => l10n.filterUnreadWithCount(n),
+      _CategoryFilter.unread => l10n.unread,
+    };
+  }
 
-    Widget build(DiscourseTopicCounts? counts) {
-      final chips = FilterChipBar(
-        options: [
-          for (final f in filters) FilterChipOption(label: label(f, counts)),
-        ],
-        selectedIndex: filters.indexOf(_activeFilter),
-        onSelected: (i) => setState(() => _activeFilter = filters[i]),
-      );
-      // Dismiss sits above the New and Unread feeds, as on Home; hidden
-      // once the counts say there is nothing to dismiss.
-      final kind = switch (_activeFilter) {
-        _CategoryFilter.newTopics => DismissKind.newTopics,
-        _CategoryFilter.unread => DismissKind.unread,
-        _ => null,
-      };
-      final remaining = switch (kind) {
-        DismissKind.newTopics => counts?.newTopics,
-        DismissKind.unread => counts?.unreadTopics,
-        null => 0,
-      };
-      if (kind == null || remaining == 0) return chips;
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          chips,
-          DismissTopicsBar(
-            siteContext: widget.siteContext,
-            kind: kind,
-            categoryId: int.tryParse(widget.forum.id),
-            onDismissed: () => _refreshCallback?.call(),
-          ),
-        ],
-      );
-    }
-
-    if (!widget.siteContext.isLoggedIn) return build(null);
+  /// Rebuilds [builder] as the reader's new/unread counts change (for this
+  /// category and its subcategories); a guest has none.
+  Widget _withCounts(Widget Function(DiscourseTopicCounts?) builder) {
+    if (!widget.siteContext.isLoggedIn) return builder(null);
     final tracking = DiscourseTopicTracking.forSite(widget.siteContext);
     return ListenableBuilder(
       listenable: tracking,
       builder: (context, _) =>
-          build(tracking.counts(categoryIds: _categoryIds)),
+          builder(tracking.counts(categoryIds: _categoryIds)),
+    );
+  }
+
+  /// The feed chips, pinned under the header's bar. A lone feed is a
+  /// label, not a choice, so there are no chips then.
+  Widget? _buildFilterTabs(BuildContext context) {
+    final filters = _filters;
+    if (filters.length < 2) return null;
+    final l10n = AppLocalizations.of(context)!;
+    return _withCounts((counts) => ColoredBox(
+          color: Theme.of(context).colorScheme.surface,
+          child: FilterChipBar(
+            options: [
+              for (final f in filters)
+                FilterChipOption(label: _chipLabel(l10n, f, counts)),
+            ],
+            selectedIndex: filters.indexOf(_activeFilter),
+            onSelected: (i) => setState(() => _activeFilter = filters[i]),
+          ),
+        ));
+  }
+
+  /// Dismiss above the New and Unread feeds, as on Home; hidden once the
+  /// counts say there is nothing to dismiss.
+  Widget _buildDismissBar() {
+    final kind = switch (_activeFilter) {
+      _CategoryFilter.newTopics => DismissKind.newTopics,
+      _CategoryFilter.unread => DismissKind.unread,
+      _ => null,
+    };
+    if (kind == null) return const SizedBox.shrink();
+    return _withCounts((counts) {
+      final remaining = kind == DismissKind.newTopics
+          ? counts?.newTopics
+          : counts?.unreadTopics;
+      if (remaining == 0) return const SizedBox.shrink();
+      return DismissTopicsBar(
+        siteContext: widget.siteContext,
+        kind: kind,
+        categoryId: int.tryParse(widget.forum.id),
+        onDismissed: () => _refreshCallback?.call(),
+      );
+    });
+  }
+
+  Widget? _buildMenu(BuildContext context) {
+    if (!widget.siteContext.isLoggedIn) return null;
+    final l10n = AppLocalizations.of(context)!;
+    return PopupMenuButton<String>(
+      tooltip: l10n.moreOptions,
+      onSelected: (value) {
+        if (value == 'dismiss') _handleMarkRead();
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem<String>(
+          value: 'dismiss',
+          child: Row(children: [
+            Icon(Icons.done_all_rounded,
+                color: Theme.of(context).colorScheme.onSurfaceVariant),
+            const SizedBox(width: 12),
+            Text(l10n.dismissNewAndUnread),
+          ]),
+        ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final subcategories = _subcategories;
+    final chips = _buildFilterTabs(context);
+    final signedIn = widget.siteContext.isLoggedIn;
     return Scaffold(
-      appBar: ForumTopicsAppBar(
-        title: widget.forum.name,
-        forumId: widget.forum.id,
-        onSubscribe: widget.siteContext.isLoggedIn && widget.forum.canSubscribe ? _handleSubscribe : null,
-        onMarkRead: widget.siteContext.isLoggedIn ? _handleMarkRead : null,
-        isSubscribed: widget.forum.isSubscribed,
-        showMarkRead: true,
-        isLoggedIn: widget.siteContext.isLoggedIn,
-        canPost: widget.forum.canPost,
-        canSubscribe: widget.forum.canSubscribe,
-      ),
-      // The filter bar is handed to the list rather than stacked above it,
-      // so it sits *under* the category header card and scrolls with the
-      // content — the header is the first item inside that list.
       body: TopicTrackingLive(
         siteContext: widget.siteContext,
         active: true,
         child: ForumTopicList(
           siteContext: widget.siteContext,
           forum: widget.forum,
-          showSubforumHeader: true,
           onRefreshAvailable: _onRefreshAvailable,
           filter: _activeFilter.route,
-          headerTrailing: _buildFilterTabs(context),
+          refreshEdgeOffset: MediaQuery.paddingOf(context).top +
+              CategoryMasthead.toolbarHeight,
+          headerSlivers: [
+            CategoryMasthead(
+              siteContext: widget.siteContext,
+              forum: widget.forum,
+              level: _level,
+              onBell: signedIn && widget.forum.canSubscribe
+                  ? _handleSubscribe
+                  : null,
+              onSearch: _openSearch,
+              menu: _buildMenu(context),
+            ),
+            // Subcategories as chips under the header, not rows before the
+            // topics.
+            if (subcategories.isNotEmpty)
+              SliverToBoxAdapter(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  child: Row(children: [
+                    for (final sub in subcategories)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: SubcategoryChip(
+                          siteContext: widget.siteContext,
+                          forum: sub,
+                          outlined: true,
+                        ),
+                      ),
+                  ]),
+                ),
+              ),
+            if (chips != null) PinnedHeaderSliver(child: chips),
+            SliverToBoxAdapter(child: _buildDismissBar()),
+          ],
         ),
       ),
       // Where a thumb is, in the forum's accent (the app's FAB theme), and
-      // always reachable — it used to sit in the category header, which
-      // scrolls away with the first topics.
+      // always reachable.
       floatingActionButton:
-          widget.siteContext.isLoggedIn && widget.forum.canPost
+          signedIn && widget.forum.canPost
               ? FloatingActionButton.extended(
                   onPressed: _handleNewTopic,
                   icon: const Icon(Icons.edit_outlined),
@@ -290,14 +399,13 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
 
 /// A category's topic feeds, mirroring web's tabs.
 enum _CategoryFilter {
-  latest('latest', 'Latest'),
-  hot('hot', 'Hot'),
-  newTopics('new', 'New'),
-  unread('unread', 'Unread');
+  latest('latest'),
+  hot('hot'),
+  newTopics('new'),
+  unread('unread');
 
-  const _CategoryFilter(this.route, this.label);
+  const _CategoryFilter(this.route);
 
   /// The `/c/{id}/l/{route}.json` segment.
   final String route;
-  final String label;
 }

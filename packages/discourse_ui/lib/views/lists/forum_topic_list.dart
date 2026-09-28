@@ -10,14 +10,11 @@ import 'package:forumcopilot_sdk/models/results/fc_topic_result.dart';
 import 'package:discourse_ui/services/topic_tracking_service.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseTopicProxy;
 import 'package:get/get.dart';
-import 'package:discourse_ui/utils/forum_navigation.dart';
 import 'package:discourse_ui/views/post_page.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/views/login_page.dart';
 import '../listitems/topic_list_item.dart';
-import '../listitems/forum_list_item.dart';
 import '../widgets/empty_state_view.dart';
-import '../widgets/subforum_header_widget.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/error_message.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -26,7 +23,6 @@ import 'package:discourse_ui/utils/app_navigation.dart';
 class ForumTopicList extends StatefulWidget {
   final SiteContext siteContext;
   final FCForum forum;
-  final bool showSubforumHeader;
   final void Function(VoidCallback)? onRefreshAvailable;
 
   /// Which Discourse category feed to show: `latest`, `new`, `hot`, …
@@ -34,19 +30,22 @@ class ForumTopicList extends StatefulWidget {
   /// owns the tab strip and passes the choice down.
   final String filter;
 
-  /// Rendered directly beneath the subforum header, inside the scroll
-  /// view. The category's filter chips live here so they sit under the
-  /// header card rather than floating above it.
-  final Widget? headerTrailing;
+  /// The page's header and its feed chips, as slivers above the topics in
+  /// the same scroll view: the category's header collapses into its bar
+  /// and the chips pin under it.
+  final List<Widget> headerSlivers;
+
+  /// Where a refresh's spinner appears: under the page's bar.
+  final double refreshEdgeOffset;
 
   const ForumTopicList({
     super.key,
     required this.siteContext,
     required this.forum,
-    this.showSubforumHeader = false,
     this.onRefreshAvailable,
     this.filter = 'latest',
-    this.headerTrailing,
+    this.headerSlivers = const [],
+    this.refreshEdgeOffset = 0,
   });
 
   @override
@@ -55,7 +54,6 @@ class ForumTopicList extends StatefulWidget {
 
 class _ForumTopicListState extends State<ForumTopicList> {
   List<FCTopic> _allItems = [];
-  List<FCForum> _childForums = [];
   int _currentTopicCount = 0;
   String? _error;
   bool _isLoading = true;
@@ -130,20 +128,15 @@ class _ForumTopicListState extends State<ForumTopicList> {
         AppLogger.debug('  - mode: TOPIC');
 
         List<FCTopic> allItems = []; // Clear the list before adding new items
-        List<FCForum> childForums = []; // Separate list for child forums
-
-        // Add child forums if they exist
-        if (widget.forum.childForums.isNotEmpty) {
-          AppLogger.debug('[ForumTopicList] Adding ${widget.forum.childForums.length} child forums');
-          childForums.addAll(widget.forum.childForums);
-        }
         bool hasMoreTopics = false;
 
         // Check if user can view content in this forum
         final canViewContent = widget.forum.canViewContent;
         AppLogger.debug('[ForumTopicList] canViewContent: $canViewContent');
 
-        if (!widget.forum.isSubForumContainer && canViewContent) {
+        // A parent category has topics too — its own and its
+        // subcategories', as its page on the website lists them.
+        if (canViewContent) {
           // Pinned topics head the list on Latest only. On Hot or New the
           // feed has its own ordering, so prepending pinned-by-top both
           // masks it and costs an extra /c/{id}/l/top.json — web does not
@@ -189,7 +182,6 @@ class _ForumTopicListState extends State<ForumTopicList> {
         if (mounted) {
           setState(() {
             _allItems = allItems;
-            _childForums = childForums;
             _isLoading = false;
             _hasMoreTopics = hasMoreTopics;
           });
@@ -281,44 +273,26 @@ class _ForumTopicListState extends State<ForumTopicList> {
 
 
 
-  Future<void> _handleSubscription(String forumId, bool subscribe) async {
-    // Check if user is logged in before proceeding with subscription
+  Future<void> _openTopic(FCTopic topic, {bool announcement = false}) async {
     if (!widget.siteContext.isLoggedIn) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Please login to ${subscribe ? 'subscribe to' : 'unsubscribe from'} forums',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onInverseSurface,
-                ),
-          ),
-          backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          duration: const Duration(seconds: 3),
-        ),
-      );
-      return;
-    }
-
-    try {
-      final subscriptionProxy = SiteProxyFactory.getSubscriptionProxy();
-
-      if (subscribe) {
-        await subscriptionProxy.subscribeForumAsync(forumId, 1); // mode 1 for subscribe
-      } else {
-        await subscriptionProxy.unsubscribeForumAsync(forumId);
+      if (!Get.isRegistered<DiscourseLoginController>()) {
+        Get.put(DiscourseLoginController());
       }
-
-      // Update the forum's subscription status in the list
-      setState(() {
-        for (var forum in _allItems) {
-          if (forum is FCForum && forum.id == forumId) {
-            forum.isSubscribed = subscribe;
-          }
-        }
-      });
-    } catch (e) {
-      AppLogger.debug('[ForumTopicList] Error handling subscription: $e');
+      final loginController = Get.find<DiscourseLoginController>();
+      final loginResult =
+          await loginController.attemptAutomaticLogin(widget.siteContext);
+      if (!loginResult.success &&
+          loginResult.hadCredentials &&
+          Get.currentRoute != '/LoginPage') {
+        await LoginPage.open(widget.siteContext);
+      }
     }
+    AppNavigation.pushGlobal(PostPage(
+      siteContext: widget.siteContext,
+      topicId: topic.id,
+      title: topic.title,
+      isAnnouncement: announcement,
+    ));
   }
 
   @override
@@ -326,200 +300,121 @@ class _ForumTopicListState extends State<ForumTopicList> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    List<Widget> content;
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_error != null) {
-      // The category header and its feed chips stay above the error, as
-      // they sit above the list: a feed that fails (say Hot) can be
-      // switched away from without leaving the category.
-      return RefreshIndicator(
-        onRefresh: _loadTopics,
-        child: ListView(
-          children: [
-            if (widget.showSubforumHeader)
-              SubforumHeaderWidget(
-                forum: widget.forum,
-                siteContext: widget.siteContext,
-              ),
-            if (widget.headerTrailing != null) widget.headerTrailing!,
-            EmptyStateView.error(
-              message: describeError(_error, context: context),
-              onRetry: _loadTopics,
-            ),
-          ],
+      content = const [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(child: CircularProgressIndicator()),
         ),
-      );
+      ];
+    } else if (_error != null) {
+      // The category's header and its feed chips stay above the error: a
+      // feed that fails (say Hot) can be switched away from without
+      // leaving the category.
+      content = [
+        SliverToBoxAdapter(
+          child: EmptyStateView.error(
+            message: describeError(_error, context: context),
+            onRetry: _loadTopics,
+          ),
+        ),
+      ];
+    } else {
+      final topics = _allItems;
+      final canViewContent = widget.forum.canViewContent;
+      final announcements =
+          topics.where((topic) => topic.isAnnouncement == true).toList();
+      final stickyTopics = topics
+          .where((topic) => topic.isPinned == true && topic.isAnnouncement != true)
+          .toList();
+      final regularTopics = topics
+          .where((topic) => topic.isAnnouncement != true && topic.isPinned != true)
+          .toList();
+      TopicListItem row(FCTopic topic, {bool announcement = false}) =>
+          TopicListItem(
+            // Inside a category — its header already names it.
+            showCategory: false,
+            siteContext: widget.siteContext,
+            topic: topic,
+            topicIcon: announcement ? Icons.campaign_outlined : null,
+            onTap: () => _openTopic(topic, announcement: announcement),
+          );
+      final rows = <Widget>[
+        if (!canViewContent)
+          Padding(
+            padding: DesignTokens.paddingL,
+            child: Container(
+              padding: DesignTokens.paddingM,
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline,
+                      color: colorScheme.onSurfaceVariant, size: 20),
+                  const SizedBox(width: DesignTokens.spacingM),
+                  Expanded(
+                    child: Text(
+                      AppLocalizations.of(context)!.noPermissionToViewSubforum,
+                      style: textTheme.bodyMedium
+                          ?.copyWith(color: colorScheme.onSurfaceVariant),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        // An empty New or Unread feed is a caught-up reader, not an empty
+        // category: the Home tab's words, not "No discussions yet".
+        if (topics.isEmpty && canViewContent)
+          switch (widget.filter) {
+            'new' => EmptyStateView(
+                icon: Icons.fiber_new,
+                message: AppLocalizations.of(context)!.noNewTopicsSinceLastVisit,
+              ),
+            'unread' => EmptyStateView(
+                icon: Icons.inbox_rounded,
+                message: AppLocalizations.of(context)!.youAreAllCaughtUp,
+                hint: AppLocalizations.of(context)!.thereAreNoUnreadTopics,
+              ),
+            _ => EmptyStateView(
+                icon: Icons.forum_outlined,
+                message: AppLocalizations.of(context)!.noDiscussionsYet,
+              ),
+          },
+        for (final t in announcements) row(t, announcement: true),
+        for (final t in stickyTopics) row(t),
+        for (final t in regularTopics) row(t),
+        if (_hasMoreTopics)
+          const Padding(
+            padding: DesignTokens.paddingS,
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        // Room for the category page's New Topic button, so the last
+        // topic can scroll clear of it.
+        const SizedBox(height: 88),
+      ];
+      content = [
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, i) => rows[i],
+            childCount: rows.length,
+          ),
+        ),
+      ];
     }
-
-    // Use separate lists for forums and topics
-    final forums = _childForums;
-    final topics = _allItems;
-    final canViewContent = widget.forum.canViewContent;
-
-    // Separate topics into different categories
-    final announcements = topics.where((topic) => topic.isAnnouncement == true).toList();
-    final stickyTopics = topics.where((topic) => topic.isPinned == true && topic.isAnnouncement != true).toList();
-    final regularTopics = topics.where((topic) => topic.isAnnouncement != true && topic.isPinned != true).toList();
 
     return RefreshIndicator(
       onRefresh: _loadTopics,
-      child: ListView(
+      edgeOffset: widget.refreshEdgeOffset,
+      child: CustomScrollView(
         controller: _scrollController,
-        children: [
-          // Subforum header (icon, name, description) - scrolls with content
-          if (widget.showSubforumHeader)
-            SubforumHeaderWidget(
-              forum: widget.forum,
-              siteContext: widget.siteContext,
-            ),
-          if (widget.headerTrailing != null) widget.headerTrailing!,
-          // Show permission message if user cannot view content
-          if (!canViewContent)
-            Padding(
-              padding: DesignTokens.paddingL,
-              child: Container(
-                padding: DesignTokens.paddingM,
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: colorScheme.onSurfaceVariant,
-                      size: 20,
-                    ),
-                    const SizedBox(width: DesignTokens.spacingM),
-                    Expanded(
-                      child: Text(
-                        AppLocalizations.of(context)!.noPermissionToViewSubforum,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          // If there are no forums and no topics, show empty state
-          // An empty New or Unread feed is a caught-up reader, not an
-          // empty category: the Home tab's words, not "No discussions yet".
-          if (forums.isEmpty && topics.isEmpty && canViewContent)
-            switch (widget.filter) {
-              'new' => EmptyStateView(
-                  icon: Icons.fiber_new,
-                  message: AppLocalizations.of(context)!.noNewTopicsSinceLastVisit,
-                ),
-              'unread' => EmptyStateView(
-                  icon: Icons.inbox_rounded,
-                  message: AppLocalizations.of(context)!.youAreAllCaughtUp,
-                  hint: AppLocalizations.of(context)!.thereAreNoUnreadTopics,
-                ),
-              _ => EmptyStateView(
-                  icon: Icons.forum_outlined,
-                  message: AppLocalizations.of(context)!.noDiscussionsYet,
-                ),
-            },
-          if (forums.isNotEmpty) ...[
-            ...forums.map((forum) => ForumListItem(
-                  siteContext: widget.siteContext,
-                  forum: forum,
-                  onSubscriptionChanged: (subscribe) => _handleSubscription(forum.id.isEmpty ? "0" : forum.id, subscribe),
-                  onTap: () {
-                    pushForumOrLinkForum(context, forum, widget.siteContext);
-                  },
-                )),
-            // Separator between Forums and Topics
-            if (announcements.isNotEmpty || stickyTopics.isNotEmpty || regularTopics.isNotEmpty)
-              Container(
-                height: 8,
-                decoration: BoxDecoration(
-                  color: colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityLow),
-                ),
-              ),
-          ],
-          if (announcements.isNotEmpty) ...[
-            ...announcements.map((topic) => TopicListItem(
-                  // Inside a category — its header already names it.
-                  showCategory: false,
-                  siteContext: widget.siteContext,
-                  topic: topic,
-                  topicIcon: Icons.campaign_outlined,
-                  onTap: () async {
-                    if (!widget.siteContext.isLoggedIn) {
-                      if (!Get.isRegistered<DiscourseLoginController>()) {
-                        Get.put(DiscourseLoginController());
-                      }
-                      final loginController = Get.find<DiscourseLoginController>();
-                      final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
-                      if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
-                        await LoginPage.open(widget.siteContext);
-                      }
-                    }
-                    AppNavigation.pushGlobal(PostPage(
-                          siteContext: widget.siteContext,
-                          topicId: topic.id,
-                          title: topic.title,
-                          isAnnouncement: true,
-                        ));
-                  },
-                )),
-          ],
-          if (stickyTopics.isNotEmpty) ...[
-            ...stickyTopics.map((topic) => TopicListItem(
-                  // Inside a category — its header already names it.
-                  showCategory: false,
-                  siteContext: widget.siteContext,
-                  topic: topic,
-                  onTap: () async {
-                    if (!widget.siteContext.isLoggedIn) {
-                      if (!Get.isRegistered<DiscourseLoginController>()) {
-                        Get.put(DiscourseLoginController());
-                      }
-                      final loginController = Get.find<DiscourseLoginController>();
-                      final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
-                      if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
-                        await LoginPage.open(widget.siteContext);
-                      }
-                    }
-                    AppNavigation.pushGlobal(PostPage(siteContext: widget.siteContext, topicId: topic.id, title: topic.title));
-                  },
-                )),
-          ],
-          if (regularTopics.isNotEmpty) ...[
-            ...regularTopics.map((topic) => TopicListItem(
-                  // Inside a category — its header already names it.
-                  showCategory: false,
-                  siteContext: widget.siteContext,
-                  topic: topic,
-                  topicIcon: null,
-                  onTap: () async {
-                    if (!widget.siteContext.isLoggedIn) {
-                      if (!Get.isRegistered<DiscourseLoginController>()) {
-                        Get.put(DiscourseLoginController());
-                      }
-                      final loginController = Get.find<DiscourseLoginController>();
-                      final loginResult = await loginController.attemptAutomaticLogin(widget.siteContext);
-                      if (!loginResult.success && loginResult.hadCredentials && Get.currentRoute != '/LoginPage') {
-                        await LoginPage.open(widget.siteContext);
-                      }
-                    }
-                    AppNavigation.pushGlobal(PostPage(siteContext: widget.siteContext, topicId: topic.id, title: topic.title));
-                  },
-                )),
-          ],
-          if (_hasMoreTopics)
-            const Padding(
-              padding: DesignTokens.paddingS,
-              child: Center(child: CircularProgressIndicator()),
-            ),
-          // Room for the category page's New Topic button, so the last
-          // topic can scroll clear of it.
-          if (widget.showSubforumHeader) const SizedBox(height: 88),
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          ...widget.headerSlivers,
+          ...content,
         ],
       ),
     );
