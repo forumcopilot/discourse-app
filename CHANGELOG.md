@@ -22,6 +22,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
   - Clearing a composer's text deletes its draft. The text used to stay on the server, and the next reply opened with it again.
   - What was typed in the last moment before closing is saved with the draft. It used to be dropped.
   - The Drafts list reloads after a draft resumed from it closes, so a sent draft no longer stays listed.
+  - A message draft resumed and closed untouched closes without asking. Its restored recipients counted as a change (`DiscourseDraftController.markOpened`).
+- **Sending no longer moves focus to the next field.** The text locks while sending, and focus used to hop to the next field that didn't (Tags in New Topic), keyboard and all.
 - **Back returns to the screen you were on.**
   - **On Android, Back on the Categories, Chat, Notifications or Profile tab returns to the forum's first tab.** Back again then leaves the forum. It used to leave the forum, or close the single-forum app, from whichever tab was showing. An open drawer still closes first. iOS is unchanged: its edge swipe leaves the forum from any tab, as tab bars work there.
   - **A push notification for a forum you have left opens the forum, then the topic.** In a multi-forum host, the forum's controller outlives the forum, so the app took it for still open. It opened the topic straight over the host's list, in default colours, and Back skipped the forum. The host now opens it, as it does from its list (`DiscourseHost.openForum`).

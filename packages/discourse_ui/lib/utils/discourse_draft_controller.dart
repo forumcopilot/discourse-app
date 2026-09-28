@@ -115,6 +115,18 @@ class DiscourseDraftController {
     return restored;
   }
 
+  /// Takes what the composer holds now as what it opened with, for a page
+  /// that restores more of the draft itself once [initialize] has returned
+  /// (New Message's recipients). Without it the restored recipients read
+  /// as a change, and closing a draft left untouched asked to discard it.
+  void markOpened() {
+    _openedReply = contentController.text;
+    _openedTitle = titleController.text;
+    _openedExtra = _extra.toString();
+    // They came from the draft, so they are saved already.
+    _lastSavedExtra = _openedExtra!;
+  }
+
   /// Whether the writer has changed anything since the composer opened:
   /// what closing it should ask about. Before the draft has loaded, any
   /// text counts. A composer emptied of everything has nothing left to

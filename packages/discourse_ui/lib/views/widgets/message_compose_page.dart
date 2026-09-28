@@ -1018,6 +1018,9 @@ class _MessageComposePageState extends State<MessageComposePage> {
       return;
     }
 
+    // The fields lock while sending, and focus used to hop from the locked
+    // text to the next field that was not (Tags), keyboard and all.
+    FocusScope.of(context).unfocus();
     setState(() => _isSubmitting = true);
 
     try {

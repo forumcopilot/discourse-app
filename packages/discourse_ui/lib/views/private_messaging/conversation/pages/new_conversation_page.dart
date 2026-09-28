@@ -117,6 +117,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
           }
         }
       });
+      _draft.markOpened();
     });
   }
 

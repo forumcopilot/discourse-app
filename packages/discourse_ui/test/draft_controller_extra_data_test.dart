@@ -125,6 +125,23 @@ void main() {
     expect(drafts.deletes, ['topic_5']);
   });
 
+  test('recipients the page restores itself are not a change', () async {
+    drafts.stored = FCDraft(
+      draftKey: 'new_private_message_1',
+      sequence: 3,
+      data: {'reply': 'Hello', 'title': 'Meetup', 'recipients': 'bob'},
+    );
+    final recipients = <String>[];
+    final c = controller(recipients);
+    final draft = await c.initialize();
+    // New Message puts the draft's recipients back after initialize.
+    recipients.add(draft!.data['recipients'] as String);
+    expect(c.changedSinceOpened, isTrue);
+    c.markOpened();
+    expect(c.changedSinceOpened, isFalse);
+    c.dispose();
+  });
+
   test('changes are counted from what the composer opened with', () async {
     drafts.stored = FCDraft(
       draftKey: 'new_private_message_1',
