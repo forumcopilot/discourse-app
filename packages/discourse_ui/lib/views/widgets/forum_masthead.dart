@@ -77,8 +77,8 @@ class ForumMasthead extends StatelessWidget {
   }
 
   /// How far the page scrolls before the header is down to its bar.
-  static double collapseDistance(BuildContext context,
-      SiteContext siteContext, FCBoardStatResult? boardStats) {
+  static double collapseDistance(BuildContext context, SiteContext siteContext,
+      FCBoardStatResult? boardStats) {
     final identity = ForumIdentity.of(context, siteContext.site);
     return _introHeight(context, identity.description != null,
         statsLine(context, boardStats) != null);
@@ -102,8 +102,7 @@ class ForumMasthead extends StatelessWidget {
       foregroundColor: identity.foreground,
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0,
-      systemOverlayStyle:
-          overlay.copyWith(statusBarColor: Colors.transparent),
+      systemOverlayStyle: overlay.copyWith(statusBarColor: Colors.transparent),
       titleSpacing: 4,
       leading: leading,
       title: _MastheadTitle(identity: identity),
@@ -201,18 +200,37 @@ class _MastheadTitle extends StatelessWidget {
             ForumIconTile(name: identity.name, url: identity.icon, size: 28),
             const SizedBox(width: 12),
             Flexible(
-              child: Text(
-                identity.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: identity.foreground,
-                    fontWeight: FontWeight.w500),
+              child: LayoutBuilder(
+                builder: (context, constraints) => Text(
+                  identity.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: _nameStyle(context, constraints.maxWidth),
+                ),
               ),
             ),
           ],
         ),
       );
+
+  /// The name at title size, or a size down when that would cut it short
+  /// ("Discussions on Python.org" in dark mode, where its wordmark is not
+  /// shown).
+  TextStyle? _nameStyle(BuildContext context, double width) {
+    final text = Theme.of(context).textTheme;
+    TextStyle? styled(TextStyle? s) =>
+        s?.copyWith(color: identity.foreground, fontWeight: FontWeight.w500);
+    final large = styled(text.titleLarge);
+    final painter = TextPainter(
+      text: TextSpan(text: identity.name, style: large),
+      maxLines: 1,
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout();
+    final fits = !painter.didExceedMaxLines && painter.width <= width;
+    painter.dispose();
+    return fits ? large : styled(text.titleMedium);
+  }
 }
 
 /// Shown only once the header has collapsed (the search button, which the
@@ -269,7 +287,8 @@ class _MastheadIntro extends StatelessWidget {
               identity.description!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: text.bodyMedium?.copyWith(color: fg.withValues(alpha: 0.8)),
+              style:
+                  text.bodyMedium?.copyWith(color: fg.withValues(alpha: 0.8)),
             ),
           if (stats != null) ...[
             const SizedBox(height: 2),
@@ -288,7 +307,8 @@ class _MastheadIntro extends StatelessWidget {
               button: true,
               child: Material(
                 color: Color.alphaBlend(
-                    fg.withValues(alpha: identity.hasDarkBackground ? 0.12 : 0.06),
+                    fg.withValues(
+                        alpha: identity.hasDarkBackground ? 0.12 : 0.06),
                     identity.background),
                 shape: const StadiumBorder(),
                 clipBehavior: Clip.antiAlias,

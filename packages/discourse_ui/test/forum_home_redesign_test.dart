@@ -200,6 +200,51 @@ void main() {
     });
   });
 
+  testWidgets('a long name steps down a size before it is cut short',
+      (tester) async {
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    Future<String> nameSize(String name) async {
+      await tester.pumpWidget(_app(
+          Scaffold(
+            drawer: const Drawer(),
+            body: CustomScrollView(slivers: [
+              ForumMasthead(
+                siteContext: SiteContext(
+                  siteType: 'discourse',
+                  site: Site(
+                    id: null,
+                    name: name,
+                    url: _forum,
+                    description: '',
+                    logoUrl: null,
+                    backgroundUrl: null,
+                    endpoint: null,
+                    baseUrl: _forum,
+                    siteType: 'discourse',
+                    language: null,
+                  ),
+                ),
+                onSearch: () {},
+              ),
+            ]),
+          ),
+          brightness: Brightness.dark));
+      await tester.pump();
+      final text = Theme.of(tester.element(find.text(name))).textTheme;
+      final size = tester.widget<Text>(find.text(name)).style?.fontSize;
+      return size == text.titleLarge!.fontSize
+          ? 'large'
+          : size == text.titleMedium!.fontSize
+              ? 'medium'
+              : '$size';
+    }
+
+    expect(await nameSize('Asana'), 'large');
+    expect(await nameSize('Discussions on Python.org'), 'medium');
+  });
+
   group('category marks are what the forum set', () {
     Future<void> pump(WidgetTester tester, DiscourseCategoryStyle style) =>
         tester.pumpWidget(_app(Scaffold(
