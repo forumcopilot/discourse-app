@@ -10,8 +10,12 @@ import 'brand_image.dart';
 import 'forum_icon_tile.dart';
 
 /// The top of a forum's Home: the forum's own header, as its website draws
-/// it, with one line about the forum, how active it is, and a search field.
-/// A line in the forum's accent runs along the bottom.
+/// it, with the forum's name, one line about the forum, how active it is,
+/// and a search field. A line in the forum's accent runs along the bottom.
+///
+/// The name is always on screen once: beside the icon in the bar, or, when
+/// the bar shows the forum's logo instead, as the first line under it. A
+/// logo may not say the name at all (Discourse Meta's is its speech bubble).
 ///
 /// It collapses into the app bar as the page scrolls: the drawer button,
 /// the forum's icon and name, and a search button, with the accent line
@@ -60,16 +64,22 @@ class ForumMasthead extends StatelessWidget {
     return parts.isEmpty ? null : parts.join(' · ');
   }
 
-  /// The intro's height at the user's text size: the description and
-  /// stats lines that exist, then the search field.
-  static double _introHeight(
-      BuildContext context, bool hasDescription, bool hasStats) {
+  /// The intro's height at the user's text size: the name when the bar
+  /// shows a logo, the description and stats lines that exist, then the
+  /// search field.
+  static double _introHeight(BuildContext context, ForumIdentity identity,
+      {required bool hasStats}) {
     final text = Theme.of(context).textTheme;
     final scaler = MediaQuery.textScalerOf(context);
     double line(TextStyle? s) =>
         (scaler.scale(s?.fontSize ?? 14) * (s?.height ?? 1.4) - 1e-6)
             .ceilToDouble();
+    final hasDescription = identity.description != null;
     var h = 0.0;
+    if (identity.wordmark != null) {
+      h += line(text.titleLarge);
+      if (hasDescription || hasStats) h += 2;
+    }
     if (hasDescription) h += line(text.bodyMedium);
     if (hasStats) h += 2 + line(text.bodySmall);
     if (h > 0) h += 12;
@@ -80,8 +90,8 @@ class ForumMasthead extends StatelessWidget {
   static double collapseDistance(BuildContext context, SiteContext siteContext,
       FCBoardStatResult? boardStats) {
     final identity = ForumIdentity.of(context, siteContext.site);
-    return _introHeight(context, identity.description != null,
-        statsLine(context, boardStats) != null);
+    return _introHeight(context, identity,
+        hasStats: statsLine(context, boardStats) != null);
   }
 
   @override
@@ -89,7 +99,7 @@ class ForumMasthead extends StatelessWidget {
     final identity = ForumIdentity.of(context, siteContext.site);
     final stats = statsLine(context, boardStats);
     final expanded = toolbarHeight +
-        _introHeight(context, identity.description != null, stats != null) +
+        _introHeight(context, identity, hasStats: stats != null) +
         lineHeight;
     final overlay = identity.hasDarkBackground
         ? SystemUiOverlayStyle.light
@@ -254,8 +264,8 @@ class _CollapsedOnly extends StatelessWidget {
   }
 }
 
-/// The open header's lower half: a line about the forum, its stats and the
-/// search field. It sits between the toolbar and the accent line and is
+/// The open header's lower half: the forum's name when the bar shows its
+/// logo, a line about the forum, its stats and the search field. It sits between the toolbar and the accent line and is
 /// clipped there, so on scroll it slides under the toolbar, fading.
 class _MastheadIntro extends StatelessWidget {
   const _MastheadIntro({
@@ -282,6 +292,20 @@ class _MastheadIntro extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // The bar's logo already names the forum to a screen reader.
+          if (identity.wordmark != null) ...[
+            ExcludeSemantics(
+              child: Text(
+                identity.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: text.titleLarge
+                    ?.copyWith(color: fg, fontWeight: FontWeight.w600),
+              ),
+            ),
+            if (identity.description != null || stats != null)
+              const SizedBox(height: 2),
+          ],
           if (identity.description != null)
             Text(
               identity.description!,
@@ -299,7 +323,9 @@ class _MastheadIntro extends StatelessWidget {
               style: text.bodySmall?.copyWith(color: fg.withValues(alpha: 0.7)),
             ),
           ],
-          if (identity.description != null || stats != null)
+          if (identity.wordmark != null ||
+              identity.description != null ||
+              stats != null)
             const SizedBox(height: 12),
           SizedBox(
             height: ForumMasthead.searchHeight,

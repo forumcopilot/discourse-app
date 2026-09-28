@@ -159,6 +159,39 @@ void main() {
     });
 
     testWidgets(
+        'the name is on screen once: under the logo when the bar shows '
+        'one, beside the icon when it does not', (tester) async {
+      // Discourse Meta: its "logo" is its speech bubble, no name in it.
+      storeForum();
+      const name = 'Discussions on Python.org';
+      final intro = find.descendant(
+          of: find.byType(OverflowBox), matching: find.text(name));
+      Future<void> pump(Brightness b) async {
+        await tester.pumpWidget(_app(
+          Scaffold(
+            drawer: const Drawer(),
+            body: CustomScrollView(slivers: [
+              ForumMasthead(
+                siteContext: _context(description: 'All about Python.'),
+                onSearch: () {},
+              ),
+            ]),
+          ),
+          brightness: b,
+        ));
+        // MaterialApp animates a change of theme.
+        await tester.pump(const Duration(seconds: 1));
+      }
+
+      await pump(Brightness.light);
+      expect(intro, findsOneWidget);
+
+      await pump(Brightness.dark);
+      expect(intro, findsNothing);
+      expect(find.text(name), findsOneWidget);
+    });
+
+    testWidgets(
         'open, it offers search named after the forum and its '
         'stats; collapsed, a search button', (tester) async {
       await tester.pumpWidget(_app(Scaffold(
