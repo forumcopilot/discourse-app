@@ -28,6 +28,7 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_rounded),
+        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
         onPressed: () => Navigator.of(context).maybePop(),
       ),
       title: Obx(() {

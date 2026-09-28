@@ -2564,4 +2564,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get saveDraft => 'Guardar borrador';
+
+  @override
+  String get notificationSettings => 'Ajustes de notificaciones';
 }

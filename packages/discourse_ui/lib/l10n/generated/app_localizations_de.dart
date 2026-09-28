@@ -2576,4 +2576,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get saveDraft => 'Entwurf speichern';
+
+  @override
+  String get notificationSettings => 'Benachrichtigungseinstellungen';
 }

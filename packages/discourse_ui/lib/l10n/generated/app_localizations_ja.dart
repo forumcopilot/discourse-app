@@ -2461,4 +2461,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get saveDraft => '下書きを保存';
+
+  @override
+  String get notificationSettings => '通知設定';
 }

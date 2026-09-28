@@ -2430,4 +2430,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get saveDraft => '保存草稿';
+
+  @override
+  String get notificationSettings => '通知设置';
 }

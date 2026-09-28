@@ -994,5 +994,6 @@
   "discardPostQuestion": "投稿を破棄しますか？",
   "discardChangesQuestion": "変更を破棄しますか？",
   "discardChanges": "変更を破棄",
-  "saveDraft": "下書きを保存"
+  "saveDraft": "下書きを保存",
+  "notificationSettings": "通知設定"
 }

@@ -994,5 +994,6 @@
   "discardPostQuestion": "Você deseja excluir sua postagem?",
   "discardChangesQuestion": "Você deseja descartar suas alterações?",
   "discardChanges": "Descartar alterações",
-  "saveDraft": "Salvar rascunho"
+  "saveDraft": "Salvar rascunho",
+  "notificationSettings": "Configurações de notificação"
 }

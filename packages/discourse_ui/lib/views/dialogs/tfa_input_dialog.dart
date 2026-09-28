@@ -284,7 +284,8 @@ class _TFAInputDialogState extends State<TFAInputDialog> {
           l10n?.twoFactorAuthentication ?? 'Two-Factor Authentication',
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
+          icon: const Icon(Icons.close),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           onPressed: () => Get.back(),
         ),
       ),

@@ -160,7 +160,8 @@ class SiteDrawer extends StatelessWidget {
                   ],
                   _DrawerRow(
                     icon: Icons.settings_outlined,
-                    title: AppLocalizations.of(context)!.notifications,
+                    // Not "Notifications": that is the tab that lists them.
+                    title: AppLocalizations.of(context)!.notificationSettings,
                     onTap: () => _push(
                       context,
                       const NotificationSettingsPage(),

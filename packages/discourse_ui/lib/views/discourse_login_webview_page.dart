@@ -58,8 +58,10 @@ class _DiscourseLoginWebViewPageState extends State<DiscourseLoginWebViewPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        // ✕ leaves sign-in from any page; Back goes back a page first.
         leading: IconButton(
           icon: const Icon(Icons.close),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -75,6 +77,7 @@ class _DiscourseLoginWebViewPageState extends State<DiscourseLoginWebViewPage> {
           supportMultipleWindows: false,
         ),
         shouldOverrideUrlLoading: _shouldOverride,
+        backGoesThroughHistory: true,
       ),
     );
   }

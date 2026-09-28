@@ -219,15 +219,16 @@ class _ForumEntryPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final error = errorMessage;
-    // The home's leading slot holds its drawer button. A pushed route keeps
-    // its back button meanwhile, so a slow forum can still be left; a root
-    // route reserves the slot, so the title does not jump when the home
-    // takes over.
+    // The home's leading slot holds its drawer button, so while the forum
+    // loads the slot shows it, not yet working: the ← it showed turned into
+    // ☰ the moment the home arrived. A slow forum can still be left with
+    // Back or the edge swipe. One that failed to connect, pushed over a
+    // host's list, shows ← beside Try Again, a plain way out of an error.
     final canPop = ModalRoute.of(context)?.canPop ?? false;
     return Scaffold(
       appBar: TopicsTabAppBar(
         siteContext: siteContext,
-        leading: canPop
+        leading: canPop && error != null
             ? null
             : const IconButton(onPressed: null, icon: Icon(Icons.menu)),
       ),

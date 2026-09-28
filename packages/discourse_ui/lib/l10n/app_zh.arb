@@ -994,5 +994,6 @@
   "discardPostQuestion": "是否要放弃您的帖子？",
   "discardChangesQuestion": "您确定要放弃所做的更改吗？",
   "discardChanges": "舍弃更改",
-  "saveDraft": "保存草稿"
+  "saveDraft": "保存草稿",
+  "notificationSettings": "通知设置"
 }

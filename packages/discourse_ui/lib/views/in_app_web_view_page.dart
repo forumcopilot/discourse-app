@@ -18,12 +18,15 @@ class InAppWebViewPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
+        // As in a browser tab opened from the app: ✕ closes the page from
+        // wherever it has got to, and Back goes back a page first.
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.close),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: ThemedWebView(url: url),
+      body: ThemedWebView(url: url, backGoesThroughHistory: true),
     );
   }
 }

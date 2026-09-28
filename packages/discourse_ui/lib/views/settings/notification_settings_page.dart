@@ -133,7 +133,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleListAppBar(title: 'Notifications'),
+      appBar: SimpleListAppBar(
+          title: AppLocalizations.of(context)!.notificationSettings),
       body: _buildBody(),
     );
   }

@@ -2560,4 +2560,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get saveDraft => 'Concept opslaan';
+
+  @override
+  String get notificationSettings => 'Meldingsinstellingen';
 }

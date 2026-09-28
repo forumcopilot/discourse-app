@@ -20,11 +20,18 @@ class ThemedWebView extends StatefulWidget {
     NavigationAction action,
   )? shouldOverrideUrlLoading;
 
+  /// Back (the system's, and Android's gesture) goes to the previous web
+  /// page while there is one, as in a browser, and leaves the page only
+  /// from the first. In sign-in, Back from Create account or Forgot
+  /// password used to abandon sign-in altogether.
+  final bool backGoesThroughHistory;
+
   const ThemedWebView({
     super.key,
     required this.url,
     this.initialSettings,
     this.shouldOverrideUrlLoading,
+    this.backGoesThroughHistory = false,
   });
 
   @override
@@ -35,6 +42,15 @@ class _ThemedWebViewState extends State<ThemedWebView> {
   late final Future<void> _ready;
   bool _painted = false;
   Timer? _fallback;
+  InAppWebViewController? _web;
+  bool _canGoBack = false;
+
+  Future<void> _historyChanged(InAppWebViewController controller) async {
+    final canGoBack = await controller.canGoBack();
+    if (mounted && canGoBack != _canGoBack) {
+      setState(() => _canGoBack = canGoBack);
+    }
+  }
 
   @override
   void initState() {
@@ -64,7 +80,7 @@ class _ThemedWebViewState extends State<ThemedWebView> {
       color: Theme.of(context).colorScheme.surface,
       child: const Center(child: CircularProgressIndicator()),
     );
-    return FutureBuilder<void>(
+    final view = FutureBuilder<void>(
       future: _ready,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) return cover;
@@ -77,11 +93,23 @@ class _ThemedWebViewState extends State<ThemedWebView> {
               onPageCommitVisible: (_, __) => _reveal(),
               onLoadStop: (_, __) => _reveal(),
               onReceivedError: (_, __, ___) => _reveal(),
+              onWebViewCreated: (controller) => _web = controller,
+              onUpdateVisitedHistory: widget.backGoesThroughHistory
+                  ? (controller, _, __) => _historyChanged(controller)
+                  : null,
             ),
             if (!_painted) Positioned.fill(child: IgnorePointer(child: cover)),
           ],
         );
       },
+    );
+    if (!widget.backGoesThroughHistory) return view;
+    return PopScope(
+      canPop: !_canGoBack,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _web?.goBack();
+      },
+      child: view,
     );
   }
 }

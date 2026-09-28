@@ -2573,4 +2573,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get saveDraft => 'Enregistrer le brouillon';
+
+  @override
+  String get notificationSettings => 'Paramètres de notification';
 }

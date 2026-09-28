@@ -3085,5 +3085,9 @@
   "saveDraft": "Save draft",
   "@saveDraft": {
     "description": "Button that closes a composer and keeps what was written as a draft."
+  },
+  "notificationSettings": "Notification settings",
+  "@notificationSettings": {
+    "description": "The drawer row and page for choosing notifications: named apart from the Notifications tab, which lists them."
   }
 }

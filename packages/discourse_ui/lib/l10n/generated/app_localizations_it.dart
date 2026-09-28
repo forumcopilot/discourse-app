@@ -2570,4 +2570,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get saveDraft => 'Salva bozza';
+
+  @override
+  String get notificationSettings => 'Impostazioni notifiche';
 }

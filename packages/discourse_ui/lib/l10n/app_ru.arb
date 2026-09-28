@@ -995,5 +995,6 @@
   "discardPostQuestion": "Отказаться от сообщения?",
   "discardChangesQuestion": "Отменить изменения?",
   "discardChanges": "Отменить изменения",
-  "saveDraft": "Сохранить черновик"
+  "saveDraft": "Сохранить черновик",
+  "notificationSettings": "Настройки уведомлений"
 }

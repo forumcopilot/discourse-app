@@ -4323,6 +4323,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save draft'**
   String get saveDraft;
+
+  /// The drawer row and page for choosing notifications: named apart from the Notifications tab, which lists them.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification settings'**
+  String get notificationSettings;
 }
 
 class _AppLocalizationsDelegate

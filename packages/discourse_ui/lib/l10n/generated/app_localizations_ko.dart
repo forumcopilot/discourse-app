@@ -2454,4 +2454,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get saveDraft => '임시 저장';
+
+  @override
+  String get notificationSettings => '알림 설정';
 }

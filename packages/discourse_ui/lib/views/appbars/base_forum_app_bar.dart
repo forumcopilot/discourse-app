@@ -16,6 +16,7 @@ abstract class BaseForumAppBar extends StatelessWidget implements PreferredSizeW
       leading: Builder(
         builder: (context) => IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () {
             Navigator.of(context).maybePop();
           },

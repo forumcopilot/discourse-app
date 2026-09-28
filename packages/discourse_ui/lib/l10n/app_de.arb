@@ -994,5 +994,6 @@
   "discardPostQuestion": "Willst du deinen Beitrag verwerfen?",
   "discardChangesQuestion": "Möchtest du deine Änderungen verwerfen?",
   "discardChanges": "Änderungen verwerfen",
-  "saveDraft": "Entwurf speichern"
+  "saveDraft": "Entwurf speichern",
+  "notificationSettings": "Benachrichtigungseinstellungen"
 }

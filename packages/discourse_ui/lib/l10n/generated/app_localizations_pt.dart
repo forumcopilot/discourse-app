@@ -2562,4 +2562,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get saveDraft => 'Salvar rascunho';
+
+  @override
+  String get notificationSettings => 'Configurações de notificação';
 }

@@ -12,6 +12,11 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 - **Back does nothing while a composer is sending.** Pressing it mid-send used to close the composer, and the send's own close then took the page under it too.
 - **A new topic or message takes the composer's place** in one transition once it is posted. Back from it goes to the list the composer was opened from. The composer used to close while the topic opened, two transitions at once. `MessageComposePage.pageAfterSubmit`.
 
+- **Back in a web page goes back a page.** In sign-in and in the app's web view, Back returns to the previous web page while there is one: from Create account or Forgot password back to sign-in. It used to leave sign-in altogether. ✕ still closes from any page. `ThemedWebView.backGoesThroughHistory`.
+- **"Notification settings"** in the drawer and on its page. It was "Notifications", the same name as the tab that lists them.
+- **A forum loading shows its ☰**, not yet working, where the loaded home has it. The ← it showed turned into ☰ the moment the home arrived. A forum that failed to connect still shows ← beside Try Again.
+- **Back buttons have a label** for screen readers ("Back", or "Close" on full-screen forms). The topic page, profiles, sign-in and the web view had none.
+
 ### Fixed
 - **Drafts.**
   - Clearing a composer's text deletes its draft. The text used to stay on the server, and the next reply opened with it again.

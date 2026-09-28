@@ -994,5 +994,6 @@
   "discardPostQuestion": "¿Quieres descartar tu publicación?",
   "discardChangesQuestion": "¿Quieres descartar tus cambios?",
   "discardChanges": "Descartar cambios",
-  "saveDraft": "Guardar borrador"
+  "saveDraft": "Guardar borrador",
+  "notificationSettings": "Ajustes de notificaciones"
 }

@@ -994,5 +994,6 @@
   "discardPostQuestion": "Voulez-vous abandonner votre message ?",
   "discardChangesQuestion": "Voulez-vous annuler vos modifications ?",
   "discardChanges": "Annuler les modifications",
-  "saveDraft": "Enregistrer le brouillon"
+  "saveDraft": "Enregistrer le brouillon",
+  "notificationSettings": "Paramètres de notification"
 }

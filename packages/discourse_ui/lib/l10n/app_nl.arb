@@ -1292,5 +1292,6 @@
   "discardPostQuestion": "Wil je je bericht weggooien?",
   "discardChangesQuestion": "Wil je je wijzigingen negeren?",
   "discardChanges": "Wijzigingen negeren",
-  "saveDraft": "Concept opslaan"
+  "saveDraft": "Concept opslaan",
+  "notificationSettings": "Meldingsinstellingen"
 }

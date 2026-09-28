@@ -994,5 +994,6 @@
   "discardPostQuestion": "Vuoi eliminare il tuo messaggio?",
   "discardChangesQuestion": "Vuoi annullare le modifiche?",
   "discardChanges": "Annulla modifiche",
-  "saveDraft": "Salva bozza"
+  "saveDraft": "Salva bozza",
+  "notificationSettings": "Impostazioni notifiche"
 }

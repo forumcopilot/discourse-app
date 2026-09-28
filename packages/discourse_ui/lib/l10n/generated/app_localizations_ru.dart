@@ -2559,4 +2559,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get saveDraft => 'Сохранить черновик';
+
+  @override
+  String get notificationSettings => 'Настройки уведомлений';
 }

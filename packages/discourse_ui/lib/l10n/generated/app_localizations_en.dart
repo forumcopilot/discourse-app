@@ -2549,4 +2549,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveDraft => 'Save draft';
+
+  @override
+  String get notificationSettings => 'Notification settings';
 }
