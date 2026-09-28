@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -192,15 +191,19 @@ void main() {
 
     testWidgets('opening a file downloads it signed in, shows progress, then offers it to the system',
         (tester) async {
-      // The forum refuses a guest (prevent_anons_from_downloading_files).
-      final gate = Completer<void>();
+      // The forum refuses a guest (prevent_anons_from_downloading_files),
+      // and holds the signed-in download until [letThrough]: a flag, not a
+      // Completer (see _realTimeUntil).
+      var letThrough = false;
       final seen = <bool>[];
       ForumMedia.debugDio = Dio()
         ..httpClientAdapter = _Adapter((r) async {
           final keyed = r.headers.containsKey('User-Api-Key');
           seen.add(keyed);
           if (!keyed) return ResponseBody.fromString('', 404);
-          await gate.future;
+          while (!letThrough) {
+            await Future<void>.delayed(const Duration(milliseconds: 5));
+          }
           return ResponseBody.fromBytes(Uint8List.fromList('%PDF'.codeUnits), 200);
         });
       addTearDown(() => ForumMedia.debugDio = null);
@@ -219,9 +222,12 @@ void main() {
         auth: ForumMediaAuth(siteUrl: _forum, credentials: {'User-Api-Key': 'k', 'User-Api-Client-Id': 'c'}),
       )));
 
+      // The download makes a real temporary folder and file, so it runs in
+      // real time, and each step waits until it has got that far rather
+      // than for a fixed time.
       await tester.runAsync(() async {
         await tester.tap(find.text('spec.pdf'));
-        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await _realTimeUntil(() => seen.length == 2, 'signed-in request');
       });
       await tester.pump();
       // While it downloads, Download is a progress ring that cancels.
@@ -229,10 +235,8 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
       await tester.runAsync(() async {
-        gate.complete();
-        for (var i = 0; i < 20 && shared.isEmpty; i++) {
-          await Future<void>.delayed(const Duration(milliseconds: 50));
-        }
+        letThrough = true;
+        await _realTimeUntil(() => shared.isNotEmpty, 'share sheet');
       });
       await tester.pump();
 
@@ -320,6 +324,23 @@ void main() {
       expect(size.width / size.height, closeTo(2, 0.01));
     });
   });
+}
+
+/// Lets real-time work run until [done], for up to 30 seconds; call it
+/// inside [WidgetTester.runAsync].
+///
+/// It polls plain state. A Completer made in the test body belongs to the
+/// test's fake-async zone: awaited once it has completed, its callback
+/// waits there until the runAsync ends. The file download stalled that way
+/// whenever the forum's answer was let through before the signed-in
+/// request had been sent, which a fixed 100 ms wait allowed on a busy
+/// machine.
+Future<void> _realTimeUntil(bool Function() done, String what) async {
+  final waited = Stopwatch()..start();
+  while (!done()) {
+    if (waited.elapsed > const Duration(seconds: 30)) fail('no $what after 30 seconds');
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+  }
 }
 
 class _Adapter implements HttpClientAdapter {
