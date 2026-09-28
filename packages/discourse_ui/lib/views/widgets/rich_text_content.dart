@@ -508,6 +508,19 @@ class RichTextContent extends StatelessWidget {
             );
           },
         ),
+        // A remote picture the forum could not download cooks to
+        // `<span class="broken-image" alt="…">` holding an SVG sprite icon,
+        // which flutter_html cannot draw: the post showed nothing where the
+        // picture was. It gets the broken-picture box.
+        MatcherExtension.inline(
+          matcher: (c) => c.elementName == 'span' && c.classes.contains('broken-image'),
+          builder: (c) => WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: _NoBaseline(
+              child: BrokenImagePlaceholder(alt: c.attributes['alt']),
+            ),
+          ),
+        ),
       ],
       ),
     );
@@ -515,7 +528,14 @@ class RichTextContent extends StatelessWidget {
 
   String _resolveUrl(String url) {
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    if (url.startsWith('//')) return 'https:$url';
+    // Protocol-relative, as Discourse writes its own uploads (`//host/
+    // uploads/…`): the forum's scheme, as a browser takes the page's. This
+    // always said https, so a forum served over http — a local one, an
+    // intranet — showed no picture at all.
+    if (url.startsWith('//')) {
+      final scheme = Uri.tryParse(siteContext.site.url)?.scheme;
+      return '${scheme == 'http' ? 'http' : 'https'}:$url';
+    }
     // Join safely: a trailing-slash base must not produce double slashes.
     var base = siteContext.site.url;
     while (base.endsWith('/')) {

@@ -137,6 +137,20 @@ void main() {
       expect(tapped, isEmpty);
       expect(CookedContent.parse(cooked, forumBaseUrl: _forum).imageUrls, isEmpty);
     });
+
+    testWidgets('a remote picture the forum could not download shows the broken-picture box',
+        (tester) async {
+      // CookedPostProcessor#add_broken_image_placeholder!: the <img> becomes
+      // a span holding an SVG sprite icon, which drew nothing.
+      const cooked = '<p><span alt="remote chart" class="broken-image" '
+          'title="This image is broken"><svg class="fa d-icon d-icon-link-slash svg-icon" '
+          'aria-hidden="true"><use href="#link-slash"></use></svg></span></p>';
+      await tester.pumpWidget(_app(RichTextContent(siteContext: _ctx, content: cooked)));
+      await tester.pump();
+
+      expect(find.byType(BrokenImagePlaceholder), findsOneWidget);
+      expect(find.text('remote chart'), findsOneWidget);
+    });
   });
 
   group('videos', () {

@@ -206,5 +206,25 @@ void main() {
       expect(html, isNot(contains('nonsense')));
     });
   });
+
+  group('CookedContent.parse — protocol-relative uploads', () {
+    // Discourse writes its own uploads as `//host/uploads/…`. They take the
+    // forum's scheme, as a browser takes the page's: resolving every one to
+    // https left a forum served over http with no pictures at all.
+    const cooked = '<p><a class="lightbox" href="//forum.example/uploads/a.jpeg">'
+        '<img src="//forum.example/uploads/a.jpeg" width="690" height="460"></a></p>';
+
+    test('an http forum keeps http', () {
+      final content =
+          CookedContent.parse(cooked, forumBaseUrl: 'http://forum.example');
+      expect(content.imageUrls, ['http://forum.example/uploads/a.jpeg']);
+    });
+
+    test('an https forum keeps https', () {
+      final content =
+          CookedContent.parse(cooked, forumBaseUrl: 'https://forum.example');
+      expect(content.imageUrls, ['https://forum.example/uploads/a.jpeg']);
+    });
+  });
 }
 

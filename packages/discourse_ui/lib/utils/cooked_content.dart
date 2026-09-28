@@ -320,7 +320,11 @@ class CookedContent {
 
   static String _absolute(String url, String origin) {
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    if (url.startsWith('//')) return 'https:$url';
+    // Protocol-relative: the forum's own scheme, as a browser takes the
+    // page's (a forum served over http otherwise loaded nothing).
+    if (url.startsWith('//')) {
+      return '${origin.startsWith('http://') ? 'http' : 'https'}:$url';
+    }
     if (origin.isEmpty) return url;
     return url.startsWith('/') ? '$origin$url' : '$origin/$url';
   }

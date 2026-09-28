@@ -61,6 +61,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Fixed
 - **"1 vote", not "1 votes"**, under a poll, in every language with plural forms.
+- **Pictures on a forum served over plain http** (a local or intranet forum) showed nothing. Discourse writes its uploads as `//host/uploads/…`, and the app always read that as https. It now uses the forum's own scheme, as a browser does.
+- **A remote picture the forum could not download** shows the broken-picture box. Discourse replaces it with `span.broken-image` holding an SVG sprite icon, which the app could not draw, so the post showed nothing there.
 
 ## [1.0.35] - 2026-09-26
 
