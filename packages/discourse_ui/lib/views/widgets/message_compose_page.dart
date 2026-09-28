@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseMediaOptimizationContext;
+    show
+        DiscourseMediaOptimizationContext,
+        DiscourseUploadKind,
+        discourseUploadKind,
+        discourseUploadMarkdown;
 import '../../utils/discourse_markup.dart';
-import 'package:flutter/foundation.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
@@ -21,6 +24,7 @@ import '../../utils/image_shrink.dart';
 import 'oversized_image_sheet.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
 import 'category_badge.dart';
+import 'upload_tile.dart';
 import '../../utils/error_message.dart';
 
 class MessageComposePage extends StatefulWidget {
@@ -124,9 +128,9 @@ class _MessageComposePageState extends State<MessageComposePage> {
   final FocusNode _titleFocusNode = FocusNode();
   final FocusNode _contentFocusNode = FocusNode();
   bool _isSubmitting = false;
-  final List<XFile> _attachments = [];
-  final Map<String, String> _fileToAttachmentId = {}; // Map file path to attachment ID
-  final Map<String, bool> _uploadingFiles = {}; // Track which files are currently uploading (key: file path)
+  /// The files picked for this post, uploading or uploaded, in the order
+  /// picked — see [_uploadAll].
+  final List<_PendingUpload> _uploads = [];
   final Set<String> _removedExistingAttachmentIds = {}; // Track removed existing attachments
   bool _isRemovingAttachment = false;
   bool _ownsTitleController = false;
@@ -135,9 +139,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
   bool _includeSignature = false; // Opt-in where a page offers it
   bool _isWhisper = false; // Discourse staff whisper mode
 
-  // Cache the attachment processing future to prevent reprocessing on rebuilds
-  Future<List<Widget>>? _cachedAttachmentWidgetsFuture;
-  String _cachedAttachmentsKey = ''; // Key to track when attachments change
 
   @override
   void initState() {
@@ -180,6 +181,8 @@ class _MessageComposePageState extends State<MessageComposePage> {
       // If autoFocusContent is false, don't focus anything
     });
 
+    _contentController.addListener(_dropUploadsTakenOutOfText);
+
     // Listen to focus changes
     _contentFocusNode.addListener(() {
       setState(() {
@@ -209,6 +212,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
 
   @override
   void dispose() {
+    _contentController.removeListener(_dropUploadsTakenOutOfText);
     // Only dispose controllers if we own them
     if (_ownsTitleController) {
       _titleController.dispose();
@@ -403,412 +407,252 @@ class _MessageComposePageState extends State<MessageComposePage> {
     _contentFocusNode.requestFocus();
   }
 
+  /// The paperclip: any file the forum accepts.
   void _handleFileUpload() async {
     if (widget.onFileUpload == null) return;
-    try {
-      // Get constraints from SiteContext (generic/attachment-sized;
-      // re-derived below once we know whether the picked file is an image).
-      final siteContext = getCurrentSiteContext();
-      final pickConstraints = getAttachmentConstraintsFromSiteContext(siteContext);
-
-      // Check attachment count limit before file selection
-      if (!canAddMoreAttachments(_attachments.length, pickConstraints)) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context)!.maximumAttachmentsAllowed((pickConstraints!.count ?? 0)),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onErrorContainer,
-                    ),
-              ),
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            ),
-          );
-        }
-        return;
-      }
-
-      // Restrict the picker to the forum's authorized extensions when known.
-      final XFile? file = await FilePickerUtils.pickFile(
-        allowedExtensions: pickConstraints?.extensions,
-      );
-
-      if (file != null && mounted) {
-        // Hide keyboard when file is selected to focus on upload progress
-        FocusScope.of(context).unfocus();
-
-        // Validate file — re-derive constraints now that we know whether
-        // it's an image (Discourse caps images at max_image_size_kb and
-        // everything else at max_attachment_size_kb).
-        XFile fileToUpload = file;
-        final isImage = isImageFile(file.name);
-        final constraints = getAttachmentConstraintsFromSiteContext(
-          siteContext,
-          isImage: isImage,
-        );
-        if (constraints != null) {
-          final validation = await validateFile(
-            file,
-            constraints,
-            isImage,
-            currentAttachmentCount: _attachments.length,
-          );
-
-          if (!validation.isValid) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    validation.errorMessage ?? 'File validation failed',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onErrorContainer,
-                        ),
-                  ),
-                  backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                ),
-              );
-            }
-            return;
-          }
-
-          if (isImage) {
-            final prepared = await _prepareImageForUpload(file, constraints);
-            if (prepared == null) return;
-            fileToUpload = prepared;
-          }
-        }
-
-        // Add file to list immediately so user can see it
-        setState(() {
-          _attachments.add(fileToUpload);
-          _uploadingFiles[fileToUpload.path] = true;
-          // Clear cached future when adding attachment so it gets regenerated
-          _cachedAttachmentWidgetsFuture = null;
-          _cachedAttachmentsKey = '';
-        });
-
-        // Start upload in background
-        try {
-          final attachmentId = await widget.onFileUpload!(fileToUpload);
-
-          if (attachmentId != null && attachmentId.isNotEmpty && mounted) {
-            setState(() {
-              _fileToAttachmentId[fileToUpload.path] = attachmentId;
-              _uploadingFiles.remove(fileToUpload.path);
-              // Clear cached future when updating attachment so it gets regenerated
-              _cachedAttachmentWidgetsFuture = null;
-              _cachedAttachmentsKey = '';
-            });
-          } else {
-            // Remove file on failure
-            setState(() {
-              _attachments.removeWhere((f) => f.path == fileToUpload.path);
-              _uploadingFiles.remove(fileToUpload.path);
-              _cachedAttachmentWidgetsFuture = null;
-              _cachedAttachmentsKey = '';
-            });
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    AppLocalizations.of(context)!.failedToUploadFilePleaseTryAgain,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onErrorContainer,
-                        ),
-                  ),
-                  backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  duration: const Duration(seconds: 4),
-                ),
-              );
-            }
-          }
-        } catch (e) {
-          // Remove file on error. Use fileToUpload.path — that's the key the
-          // row was added under (optimization may have produced a file whose
-          // path differs from the originally picked one).
-          setState(() {
-            _attachments.removeWhere((f) => f.path == fileToUpload.path);
-            _uploadingFiles.remove(fileToUpload.path);
-            _cachedAttachmentWidgetsFuture = null;
-            _cachedAttachmentsKey = '';
-          });
-          if (mounted) {
-            // Extract clean error message
-            String errorMessage = e.toString();
-            if (errorMessage.startsWith('Exception: ')) {
-              errorMessage = errorMessage.substring(11);
-            }
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppLocalizations.of(context)!.failedToUploadFile2(errorMessage),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onErrorContainer,
-                      ),
-                ),
-                backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                duration: const Duration(seconds: 4),
-              ),
-            );
-          }
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.failedToPickFile,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          ),
-        );
-      }
-    }
-  }
-
-  void _handleImageUpload({bool fromCamera = false}) async {
-    if (widget.onFileUpload == null) return;
-    try {
-      // Get constraints from SiteContext (image-sized: Discourse caps
-      // images at max_image_size_kb rather than max_attachment_size_kb).
-      final siteContext = getCurrentSiteContext();
-      final constraints =
-          getAttachmentConstraintsFromSiteContext(siteContext, isImage: true);
-
-      // Check attachment count limit before file selection
-      if (!canAddMoreAttachments(_attachments.length, constraints)) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context)!.maximumAttachmentsAllowed((constraints!.count ?? 0)),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onErrorContainer,
-                    ),
-              ),
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            ),
-          );
-        }
-        return;
-      }
-
-      // Calculate how many images can still be added
-      final remainingSlots = constraints != null && constraints.count != null && constraints.count! > 0 ? constraints.count! - _attachments.length : null;
-
-      // Pick multiple images (iOS 14+ / Android 4.3+)
-      // No imageQuality: any value makes image_picker re-encode. It
-      // rewrote every pick as JPEG and capped it at 1920px, so a PNG
-      // screenshot arrived lossy, renamed .jpg, with transparency
-      // flattened — and a 4.7 KB PNG came out 15.9 KB, so it was not
-      // even saving bytes. Worse, it ran *before* the size check, so a
-      // 20 MB file was silently rewritten to 2.2 MB and slipped under a
-      // 10 MB limit that could therefore never fire for an image.
-      // Upload what the user picked; let the server's limits be real.
-      // A camera photo takes the same path as a picked one: uploaded as
-      // taken, resized only if it is over the forum's limit.
-      List<XFile> selectedImages = fromCamera
-          ? [if (await FilePickerUtils.takePhoto() case final photo?) photo]
-          : await FilePickerUtils.pickMultiImage();
-
-      // Limit to remaining slots if there's a limit
-      if (remainingSlots != null && selectedImages.length > remainingSlots) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context)!.onlyNMoreAttachmentsAllowed(remainingSlots, remainingSlots),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-              ),
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-            ),
-          );
-        }
-        selectedImages = selectedImages.take(remainingSlots).toList();
-      }
-
-      if (selectedImages.isNotEmpty && mounted) {
-        // Hide keyboard when images are selected to focus on upload progress
-        FocusScope.of(context).unfocus();
-        
-        // Process each image
-        for (final image in selectedImages) {
-          // Check if we've reached the limit
-          if (!canAddMoreAttachments(_attachments.length, constraints)) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    AppLocalizations.of(context)!.attachmentLimitReachedSkippingRemainingImages,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                  ),
-                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                ),
-              );
-            }
-            break;
-          }
-
-          // Validate image
-          XFile imageToUpload = image;
-          if (constraints != null) {
-            final validation = await validateFile(
-              image,
-              constraints,
-              true, // isImage = true
-              currentAttachmentCount: _attachments.length,
-            );
-
-            if (!validation.isValid) {
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      '${image.name}: ${validation.errorMessage ?? 'Image validation failed'}',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                          ),
-                    ),
-                    backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  ),
-                );
-              }
-              continue; // Skip this image and continue with next
-            }
-
-            final prepared =
-                await _prepareImageForUpload(image, constraints);
-            if (prepared == null) continue;
-            imageToUpload = prepared;
-          }
-
-          // Add file to list immediately so user can see it
-          setState(() {
-            _attachments.add(imageToUpload);
-            _uploadingFiles[imageToUpload.path] = true;
-            // Clear cached future when adding attachment so it gets regenerated
-            _cachedAttachmentWidgetsFuture = null;
-            _cachedAttachmentsKey = '';
-          });
-
-          // Start upload in background
-          try {
-            final attachmentId = await widget.onFileUpload!(imageToUpload);
-            if (attachmentId != null && attachmentId.isNotEmpty && mounted) {
-              setState(() {
-                _fileToAttachmentId[imageToUpload.path] = attachmentId;
-                _uploadingFiles.remove(imageToUpload.path);
-                // Clear cached future when updating attachment so it gets regenerated
-                _cachedAttachmentWidgetsFuture = null;
-                _cachedAttachmentsKey = '';
-              });
-            } else {
-              // Remove file on failure
-              setState(() {
-                _attachments.removeWhere((f) => f.path == imageToUpload.path);
-                _uploadingFiles.remove(imageToUpload.path);
-                _cachedAttachmentWidgetsFuture = null;
-                _cachedAttachmentsKey = '';
-              });
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      AppLocalizations.of(context)!.failedToUploadImagePleaseTryAgain(imageToUpload.name),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                          ),
-                    ),
-                    backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                    duration: const Duration(seconds: 4),
-                  ),
-                );
-              }
-            }
-          } catch (e) {
-            // Remove file on error
-            setState(() {
-              _attachments.removeWhere((f) => f.path == imageToUpload.path);
-              _uploadingFiles.remove(imageToUpload.path);
-              _cachedAttachmentWidgetsFuture = null;
-              _cachedAttachmentsKey = '';
-            });
-            if (mounted) {
-              // Extract clean error message
-              String errorMessage = e.toString();
-              if (errorMessage.startsWith('Exception: ')) {
-                errorMessage = errorMessage.substring(11);
-              }
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    AppLocalizations.of(context)!.failedToUploadImage2(imageToUpload.name, errorMessage),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onErrorContainer,
-                        ),
-                  ),
-                  backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  duration: const Duration(seconds: 4),
-                ),
-              );
-            }
-          }
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.failedToPickImage,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _removeAttachment(int index) async {
-    if (index < 0 || index >= _attachments.length) {
+    final siteContext = getCurrentSiteContext();
+    final pickConstraints = getAttachmentConstraintsFromSiteContext(siteContext);
+    if (!canAddMoreAttachments(_uploads.length, pickConstraints)) {
+      _showUploadMessage(AppLocalizations.of(context)!
+          .maximumAttachmentsAllowed(pickConstraints!.count ?? 0));
       return;
     }
+    // Restrict the picker to the forum's authorized extensions when known.
+    final XFile? file = await FilePickerUtils.pickFile(
+      allowedExtensions: pickConstraints?.extensions,
+    );
+    if (file == null || !mounted) return;
+    final prepared = await _prepare(file);
+    if (prepared != null && mounted) await _uploadAll([prepared]);
+  }
 
-    final file = _attachments[index];
-    final attachmentId = _fileToAttachmentId[file.path];
+  /// The photo button: photos and videos from the gallery, or the camera.
+  void _handleImageUpload({bool fromCamera = false}) async {
+    if (widget.onFileUpload == null) return;
+    final constraints = getAttachmentConstraintsFromSiteContext(
+        getCurrentSiteContext(),
+        isImage: true);
+    if (!canAddMoreAttachments(_uploads.length, constraints)) {
+      _showUploadMessage(AppLocalizations.of(context)!
+          .maximumAttachmentsAllowed(constraints!.count ?? 0));
+      return;
+    }
+    // No imageQuality: any value makes image_picker re-encode (a PNG
+    // screenshot arrived lossy and renamed .jpg, and a 20 MB photo was
+    // silently shrunk under a limit that could then never fire). What was
+    // picked is uploaded, prepared the forum's way in [_prepare].
+    var picked = fromCamera
+        ? [if (await FilePickerUtils.takePhoto() case final photo?) photo]
+        : await FilePickerUtils.pickMultiMedia();
+    if (picked.isEmpty || !mounted) return;
+    final max = constraints?.count;
+    if (max != null && max > 0 && _uploads.length + picked.length > max) {
+      final room = max - _uploads.length;
+      _showUploadMessage(AppLocalizations.of(context)!
+          .onlyNMoreAttachmentsAllowed(room, room));
+      picked = picked.take(room).toList();
+    }
+    final ready = <XFile>[];
+    for (final file in picked) {
+      final prepared = await _prepare(file);
+      if (!mounted) return;
+      if (prepared != null) ready.add(prepared);
+    }
+    if (ready.isNotEmpty) await _uploadAll(ready);
+  }
 
-    setState(() {
-      _attachments.removeAt(index);
-      if (attachmentId != null) {
-        _fileToAttachmentId.remove(file.path);
+  /// Checks [file] against the forum's limits for its kind (Discourse caps
+  /// images at max_image_size_kb and everything else at
+  /// max_attachment_size_kb) and prepares a photo the forum's way. Null when
+  /// it cannot be sent; the reason has been shown.
+  Future<XFile?> _prepare(XFile file) async {
+    final isImage =
+        discourseUploadKind(file.name) == DiscourseUploadKind.image;
+    final constraints = getAttachmentConstraintsFromSiteContext(
+        getCurrentSiteContext(),
+        isImage: isImage);
+    if (constraints == null) return file;
+    final validation = await validateFile(file, constraints, isImage,
+        currentAttachmentCount: _uploads.length);
+    if (!validation.isValid) {
+      if (mounted) {
+        _showUploadMessage(
+            '${file.name}: ${validation.errorMessage ?? AppLocalizations.of(context)!.failedToUploadFilePleaseTryAgain}');
       }
-      // Clear cached future when removing attachment so it gets regenerated
-      _cachedAttachmentWidgetsFuture = null;
-      _cachedAttachmentsKey = '';
-    });
+      return null;
+    }
+    return isImage ? _prepareImageForUpload(file, constraints) : file;
+  }
 
-    // Notify parent to remove the corresponding attachment ID
-    // This will call the API to remove it from the server
-    if (widget.onRemoveAttachment != null) {
-      if (attachmentId != null && attachmentId.isNotEmpty) {
-        try {
-          await widget.onRemoveAttachment!(attachmentId);
-        } catch (e) {
-          // Silently handle errors
+  void _showUploadMessage(String text) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  /// Where an upload goes in the text: a line of its own at the cursor, as
+  /// the web composer places it, or at the end when the field has no cursor.
+  void _insertOnOwnLine(String line) {
+    final value = _contentController.value;
+    final body = value.text;
+    final sel = value.selection;
+    final start = sel.isValid ? sel.start.clamp(0, body.length) : body.length;
+    final end = sel.isValid ? sel.end.clamp(start, body.length) : body.length;
+    final before = body.substring(0, start);
+    final after = body.substring(end);
+    final inserted = '${before.isEmpty || before.endsWith('\n') ? '' : '\n'}'
+        '$line${after.startsWith('\n') ? '' : '\n'}';
+    _contentController.value = TextEditingValue(
+      text: before + inserted + after,
+      selection:
+          TextSelection.collapsed(offset: before.length + inserted.length),
+    );
+  }
+
+  /// Replaces the first [from] in the text with [to] — with nothing, taking
+  /// its line break along. Returns whether it was there.
+  bool _replaceInText(String from, String to) {
+    final text = _contentController.text;
+    final i = text.indexOf(from);
+    if (i < 0) return false;
+    var end = i + from.length;
+    if (to.isEmpty && end < text.length && text[end] == '\n') end++;
+    final updated = text.replaceRange(i, end, to);
+    final sel = _contentController.selection;
+    var offset = sel.isValid ? sel.baseOffset : updated.length;
+    if (offset >= end) {
+      offset += to.length - (end - i);
+    } else if (offset > i) {
+      offset = i + to.length;
+    }
+    _contentController.value = TextEditingValue(
+      text: updated,
+      selection: TextSelection.collapsed(offset: offset.clamp(0, updated.length)),
+    );
+    return true;
+  }
+
+  /// Web's placeholder, `[Uploading: name…]()`, unique in the text.
+  String _placeholderFor(String name) {
+    final l10n = AppLocalizations.of(context)!;
+    var label = name;
+    for (var n = 2;; n++) {
+      final placeholder = '[${l10n.uploadingFilename(label)}]()';
+      if (!_contentController.text.contains(placeholder) &&
+          !_uploads.any((u) => u.placeholder == placeholder)) {
+        return placeholder;
+      }
+      label = '$name ($n)';
+    }
+  }
+
+  /// Puts [files] in the text and the strip at once, then uploads them one
+  /// by one. Each starts as web's placeholder on its own line at the cursor
+  /// and becomes the Markdown Discourse expects for its kind (an image, a
+  /// video or audio that plays, a file link) when it lands; a failure takes
+  /// the placeholder out again.
+  ///
+  /// The text is what gets posted. Uploads used to live only in a list under
+  /// it and were added to the end on send: an image could not go between
+  /// paragraphs, a draft lost them, and removing one from the list left its
+  /// Markdown behind.
+  Future<void> _uploadAll(List<XFile> files) async {
+    final added = <_PendingUpload>[];
+    for (final file in files) {
+      // Unique against the ones already made for this batch too.
+      final upload = _PendingUpload(file, _placeholderFor(file.name));
+      _uploads.add(upload);
+      added.add(upload);
+    }
+    bool isImage(_PendingUpload u) =>
+        discourseUploadKind(u.file.name) == DiscourseUploadKind.image;
+    final images = added.where(isImage).toList();
+    // Three or more photos picked together go in a grid, as the web
+    // composer puts them (enable_auto_grid_images); stacked full width they
+    // made a long scroll.
+    if (images.length >= 3) {
+      _insertOnOwnLine(
+          ['[grid]', for (final u in images) u.placeholder, '[/grid]'].join('\n'));
+      for (final u in added.where((u) => !isImage(u))) {
+        _insertOnOwnLine(u.placeholder);
+      }
+    } else {
+      for (final upload in added) {
+        _insertOnOwnLine(upload.placeholder);
+      }
+    }
+    setState(() {});
+
+    for (final upload in added) {
+      if (!mounted) return;
+      if (!_uploads.contains(upload)) continue; // removed while waiting
+      String? ref;
+      Object? error;
+      try {
+        ref = await widget.onFileUpload!(upload.file);
+      } catch (e) {
+        error = e;
+      }
+      if (!mounted) return;
+      final uploaded = ref != null && ref.isNotEmpty;
+      if (!_uploads.contains(upload)) {
+        // Removed while it uploaded: let the page forget it too.
+        if (uploaded) widget.onRemoveAttachment?.call(ref);
+        continue;
+      }
+      if (!uploaded) {
+        setState(() => _uploads.remove(upload));
+        _replaceInText(upload.placeholder, '');
+        // The page's upload handler has said why (size, type, the server's
+        // message) — a second, generic message followed it. An exception is
+        // ours to report.
+        if (error != null) {
+          _showUploadMessage(AppLocalizations.of(context)!
+              .failedToUploadFile2(describeError(error)));
         }
+        continue;
       }
+      final markdown = discourseUploadMarkdown(ref);
+      if (!_replaceInText(upload.placeholder, markdown)) {
+        // The placeholder was deleted meanwhile: the writer took it out.
+        setState(() => _uploads.remove(upload));
+        widget.onRemoveAttachment?.call(ref);
+        continue;
+      }
+      setState(() {
+        upload.ref = ref;
+        upload.markdown = markdown;
+      });
+    }
+    // A grid whose photos all failed would be left empty.
+    if (images.length >= 3 && mounted) _replaceInText('[grid]\n[/grid]', '');
+  }
+
+  /// Takes [upload] out of the post: its tile, and its line in the text.
+  Future<void> _removeUpload(_PendingUpload upload) async {
+    // Out of the list first, so the text listener does not report it again.
+    setState(() => _uploads.remove(upload));
+    _replaceInText(upload.markdown ?? upload.placeholder, '');
+    final ref = upload.ref;
+    if (ref != null) {
+      try {
+        await widget.onRemoveAttachment?.call(ref);
+      } catch (_) {}
+    }
+  }
+
+  /// An uploaded file whose Markdown the writer deleted is out of the post:
+  /// its tile goes, and the page forgets it, so it is not added back at the
+  /// end on send.
+  void _dropUploadsTakenOutOfText() {
+    final text = _contentController.text;
+    final gone = [
+      for (final u in _uploads)
+        if (u.ref != null && !text.contains(u.ref!)) u,
+    ];
+    if (gone.isEmpty) return;
+    setState(() => _uploads.removeWhere(gone.contains));
+    for (final u in gone) {
+      widget.onRemoveAttachment?.call(u.ref!);
     }
   }
 
@@ -881,8 +725,9 @@ class _MessageComposePageState extends State<MessageComposePage> {
     // Get existing attachments that haven't been removed
     final existingAttachments = widget.existingAttachments?.where((a) => !_removedExistingAttachmentIds.contains(a.id)).toList() ?? [];
 
-    // Show section if we have either existing or new attachments
-    if (existingAttachments.isEmpty && _attachments.isEmpty) {
+    // Attachments already on the post (XenForo's model; a Discourse post
+    // carries its uploads in its text). New uploads are in the strip.
+    if (existingAttachments.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -920,157 +765,6 @@ class _MessageComposePageState extends State<MessageComposePage> {
             children: [
               // Existing attachments from API
               ...existingAttachments.map((attachment) => _buildExistingAttachmentItem(attachment)),
-              // New attachments (XFile)
-              if (_attachments.isNotEmpty)
-                Builder(
-                  builder: (context) {
-                    // Create a stable key based on attachments to detect changes
-                    final attachmentsKey = '${_attachments.length}_${_attachments.map((a) => a.path).join('|')}';
-
-                    // Only recreate the future if attachments have changed
-                    if (_cachedAttachmentsKey != attachmentsKey || _cachedAttachmentWidgetsFuture == null) {
-                      _cachedAttachmentsKey = attachmentsKey;
-                      _cachedAttachmentWidgetsFuture = Future.wait(
-                        _attachments.asMap().entries.map((entry) async {
-                          final index = entry.key;
-                          final attachment = entry.value;
-                          debugPrint('   - Processing attachment $index: ${attachment.name}');
-                          final fileSize = formatFileSize(await attachment.length());
-                          final fileType = getFileType(attachment.name);
-                          final isImage = isImageFile(attachment.name);
-                          final isUploading = _uploadingFiles[attachment.path] ?? false;
-                          final attachmentId = _fileToAttachmentId[attachment.path];
-
-                          return Column(
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.only(bottom: DesignTokens.spacingXS),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(8),
-                                    onTap: () {
-                                      if (attachmentId != null && _isInsertableImage(attachment.name)) {
-                                        _insertAttachmentRef(attachmentId);
-                                      }
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingS, vertical: 6),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 48,
-                                            height: 48,
-                                            decoration: BoxDecoration(
-                                              color: isImage ? Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: DesignTokens.opacityLow) : getFileTypeColor(attachment.name),
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                            child: isImage
-                                                ? ClipRRect(
-                                                    borderRadius: BorderRadius.circular(8),
-                                                    child: Image.file(
-                                                      File(attachment.path),
-                                                      width: 48,
-                                                      height: 48,
-                                                      fit: BoxFit.cover,
-                                                      errorBuilder: (context, error, stackTrace) {
-                                                        return Icon(
-                                                          Icons.image,
-                                                          size: 24,
-                                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                                        );
-                                                      },
-                                                    ),
-                                                  )
-                                                : Icon(
-                                                    getFileIcon(fileType),
-                                                    size: 24,
-                                                    color: Colors.white,
-                                                  ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  attachment.name,
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                                        color: Theme.of(context).colorScheme.onSurface,
-                                                      ),
-                                                ),
-                                                const SizedBox(height: 2),
-                                                Text(
-                                                  isUploading
-                                                      ? AppLocalizations.of(context)?.uploading ?? 'Uploading...'
-                                                      : attachmentId != null
-                                                          ? '$fileType • $fileSize • ${AppLocalizations.of(context)?.uploaded ?? 'Uploaded'}'
-                                                          : '$fileType • $fileSize',
-                                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                        color: isUploading ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant,
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          IconButton(
-                                            icon: Icon(
-                                              Icons.close,
-                                              size: 20,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                            ),
-                                            onPressed: isUploading ? null : () => _removeAttachment(index),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              if (isUploading)
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingM),
-                                  child: LinearProgressIndicator(
-                                    minHeight: 2,
-                                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
-                                  ),
-                                ),
-                            ],
-                          );
-                        }),
-                      );
-                    }
-
-                    return FutureBuilder<List<Widget>>(
-                      key: ValueKey('attachments_$_cachedAttachmentsKey'),
-                      future: _cachedAttachmentWidgetsFuture!,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          debugPrint('   - Data count: ${snapshot.data?.length ?? 0}');
-                        }
-                        if (snapshot.hasError) {
-                          debugPrint('   - Error: ${snapshot.error}');
-                        }
-
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          debugPrint('   - Showing loading indicator');
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        if (snapshot.hasError) {
-                          debugPrint('   - Showing error: ${snapshot.error}');
-                          return Text('${AppLocalizations.of(context)?.error ?? 'Error'}: ${snapshot.error}');
-                        }
-                        debugPrint('   - Returning ${snapshot.data?.length ?? 0} attachment widgets');
-                        return Column(
-                          children: snapshot.data ?? [],
-                        );
-                      },
-                    );
-                  },
-                ),
             ],
           ),
         ),
@@ -1268,7 +962,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
     // Don't post while an attachment upload is still in flight — the
     // upload's short_url wouldn't be included yet and the attachment
     // would silently be dropped from the post.
-    if (_uploadingFiles.isNotEmpty) {
+    if (_uploads.any((u) => u.isUploading)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -1362,6 +1056,36 @@ class _MessageComposePageState extends State<MessageComposePage> {
         setState(() => _isSubmitting = false);
       }
     }
+  }
+
+  /// This post's uploads, as tiles above the toolbar: what each is, its
+  /// progress, and a remove button. The text holds where each goes. (They
+  /// were a titled list under the text that flashed a spinner at every
+  /// change, and the only place an upload appeared at all.)
+  Widget _buildUploadStrip() {
+    if (_uploads.isEmpty) return const SizedBox.shrink();
+    return SizedBox(
+      height: UploadTile.extent + DesignTokens.spacingS,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(
+          DesignTokens.spacingL,
+          0,
+          DesignTokens.spacingL,
+          DesignTokens.spacingS,
+        ),
+        itemCount: _uploads.length,
+        // The badge's room is the gap.
+        separatorBuilder: (_, __) => const SizedBox(width: 2),
+        itemBuilder: (_, i) => UploadTile(
+          key: ObjectKey(_uploads[i]),
+          fileName: _uploads[i].file.name,
+          path: _uploads[i].file.path,
+          uploading: _uploads[i].isUploading,
+          onRemove: () => _removeUpload(_uploads[i]),
+        ),
+      ),
+    );
   }
 
   Widget _buildBottomToolbar() {
@@ -1809,6 +1533,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   ],
                 ),
               ),
+              _buildUploadStrip(),
               _buildBottomToolbar(),
             ],
           ),
@@ -1816,4 +1541,17 @@ class _MessageComposePageState extends State<MessageComposePage> {
       ),
     );
   }
+}
+
+/// A file picked in the composer: its placeholder in the text while it
+/// uploads, then its `upload://` ref and the Markdown that replaced it.
+class _PendingUpload {
+  _PendingUpload(this.file, this.placeholder);
+
+  final XFile file;
+  final String placeholder;
+  String? ref;
+  String? markdown;
+
+  bool get isUploading => ref == null;
 }

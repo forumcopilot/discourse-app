@@ -925,6 +925,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get unlike => 'いいねを取り消す';
 
   @override
+  String get download => 'ダウンロード';
+
+  @override
   String downloading(String filename) {
     return '$filenameをダウンロード中...';
   }
@@ -1687,6 +1690,11 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String removeFromMessageConfirm(String name) {
     return 'このメッセージから $name を削除してもよろしいですか？';
+  }
+
+  @override
+  String uploadingFilename(String filename) {
+    return 'アップロード中: $filename…';
   }
 
   @override

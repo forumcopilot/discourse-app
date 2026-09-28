@@ -920,6 +920,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get unlike => '좋아요 취소';
 
   @override
+  String get download => '다운로드';
+
+  @override
   String downloading(String filename) {
     return '$filename 다운로드 중...';
   }
@@ -1683,6 +1686,11 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String removeFromMessageConfirm(String name) {
     return '$name 님을 메시지에서 제거할까요?';
+  }
+
+  @override
+  String uploadingFilename(String filename) {
+    return '업로드 중: $filename…';
   }
 
   @override

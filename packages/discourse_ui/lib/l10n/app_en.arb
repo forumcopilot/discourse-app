@@ -836,6 +836,10 @@
   "@unlike": {
     "description": "Action verb: unlike"
   },
+  "download": "Download",
+  "@download": {
+    "description": "Button tooltip: download a file from a post or chat message and open it (Discourse lightbox.download)"
+  },
   "downloading": "Downloading {filename}...",
   "@downloading": {
     "description": "Status message when downloading file",
@@ -1919,6 +1923,11 @@
   "@removeFromMessageConfirm": {
     "description": "Confirming taking a person or group off a private message (Discourse private_message_info.remove_allowed_user)",
     "placeholders": { "name": { "type": "String" } }
+  },
+  "uploadingFilename": "Uploading: {filename}…",
+  "@uploadingFilename": {
+    "description": "Placeholder put in the post text where an upload will go while it uploads (Discourse uploading_filename)",
+    "placeholders": { "filename": { "type": "String" } }
   },
   "@messageArchive": {
     "description": "UI text: Archive"

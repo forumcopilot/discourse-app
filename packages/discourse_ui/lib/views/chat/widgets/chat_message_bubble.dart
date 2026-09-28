@@ -5,13 +5,12 @@ import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
 import '../../../theme/design_tokens.dart';
 import '../../../utils/time_utils.dart';
 import '../../user_profile_page.dart';
+import '../../widgets/post_body_extensions.dart' show kPostBlockGap;
 import '../../widgets/rich_text_content.dart';
 import '../../widgets/user_avatar.dart';
-import '../../widgets/full_screen_image_viewer.dart';
-import '../../listitems/post_list_item_attachment.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseChatUploads;
-import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
 import 'chat_reaction_chips.dart';
+import 'chat_uploads.dart';
 import '../../../l10n/generated/app_localizations.dart';
 
 /// One chat message bubble — left-aligned for others, right-aligned for
@@ -57,6 +56,8 @@ class ChatMessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final uploads =
         DiscourseChatUploads.forMessage(siteContext.site.url, message.id);
+    final hasText =
+        message.cooked.trim().isNotEmpty || message.message.trim().isNotEmpty;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -121,8 +122,7 @@ class ChatMessageBubble extends StatelessWidget {
                     // it through the same flutter_html renderer for
                     // mentions + emoji + oneboxes, at the posts' 16/24. A
                     // message may be files alone, with no text to draw.
-                    if (message.cooked.trim().isNotEmpty ||
-                        message.message.trim().isNotEmpty)
+                    if (hasText)
                       RichTextContent(
                         siteContext: siteContext,
                         textColor: textColor,
@@ -132,14 +132,16 @@ class ChatMessageBubble extends StatelessWidget {
                       ),
                     // Images and files travel in the message's `uploads`,
                     // not its cooked HTML; an upload-only message used to be
-                    // an empty bubble. Same widget as a topic post's.
-                    if (uploads.isNotEmpty)
-                      PostListItemAttachment(
-                        attachments: uploads,
-                        actions: _ChatUploadActions(uploads),
-                        context: context,
-                        isInline: true,
+                    // an empty bubble. Drawn with a post's widgets, a block
+                    // gap below the text as between a post's blocks.
+                    if (uploads.isNotEmpty) ...[
+                      if (hasText) const SizedBox(height: kPostBlockGap),
+                      ChatUploads(
+                        uploads: uploads,
+                        siteContext: siteContext,
+                        messageId: message.id,
                       ),
+                    ],
                     // Reaction chips — fed straight from the message's
                     // own reactions list, refreshed whenever the poll
                     // cycle re-parses this message (the parent Obx
@@ -180,28 +182,4 @@ class ChatMessageBubble extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Opens a chat message's images full screen, as a gallery.
-class _ChatUploadActions {
-  _ChatUploadActions(this.uploads);
-
-  final List<FCAttachment> uploads;
-
-  void onShowImage(String imageUrl, BuildContext context, String heroTag) {
-    final images = uploads.where((u) => u.isImage).toList();
-    if (images.isEmpty) return;
-    final index = images.indexWhere(
-        (u) => u.url == imageUrl || u.thumbnailUrl == imageUrl || u.id == heroTag);
-    Navigator.of(context).push(MaterialPageRoute<void>(
-      builder: (_) => FullScreenImageViewer(
-        imageUrls: [for (final u in images) u.url],
-        initialIndex: index < 0 ? 0 : index,
-        heroTag: heroTag,
-      ),
-    ));
-  }
-
-  // Chat is only reachable signed in.
-  void onLoginRequired(BuildContext context) {}
 }

@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../l10n/generated/app_localizations.dart';
+import '../../services/forum_media.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/embed_links.dart';
 import '../../utils/url_utils.dart';
 import '../../utils/youtube_cache.dart';
+import 'forum_image.dart';
 import 'full_screen_video_viewer.dart';
 import 'post_body_extensions.dart';
 
@@ -268,33 +271,49 @@ class _EmbedRow extends StatelessWidget {
 }
 
 /// A video uploaded to the forum (`<video>`, or the placeholder newer
-/// Discourse cooks with a thumbnail): its poster frame with a play button;
-/// tapping plays it in the app's video viewer.
+/// Discourse cooks with a thumbnail), in a post or a chat message: its
+/// poster frame with a play button; tapping plays it in the app's video
+/// viewer.
 class PostVideoCard extends StatelessWidget {
   const PostVideoCard({
     super.key,
     required this.src,
     this.poster,
     this.aspectRatio,
+    this.title,
+    this.auth,
   });
 
   final String src;
   final String? poster;
   final double? aspectRatio;
 
+  /// The upload's name as its author gave it, when known (a chat upload's
+  /// original_filename; cooked posts carry none).
+  final String? title;
+
+  /// The forum's media rules, for a video only a signed-in user may see.
+  final ForumMediaAuth? auth;
+
   @override
   Widget build(BuildContext context) {
     final ratio = (aspectRatio == null || aspectRatio! <= 0)
         ? 16 / 9
         : aspectRatio!.clamp(0.4, 3.0);
-    final name = Uri.tryParse(src)?.pathSegments.lastOrNull;
+    // The address ends in the upload's hash, which named the viewer and was
+    // read out to screen readers; say "Video" instead when the name is not
+    // known.
+    final given = title?.trim() ?? '';
+    final name = given.isNotEmpty
+        ? given
+        : (AppLocalizations.of(context)?.video ?? 'Video');
 
     // No poster: a black frame; the play button says what it is.
     Widget blank() => const ColoredBox(color: Colors.black);
 
     return Semantics(
       button: true,
-      label: name ?? 'video',
+      label: name,
       excludeSemantics: true,
       child: Align(
         alignment: AlignmentDirectional.centerStart,
@@ -308,14 +327,15 @@ class PostVideoCard extends StatelessWidget {
                 color: Colors.black,
                 child: InkWell(
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => FullScreenVideoViewer(videoUrl: src, title: name),
+                    builder: (_) =>
+                        FullScreenVideoViewer(videoUrl: src, title: name, auth: auth),
                   )),
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
                       if (poster != null)
-                        Image.network(
-                          poster!,
+                        Image(
+                          image: forumImage(poster!, auth),
                           fit: BoxFit.cover,
                           errorBuilder: (context, _, __) => blank(),
                         )
@@ -349,9 +369,12 @@ class PostVideoCard extends StatelessWidget {
 /// progress bar and the time, like the browser's own control. The player
 /// is only created on the first tap.
 class PostAudioPlayer extends StatefulWidget {
-  const PostAudioPlayer({super.key, required this.src});
+  const PostAudioPlayer({super.key, required this.src, this.auth});
 
   final String src;
+
+  /// The forum's media rules, for a file only a signed-in user may fetch.
+  final ForumMediaAuth? auth;
 
   @override
   State<PostAudioPlayer> createState() => _PostAudioPlayerState();
@@ -386,13 +409,15 @@ class _PostAudioPlayerState extends State<PostAudioPlayer>
       existing.value.isPlaying ? await existing.pause() : await existing.play();
       return;
     }
-    final uri = Uri.tryParse(widget.src);
-    if (uri == null) return;
-    final controller = VideoPlayerController.networkUrl(uri);
-    setState(() {
-      _controller = controller;
-      _loading = true;
-    });
+    if (Uri.tryParse(widget.src) == null) return;
+    setState(() => _loading = true);
+    // Where to play it from, and whether it needs the key (see
+    // ForumMedia.resolvePlayable).
+    final media = await ForumMedia.resolvePlayable(widget.auth, widget.src);
+    if (!mounted) return;
+    final controller =
+        VideoPlayerController.networkUrl(media.url, httpHeaders: media.headers);
+    setState(() => _controller = controller);
     try {
       await controller.initialize();
       controller.addListener(_changed);

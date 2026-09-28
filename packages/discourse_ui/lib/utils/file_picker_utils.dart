@@ -168,6 +168,57 @@ class FilePickerUtils {
     }
   }
 
+  /// Pick photos and videos: the gallery on a phone, image and video files
+  /// on desktop. Videos used to be reachable only through the paperclip,
+  /// which on iOS opens Files rather than Photos. Empty if cancelled.
+  static Future<List<XFile>> pickMultiMedia() async {
+    if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+      try {
+        final result = await FilePicker.platform
+            .pickFiles(type: FileType.media, allowMultiple: true);
+        return [
+          for (final f in result?.files ?? const <PlatformFile>[])
+            if (f.path != null)
+              XFile(f.path!,
+                  name: f.name.isNotEmpty ? f.name : path.basename(f.path!)),
+        ];
+      } catch (e) {
+        debugPrint('❌ [FILE_PICKER] Error picking media: $e');
+        return [];
+      }
+    }
+    final List<XFile> picked;
+    try {
+      picked = await ImagePicker().pickMultipleMedia();
+    } catch (e) {
+      debugPrint('❌ [FILE_PICKER] Error picking media: $e');
+      return [];
+    }
+    if (!Platform.isIOS || picked.isEmpty) return picked;
+    // iOS lends PHPicker files only briefly (see pickMultiImage): copy each
+    // out, as a file copy — a video is too big to read into memory — into a
+    // directory of its own so the original name is kept.
+    final batch = path.join((await getTemporaryDirectory()).path,
+        'picked_media_${DateTime.now().microsecondsSinceEpoch}');
+    final copies = <XFile>[];
+    for (var i = 0; i < picked.length; i++) {
+      final f = picked[i];
+      final name = f.name.isNotEmpty
+          ? f.name
+          : 'media_$i${path.extension(f.path)}';
+      try {
+        final dir = await Directory(path.join(batch, '$i')).create(recursive: true);
+        final target = path.join(dir.path,
+            name.replaceAll(RegExp(r'[<>:"/\\|?*\x00-\x1f]'), '_'));
+        await File(f.path).copy(target);
+        copies.add(XFile(target, name: name));
+      } catch (e) {
+        debugPrint('❌ [FILE_PICKER] Error copying picked media $i: $e');
+      }
+    }
+    return copies;
+  }
+
   /// Pick multiple images - uses image_picker on mobile (iOS 14+ / Android 4.3+),
   /// file_picker on desktop platforms
   /// Returns empty list if user cancels or an error occurs

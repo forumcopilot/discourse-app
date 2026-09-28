@@ -534,6 +534,7 @@
   },
   "like": "いいね",
   "unlike": "いいねを取り消す",
+  "download": "ダウンロード",
   "downloading": "{filename}をダウンロード中...",
   "@downloading": {
     "placeholders": {
@@ -789,6 +790,7 @@
   "messageListNew": "新規",
   "messageListSent": "送信済み",
   "removeFromMessageConfirm": "このメッセージから {name} を削除してもよろしいですか？",
+  "uploadingFilename": "アップロード中: {filename}…",
   "messageArchived": "メッセージをアーカイブしました",
   "messageMovedToInbox": "受信トレイに移動しました",
   "failedToArchiveMessage": "メッセージをアーカイブできませんでした: {error}",

@@ -1778,6 +1778,12 @@ abstract class AppLocalizations {
   /// **'unlike'**
   String get unlike;
 
+  /// Button tooltip: download a file from a post or chat message and open it (Discourse lightbox.download)
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
+
   /// Status message when downloading file
   ///
   /// In en, this message translates to:
@@ -3079,6 +3085,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Do you really want to remove {name} from this message?'**
   String removeFromMessageConfirm(String name);
+
+  /// Placeholder put in the post text where an upload will go while it uploads (Discourse uploading_filename)
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading: {filename}…'**
+  String uploadingFilename(String filename);
 
   /// UI text: Message archived
   ///

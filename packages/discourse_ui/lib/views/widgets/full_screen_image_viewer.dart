@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:saver_gallery/saver_gallery.dart';
@@ -6,17 +7,24 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:discourse_ui/views/widgets/cached_redirect_image.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../services/forum_media.dart';
+import 'forum_image.dart';
 
 class FullScreenImageViewer extends StatefulWidget {
   final List<String> imageUrls;
   final int initialIndex;
   final String heroTag;
 
+  /// The forum's media rules: its secure uploads are fetched with the
+  /// signed-in user's key, as they are in the post.
+  final ForumMediaAuth? auth;
+
   const FullScreenImageViewer({
     Key? key,
     required this.imageUrls,
     this.initialIndex = 0,
     required this.heroTag,
+    this.auth,
   }) : super(key: key);
 
   @override
@@ -93,14 +101,26 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
         return;
       }
 
-      // Get cached image file directly - much faster than resolving image provider
-      final imageData = await ImageLoader.fetchImageFile(imageUrl);
-      
-      if (!await imageData.file.exists()) {
-        throw Exception('Image file not found');
+      final Uint8List bytes;
+      final auth = widget.auth;
+      if (auth != null && auth.mustAuthenticate(imageUrl)) {
+        // A secure upload: fetched with the key, as it was shown.
+        final response = await ForumMedia.getBytes(auth, imageUrl);
+        final data = response.data;
+        if (response.statusCode != 200 || data == null || data.isEmpty) {
+          throw Exception('HTTP ${response.statusCode}');
+        }
+        bytes = data is Uint8List ? data : Uint8List.fromList(data);
+      } else {
+        // Get cached image file directly - much faster than resolving image provider
+        final imageData = await ImageLoader.fetchImageFile(imageUrl);
+
+        if (!await imageData.file.exists()) {
+          throw Exception('Image file not found');
+        }
+
+        bytes = await imageData.file.readAsBytes();
       }
-      
-      final bytes = await imageData.file.readAsBytes();
 
       // Save image to gallery
       final fileName = "image_${DateTime.now().millisecondsSinceEpoch}";
@@ -196,7 +216,9 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
               }
             },
             child: PhotoView(
-              imageProvider: CachedRedirectNetworkImageProvider(widget.imageUrls[index]),
+              imageProvider: widget.auth?.mustAuthenticate(widget.imageUrls[index]) == true
+                  ? forumImage(widget.imageUrls[index], widget.auth)
+                  : CachedRedirectNetworkImageProvider(widget.imageUrls[index]),
               heroAttributes: index == widget.initialIndex ? PhotoViewHeroAttributes(tag: widget.heroTag) : null,
               minScale: PhotoViewComputedScale.contained,
               maxScale: PhotoViewComputedScale.covered * 2,

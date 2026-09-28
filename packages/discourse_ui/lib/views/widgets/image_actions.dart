@@ -6,6 +6,7 @@ import 'package:discourse_ui/utils/cooked_content.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../services/forum_media.dart';
 
 class ImageActions {
   final PostController _postsController;
@@ -53,6 +54,21 @@ class ImageActions {
     }
   }
 
+  /// The pictures in a post body ([cooked]), in the order the post shows
+  /// them, and which of them [tappedUrl] is: 0 when none matches.
+  ///
+  /// A lightboxed upload is listed by its original (the anchor's href), so
+  /// the body passes that address when one is tapped.
+  static ({List<String> urls, int index}) bodyGallery(
+    String cooked,
+    String tappedUrl, {
+    required String forumBaseUrl,
+  }) {
+    final urls = CookedContent.parse(cooked, forumBaseUrl: forumBaseUrl).imageUrls;
+    final index = urls.indexOf(tappedUrl);
+    return (urls: urls, index: index < 0 ? 0 : index);
+  }
+
   void handleShowImage(String imageUrl, BuildContext context, String heroTag, String postId) {
     AppLogger.debug('Handling show image: $imageUrl');
 
@@ -90,22 +106,18 @@ class ImageActions {
       // appear in cooked HTML: inline images were silently absent from the
       // gallery, so tapping one opened the wrong image (or reported "no
       // images found" on a post with no attachments).
-      final clickedAbsoluteUrl = _makeAbsoluteUrl(imageUrl);
-      final bodyImages = CookedContent.parse(
+      final body = bodyGallery(
         post.content,
+        _makeAbsoluteUrl(imageUrl),
         forumBaseUrl: siteContext?.site.url ?? '',
-      ).imageUrls;
-      for (var url in bodyImages) {
-        // Convert relative URLs to absolute URLs for consistent comparison
-        final absoluteUrl = _makeAbsoluteUrl(url);
-        allImageUrls.add(absoluteUrl);
+      );
+      for (final url in body.urls) {
+        allImageUrls.add(url);
         allHeroTags.add('${post.id}_image_$currentIndex');
-        AppLogger.debug('  - Body image: $url -> $absoluteUrl');
-        if (url == imageUrl || absoluteUrl == imageUrl || url == clickedAbsoluteUrl || absoluteUrl == clickedAbsoluteUrl) {
-          tappedIndex = currentIndex;
-        }
+        AppLogger.debug('  - Body image: $url');
         currentIndex++;
       }
+      tappedIndex = body.index;
       // 2. Attachments (isImage or contentType starts with 'image/')
       for (var att in post.attachments) {
         final isImage = att.isImage || (att.contentType?.startsWith('image/') ?? false);
@@ -166,6 +178,7 @@ class ImageActions {
             imageUrls: allImageUrls,
             initialIndex: tappedIndex,
             heroTag: allHeroTags[tappedIndex],
+            auth: siteContext == null ? null : ForumMediaAuth.of(siteContext!),
           ),
         ),
       );

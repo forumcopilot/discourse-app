@@ -958,6 +958,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get unlike => 'descurtir';
 
   @override
+  String get download => 'Transferir';
+
+  @override
   String downloading(String filename) {
     return 'Baixando $filename...';
   }
@@ -1751,6 +1754,11 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String removeFromMessageConfirm(String name) {
     return 'Deseja mesmo remover $name desta mensagem?';
+  }
+
+  @override
+  String uploadingFilename(String filename) {
+    return 'A enviar: $filename';
   }
 
   @override

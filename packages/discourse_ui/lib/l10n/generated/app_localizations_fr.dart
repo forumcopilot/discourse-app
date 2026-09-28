@@ -962,6 +962,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get unlike => 'ne plus aimer';
 
   @override
+  String get download => 'Télécharger';
+
+  @override
   String downloading(String filename) {
     return 'Téléchargement de $filename...';
   }
@@ -1760,6 +1763,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String removeFromMessageConfirm(String name) {
     return 'Voulez-vous vraiment supprimer $name de ce message direct ?';
+  }
+
+  @override
+  String uploadingFilename(String filename) {
+    return 'Téléversement : $filename…';
   }
 
   @override

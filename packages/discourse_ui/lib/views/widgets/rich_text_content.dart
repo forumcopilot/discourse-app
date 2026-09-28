@@ -8,11 +8,13 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as html_parser;
 
+import 'attachment_file_card.dart';
 import 'brand_image.dart';
 import 'broken_image_widget.dart';
 import 'code_block.dart';
 import 'discourse_blocks.dart';
 import 'embed_cards.dart';
+import 'forum_image.dart';
 import 'onebox_card.dart';
 import 'post_body_extensions.dart';
 import 'post_content_callbacks.dart' show PostContentCallbacks;
@@ -23,10 +25,9 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/embed_links.dart';
 import '../../utils/emoji_shortcodes.dart';
-import '../../utils/file_utils.dart';
 import '../../utils/html_colors.dart';
-import '../../utils/url_utils.dart';
 import '../../services/discourse_link_handler.dart';
+import '../../services/forum_media.dart';
 import 'category_badge.dart';
 
 /// Renders post content. The data we get from Discourse's `/t/{id}.json`
@@ -104,6 +105,9 @@ class RichTextContent extends StatelessWidget {
 
     final html = _readableAuthorColours(
         _foldAttachmentSize(content), colorScheme.surface);
+    // The signed-in user's key for the forum's own uploads (secure
+    // pictures, files a guest may not download); never for other sites.
+    final media = ForumMediaAuth.of(siteContext);
 
     // Embed previews open the video or post itself — for YouTube, TikTok
     // and the like, in their app — through the same path as a link tap.
@@ -184,11 +188,12 @@ class RichTextContent extends StatelessWidget {
         _CategoryHashtagMarkExtension(siteContext),
         ImageGridExtension(
           resolve: _resolveUrl,
+          auth: media,
           onImageTap: callbacks?.onImageTap == null
               ? null
               : (full, imageContext) => callbacks!.onImageTap!(full, imageContext, full),
         ),
-        _EmbedExtension(resolve: _resolveUrl, onOpen: openEmbed),
+        _EmbedExtension(resolve: _resolveUrl, onOpen: openEmbed, auth: media),
         DiscourseBlocksExtension(onOpen: openEmbed, pollBuilder: pollBuilder),
         // Link previews: a native card; what is inside the preview's body is
         // rendered by a nested RichTextContent, so it keeps every rule here,
@@ -209,23 +214,9 @@ class RichTextContent extends StatelessWidget {
         // `<a class="attachment">name</a> (117 Bytes)`, and styles it with
         // a download glyph via CSS ::before — which flutter_html cannot
         // express, so it came out as a bare blue link indistinguishable
-        // from any other. Draw the chip web draws instead.
-        _AttachmentLinkExtension(
-          onShare: (href) {
-            // ignore: discarded_futures
-            UrlUtils.shareUrl(_resolveUrl(href));
-          },
-          onTap: (href) {
-            final resolved = _resolveUrl(href);
-            if (callbacks?.onUrlTap != null) {
-              callbacks!.onUrlTap!(resolved);
-              return;
-            }
-            // ignore: discarded_futures
-            DiscourseLinkHandler.open(context, siteContext, resolved);
-          },
-          colorScheme: colorScheme,
-        ),
+        // from any other. Draw the file card instead; it downloads the
+        // file signed in (see AttachmentFileCard).
+        _AttachmentLinkExtension(resolve: _resolveUrl, auth: media),
         // Code blocks scroll sideways; they must never wrap. flutter_html
         // wraps by default, which broke shared code rather than merely
         // squashing it: a Python post rendered
@@ -322,6 +313,13 @@ class RichTextContent extends StatelessWidget {
 
             if (src == null || src.isEmpty) return const SizedBox.shrink();
             final resolved = _resolveUrl(src);
+            // An upload the forum could not find cooks to a transparent
+            // pixel, with the `upload://` it stood for in data-orig-src
+            // (discourse-markdown-it's upload-protocol); drawn as it is, it
+            // was an invisible blank box. It gets the broken-picture box.
+            final unresolved = !isEmoji &&
+                (extensionContext.attributes['data-orig-src'] ?? '').startsWith('upload://') &&
+                (Uri.tryParse(resolved)?.path.endsWith('/images/transparent.png') ?? false);
             final w = onlyEmoji
                 ? _onlyEmojiSize
                 : double.tryParse(extensionContext.attributes['width'] ?? '') ??
@@ -355,21 +353,24 @@ class RichTextContent extends StatelessWidget {
             Widget fallback(BuildContext _) => isEmoji
                 ? Text(alt, style: TextStyle(color: mutedColor))
                 : BrokenImagePlaceholder(alt: alt);
-            Widget picture({double? width, double? height}) => isSvg
-                ? BrandImage(
-                    resolved,
-                    width: width,
-                    height: height,
-                    fit: BoxFit.contain,
-                    fallback: fallback,
-                  )
-                : Image.network(
-                    resolved,
-                    width: width,
-                    height: height,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, _, __) => fallback(context),
-                  );
+            Widget picture({double? width, double? height}) => unresolved
+                ? BrokenImagePlaceholder(alt: alt, width: width, height: height)
+                : isSvg
+                    ? BrandImage(
+                        resolved,
+                        width: width,
+                        height: height,
+                        fit: BoxFit.contain,
+                        fallback: fallback,
+                      )
+                    : Image(
+                        // A secure upload goes with the user's key.
+                        image: forumImage(resolved, media),
+                        width: width,
+                        height: height,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, _, __) => fallback(context),
+                      );
             // An upload wider than the column keeps its proportions. Given
             // both attributes, RenderImage clamps the width to the column
             // but keeps the height, and the picture ends up centred in a
@@ -392,15 +393,32 @@ class RichTextContent extends StatelessWidget {
                 ),
               );
             }
+            if (isEmoji) return _NoBaseline(child: image);
+            // A picture's corners are rounded as in an image grid and on a
+            // video (they were square); an icon-sized image keeps its own.
+            final icon = w != null && h != null && w < 48 && h < 48;
+            final framed = icon
+                ? image
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(ImageGrid.radius),
+                    child: image,
+                  );
             // Route content-image taps to the in-app viewer (emoji stay
             // plain inline glyphs/images).
             final onImageTap = callbacks?.onImageTap;
-            if (isEmoji || onImageTap == null) return _NoBaseline(child: image);
+            if (onImageTap == null || unresolved) return _NoBaseline(child: framed);
+            // A lightboxed upload opens as its original, the address the
+            // viewer's gallery lists it under (the anchor's href). The <img
+            // src> is a resized copy that matched no gallery entry, so the
+            // second and third pictures of a post opened on the first; and
+            // this detector sits over the anchor, whose own tap never fires.
+            final lightbox = _lightboxHref(extensionContext.node);
+            final target = lightbox == null ? resolved : _resolveUrl(lightbox);
             return _NoBaseline(
               child: Builder(
                 builder: (imageContext) => GestureDetector(
-                  onTap: () => onImageTap(resolved, imageContext, resolved),
-                  child: image,
+                  onTap: () => onImageTap(target, imageContext, target),
+                  child: framed,
                 ),
               ),
             );
@@ -534,6 +552,18 @@ bool _hasAncestor(dom.Node node, Set<String> tags) {
     if (tags.contains(p.localName)) return true;
   }
   return false;
+}
+
+/// The href of the `a.lightbox` around [node] — a lightboxed upload's
+/// original — or null.
+String? _lightboxHref(dom.Node node) {
+  for (var p = node.parent; p != null; p = p.parent) {
+    if (p.localName == 'a' && p.classes.contains('lightbox')) {
+      final href = p.attributes['href']?.trim();
+      return href == null || href.isEmpty ? null : href;
+    }
+  }
+  return null;
 }
 
 /// Author colours (`<font color>`, normalised to `#rrggbb` by CookedContent)
@@ -702,10 +732,11 @@ String _foldAttachmentSize(String html) {
 /// flutter_html renders none of these by itself: videos showed as a bare
 /// thumbnail, iframes and audio as nothing.
 class _EmbedExtension extends HtmlExtension {
-  const _EmbedExtension({required this.resolve, required this.onOpen});
+  const _EmbedExtension({required this.resolve, required this.onOpen, this.auth});
 
   final String Function(String url) resolve;
   final void Function(String url) onOpen;
+  final ForumMediaAuth? auth;
 
   static final RegExp _tweet = RegExp(
       r'^https?://(?:www\.|mobile\.)?(?:twitter|x)\.com/\w+/status(?:es)?/\d+',
@@ -758,6 +789,8 @@ class _EmbedExtension extends HtmlExtension {
           return PostVideoCard(
             src: resolve(src),
             poster: thumb == null || thumb.isEmpty ? null : resolve(thumb),
+            title: a['title'],
+            auth: auth,
           );
         }
         if (context.classes.contains('lazyYT')) {
@@ -805,9 +838,11 @@ class _EmbedExtension extends HtmlExtension {
           src: resolve(src),
           poster: poster == null || poster.isEmpty ? null : resolve(poster),
           aspectRatio: (w != null && h != null && h > 0) ? w / h : null,
+          title: a['title'],
+          auth: auth,
         );
       case 'audio':
-        return PostAudioPlayer(src: resolve(_mediaSrc(element)!));
+        return PostAudioPlayer(src: resolve(_mediaSrc(element)!), auth: auth);
       case 'a':
         final href = a['href']!.trim();
         if (_tweet.hasMatch(href)) return TwitterCard(url: href);
@@ -885,15 +920,10 @@ class _CategoryHashtagMarkExtension extends HtmlExtension {
 }
 
 class _AttachmentLinkExtension extends HtmlExtension {
-  const _AttachmentLinkExtension({
-    required this.onTap,
-    required this.onShare,
-    required this.colorScheme,
-  });
+  const _AttachmentLinkExtension({required this.resolve, this.auth});
 
-  final void Function(String href) onTap;
-  final void Function(String href) onShare;
-  final ColorScheme colorScheme;
+  final String Function(String url) resolve;
+  final ForumMediaAuth? auth;
 
   @override
   Set<String> get supportedTags => {'a'};
@@ -904,11 +934,7 @@ class _AttachmentLinkExtension extends HtmlExtension {
 
   @override
   InlineSpan build(ExtensionContext context) {
-    final href = context.attributes['href'] ?? '';
-    final name = context.element?.text.trim() ?? '';
-    final size = context.attributes['data-size'];
-    final label = name.isEmpty ? 'Attachment' : name;
-    final l10n = context.buildContext == null ? null : AppLocalizations.of(context.buildContext!);
+    final href = (context.attributes['href'] ?? '').trim();
 
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
@@ -918,48 +944,13 @@ class _AttachmentLinkExtension extends HtmlExtension {
       child: ConstrainedBox(
         constraints: const BoxConstraints(minWidth: double.infinity),
         child: Padding(
-        padding: EdgeInsets.symmetric(vertical: DesignTokens.spacingXS),
-        child: EmbeddedCard(
-          onTap: href.isEmpty ? null : () => onTap(href),
-          padding: EdgeInsets.zero,
-          child: FileRow(
-            // Same 48px type tile the composer draws, from the same
-            // helpers, so an attachment looks identical whether you are
-            // about to post it or reading it back.
-            leading: DecoratedBox(
-              decoration: BoxDecoration(
-                color: getFileTypeColor(label),
-                borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-              ),
-              child: Icon(
-                getFileIcon(getFileType(label)),
-                size: DesignTokens.iconSizeL,
-                color: Colors.white,
-              ),
-            ),
-            title: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
-            subtitle: Text([
-              getFileType(label).toUpperCase(),
-              if (size != null && size.isNotEmpty) size,
-            ].join(' • ')),
-            trailing: [
-              IconButton(
-                tooltip: l10n?.share ?? 'Share',
-                onPressed: href.isEmpty ? null : () => onShare(href),
-                icon: Icon(Icons.share_outlined,
-                    size: DesignTokens.iconSizeM,
-                    color: colorScheme.onSurfaceVariant),
-              ),
-              IconButton(
-                tooltip: 'Download',
-                onPressed: href.isEmpty ? null : () => onTap(href),
-                icon: Icon(Icons.download_rounded,
-                    size: DesignTokens.iconSizeM,
-                    color: colorScheme.primary),
-              ),
-            ],
+          padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingXS),
+          child: AttachmentFileCard(
+            name: context.element?.text.trim() ?? '',
+            url: href.isEmpty ? '' : resolve(href),
+            size: context.attributes['data-size'],
+            auth: auth,
           ),
-        ),
         ),
       ),
     );

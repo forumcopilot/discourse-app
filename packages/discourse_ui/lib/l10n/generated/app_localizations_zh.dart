@@ -912,6 +912,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unlike => '取消点赞';
 
   @override
+  String get download => '下载';
+
+  @override
   String downloading(String filename) {
     return '正在下载$filename...';
   }
@@ -1670,6 +1673,11 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String removeFromMessageConfirm(String name) {
     return '真的要将 $name 从此消息中移除吗？';
+  }
+
+  @override
+  String uploadingFilename(String filename) {
+    return '正在上传：$filename…';
   }
 
   @override

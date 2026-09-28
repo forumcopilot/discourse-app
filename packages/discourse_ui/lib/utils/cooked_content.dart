@@ -146,18 +146,21 @@ class CookedContent {
     // ---- 3. Images ---------------------------------------------------
     // Lightboxed uploads: <div class="lightbox-wrapper">
     //   <a class="lightbox" href="FULL"><img src="RESIZED"></a></div>
-    // The anchor href is the original; prefer it over the <img src>.
-    for (final anchor in body.querySelectorAll('a.lightbox[href]')) {
-      final href = anchor.attributes['href'] ?? '';
-      if (href.isNotEmpty) images.add(_absolute(href, origin));
-    }
-    for (final img in body.querySelectorAll('img[src]')) {
-      if (_isDecorativeImage(img)) continue;
-      // Already captured via its lightbox anchor.
-      if (_hasAncestorMatching(img, (e) => _classes(e).contains('lightbox'))) {
+    // The anchor href is the original; prefer it over the <img src>. In the
+    // order the post shows them: the gallery used to list every lightboxed
+    // picture before any other, so swiping went out of order.
+    for (final el in body.querySelectorAll('a.lightbox[href], img[src]')) {
+      if (el.localName == 'a') {
+        final href = el.attributes['href'] ?? '';
+        if (href.isNotEmpty) images.add(_absolute(href, origin));
         continue;
       }
-      final src = img.attributes['src'] ?? '';
+      if (_isDecorativeImage(el) || _isUnresolvedUpload(el)) continue;
+      // Already captured via its lightbox anchor.
+      if (_hasAncestorMatching(el, (e) => _classes(e).contains('lightbox'))) {
+        continue;
+      }
+      final src = el.attributes['src'] ?? '';
       if (src.isNotEmpty) images.add(_absolute(src, origin));
     }
 
@@ -271,6 +274,12 @@ class CookedContent {
           .split(RegExp(r'\s+'))
           .where((c) => c.isNotEmpty)
           .toSet();
+
+  /// An upload the forum could not find: a transparent pixel standing in
+  /// for the `upload://` in data-orig-src. Nothing to open.
+  static bool _isUnresolvedUpload(dom.Element img) =>
+      (img.attributes['data-orig-src'] ?? '').startsWith('upload://') &&
+      (img.attributes['src'] ?? '').endsWith('/images/transparent.png');
 
   /// Emoji, avatars, favicons and onebox thumbnails are chrome, not
   /// content — they must never enter the image gallery.

@@ -66,6 +66,34 @@ void main() {
         '[file|attachment](upload://gone.zip)');
   });
 
+  test('video and audio play in the post, as web writes them', () {
+    DiscourseUploadMetadata.remember('upload://v.mp4',
+        const DiscourseUploadMetadata(fileName: 'clip.mp4', fileSize: 10));
+    DiscourseUploadMetadata.remember('upload://a.m4a',
+        const DiscourseUploadMetadata(fileName: 'voice note.m4a', fileSize: 10));
+    expect(discourseUploadMarkdown('upload://v.mp4'),
+        '![clip|video](upload://v.mp4)');
+    expect(discourseUploadMarkdown('upload://a.m4a'),
+        '![voice note|audio](upload://a.m4a)');
+    // No metadata (a ref restored from a draft): the short_url's extension.
+    expect(discourseUploadMarkdown('upload://w.webm'),
+        '![video|video](upload://w.webm)');
+  });
+
+  test('image kinds web knows, beyond the common ones', () {
+    for (final ext in ['avif', 'jxl', 'heif', 'ico']) {
+      expect(discourseUploadKind('photo.$ext'), DiscourseUploadKind.image);
+    }
+    expect(discourseUploadKind('report.pdf'), DiscourseUploadKind.file);
+  });
+
+  test('characters that would break the link label are escaped', () {
+    DiscourseUploadMetadata.remember('upload://b.png',
+        const DiscourseUploadMetadata(fileName: 'a [b]|c.png', fileSize: 1));
+    expect(discourseUploadMarkdown('upload://b.png'),
+        r'![a \[b\]\|c](upload://b.png)');
+  });
+
   test('sizes use the units Discourse prints', () {
     for (final (bytes, expected) in [
       (117, '117 Bytes'),

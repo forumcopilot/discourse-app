@@ -534,6 +534,7 @@
   },
   "like": "点赞",
   "unlike": "取消点赞",
+  "download": "下载",
   "downloading": "正在下载{filename}...",
   "@downloading": {
     "placeholders": {
@@ -789,6 +790,7 @@
   "messageListNew": "新",
   "messageListSent": "已发送",
   "removeFromMessageConfirm": "真的要将 {name} 从此消息中移除吗？",
+  "uploadingFilename": "正在上传：{filename}…",
   "messageArchived": "消息已归档",
   "messageMovedToInbox": "已移至收件箱",
   "failedToArchiveMessage": "无法归档消息：{error}",

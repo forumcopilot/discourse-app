@@ -64,6 +64,10 @@ class DiscourseChatUploads {
       url: url,
       thumbnailUrl: isImage ? (abs(thumb) ?? url) : null,
       isImage: isImage,
+      // The picture's shape, so the bubble draws it at its proportions
+      // before it loads, as a post does.
+      width: (u['width'] as num?)?.toInt(),
+      height: (u['height'] as num?)?.toInt(),
       // The attachment widgets draw a lock and refuse the tap unless these
       // are set; a chat upload is always viewable by whoever sees the message.
       canViewUrl: true,

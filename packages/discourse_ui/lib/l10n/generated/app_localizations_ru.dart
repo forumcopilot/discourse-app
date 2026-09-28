@@ -957,6 +957,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get unlike => 'убрать лайк';
 
   @override
+  String get download => 'Скачать';
+
+  @override
   String downloading(String filename) {
     return 'Загрузка $filename...';
   }
@@ -1751,6 +1754,11 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String removeFromMessageConfirm(String name) {
     return 'Действительно удалить $name из этого сообщения?';
+  }
+
+  @override
+  String uploadingFilename(String filename) {
+    return 'Загрузка: $filename…';
   }
 
   @override

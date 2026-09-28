@@ -1,7 +1,7 @@
-import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
+import '../../widgets/upload_tile.dart';
 
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../theme/design_tokens.dart';
@@ -183,16 +183,22 @@ class _ChatComposerState extends State<ChatComposer> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (_files.isNotEmpty)
+              // The post composer's tiles: a thumbnail or the file's kind,
+              // and a remove badge with a 48dp target (it was 28).
               SizedBox(
-                height: 72,
+                height: UploadTile.extent + DesignTokens.spacingS,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.only(bottom: DesignTokens.spacingS),
                   itemCount: _files.length,
-                  separatorBuilder: (_, __) =>
-                      const SizedBox(width: DesignTokens.spacingS),
-                  itemBuilder: (_, i) => _PickedFileTile(
-                    file: _files[i],
+                  separatorBuilder: (_, __) => const SizedBox(width: 2),
+                  itemBuilder: (_, i) => UploadTile(
+                    key: ObjectKey(_files[i]),
+                    fileName: _files[i].file.name,
+                    path: _files[i].file.path,
+                    uploading: _files[i].uploadId == null,
+                    removeTooltip:
+                        AppLocalizations.of(context)!.chatRemoveUpload,
                     onRemove: _sending
                         ? null
                         : () => setState(() => _files.removeAt(i)),
@@ -264,112 +270,6 @@ class _PickedFile {
   int? uploadId;
 }
 
-/// A picked file above the input: the image itself, or the file's name,
-/// dimmed with a spinner while it uploads, with a button to drop it.
-class _PickedFileTile extends StatelessWidget {
-  const _PickedFileTile({required this.file, required this.onRemove});
-
-  final _PickedFile file;
-  final VoidCallback? onRemove;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final uploading = file.uploadId == null;
-    return SizedBox(
-      width: 64,
-      height: 64,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-              child: file.isImage
-                  ? Image.file(
-                      File(file.file.path),
-                      fit: BoxFit.cover,
-                      cacheWidth: 192,
-                      errorBuilder: (_, __, ___) =>
-                          _FileName(name: file.file.name),
-                    )
-                  : _FileName(name: file.file.name),
-            ),
-          ),
-          if (uploading)
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: colorScheme.surface.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                ),
-                child: const Center(
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-              ),
-            ),
-          if (onRemove != null)
-            Positioned(
-              top: 2,
-              right: 2,
-              child: Tooltip(
-                message: AppLocalizations.of(context)!.chatRemoveUpload,
-                child: Material(
-                  color: colorScheme.inverseSurface.withValues(alpha: 0.8),
-                  shape: const CircleBorder(),
-                  child: InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: onRemove,
-                    // 28dp, as much as a 64dp tile can spare (it was 18).
-                    child: Padding(
-                      padding: const EdgeInsets.all(6),
-                      child: Icon(Icons.close,
-                          size: DesignTokens.iconSizeS,
-                          color: colorScheme.onInverseSurface),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FileName extends StatelessWidget {
-  const _FileName({required this.name});
-
-  final String name;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ColoredBox(
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: Padding(
-        padding: const EdgeInsets.all(DesignTokens.spacingXS),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.insert_drive_file_outlined,
-                size: 20, color: theme.colorScheme.onSurfaceVariant),
-            Text(
-              name,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _SendButton extends StatelessWidget {
   const _SendButton({

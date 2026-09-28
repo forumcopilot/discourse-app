@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:html/dom.dart' as dom;
 
+import '../../services/forum_media.dart';
 import '../../theme/design_tokens.dart';
 import 'broken_image_widget.dart';
+import 'forum_image.dart';
 
 /// The one gap between consecutive blocks of a post body — paragraphs,
 /// lists, quotes, code, tables, previews, polls, images, details. Blocks
@@ -440,9 +442,12 @@ class _DetailsBlockState extends State<DetailsBlock> {
 /// or a sideways carousel for `data-mode="carousel"`. The app stacked the
 /// pictures one under another at full width.
 class ImageGridExtension extends HtmlExtension {
-  const ImageGridExtension({required this.resolve, required this.onImageTap});
+  const ImageGridExtension({required this.resolve, required this.onImageTap, this.auth});
 
   final String Function(String url) resolve;
+
+  /// The forum's media rules, for its secure uploads.
+  final ForumMediaAuth? auth;
 
   /// Opens the full-size picture ([full]) in the image viewer.
   final void Function(String full, BuildContext context)? onImageTap;
@@ -469,6 +474,7 @@ class ImageGridExtension extends HtmlExtension {
             items: items,
             carousel: context.attributes['data-mode'] == 'carousel',
             onImageTap: onImageTap,
+            auth: auth,
           ),
         ),
       ),
@@ -513,11 +519,20 @@ class GridImage {
 }
 
 class ImageGrid extends StatelessWidget {
-  const ImageGrid({super.key, required this.items, this.carousel = false, this.onImageTap});
+  const ImageGrid({
+    super.key,
+    required this.items,
+    this.carousel = false,
+    this.onImageTap,
+    this.auth,
+  });
 
   final List<GridImage> items;
   final bool carousel;
   final void Function(String full, BuildContext context)? onImageTap;
+
+  /// The forum's media rules: a secure upload is fetched with the key.
+  final ForumMediaAuth? auth;
 
   /// The gap between pictures, here and in the upload grid under a post.
   static const double gap = DesignTokens.spacingS;
@@ -528,8 +543,8 @@ class ImageGrid extends StatelessWidget {
   Widget _tile(BuildContext context, GridImage item, {double? height}) {
     final picture = ClipRRect(
       borderRadius: BorderRadius.circular(radius),
-      child: Image.network(
-        item.src,
+      child: Image(
+        image: forumImage(item.src, auth),
         fit: BoxFit.cover,
         height: height,
         errorBuilder: (c, _, __) => const BrokenImagePlaceholder(),

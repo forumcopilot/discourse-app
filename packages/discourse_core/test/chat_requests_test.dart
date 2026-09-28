@@ -75,6 +75,7 @@ void main() {
     final uploads = DiscourseChatUploads.forMessage('https://forum.example', 70);
     expect(uploads.single.filename, 'cat.png');
     expect(uploads.single.isImage, isTrue);
+    expect((uploads.single.width, uploads.single.height), (800, 600));
     expect(uploads.single.url,
         'https://forum.example/uploads/default/original/1X/abc.png');
 

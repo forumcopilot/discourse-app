@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../l10n/generated/app_localizations.dart';
+import '../../services/forum_media.dart';
+
 class FullScreenVideoViewer extends StatefulWidget {
   final String videoUrl;
   final String? title;
+
+  /// The forum's media rules, for a video only a signed-in user may see.
+  final ForumMediaAuth? auth;
 
   const FullScreenVideoViewer({
     super.key,
     required this.videoUrl,
     this.title,
+    this.auth,
   });
 
   @override
@@ -16,39 +23,55 @@ class FullScreenVideoViewer extends StatefulWidget {
 }
 
 class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
-  late final VideoPlayerController _controller;
+  VideoPlayerController? _controller;
   late final Future<void> _initializeFuture;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
-    _initializeFuture = _controller.initialize().then((_) {
-      _controller.play();
-      setState(() {});
-    });
+    _initializeFuture = _open();
+  }
+
+  /// Finds where to play the video from — the forum's secure uploads play
+  /// from their signed address, a file a guest may not fetch with the
+  /// user's key (see ForumMedia.resolvePlayable) — then starts it.
+  Future<void> _open() async {
+    final media = await ForumMedia.resolvePlayable(widget.auth, widget.videoUrl);
+    if (!mounted) return;
+    final controller =
+        VideoPlayerController.networkUrl(media.url, httpHeaders: media.headers);
+    _controller = controller;
+    await controller.initialize();
+    if (!mounted) return;
+    await controller.play();
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
   void _togglePlayPause() {
+    final controller = _controller;
+    if (controller == null) return;
     setState(() {
-      if (_controller.value.isPlaying) {
-        _controller.pause();
+      if (controller.value.isPlaying) {
+        controller.pause();
       } else {
-        _controller.play();
+        controller.play();
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final title =
-        widget.title?.isNotEmpty == true ? widget.title! : widget.videoUrl;
+    final l10n = AppLocalizations.of(context);
+    // Never the address: it ends in the upload's hash.
+    final title = widget.title?.isNotEmpty == true
+        ? widget.title!
+        : (l10n?.video ?? 'Video');
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -75,13 +98,13 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
             );
           }
 
-          final value = _controller.value;
-          if (value.hasError) {
+          final controller = _controller;
+          if (snapshot.hasError || controller == null || controller.value.hasError) {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  value.errorDescription ?? 'Failed to load video',
+                  controller?.value.errorDescription ?? 'Failed to load video',
                   style: const TextStyle(color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
@@ -89,6 +112,7 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
             );
           }
 
+          final value = controller.value;
           return Column(
             children: [
               Expanded(
@@ -96,7 +120,7 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
                   child: AspectRatio(
                     aspectRatio:
                         value.aspectRatio == 0 ? 16 / 9 : value.aspectRatio,
-                    child: VideoPlayer(_controller),
+                    child: VideoPlayer(controller),
                   ),
                 ),
               ),
@@ -106,7 +130,7 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
                 child: Column(
                   children: [
                     VideoProgressIndicator(
-                      _controller,
+                      controller,
                       allowScrubbing: true,
                       colors: const VideoProgressColors(
                         playedColor: Colors.white,

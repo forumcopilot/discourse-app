@@ -534,6 +534,7 @@
   },
   "like": "лайкнуть",
   "unlike": "убрать лайк",
+  "download": "Скачать",
   "downloading": "Загрузка {filename}...",
   "@downloading": {
     "placeholders": {
@@ -789,6 +790,7 @@
   "messageListNew": "Новые",
   "messageListSent": "Отправленные",
   "removeFromMessageConfirm": "Действительно удалить {name} из этого сообщения?",
+  "uploadingFilename": "Загрузка: {filename}…",
   "messageArchived": "Сообщение перемещено в архив",
   "messageMovedToInbox": "Перемещено во входящие",
   "failedToArchiveMessage": "Не удалось переместить сообщение в архив: {error}",

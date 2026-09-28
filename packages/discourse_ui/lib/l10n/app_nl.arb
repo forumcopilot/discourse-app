@@ -806,6 +806,7 @@
   "@unlike": {
     "description": "Action verb: unlike"
   },
+  "download": "Downloaden",
   "downloading": "Downloaden {filename}...",
   "@downloading": {
     "description": "Status message when downloading file",
@@ -1087,6 +1088,7 @@
   "messageListNew": "Nieuw",
   "messageListSent": "Verzonden",
   "removeFromMessageConfirm": "Weet je zeker dat je {name} wilt verwijderen uit dit bericht?",
+  "uploadingFilename": "Uploaden: {filename}…",
   "messageArchived": "Bericht gearchiveerd",
   "messageMovedToInbox": "Verplaatst naar inbox",
   "failedToArchiveMessage": "Kon het bericht niet archiveren: {error}",

@@ -6,6 +6,29 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Changed
+- **Uploads go into the text, where you are writing, as on the web.**
+  - A picked file appears as Discourse's placeholder, `[Uploading: name…]()`, on its own line at the cursor. When the upload lands, the placeholder becomes the Markdown Discourse renders for that kind of file.
+  - A photo can go between paragraphs, and a draft keeps its uploads.
+  - Uploads used to sit in a list under the text and were added to the end on send. Only images could be placed, by tapping a row with nothing saying so, and removing a row left its Markdown in the post.
+- **A strip of tiles above the toolbar** shows the uploads: a thumbnail for a photo, the kind of file otherwise, a spinner while uploading, and a remove badge with a 48dp target.
+  - Removing a tile takes its Markdown out of the text. Deleting the Markdown by hand drops the tile, and the upload is not added back on send.
+  - The strip replaces a titled list that flashed a spinner at every change. The chat composer uses the same tiles; its remove button was 28dp.
+- **Photos and videos from the gallery:** the photo button now offers videos too. Videos used to be reachable only through the paperclip, which on iOS opens Files rather than Photos.
+- **Videos and audio play in the post,** posted as `![name|video]` / `![name|audio]` as the web writes them; they were posted as file links. AVIF, JXL, HEIF and ICO count as images, as on the web.
+- **Three or more photos picked together go in a `[grid]`,** as the web composer does it.
+- **Several files picked at once appear together**, then upload one by one.
+- **A failed upload shows one message, not two.** The page already said why, and a generic "Failed to upload" followed it.
+- **Filenames with `[`, `]`, `|` and similar characters** are escaped in the Markdown so they don't break the link.
+- **Attachments in posts and chat:**
+  - Tapping the second or third photo in a post opens the viewer on that photo; it opened on the first. The viewer's order follows the post.
+  - Files open signed in. Tapping one downloads it with a progress ring (tap to cancel), then offers it to the system's share and open sheet. It used to open in the browser, which is signed out, so a file in a private message, or on a forum that keeps files from guests, was a 404. Share still shares the link, and the Download tooltip is translated.
+  - Secure uploads show and play. The app sends your key with a request only to the forum's own address and only for its upload paths, never to an image host, a CDN or the S3 address a secure upload redirects to. Redirects are followed one hop at a time, so the key cannot travel with one (`ForumMediaAuth`, `ForumMedia`).
+  - Chat uploads look and work like post uploads: several photos in a grid without filename captions, and files, videos and audio in the post's cards. Chat files could not be opened at all, and chat videos did not play.
+  - Post images have 8dp corners like grids; a small inline icon keeps square ones.
+  - An upload the forum cannot find shows the broken-picture box, not an invisible gap.
+  - A video's viewer and screen-reader label say "Video" rather than the file's hash name.
+
 ### Added
 - **The message lists Discourse has:**
   - The chip row reads Inbox, Unread, New, Sent and Archive, as the topic filters on Home do. Group inboxes follow when you are in a group with messages. There were only Inbox and Archive.

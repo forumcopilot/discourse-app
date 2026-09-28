@@ -534,6 +534,7 @@
   },
   "like": "curtir",
   "unlike": "descurtir",
+  "download": "Transferir",
   "downloading": "Baixando {filename}...",
   "@downloading": {
     "placeholders": {
@@ -789,6 +790,7 @@
   "messageListNew": "Novo",
   "messageListSent": "Enviado",
   "removeFromMessageConfirm": "Deseja mesmo remover {name} desta mensagem?",
+  "uploadingFilename": "A enviar: {filename}",
   "messageArchived": "Mensagem arquivada",
   "messageMovedToInbox": "Movida para a caixa de entrada",
   "failedToArchiveMessage": "Não foi possível arquivar a mensagem: {error}",

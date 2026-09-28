@@ -534,6 +534,7 @@
   },
   "like": "좋아요",
   "unlike": "좋아요 취소",
+  "download": "다운로드",
   "downloading": "{filename} 다운로드 중...",
   "@downloading": {
     "placeholders": {
@@ -789,6 +790,7 @@
   "messageListNew": "새글",
   "messageListSent": "전송됨",
   "removeFromMessageConfirm": "{name} 님을 메시지에서 제거할까요?",
+  "uploadingFilename": "업로드 중: {filename}…",
   "messageArchived": "메시지를 보관했습니다",
   "messageMovedToInbox": "받은 편지함으로 이동했습니다",
   "failedToArchiveMessage": "메시지를 보관하지 못했습니다: {error}",

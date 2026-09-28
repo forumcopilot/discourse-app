@@ -960,6 +960,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get unlike => 'togliere mi piace a';
 
   @override
+  String get download => 'Scarica';
+
+  @override
   String downloading(String filename) {
     return 'Download di $filename...';
   }
@@ -1757,6 +1760,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String removeFromMessageConfirm(String name) {
     return 'Vuoi davvero rimuovere $name da questo messaggio?';
+  }
+
+  @override
+  String uploadingFilename(String filename) {
+    return 'Caricamento: $filename…';
   }
 
   @override
