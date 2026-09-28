@@ -6,13 +6,15 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.38] - 2026-09-28
+
 ### Changed
 - **Forum colours are balanced, as Material 3 uses a brand colour.** A forum's accent now colours the accents (buttons, links, the selection, the New Topic button), and the page stays neutral. Across the 2,436 forums in ABDA's directory:
   - Links and text buttons in the accent colour now reach 4.5:1 in every forum. In light mode 60% fell short, including Discourse's default blue. The accent is darkened only as far as text needs, usually a shade. In dark mode the forum's own dark accent is kept when it reads and doesn't glare; otherwise the accent is Material's pale version of it.
   - Dark mode for a forum without a dark theme is a neutral dark page with the forum's accent. It was derived with Material's "fidelity" variant, which gave a red forum a brown-red page with a deep-red navigation indicator and buttons, and a blue forum a navy page (1,220 of 2,436 forums had a coloured dark page; now 113, all faint).
   - A forum's own page colour is kept when it is near-neutral. A strongly coloured page (navy, purple) becomes a neutral with a hint of its hue, and coloured body text (cyan on purple) becomes neutral.
   - Selected chips and the navigation indicator use Material's muted container, or the forum's own selection colour when it suits the accent. Discourse's untouched light blue is no longer kept for a purple forum.
-  - The forum's banner on its home, and in a host's list of forums, keeps the accent at full strength (`ForumColors.brand`), and category colours are unchanged. That is where the forum's identity belongs.
+  - The forum's banner on its home, and in a host's list of forums, keeps the accent at full strength (`ForumColors.brand`), and category colours are unchanged. That is where the forum's identity belongs. `ForumColors.from` takes the brand colour optionally; without it (a host's own theme) it is the scheme's accent at full strength.
 
 ### Fixed
 - **A forum whose only scheme is a light one set as its dark default** (forums.comodo.com) shows that scheme in light mode. It showed Discourse's stock blue Light instead, and a red dark theme derived from the scheme it ignored.
