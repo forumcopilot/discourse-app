@@ -7,7 +7,7 @@ import 'package:discourse_ui/config/app_forum_config.dart';
 import 'package:discourse_ui/controllers/global_loader_controller.dart';
 import 'package:discourse_ui/controllers/site_controller.dart';
 import 'package:discourse_ui/services/discourse_login_service.dart';
-import 'package:discourse_ui/views/discourse_login_webview_page.dart';
+import 'package:discourse_ui/services/discourse_auth_session.dart';
 import 'package:discourse_ui/views/enable_notifications_page.dart';
 import 'package:discourse_ui/views/site_home_page.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -96,14 +96,13 @@ class _LoginPageState extends State<LoginPage> {
     }
     if (!mounted) return;
 
-    final redirectUrl = await Navigator.of(context).push<Uri?>(
-      MaterialPageRoute<Uri?>(
-        builder: (_) => DiscourseLoginWebViewPage(
-          url: handshake.url,
-          redirectMatcher: loginService.isAuthCallback,
-          title: 'Sign in to ${_getSiteDomain()}',
-        ),
-      ),
+    // The system's browser sign-in sheet (see DiscourseAuthSession): saved
+    // passwords, passkeys, Google, and signing up all work there.
+    final redirectUrl = await DiscourseAuthSession.authorize(
+      context,
+      url: handshake.url,
+      isCallback: loginService.isAuthCallback,
+      title: 'Sign in to ${_getSiteDomain()}',
     );
     if (!mounted) return;
 

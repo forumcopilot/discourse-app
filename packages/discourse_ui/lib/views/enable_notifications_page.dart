@@ -10,7 +10,7 @@ import '../services/discourse_login_service.dart';
 import '../services/notification_key_service.dart';
 import '../services/notification_permission.dart';
 import '../theme/design_tokens.dart';
-import 'discourse_login_webview_page.dart';
+import '../services/discourse_auth_session.dart';
 import '../l10n/generated/app_localizations.dart';
 
 /// Asks the user to grant a notifications-only User API Key, shown once after
@@ -96,14 +96,13 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
       final handshake = await loginService.beginNotificationsGrant();
       if (!mounted) return;
 
-      final redirectUrl = await Navigator.of(context).push<Uri?>(
-        MaterialPageRoute<Uri?>(
-          builder: (_) => DiscourseLoginWebViewPage(
-            url: handshake.url,
-            redirectMatcher: loginService.isAuthCallback,
-            title: 'Allow notifications',
-          ),
-        ),
+      // In the same browser sheet as sign-in, which is still signed in to
+      // the forum: only Authorize is asked.
+      final redirectUrl = await DiscourseAuthSession.authorize(
+        context,
+        url: handshake.url,
+        isCallback: loginService.isAuthCallback,
+        title: 'Allow notifications',
       );
       if (!mounted) return;
 

@@ -4,7 +4,6 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:get/get.dart';
 import 'package:discourse_ui/views/login_page.dart';
 import 'empty_state_view.dart';
-import 'package:discourse_ui/utils/url_utils.dart';
 
 class NotSignedInView extends StatelessWidget {
   final SiteContext siteContext;
@@ -46,8 +45,10 @@ class NotSignedInView extends StatelessWidget {
           child: Text(AppLocalizations.of(context)!.loginTitle),
         ),
         OutlinedButton(
+          // Sign-up is on the forum's sign-in page: the same sheet, so the
+          // new account comes back signed in (see DiscourseAuthSession).
           onPressed: () {
-            UrlUtils.openUrl('${siteContext.site.url}/signup');
+            LoginPage.open(siteContext);
           },
           child: Text(AppLocalizations.of(context)?.register ?? 'Register'),
         ),

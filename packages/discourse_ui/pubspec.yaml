@@ -61,6 +61,7 @@ dependencies:
   timezone: ^0.10.1 # already in the graph via flutter_local_notifications; local dates, events
   flutter_highlight: ^0.7.0
   highlight: ^0.7.0
+  flutter_web_auth_2: ^5.1.0
 
 dev_dependencies:
   flutter_test:

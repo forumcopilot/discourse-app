@@ -8,7 +8,6 @@ import '../search_page.dart';
 import '../users_directory_page.dart';
 import '../login_page.dart';
 import '../widgets/forum_actions.dart';
-import 'package:discourse_ui/utils/url_utils.dart';
 
 class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isLoggedIn;
@@ -147,9 +146,11 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
         LoginPage.open(siteContext);
         break;
       case 'register':
-        // Discourse has no in-app registration (the account proxy says so
-        // honestly); sign-up happens on the web.
-        UrlUtils.openUrl('${siteContext.site.url}/signup');
+        // Sign-up is on the forum's sign-in page, in the same browser sheet
+        // as signing in, so the new account comes back signed in. It used to
+        // open the forum's sign-up page in the browser, and nothing came
+        // back to the app.
+        LoginPage.open(siteContext);
         break;
       case 'mark_read':
         ForumActions().markAllAsRead(context, '0');

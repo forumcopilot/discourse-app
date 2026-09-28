@@ -63,6 +63,21 @@
         <meta-data
             android:name="asset_statements"
             android:resource="@string/asset_statements" />
+        <!-- The browser sign-in sheet (flutter_web_auth_2) hands the forum's
+             answer back here: Discourse redirects to discourse://auth_redirect,
+             the one custom address every forum allows by default. Chrome's
+             Auth Tab returns it without this; older browsers need it. -->
+        <activity
+            android:name="com.linusu.flutter_web_auth_2.CallbackActivity"
+            android:exported="true"
+            android:taskAffinity="">
+            <intent-filter android:label="flutter_web_auth_2">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="discourse" android:host="auth_redirect" />
+            </intent-filter>
+        </activity>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
