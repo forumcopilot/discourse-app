@@ -11,14 +11,13 @@ import 'package:discourse_ui/controllers/topic_controller.dart';
 import 'package:discourse_ui/services/user_state_service.dart';
 import 'package:discourse_ui/theme/app_theme.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
-import 'package:discourse_ui/views/appbars/topics_tab_app_bar.dart';
 import 'package:discourse_ui/views/site_home_page.dart';
 import 'package:discourse_ui/services/site_initialization_service.dart';
 import 'package:discourse_ui/services/discourse_route_navigator.dart';
 import 'package:discourse_ui/services/forum_theme.dart';
 import 'package:discourse_ui/services/notification_route.dart';
 import 'package:discourse_ui/views/widgets/empty_state_view.dart';
-import 'package:discourse_ui/views/widgets/forum_header_widget.dart';
+import 'package:discourse_ui/views/widgets/forum_masthead.dart';
 import 'package:discourse_ui/views/widgets/topic_list_skeleton.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -198,9 +197,9 @@ class _SingleForumBootstrapPageState extends State<SingleForumBootstrapPage> {
   }
 }
 
-/// [SiteHomePage]'s first frame, before the forum has answered: the same app
-/// bar and header, the filter bar and topic list as placeholders — or, when
-/// the forum could not be reached, why, with a way to try again.
+/// [SiteHomePage]'s first frame, before the forum has answered: the same
+/// header, the filter bar and topic list as placeholders — or, when the
+/// forum could not be reached, why, with a way to try again.
 class _ForumEntryPlaceholder extends StatelessWidget {
   const _ForumEntryPlaceholder({
     required this.site,
@@ -226,18 +225,22 @@ class _ForumEntryPlaceholder extends StatelessWidget {
     // host's list, shows ← beside Try Again, a plain way out of an error.
     final canPop = ModalRoute.of(context)?.canPop ?? false;
     return Scaffold(
-      appBar: TopicsTabAppBar(
-        siteContext: siteContext,
-        leading: canPop && error != null
-            ? null
-            : const IconButton(onPressed: null, icon: Icon(Icons.menu)),
-      ),
-      body: Column(
-        children: [
-          ForumHeaderWidget(pendingSite: site, extendUnderAppBar: true),
+      body: CustomScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        slivers: [
+          // The home's own header, in the forum's colours as far as they
+          // are known yet, so the home arrives without the header changing
+          // shape.
+          ForumMasthead(
+            siteContext: siteContext,
+            onSearch: null,
+            leading: canPop && error != null
+                ? null
+                : const IconButton(onPressed: null, icon: Icon(Icons.menu)),
+          ),
           if (error == null) ...[
-            const _FilterBarPlaceholder(),
-            Expanded(
+            const SliverToBoxAdapter(child: _FilterBarPlaceholder()),
+            SliverFillRemaining(
               child: Semantics(
                 label: AppLocalizations.of(context)!.initializingForum,
                 liveRegion: true,
@@ -245,7 +248,8 @@ class _ForumEntryPlaceholder extends StatelessWidget {
               ),
             ),
           ] else
-            Expanded(
+            SliverFillRemaining(
+              hasScrollBody: false,
               child: _ConnectionError(
                 site: site,
                 message: error,

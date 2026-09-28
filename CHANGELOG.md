@@ -7,6 +7,17 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 ## [Unreleased]
 
 ### Changed
+- **A forum's Home opens with the forum's own header**: its header colour for the mode and the logo it drew for that colour, as its website shows them (a wordmark only on the kind of background it was made for, otherwise the forum's icon and name, so no logo needs a plate), one line about the forum, "active this month · members · topics", and a search field, for guests too. A line in the forum's accent runs along the bottom. It collapses into the bar with the forum's icon, name and search, so the screen never just says "Home", and the view chips stay pinned under it. It replaces the gradient card, which was much the same blue for every forum on Discourse's default colour. `ForumMasthead`, `ForumIdentity`.
+- **Home's views are the forum's own navigation bar** (`top_menu` from `/site/settings.json`): its order, its homepage first, New and Unread for signed-in readers, and Categories among them. Python.org opens on Categories, as its website does.
+- **Categories is a view on Home, not a tab.** Each category is a card with its own mark, "N new this week", its description, new/unread counts and its subcategories as chips; a parent can be opened like any category, and where the forum shows a parent's subcategories as boxes (Asana), the parent heads its subcategories' own cards. Subscribed categories carry a bell instead of being listed twice.
+- **Chat and Messages each have a tab**, so unread messages show a badge with chat on too. The bottom bar is Home, Chat (when the forum has it), Messages, Notifications and Profile.
+- **A category's page opens with a tinted header**: where it sits (the forum, and the parent for a subcategory), the category's own mark and name, its notification level as a button, two lines of description and "N new this week · N topics", on a tint of its colour with the colour as a line along the bottom. A bright category's full-colour banner used to be darkened until white text read (Python.org's yellow turned mustard). It collapses into the bar with the mark, name, bell and search; search opens with Discourse's `#category` filter. `CategoryMasthead`.
+- **Subcategories are chips under a category's header**, and a parent category lists its topics (its own and its subcategories') instead of nothing.
+- **The drawer is the forum's map**, as Discourse's sidebar is on the website: the forum and your account (or Sign in), then Community, your own sidebar categories (else the forum's defaults for new members, else its top-level categories) with counts, your tags (else the forum's top tags), and a folded Settings section. Each section remembers whether it is folded. Sign out is on Profile.
+- **Categories wear the mark the forum set** wherever they are listed: its uploaded logo (and dark-mode logo), its icon, its emoji, or a plain square in its colour. Icon-style categories showed a letter or a square; they show the forum's icon (the nearest Material icon to its Font Awesome one). `CategoryTileMark`, `materialIconForDiscourseIcon`.
+- **A category opened from a badge, a link or the drawer** has its description, counts and images, from `/site.json`.
+- **New topic on Home**, choosing the category first.
+- **"Sign In" is "Sign in"**, as everywhere else.
 - **A topic's title steps back only once you have read it to the end**, as on Discourse's website. It used to step back for every topic without a badge. On an established forum that was almost every row, including topics never opened and topics with replies since your last visit: on the local forum all 30 rows of alice's Latest looked read, and she had never opened 19 of them. A dot still marks a new topic, and a count marks the replies after where you stopped in a topic you track. The same rule applies in category, tag and search lists, and in the message list.
 - **Rows follow what you actually read.** When you come back from a topic, its row shows how far you got: the topic page's read reports (`/topics/timings`) update the row at once, on every list. Latest and Unread used to clear a row the moment it was tapped, before anything was read, so backing straight out left it looking read until a refresh brought the dot back. New, Hot, Top, category pages, tags and search never updated at all.
 - **Reading on another device updates the lists** while a list is on screen, from the forum's live messages (`/unread`, `/unread/{user_id}`), as the website does. It stops while a topic covers the list or the app is in the background, to spare the key's request budget.
@@ -16,10 +27,12 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 - **Screen readers hear "New topic" or "3 unread replies"** on a row with a badge. The badge said nothing, or just the number. `UnreadBadge.semanticLabel`.
 
 ### Added
+- `DiscourseSiteCapabilities`: `topMenu`, `defaultSidebarCategoryIds`, `defaultSidebarTags` (from `/site/settings.json`), `topTags`, `topicsThisWeek`, and on `DiscourseCategoryStyle` the description, topic and post counts, slug and `subcategoryListStyle`. The reader's own sidebar categories and tags and their trust level on the site context (`sidebarCategoryIds`, `sidebarTags`, `trustLevel`), read with the session.
 - `DiscourseTopicTracking` in `discourse_core`: the viewer's read state per forum (Discourse's TopicTrackingState), fed by every topic payload, the tracking report, in-app reading, dismissals and live messages. Kept beside the shared models, like `DiscourseTopicSlugs`, so the shared SDK is unchanged. `DiscourseTopicProxy` gains `loadTopicTrackingStateAsync`, `dismissNewAsync` and `dismissUnreadAsync`.
 
 ### Removed
 - `TopicListItem.onMarkAsRead`, the controllers' `markTopicAsRead`, and `ForumActions`.
+- The Categories tab and `ForumListTab`, `ChatMessagesTab`, `InboxTabAppBar`, `ForumsTabAppBar`, `ForumTopicsAppBar`, `SubforumHeaderWidget` and `ForumListItem`. `ForumTopicList` takes `headerSlivers` instead of `showSubforumHeader`/`headerTrailing`.
 
 ## [1.0.38] - 2026-09-28
 

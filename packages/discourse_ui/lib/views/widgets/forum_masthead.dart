@@ -23,11 +23,18 @@ class ForumMasthead extends StatelessWidget {
     required this.siteContext,
     required this.onSearch,
     this.boardStats,
+    this.leading,
   });
 
   final SiteContext siteContext;
-  final VoidCallback onSearch;
+
+  /// Opens search; null while the forum is still loading.
+  final VoidCallback? onSearch;
   final FCBoardStatResult? boardStats;
+
+  /// In place of the drawer button the bar implies (a placeholder while
+  /// the forum loads).
+  final Widget? leading;
 
   static const toolbarHeight = 64.0;
   static const lineHeight = 3.0;
@@ -98,6 +105,7 @@ class ForumMasthead extends StatelessWidget {
       systemOverlayStyle:
           overlay.copyWith(statusBarColor: Colors.transparent),
       titleSpacing: 4,
+      leading: leading,
       title: _MastheadTitle(identity: identity),
       actions: [
         _CollapsedOnly(
@@ -240,7 +248,7 @@ class _MastheadIntro extends StatelessWidget {
 
   final ForumIdentity identity;
   final String? stats;
-  final VoidCallback onSearch;
+  final VoidCallback? onSearch;
 
   @override
   Widget build(BuildContext context) {

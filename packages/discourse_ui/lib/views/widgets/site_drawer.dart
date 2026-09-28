@@ -159,7 +159,7 @@ class SiteDrawer extends StatelessWidget {
               id: 'categories',
               label: l10n.categoriesView,
               children: [
-                for (final id in _categoryIds())
+                for (final id in categoryIdsFor(siteContext))
                   _CategoryItem(
                     siteContext: siteContext,
                     categoryId: '$id',
@@ -182,7 +182,7 @@ class SiteDrawer extends StatelessWidget {
               id: 'tags',
               label: l10n.tags,
               children: [
-                for (final tag in _tags())
+                for (final tag in tagsFor(siteContext))
                   _Item(
                     icon: Icons.sell_outlined,
                     label: tag,
@@ -255,8 +255,9 @@ class SiteDrawer extends StatelessWidget {
   }
 
   /// The categories to list: the reader's sidebar, else the forum's
-  /// defaults, else its top-level categories in the forum's order.
-  List<int> _categoryIds() {
+  /// defaults, else its top-level categories in the forum's order; ones the
+  /// forum does not describe, and Uncategorized, left out.
+  static List<int> categoryIdsFor(SiteContext siteContext) {
     final caps = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl);
     final known = {
       for (final c in caps.categories)
@@ -281,7 +282,7 @@ class SiteDrawer extends StatelessWidget {
 
   /// The tags to list: the reader's sidebar, else the forum's defaults,
   /// else its most used tags.
-  List<String> _tags() {
+  static List<String> tagsFor(SiteContext siteContext) {
     final caps = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl);
     final own = siteContext.sidebarTags;
     final tags = (own != null && own.isNotEmpty)

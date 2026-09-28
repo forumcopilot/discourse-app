@@ -105,32 +105,14 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
       widget.siteContext.site.pluginUrl, 'hot');
 
   /// The views, as the forum's own navigation bar lists them
-  /// (`top_menu`): its order, its homepage first. New and Unread need a
-  /// session, as on the website; Hot needs the forum to offer the route.
-  /// Every forum gets Latest and Categories, wherever its menu puts them,
-  /// and a forum whose menu is not known yet gets Discourse's defaults.
-  List<HomeView> get _filters {
-    final caps =
-        DiscourseSiteCapabilities.forSite(widget.siteContext.site.pluginUrl);
-    final signedIn = widget.siteContext.isLoggedIn;
-    final menu = caps.topMenu.isNotEmpty
-        ? caps.topMenu
-        : const ['latest', 'hot', 'new', 'unread', 'top', 'categories'];
-    final views = <HomeView>[];
-    for (final item in menu) {
-      final view = HomeView.fromMenuItem(item);
-      if (view == null || views.contains(view)) continue;
-      if (view == HomeView.hot && !_offersHot) continue;
-      if ((view == HomeView.newTopics || view == HomeView.unread) &&
-          !signedIn) {
-        continue;
-      }
-      views.add(view);
-    }
-    if (!views.contains(HomeView.latest)) views.insert(0, HomeView.latest);
-    if (!views.contains(HomeView.categories)) views.add(HomeView.categories);
-    return views;
-  }
+  /// ([HomeView.viewsFor]).
+  List<HomeView> get _filters => HomeView.viewsFor(
+        menu: DiscourseSiteCapabilities.forSite(
+                widget.siteContext.site.pluginUrl)
+            .topMenu,
+        signedIn: widget.siteContext.isLoggedIn,
+        offersHot: _offersHot,
+      );
 
   HomeView get _activeFilter {
     final filters = _filters;
@@ -656,6 +638,32 @@ enum HomeView {
   unread,
   top,
   categories;
+
+  /// A forum's Home views: its own navigation bar ([menu], its `top_menu`)
+  /// in its order, homepage first. New and Unread need a session, as on
+  /// the website; Hot needs the forum to offer it. Every forum gets Latest
+  /// and Categories, wherever its menu puts them, and a forum whose menu is
+  /// not known yet gets Discourse's defaults.
+  static List<HomeView> viewsFor({
+    required List<String> menu,
+    required bool signedIn,
+    required bool offersHot,
+  }) {
+    final items = menu.isNotEmpty
+        ? menu
+        : const ['latest', 'hot', 'new', 'unread', 'top', 'categories'];
+    final views = <HomeView>[];
+    for (final item in items) {
+      final view = fromMenuItem(item);
+      if (view == null || views.contains(view)) continue;
+      if (view == hot && !offersHot) continue;
+      if ((view == newTopics || view == unread) && !signedIn) continue;
+      views.add(view);
+    }
+    if (!views.contains(latest)) views.insert(0, latest);
+    if (!views.contains(categories)) views.add(categories);
+    return views;
+  }
 
   /// The view a `top_menu` item names, or null for one the app does not
   /// draw (Bookmarks, Posted, Votes…).
