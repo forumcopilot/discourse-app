@@ -125,7 +125,7 @@ void main() {
 
     test('the reader’s own pages, when signed in', () {
       final me = site(username: 'bob');
-      expect(to('/my/messages', at: me).homeTab, SiteHomeTab.inbox);
+      expect(to('/my/messages', at: me).homeTab, SiteHomeTab.messages);
       expect(to('/my/notifications', at: me).homeTab, SiteHomeTab.notifications);
       expect(to('/my/activity/bookmarks', at: me).kind,
           LinkDestinationKind.bookmarks);

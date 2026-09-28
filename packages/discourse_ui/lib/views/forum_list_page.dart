@@ -55,7 +55,7 @@ class ForumListPage extends StatelessWidget {
           l10n.chat,
           ChatMessagesTab(siteContext: siteContext, isActive: true),
         ),
-      SiteHomeTab.inbox => (
+      SiteHomeTab.inbox || SiteHomeTab.messages => (
           l10n.messages,
           PrivateMessageListTab(siteContext: siteContext, isActive: true),
         ),

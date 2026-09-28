@@ -18,6 +18,10 @@ enum SiteHomeTab {
   /// Chat where the plugin is installed, private messages otherwise.
   inbox,
 
+  /// The reader's private messages: where the forum's `/my/messages` leads.
+  /// Where chat shares the home's slot with them, [inbox] opens on Chat.
+  messages,
+
   /// The notification list. Where a push notification lands when nothing in
   /// its payload names a topic to open.
   notifications,

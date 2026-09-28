@@ -135,6 +135,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
       case SiteHomeTab.categories:
         return _forumsTab;
       case SiteHomeTab.inbox:
+      case SiteHomeTab.messages:
         return _isChatEnabled ? _chatTab : _messagesTab;
       case SiteHomeTab.notifications:
         return _notificationsTab;

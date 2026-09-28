@@ -194,7 +194,7 @@ class DiscourseLinkHandler {
         if (path == 'bookmarks' || path.startsWith('activity/bookmarks')) {
           return const LinkDestination(LinkDestinationKind.bookmarks);
         }
-        if (path.startsWith('messages')) return home(SiteHomeTab.inbox);
+        if (path.startsWith('messages')) return home(SiteHomeTab.messages);
         if (path.startsWith('notifications')) {
           return home(SiteHomeTab.notifications);
         }
