@@ -1,12 +1,14 @@
 import 'dart:typed_data';
 
 import 'package:discourse_ui/theme/app_theme.dart';
+import 'package:discourse_ui/theme/forum_colors.dart';
 import 'package:discourse_ui/theme/forum_brand_style.dart';
 import 'package:discourse_ui/theme/forum_palette.dart';
 import 'package:discourse_ui/utils/html_colors.dart';
 import 'package:discourse_ui/utils/logo_tone.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_color_utilities/material_color_utilities.dart';
 
 /// The forum's identity card: a gradient in the forum's own colour, and a
 /// logo that stays visible on it. Logos are transparent artwork drawn for
@@ -167,7 +169,10 @@ void main() {
       });
       final theme = AppTheme.themeFor(Brightness.light, asana);
       final b = await brandIn(tester, theme);
-      expect(b.base, theme.colorScheme.primaryContainer);
+      // The accent at full strength: the theme's own containers are muted.
+      expect(b.base, theme.extension<ForumColors>()!.brand);
+      expect(Hct.fromInt(b.base.toARGB32()).chroma,
+          greaterThan(Hct.fromInt(theme.colorScheme.primaryContainer.toARGB32()).chroma));
       expectReadable(b);
     });
 
@@ -181,7 +186,7 @@ void main() {
       });
       final theme = AppTheme.themeFor(Brightness.dark, asana);
       final b = await brandIn(tester, theme);
-      expect(b.base, theme.colorScheme.primaryContainer);
+      expect(b.base, theme.extension<ForumColors>()!.brand);
       expect(b.base.computeLuminance(), lessThan(0.3));
       expectReadable(b);
     });

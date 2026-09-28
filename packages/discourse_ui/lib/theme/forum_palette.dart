@@ -161,12 +161,18 @@ class ForumPalette {
   /// Matched on what each scheme *is*, not which slot it came in: a forum
   /// whose default is a dark scheme and that sets no dark one is a
   /// dark-only forum, and in the app's light mode it has no light scheme.
+  ///
+  /// The forum's own schemes come first: a forum whose only scheme is a
+  /// light one sitting in the dark slot (its admin set a light scheme as the
+  /// dark default and named no light one) shows that scheme in light mode,
+  /// not Discourse's stock Light. Stock Light is the fallback only for a
+  /// forum that names no light scheme at all.
   DiscourseScheme? schemeFor(Brightness brightness) {
     final wantDark = brightness == Brightness.dark;
-    for (final s in [light ?? DiscourseScheme.light, if (dark != null) dark!]) {
+    for (final s in [if (light != null) light!, if (dark != null) dark!]) {
       if (s.isDark == wantDark) return s;
     }
-    return null;
+    return !wantDark && light == null ? DiscourseScheme.light : null;
   }
 
   /// The forum's accent — what a scheme it lacks is derived from.

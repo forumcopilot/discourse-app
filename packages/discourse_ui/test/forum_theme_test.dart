@@ -10,14 +10,15 @@ import 'package:discourse_ui/theme/forum_palette.dart';
 import 'package:discourse_ui/utils/html_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// The app wears the open forum's colours: its Discourse light and dark
-/// schemes from /site.json, mapped onto Material's ColorScheme with the
-/// colours a reader recognises the forum by pinned exactly — unless a
-/// pinned colour would be illegible — and nothing forum-coloured outside
-/// a forum.
+/// The app wears the open forum's colours, balanced as Material 3 uses a
+/// brand colour: its Discourse light and dark schemes from /site.json give
+/// the accent (legible as text) and, when they are near-neutral, the page
+/// and text; the page otherwise stays Material's neutral, and nothing is
+/// forum-coloured outside a forum.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -153,8 +154,11 @@ void main() {
         'tertiary': '1d4ed8',
       });
       final cs = AppTheme.colorSchemeFor(Brightness.light, grey);
-      expect(cs.primary, const Color(0xFF1D4ED8));
-      expect(cs.onPrimary, Colors.white);
+      // The blue, darkened until links in it read on the grey page.
+      expect(contrastRatio(cs.primary, cs.surface), greaterThanOrEqualTo(4.5));
+      expect(Hct.fromInt(cs.primary.toARGB32()).hue,
+          closeTo(Hct.fromInt(0xFF1D4ED8).hue, 3));
+      expect(contrastRatio(cs.onPrimary, cs.primary), greaterThanOrEqualTo(4.5));
     });
 
     test('unreadable page text leaves the page to the seeded scheme', () {
@@ -163,6 +167,94 @@ void main() {
       final cs = AppTheme.colorSchemeFor(Brightness.light, murky);
       expect(cs.surface, isNot(const Color(0xFF888888)));
       expect(contrastRatio(cs.onSurface, cs.surface), greaterThan(4.5));
+    });
+  });
+
+  group('balanced', () {
+    double chroma(Color c) => Hct.fromInt(c.toARGB32()).chroma;
+    double hue(Color c) => Hct.fromInt(c.toARGB32()).hue;
+
+    test('a faint accent is darkened only as far as text needs', () {
+      // Discourse's default blue on white: 4.0:1, short of text's 4.5:1.
+      const stock = ForumPalette();
+      final cs = AppTheme.colorSchemeFor(Brightness.light, stock);
+      expect(cs.primary, isNot(const Color(0xFF0088CC)));
+      expect(contrastRatio(cs.primary, cs.surface), closeTo(4.5, 0.25));
+      expect(hue(cs.primary), closeTo(hue(const Color(0xFF0088CC)), 3));
+      expect(cs.surface, Colors.white);
+    });
+
+    test('a red forum with no dark mode: a neutral page, a pale accent', () {
+      final red = ForumPalette.fromHex(light: {'tertiary': 'ff0054'});
+      final cs = AppTheme.colorSchemeFor(Brightness.dark, red);
+      // It was a brown-red page and a deep-red navigation indicator.
+      expect(chroma(cs.surface), lessThanOrEqualTo(4));
+      expect(chroma(cs.surfaceContainerHighest), lessThanOrEqualTo(4));
+      expect(chroma(cs.secondaryContainer), lessThanOrEqualTo(24));
+      expect(chroma(cs.primaryContainer), lessThanOrEqualTo(40));
+      expect(Hct.fromInt(cs.primary.toARGB32()).tone, closeTo(80, 3));
+      expect(contrastRatio(cs.primary, cs.surface), greaterThanOrEqualTo(4.5));
+      expect(contrastRatio(cs.onSurface, cs.surface), greaterThanOrEqualTo(7));
+    });
+
+    test('a coloured page becomes a neutral with a hint of its hue', () {
+      // forum.eternagame.org: a navy dark scheme.
+      final navy = ForumPalette.fromHex(
+          light: tealLight,
+          dark: {'primary': 'ffffff', 'secondary': '05224b', 'tertiary': '50b2dc'});
+      final cs = AppTheme.colorSchemeFor(Brightness.dark, navy);
+      expect(cs.surface, isNot(const Color(0xFF05224B)));
+      expect(chroma(cs.surface), lessThanOrEqualTo(7));
+      expect(hue(cs.surface), closeTo(hue(const Color(0xFF05224B)), 15));
+      // Its own dark accent reads and is not glaring: kept exactly.
+      expect(cs.primary, const Color(0xFF50B2DC));
+    });
+
+    test('coloured body text loses its colour', () {
+      // A cyan text colour on a near-black page read as one long link.
+      final cyan = ForumPalette.fromHex(
+          light: tealLight,
+          dark: {'primary': '00e5ff', 'secondary': '161616', 'tertiary': 'cc00ff'});
+      final cs = AppTheme.colorSchemeFor(Brightness.dark, cyan);
+      expect(cs.surface, const Color(0xFF161616));
+      expect(chroma(cs.onSurface), lessThanOrEqualTo(6));
+      expect(contrastRatio(cs.onSurface, cs.surface), greaterThanOrEqualTo(7));
+      // A glaring accent becomes Material's pale one in its hue.
+      expect(chroma(cs.primary), lessThanOrEqualTo(49));
+    });
+
+    test("Discourse's untouched blue selection is not kept for a purple forum",
+        () {
+      final purple = ForumPalette.fromHex(
+          light: {'tertiary': '6a0085', 'selected': 'd1f0ff'});
+      final cs = AppTheme.colorSchemeFor(Brightness.light, purple);
+      expect(cs.secondaryContainer, isNot(const Color(0xFFD1F0FF)));
+      // A grey selection, or one in the accent's hue, is the forum's own.
+      final grey = ForumPalette.fromHex(
+          light: {'tertiary': '6a0085', 'selected': 'e9e9e9'});
+      expect(AppTheme.colorSchemeFor(Brightness.light, grey).secondaryContainer,
+          const Color(0xFFE9E9E9));
+    });
+
+    test('a light scheme in the dark slot is the forum\'s light scheme', () {
+      // forums.comodo.com: its only scheme is a grey-and-red light one,
+      // set as the dark default. Light mode used Discourse's stock blue.
+      final comodo = ForumPalette.fromHex(dark: {
+        'primary': '000000',
+        'secondary': 'ebebeb',
+        'tertiary': 'e4002b',
+      });
+      expect(comodo.schemeFor(Brightness.light)!.tertiary, const Color(0xFFE4002B));
+      expect(comodo.schemeFor(Brightness.dark), isNull);
+      final cs = AppTheme.colorSchemeFor(Brightness.light, comodo);
+      expect(cs.surface, const Color(0xFFEBEBEB));
+    });
+
+    test('the banner keeps the accent at full strength', () {
+      final theme = AppTheme.themeFor(Brightness.light,
+          ForumPalette.fromHex(light: {'tertiary': 'ff0054'}));
+      final fc = theme.extension<ForumColors>()!;
+      expect(chroma(fc.brand), greaterThan(chroma(theme.colorScheme.primaryContainer)));
     });
   });
 

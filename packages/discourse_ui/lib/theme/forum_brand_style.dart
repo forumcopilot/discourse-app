@@ -55,7 +55,7 @@ class ForumBrandStyle {
     final theme = Theme.of(context);
     final fc = ForumColors.of(context);
     return ForumBrandStyle._build(theme.colorScheme, fc.headerBackground,
-        fc.headerPrimary, theme.brightness);
+        fc.headerPrimary, fc.brand, fc.onBrand, theme.brightness);
   }
 
   static final Map<(ForumPalette?, Brightness), ForumBrandStyle> _byPalette = {};
@@ -68,10 +68,13 @@ class ForumBrandStyle {
     final known = _byPalette[key];
     if (known != null) return known;
     final scheme = palette?.schemeFor(brightness) ?? DiscourseScheme.stock(brightness);
+    final (brand, onBrand) = AppTheme.brandContainerFor(brightness, palette);
     final style = ForumBrandStyle._build(
       AppTheme.colorSchemeFor(brightness, palette),
       scheme.headerBackground,
       scheme.headerPrimary,
+      brand,
+      onBrand,
       brightness,
     );
     if (_byPalette.length >= 400) _byPalette.remove(_byPalette.keys.first);
@@ -89,16 +92,17 @@ class ForumBrandStyle {
       );
 
   factory ForumBrandStyle._build(ColorScheme cs, Color headerBackground,
-      Color headerPrimary, Brightness brightness) {
+      Color headerPrimary, Color brand, Color onBrand, Brightness brightness) {
     final branded =
         contrastRatio(headerBackground, cs.surface) >= _brandedHeaderContrast;
-    var base = branded ? headerBackground : cs.primaryContainer;
+    // The forum's accent at full strength ([ForumColors.brand]): the
+    // theme's own containers are kept muted.
+    var base = branded ? headerBackground : brand;
     // A bright accent (Let's Encrypt's cyan) would light up a dark screen;
     // in dark mode the card is the same hue, deep. A forum's own header
     // colour is its choice and stays as it is.
     if (!branded && brightness == Brightness.dark) base = _deepened(base);
-    return ForumBrandStyle._withBase(
-        base, branded ? headerPrimary : cs.onPrimaryContainer);
+    return ForumBrandStyle._withBase(base, branded ? headerPrimary : onBrand);
   }
 
   static Color _deepened(Color c) {
