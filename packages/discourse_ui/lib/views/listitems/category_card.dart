@@ -24,8 +24,8 @@ String? categoryActivityLine(
           .topicsThisWeek[id];
   if (week != null && week > 0) return l10n.categoryNewThisWeek(week);
   if (forum.topicCount <= 0) return null;
-  final compact = NumberFormat.compact(
-      locale: Localizations.localeOf(context).toString());
+  final compact =
+      NumberFormat.compact(locale: Localizations.localeOf(context).toString());
   return l10n.countTopics(forum.topicCount, compact.format(forum.topicCount));
 }
 
@@ -39,11 +39,13 @@ class CategoryCard extends StatelessWidget {
     required this.siteContext,
     required this.forum,
     this.showSubcategories = true,
+    this.margin = const EdgeInsets.fromLTRB(16, 4, 16, 4),
   });
 
   final SiteContext siteContext;
   final FCForum forum;
   final bool showSubcategories;
+  final EdgeInsetsGeometry margin;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +64,7 @@ class CategoryCard extends StatelessWidget {
     final subs = showSubcategories ? forum.childForums : const <FCForum>[];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      padding: margin,
       child: Material(
         color: scheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(12),
@@ -214,8 +216,60 @@ class SubcategoryChip extends StatelessWidget {
 }
 
 /// A parent category whose forum shows its subcategories as boxes (Asana
-/// puts every category under one): a heading that opens the parent, above
-/// its subcategories' own cards.
+/// puts every category under one): its [CategorySectionHeading] above its
+/// subcategories' own cards, which hang from a rail of the parent's colour
+/// so the top-level category after the group does not read as one of them
+/// (Python.org's Typing follows its Packaging group).
+class CategoryGroup extends StatelessWidget {
+  const CategoryGroup({
+    super.key,
+    required this.siteContext,
+    required this.forum,
+  });
+
+  final SiteContext siteContext;
+  final FCForum forum;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final style = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
+        .categoryStyleFor(forum.id);
+    final rail = categoryMarkColor(
+      parseDiscourseHex(style?.colorHex ?? forum.color ?? '') ??
+          scheme.outlineVariant,
+      scheme.surface,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        CategorySectionHeading(siteContext: siteContext, forum: forum),
+        // The rail runs down from the middle of the heading's 20dp mark.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(25, 0, 0, 12),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(left: BorderSide(color: rail, width: 2)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final child in forum.childForums)
+                  CategoryCard(
+                    siteContext: siteContext,
+                    forum: child,
+                    margin: const EdgeInsets.fromLTRB(12, 4, 16, 4),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The heading of a [CategoryGroup]: opens the parent.
 class CategorySectionHeading extends StatelessWidget {
   const CategorySectionHeading({
     super.key,

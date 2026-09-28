@@ -7,6 +7,7 @@ import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/theme/app_theme.dart';
 import 'package:discourse_ui/theme/forum_identity.dart';
 import 'package:discourse_ui/utils/discourse_icons.dart';
+import 'package:discourse_ui/views/listitems/category_card.dart';
 import 'package:discourse_ui/views/tabs/topic_list_tab.dart' show HomeView;
 import 'package:discourse_ui/views/widgets/brand_image.dart';
 import 'package:discourse_ui/views/widgets/category_tile_mark.dart';
@@ -67,7 +68,8 @@ void main() {
       );
     });
 
-    test('views the app does not draw are skipped; Latest and Categories '
+    test(
+        'views the app does not draw are skipped; Latest and Categories '
         'are always there', () {
       // Asana: categories|latest|bookmarks|unread|new.
       expect(
@@ -134,7 +136,8 @@ void main() {
       expect(id.icon, '$_forum/icon.png');
     });
 
-    testWidgets('dark mode with no dark logo: the icon and name, no plated '
+    testWidgets(
+        'dark mode with no dark logo: the icon and name, no plated '
         'wordmark', (tester) async {
       storeForum();
       final id = await identity(tester, Brightness.dark);
@@ -147,14 +150,16 @@ void main() {
       expect(id.wordmark, '$_forum/logo-dark.png');
     });
 
-    testWidgets('a forum whose own header is dark keeps its wordmark in dark '
+    testWidgets(
+        'a forum whose own header is dark keeps its wordmark in dark '
         'mode', (tester) async {
       storeForum(lightHeader: '333333');
       final id = await identity(tester, Brightness.dark);
       expect(id.wordmark, '$_forum/logo.png');
     });
 
-    testWidgets('open, it offers search named after the forum and its '
+    testWidgets(
+        'open, it offers search named after the forum and its '
         'stats; collapsed, a search button', (tester) async {
       await tester.pumpWidget(_app(Scaffold(
         drawer: const Drawer(),
@@ -188,8 +193,9 @@ void main() {
       await tester.pumpAndSettle();
       final button = find.widgetWithIcon(IconButton, Icons.search);
       expect(button, findsOneWidget);
-      final opacity = tester.widget<AnimatedOpacity>(find.ancestor(
-          of: button, matching: find.byType(AnimatedOpacity)).first);
+      final opacity = tester.widget<AnimatedOpacity>(find
+          .ancestor(of: button, matching: find.byType(AnimatedOpacity))
+          .first);
       expect(opacity.opacity, 1);
     });
   });
@@ -243,12 +249,63 @@ void main() {
     });
 
     test('Discourse\'s icon names map to Material icons', () {
-      expect(materialIconForDiscourseIcon('circle-question'), Icons.help_outline);
+      expect(
+          materialIconForDiscourseIcon('circle-question'), Icons.help_outline);
       expect(materialIconForDiscourseIcon('far-circle-question'),
           Icons.help_outline);
       expect(materialIconForDiscourseIcon('square-full'), isNull);
       expect(materialIconForDiscourseIcon('no-such-icon'), isNull);
     });
+  });
+
+  testWidgets(
+      'a boxes group keeps its own cards; the next top-level '
+      'category stands outside it', (tester) async {
+    DiscourseSiteCapabilities.store(_forum, {
+      'top_menu_items': ['latest'],
+      'categories': [
+        {
+          'id': 12,
+          'name': 'Packaging',
+          'color': '3572A5',
+          'subcategory_list_style': 'boxes'
+        },
+        {'id': 40, 'name': 'Standards', 'parent_category_id': 12},
+        {'id': 17, 'name': 'Typing'},
+      ],
+    });
+    final ctx = _context();
+    final packaging = FCForum(id: '12', name: 'Packaging', childForums: [
+      FCForum(id: '40', name: 'Standards', parentId: '12'),
+    ]);
+    await tester.pumpWidget(_app(Scaffold(
+      body: ListView(children: [
+        CategoryGroup(siteContext: ctx, forum: packaging),
+        CategoryCard(
+            siteContext: ctx, forum: FCForum(id: '17', name: 'Typing')),
+      ]),
+    )));
+    final group = find.byType(CategoryGroup);
+    expect(find.descendant(of: group, matching: find.text('Packaging')),
+        findsOneWidget);
+    expect(find.descendant(of: group, matching: find.text('Standards')),
+        findsOneWidget);
+    expect(find.descendant(of: group, matching: find.text('Typing')),
+        findsNothing);
+    // Indented under the heading, so Typing's full-width card reads apart.
+    expect(
+        tester
+            .getTopLeft(find
+                .ancestor(
+                    of: find.text('Standards'), matching: find.byType(Material))
+                .first)
+            .dx,
+        greaterThan(tester
+            .getTopLeft(find
+                .ancestor(
+                    of: find.text('Typing'), matching: find.byType(Material))
+                .first)
+            .dx));
   });
 
   group('the drawer lists the reader\'s own categories and tags', () {

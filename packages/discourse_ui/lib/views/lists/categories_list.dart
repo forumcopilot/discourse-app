@@ -134,15 +134,9 @@ class CategoriesListState extends State<CategoriesList> {
       if (caps.isUncategorized(forum.id) && forum.topicCount == 0) continue;
       final boxes = forum.childForums.isNotEmpty &&
           (caps.categoryStyleFor(forum.id)?.subcategoriesAsBoxes ?? false);
-      if (boxes) {
-        items.add(CategorySectionHeading(
-            siteContext: widget.siteContext, forum: forum));
-        for (final child in forum.childForums) {
-          items.add(CategoryCard(siteContext: widget.siteContext, forum: child));
-        }
-      } else {
-        items.add(CategoryCard(siteContext: widget.siteContext, forum: forum));
-      }
+      items.add(boxes
+          ? CategoryGroup(siteContext: widget.siteContext, forum: forum)
+          : CategoryCard(siteContext: widget.siteContext, forum: forum));
     }
     // Room for the New topic button, so the last card scrolls clear of it.
     items.add(const SizedBox(height: 88));
