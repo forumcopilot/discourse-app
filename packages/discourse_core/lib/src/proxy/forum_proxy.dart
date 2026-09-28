@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/models/results/fc_forum_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../data/site/discourse_site_capabilities.dart';
+import '../data/topic/discourse_topic_tracking.dart';
 import '../util/html_text.dart';
 import '../util/discourse_link.dart';
 import '../util/site_url.dart';
@@ -99,27 +100,39 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
 
   @override
   Future<FCMarkAllAsReadResult> markAllAsRead(String forumId) async {
-    // Discourse: PUT /topics/bulk with filter=='unread' selects the user's
-    // unread topics server-side; the operation type must come from
-    // TopicsBulkAction.operations ('dismiss' is invalid) — 'dismiss_posts'
-    // marks every post in each selected topic as read.
+    // Everything read, as web does it: its two dismissals, "Dismiss New"
+    // (PUT /topics/reset-new) and "Dismiss all unread" (PUT /topics/bulk
+    // over filter 'unread' with `dismiss_posts`, the TopicsBulkAction
+    // operation that marks every post read; 'dismiss' is not one). This
+    // used to send only the second, so new topics stayed new while the
+    // app reported everything read.
+    //
+    // Every category unless one is named. The app bars passed '0', the
+    // XenForo "all forums" id; sent as category_id 0 it narrowed the
+    // selection to a category that does not exist, so nothing was marked
+    // read while the app reported success. A named category takes its
+    // subcategories with it, as "Dismiss" does on the web
+    // (TopicsController#bulk_unread_topic_ids).
     try {
-      final body = <String, dynamic>{
+      final categoryId = int.tryParse(forumId);
+      final scope = <String, dynamic>{
+        if (categoryId != null && categoryId > 0) ...{
+          'category_id': categoryId,
+          'include_subcategories': true,
+        },
+      };
+      List<String> ids(Map<String, dynamic> r) =>
+          ((r['topic_ids'] as List?) ?? const []).map((e) => '$e').toList();
+      final tracking = DiscourseTopicTracking.forSite(siteContext);
+      final dismissedNew = await apiPut('/topics/reset-new',
+          body: {'dismiss_topics': true, ...scope});
+      tracking.applyDismissedNew(ids(dismissedNew));
+      final dismissedUnread = await apiPut('/topics/bulk', body: {
         'filter': 'unread',
         'operation': {'type': 'dismiss_posts'},
-      };
-      // Every category unless one is named. The app bars pass '0', the
-      // XenForo "all forums" id; sent as category_id 0 it narrowed the
-      // selection to a category that does not exist, so nothing was marked
-      // read while the app reported success. A named category takes its
-      // subcategories with it, as "Dismiss" does on the web
-      // (TopicsController#bulk_unread_topic_ids).
-      final categoryId = int.tryParse(forumId);
-      if (categoryId != null && categoryId > 0) {
-        body['category_id'] = categoryId;
-        body['include_subcategories'] = true;
-      }
-      await apiPut('/topics/bulk', body: body);
+        ...scope,
+      });
+      tracking.applyDismissedUnread(ids(dismissedUnread));
       return FCMarkAllAsReadResult(result: true, resultText: '');
     } catch (e) {
       return FCMarkAllAsReadResult(

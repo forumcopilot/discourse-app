@@ -95,30 +95,6 @@ class DiscourseLatestTopicController extends DiscourseGlobalLoaderController wit
       rethrow;
     }
   }
-
-  void markTopicAsRead(String topicId) {
-    // Update FCTopic list immediately to reflect the change in UI
-    final updatedTopics = fcTopics.map((topic) {
-      if (topic.id == topicId) {
-        // Create a copy with hasNewPosts set to false
-        return topic.copyWith(hasNewPosts: false);
-      }
-      return topic;
-    }).toList();
-
-    // Update the observable with the modified data
-    fcTopics.value = updatedTopics;
-
-    // Also update the raw data for consistency
-    var currentData = latestTopicsDataOutput.value;
-    var updatedRawTopics = currentData.topics.map((topic) {
-      if (topic.id == topicId) {
-        return topic.copyWith(hasNewPosts: false);
-      }
-      return topic;
-    }).toList();
-    latestTopicsDataOutput.value = currentData.copyWith(topics: updatedRawTopics);
-  }
 }
 
 class DiscourseUnreadTopicController extends GetxController {
@@ -164,47 +140,6 @@ class DiscourseUnreadTopicController extends GetxController {
       fcTopics.addAll(freshTopics);
     }
     isInitialized.value = true;
-  }
-
-  void markTopicAsRead(String topicId) {
-    // Update FCTopic list immediately to reflect the change in UI
-    final updatedTopics = fcTopics.map((topic) {
-      if (topic.id == topicId) {
-        // Create a copy with hasNewPosts set to false
-        return topic.copyWith(hasNewPosts: false);
-      }
-      return topic;
-    }).toList();
-
-    // Update the observable with the modified data
-    fcTopics.value = updatedTopics;
-
-    // Also update the raw data for consistency
-    var currentData = unreadTopicsDataOutput.value;
-    var updatedRawTopics = currentData.topics.map((topic) {
-      if (topic.id == topicId) {
-        return topic.copyWith(hasNewPosts: false);
-      }
-      return topic;
-    }).toList();
-    unreadTopicsDataOutput.value = currentData.copyWith(topics: updatedRawTopics);
-  }
-
-  /// Reset and reload the unread topics list
-  /// This is called after marking all forums as read to immediately update the list
-  Future<void> resetAndReload() async {
-    // Clear existing data
-    unreadTopicsDataOutput.value = FCUnreadTopicResult(
-      result: false,
-      resultText: '',
-      totalUnreadNum: 0,
-      topics: [],
-    );
-    fcTopics.clear();
-    isInitialized.value = false;
-
-    // Reload from the beginning
-    await getUnreadTopicAsync(0, 19); // Load first page (20 items)
   }
 }
 

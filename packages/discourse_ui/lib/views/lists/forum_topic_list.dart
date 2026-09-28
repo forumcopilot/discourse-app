@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
@@ -5,6 +7,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 import 'package:forumcopilot_sdk/models/results/fc_topic_result.dart';
+import 'package:discourse_ui/services/topic_tracking_service.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseTopicProxy;
 import 'package:get/get.dart';
 import 'package:discourse_ui/utils/forum_navigation.dart';
@@ -103,6 +106,9 @@ class _ForumTopicListState extends State<ForumTopicList> {
   }
 
   Future<void> _loadTopics() async {
+    // The chips' counts and the subcategories' "3 new", with the feed.
+    unawaited(TopicTrackingService.refresh(widget.siteContext,
+        maxAge: const Duration(seconds: 10)));
     AppLogger.debug('\n[ForumTopicList] Starting to load topics for forum: ${widget.forum.name}');
     AppLogger.debug('[ForumTopicList] Current state - Loading: $_isLoading, Error: $_error');
 
@@ -400,11 +406,24 @@ class _ForumTopicListState extends State<ForumTopicList> {
               ),
             ),
           // If there are no forums and no topics, show empty state
+          // An empty New or Unread feed is a caught-up reader, not an
+          // empty category: the Home tab's words, not "No discussions yet".
           if (forums.isEmpty && topics.isEmpty && canViewContent)
-            EmptyStateView(
-              icon: Icons.forum_outlined,
-              message: AppLocalizations.of(context)!.noDiscussionsYet,
-            ),
+            switch (widget.filter) {
+              'new' => EmptyStateView(
+                  icon: Icons.fiber_new,
+                  message: AppLocalizations.of(context)!.noNewTopicsSinceLastVisit,
+                ),
+              'unread' => EmptyStateView(
+                  icon: Icons.inbox_rounded,
+                  message: AppLocalizations.of(context)!.youAreAllCaughtUp,
+                  hint: AppLocalizations.of(context)!.thereAreNoUnreadTopics,
+                ),
+              _ => EmptyStateView(
+                  icon: Icons.forum_outlined,
+                  message: AppLocalizations.of(context)!.noDiscussionsYet,
+                ),
+            },
           if (forums.isNotEmpty) ...[
             ...forums.map((forum) => ForumListItem(
                   siteContext: widget.siteContext,

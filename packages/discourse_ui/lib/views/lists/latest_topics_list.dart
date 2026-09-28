@@ -265,9 +265,6 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
             AppLogger.debug('🔍 [LatestTopicsList] Topic tapped: topicId=${topic.id}, isLoggedIn=${widget.siteContext.isLoggedIn}, mode=$mode');
             AppNavigation.pushGlobal(PostPage(siteContext: widget.siteContext, topicId: topic.id, title: topic.title, mode: mode, forumId: topic.forumId));
           },
-          onMarkAsRead: (topicId) {
-            _latestTopicController!.markTopicAsRead(topicId);
-          },
         ),
       );
     }

@@ -61,6 +61,7 @@ export 'src/data/post/discourse_post_revision.dart';
 export 'src/data/post/discourse_accepted_answer.dart';
 export 'src/data/post/discourse_valid_reactions.dart';
 export 'src/data/topic/discourse_topic_slugs.dart';
+export 'src/data/topic/discourse_topic_tracking.dart';
 export 'src/data/message/discourse_message_details.dart';
 export 'src/data/message/discourse_conversations_result.dart';
 export 'src/data/site/discourse_site_capabilities.dart';

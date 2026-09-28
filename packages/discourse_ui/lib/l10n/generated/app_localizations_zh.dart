@@ -2433,4 +2433,79 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get notificationSettings => '通知设置';
+
+  @override
+  String get topicIsNew => 'New topic';
+
+  @override
+  String get noNewTopicsSinceLastVisit =>
+      'No new topics since your last visit.';
+
+  @override
+  String get messageIsNew => 'New message';
+
+  @override
+  String topicUnreadReplies(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count unread replies',
+      one: '1 unread reply',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String filterNewWithCount(int count) {
+    return 'New ($count)';
+  }
+
+  @override
+  String filterUnreadWithCount(int count) {
+    return 'Unread ($count)';
+  }
+
+  @override
+  String categoryNewTopics(int count) {
+    return '$count new';
+  }
+
+  @override
+  String categoryUnreadTopics(int count) {
+    return '$count unread';
+  }
+
+  @override
+  String get dismissNew => 'Dismiss new';
+
+  @override
+  String get dismissUnread => 'Dismiss unread';
+
+  @override
+  String get dismissNewTitle => 'Dismiss new topics?';
+
+  @override
+  String get dismissNewMessage => 'They will no longer show as new.';
+
+  @override
+  String get dismissUnreadTitle => 'Dismiss all unread?';
+
+  @override
+  String get dismissUnreadMessage =>
+      'Their new replies will be marked as read.';
+
+  @override
+  String get dismissUnreadStopTracking =>
+      'Stop tracking these topics so they never show up as unread for me again';
+
+  @override
+  String get dismissNewAndUnread => 'Dismiss new and unread';
+
+  @override
+  String dismissNewAndUnreadMessage(String category) {
+    return 'Topics in $category will no longer show as new or unread.';
+  }
+
+  @override
+  String get dismissedTopics => 'Dismissed';
 }

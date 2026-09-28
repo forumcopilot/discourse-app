@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import '../search_page.dart';
 import '../users_directory_page.dart';
 import '../login_page.dart';
-import '../widgets/forum_actions.dart';
 
 class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isLoggedIn;
@@ -104,7 +103,6 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (isLoggedIn) {
           // Show logged-in menu items
           return [
-            _buildMenuItem('mark_read', Icons.visibility_off_rounded, AppLocalizations.of(context)?.markForumRead ?? 'Mark category read', colorScheme, textTheme),
             _buildMenuItem('notification_test', Icons.notifications_active_rounded, AppLocalizations.of(context)?.notificationTest ?? 'Notification Test', colorScheme, textTheme),
             _buildMenuItem('logout', Icons.logout_rounded, AppLocalizations.of(context)?.logout ?? 'Logout', colorScheme, textTheme, isDestructive: true),
           ];
@@ -151,9 +149,6 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
         // open the forum's sign-up page in the browser, and nothing came
         // back to the app.
         LoginPage.open(siteContext);
-        break;
-      case 'mark_read':
-        ForumActions().markAllAsRead(context, '0');
         break;
       case 'logout':
         final loginController = Get.isRegistered<DiscourseLoginController>() ? Get.find<DiscourseLoginController>() : Get.put(DiscourseLoginController());

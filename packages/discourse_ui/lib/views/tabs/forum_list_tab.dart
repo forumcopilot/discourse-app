@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:discourse_ui/services/topic_tracking_service.dart';
+import 'package:discourse_ui/views/widgets/category_read_counts.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseSiteCapabilities;
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -112,6 +116,10 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
     // Load subscribed forums when tab becomes active and user is logged in
     if (widget.isActive && !oldWidget.isActive && widget.siteContext.isLoggedIn) {
       _loadSubscribedForums();
+      // The categories load once, with the app; their counts are kept
+      // fresh as the tab comes back.
+      unawaited(TopicTrackingService.refresh(widget.siteContext,
+          maxAge: const Duration(seconds: 10)));
     }
   }
 
@@ -191,6 +199,9 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
 
   Future<void> _loadForums() async {
     AppLogger.debug('\n[ForumList] Loading forums');
+    // Each category's "3 new" / "2 unread" (ForumListItem).
+    unawaited(TopicTrackingService.refresh(widget.siteContext,
+        maxAge: const Duration(seconds: 10)));
     try {
       setState(() {
         _isLoading = true;
@@ -489,6 +500,9 @@ class ForumListTabState extends FCStatefulWidget<ForumListTab> with FCTabStatefu
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
+                // The group's new and unread, its subcategories included.
+                CategoryReadCounts(
+                    siteContext: widget.siteContext, categoryId: forum.id),
               ],
             ),
           ),

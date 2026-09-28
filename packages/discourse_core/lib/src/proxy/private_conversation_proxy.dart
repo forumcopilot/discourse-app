@@ -2,6 +2,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import '../data/message/discourse_conversations_result.dart';
 import '../data/topic/discourse_topic_slugs.dart';
+import '../data/topic/discourse_topic_tracking.dart';
 import '../util/html_text.dart';
 import '../util/quote_markup.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_private_conversation_proxy.dart';
@@ -913,6 +914,12 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     Map<String, dynamic> t, {
     Map<int, Map<String, dynamic>> users = const {},
   }) {
+    // How far the viewer has read it, for the row (DiscourseTopicTracking).
+    // Named a PM whatever the payload says: every row here is one.
+    if (siteContext.isLoggedIn) {
+      DiscourseTopicTracking.forSite(siteContext)
+          .recordTopicJson({...t, 'archetype': 'private_message'});
+    }
     // Collect every user the topic surfaces:
     //   posters[]      = OP + most-recent-poster (with `description` tags)
     //   participants[] = other recipients of the PM (no description)

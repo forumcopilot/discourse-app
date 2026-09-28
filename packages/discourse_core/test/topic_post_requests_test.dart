@@ -12,26 +12,45 @@ void main() {
   setUp(() => rec = _Recorder());
 
   group('mark all as read', () {
-    test("'0' (all forums) selects every category", () async {
+    test("'0' (all forums) dismisses new topics and unread replies everywhere",
+        () async {
       final proxy = _Forum(rec);
       await proxy.markAllAsRead('0');
-      expect(rec.last, ('PUT', '/topics/bulk'));
-      expect(rec.body, {
-        'filter': 'unread',
-        'operation': {'type': 'dismiss_posts'},
-      }, reason: 'category_id 0 narrowed it to a category that does not exist');
+      expect(rec.putList, [
+        ['/topics/reset-new', {'dismiss_topics': true}],
+        [
+          '/topics/bulk',
+          {
+            'filter': 'unread',
+            'operation': {'type': 'dismiss_posts'},
+          }
+        ],
+      ],
+          reason: 'category_id 0 narrowed it to a category that does not '
+              'exist; and the bulk call alone left new topics new');
+      rec.puts.clear();
       await proxy.markAllAsRead('');
-      expect((rec.body as Map).containsKey('category_id'), isFalse);
+      expect(rec.puts.every((p) => !(p.$2 as Map).containsKey('category_id')),
+          isTrue);
     });
 
     test('a category takes its subcategories', () async {
       await _Forum(rec).markAllAsRead('6');
-      expect(rec.body, {
-        'filter': 'unread',
-        'operation': {'type': 'dismiss_posts'},
-        'category_id': 6,
-        'include_subcategories': true,
-      });
+      expect(rec.putList, [
+        [
+          '/topics/reset-new',
+          {'dismiss_topics': true, 'category_id': 6, 'include_subcategories': true}
+        ],
+        [
+          '/topics/bulk',
+          {
+            'filter': 'unread',
+            'operation': {'type': 'dismiss_posts'},
+            'category_id': 6,
+            'include_subcategories': true,
+          }
+        ],
+      ]);
     });
   });
 
@@ -187,9 +206,13 @@ class _Recorder {
     return nextPost;
   }
 
+  final List<(String, Object?)> puts = [];
+  List<List<Object?>> get putList => [for (final p in puts) [p.$1, p.$2]];
+
   Future<Map<String, dynamic>> put(String path, Object? b) async {
     last = ('PUT', path);
     body = b;
+    puts.add((path, b));
     return nextPut;
   }
 }

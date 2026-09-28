@@ -439,6 +439,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
             final conversation = _conversations![index];
             return ConversationListItem(
               conversation: conversation,
+              siteContext: widget.siteContext,
               onTap: () => _onConversationTap(conversation),
               onDelete: () => _deleteConversation(conversation.conv_id ?? ''),
             );

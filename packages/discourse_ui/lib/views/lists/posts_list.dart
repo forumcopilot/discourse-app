@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseAcceptedAnswers, DiscourseSiteContextExtension;
+    show
+        DiscourseAcceptedAnswers,
+        DiscourseSiteContextExtension,
+        DiscourseTopicTracking;
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/models/thread_view_data.dart';
@@ -738,7 +741,13 @@ class _PostsState extends State<PostsList> {
       if (!r.result) {
         AppLogger.debug(
             'PostsList: read-tracking report failed: ${r.resultText}');
+        return;
       }
+      // Discourse moves the read place to the highest post reported; the
+      // lists behind this page follow at once instead of on their next
+      // refresh (DiscourseTopicTracking).
+      DiscourseTopicTracking.forSite(widget.siteContext)
+          .recordRead(topicId, fresh.reduce((a, b) => a > b ? a : b));
     }).catchError((e) {
       AppLogger.debug('PostsList: read-tracking report error: $e');
     });

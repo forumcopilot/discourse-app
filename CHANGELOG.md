@@ -6,6 +6,21 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Changed
+- **A topic's title steps back only once you have read it to the end**, as on Discourse's website. It used to step back for every topic without a badge. On an established forum that was almost every row, including topics never opened and topics with replies since your last visit: on the local forum all 30 rows of alice's Latest looked read, and she had never opened 19 of them. A dot still marks a new topic, and a count marks the replies after where you stopped in a topic you track. The same rule applies in category, tag and search lists, and in the message list.
+- **Rows follow what you actually read.** When you come back from a topic, its row shows how far you got: the topic page's read reports (`/topics/timings`) update the row at once, on every list. Latest and Unread used to clear a row the moment it was tapped, before anything was read, so backing straight out left it looking read until a refresh brought the dot back. New, Hot, Top, category pages, tags and search never updated at all.
+- **Reading on another device updates the lists** while a list is on screen, from the forum's live messages (`/unread`, `/unread/{user_id}`), as the website does. It stops while a topic covers the list or the app is in the background, to spare the key's request budget.
+- **"Dismiss new" and "Dismiss unread" replace "Mark all read".** They sit above the New and Unread lists, where the topics are, as on the website. Dismiss unread offers Discourse's "Stop tracking these topics so they never show up as unread for me again". A category's ⋮ menu has "Dismiss new and unread". The ✓✓ button on Home and Categories is gone: it cleared only unread replies and left new topics new, while its dialog said everything would be marked read. `IFCForumProxy.markAllAsRead` now makes both of Discourse's dismissals.
+- **The New and Unread chips show their counts**, "New (2)" and "Unread (1)" as on the website, on Home and on a category's page, and category rows say "1 new" and "1 unread", counting their subcategories. The counts come from the report the website loads on every page (`/u/{username}/topic-tracking-state.json`).
+- **A category's page has an Unread list**, beside Latest, Hot and New.
+- **Screen readers hear "New topic" or "3 unread replies"** on a row with a badge. The badge said nothing, or just the number. `UnreadBadge.semanticLabel`.
+
+### Added
+- `DiscourseTopicTracking` in `discourse_core`: the viewer's read state per forum (Discourse's TopicTrackingState), fed by every topic payload, the tracking report, in-app reading, dismissals and live messages. Kept beside the shared models, like `DiscourseTopicSlugs`, so the shared SDK is unchanged. `DiscourseTopicProxy` gains `loadTopicTrackingStateAsync`, `dismissNewAsync` and `dismissUnreadAsync`.
+
+### Removed
+- `TopicListItem.onMarkAsRead`, the controllers' `markTopicAsRead`, and `ForumActions`.
+
 ## [1.0.38] - 2026-09-28
 
 ### Changed

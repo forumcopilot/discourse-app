@@ -9,6 +9,7 @@ import '../widgets/filter_chip_bar.dart';
 import '../listitems/topic_list_item.dart';
 import '../tabs/topic_list_tab.dart';
 import '../post_page.dart';
+import '../../utils/app_navigation.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/resettable_widget.dart';
 import '../../utils/error_message.dart';
@@ -219,16 +220,12 @@ class TopTopicsListState extends FCStatefulWidget<TopTopicsList>
             siteContext: widget.siteContext,
             topic: t,
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => PostPage(
-                    siteContext: widget.siteContext,
-                    topicId: t.id,
-                    title: t.title,
-                    forumId: t.forumId,
-                  ),
-                ),
-              );
+              AppNavigation.pushGlobal(PostPage(
+                siteContext: widget.siteContext,
+                topicId: t.id,
+                title: t.title,
+                forumId: t.forumId,
+              ));
             },
           )),
       if (_hasMore && _topics.isNotEmpty)

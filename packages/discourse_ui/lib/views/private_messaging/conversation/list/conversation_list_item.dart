@@ -4,21 +4,53 @@ import 'package:discourse_ui/views/widgets/user_avatar.dart';
 import '../../../../utils/time_utils.dart';
 import '../../../../theme/design_tokens.dart';
 import '../../../widgets/unread_badge.dart';
+import '../../../../utils/topic_read_mark.dart';
+import '../../../../l10n/generated/app_localizations.dart';
+import 'package:forumcopilot_sdk/context/site_context.dart';
 
 class ConversationListItem extends StatelessWidget {
   final FCConversationSummary conversation;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
 
+  /// The forum, for the read state the app keeps for each message (a PM is
+  /// a topic), so the row changes as soon as you come back from reading
+  /// it. Without it the row goes by the list's own flags.
+  final SiteContext? siteContext;
+
   const ConversationListItem({
     Key? key,
     required this.conversation,
     this.onTap,
     this.onDelete,
+    this.siteContext,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final hasNewPosts = conversation.new_post ?? false;
+    final unreadCount = conversation.unreadMessageCount ?? 0;
+    final site = siteContext;
+    if (site == null) {
+      return _buildRow(
+        context,
+        TopicReadMark(
+          isRead: !hasNewPosts,
+          isNew: hasNewPosts && unreadCount <= 0,
+          unreadCount: hasNewPosts ? unreadCount : 0,
+        ),
+      );
+    }
+    return TopicReadMarkBuilder(
+      siteContext: site,
+      topicId: conversation.convId,
+      hasNewPosts: hasNewPosts,
+      unreadCount: unreadCount,
+      builder: _buildRow,
+    );
+  }
+
+  Widget _buildRow(BuildContext context, TopicReadMark mark) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -49,7 +81,6 @@ class ConversationListItem extends StatelessWidget {
       }
     }
 
-    final hasNewPosts = conversation.new_post ?? false;
     final replyCount = int.parse(conversation.reply_count ?? '0');
     final totalMessages = replyCount + 1; // replies + first message
     final lastTime = DateTime.tryParse(
@@ -57,7 +88,6 @@ class ConversationListItem extends StatelessWidget {
         ) ??
         DateTime.now();
 
-    final unreadCount = conversation.unreadMessageCount ?? 0;
     final metaColor = colorScheme.onSurfaceVariant;
     final metaStyle = textTheme.bodySmall?.copyWith(color: metaColor);
     Widget meta(IconData icon, String text) => Row(
@@ -103,12 +133,13 @@ class ConversationListItem extends StatelessWidget {
                         Text(
                           conversation.conv_subject ?? 'No subject',
                           style: textTheme.titleMedium?.copyWith(
-                            color: hasNewPosts
-                                ? colorScheme.onSurface
-                                : colorScheme.onSurfaceVariant,
-                            fontWeight: hasNewPosts
-                                ? DesignTokens.fontWeightMedium
-                                : DesignTokens.fontWeightNormal,
+                            // Only a message read to the end steps back.
+                            color: mark.isRead
+                                ? colorScheme.onSurfaceVariant
+                                : colorScheme.onSurface,
+                            fontWeight: mark.isRead
+                                ? DesignTokens.fontWeightNormal
+                                : DesignTokens.fontWeightMedium,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -145,9 +176,15 @@ class ConversationListItem extends StatelessWidget {
                     children: [
                       Text(formatSmartDateTime(lastTime, context),
                           style: metaStyle),
-                      if (hasNewPosts) ...[
+                      if (mark.isNew || mark.unreadCount > 0) ...[
                         const SizedBox(height: DesignTokens.spacingS),
-                        UnreadBadge(count: unreadCount),
+                        UnreadBadge(
+                          count: mark.unreadCount,
+                          semanticLabel: mark.unreadCount > 0
+                              ? AppLocalizations.of(context)!
+                                  .topicUnreadReplies(mark.unreadCount)
+                              : AppLocalizations.of(context)!.messageIsNew,
+                        ),
                       ],
                     ],
                   ),

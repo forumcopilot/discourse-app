@@ -92,9 +92,9 @@ class ForumTopicsAppBar extends BaseForumAppBar {
                 value: 'mark_read',
                 child: Row(
                   children: [
-                    Icon(Icons.visibility_off_rounded, color: colorScheme.onSurfaceVariant),
+                    Icon(Icons.done_all_rounded, color: colorScheme.onSurfaceVariant),
                     const SizedBox(width: 12),
-                    Text(AppLocalizations.of(context)!.markRead),
+                    Text(AppLocalizations.of(context)!.dismissNewAndUnread),
                   ],
                 ),
               ),

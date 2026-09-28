@@ -1,10 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/views/widgets/resettable_widget.dart';
 import 'package:discourse_ui/views/lists/latest_topics_list.dart';
 import 'package:discourse_ui/views/widgets/filter_chip_bar.dart';
 import 'package:discourse_ui/views/lists/hot_topics_list.dart';
-import 'package:discourse_core/discourse_core.dart' show DiscourseSiteCapabilities;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseSiteCapabilities, DiscourseTopicCounts, DiscourseTopicTracking;
+import 'package:discourse_ui/services/topic_tracking_service.dart';
+import 'package:discourse_ui/views/widgets/dismiss_topics.dart';
+import 'package:discourse_ui/views/widgets/topic_tracking_live.dart';
 import 'package:discourse_ui/views/lists/new_topics_list.dart';
 import 'package:discourse_ui/views/lists/top_topics_list.dart';
 import 'package:discourse_ui/views/lists/unread_topics_list.dart';
@@ -108,7 +114,8 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   String? _lastLoadedUsername;
   late final VoidCallback _authStateListener;
 
-  List<String> _getFilterLabels(BuildContext context) {
+  List<String> _getFilterLabels(
+      BuildContext context, DiscourseTopicCounts? counts) {
     // Discourse-native order: Latest, New, Unread, Top. "Subscribed" /
     // "Participated" from the old XF-flavored chip set moved out of
     // this tab in Phase 5.17c; they'll resurface under the Profile
@@ -121,9 +128,12 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
         case _HomeFilter.hot:
           return 'Hot'; // Discourse's /hot.json
         case _HomeFilter.newTopics:
-          return 'New'; // Discourse's /new.json
+          // Discourse's /new.json, with web's count: "New (5)".
+          final n = counts?.newTopics ?? 0;
+          return n > 0 ? l10n.filterNewWithCount(n) : 'New';
         case _HomeFilter.unread:
-          return l10n.unread;
+          final n = counts?.unreadTopics ?? 0;
+          return n > 0 ? l10n.filterUnreadWithCount(n) : l10n.unread;
         case _HomeFilter.top:
           return 'Top'; // Discourse's /top.json with period selector
       }
@@ -158,10 +168,17 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
         _unreadTopicsKey.currentState?.resetList();
         _topTopicsKey.currentState?.resetList();
         _hotTopicsKey.currentState?.resetList();
+        TopicTrackingService.refresh(widget.siteContext,
+            maxAge: Duration.zero);
       }
     };
 
     widget.siteContext.isLoggedInNotifier.addListener(_authStateListener);
+
+    // The New and Unread counts (and every row's read state beyond what
+    // the lists carry).
+    WidgetsBinding.instance.addPostFrameCallback(
+        (_) => TopicTrackingService.refresh(widget.siteContext));
   }
 
   @override
@@ -191,6 +208,7 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
           _hotTopicsKey.currentState?.refreshList();
           break;
       }
+      TopicTrackingService.refresh(widget.siteContext);
       // Force rebuild to show updated content
       if (mounted) {
         setState(() {});
@@ -293,12 +311,47 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   }
 
   Widget _buildFilterChips() {
-    return FilterChipBar(
-      options: [
-        for (final label in _getFilterLabels(context)) FilterChipOption(label: label),
-      ],
-      selectedIndex: _selectedFilterIndex,
-      onSelected: (i) => setState(() => _selectedFilterIndex = i),
+    Widget chips(DiscourseTopicCounts? counts) => FilterChipBar(
+          options: [
+            for (final label in _getFilterLabels(context, counts))
+              FilterChipOption(label: label),
+          ],
+          selectedIndex: _selectedFilterIndex,
+          onSelected: (i) => setState(() => _selectedFilterIndex = i),
+        );
+    if (!widget.siteContext.isLoggedIn) return chips(null);
+    final tracking = DiscourseTopicTracking.forSite(widget.siteContext);
+    return ListenableBuilder(
+      listenable: tracking,
+      builder: (context, _) => chips(tracking.counts()),
+    );
+  }
+
+  /// "Dismiss new" / "Dismiss unread" above the New and Unread lists,
+  /// where the topics it acts on are, as web places them. Only when the
+  /// list has topics.
+  Widget? _buildDismissBar() {
+    if (!widget.siteContext.isLoggedIn) return null;
+    final (kind, hasTopics, reload) = switch (_activeFilter) {
+      _HomeFilter.newTopics => (
+          DismissKind.newTopics,
+          _newTopicsKey.currentState?.hasTopics ?? false,
+          () => _newTopicsKey.currentState?.refreshList(),
+        ),
+      _HomeFilter.unread => (
+          DismissKind.unread,
+          _unreadTopicsKey.currentState?.hasTopics ?? false,
+          () => _unreadTopicsKey.currentState?.refreshList(),
+        ),
+      _ => (null, false, () {}),
+    };
+    if (kind == null || !hasTopics) return null;
+    return DismissTopicsBar(
+      siteContext: widget.siteContext,
+      kind: kind,
+      onDismissed: () {
+        reload();
+      },
     );
   }
 
@@ -400,6 +453,8 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
   }
 
   Future<void> _handleRefresh() async {
+    unawaited(TopicTrackingService.refresh(widget.siteContext,
+        maxAge: Duration.zero));
     // Trigger refresh on the active topic list
     switch (_activeFilter) {
       case _HomeFilter.latest:
@@ -445,7 +500,11 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
       );
     }
 
-    return Stack(
+    final dismissBar = _buildDismissBar();
+    return TopicTrackingLive(
+      siteContext: widget.siteContext,
+      active: widget.isActive,
+      child: Stack(
       children: [
         RefreshIndicator(
           onRefresh: _handleRefresh,
@@ -460,12 +519,14 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
                 ),
               ),
               SliverToBoxAdapter(child: _buildFilterChips()),
+              if (dismissBar != null) SliverToBoxAdapter(child: dismissBar),
               ..._topicSlivers(context, _buildTopicItems(), _buildEmptyState()),
             ],
           ),
         ),
         hiddenWidgets,
       ],
+      ),
     );
   }
 }

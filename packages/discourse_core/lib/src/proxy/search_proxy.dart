@@ -11,6 +11,7 @@ import 'package:forumcopilot_sdk/models/search/fc_search_filters.dart';
 
 import '../base_discourse_proxy.dart';
 import '../data/topic/discourse_topic_slugs.dart';
+import '../data/topic/discourse_topic_tracking.dart';
 import '../util/discourse_link.dart';
 import '../util/site_url.dart';
 
@@ -459,6 +460,9 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
     final id = (t['id'] ?? '').toString();
     final slug = t['slug']?.toString();
     DiscourseTopicSlugs.store(siteContext.site.url, id, slug);
+    if (siteContext.isLoggedIn) {
+      DiscourseTopicTracking.forSite(siteContext).recordTopicJson(t);
+    }
     final categoryId = (t['category_id'] ?? '').toString();
     return FCTopic(
       id: id,

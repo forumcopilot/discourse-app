@@ -166,6 +166,15 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
     _unreadTopicController = null;
   }
 
+  /// Whether any topic is listed — the Dismiss button's condition.
+  bool get hasTopics {
+    final controller = _unreadTopicController ??
+        (Get.isRegistered<DiscourseUnreadTopicController>()
+            ? Get.find<DiscourseUnreadTopicController>()
+            : null);
+    return controller?.fcTopics.isNotEmpty ?? false;
+  }
+
   @override
   Future<void> refreshList() async {
     await resetList();
@@ -317,9 +326,6 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
               }
             }
             AppNavigation.pushGlobal(PostPage(siteContext: widget.siteContext, topicId: topic.id, title: topic.title, forumId: topic.forumId));
-          },
-          onMarkAsRead: (topicId) {
-            controller!.markTopicAsRead(topicId);
           },
         ),
       );

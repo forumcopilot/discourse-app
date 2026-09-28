@@ -6,9 +6,11 @@ import 'package:discourse_ui/views/appbars/forum_topics_app_bar.dart';
 import 'package:discourse_ui/views/lists/forum_topic_list.dart';
 import 'package:discourse_ui/views/widgets/filter_chip_bar.dart';
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseSiteCapabilities;
+    show DiscourseSiteCapabilities, DiscourseTopicCounts, DiscourseTopicTracking;
 import 'package:discourse_ui/views/new_topic_page.dart';
-import 'package:discourse_ui/views/widgets/forum_actions.dart';
+import 'package:discourse_ui/services/topic_tracking_service.dart';
+import 'package:discourse_ui/views/widgets/dismiss_topics.dart';
+import 'package:discourse_ui/views/widgets/topic_tracking_live.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSubscriptionProxy;
 import 'package:discourse_ui/views/widgets/notification_level_sheet.dart';
@@ -30,12 +32,22 @@ class ForumTopicsPage extends StatefulWidget {
 }
 
 class _ForumTopicsPageState extends State<ForumTopicsPage> {
-  final ForumActions _forumActions = ForumActions();
   VoidCallback? _refreshCallback;
 
   @override
   void initState() {
     super.initState();
+    // The counts on the New and Unread chips.
+    WidgetsBinding.instance.addPostFrameCallback(
+        (_) => TopicTrackingService.refresh(widget.siteContext));
+  }
+
+  /// This category and every one below it: what web counts as in it.
+  Set<int>? get _categoryIds {
+    final id = int.tryParse(widget.forum.id);
+    if (id == null) return null;
+    return DiscourseSiteCapabilities.forSite(widget.siteContext.site.pluginUrl)
+        .categoryWithDescendants(id);
   }
 
   Future<void> _handleNewTopic() async {
@@ -128,12 +140,15 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
     }
   }
 
-  Future<void> _handleMarkRead() async {
-    await _forumActions.markAllAsRead(context, widget.forum.id);
-    if (_refreshCallback != null) {
-      _refreshCallback!();
-    }
-  }
+  /// The ⋮ menu's "Dismiss new and unread": both of web's dismissals,
+  /// for this category and its subcategories.
+  Future<void> _handleMarkRead() => dismissNewAndUnread(
+        context,
+        widget.siteContext,
+        categoryId: widget.forum.id,
+        categoryName: widget.forum.name,
+        onDismissed: () => _refreshCallback?.call(),
+      );
 
   void _onRefreshAvailable(VoidCallback callback) {
     // Defer setState to avoid calling it during build phase
@@ -156,9 +171,10 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
         if (DiscourseSiteCapabilities.offersRoute(
             widget.siteContext.site.pluginUrl, 'hot'))
           _CategoryFilter.hot,
-        // `/c/{id}/l/new.json` answers 403 to a guest, so it is only
-        // offered to someone who can actually use it.
+        // `/c/{id}/l/new.json` and `unread.json` answer 403 to a guest,
+        // so they are only offered to someone who can actually use them.
         if (widget.siteContext.isLoggedIn) _CategoryFilter.newTopics,
+        if (widget.siteContext.isLoggedIn) _CategoryFilter.unread,
       ];
 
   _CategoryFilter _activeFilter = _CategoryFilter.latest;
@@ -167,10 +183,63 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
     final filters = _filters;
     // A lone tab is a label, not a choice.
     if (filters.length < 2) return null;
-    return FilterChipBar(
-      options: [for (final f in filters) FilterChipOption(label: f.label)],
-      selectedIndex: filters.indexOf(_activeFilter),
-      onSelected: (i) => setState(() => _activeFilter = filters[i]),
+    final l10n = AppLocalizations.of(context)!;
+    String label(_CategoryFilter f, DiscourseTopicCounts? counts) {
+      final n = switch (f) {
+        _CategoryFilter.newTopics => counts?.newTopics ?? 0,
+        _CategoryFilter.unread => counts?.unreadTopics ?? 0,
+        _ => 0,
+      };
+      return switch (f) {
+        _CategoryFilter.newTopics when n > 0 => l10n.filterNewWithCount(n),
+        _CategoryFilter.unread when n > 0 => l10n.filterUnreadWithCount(n),
+        _CategoryFilter.unread => l10n.unread,
+        _ => f.label,
+      };
+    }
+
+    Widget build(DiscourseTopicCounts? counts) {
+      final chips = FilterChipBar(
+        options: [
+          for (final f in filters) FilterChipOption(label: label(f, counts)),
+        ],
+        selectedIndex: filters.indexOf(_activeFilter),
+        onSelected: (i) => setState(() => _activeFilter = filters[i]),
+      );
+      // Dismiss sits above the New and Unread feeds, as on Home; hidden
+      // once the counts say there is nothing to dismiss.
+      final kind = switch (_activeFilter) {
+        _CategoryFilter.newTopics => DismissKind.newTopics,
+        _CategoryFilter.unread => DismissKind.unread,
+        _ => null,
+      };
+      final remaining = switch (kind) {
+        DismissKind.newTopics => counts?.newTopics,
+        DismissKind.unread => counts?.unreadTopics,
+        null => 0,
+      };
+      if (kind == null || remaining == 0) return chips;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          chips,
+          DismissTopicsBar(
+            siteContext: widget.siteContext,
+            kind: kind,
+            categoryId: int.tryParse(widget.forum.id),
+            onDismissed: () => _refreshCallback?.call(),
+          ),
+        ],
+      );
+    }
+
+    if (!widget.siteContext.isLoggedIn) return build(null);
+    final tracking = DiscourseTopicTracking.forSite(widget.siteContext);
+    return ListenableBuilder(
+      listenable: tracking,
+      builder: (context, _) =>
+          build(tracking.counts(categoryIds: _categoryIds)),
     );
   }
 
@@ -191,13 +260,17 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
       // The filter bar is handed to the list rather than stacked above it,
       // so it sits *under* the category header card and scrolls with the
       // content — the header is the first item inside that list.
-      body: ForumTopicList(
+      body: TopicTrackingLive(
         siteContext: widget.siteContext,
-        forum: widget.forum,
-        showSubforumHeader: true,
-        onRefreshAvailable: _onRefreshAvailable,
-        filter: _activeFilter.route,
-        headerTrailing: _buildFilterTabs(context),
+        active: true,
+        child: ForumTopicList(
+          siteContext: widget.siteContext,
+          forum: widget.forum,
+          showSubforumHeader: true,
+          onRefreshAvailable: _onRefreshAvailable,
+          filter: _activeFilter.route,
+          headerTrailing: _buildFilterTabs(context),
+        ),
       ),
       // Where a thumb is, in the forum's accent (the app's FAB theme), and
       // always reachable — it used to sit in the category header, which
@@ -219,7 +292,8 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
 enum _CategoryFilter {
   latest('latest', 'Latest'),
   hot('hot', 'Hot'),
-  newTopics('new', 'New');
+  newTopics('new', 'New'),
+  unread('unread', 'Unread');
 
   const _CategoryFilter(this.route, this.label);
 

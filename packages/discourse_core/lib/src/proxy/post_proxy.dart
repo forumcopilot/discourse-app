@@ -15,6 +15,7 @@ import '../data/site/discourse_site_capabilities.dart';
 import '../data/post/discourse_accepted_answer.dart';
 import '../data/post/discourse_valid_reactions.dart';
 import '../data/topic/discourse_topic_slugs.dart';
+import '../data/topic/discourse_topic_tracking.dart';
 import '../data/message/discourse_message_details.dart';
 import '../util/discourse_link.dart';
 import '../util/quote_markup.dart';
@@ -1041,6 +1042,11 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     final details = DiscourseMessageDetails.fromTopicView(t,
         siteUrl: siteContext.site.url);
     if (details != null) DiscourseMessageDetails.store(topicId, details);
+    // Every topic view, PM or not, also says how far the viewer has read
+    // (see DiscourseTopicTracking).
+    if (siteContext.isLoggedIn) {
+      DiscourseTopicTracking.forSite(siteContext).recordTopicJson(t);
+    }
   }
 
   /// Every poll in a Discourse post payload, with the viewer's votes.

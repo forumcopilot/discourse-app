@@ -11,6 +11,7 @@ import '../../theme/style_builders.dart';
 import '../../theme/forum_colors.dart';
 import '../widgets/topic_taxonomy_chips.dart';
 import '../widgets/unread_badge.dart';
+import '../../utils/topic_read_mark.dart';
 
 /// Widget para representar un ítem de la lista de foros
 class TopicListItem extends StatelessWidget {
@@ -22,7 +23,6 @@ class TopicListItem extends StatelessWidget {
   final FCTopic topic;
   final VoidCallback? onTap;
   final IconData? topicIcon;
-  final Function(String topicId)? onMarkAsRead;
 
   const TopicListItem({
     super.key,
@@ -31,23 +31,25 @@ class TopicListItem extends StatelessWidget {
     this.showCategory = true,
     required this.onTap,
     this.topicIcon,
-    this.onMarkAsRead,
   });
 
-  void _handleTap() {
-    // Mark as read immediately when tapped if the topic has new posts
-    if (topic.hasNewPosts && onMarkAsRead != null) {
-      onMarkAsRead!(topic.id);
-    }
-    // Call the original onTap callback
-    onTap?.call();
-  }
-
+  // The row does not mark the topic read when tapped: it used to, before
+  // anything was read, so backing straight out left it looking read until
+  // the next refresh brought it back. The topic page reports what the
+  // reader actually saw, and the row follows (TopicReadMarkBuilder).
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => TopicReadMarkBuilder(
+        siteContext: siteContext,
+        topicId: topic.id,
+        hasNewPosts: topic.hasNewPosts,
+        unreadCount: topic.unreadCount,
+        builder: _buildRow,
+      );
+
+  Widget _buildRow(BuildContext context, TopicReadMark mark) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final unread = topic.hasNewPosts;
+    final l10n = AppLocalizations.of(context)!;
     final excerpt = topic.shortContent ?? '';
 
     // A Material 3 list item, title first: the author's avatar leading, the
@@ -57,7 +59,7 @@ class TopicListItem extends StatelessWidget {
     return Material(
       color: colorScheme.surface,
       child: InkWell(
-        onTap: _handleTap,
+        onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -94,27 +96,35 @@ class TopicListItem extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 withEmojiShortcodes(topic.title),
-                                // Unread titles in full strength; read ones
-                                // step back, as visited topics do on web.
+                                // Only a topic read to the end steps back,
+                                // as visited topics do on web; one never
+                                // opened keeps full strength.
                                 style: textTheme.titleMedium?.copyWith(
-                                  color: unread
-                                      ? colorScheme.onSurface
-                                      : colorScheme.onSurfaceVariant,
-                                  fontWeight: unread
-                                      ? DesignTokens.fontWeightMedium
-                                      : DesignTokens.fontWeightNormal,
+                                  color: mark.isRead
+                                      ? colorScheme.onSurfaceVariant
+                                      : colorScheme.onSurface,
+                                  fontWeight: mark.isRead
+                                      ? DesignTokens.fontWeightNormal
+                                      : DesignTokens.fontWeightMedium,
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            if (unread)
+                            if (mark.isNew || mark.unreadCount > 0)
                               Padding(
                                 padding: const EdgeInsets.only(
                                   left: DesignTokens.spacingS,
                                   top: 6,
                                 ),
-                                child: UnreadBadge(count: topic.unreadCount),
+                                child: mark.unreadCount > 0
+                                    ? UnreadBadge(
+                                        count: mark.unreadCount,
+                                        semanticLabel: l10n
+                                            .topicUnreadReplies(mark.unreadCount),
+                                      )
+                                    : UnreadBadge(
+                                        semanticLabel: l10n.topicIsNew),
                               ),
                           ],
                         ),

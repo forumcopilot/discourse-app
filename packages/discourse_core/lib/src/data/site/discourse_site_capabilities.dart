@@ -208,6 +208,26 @@ class DiscourseSiteCapabilities {
     return null;
   }
 
+  /// [categoryId] and every category below it, however deep — what web
+  /// counts as "in" a category (Category.subcategory_ids).
+  Set<int> categoryWithDescendants(int categoryId) {
+    final ids = {categoryId};
+    var grew = true;
+    while (grew) {
+      grew = false;
+      for (final c in categories) {
+        final id = c['id'];
+        if (id is int &&
+            !ids.contains(id) &&
+            ids.contains(c['parent_category_id'])) {
+          ids.add(id);
+          grew = true;
+        }
+      }
+    }
+    return ids;
+  }
+
   /// True for the forum's "Uncategorized" category, whose badge Discourse
   /// hides (`suppress_uncategorized_badge`, on by default).
   bool isUncategorized(String categoryId) =>

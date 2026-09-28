@@ -8,6 +8,7 @@ import '../../theme/design_tokens.dart';
 import '../listitems/topic_list_item.dart';
 import '../tabs/topic_list_tab.dart';
 import '../post_page.dart';
+import '../../utils/app_navigation.dart';
 import '../widgets/not_signed_in_view.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/resettable_widget.dart';
@@ -129,6 +130,9 @@ class NewTopicsListState extends FCStatefulWidget<NewTopicsList>
   @override
   Future<void> refreshList() => _load(reset: true);
 
+  /// Whether any topic is listed — the Dismiss button's condition.
+  bool get hasTopics => _topics.isNotEmpty;
+
   Future<void> loadMore() async {
     if (!_hasMore || _isLoading) return;
     await _load(reset: false);
@@ -147,16 +151,12 @@ class NewTopicsListState extends FCStatefulWidget<NewTopicsList>
             siteContext: widget.siteContext,
             topic: t,
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => PostPage(
-                    siteContext: widget.siteContext,
-                    topicId: t.id,
-                    title: t.title,
-                    forumId: t.forumId,
-                  ),
-                ),
-              );
+              AppNavigation.pushGlobal(PostPage(
+                siteContext: widget.siteContext,
+                topicId: t.id,
+                title: t.title,
+                forumId: t.forumId,
+              ));
             },
           )),
       if (_hasMore && _topics.isNotEmpty)
@@ -191,9 +191,9 @@ class NewTopicsListState extends FCStatefulWidget<NewTopicsList>
     if (_error != null) {
       return EmptyStateView.error(message: describeError(_error, context: context), onRetry: refreshList);
     }
-    return const EmptyStateView(
+    return EmptyStateView(
       icon: Icons.fiber_new,
-      message: 'No new topics since your last visit.',
+      message: AppLocalizations.of(context)!.noNewTopicsSinceLastVisit,
     );
   }
 

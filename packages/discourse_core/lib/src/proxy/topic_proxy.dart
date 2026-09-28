@@ -10,6 +10,7 @@ import '../data/site/discourse_site_capabilities.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../util/html_text.dart';
 import '../data/topic/discourse_topic_slugs.dart';
+import '../data/topic/discourse_topic_tracking.dart';
 import '../util/discourse_link.dart';
 import '../util/site_url.dart';
 
@@ -298,6 +299,98 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       return FCMarkTopicReadResult(result: false, resultText: describeApiError(e));
     }
   }
+
+  /// Discourse-only: loads the viewer's new and unread topics — the report
+  /// web preloads on every page, GET /u/{username}/topic-tracking-state
+  /// (UsersController#topic_tracking_state) — into
+  /// [DiscourseTopicTracking], which the New and Unread counts come from.
+  /// False when signed out or the request failed.
+  Future<bool> loadTopicTrackingStateAsync() async {
+    final username = siteContext.loginDataOutput?.user?.username;
+    if (!siteContext.isLoggedIn || username == null || username.isEmpty) {
+      return false;
+    }
+    try {
+      final r = await apiGet(
+          '/u/${Uri.encodeComponent(username)}/topic-tracking-state.json');
+      // A bare JSON array, which apiGet wraps under `_value`.
+      final rows = r['_value'];
+      if (rows is! List) return false;
+      DiscourseTopicTracking.forSite(siteContext).replaceReport([
+        for (final row in rows.whereType<Map>()) row.cast<String, dynamic>(),
+      ]);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Discourse-only: web's "Dismiss New" — PUT /topics/reset-new
+  /// (TopicsController#reset_new). `dismiss_topics` names new topics under
+  /// both the classic view and the experimental new-new view, where
+  /// without it nothing is dismissed. A [categoryId] takes its
+  /// subcategories, as web's category pages do; neither, and Discourse also
+  /// moves the viewer's "new since" to now.
+  Future<FCMarkTopicReadResult> dismissNewAsync(
+      {int? categoryId, String? tagName}) async {
+    try {
+      final r = await apiPut('/topics/reset-new', body: {
+        'dismiss_topics': true,
+        ..._dismissScope(categoryId: categoryId, tagName: tagName),
+      });
+      DiscourseTopicTracking.forSite(siteContext)
+          .applyDismissedNew(_topicIdsOf(r));
+      return FCMarkTopicReadResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCMarkTopicReadResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCMarkTopicReadResult(
+          result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Discourse-only: web's "Dismiss all unread" — PUT /topics/bulk over
+  /// the viewer's unread topics (`filter: unread`). Marks their new replies
+  /// read (`dismiss_posts`), or, with [stopTracking] (the dialog's "Stop
+  /// tracking these topics…"), sets them back to Normal instead, as web's
+  /// BulkSelectHelper#dismissRead does, so they stop counting as unread.
+  Future<FCMarkTopicReadResult> dismissUnreadAsync(
+      {int? categoryId, String? tagName, bool stopTracking = false}) async {
+    try {
+      final r = await apiPut('/topics/bulk', body: {
+        'filter': 'unread',
+        'operation': stopTracking
+            ? {'type': 'change_notification_level', 'notification_level_id': 1}
+            : {'type': 'dismiss_posts'},
+        ..._dismissScope(categoryId: categoryId, tagName: tagName),
+      });
+      final tracking = DiscourseTopicTracking.forSite(siteContext);
+      final ids = _topicIdsOf(r);
+      stopTracking
+          ? tracking.applyUntracked(ids)
+          : tracking.applyDismissedUnread(ids);
+      return FCMarkTopicReadResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCMarkTopicReadResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCMarkTopicReadResult(
+          result: false, resultText: describeApiError(e));
+    }
+  }
+
+  static Map<String, dynamic> _dismissScope(
+          {int? categoryId, String? tagName}) =>
+      {
+        if (categoryId != null && categoryId > 0) ...{
+          'category_id': categoryId,
+          'include_subcategories': true,
+        },
+        if (tagName != null && tagName.isNotEmpty) 'tag_name': tagName,
+      };
+
+  /// The `topic_ids` both dismiss endpoints answer with.
+  static List<String> _topicIdsOf(Map<String, dynamic> r) =>
+      ((r['topic_ids'] as List?) ?? const []).map((e) => '$e').toList();
 
   @override
   Future<FCMarkTopicReadResult> markPostsReadAsync({
@@ -740,6 +833,11 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     final id = (t['id'] ?? '').toString();
     final slug = t['slug']?.toString();
     DiscourseTopicSlugs.store(siteContext.site.url, id, slug);
+    // How far the viewer has read it, for the row (see
+    // DiscourseTopicTracking); a guest's payload carries none.
+    if (siteContext.isLoggedIn) {
+      DiscourseTopicTracking.forSite(siteContext).recordTopicJson(t);
+    }
     final categoryIdInt = t['category_id'] as int?;
     final categoryId = (t['category_id'] ?? '').toString();
     final participatedUserIds = posters

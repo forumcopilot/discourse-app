@@ -4329,6 +4329,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notification settings'**
   String get notificationSettings;
+
+  /// Read aloud for a topic row's dot: never opened, created recently (Discourse's New).
+  ///
+  /// In en, this message translates to:
+  /// **'New topic'**
+  String get topicIsNew;
+
+  /// No description provided for @noNewTopicsSinceLastVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'No new topics since your last visit.'**
+  String get noNewTopicsSinceLastVisit;
+
+  /// Read aloud for a message row's dot: never opened.
+  ///
+  /// In en, this message translates to:
+  /// **'New message'**
+  String get messageIsNew;
+
+  /// Read aloud for a topic row's count badge: replies after where the reader stopped, in a topic they track.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 unread reply} other{{count} unread replies}}'**
+  String topicUnreadReplies(int count);
+
+  /// The New list's chip with its count of new topics (Discourse web: filters.new.title_with_count).
+  ///
+  /// In en, this message translates to:
+  /// **'New ({count})'**
+  String filterNewWithCount(int count);
+
+  /// The Unread list's chip with its count of unread topics (Discourse web: filters.unread.title_with_count).
+  ///
+  /// In en, this message translates to:
+  /// **'Unread ({count})'**
+  String filterUnreadWithCount(int count);
+
+  /// A category row's count of new topics in it and its subcategories (Discourse web: filters.new.lower_title_with_count).
+  ///
+  /// In en, this message translates to:
+  /// **'{count} new'**
+  String categoryNewTopics(int count);
+
+  /// A category row's count of unread topics in it and its subcategories (Discourse web: filters.unread.lower_title_with_count).
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unread'**
+  String categoryUnreadTopics(int count);
+
+  /// Button on the New list: stop showing these topics as new (Discourse web: Dismiss New).
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss new'**
+  String get dismissNew;
+
+  /// Button on the Unread list: mark the new replies in these topics read.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss unread'**
+  String get dismissUnread;
+
+  /// No description provided for @dismissNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss new topics?'**
+  String get dismissNewTitle;
+
+  /// No description provided for @dismissNewMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'They will no longer show as new.'**
+  String get dismissNewMessage;
+
+  /// No description provided for @dismissUnreadTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss all unread?'**
+  String get dismissUnreadTitle;
+
+  /// No description provided for @dismissUnreadMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Their new replies will be marked as read.'**
+  String get dismissUnreadMessage;
+
+  /// Checkbox in the Dismiss unread dialog (Discourse web: topics.bulk.also_dismiss_topics).
+  ///
+  /// In en, this message translates to:
+  /// **'Stop tracking these topics so they never show up as unread for me again'**
+  String get dismissUnreadStopTracking;
+
+  /// A category's menu item: its new topics and unread replies, all at once.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss new and unread'**
+  String get dismissNewAndUnread;
+
+  /// No description provided for @dismissNewAndUnreadMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Topics in {category} will no longer show as new or unread.'**
+  String dismissNewAndUnreadMessage(String category);
+
+  /// Snackbar after dismissing new topics or unread replies.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismissed'**
+  String get dismissedTopics;
 }
 
 class _AppLocalizationsDelegate

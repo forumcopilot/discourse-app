@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/models/results/fc_notification_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_subscription_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/topic/discourse_topic_tracking.dart';
 import '../util/site_url.dart';
 
 /// Discourse implementation of [IFCSubscriptionProxy].
@@ -371,6 +372,10 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       }
     }
     final opUser = opUserId == null ? null : users[opUserId];
+    // How far the viewer has read it, for the row (DiscourseTopicTracking).
+    if (siteContext.isLoggedIn) {
+      DiscourseTopicTracking.forSite(siteContext).recordTopicJson(t);
+    }
     final tpl = opUser?['avatar_template'] as String?;
     String? avatarUrl;
     if (tpl != null && tpl.isNotEmpty) {
