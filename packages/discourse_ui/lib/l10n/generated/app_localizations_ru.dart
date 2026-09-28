@@ -2547,4 +2547,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get createTopic => 'Создать тему';
+
+  @override
+  String get discardPostQuestion => 'Отказаться от сообщения?';
+
+  @override
+  String get discardChangesQuestion => 'Отменить изменения?';
+
+  @override
+  String get discardChanges => 'Отменить изменения';
+
+  @override
+  String get saveDraft => 'Сохранить черновик';
 }

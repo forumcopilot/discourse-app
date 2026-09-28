@@ -2558,4 +2558,16 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get createTopic => 'Crea Argomento';
+
+  @override
+  String get discardPostQuestion => 'Vuoi eliminare il tuo messaggio?';
+
+  @override
+  String get discardChangesQuestion => 'Vuoi annullare le modifiche?';
+
+  @override
+  String get discardChanges => 'Annulla modifiche';
+
+  @override
+  String get saveDraft => 'Salva bozza';
 }

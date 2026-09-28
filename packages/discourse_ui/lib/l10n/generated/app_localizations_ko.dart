@@ -2442,4 +2442,16 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get createTopic => '글 작성하기';
+
+  @override
+  String get discardPostQuestion => '게시물을 버리시겠습니까?';
+
+  @override
+  String get discardChangesQuestion => '변경 사항을 버리시겠습니까?';
+
+  @override
+  String get discardChanges => '변경 사항 버리기';
+
+  @override
+  String get saveDraft => '임시 저장';
 }

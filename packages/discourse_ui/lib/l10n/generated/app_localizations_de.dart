@@ -2563,4 +2563,17 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get createTopic => 'Thema erstellen';
+
+  @override
+  String get discardPostQuestion => 'Willst du deinen Beitrag verwerfen?';
+
+  @override
+  String get discardChangesQuestion =>
+      'Möchtest du deine Änderungen verwerfen?';
+
+  @override
+  String get discardChanges => 'Änderungen verwerfen';
+
+  @override
+  String get saveDraft => 'Entwurf speichern';
 }

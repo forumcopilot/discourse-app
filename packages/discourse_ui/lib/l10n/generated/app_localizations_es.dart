@@ -2552,4 +2552,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get createTopic => 'Crear tema';
+
+  @override
+  String get discardPostQuestion => '¿Quieres descartar tu publicación?';
+
+  @override
+  String get discardChangesQuestion => '¿Quieres descartar tus cambios?';
+
+  @override
+  String get discardChanges => 'Descartar cambios';
+
+  @override
+  String get saveDraft => 'Guardar borrador';
 }

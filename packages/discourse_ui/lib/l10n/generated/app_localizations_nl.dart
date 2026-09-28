@@ -2548,4 +2548,16 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get createTopic => 'Topic maken';
+
+  @override
+  String get discardPostQuestion => 'Wil je je bericht weggooien?';
+
+  @override
+  String get discardChangesQuestion => 'Wil je je wijzigingen negeren?';
+
+  @override
+  String get discardChanges => 'Wijzigingen negeren';
+
+  @override
+  String get saveDraft => 'Concept opslaan';
 }

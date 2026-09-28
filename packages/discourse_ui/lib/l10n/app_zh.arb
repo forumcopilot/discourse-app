@@ -990,5 +990,9 @@
   "deleteAccountConfirm": "确定要永久删除您的帐户吗？此操作无法撤消！",
   "deletedYourself": "您的帐户已被成功删除。",
   "deleteYourselfNotAllowed": "如果您希望删除您的帐户，请联系管理人员。",
-  "createTopic": "创建话题"
+  "createTopic": "创建话题",
+  "discardPostQuestion": "是否要放弃您的帖子？",
+  "discardChangesQuestion": "您确定要放弃所做的更改吗？",
+  "discardChanges": "舍弃更改",
+  "saveDraft": "保存草稿"
 }

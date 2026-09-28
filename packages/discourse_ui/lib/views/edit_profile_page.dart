@@ -8,6 +8,7 @@ import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import 'package:discourse_ui/views/widgets/discard_changes_scope.dart';
 
 /// Phase 5.22 — inline profile editing.
 ///
@@ -120,7 +121,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Scaffold(
+    return DiscardChangesScope(
+      listenable: Listenable.merge(
+          [_bioController, _locationController, _websiteController]),
+      hasChanges: () =>
+          _bioController.text != (widget.userInfo.bio ?? '') ||
+          _locationController.text != (widget.userInfo.location ?? '') ||
+          _websiteController.text != (widget.userInfo.website ?? ''),
+      isEdit: true,
+      busy: _saving,
+      child: Scaffold(
       appBar: SimpleListAppBar(
         title: 'Edit profile',
         // The same labelled button every form ends its app bar with.
@@ -191,6 +201,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
         ),
       ),
+    ),
     );
   }
 }

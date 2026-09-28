@@ -638,7 +638,7 @@ class _ProfileViewState extends State<ProfileView> {
               onPressed: () async {
                 final saved = await Navigator.push<bool>(
                   context,
-                  MaterialPageRoute(
+                  FormPageRoute(
                     builder: (_) => EditProfilePage(
                       siteContext: widget.siteContext,
                       userInfo: _userInfo,

@@ -4,6 +4,7 @@ import '../../../../theme/design_tokens.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../widgets/empty_state_view.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import 'package:discourse_ui/views/widgets/discard_changes_scope.dart';
 
 class EditConversationPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -141,7 +142,14 @@ class _EditConversationPageState extends State<EditConversationPage> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Scaffold(
+    return DiscardChangesScope(
+      listenable: _titleController,
+      hasChanges: () =>
+          _hasChanges ||
+          (_initialOpen != null && _conversationOpen != _initialOpen),
+      isEdit: true,
+      busy: _isSubmitting,
+      child: Scaffold(
       appBar: AppBar(
         title: Text(
           AppLocalizations.of(context)!.editConversation2,
@@ -287,6 +295,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
           );
         },
       ),
+    ),
     );
   }
 }

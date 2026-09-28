@@ -991,5 +991,9 @@
   "deleteAccountConfirm": "Действительно удалить аккаунт? Отменить удаление будет невозможно!",
   "deletedYourself": "Ваш аккаунт удален.",
   "deleteYourselfNotAllowed": "Чтобы удалить аккаунт, свяжитесь с администрацией сайта.",
-  "createTopic": "Создать тему"
+  "createTopic": "Создать тему",
+  "discardPostQuestion": "Отказаться от сообщения?",
+  "discardChangesQuestion": "Отменить изменения?",
+  "discardChanges": "Отменить изменения",
+  "saveDraft": "Сохранить черновик"
 }

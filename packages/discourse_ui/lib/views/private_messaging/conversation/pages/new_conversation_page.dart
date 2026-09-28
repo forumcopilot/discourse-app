@@ -11,6 +11,7 @@ import 'package:discourse_ui/views/widgets/user_avatar.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../services/attachment_upload_service.dart';
 import '../../../../theme/design_tokens.dart';
+import '../../../../utils/app_navigation.dart';
 import '../../../../utils/discourse_draft_controller.dart';
 import '../../../lists/posts_list.dart' show PostsListMode;
 import '../../../post_page.dart';
@@ -45,9 +46,9 @@ class NewConversationPage extends StatefulWidget {
   static bool isDraftKey(String key) =>
       key == 'new_private_message' || key.startsWith('new_private_message_');
 
-  /// Opens New Message and, once it is sent, the new message — as New Topic
-  /// opens the new topic. Done here rather than inside the composer: the
-  /// composer pops itself on success, which would pop any route it pushed.
+  /// Opens New Message, which becomes the new message once it is sent (as
+  /// New Topic becomes the new topic), so Back from the message returns to
+  /// the page New Message was opened from.
   ///
   /// Returns whether a message was sent (the new message is then on top).
   static Future<bool> open(
@@ -58,31 +59,16 @@ class NewConversationPage extends StatefulWidget {
     String? draftKey,
   }) async {
     final created =
-        await Navigator.of(context).push<({String id, String title})?>(
-      MaterialPageRoute(
-        builder: (_) => NewConversationPage(
-          siteContext: siteContext,
-          initialRecipient: initialRecipient,
-          initialRecipientIconUrl: initialRecipientIconUrl,
-          draftKey: draftKey,
-        ),
+        await AppNavigation.pushForm<({String id, String title})?>(
+      context,
+      NewConversationPage(
+        siteContext: siteContext,
+        initialRecipient: initialRecipient,
+        initialRecipientIconUrl: initialRecipientIconUrl,
+        draftKey: draftKey,
       ),
     );
-    if (created == null) return false;
-    if (context.mounted) {
-      unawaited(Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => PostPage(
-            siteContext: siteContext,
-            topicId: created.id,
-            title: created.title,
-            mode: PostsListMode.normal,
-            forumId: '',
-          ),
-        ),
-      ));
-    }
-    return true;
+    return created != null;
   }
 
   @override
@@ -266,6 +252,21 @@ class _NewConversationPageState extends State<NewConversationPage> {
       contentController: _contentController,
       onSubmit: _submit,
       onSuccess: (_) => _created,
+      hasChanges: () => _draft.changedSinceOpened,
+      onSaveDraft: _draft.flushNow,
+      onDiscard: _draft.discard,
+      // The sent message takes the composer's place.
+      pageAfterSubmit: () {
+        final created = _created;
+        if (created == null) return null;
+        return PostPage(
+          siteContext: widget.siteContext,
+          topicId: created.id,
+          title: created.title,
+          mode: PostsListMode.normal,
+          forumId: '',
+        );
+      },
       onFileUpload:
           (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false)
               ? _upload

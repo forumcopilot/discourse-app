@@ -990,5 +990,9 @@
   "deleteAccountConfirm": "Voulez-vous vraiment supprimer définitivement votre compte ? Cette action est irréversible !",
   "deletedYourself": "Votre compte a été supprimé avec succès.",
   "deleteYourselfNotAllowed": "Veuillez contacter un responsable si vous souhaitez supprimer votre compte.",
-  "createTopic": "Créer le sujet"
+  "createTopic": "Créer le sujet",
+  "discardPostQuestion": "Voulez-vous abandonner votre message ?",
+  "discardChangesQuestion": "Voulez-vous annuler vos modifications ?",
+  "discardChanges": "Annuler les modifications",
+  "saveDraft": "Enregistrer le brouillon"
 }

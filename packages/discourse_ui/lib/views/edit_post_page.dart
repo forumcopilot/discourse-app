@@ -296,6 +296,7 @@ class _EditPostPageState extends State<EditPostPage> {
           contentHint: 'Edit your post...',
           autoFocusContent: false, // Don't auto-focus any field when editing
           onSubmit: _handleSubmit,
+          isEdit: true,
           onFileUpload: (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false) ? _handleFileUpload : null,
           topicTitle: widget.topicTitle,
           existingAttachments: snapshot.data?.attachments ?? _existingAttachments,

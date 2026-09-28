@@ -7,6 +7,7 @@ import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import 'package:discourse_ui/views/widgets/discard_changes_scope.dart';
 
 /// Phase 5.23 — change-email flow.
 ///
@@ -81,7 +82,12 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    return Scaffold(
+    return DiscardChangesScope(
+      listenable: _emailController,
+      hasChanges: () => _emailController.text.trim().isNotEmpty,
+      isEdit: true,
+      busy: _submitting,
+      child: Scaffold(
       appBar: SimpleListAppBar(
         title: 'Change email',
         // The same labelled button every form ends its app bar with.
@@ -151,6 +157,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           ),
         ),
       ),
+    ),
     );
   }
 }

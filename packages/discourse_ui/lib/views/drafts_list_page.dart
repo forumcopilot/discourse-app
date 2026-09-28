@@ -14,6 +14,7 @@ import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 /// Discourse-native drafts list (`/drafts.json`). Surfaces all of the
 /// current user's saved drafts — new topics, replies, and PMs.
@@ -116,22 +117,31 @@ class _DraftsListPageState extends State<DraftsListPage> {
   static bool _isNewTopicDraft(FCDraft draft) =>
       draft.draftKey == 'new_topic' || draft.draftKey.startsWith('new_topic_');
 
-  void _resume(FCDraft draft) {
+  /// Opens [draft] where it belongs, then reloads the list: a draft sent or
+  /// discarded from there is gone, and one kept has moved to the top. The
+  /// list used to stay as it was, so a sent draft stayed listed and tapping
+  /// it opened an empty composer.
+  Future<void> _resume(FCDraft draft) async {
+    await _open(draft);
+    if (mounted) await _load();
+  }
+
+  Future<void> _open(FCDraft draft) async {
     // Reply drafts → ReplyPage anchored on the topic.
     // New-topic drafts → NewTopicPage in the saved category (or "" if
     //   the draft is uncategorised).
     // New-message drafts → New Message, with the saved recipients.
     //   (A reply to a message is a `topic_<id>` draft like any reply.)
     if (NewConversationPage.isDraftKey(draft.draftKey)) {
-      NewConversationPage.open(context,
+      await NewConversationPage.open(context,
           siteContext: widget.siteContext, draftKey: draft.draftKey);
       return;
     }
     if (draft.draftKey.startsWith('topic_')) {
       final topicId = draft.draftKey.substring('topic_'.length);
       if (topicId.isEmpty) return;
-      Navigator.of(context).push(
-        MaterialPageRoute(
+      await Navigator.of(context).push(
+        FormPageRoute(
           builder: (_) => ReplyPage(
             siteContext: widget.siteContext,
             threadId: topicId,
@@ -142,8 +152,8 @@ class _DraftsListPageState extends State<DraftsListPage> {
       return;
     }
     if (_isNewTopicDraft(draft)) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
+      await Navigator.of(context).push(
+        FormPageRoute(
           builder: (_) => NewTopicPage(
             siteContext: widget.siteContext,
             draftKey: draft.draftKey,
@@ -163,7 +173,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
     // Topic-anchored drafts that we don't recognise — fall back to
     // opening the topic if we have an id.
     if (draft.topicId != null) {
-      Navigator.of(context).push(
+      await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => PostPage(
             siteContext: widget.siteContext,

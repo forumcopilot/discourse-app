@@ -80,11 +80,82 @@ void main() {
     expect(drafts.saves, hasLength(2));
     c.dispose();
   });
+
+  test('clearing the text deletes the draft', () async {
+    drafts.stored = FCDraft(
+      draftKey: 'new_private_message_1',
+      sequence: 3,
+      data: {'reply': 'Hello'},
+    );
+    final c = controller([]);
+    await c.initialize();
+    c.contentController.text = '';
+    await Future<void>.delayed(const Duration(milliseconds: 30));
+    expect(drafts.deletes, ['new_private_message_1']);
+    expect(drafts.saves, isEmpty);
+    c.dispose();
+  });
+
+  test('what was typed just before closing is saved on the way out',
+      () async {
+    final c = DiscourseDraftController(
+      draftKey: 'topic_5',
+      titleController: TextEditingController(),
+      contentController: TextEditingController(),
+    );
+    await c.initialize();
+    c.contentController.text = 'Last words';
+    c.dispose(); // well inside the 1.5 s debounce
+    await Future<void>.delayed(Duration.zero);
+    expect(drafts.saves.single['reply'], 'Last words');
+  });
+
+  test('a discarded draft is not saved again on the way out', () async {
+    final c = DiscourseDraftController(
+      draftKey: 'topic_5',
+      titleController: TextEditingController(),
+      contentController: TextEditingController(),
+    );
+    await c.initialize();
+    c.contentController.text = 'Never mind';
+    await c.discard();
+    c.dispose();
+    await Future<void>.delayed(Duration.zero);
+    expect(drafts.saves, isEmpty);
+    expect(drafts.deletes, ['topic_5']);
+  });
+
+  test('changes are counted from what the composer opened with', () async {
+    drafts.stored = FCDraft(
+      draftKey: 'new_private_message_1',
+      sequence: 3,
+      data: {'reply': 'Hello', 'recipients': 'bob'},
+    );
+    final recipients = <String>['bob'];
+    final c = controller(recipients);
+    await c.initialize();
+    expect(c.changedSinceOpened, isFalse);
+    c.contentController.text = 'Hello there';
+    expect(c.changedSinceOpened, isTrue);
+    c.contentController.text = 'Hello';
+    expect(c.changedSinceOpened, isFalse);
+    recipients.add('carol');
+    expect(c.changedSinceOpened, isTrue);
+    c.dispose();
+  });
 }
 
 class _Drafts implements IFCDraftProxy {
   FCDraft? stored;
   final List<Map<String, dynamic>> saves = [];
+  final List<String> deletes = [];
+
+  @override
+  Future<FCDeleteDraftResult> deleteDraftAsync(String draftKey,
+      {int sequence = 0}) async {
+    deletes.add(draftKey);
+    return FCDeleteDraftResult(result: true);
+  }
 
   @override
   Future<FCLoadDraftResult> loadDraftAsync(String draftKey) async =>

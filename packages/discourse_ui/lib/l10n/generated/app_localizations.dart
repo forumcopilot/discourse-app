@@ -4299,6 +4299,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create Topic'**
   String get createTopic;
+
+  /// Asked when a composer with unsaved writing is closed (Discourse post.cancel_composer.confirm).
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to discard your post?'**
+  String get discardPostQuestion;
+
+  /// Asked when an edit with unsaved changes is closed (Discourse post.cancel_composer.confirm_edit).
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to discard your changes?'**
+  String get discardChangesQuestion;
+
+  /// Button that throws away unsaved edits (Discourse post.cancel_composer.discard_edit).
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes'**
+  String get discardChanges;
+
+  /// Button that closes a composer and keeps what was written as a draft.
+  ///
+  /// In en, this message translates to:
+  /// **'Save draft'**
+  String get saveDraft;
 }
 
 class _AppLocalizationsDelegate

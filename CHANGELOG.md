@@ -6,7 +6,17 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Changed
+- **Composers and edit forms open as full-screen forms.** New Topic, Reply, Quote, Edit post, New Message, Edit title, Edit profile and Change email rise from the bottom over the page they were opened from, which stays put, and close with ✕. They used to slide in from the side like any page, with an unlabelled ←, as if they were a step deeper into the forum. New `FormPageRoute` and `AppNavigation.pushForm`. On iOS this is Cupertino's full-screen dialog, where the edge swipe does not close it.
+- **Closing a form with unsaved writing asks first**, with Discourse's own question: "Do you want to discard your post?" for new writing, "Do you want to discard your changes?" for an edit. The choices are Discard (or Discard changes) and Cancel, plus Save draft in composers that keep a draft. It asks however the form is closed: ✕, Back, or Android's back gesture. A form with nothing changed closes at once and keeps the predictive back animation. Every form used to close without a word. New `DiscardChangesScope`, and `MessageComposePage` gains `hasChanges`, `onSaveDraft`, `onDiscard` and `isEdit`.
+- **Back does nothing while a composer is sending.** Pressing it mid-send used to close the composer, and the send's own close then took the page under it too.
+- **A new topic or message takes the composer's place** in one transition once it is posted. Back from it goes to the list the composer was opened from. The composer used to close while the topic opened, two transitions at once. `MessageComposePage.pageAfterSubmit`.
+
 ### Fixed
+- **Drafts.**
+  - Clearing a composer's text deletes its draft. The text used to stay on the server, and the next reply opened with it again.
+  - What was typed in the last moment before closing is saved with the draft. It used to be dropped.
+  - The Drafts list reloads after a draft resumed from it closes, so a sent draft no longer stays listed.
 - **Back returns to the screen you were on.**
   - **On Android, Back on the Categories, Chat, Notifications or Profile tab returns to the forum's first tab.** Back again then leaves the forum. It used to leave the forum, or close the single-forum app, from whichever tab was showing. An open drawer still closes first. iOS is unchanged: its edge swipe leaves the forum from any tab, as tab bars work there.
   - **A push notification for a forum you have left opens the forum, then the topic.** In a multi-forum host, the forum's controller outlives the forum, so the app took it for still open. It opened the topic straight over the host's list, in default colours, and Back skipped the forum. The host now opens it, as it does from its list (`DiscourseHost.openForum`).

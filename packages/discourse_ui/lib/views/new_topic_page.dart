@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'post_page.dart';
 import 'widgets/post_needs_approval_dialog.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
@@ -60,6 +61,9 @@ class _NewTopicPageState extends State<NewTopicPage> {
   late final TextEditingController _titleController;
   late final TextEditingController _contentController;
   late final DiscourseDraftController _draftController;
+
+  /// The topic just created, which takes the composer's place.
+  ({String id, String title})? _created;
 
   @override
   void initState() {
@@ -136,6 +140,9 @@ class _NewTopicPageState extends State<NewTopicPage> {
           return true;
         }
         widget.onTopicCreated?.call(result.topicId.trim(), title);
+        if (result.topicId.trim().isNotEmpty) {
+          _created = (id: result.topicId.trim(), title: title);
+        }
         return true;
       } else {
         // Server returned result=false with a message - throw it directly without wrapping
@@ -210,6 +217,24 @@ class _NewTopicPageState extends State<NewTopicPage> {
       titleController: _titleController,
       contentController: _contentController,
       onSubmit: _handleSubmitWithDraftDiscard,
+      hasChanges: () => _draftController.changedSinceOpened,
+      onSaveDraft: _draftController.flushNow,
+      onDiscard: _draftController.discard,
+      // The new topic takes the composer's place, as the web opens it: Back
+      // from it goes to the list New Topic was opened from. (A topic held
+      // for approval has nothing to open.)
+      pageAfterSubmit: () {
+        final created = _created;
+        if (created == null) return null;
+        return PostPage(
+          siteContext: widget.siteContext,
+          topicId: created.id,
+          // The topic's title, not the category's: the first post renders
+          // whatever is passed here as its heading.
+          title: created.title,
+          forumId: widget.forumId,
+        );
+      },
       // Only offer tagging when the forum says this user may tag
       // (`can_tag_topics` on /site.json). Previously the field was always
       // shown and the server refused the tags on submit — the user typed

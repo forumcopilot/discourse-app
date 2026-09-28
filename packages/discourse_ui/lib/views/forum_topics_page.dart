@@ -8,7 +8,6 @@ import 'package:discourse_ui/views/widgets/filter_chip_bar.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteCapabilities;
 import 'package:discourse_ui/views/new_topic_page.dart';
-import 'package:discourse_ui/views/post_page.dart';
 import 'package:discourse_ui/views/widgets/forum_actions.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSubscriptionProxy;
@@ -57,38 +56,17 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
     }
 
     var topicCreated = false;
-    String? newTopicId;
-    var newTopicTitle = '';
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => NewTopicPage(
-          siteContext: widget.siteContext,
-          forumId: widget.forum.id,
-          forumName: widget.forum.name,
-          onTopicCreated: (topicId, title) {
-            topicCreated = true;
-            if (topicId.isNotEmpty) {
-              newTopicId = topicId;
-              newTopicTitle = title;
-            }
-          },
-        ),
+    // The composer becomes the new topic once it is posted (see
+    // NewTopicPage), so this completes as the topic opens.
+    final result = await AppNavigation.pushForm<Object?>(
+      context,
+      NewTopicPage(
+        siteContext: widget.siteContext,
+        forumId: widget.forum.id,
+        forumName: widget.forum.name,
+        onTopicCreated: (_, __) => topicCreated = true,
       ),
     );
-
-    // Open what was just created, as web does and as sending a PM already
-    // did. Done here rather than inside the composer: the composer pops
-    // itself on success, which would pop any route it pushed.
-    if (newTopicId != null && mounted) {
-      await AppNavigation.pushGlobal(PostPage(
-            siteContext: widget.siteContext,
-            topicId: newTopicId!,
-            // The topic's title, not the category's — the first post
-            // renders whatever is passed here as its heading.
-            title: newTopicTitle,
-            forumId: widget.forum.id,
-          ));
-    }
 
     if ((result == true || topicCreated) && _refreshCallback != null) {
       _refreshCallback!();

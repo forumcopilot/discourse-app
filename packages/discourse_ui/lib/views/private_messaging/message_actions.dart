@@ -7,6 +7,7 @@ import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../utils/error_message.dart';
 import 'conversation/pages/edit_conversation_page.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 /// What a private message offers beyond a topic — archive, mark unread,
 /// close, leave, edit the title — for the topic page, which reads messages
@@ -224,7 +225,7 @@ class MessageActions {
     required String topicId,
     required bool canClose,
   }) async {
-    final saved = await Navigator.of(context).push<bool>(MaterialPageRoute(
+    final saved = await Navigator.of(context).push<bool>(FormPageRoute(
       builder: (_) => EditConversationPage(
         siteContext: siteContext,
         conversationId: topicId,

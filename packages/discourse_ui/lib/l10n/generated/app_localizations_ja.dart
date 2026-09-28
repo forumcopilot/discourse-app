@@ -2449,4 +2449,16 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get createTopic => 'トピックを作成';
+
+  @override
+  String get discardPostQuestion => '投稿を破棄しますか？';
+
+  @override
+  String get discardChangesQuestion => '変更を破棄しますか？';
+
+  @override
+  String get discardChanges => '変更を破棄';
+
+  @override
+  String get saveDraft => '下書きを保存';
 }

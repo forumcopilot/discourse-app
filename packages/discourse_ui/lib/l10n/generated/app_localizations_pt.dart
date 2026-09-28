@@ -2550,4 +2550,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get createTopic => 'Criar Tópico';
+
+  @override
+  String get discardPostQuestion => 'Você deseja excluir sua postagem?';
+
+  @override
+  String get discardChangesQuestion => 'Você deseja descartar suas alterações?';
+
+  @override
+  String get discardChanges => 'Descartar alterações';
+
+  @override
+  String get saveDraft => 'Salvar rascunho';
 }

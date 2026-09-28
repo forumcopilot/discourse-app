@@ -47,6 +47,13 @@ class DiscourseDraftController {
   String _lastSavedReply = '';
   String _lastSavedTitle = '';
   String _lastSavedExtra = '';
+  bool _discarded = false;
+
+  /// What the composer held once it had opened (after the draft, or a
+  /// quote, went in): what [changedSinceOpened] compares with.
+  String? _openedReply;
+  String? _openedTitle;
+  String? _openedExtra;
 
   DiscourseDraftController({
     required this.draftKey,
@@ -100,9 +107,27 @@ class DiscourseDraftController {
       AppLogger.debug('DiscourseDraftController initial load failed: $e');
     }
     _lastSavedExtra = _extra.toString();
+    _openedReply = contentController.text;
+    _openedTitle = titleController.text;
+    _openedExtra = _lastSavedExtra;
     _loaded = true;
     _attach();
     return restored;
+  }
+
+  /// Whether the writer has changed anything since the composer opened:
+  /// what closing it should ask about. Before the draft has loaded, any
+  /// text counts.
+  bool get changedSinceOpened {
+    final reply = contentController.text;
+    final title = titleController.text;
+    final openedReply = _openedReply;
+    if (openedReply == null) {
+      return reply.trim().isNotEmpty || title.trim().isNotEmpty;
+    }
+    return reply != openedReply ||
+        title != _openedTitle ||
+        _extra.toString() != _openedExtra;
   }
 
   void _attach() {
@@ -154,9 +179,19 @@ class DiscourseDraftController {
           extraKey == _lastSavedExtra) {
         return;
       }
-      // Discourse auto-deletes drafts whose reply text is empty/whitespace,
-      // so only POST when we have something worth saving.
-      if (reply.trim().isEmpty && title.trim().isEmpty) return;
+      // Nothing left to keep: the draft goes. The text used to be left on
+      // the server when the writer cleared it (only non-empty text was
+      // saved), and the next reply opened with it again.
+      if (reply.trim().isEmpty && title.trim().isEmpty) {
+        if (_lastSavedReply.trim().isNotEmpty ||
+            _lastSavedTitle.trim().isNotEmpty) {
+          await _delete();
+          _lastSavedReply = reply;
+          _lastSavedTitle = title;
+          _lastSavedExtra = extraKey;
+        }
+        return;
+      }
       final result = await SiteProxyService.getDraftProxy().saveDraftAsync(
         draftKey: draftKey,
         sequence: _sequence,
@@ -193,10 +228,15 @@ class DiscourseDraftController {
     await _flush();
   }
 
-  /// Delete the draft from the server. Call after a successful submit
-  /// so the next composer open starts fresh.
+  /// Delete the draft from the server. Call after a successful submit, or
+  /// when the writer discards it, so the next composer open starts fresh.
   Future<void> discard() async {
+    _discarded = true;
     _debounce?.cancel();
+    await _delete();
+  }
+
+  Future<void> _delete() async {
     try {
       await SiteProxyService.getDraftProxy()
           .deleteDraftAsync(draftKey, sequence: _sequence);
@@ -205,10 +245,36 @@ class DiscourseDraftController {
     }
   }
 
+  /// Stops watching. What was typed in the last moments before the
+  /// composer closed, still waiting out the debounce, is saved on the way
+  /// out: it used to be dropped, so a draft reopened without its last
+  /// words.
   void dispose() {
-    _disposed = true;
+    final pending = _debounce?.isActive ?? false;
     _debounce?.cancel();
     contentController.removeListener(_onChanged);
     titleController.removeListener(_onChanged);
+    if (pending && _loaded && !_discarded && !_disposed) {
+      // The text is read now: the controllers are disposed next.
+      final reply = contentController.text;
+      final title = titleController.text;
+      final extra = _extra;
+      if (reply.trim().isNotEmpty || title.trim().isNotEmpty) {
+        SiteProxyService.getDraftProxy()
+            .saveDraftAsync(
+              draftKey: draftKey,
+              sequence: _sequence,
+              data: {
+                ...extra,
+                'reply': reply,
+                if (title.isNotEmpty) 'title': title,
+              },
+            )
+            .then<void>((_) {}, onError: (Object e) {
+          AppLogger.debug('DiscourseDraftController final save failed: $e');
+        });
+      }
+    }
+    _disposed = true;
   }
 }

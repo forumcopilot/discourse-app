@@ -27,6 +27,7 @@ import 'category_badge.dart';
 import 'upload_tile.dart';
 import '../../utils/error_message.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import 'package:discourse_ui/views/widgets/discard_changes_scope.dart';
 
 class MessageComposePage extends StatefulWidget {
   final SiteContext siteContext;
@@ -87,6 +88,28 @@ class MessageComposePage extends StatefulWidget {
   final bool showWhisperToggle;
   final ValueChanged<bool>? onWhisperChanged;
 
+  /// Whether closing now would lose something the writer has not kept, so
+  /// closing asks first ([DiscardChangesScope]). A composer with a server
+  /// draft passes its draft controller's `changedSinceOpened`; without one,
+  /// any change from what the composer opened with counts.
+  final bool Function()? hasChanges;
+
+  /// Keeps the writing as a draft, then closes: offered as Save draft.
+  final Future<void> Function()? onSaveDraft;
+
+  /// Throws the writing away (the server draft too) before closing.
+  final Future<void> Function()? onDiscard;
+
+  /// An edit of an existing post: closing asks about "your changes".
+  final bool isEdit;
+
+  /// The page that takes the composer's place once it has sent: the new
+  /// topic, the new message. It opens where the composer was, in one
+  /// transition, and Back from it goes to the page the composer was opened
+  /// from. The composer used to close and the page open after it, two
+  /// transitions at once. Null (or a null answer) closes the composer.
+  final Widget? Function()? pageAfterSubmit;
+
   const MessageComposePage({
     super.key,
     required this.siteContext,
@@ -117,6 +140,11 @@ class MessageComposePage extends StatefulWidget {
     this.extraHeader,
     this.showWhisperToggle = false,
     this.onWhisperChanged,
+    this.hasChanges,
+    this.onSaveDraft,
+    this.onDiscard,
+    this.isEdit = false,
+    this.pageAfterSubmit,
   });
 
   @override
@@ -129,6 +157,16 @@ class _MessageComposePageState extends State<MessageComposePage> {
   final FocusNode _titleFocusNode = FocusNode();
   final FocusNode _contentFocusNode = FocusNode();
   bool _isSubmitting = false;
+
+  /// What the composer opened with, for [_hasChanges] when the page has no
+  /// draft to ask.
+  late final String _openedTitle;
+  late final String _openedContent;
+
+  bool _hasChanges() =>
+      widget.hasChanges?.call() ??
+      (_titleController.text != _openedTitle ||
+          _contentController.text != _openedContent);
   /// The files picked for this post, uploading or uploaded, in the order
   /// picked — see [_uploadAll].
   final List<_PendingUpload> _uploads = [];
@@ -168,6 +206,8 @@ class _MessageComposePageState extends State<MessageComposePage> {
         TextPosition(offset: _contentController.text.length),
       );
     }
+    _openedTitle = _titleController.text;
+    _openedContent = _contentController.text;
 
     // Request focus after a short delay (only if auto-focus is enabled)
     Future.delayed(const Duration(milliseconds: 100), () {
@@ -998,11 +1038,15 @@ class _MessageComposePageState extends State<MessageComposePage> {
       if (mounted && success) {
         // Dismiss keyboard before navigating back
         FocusScope.of(context).unfocus();
-        if (widget.onSuccess != null) {
-          final result = widget.onSuccess!(true);
-          context.popOwnRoute(result);
+        final result =
+            widget.onSuccess != null ? widget.onSuccess!(true) : true;
+        final next = widget.pageAfterSubmit?.call();
+        final route = ModalRoute.of(context);
+        if (next != null && route != null && route.isCurrent) {
+          Navigator.of(context)
+              .pushReplacement(AppNavigation.route<void>(next), result: result);
         } else {
-          context.popOwnRoute(true);
+          context.popOwnRoute(result);
         }
       }
     } catch (e) {
@@ -1344,7 +1388,8 @@ class _MessageComposePageState extends State<MessageComposePage> {
     _titleFocusNode.unfocus();
     _contentFocusNode.unfocus();
     FocusScope.of(context).unfocus();
-    Navigator.of(context).pop();
+    // maybePop, so closing asks first when there is writing to lose.
+    Navigator.of(context).maybePop();
   }
 
   @override
@@ -1352,7 +1397,14 @@ class _MessageComposePageState extends State<MessageComposePage> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return PopScope(
+    return DiscardChangesScope(
+      listenable: Listenable.merge([_titleController, _contentController]),
+      hasChanges: _hasChanges,
+      isEdit: widget.isEdit,
+      busy: _isSubmitting,
+      onSaveDraft: widget.onSaveDraft,
+      onDiscard: widget.onDiscard,
+      child: PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, result) {
         // Dismiss keyboard when back gesture/button is triggered
@@ -1367,9 +1419,13 @@ class _MessageComposePageState extends State<MessageComposePage> {
                 title: Text(
                   widget.title,
                 ),
+                // A composer is a full-screen dialog: ✕ closes it, where ←
+                // would mean a step back through the forum. It had ← with no
+                // label, which a screen reader announced as nothing.
                 leading: Builder(
                   builder: (context) => IconButton(
-                    icon: const Icon(Icons.arrow_back_rounded),
+                    icon: const Icon(Icons.close),
+                    tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                     onPressed: _handleBackNavigation,
                   ),
                 ),
@@ -1540,6 +1596,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
           ),
         ),
       ),
+    ),
     );
   }
 }

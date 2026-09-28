@@ -3069,5 +3069,21 @@
   "createTopic": "Create Topic",
   "@createTopic": {
     "description": "The composer's submit button for a new topic (Discourse's own wording)."
+  },
+  "discardPostQuestion": "Do you want to discard your post?",
+  "@discardPostQuestion": {
+    "description": "Asked when a composer with unsaved writing is closed (Discourse post.cancel_composer.confirm)."
+  },
+  "discardChangesQuestion": "Do you want to discard your changes?",
+  "@discardChangesQuestion": {
+    "description": "Asked when an edit with unsaved changes is closed (Discourse post.cancel_composer.confirm_edit)."
+  },
+  "discardChanges": "Discard changes",
+  "@discardChanges": {
+    "description": "Button that throws away unsaved edits (Discourse post.cancel_composer.discard_edit)."
+  },
+  "saveDraft": "Save draft",
+  "@saveDraft": {
+    "description": "Button that closes a composer and keeps what was written as a draft."
   }
 }

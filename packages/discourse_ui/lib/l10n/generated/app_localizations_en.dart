@@ -2537,4 +2537,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get createTopic => 'Create Topic';
+
+  @override
+  String get discardPostQuestion => 'Do you want to discard your post?';
+
+  @override
+  String get discardChangesQuestion => 'Do you want to discard your changes?';
+
+  @override
+  String get discardChanges => 'Discard changes';
+
+  @override
+  String get saveDraft => 'Save draft';
 }

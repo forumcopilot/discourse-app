@@ -2418,4 +2418,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get createTopic => '创建话题';
+
+  @override
+  String get discardPostQuestion => '是否要放弃您的帖子？';
+
+  @override
+  String get discardChangesQuestion => '您确定要放弃所做的更改吗？';
+
+  @override
+  String get discardChanges => '舍弃更改';
+
+  @override
+  String get saveDraft => '保存草稿';
 }

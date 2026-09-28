@@ -15,6 +15,7 @@ import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
 import 'widgets/section_header.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'package:discourse_ui/utils/app_navigation.dart';
 
 /// Phase 5.20d — Forum Settings page rebuilt as a curated Discourse-
 /// native section list.
@@ -178,7 +179,7 @@ class ForumSettingsPage extends StatelessWidget {
   Future<void> _openChangeEmail(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
     final sent = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
+      FormPageRoute(
         builder: (_) => ChangeEmailPage(siteContext: siteContext),
       ),
     );

@@ -28,11 +28,18 @@ class AppNavigation {
     return _push<T>(navigator, page, name);
   }
 
+  /// Opens a form — a composer, an edit page — over the current page, as a
+  /// full-screen dialog ([FormPageRoute]): it rises from the bottom and
+  /// closes with ✕, where a page slides in from the side with ←.
+  static Future<T?> pushForm<T>(BuildContext context, Widget page) =>
+      _push<T>(Navigator.of(context), page, null, form: true);
+
   /// The page last opened here, while it may still be arriving.
   static Route<dynamic>? _arriving;
   static Type? _arrivingType;
 
-  static Future<T?> _push<T>(NavigatorState navigator, Widget page, String? name) {
+  static Future<T?> _push<T>(NavigatorState navigator, Widget page, String? name,
+      {bool form = false}) {
     // A second tap on a row, landing while the first one's page is still
     // sliding in, would open the same kind of page twice, and Back would
     // show it again. `Get.to` refused a page of the kind on top; this refuses
@@ -45,7 +52,7 @@ class AppNavigation {
         arriving.animation?.status == AnimationStatus.forward) {
       return Future<T?>.value();
     }
-    final next = route<T>(page, name: name);
+    final next = form ? FormPageRoute<T>(builder: (_) => page) : route<T>(page, name: name);
     _arriving = next;
     _arrivingType = page.runtimeType;
     return navigator.push<T>(next);
@@ -57,6 +64,53 @@ class AppNavigation {
         builder: (_) => page,
         settings: name == null ? null : RouteSettings(name: name),
       );
+}
+
+/// The route a form opens in: Material's full-screen dialog.
+///
+/// It rises from the bottom over the page it was opened from, which stays
+/// where it is, and its app bar closes it with ✕ (the AppBar's own leading
+/// for a full-screen dialog). Composers used to slide in from the side like
+/// any page, with ←, as if they were a step deeper into the forum. On iOS
+/// and macOS it is Cupertino's full-screen dialog, which also rises; there,
+/// as for any full-screen dialog, the edge swipe does not close it.
+class FormPageRoute<T> extends MaterialPageRoute<T> {
+  FormPageRoute({required super.builder, super.settings})
+      : super(fullscreenDialog: true);
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 400);
+
+  @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 250);
+
+  // The page underneath stays put, so it has nothing to be told.
+  @override
+  DelegatedTransitionBuilder? get delegatedTransition => null;
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final platform = Theme.of(context).platform;
+    if (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
+      return super.buildTransitions(context, animation, secondaryAnimation, child);
+    }
+    // Material 3's emphasized easing: in fast and settling, out quickly.
+    final curved = CurvedAnimation(
+      parent: animation,
+      curve: Easing.emphasizedDecelerate,
+      reverseCurve: Easing.emphasizedAccelerate,
+    );
+    return SlideTransition(
+      position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+          .animate(curved),
+      child: child,
+    );
+  }
 }
 
 /// Closing the page (or sheet, or dialog) a widget is on, after an await.
