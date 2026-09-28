@@ -995,5 +995,11 @@
   "discardChangesQuestion": "您确定要放弃所做的更改吗？",
   "discardChanges": "舍弃更改",
   "saveDraft": "保存草稿",
-  "notificationSettings": "通知设置"
+  "notificationSettings": "通知设置",
+  "topicMapViews": "{count, plural, other{浏览}}",
+  "topicMapLikes": "{count, plural, other{赞}}",
+  "topicMapLinks": "{count, plural, other{链接}}",
+  "topicMapUsers": "{count, plural, other{用户}}",
+  "markAsSolution": "标记为解决方案",
+  "unmarkAsSolution": "取消标记为解决方案"
 }

@@ -2576,4 +2576,53 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get notificationSettings => 'Paramètres de notification';
+
+  @override
+  String topicMapViews(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'vues',
+      one: 'vue',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'j\'aime',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapLinks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'liens',
+      one: 'lien',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapUsers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'utilisateurs',
+      one: 'utilisateur',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get markAsSolution => 'Marquer comme solution';
+
+  @override
+  String get unmarkAsSolution => 'Ne plus marquer comme solution';
 }

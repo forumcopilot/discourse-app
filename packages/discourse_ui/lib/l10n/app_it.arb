@@ -995,5 +995,11 @@
   "discardChangesQuestion": "Vuoi annullare le modifiche?",
   "discardChanges": "Annulla modifiche",
   "saveDraft": "Salva bozza",
-  "notificationSettings": "Impostazioni notifiche"
+  "notificationSettings": "Impostazioni notifiche",
+  "topicMapViews": "{count, plural, =1{visualizzazione} other{visualizzazioni}}",
+  "topicMapLikes": "{count, plural, other{mi piace}}",
+  "topicMapLinks": "{count, plural, other{link}}",
+  "topicMapUsers": "{count, plural, =1{utente} other{utenti}}",
+  "markAsSolution": "Segna come soluzione",
+  "unmarkAsSolution": "Rimuovi come soluzione"
 }

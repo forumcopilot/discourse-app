@@ -1293,5 +1293,11 @@
   "discardChangesQuestion": "Wil je je wijzigingen negeren?",
   "discardChanges": "Wijzigingen negeren",
   "saveDraft": "Concept opslaan",
-  "notificationSettings": "Meldingsinstellingen"
+  "notificationSettings": "Meldingsinstellingen",
+  "topicMapViews": "{count, plural, =1{weergave} other{weergaven}}",
+  "topicMapLikes": "{count, plural, =1{like} other{likes}}",
+  "topicMapLinks": "{count, plural, =1{link} other{links}}",
+  "topicMapUsers": "{count, plural, =1{gebruiker} other{gebruikers}}",
+  "markAsSolution": "Markeren als oplossing",
+  "unmarkAsSolution": "Markering als oplossing opheffen"
 }

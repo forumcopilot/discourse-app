@@ -2573,4 +2573,52 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationSettings => 'Impostazioni notifiche';
+
+  @override
+  String topicMapViews(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'visualizzazioni',
+      one: 'visualizzazione',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'mi piace',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapLinks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'link',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapUsers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'utenti',
+      one: 'utente',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get markAsSolution => 'Segna come soluzione';
+
+  @override
+  String get unmarkAsSolution => 'Rimuovi come soluzione';
 }

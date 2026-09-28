@@ -4329,6 +4329,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notification settings'**
   String get notificationSettings;
+
+  /// Label under the view count in the summary under a topic's first post; the number is shown above it, not in the string
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{view} other{views}}'**
+  String topicMapViews(int count);
+
+  /// Label under the like count in the summary under a topic's first post; the number is shown above it
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{like} other{likes}}'**
+  String topicMapLikes(int count);
+
+  /// Label under the link count in the summary under a topic's first post; the number is shown above it
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{link} other{links}}'**
+  String topicMapLinks(int count);
+
+  /// Label under the participant count in the summary under a topic's first post; the number is shown above it
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{user} other{users}}'**
+  String topicMapUsers(int count);
+
+  /// Post menu item (discourse-solved): mark this reply as the topic's solution. Shown only to the topic's owner and staff
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as solution'**
+  String get markAsSolution;
+
+  /// Post menu item (discourse-solved): stop treating this reply as the topic's solution
+  ///
+  /// In en, this message translates to:
+  /// **'Unmark as solution'**
+  String get unmarkAsSolution;
 }
 
 class _AppLocalizationsDelegate

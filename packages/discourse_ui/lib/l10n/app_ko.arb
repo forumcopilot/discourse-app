@@ -989,5 +989,11 @@
   "discardChangesQuestion": "변경 사항을 버리시겠습니까?",
   "discardChanges": "변경 사항 버리기",
   "saveDraft": "임시 저장",
-  "notificationSettings": "알림 설정"
+  "notificationSettings": "알림 설정",
+  "topicMapViews": "{count, plural, other{조회}}",
+  "topicMapLikes": "{count, plural, other{좋아요}}",
+  "topicMapLinks": "{count, plural, other{링크}}",
+  "topicMapUsers": "{count, plural, other{사용자}}",
+  "markAsSolution": "해결책으로 표시",
+  "unmarkAsSolution": "해결책 표시 해제"
 }

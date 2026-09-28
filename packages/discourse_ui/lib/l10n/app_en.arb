@@ -3089,5 +3089,49 @@
   "notificationSettings": "Notification settings",
   "@notificationSettings": {
     "description": "The drawer row and page for choosing notifications: named apart from the Notifications tab, which lists them."
+  },
+  "topicMapViews": "{count, plural, =1{view} other{views}}",
+  "@topicMapViews": {
+    "description": "Label under the view count in the summary under a topic's first post; the number is shown above it, not in the string",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "topicMapLikes": "{count, plural, =1{like} other{likes}}",
+  "@topicMapLikes": {
+    "description": "Label under the like count in the summary under a topic's first post; the number is shown above it",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "topicMapLinks": "{count, plural, =1{link} other{links}}",
+  "@topicMapLinks": {
+    "description": "Label under the link count in the summary under a topic's first post; the number is shown above it",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "topicMapUsers": "{count, plural, =1{user} other{users}}",
+  "@topicMapUsers": {
+    "description": "Label under the participant count in the summary under a topic's first post; the number is shown above it",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "markAsSolution": "Mark as solution",
+  "@markAsSolution": {
+    "description": "Post menu item (discourse-solved): mark this reply as the topic's solution. Shown only to the topic's owner and staff"
+  },
+  "unmarkAsSolution": "Unmark as solution",
+  "@unmarkAsSolution": {
+    "description": "Post menu item (discourse-solved): stop treating this reply as the topic's solution"
   }
 }

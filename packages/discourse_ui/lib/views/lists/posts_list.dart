@@ -1236,7 +1236,7 @@ class _PostsState extends State<PostsList> {
   late final PostActionsHandler _postActionsHandler = PostActionsHandler(
       _postsController, widget.siteContext, fallbackForumId: widget.forumId);
 
-  Widget _buildPostItem(BuildContext context, FCPost post, int postIndex, int postsListLength, ThreadViewData data, {bool isHighlighted = false}) {
+  Widget _buildPostItem(BuildContext context, FCPost post, int postIndex, int postsListLength, ThreadViewData data, {bool isHighlighted = false, FCPost? nextPost}) {
     final avatarActions = _avatarActions;
     final imageActions = _imageActions;
     final postActionsHandler = _postActionsHandler;
@@ -1271,6 +1271,18 @@ class _PostsState extends State<PostsList> {
             : null,
         onJumpToAcceptedAnswer: _jumpToPostNumber,
         onJumpToPost: _jumpToPostNumber,
+        // The post actually rendered next, not post_number + 1: the loaded
+        // window has gaps (deleted, hidden, a page not yet fetched), and a
+        // reply that is not on screen must keep its disclosure.
+        replyDirectlyBelow: nextPost != null &&
+            post.postNumber != null &&
+            nextPost.replyToPostNumber == post.postNumber,
+        // No rule of its own where a "2 months later" divider follows:
+        // that divider's rules already separate the two posts, and a rule
+        // stacked above it drew the boundary twice. The opening post
+        // closes with the topic summary and band instead.
+        showBottomDivider: post.postNumber != 1 &&
+            (nextPost == null || _timeGapBetween(post, nextPost) == null),
         onVoteSuccess: (p) => _postsController.updateThreadPoll(p),
         actions: PostActions(
           onReply: (postId) => postActionsHandler.handleReply(context, postId, widget.topicId, widget.topicTitle, _refreshWithOptionalScrollToPost),
@@ -1287,21 +1299,26 @@ class _PostsState extends State<PostsList> {
         ),
       ),
     );
-    // Topic summary under the opening post, as web does. Gated on
-    // postNumber (not postIndex) for the same reason the poll and accepted
-    // answer above are: paging can put a later post at index 0, and the
-    // summary belongs to the topic's head, not to whatever scrolled into
-    // view first.
+    // Topic summary under the opening post, as web does, then a band of
+    // the page's container colour in place of the usual 1dp rule: the
+    // topic ends here and the replies start, which a rule like every
+    // other post's could not say. Gated on postNumber (not postIndex) for
+    // the same reason the poll and accepted answer above are: paging can
+    // put a later post at index 0, and the summary belongs to the topic's
+    // head, not to whatever scrolled into view first.
     if (post.postNumber == 1) {
       postWidget = Column(
         mainAxisSize: MainAxisSize.min,
-        // Stretch, or the bar shrink-wraps its numbers: the rules would
-        // stop short of the post's edges and the row would sit centred,
-        // where web's spans the content column and reads left to right.
+        // Stretch, or the bar shrink-wraps its numbers and the band stops
+        // short of the screen's edges.
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           postWidget,
           TopicStatsBar(topic: data.topic),
+          ColoredBox(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            child: const SizedBox(height: DesignTokens.spacingS),
+          ),
         ],
       );
     }
@@ -1571,7 +1588,9 @@ class _PostsState extends State<PostsList> {
                       if (postIndex < postsList.length) {
                         final post = postsList[postIndex];
                         final isHighlighted = _highlightedPostId == post.id;
-                        final item = _buildPostItem(context, post, postIndex, postsList.length, data, isHighlighted: isHighlighted);
+                        final item = _buildPostItem(context, post, postIndex, postsList.length, data,
+                            isHighlighted: isHighlighted,
+                            nextPost: postIndex + 1 < postsList.length ? postsList[postIndex + 1] : null);
                         // "3 months later" between posts far apart in time, so a
                         // topic revived after a long silence does not read as one
                         // continuous conversation. Compared against the post
@@ -1628,8 +1647,14 @@ class _PostsState extends State<PostsList> {
   /// post above may simply not be loaded yet.
   int? _timeGapBefore(List<FCPost> posts, int index) {
     if (index <= 0 || index >= posts.length) return null;
-    final previous = posts[index - 1].timestamp;
-    final current = posts[index].timestamp;
+    return _timeGapBetween(posts[index - 1], posts[index]);
+  }
+
+  /// Whole days from [above] to [below] when a "N months later" divider
+  /// belongs between them, else null.
+  int? _timeGapBetween(FCPost above, FCPost below) {
+    final previous = above.timestamp;
+    final current = below.timestamp;
     if (previous == null || current == null) return null;
     final days = PostTimeGap.daysBetween(previous, current);
     final threshold = widget.siteContext.showTimeGapDays;

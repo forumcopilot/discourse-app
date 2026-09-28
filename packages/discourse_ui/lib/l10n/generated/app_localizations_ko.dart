@@ -2457,4 +2457,50 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get notificationSettings => '알림 설정';
+
+  @override
+  String topicMapViews(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '조회',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '좋아요',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapLinks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '링크',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapUsers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '사용자',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get markAsSolution => '해결책으로 표시';
+
+  @override
+  String get unmarkAsSolution => '해결책 표시 해제';
 }

@@ -2433,4 +2433,50 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get notificationSettings => '通知设置';
+
+  @override
+  String topicMapViews(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '浏览',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '赞',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapLinks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '链接',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapUsers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '用户',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get markAsSolution => '标记为解决方案';
+
+  @override
+  String get unmarkAsSolution => '取消标记为解决方案';
 }

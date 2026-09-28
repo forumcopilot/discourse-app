@@ -995,5 +995,11 @@
   "discardChangesQuestion": "Möchtest du deine Änderungen verwerfen?",
   "discardChanges": "Änderungen verwerfen",
   "saveDraft": "Entwurf speichern",
-  "notificationSettings": "Benachrichtigungseinstellungen"
+  "notificationSettings": "Benachrichtigungseinstellungen",
+  "topicMapViews": "{count, plural, =1{Aufruf} other{Aufrufe}}",
+  "topicMapLikes": "{count, plural, =1{Like} other{Likes}}",
+  "topicMapLinks": "{count, plural, =1{Link} other{Links}}",
+  "topicMapUsers": "{count, plural, other{Benutzer}}",
+  "markAsSolution": "Als Lösung markieren",
+  "unmarkAsSolution": "Lösungsmarkierung entfernen"
 }

@@ -2562,4 +2562,62 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get notificationSettings => 'Настройки уведомлений';
+
+  @override
+  String topicMapViews(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'просмотра',
+      many: 'просмотров',
+      few: 'просмотра',
+      one: 'просмотр',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'лайка',
+      many: 'лайков',
+      few: 'лайка',
+      one: 'лайк',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapLinks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ссылки',
+      many: 'ссылок',
+      few: 'ссылки',
+      one: 'ссылка',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicMapUsers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'пользователя',
+      many: 'пользователей',
+      few: 'пользователя',
+      one: 'пользователь',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get markAsSolution => 'Отметить как решение';
+
+  @override
+  String get unmarkAsSolution => 'Снять отметку решения';
 }
