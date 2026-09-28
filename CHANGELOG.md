@@ -6,7 +6,35 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.36] - 2026-09-27
+
+### Added
+- **The message lists Discourse has:**
+  - The chip row reads Inbox, Unread, New, Sent and Archive, as the topic filters on Home do. Group inboxes follow when you are in a group with messages. There were only Inbox and Archive.
+  - A search button at the end of the row opens search with `in:messages` filled in; Discourse needs a search term alongside it. Search's filters also offer "My messages" (`FCSearchPersonal.messages` in the canonical SDK).
+  - Each list stays loaded between switches, and reloads when you come back if a message was read, filed or left meanwhile.
+- **Remove people and groups from a message:** a remove button beside each in the participants list, when Discourse allows it (`can_remove_allowed_users`), with Discourse's own confirmation. You leave through Leave, not this button.
+- **Delete a message** from its menu, when Discourse allows it: staff, or its author while it is under a day old with one post.
+- **New messages keep a draft** as you write, as topics and replies do. It is stored the way Discourse's web composer stores one: its own `new_private_message_<time>` key, with the recipients. Drafts started on the web resume in the app, and the other way round. A draft is also saved when you only change the recipients.
+  - The Drafts list opens a new-message draft in New Message, with its recipients, title and text. It shows it with a mail icon under its title, or "New Message" if it has none. It used to show "(untitled new topic)" and tapping it did nothing.
+  - `DiscourseDraftController` takes an `extraDataBuilder` for fields that change while writing, and a `touch()` to save them. `initialize()` returns the restored draft.
+  - New Message no longer loads the inbox to find out whether uploads are allowed. It reads the same permission as the other composers.
+- **Polls in private messages.** A poll in a message is drawn where its author put it, with results, voting, changing or removing a vote and the voters list, as in topics. Messages showed nothing in its place: the SDK's message model had no polls (`FCConversationMessage.polls`, added in the canonical SDK), and `DiscoursePostProxy.pollsFromPostJson` now parses a message's polls the way it parses a post's, so a vote finds its message.
+
 ### Changed
+- **Private messages open in the topic page**, from every entry point: the inbox, notifications, push, links, bookmarks and New Message. A Discourse message is a topic, and the app had a separate copy of the reading and composing screens for them, which had fallen behind. The same message opened in one or the other depending on how you got there. Messages now get everything a topic post has:
+  - reactions and who reacted, bookmarks with reminders, and reply to a specific message
+  - delete, edit history, wiki, "in reply to" and "N replies"
+  - display names, titles and flair; hidden and moderator posts shown as on the web; link click counts
+  - small actions such as "invited …" or "left", and posts from another point in the message
+  - opening at your first unread message (it always opened at the end), loading earlier messages as you scroll, and time-gap dividers
+  - drafts in replies, and the same composer as topics, which returns you to your new message
+  - "Suggested Messages" at the end
+  - What only messages have moves with them: the participants under the title (tap for the list and Invite), and Archive or Move to Inbox, Mark as unread, Edit title, Close or Open and Leave in the menu. The inbox refreshes afterwards, and drops a message you archived or left. There is no "You are subscribed" banner on messages: every message is watched.
+  - The participants sheet uses the standard sheet title under the drag handle, with Invite beside it, and list rows.
+  - Moving a message between Inbox and Archive shows it in the other list when you switch to it. Both lists stay loaded between switches, so the other one kept showing where the message used to be until you pulled to refresh.
+  - `ConversationPage`, `ConversationItem`, `ConversationHeaderWidget`, `ConversationAppBar`, `ReplyConversationPage` and `EditConversationMessagePage` are removed (about 4,000 lines); `DiscourseMessageDetails` is now filled by the topic loaders too (`fromTopicView`, `isMessage`, participants and the viewer's rights), and uploads in a message's reply or edit are sent as the message's (`for_private_message`).
+- **New Message is the shared composer** (`MessageComposePage`) with the recipients above the title, instead of a separate copy that had drifted from it. It gains what the other composers have: photos prepared as the forum's own composer would (scaled and recompressed when the forum asks for it, and a question before shrinking one over the size limit; the copy uploaded them as picked), the same attachment rows and toolbar, and a readable reason when a send fails. Once sent it opens the new message, as before and as New Topic does, through `NewConversationPage.open`; the message list under it refreshes. `MessageComposePage` takes a `contentLabel`, and its own error message no longer shows raw "Exception: …" text.
 - **Uploads go into the text, where you are writing, as on the web.**
   - A picked file appears as Discourse's placeholder, `[Uploading: name…]()`, on its own line at the cursor. When the upload lands, the placeholder becomes the Markdown Discourse renders for that kind of file.
   - A photo can go between paragraphs, and a draft keeps its uploads.
@@ -28,36 +56,6 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
   - Post images have 8dp corners like grids; a small inline icon keeps square ones.
   - An upload the forum cannot find shows the broken-picture box, not an invisible gap.
   - A video's viewer and screen-reader label say "Video" rather than the file's hash name.
-
-### Added
-- **The message lists Discourse has:**
-  - The chip row reads Inbox, Unread, New, Sent and Archive, as the topic filters on Home do. Group inboxes follow when you are in a group with messages. There were only Inbox and Archive.
-  - A search button at the end of the row opens search with `in:messages` filled in; Discourse needs a search term alongside it. Search's filters also offer "My messages" (`FCSearchPersonal.messages` in the canonical SDK).
-  - Each list stays loaded between switches, and reloads when you come back if a message was read, filed or left meanwhile.
-- **Remove people and groups from a message:** a remove button beside each in the participants list, when Discourse allows it (`can_remove_allowed_users`), with Discourse's own confirmation. You leave through Leave, not this button.
-- **Delete a message** from its menu, when Discourse allows it: staff, or its author while it is under a day old with one post.
-- **New messages keep a draft** as you write, as topics and replies do. It is stored the way Discourse's web composer stores one: its own `new_private_message_<time>` key, with the recipients. Drafts started on the web resume in the app, and the other way round. A draft is also saved when you only change the recipients.
-  - The Drafts list opens a new-message draft in New Message, with its recipients, title and text. It shows it with a mail icon under its title, or "New Message" if it has none. It used to show "(untitled new topic)" and tapping it did nothing.
-  - `DiscourseDraftController` takes an `extraDataBuilder` for fields that change while writing, and a `touch()` to save them. `initialize()` returns the restored draft.
-  - New Message no longer loads the inbox to find out whether uploads are allowed. It reads the same permission as the other composers.
-
-### Changed
-- **Private messages open in the topic page**, from every entry point: the inbox, notifications, push, links, bookmarks and New Message. A Discourse message is a topic, and the app had a separate copy of the reading and composing screens for them, which had fallen behind. The same message opened in one or the other depending on how you got there. Messages now get everything a topic post has:
-  - reactions and who reacted, bookmarks with reminders, and reply to a specific message
-  - delete, edit history, wiki, "in reply to" and "N replies"
-  - display names, titles and flair; hidden and moderator posts shown as on the web; link click counts
-  - small actions such as "invited …" or "left", and posts from another point in the message
-  - opening at your first unread message (it always opened at the end), loading earlier messages as you scroll, and time-gap dividers
-  - drafts in replies, and the same composer as topics, which returns you to your new message
-  - "Suggested Messages" at the end
-  - What only messages have moves with them: the participants under the title (tap for the list and Invite), and Archive or Move to Inbox, Mark as unread, Edit title, Close or Open and Leave in the menu. The inbox refreshes afterwards, and drops a message you archived or left. There is no "You are subscribed" banner on messages: every message is watched.
-  - The participants sheet uses the standard sheet title under the drag handle, with Invite beside it, and list rows.
-  - Moving a message between Inbox and Archive shows it in the other list when you switch to it. Both lists stay loaded between switches, so the other one kept showing where the message used to be until you pulled to refresh.
-  - `ConversationPage`, `ConversationItem`, `ConversationHeaderWidget`, `ConversationAppBar`, `ReplyConversationPage` and `EditConversationMessagePage` are removed (about 4,000 lines); `DiscourseMessageDetails` is now filled by the topic loaders too (`fromTopicView`, `isMessage`, participants and the viewer's rights), and uploads in a message's reply or edit are sent as the message's (`for_private_message`).
-- **New Message is the shared composer** (`MessageComposePage`) with the recipients above the title, instead of a separate copy that had drifted from it. It gains what the other composers have: photos prepared as the forum's own composer would (scaled and recompressed when the forum asks for it, and a question before shrinking one over the size limit; the copy uploaded them as picked), the same attachment rows and toolbar, and a readable reason when a send fails. Once sent it opens the new message, as before and as New Topic does, through `NewConversationPage.open`; the message list under it refreshes. `MessageComposePage` takes a `contentLabel`, and its own error message no longer shows raw "Exception: …" text.
-
-### Added
-- **Polls in private messages.** A poll in a message is drawn where its author put it, with results, voting, changing or removing a vote and the voters list, as in topics. Messages showed nothing in its place: the SDK's message model had no polls (`FCConversationMessage.polls`, added in the canonical SDK), and `DiscoursePostProxy.pollsFromPostJson` now parses a message's polls the way it parses a post's, so a vote finds its message.
 
 ### Fixed
 - **"1 vote", not "1 votes"**, under a poll, in every language with plural forms.
