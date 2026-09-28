@@ -556,13 +556,19 @@ class NotificationService with ServiceErrorHandlingMixin {
     // Leave a different forum before opening this one, as the plugin path does.
     final siteController =
         Get.isRegistered<DiscourseSiteController>() ? Get.find<DiscourseSiteController>() : null;
+    final hostOpen = DiscourseHost.openForum;
+    // A forum the reader has left for a multi-forum host's list keeps its
+    // controller, so under a host the forum's home must also still be in the
+    // navigator. Without that, a push for a forum left a moment ago opened
+    // its topic straight over the host's list, with no forum under it: no
+    // forum colours, and Back skipped the forum.
     final alreadyHere = _isSameForum(siteController?.currentSite.value, targetForum) &&
         (siteController?.isInitialized.value ?? false) &&
-        siteController?.currentSiteContext.value != null;
+        siteController?.currentSiteContext.value != null &&
+        (hostOpen == null || (siteController?.homeRoute?.isActive ?? false));
     if (!alreadyHere) {
       // A multi-forum host opens the forum itself, the same way it opens
       // one from its chooser or from a link, and the route with it.
-      final hostOpen = DiscourseHost.openForum;
       if (hostOpen != null) {
         AppLogger.debug('🔔 [NotificationService] Host opens ${targetForum.url} at $route');
         await hostOpen(targetForum, route);

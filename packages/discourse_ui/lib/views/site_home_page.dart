@@ -777,6 +777,19 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     return 20 + taken;
   }
 
+  /// Whether the drawer is open. Back closes it before anything else.
+  bool _drawerOpen = false;
+
+  /// Whether Back returns to the first tab rather than leaving: on Android,
+  /// from any other tab, as Material's navigation bar has it (the first tab
+  /// is the fixed start destination). It used to leave the forum, or close
+  /// the app, from whichever tab was showing. iOS has no Back here, and its
+  /// edge swipe leaves from any tab, as tab bars do there.
+  bool _backReturnsToFirstTab(BuildContext context) =>
+      Theme.of(context).platform == TargetPlatform.android &&
+      _tabController.index != 0 &&
+      !_drawerOpen;
+
   @override
   Widget build(BuildContext context) {
     // Don't build the main UI until initialization is complete
@@ -800,7 +813,10 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
         // Error dialog should have already been shown by _initializeSite or DiscourseSiteController
         // But ensure we navigate back after a delay to allow dialog to be shown
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted && _siteContext == null) {
+          // Only this page: build runs again before the pop lands, and each
+          // run scheduled another pop, closing the page under this one too.
+          if (mounted && _siteContext == null &&
+              (ModalRoute.of(context)?.isCurrent ?? false)) {
             Navigator.of(context).pop();
           }
         });
@@ -856,53 +872,64 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
       _lastLoggedShouldShowFAB = shouldShowFAB;
     }
 
-    return Scaffold(
-      appBar: _buildAppBarForCurrentTab(isLoggedIn, canSendPM),
-      // Phase 5.18a — hamburger drawer hosts the moved Tags tab plus
-      // future community directories (Users / Groups / Badges) and
-      // account actions. Drawer is mounted at the Scaffold level so
-      // every tab's AppBar can open it via the auto-imply leading
-      // hamburger.
-      drawer: SiteDrawer(siteContext: _siteContext!),
-      // Pushed over a host's forum list, the home's left edge means Back:
-      // iOS's swipe and Android's system gesture both claim it, except that
-      // on older Android a finger resting at the edge first opened the drawer
-      // instead. One meaning per edge, so there the drawer opens from its
-      // button only. A root home (the single-forum app) has nothing behind
-      // it, so its edge opens the drawer.
-      drawerEnableOpenDragGesture: !(ModalRoute.canPopOf(context) ?? false),
-      // Android's gesture navigation keeps the outermost strip of the edge
-      // for its own Back, which from a root home would close the app. The
-      // drawer's strip starts where the system's ends; without gesture
-      // navigation that inset is zero and this is Flutter's default.
-      drawerEdgeDragWidth: _drawerEdgeDragWidth(context),
-      body: IndexedStack(
-        index: _tabController.index,
-        children: _buildTabWidgets(),
+    return PopScope(
+      canPop: !_backReturnsToFirstTab(context),
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop || _tabController.index == 0) return;
+        setState(() {
+          _tabController.index = 0;
+          _previousTabIndex = 0;
+        });
+      },
+      child: Scaffold(
+        appBar: _buildAppBarForCurrentTab(isLoggedIn, canSendPM),
+        onDrawerChanged: (open) => setState(() => _drawerOpen = open),
+        // Phase 5.18a — hamburger drawer hosts the moved Tags tab plus
+        // future community directories (Users / Groups / Badges) and
+        // account actions. Drawer is mounted at the Scaffold level so
+        // every tab's AppBar can open it via the auto-imply leading
+        // hamburger.
+        drawer: SiteDrawer(siteContext: _siteContext!),
+        // Pushed over a host's forum list, the home's left edge means Back:
+        // iOS's swipe and Android's system gesture both claim it, except that
+        // on older Android a finger resting at the edge first opened the drawer
+        // instead. One meaning per edge, so there the drawer opens from its
+        // button only. A root home (the single-forum app) has nothing behind
+        // it, so its edge opens the drawer.
+        drawerEnableOpenDragGesture: !(ModalRoute.canPopOf(context) ?? false),
+        // Android's gesture navigation keeps the outermost strip of the edge
+        // for its own Back, which from a root home would close the app. The
+        // drawer's strip starts where the system's ends; without gesture
+        // navigation that inset is zero and this is Flutter's default.
+        drawerEdgeDragWidth: _drawerEdgeDragWidth(context),
+        body: IndexedStack(
+          index: _tabController.index,
+          children: _buildTabWidgets(),
+        ),
+        bottomNavigationBar: NavigationBar(
+          onDestinationSelected: (int index) {
+            AppLogger.debug('🎯 [SITE_HOME] NavigationBar onDestinationSelected: index=$index, TabController.length=${_tabController.length}');
+            setState(() {
+              _tabController.index = index;
+              _previousTabIndex = index;
+            });
+            // Refresh badge when Messages tab becomes active
+            if (_enabledTabs[index] == _messagesTab && (_siteContext?.isLoggedIn ?? false)) {
+              _fetchInboxStat();
+            }
+          },
+          selectedIndex: _tabController.index,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          destinations: _buildNavigationDestinations(),
+        ),
+        floatingActionButton: shouldShowFAB
+            ? FloatingActionButton.extended(
+                onPressed: _onNewMessagePressed,
+                icon: const Icon(Icons.post_add_rounded),
+                label: Text(AppLocalizations.of(context)!.newConversation),
+              )
+            : null,
       ),
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
-          AppLogger.debug('🎯 [SITE_HOME] NavigationBar onDestinationSelected: index=$index, TabController.length=${_tabController.length}');
-          setState(() {
-            _tabController.index = index;
-            _previousTabIndex = index;
-          });
-          // Refresh badge when Messages tab becomes active
-          if (_enabledTabs[index] == _messagesTab && (_siteContext?.isLoggedIn ?? false)) {
-            _fetchInboxStat();
-          }
-        },
-        selectedIndex: _tabController.index,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        destinations: _buildNavigationDestinations(),
-      ),
-      floatingActionButton: shouldShowFAB
-          ? FloatingActionButton.extended(
-              onPressed: _onNewMessagePressed,
-              icon: const Icon(Icons.post_add_rounded),
-              label: Text(AppLocalizations.of(context)!.newConversation),
-            )
-          : null,
     );
   }
 

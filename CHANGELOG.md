@@ -6,6 +6,12 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Fixed
+- **Back returns to the screen you were on.**
+  - **On Android, Back on the Categories, Chat, Notifications or Profile tab returns to the forum's first tab.** Back again then leaves the forum. It used to leave the forum, or close the single-forum app, from whichever tab was showing. An open drawer still closes first. iOS is unchanged: its edge swipe leaves the forum from any tab, as tab bars work there.
+  - **A push notification for a forum you have left opens the forum, then the topic.** In a multi-forum host, the forum's controller outlives the forum, so the app took it for still open. It opened the topic straight over the host's list, in default colours, and Back skipped the forum. The host now opens it, as it does from its list (`DiscourseHost.openForum`).
+  - **A forum that failed to start pops only its own page.** Every rebuild scheduled another pop, which could close the page under it too.
+
 ## [1.0.36] - 2026-09-27
 
 ### Added
