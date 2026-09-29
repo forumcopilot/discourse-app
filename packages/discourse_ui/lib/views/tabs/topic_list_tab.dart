@@ -239,12 +239,21 @@ class TopicListTabState extends FCStatefulWidget<TopicListTab> with FCTabStatefu
     }
   }
 
-  // Method to notify parent that data has been loaded - child can call this
+  bool _redrawQueued = false;
+
+  /// A list's state changed: redraw from it (this tab reads the lists
+  /// through their keys). Lists call this from their own `initState` too —
+  /// the categories do as they start loading — which runs while this tab's
+  /// subtree is being built, when marking the tab dirty is an error. So
+  /// the redraw always waits for the end of the frame.
   void notifyDataLoaded() {
-    AppLogger.debug('📢 [TOPIC_LIST_TAB] notifyDataLoaded called - forcing rebuild');
-    if (mounted) {
-      setState(() {});
-    }
+    if (!mounted || _redrawQueued) return;
+    _redrawQueued = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _redrawQueued = false;
+      if (mounted) setState(() {});
+    });
+    WidgetsBinding.instance.ensureVisualUpdate();
   }
 
   void _onScroll() {
