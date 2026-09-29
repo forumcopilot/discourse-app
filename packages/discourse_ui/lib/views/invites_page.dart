@@ -382,6 +382,7 @@ class _InvitesPageState extends State<InvitesPage> {
       floatingActionButton: forbidden
           ? null
           : FloatingActionButton.extended(
+              heroTag: null,
               onPressed: _creating ? null : _createInviteLink,
               icon: _creating
                   ? const SizedBox(

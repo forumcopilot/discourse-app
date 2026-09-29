@@ -33,6 +33,12 @@ class ForumTopicsPage extends StatefulWidget {
     required this.siteContext,
   });
 
+  /// The New Topic button's hero tag, shared with Home's: the same action
+  /// on both pages, so the button stays put as a category opens or closes.
+  /// Every other FAB has a tag of its own or none — two heroes with one tag
+  /// in a route (Home keeps all its tabs mounted) is an error.
+  static const newTopicHeroTag = 'new-topic-fab';
+
   @override
   State<ForumTopicsPage> createState() => _ForumTopicsPageState();
 }
@@ -387,6 +393,7 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
       floatingActionButton:
           signedIn && widget.forum.canPost
               ? FloatingActionButton.extended(
+                  heroTag: ForumTopicsPage.newTopicHeroTag,
                   onPressed: _handleNewTopic,
                   icon: const Icon(Icons.edit_outlined),
                   label: Text(AppLocalizations.of(context)!.newTopic),

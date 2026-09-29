@@ -18,6 +18,7 @@ import 'appbars/messages_tab_app_bar.dart';
 import 'appbars/notifications_tab_app_bar.dart';
 import 'appbars/profile_tab_app_bar.dart';
 import 'chat/chat_channel_list_page.dart';
+import 'forum_topics_page.dart';
 import 'new_topic_page.dart';
 import 'tabs/topic_list_tab.dart';
 import 'tabs/notification_list_tab.dart';
@@ -927,12 +928,14 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
         ),
         floatingActionButton: shouldShowFAB
             ? FloatingActionButton.extended(
+                heroTag: 'new-message-fab',
                 onPressed: _onNewMessagePressed,
                 icon: const Icon(Icons.post_add_rounded),
                 label: Text(AppLocalizations.of(context)!.newConversation),
               )
             : showNewTopic
                 ? FloatingActionButton.extended(
+                    heroTag: ForumTopicsPage.newTopicHeroTag,
                     onPressed: _onNewTopicPressed,
                     icon: const Icon(Icons.edit_outlined),
                     label: Text(AppLocalizations.of(context)!.newTopic),

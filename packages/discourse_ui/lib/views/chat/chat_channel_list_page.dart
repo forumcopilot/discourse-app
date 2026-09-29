@@ -229,6 +229,9 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
         // Labelled like Messages' "New Message" button beside it; the words
         // are Discourse's sidebar link ("Start new DM").
         ? FloatingActionButton.extended(
+            // No hero: embedded, this sits in Home's route beside Home's
+            // own button, and no other page has this one.
+            heroTag: null,
             onPressed: _startNewDm,
             icon: const Icon(Icons.add_comment_outlined),
             label: Text(AppLocalizations.of(context)!.chatStartNewDm),
