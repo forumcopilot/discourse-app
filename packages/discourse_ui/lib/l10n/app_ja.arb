@@ -1020,5 +1020,7 @@
   "levelNormal": "通常",
   "levelMuted": "ミュート",
   "chooseCategory": "カテゴリを選択",
-  "signInToPostAndGetNotifications": "ログインして投稿や通知を利用"
+  "signInToPostAndGetNotifications": "ログインして投稿や通知を利用",
+  "notificationsArrivalTiming": "通知は通常 10 分以内に届きます。会話中はもっと早く届きます。",
+  "forumBlocksNotificationServer": "{forumName} が通知サーバーをブロックしているため、通知が届かない場合があります。設定でオフにできます。"
 }

@@ -2770,4 +2770,13 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get signInToPostAndGetNotifications =>
       'Log in om te posten en meldingen te krijgen';
+
+  @override
+  String get notificationsArrivalTiming =>
+      'Meldingen komen meestal binnen 10 minuten binnen, en sneller tijdens een gesprek.';
+
+  @override
+  String forumBlocksNotificationServer(Object forumName) {
+    return '$forumName blokkeert onze meldingsserver, dus meldingen komen mogelijk niet aan. Je kunt ze uitzetten in Instellingen.';
+  }
 }

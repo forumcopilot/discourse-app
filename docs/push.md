@@ -39,21 +39,34 @@ With it set, the sign-in flow ends on `EnableNotificationsPage`, which
 asks the OS for notification permission (there, not at launch — the user
 has just read what the alerts are for) and then runs a second handshake:
 `notifications` scope only (four routes: `notifications#index`, `#totals`,
-`#mark_read`, `message_bus`), its own client id (`<install>:notify`), no
-`push_url`. The key is never persisted on the device; it goes to the
-backend via `NotificationKeyService`, keyed on the forum URL and the client
-id, together with the FCM token, which is re-sent whenever it becomes
-known or rotates. A completed grant is remembered per forum, so signing in
-again does not ask again; sign-out revokes and forgets it, and Settings →
-Notifications turns it on or off later.
+`#mark_read`, `message_bus`), its own client id (`<install>:notify`), and
+the backend's `push_url` (`AppForumConfig.notificationsPushUrl`,
+`<base>/discourse/push`). The push_url does nothing until a forum's admin
+allowlists it — Discourse checks `allowed_user_api_push_urls` when it sends,
+and counts the `notifications` scope as push-capable — but a key's push_url
+can never be added later, so every grant carries it from the start.
 
-The backend has to serve three routes under the base URL — the bodies are
-on `NotificationKeyService` — and run a poller: read
-`/notifications.json?filter=unread` with the stored key (that branch never
-bumps the user's seen pointer), deliver everything above a per-key
-high-water mark, advance the mark only for what was delivered. Discourse
-rate-limits per key (20/min, 2880/day), so one poll a minute per user is
-safe.
+The key is never persisted on the device; it goes to the backend via
+`NotificationKeyService`, keyed on the forum URL and the client id. Every
+call carries the phone's installation (`NotificationInstallation`: an id and
+secret generated on first use, sent as `Authorization: Bearer <id>:<secret>`),
+so only this phone can revoke its grants or change their Do Not Disturb.
+`PUT /installation` reports the FCM token, the OS permission, app version and
+locale for all of the phone's grants at once — at launch, on token rotation,
+on every resume — and nothing is reported before the phone's first grant.
+The forum's Do Not Disturb (read from the current-user payload and the DND
+setting) goes to `PUT /discourse/notification-key/dnd`. A completed grant is
+remembered per forum, so signing in again does not ask again; sign-out
+revokes and forgets it, and Settings → Notifications turns it on or off
+later. When the backend reports `reachable: false` (something in front of
+the forum refuses it), the grant page says notifications may not arrive.
+
+The reference backend is abda-push (betterdiscourse.app): it polls
+`/notifications.json?filter=unread` (that branch writes nothing — no seen
+pointer, no read marks) every 10 minutes, every 3 for half an hour after
+news, and pushes one notification per Discourse notification. Discourse
+rate-limits per key (20/min, 2880/day) and per IP (200/min across a hosting
+cluster), which is what the 10-minute pace is sized against.
 
 What it delivers has to be a payload the app can act on. The contract is
 `DiscourseNotificationRoute` in `discourse_ui`, and its tests are the
@@ -65,7 +78,8 @@ specification:
 | `site_url` | the forum, as the backend spells it; how a multi-forum app picks which of its forums to open |
 | `topic_id` | the topic to open, when the notification is about one |
 | `post_number` | position within that topic; the app opens the page holding it |
-| `content_id` | the post *id* where `/notifications.json` exposed one (`data.original_post_id`) — a better anchor than the post number, since Discourse resolves it exactly |
+| `content_id` | the post *id* where `/notifications.json` exposed one (`data.original_post_id`) — a better anchor than the post number, since Discourse resolves it exactly. Left out for a collapsed row ("3 replies"), which should open at the first unread `post_number` |
+| `notification_type`, `url`, `chat_*`, `badge_*`, `group_name`, `bookmark*`, `username` | per-type destinations and the actor, for routing beyond topics (not yet used by the tap handler) |
 
 Everything else is passed through for display. A payload naming no topic —
 a badge, a bookmark reminder — is expected rather than an error: the app
@@ -76,9 +90,9 @@ every number arrives as text.
 
 Either server. A relay accepts unauthenticated POSTs from the forum and
 holds push credentials; a poller holds users' forum keys. Both belong in
-their own deployable, not in a client template. Forum Copilot runs them
-for its hosted customers; a fork can run its own against the contracts
-above.
+their own deployable, not in a client template. abda-push is the poller
+ABDA runs at betterdiscourse.app; a fork can run its own against the
+contracts above.
 
 ## Why not wait
 

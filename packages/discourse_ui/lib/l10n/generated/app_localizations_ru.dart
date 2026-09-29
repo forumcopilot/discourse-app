@@ -2781,4 +2781,13 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get signInToPostAndGetNotifications =>
       'Войдите, чтобы писать и получать уведомления';
+
+  @override
+  String get notificationsArrivalTiming =>
+      'Уведомления обычно приходят в течение 10 минут, а во время переписки — быстрее.';
+
+  @override
+  String forumBlocksNotificationServer(Object forumName) {
+    return '$forumName блокирует наш сервер уведомлений, поэтому они могут не приходить. Их можно отключить в настройках.';
+  }
 }

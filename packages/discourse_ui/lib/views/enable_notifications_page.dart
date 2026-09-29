@@ -7,6 +7,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 
 import '../core/logging/app_logger.dart';
 import '../services/discourse_login_service.dart';
+import '../services/notification_installation.dart';
 import '../services/notification_key_service.dart';
 import '../services/notification_permission.dart';
 import '../theme/design_tokens.dart';
@@ -121,14 +122,21 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
       AppLogger.debug(
           '🔔 [ENABLE_NOTIFICATIONS] granted, client_id=${key.clientId}');
 
+      // File this phone with the backend first — its FCM token and whether
+      // the OS lets it show notifications — so the grant below is registered
+      // under an installation that can already be reached.
+      await NotificationInstallation.report(force: true);
+
       // The key is deliberately not persisted on the device — it is not this
       // session's credential, and its whole purpose is to live on the server.
-      final uploaded = await _uploadKey(key);
+      final registration = await _uploadKey(key);
+      final uploaded = registration.ok;
 
       if (uploaded) {
         // Remembered per forum, so the next sign-in does not ask again and the
         // settings row and the token sync know there is a grant to serve.
-        await loginService.markNotificationsGranted();
+        await NotificationInstallation.markRegistered();
+        await loginService.markNotificationsGranted(installBound: true);
 
         // On a first sign-in, FCM is often still initializing at this point,
         // so the upload above carried no device token and nothing could be
@@ -149,12 +157,20 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
       // The messenger is resolved BEFORE the pop — afterwards this context is
       // defunct and the message would go nowhere.
       final messenger = ScaffoldMessenger.of(context);
+      final l10n = AppLocalizations.of(context)!;
       Navigator.of(context).pop(uploaded);
       if (!uploaded) {
         messenger.showSnackBar(
+          SnackBar(content: Text(l10n.approvedButRelayUnreachable)),
+        );
+      } else if (!registration.reachable) {
+        // Stored, but something in front of the forum (usually a Cloudflare
+        // rule against datacenter addresses) refuses our server. Say so now
+        // rather than let the user wait for notifications that never come.
+        messenger.showSnackBar(
           SnackBar(
-            content:
-                Text(AppLocalizations.of(context)!.approvedButRelayUnreachable),
+            content: Text(l10n.forumBlocksNotificationServer(_forumName)),
+            duration: const Duration(seconds: 8),
           ),
         );
       }
@@ -179,7 +195,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
   /// `notifications`-scoped key cannot call `/session/current.json`. The
   /// backend can also read it off the notifications themselves, so sending it
   /// is a convenience, not a requirement.
-  Future<bool> _uploadKey(DiscourseUserApiKey key) async {
+  Future<NotificationKeyRegistration> _uploadKey(DiscourseUserApiKey key) async {
     final site = widget.siteContext.site;
     return NotificationKeyService.register(
       siteUrl: site.url,
@@ -307,6 +323,14 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
                       const SizedBox(height: DesignTokens.spacingS),
                       Text(
                         l10n.approveNotificationsExplanation,
+                        style: textTheme.bodyMedium
+                            ?.copyWith(color: colorScheme.onSurfaceVariant),
+                      ),
+                      const SizedBox(height: DesignTokens.spacingS),
+                      // Polled, not pushed by the forum: set the expectation
+                      // before the first one arrives a few minutes late.
+                      Text(
+                        l10n.notificationsArrivalTiming,
                         style: textTheme.bodyMedium
                             ?.copyWith(color: colorScheme.onSurfaceVariant),
                       ),

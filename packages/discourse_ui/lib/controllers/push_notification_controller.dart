@@ -1,23 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:discourse_core/discourse_core.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../config/app_forum_config.dart';
 import '../services/discourse_login_service.dart';
 import '../models/site_notification_state.dart';
 import '../models/notification_preferences.dart';
 import '../services/device_service.dart';
+import '../services/notification_installation.dart';
 import '../services/push_notification_service.dart';
 import '../services/notification_preferences_service.dart';
 import '../services/notification_service.dart';
-import '../services/site_proxy_service.dart';
 import 'package:discourse_ui/core/errors/error_handling_mixins.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'site_controller.dart';
 
 /// Main controller for managing push notifications across multiple sites
-class DiscoursePushNotificationController extends GetxController with ErrorHandlingMixin {
+class DiscoursePushNotificationController extends GetxController
+    with ErrorHandlingMixin, WidgetsBindingObserver {
   static DiscoursePushNotificationController get to => Get.find();
 
   // Services
@@ -55,7 +56,19 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     _initialize();
+  }
+
+  /// Back from the background — possibly from the system settings, where the
+  /// user may have turned this app's notifications on or off. Tell the
+  /// notifications backend, which pauses polling for a phone that cannot show
+  /// anything (the report is a no-op when nothing changed).
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(NotificationInstallation.report(token: _fcmToken));
+    }
   }
 
   /// Initialize the push notification system
@@ -150,9 +163,6 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
     // Re-register sites that were previously registered
     await _reRegisterPersistedSites();
 
-    // BYO/direct push: register device with the forum's own server.
-    await _tryRegisterDirect();
-
     // Polled Discourse notifications: the token has just become available, so
     // attach it to any grant for the forum that is open.
     //
@@ -163,8 +173,9 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
     // who taps straight into a forum beats it.
     await _syncNotificationDeviceTokenForCurrentSite();
 
-    // Re-fire when the user logs in later (registration requires an authenticated session).
-    _watchLoginForDirectRegistration();
+    // And the phone as a whole: the token, permission, app version and locale
+    // behind every grant it has made, forums not open right now included.
+    unawaited(NotificationInstallation.report(token: _fcmToken));
 
     _isInitialized = true;
     AppLogger.debug('DiscoursePushNotificationController initialized successfully');
@@ -218,98 +229,6 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
         ?.userApiClientId;
   }
 
-  // ----- BYO/direct mode device registration ---------------------------
-
-  bool _hasDirectRegistered = false;
-  Worker? _loginWatcher;
-
-  /// Attempts to register this device with the forum's own server for the
-  /// BYO Firebase ("direct") push mode. No-op when this build isn't a direct
-  /// build, or when prerequisites (token, login) aren't satisfied yet.
-  Future<void> _tryRegisterDirect({String? overrideToken}) async {
-    if (AppForumConfig.pushSource != 'direct') return;
-    if (_deviceId == null) return;
-    final token = overrideToken ?? _fcmToken;
-    if (token == null || token.isEmpty) return;
-
-    final ctx = Get.isRegistered<DiscourseSiteController>()
-        ? Get.find<DiscourseSiteController>().currentSiteContext.value
-        : null;
-    if (ctx == null || !ctx.isLoggedIn) {
-      AppLogger.debug('[DirectPush] Skipping register — not logged in yet');
-      return;
-    }
-
-    try {
-      final deviceInfo = await _deviceService.getDeviceInfo();
-      final proxy = SiteProxyService.getDeviceProxy();
-      final r = await proxy.registerDeviceAsync(
-        deviceId: _deviceId!,
-        fcmToken: token,
-        platform: deviceInfo.platform,
-        source: 'direct',
-        appVersion: deviceInfo.appVersion,
-      );
-      if (r.result) {
-        _hasDirectRegistered = true;
-        AppLogger.debug('[DirectPush] Registered device ${_deviceId!.substring(0, 8)}... '
-            'platform=${deviceInfo.platform} on forum ${ctx.site.url}');
-      } else {
-        AppLogger.debug('[DirectPush] Register failed: ${r.resultText}');
-      }
-    } catch (e) {
-      AppLogger.debug('[DirectPush] Register error: $e');
-    }
-  }
-
-  /// Unregister this device from direct-mode push (BYO Firebase). Call on
-  /// logout so the server stops dispatching to this token after the user
-  /// signs out.
-  Future<bool> unregisterDirect() async {
-    if (AppForumConfig.pushSource != 'direct') return true;
-    if (_deviceId == null) return true;
-    if (!_hasDirectRegistered) return true;
-
-    try {
-      final proxy = SiteProxyService.getDeviceProxy();
-      final r = await proxy.unregisterDeviceAsync(_deviceId!);
-      if (r.result) {
-        _hasDirectRegistered = false;
-        AppLogger.debug('[DirectPush] Unregistered device ${_deviceId!.substring(0, 8)}...');
-        return true;
-      }
-      AppLogger.debug('[DirectPush] Unregister failed: ${r.resultText}');
-      return false;
-    } catch (e) {
-      AppLogger.debug('[DirectPush] Unregister error: $e');
-      return false;
-    }
-  }
-
-  /// Listens for the user to become logged in and (re-)attempts direct
-  /// registration. Called once during init.
-  void _watchLoginForDirectRegistration() {
-    if (AppForumConfig.pushSource != 'direct') return;
-    if (_loginWatcher != null) return;
-    if (!Get.isRegistered<DiscourseSiteController>()) return;
-
-    final siteCtrl = Get.find<DiscourseSiteController>();
-    _loginWatcher = ever<dynamic>(siteCtrl.currentSiteContext, (_) async {
-      final ctx = siteCtrl.currentSiteContext.value;
-      if (ctx != null && ctx.isLoggedIn && !_hasDirectRegistered) {
-        await _tryRegisterDirect();
-      }
-    });
-
-    // The Rx only notifies on reassignment/refresh, so a context that is
-    // already logged in at watcher setup would never fire it — check now.
-    final currentCtx = siteCtrl.currentSiteContext.value;
-    if (currentCtx != null && currentCtx.isLoggedIn && !_hasDirectRegistered) {
-      // Fire-and-forget: registration errors are logged inside.
-      _tryRegisterDirect();
-    }
-  }
-
   /// Point the currently open forum's notifications grant at [token], or at the
   /// current FCM token when none is given. No-ops when no forum is open, which
   /// is the normal state at app launch.
@@ -330,11 +249,14 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
     _fcmToken = newToken;
 
     // A rotated token invalidates whatever the server has stored for polled
-    // Discourse notifications; re-point it at the new one.
+    // Discourse notifications; re-point it at the new one — for every forum
+    // at once through the installation, and for a legacy grant on the forum
+    // that is open.
+    await NotificationInstallation.report(token: newToken);
     await _syncNotificationDeviceTokenForCurrentSite(newToken);
 
     // If the token arrived after onInit ran, initialization is still pending —
-    // finish it now (re-registers persisted sites and does direct registration).
+    // finish it now (re-registers persisted sites).
     if (!_isInitialized) {
       try {
         await _completeInitialization();
@@ -346,12 +268,6 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
       }
       return;
     }
-
-    // BYO/direct: re-register with the new token.
-    if (AppForumConfig.pushSource == 'direct' && _hasDirectRegistered) {
-      _hasDirectRegistered = false; // force re-register with new token
-    }
-    await _tryRegisterDirect(overrideToken: newToken);
 
     // Show toast notification
     _showToast('Updating push notification token...', isError: false);
@@ -929,6 +845,8 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+
     // Save states before closing. onClose can't await, but _saveSiteStates
     // serializes synchronously before its first await, so the snapshot is
     // captured before _siteStates is cleared below.
@@ -938,9 +856,6 @@ class DiscoursePushNotificationController extends GetxController with ErrorHandl
     _tokenWaitTimer?.cancel();
     _tokenWaitTimer = null;
 
-    // Stop watching login state
-    _loginWatcher?.dispose();
-    _loginWatcher = null;
 
     // Clear token refresh callback from NotificationService
     _notificationService.clearTokenRefreshCallback();

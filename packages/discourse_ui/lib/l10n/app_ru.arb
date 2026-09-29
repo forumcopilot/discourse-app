@@ -1021,5 +1021,7 @@
   "levelNormal": "Обычный",
   "levelMuted": "Без уведомлений",
   "chooseCategory": "Выберите категорию",
-  "signInToPostAndGetNotifications": "Войдите, чтобы писать и получать уведомления"
+  "signInToPostAndGetNotifications": "Войдите, чтобы писать и получать уведомления",
+  "notificationsArrivalTiming": "Уведомления обычно приходят в течение 10 минут, а во время переписки — быстрее.",
+  "forumBlocksNotificationServer": "{forumName} блокирует наш сервер уведомлений, поэтому они могут не приходить. Их можно отключить в настройках."
 }

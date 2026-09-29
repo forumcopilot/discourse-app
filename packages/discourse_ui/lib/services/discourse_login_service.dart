@@ -13,6 +13,7 @@ import 'package:forumcopilot_sdk/network/fc_call_result.dart';
 
 import '../config/app_forum_config.dart';
 import '../core/logging/app_logger.dart';
+import 'notification_installation.dart';
 import 'notification_key_service.dart';
 
 /// Drives the Discourse User API Key login flow from the app side.
@@ -67,12 +68,16 @@ class DiscourseLoginService {
   /// Separate from [beginLogin] in three ways that all matter:
   ///   * `notifications` scope only — four routes, no posting, no reading PMs;
   ///   * its own client id, so Discourse does not destroy the login key;
-  ///   * no `push_url`, since this key is polled rather than pushed to.
+  ///   * the backend's `push_url` ([AppForumConfig.notificationsPushUrl]).
+  ///     The key is polled; the push_url does nothing until the forum's admin
+  ///     allowlists it, and then gives instant push without a re-grant — a
+  ///     key's push_url cannot be added later.
   Future<DiscourseUserApiHandshakeRequest> beginNotificationsGrant() {
     return _authManager.beginHandshake(
       applicationName: AppForumConfig.userApiApplicationName,
       scopes: AppForumConfig.userApiNotificationsScopes,
       authRedirect: authRedirect,
+      pushUrl: AppForumConfig.notificationsPushUrl,
       clientIdSuffix: AppForumConfig.userApiNotificationsClientIdSuffix,
     );
   }
@@ -86,9 +91,17 @@ class DiscourseLoginService {
   }
 
   static const String _prefNotificationsGranted = '_notifications_key_granted';
+  static const String _prefNotificationsInstallBound =
+      '_notifications_key_install_bound';
+  static const String _prefNotificationsDndReported =
+      '_notifications_dnd_reported';
 
   String get _notificationsGrantKey =>
       '${siteContext.discourseStoragePrefix}$_prefNotificationsGranted';
+  String get _notificationsInstallBoundKey =>
+      '${siteContext.discourseStoragePrefix}$_prefNotificationsInstallBound';
+  String get _notificationsDndReportedKey =>
+      '${siteContext.discourseStoragePrefix}$_prefNotificationsDndReported';
 
   /// Whether the notifications grant for THIS forum was completed and taken
   /// by the backend. Set by [markNotificationsGranted] once the key is stored
@@ -103,9 +116,20 @@ class DiscourseLoginService {
     return prefs.getBool(_notificationsGrantKey) ?? false;
   }
 
-  Future<void> markNotificationsGranted() async {
+  /// Remember the grant. [installBound]: registered under this phone's
+  /// installation, so its token and Do Not Disturb go through
+  /// [NotificationInstallation] and [syncDoNotDisturb] rather than the legacy
+  /// per-grant device call. Grants made by earlier app versions are not.
+  Future<void> markNotificationsGranted({bool installBound = false}) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_notificationsGrantKey, true);
+    await prefs.setBool(_notificationsInstallBoundKey, installBound);
+    await prefs.remove(_notificationsDndReportedKey);
+  }
+
+  Future<bool> _isInstallBound() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_notificationsInstallBoundKey) ?? false;
   }
 
   /// Forget the grant — at sign-out, or when the user turns notifications off
@@ -113,6 +137,36 @@ class DiscourseLoginService {
   Future<void> clearNotificationsGrant() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_notificationsGrantKey);
+    await prefs.remove(_notificationsInstallBoundKey);
+    await prefs.remove(_notificationsDndReportedKey);
+  }
+
+  /// Tell the notifications backend about this forum's Do Not Disturb, so
+  /// nothing is pushed during it — Discourse drops its own push the same way.
+  /// Called wherever the app learns the state: restoring the session (the
+  /// current-user payload carries `do_not_disturb_until`) and the Do Not
+  /// Disturb setting. Only sends when the state changed since the last
+  /// report. Never throws.
+  Future<void> syncDoNotDisturb(DateTime? until) async {
+    if (!AppForumConfig.isNotificationsGrantEnabled) return;
+    try {
+      if (!await hasNotificationsGrant() || !await _isInstallBound()) return;
+      final active =
+          until != null && until.isAfter(DateTime.now().toUtc()) ? until : null;
+      final state = active?.toUtc().toIso8601String() ?? 'off';
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getString(_notificationsDndReportedKey) == state) return;
+
+      final ok = await NotificationKeyService.setDoNotDisturb(
+        siteUrl: siteContext.site.url,
+        clientId: await notificationsClientId(),
+        until: active,
+      );
+      if (ok) await prefs.setString(_notificationsDndReportedKey, state);
+    } catch (e) {
+      AppLogger.debug(
+          'DiscourseLoginService: Could not sync Do Not Disturb: $e');
+    }
   }
 
   /// Point any stored notifications grant for THIS forum at [token].
@@ -139,6 +193,14 @@ class DiscourseLoginService {
     try {
       final effective = token ?? await FirebaseMessaging.instance.getToken();
       if (effective == null || effective.isEmpty) return;
+
+      // A grant filed under this phone's installation gets its token from the
+      // installation — one call covers every forum, so a rotation reaches
+      // forums the user has not opened since.
+      if (await _isInstallBound()) {
+        await NotificationInstallation.report(token: effective);
+        return;
+      }
 
       final clientId = await notificationsClientId();
       await NotificationKeyService.updateDevice(
@@ -281,6 +343,10 @@ class DiscourseLoginService {
         siteContext.setLoginData(result);
         // Refresh the cached identity for future offline launches.
         await siteContext.saveLoginSnapshot(result.toJson());
+        // The notifications backend cannot read Do Not Disturb with its
+        // notifications-only key; this payload has it for free.
+        unawaited(syncDoNotDisturb(
+            DateTime.tryParse((cu['do_not_disturb_until'] ?? '').toString())));
         return true;
       }
       // Transient failure: 429 / 5xx / statusCode 0 (DiscourseClient maps

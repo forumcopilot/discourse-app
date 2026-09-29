@@ -12,10 +12,18 @@ void main() {
         () async {
       expect(AppForumConfig.isNotificationsGrantEnabled, isFalse);
       expect(
-        await NotificationKeyService.register(
+        (await NotificationKeyService.register(
           siteUrl: 'https://forum.example',
           clientId: 'abc:notify',
           userApiKey: 'k',
+        ))
+            .ok,
+        isFalse,
+      );
+      expect(
+        await NotificationKeyService.setDoNotDisturb(
+          siteUrl: 'https://forum.example',
+          clientId: 'abc:notify',
         ),
         isFalse,
       );
@@ -104,6 +112,39 @@ void main() {
       });
     });
 
+    test('register carries the push_url when one is given', () {
+      final body = NotificationKeyService.registerBody(
+        siteUrl: 'https://forum.example',
+        clientId: 'c',
+        userApiKey: 'k',
+        pushUrl: 'https://backend.example/api/discourse/push',
+      );
+      expect(body['push_url'], 'https://backend.example/api/discourse/push');
+      expect(
+        NotificationKeyService.registerBody(
+                siteUrl: 'https://forum.example', clientId: 'c', userApiKey: 'k')
+            .containsKey('push_url'),
+        isFalse,
+      );
+    });
+
+    test('Do Not Disturb body: UTC end, or null for off', () {
+      final on = NotificationKeyService.dndBody(
+        siteUrl: 'https://forum.example/',
+        clientId: 'c',
+        until: DateTime.utc(2026, 9, 29, 8, 30),
+      );
+      expect(on, {
+        'site_url': 'https://forum.example',
+        'client_id': 'c',
+        'dnd_until': '2026-09-29T08:30:00.000Z',
+      });
+      final off =
+          NotificationKeyService.dndBody(siteUrl: 'https://forum.example', clientId: 'c');
+      expect(off.containsKey('dnd_until'), isTrue);
+      expect(off['dnd_until'], isNull);
+    });
+
     test('revoke body identifies the grant without the key', () {
       final body = NotificationKeyService.revokeBody(
         siteUrl: 'https://forum.example',
@@ -111,6 +152,24 @@ void main() {
       );
       expect(body, {'site_url': 'https://forum.example', 'client_id': 'c'});
       expect(body.containsKey('user_api_key'), isFalse);
+    });
+  });
+
+  group('registration answer', () {
+    test('reachable unless the backend says otherwise', () {
+      expect(
+          NotificationKeyService.registrationFromResponse(
+              {'ok': true, 'validated': true, 'reachable': true}).reachable,
+          isTrue);
+      expect(
+          NotificationKeyService.registrationFromResponse({'ok': true})
+              .reachable,
+          isTrue,
+          reason: 'an older backend that does not report it');
+      final blocked = NotificationKeyService.registrationFromResponse(
+          {'ok': true, 'validated': false, 'reachable': false});
+      expect(blocked.ok, isTrue);
+      expect(blocked.reachable, isFalse);
     });
   });
 }

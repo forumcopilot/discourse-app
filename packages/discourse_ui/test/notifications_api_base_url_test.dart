@@ -46,4 +46,13 @@ void main() {
     expect(AppForumConfig.discoursePushUrl, isNull);
     expect(AppForumConfig.userApiEffectiveScopes, isNot(contains('push')));
   });
+
+  test('grants carry <base>/discourse/push as their push_url', () {
+    expect(AppForumConfig.notificationsPushUrl, isNull);
+    AppForumConfig.setNotificationsApiBaseUrl('https://x.example/api/');
+    expect(AppForumConfig.notificationsPushUrl,
+        'https://x.example/api/discourse/push');
+    AppForumConfig.setNotificationsApiBaseUrl(null);
+    expect(AppForumConfig.notificationsPushUrl, isNull);
+  });
 }

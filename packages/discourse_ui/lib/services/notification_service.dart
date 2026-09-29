@@ -214,7 +214,8 @@ class NotificationService with ServiceErrorHandlingMixin {
 
   // Initialize local notifications
   Future<void> _initializeLocalNotifications() async {
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    final androidSettings =
+        AndroidInitializationSettings(AppForumConfig.androidNotificationIcon);
     // Permission is asked explicitly (see initialize), never as a side
     // effect of plugin setup — with these on, iOS prompted at first launch
     // before the user had seen anything to want alerts about.
@@ -224,7 +225,7 @@ class NotificationService with ServiceErrorHandlingMixin {
       requestSoundPermission: false,
     );
 
-    const initSettings = InitializationSettings(
+    final initSettings = InitializationSettings(
       android: androidSettings,
       iOS: darwinSettings,
       macOS: darwinSettings, // macOS requires separate settings
@@ -239,10 +240,12 @@ class NotificationService with ServiceErrorHandlingMixin {
   Future<void> _createAndroidNotificationChannel() async {
     if (!Platform.isAndroid) return;
 
-    const channel = AndroidNotificationChannel(
-      'forum_copilot_channel',
-      'Forum Copilot Notifications',
-      description: 'Notifications for Forum Copilot app',
+    // Re-creating a channel with an existing id updates its name and
+    // description, so a rename reaches phones that already have it.
+    final channel = AndroidNotificationChannel(
+      AppForumConfig.notificationChannelId,
+      AppForumConfig.notificationChannelName,
+      description: AppForumConfig.notificationChannelDescription,
       importance: Importance.high,
     );
 
@@ -390,22 +393,28 @@ class NotificationService with ServiceErrorHandlingMixin {
 
   // Show local notification
   Future<void> _showLocalNotification(RemoteMessage message) async {
-    const androidDetails = AndroidNotificationDetails(
-      'forum_copilot_channel',
-      'Forum Copilot Notifications',
-      channelDescription: 'Notifications for Forum Copilot app',
+    // Several forums share one app icon: group and thread by forum, as the
+    // backend does for pushes shown while the app is closed.
+    final forum = message.data['site_url']?.toString();
+    final androidDetails = AndroidNotificationDetails(
+      AppForumConfig.notificationChannelId,
+      AppForumConfig.notificationChannelName,
+      channelDescription: AppForumConfig.notificationChannelDescription,
+      icon: AppForumConfig.androidNotificationIcon,
       importance: Importance.high,
       priority: Priority.high,
       showWhen: true,
+      groupKey: forum,
     );
 
-    const darwinDetails = DarwinNotificationDetails(
+    final darwinDetails = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
+      threadIdentifier: forum,
     );
 
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: androidDetails,
       iOS: darwinDetails,
       macOS: darwinDetails, // macOS requires separate notification details
@@ -414,9 +423,18 @@ class NotificationService with ServiceErrorHandlingMixin {
     // Encode notification data as JSON for payload
     final payload = jsonEncode(message.data);
 
+    // One notification, one id: the same Discourse notification shown twice
+    // replaces itself instead of stacking.
+    final notificationId = message.data['notification_id']?.toString();
+    final id = notificationId != null
+        ? Object.hash(forum, notificationId) & 0x7fffffff
+        : message.hashCode;
+
     await _localNotifications.show(
-      id: message.hashCode,
-      title: message.notification?.title ?? 'Forum Copilot',
+      id: id,
+      title: message.notification?.title ??
+          message.data['site_name']?.toString() ??
+          AppForumConfig.userApiApplicationName,
       body: message.notification?.body ?? 'New notification',
       notificationDetails: details,
       payload: payload,

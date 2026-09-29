@@ -4587,6 +4587,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in to post and get notifications'**
   String get signInToPostAndGetNotifications;
+
+  /// Enable-notifications page: polled notifications arrive within about 10 minutes (every 3 minutes during a conversation)
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications usually arrive within 10 minutes, and faster during a conversation.'**
+  String get notificationsArrivalTiming;
+
+  /// Snackbar after granting notifications when the forum's firewall (e.g. Cloudflare) refuses the notifications server
+  ///
+  /// In en, this message translates to:
+  /// **'{forumName} blocks our notification server, so notifications may not arrive. You can turn them off in Settings.'**
+  String forumBlocksNotificationServer(Object forumName);
 }
 
 class _AppLocalizationsDelegate

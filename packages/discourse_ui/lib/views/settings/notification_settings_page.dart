@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:discourse_core/discourse_core.dart';
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/config/app_forum_config.dart';
@@ -518,6 +520,14 @@ class _DoNotDisturbTileState extends State<_DoNotDisturbTile> {
         _endsAt = result.endsAt;
       }
     });
+    if (result.result) _reportToPushBackend();
+  }
+
+  /// The notifications backend polls with a key that cannot read Do Not
+  /// Disturb, so it learns the window from the app: nothing is pushed during
+  /// it, as Discourse drops its own push. A no-op without a grant here.
+  void _reportToPushBackend() {
+    unawaited(DiscourseLoginService(widget.siteContext).syncDoNotDisturb(_endsAt));
   }
 
   Future<void> _enter(String duration) async {
@@ -530,6 +540,7 @@ class _DoNotDisturbTileState extends State<_DoNotDisturbTile> {
         _endsAt = result.endsAt;
       }
     });
+    if (result.result) _reportToPushBackend();
     if (!result.result) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -551,6 +562,7 @@ class _DoNotDisturbTileState extends State<_DoNotDisturbTile> {
         _endsAt = null;
       }
     });
+    if (result.result) _reportToPushBackend();
     if (!result.result) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

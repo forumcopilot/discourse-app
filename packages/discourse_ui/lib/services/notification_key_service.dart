@@ -8,6 +8,22 @@ import 'package:forumcopilot_sdk/network/fc_web_call_info.dart';
 
 import '../config/app_forum_config.dart';
 import '../core/logging/app_logger.dart';
+import 'notification_installation.dart';
+
+/// What the backend said about a grant it was handed.
+class NotificationKeyRegistration {
+  /// The backend stored the key.
+  final bool ok;
+
+  /// False when something in front of the forum — typically a Cloudflare rule
+  /// against datacenter addresses — refuses the backend. The grant is stored,
+  /// but notifications may never arrive, and the user deserves to know.
+  final bool reachable;
+
+  const NotificationKeyRegistration({required this.ok, this.reachable = true});
+
+  static const failed = NotificationKeyRegistration(ok: false);
+}
 
 /// Hands the notifications-only Discourse User API Key to the notifications
 /// backend ([AppForumConfig.notificationsApiBaseUrl]), which polls the forum
@@ -28,16 +44,24 @@ import '../core/logging/app_logger.dart';
 /// already completed the grant on the forum, and the poller reconciles with
 /// the forum on its own.
 ///
+/// Every call carries the phone's installation credentials
+/// ([NotificationInstallation]), so a grant registered from this phone can
+/// only be revoked or changed by it.
+///
 /// Contract, served under the base URL:
 ///
-///   POST   /discourse/notification-key         [registerBody]  → 200/201
-///   POST   /discourse/notification-key/device  [deviceBody]    → 200
+///   PUT    /installation                       (NotificationInstallation)
+///   POST   /discourse/notification-key         [registerBody]  → 201
+///   PUT    /discourse/notification-key/dnd     [dndBody]       → 200
 ///   DELETE /discourse/notification-key         [revokeBody]    → 200
+///   POST   /discourse/notification-key/device  [deviceBody]    → 200, legacy:
+///          only for grants made before installations existed
 class NotificationKeyService {
   NotificationKeyService._();
 
   static const String _keyPath = '/discourse/notification-key';
   static const String _devicePath = '/discourse/notification-key/device';
+  static const String _dndPath = '/discourse/notification-key/dnd';
 
   /// Base URL without a trailing slash, or null when the flow is off.
   static String? get _baseUrl {
@@ -69,12 +93,14 @@ class NotificationKeyService {
     String? discourseUsername,
     String? deviceToken,
     String? devicePlatform,
+    String? pushUrl,
   }) {
     return <String, dynamic>{
       'site_url': normalizeSiteUrl(siteUrl),
       if (siteId != null) 'site_id': siteId,
       'client_id': clientId,
       'user_api_key': userApiKey,
+      if (pushUrl != null && pushUrl.isNotEmpty) 'push_url': pushUrl,
       if (discourseUserId != null) 'discourse_user_id': discourseUserId,
       if (discourseUsername != null && discourseUsername.isNotEmpty)
         'discourse_username': discourseUsername,
@@ -103,6 +129,20 @@ class NotificationKeyService {
     };
   }
 
+  /// Body of the Do Not Disturb call: when the forum's DND ends, in UTC, or
+  /// null for "not in DND".
+  static Map<String, dynamic> dndBody({
+    required String siteUrl,
+    required String clientId,
+    DateTime? until,
+  }) {
+    return <String, dynamic>{
+      'site_url': normalizeSiteUrl(siteUrl),
+      'client_id': clientId,
+      'dnd_until': until?.toUtc().toIso8601String(),
+    };
+  }
+
   /// Body of the revoke call. Identified by (forum, client id) rather than
   /// the key, because by sign-out the app has long discarded the key.
   static Map<String, dynamic> revokeBody({
@@ -117,9 +157,10 @@ class NotificationKeyService {
     };
   }
 
-  /// Store a freshly granted key. The backend probes the forum with it before
-  /// storing, so a 400 means the forum rejected the key, not the request.
-  static Future<bool> register({
+  /// Store a freshly granted key under this phone's installation. The
+  /// backend probes the forum with it before storing, so a 400 means the
+  /// forum rejected the key, not the request.
+  static Future<NotificationKeyRegistration> register({
     required String siteUrl,
     int? siteId,
     required String clientId,
@@ -128,8 +169,8 @@ class NotificationKeyService {
     String? discourseUsername,
     String? deviceToken,
     String? devicePlatform,
-  }) {
-    return _send(
+  }) async {
+    final response = await _request(
       'POST',
       _keyPath,
       registerBody(
@@ -141,16 +182,39 @@ class NotificationKeyService {
         discourseUsername: discourseUsername,
         deviceToken: deviceToken,
         devicePlatform: devicePlatform,
+        pushUrl: AppForumConfig.notificationsPushUrl,
       ),
+    );
+    if (response == null) return NotificationKeyRegistration.failed;
+    return registrationFromResponse(response);
+  }
+
+  /// Reads the registration answer. Pure, so the contract is testable.
+  @visibleForTesting
+  static NotificationKeyRegistration registrationFromResponse(
+      Map<String, dynamic> response) {
+    return NotificationKeyRegistration(
+      ok: true,
+      reachable: response['reachable'] != false,
     );
   }
 
-  /// Point a stored grant at this device's current FCM token.
-  ///
-  /// Separate from [register], and called repeatedly: FCM is often still
-  /// initializing when the user approves the grant, and rotates tokens
-  /// afterwards. A token captured once at grant time goes stale and push
-  /// stops with nothing to show for it.
+  /// Tell the backend about this forum's Do Not Disturb, so it drops what
+  /// arrives during it — as Discourse drops its own push — and does not
+  /// poll until it ends. [until] null means DND is off.
+  static Future<bool> setDoNotDisturb({
+    required String siteUrl,
+    required String clientId,
+    DateTime? until,
+  }) {
+    return send('PUT', _dndPath,
+        dndBody(siteUrl: siteUrl, clientId: clientId, until: until));
+  }
+
+  /// Legacy: point a grant made before installations existed at this
+  /// device's current FCM token. Grants registered under an installation get
+  /// their token from [NotificationInstallation.report] instead — one call
+  /// for every forum — and the backend ignores this call for them.
   static Future<bool> updateDevice({
     required String siteUrl,
     int? siteId,
@@ -158,7 +222,7 @@ class NotificationKeyService {
     required String deviceToken,
     String? devicePlatform,
   }) {
-    return _send(
+    return send(
       'POST',
       _devicePath,
       deviceBody(
@@ -177,7 +241,7 @@ class NotificationKeyService {
     int? siteId,
     required String clientId,
   }) {
-    return _send(
+    return send(
       'DELETE',
       _keyPath,
       revokeBody(siteUrl: siteUrl, siteId: siteId, clientId: clientId),
@@ -195,7 +259,17 @@ class NotificationKeyService {
   static String get userAgent =>
       'DiscourseApp-Notifications/1 (${Platform.operatingSystem})';
 
-  static Future<bool> _send(
+  /// One backend call; true on 200/201. Shared with
+  /// [NotificationInstallation].
+  static Future<bool> send(
+    String method,
+    String path,
+    Map<String, dynamic> body,
+  ) async =>
+      await _request(method, path, body) != null;
+
+  /// The decoded JSON answer of a 200/201, or null on anything else.
+  static Future<Map<String, dynamic>?> _request(
     String method,
     String path,
     Map<String, dynamic> body,
@@ -205,27 +279,36 @@ class NotificationKeyService {
       AppLogger.debug(
           'NotificationKeyService: no notifications backend configured — '
           'skipping $method $path');
-      return false;
+      return null;
     }
 
     try {
+      final info = FCWebCallInfo()
+        ..extraHeaders['User-Agent'] = userAgent
+        ..extraHeaders['Authorization'] =
+            await NotificationInstallation.authorization();
       // Never log the body — it carries the key.
       final response = await FCWebCall.makeHttpCall(
         '$base$path',
         method,
         jsonEncode(body),
         'application/json',
-        FCWebCallInfo()..extraHeaders['User-Agent'] = userAgent,
+        info,
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return true;
+        try {
+          final decoded = jsonDecode(response.body);
+          return decoded is Map<String, dynamic> ? decoded : <String, dynamic>{};
+        } catch (_) {
+          return <String, dynamic>{};
+        }
       }
       AppLogger.debug('NotificationKeyService: $method $path rejected '
           '${response.statusCode}: ${response.body}');
-      return false;
+      return null;
     } catch (e) {
       AppLogger.debug('NotificationKeyService: $method $path failed: $e');
-      return false;
+      return null;
     }
   }
 }

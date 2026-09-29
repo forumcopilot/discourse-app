@@ -1020,5 +1020,7 @@
   "levelNormal": "常规",
   "levelMuted": "免打扰",
   "chooseCategory": "选择类别",
-  "signInToPostAndGetNotifications": "登录后即可发帖和接收通知"
+  "signInToPostAndGetNotifications": "登录后即可发帖和接收通知",
+  "notificationsArrivalTiming": "通知通常在 10 分钟内送达，对话进行中会更快。",
+  "forumBlocksNotificationServer": "{forumName} 屏蔽了我们的通知服务器，因此通知可能无法送达。你可以在设置中关闭通知。"
 }

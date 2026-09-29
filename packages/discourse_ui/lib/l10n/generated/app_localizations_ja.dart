@@ -2664,4 +2664,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get signInToPostAndGetNotifications => 'ログインして投稿や通知を利用';
+
+  @override
+  String get notificationsArrivalTiming => '通知は通常 10 分以内に届きます。会話中はもっと早く届きます。';
+
+  @override
+  String forumBlocksNotificationServer(Object forumName) {
+    return '$forumName が通知サーバーをブロックしているため、通知が届かない場合があります。設定でオフにできます。';
+  }
 }

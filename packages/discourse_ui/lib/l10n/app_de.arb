@@ -1020,5 +1020,7 @@
   "levelNormal": "Normal",
   "levelMuted": "Stummgeschaltet",
   "chooseCategory": "Kategorie auswählen",
-  "signInToPostAndGetNotifications": "Anmelden, um zu schreiben und Benachrichtigungen zu erhalten"
+  "signInToPostAndGetNotifications": "Anmelden, um zu schreiben und Benachrichtigungen zu erhalten",
+  "notificationsArrivalTiming": "Benachrichtigungen kommen meist innerhalb von 10 Minuten an, während einer Unterhaltung schneller.",
+  "forumBlocksNotificationServer": "{forumName} blockiert unseren Benachrichtigungsserver, daher kommen Benachrichtigungen möglicherweise nicht an. Du kannst sie in den Einstellungen ausschalten."
 }

@@ -2633,4 +2633,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get signInToPostAndGetNotifications => '登录后即可发帖和接收通知';
+
+  @override
+  String get notificationsArrivalTiming => '通知通常在 10 分钟内送达，对话进行中会更快。';
+
+  @override
+  String forumBlocksNotificationServer(Object forumName) {
+    return '$forumName 屏蔽了我们的通知服务器，因此通知可能无法送达。你可以在设置中关闭通知。';
+  }
 }

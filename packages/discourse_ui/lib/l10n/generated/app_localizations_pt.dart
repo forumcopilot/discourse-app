@@ -2772,4 +2772,13 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get signInToPostAndGetNotifications =>
       'Entre para publicar e receber notificações';
+
+  @override
+  String get notificationsArrivalTiming =>
+      'As notificações costumam chegar em até 10 minutos, e mais rápido durante uma conversa.';
+
+  @override
+  String forumBlocksNotificationServer(Object forumName) {
+    return '$forumName bloqueia nosso servidor de notificações, então elas podem não chegar. Você pode desativá-las em Configurações.';
+  }
 }

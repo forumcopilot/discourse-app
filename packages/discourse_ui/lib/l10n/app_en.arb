@@ -3307,5 +3307,18 @@
   "signInToPostAndGetNotifications": "Sign in to post and get notifications",
   "@signInToPostAndGetNotifications": {
     "description": "Drawer account card for a signed-out reader"
+  },
+  "notificationsArrivalTiming": "Notifications usually arrive within 10 minutes, and faster during a conversation.",
+  "@notificationsArrivalTiming": {
+    "description": "Enable-notifications page: polled notifications arrive within about 10 minutes (every 3 minutes during a conversation)"
+  },
+  "forumBlocksNotificationServer": "{forumName} blocks our notification server, so notifications may not arrive. You can turn them off in Settings.",
+  "@forumBlocksNotificationServer": {
+    "description": "Snackbar after granting notifications when the forum's firewall (e.g. Cloudflare) refuses the notifications server",
+    "placeholders": {
+      "forumName": {
+        "type": "Object"
+      }
+    }
   }
 }

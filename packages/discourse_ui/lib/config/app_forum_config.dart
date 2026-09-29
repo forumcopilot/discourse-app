@@ -155,6 +155,62 @@ class AppForumConfig {
   static bool get isNotificationsGrantEnabled =>
       notificationsApiBaseUrl.trim().isNotEmpty;
 
+  /// Android notification channel. The id is a contract: the notifications
+  /// backend names it in every push (FirebaseService.php in abda-push) and a
+  /// host's manifest names it as FCM's default channel, so it never changes.
+  /// The name and description are what the user sees in the system settings.
+  static const String notificationChannelId = 'forum_copilot_channel';
+
+  static String _notificationChannelName = 'Forum notifications';
+  static String _notificationChannelDescription =
+      'Replies, mentions, messages and other activity on your forums';
+  static String _androidNotificationIcon = '@mipmap/ic_launcher';
+
+  static String get notificationChannelName => _notificationChannelName;
+  static String get notificationChannelDescription =>
+      _notificationChannelDescription;
+
+  /// The small icon for notifications the app shows itself. Android draws it
+  /// as a silhouette, so a host should pass a monochrome drawable
+  /// (`@drawable/ic_stat_…`) and name the same one as
+  /// `com.google.firebase.messaging.default_notification_icon` in its
+  /// manifest for the notifications FCM shows while the app is closed.
+  static String get androidNotificationIcon => _androidNotificationIcon;
+
+  /// Host apps brand the channel and icon once at startup, before the
+  /// notification service initializes. Null leaves a value as it is.
+  static void setNotificationAppearance({
+    String? channelName,
+    String? channelDescription,
+    String? androidIcon,
+  }) {
+    if (channelName != null && channelName.trim().isNotEmpty) {
+      _notificationChannelName = channelName.trim();
+    }
+    if (channelDescription != null && channelDescription.trim().isNotEmpty) {
+      _notificationChannelDescription = channelDescription.trim();
+    }
+    if (androidIcon != null && androidIcon.trim().isNotEmpty) {
+      _androidNotificationIcon = androidIcon.trim();
+    }
+  }
+
+  /// The `push_url` every notifications grant is minted with:
+  /// `<notificationsApiBaseUrl>/discourse/push`, or null when the flow is off.
+  ///
+  /// Inert on almost every forum — Discourse only pushes to a URL its admin
+  /// has put in `allowed_user_api_push_urls` — but a key's push_url can never
+  /// be changed afterwards, and Discourse checks the allowlist when it sends,
+  /// not when the key is made (`UserApiKey.push_clients_for`, which accepts
+  /// the `notifications` scope). So carrying it from the start means a forum
+  /// that later allowlists the backend gets instant push for every user who
+  /// already granted, with nobody asked to approve again.
+  static String? get notificationsPushUrl {
+    if (!isNotificationsGrantEnabled) return null;
+    final base = notificationsApiBaseUrl.trim().replaceAll(RegExp(r'/+$'), '');
+    return '$base/discourse/push';
+  }
+
   /// Whether the app wears the forum's own colours — its light and dark
   /// Discourse colour schemes from `/site.json`: background, text, accent,
   /// selection, the like heart. Off, the app uses `AppTheme.seedColor`
@@ -179,21 +235,6 @@ class AppForumConfig {
       'Discourse demo forum — try.discourse.org';
   static const String? logoUrl = null;
   static const String? backgroundUrl = null;
-
-  /// Push notification dispatch source. Identifies which mode this build of
-  /// the app is registering against on the Discourse server. The server-side
-  /// addon's `DispatchRouter` uses this to pick the right dispatcher.
-  ///
-  ///   - 'forumcopilot' — official Forum Copilot app build, OR any fork that
-  ///                      uses the hosted ForumCopilot Push backend. Server
-  ///                      dispatches via the hosted backend.
-  ///   - 'direct'       — white-label / BYO Firebase build. Server dispatches
-  ///                      via the customer's own Firebase project (the addon
-  ///                      reads a service-account JSON path from its admin
-  ///                      options and calls FCM HTTP v1 directly).
-  ///                      Requires ForumCopilot discourse addon v1.3.4+.
-  ///                      Set `pushApiBaseUrl = ''` for this mode.
-  static const String pushSource = 'forumcopilot';
 
   /// Optional push backend base URL (leave empty to disable hosted push backend).
   ///

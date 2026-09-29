@@ -1020,5 +1020,7 @@
   "levelNormal": "Normale",
   "levelMuted": "Silenziato",
   "chooseCategory": "Scegli una categoria",
-  "signInToPostAndGetNotifications": "Accedi per pubblicare e ricevere notifiche"
+  "signInToPostAndGetNotifications": "Accedi per pubblicare e ricevere notifiche",
+  "notificationsArrivalTiming": "Le notifiche arrivano di solito entro 10 minuti, e più in fretta durante una conversazione.",
+  "forumBlocksNotificationServer": "{forumName} blocca il nostro server delle notifiche, quindi potrebbero non arrivare. Puoi disattivarle nelle Impostazioni."
 }

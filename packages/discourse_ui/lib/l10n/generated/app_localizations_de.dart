@@ -2785,4 +2785,13 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get signInToPostAndGetNotifications =>
       'Anmelden, um zu schreiben und Benachrichtigungen zu erhalten';
+
+  @override
+  String get notificationsArrivalTiming =>
+      'Benachrichtigungen kommen meist innerhalb von 10 Minuten an, während einer Unterhaltung schneller.';
+
+  @override
+  String forumBlocksNotificationServer(Object forumName) {
+    return '$forumName blockiert unseren Benachrichtigungsserver, daher kommen Benachrichtigungen möglicherweise nicht an. Du kannst sie in den Einstellungen ausschalten.';
+  }
 }
