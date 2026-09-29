@@ -6,6 +6,26 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.40] - 2026-09-29
+
+### Added
+- **Push notifications know the phone they are for.** The notifications grant (`AppForumConfig.notificationsApiBaseUrl`) now registers an installation with the backend: an id and a secret generated on the phone (`NotificationInstallation`) and sent with every call, so only that phone can revoke its grants or change them. One `PUT /installation` reports the push token, whether the system allows notifications, the app version and locale for every forum at once — at launch, when the token rotates and on every resume — so a rotated token reaches forums that are not open (it used to update only the open one). Nothing is reported before the phone's first grant.
+- **Grants carry the backend's `push_url`** (`AppForumConfig.notificationsPushUrl`). It does nothing until a forum's admin allowlists it; then Discourse pushes directly, with no one asked to approve again (a key's push_url can never be added later).
+- **Do Not Disturb reaches the notifications backend**, from the forum's current-user payload and the Do Not Disturb setting, so nothing is pushed during it, as Discourse does for its own push.
+- **The "Turn on notifications" page says notifications usually arrive within 10 minutes**, and after approving, says so when the forum blocks the notifications server (a CDN rule against datacenter addresses). In all 11 languages.
+- **Hosts brand the notification channel**: `AppForumConfig.setNotificationAppearance` sets its name, description and small icon.
+
+### Changed
+- **The Android notification channel is "Forum notifications"**, not "Forum Copilot Notifications" (its id is unchanged). Notifications shown while the app is open are grouped and threaded by forum, keep one id per notification, and fall back to the forum's name for a title.
+
+### Fixed
+- **A new user's first post is no longer held as "typed too fast".** Discourse holds a new member's first post for review, and puts the account on hold, when it was typed in under 3 seconds — and the app sent no typing time, which Discourse reads as none: every new user's first post from the app was held on forums with default settings. Composers now send `typing_duration_msecs` and `composer_open_duration_msecs`, counted the way Discourse's own composer counts them. `DiscourseComposerTiming`.
+- **Tapping a notification the app showed opens its topic after the app was closed.** A push that arrives while the app is open is drawn by the app; tapped after the app was swiped away, it only opened the home screen.
+- **An error goes away by itself, and the next one replaces it.** Error messages (a new topic refused for a short title, and others) stayed until tapped and queued behind each other, because since Flutter 3.38 a message with an action ignores its duration. They now replace whatever is showing, carry a close button, and stay up for a reading time that grows with their length.
+
+### Removed
+- The unreachable "direct" push path (`AppForumConfig.pushSource`).
+
 ## [1.0.39] - 2026-09-28
 
 ### Changed
