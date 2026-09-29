@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseComposerTiming;
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_draft.dart';
 
@@ -48,6 +49,12 @@ class DiscourseDraftController {
   String _lastSavedTitle = '';
   String _lastSavedExtra = '';
   bool _discarded = false;
+
+  /// This composer's typing-time session (DiscourseComposerTiming): every
+  /// post composer has a draft controller, so it is the one place that sees
+  /// the writer type in all of them.
+  final int _timingSession = DiscourseComposerTiming.instance.open();
+  String _lastTimedText = '';
 
   /// What the composer held once it had opened (after the draft, or a
   /// quote, went in): what [changedSinceOpened] compares with.
@@ -150,6 +157,13 @@ class DiscourseDraftController {
   }
 
   void _onChanged() {
+    // Counted before the load guard: typing while a draft loads is typing.
+    // The listeners also fire on cursor moves, so only a changed text counts.
+    final text = '${titleController.text}\u0000${contentController.text}';
+    if (text != _lastTimedText) {
+      _lastTimedText = text;
+      DiscourseComposerTiming.instance.typed(_timingSession);
+    }
     if (!_loaded || _disposed) return;
     _debounce?.cancel();
     // The timer fires into the void, so swallow save failures here —
@@ -264,6 +278,7 @@ class DiscourseDraftController {
   /// out: it used to be dropped, so a draft reopened without its last
   /// words.
   void dispose() {
+    DiscourseComposerTiming.instance.close(_timingSession);
     final pending = _debounce?.isActive ?? false;
     _debounce?.cancel();
     contentController.removeListener(_onChanged);

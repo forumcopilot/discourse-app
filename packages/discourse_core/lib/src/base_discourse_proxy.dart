@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/network/fc_call_result.dart';
 
 import 'network/discourse_client.dart';
+import 'network/discourse_composer_timing.dart';
 import 'data/attachment/discourse_upload_metadata.dart';
 
 /// Common base for every `Discourse*Proxy`.
@@ -52,6 +53,10 @@ abstract class BaseDiscourseProxy {
     Map<String, dynamic>? query,
     Object? body,
   }) async {
+    // A new post carries how long it was typed, as Discourse's own composer
+    // sends it — without it a new user's first post is held as "typed too
+    // fast". See DiscourseComposerTiming.
+    body = DiscourseComposerTiming.instance.applyTo(path, body);
     final result =
         await _client.post(siteContext, path, query: query, body: body);
     return _decode(result, method: 'POST', path: path);
