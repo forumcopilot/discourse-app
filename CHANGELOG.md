@@ -6,10 +6,13 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.42] - 2026-09-29
+
 ### Changed
 - **The "Turn on notifications" page shows what you get.** Two sample notifications under the forum's own icon, a headline that names the forum, the two steps the button takes (allow on this phone, which shows a check when it is already allowed, then approve on the forum), and a line saying the permission is read-only. The button says "Turn on notifications", and the note about the forum owner is gone: a reader cannot act on it.
 
 ### Fixed
+- **Each forum names its own categories.** In a host with several forums (ABDA), opening one forum and then another named the second forum's topic rows, category page title and suggested topics from the first forum's categories, matched by id. Category names are now kept per forum.
 - **A forum's name is on its Home from the start.** When the header shows the forum's logo, the name is now the first line under it, above the description. It used to appear only once the header had collapsed into the bar, and some logos don't say it: Discourse Meta's is its speech bubble alone. When the bar shows the icon and name, the name isn't repeated.
 
 ## [1.0.41] - 2026-09-29
