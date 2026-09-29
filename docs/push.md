@@ -79,7 +79,23 @@ specification:
 | `topic_id` | the topic to open, when the notification is about one |
 | `post_number` | position within that topic; the app opens the page holding it |
 | `content_id` | the post *id* where `/notifications.json` exposed one (`data.original_post_id`) — a better anchor than the post number, since Discourse resolves it exactly. Left out for a collapsed row ("3 replies"), which should open at the first unread `post_number` |
-| `notification_type`, `url`, `chat_*`, `badge_*`, `group_name`, `bookmark*`, `username` | per-type destinations and the actor, for routing beyond topics (not yet used by the tap handler) |
+| `notification_type` | Discourse's type: with the fields below, what the tap opens (chat channel, badge sheet, group inbox, group, profile, notification list) |
+| `chat_channel_id`, `chat_message_id`, `chat_thread_id` | a chat destination; a thread opens its channel (the app has no thread view) |
+| `badge_id`, `group_name`, `username` | a badge (type 12), a group's inbox (16) or page (22, 23), a person (8, 19, 39, 800, spread reactions) |
+| `url` | the page the web would open — a chat bookmark's only address |
+| `notification_id` | marked read (with the reader's session) once opened; absent on chat messages, which have no row |
+| `push_group` | `messages`, `replies`, `reactions` or `other`: the Android channel for a notification the app shows itself |
+
+Chat DMs and messages in "always" channels have no Notification row; the
+backend reads them from the message bus (`/chat/notification-alert/<uid>`)
+and sends them with `notification_type` 30. The backend's pushes also carry
+the phone's badge (unread across its forums) and name their group's Android
+channel (`discourse_messages`, `discourse_replies`, `discourse_reactions`,
+else `forum_copilot_channel`).
+
+Per-type switches: `PUT /discourse/notification-key/groups` with
+`muted_groups` (`NotificationKeyService.setMutedGroups`), per forum and
+phone; what is muted is skipped, not saved for later.
 
 Everything else is passed through for display. A payload naming no topic —
 a badge, a bookmark reminder — is expected rather than an error: the app
