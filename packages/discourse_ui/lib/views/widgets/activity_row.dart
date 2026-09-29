@@ -220,7 +220,7 @@ class ActivityRow extends StatelessWidget {
                 ),
               if ((excerptText != null && excerptText.isNotEmpty) ||
                   author != null)
-                _Quote(author: author, text: excerptText),
+                QuotedExcerpt(author: author, text: excerptText),
               if (hasCounts) ...[
                 SizedBox(height: DesignTokens.spacingS),
                 _MetaRow(
@@ -240,11 +240,13 @@ class ActivityRow extends StatelessWidget {
 
 /// The post's words, set off by a rule down the left as the topic page's
 /// reply previews are, headed by whoever wrote them when that is news.
-class _Quote extends StatelessWidget {
-  const _Quote({this.author, this.text});
+/// Shared by the activity rows, bookmarks and drafts.
+class QuotedExcerpt extends StatelessWidget {
+  const QuotedExcerpt({super.key, this.author, this.text, this.maxLines = 3});
 
   final ActivityAttribution? author;
   final String? text;
+  final int maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -294,7 +296,7 @@ class _Quote extends StatelessWidget {
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
-              maxLines: 3,
+              maxLines: maxLines,
               overflow: TextOverflow.ellipsis,
             ),
         ],

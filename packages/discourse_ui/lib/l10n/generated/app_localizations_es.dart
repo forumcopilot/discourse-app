@@ -3053,4 +3053,93 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get profileSuspended => 'Suspendido';
+
+  @override
+  String get searchBookmarks => 'Buscar en tus marcadores';
+
+  @override
+  String get bookmarksFilterReminders => 'Recordatorios';
+
+  @override
+  String get bookmarkWholeTopic => 'Tema completo';
+
+  @override
+  String bookmarkSaved(String when) {
+    return 'guardado $when';
+  }
+
+  @override
+  String bookmarkPostNumber(int number) {
+    return 'publicación #$number';
+  }
+
+  @override
+  String reminderToday(String time) {
+    return 'Hoy, $time';
+  }
+
+  @override
+  String reminderTomorrow(String time) {
+    return 'Mañana, $time';
+  }
+
+  @override
+  String reminderDue(String when) {
+    return 'Pendiente · $when';
+  }
+
+  @override
+  String get addBookmarkLabel => 'Añadir etiqueta';
+
+  @override
+  String get editBookmarkLabel => 'Editar etiqueta';
+
+  @override
+  String get bookmarkLabelHint => '¿Para qué es?';
+
+  @override
+  String get pinBookmark => 'Fijar arriba';
+
+  @override
+  String get unpinBookmark => 'Desfijar';
+
+  @override
+  String get bookmarkRemoved => 'Marcador eliminado';
+
+  @override
+  String get undo => 'Deshacer';
+
+  @override
+  String get bookmarksNoMatch => 'Ningún marcador coincide';
+
+  @override
+  String get addReminder => 'Añadir recordatorio';
+
+  @override
+  String get bookmarksEmpty => 'Aún no hay marcadores';
+
+  @override
+  String get bookmarksEmptyHint =>
+      'Marca una publicación desde sus acciones y te esperará aquí.';
+
+  @override
+  String get draftKindNewTopic => 'Nuevo tema';
+
+  @override
+  String draftMessageTo(String names) {
+    return 'Mensaje a $names';
+  }
+
+  @override
+  String get untitledTopic => 'Tema sin título';
+
+  @override
+  String get draftDiscarded => 'Borrador descartado';
+
+  @override
+  String get draftsEmpty => 'Aún no hay borradores';
+
+  @override
+  String get draftsEmptyHint =>
+      'Los borradores se guardan mientras escribes. Empieza una respuesta o un tema y te esperará aquí.';
 }

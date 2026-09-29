@@ -3,6 +3,7 @@ import 'package:forumcopilot_sdk/interfaces/i_fc_bookmark_proxy.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_bookmark.dart';
 import 'package:forumcopilot_sdk/models/results/fc_bookmark_result.dart';
 
+import '../data/post/discourse_bookmark_details.dart';
 import '../base_discourse_proxy.dart';
 import '../util/html_text.dart';
 import '../util/site_url.dart';
@@ -285,8 +286,12 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
   /// [getBookmarksAsync] (each mapped [FCBookmark] carries the row's
   /// `reminder_at` / `pinned` directly); [DiscourseBookmarkListResult
   /// .hasMore] reflects the server's `more_bookmarks_url`.
+  ///
+  /// [query] searches the bookmarks' names and the bookmarked posts' text,
+  /// as web's bookmark search does (`q`).
   Future<DiscourseBookmarkListResult> getBookmarksWithRemindersAsync({
     int page = 0,
+    String? query,
   }) async {
     final username = siteContext.currentUsername;
     if (!siteContext.isLoggedIn || username == null || username.isEmpty) {
@@ -298,7 +303,10 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
     try {
       final response = await apiGet(
         '/u/${Uri.encodeComponent(username)}/bookmarks.json',
-        query: {if (page > 0) 'page': page.toString()},
+        query: {
+          if (page > 0) 'page': page.toString(),
+          if (query != null && query.trim().isNotEmpty) 'q': query.trim(),
+        },
       );
       final ub = (response['user_bookmark_list'] as Map<String, dynamic>?) ??
           const <String, dynamic>{};
@@ -325,7 +333,47 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
     }
   }
 
+  /// Discourse-only: pins or unpins a bookmark to the top of the list
+  /// (`PUT /bookmarks/{id}/toggle_pin`), as web's bookmark menu does.
+  Future<DiscourseBookmarkUpdateResult> toggleBookmarkPinAsync(
+      int bookmarkId) async {
+    if (!siteContext.isLoggedIn) {
+      return const DiscourseBookmarkUpdateResult(
+        result: false,
+        resultText: 'Not signed in',
+      );
+    }
+    try {
+      await apiPut('/bookmarks/$bookmarkId/toggle_pin.json');
+      return const DiscourseBookmarkUpdateResult(result: true);
+    } on DiscourseApiException catch (e) {
+      return DiscourseBookmarkUpdateResult(
+        result: false,
+        resultText: e.userMessage,
+      );
+    } catch (e) {
+      return DiscourseBookmarkUpdateResult(
+        result: false,
+        resultText: describeApiError(e),
+      );
+    }
+  }
+
   FCBookmark _bookmarkFromDiscourseJson(Map<String, dynamic> json) {
+    final id = (json['id'] as num).toInt();
+    // Where the topic lives, beside the shared model (see
+    // DiscourseBookmarkDetails). Tags arrive as names or as objects.
+    DiscourseBookmarkDetails.store(
+      siteContext.site.url,
+      id,
+      DiscourseBookmarkDetails(
+        categoryId: (json['category_id'] as num?)?.toInt(),
+        tags: ((json['tags'] as List?) ?? const [])
+            .map((t) => t is Map ? (t['name'] ?? '').toString() : t.toString())
+            .where((t) => t.isNotEmpty)
+            .toList(growable: false),
+      ),
+    );
     // The bookmarked post's author comes nested under `user`
     // (UserBookmarkBaseSerializer#user); the row has no top-level username
     // or avatar, so every bookmark showed without either.
@@ -333,7 +381,7 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
     final avatarTemplate = (user['avatar_template'] ?? json['avatar_template'])
         ?.toString();
     return FCBookmark(
-      id: (json['id'] as num).toInt(),
+      id: id,
       bookmarkableType: json['bookmarkable_type']?.toString(),
       bookmarkableId: (json['bookmarkable_id'] as num?)?.toInt(),
       topicId: (json['topic_id'] as num?)?.toInt(),

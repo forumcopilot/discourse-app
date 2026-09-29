@@ -5037,6 +5037,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Suspended'**
   String get profileSuspended;
+
+  /// Search field on the bookmarks screen
+  ///
+  /// In en, this message translates to:
+  /// **'Search your bookmarks'**
+  String get searchBookmarks;
+
+  /// Bookmarks filter chip: those with a reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get bookmarksFilterReminders;
+
+  /// A bookmark of a whole topic rather than one post
+  ///
+  /// In en, this message translates to:
+  /// **'Whole topic'**
+  String get bookmarkWholeTopic;
+
+  /// When the bookmark was made, e.g. 'saved 3 days ago'
+  ///
+  /// In en, this message translates to:
+  /// **'saved {when}'**
+  String bookmarkSaved(String when);
+
+  /// Which post a bookmark points at, e.g. 'post #12'
+  ///
+  /// In en, this message translates to:
+  /// **'post #{number}'**
+  String bookmarkPostNumber(int number);
+
+  /// Reminder chip, e.g. 'Today, 8:00 PM'
+  ///
+  /// In en, this message translates to:
+  /// **'Today, {time}'**
+  String reminderToday(String time);
+
+  /// Reminder chip, e.g. 'Tomorrow, 8:00 AM'
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow, {time}'**
+  String reminderTomorrow(String time);
+
+  /// Reminder chip for a reminder that has fired, e.g. 'Due · Mon 9:00 AM'
+  ///
+  /// In en, this message translates to:
+  /// **'Due · {when}'**
+  String reminderDue(String when);
+
+  /// Menu item: give a bookmark a label (its name)
+  ///
+  /// In en, this message translates to:
+  /// **'Add label'**
+  String get addBookmarkLabel;
+
+  /// Menu item: change a bookmark's label
+  ///
+  /// In en, this message translates to:
+  /// **'Edit label'**
+  String get editBookmarkLabel;
+
+  /// Hint in the bookmark label field
+  ///
+  /// In en, this message translates to:
+  /// **'What is this for?'**
+  String get bookmarkLabelHint;
+
+  /// Menu item: pin a bookmark to the top of the list
+  ///
+  /// In en, this message translates to:
+  /// **'Pin to top'**
+  String get pinBookmark;
+
+  /// Menu item: unpin a bookmark
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin'**
+  String get unpinBookmark;
+
+  /// Snackbar after removing a bookmark, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark removed'**
+  String get bookmarkRemoved;
+
+  /// Snackbar action undoing the last change
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// Search or filter found nothing
+  ///
+  /// In en, this message translates to:
+  /// **'No bookmarks match'**
+  String get bookmarksNoMatch;
+
+  /// Menu item: add a reminder to a bookmark
+  ///
+  /// In en, this message translates to:
+  /// **'Add reminder'**
+  String get addReminder;
+
+  /// Bookmarks screen, none yet
+  ///
+  /// In en, this message translates to:
+  /// **'No bookmarks yet'**
+  String get bookmarksEmpty;
+
+  /// Bookmarks empty state hint
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark a post from its actions and it will be waiting for you here.'**
+  String get bookmarksEmptyHint;
+
+  /// Top line of a draft row: it will start a topic
+  ///
+  /// In en, this message translates to:
+  /// **'New topic'**
+  String get draftKindNewTopic;
+
+  /// Top line of a message draft, e.g. 'Message to alice, bob'
+  ///
+  /// In en, this message translates to:
+  /// **'Message to {names}'**
+  String draftMessageTo(String names);
+
+  /// A draft topic with no title yet
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled topic'**
+  String get untitledTopic;
+
+  /// Snackbar after discarding a draft, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Draft discarded'**
+  String get draftDiscarded;
+
+  /// Drafts screen, none yet
+  ///
+  /// In en, this message translates to:
+  /// **'No drafts yet'**
+  String get draftsEmpty;
+
+  /// Drafts empty state hint
+  ///
+  /// In en, this message translates to:
+  /// **'Drafts save themselves as you type. Start a reply or a topic and it will wait for you here.'**
+  String get draftsEmptyHint;
 }
 
 class _AppLocalizationsDelegate

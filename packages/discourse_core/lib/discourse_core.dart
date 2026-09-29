@@ -71,6 +71,7 @@ export 'src/util/html_text.dart' show stripHtmlToText;
 export 'src/util/quote_markup.dart';
 export 'src/util/discourse_link.dart';
 export 'src/data/post/discourse_more_topics.dart';
+export 'src/data/post/discourse_bookmark_details.dart';
 export 'src/data/moderation/discourse_reviewable.dart';
 export 'src/data/user/discourse_do_not_disturb.dart';
 export 'src/data/user/discourse_pending_post.dart';

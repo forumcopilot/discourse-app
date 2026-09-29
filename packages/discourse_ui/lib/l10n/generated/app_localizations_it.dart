@@ -3057,4 +3057,93 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get profileSuspended => 'Sospeso';
+
+  @override
+  String get searchBookmarks => 'Cerca nei segnalibri';
+
+  @override
+  String get bookmarksFilterReminders => 'Promemoria';
+
+  @override
+  String get bookmarkWholeTopic => 'Intero argomento';
+
+  @override
+  String bookmarkSaved(String when) {
+    return 'salvato $when';
+  }
+
+  @override
+  String bookmarkPostNumber(int number) {
+    return 'messaggio #$number';
+  }
+
+  @override
+  String reminderToday(String time) {
+    return 'Oggi, $time';
+  }
+
+  @override
+  String reminderTomorrow(String time) {
+    return 'Domani, $time';
+  }
+
+  @override
+  String reminderDue(String when) {
+    return 'Scaduto · $when';
+  }
+
+  @override
+  String get addBookmarkLabel => 'Aggiungi etichetta';
+
+  @override
+  String get editBookmarkLabel => 'Modifica etichetta';
+
+  @override
+  String get bookmarkLabelHint => 'A cosa serve?';
+
+  @override
+  String get pinBookmark => 'Fissa in alto';
+
+  @override
+  String get unpinBookmark => 'Sblocca';
+
+  @override
+  String get bookmarkRemoved => 'Segnalibro rimosso';
+
+  @override
+  String get undo => 'Annulla';
+
+  @override
+  String get bookmarksNoMatch => 'Nessun segnalibro corrisponde';
+
+  @override
+  String get addReminder => 'Aggiungi promemoria';
+
+  @override
+  String get bookmarksEmpty => 'Ancora nessun segnalibro';
+
+  @override
+  String get bookmarksEmptyHint =>
+      'Aggiungi un messaggio ai segnalibri dalle sue azioni e ti aspetterà qui.';
+
+  @override
+  String get draftKindNewTopic => 'Nuovo argomento';
+
+  @override
+  String draftMessageTo(String names) {
+    return 'Messaggio a $names';
+  }
+
+  @override
+  String get untitledTopic => 'Argomento senza titolo';
+
+  @override
+  String get draftDiscarded => 'Bozza scartata';
+
+  @override
+  String get draftsEmpty => 'Ancora nessuna bozza';
+
+  @override
+  String get draftsEmptyHint =>
+      'Le bozze si salvano mentre scrivi. Inizia una risposta o un argomento e ti aspetterà qui.';
 }

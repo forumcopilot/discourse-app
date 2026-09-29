@@ -2925,4 +2925,91 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get profileSuspended => '정지됨';
+
+  @override
+  String get searchBookmarks => '북마크 검색';
+
+  @override
+  String get bookmarksFilterReminders => '알림';
+
+  @override
+  String get bookmarkWholeTopic => '주제 전체';
+
+  @override
+  String bookmarkSaved(String when) {
+    return '$when 저장';
+  }
+
+  @override
+  String bookmarkPostNumber(int number) {
+    return '게시물 #$number';
+  }
+
+  @override
+  String reminderToday(String time) {
+    return '오늘 $time';
+  }
+
+  @override
+  String reminderTomorrow(String time) {
+    return '내일 $time';
+  }
+
+  @override
+  String reminderDue(String when) {
+    return '기한 · $when';
+  }
+
+  @override
+  String get addBookmarkLabel => '라벨 추가';
+
+  @override
+  String get editBookmarkLabel => '라벨 편집';
+
+  @override
+  String get bookmarkLabelHint => '무엇을 위한 건가요?';
+
+  @override
+  String get pinBookmark => '맨 위에 고정';
+
+  @override
+  String get unpinBookmark => '고정 해제';
+
+  @override
+  String get bookmarkRemoved => '북마크를 삭제했습니다';
+
+  @override
+  String get undo => '실행 취소';
+
+  @override
+  String get bookmarksNoMatch => '일치하는 북마크가 없습니다';
+
+  @override
+  String get addReminder => '알림 추가';
+
+  @override
+  String get bookmarksEmpty => '아직 북마크가 없습니다';
+
+  @override
+  String get bookmarksEmptyHint => '게시물의 작업에서 북마크하면 여기에서 기다립니다.';
+
+  @override
+  String get draftKindNewTopic => '새 주제';
+
+  @override
+  String draftMessageTo(String names) {
+    return '$names에게 보내는 메시지';
+  }
+
+  @override
+  String get untitledTopic => '제목 없는 주제';
+
+  @override
+  String get draftDiscarded => '임시 저장을 삭제했습니다';
+
+  @override
+  String get draftsEmpty => '아직 임시 저장이 없습니다';
+
+  @override
+  String get draftsEmptyHint => '입력하는 동안 자동으로 저장됩니다. 답글이나 주제를 시작하면 여기에서 기다립니다.';
 }

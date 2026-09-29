@@ -2932,4 +2932,91 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get profileSuspended => '停止中';
+
+  @override
+  String get searchBookmarks => 'ブックマークを検索';
+
+  @override
+  String get bookmarksFilterReminders => 'リマインダー';
+
+  @override
+  String get bookmarkWholeTopic => 'トピック全体';
+
+  @override
+  String bookmarkSaved(String when) {
+    return '$whenに保存';
+  }
+
+  @override
+  String bookmarkPostNumber(int number) {
+    return '投稿 #$number';
+  }
+
+  @override
+  String reminderToday(String time) {
+    return '今日 $time';
+  }
+
+  @override
+  String reminderTomorrow(String time) {
+    return '明日 $time';
+  }
+
+  @override
+  String reminderDue(String when) {
+    return '期限 · $when';
+  }
+
+  @override
+  String get addBookmarkLabel => 'ラベルを追加';
+
+  @override
+  String get editBookmarkLabel => 'ラベルを編集';
+
+  @override
+  String get bookmarkLabelHint => '何のためのものですか？';
+
+  @override
+  String get pinBookmark => '上部に固定';
+
+  @override
+  String get unpinBookmark => '固定を解除';
+
+  @override
+  String get bookmarkRemoved => 'ブックマークを削除しました';
+
+  @override
+  String get undo => '元に戻す';
+
+  @override
+  String get bookmarksNoMatch => '一致するブックマークはありません';
+
+  @override
+  String get addReminder => 'リマインダーを追加';
+
+  @override
+  String get bookmarksEmpty => 'まだブックマークはありません';
+
+  @override
+  String get bookmarksEmptyHint => '投稿の操作からブックマークすると、ここに表示されます。';
+
+  @override
+  String get draftKindNewTopic => '新しいトピック';
+
+  @override
+  String draftMessageTo(String names) {
+    return '$names へのメッセージ';
+  }
+
+  @override
+  String get untitledTopic => '無題のトピック';
+
+  @override
+  String get draftDiscarded => '下書きを破棄しました';
+
+  @override
+  String get draftsEmpty => 'まだ下書きはありません';
+
+  @override
+  String get draftsEmptyHint => '下書きは入力中に自動保存されます。返信やトピックを書き始めると、ここに表示されます。';
 }

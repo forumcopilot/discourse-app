@@ -2900,4 +2900,91 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get profileSuspended => '已停用';
+
+  @override
+  String get searchBookmarks => '搜索你的书签';
+
+  @override
+  String get bookmarksFilterReminders => '提醒';
+
+  @override
+  String get bookmarkWholeTopic => '整个主题';
+
+  @override
+  String bookmarkSaved(String when) {
+    return '$when保存';
+  }
+
+  @override
+  String bookmarkPostNumber(int number) {
+    return '帖子 #$number';
+  }
+
+  @override
+  String reminderToday(String time) {
+    return '今天 $time';
+  }
+
+  @override
+  String reminderTomorrow(String time) {
+    return '明天 $time';
+  }
+
+  @override
+  String reminderDue(String when) {
+    return '到期 · $when';
+  }
+
+  @override
+  String get addBookmarkLabel => '添加标签';
+
+  @override
+  String get editBookmarkLabel => '编辑标签';
+
+  @override
+  String get bookmarkLabelHint => '这是用来做什么的？';
+
+  @override
+  String get pinBookmark => '置顶';
+
+  @override
+  String get unpinBookmark => '取消置顶';
+
+  @override
+  String get bookmarkRemoved => '已删除书签';
+
+  @override
+  String get undo => '撤销';
+
+  @override
+  String get bookmarksNoMatch => '没有匹配的书签';
+
+  @override
+  String get addReminder => '添加提醒';
+
+  @override
+  String get bookmarksEmpty => '还没有书签';
+
+  @override
+  String get bookmarksEmptyHint => '从帖子的操作中添加书签，它会在这里等你。';
+
+  @override
+  String get draftKindNewTopic => '新主题';
+
+  @override
+  String draftMessageTo(String names) {
+    return '发给 $names 的消息';
+  }
+
+  @override
+  String get untitledTopic => '无标题主题';
+
+  @override
+  String get draftDiscarded => '已丢弃草稿';
+
+  @override
+  String get draftsEmpty => '还没有草稿';
+
+  @override
+  String get draftsEmptyHint => '草稿会在你输入时自动保存。开始写回复或主题，它会在这里等你。';
 }

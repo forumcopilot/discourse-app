@@ -3038,4 +3038,93 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileSuspended => 'Suspended';
+
+  @override
+  String get searchBookmarks => 'Search your bookmarks';
+
+  @override
+  String get bookmarksFilterReminders => 'Reminders';
+
+  @override
+  String get bookmarkWholeTopic => 'Whole topic';
+
+  @override
+  String bookmarkSaved(String when) {
+    return 'saved $when';
+  }
+
+  @override
+  String bookmarkPostNumber(int number) {
+    return 'post #$number';
+  }
+
+  @override
+  String reminderToday(String time) {
+    return 'Today, $time';
+  }
+
+  @override
+  String reminderTomorrow(String time) {
+    return 'Tomorrow, $time';
+  }
+
+  @override
+  String reminderDue(String when) {
+    return 'Due · $when';
+  }
+
+  @override
+  String get addBookmarkLabel => 'Add label';
+
+  @override
+  String get editBookmarkLabel => 'Edit label';
+
+  @override
+  String get bookmarkLabelHint => 'What is this for?';
+
+  @override
+  String get pinBookmark => 'Pin to top';
+
+  @override
+  String get unpinBookmark => 'Unpin';
+
+  @override
+  String get bookmarkRemoved => 'Bookmark removed';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String get bookmarksNoMatch => 'No bookmarks match';
+
+  @override
+  String get addReminder => 'Add reminder';
+
+  @override
+  String get bookmarksEmpty => 'No bookmarks yet';
+
+  @override
+  String get bookmarksEmptyHint =>
+      'Bookmark a post from its actions and it will be waiting for you here.';
+
+  @override
+  String get draftKindNewTopic => 'New topic';
+
+  @override
+  String draftMessageTo(String names) {
+    return 'Message to $names';
+  }
+
+  @override
+  String get untitledTopic => 'Untitled topic';
+
+  @override
+  String get draftDiscarded => 'Draft discarded';
+
+  @override
+  String get draftsEmpty => 'No drafts yet';
+
+  @override
+  String get draftsEmptyHint =>
+      'Drafts save themselves as you type. Start a reply or a topic and it will wait for you here.';
 }

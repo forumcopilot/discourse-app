@@ -3068,4 +3068,93 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get profileSuspended => 'Заблокирован(а)';
+
+  @override
+  String get searchBookmarks => 'Поиск по закладкам';
+
+  @override
+  String get bookmarksFilterReminders => 'Напоминания';
+
+  @override
+  String get bookmarkWholeTopic => 'Вся тема';
+
+  @override
+  String bookmarkSaved(String when) {
+    return 'сохранено $when';
+  }
+
+  @override
+  String bookmarkPostNumber(int number) {
+    return 'сообщение №$number';
+  }
+
+  @override
+  String reminderToday(String time) {
+    return 'Сегодня, $time';
+  }
+
+  @override
+  String reminderTomorrow(String time) {
+    return 'Завтра, $time';
+  }
+
+  @override
+  String reminderDue(String when) {
+    return 'Срок · $when';
+  }
+
+  @override
+  String get addBookmarkLabel => 'Добавить метку';
+
+  @override
+  String get editBookmarkLabel => 'Изменить метку';
+
+  @override
+  String get bookmarkLabelHint => 'Для чего это?';
+
+  @override
+  String get pinBookmark => 'Закрепить сверху';
+
+  @override
+  String get unpinBookmark => 'Открепить';
+
+  @override
+  String get bookmarkRemoved => 'Закладка удалена';
+
+  @override
+  String get undo => 'Отменить';
+
+  @override
+  String get bookmarksNoMatch => 'Нет подходящих закладок';
+
+  @override
+  String get addReminder => 'Добавить напоминание';
+
+  @override
+  String get bookmarksEmpty => 'Пока нет закладок';
+
+  @override
+  String get bookmarksEmptyHint =>
+      'Добавьте сообщение в закладки через его действия, и оно будет ждать здесь.';
+
+  @override
+  String get draftKindNewTopic => 'Новая тема';
+
+  @override
+  String draftMessageTo(String names) {
+    return 'Сообщение для $names';
+  }
+
+  @override
+  String get untitledTopic => 'Тема без названия';
+
+  @override
+  String get draftDiscarded => 'Черновик удалён';
+
+  @override
+  String get draftsEmpty => 'Пока нет черновиков';
+
+  @override
+  String get draftsEmptyHint =>
+      'Черновики сохраняются, пока вы пишете. Начните ответ или тему, и он будет ждать здесь.';
 }

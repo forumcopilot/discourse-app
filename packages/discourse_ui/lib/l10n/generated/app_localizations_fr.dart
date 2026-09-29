@@ -3061,4 +3061,93 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get profileSuspended => 'Suspendu';
+
+  @override
+  String get searchBookmarks => 'Rechercher dans vos signets';
+
+  @override
+  String get bookmarksFilterReminders => 'Rappels';
+
+  @override
+  String get bookmarkWholeTopic => 'Sujet entier';
+
+  @override
+  String bookmarkSaved(String when) {
+    return 'enregistré $when';
+  }
+
+  @override
+  String bookmarkPostNumber(int number) {
+    return 'message n° $number';
+  }
+
+  @override
+  String reminderToday(String time) {
+    return 'Aujourd’hui, $time';
+  }
+
+  @override
+  String reminderTomorrow(String time) {
+    return 'Demain, $time';
+  }
+
+  @override
+  String reminderDue(String when) {
+    return 'Échu · $when';
+  }
+
+  @override
+  String get addBookmarkLabel => 'Ajouter une note';
+
+  @override
+  String get editBookmarkLabel => 'Modifier la note';
+
+  @override
+  String get bookmarkLabelHint => 'À quoi sert-il ?';
+
+  @override
+  String get pinBookmark => 'Épingler en haut';
+
+  @override
+  String get unpinBookmark => 'Désépingler';
+
+  @override
+  String get bookmarkRemoved => 'Signet supprimé';
+
+  @override
+  String get undo => 'Annuler';
+
+  @override
+  String get bookmarksNoMatch => 'Aucun signet ne correspond';
+
+  @override
+  String get addReminder => 'Ajouter un rappel';
+
+  @override
+  String get bookmarksEmpty => 'Aucun signet pour l’instant';
+
+  @override
+  String get bookmarksEmptyHint =>
+      'Mettez un message en signet depuis ses actions et il vous attendra ici.';
+
+  @override
+  String get draftKindNewTopic => 'Nouveau sujet';
+
+  @override
+  String draftMessageTo(String names) {
+    return 'Message à $names';
+  }
+
+  @override
+  String get untitledTopic => 'Sujet sans titre';
+
+  @override
+  String get draftDiscarded => 'Brouillon supprimé';
+
+  @override
+  String get draftsEmpty => 'Aucun brouillon pour l’instant';
+
+  @override
+  String get draftsEmptyHint =>
+      'Les brouillons s’enregistrent pendant que vous écrivez. Commencez une réponse ou un sujet et il vous attendra ici.';
 }

@@ -3051,4 +3051,93 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get profileSuspended => 'Suspenso';
+
+  @override
+  String get searchBookmarks => 'Pesquisar nos favoritos';
+
+  @override
+  String get bookmarksFilterReminders => 'Lembretes';
+
+  @override
+  String get bookmarkWholeTopic => 'Tópico inteiro';
+
+  @override
+  String bookmarkSaved(String when) {
+    return 'salvo $when';
+  }
+
+  @override
+  String bookmarkPostNumber(int number) {
+    return 'publicação #$number';
+  }
+
+  @override
+  String reminderToday(String time) {
+    return 'Hoje, $time';
+  }
+
+  @override
+  String reminderTomorrow(String time) {
+    return 'Amanhã, $time';
+  }
+
+  @override
+  String reminderDue(String when) {
+    return 'Vencido · $when';
+  }
+
+  @override
+  String get addBookmarkLabel => 'Adicionar rótulo';
+
+  @override
+  String get editBookmarkLabel => 'Editar rótulo';
+
+  @override
+  String get bookmarkLabelHint => 'Para que serve?';
+
+  @override
+  String get pinBookmark => 'Fixar no topo';
+
+  @override
+  String get unpinBookmark => 'Desafixar';
+
+  @override
+  String get bookmarkRemoved => 'Favorito removido';
+
+  @override
+  String get undo => 'Desfazer';
+
+  @override
+  String get bookmarksNoMatch => 'Nenhum favorito corresponde';
+
+  @override
+  String get addReminder => 'Adicionar lembrete';
+
+  @override
+  String get bookmarksEmpty => 'Nenhum favorito ainda';
+
+  @override
+  String get bookmarksEmptyHint =>
+      'Favorite uma publicação pelas ações dela e ela estará esperando aqui.';
+
+  @override
+  String get draftKindNewTopic => 'Novo tópico';
+
+  @override
+  String draftMessageTo(String names) {
+    return 'Mensagem para $names';
+  }
+
+  @override
+  String get untitledTopic => 'Tópico sem título';
+
+  @override
+  String get draftDiscarded => 'Rascunho descartado';
+
+  @override
+  String get draftsEmpty => 'Nenhum rascunho ainda';
+
+  @override
+  String get draftsEmptyHint =>
+      'Rascunhos são salvos enquanto você digita. Comece uma resposta ou um tópico e ele estará esperando aqui.';
 }

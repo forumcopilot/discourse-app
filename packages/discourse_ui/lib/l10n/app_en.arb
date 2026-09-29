@@ -3662,5 +3662,135 @@
   "profileSuspended": "Suspended",
   "@profileSuspended": {
     "description": "Chip on the profile of a suspended person"
+  },
+  "searchBookmarks": "Search your bookmarks",
+  "@searchBookmarks": {
+    "description": "Search field on the bookmarks screen"
+  },
+  "bookmarksFilterReminders": "Reminders",
+  "@bookmarksFilterReminders": {
+    "description": "Bookmarks filter chip: those with a reminder"
+  },
+  "bookmarkWholeTopic": "Whole topic",
+  "@bookmarkWholeTopic": {
+    "description": "A bookmark of a whole topic rather than one post"
+  },
+  "bookmarkSaved": "saved {when}",
+  "@bookmarkSaved": {
+    "description": "When the bookmark was made, e.g. 'saved 3 days ago'",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "bookmarkPostNumber": "post #{number}",
+  "@bookmarkPostNumber": {
+    "description": "Which post a bookmark points at, e.g. 'post #12'",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "reminderToday": "Today, {time}",
+  "@reminderToday": {
+    "description": "Reminder chip, e.g. 'Today, 8:00 PM'",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderTomorrow": "Tomorrow, {time}",
+  "@reminderTomorrow": {
+    "description": "Reminder chip, e.g. 'Tomorrow, 8:00 AM'",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderDue": "Due · {when}",
+  "@reminderDue": {
+    "description": "Reminder chip for a reminder that has fired, e.g. 'Due · Mon 9:00 AM'",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "addBookmarkLabel": "Add label",
+  "@addBookmarkLabel": {
+    "description": "Menu item: give a bookmark a label (its name)"
+  },
+  "editBookmarkLabel": "Edit label",
+  "@editBookmarkLabel": {
+    "description": "Menu item: change a bookmark's label"
+  },
+  "bookmarkLabelHint": "What is this for?",
+  "@bookmarkLabelHint": {
+    "description": "Hint in the bookmark label field"
+  },
+  "pinBookmark": "Pin to top",
+  "@pinBookmark": {
+    "description": "Menu item: pin a bookmark to the top of the list"
+  },
+  "unpinBookmark": "Unpin",
+  "@unpinBookmark": {
+    "description": "Menu item: unpin a bookmark"
+  },
+  "bookmarkRemoved": "Bookmark removed",
+  "@bookmarkRemoved": {
+    "description": "Snackbar after removing a bookmark, with Undo"
+  },
+  "undo": "Undo",
+  "@undo": {
+    "description": "Snackbar action undoing the last change"
+  },
+  "bookmarksNoMatch": "No bookmarks match",
+  "@bookmarksNoMatch": {
+    "description": "Search or filter found nothing"
+  },
+  "addReminder": "Add reminder",
+  "@addReminder": {
+    "description": "Menu item: add a reminder to a bookmark"
+  },
+  "bookmarksEmpty": "No bookmarks yet",
+  "@bookmarksEmpty": {
+    "description": "Bookmarks screen, none yet"
+  },
+  "bookmarksEmptyHint": "Bookmark a post from its actions and it will be waiting for you here.",
+  "@bookmarksEmptyHint": {
+    "description": "Bookmarks empty state hint"
+  },
+  "draftKindNewTopic": "New topic",
+  "@draftKindNewTopic": {
+    "description": "Top line of a draft row: it will start a topic"
+  },
+  "draftMessageTo": "Message to {names}",
+  "@draftMessageTo": {
+    "description": "Top line of a message draft, e.g. 'Message to alice, bob'",
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "untitledTopic": "Untitled topic",
+  "@untitledTopic": {
+    "description": "A draft topic with no title yet"
+  },
+  "draftDiscarded": "Draft discarded",
+  "@draftDiscarded": {
+    "description": "Snackbar after discarding a draft, with Undo"
+  },
+  "draftsEmpty": "No drafts yet",
+  "@draftsEmpty": {
+    "description": "Drafts screen, none yet"
+  },
+  "draftsEmptyHint": "Drafts save themselves as you type. Start a reply or a topic and it will wait for you here.",
+  "@draftsEmptyHint": {
+    "description": "Drafts empty state hint"
   }
 }

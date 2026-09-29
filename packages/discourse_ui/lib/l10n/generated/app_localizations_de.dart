@@ -3067,4 +3067,93 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get profileSuspended => 'Gesperrt';
+
+  @override
+  String get searchBookmarks => 'Lesezeichen durchsuchen';
+
+  @override
+  String get bookmarksFilterReminders => 'Erinnerungen';
+
+  @override
+  String get bookmarkWholeTopic => 'Ganzes Thema';
+
+  @override
+  String bookmarkSaved(String when) {
+    return 'gespeichert $when';
+  }
+
+  @override
+  String bookmarkPostNumber(int number) {
+    return 'Beitrag #$number';
+  }
+
+  @override
+  String reminderToday(String time) {
+    return 'Heute, $time';
+  }
+
+  @override
+  String reminderTomorrow(String time) {
+    return 'Morgen, $time';
+  }
+
+  @override
+  String reminderDue(String when) {
+    return 'Fällig · $when';
+  }
+
+  @override
+  String get addBookmarkLabel => 'Notiz hinzufügen';
+
+  @override
+  String get editBookmarkLabel => 'Notiz bearbeiten';
+
+  @override
+  String get bookmarkLabelHint => 'Wofür ist das?';
+
+  @override
+  String get pinBookmark => 'Oben anheften';
+
+  @override
+  String get unpinBookmark => 'Lösen';
+
+  @override
+  String get bookmarkRemoved => 'Lesezeichen entfernt';
+
+  @override
+  String get undo => 'Rückgängig';
+
+  @override
+  String get bookmarksNoMatch => 'Keine passenden Lesezeichen';
+
+  @override
+  String get addReminder => 'Erinnerung hinzufügen';
+
+  @override
+  String get bookmarksEmpty => 'Noch keine Lesezeichen';
+
+  @override
+  String get bookmarksEmptyHint =>
+      'Setze bei einem Beitrag ein Lesezeichen, dann wartet er hier auf dich.';
+
+  @override
+  String get draftKindNewTopic => 'Neues Thema';
+
+  @override
+  String draftMessageTo(String names) {
+    return 'Nachricht an $names';
+  }
+
+  @override
+  String get untitledTopic => 'Thema ohne Titel';
+
+  @override
+  String get draftDiscarded => 'Entwurf verworfen';
+
+  @override
+  String get draftsEmpty => 'Noch keine Entwürfe';
+
+  @override
+  String get draftsEmptyHint =>
+      'Entwürfe speichern sich beim Tippen. Beginne eine Antwort oder ein Thema, dann wartet es hier auf dich.';
 }

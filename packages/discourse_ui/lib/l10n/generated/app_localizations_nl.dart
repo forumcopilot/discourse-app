@@ -3049,4 +3049,93 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get profileSuspended => 'Geschorst';
+
+  @override
+  String get searchBookmarks => 'Zoek in je bladwijzers';
+
+  @override
+  String get bookmarksFilterReminders => 'Herinneringen';
+
+  @override
+  String get bookmarkWholeTopic => 'Heel onderwerp';
+
+  @override
+  String bookmarkSaved(String when) {
+    return 'opgeslagen $when';
+  }
+
+  @override
+  String bookmarkPostNumber(int number) {
+    return 'bericht #$number';
+  }
+
+  @override
+  String reminderToday(String time) {
+    return 'Vandaag, $time';
+  }
+
+  @override
+  String reminderTomorrow(String time) {
+    return 'Morgen, $time';
+  }
+
+  @override
+  String reminderDue(String when) {
+    return 'Verlopen · $when';
+  }
+
+  @override
+  String get addBookmarkLabel => 'Label toevoegen';
+
+  @override
+  String get editBookmarkLabel => 'Label bewerken';
+
+  @override
+  String get bookmarkLabelHint => 'Waar is dit voor?';
+
+  @override
+  String get pinBookmark => 'Bovenaan vastzetten';
+
+  @override
+  String get unpinBookmark => 'Losmaken';
+
+  @override
+  String get bookmarkRemoved => 'Bladwijzer verwijderd';
+
+  @override
+  String get undo => 'Ongedaan maken';
+
+  @override
+  String get bookmarksNoMatch => 'Geen bladwijzers gevonden';
+
+  @override
+  String get addReminder => 'Herinnering toevoegen';
+
+  @override
+  String get bookmarksEmpty => 'Nog geen bladwijzers';
+
+  @override
+  String get bookmarksEmptyHint =>
+      'Zet een bladwijzer bij een bericht via de acties en het wacht hier op je.';
+
+  @override
+  String get draftKindNewTopic => 'Nieuw onderwerp';
+
+  @override
+  String draftMessageTo(String names) {
+    return 'Bericht aan $names';
+  }
+
+  @override
+  String get untitledTopic => 'Onderwerp zonder titel';
+
+  @override
+  String get draftDiscarded => 'Concept verwijderd';
+
+  @override
+  String get draftsEmpty => 'Nog geen concepten';
+
+  @override
+  String get draftsEmptyHint =>
+      'Concepten worden opgeslagen terwijl je typt. Begin een antwoord of onderwerp en het wacht hier op je.';
 }
