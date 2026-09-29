@@ -14,6 +14,8 @@ import '../lists/posts_list.dart';
 import '../user_profile_page.dart';
 import '../chat/chat_channel_view.dart';
 import '../group_detail_page.dart';
+import '../forum_list_page.dart';
+import '../site_home_tab.dart';
 import '../widgets/badge_detail_sheet.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import '../../utils/url_utils.dart';
@@ -492,6 +494,23 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
             channelId: channelId,
             // Open on the message the notification is about.
             targetMessageId: int.tryParse(alert.postId ?? ''),
+          ),
+        ),
+      );
+    } else if (contentType == 'group_inbox') {
+      // A group message summary: the group's inbox, where the messages are.
+      final groupName = alert.content_id ?? '';
+      if (groupName.isEmpty) {
+        _showErrorDialog(context, 'Group name is missing. Cannot open the inbox.');
+        return;
+      }
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ForumListPage(
+            siteContext: widget.siteContext,
+            tab: SiteHomeTab.messages,
+            messageGroup: groupName,
           ),
         ),
       );

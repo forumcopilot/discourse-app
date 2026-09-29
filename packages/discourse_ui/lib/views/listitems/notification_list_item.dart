@@ -29,6 +29,32 @@ class NotificationBadgeStyle {
           icon: Icons.alternate_email,
           tint: (cs) => cs.primary,
         );
+      case 'invite':
+        return NotificationBadgeStyle(
+          icon: Icons.person_add_alt_1_rounded,
+          tint: (cs) => cs.primary,
+        );
+      case 'event':
+        return NotificationBadgeStyle(
+          icon: Icons.event_rounded,
+          tint: (cs) => cs.tertiary,
+        );
+      case 'follow':
+        return NotificationBadgeStyle(
+          icon: Icons.person_add_rounded,
+          tint: (cs) => cs.primary,
+        );
+      case 'solved':
+        return NotificationBadgeStyle(
+          icon: Icons.task_alt_rounded,
+          tint: (cs) => cs.primary,
+        );
+      case 'activity':
+        // A type the app has no word for yet still gets a mark.
+        return NotificationBadgeStyle(
+          icon: Icons.notifications_rounded,
+          tint: (cs) => cs.secondary,
+        );
       case 'reply':
         return NotificationBadgeStyle(
           icon: Icons.reply_rounded,

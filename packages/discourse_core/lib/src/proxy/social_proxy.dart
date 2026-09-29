@@ -79,6 +79,10 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
   static const int _ntNewFeatures = 37;
   static const int _ntAdminProblems = 38;
   static const int _ntLinkedConsolidated = 39;
+  // discourse-follow (external plugin).
+  static const int _ntFollowing = 800;
+  static const int _ntFollowingCreatedTopic = 801;
+  static const int _ntFollowingReplied = 802;
 
   @override
   Future<FCLikePostResult> likePostAsync(String postId,
@@ -375,13 +379,7 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     // Phase 5.47 — the acting user's name lives under different data
     // keys depending on notification type (mentions/replies use
     // display_username; invites use invited_by/original_username).
-    final fromUser = (data['display_username'] ??
-            data['username'] ??
-            data['mentioned_by_username'] ??
-            data['invited_by_username'] ??
-            data['original_username'] ??
-            '')
-        .toString();
+    final fromUser = _actorOf(type, data);
     // fancy_title is entity-encoded HTML ("Q&amp;A", "&hellip;") —
     // flatten before it lands in the alert's plain-text message.
     final topicTitle = stripHtmlToText(
@@ -452,14 +450,22 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       // the reader's last-read point. For chat, the message instead
       // (`data.chat_message_id`), so the channel opens on it.
       postId: contentType == 'chat_channel'
-          ? data['chat_message_id']?.toString()
+          ? (data['chat_thread_id'] != null
+              // A thread's replies are not in the channel's timeline: open
+              // the channel, not a message it cannot scroll to.
+              ? null
+              : (data['chat_message_id'] ??
+                      (type == _ntBookmarkReminder
+                          ? data['bookmarkable_id']
+                          : null))
+                  ?.toString())
           : data['original_post_id']?.toString(),
       // Whatever _alertTarget decided is a conversation — so an invite-to-PM
       // routes the same as the PM itself, rather than only type 6 doing so.
       conversationId: contentType == 'conversation_message' ? topicId : null,
       actionUrl: actionUrl,
       fromUsername: fromUser,
-      action: _alertActionVerb(type),
+      action: _alertActionVerb(type, data),
       // Phase 5.47 — read flag drives the unread-row styling in the
       // notifications tab. Treat a missing flag as read so nothing
       // renders falsely bold.
@@ -503,6 +509,67 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     );
   }
 
+  /// Who did it, per type — the same rules as the push backend's
+  /// (abda-push NotificationPayload::actor). For posts, the author of the
+  /// post (`original_username`): once Discourse collapses several replies
+  /// into one row, `display_username` reads "3 replies". For chat, the
+  /// mentioner or inviter. Nobody for a badge, a reminder or a notice,
+  /// where `display_username` is the reader.
+  static String _actorOf(int type, Map<String, dynamic> data) {
+    String? pick(List<String> keys) {
+      for (final key in keys) {
+        final v = (data[key] ?? '').toString().trim();
+        // Usernames never contain spaces; "3 replies" and a group's full
+        // name (a group assignment) do.
+        if (v.isNotEmpty && !v.contains(RegExp(r'\s'))) return v;
+      }
+      return null;
+    }
+
+    const postAlerter = {
+      _ntMentioned, _ntReplied, _ntQuoted, _ntEdited, _ntPrivateMessage,
+      _ntPosted, _ntLinked, _ntGroupMentioned, _ntWatchingFirstPost,
+      _ntChatQuoted, _ntWatchingCategoryOrTag, _ntFollowingCreatedTopic,
+      _ntFollowingReplied,
+    };
+    const noActor = {
+      _ntGrantedBadge, _ntGroupMessageSummary, _ntTopicReminder,
+      _ntPostApproved, _ntMembershipRequestAccepted,
+      _ntMembershipRequestConsolidated, _ntBookmarkReminder,
+      _ntVotesReleased, _ntEventReminder, _ntNewFeatures, _ntAdminProblems,
+      _ntCodeReviewCommitApproved,
+    };
+    if (noActor.contains(type)) return '';
+    final String? actor;
+    if (postAlerter.contains(type)) {
+      actor = pick(['original_username', 'display_username']);
+    } else if (type == _ntChatMention || type == _ntChatGroupMention) {
+      actor = pick(['mentioned_by_username', 'username']);
+    } else if (type == _ntChatInvitation) {
+      actor = pick(['invited_by_username']);
+    } else if (type == _ntChatWatchedThread) {
+      actor = pick(['username']);
+    } else {
+      actor = pick(['display_username', 'username', 'original_username']);
+    }
+    return actor ?? '';
+  }
+
+  /// "jane", "jane and bob", or "jane, bob and 3 others" — the web client's
+  /// liked_2 / liked_many, for likes, reactions and watched chat threads.
+  static String _several(String from, Map<String, dynamic> data) {
+    final second = (data['username2'] ?? '').toString().trim();
+    if (second.isEmpty) return from;
+    final count = data['count'] is num
+        ? (data['count'] as num).toInt()
+        : int.tryParse('${data['count'] ?? ''}');
+    if (count != null && count > 2) {
+      final others = count - 2;
+      return '$from, $second and $others ${others == 1 ? 'other' : 'others'}';
+    }
+    return '$from and $second';
+  }
+
   String _readableNotification(
     int type,
     String from,
@@ -523,13 +590,16 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       case _ntMentioned:
         return '$from mentioned you in "$topic"';
       case _ntReplied:
+        // A collapsed row: Discourse's own label for it ("3 replies").
+        final collapsed = s('display_username');
+        if (collapsed.contains(' ')) return '$collapsed in "$topic"';
         return '$from replied to your post in "$topic"';
       case _ntQuoted:
         return '$from quoted your post in "$topic"';
       case _ntEdited:
         return '$from edited your post in "$topic"';
       case _ntLiked:
-        return '$from liked your post in "$topic"';
+        return '${_several(from, data)} liked your post in "$topic"';
       case _ntPrivateMessage:
         return 'New message from $from: "$topic"';
       case _ntInvitedToPm:
@@ -537,9 +607,13 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       case _ntInviteeAccepted:
         return '$from accepted your invitation';
       case _ntPosted:
+        final collapsed = s('display_username');
+        if (collapsed.contains(' ')) return '$collapsed in "$topic"';
         return '$from posted in "$topic"';
       case _ntMovedPost:
-        return 'A post was moved to "$topic"';
+        return from.isNotEmpty
+            ? '$from moved a post to "$topic"'
+            : 'A post was moved to "$topic"';
       case _ntLinked:
         return '$from linked to your post in "$topic"';
       case _ntGrantedBadge:
@@ -551,8 +625,15 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       case _ntInvitedToTopic:
         return '$from invited you to "$topic"';
       case _ntCustom:
-        // Discourse plugins fire `custom` with their own message
-        // payload — fall back to topic title when present.
+        // Plugins fire `custom` with an i18n key in `message`; the ones a
+        // reader meets most are discourse-solved's.
+        switch (s('message')) {
+          case 'solved.accepted_notification':
+            return '$from accepted your answer in "$topic"';
+          case 'solved.topic_solved_notification':
+            return '$from marked "$topic" solved';
+        }
+        if (from.isNotEmpty && topic.isNotEmpty) return '$from: "$topic"';
         return topic.isNotEmpty ? topic : 'New activity';
       case _ntGroupMentioned:
         final group = s('group_name');
@@ -563,7 +644,9 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         final count = i('inbox_count') ?? 0;
         final group = s('group_name');
         if (count > 0 && group.isNotEmpty) {
-          return '$count new messages in @$group';
+          return count == 1
+              ? '1 new message in your $group inbox'
+              : '$count new messages in your $group inbox';
         }
         return 'New group messages';
       case _ntWatchingFirstPost:
@@ -572,6 +655,11 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         return 'Reminder: "$topic"';
       case _ntLikedConsolidated:
         final count = i('count') ?? 0;
+        if (from.isNotEmpty) {
+          return count > 0
+              ? '$from liked $count of your posts'
+              : '$from liked your posts';
+        }
         return count > 0
             ? 'Your posts received $count likes'
             : 'Your posts received new likes';
@@ -590,18 +678,30 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
             ? '$count new membership requests'
             : 'New membership requests';
       case _ntBookmarkReminder:
-        return 'Reminder: "$topic"';
+        // A chat message's bookmark has no topic: its own title stands in.
+        final name = s('bookmark_name');
+        final label = name.isNotEmpty
+            ? name
+            : (topic.isNotEmpty ? topic : s('title'));
+        return label.isNotEmpty ? 'Reminder: "$label"' : 'Bookmark reminder';
       case _ntReaction:
         final actor = from.isNotEmpty ? from : s('username');
+        if (data['consolidated'] == true || topic.isEmpty) {
+          final count = i('count');
+          return count != null && count > 0
+              ? '$actor reacted to $count of your posts'
+              : '$actor reacted to your posts';
+        }
         return actor.isNotEmpty
-            ? '$actor reacted to your post in "$topic"'
+            ? '${_several(actor, data)} reacted to your post in "$topic"'
             : 'New reaction on your post in "$topic"';
       case _ntVotesReleased:
         return 'Votes released on "$topic"';
       case _ntEventReminder:
         return 'Event reminder: "$topic"';
       case _ntEventInvitation:
-        return '$from invited you to "$topic"';
+        final event = s('event_name');
+        return '$from invited you to "${event.isNotEmpty ? event : topic}"';
       // Discourse chat's own wording (plugins/chat client.en.yml,
       // notifications.popup / notifications.*), including the personal-chat
       // variants: a DM notification used to read "mentioned you in #alice".
@@ -633,25 +733,49 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       case _ntChatQuoted:
         return '$from quoted your chat message';
       case _ntChatWatchedThread:
-        final channel = s('chat_channel_title');
-        return channel.isNotEmpty
-            ? 'New reply in a watched thread in "$channel"'
-            : 'New reply in a watched chat thread';
+        final thread = s('description');
+        final who = from.isNotEmpty
+            ? '${_several(from, data)} replied'
+            : 'New reply';
+        return thread.isNotEmpty
+            ? '$who in a thread you watch: "$thread"'
+            : '$who in a thread you watch';
       case _ntAssigned:
-        return '"$topic" was assigned to you';
+        if (s('message') == 'discourse_assign.assign_group_notification') {
+          final group = s('display_username');
+          return group.isNotEmpty
+              ? '"$topic" was assigned to your group $group'
+              : '"$topic" was assigned to your group';
+        }
+        return from.isNotEmpty
+            ? '$from assigned you "$topic"'
+            : '"$topic" was assigned to you';
       case _ntQuestionAnswerUserCommented:
         return '$from commented on the accepted answer in "$topic"';
       case _ntWatchingCategoryOrTag:
-        return 'New topic: "$topic"';
+        final collapsed = s('display_username');
+        if (collapsed.contains(' ')) return '$collapsed in "$topic"';
+        return from.isNotEmpty ? '$from posted in "$topic"' : 'New post in "$topic"';
       case _ntNewFeatures:
         return 'New features available';
       case _ntAdminProblems:
-        return 'Admin: site problem detected';
+        return 'New advice on your site dashboard';
       case _ntLinkedConsolidated:
         final count = i('count') ?? 0;
+        if (from.isNotEmpty) {
+          return count > 0
+              ? '$from linked to $count of your posts'
+              : '$from linked to your posts';
+        }
         return count > 0
             ? 'Your post was linked $count times'
             : 'Your post was linked';
+      case _ntFollowing:
+        return '$from started following you';
+      case _ntFollowingCreatedTopic:
+        return '$from created "$topic"';
+      case _ntFollowingReplied:
+        return '$from replied in "$topic"';
       default:
         return topic.isNotEmpty
             ? 'New activity in "$topic"'
@@ -721,6 +845,30 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         break;
 
       case _ntGroupMessageSummary:
+        // The group's inbox, where the messages are — its profile page
+        // only listed members.
+        final inbox = (data['group_name'] ?? '').toString();
+        if (inbox.isNotEmpty) return (type: 'group_inbox', id: inbox);
+        break;
+
+      case _ntBookmarkReminder:
+        // A chat message's bookmark: its channel, by the bookmark's link.
+        if (!hasTopic) {
+          final chat = RegExp(r'/chat/c/[^/]+/(\d+)')
+              .firstMatch((data['bookmarkable_url'] ?? '').toString());
+          if (chat != null) return (type: 'chat_channel', id: chat.group(1)!);
+        }
+        break;
+
+      case _ntReaction:
+        // Reactions spread over several posts name none; like consolidated
+        // likes, the person is the destination.
+        if (!hasTopic) return (type: 'user', id: '');
+        break;
+
+      case _ntFollowing:
+        return (type: 'user', id: '');
+
       case _ntMembershipRequestConsolidated:
       // "You are now a member of X": data is {group_id, group_name}
       // (Group#send_membership_notification), with no user —
@@ -751,7 +899,11 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
     return (type: 'notice', id: '');
   }
 
-  String _alertActionVerb(int type) {
+  String _alertActionVerb(int type, [Map<String, dynamic> data = const {}]) {
+    if (type == _ntCustom &&
+        (data['message'] ?? '').toString().startsWith('solved.')) {
+      return 'solved';
+    }
     // Phase 5.20c — the UI uses this verb as a key for the small
     // overlay icon on the notification list row. New verbs match
     // the icon mapper in `notification_list_item.dart::iconForAction`.
@@ -774,9 +926,11 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         return 'like';
       case _ntPrivateMessage:
       case _ntInvitedToPm:
-      case _ntInvitedToTopic:
-      case _ntEventInvitation:
         return 'pm';
+      case _ntInvitedToTopic:
+        return 'invite';
+      case _ntEventInvitation:
+        return 'event';
       case _ntGroupMessageSummary:
         return 'group_message';
       case _ntLinked:
@@ -800,7 +954,12 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
       case _ntChatMessage:
       case _ntChatInvitation:
       case _ntChatGroupMention:
+      case _ntChatWatchedThread:
         return 'chat';
+      case _ntFollowing:
+      case _ntFollowingCreatedTopic:
+      case _ntFollowingReplied:
+        return 'follow';
       case _ntAssigned:
         return 'assigned';
       case _ntQuestionAnswerUserCommented:
@@ -817,6 +976,8 @@ class DiscourseSocialProxy extends BaseDiscourseProxy implements IFCSocialProxy 
         return 'admin';
       case _ntCustom:
       default:
+        // discourse-solved is the custom type readers meet; everything
+        // else unknown still gets a mark rather than none.
         return 'activity';
     }
   }
