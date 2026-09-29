@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 import 'package:forumcopilot_sdk/models/results/fc_topic_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/post/discourse_more_topics.dart';
 import '../data/site/discourse_site_capabilities.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../util/html_text.dart';
@@ -757,6 +758,67 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         topics: const [],
       );
     }
+  }
+
+  /// What to read after topic [topicId]: its suggested and related topics,
+  /// as rows like any topic list's (category, tags, last poster, counts,
+  /// unread state).
+  ///
+  /// Read from the topic load that opened it (see [DiscourseMoreTopics]);
+  /// fetched only when this session has not loaded the topic. Never
+  /// throws: a failure is an empty footer, not an error on a page the
+  /// reader has finished.
+  Future<DiscourseMoreTopics> getMoreTopicsAsync(String topicId) async {
+    if (topicId.isEmpty) return const DiscourseMoreTopics();
+    final forumUrl = siteContext.site.url;
+    try {
+      var raw = DiscourseMoreTopics.rawFor(forumUrl, topicId);
+      if (raw == null) {
+        DiscourseMoreTopics.storeFrom(
+            forumUrl, topicId, await apiGet('/t/$topicId.json'));
+        raw = DiscourseMoreTopics.rawFor(forumUrl, topicId);
+      }
+      if (raw == null) return const DiscourseMoreTopics();
+      final catNames = await _loadCategoryNames();
+      return DiscourseMoreTopics(
+        suggested: _topicViewListTopics(raw.suggested, catNames),
+        related: _topicViewListTopics(raw.related, catNames),
+      );
+    } catch (_) {
+      return const DiscourseMoreTopics();
+    }
+  }
+
+  /// A topic view's embedded topic list (`suggested_topics`,
+  /// `related_topics`) as rows.
+  ///
+  /// Those embed each poster's user (`SuggestedPosterSerializer`: `{extras,
+  /// description, user: {...}}`) where a topic list ships `user_id` plus a
+  /// `users[]` table, so each is put in the list's shape and mapped by
+  /// [_topicFromTopicJson] — a suggested topic then reads exactly as it does
+  /// in Latest. Reading `user_id` off these posters found nobody, and every
+  /// suggestion was drawn with a placeholder instead of a face.
+  List<FCTopic> _topicViewListTopics(
+      List<Map<String, dynamic>> topics, Map<int, String> catNames) {
+    final out = <FCTopic>[];
+    for (final t in topics) {
+      final users = <int, Map<String, dynamic>>{};
+      final posters = <Map<String, dynamic>>[];
+      for (final p in ((t['posters'] as List?) ?? const []).whereType<Map>()) {
+        final poster = p.cast<String, dynamic>();
+        final user = poster['user'];
+        final id = user is Map ? user['id'] : poster['user_id'];
+        if (user is Map && id is int) users[id] = user.cast<String, dynamic>();
+        posters.add({...poster, 'user_id': id});
+      }
+      try {
+        out.add(_topicFromTopicJson({...t, 'posters': posters},
+            users: users, catNames: catNames));
+      } catch (_) {
+        // One malformed entry should not empty the whole footer.
+      }
+    }
+    return out;
   }
 
   /// Absolute avatar URL from a Discourse `avatar_template`.

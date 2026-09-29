@@ -2641,4 +2641,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName 屏蔽了我们的通知服务器，因此通知可能无法送达。你可以在设置中关闭通知。';
   }
+
+  @override
+  String get relatedTopics => '相关主题';
+
+  @override
+  String get relatedMessages => '相关消息';
+
+  @override
+  String moreInCategory(String category) {
+    return '$category 中的更多主题';
+  }
+
+  @override
+  String get latestTopics => '最新主题';
 }

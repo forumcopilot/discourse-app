@@ -20,7 +20,7 @@ import '../data/message/discourse_message_details.dart';
 import '../util/discourse_link.dart';
 import '../util/quote_markup.dart';
 import '../data/post/discourse_post_revision.dart';
-import '../data/post/discourse_suggested_topic.dart';
+import '../data/post/discourse_more_topics.dart';
 import '../util/html_text.dart';
 import '../util/site_url.dart';
 
@@ -119,6 +119,9 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // picker what this forum accepts — see DiscourseValidReactions.
       DiscourseValidReactions.store(t['valid_reactions']);
       _rememberMessage(topicId, t);
+      // What to read next rides on every topic payload too; the footer
+      // reads it from here instead of fetching the topic again.
+      DiscourseMoreTopics.storeFrom(siteContext.site.url, topicId, t);
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       final rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
@@ -250,6 +253,9 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // picker what this forum accepts — see DiscourseValidReactions.
       DiscourseValidReactions.store(t['valid_reactions']);
       _rememberMessage(topicId, t);
+      // What to read next rides on every topic payload too; the footer
+      // reads it from here instead of fetching the topic again.
+      DiscourseMoreTopics.storeFrom(siteContext.site.url, topicId, t);
       final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
       final rawPosts = ((stream['posts'] as List?) ?? const [])
           .whereType<Map>()
@@ -355,6 +361,9 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // picker what this forum accepts — see DiscourseValidReactions.
       DiscourseValidReactions.store(t['valid_reactions']);
       _rememberMessage(topicId, t);
+      // What to read next rides on every topic payload too; the footer
+      // reads it from here instead of fetching the topic again.
+      DiscourseMoreTopics.storeFrom(siteContext.site.url, topicId, t);
       // The post after the last one read, capped at the newest — what the
       // web opens (Topic#lastUnreadUrl); post 1 for a topic never opened.
       // This anchored on the last read post itself, one post early.
@@ -1493,72 +1502,6 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       hasVotes: base.voteCount.abs() > 1,
       viewerDirection: null,
     );
-  }
-
-  /// Discourse-only: fetch the "Suggested Topics" Discourse appends to
-  /// every topic page response. Re-fetches `/t/{id}.json` once; the
-  /// suggestions array isn't included in any other endpoint we call.
-  Future<List<DiscourseSuggestedTopic>> getSuggestedTopicsAsync(
-      String topicId) async {
-    if (topicId.isEmpty) return const [];
-    try {
-      final t = await apiGet('/t/$topicId.json');
-      // Build a user-id → user-record lookup so we can resolve last
-      // posters when Discourse only inlines `posters` (a list of
-      // `{user_id, description}`) on each suggested topic.
-      final users = <int, Map<String, dynamic>>{};
-      for (final raw in ((t['users'] as List?) ?? const []).whereType<Map>()) {
-        final u = raw.cast<String, dynamic>();
-        final id = u['id'];
-        if (id is int) users[id] = u;
-      }
-      final suggested = (t['suggested_topics'] as List?) ?? const [];
-      final out = <DiscourseSuggestedTopic>[];
-      for (final raw in suggested.whereType<Map>()) {
-        final s = raw.cast<String, dynamic>();
-        Map<String, dynamic>? lastUser;
-        final posters = (s['posters'] as List?) ?? const [];
-        for (final p in posters.whereType<Map>()) {
-          // The "last poster" entry is flagged locale-independently via
-          // `extras` containing 'latest' ("latest" or "latest single",
-          // see TopicPostersSummary). The localized description string
-          // is only a fallback.
-          final extras = (p['extras'] ?? '').toString();
-          final desc = (p['description'] ?? '').toString();
-          if (extras.contains('latest') ||
-              desc.contains('Most Recent Poster')) {
-            final uid = p['user_id'] as int?;
-            if (uid != null) lastUser = users[uid];
-            break;
-          }
-        }
-        // Fallback: use the first poster if no "most recent" tag.
-        if (lastUser == null && posters.isNotEmpty) {
-          final uid = (posters.first as Map)['user_id'] as int?;
-          if (uid != null) lastUser = users[uid];
-        }
-        out.add(DiscourseSuggestedTopic(
-          id: (s['id'] as num).toInt(),
-          // Prefer the plain `title`; fancy_title is entity-encoded
-          // HTML, so flatten whichever we end up with (Phase 5.47).
-          title: stripHtmlToText(
-              (s['title'] ?? s['fancy_title'] ?? '').toString()),
-          slug: s['slug']?.toString(),
-          postsCount: (s['posts_count'] as num?)?.toInt(),
-          lastActivity:
-              DateTime.tryParse(s['bumped_at']?.toString() ?? '') ??
-                  DateTime.tryParse(s['last_posted_at']?.toString() ?? ''),
-          lastPosterUsername: lastUser?['username']?.toString(),
-          lastPosterAvatarTemplate:
-              lastUser?['avatar_template']?.toString(),
-          hasUnread: (s['unread_posts'] as int? ?? 0) > 0,
-          isNew: s['unseen'] == true,
-        ));
-      }
-      return out;
-    } catch (_) {
-      return const [];
-    }
   }
 
   /// Discourse-only: fetch one revision of a post's edit history.

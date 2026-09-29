@@ -2790,4 +2790,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName блокирует наш сервер уведомлений, поэтому они могут не приходить. Их можно отключить в настройках.';
   }
+
+  @override
+  String get relatedTopics => 'Связанные темы';
+
+  @override
+  String get relatedMessages => 'Связанные сообщения';
+
+  @override
+  String moreInCategory(String category) {
+    return 'Ещё в разделе «$category»';
+  }
+
+  @override
+  String get latestTopics => 'Последние темы';
 }

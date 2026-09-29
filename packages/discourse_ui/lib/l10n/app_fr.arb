@@ -1022,5 +1022,9 @@
   "chooseCategory": "Choisir une catégorie",
   "signInToPostAndGetNotifications": "Connectez-vous pour publier et recevoir des notifications",
   "notificationsArrivalTiming": "Les notifications arrivent en général en moins de 10 minutes, et plus vite pendant une conversation.",
-  "forumBlocksNotificationServer": "{forumName} bloque notre serveur de notifications, elles risquent donc de ne pas arriver. Vous pouvez les désactiver dans les Réglages."
+  "forumBlocksNotificationServer": "{forumName} bloque notre serveur de notifications, elles risquent donc de ne pas arriver. Vous pouvez les désactiver dans les Réglages.",
+  "relatedTopics": "Sujets connexes",
+  "relatedMessages": "Messages connexes",
+  "moreInCategory": "Plus dans {category}",
+  "latestTopics": "Sujets récents"
 }

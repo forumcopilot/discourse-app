@@ -1022,5 +1022,9 @@
   "chooseCategory": "选择类别",
   "signInToPostAndGetNotifications": "登录后即可发帖和接收通知",
   "notificationsArrivalTiming": "通知通常在 10 分钟内送达，对话进行中会更快。",
-  "forumBlocksNotificationServer": "{forumName} 屏蔽了我们的通知服务器，因此通知可能无法送达。你可以在设置中关闭通知。"
+  "forumBlocksNotificationServer": "{forumName} 屏蔽了我们的通知服务器，因此通知可能无法送达。你可以在设置中关闭通知。",
+  "relatedTopics": "相关主题",
+  "relatedMessages": "相关消息",
+  "moreInCategory": "{category} 中的更多主题",
+  "latestTopics": "最新主题"
 }

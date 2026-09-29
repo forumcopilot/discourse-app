@@ -1023,5 +1023,9 @@
   "chooseCategory": "Выберите категорию",
   "signInToPostAndGetNotifications": "Войдите, чтобы писать и получать уведомления",
   "notificationsArrivalTiming": "Уведомления обычно приходят в течение 10 минут, а во время переписки — быстрее.",
-  "forumBlocksNotificationServer": "{forumName} блокирует наш сервер уведомлений, поэтому они могут не приходить. Их можно отключить в настройках."
+  "forumBlocksNotificationServer": "{forumName} блокирует наш сервер уведомлений, поэтому они могут не приходить. Их можно отключить в настройках.",
+  "relatedTopics": "Связанные темы",
+  "relatedMessages": "Связанные сообщения",
+  "moreInCategory": "Ещё в разделе «{category}»",
+  "latestTopics": "Последние темы"
 }

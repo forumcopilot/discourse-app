@@ -1022,5 +1022,9 @@
   "chooseCategory": "Kategorie auswählen",
   "signInToPostAndGetNotifications": "Anmelden, um zu schreiben und Benachrichtigungen zu erhalten",
   "notificationsArrivalTiming": "Benachrichtigungen kommen meist innerhalb von 10 Minuten an, während einer Unterhaltung schneller.",
-  "forumBlocksNotificationServer": "{forumName} blockiert unseren Benachrichtigungsserver, daher kommen Benachrichtigungen möglicherweise nicht an. Du kannst sie in den Einstellungen ausschalten."
+  "forumBlocksNotificationServer": "{forumName} blockiert unseren Benachrichtigungsserver, daher kommen Benachrichtigungen möglicherweise nicht an. Du kannst sie in den Einstellungen ausschalten.",
+  "relatedTopics": "Ähnliche Themen",
+  "relatedMessages": "Ähnliche Nachrichten",
+  "moreInCategory": "Mehr in {category}",
+  "latestTopics": "Neueste Themen"
 }

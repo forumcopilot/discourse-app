@@ -2794,4 +2794,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName blockiert unseren Benachrichtigungsserver, daher kommen Benachrichtigungen möglicherweise nicht an. Du kannst sie in den Einstellungen ausschalten.';
   }
+
+  @override
+  String get relatedTopics => 'Ähnliche Themen';
+
+  @override
+  String get relatedMessages => 'Ähnliche Nachrichten';
+
+  @override
+  String moreInCategory(String category) {
+    return 'Mehr in $category';
+  }
+
+  @override
+  String get latestTopics => 'Neueste Themen';
 }

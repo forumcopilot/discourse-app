@@ -3320,5 +3320,26 @@
         "type": "Object"
       }
     }
+  },
+  "relatedTopics": "Related Topics",
+  "@relatedTopics": {
+    "description": "Heading (or tab) under a topic's last post listing related topics (discourse-ai), as Discourse web words it"
+  },
+  "relatedMessages": "Related Messages",
+  "@relatedMessages": {
+    "description": "Heading (or tab) under a private message listing related messages"
+  },
+  "moreInCategory": "More in {category}",
+  "@moreInCategory": {
+    "description": "Button under a topic's suggested topics opening the topic's category",
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "latestTopics": "Latest topics",
+  "@latestTopics": {
+    "description": "Button under a topic's suggested topics opening the forum's latest topics"
   }
 }

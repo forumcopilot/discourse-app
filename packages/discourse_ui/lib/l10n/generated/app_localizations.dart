@@ -4599,6 +4599,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{forumName} blocks our notification server, so notifications may not arrive. You can turn them off in Settings.'**
   String forumBlocksNotificationServer(Object forumName);
+
+  /// Heading (or tab) under a topic's last post listing related topics (discourse-ai), as Discourse web words it
+  ///
+  /// In en, this message translates to:
+  /// **'Related Topics'**
+  String get relatedTopics;
+
+  /// Heading (or tab) under a private message listing related messages
+  ///
+  /// In en, this message translates to:
+  /// **'Related Messages'**
+  String get relatedMessages;
+
+  /// Button under a topic's suggested topics opening the topic's category
+  ///
+  /// In en, this message translates to:
+  /// **'More in {category}'**
+  String moreInCategory(String category);
+
+  /// Button under a topic's suggested topics opening the forum's latest topics
+  ///
+  /// In en, this message translates to:
+  /// **'Latest topics'**
+  String get latestTopics;
 }
 
 class _AppLocalizationsDelegate

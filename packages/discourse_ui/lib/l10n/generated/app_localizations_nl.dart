@@ -2779,4 +2779,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName blokkeert onze meldingsserver, dus meldingen komen mogelijk niet aan. Je kunt ze uitzetten in Instellingen.';
   }
+
+  @override
+  String get relatedTopics => 'Gerelateerde onderwerpen';
+
+  @override
+  String get relatedMessages => 'Gerelateerde berichten';
+
+  @override
+  String moreInCategory(String category) {
+    return 'Meer in $category';
+  }
+
+  @override
+  String get latestTopics => 'Nieuwste onderwerpen';
 }

@@ -2666,4 +2666,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName에서 알림 서버를 차단하고 있어 알림이 도착하지 않을 수 있습니다. 설정에서 끌 수 있습니다.';
   }
+
+  @override
+  String get relatedTopics => '관련 주제';
+
+  @override
+  String get relatedMessages => '관련 메시지';
+
+  @override
+  String moreInCategory(String category) {
+    return '$category의 다른 주제';
+  }
+
+  @override
+  String get latestTopics => '최신 주제';
 }

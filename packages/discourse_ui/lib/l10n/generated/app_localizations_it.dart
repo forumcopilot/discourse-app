@@ -2787,4 +2787,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName blocca il nostro server delle notifiche, quindi potrebbero non arrivare. Puoi disattivarle nelle Impostazioni.';
   }
+
+  @override
+  String get relatedTopics => 'Argomenti correlati';
+
+  @override
+  String get relatedMessages => 'Messaggi correlati';
+
+  @override
+  String moreInCategory(String category) {
+    return 'Altro in $category';
+  }
+
+  @override
+  String get latestTopics => 'Argomenti recenti';
 }

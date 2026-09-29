@@ -2672,4 +2672,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName が通知サーバーをブロックしているため、通知が届かない場合があります。設定でオフにできます。';
   }
+
+  @override
+  String get relatedTopics => '関連トピック';
+
+  @override
+  String get relatedMessages => '関連メッセージ';
+
+  @override
+  String moreInCategory(String category) {
+    return '$category のトピックをもっと見る';
+  }
+
+  @override
+  String get latestTopics => '最新のトピック';
 }

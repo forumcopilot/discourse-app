@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:discourse_core/discourse_core.dart'
     show
         DiscourseAcceptedAnswers,
+        DiscourseMoreTopics,
         DiscourseSiteContextExtension,
         DiscourseTopicTracking;
 import 'package:flutter/material.dart';
@@ -1210,8 +1211,22 @@ class _PostsState extends State<PostsList> {
   late final PostActionsHandler _postActionsHandler = PostActionsHandler(
       _postsController, widget.siteContext, fallbackForumId: widget.forumId);
 
+  /// The loaded topic's own id. [widget.topicId] is a placeholder when the
+  /// page was opened at a post (thread_by_post mode).
+  String _loadedTopicId(ThreadViewData data) =>
+      data.topic.id.isNotEmpty ? data.topic.id : widget.topicId;
+
+  /// Whether the "Suggested / Related topics" section closes the page: the
+  /// last post is loaded and the topic's payload listed something to read
+  /// next.
+  bool _moreTopicsFollow(ThreadViewData data) =>
+      !_hasMorePosts &&
+      DiscourseMoreTopics.hasAny(widget.siteContext.site.url, _loadedTopicId(data));
+
   Widget _buildPostItem(BuildContext context, FCPost post, int postIndex, int postsListLength, ThreadViewData data, {bool isHighlighted = false, FCPost? nextPost}) {
     final avatarActions = _avatarActions;
+    final isLast = postIndex == postsListLength - 1;
+    final moreTopicsFollow = isLast && _moreTopicsFollow(data);
     final imageActions = _imageActions;
     final postActionsHandler = _postActionsHandler;
 
@@ -1253,9 +1268,11 @@ class _PostsState extends State<PostsList> {
             nextPost.replyToPostNumber == post.postNumber,
         // No rule of its own where a "2 months later" divider follows:
         // that divider's rules already separate the two posts, and a rule
-        // stacked above it drew the boundary twice. The opening post
-        // closes with the topic summary and band instead.
+        // stacked above it drew the boundary twice. Nor above the band
+        // that opens the suggested topics. The opening post closes with
+        // the topic summary and band instead.
         showBottomDivider: post.postNumber != 1 &&
+            !moreTopicsFollow &&
             (nextPost == null || _timeGapBetween(post, nextPost) == null),
         onVoteSuccess: (p) => _postsController.updateThreadPoll(p),
         actions: PostActions(
@@ -1296,22 +1313,25 @@ class _PostsState extends State<PostsList> {
         ],
       );
     }
-    if (postIndex == postsListLength - 1) {
+    if (isLast) {
       // Add padding equal to the toolbar height so the last post can scroll above it
       final double toolbarHeight = _getBottomToolbarHeight(context);
-      // Discourse appends a "Suggested Topics" footer below the last
-      // post — only render once we know there are no more posts to
-      // page in (otherwise the suggestion card would jump as new posts
-      // load above it).
-      final showSuggested = !_hasMorePosts;
+      // Discourse appends "Suggested / Related Topics" below the last
+      // post — only once there are no more posts to page in (otherwise
+      // the section would jump as new posts load above it).
       return Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           postWidget,
-          if (showSuggested)
+          if (moreTopicsFollow)
             SuggestedTopicsCard(
               siteContext: widget.siteContext,
-              topicId: widget.topicId,
+              topicId: _loadedTopicId(data),
+              categoryId: data.topic.forumId,
+              // The opening post, when it is also the last, already ends
+              // with the band.
+              showTopBand: post.postNumber != 1,
             ),
           SizedBox(height: toolbarHeight),
         ],
@@ -1541,7 +1561,9 @@ class _PostsState extends State<PostsList> {
                       if (postIndex == postsList.length) {
                         if (_isLoadingMore && _pagingDirection == _PagingDirection.later) {
                           return _buildLoadingCard(context);
-                        } else if (_hasMorePosts) {
+                        } else if (_hasMorePosts || _moreTopicsFollow(data)) {
+                          // More posts to page in, or the suggested topics
+                          // already close the page (web has no end line).
                           return const SizedBox.shrink();
                         } else {
                           // End of discussion indicator
