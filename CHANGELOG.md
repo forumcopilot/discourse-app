@@ -6,6 +6,9 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Changed
+- **The "Turn on notifications" page shows what you get.** Two sample notifications under the forum's own icon, a headline that names the forum, the two steps the button takes (allow on this phone, which shows a check when it is already allowed, then approve on the forum), and a line saying the permission is read-only. The button says "Turn on notifications", and the note about the forum owner is gone: a reader cannot act on it.
+
 ## [1.0.41] - 2026-09-29
 
 ### Added

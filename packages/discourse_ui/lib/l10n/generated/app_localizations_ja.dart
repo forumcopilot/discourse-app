@@ -1430,18 +1430,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notificationsAreTurnedOffForThisApp => 'このアプリの通知はオフになっています';
 
   @override
-  String forumWillAskToApproveNotifications(Object forumName) {
-    return '次に、$forumName が「通知」の承認を求めます。';
-  }
-
-  @override
-  String get approveNotificationsExplanation =>
-      '承認すると、通知を確認してこのデバイスに送信できるようになります。この権限では投稿、返信、メッセージの閲覧はできません。';
-
-  @override
-  String get forumOwnerPushNote => 'このフォーラムの管理者がアプリの通知を設定すれば、この手順は不要になります。';
-
-  @override
   String get pleaseLoginToCreateANewTopic => '新しいトピックを作成するにはログインしてください';
 
   @override
@@ -2666,9 +2654,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get signInToPostAndGetNotifications => 'ログインして投稿や通知を利用';
 
   @override
-  String get notificationsArrivalTiming => '通知は通常 10 分以内に届きます。会話中はもっと早く届きます。';
-
-  @override
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName が通知サーバーをブロックしているため、通知が届かない場合があります。設定でオフにできます。';
   }
@@ -2717,4 +2702,39 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get couldNotChangePushSetting =>
       'この設定を変更できませんでした。しばらくしてからもう一度お試しください。';
+
+  @override
+  String neverMissAReplyOn(Object forumName) {
+    return '$forumName の返信を見逃さない';
+  }
+
+  @override
+  String get notificationsPitch =>
+      '返信、メンション、メッセージ、チャットをロック画面に。通常は 10 分以内に届きます。どれを受け取るかは設定でいつでも選べます。';
+
+  @override
+  String get notificationsStepAllow => 'この端末で通知を許可';
+
+  @override
+  String get notificationsStepAllowed => 'この端末で通知が許可されています';
+
+  @override
+  String notificationsStepApprove(Object forumName) {
+    return '$forumName で承認';
+  }
+
+  @override
+  String get notificationsReadOnlyNote => '読み取り専用：投稿、返信、メッセージの閲覧はできません';
+
+  @override
+  String get notificationPreviewReply => 'Jane があなたに返信しました：ようこそ！見つけてくれてうれしいです。';
+
+  @override
+  String get notificationPreviewMessage => 'Sam からメッセージ：金曜日は来ますか？';
+
+  @override
+  String get notificationPreviewNow => '今';
+
+  @override
+  String get notificationPreviewEarlier => '5分前';
 }

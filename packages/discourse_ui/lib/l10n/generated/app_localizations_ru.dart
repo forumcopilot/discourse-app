@@ -1481,19 +1481,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Уведомления для этого приложения отключены';
 
   @override
-  String forumWillAskToApproveNotifications(Object forumName) {
-    return 'Далее $forumName попросит разрешить «Уведомления».';
-  }
-
-  @override
-  String get approveNotificationsExplanation =>
-      'Разрешение позволяет нам проверять ваши уведомления и отправлять их на это устройство. Оно не даёт права писать, отвечать или читать ваши сообщения.';
-
-  @override
-  String get forumOwnerPushNote =>
-      'Если владелец форума настроит уведомления для приложения, этот шаг не понадобится.';
-
-  @override
   String get pleaseLoginToCreateANewTopic => 'Войдите, чтобы создать тему';
 
   @override
@@ -2783,10 +2770,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Войдите, чтобы писать и получать уведомления';
 
   @override
-  String get notificationsArrivalTiming =>
-      'Уведомления обычно приходят в течение 10 минут, а во время переписки — быстрее.';
-
-  @override
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName блокирует наш сервер уведомлений, поэтому они могут не приходить. Их можно отключить в настройках.';
   }
@@ -2838,4 +2821,43 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get couldNotChangePushSetting =>
       'Не удалось изменить эту настройку. Повторите попытку позже.';
+
+  @override
+  String neverMissAReplyOn(Object forumName) {
+    return 'Не пропускайте ответы на $forumName';
+  }
+
+  @override
+  String get notificationsPitch =>
+      'Ответы, упоминания, сообщения и чат на экране блокировки, обычно в течение 10 минут. Что получать, можно выбрать в любой момент в настройках.';
+
+  @override
+  String get notificationsStepAllow => 'Разрешить уведомления на этом телефоне';
+
+  @override
+  String get notificationsStepAllowed =>
+      'Уведомления на этом телефоне разрешены';
+
+  @override
+  String notificationsStepApprove(Object forumName) {
+    return 'Одобрить на $forumName';
+  }
+
+  @override
+  String get notificationsReadOnlyNote =>
+      'Только чтение: не может публиковать, отвечать или читать ваши сообщения';
+
+  @override
+  String get notificationPreviewReply =>
+      'Jane ответила вам: Добро пожаловать! Рады, что вы нас нашли.';
+
+  @override
+  String get notificationPreviewMessage =>
+      'Sam отправил вам сообщение: Придёшь в пятницу?';
+
+  @override
+  String get notificationPreviewNow => 'сейчас';
+
+  @override
+  String get notificationPreviewEarlier => '5 мин назад';
 }

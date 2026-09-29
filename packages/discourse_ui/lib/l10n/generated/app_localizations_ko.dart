@@ -1425,18 +1425,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notificationsAreTurnedOffForThisApp => '이 앱의 알림이 꺼져 있습니다';
 
   @override
-  String forumWillAskToApproveNotifications(Object forumName) {
-    return '다음으로 $forumName에서 \"알림\" 승인을 요청합니다.';
-  }
-
-  @override
-  String get approveNotificationsExplanation =>
-      '승인하면 알림을 확인하여 이 기기로 보낼 수 있습니다. 이 권한으로는 게시, 답글, 메시지 읽기를 할 수 없습니다.';
-
-  @override
-  String get forumOwnerPushNote => '이 포럼 운영자가 앱 알림을 설정하면 이 단계는 필요 없습니다.';
-
-  @override
   String get pleaseLoginToCreateANewTopic => '새 주제를 만들려면 로그인하세요';
 
   @override
@@ -2659,10 +2647,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get signInToPostAndGetNotifications => '로그인하여 글을 쓰고 알림을 받으세요';
 
   @override
-  String get notificationsArrivalTiming =>
-      '알림은 보통 10분 이내에 도착하며, 대화 중에는 더 빨리 도착합니다.';
-
-  @override
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName에서 알림 서버를 차단하고 있어 알림이 도착하지 않을 수 있습니다. 설정에서 끌 수 있습니다.';
   }
@@ -2710,4 +2694,40 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get couldNotChangePushSetting => '이 설정을 변경하지 못했습니다. 나중에 다시 시도하세요.';
+
+  @override
+  String neverMissAReplyOn(Object forumName) {
+    return '$forumName의 답글을 놓치지 마세요';
+  }
+
+  @override
+  String get notificationsPitch =>
+      '답글, 멘션, 메시지, 채팅을 잠금 화면에서 받아보세요. 보통 10분 이내에 도착합니다. 받을 항목은 설정에서 언제든 고를 수 있습니다.';
+
+  @override
+  String get notificationsStepAllow => '이 휴대폰에서 알림 허용';
+
+  @override
+  String get notificationsStepAllowed => '이 휴대폰에서 알림이 허용되어 있습니다';
+
+  @override
+  String notificationsStepApprove(Object forumName) {
+    return '$forumName에서 승인';
+  }
+
+  @override
+  String get notificationsReadOnlyNote => '읽기 전용: 글쓰기, 답글, 메시지 읽기는 할 수 없습니다';
+
+  @override
+  String get notificationPreviewReply =>
+      'Jane님이 답글을 남겼습니다: 환영해요! 찾아와 주셔서 반가워요.';
+
+  @override
+  String get notificationPreviewMessage => 'Sam님이 메시지를 보냈습니다: 금요일에 오시나요?';
+
+  @override
+  String get notificationPreviewNow => '지금';
+
+  @override
+  String get notificationPreviewEarlier => '5분 전';
 }

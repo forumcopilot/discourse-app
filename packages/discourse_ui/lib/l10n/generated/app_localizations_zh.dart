@@ -1415,18 +1415,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notificationsAreTurnedOffForThisApp => '此应用的通知已关闭';
 
   @override
-  String forumWillAskToApproveNotifications(Object forumName) {
-    return '接下来，$forumName 会请求你批准“通知”。';
-  }
-
-  @override
-  String get approveNotificationsExplanation =>
-      '批准后，我们可以为你查看通知并发送到此设备。该权限无法发帖、回复或读取你的消息。';
-
-  @override
-  String get forumOwnerPushNote => '如果论坛所有者为应用设置了通知，则无需此步骤。';
-
-  @override
   String get pleaseLoginToCreateANewTopic => '请登录后创建新主题';
 
   @override
@@ -2635,9 +2623,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get signInToPostAndGetNotifications => '登录后即可发帖和接收通知';
 
   @override
-  String get notificationsArrivalTiming => '通知通常在 10 分钟内送达，对话进行中会更快。';
-
-  @override
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName 屏蔽了我们的通知服务器，因此通知可能无法送达。你可以在设置中关闭通知。';
   }
@@ -2685,4 +2670,39 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get couldNotChangePushSetting => '无法更改此设置，请稍后再试。';
+
+  @override
+  String neverMissAReplyOn(Object forumName) {
+    return '不错过 $forumName 上的任何回复';
+  }
+
+  @override
+  String get notificationsPitch =>
+      '回复、提及、私信和聊天直达锁屏，通常在 10 分钟内送达。你可以随时在设置中选择接收哪些。';
+
+  @override
+  String get notificationsStepAllow => '允许此手机接收通知';
+
+  @override
+  String get notificationsStepAllowed => '此手机已允许通知';
+
+  @override
+  String notificationsStepApprove(Object forumName) {
+    return '在 $forumName 上批准';
+  }
+
+  @override
+  String get notificationsReadOnlyNote => '只读：无法发帖、回复或阅读你的私信';
+
+  @override
+  String get notificationPreviewReply => 'Jane 回复了你：欢迎加入！很高兴你找到了我们。';
+
+  @override
+  String get notificationPreviewMessage => 'Sam 给你发了消息：周五你来吗？';
+
+  @override
+  String get notificationPreviewNow => '刚刚';
+
+  @override
+  String get notificationPreviewEarlier => '5 分钟前';
 }

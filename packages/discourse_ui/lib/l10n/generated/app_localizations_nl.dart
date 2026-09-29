@@ -1477,19 +1477,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Meldingen zijn uitgeschakeld voor deze app';
 
   @override
-  String forumWillAskToApproveNotifications(Object forumName) {
-    return 'Hierna vraagt $forumName je om \"Meldingen\" goed te keuren.';
-  }
-
-  @override
-  String get approveNotificationsExplanation =>
-      'Door goed te keuren mogen we je meldingen ophalen en naar dit apparaat sturen. Deze toestemming kan niet posten, reageren of je berichten lezen.';
-
-  @override
-  String get forumOwnerPushNote =>
-      'Als de eigenaar van dit forum meldingen voor de app instelt, is deze stap niet nodig.';
-
-  @override
   String get pleaseLoginToCreateANewTopic =>
       'Meld je aan om een nieuw onderwerp te maken';
 
@@ -2772,10 +2759,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Log in om te posten en meldingen te krijgen';
 
   @override
-  String get notificationsArrivalTiming =>
-      'Meldingen komen meestal binnen 10 minuten binnen, en sneller tijdens een gesprek.';
-
-  @override
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName blokkeert onze meldingsserver, dus meldingen komen mogelijk niet aan. Je kunt ze uitzetten in Instellingen.';
   }
@@ -2827,4 +2810,43 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get couldNotChangePushSetting =>
       'Deze instelling kon niet worden gewijzigd. Probeer het later opnieuw.';
+
+  @override
+  String neverMissAReplyOn(Object forumName) {
+    return 'Mis geen antwoord op $forumName';
+  }
+
+  @override
+  String get notificationsPitch =>
+      'Antwoorden, vermeldingen, berichten en chat op je vergrendelscherm, meestal binnen 10 minuten. Welke, kies je wanneer je wilt in Instellingen.';
+
+  @override
+  String get notificationsStepAllow => 'Meldingen toestaan op deze telefoon';
+
+  @override
+  String get notificationsStepAllowed =>
+      'Meldingen zijn toegestaan op deze telefoon';
+
+  @override
+  String notificationsStepApprove(Object forumName) {
+    return 'Goedkeuren op $forumName';
+  }
+
+  @override
+  String get notificationsReadOnlyNote =>
+      'Alleen lezen: kan niet posten, antwoorden of je berichten lezen';
+
+  @override
+  String get notificationPreviewReply =>
+      'Jane heeft je geantwoord: Welkom! Fijn dat je ons gevonden hebt.';
+
+  @override
+  String get notificationPreviewMessage =>
+      'Sam heeft je een bericht gestuurd: Kom je vrijdag?';
+
+  @override
+  String get notificationPreviewNow => 'nu';
+
+  @override
+  String get notificationPreviewEarlier => '5 min geleden';
 }

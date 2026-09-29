@@ -1486,19 +1486,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Les notifications sont désactivées pour cette application';
 
   @override
-  String forumWillAskToApproveNotifications(Object forumName) {
-    return 'Ensuite, $forumName vous demandera d’approuver « Notifications ».';
-  }
-
-  @override
-  String get approveNotificationsExplanation =>
-      'En approuvant, vous nous permettez de consulter vos notifications et de les envoyer sur cet appareil. Cette autorisation ne permet ni de publier, ni de répondre, ni de lire vos messages.';
-
-  @override
-  String get forumOwnerPushNote =>
-      'Si le propriétaire de ce forum configure les notifications pour l’application, cette étape ne sera plus nécessaire.';
-
-  @override
   String get pleaseLoginToCreateANewTopic =>
       'Connectez-vous pour créer un sujet';
 
@@ -2784,10 +2771,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Connectez-vous pour publier et recevoir des notifications';
 
   @override
-  String get notificationsArrivalTiming =>
-      'Les notifications arrivent en général en moins de 10 minutes, et plus vite pendant une conversation.';
-
-  @override
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName bloque notre serveur de notifications, elles risquent donc de ne pas arriver. Vous pouvez les désactiver dans les Réglages.';
   }
@@ -2839,4 +2822,44 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get couldNotChangePushSetting =>
       'Impossible de modifier ce réglage. Réessayez plus tard.';
+
+  @override
+  String neverMissAReplyOn(Object forumName) {
+    return 'Ne manquez aucune réponse sur $forumName';
+  }
+
+  @override
+  String get notificationsPitch =>
+      'Réponses, mentions, messages et chat sur votre écran verrouillé, en général en moins de 10 minutes. Vous choisissez lesquels à tout moment dans les Réglages.';
+
+  @override
+  String get notificationsStepAllow =>
+      'Autoriser les notifications sur ce téléphone';
+
+  @override
+  String get notificationsStepAllowed =>
+      'Les notifications sont autorisées sur ce téléphone';
+
+  @override
+  String notificationsStepApprove(Object forumName) {
+    return 'Approuver sur $forumName';
+  }
+
+  @override
+  String get notificationsReadOnlyNote =>
+      'Lecture seule : ne peut ni publier, ni répondre, ni lire vos messages';
+
+  @override
+  String get notificationPreviewReply =>
+      'Jane vous a répondu : Bienvenue ! Ravis que vous nous ayez trouvés.';
+
+  @override
+  String get notificationPreviewMessage =>
+      'Sam vous a envoyé un message : Tu viens vendredi ?';
+
+  @override
+  String get notificationPreviewNow => 'maintenant';
+
+  @override
+  String get notificationPreviewEarlier => 'il y a 5 min';
 }

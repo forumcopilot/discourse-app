@@ -1470,19 +1470,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Notifications are turned off for this app';
 
   @override
-  String forumWillAskToApproveNotifications(Object forumName) {
-    return 'Next, $forumName will ask you to approve “Notifications”.';
-  }
-
-  @override
-  String get approveNotificationsExplanation =>
-      'Approving lets us check your notifications for you and send them to this device. This permission cannot post, reply, or read your messages.';
-
-  @override
-  String get forumOwnerPushNote =>
-      'If this forum’s owner sets up notifications for the app, this step won’t be needed.';
-
-  @override
   String get pleaseLoginToCreateANewTopic =>
       'Please login to create a new topic';
 
@@ -2761,10 +2748,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Sign in to post and get notifications';
 
   @override
-  String get notificationsArrivalTiming =>
-      'Notifications usually arrive within 10 minutes, and faster during a conversation.';
-
-  @override
   String forumBlocksNotificationServer(Object forumName) {
     return '$forumName blocks our notification server, so notifications may not arrive. You can turn them off in Settings.';
   }
@@ -2816,4 +2799,43 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get couldNotChangePushSetting =>
       'Couldn\'t change this setting. Try again later.';
+
+  @override
+  String neverMissAReplyOn(Object forumName) {
+    return 'Never miss a reply on $forumName';
+  }
+
+  @override
+  String get notificationsPitch =>
+      'Replies, mentions, messages and chat on your lock screen, usually within 10 minutes. You can choose which, any time, in Settings.';
+
+  @override
+  String get notificationsStepAllow => 'Allow notifications on this phone';
+
+  @override
+  String get notificationsStepAllowed =>
+      'Notifications are allowed on this phone';
+
+  @override
+  String notificationsStepApprove(Object forumName) {
+    return 'Approve on $forumName';
+  }
+
+  @override
+  String get notificationsReadOnlyNote =>
+      'Read-only: it can\'t post, reply or read your messages';
+
+  @override
+  String get notificationPreviewReply =>
+      'Jane replied to you: Welcome aboard! Glad you found us.';
+
+  @override
+  String get notificationPreviewMessage =>
+      'Sam sent you a message: Are you coming on Friday?';
+
+  @override
+  String get notificationPreviewNow => 'now';
+
+  @override
+  String get notificationPreviewEarlier => '5m ago';
 }

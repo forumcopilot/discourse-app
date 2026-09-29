@@ -2606,24 +2606,6 @@ abstract class AppLocalizations {
   /// **'Notifications are turned off for this app'**
   String get notificationsAreTurnedOffForThisApp;
 
-  /// UI text: Next, {forumName} will ask you to approve “Notifications”.
-  ///
-  /// In en, this message translates to:
-  /// **'Next, {forumName} will ask you to approve “Notifications”.'**
-  String forumWillAskToApproveNotifications(Object forumName);
-
-  /// UI text: Approving lets us check your notifications for you and send
-  ///
-  /// In en, this message translates to:
-  /// **'Approving lets us check your notifications for you and send them to this device. This permission cannot post, reply, or read your messages.'**
-  String get approveNotificationsExplanation;
-
-  /// UI text: If this forum’s owner sets up notifications for the app, thi
-  ///
-  /// In en, this message translates to:
-  /// **'If this forum’s owner sets up notifications for the app, this step won’t be needed.'**
-  String get forumOwnerPushNote;
-
   /// UI text: Please login to create a new topic
   ///
   /// In en, this message translates to:
@@ -4588,12 +4570,6 @@ abstract class AppLocalizations {
   /// **'Sign in to post and get notifications'**
   String get signInToPostAndGetNotifications;
 
-  /// Enable-notifications page: polled notifications arrive within about 10 minutes (every 3 minutes during a conversation)
-  ///
-  /// In en, this message translates to:
-  /// **'Notifications usually arrive within 10 minutes, and faster during a conversation.'**
-  String get notificationsArrivalTiming;
-
   /// Snackbar after granting notifications when the forum's firewall (e.g. Cloudflare) refuses the notifications server
   ///
   /// In en, this message translates to:
@@ -4683,6 +4659,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t change this setting. Try again later.'**
   String get couldNotChangePushSetting;
+
+  /// Enable-notifications page
+  ///
+  /// In en, this message translates to:
+  /// **'Never miss a reply on {forumName}'**
+  String neverMissAReplyOn(Object forumName);
+
+  /// Enable-notifications page
+  ///
+  /// In en, this message translates to:
+  /// **'Replies, mentions, messages and chat on your lock screen, usually within 10 minutes. You can choose which, any time, in Settings.'**
+  String get notificationsPitch;
+
+  /// Enable-notifications page
+  ///
+  /// In en, this message translates to:
+  /// **'Allow notifications on this phone'**
+  String get notificationsStepAllow;
+
+  /// Enable-notifications page
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are allowed on this phone'**
+  String get notificationsStepAllowed;
+
+  /// Enable-notifications page
+  ///
+  /// In en, this message translates to:
+  /// **'Approve on {forumName}'**
+  String notificationsStepApprove(Object forumName);
+
+  /// Enable-notifications page
+  ///
+  /// In en, this message translates to:
+  /// **'Read-only: it can\'t post, reply or read your messages'**
+  String get notificationsReadOnlyNote;
+
+  /// Enable-notifications page (a sample notification shown as a preview)
+  ///
+  /// In en, this message translates to:
+  /// **'Jane replied to you: Welcome aboard! Glad you found us.'**
+  String get notificationPreviewReply;
+
+  /// Enable-notifications page (a sample notification shown as a preview)
+  ///
+  /// In en, this message translates to:
+  /// **'Sam sent you a message: Are you coming on Friday?'**
+  String get notificationPreviewMessage;
+
+  /// Enable-notifications page (a sample notification shown as a preview)
+  ///
+  /// In en, this message translates to:
+  /// **'now'**
+  String get notificationPreviewNow;
+
+  /// Enable-notifications page (a sample notification shown as a preview)
+  ///
+  /// In en, this message translates to:
+  /// **'5m ago'**
+  String get notificationPreviewEarlier;
 }
 
 class _AppLocalizationsDelegate

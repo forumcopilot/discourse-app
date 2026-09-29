@@ -11,6 +11,8 @@ import '../services/notification_installation.dart';
 import '../services/notification_key_service.dart';
 import '../services/notification_permission.dart';
 import '../theme/design_tokens.dart';
+import '../theme/forum_identity.dart';
+import 'widgets/forum_icon_tile.dart';
 import '../services/discourse_auth_session.dart';
 import '../l10n/generated/app_localizations.dart';
 
@@ -31,10 +33,9 @@ import '../l10n/generated/app_localizations.dart';
 ///      refused, with the only way back (the system settings);
 ///   2. the forum lets us read this user's notifications — the grant below.
 ///
-/// This whole flow is a stand-in for the forum-wide push relay. Once an owner
-/// adds a push URL to `allowed_user_api_push_urls`, Discourse posts
-/// notifications directly and no per-user key is needed — hence the closing
-/// line.
+/// The page leads with what the user gets — two sample notifications with the
+/// forum's own icon — and then the two steps above, numbered, so the system
+/// prompt and the forum's approval page that follow are both expected.
 class EnableNotificationsPage extends StatefulWidget {
   final SiteContext siteContext;
 
@@ -195,7 +196,8 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
   /// `notifications`-scoped key cannot call `/session/current.json`. The
   /// backend can also read it off the notifications themselves, so sending it
   /// is a convenience, not a requirement.
-  Future<NotificationKeyRegistration> _uploadKey(DiscourseUserApiKey key) async {
+  Future<NotificationKeyRegistration> _uploadKey(
+      DiscourseUserApiKey key) async {
     final site = widget.siteContext.site;
     return NotificationKeyService.register(
       siteUrl: site.url,
@@ -239,140 +241,336 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context)!;
+    final forumIcon = ForumIdentity.of(context, widget.siteContext.site).icon;
     // Only a refusal earns a banner. "Not asked yet" is handled by the button
     // below, so a first-time user sees no warning about a problem they do
     // not have.
     final osBlocked = _permission == NotificationPermissionState.denied;
+    final osAllowed = _permission == NotificationPermissionState.granted;
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.turnOnNotifications)),
-      // The explanation scrolls and the buttons stay at the bottom. It was
-      // one fixed Column with a Spacer, which overflowed at a large text
-      // size or on a short phone.
+      // The explanation scrolls and the buttons stay at the bottom, so a large
+      // text size or a short phone never overflows.
       body: SafeArea(
-        child: Padding(
-          padding: DesignTokens.paddingL,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(DesignTokens.spacingXL,
+                    DesignTokens.spacingS, DesignTokens.spacingXL, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // What arrives, shown rather than described: two
+                    // notifications as they will look, under this forum's icon.
+                    _NotificationPreview(
+                      forumName: _forumName,
+                      forumIcon: forumIcon,
+                      samples: [
+                        (
+                          l10n.notificationPreviewNow,
+                          l10n.notificationPreviewReply
+                        ),
+                        (
+                          l10n.notificationPreviewEarlier,
+                          l10n.notificationPreviewMessage
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: DesignTokens.spacingXL),
+                    Text(
+                      l10n.neverMissAReplyOn(_forumName),
+                      style: textTheme.headlineSmall?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: DesignTokens.fontWeightSemiBold,
+                        height: 1.25,
+                      ),
+                    ),
+                    const SizedBox(height: DesignTokens.spacingS),
+                    // Polled, not pushed by the forum: set the expectation
+                    // before the first one arrives a few minutes late.
+                    Text(
+                      l10n.notificationsPitch,
+                      style: textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        height: 1.45,
+                      ),
+                    ),
+                    const SizedBox(height: DesignTokens.spacingXL),
+
+                    if (osBlocked) ...[
+                      _OsBlockedBanner(l10n: l10n),
+                      const SizedBox(height: DesignTokens.spacingL),
+                    ],
+
+                    // The two things the button is about to ask for, in order:
+                    // the system prompt, then the forum's approval page.
+                    _Step(
+                      number: 1,
+                      done: osAllowed,
+                      label: osAllowed
+                          ? l10n.notificationsStepAllowed
+                          : l10n.notificationsStepAllow,
+                    ),
+                    const SizedBox(height: DesignTokens.spacingM),
+                    _Step(
+                      number: 2,
+                      label: l10n.notificationsStepApprove(_forumName),
+                    ),
+                    const SizedBox(height: DesignTokens.spacingXL),
+
+                    // What the forum's page will ask to approve, answered
+                    // before it is asked: the key is notifications-only.
+                    Row(
+                      children: [
+                        Icon(Icons.lock_outline,
+                            size: DesignTokens.iconSizeSMedium,
+                            color: colorScheme.onSurfaceVariant),
+                        const SizedBox(width: DesignTokens.spacingS),
+                        Expanded(
+                          child: Text(
+                            l10n.notificationsReadOnlyNote,
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: DesignTokens.spacingL),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                  DesignTokens.spacingXL,
+                  DesignTokens.spacingS,
+                  DesignTokens.spacingXL,
+                  DesignTokens.spacingS),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52),
+                      textStyle: textTheme.titleMedium,
+                    ),
+                    onPressed: _granting ? null : _grantNotificationsAccess,
+                    child: _granting
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(l10n.turnOnNotifications),
+                  ),
+                  const SizedBox(height: DesignTokens.spacingXS),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                      textStyle: textTheme.titleMedium,
+                    ),
+                    onPressed: _granting
+                        ? null
+                        : () => Navigator.of(context).pop(false),
+                    child: Text(l10n.notNow),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Two sample notifications on a panel in the forum's accent, the newer one
+/// in full and the older one faded, as a lock screen stacks them.
+class _NotificationPreview extends StatelessWidget {
+  const _NotificationPreview({
+    required this.forumName,
+    required this.forumIcon,
+    required this.samples,
+  });
+
+  final String forumName;
+  final String? forumIcon;
+
+  /// (when, text) for each card, newest first.
+  final List<(String, String)> samples;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    // White cards in light mode, as notifications are; raised grey in dark.
+    final card = theme.brightness == Brightness.light
+        ? colorScheme.surfaceContainerLowest
+        : colorScheme.surfaceContainerHighest;
+
+    return ExcludeSemantics(
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+            horizontal: DesignTokens.spacingM, vertical: DesignTokens.spacingL),
+        decoration: BoxDecoration(
+          color: colorScheme.primaryContainer,
+          borderRadius: BorderRadius.circular(22),
+        ),
+        child: Column(
+          children: [
+            for (final (index, (age, text)) in samples.indexed) ...[
+              if (index > 0) const SizedBox(height: DesignTokens.spacingS + 2),
+              Opacity(
+                opacity: index == 0 ? 1 : 0.7,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: DesignTokens.spacingM + 2,
+                      vertical: DesignTokens.spacingM),
+                  decoration: BoxDecoration(
+                    color: card,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.notifications_active_outlined,
-                          size: 48, color: colorScheme.primary),
-                      const SizedBox(height: DesignTokens.spacingL),
-
-                      // Step 1 — only shown when the OS is actually blocking us.
-                      if (osBlocked) ...[
-                        Container(
-                          padding: DesignTokens.paddingM,
-                          decoration: BoxDecoration(
-                            color: colorScheme.errorContainer
-                                .withValues(alpha: DesignTokens.opacityLow),
-                            borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(Icons.error_outline,
-                                      color: colorScheme.error, size: 20),
-                                  const SizedBox(width: DesignTokens.spacingS),
-                                  Expanded(
-                                    child: Text(
-                                      l10n.notificationsAreTurnedOffForThisApp,
-                                      style: textTheme.titleSmall?.copyWith(
-                                        color: colorScheme.onSurface,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                      ForumIconTile(name: forumName, url: forumIcon, size: 36),
+                      const SizedBox(width: DesignTokens.spacingM),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '$forumName · $age',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
                               ),
-                              const SizedBox(height: DesignTokens.spacingXS),
-                              Text(
-                                l10n.deviceWillNotShowAlertsUntilAllowedInSettings,
-                                style: textTheme.bodySmall
-                                    ?.copyWith(color: colorScheme.onSurfaceVariant),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              text,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurface,
                               ),
-                              if (NotificationPermission.canOpenSettings) ...[
-                                const SizedBox(height: DesignTokens.spacingS),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: FilledButton.tonal(
-                                    onPressed: NotificationPermission.openSettings,
-                                    child: Text(l10n.openSettings),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: DesignTokens.spacingL),
-                      ],
-
-                      // Step 2 — what the next screen will ask, in plain terms.
-                      Text(
-                        l10n.forumWillAskToApproveNotifications(_forumName),
-                        style: textTheme.titleMedium?.copyWith(
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: DesignTokens.spacingS),
-                      Text(
-                        l10n.approveNotificationsExplanation,
-                        style: textTheme.bodyMedium
-                            ?.copyWith(color: colorScheme.onSurfaceVariant),
-                      ),
-                      const SizedBox(height: DesignTokens.spacingS),
-                      // Polled, not pushed by the forum: set the expectation
-                      // before the first one arrives a few minutes late.
-                      Text(
-                        l10n.notificationsArrivalTiming,
-                        style: textTheme.bodyMedium
-                            ?.copyWith(color: colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: DesignTokens.spacingL),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _granting ? null : _grantNotificationsAccess,
-                  child: _granting
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(l10n.continueButton),
-                ),
-              ),
-              const SizedBox(height: DesignTokens.spacingS),
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed:
-                      _granting ? null : () => Navigator.of(context).pop(false),
-                  child: Text(l10n.notNow),
-                ),
-              ),
+/// One numbered step; a check replaces the number once it is already done.
+class _Step extends StatelessWidget {
+  const _Step({required this.number, required this.label, this.done = false});
 
-              const SizedBox(height: DesignTokens.spacingM),
-              Text(
-                l10n.forumOwnerPushNote,
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+  final int number;
+  final String label;
+  final bool done;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Row(
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: done ? colorScheme.primary : colorScheme.primaryContainer,
+            shape: BoxShape.circle,
+          ),
+          child: done
+              ? Icon(Icons.check, size: 18, color: colorScheme.onPrimary)
+              : Text(
+                  '$number',
+                  textScaler: TextScaler.noScaling,
+                  style: textTheme.labelLarge?.copyWith(
+                    color: colorScheme.onPrimaryContainer,
+                    fontWeight: DesignTokens.fontWeightSemiBold,
+                  ),
+                ),
+        ),
+        const SizedBox(width: DesignTokens.spacingM),
+        Expanded(
+          child: Text(
+            label,
+            style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The system has refused this app notifications: say so, and give the only
+/// way back.
+class _OsBlockedBanner extends StatelessWidget {
+  const _OsBlockedBanner({required this.l10n});
+
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Container(
+      width: double.infinity,
+      padding: DesignTokens.paddingM,
+      decoration: BoxDecoration(
+        color: colorScheme.errorContainer
+            .withValues(alpha: DesignTokens.opacityLow),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.error_outline, color: colorScheme.error, size: 20),
+              const SizedBox(width: DesignTokens.spacingS),
+              Expanded(
+                child: Text(
+                  l10n.notificationsAreTurnedOffForThisApp,
+                  style: textTheme.titleSmall
+                      ?.copyWith(color: colorScheme.onSurface),
                 ),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: DesignTokens.spacingXS),
+          Text(
+            l10n.deviceWillNotShowAlertsUntilAllowedInSettings,
+            style: textTheme.bodySmall
+                ?.copyWith(color: colorScheme.onSurfaceVariant),
+          ),
+          if (NotificationPermission.canOpenSettings) ...[
+            const SizedBox(height: DesignTokens.spacingS),
+            FilledButton.tonal(
+              onPressed: NotificationPermission.openSettings,
+              child: Text(l10n.openSettings),
+            ),
+          ],
+        ],
       ),
     );
   }

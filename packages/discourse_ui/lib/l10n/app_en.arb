@@ -1558,23 +1558,6 @@
   "@notificationsAreTurnedOffForThisApp": {
     "description": "UI text: Notifications are turned off for this app"
   },
-  "forumWillAskToApproveNotifications": "Next, {forumName} will ask you to approve “Notifications”.",
-  "@forumWillAskToApproveNotifications": {
-    "description": "UI text: Next, {forumName} will ask you to approve “Notifications”.",
-    "placeholders": {
-      "forumName": {
-        "type": "Object"
-      }
-    }
-  },
-  "approveNotificationsExplanation": "Approving lets us check your notifications for you and send them to this device. This permission cannot post, reply, or read your messages.",
-  "@approveNotificationsExplanation": {
-    "description": "UI text: Approving lets us check your notifications for you and send "
-  },
-  "forumOwnerPushNote": "If this forum’s owner sets up notifications for the app, this step won’t be needed.",
-  "@forumOwnerPushNote": {
-    "description": "UI text: If this forum’s owner sets up notifications for the app, thi"
-  },
   "pleaseLoginToCreateANewTopic": "Please login to create a new topic",
   "@pleaseLoginToCreateANewTopic": {
     "description": "UI text: Please login to create a new topic"
@@ -3308,10 +3291,6 @@
   "@signInToPostAndGetNotifications": {
     "description": "Drawer account card for a signed-out reader"
   },
-  "notificationsArrivalTiming": "Notifications usually arrive within 10 minutes, and faster during a conversation.",
-  "@notificationsArrivalTiming": {
-    "description": "Enable-notifications page: polled notifications arrive within about 10 minutes (every 3 minutes during a conversation)"
-  },
   "forumBlocksNotificationServer": "{forumName} blocks our notification server, so notifications may not arrive. You can turn them off in Settings.",
   "@forumBlocksNotificationServer": {
     "description": "Snackbar after granting notifications when the forum's firewall (e.g. Cloudflare) refuses the notifications server",
@@ -3381,5 +3360,55 @@
   "couldNotChangePushSetting": "Couldn't change this setting. Try again later.",
   "@couldNotChangePushSetting": {
     "description": "Snackbar when a per-type push switch could not be saved on the notifications backend"
+  },
+  "neverMissAReplyOn": "Never miss a reply on {forumName}",
+  "@neverMissAReplyOn": {
+    "description": "Enable-notifications page",
+    "placeholders": {
+      "forumName": {
+        "type": "Object"
+      }
+    }
+  },
+  "notificationsPitch": "Replies, mentions, messages and chat on your lock screen, usually within 10 minutes. You can choose which, any time, in Settings.",
+  "@notificationsPitch": {
+    "description": "Enable-notifications page"
+  },
+  "notificationsStepAllow": "Allow notifications on this phone",
+  "@notificationsStepAllow": {
+    "description": "Enable-notifications page"
+  },
+  "notificationsStepAllowed": "Notifications are allowed on this phone",
+  "@notificationsStepAllowed": {
+    "description": "Enable-notifications page"
+  },
+  "notificationsStepApprove": "Approve on {forumName}",
+  "@notificationsStepApprove": {
+    "description": "Enable-notifications page",
+    "placeholders": {
+      "forumName": {
+        "type": "Object"
+      }
+    }
+  },
+  "notificationsReadOnlyNote": "Read-only: it can't post, reply or read your messages",
+  "@notificationsReadOnlyNote": {
+    "description": "Enable-notifications page"
+  },
+  "notificationPreviewReply": "Jane replied to you: Welcome aboard! Glad you found us.",
+  "@notificationPreviewReply": {
+    "description": "Enable-notifications page (a sample notification shown as a preview)"
+  },
+  "notificationPreviewMessage": "Sam sent you a message: Are you coming on Friday?",
+  "@notificationPreviewMessage": {
+    "description": "Enable-notifications page (a sample notification shown as a preview)"
+  },
+  "notificationPreviewNow": "now",
+  "@notificationPreviewNow": {
+    "description": "Enable-notifications page (a sample notification shown as a preview)"
+  },
+  "notificationPreviewEarlier": "5m ago",
+  "@notificationPreviewEarlier": {
+    "description": "Enable-notifications page (a sample notification shown as a preview)"
   }
 }
