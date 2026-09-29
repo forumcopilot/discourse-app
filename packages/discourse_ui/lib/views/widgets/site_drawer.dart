@@ -392,27 +392,12 @@ class _Header extends StatelessWidget {
                     if (!signedIn)
                       Padding(
                         padding: const EdgeInsets.only(top: 10, right: 4),
-                        child: Row(children: [
-                          Expanded(
-                            child: FilledButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                LoginPage.open(siteContext);
-                              },
-                              child: Text(l10n.signIn),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                LoginPage.open(siteContext);
-                              },
-                              child: Text(l10n.createAccount),
-                            ),
-                          ),
-                        ]),
+                        child: _SignInButtons(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            LoginPage.open(siteContext);
+                          },
+                        ),
                       ),
                   ],
                 ),
@@ -422,6 +407,62 @@ class _Header extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// Sign in and Create account, side by side while both labels fit on one
+/// line, else one above the other (a narrow drawer, a large text size):
+/// "Create account" wrapped onto two lines in half the drawer.
+class _SignInButtons extends StatelessWidget {
+  const _SignInButtons({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  static const _gap = 8.0;
+  static const _padding = EdgeInsets.symmetric(horizontal: 12);
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final signIn = FilledButton(
+      onPressed: onPressed,
+      style: FilledButton.styleFrom(padding: _padding),
+      child: Text(l10n.signIn, maxLines: 1),
+    );
+    final createAccount = OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(padding: _padding),
+      child: Text(l10n.createAccount, maxLines: 1),
+    );
+    return LayoutBuilder(builder: (context, constraints) {
+      final style = Theme.of(context).textTheme.labelLarge;
+      final scaler = MediaQuery.textScalerOf(context);
+      final direction = Directionality.of(context);
+      bool fits(String label) {
+        final painter = TextPainter(
+          text: TextSpan(text: label, style: style),
+          textDirection: direction,
+          textScaler: scaler,
+          maxLines: 1,
+        )..layout();
+        final width = painter.width + _padding.horizontal;
+        painter.dispose();
+        // The outlined button's border takes a pixel each side.
+        return width + 2 <= (constraints.maxWidth - _gap) / 2;
+      }
+
+      if (fits(l10n.signIn) && fits(l10n.createAccount)) {
+        return Row(children: [
+          Expanded(child: signIn),
+          const SizedBox(width: _gap),
+          Expanded(child: createAccount),
+        ]);
+      }
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [signIn, const SizedBox(height: _gap), createAccount],
+      );
+    });
   }
 }
 

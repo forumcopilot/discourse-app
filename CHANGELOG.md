@@ -11,6 +11,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Fixed
 - **Account and privacy repeats nothing the Profile tab has.** The page it opens still led with its own Notifications row (the same screen as the tab's Notification settings) and ended with the forum's Terms and Privacy (in the tab's footer), under an untranslated "Account & preferences" title. It now holds what the tab doesn't: Account (change email, change password), Privacy (ignored users), Manage account on web, and Delete account, titled Account and privacy in every language.
+- **"Create account" in the drawer stays on one line.** Signed out, the drawer's Sign in and Create account sat side by side in half its width each, and "Create account" wrapped onto two lines on phones. They sit side by side only while both fit, and otherwise one above the other at full width, as on the Profile tab.
 
 ## [1.0.43] - 2026-09-29
 

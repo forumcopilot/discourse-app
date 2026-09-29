@@ -6,6 +6,7 @@ import 'package:discourse_ui/views/settings_page.dart';
 import 'package:discourse_ui/views/tabs/profile_tab.dart';
 import 'package:discourse_ui/views/widgets/site_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 
@@ -137,6 +138,38 @@ void main() {
       expect(find.text('Users'), findsOneWidget);
       expect(find.widgetWithText(FilledButton, 'Sign in'), findsOneWidget);
       expect(find.widgetWithText(OutlinedButton, 'Create account'), findsOneWidget);
+    });
+
+    testWidgets("the guest's buttons stack rather than wrap a label",
+        (tester) async {
+      final ctx = context(signedIn: false);
+      Widget drawer(double scale) => Builder(
+            builder: (c) => MediaQuery(
+              data: MediaQuery.of(c)
+                  .copyWith(textScaler: TextScaler.linear(scale)),
+              child: SiteDrawer(siteContext: ctx, homeIsCurrent: true),
+            ),
+          );
+      final signIn = find.widgetWithText(FilledButton, 'Sign in');
+      final create = find.widgetWithText(OutlinedButton, 'Create account');
+
+      // The test font draws every glyph a full em wide, so "Create
+      // account" is twice its width in Roboto: a small size fits beside
+      // Sign in, full size does not.
+      await pump(tester, drawer(0.4));
+      expect(tester.getTopLeft(create).dy, tester.getTopLeft(signIn).dy,
+          reason: 'side by side while both labels fit');
+
+      await pump(tester, drawer(1));
+      expect(tester.getTopLeft(create).dy,
+          greaterThan(tester.getBottomLeft(signIn).dy),
+          reason: 'one above the other at a large text size');
+      final label = tester.renderObject<RenderParagraph>(
+          find.descendant(of: create, matching: find.byType(RichText)));
+      expect(label.didExceedMaxLines, isFalse);
+      expect(tester.getSize(create).width,
+          greaterThan(tester.getSize(find.byType(Drawer)).width / 2),
+          reason: 'full width when stacked');
     });
   });
 }
