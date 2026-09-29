@@ -641,6 +641,25 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
     }
   }
 
+  /// The topics [username] started, newest first — web's Activity › Topics
+  /// (`/topics/created-by/{username}.json`). A topic list, so each row has
+  /// its reply, view and like counts, tags and solved state; the
+  /// user_actions feed the profile's Topics tab reads has none of them.
+  Future<({List<FCTopic> topics, bool hasMore, String? error})>
+      getTopicsCreatedByAsync(String username, {int page = 0}) async {
+    if (username.isEmpty) {
+      return (topics: const <FCTopic>[], hasMore: false, error: 'username required');
+    }
+    try {
+      final list = await _listTopics(
+          '/topics/created-by/${Uri.encodeComponent(username)}.json',
+          page: page);
+      return (topics: list.topics, hasMore: list.hasMore, error: null);
+    } catch (e) {
+      return (topics: const <FCTopic>[], hasMore: false, error: describeApiError(e));
+    }
+  }
+
   Future<_TopicListResponse> _listTopics(
     String path, {
     int page = 0,

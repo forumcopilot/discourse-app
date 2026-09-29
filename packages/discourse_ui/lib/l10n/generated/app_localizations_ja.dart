@@ -2737,4 +2737,74 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get notificationPreviewEarlier => '5分前';
+
+  @override
+  String get activityReplied => '返信';
+
+  @override
+  String get activityStartedTopic => 'トピックを作成';
+
+  @override
+  String get activityLiked => 'いいね';
+
+  @override
+  String get activitySolution => '解決策';
+
+  @override
+  String get activityAcceptedBy => '承認者:';
+
+  @override
+  String get activityAwaitingApproval => '承認待ち';
+
+  @override
+  String get activityFilterTopics => 'トピック';
+
+  @override
+  String get activityFilterReplies => '返信';
+
+  @override
+  String get activityFilterLikes => 'いいね';
+
+  @override
+  String get activityFilterPending => '保留中';
+
+  @override
+  String get sectionToday => '今日';
+
+  @override
+  String get sectionThisWeek => '今週';
+
+  @override
+  String get sectionEarlier => 'それ以前';
+
+  @override
+  String draftsWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '下書きが $count 件あります',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get resumeDrafts => '再開';
+
+  @override
+  String get myPostsEmpty => 'まだ投稿がありません';
+
+  @override
+  String get myPostsEmptyHint => '作成したトピックや書いた返信がここに表示されます。';
+
+  @override
+  String get activityEmptyTopics => 'まだトピックがありません';
+
+  @override
+  String get activityEmptyReplies => 'まだ返信がありません';
+
+  @override
+  String get activityEmptyLikes => 'まだいいねしていません';
+
+  @override
+  String get activityEmptySolved => 'まだ解決策がありません';
 }

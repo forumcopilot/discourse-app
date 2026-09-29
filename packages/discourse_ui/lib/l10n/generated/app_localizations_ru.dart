@@ -2860,4 +2860,78 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get notificationPreviewEarlier => '5 мин назад';
+
+  @override
+  String get activityReplied => 'Ответ';
+
+  @override
+  String get activityStartedTopic => 'Создана тема';
+
+  @override
+  String get activityLiked => 'Понравилось';
+
+  @override
+  String get activitySolution => 'Решение';
+
+  @override
+  String get activityAcceptedBy => 'принял(а)';
+
+  @override
+  String get activityAwaitingApproval => 'Ожидает одобрения';
+
+  @override
+  String get activityFilterTopics => 'Темы';
+
+  @override
+  String get activityFilterReplies => 'Ответы';
+
+  @override
+  String get activityFilterLikes => 'Лайки';
+
+  @override
+  String get activityFilterPending => 'На проверке';
+
+  @override
+  String get sectionToday => 'Сегодня';
+
+  @override
+  String get sectionThisWeek => 'На этой неделе';
+
+  @override
+  String get sectionEarlier => 'Ранее';
+
+  @override
+  String draftsWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count черновика ждут',
+      many: '$count черновиков ждут',
+      few: '$count черновика ждут',
+      one: '$count черновик ждёт',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get resumeDrafts => 'Продолжить';
+
+  @override
+  String get myPostsEmpty => 'Пока нет сообщений';
+
+  @override
+  String get myPostsEmptyHint =>
+      'Здесь появятся созданные вами темы и написанные ответы.';
+
+  @override
+  String get activityEmptyTopics => 'Пока нет тем';
+
+  @override
+  String get activityEmptyReplies => 'Пока нет ответов';
+
+  @override
+  String get activityEmptyLikes => 'Вы ещё не ставили лайки';
+
+  @override
+  String get activityEmptySolved => 'Пока нет решений';
 }

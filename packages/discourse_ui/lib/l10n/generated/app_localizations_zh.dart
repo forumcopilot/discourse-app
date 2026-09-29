@@ -2705,4 +2705,74 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get notificationPreviewEarlier => '5 分钟前';
+
+  @override
+  String get activityReplied => '回复了';
+
+  @override
+  String get activityStartedTopic => '发起了主题';
+
+  @override
+  String get activityLiked => '赞了';
+
+  @override
+  String get activitySolution => '解决方案';
+
+  @override
+  String get activityAcceptedBy => '采纳者';
+
+  @override
+  String get activityAwaitingApproval => '等待审核';
+
+  @override
+  String get activityFilterTopics => '主题';
+
+  @override
+  String get activityFilterReplies => '回复';
+
+  @override
+  String get activityFilterLikes => '赞';
+
+  @override
+  String get activityFilterPending => '待审核';
+
+  @override
+  String get sectionToday => '今天';
+
+  @override
+  String get sectionThisWeek => '本周';
+
+  @override
+  String get sectionEarlier => '更早';
+
+  @override
+  String draftsWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 份草稿待完成',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get resumeDrafts => '继续';
+
+  @override
+  String get myPostsEmpty => '还没有帖子';
+
+  @override
+  String get myPostsEmptyHint => '你发起的主题和写的回复会显示在这里。';
+
+  @override
+  String get activityEmptyTopics => '还没有主题';
+
+  @override
+  String get activityEmptyReplies => '还没有回复';
+
+  @override
+  String get activityEmptyLikes => '还没有点过赞';
+
+  @override
+  String get activityEmptySolved => '还没有解决方案';
 }

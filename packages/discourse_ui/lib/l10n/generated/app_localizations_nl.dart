@@ -2849,4 +2849,76 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get notificationPreviewEarlier => '5 min geleden';
+
+  @override
+  String get activityReplied => 'Beantwoord';
+
+  @override
+  String get activityStartedTopic => 'Onderwerp gestart';
+
+  @override
+  String get activityLiked => 'Geliket';
+
+  @override
+  String get activitySolution => 'Oplossing';
+
+  @override
+  String get activityAcceptedBy => 'geaccepteerd door';
+
+  @override
+  String get activityAwaitingApproval => 'Wacht op goedkeuring';
+
+  @override
+  String get activityFilterTopics => 'Onderwerpen';
+
+  @override
+  String get activityFilterReplies => 'Antwoorden';
+
+  @override
+  String get activityFilterLikes => 'Likes';
+
+  @override
+  String get activityFilterPending => 'In afwachting';
+
+  @override
+  String get sectionToday => 'Vandaag';
+
+  @override
+  String get sectionThisWeek => 'Deze week';
+
+  @override
+  String get sectionEarlier => 'Eerder';
+
+  @override
+  String draftsWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count concepten wachten',
+      one: '1 concept wacht',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get resumeDrafts => 'Hervatten';
+
+  @override
+  String get myPostsEmpty => 'Nog geen berichten';
+
+  @override
+  String get myPostsEmptyHint =>
+      'Onderwerpen die je start en antwoorden die je schrijft verschijnen hier.';
+
+  @override
+  String get activityEmptyTopics => 'Nog geen onderwerpen';
+
+  @override
+  String get activityEmptyReplies => 'Nog geen antwoorden';
+
+  @override
+  String get activityEmptyLikes => 'Nog geen likes gegeven';
+
+  @override
+  String get activityEmptySolved => 'Nog geen oplossingen';
 }

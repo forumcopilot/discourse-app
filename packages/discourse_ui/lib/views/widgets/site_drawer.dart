@@ -27,7 +27,7 @@ import '../settings/notification_settings_page.dart';
 import '../site_home_tab.dart';
 import '../tag_topics_page.dart';
 import '../tags_page.dart';
-import '../user_profile_page.dart';
+import '../my_posts_page.dart';
 import '../users_directory_page.dart';
 import 'appearance_sheet.dart';
 import 'category_badge.dart' show categoryForum;
@@ -88,10 +88,10 @@ class SiteDrawer extends StatelessWidget {
                   _Item(
                     icon: Icons.person_outline,
                     label: l10n.myPosts,
-                    onTap: () => _push(
-                        context,
-                        UserProfilePage(
-                            siteContext: siteContext, userName: username)),
+                    // Its own screen, as web's sidebar link opens the
+                    // activity stream; it used to open the whole profile.
+                    onTap: () =>
+                        _push(context, MyPostsPage(siteContext: siteContext)),
                   ),
                 if (signedIn) ...[
                   _Item(

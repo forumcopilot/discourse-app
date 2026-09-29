@@ -4719,6 +4719,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'5m ago'**
   String get notificationPreviewEarlier;
+
+  /// Top line of an activity row: the user replied in this topic
+  ///
+  /// In en, this message translates to:
+  /// **'Replied'**
+  String get activityReplied;
+
+  /// Top line of an activity row: the user started this topic
+  ///
+  /// In en, this message translates to:
+  /// **'Started a topic'**
+  String get activityStartedTopic;
+
+  /// Top line of an activity row: the user liked this post
+  ///
+  /// In en, this message translates to:
+  /// **'Liked'**
+  String get activityLiked;
+
+  /// Top line of an activity row: this post is an accepted solution (discourse-solved)
+  ///
+  /// In en, this message translates to:
+  /// **'Solution'**
+  String get activitySolution;
+
+  /// Prefix before the username of whoever accepted a solution, e.g. 'accepted by alice'
+  ///
+  /// In en, this message translates to:
+  /// **'accepted by'**
+  String get activityAcceptedBy;
+
+  /// Top line of an activity row: the post is waiting for a moderator
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting approval'**
+  String get activityAwaitingApproval;
+
+  /// Activity filter chip: topics the user started
+  ///
+  /// In en, this message translates to:
+  /// **'Topics'**
+  String get activityFilterTopics;
+
+  /// Activity filter chip: the user's replies
+  ///
+  /// In en, this message translates to:
+  /// **'Replies'**
+  String get activityFilterReplies;
+
+  /// Activity filter chip: posts the user liked
+  ///
+  /// In en, this message translates to:
+  /// **'Likes'**
+  String get activityFilterLikes;
+
+  /// Activity filter chip: the user's posts awaiting approval
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get activityFilterPending;
+
+  /// Section heading in a list grouped by time
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get sectionToday;
+
+  /// Section heading in a list grouped by time: the last seven days before today
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get sectionThisWeek;
+
+  /// Section heading in a list grouped by time: older than a week
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier'**
+  String get sectionEarlier;
+
+  /// Banner at the top of My posts when the user has saved drafts
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 draft waiting} other{{count} drafts waiting}}'**
+  String draftsWaiting(int count);
+
+  /// Button on the drafts banner opening the drafts list
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get resumeDrafts;
+
+  /// My posts, nothing written yet
+  ///
+  /// In en, this message translates to:
+  /// **'No posts yet'**
+  String get myPostsEmpty;
+
+  /// My posts empty state hint
+  ///
+  /// In en, this message translates to:
+  /// **'Topics you start and replies you write will show up here.'**
+  String get myPostsEmptyHint;
+
+  /// Empty activity filter: topics
+  ///
+  /// In en, this message translates to:
+  /// **'No topics yet'**
+  String get activityEmptyTopics;
+
+  /// Empty activity filter: replies
+  ///
+  /// In en, this message translates to:
+  /// **'No replies yet'**
+  String get activityEmptyReplies;
+
+  /// Empty activity filter: likes given
+  ///
+  /// In en, this message translates to:
+  /// **'No likes given yet'**
+  String get activityEmptyLikes;
+
+  /// Empty activity filter: solutions
+  ///
+  /// In en, this message translates to:
+  /// **'No solutions yet'**
+  String get activityEmptySolved;
 }
 
 class _AppLocalizationsDelegate

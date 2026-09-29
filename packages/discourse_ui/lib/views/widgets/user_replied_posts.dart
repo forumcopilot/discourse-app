@@ -9,6 +9,7 @@ import 'package:discourse_ui/views/post_page.dart';
 import 'package:discourse_ui/views/lists/posts_list.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/views/login_page.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/error_message.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -325,14 +326,17 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
   /// exists": every filter reports one, and only here does it mean
   /// "accepted". Naming the actor without saying what they did would read
   /// as a byline and credit the wrong person for the post.
-  String? get _actorLabel =>
-      widget.actionFilter == _solvedFilter ? 'Accepted by' : null;
-
-  /// `UserAction::SOLVED` — the discourse-solved plugin's action type.
-  static const int _solvedFilter = 15;
+  String? get _actorLabel => widget.actionFilter == ActivityFilters.solved
+      ? (AppLocalizations.of(context)?.activityAcceptedBy ?? 'accepted by')
+      : null;
 
   Widget _buildPostItem(BuildContext context, FCUserReply post) {
+    final l10n = AppLocalizations.of(context);
     return ActivityRow(
+      kind: l10n == null
+          ? null
+          : activityKindLabel(l10n,
+              filter: widget.actionFilter, postNumber: post.replyNumber),
       title: post.topicTitle.isNotEmpty ? post.topicTitle : 'Unknown Topic',
       excerpt: post.shortContent,
       time: post.postTime,

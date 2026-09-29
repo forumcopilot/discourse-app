@@ -2858,4 +2858,76 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationPreviewEarlier => '5 min fa';
+
+  @override
+  String get activityReplied => 'Ha risposto';
+
+  @override
+  String get activityStartedTopic => 'Ha aperto un argomento';
+
+  @override
+  String get activityLiked => 'Mi piace';
+
+  @override
+  String get activitySolution => 'Soluzione';
+
+  @override
+  String get activityAcceptedBy => 'accettata da';
+
+  @override
+  String get activityAwaitingApproval => 'In attesa di approvazione';
+
+  @override
+  String get activityFilterTopics => 'Argomenti';
+
+  @override
+  String get activityFilterReplies => 'Risposte';
+
+  @override
+  String get activityFilterLikes => 'Mi piace';
+
+  @override
+  String get activityFilterPending => 'In attesa';
+
+  @override
+  String get sectionToday => 'Oggi';
+
+  @override
+  String get sectionThisWeek => 'Questa settimana';
+
+  @override
+  String get sectionEarlier => 'Prima';
+
+  @override
+  String draftsWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bozze in attesa',
+      one: '1 bozza in attesa',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get resumeDrafts => 'Riprendi';
+
+  @override
+  String get myPostsEmpty => 'Ancora nessun messaggio';
+
+  @override
+  String get myPostsEmptyHint =>
+      'Gli argomenti che apri e le risposte che scrivi appariranno qui.';
+
+  @override
+  String get activityEmptyTopics => 'Ancora nessun argomento';
+
+  @override
+  String get activityEmptyReplies => 'Ancora nessuna risposta';
+
+  @override
+  String get activityEmptyLikes => 'Nessun Mi piace dato';
+
+  @override
+  String get activityEmptySolved => 'Ancora nessuna soluzione';
 }

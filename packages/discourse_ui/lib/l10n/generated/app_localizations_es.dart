@@ -2854,4 +2854,76 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get notificationPreviewEarlier => 'hace 5 min';
+
+  @override
+  String get activityReplied => 'Respondió';
+
+  @override
+  String get activityStartedTopic => 'Inició un tema';
+
+  @override
+  String get activityLiked => 'Le gustó';
+
+  @override
+  String get activitySolution => 'Solución';
+
+  @override
+  String get activityAcceptedBy => 'aceptada por';
+
+  @override
+  String get activityAwaitingApproval => 'Pendiente de aprobación';
+
+  @override
+  String get activityFilterTopics => 'Temas';
+
+  @override
+  String get activityFilterReplies => 'Respuestas';
+
+  @override
+  String get activityFilterLikes => 'Me gusta';
+
+  @override
+  String get activityFilterPending => 'Pendientes';
+
+  @override
+  String get sectionToday => 'Hoy';
+
+  @override
+  String get sectionThisWeek => 'Esta semana';
+
+  @override
+  String get sectionEarlier => 'Antes';
+
+  @override
+  String draftsWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count borradores pendientes',
+      one: '1 borrador pendiente',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get resumeDrafts => 'Reanudar';
+
+  @override
+  String get myPostsEmpty => 'Aún no hay publicaciones';
+
+  @override
+  String get myPostsEmptyHint =>
+      'Los temas que inicies y las respuestas que escribas aparecerán aquí.';
+
+  @override
+  String get activityEmptyTopics => 'Aún no hay temas';
+
+  @override
+  String get activityEmptyReplies => 'Aún no hay respuestas';
+
+  @override
+  String get activityEmptyLikes => 'Aún no has dado me gusta';
+
+  @override
+  String get activityEmptySolved => 'Aún no hay soluciones';
 }

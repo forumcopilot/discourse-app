@@ -10,6 +10,7 @@ import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../data/user/discourse_do_not_disturb.dart';
+import '../data/user/discourse_pending_post.dart';
 import '../data/user/discourse_user_summary.dart';
 import '../util/html_text.dart';
 import '../util/site_url.dart';
@@ -594,9 +595,12 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
   /// all — the profile's activity tabs are this parameter and nothing
   /// else. Not on IFCUserProxy: the SDK contract has a single "replies"
   /// feed, because XenForo has no equivalent of user_actions.
+  ///
+  /// [actionFilters] asks for several at once, as web's "All" stream does
+  /// (topics and replies: `filter=4,5`); it wins over [actionFilter].
   Future<FCUserReplyResult> getUserActionsAsync(
       int startNum, String? username,
-      {required int actionFilter}) async {
+      {int actionFilter = 5, List<int>? actionFilters}) async {
     if (username == null || username.isEmpty) {
       return FCUserReplyResult(
         result: false,
@@ -608,7 +612,9 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     try {
       final response = await apiGet('/user_actions.json', query: {
         'username': username,
-        'filter': actionFilter.toString(),
+        'filter': (actionFilters?.isNotEmpty ?? false)
+            ? actionFilters!.join(',')
+            : actionFilter.toString(),
         if (startNum > 0) 'offset': startNum.toString(),
       });
       final actions = ((response['user_actions'] as List?) ?? const [])
@@ -679,6 +685,25 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         total: 0,
         list: const [],
       );
+    }
+  }
+
+  /// Discourse-only: the signed-in user's posts waiting for a moderator
+  /// (`/posts/{username}/pending.json`). Null when the list could not be
+  /// read — including for anyone but the user themself, whom the server
+  /// refuses.
+  Future<List<DiscoursePendingPost>?> getPendingPostsAsync(
+      String username) async {
+    if (username.isEmpty) return null;
+    try {
+      final response =
+          await apiGet('/posts/${Uri.encodeComponent(username)}/pending.json');
+      return ((response['pending_posts'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((m) => DiscoursePendingPost.fromJson(m.cast<String, dynamic>()))
+          .toList(growable: false);
+    } catch (_) {
+      return null;
     }
   }
 

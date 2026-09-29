@@ -3410,5 +3410,94 @@
   "notificationPreviewEarlier": "5m ago",
   "@notificationPreviewEarlier": {
     "description": "Enable-notifications page (a sample notification shown as a preview)"
+  },
+  "activityReplied": "Replied",
+  "@activityReplied": {
+    "description": "Top line of an activity row: the user replied in this topic"
+  },
+  "activityStartedTopic": "Started a topic",
+  "@activityStartedTopic": {
+    "description": "Top line of an activity row: the user started this topic"
+  },
+  "activityLiked": "Liked",
+  "@activityLiked": {
+    "description": "Top line of an activity row: the user liked this post"
+  },
+  "activitySolution": "Solution",
+  "@activitySolution": {
+    "description": "Top line of an activity row: this post is an accepted solution (discourse-solved)"
+  },
+  "activityAcceptedBy": "accepted by",
+  "@activityAcceptedBy": {
+    "description": "Prefix before the username of whoever accepted a solution, e.g. 'accepted by alice'"
+  },
+  "activityAwaitingApproval": "Awaiting approval",
+  "@activityAwaitingApproval": {
+    "description": "Top line of an activity row: the post is waiting for a moderator"
+  },
+  "activityFilterTopics": "Topics",
+  "@activityFilterTopics": {
+    "description": "Activity filter chip: topics the user started"
+  },
+  "activityFilterReplies": "Replies",
+  "@activityFilterReplies": {
+    "description": "Activity filter chip: the user's replies"
+  },
+  "activityFilterLikes": "Likes",
+  "@activityFilterLikes": {
+    "description": "Activity filter chip: posts the user liked"
+  },
+  "activityFilterPending": "Pending",
+  "@activityFilterPending": {
+    "description": "Activity filter chip: the user's posts awaiting approval"
+  },
+  "sectionToday": "Today",
+  "@sectionToday": {
+    "description": "Section heading in a list grouped by time"
+  },
+  "sectionThisWeek": "This week",
+  "@sectionThisWeek": {
+    "description": "Section heading in a list grouped by time: the last seven days before today"
+  },
+  "sectionEarlier": "Earlier",
+  "@sectionEarlier": {
+    "description": "Section heading in a list grouped by time: older than a week"
+  },
+  "draftsWaiting": "{count, plural, =1{1 draft waiting} other{{count} drafts waiting}}",
+  "@draftsWaiting": {
+    "description": "Banner at the top of My posts when the user has saved drafts",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "resumeDrafts": "Resume",
+  "@resumeDrafts": {
+    "description": "Button on the drafts banner opening the drafts list"
+  },
+  "myPostsEmpty": "No posts yet",
+  "@myPostsEmpty": {
+    "description": "My posts, nothing written yet"
+  },
+  "myPostsEmptyHint": "Topics you start and replies you write will show up here.",
+  "@myPostsEmptyHint": {
+    "description": "My posts empty state hint"
+  },
+  "activityEmptyTopics": "No topics yet",
+  "@activityEmptyTopics": {
+    "description": "Empty activity filter: topics"
+  },
+  "activityEmptyReplies": "No replies yet",
+  "@activityEmptyReplies": {
+    "description": "Empty activity filter: replies"
+  },
+  "activityEmptyLikes": "No likes given yet",
+  "@activityEmptyLikes": {
+    "description": "Empty activity filter: likes given"
+  },
+  "activityEmptySolved": "No solutions yet",
+  "@activityEmptySolved": {
+    "description": "Empty activity filter: solutions"
   }
 }

@@ -2838,4 +2838,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationPreviewEarlier => '5m ago';
+
+  @override
+  String get activityReplied => 'Replied';
+
+  @override
+  String get activityStartedTopic => 'Started a topic';
+
+  @override
+  String get activityLiked => 'Liked';
+
+  @override
+  String get activitySolution => 'Solution';
+
+  @override
+  String get activityAcceptedBy => 'accepted by';
+
+  @override
+  String get activityAwaitingApproval => 'Awaiting approval';
+
+  @override
+  String get activityFilterTopics => 'Topics';
+
+  @override
+  String get activityFilterReplies => 'Replies';
+
+  @override
+  String get activityFilterLikes => 'Likes';
+
+  @override
+  String get activityFilterPending => 'Pending';
+
+  @override
+  String get sectionToday => 'Today';
+
+  @override
+  String get sectionThisWeek => 'This week';
+
+  @override
+  String get sectionEarlier => 'Earlier';
+
+  @override
+  String draftsWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count drafts waiting',
+      one: '1 draft waiting',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get resumeDrafts => 'Resume';
+
+  @override
+  String get myPostsEmpty => 'No posts yet';
+
+  @override
+  String get myPostsEmptyHint =>
+      'Topics you start and replies you write will show up here.';
+
+  @override
+  String get activityEmptyTopics => 'No topics yet';
+
+  @override
+  String get activityEmptyReplies => 'No replies yet';
+
+  @override
+  String get activityEmptyLikes => 'No likes given yet';
+
+  @override
+  String get activityEmptySolved => 'No solutions yet';
 }

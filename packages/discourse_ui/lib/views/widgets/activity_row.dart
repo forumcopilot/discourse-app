@@ -1,11 +1,15 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:flutter/material.dart';
 
+import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
+import '../../theme/forum_colors.dart';
 import '../../utils/emoji_shortcodes.dart';
+import '../../utils/number_utils.dart';
 import '../../utils/time_utils.dart';
-import 'user_avatar.dart';
 import 'category_badge.dart';
+import 'topic_taxonomy_chips.dart';
+import 'user_avatar.dart';
 
 /// The person a row names, when naming one says something.
 ///
@@ -30,65 +34,141 @@ class ActivityAttribution {
   final String? label;
 }
 
-/// One row in the profile's Activity feed, for every tab.
+/// `/user_actions.json` filter ids the feeds use.
+class ActivityFilters {
+  ActivityFilters._();
+  static const int likes = 1;
+  static const int topics = 4;
+  static const int replies = 5;
+  static const int solved = 15;
+}
+
+/// What a `/user_actions.json` row records, for [ActivityRow.kind]: the
+/// feed says most of it; on a mixed feed (web's "All": topics and replies)
+/// the post number tells a topic's opening post from a reply.
+String activityKindLabel(AppLocalizations l10n,
+    {required int filter, int? postNumber}) {
+  switch (filter) {
+    case ActivityFilters.likes:
+      return l10n.activityLiked;
+    case ActivityFilters.solved:
+      return l10n.activitySolution;
+    case ActivityFilters.topics:
+      return l10n.activityStartedTopic;
+    default:
+      return (postNumber ?? 0) <= 1
+          ? l10n.activityStartedTopic
+          : l10n.activityReplied;
+  }
+}
+
+/// One row of an activity feed — My posts and the profile's Activity — in
+/// the topic page's language: what happened and when on a short line,
+/// the topic, where it lives, then the post's own words as a quote.
 ///
-/// The four tabs used to be served by two different widgets: Topics got a
-/// compact title/excerpt/metadata row, while Replies, Likes and Solved got
-/// a row roughly twice as tall, led by an avatar-and-username header.
+/// * The line on top is [kind] ("Replied", "Started a topic", "Liked",
+///   "Solution") with the post's number and its time. The time and "#45"
+///   used to trail at the bottom, under the excerpt, where a reader
+///   scanning for "what did I do today" had to hunt for them.
+/// * The excerpt is quoted (a rule down its left edge, as reply previews
+///   are), so it reads as the words that were written rather than as a
+///   second description of the topic. When somebody else wrote them — a
+///   post you liked — their face and name head the quote.
+/// * Counts appear only where the feed has them: a topic list row has
+///   replies, views and likes; `/user_actions.json` has none, and a zero
+///   or a stand-in would say something false.
 ///
-/// That header is the reason they are unified here rather than merely
-/// restyled. `/user_actions.json` returns the *post author* in `username`,
-/// and who that is depends entirely on the filter: for Replies, Topics and
-/// Solved it is the profile owner, so the header repeated the same name and
-/// face down every row of their own profile; for Likes it is somebody else,
-/// and naming them is the entire content of the row — "you liked *their*
-/// post". So attribution is not a per-tab style choice, it is a property of
-/// the individual row: show it when the author differs from the profile
-/// owner, and never otherwise.
+/// Attribution is a property of the individual row, not of the tab:
+/// `/user_actions.json` returns the *post author* in `username`, which is
+/// the profile owner on Replies, Topics and Solved (naming them down every
+/// row repeated the same face) and somebody else on Likes, where naming
+/// them is the point. An [ActivityAttribution] with a label ("Accepted by")
+/// names someone who acted on the post rather than wrote it, and joins the
+/// top line instead of heading the quote.
 class ActivityRow extends StatelessWidget {
   const ActivityRow({
     super.key,
     required this.title,
     required this.onTap,
+    this.kind,
     this.excerpt,
     this.attribution,
     this.time,
     this.replyCount,
     this.viewCount,
+    this.likeCount,
     this.postNumber,
     this.siteContext,
     this.categoryId,
+    this.tags = const [],
+    this.solved = false,
   });
 
   final String title;
   final VoidCallback onTap;
+
+  /// What the row records, e.g. "Replied". Leads the top line.
+  final String? kind;
   final String? excerpt;
 
-  /// Non-null only when the post's author is not the profile owner.
+  /// Who wrote the quoted post when it is not the feed's owner, or (with a
+  /// label) who acted on it.
   final ActivityAttribution? attribution;
 
   final DateTime? time;
   final int? replyCount;
   final int? viewCount;
+  final int? likeCount;
 
-  /// The post's position in its topic (`post_number`). Shown as "#45",
-  /// never behind a comment icon — it was previously rendered with
-  /// `Icons.comment_outlined`, which read as a reply count. The action
-  /// feeds carry no reply count at all (`reply_count` is null on every
-  /// row), so there was nothing true for that icon to show.
+  /// The post's position in its topic (`post_number`), shown as "#45".
+  /// Post 1 is the topic's opening post, which the kind already says.
   final int? postNumber;
 
-  /// The topic's category, badged under the title as on every topic row.
-  /// The action feeds carry `category_id` but no name; the badge takes both
-  /// the name and the colour from the forum's /site.json.
+  /// The topic's category and tags, badged under the title as on every
+  /// topic row. The badge takes the name and colour from /site.json.
   final SiteContext? siteContext;
   final String? categoryId;
+  final List<String> tags;
+
+  /// The topic has an accepted answer (discourse-solved).
+  final bool solved;
+
+  static final _epoch = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final excerptText = excerpt == null ? null : withEmojiShortcodes(excerpt!.trim());
+    final excerptText =
+        excerpt == null ? null : withEmojiShortcodes(excerpt!.trim());
+    final muted = textTheme.bodySmall?.copyWith(
+      color: colorScheme.onSurfaceVariant,
+    );
+    final actor = attribution?.label != null ? attribution : null;
+    final author = attribution?.label == null ? attribution : null;
+    final hasTime = time != null && time!.toUtc() != _epoch;
+
+    final top = <InlineSpan>[
+      if (kind != null)
+        TextSpan(
+          text: kind,
+          style: textTheme.labelMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            fontWeight: DesignTokens.fontWeightMedium,
+          ),
+        ),
+      if (actor != null) TextSpan(text: '${actor.label} ${actor.username}'),
+      if (postNumber != null && postNumber! > 1) TextSpan(text: '#$postNumber'),
+      if (hasTime) TextSpan(text: formatSmartDateTime(time!, context)),
+    ];
+    final showTaxonomy = siteContext != null &&
+        (tags.isNotEmpty ||
+            ((categoryId ?? '').isNotEmpty &&
+                CategoryBadge.shows(siteContext!, categoryId!)));
+    final hasCounts = (replyCount ?? 0) > 0 ||
+        (viewCount ?? 0) > 0 ||
+        (likeCount ?? 0) > 0 ||
+        solved;
 
     return Material(
       color: colorScheme.surface,
@@ -107,39 +187,19 @@ class ActivityRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (attribution != null) ...[
-                Row(
-                  children: [
-                    UserAvatar(
-                      username: attribution!.username,
-                      iconUrl: attribution!.avatarUrl?.isNotEmpty == true
-                          ? attribution!.avatarUrl
-                          : null,
-                      radius: DesignTokens.avatarRadiusXS,
-                    ),
-                    SizedBox(width: DesignTokens.spacingS),
-                    Expanded(
-                      child: Text.rich(
-                        TextSpan(children: [
-                          if (attribution!.label != null)
-                            TextSpan(
-                              text: '${attribution!.label} ',
-                              style: TextStyle(
-                                fontWeight: DesignTokens.fontWeightNormal,
-                              ),
-                            ),
-                          TextSpan(text: attribution!.username),
-                        ]),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.labelLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                  ],
+              if (top.isNotEmpty) ...[
+                Text.rich(
+                  TextSpan(children: [
+                    for (var i = 0; i < top.length; i++) ...[
+                      if (i > 0) const TextSpan(text: ' · '),
+                      top[i],
+                    ],
+                  ]),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: muted,
                 ),
-                SizedBox(height: DesignTokens.spacingS),
+                SizedBox(height: DesignTokens.spacingXS),
               ],
               Text(
                 withEmojiShortcodes(title),
@@ -150,35 +210,26 @@ class ActivityRow extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              if (siteContext != null &&
-                  (categoryId ?? '').isNotEmpty &&
-                  CategoryBadge.shows(siteContext!, categoryId!)) ...[
-                SizedBox(height: DesignTokens.spacingXS),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: CategoryBadge(
-                      siteContext: siteContext!, categoryId: categoryId!),
+              if (showTaxonomy)
+                TopicTaxonomyChips(
+                  siteContext: siteContext!,
+                  categoryId: categoryId ?? '',
+                  tags: tags,
+                  maxTags: 3,
+                  padding: EdgeInsets.only(top: DesignTokens.spacingXS),
+                ),
+              if ((excerptText != null && excerptText.isNotEmpty) ||
+                  author != null)
+                _Quote(author: author, text: excerptText),
+              if (hasCounts) ...[
+                SizedBox(height: DesignTokens.spacingS),
+                _MetaRow(
+                  replyCount: replyCount,
+                  viewCount: viewCount,
+                  likeCount: likeCount,
+                  solved: solved,
                 ),
               ],
-              if (excerptText != null && excerptText.isNotEmpty) ...[
-                SizedBox(height: DesignTokens.spacingXS),
-                Text(
-                  excerptText,
-                  textAlign: TextAlign.start,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-              SizedBox(height: DesignTokens.spacingS),
-              _MetaRow(
-                time: time,
-                replyCount: replyCount,
-                viewCount: viewCount,
-                postNumber: postNumber,
-              ),
             ],
           ),
         ),
@@ -187,21 +238,86 @@ class ActivityRow extends StatelessWidget {
   }
 }
 
-/// The muted line under every row. Identical across tabs so the feeds read
-/// as one component; each item drops out when its feed has no value for it
-/// rather than showing a zero or a stand-in.
+/// The post's words, set off by a rule down the left as the topic page's
+/// reply previews are, headed by whoever wrote them when that is news.
+class _Quote extends StatelessWidget {
+  const _Quote({this.author, this.text});
+
+  final ActivityAttribution? author;
+  final String? text;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Container(
+      margin: EdgeInsets.only(top: DesignTokens.spacingS),
+      padding: EdgeInsets.only(left: DesignTokens.spacingM),
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(color: colorScheme.outlineVariant, width: 2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (author != null)
+            Padding(
+              padding: EdgeInsets.only(bottom: DesignTokens.spacingXS),
+              child: Row(
+                children: [
+                  UserAvatar(
+                    username: author!.username,
+                    iconUrl: author!.avatarUrl?.isNotEmpty == true
+                        ? author!.avatarUrl
+                        : null,
+                    radius: DesignTokens.avatarRadiusXS,
+                  ),
+                  SizedBox(width: DesignTokens.spacingS),
+                  Expanded(
+                    child: Text(
+                      author!.username,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.labelLarge?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (text != null && text!.isNotEmpty)
+            Text(
+              text!,
+              textAlign: TextAlign.start,
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A topic's counts under its row: replies, views, likes, and whether it
+/// is solved. Each drops out when the feed has no value for it rather than
+/// showing a zero or a stand-in.
 class _MetaRow extends StatelessWidget {
   const _MetaRow({
-    this.time,
     this.replyCount,
     this.viewCount,
-    this.postNumber,
+    this.likeCount,
+    this.solved = false,
   });
 
-  final DateTime? time;
   final int? replyCount;
   final int? viewCount;
-  final int? postNumber;
+  final int? likeCount;
+  final bool solved;
 
   @override
   Widget build(BuildContext context) {
@@ -211,32 +327,30 @@ class _MetaRow extends StatelessWidget {
       color: colorScheme.onSurfaceVariant,
     );
 
-    Widget item(IconData icon, String label) => Row(
+    Widget item(IconData icon, String label, {Color? color}) => Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon,
                 size: DesignTokens.iconSizeS,
-                color: colorScheme.onSurfaceVariant),
+                color: color ?? colorScheme.onSurfaceVariant),
             SizedBox(width: DesignTokens.spacingXS),
-            Text(label, style: style),
+            Text(label, style: color == null ? style : style?.copyWith(color: color)),
           ],
         );
 
-    final epoch = DateTime.fromMillisecondsSinceEpoch(0);
     return Wrap(
       spacing: DesignTokens.spacingM,
       runSpacing: DesignTokens.spacingXS,
       children: [
-        if (time != null && time!.toUtc() != epoch.toUtc())
-          item(Icons.schedule, formatSmartDateTime(time!, context)),
-        if (replyCount != null && replyCount! > 0)
-          item(Icons.comment_outlined, replyCount!.toString()),
-        if (viewCount != null && viewCount! > 0)
-          item(Icons.visibility_outlined, viewCount!.toString()),
-        // Post 1 is the topic's opening post; "#1" tells the reader
-        // nothing they cannot see from the row being a topic.
-        if (postNumber != null && postNumber! > 1)
-          Text('#${postNumber!}', style: style),
+        if ((replyCount ?? 0) > 0)
+          item(Icons.chat_bubble_outline, formatNumber(context, replyCount!)),
+        if ((viewCount ?? 0) > 0)
+          item(Icons.visibility_outlined, formatNumber(context, viewCount!)),
+        if ((likeCount ?? 0) > 0)
+          item(Icons.favorite_border, formatNumber(context, likeCount!)),
+        if (solved)
+          item(Icons.check_circle, AppLocalizations.of(context)?.solved ?? 'Solved',
+              color: ForumColors.of(context).success),
       ],
     );
   }

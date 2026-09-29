@@ -2866,4 +2866,76 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get notificationPreviewEarlier => 'vor 5 Min.';
+
+  @override
+  String get activityReplied => 'Geantwortet';
+
+  @override
+  String get activityStartedTopic => 'Thema erstellt';
+
+  @override
+  String get activityLiked => 'Gefällt mir';
+
+  @override
+  String get activitySolution => 'Lösung';
+
+  @override
+  String get activityAcceptedBy => 'akzeptiert von';
+
+  @override
+  String get activityAwaitingApproval => 'Wartet auf Freigabe';
+
+  @override
+  String get activityFilterTopics => 'Themen';
+
+  @override
+  String get activityFilterReplies => 'Antworten';
+
+  @override
+  String get activityFilterLikes => 'Likes';
+
+  @override
+  String get activityFilterPending => 'Ausstehend';
+
+  @override
+  String get sectionToday => 'Heute';
+
+  @override
+  String get sectionThisWeek => 'Diese Woche';
+
+  @override
+  String get sectionEarlier => 'Früher';
+
+  @override
+  String draftsWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Entwürfe warten',
+      one: '1 Entwurf wartet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get resumeDrafts => 'Fortsetzen';
+
+  @override
+  String get myPostsEmpty => 'Noch keine Beiträge';
+
+  @override
+  String get myPostsEmptyHint =>
+      'Themen, die du erstellst, und Antworten, die du schreibst, erscheinen hier.';
+
+  @override
+  String get activityEmptyTopics => 'Noch keine Themen';
+
+  @override
+  String get activityEmptyReplies => 'Noch keine Antworten';
+
+  @override
+  String get activityEmptyLikes => 'Noch keine Likes vergeben';
+
+  @override
+  String get activityEmptySolved => 'Noch keine Lösungen';
 }

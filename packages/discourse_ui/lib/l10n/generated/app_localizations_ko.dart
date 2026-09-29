@@ -2730,4 +2730,74 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get notificationPreviewEarlier => '5분 전';
+
+  @override
+  String get activityReplied => '답글';
+
+  @override
+  String get activityStartedTopic => '주제 작성';
+
+  @override
+  String get activityLiked => '좋아요';
+
+  @override
+  String get activitySolution => '해결책';
+
+  @override
+  String get activityAcceptedBy => '승인:';
+
+  @override
+  String get activityAwaitingApproval => '승인 대기 중';
+
+  @override
+  String get activityFilterTopics => '주제';
+
+  @override
+  String get activityFilterReplies => '답글';
+
+  @override
+  String get activityFilterLikes => '좋아요';
+
+  @override
+  String get activityFilterPending => '대기 중';
+
+  @override
+  String get sectionToday => '오늘';
+
+  @override
+  String get sectionThisWeek => '이번 주';
+
+  @override
+  String get sectionEarlier => '이전';
+
+  @override
+  String draftsWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '임시 저장 $count개',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get resumeDrafts => '이어 쓰기';
+
+  @override
+  String get myPostsEmpty => '아직 게시물이 없습니다';
+
+  @override
+  String get myPostsEmptyHint => '작성한 주제와 답글이 여기에 표시됩니다.';
+
+  @override
+  String get activityEmptyTopics => '아직 주제가 없습니다';
+
+  @override
+  String get activityEmptyReplies => '아직 답글이 없습니다';
+
+  @override
+  String get activityEmptyLikes => '아직 누른 좋아요가 없습니다';
+
+  @override
+  String get activityEmptySolved => '아직 해결책이 없습니다';
 }

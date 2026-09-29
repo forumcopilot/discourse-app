@@ -2862,4 +2862,76 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get notificationPreviewEarlier => 'il y a 5 min';
+
+  @override
+  String get activityReplied => 'A répondu';
+
+  @override
+  String get activityStartedTopic => 'A créé un sujet';
+
+  @override
+  String get activityLiked => 'A aimé';
+
+  @override
+  String get activitySolution => 'Solution';
+
+  @override
+  String get activityAcceptedBy => 'acceptée par';
+
+  @override
+  String get activityAwaitingApproval => 'En attente de validation';
+
+  @override
+  String get activityFilterTopics => 'Sujets';
+
+  @override
+  String get activityFilterReplies => 'Réponses';
+
+  @override
+  String get activityFilterLikes => 'J’aime';
+
+  @override
+  String get activityFilterPending => 'En attente';
+
+  @override
+  String get sectionToday => 'Aujourd’hui';
+
+  @override
+  String get sectionThisWeek => 'Cette semaine';
+
+  @override
+  String get sectionEarlier => 'Plus tôt';
+
+  @override
+  String draftsWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count brouillons en attente',
+      one: '1 brouillon en attente',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get resumeDrafts => 'Reprendre';
+
+  @override
+  String get myPostsEmpty => 'Aucun message pour l’instant';
+
+  @override
+  String get myPostsEmptyHint =>
+      'Les sujets que vous créez et les réponses que vous écrivez apparaîtront ici.';
+
+  @override
+  String get activityEmptyTopics => 'Aucun sujet pour l’instant';
+
+  @override
+  String get activityEmptyReplies => 'Aucune réponse pour l’instant';
+
+  @override
+  String get activityEmptyLikes => 'Aucun j’aime donné';
+
+  @override
+  String get activityEmptySolved => 'Aucune solution pour l’instant';
 }

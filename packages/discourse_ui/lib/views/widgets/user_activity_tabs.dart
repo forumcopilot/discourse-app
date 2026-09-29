@@ -19,19 +19,31 @@ import '../../l10n/generated/app_localizations.dart';
 /// not user_actions feeds at all (separate routes, and two of them are
 /// plugin-specific).
 enum ActivityTab {
-  replies('Replies', Icons.reply_rounded, 5, 'No replies yet'),
-  topics('Topics', Icons.topic_outlined, 4, 'No topics yet'),
-  likes('Likes', Icons.favorite_border, 1, 'No likes given yet'),
-  solved('Solved', Icons.check_circle_outline, 15, 'No solutions yet');
+  replies(Icons.reply_rounded, 5),
+  topics(Icons.topic_outlined, 4),
+  likes(Icons.favorite_border, 1),
+  solved(Icons.check_circle_outline, 15);
 
-  const ActivityTab(this.label, this.icon, this.filter, this.emptyLabel);
+  const ActivityTab(this.icon, this.filter);
 
-  final String label;
   final IconData icon;
 
   /// The `/user_actions.json` filter id.
   final int filter;
-  final String emptyLabel;
+
+  String label(AppLocalizations l10n) => switch (this) {
+        replies => l10n.activityFilterReplies,
+        topics => l10n.activityFilterTopics,
+        likes => l10n.activityFilterLikes,
+        solved => l10n.solved,
+      };
+
+  String emptyLabel(AppLocalizations l10n) => switch (this) {
+        replies => l10n.activityEmptyReplies,
+        topics => l10n.activityEmptyTopics,
+        likes => l10n.activityEmptyLikes,
+        solved => l10n.activityEmptySolved,
+      };
 }
 
 /// The "Activity" heading, in the shared section chrome.
@@ -105,7 +117,9 @@ class ActivityChipBar extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: FilterChipBar(
         options: [
-          for (final t in tabs) FilterChipOption(label: t.label, icon: t.icon),
+          for (final t in tabs)
+            FilterChipOption(
+                label: t.label(AppLocalizations.of(context)!), icon: t.icon),
         ],
         selectedIndex: tabs.indexOf(selected),
         onSelected: (i) => onSelected(tabs[i]),
@@ -200,7 +214,7 @@ class ActivityFeed extends StatelessWidget {
       userId: userId,
       userName: userName,
       actionFilter: tab.filter,
-      emptyLabel: tab.emptyLabel,
+      emptyLabel: tab.emptyLabel(AppLocalizations.of(context)!),
     );
   }
 }

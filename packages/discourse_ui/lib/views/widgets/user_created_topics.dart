@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/views/post_page.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseUserProxy;
@@ -188,6 +190,7 @@ class _UserCreatedTopicsState extends State<UserCreatedTopics> {
           itemCount: topics.length,
           separatorBuilder: (_, __) => const ProfileRowDivider(),
           itemBuilder: (_, i) => ActivityRow(
+            kind: AppLocalizations.of(context)?.activityStartedTopic,
             title: topics[i].topicTitle,
             excerpt: topics[i].shortContent,
             time: topics[i].postTime,
