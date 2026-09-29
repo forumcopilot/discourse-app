@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_topic_proxy.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
@@ -33,12 +34,20 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
 
   static const int _perPage = 30;
 
-  // Process-lifetime cache of category id → name. /categories.json is the
-  // only place to resolve `forumName`, so we warm this lazily on the first
-  // topic-list call. A stale cache is acceptable for v1 — categories rarely
-  // rename. Phase 2.x: invalidate on logout / forum switch.
-  static Map<int, String>? _catNamesById;
-  static Future<Map<int, String>>? _catNamesLoading;
+  // Process-lifetime cache of category id → name, per forum (keyed by
+  // `site.pluginUrl`, as [DiscourseSiteCapabilities] is): category ids are
+  // the forum's own, so a host with several forums open (ABDA) must never
+  // name forum B's rows from forum A's table. Warmed lazily on the first
+  // topic-list call; a stale name is acceptable, categories rarely rename.
+  static final Map<String, Map<int, String>> _catNamesBySite = {};
+  static final Map<String, Future<Map<int, String>>> _catNamesLoading = {};
+
+  /// Only for tests.
+  @visibleForTesting
+  static void clearCategoryNames() {
+    _catNamesBySite.clear();
+    _catNamesLoading.clear();
+  }
 
   @override
   Future<FCLatestTopicResult> getLatestTopicAsync(
@@ -605,8 +614,9 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         page: page,
       );
       final catId = int.tryParse(forumId);
-      final forumName =
-          catId == null ? '' : (_catNamesById?[catId] ?? '');
+      final forumName = catId == null
+          ? ''
+          : (_catNamesBySite[siteContext.site.pluginUrl]?[catId] ?? '');
       return FCTopicDataResult(
         result: true,
         resultText: '',
@@ -679,16 +689,18 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
   /// Warm-once cache of category id → name. Resolves [FCTopic.forumName]
   /// on topic listings without paying for /categories.json on every call.
   Future<Map<int, String>> _loadCategoryNames() async {
-    if (_catNamesById != null) return _catNamesById!;
-    if (_catNamesLoading != null) return _catNamesLoading!;
+    final site = siteContext.site.pluginUrl;
+    final cached = _catNamesBySite[site];
+    if (cached != null) return cached;
+    final loading = _catNamesLoading[site];
+    if (loading != null) return loading;
     // /site.json first: the app already fetches it once per forum for
     // capabilities, and it carries every category including subcategories.
     // /categories.json does not — meta.discourse.org returns 12 of its 45
     // there and ignores include_subcategories entirely, so the topic list
     // could not name the category of most of its own rows and the badge
     // silently vanished from nearly every row.
-    final fromSite = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
-        .categories;
+    final fromSite = DiscourseSiteCapabilities.forSite(site).categories;
     if (fromSite.isNotEmpty) {
       final m = <int, String>{};
       for (final c in fromSite) {
@@ -697,12 +709,12 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         if (id is int && name != null && name.isNotEmpty) m[id] = name;
       }
       if (m.isNotEmpty) {
-        _catNamesById = m;
+        _catNamesBySite[site] = m;
         return m;
       }
     }
     final completer = Completer<Map<int, String>>();
-    _catNamesLoading = completer.future;
+    _catNamesLoading[site] = completer.future;
     try {
       // include_subcategories=true: without it /categories.json omits
       // subcategories, leaving their names unresolvable (blank labels).
@@ -717,15 +729,15 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
         final name = c['name']?.toString();
         if (id is int && name != null && name.isNotEmpty) m[id] = name;
       }
-      _catNamesById = m;
+      _catNamesBySite[site] = m;
       completer.complete(m);
       return m;
     } catch (_) {
-      _catNamesById = const {};
+      _catNamesBySite[site] = const {};
       completer.complete(const {});
       return const {};
     } finally {
-      _catNamesLoading = null;
+      _catNamesLoading.remove(site);
     }
   }
 
