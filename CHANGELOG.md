@@ -6,6 +6,19 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.41] - 2026-09-29
+
+### Added
+- **Chat direct messages arrive as push notifications.** A chat DM (or a message in a channel set to "always") has no entry in Discourse's notification list, so it was never pushed. The notifications backend now reads the forum's chat alerts as well, and the push opens the chat at that message.
+- **A push opens what its notification is about**: a chat channel at its message, a badge's sheet, a group's message inbox, a group, or a person — not only topics — and marks the notification read once opened, as tapping it on the web does.
+- **A switch for each kind of notification**, per forum, under Settings → Notifications: Replies and mentions, Messages and chat, Likes and reactions, Everything else. All on unless turned off.
+- **An Android notification channel for each kind**, so chat can be made louder or likes quieter in the system settings. The existing channel becomes "Other notifications". Names in all 11 languages.
+- **Pushes show what was written** when the forum shares it (the first lines of a reply or mention), and carry the app-icon badge: unread notifications across your forums.
+- **Suggested and related topics under a topic's last post**, as the website shows them, as ordinary topic rows (last poster, category and tags, counts, read state, solved). Related topics (discourse-ai) sit beside suggested ones, with a choice when a forum sends both; ends with More in {category} and Latest topics.
+
+### Fixed
+- **The notification list says who did what, for every type**: a reply's author rather than "3 replies", everyone behind a like or reaction ("jane, bob and 3 others"), who accepted your answer, a watched chat thread's replies, a group assignment, a moved post's mover, a new follower. A group message summary opens the group's inbox (it opened the member list); spread-out reactions and chat bookmarks open their person and chat message (they showed a dialog with an empty title); every type has an icon.
+
 ## [1.0.40] - 2026-09-29
 
 ### Added
