@@ -333,6 +333,9 @@ class NotificationService with ServiceErrorHandlingMixin {
 
   // Setup message handlers
   void _setupMessageHandlers() {
+    // A notification this app drew itself was tapped after the app closed.
+    _handleLocalNotificationLaunch();
+
     // Handle messages when app is in foreground
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
 
@@ -361,6 +364,37 @@ class NotificationService with ServiceErrorHandlingMixin {
           });
         }
       });
+    }
+  }
+
+  /// Routes the tap that launched the app, when it was on a notification
+  /// this app drew itself.
+  ///
+  /// A push that arrives while the app is in the foreground is shown by
+  /// [_showLocalNotification], not by the system, so its tap comes back
+  /// through flutter_local_notifications rather than FCM. While the app
+  /// runs, that is [_onNotificationTapped]. But the notification outlives
+  /// the app: close the app (swipe it from Recents) and tap it later, and
+  /// the tap starts the app cold, the callback never fires, and the payload
+  /// is only available here — without this the reader lands on the home
+  /// screen instead of the topic (seen on a Pixel, 2026-09-28). The delay
+  /// matches FCM's initial-message path: the host's first screen has to be
+  /// up before a forum can be opened over it.
+  Future<void> _handleLocalNotificationLaunch() async {
+    try {
+      final details =
+          await _localNotifications.getNotificationAppLaunchDetails();
+      final response = details?.notificationResponse;
+      if (details?.didNotificationLaunchApp != true || response == null) {
+        return;
+      }
+      AppLogger.debug(
+          '🔔 [NotificationService] App launched by a tap on a local notification');
+      Future.delayed(
+          const Duration(milliseconds: 500), () => _onNotificationTapped(response));
+    } catch (e) {
+      AppLogger.debug(
+          '⚠️ [NotificationService] Could not read notification launch details: $e');
     }
   }
 
