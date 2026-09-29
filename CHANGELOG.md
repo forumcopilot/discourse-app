@@ -6,6 +6,23 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.43] - 2026-09-29
+
+### Added
+- **My posts is its own screen.** The drawer's My posts opened your whole profile; it now opens your activity, filtered as the website's activity tabs are: All, Topics, Replies, Likes, Solved, and Pending while a moderator still has posts of yours to approve (the app gave no sign of them after the first snackbar). Topics carry their replies, views, likes, tags and solved state. The feed is grouped Today / This week / Earlier, and saved drafts are announced at the top with Resume.
+- **Pin and label bookmarks, search them.** Bookmarks can be searched (labels and the saved post's words) and filtered to Reminders or Pinned; pinned ones lead the list. The ⋮ menu adds Add/Edit label and Pin/Unpin, as the website's bookmark menu does.
+
+### Changed
+- **The Profile tab is your account on the forum.** Signed in, it shows your avatar (tap the camera to change it), name and trust level, View profile and Edit profile, and your numbers (posts, likes, days, and solutions where the forum reports them). Then Your stuff (My posts, Drafts and Bookmarks with their counts, Badges, Invites), then Settings (notifications, Do not disturb, Appearance, account and privacy, Sign out). Terms and Privacy sit at the foot. Signed out, it says what an account gets you and offers Sign in and Create account; it used to be an empty "sign in to view profile" page.
+- **The drawer is the forum's map again**: Home, My posts, Review (staff), and Users, Groups, Badges and About under More, then categories and tags, with Terms and Privacy as a footer. Bookmarks, Drafts, Invites, notification settings and Appearance moved to the Profile tab.
+- **Someone's profile reads like their page on the website.** It opens with their background, avatar, name, title and status, then their bio, their location and local time (where the forum shares time zones), their website, and one "Joined · Seen" line. Message, Chat and Follow appear where the forum allows them. Below come their numbers and pinned Activity / Summary / Badges tabs. Summary adds the featured topic and top categories, and a profile's groups no longer list automatic ones such as trust_level_1. Share and Copy link are in the ⋮ menu.
+- **Activity rows read like the topic page**: what happened and when ("Replied · #12 · 2h ago"), the topic with its category and tags, the post's words quoted, and counts where there are any. This applies in My posts and on profiles.
+- **Bookmark rows say more**: the topic's category and tags, your label, the reminder in words ("Tomorrow, 8:00 AM", red "Due" once it has fired), the saved post's words, and who wrote it. Swipe to remove, with Undo.
+- **Draft rows say what they are**: a badge for reply, new topic or message, who a message is to, a new topic's category and tags, and the words so far without their Markdown. They are grouped Today / Earlier. Discarding is a swipe or the bin with Undo, in place of a confirm dialog every time.
+
+### Fixed
+- **Debug builds no longer show framework errors on Home.** The topic lists redrew Home while it was being built, and Home's floating buttons shared a hero tag, so moving between screens reported duplicate heroes. Release builds were not affected.
+
 ## [1.0.42] - 2026-09-29
 
 ### Changed
