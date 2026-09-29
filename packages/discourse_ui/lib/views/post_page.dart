@@ -3,6 +3,8 @@ import 'package:discourse_core/discourse_core.dart'
 import 'package:flutter/material.dart';
 import '../core/errors/action_refused.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../utils/error_message.dart';
+import '../utils/snackbar_helper.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseSubscriptionProxy;
@@ -213,27 +215,7 @@ class _PostPageState extends State<PostPage> {
     } catch (e) {
       // If sharing fails, show an error message
       if (mounted) {
-        // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-        final scaffoldMessenger = ScaffoldMessenger.of(context);
-        scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.failedToShareTopic(e.toString()),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            duration: const Duration(seconds: 3),
-            action: SnackBarAction(
-              label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-              textColor: Theme.of(context).colorScheme.onErrorContainer,
-              onPressed: () {
-                scaffoldMessenger.hideCurrentSnackBar();
-              },
-            ),
-          ),
-        );
+        SnackbarHelper.showError(context, AppLocalizations.of(context)!.failedToShareTopic(describeError(e, context: context)));
       }
     }
   }
@@ -303,29 +285,7 @@ class _PostPageState extends State<PostPage> {
       }
     } catch (e) {
       if (mounted) {
-        // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-        final scaffoldMessenger = ScaffoldMessenger.of(context);
-        // Hide any existing SnackBar before showing a new one
-        scaffoldMessenger.hideCurrentSnackBar();
-        scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.failedToSubscribeToThread,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            duration: const Duration(seconds: 4),
-            action: SnackBarAction(
-              label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-              textColor: Theme.of(context).colorScheme.onErrorContainer,
-              onPressed: () {
-                scaffoldMessenger.hideCurrentSnackBar();
-              },
-            ),
-          ),
-        );
+        SnackbarHelper.showError(context, AppLocalizations.of(context)!.failedToSubscribeToThread);
       }
     }
   }
@@ -343,52 +303,14 @@ class _PostPageState extends State<PostPage> {
         setState(() {
           _isClosed = !_isClosed;
         });
-        // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-        final scaffoldMessenger = ScaffoldMessenger.of(context);
-        scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text(
-              _isClosed ? AppLocalizations.of(context)!.topicClosed : AppLocalizations.of(context)!.topicOpened,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onInverseSurface,
-                  ),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-            duration: const Duration(seconds: 2),
-            action: SnackBarAction(
-              label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-              textColor: Theme.of(context).colorScheme.inversePrimary,
-              onPressed: () {
-                scaffoldMessenger.hideCurrentSnackBar();
-              },
-            ),
-          ),
-        );
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(SnackBar(content: Text(_isClosed ? AppLocalizations.of(context)!.topicClosed : AppLocalizations.of(context)!.topicOpened), duration: const Duration(seconds: 2)));
         _refreshCallback?.call();
       }
     } catch (e) {
       if (mounted) {
-        // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-        final scaffoldMessenger = ScaffoldMessenger.of(context);
-        scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text(
-              'Failed to ${_isClosed ? 'open' : 'close'} topic: $e',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            duration: const Duration(seconds: 4),
-            action: SnackBarAction(
-              label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-              textColor: Theme.of(context).colorScheme.onErrorContainer,
-              onPressed: () {
-                scaffoldMessenger.hideCurrentSnackBar();
-              },
-            ),
-          ),
-        );
+        SnackbarHelper.showError(context, 'Failed to ${_isClosed ? 'open' : 'close'} topic: ${describeError(e, context: context)}');
       }
     }
   }
@@ -405,52 +327,14 @@ class _PostPageState extends State<PostPage> {
         setState(() {
           _isSticky = !_isSticky;
         });
-        // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-        final scaffoldMessenger = ScaffoldMessenger.of(context);
-        scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text(
-              _isSticky ? AppLocalizations.of(context)!.topicStickied : AppLocalizations.of(context)!.topicUnstickied,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onInverseSurface,
-                  ),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-            duration: const Duration(seconds: 2),
-            action: SnackBarAction(
-              label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-              textColor: Theme.of(context).colorScheme.inversePrimary,
-              onPressed: () {
-                scaffoldMessenger.hideCurrentSnackBar();
-              },
-            ),
-          ),
-        );
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(SnackBar(content: Text(_isSticky ? AppLocalizations.of(context)!.topicStickied : AppLocalizations.of(context)!.topicUnstickied), duration: const Duration(seconds: 2)));
         _refreshCallback?.call();
       }
     } catch (e) {
       if (mounted) {
-        // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-        final scaffoldMessenger = ScaffoldMessenger.of(context);
-        scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text(
-              'Failed to ${_isSticky ? 'unstick' : 'stick'} topic: $e',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            duration: const Duration(seconds: 4),
-            action: SnackBarAction(
-              label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-              textColor: Theme.of(context).colorScheme.onErrorContainer,
-              onPressed: () {
-                scaffoldMessenger.hideCurrentSnackBar();
-              },
-            ),
-          ),
-        );
+        SnackbarHelper.showError(context, 'Failed to ${_isSticky ? 'unstick' : 'stick'} topic: ${describeError(e, context: context)}');
       }
     }
   }
@@ -786,28 +670,8 @@ class _PostPageState extends State<PostPage> {
               await Future.delayed(const Duration(milliseconds: 800));
             } catch (e) {
               // Handle any errors during refresh
-              if (mounted) {
-                // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-                final scaffoldMessenger = ScaffoldMessenger.of(context);
-                scaffoldMessenger.showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      AppLocalizations.of(context)!.refreshFailed(e),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                          ),
-                    ),
-                    backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                    duration: const Duration(seconds: 4),
-                    action: SnackBarAction(
-                      label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-                      textColor: Theme.of(context).colorScheme.onErrorContainer,
-                      onPressed: () {
-                        scaffoldMessenger.hideCurrentSnackBar();
-                      },
-                    ),
-                  ),
-                );
+              if (context.mounted) {
+                SnackbarHelper.showError(context, AppLocalizations.of(context)!.refreshFailed(describeError(e, context: context)));
               }
             } finally {
               if (mounted) {

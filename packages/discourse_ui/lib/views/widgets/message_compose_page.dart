@@ -26,6 +26,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
 import 'category_badge.dart';
 import 'upload_tile.dart';
 import '../../utils/error_message.dart';
+import '../../utils/snackbar_helper.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
 import 'package:discourse_ui/views/widgets/discard_changes_scope.dart';
 
@@ -374,36 +375,13 @@ class _MessageComposePageState extends State<MessageComposePage> {
     return XFile(shrunk.file.path, name: image.name);
   }
 
-  void _showAttachmentError(String message) {
-    final scheme = Theme.of(context).colorScheme;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(color: scheme.onErrorContainer)),
-        backgroundColor: scheme.errorContainer,
-      ),
-    );
-  }
+  void _showAttachmentError(String message) =>
+      SnackbarHelper.showError(context, message);
 
   /// Says what was done to a file the user picked. Resizing without
   /// telling anyone is how a 20 MB PNG became a 2.2 MB JPEG unnoticed.
-  void _showAttachmentNotice(String message) {
-    final scheme = Theme.of(context).colorScheme;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(color: scheme.onSurfaceVariant)),
-        backgroundColor: scheme.surfaceContainerHighest,
-        duration: const Duration(seconds: 5),
-      ),
-    );
-  }
+  void _showAttachmentNotice(String message) =>
+      SnackbarHelper.showInfo(context, message);
 
   void _insertAttachmentRef(String attachmentRef) {
     // Ensure content field has focus
@@ -454,7 +432,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
     final siteContext = getCurrentSiteContext();
     final pickConstraints = getAttachmentConstraintsFromSiteContext(siteContext);
     if (!canAddMoreAttachments(_uploads.length, pickConstraints)) {
-      _showUploadMessage(AppLocalizations.of(context)!
+      _showNotice(AppLocalizations.of(context)!
           .maximumAttachmentsAllowed(pickConstraints!.count ?? 0));
       return;
     }
@@ -474,7 +452,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
         getCurrentSiteContext(),
         isImage: true);
     if (!canAddMoreAttachments(_uploads.length, constraints)) {
-      _showUploadMessage(AppLocalizations.of(context)!
+      _showNotice(AppLocalizations.of(context)!
           .maximumAttachmentsAllowed(constraints!.count ?? 0));
       return;
     }
@@ -489,7 +467,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
     final max = constraints?.count;
     if (max != null && max > 0 && _uploads.length + picked.length > max) {
       final room = max - _uploads.length;
-      _showUploadMessage(AppLocalizations.of(context)!
+      _showNotice(AppLocalizations.of(context)!
           .onlyNMoreAttachmentsAllowed(room, room));
       picked = picked.take(room).toList();
     }
@@ -517,7 +495,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
         currentAttachmentCount: _uploads.length);
     if (!validation.isValid) {
       if (mounted) {
-        _showUploadMessage(
+        _showNotice(
             '${file.name}: ${validation.errorMessage ?? AppLocalizations.of(context)!.failedToUploadFilePleaseTryAgain}');
       }
       return null;
@@ -525,9 +503,14 @@ class _MessageComposePageState extends State<MessageComposePage> {
     return isImage ? _prepareImageForUpload(file, constraints) : file;
   }
 
-  void _showUploadMessage(String text) {
+  /// A plain notice (M3's default snackbar colours). It replaces the
+  /// one showing rather than queueing behind it: tapping Send twice on an
+  /// empty title used to line the same notice up twice.
+  void _showNotice(String text) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(content: Text(text)));
   }
 
   /// Where an upload goes in the text: a line of its own at the cursor, as
@@ -647,7 +630,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
         // message) — a second, generic message followed it. An exception is
         // ours to report.
         if (error != null) {
-          _showUploadMessage(AppLocalizations.of(context)!
+          _showNotice(AppLocalizations.of(context)!
               .failedToUploadFile2(describeError(error)));
         }
         continue;
@@ -743,16 +726,10 @@ class _MessageComposePageState extends State<MessageComposePage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.failedToRemoveAttachment2(e.toString()),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          ),
+        SnackbarHelper.showError(
+          context,
+          AppLocalizations.of(context)!
+              .failedToRemoveAttachment2(describeError(e, context: context)),
         );
       }
     } finally {
@@ -971,32 +948,12 @@ class _MessageComposePageState extends State<MessageComposePage> {
 
   Future<void> _submit() async {
     if (widget.showTitleField && widget.requireTitle && _titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)?.pleaseEnterTitle ?? 'Please enter a title',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onInverseSurface,
-                ),
-          ),
-          backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-        ),
-      );
+      _showNotice(AppLocalizations.of(context)?.pleaseEnterTitle ?? 'Please enter a title');
       return;
     }
 
     if (_contentController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)?.pleaseEnterContent ?? 'Please enter some content',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onInverseSurface,
-                ),
-          ),
-          backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-        ),
-      );
+      _showNotice(AppLocalizations.of(context)?.pleaseEnterContent ?? 'Please enter some content');
       return;
     }
 
@@ -1004,17 +961,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
     // upload's short_url wouldn't be included yet and the attachment
     // would silently be dropped from the post.
     if (_uploads.any((u) => u.isUploading)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.pleaseWaitForAttachmentsToFinishUploading,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onInverseSurface,
-                ),
-          ),
-          backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-        ),
-      );
+      _showNotice(AppLocalizations.of(context)!.pleaseWaitForAttachmentsToFinishUploading);
       return;
     }
 
@@ -1054,47 +1001,12 @@ class _MessageComposePageState extends State<MessageComposePage> {
       }
     } catch (e) {
       if (mounted) {
-        if (widget.onError != null) {
-          widget.onError!(e as Exception);
+        if (widget.onError != null && e is Exception) {
+          widget.onError!(e);
         } else {
-          // Cache theme values to avoid multiple Theme.of(context) calls that could trigger rebuilds
-          final theme = Theme.of(context);
-          final colorScheme = theme.colorScheme;
-          final textTheme = theme.textTheme;
-          
-          // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-          final scaffoldMessenger = ScaffoldMessenger.of(context);
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    color: colorScheme.onErrorContainer,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Expanded(
-                    child: Text(
-                      // Readable, not "Exception: …" or an API dump.
-                      describeError(e, context: context),
-                      style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onErrorContainer,
-                          ),
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: colorScheme.errorContainer,
-              duration: const Duration(seconds: 4),
-              action: SnackBarAction(
-                label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-                textColor: colorScheme.onErrorContainer,
-                onPressed: () {
-                  scaffoldMessenger.hideCurrentSnackBar();
-                },
-              ),
-            ),
-          );
+          // The forum's own reason ("Title is too short (minimum is 15
+          // characters)"), readable rather than "Exception: …".
+          SnackbarHelper.showError(context, describeError(e, context: context));
         }
       }
     } finally {

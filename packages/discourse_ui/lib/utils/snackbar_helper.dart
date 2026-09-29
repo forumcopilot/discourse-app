@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/design_tokens.dart';
 
 /// Shared helper for the project's three canonical snackbar styles —
 /// error / info / success. Use these instead of building `SnackBar`
@@ -7,19 +8,22 @@ import 'package:flutter/material.dart';
 /// colours stay consistent across every screen.
 ///
 /// All variants:
-///   * `behavior: SnackBarBehavior.floating`
-///   * `margin: EdgeInsets.all(DesignTokens.spacingS)`
-///   * `bodyMedium` text style with role-appropriate `onX` colour
+///   * float (`snackBarTheme` in `AppTheme`)
+///   * replace whatever snackbar is showing or queued, so the newest
+///     message is the one on screen
+///   * dismiss themselves after a reading time that grows with the text
 ///
-/// The optional [action] / [duration] arguments cover the few cases
-/// where call-sites want to attach an "Undo" / "Retry" button or
-/// extend the visibility window beyond the default 4s.
+/// Don't give a snackbar a "Dismiss" [SnackBarAction]: since Flutter 3.38
+/// a snackbar with an action persists (`SnackBar.persist` defaults to
+/// `action != null`), so it never times out and every later message
+/// queues unseen behind it. Errors get a close icon instead; pass an
+/// [action] only for a real one ("Retry", "Undo"), which is then meant
+/// to stay until used.
 class SnackbarHelper {
   SnackbarHelper._();
 
   /// Surface a recoverable failure. Uses `colorScheme.errorContainer`
-  /// — the same Material 3 role the inline error snackbars currently
-  /// use throughout the attachment + compose flows.
+  /// with an error icon and a close button.
   static void showError(
     BuildContext context,
     String message, {
@@ -31,6 +35,8 @@ class SnackbarHelper {
         message,
         backgroundColor: Theme.of(context).colorScheme.errorContainer,
         foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
+        icon: Icons.error_outline,
+        showCloseIcon: true,
         action: action,
         duration: duration,
       );
@@ -72,28 +78,52 @@ class SnackbarHelper {
         duration: duration,
       );
 
+  /// How long [message] stays up: 4 s for a short line, longer for a
+  /// forum's validation message ("Title is too short (minimum is 15
+  /// characters); Body is too short …"), at most 10 s.
+  @visibleForTesting
+  static Duration readingTime(String message) => Duration(
+        milliseconds: (1500 + 65 * message.length).clamp(4000, 10000),
+      );
+
   static void _show(
     BuildContext context,
     String message, {
     required Color backgroundColor,
     required Color foregroundColor,
+    IconData? icon,
+    bool showCloseIcon = false,
     SnackBarAction? action,
     Duration? duration,
   }) {
     final messenger = ScaffoldMessenger.maybeOf(context);
     if (messenger == null) return;
+    final text = Text(
+      message,
+      style: Theme.of(context)
+          .textTheme
+          .bodyMedium
+          ?.copyWith(color: foregroundColor),
+    );
+    // ScaffoldMessenger queues: a second failed submit used to wait,
+    // unseen, behind the first message.
+    messenger.clearSnackBars();
     messenger.showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.copyWith(color: foregroundColor),
-        ),
+        content: icon == null
+            ? text
+            : Row(
+                children: [
+                  Icon(icon, color: foregroundColor),
+                  const SizedBox(width: DesignTokens.spacingM),
+                  Expanded(child: text),
+                ],
+              ),
         backgroundColor: backgroundColor,
         action: action,
-        duration: duration ?? const Duration(seconds: 4),
+        showCloseIcon: showCloseIcon,
+        closeIconColor: foregroundColor,
+        duration: duration ?? readingTime(message),
       ),
     );
   }

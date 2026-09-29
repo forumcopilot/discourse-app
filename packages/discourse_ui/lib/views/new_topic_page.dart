@@ -6,12 +6,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
-import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:discourse_ui/utils/discourse_draft_controller.dart';
 import 'package:discourse_ui/views/widgets/tag_input_field.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteCapabilities;
 import '../services/attachment_upload_service.dart';
+import '../utils/snackbar_helper.dart';
 
 class NewTopicPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -114,58 +114,33 @@ class _NewTopicPageState extends State<NewTopicPage> {
     return ok;
   }
 
+  /// Throws with the forum's reason when it refuses the topic ("Title is
+  /// too short (minimum is 15 characters)"); the composer shows it.
   Future<bool> _handleSubmit(String title, String content) async {
-    try {
-      final topicProxy = SiteProxyFactory.getTopicProxy();
-      final result = await topicProxy.newTopic(
-        widget.forumId,
-        title,
-        content,
-        attachmentIds: _attachmentIds.isNotEmpty ? _attachmentIds : null,
-        groupId: _groupId,
-        tags: _tags.isNotEmpty ? _tags : null,
-      );
+    final topicProxy = SiteProxyFactory.getTopicProxy();
+    final result = await topicProxy.newTopic(
+      widget.forumId,
+      title,
+      content,
+      attachmentIds: _attachmentIds.isNotEmpty ? _attachmentIds : null,
+      groupId: _groupId,
+      tags: _tags.isNotEmpty ? _tags : null,
+    );
 
-      debugPrint('🔍 [NEW_TOPIC] Submit result:');
-      debugPrint('   - result: ${result.result}');
-      debugPrint('   - resultText: "${result.resultText}"');
-      debugPrint('   - topicId: "${result.topicId}"');
-      debugPrint('   - attachmentIds passed: $_attachmentIds');
-      debugPrint('   - groupId passed: "$_groupId"');
-
-      if (result.result) {
-        if (result.state == 1) {
-          // Queued for a moderator: there is no topic to open yet.
-          if (mounted) await showPostNeedsApproval(context);
-          return true;
-        }
-        widget.onTopicCreated?.call(result.topicId.trim(), title);
-        if (result.topicId.trim().isNotEmpty) {
-          _created = (id: result.topicId.trim(), title: title);
-        }
-        return true;
-      } else {
-        // Server returned result=false with a message - throw it directly without wrapping
-        // This allows the error handler to show the server's message cleanly
-        final errorMessage = result.resultText?.trim();
-        if (errorMessage != null && errorMessage.isNotEmpty) {
-          throw Exception(errorMessage);
-        } else {
-          throw Exception('Failed to create topic');
-        }
-      }
-    } catch (e) {
-      // Only wrap if it's not already a clean server error message
-      // Check if the exception message doesn't start with "Failed to create topic"
-      final message = e.toString();
-      if (message.startsWith('Exception: ') && !message.contains('Failed to create topic')) {
-        // This is already a clean server message, re-throw as-is
-        rethrow;
-      } else {
-        // Wrap other exceptions
-        throw Exception('Failed to create topic: ${e.toString()}');
-      }
+    if (!result.result) {
+      final reason = result.resultText?.trim() ?? '';
+      throw Exception(reason.isNotEmpty ? reason : 'Failed to create topic');
     }
+    if (result.state == 1) {
+      // Queued for a moderator: there is no topic to open yet.
+      if (mounted) await showPostNeedsApproval(context);
+      return true;
+    }
+    widget.onTopicCreated?.call(result.topicId.trim(), title);
+    if (result.topicId.trim().isNotEmpty) {
+      _created = (id: result.topicId.trim(), title: title);
+    }
+    return true;
   }
 
   /// Uploads one picked file and returns Discourse's `upload://` ref.
@@ -186,17 +161,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
     if (outcome.cancelled) return null;
     if (!outcome.succeeded) {
       if (mounted && outcome.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              outcome.errorMessage!,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          ),
-        );
+        SnackbarHelper.showError(context, outcome.errorMessage!);
       }
       return null;
     }
@@ -281,49 +246,6 @@ class _NewTopicPageState extends State<NewTopicPage> {
       // Discourse equivalent, and it was on by default, stamping every new
       // topic from the app.
       showSignatureToggle: false,
-      onError: (error) {
-        if (context.mounted) {
-          // Extract the clean message from the exception
-          String errorMessage = error.toString();
-          // Remove "Exception: " prefix if present
-          if (errorMessage.startsWith('Exception: ')) {
-            errorMessage = errorMessage.substring(11);
-          }
-
-          // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-          final scaffoldMessenger = ScaffoldMessenger.of(context);
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Expanded(
-                    child: Text(
-                      errorMessage,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                          ),
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              duration: const Duration(seconds: 4),
-              action: SnackBarAction(
-                label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-                textColor: Theme.of(context).colorScheme.onErrorContainer,
-                onPressed: () {
-                  scaffoldMessenger.hideCurrentSnackBar();
-                },
-              ),
-            ),
-          );
-        }
-      },
     );
   }
 }

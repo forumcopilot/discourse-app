@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../core/errors/action_refused.dart';
 import 'package:discourse_ui/utils/like_cooldown.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../utils/error_message.dart';
+import '../../utils/snackbar_helper.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:discourse_ui/controllers/post_controller.dart';
@@ -211,39 +213,7 @@ class PostActionsHandler {
         if (context.mounted) onRefresh();
       });
     } else if (result == false && context.mounted) {
-      // Show error message
-      // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-      final scaffoldMessenger = ScaffoldMessenger.of(context);
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(
-                Icons.error_outline,
-                color: Theme.of(context).colorScheme.onErrorContainer,
-              ),
-              const SizedBox(width: DesignTokens.spacingM),
-              Expanded(
-                child: Text(
-                  AppLocalizations.of(context)!.failedToPostReplyPleaseTryAgain,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onErrorContainer,
-                      ),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          duration: const Duration(seconds: 4),
-          action: SnackBarAction(
-            label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-            textColor: Theme.of(context).colorScheme.onErrorContainer,
-            onPressed: () {
-              scaffoldMessenger.hideCurrentSnackBar();
-            },
-          ),
-        ),
-      );
+      SnackbarHelper.showError(context, AppLocalizations.of(context)!.failedToPostReplyPleaseTryAgain);
     }
   }
 
@@ -401,39 +371,7 @@ class PostActionsHandler {
         onRefresh();
       }
     } else if (result == false && context.mounted) {
-      // Show error message
-      // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-      final scaffoldMessenger = ScaffoldMessenger.of(context);
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(
-                Icons.error_outline,
-                color: Theme.of(context).colorScheme.onErrorContainer,
-              ),
-              const SizedBox(width: DesignTokens.spacingM),
-              Expanded(
-                child: Text(
-                  AppLocalizations.of(context)!.failedToUpdatePostPleaseTryAgain,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onErrorContainer,
-                      ),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          duration: const Duration(seconds: 4),
-          action: SnackBarAction(
-            label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-            textColor: Theme.of(context).colorScheme.onErrorContainer,
-            onPressed: () {
-              scaffoldMessenger.hideCurrentSnackBar();
-            },
-          ),
-        ),
-      );
+      SnackbarHelper.showError(context, AppLocalizations.of(context)!.failedToUpdatePostPleaseTryAgain);
     }
   }
 
@@ -532,42 +470,8 @@ class PostActionsHandler {
       } catch (e) {
         AppLogger.debug('Error deleting post: $e');
         if (context.mounted) {
-          // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-          final scaffoldMessenger = ScaffoldMessenger.of(context);
-          // Hide loading snackbar
-          scaffoldMessenger.hideCurrentSnackBar();
-
-          // Show error message
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Expanded(
-                    child: Text(
-                      AppLocalizations.of(context)!.failedToDeletePost(e.toString()),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                          ),
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              duration: const Duration(seconds: 4),
-              action: SnackBarAction(
-                label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-                textColor: Theme.of(context).colorScheme.onErrorContainer,
-                onPressed: () {
-                  scaffoldMessenger.hideCurrentSnackBar();
-                },
-              ),
-            ),
-          );
+          // Replaces the loading snackbar.
+          SnackbarHelper.showError(context, AppLocalizations.of(context)!.failedToDeletePost(describeError(e, context: context)));
         }
       }
     }
@@ -709,79 +613,14 @@ class PostActionsHandler {
             final errorMessage = (reportResult.resultText != null && reportResult.resultText!.isNotEmpty) ? reportResult.resultText! : 'Failed to submit report';
 
             AppLogger.debug('Report failed for post: $postId, error: $errorMessage');
-            // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-            final scaffoldMessenger = ScaffoldMessenger.of(context);
-            scaffoldMessenger.showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      color: Theme.of(context).colorScheme.onErrorContainer,
-                    ),
-                    const SizedBox(width: DesignTokens.spacingM),
-                    Expanded(
-                      child: Text(
-                        errorMessage,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onErrorContainer,
-                            ),
-                      ),
-                    ),
-                  ],
-                ),
-                backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                duration: const Duration(seconds: 4),
-                action: SnackBarAction(
-                  label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-                  textColor: Theme.of(context).colorScheme.onErrorContainer,
-                  onPressed: () {
-                    scaffoldMessenger.hideCurrentSnackBar();
-                  },
-                ),
-              ),
-            );
+            SnackbarHelper.showError(context, errorMessage);
           }
         }
       } catch (e) {
         AppLogger.debug('Exception occurred while reporting post: $postId, error: $e');
         if (context.mounted) {
-          // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-          final scaffoldMessenger = ScaffoldMessenger.of(context);
-          // Hide loading snackbar
-          scaffoldMessenger.hideCurrentSnackBar();
-
-          // Show error message
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Expanded(
-                    child: Text(
-                      AppLocalizations.of(context)!.failedToSubmitReport2(e.toString()),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                          ),
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              duration: const Duration(seconds: 4),
-              action: SnackBarAction(
-                label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-                textColor: Theme.of(context).colorScheme.onErrorContainer,
-                onPressed: () {
-                  scaffoldMessenger.hideCurrentSnackBar();
-                },
-              ),
-            ),
-          );
+          // Replaces the loading snackbar.
+          SnackbarHelper.showError(context, AppLocalizations.of(context)!.failedToSubmitReport2(describeError(e, context: context)));
         }
       }
     }
@@ -867,39 +706,9 @@ class PostActionsHandler {
         ),
       );
     } else {
-      final scaffoldMessenger = ScaffoldMessenger.of(context);
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(
-                Icons.error_outline,
-                color: Theme.of(context).colorScheme.onErrorContainer,
-              ),
-              const SizedBox(width: DesignTokens.spacingM),
-              Expanded(
-                child: Text(
-                  errText.isNotEmpty
+      SnackbarHelper.showError(context, errText.isNotEmpty
                       ? errText
-                      : 'Failed to change wiki status',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onErrorContainer,
-                      ),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          duration: const Duration(seconds: 4),
-          action: SnackBarAction(
-            label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-            textColor: Theme.of(context).colorScheme.onErrorContainer,
-            onPressed: () {
-              scaffoldMessenger.hideCurrentSnackBar();
-            },
-          ),
-        ),
-      );
+                      : 'Failed to change wiki status');
     }
   }
 

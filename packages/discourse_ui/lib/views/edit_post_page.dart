@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import '../l10n/generated/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseMessageDetails;
 import 'package:image_picker/image_picker.dart';
-import '../theme/design_tokens.dart';
 import 'widgets/empty_state_view.dart';
 import '../utils/error_message.dart';
 import '../services/attachment_upload_service.dart';
@@ -338,49 +336,6 @@ class _EditPostPageState extends State<EditPostPage> {
             }
           },
           onSuccess: (success) => widget.postId,
-          onError: (error) {
-            if (context.mounted) {
-              // Extract the clean message from the exception
-              String errorMessage = error.toString();
-              // Remove "Exception: " prefix if present
-              if (errorMessage.startsWith('Exception: ')) {
-                errorMessage = errorMessage.substring(11);
-              }
-
-              // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-              final scaffoldMessenger = ScaffoldMessenger.of(context);
-              scaffoldMessenger.showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        color: Theme.of(context).colorScheme.onErrorContainer,
-                      ),
-                      const SizedBox(width: DesignTokens.spacingM),
-                      Expanded(
-                        child: Text(
-                          errorMessage,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onErrorContainer,
-                              ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  duration: const Duration(seconds: 4),
-                  action: SnackBarAction(
-                    label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-                    textColor: Theme.of(context).colorScheme.onErrorContainer,
-                    onPressed: () {
-                      scaffoldMessenger.hideCurrentSnackBar();
-                    },
-                  ),
-                ),
-              );
-            }
-          },
         );
 
         return compose;

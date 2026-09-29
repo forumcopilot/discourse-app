@@ -11,7 +11,6 @@ import 'package:discourse_ui/views/widgets/post_needs_approval_dialog.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
-import '../theme/design_tokens.dart';
 import '../utils/discourse_draft_controller.dart';
 import '../services/attachment_upload_service.dart';
 
@@ -449,56 +448,6 @@ class _ReplyPageState extends State<ReplyPage> {
         },
         onSuccess: (success) {
           return _createdPostId;
-        },
-        onError: (error) {
-          if (context.mounted) {
-            // Extract the clean message from the exception
-            String errorMessage = error.toString();
-            // Remove "Exception: " prefix if present
-            if (errorMessage.startsWith('Exception: ')) {
-              errorMessage = errorMessage.substring(11);
-            }
-            
-            // Cache theme values to avoid multiple Theme.of(context) calls that could trigger rebuilds
-            final theme = Theme.of(context);
-            final colorScheme = theme.colorScheme;
-            final textTheme = theme.textTheme;
-            
-            // Capture ScaffoldMessengerState to ensure dismiss button works correctly
-            final scaffoldMessenger = ScaffoldMessenger.of(context);
-            scaffoldMessenger.showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      color: colorScheme.onErrorContainer,
-                    ),
-                    const SizedBox(width: DesignTokens.spacingM),
-                    Expanded(
-                      child: Text(
-                        errorMessage,
-                        style: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onErrorContainer,
-                            ),
-                      ),
-                    ),
-                  ],
-                ),
-                backgroundColor: colorScheme.errorContainer,
-                duration: const Duration(seconds: 4),
-                action: SnackBarAction(
-                  label: 'Dismiss',
-                  textColor: colorScheme.onErrorContainer,
-                  onPressed: () {
-                    scaffoldMessenger.hideCurrentSnackBar();
-                  },
-                ),
-              ),
-            );
-          }
-          // Note: We do NOT call Navigator.pop or trigger any parent widget operations
-          // when a reply fails. Only MessageComposePage's setState will be called.
         },
       );
     }

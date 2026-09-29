@@ -6,6 +6,7 @@ import 'package:discourse_core/discourse_core.dart'
         DiscourseTopicTracking;
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../utils/snackbar_helper.dart';
 import 'package:discourse_ui/models/thread_view_data.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:get/get.dart';
@@ -561,43 +562,7 @@ class _PostsState extends State<PostsList> {
   /// failures). Safe to call from fire-and-forget loaders.
   void _showErrorSnackBar(Object e) {
     if (!mounted) return;
-    final errorMessage = extractErrorMessage(e);
-    // Capture ScaffoldMessengerState and theme to avoid using context after unmount
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final theme = Theme.of(context);
-    final errorContainerColor = theme.colorScheme.errorContainer;
-    final onErrorContainerColor = theme.colorScheme.onErrorContainer;
-
-    scaffoldMessenger.showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.error_outline,
-              color: onErrorContainerColor,
-            ),
-            const SizedBox(width: DesignTokens.spacingM),
-            Expanded(
-              child: Text(
-                errorMessage,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: onErrorContainerColor,
-                ),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: errorContainerColor,
-        duration: const Duration(seconds: 4),
-        action: SnackBarAction(
-          label: AppLocalizations.of(context)?.dismiss ?? 'Dismiss',
-          textColor: onErrorContainerColor,
-          onPressed: () {
-            scaffoldMessenger.hideCurrentSnackBar();
-          },
-        ),
-      ),
-    );
+    SnackbarHelper.showError(context, extractErrorMessage(e));
   }
 
   /// The post that fills most of the viewport, for the bottom-bar label
