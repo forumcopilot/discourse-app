@@ -1,6 +1,7 @@
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteCapabilities;
 import 'package:discourse_ui/l10n/generated/app_localizations.dart';
+import 'package:discourse_ui/services/notification_permission.dart';
 import 'package:discourse_ui/theme/app_theme.dart';
 import 'package:discourse_ui/views/enable_notifications_page.dart';
 import 'package:discourse_ui/views/widgets/forum_icon_tile.dart';
@@ -42,7 +43,13 @@ Widget _app({Brightness brightness = Brightness.light, double textScale = 1}) =>
     );
 
 void main() {
-  setUp(DiscourseSiteCapabilities.reset);
+  setUp(() {
+    DiscourseSiteCapabilities.reset();
+    // Not asked yet, on every machine the tests run on.
+    NotificationPermission.debugStatus =
+        NotificationPermissionState.notDetermined;
+  });
+  tearDown(() => NotificationPermission.debugStatus = null);
 
   testWidgets('previews notifications under the forum and names both steps',
       (tester) async {
@@ -57,11 +64,24 @@ void main() {
     expect(find.text('Approve on ABDA Community'), findsOneWidget);
     expect(find.textContaining('Read-only'), findsOneWidget);
     // The button says what it does, and appears with the title.
-    expect(
-        find.widgetWithText(FilledButton, 'Turn on notifications'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, 'Turn on notifications'),
+        findsOneWidget);
     expect(find.widgetWithText(TextButton, 'Not now'), findsOneWidget);
     // The owner footnote is gone: a user cannot act on it.
     expect(find.textContaining('owner'), findsNothing);
+  });
+
+  testWidgets(
+      'when the phone already allows notifications, the first step '
+      'says so', (tester) async {
+    NotificationPermission.debugStatus = NotificationPermissionState.granted;
+    await tester.pumpWidget(_app());
+    await tester.pump();
+
+    expect(
+        find.text('Notifications are allowed on this phone'), findsOneWidget);
+    expect(find.text('Allow notifications on this phone'), findsNothing);
+    expect(find.text('Approve on ABDA Community'), findsOneWidget);
   });
 
   for (final brightness in Brightness.values) {

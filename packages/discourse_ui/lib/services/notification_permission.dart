@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../core/logging/app_logger.dart';
@@ -33,7 +34,16 @@ enum NotificationPermissionState {
 class NotificationPermission {
   NotificationPermission._();
 
+  /// Tests pin the answer here: otherwise it depends on the machine the
+  /// test runs on (a Mac asks Firebase, which is not set up, and reports
+  /// [NotificationPermissionState.notDetermined]; Linux has no gate and
+  /// reports [NotificationPermissionState.granted]).
+  @visibleForTesting
+  static NotificationPermissionState? debugStatus;
+
   static Future<NotificationPermissionState> status() async {
+    final override = debugStatus;
+    if (override != null) return override;
     try {
       if (Platform.isAndroid) {
         return _fromAndroid(await Permission.notification.status);
