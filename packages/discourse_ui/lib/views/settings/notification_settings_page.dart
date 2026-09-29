@@ -180,7 +180,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         // own status fetch so the prefs load above stays untouched.
         if (_siteContext?.isLoggedIn ?? false) ...[
           _Section(label: 'Do not disturb'),
-          _DoNotDisturbTile(siteContext: _siteContext!),
+          DoNotDisturbTile(siteContext: _siteContext!),
           const Divider(height: 1),
         ],
         _Section(label: 'Email'),
@@ -534,16 +534,16 @@ class _NotificationsGrantTileState extends State<_NotificationsGrantTile> {
 /// window is active the tile reports "until <time>" with a Turn off
 /// action; when inactive, tapping it opens a duration picker bottom
 /// sheet matching the `_EnumTile` picker cadence.
-class _DoNotDisturbTile extends StatefulWidget {
+class DoNotDisturbTile extends StatefulWidget {
   final SiteContext siteContext;
 
-  const _DoNotDisturbTile({required this.siteContext});
+  const DoNotDisturbTile({super.key, required this.siteContext});
 
   @override
-  State<_DoNotDisturbTile> createState() => _DoNotDisturbTileState();
+  State<DoNotDisturbTile> createState() => DoNotDisturbTileState();
 }
 
-class _DoNotDisturbTileState extends State<_DoNotDisturbTile> {
+class DoNotDisturbTileState extends State<DoNotDisturbTile> {
   bool _loading = true;
   bool _busy = false;
   DateTime? _endsAt;

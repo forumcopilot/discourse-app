@@ -1361,6 +1361,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           timeRead: stat('time_read'),
           recentTimeRead: stat('recent_time_read'),
           bookmarkCount: (summary['bookmark_count'] as num?)?.toInt(),
+          solvedCount: (summary['solved_count'] as num?)?.toInt(),
           canSeeSummaryStats: summary['can_see_summary_stats'] == true,
           badgeCount: ((summary['badges'] as List?) ?? const []).length,
           topTopics: topTopics,

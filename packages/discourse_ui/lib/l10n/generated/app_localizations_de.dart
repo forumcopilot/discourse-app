@@ -2938,4 +2938,79 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get activityEmptySolved => 'Noch keine Lösungen';
+
+  @override
+  String get viewProfile => 'Profil ansehen';
+
+  @override
+  String get yourStuff => 'Deine Sachen';
+
+  @override
+  String get accountAndPrivacy => 'Konto und Privatsphäre';
+
+  @override
+  String profileStatPosts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Beiträge',
+      one: 'Beitrag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Likes',
+      one: 'Like',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tage',
+      one: 'Tag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get profileStatSolved => 'gelöst';
+
+  @override
+  String joinForum(String forum) {
+    return '$forum beitreten';
+  }
+
+  @override
+  String get guestBenefitPost => 'Antworten und Themen starten';
+
+  @override
+  String get guestBenefitNotify =>
+      'Benachrichtigt werden, wenn jemand antwortet';
+
+  @override
+  String get guestBenefitSave => 'Beiträge merken und Entwürfe behalten';
+
+  @override
+  String get guestBenefitChat => 'Chatten und Nachrichten senden';
+
+  @override
+  String get createAccount => 'Konto erstellen';
+
+  @override
+  String get aboutThisForum => 'Über dieses Forum';
+
+  @override
+  String get drawerMore => 'Mehr';
+
+  @override
+  String get goToYourProfile => 'Zu deinem Profil';
 }

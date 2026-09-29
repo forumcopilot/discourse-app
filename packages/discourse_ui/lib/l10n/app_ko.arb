@@ -1057,5 +1057,21 @@
   "activityEmptyTopics": "아직 주제가 없습니다",
   "activityEmptyReplies": "아직 답글이 없습니다",
   "activityEmptyLikes": "아직 누른 좋아요가 없습니다",
-  "activityEmptySolved": "아직 해결책이 없습니다"
+  "activityEmptySolved": "아직 해결책이 없습니다",
+  "viewProfile": "프로필 보기",
+  "yourStuff": "내 항목",
+  "accountAndPrivacy": "계정 및 개인정보",
+  "profileStatPosts": "{count, plural, other{게시물}}",
+  "profileStatLikes": "{count, plural, other{좋아요}}",
+  "profileStatDays": "{count, plural, other{일}}",
+  "profileStatSolved": "해결",
+  "joinForum": "{forum} 가입하기",
+  "guestBenefitPost": "답글과 새 주제 작성",
+  "guestBenefitNotify": "답글이 달리면 알림 받기",
+  "guestBenefitSave": "게시물 북마크와 임시 저장",
+  "guestBenefitChat": "채팅과 메시지",
+  "createAccount": "계정 만들기",
+  "aboutThisForum": "이 포럼 소개",
+  "drawerMore": "더 보기",
+  "goToYourProfile": "내 프로필로 이동"
 }

@@ -4845,6 +4845,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No solutions yet'**
   String get activityEmptySolved;
+
+  /// Profile tab button: open your public profile as others see it
+  ///
+  /// In en, this message translates to:
+  /// **'View profile'**
+  String get viewProfile;
+
+  /// Profile tab section heading: your posts, drafts, bookmarks, badges, invites
+  ///
+  /// In en, this message translates to:
+  /// **'Your stuff'**
+  String get yourStuff;
+
+  /// Profile tab row opening email, password, ignored users and account deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Account and privacy'**
+  String get accountAndPrivacy;
+
+  /// Label under your post count on the Profile tab; the number is shown above it
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{post} other{posts}}'**
+  String profileStatPosts(int count);
+
+  /// Label under the likes you have received on the Profile tab
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{like} other{likes}}'**
+  String profileStatLikes(int count);
+
+  /// Label under the days you have visited on the Profile tab
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{day} other{days}}'**
+  String profileStatDays(int count);
+
+  /// Label under the number of your accepted solutions on the Profile tab
+  ///
+  /// In en, this message translates to:
+  /// **'solved'**
+  String get profileStatSolved;
+
+  /// Heading on the Profile tab for a guest
+  ///
+  /// In en, this message translates to:
+  /// **'Join {forum}'**
+  String joinForum(String forum);
+
+  /// What signing in lets a guest do
+  ///
+  /// In en, this message translates to:
+  /// **'Reply and start topics'**
+  String get guestBenefitPost;
+
+  /// What signing in lets a guest do
+  ///
+  /// In en, this message translates to:
+  /// **'Get notified when people reply'**
+  String get guestBenefitNotify;
+
+  /// What signing in lets a guest do
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark posts and keep drafts'**
+  String get guestBenefitSave;
+
+  /// What signing in lets a guest do (forums with chat)
+  ///
+  /// In en, this message translates to:
+  /// **'Chat and send messages'**
+  String get guestBenefitChat;
+
+  /// Button opening sign-up
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get createAccount;
+
+  /// Row opening the forum's About page
+  ///
+  /// In en, this message translates to:
+  /// **'About this forum'**
+  String get aboutThisForum;
+
+  /// Drawer row folding the less used community links (users, groups, badges, about)
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get drawerMore;
+
+  /// Subtitle on the drawer's account card
+  ///
+  /// In en, this message translates to:
+  /// **'Go to your profile'**
+  String get goToYourProfile;
 }
 
 class _AppLocalizationsDelegate

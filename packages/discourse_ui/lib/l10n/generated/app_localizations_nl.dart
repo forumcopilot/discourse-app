@@ -2921,4 +2921,78 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get activityEmptySolved => 'Nog geen oplossingen';
+
+  @override
+  String get viewProfile => 'Profiel bekijken';
+
+  @override
+  String get yourStuff => 'Jouw spullen';
+
+  @override
+  String get accountAndPrivacy => 'Account en privacy';
+
+  @override
+  String profileStatPosts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'berichten',
+      one: 'bericht',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'likes',
+      one: 'like',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'dagen',
+      one: 'dag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get profileStatSolved => 'opgelost';
+
+  @override
+  String joinForum(String forum) {
+    return 'Word lid van $forum';
+  }
+
+  @override
+  String get guestBenefitPost => 'Antwoorden en onderwerpen starten';
+
+  @override
+  String get guestBenefitNotify => 'Een melding krijgen als iemand reageert';
+
+  @override
+  String get guestBenefitSave => 'Berichten bewaren en concepten houden';
+
+  @override
+  String get guestBenefitChat => 'Chatten en berichten sturen';
+
+  @override
+  String get createAccount => 'Account aanmaken';
+
+  @override
+  String get aboutThisForum => 'Over dit forum';
+
+  @override
+  String get drawerMore => 'Meer';
+
+  @override
+  String get goToYourProfile => 'Naar je profiel';
 }

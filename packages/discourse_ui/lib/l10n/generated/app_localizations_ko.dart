@@ -2800,4 +2800,75 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get activityEmptySolved => '아직 해결책이 없습니다';
+
+  @override
+  String get viewProfile => '프로필 보기';
+
+  @override
+  String get yourStuff => '내 항목';
+
+  @override
+  String get accountAndPrivacy => '계정 및 개인정보';
+
+  @override
+  String profileStatPosts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '게시물',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '좋아요',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '일',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get profileStatSolved => '해결';
+
+  @override
+  String joinForum(String forum) {
+    return '$forum 가입하기';
+  }
+
+  @override
+  String get guestBenefitPost => '답글과 새 주제 작성';
+
+  @override
+  String get guestBenefitNotify => '답글이 달리면 알림 받기';
+
+  @override
+  String get guestBenefitSave => '게시물 북마크와 임시 저장';
+
+  @override
+  String get guestBenefitChat => '채팅과 메시지';
+
+  @override
+  String get createAccount => '계정 만들기';
+
+  @override
+  String get aboutThisForum => '이 포럼 소개';
+
+  @override
+  String get drawerMore => '더 보기';
+
+  @override
+  String get goToYourProfile => '내 프로필로 이동';
 }

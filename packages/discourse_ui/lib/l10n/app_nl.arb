@@ -1361,5 +1361,21 @@
   "activityEmptyTopics": "Nog geen onderwerpen",
   "activityEmptyReplies": "Nog geen antwoorden",
   "activityEmptyLikes": "Nog geen likes gegeven",
-  "activityEmptySolved": "Nog geen oplossingen"
+  "activityEmptySolved": "Nog geen oplossingen",
+  "viewProfile": "Profiel bekijken",
+  "yourStuff": "Jouw spullen",
+  "accountAndPrivacy": "Account en privacy",
+  "profileStatPosts": "{count, plural, =1{bericht} other{berichten}}",
+  "profileStatLikes": "{count, plural, =1{like} other{likes}}",
+  "profileStatDays": "{count, plural, =1{dag} other{dagen}}",
+  "profileStatSolved": "opgelost",
+  "joinForum": "Word lid van {forum}",
+  "guestBenefitPost": "Antwoorden en onderwerpen starten",
+  "guestBenefitNotify": "Een melding krijgen als iemand reageert",
+  "guestBenefitSave": "Berichten bewaren en concepten houden",
+  "guestBenefitChat": "Chatten en berichten sturen",
+  "createAccount": "Account aanmaken",
+  "aboutThisForum": "Over dit forum",
+  "drawerMore": "Meer",
+  "goToYourProfile": "Naar je profiel"
 }

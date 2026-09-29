@@ -2807,4 +2807,75 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get activityEmptySolved => 'まだ解決策がありません';
+
+  @override
+  String get viewProfile => 'プロフィールを見る';
+
+  @override
+  String get yourStuff => 'あなたのもの';
+
+  @override
+  String get accountAndPrivacy => 'アカウントとプライバシー';
+
+  @override
+  String profileStatPosts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '投稿',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'いいね',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '日',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get profileStatSolved => '解決';
+
+  @override
+  String joinForum(String forum) {
+    return '$forum に参加';
+  }
+
+  @override
+  String get guestBenefitPost => '返信してトピックを作成';
+
+  @override
+  String get guestBenefitNotify => '返信があったら通知を受け取る';
+
+  @override
+  String get guestBenefitSave => '投稿をブックマークし、下書きを保存';
+
+  @override
+  String get guestBenefitChat => 'チャットとメッセージ';
+
+  @override
+  String get createAccount => 'アカウントを作成';
+
+  @override
+  String get aboutThisForum => 'このフォーラムについて';
+
+  @override
+  String get drawerMore => 'その他';
+
+  @override
+  String get goToYourProfile => 'プロフィールへ';
 }

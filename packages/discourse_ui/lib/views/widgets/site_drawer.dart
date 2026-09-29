@@ -7,29 +7,22 @@ import 'package:discourse_core/discourse_core.dart'
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../controllers/site_controller.dart';
-import '../../host/discourse_host.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../settings_context.dart';
 import '../../theme/forum_identity.dart';
+import '../../utils/forum_legal_links.dart';
 import '../badges_directory_page.dart';
-import '../bookmarks_page.dart';
-import '../drafts_list_page.dart';
 import '../forum_topics_page.dart';
 import '../groups_list_page.dart';
 import '../in_app_web_view_page.dart';
-import '../invites_page.dart';
 import '../login_page.dart';
 import '../moderation/reviewables_page.dart';
-import '../settings/notification_settings_page.dart';
 import '../site_home_tab.dart';
 import '../tag_topics_page.dart';
 import '../tags_page.dart';
 import '../my_posts_page.dart';
 import '../users_directory_page.dart';
-import 'appearance_sheet.dart';
 import 'category_badge.dart' show categoryForum;
 import 'category_tile_mark.dart';
 import 'forum_icon_tile.dart';
@@ -93,20 +86,6 @@ class SiteDrawer extends StatelessWidget {
                     onTap: () =>
                         _push(context, MyPostsPage(siteContext: siteContext)),
                   ),
-                if (signedIn) ...[
-                  _Item(
-                    icon: Icons.bookmark_outline,
-                    label: l10n.bookmarks,
-                    onTap: () =>
-                        _push(context, BookmarksPage(siteContext: siteContext)),
-                  ),
-                  _Item(
-                    icon: Icons.edit_note_outlined,
-                    label: l10n.drafts,
-                    onTap: () =>
-                        _push(context, DraftsListPage(siteContext: siteContext)),
-                  ),
-                ],
                 // Staff only (admin or moderator), as on the website.
                 if (canModerate)
                   _Item(
@@ -115,43 +94,45 @@ class SiteDrawer extends StatelessWidget {
                     onTap: () => _push(
                         context, ReviewablesPage(siteContext: siteContext)),
                   ),
-                _Item(
-                  icon: Icons.people_outline,
-                  label: l10n.users,
-                  onTap: () => _push(
-                      context, UsersDirectoryPage(siteContext: siteContext)),
-                ),
-                _Item(
-                  icon: Icons.groups_outlined,
-                  label: l10n.groups,
-                  onTap: () =>
-                      _push(context, GroupsListPage(siteContext: siteContext)),
-                ),
-                _Item(
-                  icon: Icons.emoji_events_outlined,
-                  label: l10n.badges,
-                  onTap: () => _push(
-                      context, BadgesDirectoryPage(siteContext: siteContext)),
-                ),
-                // Whether one may invite is the server's call
-                // (invite_allowed_groups); the page says so if not.
-                if (signedIn)
-                  _Item(
-                    icon: Icons.person_add_alt_outlined,
-                    label: l10n.invites,
-                    onTap: () =>
-                        _push(context, InvitesPage(siteContext: siteContext)),
-                  ),
-                _Item(
-                  icon: Icons.info_outline,
-                  label: l10n.about,
-                  onTap: () => _push(
-                    context,
-                    InAppWebViewPage(
-                      url: '${_base()}/about',
-                      title: siteContext.site.name,
+                // The forum's less used places, folded as web's sidebar
+                // folds them under More. Bookmarks, Drafts, Invites and the
+                // settings live on the Profile tab now, with the rest of
+                // the reader's own things. A guest has only these, so they
+                // show unfolded.
+                _MoreItems(
+                  label: l10n.drawerMore,
+                  folds: signedIn,
+                  children: [
+                    _Item(
+                      icon: Icons.people_outline,
+                      label: l10n.users,
+                      onTap: () => _push(context,
+                          UsersDirectoryPage(siteContext: siteContext)),
                     ),
-                  ),
+                    _Item(
+                      icon: Icons.groups_outlined,
+                      label: l10n.groups,
+                      onTap: () => _push(
+                          context, GroupsListPage(siteContext: siteContext)),
+                    ),
+                    _Item(
+                      icon: Icons.emoji_events_outlined,
+                      label: l10n.badges,
+                      onTap: () => _push(context,
+                          BadgesDirectoryPage(siteContext: siteContext)),
+                    ),
+                    _Item(
+                      icon: Icons.info_outline,
+                      label: l10n.about,
+                      onTap: () => _push(
+                        context,
+                        InAppWebViewPage(
+                          url: ForumLegalLinks.aboutUrl(siteContext),
+                          title: siteContext.site.name,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -186,68 +167,21 @@ class SiteDrawer extends StatelessWidget {
                   _Item(
                     icon: Icons.sell_outlined,
                     label: tag,
-                    onTap: () => _push(
-                        context, TagTopicsPage(siteContext: siteContext, tag: tag)),
+                    onTap: () => _push(context,
+                        TagTopicsPage(siteContext: siteContext, tag: tag)),
                   ),
                 _Item(
                   icon: Icons.list,
                   label: l10n.allTags,
-                  onTap: () => _push(context, TagsPage(siteContext: siteContext)),
+                  onTap: () =>
+                      _push(context, TagsPage(siteContext: siteContext)),
                 ),
               ],
             ),
-            _Section(
-              id: 'settings',
-              label: l10n.settings,
-              initiallyOpen: false,
-              children: [
-                if (signedIn)
-                  _Item(
-                    icon: Icons.notifications_none,
-                    label: l10n.notificationSettings,
-                    onTap: () =>
-                        _push(context, const NotificationSettingsPage()),
-                  ),
-                // A device setting, so it shows signed out too; a host with
-                // its own Settings screen keeps it there instead.
-                if (DiscourseHost.showAppearanceSetting)
-                  _Item(
-                    icon: Icons.brightness_6_outlined,
-                    label: l10n.appearance,
-                    trailing: Obx(() => Text(
-                          appearanceLabel(context,
-                              SettingsContext.instance.themeMode.value),
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant),
-                        )),
-                    onTap: () => showAppearanceSheet(context),
-                  ),
-                _Item(
-                  icon: Icons.gavel_outlined,
-                  label: l10n.termsOfService,
-                  onTap: () => _openLegal(
-                      context,
-                      _legalUrl(
-                          DiscourseSiteCapabilities.forSite(
-                                  siteContext.site.pluginUrl)
-                              .tosUrl,
-                          '/tos')),
-                ),
-                _Item(
-                  icon: Icons.policy_outlined,
-                  label: l10n.privacyPolicy,
-                  onTap: () => _openLegal(
-                      context,
-                      _legalUrl(
-                          DiscourseSiteCapabilities.forSite(
-                                  siteContext.site.pluginUrl)
-                              .privacyPolicyUrl,
-                          '/privacy')),
-                ),
-              ],
-            ),
+            // Terms and Privacy, small, as the web sidebar's footer has
+            // them. Notification settings and Appearance moved to the
+            // Profile tab.
+            _LegalFooter(siteContext: siteContext),
           ],
         ),
       ),
@@ -293,8 +227,6 @@ class SiteDrawer extends StatelessWidget {
     return tags.take(_maxTags).toList();
   }
 
-  String _base() => siteContext.site.url.replaceAll(RegExp(r'/+$'), '');
-
   // Close the drawer first, so the new page arrives over the closed state.
   void _push(BuildContext context, Widget page) {
     Navigator.of(context).pop();
@@ -307,25 +239,6 @@ class SiteDrawer extends StatelessWidget {
     if (Get.isRegistered<DiscourseSiteController>()) {
       Get.find<DiscourseSiteController>().requestedHomeTab.value = tab;
     }
-  }
-
-  /// A legal page's address from the site setting, which may be absolute
-  /// (a hosted forum's company page) or site-relative, else the page every
-  /// Discourse serves.
-  String _legalUrl(String? configured, String fallbackPath) {
-    final value = (configured ?? '').trim();
-    if (value.isEmpty) return '${_base()}$fallbackPath';
-    if (value.startsWith('http://') || value.startsWith('https://')) {
-      return value;
-    }
-    return '${_base()}${value.startsWith('/') ? '' : '/'}$value';
-  }
-
-  Future<void> _openLegal(BuildContext context, String url) async {
-    Navigator.of(context).pop();
-    final uri = Uri.tryParse(url);
-    if (uri == null) return;
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }
 
@@ -392,53 +305,195 @@ class _Header extends StatelessWidget {
                   : null,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
-                child: Row(children: [
-                  RemoteCircleAvatar(
-                    radius: 18,
-                    backgroundColor: scheme.surfaceContainerHighest,
-                    imageUrl: signedIn ? user.iconUrl : null,
-                    fallback: Icon(Icons.person_outline,
-                        size: 20, color: scheme.onSurfaceVariant),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          signedIn ? user.username : l10n.notSignedIn,
-                          style: text.titleSmall,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(children: [
+                      RemoteCircleAvatar(
+                        radius: 18,
+                        backgroundColor: scheme.surfaceContainerHighest,
+                        imageUrl: signedIn ? user.iconUrl : null,
+                        fallback: Icon(Icons.person_outline,
+                            size: 20, color: scheme.onSurfaceVariant),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              signedIn ? user.username : l10n.notSignedIn,
+                              style: text.titleSmall,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              signedIn
+                                  ? [
+                                      if (level != null)
+                                        l10n.trustLevelN(level),
+                                      l10n.goToYourProfile,
+                                    ].join(' · ')
+                                  : l10n.signInToPostAndGetNotifications,
+                              style: text.bodySmall
+                                  ?.copyWith(color: scheme.onSurfaceVariant),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
-                        Text(
-                          signedIn
-                              ? (level != null ? l10n.trustLevelN(level) : host)
-                              : l10n.signInToPostAndGetNotifications,
-                          style: text.bodySmall
-                              ?.copyWith(color: scheme.onSurfaceVariant),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (signedIn)
-                    Icon(Icons.chevron_right, color: scheme.onSurfaceVariant)
-                  else
-                    FilledButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        LoginPage.open(siteContext);
-                      },
-                      child: Text(l10n.signIn),
-                    ),
-                ]),
+                      ),
+                      if (signedIn)
+                        Icon(Icons.chevron_right,
+                            color: scheme.onSurfaceVariant),
+                    ]),
+                    if (!signedIn)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10, right: 4),
+                        child: Row(children: [
+                          Expanded(
+                            child: FilledButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                LoginPage.open(siteContext);
+                              },
+                              child: Text(l10n.signIn),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                LoginPage.open(siteContext);
+                              },
+                              child: Text(l10n.createAccount),
+                            ),
+                          ),
+                        ]),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// The community links the drawer folds under "More", as web's sidebar
+/// does. Open or closed is remembered, like the sections. Unfolded, and
+/// without the More row, when [folds] is off (a guest has nothing else).
+class _MoreItems extends StatefulWidget {
+  const _MoreItems({
+    required this.label,
+    required this.children,
+    this.folds = true,
+  });
+
+  final String label;
+  final List<Widget> children;
+  final bool folds;
+
+  @override
+  State<_MoreItems> createState() => _MoreItemsState();
+}
+
+class _MoreItemsState extends State<_MoreItems> {
+  static const _key = 'drawer_section_open_more';
+  bool _open = false;
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      final saved = prefs.getBool(_key);
+      if (saved != null && mounted && saved != _open) {
+        setState(() => _open = saved);
+      }
+    });
+  }
+
+  void _toggle() {
+    setState(() => _open = !_open);
+    SharedPreferences.getInstance().then((p) => p.setBool(_key, _open));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.folds) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: widget.children,
+      );
+    }
+    final scheme = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Semantics(
+          expanded: _open,
+          child: _Item(
+            icon: Icons.more_horiz,
+            label: widget.label,
+            trailing: Icon(_open ? Icons.expand_less : Icons.expand_more,
+                size: 20, color: scheme.onSurfaceVariant),
+            onTap: _toggle,
+          ),
+        ),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 150),
+          alignment: Alignment.topCenter,
+          child: _open
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: widget.children,
+                )
+              : const SizedBox(width: double.infinity),
+        ),
+      ],
+    );
+  }
+}
+
+/// Terms and Privacy, small, at the foot of the drawer.
+class _LegalFooter extends StatelessWidget {
+  const _LegalFooter({required this.siteContext});
+
+  final SiteContext siteContext;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final style = Theme.of(context)
+        .textTheme
+        .bodySmall
+        ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 28, vertical: 4),
+          child: Divider(height: 1),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Wrap(children: [
+            TextButton(
+              onPressed: () =>
+                  ForumLegalLinks.open(ForumLegalLinks.termsUrl(siteContext)),
+              child: Text(l10n.termsOfService, style: style),
+            ),
+            TextButton(
+              onPressed: () =>
+                  ForumLegalLinks.open(ForumLegalLinks.privacyUrl(siteContext)),
+              child: Text(l10n.privacyPolicy, style: style),
+            ),
+          ]),
+        ),
+      ],
     );
   }
 }
@@ -450,20 +505,18 @@ class _Section extends StatefulWidget {
     required this.id,
     required this.label,
     required this.children,
-    this.initiallyOpen = true,
   });
 
   final String id;
   final String label;
   final List<Widget> children;
-  final bool initiallyOpen;
 
   @override
   State<_Section> createState() => _SectionState();
 }
 
 class _SectionState extends State<_Section> {
-  late bool _open = widget.initiallyOpen;
+  bool _open = true;
 
   String get _key => 'drawer_section_open_${widget.id}';
 
@@ -505,8 +558,8 @@ class _SectionState extends State<_Section> {
               child: Row(children: [
                 Expanded(
                   child: Text(widget.label,
-                      style:
-                          text.titleSmall?.copyWith(color: scheme.onSurfaceVariant)),
+                      style: text.titleSmall
+                          ?.copyWith(color: scheme.onSurfaceVariant)),
                 ),
                 Icon(_open ? Icons.expand_less : Icons.expand_more,
                     size: 20, color: scheme.onSurfaceVariant),

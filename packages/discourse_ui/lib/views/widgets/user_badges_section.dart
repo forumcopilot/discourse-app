@@ -25,10 +25,15 @@ class UserBadgesSection extends StatefulWidget {
   /// row, not a scroll gesture; beyond this the sheet is the better view.
   final int maxToShow;
 
+  /// The section's break and "Badges" title. Off on a page that is only
+  /// the badges, whose app bar already says so.
+  final bool showHeading;
+
   const UserBadgesSection({
     super.key,
     required this.username,
     this.maxToShow = 18,
+    this.showHeading = true,
   });
 
   @override
@@ -133,28 +138,32 @@ class _UserBadgesSectionState extends State<UserBadgesSection> {
     final visible = badges.take(widget.maxToShow).toList();
     final remaining = badges.length - visible.length;
 
+    final chips = Wrap(
+      spacing: DesignTokens.spacingS,
+      runSpacing: DesignTokens.spacingS,
+      children: [
+        for (final b in visible)
+          _BadgeChip(
+            badge: b,
+            background: _bgFor(b.tier, colorScheme),
+            foreground: _fgFor(b.tier, Theme.of(context).colorScheme.surface),
+            onTap: () => showBadgeDetailSheet(context, b),
+          ),
+        if (remaining > 0)
+          ActionChip(
+            label: Text(AppLocalizations.of(context)!.moreBadges(remaining)),
+            onPressed: () => _showAll(context),
+          ),
+      ],
+    );
+    if (!widget.showHeading) {
+      return Padding(padding: DesignTokens.paddingL, child: chips);
+    }
     return ProfileSection(
-      title: 'Badges',
+      title: AppLocalizations.of(context)!.badges,
       contentPadding:
           const EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
-      child: Wrap(
-        spacing: DesignTokens.spacingS,
-        runSpacing: DesignTokens.spacingS,
-        children: [
-          for (final b in visible)
-            _BadgeChip(
-              badge: b,
-              background: _bgFor(b.tier, colorScheme),
-              foreground: _fgFor(b.tier, Theme.of(context).colorScheme.surface),
-              onTap: () => showBadgeDetailSheet(context, b),
-            ),
-          if (remaining > 0)
-            ActionChip(
-              label: Text(AppLocalizations.of(context)!.moreBadges(remaining)),
-              onPressed: () => _showAll(context),
-            ),
-        ],
-      ),
+      child: chips,
     );
   }
 }
@@ -265,8 +274,7 @@ class _AllBadgesSheet extends StatelessWidget {
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.workspace_premium),
                   title: Text(b.name),
-                  subtitle:
-                      b.description != null ? Text(b.description!) : null,
+                  subtitle: b.description != null ? Text(b.description!) : null,
                   trailing: b.grantCount > 1 ? Text('×${b.grantCount}') : null,
                   onTap: () => showBadgeDetailSheet(context, b),
                 );

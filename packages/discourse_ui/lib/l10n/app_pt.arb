@@ -1063,5 +1063,21 @@
   "activityEmptyTopics": "Nenhum tópico ainda",
   "activityEmptyReplies": "Nenhuma resposta ainda",
   "activityEmptyLikes": "Nenhuma curtida dada ainda",
-  "activityEmptySolved": "Nenhuma solução ainda"
+  "activityEmptySolved": "Nenhuma solução ainda",
+  "viewProfile": "Ver perfil",
+  "yourStuff": "Suas coisas",
+  "accountAndPrivacy": "Conta e privacidade",
+  "profileStatPosts": "{count, plural, =1{publicação} other{publicações}}",
+  "profileStatLikes": "{count, plural, =1{curtida} other{curtidas}}",
+  "profileStatDays": "{count, plural, =1{dia} other{dias}}",
+  "profileStatSolved": "resolvidos",
+  "joinForum": "Entre em {forum}",
+  "guestBenefitPost": "Responda e crie tópicos",
+  "guestBenefitNotify": "Receba avisos quando responderem",
+  "guestBenefitSave": "Salve publicações e rascunhos",
+  "guestBenefitChat": "Converse e envie mensagens",
+  "createAccount": "Criar conta",
+  "aboutThisForum": "Sobre este fórum",
+  "drawerMore": "Mais",
+  "goToYourProfile": "Ir para seu perfil"
 }

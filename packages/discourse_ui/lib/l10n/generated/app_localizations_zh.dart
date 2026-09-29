@@ -2775,4 +2775,75 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get activityEmptySolved => '还没有解决方案';
+
+  @override
+  String get viewProfile => '查看个人资料';
+
+  @override
+  String get yourStuff => '我的内容';
+
+  @override
+  String get accountAndPrivacy => '账户和隐私';
+
+  @override
+  String profileStatPosts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '帖子',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '赞',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '天',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get profileStatSolved => '已解决';
+
+  @override
+  String joinForum(String forum) {
+    return '加入 $forum';
+  }
+
+  @override
+  String get guestBenefitPost => '回复和发起主题';
+
+  @override
+  String get guestBenefitNotify => '有人回复时收到通知';
+
+  @override
+  String get guestBenefitSave => '收藏帖子，保存草稿';
+
+  @override
+  String get guestBenefitChat => '聊天和发送消息';
+
+  @override
+  String get createAccount => '创建账户';
+
+  @override
+  String get aboutThisForum => '关于此论坛';
+
+  @override
+  String get drawerMore => '更多';
+
+  @override
+  String get goToYourProfile => '前往你的个人资料';
 }

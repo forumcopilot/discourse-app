@@ -2934,4 +2934,84 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get activityEmptySolved => 'Пока нет решений';
+
+  @override
+  String get viewProfile => 'Открыть профиль';
+
+  @override
+  String get yourStuff => 'Ваше';
+
+  @override
+  String get accountAndPrivacy => 'Аккаунт и приватность';
+
+  @override
+  String profileStatPosts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'сообщения',
+      many: 'сообщений',
+      few: 'сообщения',
+      one: 'сообщение',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'лайка',
+      many: 'лайков',
+      few: 'лайка',
+      one: 'лайк',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'дня',
+      many: 'дней',
+      few: 'дня',
+      one: 'день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get profileStatSolved => 'решено';
+
+  @override
+  String joinForum(String forum) {
+    return 'Присоединиться к $forum';
+  }
+
+  @override
+  String get guestBenefitPost => 'Отвечать и создавать темы';
+
+  @override
+  String get guestBenefitNotify => 'Получать уведомления об ответах';
+
+  @override
+  String get guestBenefitSave => 'Сохранять закладки и черновики';
+
+  @override
+  String get guestBenefitChat => 'Чат и личные сообщения';
+
+  @override
+  String get createAccount => 'Создать аккаунт';
+
+  @override
+  String get aboutThisForum => 'Об этом форуме';
+
+  @override
+  String get drawerMore => 'Ещё';
+
+  @override
+  String get goToYourProfile => 'Перейти в профиль';
 }

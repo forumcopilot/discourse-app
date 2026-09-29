@@ -1063,5 +1063,21 @@
   "activityEmptyTopics": "Aucun sujet pour l’instant",
   "activityEmptyReplies": "Aucune réponse pour l’instant",
   "activityEmptyLikes": "Aucun j’aime donné",
-  "activityEmptySolved": "Aucune solution pour l’instant"
+  "activityEmptySolved": "Aucune solution pour l’instant",
+  "viewProfile": "Voir le profil",
+  "yourStuff": "Vos contenus",
+  "accountAndPrivacy": "Compte et confidentialité",
+  "profileStatPosts": "{count, plural, =1{message} other{messages}}",
+  "profileStatLikes": "{count, plural, other{j’aime}}",
+  "profileStatDays": "{count, plural, =1{jour} other{jours}}",
+  "profileStatSolved": "résolus",
+  "joinForum": "Rejoindre {forum}",
+  "guestBenefitPost": "Répondre et créer des sujets",
+  "guestBenefitNotify": "Être averti quand on vous répond",
+  "guestBenefitSave": "Garder des signets et des brouillons",
+  "guestBenefitChat": "Discuter et envoyer des messages",
+  "createAccount": "Créer un compte",
+  "aboutThisForum": "À propos de ce forum",
+  "drawerMore": "Plus",
+  "goToYourProfile": "Aller à votre profil"
 }

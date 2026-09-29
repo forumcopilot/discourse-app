@@ -1064,5 +1064,21 @@
   "activityEmptyTopics": "Пока нет тем",
   "activityEmptyReplies": "Пока нет ответов",
   "activityEmptyLikes": "Вы ещё не ставили лайки",
-  "activityEmptySolved": "Пока нет решений"
+  "activityEmptySolved": "Пока нет решений",
+  "viewProfile": "Открыть профиль",
+  "yourStuff": "Ваше",
+  "accountAndPrivacy": "Аккаунт и приватность",
+  "profileStatPosts": "{count, plural, one{сообщение} few{сообщения} many{сообщений} other{сообщения}}",
+  "profileStatLikes": "{count, plural, one{лайк} few{лайка} many{лайков} other{лайка}}",
+  "profileStatDays": "{count, plural, one{день} few{дня} many{дней} other{дня}}",
+  "profileStatSolved": "решено",
+  "joinForum": "Присоединиться к {forum}",
+  "guestBenefitPost": "Отвечать и создавать темы",
+  "guestBenefitNotify": "Получать уведомления об ответах",
+  "guestBenefitSave": "Сохранять закладки и черновики",
+  "guestBenefitChat": "Чат и личные сообщения",
+  "createAccount": "Создать аккаунт",
+  "aboutThisForum": "Об этом форуме",
+  "drawerMore": "Ещё",
+  "goToYourProfile": "Перейти в профиль"
 }

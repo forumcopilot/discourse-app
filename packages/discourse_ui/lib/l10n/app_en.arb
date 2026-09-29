@@ -3499,5 +3499,89 @@
   "activityEmptySolved": "No solutions yet",
   "@activityEmptySolved": {
     "description": "Empty activity filter: solutions"
+  },
+  "viewProfile": "View profile",
+  "@viewProfile": {
+    "description": "Profile tab button: open your public profile as others see it"
+  },
+  "yourStuff": "Your stuff",
+  "@yourStuff": {
+    "description": "Profile tab section heading: your posts, drafts, bookmarks, badges, invites"
+  },
+  "accountAndPrivacy": "Account and privacy",
+  "@accountAndPrivacy": {
+    "description": "Profile tab row opening email, password, ignored users and account deletion"
+  },
+  "profileStatPosts": "{count, plural, =1{post} other{posts}}",
+  "@profileStatPosts": {
+    "description": "Label under your post count on the Profile tab; the number is shown above it",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileStatLikes": "{count, plural, =1{like} other{likes}}",
+  "@profileStatLikes": {
+    "description": "Label under the likes you have received on the Profile tab",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileStatDays": "{count, plural, =1{day} other{days}}",
+  "@profileStatDays": {
+    "description": "Label under the days you have visited on the Profile tab",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileStatSolved": "solved",
+  "@profileStatSolved": {
+    "description": "Label under the number of your accepted solutions on the Profile tab"
+  },
+  "joinForum": "Join {forum}",
+  "@joinForum": {
+    "description": "Heading on the Profile tab for a guest",
+    "placeholders": {
+      "forum": {
+        "type": "String"
+      }
+    }
+  },
+  "guestBenefitPost": "Reply and start topics",
+  "@guestBenefitPost": {
+    "description": "What signing in lets a guest do"
+  },
+  "guestBenefitNotify": "Get notified when people reply",
+  "@guestBenefitNotify": {
+    "description": "What signing in lets a guest do"
+  },
+  "guestBenefitSave": "Bookmark posts and keep drafts",
+  "@guestBenefitSave": {
+    "description": "What signing in lets a guest do"
+  },
+  "guestBenefitChat": "Chat and send messages",
+  "@guestBenefitChat": {
+    "description": "What signing in lets a guest do (forums with chat)"
+  },
+  "createAccount": "Create account",
+  "@createAccount": {
+    "description": "Button opening sign-up"
+  },
+  "aboutThisForum": "About this forum",
+  "@aboutThisForum": {
+    "description": "Row opening the forum's About page"
+  },
+  "drawerMore": "More",
+  "@drawerMore": {
+    "description": "Drawer row folding the less used community links (users, groups, badges, about)"
+  },
+  "goToYourProfile": "Go to your profile",
+  "@goToYourProfile": {
+    "description": "Subtitle on the drawer's account card"
   }
 }

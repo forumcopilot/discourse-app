@@ -113,6 +113,10 @@ class DiscourseUserSummary {
   /// Only present when viewing one's own summary.
   final int? bookmarkCount;
 
+  /// Accepted solutions (discourse-solved's `solved_count`). Null on a
+  /// forum without the plugin, which is also how to tell.
+  final int? solvedCount;
+
   /// False when Discourse hid the numeric stats from this viewer (all
   /// stat fields above will be 0 in that case).
   final bool canSeeSummaryStats;
@@ -138,6 +142,7 @@ class DiscourseUserSummary {
     this.topicCount = 0,
     this.timeRead = 0,
     this.recentTimeRead = 0,
+    this.solvedCount,
     this.bookmarkCount,
     this.canSeeSummaryStats = false,
     this.badgeCount = 0,

@@ -33,22 +33,32 @@ import 'widgets/filter_chip_bar.dart';
 /// * Saved drafts are announced at the top, as web's sidebar link turns
 ///   into "My drafts" while there are any.
 class MyPostsPage extends StatefulWidget {
-  const MyPostsPage({super.key, required this.siteContext});
+  const MyPostsPage({
+    super.key,
+    required this.siteContext,
+    this.initialFilter = MyPostsFilter.all,
+  });
 
   final SiteContext siteContext;
+
+  /// The filter it opens on — the Profile tab's stats open their own.
+  final MyPostsFilter initialFilter;
 
   @override
   State<MyPostsPage> createState() => _MyPostsPageState();
 }
 
-enum _Filter { all, topics, replies, likes, solved, pending }
+
+
+/// The page's filters, as web's activity tabs.
+enum MyPostsFilter { all, topics, replies, likes, solved, pending }
 
 enum _Bucket { today, week, earlier }
 
 class _MyPostsPageState extends State<MyPostsPage> {
   final _scroll = ScrollController();
 
-  _Filter _filter = _Filter.all;
+  late MyPostsFilter _filter = widget.initialFilter;
   List<Object> _items = const [];
   bool _loading = true;
   bool _loadingMore = false;
@@ -109,7 +119,7 @@ class _MyPostsPageState extends State<MyPostsPage> {
     if (!mounted || pending == null) return;
     setState(() {
       _pending = pending;
-      if (_filter == _Filter.pending) _items = pending;
+      if (_filter == MyPostsFilter.pending) _items = pending;
     });
   }
 
@@ -131,10 +141,10 @@ class _MyPostsPageState extends State<MyPostsPage> {
     }
   }
 
-  static int? _actionFilter(_Filter f) => switch (f) {
-        _Filter.replies => ActivityFilters.replies,
-        _Filter.likes => ActivityFilters.likes,
-        _Filter.solved => ActivityFilters.solved,
+  static int? _actionFilter(MyPostsFilter f) => switch (f) {
+        MyPostsFilter.replies => ActivityFilters.replies,
+        MyPostsFilter.likes => ActivityFilters.likes,
+        MyPostsFilter.solved => ActivityFilters.solved,
         _ => null,
       };
 
@@ -160,9 +170,9 @@ class _MyPostsPageState extends State<MyPostsPage> {
     var hasMore = false;
     String? error;
     switch (_filter) {
-      case _Filter.pending:
+      case MyPostsFilter.pending:
         batch = _pending;
-      case _Filter.topics:
+      case MyPostsFilter.topics:
         final proxy = _topicProxy;
         if (proxy == null) break;
         final r = await proxy.getTopicsCreatedByAsync(username, page: _page);
@@ -176,7 +186,7 @@ class _MyPostsPageState extends State<MyPostsPage> {
           _offset,
           username,
           actionFilter: _actionFilter(_filter) ?? ActivityFilters.replies,
-          actionFilters: _filter == _Filter.all
+          actionFilters: _filter == MyPostsFilter.all
               ? const [ActivityFilters.topics, ActivityFilters.replies]
               : null,
         );
@@ -197,7 +207,7 @@ class _MyPostsPageState extends State<MyPostsPage> {
     });
   }
 
-  void _select(_Filter f) {
+  void _select(MyPostsFilter f) {
     if (f == _filter) return;
     setState(() => _filter = f);
     if (_scroll.hasClients) _scroll.jumpTo(0);
@@ -244,20 +254,20 @@ class _MyPostsPageState extends State<MyPostsPage> {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final filters = [
-      _Filter.all,
-      _Filter.topics,
-      _Filter.replies,
-      _Filter.likes,
-      _Filter.solved,
-      if (_pending.isNotEmpty || _filter == _Filter.pending) _Filter.pending,
+      MyPostsFilter.all,
+      MyPostsFilter.topics,
+      MyPostsFilter.replies,
+      MyPostsFilter.likes,
+      MyPostsFilter.solved,
+      if (_pending.isNotEmpty || _filter == MyPostsFilter.pending) MyPostsFilter.pending,
     ];
-    String label(_Filter f) => switch (f) {
-          _Filter.all => l10n.all,
-          _Filter.topics => l10n.activityFilterTopics,
-          _Filter.replies => l10n.activityFilterReplies,
-          _Filter.likes => l10n.activityFilterLikes,
-          _Filter.solved => l10n.solved,
-          _Filter.pending =>
+    String label(MyPostsFilter f) => switch (f) {
+          MyPostsFilter.all => l10n.all,
+          MyPostsFilter.topics => l10n.activityFilterTopics,
+          MyPostsFilter.replies => l10n.activityFilterReplies,
+          MyPostsFilter.likes => l10n.activityFilterLikes,
+          MyPostsFilter.solved => l10n.solved,
+          MyPostsFilter.pending =>
             '${l10n.activityFilterPending} (${_pending.length})',
         };
 
@@ -323,10 +333,10 @@ class _MyPostsPageState extends State<MyPostsPage> {
     }
     if (_items.isEmpty) {
       final (icon, message, hint) = switch (_filter) {
-        _Filter.topics => (Icons.topic_outlined, l10n.activityEmptyTopics, null),
-        _Filter.replies => (Icons.reply_rounded, l10n.activityEmptyReplies, null),
-        _Filter.likes => (Icons.favorite_border, l10n.activityEmptyLikes, null),
-        _Filter.solved =>
+        MyPostsFilter.topics => (Icons.topic_outlined, l10n.activityEmptyTopics, null),
+        MyPostsFilter.replies => (Icons.reply_rounded, l10n.activityEmptyReplies, null),
+        MyPostsFilter.likes => (Icons.favorite_border, l10n.activityEmptyLikes, null),
+        MyPostsFilter.solved =>
           (Icons.check_circle_outline, l10n.activityEmptySolved, null),
         _ => (Icons.forum_outlined, l10n.myPostsEmpty, l10n.myPostsEmptyHint),
       };
@@ -340,7 +350,7 @@ class _MyPostsPageState extends State<MyPostsPage> {
 
     // Topics are listed by latest activity, not by when they were started,
     // so their dates do not fall into time groups.
-    final grouped = _filter != _Filter.topics;
+    final grouped = _filter != MyPostsFilter.topics;
     final entries = <Object>[];
     _Bucket? bucket;
     for (final item in _items) {
@@ -489,14 +499,14 @@ class _MyPostsPageState extends State<MyPostsPage> {
   /// accepted the answer, on Solved; nothing on the reader's own posts.
   ActivityAttribution? _attribution(AppLocalizations l10n, FCUserReply p) {
     final me = (_username ?? '').toLowerCase();
-    if (_filter == _Filter.likes &&
+    if (_filter == MyPostsFilter.likes &&
         p.authorName.isNotEmpty &&
         p.authorName.toLowerCase() != me) {
       return ActivityAttribution(
           username: p.authorName, avatarUrl: p.authorIconUrl);
     }
     final actor = p.actorName;
-    if (_filter == _Filter.solved && actor != null && actor.isNotEmpty) {
+    if (_filter == MyPostsFilter.solved && actor != null && actor.isNotEmpty) {
       return ActivityAttribution(
         username: actor,
         avatarUrl: p.actorIconUrl,

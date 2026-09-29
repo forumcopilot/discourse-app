@@ -976,6 +976,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
             key: _profileTabKey,
             isActive: _isCurrentTab(_profileTab),
             autoShowLogin: SiteHomePage.triggerProfileAutoLogin,
+            boardStats: _boardStats,
             siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
           );
         default:

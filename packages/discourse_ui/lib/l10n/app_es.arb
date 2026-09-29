@@ -1063,5 +1063,21 @@
   "activityEmptyTopics": "Aún no hay temas",
   "activityEmptyReplies": "Aún no hay respuestas",
   "activityEmptyLikes": "Aún no has dado me gusta",
-  "activityEmptySolved": "Aún no hay soluciones"
+  "activityEmptySolved": "Aún no hay soluciones",
+  "viewProfile": "Ver perfil",
+  "yourStuff": "Lo tuyo",
+  "accountAndPrivacy": "Cuenta y privacidad",
+  "profileStatPosts": "{count, plural, =1{publicación} other{publicaciones}}",
+  "profileStatLikes": "{count, plural, other{me gusta}}",
+  "profileStatDays": "{count, plural, =1{día} other{días}}",
+  "profileStatSolved": "resueltos",
+  "joinForum": "Únete a {forum}",
+  "guestBenefitPost": "Responde y crea temas",
+  "guestBenefitNotify": "Recibe avisos cuando te respondan",
+  "guestBenefitSave": "Guarda publicaciones y borradores",
+  "guestBenefitChat": "Chatea y envía mensajes",
+  "createAccount": "Crear cuenta",
+  "aboutThisForum": "Acerca de este foro",
+  "drawerMore": "Más",
+  "goToYourProfile": "Ir a tu perfil"
 }

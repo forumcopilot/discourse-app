@@ -2910,4 +2910,78 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get activityEmptySolved => 'No solutions yet';
+
+  @override
+  String get viewProfile => 'View profile';
+
+  @override
+  String get yourStuff => 'Your stuff';
+
+  @override
+  String get accountAndPrivacy => 'Account and privacy';
+
+  @override
+  String profileStatPosts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'posts',
+      one: 'post',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'likes',
+      one: 'like',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String profileStatDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'days',
+      one: 'day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get profileStatSolved => 'solved';
+
+  @override
+  String joinForum(String forum) {
+    return 'Join $forum';
+  }
+
+  @override
+  String get guestBenefitPost => 'Reply and start topics';
+
+  @override
+  String get guestBenefitNotify => 'Get notified when people reply';
+
+  @override
+  String get guestBenefitSave => 'Bookmark posts and keep drafts';
+
+  @override
+  String get guestBenefitChat => 'Chat and send messages';
+
+  @override
+  String get createAccount => 'Create account';
+
+  @override
+  String get aboutThisForum => 'About this forum';
+
+  @override
+  String get drawerMore => 'More';
+
+  @override
+  String get goToYourProfile => 'Go to your profile';
 }

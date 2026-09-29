@@ -1063,5 +1063,21 @@
   "activityEmptyTopics": "还没有主题",
   "activityEmptyReplies": "还没有回复",
   "activityEmptyLikes": "还没有点过赞",
-  "activityEmptySolved": "还没有解决方案"
+  "activityEmptySolved": "还没有解决方案",
+  "viewProfile": "查看个人资料",
+  "yourStuff": "我的内容",
+  "accountAndPrivacy": "账户和隐私",
+  "profileStatPosts": "{count, plural, other{帖子}}",
+  "profileStatLikes": "{count, plural, other{赞}}",
+  "profileStatDays": "{count, plural, other{天}}",
+  "profileStatSolved": "已解决",
+  "joinForum": "加入 {forum}",
+  "guestBenefitPost": "回复和发起主题",
+  "guestBenefitNotify": "有人回复时收到通知",
+  "guestBenefitSave": "收藏帖子，保存草稿",
+  "guestBenefitChat": "聊天和发送消息",
+  "createAccount": "创建账户",
+  "aboutThisForum": "关于此论坛",
+  "drawerMore": "更多",
+  "goToYourProfile": "前往你的个人资料"
 }

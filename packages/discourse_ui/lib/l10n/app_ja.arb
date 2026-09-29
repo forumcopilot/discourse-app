@@ -1063,5 +1063,21 @@
   "activityEmptyTopics": "まだトピックがありません",
   "activityEmptyReplies": "まだ返信がありません",
   "activityEmptyLikes": "まだいいねしていません",
-  "activityEmptySolved": "まだ解決策がありません"
+  "activityEmptySolved": "まだ解決策がありません",
+  "viewProfile": "プロフィールを見る",
+  "yourStuff": "あなたのもの",
+  "accountAndPrivacy": "アカウントとプライバシー",
+  "profileStatPosts": "{count, plural, other{投稿}}",
+  "profileStatLikes": "{count, plural, other{いいね}}",
+  "profileStatDays": "{count, plural, other{日}}",
+  "profileStatSolved": "解決",
+  "joinForum": "{forum} に参加",
+  "guestBenefitPost": "返信してトピックを作成",
+  "guestBenefitNotify": "返信があったら通知を受け取る",
+  "guestBenefitSave": "投稿をブックマークし、下書きを保存",
+  "guestBenefitChat": "チャットとメッセージ",
+  "createAccount": "アカウントを作成",
+  "aboutThisForum": "このフォーラムについて",
+  "drawerMore": "その他",
+  "goToYourProfile": "プロフィールへ"
 }
