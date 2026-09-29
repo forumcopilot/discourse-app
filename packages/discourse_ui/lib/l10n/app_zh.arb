@@ -1026,5 +1026,15 @@
   "relatedTopics": "相关主题",
   "relatedMessages": "相关消息",
   "moreInCategory": "{category} 中的更多主题",
-  "latestTopics": "最新主题"
+  "latestTopics": "最新主题",
+  "pushGroupMessages": "消息和聊天",
+  "pushGroupMessagesHint": "私信、群组收件箱和聊天",
+  "pushGroupReplies": "回复和提及",
+  "pushGroupRepliesHint": "回复、提及、引用和关注的话题",
+  "pushGroupReactions": "点赞和回应",
+  "pushGroupReactionsHint": "对你帖子的点赞和回应",
+  "pushGroupOther": "其他所有",
+  "pushGroupOtherHint": "徽章、提醒、被采纳的回答等",
+  "pushChannelOther": "其他通知",
+  "couldNotChangePushSetting": "无法更改此设置，请稍后再试。"
 }

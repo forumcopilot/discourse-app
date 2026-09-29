@@ -2782,4 +2782,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get latestTopics => 'Latest topics';
+
+  @override
+  String get pushGroupMessages => 'Messages and chat';
+
+  @override
+  String get pushGroupMessagesHint =>
+      'Personal messages, group inboxes and chat';
+
+  @override
+  String get pushGroupReplies => 'Replies and mentions';
+
+  @override
+  String get pushGroupRepliesHint =>
+      'Replies, mentions, quotes and topics you watch';
+
+  @override
+  String get pushGroupReactions => 'Likes and reactions';
+
+  @override
+  String get pushGroupReactionsHint => 'Likes and reactions to your posts';
+
+  @override
+  String get pushGroupOther => 'Everything else';
+
+  @override
+  String get pushGroupOtherHint =>
+      'Badges, reminders, accepted answers and more';
+
+  @override
+  String get pushChannelOther => 'Other notifications';
+
+  @override
+  String get couldNotChangePushSetting =>
+      'Couldn\'t change this setting. Try again later.';
 }

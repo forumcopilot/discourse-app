@@ -1027,5 +1027,15 @@
   "relatedTopics": "Связанные темы",
   "relatedMessages": "Связанные сообщения",
   "moreInCategory": "Ещё в разделе «{category}»",
-  "latestTopics": "Последние темы"
+  "latestTopics": "Последние темы",
+  "pushGroupMessages": "Сообщения и чат",
+  "pushGroupMessagesHint": "Личные сообщения, групповые входящие и чат",
+  "pushGroupReplies": "Ответы и упоминания",
+  "pushGroupRepliesHint": "Ответы, упоминания, цитаты и отслеживаемые темы",
+  "pushGroupReactions": "Лайки и реакции",
+  "pushGroupReactionsHint": "Лайки и реакции на ваши сообщения",
+  "pushGroupOther": "Всё остальное",
+  "pushGroupOtherHint": "Значки, напоминания, принятые ответы и прочее",
+  "pushChannelOther": "Другие уведомления",
+  "couldNotChangePushSetting": "Не удалось изменить эту настройку. Повторите попытку позже."
 }

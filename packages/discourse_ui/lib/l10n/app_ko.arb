@@ -1020,5 +1020,15 @@
   "relatedTopics": "관련 주제",
   "relatedMessages": "관련 메시지",
   "moreInCategory": "{category}의 다른 주제",
-  "latestTopics": "최신 주제"
+  "latestTopics": "최신 주제",
+  "pushGroupMessages": "메시지와 채팅",
+  "pushGroupMessagesHint": "개인 메시지, 그룹 받은편지함, 채팅",
+  "pushGroupReplies": "답글과 멘션",
+  "pushGroupRepliesHint": "답글, 멘션, 인용, 관심 주제",
+  "pushGroupReactions": "좋아요와 반응",
+  "pushGroupReactionsHint": "내 게시물에 대한 좋아요와 반응",
+  "pushGroupOther": "그 밖의 모든 것",
+  "pushGroupOtherHint": "배지, 리마인더, 채택된 답변 등",
+  "pushChannelOther": "기타 알림",
+  "couldNotChangePushSetting": "이 설정을 변경하지 못했습니다. 나중에 다시 시도하세요."
 }

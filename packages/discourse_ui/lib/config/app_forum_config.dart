@@ -161,13 +161,25 @@ class AppForumConfig {
   /// The name and description are what the user sees in the system settings.
   static const String notificationChannelId = 'forum_copilot_channel';
 
-  static String _notificationChannelName = 'Forum notifications';
-  static String _notificationChannelDescription =
-      'Replies, mentions, messages and other activity on your forums';
+  /// One channel per push group, as the backend names them
+  /// (NotificationPayload::channelFor in abda-push), so each can be silenced
+  /// or made quieter in the system settings. "other" is
+  /// [notificationChannelId], the channel every build has.
+  static const Map<String, String> notificationChannelIdForGroup = {
+    'messages': 'discourse_messages',
+    'replies': 'discourse_replies',
+    'reactions': 'discourse_reactions',
+    'other': notificationChannelId,
+  };
+
+  static String? _notificationChannelName;
+  static String? _notificationChannelDescription;
   static String _androidNotificationIcon = '@mipmap/ic_launcher';
 
-  static String get notificationChannelName => _notificationChannelName;
-  static String get notificationChannelDescription =>
+  /// A host's own name and description for the "other" channel, or null
+  /// for the app's translated ones ("Other notifications").
+  static String? get notificationChannelName => _notificationChannelName;
+  static String? get notificationChannelDescription =>
       _notificationChannelDescription;
 
   /// The small icon for notifications the app shows itself. Android draws it

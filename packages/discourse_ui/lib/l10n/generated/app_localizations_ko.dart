@@ -2680,4 +2680,34 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get latestTopics => '최신 주제';
+
+  @override
+  String get pushGroupMessages => '메시지와 채팅';
+
+  @override
+  String get pushGroupMessagesHint => '개인 메시지, 그룹 받은편지함, 채팅';
+
+  @override
+  String get pushGroupReplies => '답글과 멘션';
+
+  @override
+  String get pushGroupRepliesHint => '답글, 멘션, 인용, 관심 주제';
+
+  @override
+  String get pushGroupReactions => '좋아요와 반응';
+
+  @override
+  String get pushGroupReactionsHint => '내 게시물에 대한 좋아요와 반응';
+
+  @override
+  String get pushGroupOther => '그 밖의 모든 것';
+
+  @override
+  String get pushGroupOtherHint => '배지, 리마인더, 채택된 답변 등';
+
+  @override
+  String get pushChannelOther => '기타 알림';
+
+  @override
+  String get couldNotChangePushSetting => '이 설정을 변경하지 못했습니다. 나중에 다시 시도하세요.';
 }

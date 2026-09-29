@@ -17,6 +17,7 @@ import '../enable_notifications_page.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/simple_list_app_bar.dart';
 import '../../utils/error_message.dart';
+import '../../utils/snackbar_helper.dart';
 import '../widgets/sheet_title.dart';
 import '../widgets/section_header.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -382,6 +383,11 @@ class _NotificationsGrantTileState extends State<_NotificationsGrantTile> {
   bool _busy = false;
   bool _granted = false;
 
+  /// Per-type switches exist for grants made under the phone's installation.
+  bool _installBound = false;
+  Set<String> _muted = const {};
+  String? _savingGroup;
+
   DiscourseLoginService get _loginService =>
       DiscourseLoginService(widget.siteContext);
 
@@ -393,12 +399,38 @@ class _NotificationsGrantTileState extends State<_NotificationsGrantTile> {
 
   Future<void> _load() async {
     final granted = await _loginService.hasNotificationsGrant();
+    final bound = granted && await _loginService.isNotificationsGrantInstallBound();
+    final muted = bound ? await _loginService.mutedPushGroups() : const <String>{};
     if (!mounted) return;
     setState(() {
       _loading = false;
       _granted = granted;
+      _installBound = bound;
+      _muted = muted;
     });
   }
+
+  Future<void> _setGroup(String group, bool on) async {
+    setState(() => _savingGroup = group);
+    final ok = await _loginService.setPushGroupMuted(group, !on);
+    if (!mounted) return;
+    setState(() {
+      _savingGroup = null;
+      if (ok) _muted = on ? ({..._muted}..remove(group)) : {..._muted, group};
+    });
+    if (!ok) {
+      SnackbarHelper.showError(
+          context, AppLocalizations.of(context)!.couldNotChangePushSetting);
+    }
+  }
+
+  (String, String) _groupLabel(String group, AppLocalizations l10n) =>
+      switch (group) {
+        'messages' => (l10n.pushGroupMessages, l10n.pushGroupMessagesHint),
+        'replies' => (l10n.pushGroupReplies, l10n.pushGroupRepliesHint),
+        'reactions' => (l10n.pushGroupReactions, l10n.pushGroupReactionsHint),
+        _ => (l10n.pushGroupOther, l10n.pushGroupOtherHint),
+      };
 
   Future<void> _turnOn() async {
     await Navigator.of(context).push<bool>(
@@ -445,7 +477,7 @@ class _NotificationsGrantTileState extends State<_NotificationsGrantTile> {
     final colorScheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context)!;
 
-    return ListTile(
+    final tile = ListTile(
       leading: Icon(
         _granted
             ? Icons.notifications_active_outlined
@@ -466,6 +498,30 @@ class _NotificationsGrantTileState extends State<_NotificationsGrantTile> {
               onPressed: _granted ? _turnOff : _turnOn,
               child: Text(_granted ? l10n.turnOff : l10n.turnOn),
             ),
+    );
+    if (!_granted || !_installBound || _loading) return tile;
+
+    // Which kinds of notification this forum pushes to this phone. All on
+    // unless turned off; the backend skips what is off.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        tile,
+        for (final group in NotificationKeyService.pushGroups)
+          Builder(builder: (context) {
+            final (title, hint) = _groupLabel(group, l10n);
+            return SwitchListTile(
+              contentPadding: const EdgeInsets.only(
+                  left: DesignTokens.spacingXL * 2, right: DesignTokens.spacingM),
+              title: Text(title),
+              subtitle: Text(hint),
+              value: !_muted.contains(group),
+              onChanged: _savingGroup != null || _busy
+                  ? null
+                  : (on) => _setGroup(group, on),
+            );
+          }),
+      ],
     );
   }
 }

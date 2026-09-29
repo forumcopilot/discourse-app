@@ -1026,5 +1026,15 @@
   "relatedTopics": "Sujets connexes",
   "relatedMessages": "Messages connexes",
   "moreInCategory": "Plus dans {category}",
-  "latestTopics": "Sujets récents"
+  "latestTopics": "Sujets récents",
+  "pushGroupMessages": "Messages et chat",
+  "pushGroupMessagesHint": "Messages personnels, boîtes de groupe et chat",
+  "pushGroupReplies": "Réponses et mentions",
+  "pushGroupRepliesHint": "Réponses, mentions, citations et sujets suivis",
+  "pushGroupReactions": "J’aime et réactions",
+  "pushGroupReactionsHint": "J’aime et réactions à vos messages",
+  "pushGroupOther": "Tout le reste",
+  "pushGroupOtherHint": "Badges, rappels, réponses acceptées et plus",
+  "pushChannelOther": "Autres notifications",
+  "couldNotChangePushSetting": "Impossible de modifier ce réglage. Réessayez plus tard."
 }

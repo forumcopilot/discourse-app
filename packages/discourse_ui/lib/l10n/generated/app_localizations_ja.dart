@@ -2686,4 +2686,35 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get latestTopics => '最新のトピック';
+
+  @override
+  String get pushGroupMessages => 'メッセージとチャット';
+
+  @override
+  String get pushGroupMessagesHint => '個人メッセージ、グループの受信箱、チャット';
+
+  @override
+  String get pushGroupReplies => '返信とメンション';
+
+  @override
+  String get pushGroupRepliesHint => '返信、メンション、引用、ウォッチ中のトピック';
+
+  @override
+  String get pushGroupReactions => 'いいねとリアクション';
+
+  @override
+  String get pushGroupReactionsHint => 'あなたの投稿へのいいねとリアクション';
+
+  @override
+  String get pushGroupOther => 'その他すべて';
+
+  @override
+  String get pushGroupOtherHint => 'バッジ、リマインダー、採用された回答など';
+
+  @override
+  String get pushChannelOther => 'その他の通知';
+
+  @override
+  String get couldNotChangePushSetting =>
+      'この設定を変更できませんでした。しばらくしてからもう一度お試しください。';
 }

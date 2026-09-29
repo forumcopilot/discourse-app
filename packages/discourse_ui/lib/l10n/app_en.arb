@@ -3341,5 +3341,45 @@
   "latestTopics": "Latest topics",
   "@latestTopics": {
     "description": "Button under a topic's suggested topics opening the forum's latest topics"
+  },
+  "pushGroupMessages": "Messages and chat",
+  "@pushGroupMessages": {
+    "description": "Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)"
+  },
+  "pushGroupMessagesHint": "Personal messages, group inboxes and chat",
+  "@pushGroupMessagesHint": {
+    "description": "Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)"
+  },
+  "pushGroupReplies": "Replies and mentions",
+  "@pushGroupReplies": {
+    "description": "Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)"
+  },
+  "pushGroupRepliesHint": "Replies, mentions, quotes and topics you watch",
+  "@pushGroupRepliesHint": {
+    "description": "Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)"
+  },
+  "pushGroupReactions": "Likes and reactions",
+  "@pushGroupReactions": {
+    "description": "Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)"
+  },
+  "pushGroupReactionsHint": "Likes and reactions to your posts",
+  "@pushGroupReactionsHint": {
+    "description": "Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)"
+  },
+  "pushGroupOther": "Everything else",
+  "@pushGroupOther": {
+    "description": "Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)"
+  },
+  "pushGroupOtherHint": "Badges, reminders, accepted answers and more",
+  "@pushGroupOtherHint": {
+    "description": "Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)"
+  },
+  "pushChannelOther": "Other notifications",
+  "@pushChannelOther": {
+    "description": "Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)"
+  },
+  "couldNotChangePushSetting": "Couldn't change this setting. Try again later.",
+  "@couldNotChangePushSetting": {
+    "description": "Snackbar when a per-type push switch could not be saved on the notifications backend"
   }
 }

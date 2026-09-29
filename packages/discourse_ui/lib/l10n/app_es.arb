@@ -1026,5 +1026,15 @@
   "relatedTopics": "Temas relacionados",
   "relatedMessages": "Mensajes relacionados",
   "moreInCategory": "Más en {category}",
-  "latestTopics": "Temas recientes"
+  "latestTopics": "Temas recientes",
+  "pushGroupMessages": "Mensajes y chat",
+  "pushGroupMessagesHint": "Mensajes personales, bandejas de grupo y chat",
+  "pushGroupReplies": "Respuestas y menciones",
+  "pushGroupRepliesHint": "Respuestas, menciones, citas y temas que sigues",
+  "pushGroupReactions": "Me gusta y reacciones",
+  "pushGroupReactionsHint": "Me gusta y reacciones a tus publicaciones",
+  "pushGroupOther": "Todo lo demás",
+  "pushGroupOtherHint": "Insignias, recordatorios, respuestas aceptadas y más",
+  "pushChannelOther": "Otras notificaciones",
+  "couldNotChangePushSetting": "No se pudo cambiar este ajuste. Inténtalo más tarde."
 }

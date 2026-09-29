@@ -62,6 +62,16 @@ class NotificationKeyService {
   static const String _keyPath = '/discourse/notification-key';
   static const String _devicePath = '/discourse/notification-key/device';
   static const String _dndPath = '/discourse/notification-key/dnd';
+  static const String _groupsPath = '/discourse/notification-key/groups';
+
+  /// The push groups the backend knows (NotificationPayload::GROUPS in
+  /// abda-push), in the order the settings list them.
+  static const List<String> pushGroups = [
+    'replies',
+    'messages',
+    'reactions',
+    'other',
+  ];
 
   /// Base URL without a trailing slash, or null when the flow is off.
   static String? get _baseUrl {
@@ -209,6 +219,30 @@ class NotificationKeyService {
   }) {
     return send('PUT', _dndPath,
         dndBody(siteUrl: siteUrl, clientId: clientId, until: until));
+  }
+
+  /// Turn push groups off (or back on) for this forum on this phone:
+  /// [muted] lists the ones to skip; empty means everything on. What is
+  /// muted is skipped by the backend, not saved for later.
+  static Future<bool> setMutedGroups({
+    required String siteUrl,
+    required String clientId,
+    required List<String> muted,
+  }) {
+    return send('PUT', _groupsPath, mutedGroupsBody(siteUrl: siteUrl, clientId: clientId, muted: muted));
+  }
+
+  /// Body of the push-groups call. Pure, so the contract is testable.
+  static Map<String, dynamic> mutedGroupsBody({
+    required String siteUrl,
+    required String clientId,
+    required List<String> muted,
+  }) {
+    return <String, dynamic>{
+      'site_url': normalizeSiteUrl(siteUrl),
+      'client_id': clientId,
+      'muted_groups': [for (final g in pushGroups) if (muted.contains(g)) g],
+    };
   }
 
   /// Legacy: point a grant made before installations existed at this

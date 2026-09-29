@@ -172,4 +172,28 @@ void main() {
       expect(blocked.reachable, isFalse);
     });
   });
+
+  group('push groups', () {
+    test('the body lists what is off, in a stable order, and only known groups', () {
+      final body = NotificationKeyService.mutedGroupsBody(
+        siteUrl: 'https://forum.example/',
+        clientId: 'c',
+        muted: ['reactions', 'nonsense', 'messages'],
+      );
+      expect(body, {
+        'site_url': 'https://forum.example',
+        'client_id': 'c',
+        'muted_groups': ['messages', 'reactions'],
+      });
+      expect(
+        NotificationKeyService.mutedGroupsBody(siteUrl: 'https://f', clientId: 'c', muted: [])['muted_groups'],
+        isEmpty,
+        reason: 'everything on',
+      );
+    });
+
+    test('the four groups the backend knows, as the settings list them', () {
+      expect(NotificationKeyService.pushGroups, ['replies', 'messages', 'reactions', 'other']);
+    });
+  });
 }

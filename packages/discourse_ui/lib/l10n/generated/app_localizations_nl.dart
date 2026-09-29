@@ -2793,4 +2793,38 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get latestTopics => 'Nieuwste onderwerpen';
+
+  @override
+  String get pushGroupMessages => 'Berichten en chat';
+
+  @override
+  String get pushGroupMessagesHint =>
+      'Persoonlijke berichten, groepsinboxen en chat';
+
+  @override
+  String get pushGroupReplies => 'Antwoorden en vermeldingen';
+
+  @override
+  String get pushGroupRepliesHint =>
+      'Antwoorden, vermeldingen, citaten en gevolgde topics';
+
+  @override
+  String get pushGroupReactions => 'Likes en reacties';
+
+  @override
+  String get pushGroupReactionsHint => 'Likes en reacties op je berichten';
+
+  @override
+  String get pushGroupOther => 'Al het andere';
+
+  @override
+  String get pushGroupOtherHint =>
+      'Badges, herinneringen, geaccepteerde antwoorden en meer';
+
+  @override
+  String get pushChannelOther => 'Overige meldingen';
+
+  @override
+  String get couldNotChangePushSetting =>
+      'Deze instelling kon niet worden gewijzigd. Probeer het later opnieuw.';
 }

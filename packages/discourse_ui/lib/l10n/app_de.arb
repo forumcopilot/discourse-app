@@ -1026,5 +1026,15 @@
   "relatedTopics": "Ähnliche Themen",
   "relatedMessages": "Ähnliche Nachrichten",
   "moreInCategory": "Mehr in {category}",
-  "latestTopics": "Neueste Themen"
+  "latestTopics": "Neueste Themen",
+  "pushGroupMessages": "Nachrichten und Chat",
+  "pushGroupMessagesHint": "Persönliche Nachrichten, Gruppenpostfächer und Chat",
+  "pushGroupReplies": "Antworten und Erwähnungen",
+  "pushGroupRepliesHint": "Antworten, Erwähnungen, Zitate und beobachtete Themen",
+  "pushGroupReactions": "Likes und Reaktionen",
+  "pushGroupReactionsHint": "Likes und Reaktionen auf deine Beiträge",
+  "pushGroupOther": "Alles andere",
+  "pushGroupOtherHint": "Abzeichen, Erinnerungen, akzeptierte Antworten und mehr",
+  "pushChannelOther": "Weitere Benachrichtigungen",
+  "couldNotChangePushSetting": "Diese Einstellung konnte nicht geändert werden. Versuche es später erneut."
 }

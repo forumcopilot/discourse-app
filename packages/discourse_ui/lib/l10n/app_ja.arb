@@ -1026,5 +1026,15 @@
   "relatedTopics": "関連トピック",
   "relatedMessages": "関連メッセージ",
   "moreInCategory": "{category} のトピックをもっと見る",
-  "latestTopics": "最新のトピック"
+  "latestTopics": "最新のトピック",
+  "pushGroupMessages": "メッセージとチャット",
+  "pushGroupMessagesHint": "個人メッセージ、グループの受信箱、チャット",
+  "pushGroupReplies": "返信とメンション",
+  "pushGroupRepliesHint": "返信、メンション、引用、ウォッチ中のトピック",
+  "pushGroupReactions": "いいねとリアクション",
+  "pushGroupReactionsHint": "あなたの投稿へのいいねとリアクション",
+  "pushGroupOther": "その他すべて",
+  "pushGroupOtherHint": "バッジ、リマインダー、採用された回答など",
+  "pushChannelOther": "その他の通知",
+  "couldNotChangePushSetting": "この設定を変更できませんでした。しばらくしてからもう一度お試しください。"
 }

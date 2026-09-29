@@ -1324,5 +1324,15 @@
   "relatedTopics": "Gerelateerde onderwerpen",
   "relatedMessages": "Gerelateerde berichten",
   "moreInCategory": "Meer in {category}",
-  "latestTopics": "Nieuwste onderwerpen"
+  "latestTopics": "Nieuwste onderwerpen",
+  "pushGroupMessages": "Berichten en chat",
+  "pushGroupMessagesHint": "Persoonlijke berichten, groepsinboxen en chat",
+  "pushGroupReplies": "Antwoorden en vermeldingen",
+  "pushGroupRepliesHint": "Antwoorden, vermeldingen, citaten en gevolgde topics",
+  "pushGroupReactions": "Likes en reacties",
+  "pushGroupReactionsHint": "Likes en reacties op je berichten",
+  "pushGroupOther": "Al het andere",
+  "pushGroupOtherHint": "Badges, herinneringen, geaccepteerde antwoorden en meer",
+  "pushChannelOther": "Overige meldingen",
+  "couldNotChangePushSetting": "Deze instelling kon niet worden gewijzigd. Probeer het later opnieuw."
 }

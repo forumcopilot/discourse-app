@@ -2804,4 +2804,38 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get latestTopics => 'Последние темы';
+
+  @override
+  String get pushGroupMessages => 'Сообщения и чат';
+
+  @override
+  String get pushGroupMessagesHint =>
+      'Личные сообщения, групповые входящие и чат';
+
+  @override
+  String get pushGroupReplies => 'Ответы и упоминания';
+
+  @override
+  String get pushGroupRepliesHint =>
+      'Ответы, упоминания, цитаты и отслеживаемые темы';
+
+  @override
+  String get pushGroupReactions => 'Лайки и реакции';
+
+  @override
+  String get pushGroupReactionsHint => 'Лайки и реакции на ваши сообщения';
+
+  @override
+  String get pushGroupOther => 'Всё остальное';
+
+  @override
+  String get pushGroupOtherHint =>
+      'Значки, напоминания, принятые ответы и прочее';
+
+  @override
+  String get pushChannelOther => 'Другие уведомления';
+
+  @override
+  String get couldNotChangePushSetting =>
+      'Не удалось изменить эту настройку. Повторите попытку позже.';
 }

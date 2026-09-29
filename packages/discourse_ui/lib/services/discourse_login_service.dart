@@ -95,6 +95,7 @@ class DiscourseLoginService {
       '_notifications_key_install_bound';
   static const String _prefNotificationsDndReported =
       '_notifications_dnd_reported';
+  static const String _prefNotificationsMuted = '_notifications_muted_groups';
 
   String get _notificationsGrantKey =>
       '${siteContext.discourseStoragePrefix}$_prefNotificationsGranted';
@@ -102,6 +103,8 @@ class DiscourseLoginService {
       '${siteContext.discourseStoragePrefix}$_prefNotificationsInstallBound';
   String get _notificationsDndReportedKey =>
       '${siteContext.discourseStoragePrefix}$_prefNotificationsDndReported';
+  String get _notificationsMutedKey =>
+      '${siteContext.discourseStoragePrefix}$_prefNotificationsMuted';
 
   /// Whether the notifications grant for THIS forum was completed and taken
   /// by the backend. Set by [markNotificationsGranted] once the key is stored
@@ -125,6 +128,37 @@ class DiscourseLoginService {
     await prefs.setBool(_notificationsGrantKey, true);
     await prefs.setBool(_notificationsInstallBoundKey, installBound);
     await prefs.remove(_notificationsDndReportedKey);
+    // A new grant starts with everything on, on the backend too.
+    await prefs.remove(_notificationsMutedKey);
+  }
+
+  /// Whether this forum's grant was registered under the phone's
+  /// installation — only those can have per-type switches.
+  Future<bool> isNotificationsGrantInstallBound() => _isInstallBound();
+
+  /// The push groups turned off for this forum on this phone
+  /// (NotificationKeyService.pushGroups); empty when everything is on.
+  Future<Set<String>> mutedPushGroups() async {
+    final prefs = await SharedPreferences.getInstance();
+    return (prefs.getStringList(_notificationsMutedKey) ?? const []).toSet();
+  }
+
+  /// Turns [group] on or off, on the backend first: the switch only moves
+  /// once the backend has it. False when it could not be saved.
+  Future<bool> setPushGroupMuted(String group, bool muted) async {
+    final current = await mutedPushGroups();
+    final next = {...current};
+    muted ? next.add(group) : next.remove(group);
+    final ok = await NotificationKeyService.setMutedGroups(
+      siteUrl: siteContext.site.url,
+      clientId: await notificationsClientId(),
+      muted: next.toList(),
+    );
+    if (ok) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(_notificationsMutedKey, next.toList());
+    }
+    return ok;
   }
 
   Future<bool> _isInstallBound() async {
@@ -139,6 +173,7 @@ class DiscourseLoginService {
     await prefs.remove(_notificationsGrantKey);
     await prefs.remove(_notificationsInstallBoundKey);
     await prefs.remove(_notificationsDndReportedKey);
+    await prefs.remove(_notificationsMutedKey);
   }
 
   /// Tell the notifications backend about this forum's Do Not Disturb, so

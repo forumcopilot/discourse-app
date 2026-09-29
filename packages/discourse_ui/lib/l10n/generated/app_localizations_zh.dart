@@ -2655,4 +2655,34 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get latestTopics => '最新主题';
+
+  @override
+  String get pushGroupMessages => '消息和聊天';
+
+  @override
+  String get pushGroupMessagesHint => '私信、群组收件箱和聊天';
+
+  @override
+  String get pushGroupReplies => '回复和提及';
+
+  @override
+  String get pushGroupRepliesHint => '回复、提及、引用和关注的话题';
+
+  @override
+  String get pushGroupReactions => '点赞和回应';
+
+  @override
+  String get pushGroupReactionsHint => '对你帖子的点赞和回应';
+
+  @override
+  String get pushGroupOther => '其他所有';
+
+  @override
+  String get pushGroupOtherHint => '徽章、提醒、被采纳的回答等';
+
+  @override
+  String get pushChannelOther => '其他通知';
+
+  @override
+  String get couldNotChangePushSetting => '无法更改此设置，请稍后再试。';
 }

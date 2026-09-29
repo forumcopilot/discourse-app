@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui' show PlatformDispatcher;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ import '../host/discourse_host.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseSocialProxy;
 import 'discourse_route_navigator.dart';
 import 'notification_route.dart';
+import '../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
 
 class NotificationService with ServiceErrorHandlingMixin {
@@ -238,17 +240,50 @@ class NotificationService with ServiceErrorHandlingMixin {
     );
   }
 
+  /// The app's strings in the phone's language, without a BuildContext —
+  /// channels are made before any screen exists. English when the language
+  /// is not one the app speaks.
+  static AppLocalizations _l10n() {
+    try {
+      return lookupAppLocalizations(PlatformDispatcher.instance.locale);
+    } catch (_) {
+      return lookupAppLocalizations(const Locale('en'));
+    }
+  }
+
+  /// One channel per push group (AppForumConfig.notificationChannelIdForGroup),
+  /// so a reader can silence likes, or make chat louder, in the system
+  /// settings — per app, where the per-forum switches are in the app.
+  static List<AndroidNotificationChannel> _channels() {
+    final l10n = _l10n();
+    final ids = AppForumConfig.notificationChannelIdForGroup;
+    return [
+      AndroidNotificationChannel(ids['messages']!, l10n.pushGroupMessages,
+          description: l10n.pushGroupMessagesHint, importance: Importance.high),
+      AndroidNotificationChannel(ids['replies']!, l10n.pushGroupReplies,
+          description: l10n.pushGroupRepliesHint, importance: Importance.high),
+      AndroidNotificationChannel(ids['reactions']!, l10n.pushGroupReactions,
+          description: l10n.pushGroupReactionsHint,
+          importance: Importance.defaultImportance),
+      AndroidNotificationChannel(
+        ids['other']!,
+        AppForumConfig.notificationChannelName ?? l10n.pushChannelOther,
+        description:
+            AppForumConfig.notificationChannelDescription ?? l10n.pushGroupOtherHint,
+        importance: Importance.high,
+      ),
+    ];
+  }
+
+  static AndroidNotificationChannel _channelFor(Map<String, dynamic> data) {
+    final id = AppForumConfig.notificationChannelIdForGroup[
+            data['push_group']?.toString()] ??
+        AppForumConfig.notificationChannelId;
+    return _channels().firstWhere((c) => c.id == id);
+  }
+
   Future<void> _createAndroidNotificationChannel() async {
     if (!Platform.isAndroid) return;
-
-    // Re-creating a channel with an existing id updates its name and
-    // description, so a rename reaches phones that already have it.
-    final channel = AndroidNotificationChannel(
-      AppForumConfig.notificationChannelId,
-      AppForumConfig.notificationChannelName,
-      description: AppForumConfig.notificationChannelDescription,
-      importance: Importance.high,
-    );
 
     final androidPlugin = _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
     if (androidPlugin == null) {
@@ -256,8 +291,13 @@ class NotificationService with ServiceErrorHandlingMixin {
       return;
     }
 
-    await androidPlugin.createNotificationChannel(channel);
-    AppLogger.debug('✅ [NotificationService] Android notification channel created');
+    // Re-creating a channel with an existing id updates its name and
+    // description, so a rename (or a new language) reaches phones that
+    // already have it.
+    for (final channel in _channels()) {
+      await androidPlugin.createNotificationChannel(channel);
+    }
+    AppLogger.debug('✅ [NotificationService] Android notification channels created');
   }
 
   // Get FCM token
@@ -431,13 +471,18 @@ class NotificationService with ServiceErrorHandlingMixin {
     // Several forums share one app icon: group and thread by forum, as the
     // backend does for pushes shown while the app is closed.
     final forum = message.data['site_url']?.toString();
+    // The push group's channel, as the backend names it for the ones the
+    // system shows.
+    final channel = _channelFor(message.data);
     final androidDetails = AndroidNotificationDetails(
-      AppForumConfig.notificationChannelId,
-      AppForumConfig.notificationChannelName,
-      channelDescription: AppForumConfig.notificationChannelDescription,
+      channel.id,
+      channel.name,
+      channelDescription: channel.description,
       icon: AppForumConfig.androidNotificationIcon,
-      importance: Importance.high,
-      priority: Priority.high,
+      importance: channel.importance,
+      priority: channel.importance == Importance.high
+          ? Priority.high
+          : Priority.defaultPriority,
       showWhen: true,
       groupKey: forum,
     );

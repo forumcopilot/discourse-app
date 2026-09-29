@@ -4623,6 +4623,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Latest topics'**
   String get latestTopics;
+
+  /// Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)
+  ///
+  /// In en, this message translates to:
+  /// **'Messages and chat'**
+  String get pushGroupMessages;
+
+  /// Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)
+  ///
+  /// In en, this message translates to:
+  /// **'Personal messages, group inboxes and chat'**
+  String get pushGroupMessagesHint;
+
+  /// Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)
+  ///
+  /// In en, this message translates to:
+  /// **'Replies and mentions'**
+  String get pushGroupReplies;
+
+  /// Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)
+  ///
+  /// In en, this message translates to:
+  /// **'Replies, mentions, quotes and topics you watch'**
+  String get pushGroupRepliesHint;
+
+  /// Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)
+  ///
+  /// In en, this message translates to:
+  /// **'Likes and reactions'**
+  String get pushGroupReactions;
+
+  /// Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)
+  ///
+  /// In en, this message translates to:
+  /// **'Likes and reactions to your posts'**
+  String get pushGroupReactionsHint;
+
+  /// Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)
+  ///
+  /// In en, this message translates to:
+  /// **'Everything else'**
+  String get pushGroupOther;
+
+  /// Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)
+  ///
+  /// In en, this message translates to:
+  /// **'Badges, reminders, accepted answers and more'**
+  String get pushGroupOtherHint;
+
+  /// Push notification group (a per-type switch in Settings → Notifications, and an Android notification channel)
+  ///
+  /// In en, this message translates to:
+  /// **'Other notifications'**
+  String get pushChannelOther;
+
+  /// Snackbar when a per-type push switch could not be saved on the notifications backend
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t change this setting. Try again later.'**
+  String get couldNotChangePushSetting;
 }
 
 class _AppLocalizationsDelegate
