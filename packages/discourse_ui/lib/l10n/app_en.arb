@@ -3246,6 +3246,10 @@
   "@myPosts": {
     "description": "Drawer link to the signed-in user's own posts (Discourse sidebar: My posts)"
   },
+  "drawerIntroduction": "This forum's categories, tags and your account are all in this menu. Open it again any time with the menu button.",
+  "@drawerIntroduction": {
+    "description": "Shown once at the top of a forum's drawer (the menu), the one time it opens by itself in a multi-forum app, beside a menu icon"
+  },
   "trustLevelN": "Trust level {level}",
   "@trustLevelN": {
     "description": "The signed-in user's Discourse trust level, in the drawer's account card",

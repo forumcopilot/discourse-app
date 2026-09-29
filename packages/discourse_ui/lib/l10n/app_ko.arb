@@ -1002,6 +1002,7 @@
   "allCategories": "모든 카테고리",
   "allTags": "모든 태그",
   "myPosts": "내 게시물",
+  "drawerIntroduction": "이 포럼의 카테고리, 태그, 계정은 모두 이 메뉴에 있습니다. 메뉴 버튼으로 언제든지 다시 열 수 있습니다.",
   "trustLevelN": "신뢰 수준 {level}",
   "filterNew": "새 글",
   "filterTop": "인기",

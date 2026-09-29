@@ -1008,6 +1008,7 @@
   "allCategories": "すべてのカテゴリ",
   "allTags": "すべてのタグ",
   "myPosts": "自分の投稿",
+  "drawerIntroduction": "このフォーラムのカテゴリ、タグ、アカウントはすべてこのメニューにあります。メニューボタンからいつでも開けます。",
   "trustLevelN": "信頼レベル {level}",
   "filterNew": "新着",
   "filterTop": "トップ",

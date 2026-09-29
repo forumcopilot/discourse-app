@@ -2726,6 +2726,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get myPosts => 'Mijn berichten';
 
   @override
+  String get drawerIntroduction =>
+      'De categorieën, tags en je account van dit forum staan allemaal in dit menu. Open het altijd weer met de menuknop.';
+
+  @override
   String trustLevelN(int level) {
     return 'Vertrouwensniveau $level';
   }

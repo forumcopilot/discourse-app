@@ -2715,6 +2715,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get myPosts => 'My posts';
 
   @override
+  String get drawerIntroduction =>
+      'This forum\'s categories, tags and your account are all in this menu. Open it again any time with the menu button.';
+
+  @override
   String trustLevelN(int level) {
     return 'Trust level $level';
   }

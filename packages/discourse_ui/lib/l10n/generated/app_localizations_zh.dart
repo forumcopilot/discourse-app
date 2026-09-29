@@ -2591,6 +2591,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get myPosts => '我的帖子';
 
   @override
+  String get drawerIntroduction => '此论坛的类别、标签和您的账户都在这个菜单里。随时点按菜单按钮即可再次打开。';
+
+  @override
   String trustLevelN(int level) {
     return '信任等级 $level';
   }

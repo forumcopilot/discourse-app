@@ -2729,6 +2729,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get myPosts => 'Mis publicaciones';
 
   @override
+  String get drawerIntroduction =>
+      'Las categorías, etiquetas y tu cuenta de este foro están en este menú. Ábrelo cuando quieras con el botón de menú.';
+
+  @override
   String trustLevelN(int level) {
     return 'Nivel de confianza $level';
   }

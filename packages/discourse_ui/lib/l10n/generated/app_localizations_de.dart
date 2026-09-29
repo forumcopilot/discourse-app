@@ -2741,6 +2741,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get myPosts => 'Meine Beiträge';
 
   @override
+  String get drawerIntroduction =>
+      'Die Kategorien, Schlagwörter und dein Konto in diesem Forum findest du alle in diesem Menü. Öffne es jederzeit wieder mit der Menü-Schaltfläche.';
+
+  @override
   String trustLevelN(int level) {
     return 'Vertrauensstufe $level';
   }

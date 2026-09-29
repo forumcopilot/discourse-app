@@ -2737,6 +2737,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get myPosts => 'Мои сообщения';
 
   @override
+  String get drawerIntroduction =>
+      'Категории, теги и ваш аккаунт на этом форуме — в этом меню. Открыть его снова можно в любой момент кнопкой меню.';
+
+  @override
   String trustLevelN(int level) {
     return 'Уровень доверия $level';
   }

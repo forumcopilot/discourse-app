@@ -4510,6 +4510,12 @@ abstract class AppLocalizations {
   /// **'My posts'**
   String get myPosts;
 
+  /// Shown once at the top of a forum's drawer (the menu), the one time it opens by itself in a multi-forum app, beside a menu icon
+  ///
+  /// In en, this message translates to:
+  /// **'This forum\'s categories, tags and your account are all in this menu. Open it again any time with the menu button.'**
+  String get drawerIntroduction;
+
   /// The signed-in user's Discourse trust level, in the drawer's account card
   ///
   /// In en, this message translates to:

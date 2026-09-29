@@ -1008,6 +1008,7 @@
   "allCategories": "所有类别",
   "allTags": "所有标签",
   "myPosts": "我的帖子",
+  "drawerIntroduction": "此论坛的类别、标签和您的账户都在这个菜单里。随时点按菜单按钮即可再次打开。",
   "trustLevelN": "信任等级 {level}",
   "filterNew": "新",
   "filterTop": "热门",

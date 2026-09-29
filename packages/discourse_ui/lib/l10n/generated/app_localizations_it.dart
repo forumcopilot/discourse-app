@@ -2734,6 +2734,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get myPosts => 'I miei messaggi';
 
   @override
+  String get drawerIntroduction =>
+      'Le categorie, i tag e il tuo account di questo forum sono in questo menu. Riaprilo quando vuoi con il pulsante del menu.';
+
+  @override
   String trustLevelN(int level) {
     return 'Livello di fiducia $level';
   }

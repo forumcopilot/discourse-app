@@ -1008,6 +1008,7 @@
   "allCategories": "Toutes les catégories",
   "allTags": "Toutes les étiquettes",
   "myPosts": "Mes messages",
+  "drawerIntroduction": "Les catégories, les étiquettes et votre compte sur ce forum se trouvent dans ce menu. Rouvrez-le à tout moment avec le bouton de menu.",
   "trustLevelN": "Niveau de confiance {level}",
   "filterNew": "Nouveaux",
   "filterTop": "Top",

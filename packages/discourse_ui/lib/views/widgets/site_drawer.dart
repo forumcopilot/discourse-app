@@ -25,6 +25,7 @@ import '../my_posts_page.dart';
 import '../users_directory_page.dart';
 import 'category_badge.dart' show categoryForum;
 import 'category_tile_mark.dart';
+import 'drawer_introduction.dart' show DrawerIntroduction;
 import 'forum_icon_tile.dart';
 import 'remote_circle_avatar.dart';
 
@@ -42,10 +43,16 @@ class SiteDrawer extends StatelessWidget {
   /// destination.
   final bool homeIsCurrent;
 
+  /// Whether the drawer opened by itself to introduce itself
+  /// ([DrawerIntroduction]): a line under the header says what it holds and
+  /// how to open it again.
+  final bool introduction;
+
   const SiteDrawer({
     super.key,
     required this.siteContext,
     this.homeIsCurrent = false,
+    this.introduction = false,
   });
 
   /// How many categories and tags the drawer lists before "All …".
@@ -67,6 +74,7 @@ class SiteDrawer extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 24),
           children: [
             _Header(siteContext: siteContext),
+            if (introduction) const _Introduction(),
             _Section(
               id: 'community',
               label: l10n.community,
@@ -239,6 +247,40 @@ class SiteDrawer extends StatelessWidget {
     if (Get.isRegistered<DiscourseSiteController>()) {
       Get.find<DiscourseSiteController>().requestedHomeTab.value = tab;
     }
+  }
+}
+
+/// What the drawer is and how to open it again, shown the one time it opens
+/// by itself: beside ☰, so the button is recognised in the app bar.
+class _Introduction extends StatelessWidget {
+  const _Introduction();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      child: Material(
+        color: scheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 16, 12),
+          child: Row(children: [
+            Icon(Icons.menu, color: scheme.onSecondaryContainer),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context)!.drawerIntroduction,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: scheme.onSecondaryContainer),
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
   }
 }
 

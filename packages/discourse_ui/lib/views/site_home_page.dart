@@ -27,6 +27,7 @@ import 'tabs/profile_tab.dart';
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
 import 'widgets/category_picker_sheet.dart';
 import 'widgets/resettable_widget.dart';
+import 'widgets/drawer_introduction.dart';
 import 'widgets/site_drawer.dart';
 import 'site_home_tab.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -779,6 +780,10 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
   /// Whether the drawer is open. Back closes it before anything else.
   bool _drawerOpen = false;
 
+  /// Whether the drawer opened by itself, the one time it introduces itself
+  /// ([DrawerIntroduction]); its introduction shows until it closes.
+  bool _introducingDrawer = false;
+
   /// Whether Back returns to the first tab rather than leaving: on Android,
   /// from any other tab, as Material's navigation bar has it (the first tab
   /// is the fixed start destination). It used to leave the forum, or close
@@ -873,6 +878,9 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
       _lastLoggedShouldShowFAB = shouldShowFAB;
     }
 
+    // Pushed over a host's forum list (ABDA), rather than the app's root.
+    final hostedHome = ModalRoute.canPopOf(context) ?? false;
+
     return PopScope(
       canPop: !_backReturnsToFirstTab(context),
       onPopInvokedWithResult: (didPop, _) {
@@ -884,7 +892,14 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
       },
       child: Scaffold(
         appBar: _buildAppBarForCurrentTab(isLoggedIn, canSendPM),
-        onDrawerChanged: (open) => setState(() => _drawerOpen = open),
+        onDrawerChanged: (open) {
+          setState(() {
+            _drawerOpen = open;
+            if (!open) _introducingDrawer = false;
+          });
+          // Opened by the reader: found, so it never opens by itself.
+          if (open) DrawerIntroduction.markSeen();
+        },
         // Phase 5.18a — hamburger drawer hosts the moved Tags tab plus
         // future community directories (Users / Groups / Badges) and
         // account actions. Drawer is mounted at the Scaffold level so
@@ -893,6 +908,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
         drawer: SiteDrawer(
           siteContext: _siteContext!,
           homeIsCurrent: _isCurrentTab(_topicsTab),
+          introduction: _introducingDrawer,
         ),
         // Pushed over a host's forum list, the home's left edge means Back:
         // iOS's swipe and Android's system gesture both claim it, except that
@@ -900,15 +916,21 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
         // instead. One meaning per edge, so there the drawer opens from its
         // button only. A root home (the single-forum app) has nothing behind
         // it, so its edge opens the drawer.
-        drawerEnableOpenDragGesture: !(ModalRoute.canPopOf(context) ?? false),
+        drawerEnableOpenDragGesture: !hostedHome,
         // Android's gesture navigation keeps the outermost strip of the edge
         // for its own Back, which from a root home would close the app. The
         // drawer's strip starts where the system's ends; without gesture
         // navigation that inset is zero and this is Flutter's default.
         drawerEdgeDragWidth: _drawerEdgeDragWidth(context),
-        body: IndexedStack(
-          index: _tabController.index,
-          children: _buildTabWidgets(),
+        // With the edge taken by Back, the drawer opens from ☰ only: it
+        // shows itself once, so the button is known.
+        body: DrawerIntroduction(
+          enabled: hostedHome,
+          onIntroduce: () => setState(() => _introducingDrawer = true),
+          child: IndexedStack(
+            index: _tabController.index,
+            children: _buildTabWidgets(),
+          ),
         ),
         bottomNavigationBar: NavigationBar(
           onDestinationSelected: (int index) {

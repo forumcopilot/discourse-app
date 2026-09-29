@@ -1008,6 +1008,7 @@
   "allCategories": "Todas las categorías",
   "allTags": "Todas las etiquetas",
   "myPosts": "Mis publicaciones",
+  "drawerIntroduction": "Las categorías, etiquetas y tu cuenta de este foro están en este menú. Ábrelo cuando quieras con el botón de menú.",
   "trustLevelN": "Nivel de confianza {level}",
   "filterNew": "Nuevos",
   "filterTop": "Destacados",

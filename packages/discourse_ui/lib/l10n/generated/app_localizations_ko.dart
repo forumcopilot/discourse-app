@@ -2615,6 +2615,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get myPosts => '내 게시물';
 
   @override
+  String get drawerIntroduction =>
+      '이 포럼의 카테고리, 태그, 계정은 모두 이 메뉴에 있습니다. 메뉴 버튼으로 언제든지 다시 열 수 있습니다.';
+
+  @override
   String trustLevelN(int level) {
     return '신뢰 수준 $level';
   }

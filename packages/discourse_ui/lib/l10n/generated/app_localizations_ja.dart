@@ -2622,6 +2622,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get myPosts => '自分の投稿';
 
   @override
+  String get drawerIntroduction =>
+      'このフォーラムのカテゴリ、タグ、アカウントはすべてこのメニューにあります。メニューボタンからいつでも開けます。';
+
+  @override
   String trustLevelN(int level) {
     return '信頼レベル $level';
   }
