@@ -1121,5 +1121,7 @@
   "untitledTopic": "Tópico sem título",
   "draftDiscarded": "Rascunho descartado",
   "draftsEmpty": "Nenhum rascunho ainda",
-  "draftsEmptyHint": "Rascunhos são salvos enquanto você digita. Comece uma resposta ou um tópico e ele estará esperando aqui."
+  "draftsEmptyHint": "Rascunhos são salvos enquanto você digita. Comece uma resposta ou um tópico e ele estará esperando aqui.",
+  "privacySection": "Privacidade",
+  "changeEmailSubtitle": "Enviaremos um link de verificação para o novo endereço"
 }

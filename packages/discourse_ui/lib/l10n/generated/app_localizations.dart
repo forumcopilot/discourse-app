@@ -5193,6 +5193,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Drafts save themselves as you type. Start a reply or a topic and it will wait for you here.'**
   String get draftsEmptyHint;
+
+  /// Account and privacy page: heading over ignored users
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get privacySection;
+
+  /// Account and privacy page: under Change email
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll send a verification link to the new address'**
+  String get changeEmailSubtitle;
 }
 
 class _AppLocalizationsDelegate

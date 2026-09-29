@@ -2990,4 +2990,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get draftsEmptyHint => '草稿会在你输入时自动保存。开始写回复或主题，它会在这里等你。';
+
+  @override
+  String get privacySection => '隐私';
+
+  @override
+  String get changeEmailSubtitle => '我们会向新地址发送验证链接';
 }

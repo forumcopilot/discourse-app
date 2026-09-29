@@ -1121,5 +1121,7 @@
   "untitledTopic": "Tema sin título",
   "draftDiscarded": "Borrador descartado",
   "draftsEmpty": "Aún no hay borradores",
-  "draftsEmptyHint": "Los borradores se guardan mientras escribes. Empieza una respuesta o un tema y te esperará aquí."
+  "draftsEmptyHint": "Los borradores se guardan mientras escribes. Empieza una respuesta o un tema y te esperará aquí.",
+  "privacySection": "Privacidad",
+  "changeEmailSubtitle": "Te enviaremos un enlace de verificación a la nueva dirección"
 }

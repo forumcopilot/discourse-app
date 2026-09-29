@@ -3160,4 +3160,11 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get draftsEmptyHint =>
       'Entwürfe speichern sich beim Tippen. Beginne eine Antwort oder ein Thema, dann wartet es hier auf dich.';
+
+  @override
+  String get privacySection => 'Privatsphäre';
+
+  @override
+  String get changeEmailSubtitle =>
+      'Wir senden einen Bestätigungslink an die neue Adresse';
 }

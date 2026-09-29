@@ -3796,5 +3796,13 @@
   "draftsEmptyHint": "Drafts save themselves as you type. Start a reply or a topic and it will wait for you here.",
   "@draftsEmptyHint": {
     "description": "Drafts empty state hint"
+  },
+  "privacySection": "Privacy",
+  "@privacySection": {
+    "description": "Account and privacy page: heading over ignored users"
+  },
+  "changeEmailSubtitle": "We'll send a verification link to the new address",
+  "@changeEmailSubtitle": {
+    "description": "Account and privacy page: under Change email"
   }
 }

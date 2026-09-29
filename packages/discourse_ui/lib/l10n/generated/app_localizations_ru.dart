@@ -3161,4 +3161,11 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get draftsEmptyHint =>
       'Черновики сохраняются, пока вы пишете. Начните ответ или тему, и он будет ждать здесь.';
+
+  @override
+  String get privacySection => 'Приватность';
+
+  @override
+  String get changeEmailSubtitle =>
+      'Мы отправим ссылку для подтверждения на новый адрес';
 }

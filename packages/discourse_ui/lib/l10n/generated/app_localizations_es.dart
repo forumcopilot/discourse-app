@@ -3146,4 +3146,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get draftsEmptyHint =>
       'Los borradores se guardan mientras escribes. Empieza una respuesta o un tema y te esperará aquí.';
+
+  @override
+  String get privacySection => 'Privacidad';
+
+  @override
+  String get changeEmailSubtitle =>
+      'Te enviaremos un enlace de verificación a la nueva dirección';
 }

@@ -2,6 +2,7 @@ import 'package:discourse_core/discourse_core.dart';
 import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/theme/app_theme.dart';
+import 'package:discourse_ui/views/settings_page.dart';
 import 'package:discourse_ui/views/tabs/profile_tab.dart';
 import 'package:discourse_ui/views/widgets/site_drawer.dart';
 import 'package:flutter/material.dart';
@@ -88,6 +89,24 @@ void main() {
       // Drafts and bookmarks carry their counts.
       expect(find.text('2'), findsOneWidget);
       expect(find.text('3'), findsOneWidget);
+    });
+
+    testWidgets('Account and privacy repeats nothing the tab already has',
+        (tester) async {
+      final ctx = context();
+      await pump(tester, ForumSettingsPage(siteContext: ctx));
+
+      expect(find.text('Account and privacy'), findsOneWidget);
+      for (final row in ['Account', 'Change email', 'Change password',
+          'Privacy', 'Ignored users', 'Manage account on web']) {
+        expect(find.text(row), findsOneWidget, reason: row);
+      }
+      expect(find.text('Delete account'), findsWidgets);
+      // Notification settings and Terms / Privacy Policy are on the tab.
+      for (final gone in ['Notifications', 'Notification settings',
+          'Terms of Service', 'Privacy Policy']) {
+        expect(find.text(gone), findsNothing, reason: gone);
+      }
     });
   });
 

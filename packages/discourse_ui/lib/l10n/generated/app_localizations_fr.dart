@@ -3154,4 +3154,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get draftsEmptyHint =>
       'Les brouillons s’enregistrent pendant que vous écrivez. Commencez une réponse ou un sujet et il vous attendra ici.';
+
+  @override
+  String get privacySection => 'Confidentialité';
+
+  @override
+  String get changeEmailSubtitle =>
+      'Nous enverrons un lien de vérification à la nouvelle adresse';
 }

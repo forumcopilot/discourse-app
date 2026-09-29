@@ -3023,4 +3023,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get draftsEmptyHint => '下書きは入力中に自動保存されます。返信やトピックを書き始めると、ここに表示されます。';
+
+  @override
+  String get privacySection => 'プライバシー';
+
+  @override
+  String get changeEmailSubtitle => '新しいアドレスに確認リンクを送信します';
 }

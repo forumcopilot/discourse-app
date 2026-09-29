@@ -1121,5 +1121,7 @@
   "untitledTopic": "无标题主题",
   "draftDiscarded": "已丢弃草稿",
   "draftsEmpty": "还没有草稿",
-  "draftsEmptyHint": "草稿会在你输入时自动保存。开始写回复或主题，它会在这里等你。"
+  "draftsEmptyHint": "草稿会在你输入时自动保存。开始写回复或主题，它会在这里等你。",
+  "privacySection": "隐私",
+  "changeEmailSubtitle": "我们会向新地址发送验证链接"
 }

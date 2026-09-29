@@ -3,33 +3,21 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:discourse_core/discourse_core.dart'
-    show DiscourseSiteCapabilities, DiscourseUserProxy;
+import 'package:discourse_core/discourse_core.dart' show DiscourseUserProxy;
 
 import '../controllers/login_controller.dart';
 import '../theme/design_tokens.dart';
 import 'change_email_page.dart';
 import 'ignored_users_page.dart';
-import 'settings/notification_settings_page.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
 import 'widgets/section_header.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
 
-/// Phase 5.20d — Forum Settings page rebuilt as a curated Discourse-
-/// native section list.
-///
-/// The original implementation called `getUserSettingsCategories()`
-/// (XF-shaped flat list of typed categories) which returned `[]` on
-/// Discourse — Discourse exposes preferences as a flat structure
-/// under `/u/{me}.json#user_option`, not as nested categories. The
-/// resulting page rendered an empty "No settings available" state
-/// with just a Delete Account block at the bottom.
-///
-/// New page surfaces the actual settings entry points the app
-/// supports natively, plus a link to the full Discourse-web prefs
-/// for anything not modelled in the app.
+/// Account and privacy, opened from the Profile tab: changing email and
+/// password, ignored users, the website's preferences for everything the
+/// app doesn't model, and deleting the account.
 class ForumSettingsPage extends StatelessWidget {
   final SiteContext siteContext;
 
@@ -37,93 +25,50 @@ class ForumSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    Widget row(IconData icon, String title, String subtitle,
+            VoidCallback onTap,
+            {IconData trailing = Icons.chevron_right_rounded}) =>
+        ListTile(
+          leading: Icon(icon, color: colorScheme.onSurfaceVariant),
+          title: Text(title),
+          subtitle: Text(subtitle),
+          trailing: Icon(trailing, color: colorScheme.onSurfaceVariant),
+          onTap: onTap,
+        );
+    // Notifications, Appearance and the forum's Terms and Privacy are on
+    // the Profile tab that opens this page, so they are not repeated here.
     return Scaffold(
-      appBar: const SimpleListAppBar(title: 'Account & preferences'),
+      appBar: SimpleListAppBar(title: l10n.accountAndPrivacy),
       body: ListView(
         children: [
-          _Section(label: 'Preferences'),
-          ListTile(
-            leading: Icon(Icons.notifications_outlined,
-                color: colorScheme.onSurfaceVariant),
-            title: Text(AppLocalizations.of(context)!.notifications),
-            subtitle: Text(
-              AppLocalizations.of(context)!.emailSettingsSubtitle,
-            ),
-            trailing: Icon(Icons.chevron_right_rounded,
-                color: colorScheme.onSurfaceVariant),
-            onTap: () => Navigator.of(context).push(
+          _Section(label: l10n.account),
+          row(Icons.alternate_email_rounded, l10n.changeEmail,
+              l10n.changeEmailSubtitle, () => _openChangeEmail(context)),
+          row(Icons.password_rounded, l10n.changePassword,
+              l10n.changePasswordSubtitle,
+              () => _confirmPasswordReset(context)),
+          _Section(label: l10n.privacySection),
+          row(
+            Icons.notifications_off_outlined,
+            l10n.ignoredUsers,
+            l10n.ignoredUsersSubtitle,
+            () => Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => const NotificationSettingsPage(),
-              ),
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.open_in_new_rounded,
-                color: colorScheme.onSurfaceVariant),
-            title: Text(AppLocalizations.of(context)!.manageAccountOnWeb),
-            subtitle: Text(
-              AppLocalizations.of(context)!.manageAccountSubtitle,
-            ),
-            trailing: Icon(Icons.chevron_right_rounded,
-                color: colorScheme.onSurfaceVariant),
-            onTap: () => _openWebPreferences(context),
-          ),
-          const Divider(height: 1),
-          _Section(label: 'Account'),
-          ListTile(
-            leading: Icon(Icons.alternate_email_rounded,
-                color: colorScheme.onSurfaceVariant),
-            title: Text(AppLocalizations.of(context)!.changeEmail),
-            subtitle: Text(
-              "We'll send a verification link to the new address",
-            ),
-            trailing: Icon(Icons.chevron_right_rounded,
-                color: colorScheme.onSurfaceVariant),
-            onTap: () => _openChangeEmail(context),
-          ),
-          ListTile(
-            leading: Icon(Icons.password_rounded,
-                color: colorScheme.onSurfaceVariant),
-            title: Text(AppLocalizations.of(context)!.changePassword),
-            subtitle: Text(
-              AppLocalizations.of(context)!.changePasswordSubtitle,
-            ),
-            trailing: Icon(Icons.chevron_right_rounded,
-                color: colorScheme.onSurfaceVariant),
-            onTap: () => _confirmPasswordReset(context),
-          ),
-          ListTile(
-            leading: Icon(Icons.notifications_off_outlined,
-                color: colorScheme.onSurfaceVariant),
-            title: Text(AppLocalizations.of(context)!.ignoredUsers),
-            subtitle: Text(
-              AppLocalizations.of(context)!.ignoredUsersSubtitle,
-            ),
-            trailing: Icon(Icons.chevron_right_rounded,
-                color: colorScheme.onSurfaceVariant),
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) =>
-                    IgnoredUsersPage(siteContext: siteContext),
+                builder: (_) => IgnoredUsersPage(siteContext: siteContext),
               ),
             ),
           ),
           const Divider(height: 1),
-          // Legal links the forum publishes on /site.json. Rendered only
-          // when it names them: the paths are per-forum (meta's tos_url is
-          // the relative "/tos", its privacy policy an absolute
-          // discourse.org URL), so both are resolved against the forum
-          // base rather than assumed.
-          ..._legalLinks(context, colorScheme, textTheme),
+          // Everything the app doesn't model (security keys, sessions,
+          // email frequency, sidebar…) is on the website's preferences.
+          row(Icons.manage_accounts_outlined, l10n.manageAccountOnWeb,
+              l10n.manageAccountSubtitle, () => _openWebPreferences(context),
+              trailing: Icons.open_in_new_rounded),
           Padding(
-            padding: const EdgeInsets.fromLTRB(
-              DesignTokens.spacingL,
-              DesignTokens.spacingL,
-              DesignTokens.spacingL,
-              DesignTokens.spacingL,
-            ),
+            padding: const EdgeInsets.all(DesignTokens.spacingL),
             child: Container(
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainerLowest,
@@ -141,14 +86,14 @@ class ForumSettingsPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    AppLocalizations.of(context)!.deleteAccount,
+                    l10n.deleteAccount,
                     style: textTheme.titleMedium?.copyWith(
                       color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: DesignTokens.spacingS),
                   Text(
-                    AppLocalizations.of(context)!.deleteAccountExplanation,
+                    l10n.deleteAccountExplanation,
                     style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -161,7 +106,7 @@ class ForumSettingsPage extends StatelessWidget {
                       backgroundColor: colorScheme.error,
                       foregroundColor: colorScheme.onError,
                     ),
-                    child: Text(AppLocalizations.of(context)!.deleteAccount),
+                    child: Text(l10n.deleteAccount),
                   ),
                 ],
               ),
@@ -202,52 +147,6 @@ class ForumSettingsPage extends StatelessWidget {
   ///
   /// Confirmation dialog first because this triggers an immediate
   /// email — accidental taps would be annoying.
-
-  /// Terms / privacy rows, when the forum publishes them.
-  ///
-  /// App stores generally require a reachable privacy policy, and the
-  /// forum is the only party that knows its own — so these are read
-  /// rather than hardcoded, and simply absent on a forum that publishes
-  /// neither.
-  List<Widget> _legalLinks(
-      BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
-    final caps =
-        DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl);
-    final entries = <({String label, IconData icon, String url})>[
-      if (caps.tosUrl?.isNotEmpty ?? false)
-        (label: 'Terms of Service', icon: Icons.gavel_outlined, url: caps.tosUrl!),
-      if (caps.privacyPolicyUrl?.isNotEmpty ?? false)
-        (
-          label: 'Privacy Policy',
-          icon: Icons.privacy_tip_outlined,
-          url: caps.privacyPolicyUrl!
-        ),
-    ];
-    if (entries.isEmpty) return const [];
-    return [
-      for (final e in entries) ...[
-        ListTile(
-          leading: Icon(e.icon, color: colorScheme.onSurfaceVariant),
-          title: Text(e.label),
-          trailing: Icon(Icons.open_in_new,
-              color: colorScheme.onSurfaceVariant),
-          onTap: () => _openForumUrl(context, e.url),
-        ),
-      ],
-    ];
-  }
-
-  /// Opens a forum-published URL, which may be absolute or site-relative.
-  Future<void> _openForumUrl(BuildContext context, String url) async {
-    final uri = url.startsWith('http')
-        ? Uri.parse(url)
-        : Uri.parse(siteContext.site.url).resolve(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else if (context.mounted) {
-      _toast(context, "Couldn't open that page.");
-    }
-  }
 
   Future<void> _confirmPasswordReset(BuildContext context) async {
     final confirmed = await showDialog<bool>(

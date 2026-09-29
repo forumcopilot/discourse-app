@@ -3142,4 +3142,11 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get draftsEmptyHint =>
       'Concepten worden opgeslagen terwijl je typt. Begin een antwoord of onderwerp en het wacht hier op je.';
+
+  @override
+  String get privacySection => 'Privacy';
+
+  @override
+  String get changeEmailSubtitle =>
+      'We sturen een verificatielink naar het nieuwe adres';
 }

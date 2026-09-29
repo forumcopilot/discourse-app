@@ -1121,5 +1121,7 @@
   "untitledTopic": "無題のトピック",
   "draftDiscarded": "下書きを破棄しました",
   "draftsEmpty": "まだ下書きはありません",
-  "draftsEmptyHint": "下書きは入力中に自動保存されます。返信やトピックを書き始めると、ここに表示されます。"
+  "draftsEmptyHint": "下書きは入力中に自動保存されます。返信やトピックを書き始めると、ここに表示されます。",
+  "privacySection": "プライバシー",
+  "changeEmailSubtitle": "新しいアドレスに確認リンクを送信します"
 }

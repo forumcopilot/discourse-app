@@ -3144,4 +3144,11 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get draftsEmptyHint =>
       'Rascunhos são salvos enquanto você digita. Comece uma resposta ou um tópico e ele estará esperando aqui.';
+
+  @override
+  String get privacySection => 'Privacidade';
+
+  @override
+  String get changeEmailSubtitle =>
+      'Enviaremos um link de verificação para o novo endereço';
 }

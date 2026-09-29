@@ -1121,5 +1121,7 @@
   "untitledTopic": "Argomento senza titolo",
   "draftDiscarded": "Bozza scartata",
   "draftsEmpty": "Ancora nessuna bozza",
-  "draftsEmptyHint": "Le bozze si salvano mentre scrivi. Inizia una risposta o un argomento e ti aspetterà qui."
+  "draftsEmptyHint": "Le bozze si salvano mentre scrivi. Inizia una risposta o un argomento e ti aspetterà qui.",
+  "privacySection": "Privacy",
+  "changeEmailSubtitle": "Invieremo un link di verifica al nuovo indirizzo"
 }

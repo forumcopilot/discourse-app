@@ -9,6 +9,9 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 ### Added
 - **A forum opened in a host app shows its drawer once.** In ABDA the left edge is Back to the forum list, so the drawer (the forum's categories, tags and account) opens only from ☰, and a reader who never taps it misses it. The first time a forum is opened, once per install, the drawer slides out by itself after the forum has shown for a moment, with a line saying what it holds and how to open it again. It holds back for a reader already touching the screen or with a page open over the forum, trying again with the next forum, and never comes for a reader who opened the drawer themselves. The single-forum app, whose edge opens the drawer, is unchanged. `DrawerIntroduction`; covered by `drawer_introduction_test.dart`.
 
+### Fixed
+- **Account and privacy repeats nothing the Profile tab has.** The page it opens still led with its own Notifications row (the same screen as the tab's Notification settings) and ended with the forum's Terms and Privacy (in the tab's footer), under an untranslated "Account & preferences" title. It now holds what the tab doesn't: Account (change email, change password), Privacy (ignored users), Manage account on web, and Delete account, titled Account and privacy in every language.
+
 ## [1.0.43] - 2026-09-29
 
 ### Added

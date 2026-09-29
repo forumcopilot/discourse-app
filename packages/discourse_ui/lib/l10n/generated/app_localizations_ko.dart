@@ -3016,4 +3016,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get draftsEmptyHint => '입력하는 동안 자동으로 저장됩니다. 답글이나 주제를 시작하면 여기에서 기다립니다.';
+
+  @override
+  String get privacySection => '개인정보';
+
+  @override
+  String get changeEmailSubtitle => '새 주소로 인증 링크를 보내드립니다';
 }

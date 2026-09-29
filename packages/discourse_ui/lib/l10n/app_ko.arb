@@ -1115,5 +1115,7 @@
   "untitledTopic": "제목 없는 주제",
   "draftDiscarded": "임시 저장을 삭제했습니다",
   "draftsEmpty": "아직 임시 저장이 없습니다",
-  "draftsEmptyHint": "입력하는 동안 자동으로 저장됩니다. 답글이나 주제를 시작하면 여기에서 기다립니다."
+  "draftsEmptyHint": "입력하는 동안 자동으로 저장됩니다. 답글이나 주제를 시작하면 여기에서 기다립니다.",
+  "privacySection": "개인정보",
+  "changeEmailSubtitle": "새 주소로 인증 링크를 보내드립니다"
 }

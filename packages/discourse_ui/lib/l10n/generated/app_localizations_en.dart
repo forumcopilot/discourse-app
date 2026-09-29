@@ -3131,4 +3131,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get draftsEmptyHint =>
       'Drafts save themselves as you type. Start a reply or a topic and it will wait for you here.';
+
+  @override
+  String get privacySection => 'Privacy';
+
+  @override
+  String get changeEmailSubtitle =>
+      'We\'ll send a verification link to the new address';
 }

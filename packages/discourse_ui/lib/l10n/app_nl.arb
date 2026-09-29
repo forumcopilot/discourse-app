@@ -1419,5 +1419,7 @@
   "untitledTopic": "Onderwerp zonder titel",
   "draftDiscarded": "Concept verwijderd",
   "draftsEmpty": "Nog geen concepten",
-  "draftsEmptyHint": "Concepten worden opgeslagen terwijl je typt. Begin een antwoord of onderwerp en het wacht hier op je."
+  "draftsEmptyHint": "Concepten worden opgeslagen terwijl je typt. Begin een antwoord of onderwerp en het wacht hier op je.",
+  "privacySection": "Privacy",
+  "changeEmailSubtitle": "We sturen een verificatielink naar het nieuwe adres"
 }

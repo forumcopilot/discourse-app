@@ -1121,5 +1121,7 @@
   "untitledTopic": "Sujet sans titre",
   "draftDiscarded": "Brouillon supprimé",
   "draftsEmpty": "Aucun brouillon pour l’instant",
-  "draftsEmptyHint": "Les brouillons s’enregistrent pendant que vous écrivez. Commencez une réponse ou un sujet et il vous attendra ici."
+  "draftsEmptyHint": "Les brouillons s’enregistrent pendant que vous écrivez. Commencez une réponse ou un sujet et il vous attendra ici.",
+  "privacySection": "Confidentialité",
+  "changeEmailSubtitle": "Nous enverrons un lien de vérification à la nouvelle adresse"
 }

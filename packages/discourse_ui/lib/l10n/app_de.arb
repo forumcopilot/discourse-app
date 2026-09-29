@@ -1121,5 +1121,7 @@
   "untitledTopic": "Thema ohne Titel",
   "draftDiscarded": "Entwurf verworfen",
   "draftsEmpty": "Noch keine Entwürfe",
-  "draftsEmptyHint": "Entwürfe speichern sich beim Tippen. Beginne eine Antwort oder ein Thema, dann wartet es hier auf dich."
+  "draftsEmptyHint": "Entwürfe speichern sich beim Tippen. Beginne eine Antwort oder ein Thema, dann wartet es hier auf dich.",
+  "privacySection": "Privatsphäre",
+  "changeEmailSubtitle": "Wir senden einen Bestätigungslink an die neue Adresse"
 }

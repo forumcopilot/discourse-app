@@ -3150,4 +3150,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get draftsEmptyHint =>
       'Le bozze si salvano mentre scrivi. Inizia una risposta o un argomento e ti aspetterà qui.';
+
+  @override
+  String get privacySection => 'Privacy';
+
+  @override
+  String get changeEmailSubtitle =>
+      'Invieremo un link di verifica al nuovo indirizzo';
 }
