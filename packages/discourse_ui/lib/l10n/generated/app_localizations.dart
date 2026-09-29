@@ -4941,6 +4941,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Go to your profile'**
   String get goToYourProfile;
+
+  /// When the person joined, e.g. 'Joined Mar 2024'
+  ///
+  /// In en, this message translates to:
+  /// **'Joined {date}'**
+  String profileJoined(String date);
+
+  /// When the person was last seen, e.g. 'Seen 2 hours ago'
+  ///
+  /// In en, this message translates to:
+  /// **'Seen {when}'**
+  String profileSeen(String when);
+
+  /// The person's local time on their profile, e.g. '21:40 local time'
+  ///
+  /// In en, this message translates to:
+  /// **'{time} local time'**
+  String profileLocalTime(String time);
+
+  /// Profile tab: the person's summary
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get profileTabSummary;
+
+  /// Summary section
+  ///
+  /// In en, this message translates to:
+  /// **'Top replies'**
+  String get summaryTopReplies;
+
+  /// Summary section
+  ///
+  /// In en, this message translates to:
+  /// **'Top topics'**
+  String get summaryTopTopics;
+
+  /// Summary section: people who liked this person's posts most
+  ///
+  /// In en, this message translates to:
+  /// **'Most liked by'**
+  String get summaryMostLikedBy;
+
+  /// Summary section: people whose posts this person liked most
+  ///
+  /// In en, this message translates to:
+  /// **'Most liked'**
+  String get summaryMostLiked;
+
+  /// Summary section
+  ///
+  /// In en, this message translates to:
+  /// **'Most replied to'**
+  String get summaryMostRepliedTo;
+
+  /// Summary section
+  ///
+  /// In en, this message translates to:
+  /// **'Top links'**
+  String get summaryTopLinks;
+
+  /// Summary section: categories the person posts in most
+  ///
+  /// In en, this message translates to:
+  /// **'Top categories'**
+  String get summaryTopCategories;
+
+  /// The topic a person features on their profile
+  ///
+  /// In en, this message translates to:
+  /// **'Featured topic'**
+  String get featuredTopic;
+
+  /// Profile section with trust level, groups, views and custom fields
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get profileDetails;
+
+  /// Button to follow a person
+  ///
+  /// In en, this message translates to:
+  /// **'Follow'**
+  String get followUser;
+
+  /// Button to stop following a person
+  ///
+  /// In en, this message translates to:
+  /// **'Unfollow'**
+  String get unfollowUser;
+
+  /// Chip on the profile of a suspended person
+  ///
+  /// In en, this message translates to:
+  /// **'Suspended'**
+  String get profileSuspended;
 }
 
 class _AppLocalizationsDelegate

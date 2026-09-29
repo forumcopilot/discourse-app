@@ -96,6 +96,25 @@ class DiscourseSummaryUser {
   });
 }
 
+/// A category the person posts in most (`top_categories`).
+class DiscourseSummaryCategory {
+  final int id;
+  final String name;
+
+  /// Hex without the '#', as Discourse sends it.
+  final String? color;
+  final int topicCount;
+  final int postCount;
+
+  DiscourseSummaryCategory({
+    required this.id,
+    required this.name,
+    this.color,
+    this.topicCount = 0,
+    this.postCount = 0,
+  });
+}
+
 /// The profile-summary stats block (`user_summary` root).
 class DiscourseUserSummary {
   final int likesGiven;
@@ -131,6 +150,7 @@ class DiscourseUserSummary {
   final List<DiscourseSummaryUser> mostLikedByUsers;
   final List<DiscourseSummaryUser> mostLikedUsers;
   final List<DiscourseSummaryUser> mostRepliedToUsers;
+  final List<DiscourseSummaryCategory> topCategories;
 
   DiscourseUserSummary({
     this.likesGiven = 0,
@@ -143,6 +163,7 @@ class DiscourseUserSummary {
     this.timeRead = 0,
     this.recentTimeRead = 0,
     this.solvedCount,
+    this.topCategories = const [],
     this.bookmarkCount,
     this.canSeeSummaryStats = false,
     this.badgeCount = 0,

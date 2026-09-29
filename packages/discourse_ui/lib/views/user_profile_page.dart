@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:discourse_ui/utils/url_utils.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -132,6 +133,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
     await _fetchUserInfo();
   }
 
+  /// This profile's address on the forum's website.
+  String get _profileUrl =>
+      '${widget.siteContext.site.url.replaceAll(RegExp(r'/+$'), '')}'
+      '/u/${Uri.encodeComponent(_userInfo?.username ?? widget.userName ?? '')}';
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -155,18 +161,24 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       )
                 : Text(AppLocalizations.of(context)?.userProfile ?? 'User Profile'),
         actions: [
-          if (_userInfo != null &&
-              widget.siteContext.loginDataOutput != null &&
-              widget.siteContext.loginDataOutput?.user?.id != _userInfo!.id &&
-              // Don't render an empty overflow menu when the viewer has
-              // no per-user actions available.
-              (_userInfo!.canIgnore ||
-                  _userInfo!.canBan ||
-                  _userInfo!.canSpamClean))
+          // Share and Copy link for anyone's profile (your own too); the
+          // moderation items below only where the server allows them.
+          if (_userInfo != null)
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),
               onSelected: (value) {
                 switch (value) {
+                  case 'share':
+                    UrlUtils.shareUrl(_profileUrl);
+                    break;
+                  case 'copy_link':
+                    UrlUtils.copyUrlToClipboard(_profileUrl).then((_) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content:
+                              Text(AppLocalizations.of(context)!.linkCopied)));
+                    });
+                    break;
                   // 'report' case removed in Phase 5.20a along with
                   // the menu item — see commentary further down.
                   case 'ignore':
@@ -185,6 +197,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 }
               },
               itemBuilder: (BuildContext context) => [
+                PopupMenuItem<String>(
+                  value: 'share',
+                  child: Row(children: [
+                    Icon(Icons.share_outlined,
+                        color: colorScheme.onSurfaceVariant),
+                    const SizedBox(width: DesignTokens.spacingM),
+                    Text(AppLocalizations.of(context)!.share),
+                  ]),
+                ),
+                PopupMenuItem<String>(
+                  value: 'copy_link',
+                  child: Row(children: [
+                    Icon(Icons.link, color: colorScheme.onSurfaceVariant),
+                    const SizedBox(width: DesignTokens.spacingM),
+                    Text(AppLocalizations.of(context)!.copyLink),
+                  ]),
+                ),
                 // Phase 5.20a — "Report user" removed: Discourse
                 // doesn't have a per-user report action. The user-
                 // level proxy method (`userProxy.reportUserAsync`)

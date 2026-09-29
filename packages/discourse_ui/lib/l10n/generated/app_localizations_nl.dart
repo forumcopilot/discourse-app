@@ -2995,4 +2995,58 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get goToYourProfile => 'Naar je profiel';
+
+  @override
+  String profileJoined(String date) {
+    return 'Lid sinds $date';
+  }
+
+  @override
+  String profileSeen(String when) {
+    return 'Gezien $when';
+  }
+
+  @override
+  String profileLocalTime(String time) {
+    return '$time lokale tijd';
+  }
+
+  @override
+  String get profileTabSummary => 'Samenvatting';
+
+  @override
+  String get summaryTopReplies => 'Topantwoorden';
+
+  @override
+  String get summaryTopTopics => 'Toponderwerpen';
+
+  @override
+  String get summaryMostLikedBy => 'Meest geliket door';
+
+  @override
+  String get summaryMostLiked => 'Meest geliket';
+
+  @override
+  String get summaryMostRepliedTo => 'Meest beantwoord';
+
+  @override
+  String get summaryTopLinks => 'Toplinks';
+
+  @override
+  String get summaryTopCategories => 'Topcategorieën';
+
+  @override
+  String get featuredTopic => 'Uitgelicht onderwerp';
+
+  @override
+  String get profileDetails => 'Details';
+
+  @override
+  String get followUser => 'Volgen';
+
+  @override
+  String get unfollowUser => 'Ontvolgen';
+
+  @override
+  String get profileSuspended => 'Geschorst';
 }

@@ -1073,5 +1073,21 @@
   "createAccount": "계정 만들기",
   "aboutThisForum": "이 포럼 소개",
   "drawerMore": "더 보기",
-  "goToYourProfile": "내 프로필로 이동"
+  "goToYourProfile": "내 프로필로 이동",
+  "profileJoined": "{date} 가입",
+  "profileSeen": "{when} 접속",
+  "profileLocalTime": "현지 시간 {time}",
+  "profileTabSummary": "요약",
+  "summaryTopReplies": "인기 답글",
+  "summaryTopTopics": "인기 주제",
+  "summaryMostLikedBy": "좋아요를 가장 많이 준 사람",
+  "summaryMostLiked": "가장 많이 좋아요한 사람",
+  "summaryMostRepliedTo": "가장 많이 답글한 사람",
+  "summaryTopLinks": "인기 링크",
+  "summaryTopCategories": "주요 카테고리",
+  "featuredTopic": "추천 주제",
+  "profileDetails": "세부 정보",
+  "followUser": "팔로우",
+  "unfollowUser": "언팔로우",
+  "profileSuspended": "정지됨"
 }

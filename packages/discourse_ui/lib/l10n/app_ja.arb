@@ -1079,5 +1079,21 @@
   "createAccount": "アカウントを作成",
   "aboutThisForum": "このフォーラムについて",
   "drawerMore": "その他",
-  "goToYourProfile": "プロフィールへ"
+  "goToYourProfile": "プロフィールへ",
+  "profileJoined": "{date} に参加",
+  "profileSeen": "最終アクセス {when}",
+  "profileLocalTime": "現地時間 {time}",
+  "profileTabSummary": "概要",
+  "summaryTopReplies": "人気の返信",
+  "summaryTopTopics": "人気のトピック",
+  "summaryMostLikedBy": "いいねをくれた人",
+  "summaryMostLiked": "いいねした相手",
+  "summaryMostRepliedTo": "よく返信する相手",
+  "summaryTopLinks": "人気のリンク",
+  "summaryTopCategories": "よく投稿するカテゴリ",
+  "featuredTopic": "注目のトピック",
+  "profileDetails": "詳細",
+  "followUser": "フォロー",
+  "unfollowUser": "フォロー解除",
+  "profileSuspended": "停止中"
 }

@@ -11,6 +11,7 @@ import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../data/user/discourse_do_not_disturb.dart';
 import '../data/user/discourse_pending_post.dart';
+import '../data/user/discourse_user_profile_extras.dart';
 import '../data/user/discourse_user_summary.dart';
 import '../util/html_text.dart';
 import '../util/site_url.dart';
@@ -408,8 +409,12 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
       }
 
       final groupsRaw = user['groups'] as List? ?? const [];
+      // Groups the person joined or was put in — not Discourse's
+      // automatic ones (trust_level_0…4, staff, admins, moderators),
+      // which restate the trust level and read as noise on a profile.
       final groups = groupsRaw
           .whereType<Map>()
+          .where((g) => g['automatic'] != true)
           .map((g) => (g['name'] ?? '').toString())
           .where((s) => s.isNotEmpty)
           .toList();
@@ -465,6 +470,8 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           // Best-effort; keep the profile usable without a post count.
         }
       }
+
+      _storeProfileExtras(user);
 
       return FCUserInfoResult(
         result: true,
@@ -686,6 +693,43 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         list: const [],
       );
     }
+  }
+
+  /// Records what the profile says beyond the shared user model — see
+  /// [DiscourseUserProfileExtras].
+  void _storeProfileExtras(Map<String, dynamic> user) {
+    final username = (user['username'] ?? '').toString();
+    if (username.isEmpty) return;
+    String? text(Object? v) {
+      final s = v?.toString().trim();
+      return (s == null || s.isEmpty) ? null : s;
+    }
+
+    String? url(Object? v) {
+      final s = text(v);
+      return s == null ? null : absoluteSiteUrl(siteContext.site.url, s);
+    }
+
+    final status = (user['status'] as Map?)?.cast<String, dynamic>();
+    final featured = (user['featured_topic'] as Map?)?.cast<String, dynamic>();
+    final cookedBio = text(user['bio_cooked']);
+    DiscourseUserProfileExtras.store(
+      siteContext.site.url,
+      username,
+      DiscourseUserProfileExtras(
+        title: text(user['title']),
+        statusEmoji: text(status?['emoji']),
+        statusDescription: text(status?['description']),
+        statusEndsAt: DateTime.tryParse(status?['ends_at']?.toString() ?? ''),
+        backgroundUrl: url(user['profile_background_upload_url']) ??
+            url(user['card_background_upload_url']),
+        featuredTopicId: (featured?['id'] as num?)?.toInt(),
+        featuredTopicTitle: text(featured?['fancy_title'] ?? featured?['title']),
+        timezone: text(user['timezone']),
+        bioText: cookedBio == null ? text(user['bio_raw']) : stripHtmlToText(cookedBio),
+        primaryGroupName: text(user['primary_group_name']),
+      ),
+    );
   }
 
   /// Discourse-only: the signed-in user's posts waiting for a moderator
@@ -1370,6 +1414,20 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
           mostLikedByUsers: users('most_liked_by_users'),
           mostLikedUsers: users('most_liked_users'),
           mostRepliedToUsers: users('most_replied_to_users'),
+          topCategories: ((summary['top_categories'] as List?) ?? const [])
+              .whereType<Map>()
+              .map((raw) {
+                final c = raw.cast<String, dynamic>();
+                return DiscourseSummaryCategory(
+                  id: (c['id'] as num?)?.toInt() ?? 0,
+                  name: (c['name'] ?? '').toString(),
+                  color: c['color']?.toString(),
+                  topicCount: (c['topic_count'] as num?)?.toInt() ?? 0,
+                  postCount: (c['post_count'] as num?)?.toInt() ?? 0,
+                );
+              })
+              .where((c) => c.id != 0 && c.name.isNotEmpty)
+              .toList(growable: false),
         ),
       );
     } on DiscourseApiException catch (e) {

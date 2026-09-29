@@ -3583,5 +3583,84 @@
   "goToYourProfile": "Go to your profile",
   "@goToYourProfile": {
     "description": "Subtitle on the drawer's account card"
+  },
+  "profileJoined": "Joined {date}",
+  "@profileJoined": {
+    "description": "When the person joined, e.g. 'Joined Mar 2024'",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profileSeen": "Seen {when}",
+  "@profileSeen": {
+    "description": "When the person was last seen, e.g. 'Seen 2 hours ago'",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "profileLocalTime": "{time} local time",
+  "@profileLocalTime": {
+    "description": "The person's local time on their profile, e.g. '21:40 local time'",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "profileTabSummary": "Summary",
+  "@profileTabSummary": {
+    "description": "Profile tab: the person's summary"
+  },
+  "summaryTopReplies": "Top replies",
+  "@summaryTopReplies": {
+    "description": "Summary section"
+  },
+  "summaryTopTopics": "Top topics",
+  "@summaryTopTopics": {
+    "description": "Summary section"
+  },
+  "summaryMostLikedBy": "Most liked by",
+  "@summaryMostLikedBy": {
+    "description": "Summary section: people who liked this person's posts most"
+  },
+  "summaryMostLiked": "Most liked",
+  "@summaryMostLiked": {
+    "description": "Summary section: people whose posts this person liked most"
+  },
+  "summaryMostRepliedTo": "Most replied to",
+  "@summaryMostRepliedTo": {
+    "description": "Summary section"
+  },
+  "summaryTopLinks": "Top links",
+  "@summaryTopLinks": {
+    "description": "Summary section"
+  },
+  "summaryTopCategories": "Top categories",
+  "@summaryTopCategories": {
+    "description": "Summary section: categories the person posts in most"
+  },
+  "featuredTopic": "Featured topic",
+  "@featuredTopic": {
+    "description": "The topic a person features on their profile"
+  },
+  "profileDetails": "Details",
+  "@profileDetails": {
+    "description": "Profile section with trust level, groups, views and custom fields"
+  },
+  "followUser": "Follow",
+  "@followUser": {
+    "description": "Button to follow a person"
+  },
+  "unfollowUser": "Unfollow",
+  "@unfollowUser": {
+    "description": "Button to stop following a person"
+  },
+  "profileSuspended": "Suspended",
+  "@profileSuspended": {
+    "description": "Chip on the profile of a suspended person"
   }
 }

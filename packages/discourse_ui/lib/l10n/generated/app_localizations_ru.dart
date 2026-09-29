@@ -3014,4 +3014,58 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get goToYourProfile => 'Перейти в профиль';
+
+  @override
+  String profileJoined(String date) {
+    return 'С нами с $date';
+  }
+
+  @override
+  String profileSeen(String when) {
+    return 'Был(а) $when';
+  }
+
+  @override
+  String profileLocalTime(String time) {
+    return '$time по местному времени';
+  }
+
+  @override
+  String get profileTabSummary => 'Сводка';
+
+  @override
+  String get summaryTopReplies => 'Лучшие ответы';
+
+  @override
+  String get summaryTopTopics => 'Лучшие темы';
+
+  @override
+  String get summaryMostLikedBy => 'Больше всего лайков от';
+
+  @override
+  String get summaryMostLiked => 'Больше всего лайкает';
+
+  @override
+  String get summaryMostRepliedTo => 'Чаще всего отвечает';
+
+  @override
+  String get summaryTopLinks => 'Популярные ссылки';
+
+  @override
+  String get summaryTopCategories => 'Основные разделы';
+
+  @override
+  String get featuredTopic => 'Избранная тема';
+
+  @override
+  String get profileDetails => 'Подробности';
+
+  @override
+  String get followUser => 'Подписаться';
+
+  @override
+  String get unfollowUser => 'Отписаться';
+
+  @override
+  String get profileSuspended => 'Заблокирован(а)';
 }

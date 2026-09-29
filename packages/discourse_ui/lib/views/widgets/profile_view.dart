@@ -1,13 +1,9 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
-import 'package:forumcopilot_sdk/models/entities/fc_custom_field.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'package:discourse_core/discourse_core.dart'
     show
@@ -15,28 +11,32 @@ import 'package:discourse_core/discourse_core.dart'
         DiscourseUserProxy,
         DiscourseSummaryUser,
         DiscourseSummaryLink,
+        DiscourseUserProfileExtras,
         DiscourseUserSummary;
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../l10n/generated/app_localizations.dart';
 import 'profile_section.dart';
 import '../../theme/design_tokens.dart';
-import '../../theme/style_builders.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
-import 'package:discourse_ui/utils/avatar_cache_utils.dart';
 import 'package:discourse_ui/utils/error_message.dart';
-import 'package:discourse_ui/utils/file_picker_utils.dart';
 import 'package:discourse_ui/utils/time_utils.dart';
 import 'package:discourse_ui/views/post_page.dart';
 
+import '../../utils/local_dates.dart' show timeZoneNamed;
+import '../../utils/number_utils.dart';
+import 'cached_redirect_image.dart';
+import 'category_badge.dart';
 import 'full_screen_image_viewer.dart';
+import 'profile_stats_strip.dart';
+import 'reaction_glyph.dart';
 import 'trust_level_sheet.dart';
 import 'user_avatar.dart';
 import '../chat/chat_channel_view.dart';
 import 'user_badges_section.dart';
 import 'user_activity_tabs.dart';
 import '../edit_profile_page.dart';
-import '../settings_page.dart';
 import '../user_profile_page.dart';
 import '../private_messaging/conversation/pages/new_conversation_page.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
@@ -52,26 +52,28 @@ String websiteDisplayName(String website) {
   return '$host$path';
 }
 
-/// The one shared profile experience ("subtraction model").
+/// A person's profile — web's user page — for anyone, the reader's own
+/// included ("View profile" on the Profile tab shows it exactly as others
+/// see it, with Edit profile in place of Message).
 ///
-/// Renders the FULL profile — avatar block (with camera-upload badge in
-/// self mode), username + BANNED chip, display text, trust-level chip,
-/// badges row, action row (self: Edit profile + Settings; other:
-/// Follow/Unfollow + Send Message), nav rows (self only: Messages /
-/// Bookmarks / Drafts), the info card, the summary stats section, and
-/// the Replies/Topics activity tabs.
+/// * A header: their background (profile or card background, else a soft
+///   tint) with the avatar over its edge, their name, @username and title,
+///   status, bio, location with their local time, website, and one line
+///   for when they joined and were last seen.
+/// * Message, Chat and Follow where the server allows each.
+/// * Their numbers, as the Profile tab and the topic summary draw them.
+/// * Pinned tabs: Activity (the shared activity rows), Summary (featured
+///   topic, top replies and topics, the people lists, top categories, top
+///   links, then details: trust level, groups, views, followers, custom
+///   fields) and Badges.
 ///
-/// Used by BOTH profile surfaces:
-///  - `ProfileTab` (bottom-nav tab, always self) — the host keeps the
-///    logged-out `NotSignedInView`, the tab reset/auth-listener wiring
-///    and the userInfo fetch.
-///  - `UserProfilePage` (avatar-tap page, self or other) — the host
-///    keeps the app bar + moderation overflow menu, the userInfo fetch
-///    and the pull-to-refresh wrapper.
+/// It used to be a centred avatar over a XenForo-style info card (Member
+/// Since, Last Activity, Posts, Seen — two of them the same timestamp —
+/// Birthday that could never render), the reader's own editing tools on
+/// their own page, and the summary and activity stacked below.
 ///
-/// The host always owns the `userInfo` fetch; this widget owns the
-/// summary fetch (self-loading `_UserSummarySection`) and the avatar
-/// upload / follow-toggle interactions.
+/// The host (`UserProfilePage`) owns the user fetch, the app bar and its
+/// menu; this widget loads the summary.
 class ProfileView extends StatefulWidget {
   final SiteContext siteContext;
   final FCUserInfoResult userInfo;
@@ -83,28 +85,22 @@ class ProfileView extends StatefulWidget {
   /// avatar-tap page passes the URL it was opened with).
   final String? fallbackAvatarUrl;
 
-  /// Self mode: called after `EditProfilePage` pops with a successful
-  /// save. The host must null out its cached userInfo AND reset its
-  /// has-loaded flag, then refetch — see the ProfileTab comment about
-  /// the section vanishing after an edit when only one was reset.
+  /// Called after `EditProfilePage` pops with a successful save; the host
+  /// refetches.
   final VoidCallback? onEdited;
 
-  /// Self mode: called after a successful avatar upload (the new
-  /// iconUrl has already been written into `siteContext.loginDataOutput`
-  /// and persisted). The host should refetch userInfo.
+  /// Kept for hosts that still pass it; avatars are changed on the
+  /// Profile tab now.
   final VoidCallback? onAvatarUploaded;
 
-  /// Passed through to `UserActivityTabs.repliesKey` so the page host
-  /// can keep driving load-more from its outer scroll controller.
+  /// Passed through to the Replies feed so the host can force a refresh.
   final Key? repliesKey;
 
-  /// Bump to force the summary section to remount and refetch (the
-  /// page host increments this on pull-to-refresh).
+  /// Bump to refetch the summary (the host does on pull-to-refresh).
   final int refreshToken;
 
   /// The host's scroll controller. ProfileView is the scrollable itself —
-  /// hosts pass their controller in rather than wrapping it, because a
-  /// pinned sliver only pins inside the viewport that owns it.
+  /// a pinned sliver only pins inside the viewport that owns it.
   final ScrollController? scrollController;
 
   const ProfileView({
@@ -124,13 +120,25 @@ class ProfileView extends StatefulWidget {
   State<ProfileView> createState() => _ProfileViewState();
 }
 
+enum _ProfileTab { activity, summary, badges }
+
 class _ProfileViewState extends State<ProfileView> {
-  File? _selectedImageFile;
-  bool _isUploading = false;
   bool _isTogglingFollow = false;
   bool _isStartingChat = false;
+  _ProfileTab _tab = _ProfileTab.activity;
+
+  /// Which Activity feed is showing. Lives here because the chip bar is a
+  /// pinned sliver and the feed a separate one.
+  ActivityTab _activityTab = ActivityTab.replies;
+
+  DiscourseUserSummary? _summary;
+  String? _summaryError;
+  bool _summaryLoading = true;
 
   FCUserInfoResult get _userInfo => widget.userInfo;
+
+  DiscourseUserProfileExtras? get _extras => DiscourseUserProfileExtras.forUser(
+      widget.siteContext.site.url, _userInfo.username);
 
   String? get _avatarUrl {
     final iconUrl = _userInfo.iconUrl;
@@ -140,195 +148,54 @@ class _ProfileViewState extends State<ProfileView> {
     return null;
   }
 
-  /// Discourse trust level label. 0–4 are the canonical
-  /// levels; anything outside that range falls back to "TLn".
-  String _trustLevelLabel(int level) {
-    switch (level) {
-      case 0:
-        return 'TL0 · New';
-      case 1:
-        return 'TL1 · Basic';
-      case 2:
-        return 'TL2 · Member';
-      case 3:
-        return 'TL3 · Regular';
-      case 4:
-        return 'TL4 · Leader';
-      default:
-        return 'TL$level';
+  @override
+  void initState() {
+    super.initState();
+    _loadSummary();
+  }
+
+  @override
+  void didUpdateWidget(covariant ProfileView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.userInfo.username != widget.userInfo.username ||
+        oldWidget.refreshToken != widget.refreshToken) {
+      _loadSummary();
     }
   }
 
-  // --- Avatar upload (self mode) -----------------------------------
-
-  Future<void> _pickImage(BuildContext context) async {
-    // Check permission before allowing image pick
-    final canUploadAvatar =
-        widget.siteContext.loginDataOutput?.canUploadAvatar ?? false;
-    if (!canUploadAvatar) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.noPermissionToUploadAvatar,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
-      return;
-    }
-
+  Future<void> _loadSummary() async {
+    setState(() {
+      _summaryLoading = true;
+      _summaryError = null;
+    });
     try {
-      // Use FilePickerUtils for macOS compatibility, fallback to
-      // image_picker for mobile
-      XFile? image;
-      if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
-        image =
-            await FilePickerUtils.pickImage(imageQuality: ImageQuality.high);
-      } else {
-        // Camera or library. An avatar is shown small, so unlike a post's
-        // images it is scaled and recompressed on the way.
-        final l10n = AppLocalizations.of(context)!;
-        final source = await showModalBottomSheet<ImageSource>(
-          context: context,
-          builder: (sheet) => SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.photo_camera_outlined),
-                  title: Text(l10n.takePhoto),
-                  onTap: () => Navigator.pop(sheet, ImageSource.camera),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.photo_library_outlined),
-                  title: Text(l10n.uploadImage),
-                  onTap: () => Navigator.pop(sheet, ImageSource.gallery),
-                ),
-              ],
-            ),
-          ),
-        );
-        if (source == null) return;
-        final ImagePicker picker = ImagePicker();
-        image = await picker.pickImage(
-          source: source,
-          maxWidth: 1024,
-          maxHeight: 1024,
-          imageQuality: 85,
-        );
-      }
-
-      if (image != null) {
-        if (mounted) {
-          setState(() {
-            _selectedImageFile = File(image!.path);
-            _isUploading = true;
-          });
-        }
-        try {
-          var attachmentProxy = SiteProxyFactory.getAttachmentProxy();
-          var uploadAttachmentResult = await attachmentProxy.uploadAvatarAsync(
-              "jpg", await image.readAsBytes());
-          if (uploadAttachmentResult.result == true) {
-            // After successful upload, refresh user info to get the
-            // updated image URL into the login context.
-            await _refreshLoginAvatar();
-
-            if (mounted) {
-              setState(() {
-                _isUploading = false;
-                _selectedImageFile = null;
-              });
-            }
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    AppLocalizations.of(context)!.avatarUploadedSuccessfully,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onInverseSurface,
-                        ),
-                  ),
-                  backgroundColor:
-                      Theme.of(context).colorScheme.inverseSurface,
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-            }
-          } else {
-            throw Exception(uploadAttachmentResult.resultText);
-          }
-        } catch (e) {
-          if (mounted) {
-            setState(() {
-              _isUploading = false;
-              _selectedImageFile = null;
-            });
-          }
-          throw Exception('Failed to upload file: ${e.toString()}');
-        }
-      }
+      final registered = SiteProxyService.getUserProxy();
+      final proxy = registered is DiscourseUserProxy
+          ? registered
+          : DiscourseUserProxy(widget.siteContext);
+      final result = await proxy.getUserSummaryAsync(_userInfo.username);
+      if (!mounted) return;
+      setState(() {
+        _summary = result.result ? result.summary : null;
+        _summaryError = result.result
+            ? null
+            : (result.resultText.isNotEmpty
+                ? result.resultText
+                : 'Could not load stats.');
+        _summaryLoading = false;
+      });
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isUploading = false;
-          _selectedImageFile = null;
-        });
-      }
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.failedToPickImage2(e),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
+      AppLogger.debug('Error fetching user summary: $e');
+      if (!mounted) return;
+      setState(() {
+        _summaryError = describeError(e, fallback: 'Could not load stats.');
+        _summaryLoading = false;
+      });
     }
   }
 
-  Future<void> _refreshLoginAvatar() async {
-    try {
-      final username = widget.siteContext.loginDataOutput?.user?.username;
-      if (username == null) return;
-
-      final proxy = SiteProxyFactory.getUserProxy();
-      final userInfo = await proxy.getUserInfoAsync(username, null);
-
-      // Update the login context with the new image URL
-      if (widget.siteContext.loginDataOutput != null) {
-        widget.siteContext.loginDataOutput!.user?.iconUrl =
-            userInfo.iconUrl ?? '';
-      }
-
-      // Save the updated context to device
-      await widget.siteContext.saveToDevice();
-
-      // Notify the host so it refetches userInfo
-      widget.onAvatarUploaded?.call();
-    } catch (e) {
-      AppLogger.debug('Error refreshing user info after avatar upload: $e');
-    }
-  }
-
-  // --- Follow toggle (other mode) ----------------------------------
-
-  /// Toggle the viewer's follow relationship with the displayed user.
-  /// Optimistically flips state; reverts on failure. Routed through
-  /// `IFCSocialProxy`; the richer `FCFollowResult` shape lets us
-  /// surface the plugin-not-installed case explicitly.
+  /// Toggle the viewer's follow relationship (discourse-follow). Flips
+  /// optimistically; reverts on failure.
   Future<void> _handleToggleFollow() async {
     if (_isTogglingFollow) return;
     if (!widget.siteContext.isLoggedIn) {
@@ -345,20 +212,13 @@ class _ProfileViewState extends State<ProfileView> {
     });
     String? errorText;
     try {
-      if (wasFollowing) {
-        final result = await proxy.unfollowAsync(_userInfo.username);
-        if (!result.result) {
-          errorText = result.resultText?.isNotEmpty == true
-              ? result.resultText
-              : 'Failed to unfollow';
-        }
-      } else {
-        final result = await proxy.followAsync(_userInfo.username);
-        if (!result.result) {
-          errorText = result.resultText?.isNotEmpty == true
-              ? result.resultText
-              : 'Failed to follow';
-        }
+      final result = wasFollowing
+          ? await proxy.unfollowAsync(_userInfo.username)
+          : await proxy.followAsync(_userInfo.username);
+      if (!result.result) {
+        errorText = result.resultText?.isNotEmpty == true
+            ? result.resultText
+            : (wasFollowing ? 'Failed to unfollow' : 'Failed to follow');
       }
     } catch (e) {
       errorText = 'Error: $e';
@@ -366,340 +226,25 @@ class _ProfileViewState extends State<ProfileView> {
     if (!mounted) return;
     setState(() {
       _isTogglingFollow = false;
-      if (errorText != null) {
-        _userInfo.isFollowing = wasFollowing;
-      }
+      if (errorText != null) _userInfo.isFollowing = wasFollowing;
     });
     if (errorText != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorText)),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(errorText)));
     }
   }
 
-  // --- Build -------------------------------------------------------
-
-  /// Which Activity feed is showing. Lives here rather than inside the
-  /// tab widget because the chip bar is now a pinned sliver and the feed
-  /// a separate one — they are siblings in the scroll view, so their
-  /// shared state has to sit above both.
-  ActivityTab _activityTab = ActivityTab.replies;
-
-  @override
-  Widget build(BuildContext context) {
-    // ProfileView owns the scrollable now. The hosts used to wrap it in a
-    // ListView / SingleChildScrollView, which made every part of the page
-    // a single box — and a box cannot pin anything. The chip bar has to be
-    // a direct sliver of the scroll view to stay on screen.
-    return CustomScrollView(
-      controller: widget.scrollController,
-      // Kept from the hosts: pull-to-refresh has to work even when the
-      // profile is short enough not to scroll.
-      physics: const AlwaysScrollableScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(child: _buildHeaderAndSections(context)),
-        const SliverToBoxAdapter(child: ActivitySectionHeading()),
-        SliverPersistentHeader(
-          pinned: true,
-          delegate: ActivityChipBarDelegate(
-            selected: _activityTab,
-            onSelected: (t) => setState(() => _activityTab = t),
-            textScaler: MediaQuery.textScalerOf(context),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: ActivityFeed(
-            siteContext: widget.siteContext,
-            tab: _activityTab,
-            userId: _userInfo.id,
-            userName: _userInfo.username,
-            repliesKey: widget.repliesKey,
-          ),
-        ),
-        SliverToBoxAdapter(
-            child: SizedBox(height: DesignTokens.spacingL)),
-      ],
-    );
-  }
-
-  Widget _buildHeaderAndSections(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Column(
-      children: [
-        SizedBox(height: DesignTokens.spacingL),
-        _buildAvatarBlock(context, colorScheme),
-        SizedBox(height: DesignTokens.spacingM),
-        // Username with Banned Badge
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              _userInfo.username,
-              // The profile's headline (it was 22sp bold).
-              style: textTheme.headlineSmall?.copyWith(
-                color: colorScheme.onSurface,
-              ),
-            ),
-            if (_userInfo.isBanned) ...[
-              SizedBox(width: DesignTokens.spacingS),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingM - DesignTokens.spacingXS,
-                  vertical: DesignTokens.spacingXS / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: colorScheme.errorContainer
-                      .withValues(alpha: DesignTokens.opacityHigh),
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.block,
-                      size: DesignTokens.iconSizeXS,
-                      color: colorScheme.onErrorContainer,
-                    ),
-                    SizedBox(width: DesignTokens.spacingXS),
-                    Text(
-                      AppLocalizations.of(context)?.banned ?? 'BANNED',
-                      style: StyleBuilders.badgeTextStyle(
-                        colorScheme: colorScheme,
-                        textTheme: textTheme,
-                        color: colorScheme.onErrorContainer,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-        if (_userInfo.displayText != null &&
-            _userInfo.displayText!.isNotEmpty) ...[
-          SizedBox(height: DesignTokens.spacingXS),
-          Padding(
-            padding: DesignTokens.paddingScreenHorizontal,
-            child: Text(
-              _userInfo.displayText!,
-              style: textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-        // Trust level moved into the info card, and badges into their
-        // own section above Stats. Both were stacked under the username as
-        // chips, which pushed the actual profile below the fold and gave a
-        // one-line fact (trust level) the same weight as the name.
-        SizedBox(height: DesignTokens.spacingM),
-        // Action row — self: Edit profile + Settings;
-        // other: Follow/Unfollow + Send Message.
-        if (widget.isSelf)
-          _buildSelfActionRow(context)
-        else
-          _buildOtherActionRow(context, colorScheme, textTheme),
-        // The personal nav card (Messages / Bookmarks / Drafts) is gone.
-        // Messages is a bottom-nav tab in its own right, so the row was a
-        // second door to the same room; Bookmarks and Drafts moved to the
-        // drawer's Account section, where the rest of "your stuff" lives.
-        // Leaving one of the three behind would have been a card with a
-        // single row in it.
-        const SizedBox(height: DesignTokens.spacingL),
-        _buildInfoCard(context, colorScheme, textTheme),
-        // Badges get a section of their own, immediately above Stats.
-        // Renders nothing at all when the user has none.
-        UserBadgesSection(username: _userInfo.username),
-        // Discourse summary stats (`/u/{username}/summary.json`).
-        // Loaded lazily by the section itself so the main profile
-        // fetch stays a single request; renders nothing while
-        // loading, on failure, or when the server hides the stats
-        // from this viewer (`can_see_summary_stats`).
-        _UserSummarySection(
-          key: ValueKey(
-              'summary_${_userInfo.username}_${widget.refreshToken}'),
-          siteContext: widget.siteContext,
-          username: _userInfo.username,
-        ),
-        SizedBox(height: DesignTokens.spacingS),
-      ],
-    );
-  }
-
-  Widget _buildAvatarBlock(BuildContext context, ColorScheme colorScheme) {
-    final canUploadAvatar = widget.isSelf &&
-        (widget.siteContext.loginDataOutput?.canUploadAvatar ?? false);
-    final avatarUrl = _avatarUrl;
-
-    return Stack(
-      children: [
-        GestureDetector(
-          onTap: () {
-            if (avatarUrl != null && avatarUrl.isNotEmpty) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FullScreenImageViewer(
-                    imageUrls: [avatarUrl],
-                    initialIndex: 0,
-                    heroTag: 'profile_picture_${_userInfo.username}',
-                  ),
-                ),
-              );
-            }
-          },
-          child: _selectedImageFile != null
-              ? ClipOval(
-                  child: SizedBox(
-                    width: 100,
-                    height: 100,
-                    child: Image.file(
-                      _selectedImageFile!,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                )
-              : UserAvatar(
-                  username: _userInfo.username,
-                  iconUrl: avatarUrl,
-                  radius: 50,
-                  showOnlineIndicator: true,
-                  isOnline: _userInfo.isOnline,
-                  cacheKey: () {
-                    if (avatarUrl != null && avatarUrl.isNotEmpty) {
-                      return AvatarCacheUtils.generateAvatarCacheKey(
-                        userId: _userInfo.id,
-                        username: _userInfo.username,
-                        avatarUrl: avatarUrl,
-                      );
-                    }
-                    return null;
-                  }(),
-                ),
-        ),
-        if (_isUploading)
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                color: colorScheme.surface.withValues(alpha: 0.35),
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: SizedBox(
-                width: DesignTokens.iconSizeL,
-                height: DesignTokens.iconSizeL,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(colorScheme.primary),
-                ),
-              ),
-            ),
-          ),
-        // Only show camera icon on the viewer's own profile when the
-        // forum allows avatar uploads.
-        if (canUploadAvatar)
-          // A filled icon button: a 40dp badge in a 48dp target. The
-          // hand-drawn badge was a 36dp tap area.
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: IconButton.filled(
-              onPressed: () => _pickImage(context),
-              tooltip: AppLocalizations.of(context)!.uploadImage,
-              icon: const Icon(Icons.camera_alt_rounded),
-              style: IconButton.styleFrom(
-                side: BorderSide(
-                  color: colorScheme.surface,
-                  width: DesignTokens.borderWidthMedium,
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  /// Edit profile + Settings, side by side. The EditProfilePage pops
-  /// with `true` on a successful save so the host re-fetches user
-  /// info and surfaces the new values.
-  Widget _buildSelfActionRow(BuildContext context) {
-    return Padding(
-      padding: DesignTokens.paddingScreenHorizontal,
-      child: Row(
-        children: [
-          Expanded(
-            child: FilledButton.tonalIcon(
-              onPressed: () async {
-                final saved = await Navigator.push<bool>(
-                  context,
-                  FormPageRoute(
-                    builder: (_) => EditProfilePage(
-                      siteContext: widget.siteContext,
-                      userInfo: _userInfo,
-                    ),
-                  ),
-                );
-                if (saved == true && mounted) {
-                  // The host must force a fresh fetch so name / bio /
-                  // location / website re-render with the saved values
-                  // (nulling its cached userInfo AND resetting its
-                  // has-loaded flag — see ProfileTab).
-                  widget.onEdited?.call();
-                }
-              },
-              icon: Icon(Icons.edit_outlined, size: DesignTokens.iconSizeM),
-              label: Text(AppLocalizations.of(context)!.editProfile),
-            ),
-          ),
-          SizedBox(width: DesignTokens.spacingS),
-          Expanded(
-            child: FilledButton.tonalIcon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ForumSettingsPage(
-                      siteContext: widget.siteContext,
-                    ),
-                  ),
-                );
-              },
-              icon: Icon(Icons.settings_outlined,
-                  size: DesignTokens.iconSizeM),
-              label: Text(AppLocalizations.of(context)!.settings),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Opens (or reuses) a direct-message chat channel with this user.
-  ///
-  /// `upsert: true` because the intent is "talk to this person", not
-  /// "create a channel" — if one already exists, reuse it rather than
-  /// failing or making a duplicate.
   Future<void> _handleStartChat() async {
     if (_isStartingChat) return;
     setState(() => _isStartingChat = true);
     try {
-      // Discourse-only: creating a DM channel is not on IFCChatProxy,
-      // because the SDK's XenForo-shaped contract has no equivalent.
+      // Discourse-only: creating a DM channel is not on IFCChatProxy.
       final proxy = SiteProxyService.getChatProxy() as DiscourseChatProxy;
       final result = await proxy
           .createDirectMessageChannelAsync([_userInfo.username], upsert: true);
       if (!mounted) return;
       final channel = result.channel;
       if (!result.result || channel == null) {
-        // The server refuses for real reasons — DMs disabled, this user
-        // does not accept them — so show what it said rather than a
-        // generic failure.
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(result.resultText?.isNotEmpty == true
               ? result.resultText!
@@ -723,621 +268,679 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
-  Widget _buildOtherActionRow(
-      BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
-    // Wraps rather than overflowing a phone when Follow, Message and Chat
-    // are all offered; one button size for all three.
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        spacing: DesignTokens.spacingS,
-        runSpacing: DesignTokens.spacingS,
+  Future<void> _openEdit() async {
+    final saved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => EditProfilePage(
+          siteContext: widget.siteContext,
+          userInfo: _userInfo,
+        ),
+      ),
+    );
+    if (saved == true) widget.onEdited?.call();
+  }
+
+  void _viewAvatar() {
+    final url = _avatarUrl;
+    if (url == null || url.isEmpty) return;
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => FullScreenImageViewer(
+        imageUrls: [url],
+        initialIndex: 0,
+        heroTag: 'profile_picture_${_userInfo.username}',
+      ),
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final scaler = MediaQuery.textScalerOf(context);
+    return CustomScrollView(
+      controller: widget.scrollController,
+      // Pull-to-refresh works even when the profile is short.
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverToBoxAdapter(child: _buildHeader(context)),
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _ProfileTabsDelegate(
+            labels: [l10n.activity, l10n.profileTabSummary, l10n.badges],
+            selected: _tab.index,
+            onSelected: (i) => setState(() => _tab = _ProfileTab.values[i]),
+            textScaler: scaler,
+          ),
+        ),
+        if (_tab == _ProfileTab.activity) ...[
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: ActivityChipBarDelegate(
+              selected: _activityTab,
+              onSelected: (t) => setState(() => _activityTab = t),
+              textScaler: scaler,
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: ActivityFeed(
+              siteContext: widget.siteContext,
+              tab: _activityTab,
+              userId: _userInfo.id,
+              userName: _userInfo.username,
+              repliesKey: widget.repliesKey,
+            ),
+          ),
+        ],
+        if (_tab == _ProfileTab.summary)
+          SliverToBoxAdapter(
+            child: _SummaryTab(
+              siteContext: widget.siteContext,
+              userInfo: _userInfo,
+              extras: _extras,
+              summary: _summary,
+              loading: _summaryLoading,
+              error: _summaryError,
+              onRetry: _loadSummary,
+            ),
+          ),
+        if (_tab == _ProfileTab.badges)
+          SliverToBoxAdapter(
+            child: UserBadgesSection(
+              username: _userInfo.username,
+              maxToShow: 1000,
+              showHeading: false,
+            ),
+          ),
+        const SliverToBoxAdapter(
+            child: SizedBox(height: DesignTokens.spacingXL)),
+      ],
+    );
+  }
+
+  static const double _bandHeight = 88;
+  static const double _avatarRadius = 40;
+  static const double _ring = 4;
+
+  Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final extras = _extras;
+    final name = (_userInfo.displayText ?? '').trim();
+    final title = extras?.title;
+    final subline = [
+      if (name.isNotEmpty) '@${_userInfo.username}',
+      if (title != null) title,
+    ].join(' · ');
+    final bio = (extras?.bioText ?? _userInfo.bio ?? '').trim();
+    final avatarBox = (_avatarRadius + _ring) * 2;
+    final summary = _summary;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          height: _bandHeight + avatarBox / 2,
+          child: Stack(
+            children: [
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 0,
+                height: _bandHeight,
+                child: extras?.backgroundUrl != null
+                    ? CachedRedirectImage(
+                        imageUrl: extras!.backgroundUrl!,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) =>
+                            ColoredBox(color: colorScheme.surfaceContainerHigh),
+                        errorWidget: (_, __, ___) =>
+                            ColoredBox(color: colorScheme.surfaceContainerHigh),
+                      )
+                    : ColoredBox(color: colorScheme.surfaceContainerHigh),
+              ),
+              Positioned(
+                left: DesignTokens.spacingL - _ring,
+                top: _bandHeight - avatarBox / 2,
+                child: GestureDetector(
+                  onTap: _viewAvatar,
+                  child: Container(
+                    padding: const EdgeInsets.all(_ring),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      shape: BoxShape.circle,
+                    ),
+                    child: UserAvatar(
+                      username: _userInfo.username,
+                      iconUrl: _avatarUrl,
+                      radius: _avatarRadius,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(DesignTokens.spacingL,
+              DesignTokens.spacingS, DesignTokens.spacingL, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: DesignTokens.spacingS,
+                children: [
+                  Text(
+                    name.isNotEmpty ? name : _userInfo.username,
+                    style: textTheme.headlineSmall,
+                  ),
+                  if (_userInfo.isBanned)
+                    Chip(
+                      avatar: Icon(Icons.block,
+                          size: DesignTokens.iconSizeS,
+                          color: colorScheme.onErrorContainer),
+                      label: Text(l10n.profileSuspended),
+                      backgroundColor: colorScheme.errorContainer,
+                      labelStyle: textTheme.labelMedium
+                          ?.copyWith(color: colorScheme.onErrorContainer),
+                      side: BorderSide.none,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                ],
+              ),
+              if (subline.isNotEmpty)
+                Text(
+                  subline,
+                  style: textTheme.bodyMedium
+                      ?.copyWith(color: colorScheme.onSurfaceVariant),
+                ),
+              if (extras?.hasStatus ?? false) ...[
+                const SizedBox(height: DesignTokens.spacingS),
+                Row(
+                  children: [
+                    if (extras!.statusEmoji != null) ...[
+                      ReactionGlyph(
+                        reactionId: extras.statusEmoji!,
+                        size: DesignTokens.iconSizeM,
+                        siteContext: widget.siteContext,
+                      ),
+                      const SizedBox(width: DesignTokens.spacingS),
+                    ],
+                    Expanded(
+                      child: Text(extras.statusDescription!,
+                          style: textTheme.bodyMedium),
+                    ),
+                  ],
+                ),
+              ],
+              if (bio.isNotEmpty) ...[
+                const SizedBox(height: DesignTokens.spacingS),
+                Text(bio,
+                    style: textTheme.bodyMedium,
+                    maxLines: 6,
+                    overflow: TextOverflow.ellipsis),
+              ],
+              _buildMetaLine(context, extras),
+              _buildDatesLine(context),
+              const SizedBox(height: DesignTokens.spacingM),
+              _buildActions(context),
+            ],
+          ),
+        ),
+        if (summary != null && summary.canSeeSummaryStats)
+          ProfileStatsStrip(summary: summary)
+        else
+          const SizedBox(height: DesignTokens.spacingM),
+      ],
+    );
+  }
+
+  /// Location with their local time, and website.
+  Widget _buildMetaLine(
+      BuildContext context, DiscourseUserProfileExtras? extras) {
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+    final muted = Theme.of(context)
+        .textTheme
+        .bodyMedium
+        ?.copyWith(color: colorScheme.onSurfaceVariant);
+    final location = (_userInfo.location ?? '').trim();
+    final website = (_userInfo.website ?? '').trim();
+    final zone = timeZoneNamed(extras?.timezone);
+    final localTime = zone == null
+        ? null
+        : DateFormat.jm(Localizations.localeOf(context).toString())
+            .format(tz.TZDateTime.now(zone));
+    if (location.isEmpty && website.isEmpty && localTime == null) {
+      return const SizedBox.shrink();
+    }
+    Widget item(IconData icon, String text, {VoidCallback? onTap, Color? color}) {
+      final row = Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Follow / Unfollow toggle (Discourse 3.x). acceptsFollowers
-          // is wired off `can_follow` — we only show the button when
-          // the target permits follows.
-          if (_userInfo.acceptsFollowers) ...[
-            OutlinedButton.icon(
-              onPressed: _isTogglingFollow ? null : _handleToggleFollow,
-              icon: Icon(
-                _userInfo.isFollowing
-                    ? Icons.person_remove
-                    : Icons.person_add,
-                size: DesignTokens.iconSizeM,
-              ),
-              label: Text(
-                _userInfo.isFollowing ? 'Unfollow' : 'Follow',
-              ),
-            ),
-          ],
-          if (_userInfo.acceptsPM) ...[
-            FilledButton.icon(
-              onPressed: () {
-                // Discourse PMs are always conversations; the new one
-                // opens once sent.
-                NewConversationPage.open(
-                  context,
-                  siteContext: widget.siteContext,
-                  initialRecipient: _userInfo.username,
-                  initialRecipientIconUrl: _avatarUrl,
-                );
+          Icon(icon, size: DesignTokens.iconSizeS, color: colorScheme.onSurfaceVariant),
+          const SizedBox(width: DesignTokens.spacingXS),
+          Flexible(
+            child: Text(text,
+                style: color == null ? muted : muted?.copyWith(color: color),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
+          ),
+        ],
+      );
+      return onTap == null ? row : InkWell(onTap: onTap, child: row);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: DesignTokens.spacingS),
+      child: Wrap(
+        spacing: DesignTokens.spacingM,
+        runSpacing: DesignTokens.spacingXS,
+        children: [
+          if (location.isNotEmpty) item(Icons.place_outlined, location),
+          if (localTime != null)
+            item(Icons.schedule, l10n.profileLocalTime(localTime)),
+          if (website.isNotEmpty)
+            item(
+              Icons.link,
+              websiteDisplayName(website),
+              color: colorScheme.primary,
+              onTap: () {
+                final uri = Uri.tryParse(
+                    website.contains('://') ? website : 'https://$website');
+                if (uri != null) {
+                  launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
               },
-              icon: Icon(Icons.message, size: DesignTokens.iconSizeM),
-              label: Text(
-                AppLocalizations.of(context)?.sendMessage ?? 'Send Message',
-              ),
             ),
-          ],
-          // Web offers Message *and* Chat on a profile. Gated on the server's
-          // `can_chat_user`, not on whether the chat plugin is installed:
-          // those are different questions, and only the server knows whether
-          // this viewer may chat with this person. It no longer sits inside
-          // the personal-message block — someone can take chats and not PMs.
-          if (_userInfo.canChatUser) ...[
-            OutlinedButton.icon(
-              onPressed: _isStartingChat ? null : _handleStartChat,
-              icon: Icon(Icons.forum_outlined, size: DesignTokens.iconSizeM),
-              label: Text(AppLocalizations.of(context)?.chatWithUser ?? 'Chat'),
-            ),
-          ],
         ],
       ),
     );
   }
 
-  // --- Info card (the ONE implementation) --------------------------
+  /// "Joined Mar 2024 · Seen 2 hours ago" — one line where the info card
+  /// had Member Since, Last Activity and Seen (the last two the same time).
+  Widget _buildDatesLine(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final joined = _userInfo.registrationTime;
+    final seen = _userInfo.lastSeenAt ?? _userInfo.lastActivityTime;
+    final parts = [
+      if (joined != null)
+        l10n.profileJoined(
+            DateFormat.yMMM(Localizations.localeOf(context).toString())
+                .format(joined.toLocal())),
+      if (seen != null) l10n.profileSeen(formatTimeAgo(seen, context)),
+    ];
+    if (parts.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: DesignTokens.spacingXS),
+      child: Text(
+        parts.join(' · '),
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant),
+      ),
+    );
+  }
 
-  Widget _buildInfoCard(
-      BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
-    return Card(
-      margin: EdgeInsets.symmetric(
-        horizontal: DesignTokens.spacingL,
-        vertical: DesignTokens.spacingXS,
-      ),
-      elevation: DesignTokens.elevationNone,
-      color: colorScheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
-        side: BorderSide(
-          color: colorScheme.outlineVariant
-              .withValues(alpha: DesignTokens.opacityLow),
-          width: DesignTokens.borderWidthThin,
+  /// Message, Chat and Follow where the server allows each; on the
+  /// reader's own profile, Edit profile.
+  Widget _buildActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    if (widget.isSelf) {
+      return Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: OutlinedButton.icon(
+          onPressed: _openEdit,
+          icon: const Icon(Icons.edit_outlined, size: DesignTokens.iconSizeM),
+          label: Text(l10n.editProfile),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Core Information
-          if (_userInfo.registrationTime != null)
-            _buildInfoTile(
-              context,
-              icon: Icons.calendar_today,
-              title: AppLocalizations.of(context)?.memberSince ??
-                  'Member Since',
-              subtitle: DateFormat.yMMMMd()
-                  .format(_userInfo.registrationTime as DateTime),
-            ),
-          if (_userInfo.customFieldsList != null)
-            ...(() {
-              final birthdayField = _userInfo.customFieldsList!
-                  .where((f) =>
-                      f.name.toLowerCase() == 'birthday' &&
-                      f.value.trim().isNotEmpty &&
-                      f.value != '0')
-                  .cast<FCCustomField?>()
-                  .toList();
-              if (birthdayField.isEmpty) return <Widget>[];
-              final field = birthdayField.first;
-              DateTime? birthdayDate;
-              try {
-                birthdayDate = DateFormat('d MMM yyyy').parse(field!.value);
-              } catch (_) {}
-              final now = DateTime.now();
-              if (birthdayDate == null ||
-                  birthdayDate.year < 1900 ||
-                  birthdayDate.isAfter(now)) {
-                return <Widget>[];
-              }
-              final locale = Localizations.localeOf(context).toString();
-              final formatted = DateFormat.yMMMMd(locale).format(birthdayDate);
-              return [
-                _buildInfoTile(
-                  context,
-                  icon: Icons.cake,
-                  title: AppLocalizations.of(context)?.birthday ?? 'Birthday',
-                  subtitle: formatted,
-                ),
-              ];
-            })(),
-          if (_userInfo.lastActivityTime != null)
-            _buildInfoTile(
-              context,
-              icon: Icons.access_time,
-              title: AppLocalizations.of(context)?.lastActivity ??
-                  'Last Activity',
-              subtitle: DateFormat.yMMMd(
-                      Localizations.localeOf(context).toString())
-                  .add_jm()
-                  .format(_userInfo.lastActivityTime!.toLocal()),
-            ),
-          // Trust level reads as a fact about the account, like the join
-          // date beside it — not as a title for the person, which is what
-          // a chip under the username made it look like. Still tappable
-          // for the explainer sheet.
-          if (_userInfo.trustLevel != null)
-            _buildInfoTile(
-              context,
-              icon: Icons.military_tech_outlined,
-              title: 'Trust Level',
-              subtitle: _trustLevelLabel(_userInfo.trustLevel!),
-              onTap: () => TrustLevelSheet.show(
-                context: context,
-                currentLevel: _userInfo.trustLevel!,
-              ),
-            ),
-          if (_userInfo.postCount != 0)
-            _buildInfoTile(
-              context,
-              icon: Icons.post_add,
-              title: AppLocalizations.of(context)?.posts ?? 'Posts',
-              subtitle: NumberFormat.decimalPattern(
-                      Localizations.localeOf(context).toString())
-                  .format(_userInfo.postCount),
-            ),
-          // Web's profile header carries these two and the app's did not.
-          // Both come from the same /u/{name}.json the page already fetches.
-          if (_userInfo.lastSeenAt != null)
-            _buildInfoTile(
-              context,
-              // Not an eye: Views sits directly below with one, and two
-              // eyes side by side read as the same statistic twice. Seen
-              // is a timestamp, so it takes a clock.
-              icon: Icons.schedule,
-              title: AppLocalizations.of(context)?.lastSeen ?? 'Seen',
-              subtitle: DateFormat.yMMMMd(
-                      Localizations.localeOf(context).toString())
-                  .add_jm()
-                  .format(_userInfo.lastSeenAt!.toLocal()),
-            ),
-          if (_userInfo.profileViewCount != 0)
-            _buildInfoTile(
-              context,
-              icon: Icons.visibility_outlined,
-              title: AppLocalizations.of(context)?.profileViews ?? 'Views',
-              subtitle: NumberFormat.decimalPattern(
-                      Localizations.localeOf(context).toString())
-                  .format(_userInfo.profileViewCount),
-            ),
-          // No badge *count* row: the Badges section sits immediately
-          // below this card and lists them, so the number restated what
-          // the next thing on screen already shows.
-          if (_userInfo.followingCount != 0)
-            _buildInfoTile(
-              context,
-              icon: Icons.people_outline,
-              title: AppLocalizations.of(context)?.following ?? 'Following',
-              subtitle: _userInfo.followingCount.toString(),
-            ),
-          if (_userInfo.followerCount != 0)
-            _buildInfoTile(
-              context,
-              icon: Icons.people,
-              title: AppLocalizations.of(context)?.followers ?? 'Followers',
-              subtitle: _userInfo.followerCount.toString(),
-            ),
-          // About field (from direct API field)
-          if (_userInfo.bio != null && _userInfo.bio!.isNotEmpty)
-            _buildInfoTile(
-              context,
-              icon: Icons.person_outline,
-              title: AppLocalizations.of(context)?.about ?? 'About',
-              subtitle: _userInfo.bio!,
-            ),
-          // Location field (from direct API field)
-          if (_userInfo.location != null && _userInfo.location!.isNotEmpty)
-            _buildInfoTile(
-              context,
-              icon: Icons.location_on,
-              title: AppLocalizations.of(context)?.location ?? 'Location',
-              subtitle: _userInfo.location!,
-            ),
-          // Website field (clickable)
-          if (_userInfo.website != null && _userInfo.website!.isNotEmpty)
-            _buildInfoTile(
-              context,
-              icon: Icons.language,
-              title: AppLocalizations.of(context)?.website ?? 'Website',
-              subtitle: websiteDisplayName(_userInfo.website!),
-              onTap: () async {
-                final url = _userInfo.website!;
-                final uri = Uri.parse(
-                    url.startsWith('http://') || url.startsWith('https://')
-                        ? url
-                        : 'https://$url');
-                if (await canLaunchUrl(uri)) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                }
-              },
-            ),
-          // Location field from customFields (fallback for older data)
-          if (_userInfo.location == null && _userInfo.customFieldsList != null)
-            ...(() {
-              final locationField = _userInfo.customFieldsList!
-                  .where((f) =>
-                      f.name.toLowerCase().contains('location') &&
-                      f.value.trim().isNotEmpty &&
-                      f.value != '0')
-                  .toList();
-              if (locationField.isEmpty) return <Widget>[];
-              return [
-                _buildInfoTile(
-                  context,
-                  icon: Icons.location_on,
-                  title: locationField.first.name,
-                  subtitle: locationField.first.value,
-                ),
-              ];
-            })(),
-          // Additional Information Section (Expandable)
-          if (_userInfo.customFieldsList != null &&
-              _userInfo.customFieldsList!.isNotEmpty &&
-              _userInfo.customFieldsList!.any((f) =>
-                  f.value.trim().isNotEmpty &&
-                  f.value != "0" &&
-                  f.name.toLowerCase() != 'birthday' &&
-                  !f.name.toLowerCase().contains('location')))
-            Theme(
-              data: Theme.of(context)
-                  .copyWith(dividerColor: Colors.transparent),
-              child: ExpansionTile(
-                initiallyExpanded: false,
-                backgroundColor: Colors.transparent,
-                collapsedBackgroundColor: Colors.transparent,
-                title: Text(
-                  AppLocalizations.of(context)?.showMore ?? 'Show More',
-                  style: textTheme.titleSmall?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: DesignTokens.fontWeightMedium,
+      );
+    }
+    final buttons = <Widget>[
+      if (_userInfo.acceptsPM)
+        FilledButton.tonalIcon(
+          onPressed: () => NewConversationPage.open(
+            context,
+            siteContext: widget.siteContext,
+            initialRecipient: _userInfo.username,
+            initialRecipientIconUrl: _avatarUrl,
+          ),
+          icon: const Icon(Icons.mail_outline, size: DesignTokens.iconSizeM),
+          label: Text(l10n.sendMessage),
+        ),
+      if (_userInfo.canChatUser)
+        OutlinedButton.icon(
+          onPressed: _isStartingChat ? null : _handleStartChat,
+          icon: const Icon(Icons.chat_bubble_outline, size: DesignTokens.iconSizeM),
+          label: Text(l10n.chatWithUser),
+        ),
+      if (_userInfo.acceptsFollowers)
+        OutlinedButton.icon(
+          onPressed: _isTogglingFollow ? null : _handleToggleFollow,
+          icon: Icon(
+              _userInfo.isFollowing
+                  ? Icons.person_remove_outlined
+                  : Icons.person_add_outlined,
+              size: DesignTokens.iconSizeM),
+          label: Text(_userInfo.isFollowing ? l10n.unfollowUser : l10n.followUser),
+        ),
+    ];
+    if (buttons.isEmpty) return const SizedBox.shrink();
+    return Wrap(
+      spacing: DesignTokens.spacingS,
+      runSpacing: DesignTokens.spacingS,
+      children: buttons,
+    );
+  }
+}
+
+/// Activity · Summary · Badges, pinned under the header.
+class _ProfileTabsDelegate extends SliverPersistentHeaderDelegate {
+  const _ProfileTabsDelegate({
+    required this.labels,
+    required this.selected,
+    required this.onSelected,
+    required this.textScaler,
+  });
+
+  final List<String> labels;
+  final int selected;
+  final ValueChanged<int> onSelected;
+  final TextScaler textScaler;
+
+  double get _height => 16 + textScaler.scale(20) + 14;
+
+  @override
+  double get minExtent => _height;
+
+  @override
+  double get maxExtent => _height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Material(
+      color: colorScheme.surface,
+      elevation: overlapsContent ? DesignTokens.elevationLow : 0,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
+        ),
+        child: Row(
+          children: [
+            for (var i = 0; i < labels.length; i++)
+              Expanded(
+                child: Semantics(
+                  selected: i == selected,
+                  button: true,
+                  child: InkWell(
+                    onTap: () => onSelected(i),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          labels[i],
+                          style: textTheme.titleSmall?.copyWith(
+                            color: i == selected
+                                ? colorScheme.primary
+                                : colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 11),
+                        Container(
+                          height: 3,
+                          margin: const EdgeInsets.symmetric(horizontal: 24),
+                          decoration: BoxDecoration(
+                            color: i == selected
+                                ? colorScheme.primary
+                                : Colors.transparent,
+                            borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(3)),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(_ProfileTabsDelegate old) =>
+      old.selected != selected ||
+      old.labels.join() != labels.join() ||
+      old.textScaler != textScaler;
+}
+
+/// The Summary tab: what the person is known for here, then the details
+/// the old info card listed.
+class _SummaryTab extends StatelessWidget {
+  const _SummaryTab({
+    required this.siteContext,
+    required this.userInfo,
+    required this.extras,
+    required this.summary,
+    required this.loading,
+    required this.error,
+    required this.onRetry,
+  });
+
+  final SiteContext siteContext;
+  final FCUserInfoResult userInfo;
+  final DiscourseUserProfileExtras? extras;
+  final DiscourseUserSummary? summary;
+  final bool loading;
+  final String? error;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final s = summary;
+    final featuredId = extras?.featuredTopicId;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (loading && s == null)
+          const Padding(
+            padding: EdgeInsets.all(DesignTokens.spacingXL),
+            child: Center(child: CircularProgressIndicator()),
+          )
+        else if (s == null && error != null)
+          _SummaryUnavailable(message: error!, onRetry: onRetry),
+        if (featuredId != null)
+          ProfileSection(
+            title: l10n.featuredTopic,
+            child: ListTile(
+              leading: const Icon(Icons.push_pin_outlined),
+              title: Text(extras?.featuredTopicTitle ?? ''),
+              onTap: () => AppNavigation.pushGlobal(PostPage(
+                siteContext: siteContext,
+                topicId: '$featuredId',
+                title: extras?.featuredTopicTitle ?? '',
+              )),
+            ),
+          ),
+        if (s != null) ..._summaryLists(context, l10n, s),
+        _details(context, l10n),
+      ],
+    );
+  }
+
+  List<Widget> _summaryLists(
+      BuildContext context, AppLocalizations l10n, DiscourseUserSummary s) {
+    return [
+      if (s.topReplies.isNotEmpty)
+        _SummaryTopicSection(
+          title: l10n.summaryTopReplies,
+          rows: [
+            for (final r in s.topReplies.take(5))
+              _SummaryTopicRowData(
+                title: r.topicTitle,
+                likeCount: r.likeCount,
+                createdAt: r.createdAt,
+                onTap: () => AppNavigation.pushGlobal(PostPage(
+                  siteContext: siteContext,
+                  topicId: r.topicId.toString(),
+                  title: r.topicTitle,
+                )),
+              ),
+          ],
+        ),
+      if (s.topTopics.isNotEmpty)
+        _SummaryTopicSection(
+          title: l10n.summaryTopTopics,
+          rows: [
+            for (final t in s.topTopics.take(5))
+              _SummaryTopicRowData(
+                title: t.title,
+                likeCount: t.likeCount,
+                createdAt: t.createdAt,
+                replyCount: t.postsCount == null ? null : (t.postsCount! - 1),
+                onTap: () => AppNavigation.pushGlobal(PostPage(
+                  siteContext: siteContext,
+                  topicId: t.id.toString(),
+                  title: t.title,
+                )),
+              ),
+          ],
+        ),
+      if (s.mostLikedByUsers.isNotEmpty)
+        _SummaryPeopleStrip(
+          title: l10n.summaryMostLikedBy,
+          people: s.mostLikedByUsers,
+          countLabel: (n) => n == 1 ? '1 like' : '$n likes',
+          siteContext: siteContext,
+        ),
+      if (s.mostLikedUsers.isNotEmpty)
+        _SummaryPeopleStrip(
+          title: l10n.summaryMostLiked,
+          people: s.mostLikedUsers,
+          countLabel: (n) => n == 1 ? '1 like' : '$n likes',
+          siteContext: siteContext,
+        ),
+      if (s.mostRepliedToUsers.isNotEmpty)
+        _SummaryPeopleStrip(
+          title: l10n.summaryMostRepliedTo,
+          people: s.mostRepliedToUsers.take(5).toList(),
+          countLabel: (n) => n == 1 ? '1 reply' : '$n replies',
+          siteContext: siteContext,
+        ),
+      if (s.topCategories.isNotEmpty)
+        ProfileSection(
+          title: l10n.summaryTopCategories,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final c in s.topCategories.take(5))
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: DesignTokens.spacingXS),
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: CategoryBadge(
+                          siteContext: siteContext,
+                          categoryId: '${c.id}',
+                          fallbackName: c.name,
+                        ),
+                      ),
+                      const SizedBox(width: DesignTokens.spacingS),
+                      Text(
+                        [
+                          if (c.topicCount > 0)
+                            l10n.countTopics(c.topicCount, '${c.topicCount}'),
+                          if (c.postCount > 0)
+                            '${c.postCount} ${l10n.profileStatPosts(c.postCount)}',
+                        ].join(' · '),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      if (s.topLinks.isNotEmpty)
+        _SummaryLinksSection(links: s.topLinks.take(5).toList()),
+    ];
+  }
+
+  /// Trust level, groups, views, followers and custom fields: what the old
+  /// info card had that is not already in the header.
+  Widget _details(BuildContext context, AppLocalizations l10n) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final level = userInfo.trustLevel;
+    final groups = userInfo.userGroups;
+    final fields = userInfo.customFields
+        .where((f) => f.name.isNotEmpty && f.value.trim().isNotEmpty)
+        .toList();
+    Widget row(IconData icon, String label, String? value, {VoidCallback? onTap}) =>
+        ListTile(
+          dense: true,
+          leading: Icon(icon, color: colorScheme.onSurfaceVariant),
+          title: Text(label, style: textTheme.bodyMedium),
+          trailing: value != null
+              ? Text(value,
+                  style: textTheme.bodyMedium
+                      ?.copyWith(color: colorScheme.onSurfaceVariant))
+              : (onTap != null
+                  ? Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant)
+                  : null),
+          onTap: onTap,
+        );
+    return ProfileSection(
+      title: l10n.profileDetails,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (level != null)
+            // What the level means is one tap away, as before.
+            row(Icons.verified_outlined, l10n.trustLevelN(level), null,
+                onTap: () =>
+                    TrustLevelSheet.show(context: context, currentLevel: level)),
+          if (userInfo.profileViewCount > 0)
+            row(Icons.visibility_outlined, l10n.profileViews,
+                formatNumber(context, userInfo.profileViewCount)),
+          if (userInfo.acceptsFollowers || userInfo.followerCount > 0) ...[
+            row(Icons.people_outline, l10n.followers,
+                formatNumber(context, userInfo.followerCount)),
+            row(Icons.person_outline, l10n.following,
+                formatNumber(context, userInfo.followingCount)),
+          ],
+          for (final f in fields) row(Icons.info_outline, f.name, f.value),
+          if (groups.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(DesignTokens.spacingL,
+                  DesignTokens.spacingS, DesignTokens.spacingL, 0),
+              child: Wrap(
+                spacing: DesignTokens.spacingS,
+                runSpacing: DesignTokens.spacingS,
                 children: [
-                  ..._userInfo.customFieldsList!
-                      .where((f) =>
-                          f.value.trim().isNotEmpty &&
-                          f.value != "0" &&
-                          !f.name.toLowerCase().contains('location'))
-                      .map((f) => _buildInfoTile(
-                            context,
-                            icon: Icons.info_outline,
-                            title: f.name,
-                            subtitle: f.value,
-                          ))
-                      .toList(),
+                  for (final g in groups)
+                    Chip(
+                      avatar: const Icon(Icons.groups_outlined,
+                          size: DesignTokens.iconSizeS),
+                      label: Text(g),
+                      visualDensity: VisualDensity.compact,
+                    ),
                 ],
               ),
             ),
         ],
       ),
-    );
-  }
-
-  Widget _buildInfoTile(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    VoidCallback? onTap,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: colorScheme.onSurfaceVariant,
-      ),
-      title: Text(
-        title,
-        style: textTheme.bodySmall?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-        ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: textTheme.bodyLarge?.copyWith(
-          color: onTap != null ? colorScheme.primary : colorScheme.onSurface,
-          decoration: onTap != null ? TextDecoration.underline : null,
-        ),
-      ),
-      onTap: onTap,
-    );
-  }
-
-}
-class _UserSummarySection extends StatefulWidget {
-  final SiteContext siteContext;
-  final String username;
-
-  const _UserSummarySection({
-    super.key,
-    required this.siteContext,
-    required this.username,
-  });
-
-  @override
-  State<_UserSummarySection> createState() => _UserSummarySectionState();
-}
-
-class _UserSummarySectionState extends State<_UserSummarySection> {
-  DiscourseUserSummary? _summary;
-  bool _loading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      final result = await DiscourseUserProxy(widget.siteContext)
-          .getUserSummaryAsync(widget.username);
-      if (!mounted) return;
-      setState(() {
-        _summary = result.result ? result.summary : null;
-        _error = result.result
-            ? null
-            : (result.resultText.isNotEmpty
-                ? result.resultText
-                : 'Could not load stats.');
-        _loading = false;
-      });
-    } catch (e) {
-      AppLogger.debug('Error fetching user summary: $e');
-      if (!mounted) return;
-      setState(() {
-        _error = describeError(e, fallback: 'Could not load stats.');
-        _loading = false;
-      });
-    }
-  }
-
-  /// "3d 4h" / "2h 15m" / "45m" / "< 1m" from a seconds count.
-  String _humanizeDuration(int seconds) {
-    if (seconds < 60) return '< 1m';
-    final minutes = seconds ~/ 60;
-    final hours = minutes ~/ 60;
-    final days = hours ~/ 24;
-    if (days > 0) {
-      final remHours = hours % 24;
-      return remHours > 0 ? '${days}d ${remHours}h' : '${days}d';
-    }
-    if (hours > 0) {
-      final remMinutes = minutes % 60;
-      return remMinutes > 0 ? '${hours}h ${remMinutes}m' : '${hours}h';
-    }
-    return '${minutes}m';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final summary = _summary;
-    // A failed summary used to render nothing at all, which is
-    // indistinguishable from "this user has no stats" — and because a
-    // rate-limited app fails exactly here, the profile appeared to lose
-    // its whole lower half with no explanation. Say so, and offer a retry.
-    if (_loading) return const SizedBox.shrink();
-    if (summary == null) {
-      if (_error == null) return const SizedBox.shrink();
-      return _SummaryUnavailable(message: _error!, onRetry: _load);
-    }
-
-    final showStats = summary.canSeeSummaryStats;
-    final likedBy = summary.mostLikedByUsers;
-    final topTopics = summary.topTopics;
-    final topReplies = summary.topReplies;
-    final topLinks = summary.topLinks;
-    final mostLiked = summary.mostLikedUsers;
-    final mostRepliedTo = summary.mostRepliedToUsers;
-    if (!showStats &&
-        likedBy.isEmpty &&
-        mostLiked.isEmpty &&
-        topTopics.isEmpty &&
-        topReplies.isEmpty &&
-        topLinks.isEmpty &&
-        mostRepliedTo.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final numberFormat = NumberFormat.decimalPattern(
-        Localizations.localeOf(context).toString());
-
-    final stats = <({String value, String label})>[
-      (
-        value: numberFormat.format(summary.daysVisited),
-        label: 'Days visited',
-      ),
-      (
-        value: _humanizeDuration(summary.timeRead),
-        label: 'Time read',
-      ),
-      (
-        value: numberFormat.format(summary.topicsEntered),
-        label: 'Topics entered',
-      ),
-      (
-        value: numberFormat.format(summary.postsReadCount),
-        label: 'Posts read',
-      ),
-      (
-        value: numberFormat.format(summary.likesGiven),
-        label: 'Likes given',
-      ),
-      (
-        value: numberFormat.format(summary.likesReceived),
-        label: 'Likes received',
-      ),
-      // Discourse web shows these two alongside the rest; without them
-      // the app's grid read as a truncated version of the same block.
-      (
-        value: numberFormat.format(summary.topicCount),
-        label: 'Topics created',
-      ),
-      (
-        value: numberFormat.format(summary.postCount),
-        label: 'Posts created',
-      ),
-    ];
-
-    // Stats stay in a card (mirroring the info card above); the two lists
-    // below are full-width sections in the same shape as "Recent Posts",
-    // because that is how this app presents a list of topics.
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _statsCard(context, colorScheme, textTheme, stats, showStats),
-        if (topReplies.isNotEmpty)
-          _SummaryTopicSection(
-            title: 'Top Replies',
-            rows: [
-              for (final r in topReplies.take(5))
-                _SummaryTopicRowData(
-                  title: r.topicTitle,
-                  likeCount: r.likeCount,
-                  // The topic title is the same for every reply in a topic,
-                  // so without the date three rows read identically.
-                  createdAt: r.createdAt,
-                  // Opens the topic, not the exact post: the summary gives a
-                  // post_number, while anchoring needs a post id, and
-                  // `gotoPage` is a page index — not the same thing.
-                  onTap: () => AppNavigation.pushGlobal(PostPage(
-                        siteContext: widget.siteContext,
-                        topicId: r.topicId.toString(),
-                        title: r.topicTitle,
-                      )),
-                ),
-            ],
-          ),
-        if (topTopics.isNotEmpty)
-          _SummaryTopicSection(
-            title: 'Top Topics',
-            rows: [
-              for (final t in topTopics.take(5))
-                _SummaryTopicRowData(
-                  title: t.title,
-                  likeCount: t.likeCount,
-                  createdAt: t.createdAt,
-                  replyCount:
-                      t.postsCount == null ? null : (t.postsCount! - 1),
-                  onTap: () => AppNavigation.pushGlobal(PostPage(
-                        siteContext: widget.siteContext,
-                        topicId: t.id.toString(),
-                        title: t.title,
-                      )),
-                ),
-            ],
-          ),
-        // Top Links and Most Replied To complete web's summary. Both were
-        // already parsed off /u/{name}/summary.json — only the rendering
-        // was missing, so neither costs a request.
-        if (likedBy.isNotEmpty)
-          _SummaryPeopleStrip(
-            title: 'Most Liked By',
-            people: likedBy,
-            countLabel: (n) => n == 1 ? '1 like' : '$n likes',
-            siteContext: widget.siteContext,
-          ),
-        // Web shows this third people list too. It was already parsed off
-        // the same payload and simply never rendered, so it costs nothing.
-        if (mostLiked.isNotEmpty)
-          _SummaryPeopleStrip(
-            title: 'Most Liked',
-            people: mostLiked,
-            countLabel: (n) => n == 1 ? '1 like' : '$n likes',
-            siteContext: widget.siteContext,
-          ),
-        if (mostRepliedTo.isNotEmpty)
-          _SummaryPeopleStrip(
-            title: 'Most Replied To',
-            people: mostRepliedTo.take(5).toList(),
-            countLabel: (n) => n == 1 ? '1 reply' : '$n replies',
-            siteContext: widget.siteContext,
-          ),
-        if (topLinks.isNotEmpty)
-          _SummaryLinksSection(links: topLinks.take(5).toList()),
-      ],
-    );
-  }
-
-  Widget _statsCard(
-    BuildContext context,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-    List<({String value, String label})> stats,
-    bool showStats,
-  ) {
-    if (!showStats) return const SizedBox.shrink();
-    // Was a card with an uppercase STATS micro-label — a fourth chrome on
-    // a page that now has one. Same heading and tinted break as every
-    // section below it.
-    return ProfileSection(
-      title: 'Stats',
-      contentPadding:
-          EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
-      child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (showStats) ...[
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final cellWidth =
-                      (constraints.maxWidth - 2 * DesignTokens.spacingS) / 3;
-                  return Wrap(
-                    spacing: DesignTokens.spacingS,
-                    runSpacing: DesignTokens.spacingM,
-                    children: stats
-                        .map(
-                          (s) => SizedBox(
-                            width: cellWidth,
-                            child: Column(
-                              children: [
-                                Text(
-                                  s.value,
-                                  style: textTheme.titleMedium?.copyWith(
-                                    color: colorScheme.onSurface,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                SizedBox(height: DesignTokens.spacingXS / 2),
-                                Text(
-                                  s.label,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  );
-                },
-              ),
-            ],
-          ],
-        ),
     );
   }
 }

@@ -2846,4 +2846,58 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get goToYourProfile => '前往你的个人资料';
+
+  @override
+  String profileJoined(String date) {
+    return '$date 加入';
+  }
+
+  @override
+  String profileSeen(String when) {
+    return '$when 访问';
+  }
+
+  @override
+  String profileLocalTime(String time) {
+    return '当地时间 $time';
+  }
+
+  @override
+  String get profileTabSummary => '摘要';
+
+  @override
+  String get summaryTopReplies => '热门回复';
+
+  @override
+  String get summaryTopTopics => '热门主题';
+
+  @override
+  String get summaryMostLikedBy => '最常点赞者';
+
+  @override
+  String get summaryMostLiked => '最常赞的人';
+
+  @override
+  String get summaryMostRepliedTo => '最常回复的人';
+
+  @override
+  String get summaryTopLinks => '热门链接';
+
+  @override
+  String get summaryTopCategories => '常去的分类';
+
+  @override
+  String get featuredTopic => '精选主题';
+
+  @override
+  String get profileDetails => '详细信息';
+
+  @override
+  String get followUser => '关注';
+
+  @override
+  String get unfollowUser => '取消关注';
+
+  @override
+  String get profileSuspended => '已停用';
 }

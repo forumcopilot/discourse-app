@@ -2871,4 +2871,58 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get goToYourProfile => '내 프로필로 이동';
+
+  @override
+  String profileJoined(String date) {
+    return '$date 가입';
+  }
+
+  @override
+  String profileSeen(String when) {
+    return '$when 접속';
+  }
+
+  @override
+  String profileLocalTime(String time) {
+    return '현지 시간 $time';
+  }
+
+  @override
+  String get profileTabSummary => '요약';
+
+  @override
+  String get summaryTopReplies => '인기 답글';
+
+  @override
+  String get summaryTopTopics => '인기 주제';
+
+  @override
+  String get summaryMostLikedBy => '좋아요를 가장 많이 준 사람';
+
+  @override
+  String get summaryMostLiked => '가장 많이 좋아요한 사람';
+
+  @override
+  String get summaryMostRepliedTo => '가장 많이 답글한 사람';
+
+  @override
+  String get summaryTopLinks => '인기 링크';
+
+  @override
+  String get summaryTopCategories => '주요 카테고리';
+
+  @override
+  String get featuredTopic => '추천 주제';
+
+  @override
+  String get profileDetails => '세부 정보';
+
+  @override
+  String get followUser => '팔로우';
+
+  @override
+  String get unfollowUser => '언팔로우';
+
+  @override
+  String get profileSuspended => '정지됨';
 }

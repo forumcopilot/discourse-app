@@ -1080,5 +1080,21 @@
   "createAccount": "Создать аккаунт",
   "aboutThisForum": "Об этом форуме",
   "drawerMore": "Ещё",
-  "goToYourProfile": "Перейти в профиль"
+  "goToYourProfile": "Перейти в профиль",
+  "profileJoined": "С нами с {date}",
+  "profileSeen": "Был(а) {when}",
+  "profileLocalTime": "{time} по местному времени",
+  "profileTabSummary": "Сводка",
+  "summaryTopReplies": "Лучшие ответы",
+  "summaryTopTopics": "Лучшие темы",
+  "summaryMostLikedBy": "Больше всего лайков от",
+  "summaryMostLiked": "Больше всего лайкает",
+  "summaryMostRepliedTo": "Чаще всего отвечает",
+  "summaryTopLinks": "Популярные ссылки",
+  "summaryTopCategories": "Основные разделы",
+  "featuredTopic": "Избранная тема",
+  "profileDetails": "Подробности",
+  "followUser": "Подписаться",
+  "unfollowUser": "Отписаться",
+  "profileSuspended": "Заблокирован(а)"
 }

@@ -2878,4 +2878,58 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get goToYourProfile => 'プロフィールへ';
+
+  @override
+  String profileJoined(String date) {
+    return '$date に参加';
+  }
+
+  @override
+  String profileSeen(String when) {
+    return '最終アクセス $when';
+  }
+
+  @override
+  String profileLocalTime(String time) {
+    return '現地時間 $time';
+  }
+
+  @override
+  String get profileTabSummary => '概要';
+
+  @override
+  String get summaryTopReplies => '人気の返信';
+
+  @override
+  String get summaryTopTopics => '人気のトピック';
+
+  @override
+  String get summaryMostLikedBy => 'いいねをくれた人';
+
+  @override
+  String get summaryMostLiked => 'いいねした相手';
+
+  @override
+  String get summaryMostRepliedTo => 'よく返信する相手';
+
+  @override
+  String get summaryTopLinks => '人気のリンク';
+
+  @override
+  String get summaryTopCategories => 'よく投稿するカテゴリ';
+
+  @override
+  String get featuredTopic => '注目のトピック';
+
+  @override
+  String get profileDetails => '詳細';
+
+  @override
+  String get followUser => 'フォロー';
+
+  @override
+  String get unfollowUser => 'フォロー解除';
+
+  @override
+  String get profileSuspended => '停止中';
 }

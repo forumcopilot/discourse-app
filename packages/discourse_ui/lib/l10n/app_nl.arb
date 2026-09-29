@@ -1377,5 +1377,21 @@
   "createAccount": "Account aanmaken",
   "aboutThisForum": "Over dit forum",
   "drawerMore": "Meer",
-  "goToYourProfile": "Naar je profiel"
+  "goToYourProfile": "Naar je profiel",
+  "profileJoined": "Lid sinds {date}",
+  "profileSeen": "Gezien {when}",
+  "profileLocalTime": "{time} lokale tijd",
+  "profileTabSummary": "Samenvatting",
+  "summaryTopReplies": "Topantwoorden",
+  "summaryTopTopics": "Toponderwerpen",
+  "summaryMostLikedBy": "Meest geliket door",
+  "summaryMostLiked": "Meest geliket",
+  "summaryMostRepliedTo": "Meest beantwoord",
+  "summaryTopLinks": "Toplinks",
+  "summaryTopCategories": "Topcategorieën",
+  "featuredTopic": "Uitgelicht onderwerp",
+  "profileDetails": "Details",
+  "followUser": "Volgen",
+  "unfollowUser": "Ontvolgen",
+  "profileSuspended": "Geschorst"
 }

@@ -1079,5 +1079,21 @@
   "createAccount": "创建账户",
   "aboutThisForum": "关于此论坛",
   "drawerMore": "更多",
-  "goToYourProfile": "前往你的个人资料"
+  "goToYourProfile": "前往你的个人资料",
+  "profileJoined": "{date} 加入",
+  "profileSeen": "{when} 访问",
+  "profileLocalTime": "当地时间 {time}",
+  "profileTabSummary": "摘要",
+  "summaryTopReplies": "热门回复",
+  "summaryTopTopics": "热门主题",
+  "summaryMostLikedBy": "最常点赞者",
+  "summaryMostLiked": "最常赞的人",
+  "summaryMostRepliedTo": "最常回复的人",
+  "summaryTopLinks": "热门链接",
+  "summaryTopCategories": "常去的分类",
+  "featuredTopic": "精选主题",
+  "profileDetails": "详细信息",
+  "followUser": "关注",
+  "unfollowUser": "取消关注",
+  "profileSuspended": "已停用"
 }

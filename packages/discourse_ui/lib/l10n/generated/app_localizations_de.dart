@@ -3013,4 +3013,58 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get goToYourProfile => 'Zu deinem Profil';
+
+  @override
+  String profileJoined(String date) {
+    return 'Dabei seit $date';
+  }
+
+  @override
+  String profileSeen(String when) {
+    return 'Gesehen $when';
+  }
+
+  @override
+  String profileLocalTime(String time) {
+    return '$time Ortszeit';
+  }
+
+  @override
+  String get profileTabSummary => 'Übersicht';
+
+  @override
+  String get summaryTopReplies => 'Top-Antworten';
+
+  @override
+  String get summaryTopTopics => 'Top-Themen';
+
+  @override
+  String get summaryMostLikedBy => 'Am meisten geliked von';
+
+  @override
+  String get summaryMostLiked => 'Am meisten geliked';
+
+  @override
+  String get summaryMostRepliedTo => 'Am meisten geantwortet';
+
+  @override
+  String get summaryTopLinks => 'Top-Links';
+
+  @override
+  String get summaryTopCategories => 'Top-Kategorien';
+
+  @override
+  String get featuredTopic => 'Hervorgehobenes Thema';
+
+  @override
+  String get profileDetails => 'Details';
+
+  @override
+  String get followUser => 'Folgen';
+
+  @override
+  String get unfollowUser => 'Nicht mehr folgen';
+
+  @override
+  String get profileSuspended => 'Gesperrt';
 }

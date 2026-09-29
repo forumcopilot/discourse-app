@@ -1079,5 +1079,21 @@
   "createAccount": "Crear cuenta",
   "aboutThisForum": "Acerca de este foro",
   "drawerMore": "Más",
-  "goToYourProfile": "Ir a tu perfil"
+  "goToYourProfile": "Ir a tu perfil",
+  "profileJoined": "Se unió en {date}",
+  "profileSeen": "Visto {when}",
+  "profileLocalTime": "{time} hora local",
+  "profileTabSummary": "Resumen",
+  "summaryTopReplies": "Mejores respuestas",
+  "summaryTopTopics": "Mejores temas",
+  "summaryMostLikedBy": "Más me gusta de",
+  "summaryMostLiked": "Más le gustó",
+  "summaryMostRepliedTo": "Más respondido a",
+  "summaryTopLinks": "Enlaces destacados",
+  "summaryTopCategories": "Categorías principales",
+  "featuredTopic": "Tema destacado",
+  "profileDetails": "Detalles",
+  "followUser": "Seguir",
+  "unfollowUser": "Dejar de seguir",
+  "profileSuspended": "Suspendido"
 }
