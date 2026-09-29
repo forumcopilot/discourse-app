@@ -20,10 +20,19 @@ import 'user_profile_page.dart';
 /// tab, so Back from there left the forum rather than returning to the page
 /// the link was on. This opens on top instead; the home keeps its tabs.
 class ForumListPage extends StatelessWidget {
-  const ForumListPage({super.key, required this.siteContext, required this.tab});
+  const ForumListPage({
+    super.key,
+    required this.siteContext,
+    required this.tab,
+    this.messageGroup,
+  });
 
   final SiteContext siteContext;
   final SiteHomeTab tab;
+
+  /// For [SiteHomeTab.messages]: open on this group's inbox (a group
+  /// message summary names one).
+  final String? messageGroup;
 
   /// Opens [tab]'s list over the current page.
   static Future<void> open(
@@ -58,7 +67,10 @@ class ForumListPage extends StatelessWidget {
         ),
       SiteHomeTab.inbox || SiteHomeTab.messages => (
           l10n.messages,
-          PrivateMessageListTab(siteContext: siteContext, isActive: true),
+          PrivateMessageListTab(
+              siteContext: siteContext,
+              isActive: true,
+              initialGroup: messageGroup),
         ),
       SiteHomeTab.notifications || SiteHomeTab.profile => (
           l10n.notifications,

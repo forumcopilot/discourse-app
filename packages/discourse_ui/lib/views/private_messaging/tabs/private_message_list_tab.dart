@@ -18,8 +18,16 @@ import '../conversation/list/conversation_list.dart';
 class PrivateMessageListTab extends StatefulWidget {
   final SiteContext siteContext;
   final bool isActive;
+
+  /// A group whose inbox to show first, once the reader's groups have
+  /// loaded (a group message summary notification names one).
+  final String? initialGroup;
+
   const PrivateMessageListTab(
-      {super.key, required this.isActive, required this.siteContext});
+      {super.key,
+      required this.isActive,
+      required this.siteContext,
+      this.initialGroup});
   @override
   PrivateMessageListTabState createState() => PrivateMessageListTabState();
 }
@@ -68,6 +76,11 @@ class PrivateMessageListTabState extends FCStatefulWidget<PrivateMessageListTab>
     if (proxy is! DiscoursePrivateConversationProxy) return;
     final groups = await proxy.getMessageGroupsAsync();
     if (mounted && groups.isNotEmpty) setState(() => _groups = groups);
+    final wanted = widget.initialGroup?.toLowerCase();
+    if (!mounted || wanted == null) return;
+    final index =
+        _allLists.indexWhere((l) => l.group?.toLowerCase() == wanted);
+    if (index >= 0) _select(index);
   }
 
   @override

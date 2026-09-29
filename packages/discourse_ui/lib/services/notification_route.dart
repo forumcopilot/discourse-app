@@ -40,6 +40,23 @@ enum NotificationRouteKind {
   /// rather than the topic reader.
   conversation,
 
+  /// A chat channel, at a message when the payload named one outside a
+  /// thread (chat mentions, invitations, DMs, watched threads).
+  chat,
+
+  /// A badge the reader earned: its sheet, over the page on screen.
+  badge,
+
+  /// A group's message inbox (`group_message_summary`): the Messages page,
+  /// on that group's list.
+  groupInbox,
+
+  /// A group's page (membership accepted, membership requests).
+  group,
+
+  /// A person's profile (an invitee who joined, a new follower).
+  profile,
+
   /// Nothing to open. The notification list is the honest destination.
   notificationsTab,
 }
@@ -53,6 +70,12 @@ class DiscourseNotificationRoute {
     this.postNumber,
     this.page,
     this.siteUrl,
+    this.chatChannelId,
+    this.chatMessageId,
+    this.badgeId,
+    this.groupName,
+    this.username,
+    this.notificationId,
   });
 
   final NotificationRouteKind kind;
@@ -72,6 +95,25 @@ class DiscourseNotificationRoute {
   /// The forum the notification came from, as the backend spelled it.
   final String? siteUrl;
 
+  /// For [NotificationRouteKind.chat]: the channel, and the message to
+  /// scroll to — null inside a thread, whose replies are not in the
+  /// channel's timeline.
+  final int? chatChannelId;
+  final int? chatMessageId;
+
+  /// For [NotificationRouteKind.badge].
+  final int? badgeId;
+
+  /// For [NotificationRouteKind.groupInbox] and [NotificationRouteKind.group].
+  final String? groupName;
+
+  /// For [NotificationRouteKind.profile].
+  final String? username;
+
+  /// The Discourse notification behind the push, marked read once opened.
+  /// Null for chat messages, which have no notification row.
+  final int? notificationId;
+
   /// Posts per page, matching `PostsList`'s own page size — the page number
   /// is only useful if both sides agree on how long a page is.
   static const int postsPerPage = 20;
@@ -82,17 +124,43 @@ class DiscourseNotificationRoute {
       (data['type'] ?? '').toString().toLowerCase() == 'discourse_notification';
 
   /// Read a route out of one FCM data payload.
+  ///
+  /// Each Discourse notification type opens what its row in Discourse's own
+  /// notification menu opens: a topic or message at its post, a chat
+  /// channel at its message, a badge, a group's inbox or page, a profile.
   factory DiscourseNotificationRoute.from(Map<String, dynamic> data) {
     final topicId = _intFrom(data['topic_id']);
     final postId = _intFrom(data['content_id']);
     final postNumber = _intFrom(data['post_number']);
     final siteUrl = _stringFrom(data['site_url']);
+    final notificationId = _intFrom(data['notification_id']);
+    final type = _intFrom(data['notification_type']);
+
+    // Chat: a mention, an invitation, a DM, a watched thread, and a chat
+    // bookmark whose only address is its link.
+    var channelId = _intFrom(data['chat_channel_id']);
+    var messageId = _intFrom(data['chat_message_id']);
+    var threadId = _intFrom(data['chat_thread_id']);
+    if (channelId == null) {
+      final chat = _chatFromUrl(_stringFrom(data['url']));
+      channelId = chat?.channel;
+      messageId ??= chat?.message;
+      threadId ??= chat?.thread;
+    }
+    if (channelId != null) {
+      return DiscourseNotificationRoute(
+        kind: NotificationRouteKind.chat,
+        chatChannelId: channelId,
+        chatMessageId: threadId == null ? messageId : null,
+        siteUrl: siteUrl,
+        notificationId: notificationId,
+      );
+    }
 
     // A personal message (private_message 6, invited_to_private_message 7)
     // opens where the notifications tab opens it: the message screen. The
     // backend passes Discourse's notification_type along; this used to be
     // ignored, so a message push landed in the topic reader.
-    final type = _intFrom(data['notification_type']);
     if (topicId != null && (type == 6 || type == 7)) {
       return DiscourseNotificationRoute(
         kind: NotificationRouteKind.conversation,
@@ -100,6 +168,7 @@ class DiscourseNotificationRoute {
         postId: postId?.toString(),
         postNumber: postNumber,
         siteUrl: siteUrl,
+        notificationId: notificationId,
       );
     }
 
@@ -112,6 +181,7 @@ class DiscourseNotificationRoute {
         postId: postId.toString(),
         postNumber: postNumber,
         siteUrl: siteUrl,
+        notificationId: notificationId,
       );
     }
     if (topicId != null && postNumber != null && postNumber > 0) {
@@ -121,6 +191,7 @@ class DiscourseNotificationRoute {
         postNumber: postNumber,
         page: ((postNumber - 1) ~/ postsPerPage) + 1,
         siteUrl: siteUrl,
+        notificationId: notificationId,
       );
     }
     // A topic with no position at all still beats the notification list.
@@ -130,11 +201,68 @@ class DiscourseNotificationRoute {
         topicId: topicId.toString(),
         page: 1,
         siteUrl: siteUrl,
+        notificationId: notificationId,
+      );
+    }
+
+    // No topic: the types whose destination is a badge, a group or a person.
+    final badgeId = _intFrom(data['badge_id']);
+    if (type == 12 && badgeId != null) {
+      return DiscourseNotificationRoute(
+        kind: NotificationRouteKind.badge,
+        badgeId: badgeId,
+        siteUrl: siteUrl,
+        notificationId: notificationId,
+      );
+    }
+    final group = _stringFrom(data['group_name']);
+    if (group != null && type == 16) {
+      return DiscourseNotificationRoute(
+        kind: NotificationRouteKind.groupInbox,
+        groupName: group,
+        siteUrl: siteUrl,
+        notificationId: notificationId,
+      );
+    }
+    if (group != null && (type == 22 || type == 23)) {
+      return DiscourseNotificationRoute(
+        kind: NotificationRouteKind.group,
+        groupName: group,
+        siteUrl: siteUrl,
+        notificationId: notificationId,
+      );
+    }
+    // An invitee who joined, a new follower — and likes or links spread
+    // over several posts, whose person is the one thing they share (the
+    // notification list opens the same).
+    final username = _stringFrom(data['username']);
+    if (username != null && const {8, 19, 39, 25, 800}.contains(type)) {
+      return DiscourseNotificationRoute(
+        kind: NotificationRouteKind.profile,
+        username: username,
+        siteUrl: siteUrl,
+        notificationId: notificationId,
       );
     }
     return DiscourseNotificationRoute(
       kind: NotificationRouteKind.notificationsTab,
       siteUrl: siteUrl,
+      notificationId: notificationId,
+    );
+  }
+
+  /// A chat address (`…/chat/c/<slug>/<channel>/<message>`, or
+  /// `…/t/<thread>[/<message>]` inside a thread) as its parts.
+  static ({int channel, int? message, int? thread})? _chatFromUrl(String? url) {
+    if (url == null) return null;
+    final path = Uri.tryParse(url)?.path ?? url;
+    final m = RegExp(r'/chat/c/[^/]+/(\d+)(?:/t/(\d+))?(?:/(\d+))?/?$')
+        .firstMatch(path);
+    if (m == null) return null;
+    return (
+      channel: int.parse(m.group(1)!),
+      thread: m.group(2) == null ? null : int.parse(m.group(2)!),
+      message: m.group(3) == null ? null : int.parse(m.group(3)!),
     );
   }
 
@@ -165,7 +293,9 @@ class DiscourseNotificationRoute {
 
   @override
   String toString() => 'DiscourseNotificationRoute($kind, topic=$topicId, '
-      'post=$postId, postNumber=$postNumber, page=$page, site=$siteUrl)';
+      'post=$postId, postNumber=$postNumber, page=$page, chat=$chatChannelId/'
+      '$chatMessageId, badge=$badgeId, group=$groupName, user=$username, '
+      'notification=$notificationId, site=$siteUrl)';
 
   /// Ints arrive as strings over FCM, and occasionally as `"580.0"` where a
   /// sender pushed them through a float. Anything else is not a number.

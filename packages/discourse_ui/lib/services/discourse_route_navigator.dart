@@ -8,8 +8,13 @@ import '../l10n/generated/app_localizations.dart';
 import '../utils/snackbar_helper.dart';
 import '../views/lists/posts_list.dart';
 import '../utils/app_navigation.dart';
+import '../views/chat/chat_channel_view.dart';
 import '../views/forum_list_page.dart';
+import '../views/group_detail_page.dart';
 import '../views/post_page.dart';
+import '../views/user_profile_page.dart';
+import '../views/widgets/badge_detail_sheet.dart';
+import 'site_proxy_service.dart';
 import '../views/site_home_tab.dart';
 import 'notification_route.dart';
 
@@ -77,6 +82,36 @@ class DiscourseRouteNavigator {
                 ? PostsListMode.thread_by_post
                 : PostsListMode.first_unread,
             anchorPostId: postId);
+      case NotificationRouteKind.chat:
+        final channelId = route.chatChannelId;
+        if (channelId == null) return;
+        AppLogger.debug('🧭 [DiscourseRouteNavigator] Chat $channelId at ${route.chatMessageId}');
+        AppNavigation.pushGlobal(ChatChannelScreen(
+          siteContext: siteContext,
+          channelId: channelId,
+          targetMessageId: route.chatMessageId,
+        ));
+      case NotificationRouteKind.badge:
+        final badgeId = route.badgeId;
+        if (badgeId != null) await _openBadge(siteContext, badgeId);
+      case NotificationRouteKind.groupInbox:
+        final group = route.groupName;
+        if (group == null) return;
+        AppLogger.debug('🧭 [DiscourseRouteNavigator] Group inbox $group');
+        AppNavigation.pushGlobal(ForumListPage(
+            siteContext: siteContext,
+            tab: SiteHomeTab.messages,
+            messageGroup: group));
+      case NotificationRouteKind.group:
+        final group = route.groupName;
+        if (group == null) return;
+        AppNavigation.pushGlobal(
+            GroupDetailPage(siteContext: siteContext, groupName: group));
+      case NotificationRouteKind.profile:
+        final username = route.username;
+        if (username == null) return;
+        AppNavigation.pushGlobal(
+            UserProfilePage(siteContext: siteContext, userName: username));
       case NotificationRouteKind.notificationsTab:
         // On the forum's home, its Notifications tab; anywhere else the
         // list opens over the page on screen. Only switching the home's
@@ -93,6 +128,29 @@ class DiscourseRouteNavigator {
               siteContext: siteContext, tab: SiteHomeTab.notifications));
         }
     }
+  }
+
+  /// A badge's sheet, found among the reader's own badges — a badge
+  /// notification is always about the reader. Falls back to the
+  /// notification list when the badge cannot be loaded.
+  static Future<void> _openBadge(SiteContext siteContext, int badgeId) async {
+    final username = siteContext.currentUsername;
+    if (username != null && username.isNotEmpty) {
+      try {
+        final result =
+            await SiteProxyService.getUserProxy().getUserBadgesAsync(username);
+        final badge = result.badges.where((b) => b.id == badgeId).firstOrNull;
+        final context = Get.context;
+        if (badge != null && context != null && context.mounted) {
+          await showBadgeDetailSheet(context, badge);
+          return;
+        }
+      } catch (e) {
+        AppLogger.debug('⚠️ [DiscourseRouteNavigator] Badge $badgeId: $e');
+      }
+    }
+    await open(siteContext, const DiscourseNotificationRoute(
+        kind: NotificationRouteKind.notificationsTab));
   }
 
   /// A post short link names only the post. PostPage keys its topic
