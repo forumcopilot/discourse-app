@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post.dart';
 import 'package:discourse_ui/utils/time_utils.dart';
-import '../user_profile_page.dart';
+import '../profile/user_card_sheet.dart';
 // import '../widgets/cached_redirect_image.dart';
 import '../widgets/user_avatar.dart';
 import '../widgets/post_actions.dart';
@@ -109,17 +109,13 @@ class PostListItemHeader extends StatelessWidget {
                           return;
                         }
 
-                        // Navigate to user profile if logged in
-                        Navigator.push(
+                        // Their user card, over the topic.
+                        showUserCard(
                           this.context,
-                          MaterialPageRoute(
-                            builder: (context) => UserProfilePage(
-                              siteContext: siteContext,
-                              userName: post.authorName,
-                              userId: post.authorId,
-                              profilePictureUrl: post.authorIconUrl,
-                            ),
-                          ),
+                          siteContext: siteContext,
+                          username: post.authorName,
+                          topicId: int.tryParse(post.topicId),
+                          avatarUrl: post.authorIconUrl,
                         );
                       },
                       child: Text(

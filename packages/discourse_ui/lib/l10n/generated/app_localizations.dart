@@ -5841,6 +5841,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'What are you doing?'**
   String get whatAreYouDoing;
+
+  /// User card: when they last posted, e.g. 'Posted 2 hours ago'
+  ///
+  /// In en, this message translates to:
+  /// **'Posted {when}'**
+  String cardPosted(String when);
+
+  /// User card: change your own card background
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get change;
+
+  /// User card menu
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link to profile'**
+  String get copyProfileLink;
+
+  /// User card menu: hide this person's posts and notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Ignore'**
+  String get ignore;
+
+  /// User card of a private profile: their primary group
+  ///
+  /// In en, this message translates to:
+  /// **'Member of {group}'**
+  String memberOfGroup(String group);
+
+  /// User card menu: stop notifications from this person
+  ///
+  /// In en, this message translates to:
+  /// **'Mute'**
+  String get mute;
+
+  /// User card menu
+  ///
+  /// In en, this message translates to:
+  /// **'Unmute'**
+  String get unmute;
+
+  /// Accessibility label of the picture on a user card
+  ///
+  /// In en, this message translates to:
+  /// **'Open @{username}\'s profile'**
+  String openProfileOf(String username);
+
+  /// User card of someone who hides their profile
+  ///
+  /// In en, this message translates to:
+  /// **'{username} keeps their profile private.'**
+  String profileIsPrivate(String username);
+
+  /// User card opened from a topic
+  ///
+  /// In en, this message translates to:
+  /// **'Show only {name}\'s {count, plural, =1{post} other{{count} posts}} in this topic'**
+  String showOnlyTheirPostsHere(String name, int count);
+
+  /// Your own user card opened from a topic
+  ///
+  /// In en, this message translates to:
+  /// **'Show only your {count, plural, =1{post} other{{count} posts}} in this topic'**
+  String showOnlyYourPostsHere(int count);
+
+  /// Snackbar after ignoring someone from their card
+  ///
+  /// In en, this message translates to:
+  /// **'Ignoring @{username} for 4 months'**
+  String userIgnoredFor4Months(String username);
+
+  /// Snackbar after muting someone
+  ///
+  /// In en, this message translates to:
+  /// **'Muted @{username}'**
+  String userMuted(String username);
+
+  /// Snackbar after unmuting someone
+  ///
+  /// In en, this message translates to:
+  /// **'Unmuted @{username}'**
+  String userUnmuted(String username);
+
+  /// User card: after your own name
+  ///
+  /// In en, this message translates to:
+  /// **'(you)'**
+  String get youParenthetical;
 }
 
 class _AppLocalizationsDelegate

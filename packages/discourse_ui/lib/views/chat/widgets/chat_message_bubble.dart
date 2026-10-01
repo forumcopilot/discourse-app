@@ -4,7 +4,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
 
 import '../../../theme/design_tokens.dart';
 import '../../../utils/time_utils.dart';
-import '../../user_profile_page.dart';
+import '../../profile/user_card_sheet.dart';
 import '../../widgets/post_body_extensions.dart' show kPostBlockGap;
 import '../../widgets/rich_text_content.dart';
 import '../../widgets/user_avatar.dart';
@@ -43,13 +43,8 @@ class ChatMessageBubble extends StatelessWidget {
 
   void _openProfile(BuildContext context) {
     if (message.authorUsername.isEmpty || message.authorId == 0) return;
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => UserProfilePage(
-        siteContext: siteContext,
-        userId: message.authorId.toString(),
-        userName: message.authorUsername,
-      ),
-    ));
+    showUserCard(context,
+        siteContext: siteContext, username: message.authorUsername);
   }
 
   @override

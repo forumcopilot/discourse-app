@@ -38,7 +38,7 @@ import 'post_list_item_header.dart';
 import 'post_list_item_attachment.dart';
 import 'post_list_item_social.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
-import '../user_profile_page.dart';
+import '../profile/user_card_sheet.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_bookmark.dart';
 import 'package:discourse_core/discourse_core.dart'
     show DiscourseBookmarkProxy, DiscourseBookmarkAutoDelete;
@@ -570,18 +570,12 @@ class _PostListItemState extends State<PostListItem> {
           AppLogger.debug('No onShowImage action defined');
         }
       },
-      onMentionTap: (username) {
-        AppLogger.debug('BBCode Mention tapped: $username');
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserProfilePage(
-              siteContext: widget.siteContext,
-              userName: username,
-            ),
-          ),
-        );
-      },
+      onMentionTap: (username) => showUserCard(
+        context,
+        siteContext: widget.siteContext,
+        username: username,
+        topicId: int.tryParse(widget.post.topicId),
+      ),
     );
     // No padding of its own under the body: PostListItemSocial opens with
     // 12dp, and the body no longer ends in a paragraph margin. Text posts

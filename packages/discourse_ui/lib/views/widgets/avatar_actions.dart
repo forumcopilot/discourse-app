@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import 'package:discourse_ui/views/user_profile_page.dart';
+import 'package:discourse_ui/views/profile/user_card_sheet.dart';
 import 'package:discourse_ui/views/widgets/post_actions.dart';
 import 'package:discourse_ui/views/login_page.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 
 class AvatarActions {
-  void handleAvatarTap(BuildContext context, SiteContext siteContext, String userId, String userName, {PostActionsHandler? postActionsHandler, VoidCallback? onRefresh}) {
+  /// A picture tapped on a post opens the person's user card, over the
+  /// topic ([topicId] lets it offer their posts in it).
+  void handleAvatarTap(BuildContext context, SiteContext siteContext, String userId, String userName, {PostActionsHandler? postActionsHandler, VoidCallback? onRefresh, int? topicId, String? avatarUrl}) {
     AppLogger.debug('Avatar tapped for user: $userId $userName');
 
     // Check if user is logged in
@@ -22,17 +24,11 @@ class AvatarActions {
       return;
     }
 
-    // Navigate to user profile if logged in
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => UserProfilePage(
-          siteContext: siteContext,
-          userId: userId,
-          userName: userName,
-        ),
-      ),
-    );
+    showUserCard(context,
+        siteContext: siteContext,
+        username: userName,
+        topicId: topicId,
+        avatarUrl: avatarUrl);
   }
 
   void _showSimpleLoginPrompt(BuildContext context, SiteContext siteContext) {

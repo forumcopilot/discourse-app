@@ -289,6 +289,14 @@ class DiscourseProfileProxy extends BaseDiscourseProxy {
     return changed;
   }
 
+  /// Mutes or unmutes [username] for the member
+  /// (`PUT /u/{username}/notification_level.json`). Ignoring, which also
+  /// needs an end date, is `DiscourseUserProxy.ignoreUserAsync`.
+  Future<void> setMuted(String username, bool muted) async {
+    await apiPut('/u/${Uri.encodeComponent(username)}/notification_level.json',
+        body: {'notification_level': muted ? 'mute' : 'normal'});
+  }
+
   /// Sets the member's status (`PUT /user-status.json`). Discourse
   /// requires an emoji; web's picker starts on a speech balloon.
   Future<void> setStatus(DiscourseUserStatus status) async {

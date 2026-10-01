@@ -1238,7 +1238,7 @@ class _PostsState extends State<PostsList> {
       key: ValueKey('post_${post.id}'),
       child: PostListItem(
         siteContext: widget.siteContext,
-        onAvatarTap: (userId, userName) => avatarActions.handleAvatarTap(context, widget.siteContext, userId, userName, postActionsHandler: postActionsHandler, onRefresh: _refreshCurrentPage),
+        onAvatarTap: (userId, userName) => avatarActions.handleAvatarTap(context, widget.siteContext, userId, userName, postActionsHandler: postActionsHandler, onRefresh: _refreshCurrentPage, topicId: int.tryParse(post.topicId), avatarUrl: post.authorIconUrl),
         post: post,
         threadId: widget.topicId,
         // The loaded topic's title, so a rename shows once the topic

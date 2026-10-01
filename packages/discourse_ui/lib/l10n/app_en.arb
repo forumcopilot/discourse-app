@@ -4309,5 +4309,113 @@
   "whatAreYouDoing": "What are you doing?",
   "@whatAreYouDoing": {
     "description": "Status sheet: the status text field, as Discourse words it"
+  },
+  "cardPosted": "Posted {when}",
+  "@cardPosted": {
+    "description": "User card: when they last posted, e.g. 'Posted 2 hours ago'",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "change": "Change",
+  "@change": {
+    "description": "User card: change your own card background"
+  },
+  "copyProfileLink": "Copy link to profile",
+  "@copyProfileLink": {
+    "description": "User card menu"
+  },
+  "ignore": "Ignore",
+  "@ignore": {
+    "description": "User card menu: hide this person's posts and notifications"
+  },
+  "memberOfGroup": "Member of {group}",
+  "@memberOfGroup": {
+    "description": "User card of a private profile: their primary group",
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "mute": "Mute",
+  "@mute": {
+    "description": "User card menu: stop notifications from this person"
+  },
+  "unmute": "Unmute",
+  "@unmute": {
+    "description": "User card menu"
+  },
+  "openProfileOf": "Open @{username}'s profile",
+  "@openProfileOf": {
+    "description": "Accessibility label of the picture on a user card",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "profileIsPrivate": "{username} keeps their profile private.",
+  "@profileIsPrivate": {
+    "description": "User card of someone who hides their profile",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "showOnlyTheirPostsHere": "Show only {name}'s {count, plural, =1{post} other{{count} posts}} in this topic",
+  "@showOnlyTheirPostsHere": {
+    "description": "User card opened from a topic",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "showOnlyYourPostsHere": "Show only your {count, plural, =1{post} other{{count} posts}} in this topic",
+  "@showOnlyYourPostsHere": {
+    "description": "Your own user card opened from a topic",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "userIgnoredFor4Months": "Ignoring @{username} for 4 months",
+  "@userIgnoredFor4Months": {
+    "description": "Snackbar after ignoring someone from their card",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "userMuted": "Muted @{username}",
+  "@userMuted": {
+    "description": "Snackbar after muting someone",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "userUnmuted": "Unmuted @{username}",
+  "@userUnmuted": {
+    "description": "Snackbar after unmuting someone",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "youParenthetical": "(you)",
+  "@youParenthetical": {
+    "description": "User card: after your own name"
   }
 }

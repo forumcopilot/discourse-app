@@ -8,7 +8,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_directory_item.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 
 import '../theme/design_tokens.dart';
-import 'user_profile_page.dart';
+import 'profile/user_card_sheet.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
 import 'widgets/search_text_field.dart';
@@ -25,7 +25,7 @@ import '../utils/error_message.dart';
 /// horizontal `ChoiceChip` strips at the top; changing either
 /// re-fetches from page 1.
 ///
-/// Tapping a row drills into the existing `UserProfilePage`. The
+/// Tapping a row opens the person's user card (`showUserCard`). The
 /// page also supports infinite scroll (loads next page when the
 /// list is scrolled near its end).
 class UsersDirectoryPage extends StatefulWidget {
@@ -353,16 +353,10 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
           username: u.username,
           subtitle: u.displayText,
           avatarUrl: u.iconUrl,
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => UserProfilePage(
-                siteContext: widget.siteContext,
-                userId: u.id,
-                userName: u.username,
-                profilePictureUrl: u.iconUrl,
-              ),
-            ),
-          ),
+          onTap: () => showUserCard(context,
+              siteContext: widget.siteContext,
+              username: u.username,
+              avatarUrl: u.iconUrl),
         );
       },
     );
@@ -412,16 +406,10 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
             trustLevel: item.trustLevel,
             statLabel: _formatCount(item.statFor(_order.apiName)),
             statIcon: _order.icon,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => UserProfilePage(
-                  siteContext: widget.siteContext,
-                  userId: item.id.toString(),
-                  userName: item.username,
-                  profilePictureUrl: item.avatarUrl,
-                ),
-              ),
-            ),
+            onTap: () => showUserCard(context,
+                siteContext: widget.siteContext,
+                username: item.username,
+                avatarUrl: item.avatarUrl),
           );
         },
       ),

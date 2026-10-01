@@ -3537,4 +3537,79 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get whatAreYouDoing => 'What are you doing?';
+
+  @override
+  String cardPosted(String when) {
+    return 'Posted $when';
+  }
+
+  @override
+  String get change => 'Change';
+
+  @override
+  String get copyProfileLink => 'Copy link to profile';
+
+  @override
+  String get ignore => 'Ignore';
+
+  @override
+  String memberOfGroup(String group) {
+    return 'Member of $group';
+  }
+
+  @override
+  String get mute => 'Mute';
+
+  @override
+  String get unmute => 'Unmute';
+
+  @override
+  String openProfileOf(String username) {
+    return 'Open @$username\'s profile';
+  }
+
+  @override
+  String profileIsPrivate(String username) {
+    return '$username keeps their profile private.';
+  }
+
+  @override
+  String showOnlyTheirPostsHere(String name, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count posts',
+      one: 'post',
+    );
+    return 'Show only $name\'s $_temp0 in this topic';
+  }
+
+  @override
+  String showOnlyYourPostsHere(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count posts',
+      one: 'post',
+    );
+    return 'Show only your $_temp0 in this topic';
+  }
+
+  @override
+  String userIgnoredFor4Months(String username) {
+    return 'Ignoring @$username for 4 months';
+  }
+
+  @override
+  String userMuted(String username) {
+    return 'Muted @$username';
+  }
+
+  @override
+  String userUnmuted(String username) {
+    return 'Unmuted @$username';
+  }
+
+  @override
+  String get youParenthetical => '(you)';
 }
