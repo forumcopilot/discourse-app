@@ -9,7 +9,9 @@ import 'package:forumcopilot_sdk/models/results/fc_private_conversation_result.d
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
+import '../data/site/discourse_site_capabilities.dart';
 import '../data/user/discourse_do_not_disturb.dart';
+import '../data/user/discourse_profile.dart';
 import '../data/user/discourse_pending_post.dart';
 import '../data/user/discourse_user_profile_extras.dart';
 import '../data/user/discourse_user_summary.dart';
@@ -713,6 +715,7 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     final status = (user['status'] as Map?)?.cast<String, dynamic>();
     final featured = (user['featured_topic'] as Map?)?.cast<String, dynamic>();
     final cookedBio = text(user['bio_cooked']);
+    final flair = text(user['flair_url']);
     DiscourseUserProfileExtras.store(
       siteContext.site.url,
       username,
@@ -727,9 +730,32 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
         featuredTopicTitle: text(featured?['fancy_title'] ?? featured?['title']),
         timezone: text(user['timezone']),
         bioText: cookedBio == null ? text(user['bio_raw']) : stripHtmlToText(cookedBio),
+        bioCooked: cookedBio,
         primaryGroupName: text(user['primary_group_name']),
+        flairName: text(user['flair_name']),
+        flairUrl: flair == null
+            ? null
+            : (flair.contains('/') ? absoluteSiteUrl(siteContext.site.url, flair) : flair),
+        flairBgColor: text(user['flair_bg_color'])?.replaceFirst('#', ''),
+        flairColor: text(user['flair_color'])?.replaceFirst('#', ''),
+        fields: _profileFields(user['user_fields']),
       ),
     );
+  }
+
+  /// The forum's profile questions shown on profiles (`show_on_profile`),
+  /// with this person's answers, in the forum's order.
+  List<({String name, String value})> _profileFields(Object? raw) {
+    if (raw is! Map) return const [];
+    final defs =
+        DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl).userFields;
+    return [
+      for (final def in defs)
+        if (def.showOnProfile)
+          if (DiscourseUserFieldDef.display(def, raw['${def.id}'])
+              case final value?)
+            (name: def.name, value: value),
+    ];
   }
 
   /// Discourse-only: the signed-in user's posts waiting for a moderator

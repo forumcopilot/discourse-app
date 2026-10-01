@@ -19,7 +19,13 @@ class DiscourseUserProfileExtras {
     this.featuredTopicTitle,
     this.timezone,
     this.bioText,
+    this.bioCooked,
     this.primaryGroupName,
+    this.flairName,
+    this.flairUrl,
+    this.flairBgColor,
+    this.flairColor,
+    this.fields = const [],
   });
 
   /// The title the forum granted or they chose ("Community lead").
@@ -44,6 +50,21 @@ class DiscourseUserProfileExtras {
   final String? bioText;
 
   final String? primaryGroupName;
+
+  /// The bio as the server cooked it, links and emoji kept.
+  final String? bioCooked;
+
+  /// The flair they wear: the group, its icon name or image URL, and its
+  /// colours (six-digit hex without '#').
+  final String? flairName;
+  final String? flairUrl;
+  final String? flairBgColor;
+  final String? flairColor;
+
+  /// The forum's profile questions marked to show on profiles, answered.
+  final List<({String name, String value})> fields;
+
+  bool get hasFlair => flairUrl != null && flairUrl!.isNotEmpty;
 
   bool get hasStatus =>
       (statusDescription?.isNotEmpty ?? false) &&

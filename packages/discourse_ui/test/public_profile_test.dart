@@ -2,6 +2,7 @@ import 'package:discourse_core/discourse_core.dart';
 import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/theme/app_theme.dart';
+import 'package:discourse_ui/views/profile/profile_common.dart';
 import 'package:discourse_ui/views/widgets/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -110,6 +111,44 @@ void main() {
     expect(find.text('Details'), findsOneWidget);
     expect(find.text('Trust level 3'), findsOneWidget);
     expect(find.text('meetup-hosts'), findsOneWidget);
+  });
+
+  testWidgets("their flair on the picture and the forum's profile fields",
+      (tester) async {
+    DiscourseUserProfileExtras.store(
+      forum,
+      'alice',
+      const DiscourseUserProfileExtras(
+        flairName: 'designers',
+        flairUrl: 'paintbrush',
+        flairBgColor: '7B4FC9',
+        fields: [
+          (name: 'Pronouns', value: 'she/her'),
+          (name: 'Company', value: 'Riverside Studio'),
+        ],
+      ),
+    );
+    await pump(tester);
+    final flair = tester.widget<UserFlairBadge>(find.byType(UserFlairBadge));
+    expect(flair.flairUrl, 'paintbrush');
+    expect(flair.semanticLabel, 'designers');
+    expect(find.text('Pronouns'), findsOneWidget);
+    expect(find.text('she/her'), findsOneWidget);
+    expect(find.text('Riverside Studio'), findsOneWidget);
+    expect(find.text('Set a status'), findsNothing,
+        reason: "nobody sets someone else's status");
+  });
+
+  testWidgets('your own profile offers to set a status where the forum has them',
+      (tester) async {
+    DiscourseUserProfileExtras.store(
+        forum, 'alice', const DiscourseUserProfileExtras());
+    DiscourseSiteCapabilities.storeClientSettings(
+        ctx.site.pluginUrl, {'enable_user_status': true});
+    addTearDown(() => DiscourseSiteCapabilities.storeClientSettings(
+        ctx.site.pluginUrl, const {}));
+    await pump(tester, self: true);
+    expect(find.text('Set a status'), findsOneWidget);
   });
 
   testWidgets('your own public profile offers Edit profile instead',

@@ -3478,4 +3478,46 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get yourPhoto => 'Your photo';
+
+  @override
+  String get chooseEmoji => 'Choose emoji';
+
+  @override
+  String get clearStatus => 'Clear status';
+
+  @override
+  String get clearText => 'Clear';
+
+  @override
+  String get inOneHour => 'In one hour';
+
+  @override
+  String get never => 'Never';
+
+  @override
+  String get pauseNotifications => 'Pause notifications';
+
+  @override
+  String get pauseNotificationsUntilStatusClears => 'Until your status clears';
+
+  @override
+  String get pickATime => 'Pick a time';
+
+  @override
+  String get removeStatusAfter => 'Remove status';
+
+  @override
+  String get searchEmoji => 'Search emoji';
+
+  @override
+  String get setStatus => 'Set status';
+
+  @override
+  String get setAStatus => 'Set a status';
+
+  @override
+  String get statusUpdated => 'Status updated';
+
+  @override
+  String get whatAreYouDoing => 'What are you doing?';
 }

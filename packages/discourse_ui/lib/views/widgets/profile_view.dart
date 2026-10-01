@@ -9,6 +9,7 @@ import 'package:discourse_core/discourse_core.dart'
     show
         DiscourseChatProxy,
         DiscourseUserProxy,
+        DiscourseUserStatus,
         DiscourseSummaryUser,
         DiscourseSummaryLink,
         DiscourseUserProfileExtras,
@@ -26,7 +27,11 @@ import 'package:discourse_ui/views/post_page.dart';
 
 import '../../utils/local_dates.dart' show timeZoneNamed;
 import '../../utils/number_utils.dart';
+import '../../utils/snackbar_helper.dart';
+import '../profile/profile_common.dart';
+import '../profile/status_sheet.dart';
 import 'cached_redirect_image.dart';
+import 'rich_text_content.dart';
 import 'category_badge.dart';
 import 'full_screen_image_viewer.dart';
 import 'profile_stats_strip.dart';
@@ -278,6 +283,25 @@ class _ProfileViewState extends State<ProfileView> {
     if (mounted) widget.onEdited?.call();
   }
 
+  /// Your status, from where your profile shows it. Saved by the sheet;
+  /// the host refetches so the profile shows the new one.
+  Future<void> _editStatus() async {
+    final l10n = AppLocalizations.of(context)!;
+    final extras = _extras;
+    final current = (extras?.hasStatus ?? false)
+        ? DiscourseUserStatus(
+            description: extras!.statusDescription!,
+            emoji: extras.statusEmoji,
+            endsAt: extras.statusEndsAt,
+          )
+        : null;
+    final changed = await showStatusSheet(
+        context: context, siteContext: widget.siteContext, current: current);
+    if (!changed || !mounted) return;
+    SnackbarHelper.showInfo(context, l10n.statusUpdated);
+    widget.onEdited?.call();
+  }
+
   void _viewAvatar() {
     final url = _avatarUrl;
     if (url == null || url.isEmpty) return;
@@ -354,7 +378,10 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
+  /// The band behind the picture: a strip of colour, or taller when it is
+  /// the person's cover photo, so the photo can be seen.
   static const double _bandHeight = 88;
+  static const double _coverHeight = 132;
   static const double _avatarRadius = 40;
   static const double _ring = 4;
 
@@ -372,19 +399,21 @@ class _ProfileViewState extends State<ProfileView> {
     final bio = (extras?.bioText ?? _userInfo.bio ?? '').trim();
     final avatarBox = (_avatarRadius + _ring) * 2;
     final summary = _summary;
+    final band = extras?.backgroundUrl != null ? _coverHeight : _bandHeight;
+    final cookedBio = extras?.bioCooked;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SizedBox(
-          height: _bandHeight + avatarBox / 2,
+          height: band + avatarBox / 2,
           child: Stack(
             children: [
               Positioned(
                 left: 0,
                 right: 0,
                 top: 0,
-                height: _bandHeight,
+                height: band,
                 child: extras?.backgroundUrl != null
                     ? CachedRedirectImage(
                         imageUrl: extras!.backgroundUrl!,
@@ -398,7 +427,7 @@ class _ProfileViewState extends State<ProfileView> {
               ),
               Positioned(
                 left: DesignTokens.spacingL - _ring,
-                top: _bandHeight - avatarBox / 2,
+                top: band - avatarBox / 2,
                 child: GestureDetector(
                   onTap: _viewAvatar,
                   child: Container(
@@ -407,10 +436,30 @@ class _ProfileViewState extends State<ProfileView> {
                       color: colorScheme.surface,
                       shape: BoxShape.circle,
                     ),
-                    child: UserAvatar(
-                      username: _userInfo.username,
-                      iconUrl: _avatarUrl,
-                      radius: _avatarRadius,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        UserAvatar(
+                          username: _userInfo.username,
+                          iconUrl: _avatarUrl,
+                          radius: _avatarRadius,
+                        ),
+                        // The flair of the group they chose, as web draws it
+                        // on their picture.
+                        if (extras?.hasFlair ?? false)
+                          Positioned(
+                            right: -2,
+                            bottom: -2,
+                            child: UserFlairBadge(
+                              flairUrl: extras!.flairUrl!,
+                              bgHex: extras.flairBgColor,
+                              fgHex: extras.flairColor,
+                              size: 28,
+                              ringColor: colorScheme.surface,
+                              semanticLabel: extras.flairName,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ),
@@ -454,30 +503,92 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
               if (extras?.hasStatus ?? false) ...[
                 const SizedBox(height: DesignTokens.spacingS),
-                Row(
-                  children: [
-                    if (extras!.statusEmoji != null) ...[
-                      ReactionGlyph(
-                        reactionId: extras.statusEmoji!,
-                        size: DesignTokens.iconSizeM,
-                        siteContext: widget.siteContext,
+                InkWell(
+                  // Your own status is changed where it is shown.
+                  onTap: widget.isSelf ? _editStatus : null,
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusS),
+                  child: Row(
+                    children: [
+                      if (extras!.statusEmoji != null) ...[
+                        ReactionGlyph(
+                          reactionId: extras.statusEmoji!,
+                          size: DesignTokens.iconSizeM,
+                          siteContext: widget.siteContext,
+                        ),
+                        const SizedBox(width: DesignTokens.spacingS),
+                      ],
+                      Expanded(
+                        child: Text(extras.statusDescription!,
+                            style: textTheme.bodyMedium),
                       ),
-                      const SizedBox(width: DesignTokens.spacingS),
+                      if (widget.isSelf)
+                        Icon(Icons.edit_outlined,
+                            size: DesignTokens.iconSizeS,
+                            color: colorScheme.onSurfaceVariant,
+                            semanticLabel: l10n.setStatus),
                     ],
-                    Expanded(
-                      child: Text(extras.statusDescription!,
-                          style: textTheme.bodyMedium),
-                    ),
-                  ],
+                  ),
+                ),
+              ] else if (widget.isSelf &&
+                  forumHasUserStatus(widget.siteContext)) ...[
+                const SizedBox(height: DesignTokens.spacingXS),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: TextButton.icon(
+                    style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: DesignTokens.spacingS)),
+                    onPressed: _editStatus,
+                    icon: const Icon(Icons.add_reaction_outlined,
+                        size: DesignTokens.iconSizeM),
+                    label: Text(l10n.setAStatus),
+                  ),
                 ),
               ],
               if (bio.isNotEmpty) ...[
                 const SizedBox(height: DesignTokens.spacingS),
-                Text(bio,
-                    style: textTheme.bodyMedium,
-                    maxLines: 6,
-                    overflow: TextOverflow.ellipsis),
+                // With links, the bio as the forum cooked it, so they can
+                // be tapped; otherwise plain text, cut at six lines.
+                if (cookedBio != null && cookedBio.contains('<a '))
+                  RichTextContent(
+                    siteContext: widget.siteContext,
+                    content: cookedBio,
+                    baseFontSize: textTheme.bodyMedium?.fontSize,
+                  )
+                else
+                  Text(bio,
+                      style: textTheme.bodyMedium,
+                      maxLines: 6,
+                      overflow: TextOverflow.ellipsis),
               ],
+              if (extras != null && extras.fields.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: DesignTokens.spacingS),
+                  child: Table(
+                    columnWidths: const {
+                      0: IntrinsicColumnWidth(),
+                      1: FlexColumnWidth(),
+                    },
+                    children: [
+                      for (final f in extras.fields)
+                        TableRow(children: [
+                          Padding(
+                            padding: const EdgeInsetsDirectional.only(
+                                end: DesignTokens.spacingM,
+                                bottom: DesignTokens.spacingXS),
+                            child: Text(f.name,
+                                style: textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant)),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                bottom: DesignTokens.spacingXS),
+                            child: Text(f.value, style: textTheme.bodyMedium),
+                          ),
+                        ]),
+                    ],
+                  ),
+                ),
               _buildMetaLine(context, extras),
               _buildDatesLine(context),
               const SizedBox(height: DesignTokens.spacingM),

@@ -4253,5 +4253,61 @@
   "yourPhoto": "Your photo",
   "@yourPhoto": {
     "description": "Profile picture sheet: the photo uploaded earlier"
+  },
+  "chooseEmoji": "Choose emoji",
+  "@chooseEmoji": {
+    "description": "Status sheet: the emoji button, and the emoji picker's title"
+  },
+  "clearStatus": "Clear status",
+  "@clearStatus": {
+    "description": "Status sheet: remove the status now"
+  },
+  "clearText": "Clear",
+  "@clearText": {
+    "description": "Tooltip of a button that empties a text field"
+  },
+  "inOneHour": "In one hour",
+  "@inOneHour": {
+    "description": "Status sheet: the status clears in an hour"
+  },
+  "never": "Never",
+  "@never": {
+    "description": "Status sheet: the status never clears on its own"
+  },
+  "pauseNotifications": "Pause notifications",
+  "@pauseNotifications": {
+    "description": "Status sheet: switch, as Discourse's own status dialog has it"
+  },
+  "pauseNotificationsUntilStatusClears": "Until your status clears",
+  "@pauseNotificationsUntilStatusClears": {
+    "description": "Status sheet: under Pause notifications"
+  },
+  "pickATime": "Pick a time",
+  "@pickATime": {
+    "description": "Status sheet: choose when the status clears"
+  },
+  "removeStatusAfter": "Remove status",
+  "@removeStatusAfter": {
+    "description": "Status sheet: heading over when the status clears"
+  },
+  "searchEmoji": "Search emoji",
+  "@searchEmoji": {
+    "description": "Emoji picker: search field"
+  },
+  "setStatus": "Set status",
+  "@setStatus": {
+    "description": "Status sheet title"
+  },
+  "setAStatus": "Set a status",
+  "@setAStatus": {
+    "description": "Profile tab and your profile: when you have no status"
+  },
+  "statusUpdated": "Status updated",
+  "@statusUpdated": {
+    "description": "Snackbar after setting or clearing the status"
+  },
+  "whatAreYouDoing": "What are you doing?",
+  "@whatAreYouDoing": {
+    "description": "Status sheet: the status text field, as Discourse words it"
   }
 }

@@ -1,5 +1,10 @@
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseSiteContextExtension, DiscourseUserProxy, DiscourseUserSummary;
+    show
+        DiscourseSiteContextExtension,
+        DiscourseUserProfileExtras,
+        DiscourseUserProxy,
+        DiscourseUserStatus,
+        DiscourseUserSummary;
 import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/views/widgets/resettable_widget.dart';
@@ -22,6 +27,9 @@ import '../../utils/number_utils.dart';
 import '../bookmarks_page.dart';
 import '../drafts_list_page.dart';
 import '../edit_profile_page.dart';
+import '../profile/status_sheet.dart';
+import '../../utils/snackbar_helper.dart';
+import '../widgets/reaction_glyph.dart';
 import '../in_app_web_view_page.dart';
 import '../invites_page.dart';
 import '../login_page.dart';
@@ -297,6 +305,16 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab>
                               ?.copyWith(color: colorScheme.onSurfaceVariant),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                        ),
+                      if (forumHasUserStatus(site))
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              top: DesignTokens.spacingS),
+                          child: _StatusChip(
+                            siteContext: site,
+                            username: username,
+                            onChanged: _refresh,
+                          ),
                         ),
                     ],
                   ),
@@ -662,6 +680,78 @@ class _GuestProfile extends StatelessWidget {
         ),
         _LegalFooter(siteContext: siteContext),
       ],
+    );
+  }
+}
+
+/// Your status, where web's user menu keeps it: tap to change it, × to
+/// clear it, or "Set a status" when there is none.
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({
+    required this.siteContext,
+    required this.username,
+    required this.onChanged,
+  });
+
+  final SiteContext siteContext;
+  final String username;
+  final VoidCallback onChanged;
+
+  DiscourseUserStatus? get _status {
+    final extras =
+        DiscourseUserProfileExtras.forUser(siteContext.site.url, username);
+    if (extras == null || !extras.hasStatus) return null;
+    return DiscourseUserStatus(
+      description: extras.statusDescription!,
+      emoji: extras.statusEmoji,
+      endsAt: extras.statusEndsAt,
+    );
+  }
+
+  Future<void> _edit(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final changed = await showStatusSheet(
+        context: context, siteContext: siteContext, current: _status);
+    if (!changed || !context.mounted) return;
+    SnackbarHelper.showInfo(context, l10n.statusUpdated);
+    onChanged();
+  }
+
+  Future<void> _clear(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      await clearUserStatus(siteContext);
+      if (!context.mounted) return;
+      SnackbarHelper.showInfo(context, l10n.statusUpdated);
+      onChanged();
+    } catch (e) {
+      if (context.mounted) SnackbarHelper.showError(context, describeError(e));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final status = _status;
+    if (status == null) {
+      return ActionChip(
+        avatar: const Icon(Icons.add_reaction_outlined),
+        label: Text(l10n.setAStatus),
+        onPressed: () => _edit(context),
+      );
+    }
+    return InputChip(
+      avatar: status.emoji == null
+          ? null
+          : ReactionGlyph(
+              reactionId: status.emoji!,
+              size: DesignTokens.iconSizeSMedium,
+              siteContext: siteContext),
+      label: Text(status.description,
+          maxLines: 1, overflow: TextOverflow.ellipsis),
+      onPressed: () => _edit(context),
+      onDeleted: () => _clear(context),
+      deleteButtonTooltipMessage: l10n.clearStatus,
     );
   }
 }

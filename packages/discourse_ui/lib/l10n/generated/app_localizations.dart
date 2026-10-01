@@ -5757,6 +5757,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your photo'**
   String get yourPhoto;
+
+  /// Status sheet: the emoji button, and the emoji picker's title
+  ///
+  /// In en, this message translates to:
+  /// **'Choose emoji'**
+  String get chooseEmoji;
+
+  /// Status sheet: remove the status now
+  ///
+  /// In en, this message translates to:
+  /// **'Clear status'**
+  String get clearStatus;
+
+  /// Tooltip of a button that empties a text field
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clearText;
+
+  /// Status sheet: the status clears in an hour
+  ///
+  /// In en, this message translates to:
+  /// **'In one hour'**
+  String get inOneHour;
+
+  /// Status sheet: the status never clears on its own
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get never;
+
+  /// Status sheet: switch, as Discourse's own status dialog has it
+  ///
+  /// In en, this message translates to:
+  /// **'Pause notifications'**
+  String get pauseNotifications;
+
+  /// Status sheet: under Pause notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Until your status clears'**
+  String get pauseNotificationsUntilStatusClears;
+
+  /// Status sheet: choose when the status clears
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a time'**
+  String get pickATime;
+
+  /// Status sheet: heading over when the status clears
+  ///
+  /// In en, this message translates to:
+  /// **'Remove status'**
+  String get removeStatusAfter;
+
+  /// Emoji picker: search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search emoji'**
+  String get searchEmoji;
+
+  /// Status sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Set status'**
+  String get setStatus;
+
+  /// Profile tab and your profile: when you have no status
+  ///
+  /// In en, this message translates to:
+  /// **'Set a status'**
+  String get setAStatus;
+
+  /// Snackbar after setting or clearing the status
+  ///
+  /// In en, this message translates to:
+  /// **'Status updated'**
+  String get statusUpdated;
+
+  /// Status sheet: the status text field, as Discourse words it
+  ///
+  /// In en, this message translates to:
+  /// **'What are you doing?'**
+  String get whatAreYouDoing;
 }
 
 class _AppLocalizationsDelegate
