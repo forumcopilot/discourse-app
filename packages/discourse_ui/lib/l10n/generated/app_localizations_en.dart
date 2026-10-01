@@ -4423,24 +4423,71 @@ class AppLocalizationsEn extends AppLocalizations {
   String get postBookmarkAction => 'Bookmark post';
 
   @override
-  String postReactionsSemanticsReacted(int count) {
+  String get reactionButtonRemoveLike =>
+      'You liked this. Tap to remove your like.';
+
+  @override
+  String reactionButtonRemove(String reaction) {
+    return 'Your reaction: $reaction. Tap to remove it.';
+  }
+
+  @override
+  String reactionButtonLocked(String reaction) {
+    return 'Your reaction: $reaction. It can no longer be changed.';
+  }
+
+  @override
+  String get reactionHoldHint => 'Long press for more reactions';
+
+  @override
+  String reactionSummarySemantics(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other:
-          'You reacted. $count reactions. Tap to change, long press to see who.',
-      one: 'You reacted. 1 reaction. Tap to change, long press to see who.',
+      other: '$count reactions. Tap to see who reacted.',
+      one: '1 reaction. Tap to see who reacted.',
     );
     return '$_temp0';
   }
 
   @override
-  String postReactionsSemantics(int count) {
+  String get reactionLockedMessage =>
+      'You can no longer change your reaction to this post.';
+
+  @override
+  String get reactionHoldTip => 'Tip: long-press the heart for more reactions.';
+
+  @override
+  String reactionsTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count reactions. Tap to react, long press to see who.',
-      one: '1 reaction. Tap to react, long press to see who.',
+      other: '$count reactions',
+      one: '1 reaction',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reactionsAll => 'All';
+
+  @override
+  String get reactionYou => 'You';
+
+  @override
+  String get changeYourReaction => 'Change your reaction';
+
+  @override
+  String get reactionTapAgainToRemove =>
+      'Tap your reaction again to remove it.';
+
+  @override
+  String reactionFilterSemantics(String reaction, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$reaction, $count people',
+      one: '$reaction, 1 person',
     );
     return '$_temp0';
   }

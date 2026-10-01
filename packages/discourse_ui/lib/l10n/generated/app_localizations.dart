@@ -7264,17 +7264,83 @@ abstract class AppLocalizations {
   /// **'Bookmark post'**
   String get postBookmarkAction;
 
-  /// Screen-reader label of a post's reactions button when the reader has reacted; count is the post's total reactions
+  /// Screen-reader label of a post's react button when the reader has liked the post
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{You reacted. 1 reaction. Tap to change, long press to see who.} other{You reacted. {count} reactions. Tap to change, long press to see who.}}'**
-  String postReactionsSemanticsReacted(int count);
+  /// **'You liked this. Tap to remove your like.'**
+  String get reactionButtonRemoveLike;
 
-  /// Screen-reader label of a post's reactions button when the reader has not reacted; count is the post's total reactions
+  /// Screen-reader label of a post's react button when the reader reacted with an emoji other than the like; reaction is the emoji's name, e.g. 'rocket'
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{1 reaction. Tap to react, long press to see who.} other{{count} reactions. Tap to react, long press to see who.}}'**
-  String postReactionsSemantics(int count);
+  /// **'Your reaction: {reaction}. Tap to remove it.'**
+  String reactionButtonRemove(String reaction);
+
+  /// Screen-reader label of a post's react button once the reader's reaction can no longer be changed (Discourse allows changes for a few minutes); reaction is the emoji's name
+  ///
+  /// In en, this message translates to:
+  /// **'Your reaction: {reaction}. It can no longer be changed.'**
+  String reactionButtonLocked(String reaction);
+
+  /// Screen-reader hint on a post's react button: a long press opens the reaction picker
+  ///
+  /// In en, this message translates to:
+  /// **'Long press for more reactions'**
+  String get reactionHoldHint;
+
+  /// Screen-reader label of a post's reactions summary (the emoji and count beside the react button); count is the number of people who reacted
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 reaction. Tap to see who reacted.} other{{count} reactions. Tap to see who reacted.}}'**
+  String reactionSummarySemantics(int count);
+
+  /// Message shown when the reader tries to change a reaction after Discourse's undo window has closed
+  ///
+  /// In en, this message translates to:
+  /// **'You can no longer change your reaction to this post.'**
+  String get reactionLockedMessage;
+
+  /// One-time tip shown after the reader's first like, on forums with more reactions than the like
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: long-press the heart for more reactions.'**
+  String get reactionHoldTip;
+
+  /// Title of the sheet listing who reacted to a post; count is the number of people
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 reaction} other{{count} reactions}}'**
+  String reactionsTitle(int count);
+
+  /// Filter chip in the who-reacted sheet that shows everyone, followed by the total count
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get reactionsAll;
+
+  /// Tag on the reader's own row in the who-reacted sheet
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get reactionYou;
+
+  /// Button in the who-reacted sheet that opens the reaction picker when the reader has already reacted
+  ///
+  /// In en, this message translates to:
+  /// **'Change your reaction'**
+  String get changeYourReaction;
+
+  /// Note in the reaction picker when the reader has reacted: tapping the same emoji removes it
+  ///
+  /// In en, this message translates to:
+  /// **'Tap your reaction again to remove it.'**
+  String get reactionTapAgainToRemove;
+
+  /// Screen-reader label of a per-emoji filter chip in the who-reacted sheet; reaction is the emoji's name, count the people who used it
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{{reaction}, 1 person} other{{reaction}, {count} people}}'**
+  String reactionFilterSemantics(String reaction, int count);
 
   /// Screen-reader label of a post's like (heart) button when the reader has not liked it
   ///

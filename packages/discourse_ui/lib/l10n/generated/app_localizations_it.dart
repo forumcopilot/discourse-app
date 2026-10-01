@@ -4482,27 +4482,72 @@ class AppLocalizationsIt extends AppLocalizations {
   String get postBookmarkAction => 'Aggiungi un segnalibro al messaggio';
 
   @override
-  String postReactionsSemanticsReacted(int count) {
+  String get reactionButtonRemoveLike =>
+      'Hai messo Mi piace. Tocca per toglierlo.';
+
+  @override
+  String reactionButtonRemove(String reaction) {
+    return 'La tua reazione: $reaction. Tocca per rimuoverla.';
+  }
+
+  @override
+  String reactionButtonLocked(String reaction) {
+    return 'La tua reazione: $reaction. Non può più essere cambiata.';
+  }
+
+  @override
+  String get reactionHoldHint => 'Tieni premuto per altre reazioni';
+
+  @override
+  String reactionSummarySemantics(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other:
-          'Hai reagito. $count reazioni. Tocca per cambiare, tieni premuto per vedere chi ha reagito.',
-      one:
-          'Hai reagito. 1 reazione. Tocca per cambiare, tieni premuto per vedere chi ha reagito.',
+      other: '$count reazioni. Tocca per vedere chi ha reagito.',
+      one: '1 reazione. Tocca per vedere chi ha reagito.',
     );
     return '$_temp0';
   }
 
   @override
-  String postReactionsSemantics(int count) {
+  String get reactionLockedMessage =>
+      'Non puoi più cambiare la tua reazione a questo messaggio.';
+
+  @override
+  String get reactionHoldTip =>
+      'Suggerimento: tieni premuto il cuore per altre reazioni.';
+
+  @override
+  String reactionsTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other:
-          '$count reazioni. Tocca per reagire, tieni premuto per vedere chi ha reagito.',
-      one:
-          '1 reazione. Tocca per reagire, tieni premuto per vedere chi ha reagito.',
+      other: '$count reazioni',
+      one: '1 reazione',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reactionsAll => 'Tutte';
+
+  @override
+  String get reactionYou => 'Tu';
+
+  @override
+  String get changeYourReaction => 'Cambia la tua reazione';
+
+  @override
+  String get reactionTapAgainToRemove =>
+      'Tocca di nuovo la tua reazione per rimuoverla.';
+
+  @override
+  String reactionFilterSemantics(String reaction, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$reaction, $count persone',
+      one: '$reaction, 1 persona',
     );
     return '$_temp0';
   }

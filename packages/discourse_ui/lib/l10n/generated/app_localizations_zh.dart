@@ -4204,21 +4204,65 @@ class AppLocalizationsZh extends AppLocalizations {
   String get postBookmarkAction => '将帖子加入书签';
 
   @override
-  String postReactionsSemanticsReacted(int count) {
+  String get reactionButtonRemoveLike => '你已点赞。点按可取消点赞。';
+
+  @override
+  String reactionButtonRemove(String reaction) {
+    return '你的反应：$reaction。点按可取消。';
+  }
+
+  @override
+  String reactionButtonLocked(String reaction) {
+    return '你的反应：$reaction。已无法更改。';
+  }
+
+  @override
+  String get reactionHoldHint => '长按可选择更多反应';
+
+  @override
+  String reactionSummarySemantics(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '你已做出反应。$count 个反应。点按可更改，长按可查看谁做出了反应。',
+      other: '$count 个反应。点按可查看谁做出了反应。',
     );
     return '$_temp0';
   }
 
   @override
-  String postReactionsSemantics(int count) {
+  String get reactionLockedMessage => '你已无法更改对此帖子的反应。';
+
+  @override
+  String get reactionHoldTip => '提示：长按爱心可选择更多反应。';
+
+  @override
+  String reactionsTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count 个反应。点按可做出反应，长按可查看谁做出了反应。',
+      other: '$count 个反应',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reactionsAll => '全部';
+
+  @override
+  String get reactionYou => '你';
+
+  @override
+  String get changeYourReaction => '更改反应';
+
+  @override
+  String get reactionTapAgainToRemove => '再次点按你的反应即可取消。';
+
+  @override
+  String reactionFilterSemantics(String reaction, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$reaction，$count 人',
     );
     return '$_temp0';
   }

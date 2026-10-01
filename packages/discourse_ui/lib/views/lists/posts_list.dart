@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:discourse_core/discourse_core.dart'
     show
         DiscourseAcceptedAnswers,
+        DiscourseLiveReactions,
         DiscourseMoreTopics,
         DiscourseSiteContextExtension,
         DiscourseTopicStatus,
@@ -148,6 +149,22 @@ class _PostsState extends State<PostsList> {
     _postsController = PostController();
   }
 
+  /// Stops following the open topic's reactions (see [_watchReactions]).
+  void Function()? _stopLiveReactions;
+  String? _liveReactionsTopicId;
+
+  /// Follows [topicId]'s reactions while it is open, so counts change as
+  /// people react, as on the web. Signed-in readers only, as the unread
+  /// counts are: it rides the forum's message bus, whose long-poll counts
+  /// against the reader's key (see DiscourseMessageBus).
+  void _watchReactions(String topicId) {
+    if (topicId.isEmpty || topicId == _liveReactionsTopicId) return;
+    if (!widget.siteContext.isLoggedIn) return;
+    _stopLiveReactions?.call();
+    _liveReactionsTopicId = topicId;
+    _stopLiveReactions = DiscourseLiveReactions.watch(widget.siteContext, topicId);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -159,6 +176,7 @@ class _PostsState extends State<PostsList> {
         [for (final p in data.posts) p.content],
         forumBaseUrl: widget.siteContext.site.url,
       );
+      _watchReactions(data.topic.id);
     });
 
     // Schedule callback for the next frame to avoid setState during build
@@ -1725,6 +1743,7 @@ class _PostsState extends State<PostsList> {
 
   @override
   void dispose() {
+    _stopLiveReactions?.call();
     _warmWorker?.dispose();
     _visiblePostIndex.dispose();
     _itemPositionsListener.itemPositions.removeListener(_onScroll);

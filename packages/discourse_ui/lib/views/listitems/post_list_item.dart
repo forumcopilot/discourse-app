@@ -4,12 +4,19 @@ import 'package:discourse_core/discourse_core.dart'
     show
         DiscourseAcceptedAnswer,
         DiscourseLink,
+        DiscourseLiveReactions,
         DiscourseMessageDetails,
         DiscoursePostProxy,
+        DiscourseReactionUpdate,
         DiscourseTopicSlugs,
+        DiscourseValidReactions,
         stripHtmlToText;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/discourse_link_handler.dart';
+import '../../utils/post_reactions.dart';
+import '../../utils/snackbar_helper.dart';
 import 'package:discourse_ui/views/widgets/solution_summary_card.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
@@ -192,8 +199,7 @@ class PostListItem extends StatefulWidget {
 }
 
 class _PostListItemState extends State<PostListItem> {
-  // Local state for like + bookmark
-  late bool _isLiked;
+  // Local state for bookmark
   late bool _isBookmarked;
   bool _bookmarkInFlight = false;
   bool _repliesExpanded = false;
@@ -201,7 +207,6 @@ class _PostListItemState extends State<PostListItem> {
   List<FCPost>? _replies;
   String? _repliesError;
   late final PostController _postsController;
-  late int _likeCount; // Add local state for like count
   late final PostActionsHandler _postActionsHandler;
 
   // discourse-reactions local copy. Mirrors widget.post.reactions at
@@ -209,6 +214,19 @@ class _PostListItemState extends State<PostListItem> {
   // without a full thread refetch. Phase 5.36 — lifted from a
   // DiscoursePostProxy Expando sidecar to a proper FCPost field.
   late List<FCPostReaction> _reactions;
+
+  /// Whether the reader may add a reaction now: Discourse's `can_act` for
+  /// a like, which it leaves off once they have acted, so it turns true
+  /// here when they remove their reaction.
+  late bool _canAct;
+
+  /// A reaction change is on its way to the server; its result, not a
+  /// live update that crossed it, decides what is shown.
+  bool _reactionInFlight = false;
+
+  /// Reaction changes other people make while the topic is open (see
+  /// DiscourseLiveReactions, watched by the topic page).
+  StreamSubscription<DiscourseReactionUpdate>? _liveReactions;
 
   // discourse-post-voting local copy. Null when voting isn't enabled
   // on this topic, in which case the vote column is hidden.
@@ -226,18 +244,17 @@ class _PostListItemState extends State<PostListItem> {
         PostActionsHandler(_postsController, widget.siteContext);
     // Set the default refresh callback for attachment login prompts
     _postActionsHandler.setDefaultRefreshCallback(widget.actions?.onRefresh);
-    _isLiked = widget.post.isLiked;
-    // `likesInfo` is intentionally empty (the proxy no longer pads it
-    // with placeholder actors) — `likeCount` is the count of record.
-    _likeCount = widget.post.likeCount;
     _isBookmarked = widget.post.bookmarked;
     _reactions = List.of(widget.post.reactions, growable: false);
+    _canAct = widget.post.canLike;
     _vote = widget.post.vote;
+    _liveReactions = DiscourseLiveReactions.updates.listen(_onLiveReactions);
   }
 
   @override
   void dispose() {
     _cooldownTicker?.cancel();
+    _liveReactions?.cancel();
     super.dispose();
   }
 
@@ -252,8 +269,7 @@ class _PostListItemState extends State<PostListItem> {
       _contentData = null;
     }
     if (!identical(oldWidget.post, widget.post)) {
-      _isLiked = widget.post.isLiked;
-      _likeCount = widget.post.likeCount;
+      _canAct = widget.post.canLike;
       // Don't clobber an in-flight optimistic bookmark toggle.
       if (!_bookmarkInFlight) {
         _isBookmarked = widget.post.bookmarked;
@@ -785,12 +801,6 @@ class _PostListItemState extends State<PostListItem> {
               webUrl: _webUrl,
             ),
           ),
-          // Reaction chips — the single like/reaction surface. On
-          // plugin-less forums the proxy synthesizes one heart entry
-          // here, so a plain like renders as a chip too. Tap toggles,
-          // long-press lists the real reactors, trailing "+" opens the
-          // full picker. Hidden only in the zero state, where the
-          // heart button in the action row takes over.
           if (data.attachments.isNotEmpty) ...[
             const SizedBox(height: DesignTokens.spacingS),
             PostListItemAttachment(
@@ -809,20 +819,23 @@ class _PostListItemState extends State<PostListItem> {
               context: context,
             ),
           ],
+          // Reactions, as on Discourse web: the summary of everyone's (a
+          // tap lists who) beside the react button (a tap likes or removes
+          // the reader's reaction, a long press opens the picker). On
+          // forums without the reactions plugin the proxy synthesizes one
+          // heart entry from the like count, so the same row serves both.
           PostListItemSocial(
             post: widget.post,
-            isLiked: _isLiked,
-            likeCount: _likeCount,
             likeCooldownSeconds: LikeCooldown.secondsLeft(widget.post.id),
             reactions: _reactions,
             reactionSiteContext: widget.siteContext,
-            onShowReactors: () => _showReactionUsers(''),
+            mainReaction: _mainReaction,
+            canAct: _canAct,
+            hasMoreReactions: _hasMoreReactions,
+            onShowReactors: _showReactionUsers,
             isLoggedIn: widget.siteContext.isLoggedIn,
-            // One home for "react": the picker. Removing your reaction is
-            // tapping it again inside the picker, so there is no hidden
-            // long-press to discover.
-            onLike: _openReactionPicker,
-            onLongPressLike: _openReactionPicker,
+            onReact: _onReactTap,
+            onMoreReactions: _openReactionPicker,
             isBookmarked: _isBookmarked,
             onBookmark: _handleBookmarkAction,
             // Long-press opens the Discourse bookmark-reminder sheet
@@ -1611,48 +1624,162 @@ class _PostListItemState extends State<PostListItem> {
     });
   }
 
-  /// Long-press on a reaction chip: list the users behind that count,
-  /// fetched live from the server (never from `post.likesInfo`).
-  void _showReactionUsers(String reactionId) {
+  String get _siteUrl => widget.siteContext.site.url;
+
+  /// The reaction a like stands for on this forum (`heart` unless it chose
+  /// another).
+  String get _mainReaction => DiscourseValidReactions.mainReaction(_siteUrl);
+
+  /// Whether the forum offers more than the like. Unknown counts as yes:
+  /// the picker then finds out.
+  bool get _hasMoreReactions {
+    final known = DiscourseValidReactions.forSite(_siteUrl);
+    return known == null || known.length > 1;
+  }
+
+  FCPostReaction? get _mine => viewerReactionOf(_reactions);
+
+  /// The reader reacted and Discourse no longer lets them change it (its
+  /// undo window, `post_undo_action_window_mins`, 10 by default).
+  bool get _locked {
+    final mine = _mine;
+    return mine != null && !mine.canUndo;
+  }
+
+  bool _requireSignIn() {
+    if (widget.siteContext.isLoggedIn) return true;
+    SnackbarHelper.showInfo(context, AppLocalizations.of(context)!.pleaseLogInToReact);
+    return false;
+  }
+
+  /// Tap on the react button: like, or remove the reader's reaction, as a
+  /// click on the web's button does; once it can no longer be changed, say
+  /// so instead of sending a request the server refuses.
+  void _onReactTap() {
+    if (!_requireSignIn()) return;
+    final mine = _mine;
+    if (mine != null && !mine.canUndo) {
+      SnackbarHelper.showInfo(context, AppLocalizations.of(context)!.reactionLockedMessage);
+      return;
+    }
+    // ignore: discarded_futures
+    _toggleReaction(mine?.id ?? _mainReaction, fromButton: true);
+  }
+
+  /// Long press on the react button, or the button in the who-reacted
+  /// sheet: the picker, which hands back the reaction to toggle.
+  Future<void> _openReactionPicker() async {
+    if (!_requireSignIn()) return;
+    final chosen = await ReactionPickerSheet.show(
+      context: context,
+      siteContext: widget.siteContext,
+      reactions: _reactions,
+      locked: _locked,
+    );
+    if (!mounted || chosen == null) return;
+    await _toggleReaction(chosen);
+  }
+
+  /// A tap on the reactions summary: who reacted, and with what.
+  void _showReactionUsers() {
+    final signedIn = widget.siteContext.isLoggedIn;
+    final mayChange = _mine != null ? !_locked : _canAct;
     ReactionUsersSheet.show(
       context: context,
       siteContext: widget.siteContext,
       postId: widget.post.id,
-      reactionId: reactionId.isEmpty ? null : reactionId,
+      reactions: _reactions,
+      // The way to the picker without a long press; a forum with nothing
+      // but the like has the heart for that.
+      onReact: signedIn && mayChange && _hasMoreReactions ? _openReactionPicker : null,
     );
   }
 
-  /// Open the full reaction picker. Reachable from the trailing "+"
-  /// chip when reactions exist, and from a long-press on the like
-  /// button in the zero state, so users can pick any of the forum's
-  /// enabled emojis, not just the ones already showing.
-  Future<void> _openReactionPicker() async {
-    if (!widget.siteContext.isLoggedIn) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseLogInToReact)),
-      );
+  /// Applies [reactionId] (the reader's own again removes it) at once, then
+  /// sends it; the server's answer replaces the guess, and a refusal puts
+  /// the reactions back and says why.
+  Future<void> _toggleReaction(String reactionId, {bool fromButton = false}) async {
+    if (_reactionInFlight) return;
+    final l10n = AppLocalizations.of(context)!;
+    final postId = widget.post.id;
+    if (LikeCooldown.isCoolingDown(postId)) {
+      SnackbarHelper.showInfo(context, l10n.reactAgainInSeconds(LikeCooldown.secondsLeft(postId)));
+      _startCooldownTicker();
       return;
     }
-    final current = _reactions
-        .firstWhere(
-          (r) => r.viewerReacted,
-          orElse: () => FCPostReaction(id: '', count: 0),
-        )
-        .id;
-    final updated = await ReactionPickerSheet.show(
-      context: context,
-      siteContext: widget.siteContext,
-      postId: widget.post.id,
-      currentReactionId: current.isEmpty ? null : current,
-    );
-    if (!mounted) return;
-    // The sheet records the cooldown when the server refuses; keep the
-    // cluster ticking so it stays dimmed with a live countdown.
-    if (LikeCooldown.isCoolingDown(widget.post.id)) _startCooldownTicker();
-    if (updated == null) return;
+    final before = _reactions;
+    final mine = viewerReactionOf(before);
+    final isNewLike = mine == null && reactionId == _mainReaction;
     setState(() {
-      _reactions = updated;
-      widget.post.reactions = updated;
+      _reactionInFlight = true;
+      _reactions = toggledReactions(before, reactionId);
     });
+    // ignore: discarded_futures
+    HapticFeedback.selectionClick();
+
+    final proxy = SiteProxyService.getPostProxy();
+    final result = proxy is DiscoursePostProxy
+        // Whether to like or unlike, for forums without the plugin.
+        ? await proxy.toggleReactionAsync(postId, reactionId, viewerReacted: mine != null)
+        : await proxy.toggleReactionAsync(postId, reactionId);
+    if (!mounted) return;
+
+    if (result.result) {
+      final after = result.reactions;
+      setState(() {
+        _reactionInFlight = false;
+        _reactions = after;
+        widget.post.reactions = after;
+        if (viewerReactionOf(after) == null) _canAct = true;
+      });
+      DiscourseLiveReactions.noteOwnChange(_siteUrl, postId);
+      DiscourseLiveReactions.publish(
+          DiscourseReactionUpdate(siteUrl: _siteUrl, postId: postId, reactions: after));
+      if (isNewLike && fromButton) {
+        // ignore: discarded_futures
+        _maybeShowHoldTip();
+      }
+      return;
+    }
+
+    final cooldown = LikeCooldown.noteFromLastResponse(widget.siteContext, postId);
+    setState(() {
+      _reactionInFlight = false;
+      _reactions = before;
+    });
+    if (cooldown != null) {
+      _startCooldownTicker();
+      SnackbarHelper.showInfo(context, l10n.reactAgainInSeconds(LikeCooldown.secondsLeft(postId)));
+    } else {
+      final text = result.resultText;
+      SnackbarHelper.showError(
+          context, text != null && text.isNotEmpty ? text : l10n.reactionUpdateFailed);
+    }
+  }
+
+  void _onLiveReactions(DiscourseReactionUpdate update) {
+    if (!mounted || _reactionInFlight) return;
+    if (update.postId != widget.post.id || update.siteUrl != _siteUrl) return;
+    setState(() {
+      _reactions = update.reactions;
+      widget.post.reactions = update.reactions;
+    });
+  }
+
+  static const String holdTipKey = 'reaction_hold_tip_shown';
+
+  /// After the reader's first like with the button, once: the long press
+  /// that opens the other reactions is not something anyone guesses.
+  Future<void> _maybeShowHoldTip() async {
+    if (!_hasMoreReactions) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool(holdTipKey) == true) return;
+      await prefs.setBool(holdTipKey, true);
+    } catch (_) {
+      return;
+    }
+    if (!mounted) return;
+    SnackbarHelper.showInfo(context, AppLocalizations.of(context)!.reactionHoldTip);
   }
 }

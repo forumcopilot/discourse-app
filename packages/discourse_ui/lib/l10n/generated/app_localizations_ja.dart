@@ -4264,21 +4264,65 @@ class AppLocalizationsJa extends AppLocalizations {
   String get postBookmarkAction => '投稿をブックマーク';
 
   @override
-  String postReactionsSemanticsReacted(int count) {
+  String get reactionButtonRemoveLike => 'いいね！済みです。タップすると取り消します。';
+
+  @override
+  String reactionButtonRemove(String reaction) {
+    return 'あなたのリアクション：$reaction。タップすると取り消します。';
+  }
+
+  @override
+  String reactionButtonLocked(String reaction) {
+    return 'あなたのリアクション：$reaction。これ以上変更できません。';
+  }
+
+  @override
+  String get reactionHoldHint => '長押しでほかのリアクション';
+
+  @override
+  String reactionSummarySemantics(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'リアクション済み。リアクション $count 件。タップで変更、長押しでリアクションした人を表示。',
+      other: 'リアクション $count 件。タップでリアクションした人を表示。',
     );
     return '$_temp0';
   }
 
   @override
-  String postReactionsSemantics(int count) {
+  String get reactionLockedMessage => 'この投稿へのリアクションはもう変更できません。';
+
+  @override
+  String get reactionHoldTip => 'ヒント：ハートを長押しするとほかのリアクションを選べます。';
+
+  @override
+  String reactionsTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'リアクション $count 件。タップでリアクション、長押しでリアクションした人を表示。',
+      other: 'リアクション $count 件',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reactionsAll => 'すべて';
+
+  @override
+  String get reactionYou => 'あなた';
+
+  @override
+  String get changeYourReaction => 'リアクションを変更';
+
+  @override
+  String get reactionTapAgainToRemove => 'もう一度タップするとリアクションを取り消します。';
+
+  @override
+  String reactionFilterSemantics(String reaction, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$reaction、$count 人',
     );
     return '$_temp0';
   }

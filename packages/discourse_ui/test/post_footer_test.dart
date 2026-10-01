@@ -4,6 +4,7 @@ import 'package:discourse_ui/theme/app_theme.dart';
 import 'package:discourse_ui/views/listitems/post_list_item.dart';
 import 'package:discourse_ui/views/listitems/post_list_item_social.dart';
 import 'package:discourse_ui/views/widgets/post_action_button.dart';
+import 'package:discourse_ui/views/widgets/reaction_glyph.dart';
 import 'package:discourse_ui/views/widgets/remote_circle_avatar.dart';
 import 'package:discourse_ui/views/widgets/topic_stats_bar.dart';
 import 'package:flutter/material.dart';
@@ -112,18 +113,20 @@ void main() {
       required FCPost post,
       bool loggedIn = true,
       List<FCPostReaction> reactions = const [],
-      VoidCallback? onLike,
+      bool hasMore = true,
+      VoidCallback? onReact,
+      VoidCallback? onMore,
       VoidCallback? onShowReactors,
       Widget? leading,
       Widget? trailing,
     }) =>
         _app(PostListItemSocial(
           post: post,
-          isLiked: false,
-          likeCount: 0,
           isLoggedIn: loggedIn,
           reactions: reactions,
-          onLike: onLike,
+          hasMoreReactions: hasMore,
+          onReact: onReact,
+          onMoreReactions: onMore,
           onShowReactors: onShowReactors,
           onBookmark: () {},
           leading: leading,
@@ -149,29 +152,140 @@ void main() {
           reason: 'right-aligned, as web packs its post menu');
     });
 
+    testWidgets('once others reacted, the heart stays beside the count',
+        (tester) async {
+      // Defect: the heart was replaced by the count as soon as anyone
+      // reacted, so the way to react disappeared.
+      var reacts = 0, lists = 0;
+      await tester.pumpWidget(row(
+        post: _post(),
+        reactions: _reactions,
+        onReact: () => reacts++,
+        onShowReactors: () => lists++,
+      ));
+      expect(find.byIcon(Icons.favorite_border), findsOneWidget);
+      expect(tester.getCenter(find.text('2')).dx,
+          lessThan(tester.getCenter(find.byIcon(Icons.favorite_border)).dx),
+          reason: 'the summary sits just before the button, as on web');
+      await tester.tap(find.text('2'));
+      expect(lists, 1, reason: 'a tap on the count lists who reacted');
+      await tester.tap(find.byIcon(Icons.favorite_border));
+      expect(reacts, 1);
+    });
+
+    testWidgets('with only likes the summary is the bare number',
+        (tester) async {
+      await tester.pumpWidget(row(post: _post(), reactions: _reactions));
+      expect(find.byType(ReactionGlyph), findsNothing);
+    });
+
+    testWidgets('mixed reactions show the three most used and everyone',
+        (tester) async {
+      await tester.pumpWidget(row(post: _post(), reactions: [
+        FCPostReaction(id: 'heart', count: 5),
+        FCPostReaction(id: 'rocket', count: 3),
+        FCPostReaction(id: 'eyes', count: 1),
+        FCPostReaction(id: 'clap', count: 1),
+      ]));
+      expect(find.byType(ReactionGlyph), findsNWidgets(3));
+      expect(find.text('10'), findsOneWidget);
+    });
+
+    testWidgets("your like is a filled heart; a tap is the caller's to undo",
+        (tester) async {
+      final semantics = tester.ensureSemantics();
+      var reacts = 0;
+      // Discourse leaves `can_act` off once you have acted.
+      await tester.pumpWidget(row(
+        post: _post(canLike: false),
+        reactions: [
+          FCPostReaction(id: 'heart', count: 3, viewerReacted: true, canUndo: true),
+        ],
+        onReact: () => reacts++,
+      ));
+      expect(find.byIcon(Icons.favorite), findsOneWidget);
+      expect(find.byIcon(Icons.favorite_border), findsNothing);
+      expect(find.bySemanticsLabel('You liked this. Tap to remove your like.'),
+          findsOneWidget);
+      await tester.tap(find.byIcon(Icons.favorite));
+      expect(reacts, 1);
+      semantics.dispose();
+    });
+
+    testWidgets('your other reaction is the button, not a colour',
+        (tester) async {
+      // Defect: the only sign was the count turning blue.
+      final semantics = tester.ensureSemantics();
+      var reacts = 0;
+      await tester.pumpWidget(row(
+        post: _post(canLike: false),
+        reactions: [
+          FCPostReaction(id: 'heart', count: 2),
+          FCPostReaction(id: 'rocket', count: 1, viewerReacted: true, canUndo: true),
+        ],
+        onReact: () => reacts++,
+      ));
+      expect(find.byIcon(Icons.favorite_border), findsNothing);
+      final button = find.bySemanticsLabel('Your reaction: rocket. Tap to remove it.');
+      expect(button, findsOneWidget);
+      await tester.tap(button);
+      expect(reacts, 1);
+      semantics.dispose();
+    });
+
+    testWidgets('past the change window it dims, and a hold opens nothing',
+        (tester) async {
+      final semantics = tester.ensureSemantics();
+      var reacts = 0, more = 0;
+      await tester.pumpWidget(row(
+        post: _post(canLike: false),
+        reactions: [
+          FCPostReaction(id: 'rocket', count: 1, viewerReacted: true, canUndo: false),
+        ],
+        onReact: () => reacts++,
+        onMore: () => more++,
+      ));
+      final button = find.bySemanticsLabel(
+          'Your reaction: rocket. It can no longer be changed.');
+      expect(button, findsOneWidget);
+      expect(
+          find.ancestor(of: find.byType(ReactionGlyph).last, matching: find.byType(Opacity)),
+          findsOneWidget);
+      await tester.longPress(button);
+      expect(more, 0, reason: 'no picker to change what cannot change');
+      expect(reacts, 1, reason: 'a hold explains, as a tap does');
+      await tester.tap(button);
+      expect(reacts, 2, reason: 'the tap explains, through the caller');
+      semantics.dispose();
+    });
+
+    testWidgets('a hold opens the picker only where there is one',
+        (tester) async {
+      var more = 0;
+      await tester.pumpWidget(row(post: _post(), onMore: () => more++));
+      await tester.longPress(find.byIcon(Icons.favorite_border));
+      expect(more, 1);
+      await tester.pumpWidget(row(post: _post(), hasMore: false, onMore: () => more++));
+      await tester.longPress(find.byIcon(Icons.favorite_border));
+      expect(more, 1, reason: 'a forum with nothing but the like');
+    });
+
     testWidgets("your own post's reactions show, and a tap lists who",
         (tester) async {
-      var likes = 0, lists = 0;
+      var reacts = 0, lists = 0;
       // Discourse leaves `can_act` off the author's own post.
       await tester.pumpWidget(row(
         post: _post(canLike: false),
         reactions: _reactions,
-        onLike: () => likes++,
+        onReact: () => reacts++,
         onShowReactors: () => lists++,
       ));
-      expect(find.text('2'), findsOneWidget,
-          reason: 'the cluster was gated on canLike and vanished');
+      expect(find.text('2'), findsOneWidget);
+      expect(find.byIcon(Icons.favorite_border), findsNothing,
+          reason: 'no reacting to your own post');
       await tester.tap(find.text('2'));
       expect(lists, 1);
-      expect(likes, 0);
-    });
-
-    testWidgets('a reader who may react gets the picker', (tester) async {
-      var likes = 0;
-      await tester.pumpWidget(row(
-          post: _post(), reactions: _reactions, onLike: () => likes++));
-      await tester.tap(find.text('2'));
-      expect(likes, 1);
+      expect(reacts, 0);
     });
 
     testWidgets('a guest sees the reactions too', (tester) async {
@@ -179,6 +293,7 @@ void main() {
           row(post: _post(), loggedIn: false, reactions: _reactions));
       expect(find.text('2'), findsOneWidget);
       expect(find.byIcon(Icons.bookmark_border), findsNothing);
+      expect(find.byIcon(Icons.favorite_border), findsNothing);
     });
 
     testWidgets('nothing to show leaves no empty 48dp row', (tester) async {

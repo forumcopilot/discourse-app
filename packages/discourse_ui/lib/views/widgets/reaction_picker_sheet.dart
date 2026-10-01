@@ -1,51 +1,58 @@
+import 'package:discourse_core/discourse_core.dart' show DiscourseValidReactions;
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_post_reaction.dart';
 
-import '../../utils/like_cooldown.dart';
 import '../../theme/design_tokens.dart';
+import '../../utils/post_reactions.dart';
 import 'reaction_glyph.dart';
 import 'sheet_title.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
 
-/// Bottom-sheet picker for the `discourse-reactions` plugin. Loads the
-/// forum's enabled emoji set from `/discourse-reactions/custom-reactions`
-/// and lets the user toggle one on a post.
+/// Bottom-sheet picker for the `discourse-reactions` plugin: the forum's
+/// enabled reactions, the main one (the like) first.
 ///
-/// Use [show] to open it as a modal sheet; the result is the post's new
-/// reaction list, or null if the user cancelled or the toggle failed.
+/// Each emoji shows how many people used it on this post, so matching a
+/// popular reaction is one tap; the reader's own is marked and the note
+/// says that tapping it again removes it. Once Discourse no longer lets the
+/// reader change their reaction (its undo window), every choice is disabled
+/// and the note says so, rather than offering choices the server refuses.
+///
+/// The sheet only chooses: [show] returns the chosen reaction id (the
+/// reader's own to remove it), or null when dismissed. The caller applies
+/// it, drawing the change at once.
 class ReactionPickerSheet extends StatefulWidget {
-  final String postId;
-  final String? currentReactionId;
+  /// The post's reactions, for the counts and the reader's own.
+  final List<FCPostReaction> reactions;
 
-  /// Resolves custom-emoji images in [ReactionGlyph]. Optional so callers
-  /// without a context still get unicode reactions.
+  /// Whether the reader's reaction can no longer be changed.
+  final bool locked;
+
+  /// The forum: its reaction set and custom-emoji images.
   final SiteContext? siteContext;
 
   const ReactionPickerSheet({
     super.key,
-    required this.postId,
-    this.currentReactionId,
+    this.reactions = const [],
+    this.locked = false,
     this.siteContext,
   });
 
-  static Future<List<FCPostReaction>?> show({
+  static Future<String?> show({
     required BuildContext context,
-    required String postId,
-    String? currentReactionId,
+    List<FCPostReaction> reactions = const [],
+    bool locked = false,
     SiteContext? siteContext,
   }) {
-    return showModalBottomSheet<List<FCPostReaction>>(
+    return showModalBottomSheet<String>(
       context: context,
-      builder: (sheetContext) {
-        return ReactionPickerSheet(
-          siteContext: siteContext,
-          postId: postId,
-          currentReactionId: currentReactionId,
-        );
-      },
+      builder: (sheetContext) => ReactionPickerSheet(
+        siteContext: siteContext,
+        reactions: reactions,
+        locked: locked,
+      ),
     );
   }
 
@@ -55,67 +62,39 @@ class ReactionPickerSheet extends StatefulWidget {
 
 class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
   List<String>? _available;
-  bool _loading = true;
-  String? _toggling;
 
   @override
   void initState() {
     super.initState();
-    _load();
+    // The forum's set is usually known from the topic that is open, so the
+    // sheet opens with its choices, without a spinner.
+    final site = widget.siteContext;
+    _available = site == null ? null : DiscourseValidReactions.forSite(site.site.url);
+    if (_available == null) _load();
   }
 
   Future<void> _load() async {
-    final result =
-        await SiteProxyService.getPostProxy().getAvailableReactionsAsync();
+    final result = await SiteProxyService.getPostProxy().getAvailableReactionsAsync();
     if (!mounted) return;
-    setState(() {
-      _available = result.reactions;
-      _loading = false;
-    });
+    setState(() => _available = result.reactions);
   }
 
-  String? _error;
-
-  Future<void> _toggle(String reaction) async {
-    setState(() {
-      _toggling = reaction;
-      _error = null;
-    });
-    final result = await SiteProxyService.getPostProxy()
-        .toggleReactionAsync(widget.postId, reaction);
-    if (!mounted) return;
-    if (result.result) {
-      context.popOwnRoute(result.reactions);
-    } else {
-      // The per-post budget (4 actions/minute, likes and unlikes sharing
-      // the counter) is now spent through this sheet, so this is where the
-      // cooldown has to be recorded — it used to be captured by the chips
-      // row, which no longer exists.
-      final cooldown = widget.siteContext == null
-          ? null
-          : LikeCooldown.noteFromLastResponse(
-              widget.siteContext!, widget.postId);
-      // Inline, not a snackbar: this sheet covers the bottom of the
-      // screen, so a snackbar raised from here paints behind it and the
-      // user sees the sheet simply not respond.
-      setState(() {
-        _toggling = null;
-        _error = cooldown != null
-            ? AppLocalizations.of(context)!
-                .reactAgainInSeconds(LikeCooldown.secondsLeft(widget.postId))
-            : (result.resultText?.isNotEmpty == true
-                ? result.resultText!
-                : AppLocalizations.of(context)!.reactionUpdateFailed);
-      });
-    }
-  }
-
-  /// Convert a Discourse reaction shortcode (e.g. "heart", "+1") to its
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final mine = viewerReactionOf(widget.reactions);
+    final counts = {for (final r in widget.reactions) r.id: r.count};
     final available = _available;
+    // The reader's reaction stays removable even if the forum has since
+    // stopped offering it.
+    final choices = available == null
+        ? null
+        : [...available, if (mine != null && !available.contains(mine.id)) mine.id];
+    final note = widget.locked
+        ? l10n.reactionLockedMessage
+        : (mine != null ? l10n.reactionTapAgainToRemove : null);
 
     return SafeArea(
       child: Padding(
@@ -124,21 +103,27 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SheetTitle(AppLocalizations.of(context)!.react),
-            const SizedBox(height: DesignTokens.spacingS),
-            if (_loading && available == null)
+            SheetTitle(l10n.react),
+            if (note != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  DesignTokens.spacingL, 0, DesignTokens.spacingL, DesignTokens.spacingS),
+                child: Text(
+                  note,
+                  style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                ),
+              ),
+            if (choices == null)
               const Padding(
                 padding: EdgeInsets.all(DesignTokens.spacingL),
                 child: Center(child: CircularProgressIndicator()),
               )
-            else if (available == null || available.isEmpty)
+            else if (choices.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(DesignTokens.spacingL),
                 child: Text(
-                  AppLocalizations.of(context)!.reactionsAreNotEnabledOnThisForum,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                  l10n.reactionsAreNotEnabledOnThisForum,
+                  style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
                 ),
               )
             else
@@ -148,43 +133,20 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
                   vertical: DesignTokens.spacingS,
                 ),
                 child: Wrap(
-                  spacing: DesignTokens.spacingS,
-                  runSpacing: DesignTokens.spacingS,
+                  spacing: DesignTokens.spacingM,
+                  runSpacing: DesignTokens.spacingM,
                   children: [
-                    for (final r in available)
+                    for (final r in choices)
                       _ReactionTile(
                         reaction: r,
+                        count: counts[r] ?? 0,
                         siteContext: widget.siteContext,
-                        selected: r == widget.currentReactionId,
-                        busy: _toggling == r,
-                        onTap: _toggling == null ? () => _toggle(r) : null,
+                        selected: r == mine?.id,
+                        onTap: widget.locked ? null : () => context.popOwnRoute(r),
                       ),
                   ],
                 ),
               ),
-            if (_error != null) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingL,
-                  vertical: DesignTokens.spacingS,
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.error_outline,
-                        size: DesignTokens.iconSizeS,
-                        color: colorScheme.error),
-                    const SizedBox(width: DesignTokens.spacingS),
-                    Expanded(
-                      child: Text(
-                        _error!,
-                        style: textTheme.bodySmall
-                            ?.copyWith(color: colorScheme.error),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
             const SizedBox(height: DesignTokens.spacingS),
           ],
         ),
@@ -195,55 +157,88 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
 
 class _ReactionTile extends StatelessWidget {
   final String reaction;
+  final int count;
   final SiteContext? siteContext;
   final bool selected;
-  final bool busy;
   final VoidCallback? onTap;
 
   const _ReactionTile({
     required this.reaction,
+    required this.count,
     required this.siteContext,
     required this.selected,
-    required this.busy,
     required this.onTap,
   });
 
+  static const double size = 56;
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(28),
-      child: Container(
-        width: 56,
-        height: 56,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
+    final name = reactionDisplayName(reaction);
+    final tile = Container(
+      width: size,
+      height: size,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: selected
+            ? colorScheme.primaryContainer
+            : colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+        shape: BoxShape.circle,
+        border: Border.all(
           color: selected
-              ? colorScheme.primaryContainer
-              : colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(
-            color: selected
-                ? colorScheme.primary
-                : colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
-            width: selected ? 1.5 : 0.5,
+              ? colorScheme.primary
+              : colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
+          width: selected ? 2 : 0.5,
+        ),
+      ),
+      child: ReactionGlyph(reactionId: reaction, size: 26, siteContext: siteContext),
+    );
+    return Semantics(
+      label: count > 0 ? l10n.reactionFilterSemantics(name, count) : name,
+      button: true,
+      selected: selected,
+      enabled: onTap != null,
+      excludeSemantics: true,
+      child: Opacity(
+        opacity: onTap == null ? 0.4 : 1,
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: SizedBox(
+            width: size + 8,
+            height: size + 8,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                tile,
+                if (count > 0)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      constraints: const BoxConstraints(minWidth: 22),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: selected ? colorScheme.primary : colorScheme.surface,
+                        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+                        border: Border.all(color: colorScheme.outlineVariant),
+                      ),
+                      child: Text(
+                        '$count',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: selected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                            ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
-        child: busy
-            ? SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: colorScheme.primary,
-                ),
-              )
-            : ReactionGlyph(
-                reactionId: reaction,
-                size: 26,
-                siteContext: siteContext,
-              ),
       ),
     );
   }

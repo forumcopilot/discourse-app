@@ -5547,19 +5547,81 @@
   "@postBookmarkAction": {
     "description": "Screen-reader label of a post's bookmark button when the post is not bookmarked"
   },
-  "postReactionsSemanticsReacted": "{count, plural, =1{You reacted. 1 reaction. Tap to change, long press to see who.} other{You reacted. {count} reactions. Tap to change, long press to see who.}}",
-  "@postReactionsSemanticsReacted": {
-    "description": "Screen-reader label of a post's reactions button when the reader has reacted; count is the post's total reactions",
+  "reactionButtonRemoveLike": "You liked this. Tap to remove your like.",
+  "@reactionButtonRemoveLike": {
+    "description": "Screen-reader label of a post's react button when the reader has liked the post"
+  },
+  "reactionButtonRemove": "Your reaction: {reaction}. Tap to remove it.",
+  "@reactionButtonRemove": {
+    "description": "Screen-reader label of a post's react button when the reader reacted with an emoji other than the like; reaction is the emoji's name, e.g. 'rocket'",
+    "placeholders": {
+      "reaction": {
+        "type": "String"
+      }
+    }
+  },
+  "reactionButtonLocked": "Your reaction: {reaction}. It can no longer be changed.",
+  "@reactionButtonLocked": {
+    "description": "Screen-reader label of a post's react button once the reader's reaction can no longer be changed (Discourse allows changes for a few minutes); reaction is the emoji's name",
+    "placeholders": {
+      "reaction": {
+        "type": "String"
+      }
+    }
+  },
+  "reactionHoldHint": "Long press for more reactions",
+  "@reactionHoldHint": {
+    "description": "Screen-reader hint on a post's react button: a long press opens the reaction picker"
+  },
+  "reactionSummarySemantics": "{count, plural, =1{1 reaction. Tap to see who reacted.} other{{count} reactions. Tap to see who reacted.}}",
+  "@reactionSummarySemantics": {
+    "description": "Screen-reader label of a post's reactions summary (the emoji and count beside the react button); count is the number of people who reacted",
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "postReactionsSemantics": "{count, plural, =1{1 reaction. Tap to react, long press to see who.} other{{count} reactions. Tap to react, long press to see who.}}",
-  "@postReactionsSemantics": {
-    "description": "Screen-reader label of a post's reactions button when the reader has not reacted; count is the post's total reactions",
+  "reactionLockedMessage": "You can no longer change your reaction to this post.",
+  "@reactionLockedMessage": {
+    "description": "Message shown when the reader tries to change a reaction after Discourse's undo window has closed"
+  },
+  "reactionHoldTip": "Tip: long-press the heart for more reactions.",
+  "@reactionHoldTip": {
+    "description": "One-time tip shown after the reader's first like, on forums with more reactions than the like"
+  },
+  "reactionsTitle": "{count, plural, =1{1 reaction} other{{count} reactions}}",
+  "@reactionsTitle": {
+    "description": "Title of the sheet listing who reacted to a post; count is the number of people",
     "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reactionsAll": "All",
+  "@reactionsAll": {
+    "description": "Filter chip in the who-reacted sheet that shows everyone, followed by the total count"
+  },
+  "reactionYou": "You",
+  "@reactionYou": {
+    "description": "Tag on the reader's own row in the who-reacted sheet"
+  },
+  "changeYourReaction": "Change your reaction",
+  "@changeYourReaction": {
+    "description": "Button in the who-reacted sheet that opens the reaction picker when the reader has already reacted"
+  },
+  "reactionTapAgainToRemove": "Tap your reaction again to remove it.",
+  "@reactionTapAgainToRemove": {
+    "description": "Note in the reaction picker when the reader has reacted: tapping the same emoji removes it"
+  },
+  "reactionFilterSemantics": "{count, plural, =1{{reaction}, 1 person} other{{reaction}, {count} people}}",
+  "@reactionFilterSemantics": {
+    "description": "Screen-reader label of a per-emoji filter chip in the who-reacted sheet; reaction is the emoji's name, count the people who used it",
+    "placeholders": {
+      "reaction": {
+        "type": "String"
+      },
       "count": {
         "type": "int"
       }

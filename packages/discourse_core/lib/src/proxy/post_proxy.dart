@@ -13,6 +13,7 @@ import 'package:forumcopilot_sdk/models/results/fc_reaction_result.dart';
 import '../base_discourse_proxy.dart';
 import '../data/site/discourse_site_capabilities.dart';
 import '../data/post/discourse_accepted_answer.dart';
+import '../data/post/discourse_reaction_users.dart';
 import '../data/post/discourse_valid_reactions.dart';
 import '../data/topic/discourse_topic_slugs.dart';
 import '../data/topic/discourse_topic_tracking.dart';
@@ -118,7 +119,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // The forum's enabled reaction set rides along on every topic payload.
       // It is site-level, not topic-level, so any topic load teaches the
       // picker what this forum accepts — see DiscourseValidReactions.
-      DiscourseValidReactions.store(t['valid_reactions']);
+      DiscourseValidReactions.storeFromTopicView(siteContext.site.url, t);
       _rememberMessage(topicId, t);
       // What to read next rides on every topic payload too; the footer
       // reads it from here instead of fetching the topic again.
@@ -252,7 +253,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // The forum's enabled reaction set rides along on every topic payload.
       // It is site-level, not topic-level, so any topic load teaches the
       // picker what this forum accepts — see DiscourseValidReactions.
-      DiscourseValidReactions.store(t['valid_reactions']);
+      DiscourseValidReactions.storeFromTopicView(siteContext.site.url, t);
       _rememberMessage(topicId, t);
       // What to read next rides on every topic payload too; the footer
       // reads it from here instead of fetching the topic again.
@@ -360,7 +361,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       // The forum's enabled reaction set rides along on every topic payload.
       // It is site-level, not topic-level, so any topic load teaches the
       // picker what this forum accepts — see DiscourseValidReactions.
-      DiscourseValidReactions.store(t['valid_reactions']);
+      DiscourseValidReactions.storeFromTopicView(siteContext.site.url, t);
       _rememberMessage(topicId, t);
       // What to read next rides on every topic payload too; the footer
       // reads it from here instead of fetching the topic again.
@@ -1149,7 +1150,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   /// forums without it, it is the chip [_parseReactions] synthesizes from
   /// the like count. Either way it is the one reaction that can also be
   /// applied through `/post_actions`.
-  static const String likeReactionId = 'heart';
+  static const String likeReactionId = DiscourseValidReactions.like;
 
   /// The single entry point for reacting to a post.
   ///
@@ -1159,10 +1160,13 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   /// serializer, so [_parseReactions] normalizes either into the same
   /// list — empty meaning "no reactions", on both paths.
   ///
-  /// [viewerReacted] is only consulted on the `/post_actions` fallback,
-  /// which needs to know whether to add or remove the like (the plugin
-  /// route is a true toggle). It is an added optional parameter, which
-  /// Dart permits on an override, so the SDK interface is untouched.
+  /// [viewerReacted] is only consulted on the `/post_actions` path, which
+  /// needs to know whether to add or remove the like (the plugin route is a
+  /// true toggle). Pass it whenever the viewer's state is known: without it
+  /// the like path assumes "not yet liked", and removing a like on a forum
+  /// without the plugin sent a second like that Discourse refused. It is an
+  /// added optional parameter, which Dart permits on an override, so the
+  /// SDK interface is untouched.
   @override
   Future<FCToggleReactionResult> toggleReactionAsync(
       String postId, String reactionId,
@@ -1171,6 +1175,12 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     if (pid == null) {
       return FCToggleReactionResult(
           result: false, resultText: 'Invalid post id');
+    }
+    // A forum known to run without the plugin: straight to the like path,
+    // without a toggle request that can only 404 first.
+    if (DiscourseValidReactions.likesOnly(siteContext.site.url) &&
+        reactionId == likeReactionId) {
+      return _toggleLikeAsReaction(pid, viewerReacted: viewerReacted ?? false);
     }
     try {
       final response = await apiPut(
@@ -1230,7 +1240,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     // `discourse_reactions_enabled_reactions` site setting serialized
     // verbatim, so it is both authoritative and free — no request at all,
     // and no guessing from the shape of a 404 (see below).
-    final known = DiscourseValidReactions.current;
+    final known = DiscourseValidReactions.forSite(siteContext.site.url);
     if (known != null && known.isNotEmpty) {
       return FCAvailableReactionsResult(result: true, reactions: known);
     }
@@ -1239,6 +1249,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       final reactions = ((response['reactions'] as List?) ?? const [])
           .whereType<String>()
           .toList(growable: false);
+      DiscourseValidReactions.store(siteContext.site.url, reactions);
       if (reactions.isEmpty) {
         // The plugin IS installed but named no reactions; its routes will
         // accept the standard set, so guessing is safe here (unlike the
@@ -1309,8 +1320,8 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   ///   * `limit` — server clamps to 1..50, defaulting to 30.
   /// Response: `{ users: [{id, username, name, avatar_template, reaction}],
   /// total_rows: n }`. The rows carry no timestamp (the controller drops
-  /// the query's `created_at`), so [FCLike.timestamp] stays null; `reaction`
-  /// lands in [FCLike.reactionEmoji]. The endpoint is readable while
+  /// the query's `created_at`); `name` and `reaction` land on
+  /// [DiscourseReactionUser]. The endpoint is readable while
   /// logged out (`before_action :ensure_logged_in, except: ...:166`).
   ///
   /// Fallback when the plugin is absent/disabled (both 404 — the route is
@@ -1327,7 +1338,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   ///
   /// Never throws: failures come back as `result: false` with the server's
   /// message and an empty user list.
-  Future<FCReactionUsersResult> getReactionUsersAsync(
+  Future<DiscourseReactionUsersResult> getReactionUsersAsync(
     String postId, {
     String? reactionId,
     int page = 0,
@@ -1335,11 +1346,10 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   }) async {
     final pid = int.tryParse(postId);
     if (pid == null) {
-      return FCReactionUsersResult(
+      return DiscourseReactionUsersResult(
         result: false,
         resultText: 'Invalid post id',
-        users: <FCLike>[],
-      );
+              );
     }
     final safePage = page < 0 ? 0 : page;
     final safeLimit = limit.clamp(1, 50);
@@ -1358,9 +1368,9 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       );
       final users = ((response['users'] as List?) ?? const [])
           .whereType<Map>()
-          .map((u) => _likeFromReactionRow(u.cast<String, dynamic>()))
+          .map((u) => _reactionUserFromRow(u.cast<String, dynamic>()))
           .toList();
-      return FCReactionUsersResult(
+      return DiscourseReactionUsersResult(
         result: true,
         users: users,
         total: (response['total_rows'] as num?)?.toInt() ?? users.length,
@@ -1369,23 +1379,21 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       if (e.statusCode == 404) {
         return _postActionLikeUsers(pid, page: safePage, limit: safeLimit);
       }
-      return FCReactionUsersResult(
+      return DiscourseReactionUsersResult(
         result: false,
         resultText: e.userMessage,
-        users: <FCLike>[],
-      );
+              );
     } catch (e) {
-      return FCReactionUsersResult(
+      return DiscourseReactionUsersResult(
         result: false,
         resultText: describeApiError(e),
-        users: <FCLike>[],
-      );
+              );
     }
   }
 
   /// Plugin-less fallback for [getReactionUsersAsync] — stock Discourse's
   /// like actors (`post_action_type_id: 2`).
-  Future<FCReactionUsersResult> _postActionLikeUsers(
+  Future<DiscourseReactionUsersResult> _postActionLikeUsers(
     int postId, {
     required int page,
     required int limit,
@@ -1399,41 +1407,59 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       });
       final users = ((response['post_action_users'] as List?) ?? const [])
           .whereType<Map>()
-          .map((u) => _likeFromReactionRow(u.cast<String, dynamic>()))
+          .map((u) => _reactionUserFromRow(u.cast<String, dynamic>(),
+              fallbackReaction: likeReactionId))
           .toList();
-      return FCReactionUsersResult(
+      return DiscourseReactionUsersResult(
         result: true,
         users: users,
         total: (response['total_rows_post_action_users'] as num?)?.toInt() ??
             (page * limit + users.length),
       );
     } on DiscourseApiException catch (e) {
-      return FCReactionUsersResult(
+      return DiscourseReactionUsersResult(
         result: false,
         resultText: e.userMessage,
-        users: <FCLike>[],
-      );
+              );
     } catch (e) {
-      return FCReactionUsersResult(
+      return DiscourseReactionUsersResult(
         result: false,
         resultText: describeApiError(e),
-        users: <FCLike>[],
-      );
+              );
     }
   }
 
-  /// Map one actor row (either endpoint) to [FCLike]. `reaction` is only
-  /// present on the discourse-reactions payload.
-  FCLike _likeFromReactionRow(Map<String, dynamic> u) {
+  /// Map one actor row (either endpoint). `reaction` is only present on
+  /// the discourse-reactions payload; a `post_action_users` row is a like.
+  DiscourseReactionUser _reactionUserFromRow(Map<String, dynamic> u,
+      {String? fallbackReaction}) {
     final reaction = u['reaction']?.toString();
-    return FCLike(
+    final name = u['name']?.toString().trim();
+    return DiscourseReactionUser(
       userId: (u['id'] ?? '').toString(),
       username: (u['username'] ?? '').toString(),
+      name: (name == null || name.isEmpty) ? null : name,
       avatarUrl: _avatarFromTemplate(u['avatar_template'] as String?) ?? '',
       // Discourse identifies reactions by emoji shortcode ('heart',
       // 'laughing', …) — the same token toggleReactionAsync consumes.
-      reactionEmoji: (reaction != null && reaction.isNotEmpty) ? reaction : null,
+      reaction: (reaction != null && reaction.isNotEmpty)
+          ? reaction
+          : fallbackReaction,
     );
+  }
+
+  /// The post's reactions as they are now, for a live update: Discourse
+  /// announces a change on `/topic/{id}/reactions` with the post's id only,
+  /// and its web client refetches the post the same way. Null on failure.
+  Future<List<FCPostReaction>?> getPostReactionsAsync(String postId) async {
+    final pid = int.tryParse(postId);
+    if (pid == null) return null;
+    try {
+      final p = await apiGet('/posts/$pid.json');
+      return _parseReactions(p.cast<String, dynamic>());
+    } catch (_) {
+      return null;
+    }
   }
 
   @override

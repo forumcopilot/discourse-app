@@ -4508,35 +4508,78 @@ class AppLocalizationsRu extends AppLocalizations {
   String get postBookmarkAction => 'Добавить сообщение в закладки';
 
   @override
-  String postReactionsSemanticsReacted(int count) {
+  String get reactionButtonRemoveLike =>
+      'Вам понравилось. Нажмите, чтобы убрать лайк.';
+
+  @override
+  String reactionButtonRemove(String reaction) {
+    return 'Ваша реакция: $reaction. Нажмите, чтобы убрать её.';
+  }
+
+  @override
+  String reactionButtonLocked(String reaction) {
+    return 'Ваша реакция: $reaction. Изменить её уже нельзя.';
+  }
+
+  @override
+  String get reactionHoldHint => 'Удерживайте для других реакций';
+
+  @override
+  String reactionSummarySemantics(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other:
-          'Вы отреагировали. $count реакции. Нажмите, чтобы изменить, удерживайте, чтобы увидеть, кто отреагировал.',
-      many:
-          'Вы отреагировали. $count реакций. Нажмите, чтобы изменить, удерживайте, чтобы увидеть, кто отреагировал.',
-      few:
-          'Вы отреагировали. $count реакции. Нажмите, чтобы изменить, удерживайте, чтобы увидеть, кто отреагировал.',
-      one:
-          'Вы отреагировали. $count реакция. Нажмите, чтобы изменить, удерживайте, чтобы увидеть, кто отреагировал.',
+      other: '$count реакции. Нажмите, чтобы увидеть, кто отреагировал.',
+      many: '$count реакций. Нажмите, чтобы увидеть, кто отреагировал.',
+      few: '$count реакции. Нажмите, чтобы увидеть, кто отреагировал.',
+      one: '$count реакция. Нажмите, чтобы увидеть, кто отреагировал.',
     );
     return '$_temp0';
   }
 
   @override
-  String postReactionsSemantics(int count) {
+  String get reactionLockedMessage =>
+      'Вы больше не можете изменить свою реакцию на это сообщение.';
+
+  @override
+  String get reactionHoldTip =>
+      'Совет: удерживайте сердечко, чтобы выбрать другую реакцию.';
+
+  @override
+  String reactionsTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other:
-          '$count реакции. Нажмите, чтобы отреагировать, удерживайте, чтобы увидеть, кто отреагировал.',
-      many:
-          '$count реакций. Нажмите, чтобы отреагировать, удерживайте, чтобы увидеть, кто отреагировал.',
-      few:
-          '$count реакции. Нажмите, чтобы отреагировать, удерживайте, чтобы увидеть, кто отреагировал.',
-      one:
-          '$count реакция. Нажмите, чтобы отреагировать, удерживайте, чтобы увидеть, кто отреагировал.',
+      other: '$count реакции',
+      many: '$count реакций',
+      few: '$count реакции',
+      one: '$count реакция',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reactionsAll => 'Все';
+
+  @override
+  String get reactionYou => 'Вы';
+
+  @override
+  String get changeYourReaction => 'Изменить реакцию';
+
+  @override
+  String get reactionTapAgainToRemove =>
+      'Нажмите на свою реакцию ещё раз, чтобы убрать её.';
+
+  @override
+  String reactionFilterSemantics(String reaction, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$reaction, $count человека',
+      many: '$reaction, $count человек',
+      few: '$reaction, $count человека',
+      one: '$reaction, $count человек',
     );
     return '$_temp0';
   }
