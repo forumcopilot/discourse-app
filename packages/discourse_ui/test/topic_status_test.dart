@@ -7,6 +7,8 @@ import 'package:discourse_ui/l10n/generated/app_localizations_en.dart';
 import 'package:discourse_ui/theme/app_theme.dart';
 import 'package:discourse_ui/views/appbars/posts_page_app_bar.dart';
 import 'package:discourse_ui/views/listitems/post_list_item.dart';
+import 'package:discourse_ui/views/listitems/topic_list_item.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 import 'package:discourse_ui/views/widgets/notification_level_sheet.dart';
 import 'package:discourse_ui/views/widgets/topic_status.dart';
 import 'package:flutter/material.dart';
@@ -341,6 +343,47 @@ void main() {
       expect(items, contains('Archive'));
       expect(items, isNot(contains('Close Topic')));
       expect(items, isNot(contains('Delete Topic')));
+    });
+  });
+
+  group('topic list rows', () {
+    FCTopic topic({bool closed = false, bool pinned = false}) => FCTopic(
+          id: '7',
+          title: 'Welcome',
+          forumId: '3',
+          forumName: 'General',
+          authorId: '1',
+          authorName: 'bob',
+          timestamp: DateTime(2026, 9, 28),
+          isClosed: closed,
+          isPinned: pinned,
+        );
+
+    Future<void> pumpRow(WidgetTester tester, FCTopic t, {IconData? icon}) async {
+      await tester.pumpWidget(_app(TopicListItem(
+          siteContext: _ctx(), topic: t, topicIcon: icon, onTap: () {})));
+      await tester.pump();
+    }
+
+    testWidgets('a closed topic is Closed, not Locked', (tester) async {
+      await pumpRow(tester, topic(closed: true));
+      expect(find.text('Closed'), findsOneWidget);
+      expect(find.text('Locked'), findsNothing);
+    });
+
+    testWidgets('a globally pinned one is Pinned Globally, not an Announcement',
+        (tester) async {
+      await pumpRow(tester, topic(), icon: Icons.push_pin_outlined);
+      expect(find.text('Pinned Globally'), findsOneWidget);
+      expect(find.text('Announcement'), findsNothing);
+    });
+
+    testWidgets("the reader's level by its name, not Subscribed", (tester) async {
+      DiscourseTopicTracking.forSite(_ctx()).recordTopicJson(
+          {'id': 7, 'highest_post_number': 3, 'notification_level': 2});
+      await pumpRow(tester, topic());
+      expect(find.text('Tracking'), findsOneWidget);
+      expect(find.text('Subscribed'), findsNothing);
     });
   });
 

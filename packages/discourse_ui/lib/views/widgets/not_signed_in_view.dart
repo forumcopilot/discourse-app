@@ -50,7 +50,7 @@ class NotSignedInView extends StatelessWidget {
           onPressed: () {
             LoginPage.open(siteContext);
           },
-          child: Text(AppLocalizations.of(context)?.register ?? 'Register'),
+          child: Text(AppLocalizations.of(context)!.signUp),
         ),
       ],
     );

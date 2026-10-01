@@ -228,47 +228,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get markRead => 'Als gelesen markieren';
 
   @override
-  String get spamOrAdvertising => 'Spam oder Werbung';
-
-  @override
-  String get otherPleaseSpecify => 'Andere (bitte angeben)';
-
-  @override
   String get pleaseSpecifyReason => 'Bitte geben Sie den Grund an';
-
-  @override
-  String get banUser => 'Benutzer sperren';
-
-  @override
-  String get unbanUser => 'Benutzer entsperren';
-
-  @override
-  String pleaseSelectReasonForBanningUser(String username) {
-    return 'Bitte wählen Sie einen Grund für die Sperrung von $username';
-  }
-
-  @override
-  String get violationOfCommunityGuidelines =>
-      'Verstoß gegen die Community-Richtlinien';
-
-  @override
-  String get harassmentOrAbusiveBehavior =>
-      'Belästigung oder missbräuchliches Verhalten';
-
-  @override
-  String get postingInappropriateContent =>
-      'Veröffentlichung unangemessener Inhalte';
-
-  @override
-  String get accountCompromiseOrSecurityIssue =>
-      'Kontokompromittierung oder Sicherheitsproblem';
-
-  @override
-  String get enterReasonForBanningUser =>
-      'Geben Sie den Grund für die Sperrung dieses Benutzers ein';
-
-  @override
-  String get banUntil => 'Sperren bis';
 
   @override
   String get selectDate => 'Datum auswählen';
@@ -377,9 +337,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get areYouSureYouWantToLogout => 'Möchten Sie sich wirklich abmelden?';
 
   @override
-  String get register => 'Registrieren';
-
-  @override
   String get signIn => 'Anmelden';
 
   @override
@@ -477,25 +434,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get next => 'Weiter';
 
   @override
-  String get permanent => 'Permanent';
-
-  @override
   String get temporary => 'Temporär';
 
   @override
-  String setBanDurationFor(String username) {
-    return 'Bann-Dauer für $username festlegen';
-  }
-
-  @override
-  String get pleaseSelectEndDateForTemporaryBan =>
-      'Bitte wählen Sie ein Enddatum für den temporären Bann';
-
-  @override
   String get back => 'Zurück';
-
-  @override
-  String get unban => 'Entbannen';
 
   @override
   String get confirm => 'Bestätigen';
@@ -692,18 +634,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get pleaseSelectEndDate => 'Bitte wählen Sie ein Enddatum';
 
   @override
-  String get userBannedSuccessfully => 'Benutzer erfolgreich gesperrt';
-
-  @override
-  String get failedToBanUser => 'Benutzer konnte nicht gesperrt werden';
-
-  @override
-  String get userUnbannedSuccessfully => 'Benutzer erfolgreich entsperrt';
-
-  @override
-  String get failedToUnbanUser => 'Benutzer konnte nicht entsperrt werden';
-
-  @override
   String get spamCleanUser => 'Spam des Benutzers bereinigen';
 
   @override
@@ -778,15 +708,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get mentionUser => 'Benutzer erwähnen';
-
-  @override
-  String get submittingReport => 'Bericht senden...';
-
-  @override
-  String get banningUser => 'Benutzer sperren...';
-
-  @override
-  String get unbanningUser => 'Benutzersperre aufheben...';
 
   @override
   String get cleaningSpam => 'Spam bereinigen...';
@@ -869,9 +790,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get edit => 'Bearbeiten';
-
-  @override
-  String get report => 'Melden';
 
   @override
   String get remove => 'Entfernen';
@@ -1469,9 +1387,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bitte anmelden, um Benutzerprofile zu sehen.';
 
   @override
-  String get announcement => 'Ankündigung';
-
-  @override
   String get solved => 'Gelöst';
 
   @override
@@ -1479,9 +1394,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pinned => 'Angeheftet';
-
-  @override
-  String get subscribedLabel => 'Abonniert';
 
   @override
   String get locked => 'Gesperrt';
@@ -1493,10 +1405,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String errorLoadingContent(Object error) {
     return 'Fehler beim Laden des Inhalts: $error';
   }
-
-  @override
-  String get noPermissionToViewSubforum =>
-      'Du hast keine Berechtigung, Themen in diesem Unterforum zu sehen.';
 
   @override
   String get noDiscussionsYet => 'Noch keine Diskussionen.';
@@ -1920,13 +1828,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get initializingForum => 'Forum wird initialisiert…';
 
   @override
-  String get unableToLoadForums => 'Foren konnten nicht geladen werden';
-
-  @override
-  String get noForumsToDisplayExplanation =>
-      'Es gibt keine Foren zum Anzeigen. Das kann an Berechtigungen oder an der Forumsstruktur liegen.';
-
-  @override
   String get subscribedForums => 'Abonnierte Foren';
 
   @override
@@ -1938,7 +1839,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get noNewNotificationsExplanation =>
-      'Keine neuen Benachrichtigungen. Schau später wieder vorbei für Neuigkeiten zu Themen, denen du folgst.';
+      'Du wirst in diesem Panel über für dich direkt relevante Aktivitäten benachrichtigt, einschließlich Antworten auf deine Themen und Beiträge, wenn dich jemand mit @ erwähnt oder zitiert und wenn jemand auf Themen antwortet, die du beobachtest. Benachrichtigungen werden auch an deine E-Mail-Adresse gesendet, wenn du dich eine Weile nicht eingeloggt hast.';
 
   @override
   String noTagsMatch(Object filter) {
@@ -1948,21 +1849,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String noTopicsTagged(Object tag) {
     return 'Keine Themen mit Schlagwort „$tag“';
-  }
-
-  @override
-  String failedToBanUser2(Object error) {
-    return 'Benutzer konnte nicht gesperrt werden: $error';
-  }
-
-  @override
-  String unbanUserConfirmation(Object username) {
-    return 'Sperre von $username wirklich aufheben?';
-  }
-
-  @override
-  String failedToUnbanUser2(Object error) {
-    return 'Sperre konnte nicht aufgehoben werden: $error';
   }
 
   @override
@@ -2069,10 +1955,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get failedToPostReplyPleaseTryAgain =>
       'Antwort konnte nicht gesendet werden. Bitte erneut versuchen.';
-
-  @override
-  String get pleaseWaitForTheThreadToLoad =>
-      'Bitte warten, bis das Thema geladen ist';
 
   @override
   String get failedToUpdatePostPleaseTryAgain =>
@@ -3895,4 +3777,97 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get topicStatusDeletedHelp =>
       'Dieses Thema ist gelöscht und für andere Benutzer nicht sichtbar';
+
+  @override
+  String get flagAction => 'Melden';
+
+  @override
+  String get flagPost => 'Beitrag melden';
+
+  @override
+  String get signUp => 'Registrieren';
+
+  @override
+  String get suspendUser => 'Benutzer sperren';
+
+  @override
+  String get unsuspend => 'Entsperren';
+
+  @override
+  String get suspendUntil => 'Benutzer sperren bis';
+
+  @override
+  String get suspendForever => 'Für immer sperren';
+
+  @override
+  String failedToSuspendUser(String error) {
+    return 'Beim Sperren dieses Benutzers ist etwas schiefgegangen: $error';
+  }
+
+  @override
+  String failedToUnsuspendUser(String error) {
+    return 'Beim Entsperren dieses Benutzers ist etwas schiefgegangen: $error';
+  }
+
+  @override
+  String get suspendReasonNotListening => 'Hat nicht auf Team-Feedback gehört';
+
+  @override
+  String get suspendReasonStaffTime =>
+      'Hat überproportional viel Zeit des Teams verbraucht';
+
+  @override
+  String get suspendReasonCombative => 'Zu streitlustig';
+
+  @override
+  String get suspendReasonWrongPlace => 'An der falschen Stelle';
+
+  @override
+  String get suspendReasonNoPurpose =>
+      'Kein konstruktiver Zweck der Handlungen, außer Dissens innerhalb der Gemeinschaft zu erzeugen';
+
+  @override
+  String get suspendReasonCustom => 'Benutzerdefiniert …';
+
+  @override
+  String get suspendReasonQuestion =>
+      'Was ist der Grund für die Sperre? Dieser Text wird dem Benutzer angezeigt, wenn er versucht, sich anzumelden. Fasse dich kurz.';
+
+  @override
+  String get closedLabel => 'Geschlossen';
+
+  @override
+  String get flaggingPost => 'Beitrag wird gemeldet…';
+
+  @override
+  String setSuspensionFor(String username) {
+    return 'Wie lange soll $username gesperrt werden?';
+  }
+
+  @override
+  String get pleaseSelectSuspensionEndDate => 'Wähle, wann die Sperre endet';
+
+  @override
+  String get suspendingUser => 'Benutzer wird gesperrt…';
+
+  @override
+  String get unsuspendingUser => 'Benutzer wird entsperrt…';
+
+  @override
+  String get userSuspended => 'Benutzer gesperrt';
+
+  @override
+  String get userUnsuspended => 'Benutzer entsperrt';
+
+  @override
+  String unsuspendUserConfirmation(String username) {
+    return '$username entsperren? Die Person kann sich dann wieder anmelden.';
+  }
+
+  @override
+  String get noCategoriesToDisplay => 'Es gibt keine Kategorien zum Anzeigen.';
+
+  @override
+  String get noPermissionToViewCategory =>
+      'Du hast keine Berechtigung, Themen in dieser Kategorie anzusehen.';
 }

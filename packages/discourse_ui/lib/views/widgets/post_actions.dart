@@ -255,7 +255,7 @@ class PostActionsHandler {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              AppLocalizations.of(context)!.pleaseWaitForTheThreadToLoad,
+              AppLocalizations.of(context)!.pleaseWaitForThreadToLoad,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onInverseSurface,
                   ),
@@ -275,7 +275,7 @@ class PostActionsHandler {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              AppLocalizations.of(context)!.pleaseWaitForTheThreadToLoad,
+              AppLocalizations.of(context)!.pleaseWaitForThreadToLoad,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onInverseSurface,
                   ),
@@ -560,7 +560,7 @@ class PostActionsHandler {
               ),
               const SizedBox(width: DesignTokens.spacingM),
               Text(
-                AppLocalizations.of(context)!.submittingReport,
+                AppLocalizations.of(context)!.flaggingPost,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onInverseSurface,
                     ),

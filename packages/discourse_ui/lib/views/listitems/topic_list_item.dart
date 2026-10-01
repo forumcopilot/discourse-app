@@ -1,3 +1,4 @@
+import 'package:discourse_core/discourse_core.dart' show DiscourseTopicTracking;
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -157,7 +158,17 @@ class TopicListItem extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(
                               top: DesignTokens.spacingXS),
-                          child: _MetaRow(topic: topic, topicIcon: topicIcon),
+                          child: _MetaRow(
+                            topic: topic,
+                            topicIcon: topicIcon,
+                            // The reader's level on the topic, as the
+                            // proxies recorded it from the list payload.
+                            notificationLevel: siteContext.isLoggedIn
+                                ? DiscourseTopicTracking.forSite(siteContext)
+                                    .stateOf(topic.id)
+                                    ?.notificationLevel
+                                : null,
+                          ),
                         ),
                       ],
                     ),
@@ -211,9 +222,13 @@ class _DeletedBadge extends StatelessWidget {
 }
 
 class _MetaRow extends StatelessWidget {
-  const _MetaRow({required this.topic, required this.topicIcon});
+  const _MetaRow(
+      {required this.topic, required this.topicIcon, this.notificationLevel});
   final FCTopic topic;
   final IconData? topicIcon;
+
+  /// 3 Watching, 2 Tracking; null when not known.
+  final int? notificationLevel;
 
   @override
   Widget build(BuildContext context) {
@@ -255,21 +270,27 @@ class _MetaRow extends StatelessWidget {
     }
 
     // One badge, by how much it changes what the reader should expect.
+    // A pinned-globally topic leads a category list (forum_topic_list);
+    // Discourse calls it "Pinned Globally".
     final (IconData, String, Color)? badge = topicIcon != null
-        ? (topicIcon!, l10n?.announcement ?? 'Announcement', metaColor)
+        ? (topicIcon!, l10n?.topicStatusPinnedGloballyTitle ?? 'Pinned Globally', metaColor)
         : topic.isSolved
             ? (Icons.check_circle, l10n?.solved ?? 'Solved', ForumColors.of(context).success)
             : topic.isClosed
-                ? (Icons.lock_outlined, l10n?.locked ?? 'Locked', metaColor)
+                ? (Icons.lock_outlined, l10n?.closedLabel ?? 'Closed', metaColor)
                 : topic.isHot
                     ? (Icons.local_fire_department, l10n?.hot ?? 'Hot', Colors.deepOrange.shade400)
                     : topic.isPinned
                         ? (Icons.push_pin_outlined, l10n?.pinned ?? 'Pinned', metaColor)
                         : topic.hasPoll
                             ? (Icons.poll_outlined, l10n?.poll ?? 'Poll', metaColor)
-                            : topic.isSubscribed
-                                ? (Icons.watch_outlined, l10n?.subscribedLabel ?? 'Watching', metaColor)
-                                : null;
+                            // The reader's level by Discourse's name for it;
+                            // nothing when the list did not say which.
+                            : notificationLevel == 3
+                                ? (Icons.notifications_active_outlined, l10n?.notificationLevelWatching ?? 'Watching', metaColor)
+                                : notificationLevel == 2
+                                    ? (Icons.notifications_outlined, l10n?.notificationLevelTracking ?? 'Tracking', metaColor)
+                                    : null;
 
     // The activity text gives way to the counts beside it, and both to the
     // badge at the end. (A Flexible and a Spacer in one Row split the free

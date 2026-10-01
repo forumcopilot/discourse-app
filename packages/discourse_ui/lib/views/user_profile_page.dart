@@ -259,7 +259,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ),
                         const SizedBox(width: DesignTokens.spacingM),
                         Text(
-                          _userInfo!.isBanned ? AppLocalizations.of(context)!.unbanUser : AppLocalizations.of(context)!.banUser,
+                          _userInfo!.isBanned ? AppLocalizations.of(context)!.unsuspend : AppLocalizations.of(context)!.suspendUser,
                         ),
                       ],
                     ),
@@ -385,15 +385,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
     AppLogger.debug('Handling ban of user: ${_userInfo!.id}');
 
-    // Common ban reasons
+    // Discourse's own suspension reasons (admin.user.suspend_reasons), as
+    // its Suspend User dialog offers them, then a custom one.
     final l10n = AppLocalizations.of(context)!;
     final banReasons = [
-      l10n.violationOfCommunityGuidelines,
-      l10n.spamOrAdvertising,
-      l10n.harassmentOrAbusiveBehavior,
-      l10n.postingInappropriateContent,
-      l10n.accountCompromiseOrSecurityIssue,
-      l10n.otherPleaseSpecify,
+      l10n.suspendReasonNotListening,
+      l10n.suspendReasonStaffTime,
+      l10n.suspendReasonCombative,
+      l10n.suspendReasonWrongPlace,
+      l10n.suspendReasonNoPurpose,
+      l10n.suspendReasonCustom,
     ];
 
     String? reasonResult;
@@ -418,7 +419,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
               return AlertDialog(
                 title: Text(
-                  AppLocalizations.of(context)!.banUser,
+                  AppLocalizations.of(context)!.suspendUser,
                 ),
                 content: Form(
                   key: formKey,
@@ -428,7 +429,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          AppLocalizations.of(context)!.pleaseSelectReasonForBanningUser(_userInfo!.username),
+                          AppLocalizations.of(context)!.suspendReasonQuestion,
                           style: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -457,18 +458,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         }).toList(),
                           ),
                         ),
-                        if (selectedReason == l10n.otherPleaseSpecify) ...[
+                        if (selectedReason == l10n.suspendReasonCustom) ...[
                           const SizedBox(height: DesignTokens.spacingM),
                           TextFormField(
                             controller: customReasonController,
                             decoration: InputDecoration(
                               labelText: AppLocalizations.of(context)!.pleaseSpecifyReason,
-                              hintText: AppLocalizations.of(context)!.enterReasonForBanningUser,
                               border: const OutlineInputBorder(),
                             ),
                             maxLines: 3,
                             validator: (value) {
-                              if (selectedReason == l10n.otherPleaseSpecify && (value == null || value.trim().isEmpty)) {
+                              if (selectedReason == l10n.suspendReasonCustom && (value == null || value.trim().isEmpty)) {
                                 return AppLocalizations.of(context)!.pleaseSpecifyReason;
                               }
                               return null;
@@ -492,7 +492,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               return;
                             }
 
-                            final reason = selectedReason == 'Other (please specify)' ? customReasonController.text.trim() : selectedReason!;
+                            final reason = selectedReason == l10n.suspendReasonCustom ? customReasonController.text.trim() : selectedReason!;
 
                             Navigator.of(context).pop(reason);
                           },
@@ -521,7 +521,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
               return AlertDialog(
                 title: Text(
-                  AppLocalizations.of(context)!.banUser,
+                  AppLocalizations.of(context)!.suspendUser,
                 ),
                 content: SingleChildScrollView(
                   child: Column(
@@ -529,7 +529,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        AppLocalizations.of(context)?.setBanDurationFor(_userInfo!.username) ?? 'Set the ban duration for ${_userInfo!.username}',
+                        AppLocalizations.of(context)!.setSuspensionFor(_userInfo!.username),
                         style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -554,7 +554,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           children: [
                       RadioListTile<String>(
                         title: Text(
-                          AppLocalizations.of(context)?.permanent ?? 'Permanent',
+                          AppLocalizations.of(context)!.suspendForever,
                           style: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurface,
                           ),
@@ -616,7 +616,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           },
                           child: InputDecorator(
                             decoration: InputDecoration(
-                              labelText: AppLocalizations.of(context)!.banUntil,
+                              labelText: AppLocalizations.of(context)!.suspendUntil,
                               border: const OutlineInputBorder(),
                               suffixIcon: const Icon(Icons.calendar_today),
                             ),
@@ -651,7 +651,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       if (banLength == 'temporary' && selectedEndDate == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(AppLocalizations.of(context)?.pleaseSelectEndDateForTemporaryBan ?? 'Please select an end date for temporary ban'),
+                            content: Text(AppLocalizations.of(context)!.pleaseSelectSuspensionEndDate),
                             backgroundColor: colorScheme.error,
                           ),
                         );
@@ -672,7 +672,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       backgroundColor: colorScheme.error,
                       foregroundColor: colorScheme.onError,
                     ),
-                    child: Text(AppLocalizations.of(context)?.banUser ?? 'Ban User'),
+                    child: Text(AppLocalizations.of(context)!.suspendUser),
                   ),
                 ],
               );
@@ -707,7 +707,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ),
               const SizedBox(width: DesignTokens.spacingM),
               Text(
-                AppLocalizations.of(context)?.banningUser ?? 'Banning user...',
+                AppLocalizations.of(context)!.suspendingUser,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onInverseSurface,
                     ),
@@ -750,7 +750,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                     const SizedBox(width: DesignTokens.spacingM),
                     Text(
-                      AppLocalizations.of(context)?.userBannedSuccessfully ?? 'User banned successfully',
+                      AppLocalizations.of(context)!.userSuspended,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onInverseSurface,
                           ),
@@ -764,7 +764,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             // Refresh entire page to reflect ban status
             await _refreshProfile();
           } else {
-            final errorMessage = (banResult.resultText != null && banResult.resultText!.isNotEmpty) ? banResult.resultText! : (AppLocalizations.of(context)?.failedToBanUser ?? 'Failed to ban user');
+            final errorMessage = (banResult.resultText != null && banResult.resultText!.isNotEmpty) ? banResult.resultText! : AppLocalizations.of(context)!.failedToSuspendUser(AppLocalizations.of(context)!.anErrorOccurred);
             AppLogger.debug('Ban failed for user: ${_userInfo!.id}, error: $errorMessage');
             // Show error message
             ScaffoldMessenger.of(context).showSnackBar(
@@ -807,7 +807,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   const SizedBox(width: DesignTokens.spacingM),
                   Expanded(
                     child: Text(
-                      AppLocalizations.of(context)!.failedToBanUser2(e.toString()),
+                      AppLocalizations.of(context)!.failedToSuspendUser(describeError(e, context: context)),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onErrorContainer,
                           ),
@@ -836,10 +836,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
         return AlertDialog(
           title: Text(
-            AppLocalizations.of(context)!.unbanUser,
+            AppLocalizations.of(context)!.unsuspend,
           ),
           content: Text(
-            AppLocalizations.of(context)!.unbanUserConfirmation(_userInfo!.username),
+            AppLocalizations.of(context)!.unsuspendUserConfirmation(_userInfo!.username),
           ),
           actions: [
             TextButton(
@@ -848,7 +848,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text(AppLocalizations.of(context)?.unban ?? 'Unban'),
+              child: Text(AppLocalizations.of(context)!.unsuspend),
             ),
           ],
         );
@@ -874,7 +874,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
             const SizedBox(width: DesignTokens.spacingM),
             Text(
-              AppLocalizations.of(context)?.unbanningUser ?? 'Unbanning user...',
+              AppLocalizations.of(context)!.unsuspendingUser,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onInverseSurface,
                   ),
@@ -911,7 +911,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ),
                   const SizedBox(width: DesignTokens.spacingM),
                   Text(
-                    AppLocalizations.of(context)?.userUnbannedSuccessfully ?? 'User unbanned successfully',
+                    AppLocalizations.of(context)!.userUnsuspended,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onInverseSurface,
                         ),
@@ -926,7 +926,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           await _refreshProfile();
         } else {
           final errorMessage =
-              (unbanResult.resultText != null && unbanResult.resultText!.isNotEmpty) ? unbanResult.resultText! : (AppLocalizations.of(context)?.failedToUnbanUser ?? 'Failed to unban user');
+              (unbanResult.resultText != null && unbanResult.resultText!.isNotEmpty) ? unbanResult.resultText! : AppLocalizations.of(context)!.failedToUnsuspendUser(AppLocalizations.of(context)!.anErrorOccurred);
           AppLogger.debug('Unban failed for user: ${_userInfo!.id}, error: $errorMessage');
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
@@ -969,7 +969,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 const SizedBox(width: DesignTokens.spacingM),
                 Expanded(
                   child: Text(
-                    AppLocalizations.of(context)!.failedToUnbanUser2(e.toString()),
+                    AppLocalizations.of(context)!.failedToUnsuspendUser(describeError(e, context: context)),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onErrorContainer,
                         ),

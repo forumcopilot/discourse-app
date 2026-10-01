@@ -89,7 +89,7 @@ Future<void> showDiscourseReportDialog(
 
   final messenger = ScaffoldMessenger.of(context);
   messenger.showSnackBar(
-    SnackBar(content: Text(AppLocalizations.of(context)!.submittingReport)),
+    SnackBar(content: Text(AppLocalizations.of(context)!.flaggingPost)),
   );
 
   final response = await proxy.flagPostAsync(
@@ -148,7 +148,7 @@ class _ReportDialogState extends State<_ReportDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.report),
+      title: Text(AppLocalizations.of(context)!.flagPost),
       content: SingleChildScrollView(
         child: RadioGroup<_FlagOption>(
           groupValue: _selected,

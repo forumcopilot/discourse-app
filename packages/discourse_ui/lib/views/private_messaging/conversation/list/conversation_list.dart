@@ -511,7 +511,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
       // silently ending pagination.
       throw Exception(conversationsData.resultText?.isNotEmpty == true
           ? conversationsData.resultText
-          : 'Failed to load more conversations');
+          : 'Failed to load more messages');
     }
 
     if (mounted) {

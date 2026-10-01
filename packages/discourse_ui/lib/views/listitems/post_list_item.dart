@@ -1182,7 +1182,7 @@ class _PostListItemState extends State<PostListItem> {
               Icon(Icons.flag,
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: DesignTokens.spacingM),
-              Text(AppLocalizations.of(context)?.report ?? 'Report'),
+              Text(AppLocalizations.of(context)!.flagAction),
             ],
           ),
         ),

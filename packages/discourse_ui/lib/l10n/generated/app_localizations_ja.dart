@@ -216,42 +216,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get markRead => '既読にする';
 
   @override
-  String get spamOrAdvertising => 'スパムまたは広告';
-
-  @override
-  String get otherPleaseSpecify => 'その他（指定してください）';
-
-  @override
   String get pleaseSpecifyReason => '理由を指定してください';
-
-  @override
-  String get banUser => 'ユーザーを禁止';
-
-  @override
-  String get unbanUser => 'ユーザーの禁止を解除';
-
-  @override
-  String pleaseSelectReasonForBanningUser(String username) {
-    return '$username を禁止する理由を選択してください';
-  }
-
-  @override
-  String get violationOfCommunityGuidelines => 'コミュニティガイドライン違反';
-
-  @override
-  String get harassmentOrAbusiveBehavior => '嫌がらせまたは虐待的行為';
-
-  @override
-  String get postingInappropriateContent => '不適切なコンテンツの投稿';
-
-  @override
-  String get accountCompromiseOrSecurityIssue => 'アカウントの侵害またはセキュリティ問題';
-
-  @override
-  String get enterReasonForBanningUser => 'このユーザーを禁止する理由を入力してください';
-
-  @override
-  String get banUntil => '禁止期限';
 
   @override
   String get selectDate => '日付を選択';
@@ -358,9 +323,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get areYouSureYouWantToLogout => 'ログアウトしてもよろしいですか？';
 
   @override
-  String get register => '登録';
-
-  @override
   String get signIn => 'ログイン';
 
   @override
@@ -455,24 +417,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get next => '次へ';
 
   @override
-  String get permanent => '永続的';
-
-  @override
   String get temporary => '一時的';
 
   @override
-  String setBanDurationFor(String username) {
-    return '$usernameの禁止期間を設定';
-  }
-
-  @override
-  String get pleaseSelectEndDateForTemporaryBan => '一時的な禁止の終了日を選択してください';
-
-  @override
   String get back => '戻る';
-
-  @override
-  String get unban => '禁止を解除';
 
   @override
   String get confirm => '確認';
@@ -660,18 +608,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get pleaseSelectEndDate => '終了日を選択してください';
 
   @override
-  String get userBannedSuccessfully => 'ユーザーが正常に禁止されました';
-
-  @override
-  String get failedToBanUser => 'ユーザーの禁止に失敗しました';
-
-  @override
-  String get userUnbannedSuccessfully => 'ユーザーの禁止が正常に解除されました';
-
-  @override
-  String get failedToUnbanUser => 'ユーザーの禁止解除に失敗しました';
-
-  @override
   String get spamCleanUser => 'ユーザーのスパムをクリーンアップ';
 
   @override
@@ -745,15 +681,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mentionUser => 'ユーザーをメンション';
-
-  @override
-  String get submittingReport => 'レポート送信中...';
-
-  @override
-  String get banningUser => 'ユーザーを禁止中...';
-
-  @override
-  String get unbanningUser => 'ユーザーの禁止解除中...';
 
   @override
   String get cleaningSpam => 'スパムをクリーンアップ中...';
@@ -835,9 +762,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get edit => '編集';
-
-  @override
-  String get report => '報告';
 
   @override
   String get remove => '削除';
@@ -1413,9 +1337,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get pleaseLoginToViewUserProfiles => 'ユーザープロフィールを見るにはログインしてください。';
 
   @override
-  String get announcement => 'お知らせ';
-
-  @override
   String get solved => '解決済み';
 
   @override
@@ -1423,9 +1344,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get pinned => '固定';
-
-  @override
-  String get subscribedLabel => '購読中';
 
   @override
   String get locked => 'ロック中';
@@ -1437,9 +1355,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String errorLoadingContent(Object error) {
     return 'コンテンツの読み込みエラー: $error';
   }
-
-  @override
-  String get noPermissionToViewSubforum => 'このサブフォーラムのトピックを閲覧する権限がありません。';
 
   @override
   String get noDiscussionsYet => 'まだ議論はありません。';
@@ -1837,13 +1752,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get initializingForum => 'フォーラムを初期化しています…';
 
   @override
-  String get unableToLoadForums => 'フォーラムを読み込めません';
-
-  @override
-  String get noForumsToDisplayExplanation =>
-      '表示するフォーラムがありません。権限またはフォーラムの構成が原因の可能性があります。';
-
-  @override
   String get subscribedForums => '購読中のフォーラム';
 
   @override
@@ -1854,7 +1762,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get noNewNotificationsExplanation =>
-      '新しい通知はありません。フォロー中のトピックの更新は後で確認してください。';
+      'あなたのトピックや投稿に対する返信があったとき、誰かがあなたを @メンションまたは引用したとき、あなたがウォッチ中のトピックに返信があったときなど、あなたに直接関連するアクティビティはこのパネルで通知されます。あなたがしばらくログインしていない場合は、メールにも通知が送信されます。';
 
   @override
   String noTagsMatch(Object filter) {
@@ -1864,21 +1772,6 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String noTopicsTagged(Object tag) {
     return '「$tag」タグのトピックはありません';
-  }
-
-  @override
-  String failedToBanUser2(Object error) {
-    return 'ユーザーを利用停止にできませんでした: $error';
-  }
-
-  @override
-  String unbanUserConfirmation(Object username) {
-    return '$username の利用停止を解除しますか？';
-  }
-
-  @override
-  String failedToUnbanUser2(Object error) {
-    return '利用停止を解除できませんでした: $error';
   }
 
   @override
@@ -1981,9 +1874,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get failedToPostReplyPleaseTryAgain => '返信を投稿できませんでした。もう一度お試しください。';
-
-  @override
-  String get pleaseWaitForTheThreadToLoad => 'トピックの読み込みが終わるまでお待ちください';
 
   @override
   String get failedToUpdatePostPleaseTryAgain => '投稿を更新できませんでした。もう一度お試しください。';
@@ -3722,4 +3612,94 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get topicStatusDeletedHelp => 'このトピックは削除され、他のユーザーには表示されません';
+
+  @override
+  String get flagAction => '通報';
+
+  @override
+  String get flagPost => '投稿を通報';
+
+  @override
+  String get signUp => 'アカウントを登録';
+
+  @override
+  String get suspendUser => 'ユーザーを凍結';
+
+  @override
+  String get unsuspend => '凍結を解除';
+
+  @override
+  String get suspendUntil => '次の期間までユーザーを凍結する';
+
+  @override
+  String get suspendForever => '永久に凍結する';
+
+  @override
+  String failedToSuspendUser(String error) {
+    return 'このユーザーを凍結中にエラーが発生しました: $error';
+  }
+
+  @override
+  String failedToUnsuspendUser(String error) {
+    return 'このユーザーの凍結を解除中にエラーが発生しました: $error';
+  }
+
+  @override
+  String get suspendReasonNotListening => 'スタッフのフィードバックを聞き入れないため';
+
+  @override
+  String get suspendReasonStaffTime => 'スタッフの時間を不当に消耗したため';
+
+  @override
+  String get suspendReasonCombative => '好戦的過ぎるため';
+
+  @override
+  String get suspendReasonWrongPlace => '場所が誤っているため';
+
+  @override
+  String get suspendReasonNoPurpose => 'コミュニティー内で異議を唱える以外に建設的な目的がないため';
+
+  @override
+  String get suspendReasonCustom => 'カスタム…';
+
+  @override
+  String get suspendReasonQuestion =>
+      'なぜ凍結していますか？このテキストはユーザーがログインしようとするときに表示されます。簡潔に説明してください。';
+
+  @override
+  String get closedLabel => 'クローズ';
+
+  @override
+  String get flaggingPost => '投稿を通報しています…';
+
+  @override
+  String setSuspensionFor(String username) {
+    return '$username をどのくらいの期間凍結しますか？';
+  }
+
+  @override
+  String get pleaseSelectSuspensionEndDate => '凍結の終了日時を選択してください';
+
+  @override
+  String get suspendingUser => 'ユーザーを凍結しています…';
+
+  @override
+  String get unsuspendingUser => 'ユーザーの凍結を解除しています…';
+
+  @override
+  String get userSuspended => 'ユーザーを凍結しました';
+
+  @override
+  String get userUnsuspended => 'ユーザーの凍結を解除しました';
+
+  @override
+  String unsuspendUserConfirmation(String username) {
+    return '$username の凍結を解除しますか？再びログインできるようになります。';
+  }
+
+  @override
+  String get noCategoriesToDisplay => '表示するカテゴリはありません。';
+
+  @override
+  String get noPermissionToViewCategory => 'このカテゴリのトピックを表示する権限がありません。';
 }

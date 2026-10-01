@@ -337,7 +337,8 @@ class _ForumTopicListState extends State<ForumTopicList> {
             showCategory: false,
             siteContext: widget.siteContext,
             topic: topic,
-            topicIcon: announcement ? Icons.campaign_outlined : null,
+            // Web's thumbtack: Discourse has no announcements, only pins.
+            topicIcon: announcement ? Icons.push_pin_outlined : null,
             onTap: () => _openTopic(topic, announcement: announcement),
           );
       final rows = <Widget>[
@@ -357,7 +358,7 @@ class _ForumTopicListState extends State<ForumTopicList> {
                   const SizedBox(width: DesignTokens.spacingM),
                   Expanded(
                     child: Text(
-                      AppLocalizations.of(context)!.noPermissionToViewSubforum,
+                      AppLocalizations.of(context)!.noPermissionToViewCategory,
                       style: textTheme.bodyMedium
                           ?.copyWith(color: colorScheme.onSurfaceVariant),
                     ),

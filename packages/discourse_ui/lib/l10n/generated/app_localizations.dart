@@ -494,77 +494,11 @@ abstract class AppLocalizations {
   /// **'Mark Read'**
   String get markRead;
 
-  /// No description provided for @spamOrAdvertising.
-  ///
-  /// In en, this message translates to:
-  /// **'Spam or advertising'**
-  String get spamOrAdvertising;
-
-  /// No description provided for @otherPleaseSpecify.
-  ///
-  /// In en, this message translates to:
-  /// **'Other (please specify)'**
-  String get otherPleaseSpecify;
-
   /// No description provided for @pleaseSpecifyReason.
   ///
   /// In en, this message translates to:
   /// **'Please specify the reason'**
   String get pleaseSpecifyReason;
-
-  /// Button to ban a user
-  ///
-  /// In en, this message translates to:
-  /// **'Ban User'**
-  String get banUser;
-
-  /// No description provided for @unbanUser.
-  ///
-  /// In en, this message translates to:
-  /// **'Unban User'**
-  String get unbanUser;
-
-  /// Message asking to select reason for banning user
-  ///
-  /// In en, this message translates to:
-  /// **'Please select a reason for banning {username}'**
-  String pleaseSelectReasonForBanningUser(String username);
-
-  /// No description provided for @violationOfCommunityGuidelines.
-  ///
-  /// In en, this message translates to:
-  /// **'Violation of community guidelines'**
-  String get violationOfCommunityGuidelines;
-
-  /// No description provided for @harassmentOrAbusiveBehavior.
-  ///
-  /// In en, this message translates to:
-  /// **'Harassment or abusive behavior'**
-  String get harassmentOrAbusiveBehavior;
-
-  /// No description provided for @postingInappropriateContent.
-  ///
-  /// In en, this message translates to:
-  /// **'Posting inappropriate content'**
-  String get postingInappropriateContent;
-
-  /// No description provided for @accountCompromiseOrSecurityIssue.
-  ///
-  /// In en, this message translates to:
-  /// **'Account compromise or security issue'**
-  String get accountCompromiseOrSecurityIssue;
-
-  /// No description provided for @enterReasonForBanningUser.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the reason for banning this user'**
-  String get enterReasonForBanningUser;
-
-  /// No description provided for @banUntil.
-  ///
-  /// In en, this message translates to:
-  /// **'Ban until'**
-  String get banUntil;
 
   /// No description provided for @selectDate.
   ///
@@ -752,12 +686,6 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to logout?'**
   String get areYouSureYouWantToLogout;
 
-  /// No description provided for @register.
-  ///
-  /// In en, this message translates to:
-  /// **'Register'**
-  String get register;
-
   /// No description provided for @signIn.
   ///
   /// In en, this message translates to:
@@ -926,41 +854,17 @@ abstract class AppLocalizations {
   /// **'Next'**
   String get next;
 
-  /// No description provided for @permanent.
-  ///
-  /// In en, this message translates to:
-  /// **'Permanent'**
-  String get permanent;
-
   /// No description provided for @temporary.
   ///
   /// In en, this message translates to:
   /// **'Temporary'**
   String get temporary;
 
-  /// Message asking to set ban duration
-  ///
-  /// In en, this message translates to:
-  /// **'Set the ban duration for {username}'**
-  String setBanDurationFor(String username);
-
-  /// No description provided for @pleaseSelectEndDateForTemporaryBan.
-  ///
-  /// In en, this message translates to:
-  /// **'Please select an end date for temporary ban'**
-  String get pleaseSelectEndDateForTemporaryBan;
-
   /// No description provided for @back.
   ///
   /// In en, this message translates to:
   /// **'Back'**
   String get back;
-
-  /// No description provided for @unban.
-  ///
-  /// In en, this message translates to:
-  /// **'Unban'**
-  String get unban;
 
   /// No description provided for @confirm.
   ///
@@ -1292,30 +1196,6 @@ abstract class AppLocalizations {
   /// **'Please select an end date'**
   String get pleaseSelectEndDate;
 
-  /// Success message after banning a user
-  ///
-  /// In en, this message translates to:
-  /// **'User banned successfully'**
-  String get userBannedSuccessfully;
-
-  /// Error message when banning user fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to ban user'**
-  String get failedToBanUser;
-
-  /// Success message after unbanning a user
-  ///
-  /// In en, this message translates to:
-  /// **'User unbanned successfully'**
-  String get userUnbannedSuccessfully;
-
-  /// Error message when unbanning user fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to unban user'**
-  String get failedToUnbanUser;
-
   /// Title for spam clean user dialog
   ///
   /// In en, this message translates to:
@@ -1460,24 +1340,6 @@ abstract class AppLocalizations {
   /// **'Mention User'**
   String get mentionUser;
 
-  /// Status message when submitting report
-  ///
-  /// In en, this message translates to:
-  /// **'Submitting report...'**
-  String get submittingReport;
-
-  /// Status message when banning user
-  ///
-  /// In en, this message translates to:
-  /// **'Banning user...'**
-  String get banningUser;
-
-  /// Status message when unbanning user
-  ///
-  /// In en, this message translates to:
-  /// **'Unbanning user...'**
-  String get unbanningUser;
-
   /// Status message when cleaning spam
   ///
   /// In en, this message translates to:
@@ -1609,12 +1471,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit'**
   String get edit;
-
-  /// Button text to report
-  ///
-  /// In en, this message translates to:
-  /// **'Report'**
-  String get report;
 
   /// Button text to remove
   ///
@@ -2564,12 +2420,6 @@ abstract class AppLocalizations {
   /// **'Please login to view user profiles.'**
   String get pleaseLoginToViewUserProfiles;
 
-  /// UI text: Announcement
-  ///
-  /// In en, this message translates to:
-  /// **'Announcement'**
-  String get announcement;
-
   /// UI text: Solved
   ///
   /// In en, this message translates to:
@@ -2588,12 +2438,6 @@ abstract class AppLocalizations {
   /// **'Pinned'**
   String get pinned;
 
-  /// UI text: Subscribed
-  ///
-  /// In en, this message translates to:
-  /// **'Subscribed'**
-  String get subscribedLabel;
-
   /// UI text: Locked
   ///
   /// In en, this message translates to:
@@ -2611,12 +2455,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error loading content: {error}'**
   String errorLoadingContent(Object error);
-
-  /// UI text: You do not have permission to view topics in this subforum.
-  ///
-  /// In en, this message translates to:
-  /// **'You do not have permission to view topics in this subforum.'**
-  String get noPermissionToViewSubforum;
 
   /// UI text: No discussions yet.
   ///
@@ -3314,18 +3152,6 @@ abstract class AppLocalizations {
   /// **'Initializing forum…'**
   String get initializingForum;
 
-  /// UI text: Unable to Load Forums
-  ///
-  /// In en, this message translates to:
-  /// **'Unable to Load Forums'**
-  String get unableToLoadForums;
-
-  /// UI text: There are no forums to display. This might be due to permiss
-  ///
-  /// In en, this message translates to:
-  /// **'There are no forums to display. This might be due to permissions or the forum structure.'**
-  String get noForumsToDisplayExplanation;
-
   /// UI text: Subscribed Forums
   ///
   /// In en, this message translates to:
@@ -3347,7 +3173,7 @@ abstract class AppLocalizations {
   /// UI text: You have no new notifications. Check back later for updates
   ///
   /// In en, this message translates to:
-  /// **'You have no new notifications. Check back later for updates on topics you\'re following.'**
+  /// **'You will be notified in this panel about activity directly relevant to you, including replies to your topics and posts, when someone @mentions you or quotes you, and replies to topics you are watching. Notifications will also be sent to your email when you haven’t logged in for a while.'**
   String get noNewNotificationsExplanation;
 
   /// UI text: No tags match "{text}".
@@ -3361,24 +3187,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No topics tagged \"{tag}\"'**
   String noTopicsTagged(Object tag);
-
-  /// UI text: Failed to ban user: {toString}
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to ban user: {error}'**
-  String failedToBanUser2(Object error);
-
-  /// UI text: Are you sure you want to unban {username}?
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to unban {username}?'**
-  String unbanUserConfirmation(Object username);
-
-  /// UI text: Failed to unban user: {toString}
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to unban user: {error}'**
-  String failedToUnbanUser2(Object error);
 
   /// UI text: Delete posts, profile posts, and comments
   ///
@@ -3531,12 +3339,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to post reply. Please try again.'**
   String get failedToPostReplyPleaseTryAgain;
-
-  /// UI text: Please wait for the thread to load
-  ///
-  /// In en, this message translates to:
-  /// **'Please wait for the thread to load'**
-  String get pleaseWaitForTheThreadToLoad;
 
   /// UI text: Failed to update post. Please try again.
   ///
@@ -6291,6 +6093,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This topic is deleted and hidden from other users'**
   String get topicStatusDeletedHelp;
+
+  /// Discourse post.controls.flag_action: the post menu item that opens the flag dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Flag'**
+  String get flagAction;
+
+  /// Discourse flagging.action: title of the flag dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Flag Post'**
+  String get flagPost;
+
+  /// Discourse sign_up: the button that opens the forum sign-up page
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get signUp;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend User'**
+  String get suspendUser;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Unsuspend'**
+  String get unsuspend;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend user until'**
+  String get suspendUntil;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend forever'**
+  String get suspendForever;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong suspending this user: {error}'**
+  String failedToSuspendUser(String error);
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong unsuspending this user: {error}'**
+  String failedToUnsuspendUser(String error);
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Would not listen to staff feedback'**
+  String get suspendReasonNotListening;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Consumed disproportionate amounts of staff time'**
+  String get suspendReasonStaffTime;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Too combative'**
+  String get suspendReasonCombative;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'In the wrong place'**
+  String get suspendReasonWrongPlace;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'No constructive purpose to their actions other than creating dissent within the community'**
+  String get suspendReasonNoPurpose;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Custom…'**
+  String get suspendReasonCustom;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Why are you suspending? This text will be shown to the user when they try to log in. Keep it short.'**
+  String get suspendReasonQuestion;
+
+  /// Badge on a closed topic in topic lists
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get closedLabel;
+
+  /// Snackbar while a flag is being sent
+  ///
+  /// In en, this message translates to:
+  /// **'Flagging post…'**
+  String get flaggingPost;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'How long should {username} be suspended?'**
+  String setSuspensionFor(String username);
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Choose when the suspension ends'**
+  String get pleaseSelectSuspensionEndDate;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Suspending user…'**
+  String get suspendingUser;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Unsuspending user…'**
+  String get unsuspendingUser;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'User suspended'**
+  String get userSuspended;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'User unsuspended'**
+  String get userUnsuspended;
+
+  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
+  ///
+  /// In en, this message translates to:
+  /// **'Unsuspend {username}? They will be able to log in again.'**
+  String unsuspendUserConfirmation(String username);
+
+  /// Empty state of the Categories view
+  ///
+  /// In en, this message translates to:
+  /// **'There are no categories to display.'**
+  String get noCategoriesToDisplay;
+
+  /// Notice on a category whose topics the reader may not see
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to view topics in this category.'**
+  String get noPermissionToViewCategory;
 }
 
 class _AppLocalizationsDelegate

@@ -111,7 +111,7 @@ class CategoriesListState extends State<CategoriesList> {
     if (_error == null || (_forums?.isNotEmpty ?? false)) return null;
     return EmptyStateView.error(
       icon: Icons.error_outline_rounded,
-      message: AppLocalizations.of(context)!.unableToLoadForums,
+      message: AppLocalizations.of(context)!.couldNotLoadCategories,
       hint: describeError(_error, context: context),
       onRetry: refreshList,
     );
@@ -119,7 +119,7 @@ class CategoriesListState extends State<CategoriesList> {
 
   Widget buildEmptyState() => EmptyStateView(
         icon: Icons.forum_outlined,
-        message: AppLocalizations.of(context)!.noForumsToDisplayExplanation,
+        message: AppLocalizations.of(context)!.noCategoriesToDisplay,
       );
 
   /// The rows, or an empty list while loading or when there are none.

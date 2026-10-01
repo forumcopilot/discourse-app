@@ -264,14 +264,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           ),
         ),
         _EnumTile(
-          title: 'When I reply to a topic',
-          subtitle: 'Discourse will set this notification level on '
-              'topics you reply to',
+          // Discourse's words (user.notification_level_when_replying).
+          title: 'When posting',
+          subtitle: 'What happens to a topic you reply to',
           value: prefs.notificationLevelWhenReplying,
           options: const [
-            _EnumOption(value: 3, label: 'Watching (all new posts)'),
-            _EnumOption(value: 2, label: 'Tracking (counts in unread)'),
-            _EnumOption(value: 1, label: 'Normal (no auto-follow)'),
+            _EnumOption(value: 3, label: 'Watch topic'),
+            _EnumOption(value: 2, label: 'Track topic'),
+            _EnumOption(value: 1, label: 'Do nothing'),
           ],
           onChanged: (v) => _save(
             prefs.copyWith(notificationLevelWhenReplying: v),

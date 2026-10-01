@@ -213,42 +213,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get markRead => '읽음으로 표시';
 
   @override
-  String get spamOrAdvertising => '스팸 또는 광고';
-
-  @override
-  String get otherPleaseSpecify => '기타 (지정해주세요)';
-
-  @override
   String get pleaseSpecifyReason => '사유를 지정하세요';
-
-  @override
-  String get banUser => '사용자 차단';
-
-  @override
-  String get unbanUser => '사용자 차단 해제';
-
-  @override
-  String pleaseSelectReasonForBanningUser(String username) {
-    return '$username님을 차단하는 사유를 선택하세요';
-  }
-
-  @override
-  String get violationOfCommunityGuidelines => '커뮤니티 가이드라인 위반';
-
-  @override
-  String get harassmentOrAbusiveBehavior => '괴롭힘 또는 학대 행위';
-
-  @override
-  String get postingInappropriateContent => '부적절한 콘텐츠 게시';
-
-  @override
-  String get accountCompromiseOrSecurityIssue => '계정 손상 또는 보안 문제';
-
-  @override
-  String get enterReasonForBanningUser => '이 사용자를 차단하는 사유를 입력하세요';
-
-  @override
-  String get banUntil => '차단 기간';
 
   @override
   String get selectDate => '날짜 선택';
@@ -355,9 +320,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get areYouSureYouWantToLogout => '로그아웃하시겠습니까?';
 
   @override
-  String get register => '등록';
-
-  @override
   String get signIn => '로그인';
 
   @override
@@ -452,24 +414,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get next => '다음';
 
   @override
-  String get permanent => '영구';
-
-  @override
   String get temporary => '임시';
 
   @override
-  String setBanDurationFor(String username) {
-    return '$username의 차단 기간 설정';
-  }
-
-  @override
-  String get pleaseSelectEndDateForTemporaryBan => '임시 차단의 종료일을 선택하세요';
-
-  @override
   String get back => '뒤로';
-
-  @override
-  String get unban => '차단 해제';
 
   @override
   String get confirm => '확인';
@@ -656,18 +604,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get pleaseSelectEndDate => '종료일을 선택하세요';
 
   @override
-  String get userBannedSuccessfully => '사용자가 성공적으로 차단되었습니다';
-
-  @override
-  String get failedToBanUser => '사용자 차단 실패';
-
-  @override
-  String get userUnbannedSuccessfully => '사용자 차단 해제 성공';
-
-  @override
-  String get failedToUnbanUser => '사용자 차단 해제 실패';
-
-  @override
   String get spamCleanUser => '사용자 스팸 정리';
 
   @override
@@ -741,15 +677,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mentionUser => '사용자 멘션';
-
-  @override
-  String get submittingReport => '신고 제출 중...';
-
-  @override
-  String get banningUser => '사용자 차단 중...';
-
-  @override
-  String get unbanningUser => '사용자 차단 해제 중...';
 
   @override
   String get cleaningSpam => '스팸 정리 중...';
@@ -830,9 +757,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get edit => '편집';
-
-  @override
-  String get report => '신고';
 
   @override
   String get remove => '제거';
@@ -1408,9 +1332,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get pleaseLoginToViewUserProfiles => '사용자 프로필을 보려면 로그인하세요.';
 
   @override
-  String get announcement => '공지';
-
-  @override
   String get solved => '해결됨';
 
   @override
@@ -1418,9 +1339,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get pinned => '고정됨';
-
-  @override
-  String get subscribedLabel => '구독 중';
 
   @override
   String get locked => '잠김';
@@ -1432,9 +1350,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String errorLoadingContent(Object error) {
     return '콘텐츠 불러오기 오류: $error';
   }
-
-  @override
-  String get noPermissionToViewSubforum => '이 하위 포럼의 주제를 볼 권한이 없습니다.';
 
   @override
   String get noDiscussionsYet => '아직 토론이 없습니다.';
@@ -1832,13 +1747,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get initializingForum => '포럼 초기화 중…';
 
   @override
-  String get unableToLoadForums => '포럼을 불러올 수 없습니다';
-
-  @override
-  String get noForumsToDisplayExplanation =>
-      '표시할 포럼이 없습니다. 권한이나 포럼 구조 때문일 수 있습니다.';
-
-  @override
   String get subscribedForums => '구독한 포럼';
 
   @override
@@ -1849,7 +1757,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get noNewNotificationsExplanation =>
-      '새 알림이 없습니다. 팔로우 중인 주제의 업데이트는 나중에 확인하세요.';
+      '이 패널에서는 나와 직접적으로 관련된 활동에 대한 알림을 받습니다. 예를 들면 내 글 및 게시물에 대한 댓글, 누군가 나를 @언급 또는 인용할 때, 내가 구독하는 글에 댓글을 달 때입니다. 한동안 로그인하지 않은 경우에도 이메일로 알림이 전송됩니다.';
 
   @override
   String noTagsMatch(Object filter) {
@@ -1859,21 +1767,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String noTopicsTagged(Object tag) {
     return '\"$tag\" 태그가 있는 주제가 없습니다';
-  }
-
-  @override
-  String failedToBanUser2(Object error) {
-    return '사용자를 차단하지 못했습니다: $error';
-  }
-
-  @override
-  String unbanUserConfirmation(Object username) {
-    return '$username 차단을 해제할까요?';
-  }
-
-  @override
-  String failedToUnbanUser2(Object error) {
-    return '차단을 해제하지 못했습니다: $error';
   }
 
   @override
@@ -1975,9 +1868,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get failedToPostReplyPleaseTryAgain => '답글을 게시하지 못했습니다. 다시 시도하세요.';
-
-  @override
-  String get pleaseWaitForTheThreadToLoad => '주제가 로드될 때까지 기다려 주세요';
 
   @override
   String get failedToUpdatePostPleaseTryAgain => '게시물을 수정하지 못했습니다. 다시 시도하세요.';
@@ -3719,4 +3609,94 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get topicStatusDeletedHelp => '이 주제는 삭제되어 다른 사용자에게 보이지 않습니다';
+
+  @override
+  String get flagAction => '신고';
+
+  @override
+  String get flagPost => '게시물 신고';
+
+  @override
+  String get signUp => '회원가입';
+
+  @override
+  String get suspendUser => '사용자 정지';
+
+  @override
+  String get unsuspend => '정지 해제';
+
+  @override
+  String get suspendUntil => '사용자 정지 기간';
+
+  @override
+  String get suspendForever => '영구 정지';
+
+  @override
+  String failedToSuspendUser(String error) {
+    return '이 사용자를 정지하는 중에 오류 발생: $error';
+  }
+
+  @override
+  String failedToUnsuspendUser(String error) {
+    return '이 사용자를 정지 해제하는 중에 오류 발생: $error';
+  }
+
+  @override
+  String get suspendReasonNotListening => '운영진의 피드백을 따르지 않음';
+
+  @override
+  String get suspendReasonStaffTime => '운영진의 시간을 과도하게 빼앗음';
+
+  @override
+  String get suspendReasonCombative => '분란 조장';
+
+  @override
+  String get suspendReasonWrongPlace => '이곳과 맞지 않음';
+
+  @override
+  String get suspendReasonNoPurpose => '커뮤니티 내에서 반대하는 것 외에는 건설적인 목적이 없음';
+
+  @override
+  String get suspendReasonCustom => '직접 입력…';
+
+  @override
+  String get suspendReasonQuestion =>
+      '정지 이유는 무엇인가요? 이 텍스트는 해당 사용자가 로그인할 때 보입니다. 짧게 적어주세요.';
+
+  @override
+  String get closedLabel => '잠김';
+
+  @override
+  String get flaggingPost => '게시물 신고 중…';
+
+  @override
+  String setSuspensionFor(String username) {
+    return '$username 님을 얼마 동안 정지할까요?';
+  }
+
+  @override
+  String get pleaseSelectSuspensionEndDate => '정지가 끝나는 날짜를 선택하세요';
+
+  @override
+  String get suspendingUser => '사용자를 정지하는 중…';
+
+  @override
+  String get unsuspendingUser => '사용자 정지를 해제하는 중…';
+
+  @override
+  String get userSuspended => '사용자를 정지했습니다';
+
+  @override
+  String get userUnsuspended => '사용자 정지를 해제했습니다';
+
+  @override
+  String unsuspendUserConfirmation(String username) {
+    return '$username 님의 정지를 해제할까요? 다시 로그인할 수 있게 됩니다.';
+  }
+
+  @override
+  String get noCategoriesToDisplay => '표시할 카테고리가 없습니다.';
+
+  @override
+  String get noPermissionToViewCategory => '이 카테고리의 글을 볼 권한이 없습니다.';
 }

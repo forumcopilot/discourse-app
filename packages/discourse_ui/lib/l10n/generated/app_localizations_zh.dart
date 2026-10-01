@@ -207,42 +207,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get markRead => '标记为已读';
 
   @override
-  String get spamOrAdvertising => '垃圾邮件或广告';
-
-  @override
-  String get otherPleaseSpecify => '其他（请说明）';
-
-  @override
   String get pleaseSpecifyReason => '请说明原因';
-
-  @override
-  String get banUser => '封禁用户';
-
-  @override
-  String get unbanUser => '解除封禁';
-
-  @override
-  String pleaseSelectReasonForBanningUser(String username) {
-    return '请选择封禁 $username 的原因';
-  }
-
-  @override
-  String get violationOfCommunityGuidelines => '违反社区准则';
-
-  @override
-  String get harassmentOrAbusiveBehavior => '骚扰或虐待行为';
-
-  @override
-  String get postingInappropriateContent => '发布不当内容';
-
-  @override
-  String get accountCompromiseOrSecurityIssue => '账户泄露或安全问题';
-
-  @override
-  String get enterReasonForBanningUser => '输入封禁此用户的原因';
-
-  @override
-  String get banUntil => '封禁至';
 
   @override
   String get selectDate => '选择日期';
@@ -349,9 +314,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get areYouSureYouWantToLogout => '您确定要退出登录吗？';
 
   @override
-  String get register => '注册';
-
-  @override
   String get signIn => '登录';
 
   @override
@@ -446,24 +408,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get next => '下一步';
 
   @override
-  String get permanent => '永久';
-
-  @override
   String get temporary => '临时';
 
   @override
-  String setBanDurationFor(String username) {
-    return '设置 $username 的封禁期限';
-  }
-
-  @override
-  String get pleaseSelectEndDateForTemporaryBan => '请选择临时封禁的结束日期';
-
-  @override
   String get back => '返回';
-
-  @override
-  String get unban => '解除封禁';
 
   @override
   String get confirm => '确认';
@@ -649,18 +597,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pleaseSelectEndDate => '请选择结束日期';
 
   @override
-  String get userBannedSuccessfully => '用户封禁成功';
-
-  @override
-  String get failedToBanUser => '封禁用户失败';
-
-  @override
-  String get userUnbannedSuccessfully => '用户解封成功';
-
-  @override
-  String get failedToUnbanUser => '解封用户失败';
-
-  @override
   String get spamCleanUser => '清理用户垃圾信息';
 
   @override
@@ -733,15 +669,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mentionUser => '提及用户';
-
-  @override
-  String get submittingReport => '提交报告中...';
-
-  @override
-  String get banningUser => '封禁用户中...';
-
-  @override
-  String get unbanningUser => '解封用户中...';
 
   @override
   String get cleaningSpam => '清理垃圾信息中...';
@@ -822,9 +749,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get edit => '编辑';
-
-  @override
-  String get report => '举报';
 
   @override
   String get remove => '删除';
@@ -1398,9 +1322,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pleaseLoginToViewUserProfiles => '请登录后查看用户资料。';
 
   @override
-  String get announcement => '公告';
-
-  @override
   String get solved => '已解决';
 
   @override
@@ -1408,9 +1329,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pinned => '置顶';
-
-  @override
-  String get subscribedLabel => '已订阅';
 
   @override
   String get locked => '已锁定';
@@ -1422,9 +1340,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String errorLoadingContent(Object error) {
     return '加载内容出错：$error';
   }
-
-  @override
-  String get noPermissionToViewSubforum => '你没有权限查看此子论坛中的主题。';
 
   @override
   String get noDiscussionsYet => '还没有讨论。';
@@ -1815,12 +1730,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get initializingForum => '正在初始化论坛…';
 
   @override
-  String get unableToLoadForums => '无法加载论坛';
-
-  @override
-  String get noForumsToDisplayExplanation => '没有可显示的论坛。可能是权限或论坛结构所致。';
-
-  @override
   String get subscribedForums => '已订阅的论坛';
 
   @override
@@ -1830,7 +1739,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pullDownToRefresh => '下拉刷新';
 
   @override
-  String get noNewNotificationsExplanation => '没有新通知。稍后再来查看你关注主题的更新。';
+  String get noNewNotificationsExplanation =>
+      '您将直接在此面板上收到与您相关的活动通知，包括对您的话题和帖子的回复，以及当有人提及 (@) 您或引用您以及回复您关注的话题时。当您有一段时间没有登录时，通知还将发送到您的电子邮件。';
 
   @override
   String noTagsMatch(Object filter) {
@@ -1840,21 +1750,6 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String noTopicsTagged(Object tag) {
     return '没有带“$tag”标签的主题';
-  }
-
-  @override
-  String failedToBanUser2(Object error) {
-    return '无法封禁用户：$error';
-  }
-
-  @override
-  String unbanUserConfirmation(Object username) {
-    return '确定要解封 $username 吗？';
-  }
-
-  @override
-  String failedToUnbanUser2(Object error) {
-    return '无法解封用户：$error';
   }
 
   @override
@@ -1953,9 +1848,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get failedToPostReplyPleaseTryAgain => '回复发布失败。请重试。';
-
-  @override
-  String get pleaseWaitForTheThreadToLoad => '请等待主题加载完成';
 
   @override
   String get failedToUpdatePostPleaseTryAgain => '帖子更新失败。请重试。';
@@ -3669,4 +3561,93 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get topicStatusDeletedHelp => '此主题已删除并对其他用户隐藏';
+
+  @override
+  String get flagAction => '举报';
+
+  @override
+  String get flagPost => '举报帖子';
+
+  @override
+  String get signUp => '注册';
+
+  @override
+  String get suspendUser => '封禁用户';
+
+  @override
+  String get unsuspend => '取消封禁';
+
+  @override
+  String get suspendUntil => '将用户封禁至';
+
+  @override
+  String get suspendForever => '永久封禁';
+
+  @override
+  String failedToSuspendUser(String error) {
+    return '封禁此用户时出错：$error';
+  }
+
+  @override
+  String failedToUnsuspendUser(String error) {
+    return '取消封禁此用户时出错：$error';
+  }
+
+  @override
+  String get suspendReasonNotListening => '不听从管理人员反馈';
+
+  @override
+  String get suspendReasonStaffTime => '消耗了过多的管理人员时间';
+
+  @override
+  String get suspendReasonCombative => '好斗';
+
+  @override
+  String get suspendReasonWrongPlace => '在错误的地方';
+
+  @override
+  String get suspendReasonNoPurpose => '除了在社区内引起异议外，该用户的行动没有任何建设性的目的';
+
+  @override
+  String get suspendReasonCustom => '自定义…';
+
+  @override
+  String get suspendReasonQuestion => '您为什么封禁该用户？当用户尝试登录时将看到此文本。尽量简洁。';
+
+  @override
+  String get closedLabel => '已关闭';
+
+  @override
+  String get flaggingPost => '正在举报帖子…';
+
+  @override
+  String setSuspensionFor(String username) {
+    return '要封禁 $username 多久？';
+  }
+
+  @override
+  String get pleaseSelectSuspensionEndDate => '请选择封禁结束时间';
+
+  @override
+  String get suspendingUser => '正在封禁用户…';
+
+  @override
+  String get unsuspendingUser => '正在取消封禁用户…';
+
+  @override
+  String get userSuspended => '已封禁用户';
+
+  @override
+  String get userUnsuspended => '已取消封禁用户';
+
+  @override
+  String unsuspendUserConfirmation(String username) {
+    return '取消封禁 $username？该用户将能再次登录。';
+  }
+
+  @override
+  String get noCategoriesToDisplay => '没有可显示的类别。';
+
+  @override
+  String get noPermissionToViewCategory => '您无权查看此类别中的话题。';
 }

@@ -227,45 +227,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get markRead => 'Als gelezen markeren';
 
   @override
-  String get spamOrAdvertising => 'Spam of reclame';
-
-  @override
-  String get otherPleaseSpecify => 'Anders (geef op)';
-
-  @override
   String get pleaseSpecifyReason => 'Geef de reden op';
-
-  @override
-  String get banUser => 'Gebruiker blokkeren';
-
-  @override
-  String get unbanUser => 'Blokkering opheffen';
-
-  @override
-  String pleaseSelectReasonForBanningUser(String username) {
-    return 'Selecteer een reden voor het blokkeren van $username';
-  }
-
-  @override
-  String get violationOfCommunityGuidelines =>
-      'Overtreding van de communityrichtlijnen';
-
-  @override
-  String get harassmentOrAbusiveBehavior => 'Intimidatie of misbruik';
-
-  @override
-  String get postingInappropriateContent => 'Plaatsen van ongepaste inhoud';
-
-  @override
-  String get accountCompromiseOrSecurityIssue =>
-      'Accountcompromittering of beveiligingsprobleem';
-
-  @override
-  String get enterReasonForBanningUser =>
-      'Voer de reden voor het blokkeren van deze gebruiker in';
-
-  @override
-  String get banUntil => 'Blokkeren tot';
 
   @override
   String get selectDate => 'Selecteer datum';
@@ -373,9 +335,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get areYouSureYouWantToLogout => 'Weet u zeker dat u wilt uitloggen?';
 
   @override
-  String get register => 'Registreren';
-
-  @override
   String get signIn => 'Inloggen';
 
   @override
@@ -472,25 +431,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get next => 'Volgende';
 
   @override
-  String get permanent => 'Permanent';
-
-  @override
   String get temporary => 'Tijdelijk';
 
   @override
-  String setBanDurationFor(String username) {
-    return 'Stel de blokkeerduur in voor $username';
-  }
-
-  @override
-  String get pleaseSelectEndDateForTemporaryBan =>
-      'Selecteer een einddatum voor tijdelijke blokkering';
-
-  @override
   String get back => 'Terug';
-
-  @override
-  String get unban => 'Blokkering opheffen';
 
   @override
   String get confirm => 'Bevestigen';
@@ -686,18 +630,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get pleaseSelectEndDate => 'Selecteer een einddatum';
 
   @override
-  String get userBannedSuccessfully => 'Gebruiker succesvol geblokkeerd';
-
-  @override
-  String get failedToBanUser => 'Kon gebruiker niet blokkeren';
-
-  @override
-  String get userUnbannedSuccessfully => 'Gebruiker succesvol gedeblokkeerd';
-
-  @override
-  String get failedToUnbanUser => 'Kon blokkering niet opheffen';
-
-  @override
   String get spamCleanUser => 'Spam opruimen gebruiker';
 
   @override
@@ -772,15 +704,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get mentionUser => 'Gebruiker vermelden';
-
-  @override
-  String get submittingReport => 'Melding verzenden...';
-
-  @override
-  String get banningUser => 'Gebruiker blokkeren...';
-
-  @override
-  String get unbanningUser => 'Blokkering opheffen...';
 
   @override
   String get cleaningSpam => 'Spam opruimen...';
@@ -862,9 +785,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get edit => 'Bewerken';
-
-  @override
-  String get report => 'Melden';
 
   @override
   String get remove => 'Verwijderen';
@@ -1459,9 +1379,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Meld je aan om gebruikersprofielen te bekijken.';
 
   @override
-  String get announcement => 'Aankondiging';
-
-  @override
   String get solved => 'Opgelost';
 
   @override
@@ -1469,9 +1386,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get pinned => 'Vastgezet';
-
-  @override
-  String get subscribedLabel => 'Geabonneerd';
 
   @override
   String get locked => 'Vergrendeld';
@@ -1483,10 +1397,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String errorLoadingContent(Object error) {
     return 'Fout bij laden van inhoud: $error';
   }
-
-  @override
-  String get noPermissionToViewSubforum =>
-      'Je hebt geen toestemming om onderwerpen in dit subforum te bekijken.';
 
   @override
   String get noDiscussionsYet => 'Nog geen discussies.';
@@ -1907,13 +1817,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get initializingForum => 'Forum initialiseren…';
 
   @override
-  String get unableToLoadForums => 'Forums laden mislukt';
-
-  @override
-  String get noForumsToDisplayExplanation =>
-      'Er zijn geen forums om weer te geven. Dit kan door rechten of de forumstructuur komen.';
-
-  @override
   String get subscribedForums => 'Geabonneerde forums';
 
   @override
@@ -1924,7 +1827,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get noNewNotificationsExplanation =>
-      'Je hebt geen nieuwe meldingen. Kom later terug voor updates over onderwerpen die je volgt.';
+      'Je krijgt een bericht in dit paneel over activiteit die direct relevant voor je is, inclusief reacties op je topics en berichten, wanneer iemand je @vermeldt of citeert en reacties geeft op topics die je observeert. Er worden ook meldingen gestuurd naar je e-mail wanneer je je een tijdje niet hebt aangemeld.';
 
   @override
   String noTagsMatch(Object filter) {
@@ -1934,21 +1837,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String noTopicsTagged(Object tag) {
     return 'Geen onderwerpen met tag \"$tag\"';
-  }
-
-  @override
-  String failedToBanUser2(Object error) {
-    return 'Gebruiker verbannen mislukt: $error';
-  }
-
-  @override
-  String unbanUserConfirmation(Object username) {
-    return 'Weet je zeker dat je de verbanning van $username wilt opheffen?';
-  }
-
-  @override
-  String failedToUnbanUser2(Object error) {
-    return 'Verbanning opheffen mislukt: $error';
   }
 
   @override
@@ -2055,10 +1943,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get failedToPostReplyPleaseTryAgain =>
       'Reactie plaatsen mislukt. Probeer het opnieuw.';
-
-  @override
-  String get pleaseWaitForTheThreadToLoad =>
-      'Wacht tot het onderwerp is geladen';
 
   @override
   String get failedToUpdatePostPleaseTryAgain =>
@@ -3874,4 +3758,100 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get topicStatusDeletedHelp =>
       'Dit onderwerp is verwijderd en verborgen voor andere gebruikers';
+
+  @override
+  String get flagAction => 'Markeren';
+
+  @override
+  String get flagPost => 'Bericht markeren';
+
+  @override
+  String get signUp => 'Registreren';
+
+  @override
+  String get suspendUser => 'Gebruiker schorsen';
+
+  @override
+  String get unsuspend => 'Schorsing opheffen';
+
+  @override
+  String get suspendUntil => 'Gebruiker schorsen tot';
+
+  @override
+  String get suspendForever => 'Voor altijd schorsen';
+
+  @override
+  String failedToSuspendUser(String error) {
+    return 'Er is iets misgegaan bij het schorsen van deze gebruiker: $error';
+  }
+
+  @override
+  String failedToUnsuspendUser(String error) {
+    return 'Er is iets misgegaan bij het opheffen van de schorsing van deze gebruiker: $error';
+  }
+
+  @override
+  String get suspendReasonNotListening =>
+      'Wilde niet naar feedback van medewerkers luisteren';
+
+  @override
+  String get suspendReasonStaffTime =>
+      'Heeft onevenredig veel tijd van medewerkers verbruikt';
+
+  @override
+  String get suspendReasonCombative => 'Te strijdlustig';
+
+  @override
+  String get suspendReasonWrongPlace => 'Op de verkeerde plek';
+
+  @override
+  String get suspendReasonNoPurpose =>
+      'Geen constructief doel voor hun acties, anders dan het creëren van onenigheid binnen de community';
+
+  @override
+  String get suspendReasonCustom => 'Aangepast…';
+
+  @override
+  String get suspendReasonQuestion =>
+      'Waarom schors je? Deze tekst wordt aan de gebruiker weergegeven wanneer deze zich probeert aan te melden. Houd het kort.';
+
+  @override
+  String get closedLabel => 'Gesloten';
+
+  @override
+  String get flaggingPost => 'Bericht markeren…';
+
+  @override
+  String setSuspensionFor(String username) {
+    return 'Hoe lang moet $username geschorst worden?';
+  }
+
+  @override
+  String get pleaseSelectSuspensionEndDate =>
+      'Kies wanneer de schorsing eindigt';
+
+  @override
+  String get suspendingUser => 'Gebruiker schorsen…';
+
+  @override
+  String get unsuspendingUser => 'Schorsing opheffen…';
+
+  @override
+  String get userSuspended => 'Gebruiker geschorst';
+
+  @override
+  String get userUnsuspended => 'Schorsing opgeheven';
+
+  @override
+  String unsuspendUserConfirmation(String username) {
+    return 'Schorsing van $username opheffen? Diegene kan dan weer inloggen.';
+  }
+
+  @override
+  String get noCategoriesToDisplay =>
+      'Er zijn geen categorieën om weer te geven.';
+
+  @override
+  String get noPermissionToViewCategory =>
+      'Je hebt geen toestemming om topics in deze categorie te bekijken.';
 }

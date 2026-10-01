@@ -98,26 +98,7 @@
   },
   "newTopic": "New Topic",
   "markRead": "Mark Read",
-  "spamOrAdvertising": "Spam or advertising",
-  "otherPleaseSpecify": "Other (please specify)",
   "pleaseSpecifyReason": "Please specify the reason",
-  "banUser": "Ban User",
-  "unbanUser": "Unban User",
-  "pleaseSelectReasonForBanningUser": "Please select a reason for banning {username}",
-  "@pleaseSelectReasonForBanningUser": {
-    "description": "Message asking to select reason for banning user",
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-  "violationOfCommunityGuidelines": "Violation of community guidelines",
-  "harassmentOrAbusiveBehavior": "Harassment or abusive behavior",
-  "postingInappropriateContent": "Posting inappropriate content",
-  "accountCompromiseOrSecurityIssue": "Account compromise or security issue",
-  "enterReasonForBanningUser": "Enter the reason for banning this user",
-  "banUntil": "Ban until",
   "selectDate": "Select date",
   "moreOptions": "More options",
   "topicClosed": "Topic closed",
@@ -174,7 +155,6 @@
   "search": "Search",
   "logout": "Logout",
   "areYouSureYouWantToLogout": "Are you sure you want to logout?",
-  "register": "Register",
   "signIn": "Sign in",
   "markForumRead": "Mark category read",
   "notificationTest": "Notification Test",
@@ -243,20 +223,8 @@
   "location": "Location",
   "website": "Website",
   "next": "Next",
-  "permanent": "Permanent",
   "temporary": "Temporary",
-  "setBanDurationFor": "Set the ban duration for {username}",
-  "@setBanDurationFor": {
-    "description": "Message asking to set ban duration",
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-  "pleaseSelectEndDateForTemporaryBan": "Please select an end date for temporary ban",
   "back": "Back",
-  "unban": "Unban",
   "confirm": "Confirm",
   "spamClean": "Spam Clean {username}",
   "@spamClean": {
@@ -459,25 +427,6 @@
   "@pleaseSelectEndDate": {
     "description": "Error message when end date is not selected"
   },
-  "@banUser": {
-    "description": "Button to ban a user"
-  },
-  "userBannedSuccessfully": "User banned successfully",
-  "@userBannedSuccessfully": {
-    "description": "Success message after banning a user"
-  },
-  "failedToBanUser": "Failed to ban user",
-  "@failedToBanUser": {
-    "description": "Error message when banning user fails"
-  },
-  "userUnbannedSuccessfully": "User unbanned successfully",
-  "@userUnbannedSuccessfully": {
-    "description": "Success message after unbanning a user"
-  },
-  "failedToUnbanUser": "Failed to unban user",
-  "@failedToUnbanUser": {
-    "description": "Error message when unbanning user fails"
-  },
   "spamCleanUser": "Spam Clean User",
   "@spamCleanUser": {
     "description": "Title for spam clean user dialog"
@@ -584,18 +533,6 @@
   "mentionUser": "Mention User",
   "@mentionUser": {
     "description": "Tooltip for mention user button"
-  },
-  "submittingReport": "Submitting report...",
-  "@submittingReport": {
-    "description": "Status message when submitting report"
-  },
-  "banningUser": "Banning user...",
-  "@banningUser": {
-    "description": "Status message when banning user"
-  },
-  "unbanningUser": "Unbanning user...",
-  "@unbanningUser": {
-    "description": "Status message when unbanning user"
   },
   "cleaningSpam": "Cleaning spam...",
   "@cleaningSpam": {
@@ -719,10 +656,6 @@
   "edit": "Edit",
   "@edit": {
     "description": "Button text to edit"
-  },
-  "report": "Report",
-  "@report": {
-    "description": "Button text to report"
   },
   "remove": "Remove",
   "@remove": {
@@ -1552,10 +1485,6 @@
   "@pleaseLoginToViewUserProfiles": {
     "description": "UI text: Please login to view user profiles."
   },
-  "announcement": "Announcement",
-  "@announcement": {
-    "description": "UI text: Announcement"
-  },
   "solved": "Solved",
   "@solved": {
     "description": "UI text: Solved"
@@ -1567,10 +1496,6 @@
   "pinned": "Pinned",
   "@pinned": {
     "description": "UI text: Pinned"
-  },
-  "subscribedLabel": "Subscribed",
-  "@subscribedLabel": {
-    "description": "UI text: Subscribed"
   },
   "locked": "Locked",
   "@locked": {
@@ -1588,10 +1513,6 @@
         "type": "Object"
       }
     }
-  },
-  "noPermissionToViewSubforum": "You do not have permission to view topics in this subforum.",
-  "@noPermissionToViewSubforum": {
-    "description": "UI text: You do not have permission to view topics in this subforum."
   },
   "noDiscussionsYet": "No discussions yet.",
   "@noDiscussionsYet": {
@@ -2132,14 +2053,6 @@
   "@initializingForum": {
     "description": "UI text: Initializing forum…"
   },
-  "unableToLoadForums": "Unable to Load Forums",
-  "@unableToLoadForums": {
-    "description": "UI text: Unable to Load Forums"
-  },
-  "noForumsToDisplayExplanation": "There are no forums to display. This might be due to permissions or the forum structure.",
-  "@noForumsToDisplayExplanation": {
-    "description": "UI text: There are no forums to display. This might be due to permiss"
-  },
   "subscribedForums": "Subscribed Forums",
   "@subscribedForums": {
     "description": "UI text: Subscribed Forums"
@@ -2152,7 +2065,7 @@
   "@pullDownToRefresh": {
     "description": "UI text: Pull down to refresh"
   },
-  "noNewNotificationsExplanation": "You have no new notifications. Check back later for updates on topics you're following.",
+  "noNewNotificationsExplanation": "You will be notified in this panel about activity directly relevant to you, including replies to your topics and posts, when someone @mentions you or quotes you, and replies to topics you are watching. Notifications will also be sent to your email when you haven’t logged in for a while.",
   "@noNewNotificationsExplanation": {
     "description": "UI text: You have no new notifications. Check back later for updates "
   },
@@ -2170,33 +2083,6 @@
     "description": "UI text: No topics tagged \"{tag}\"",
     "placeholders": {
       "tag": {
-        "type": "Object"
-      }
-    }
-  },
-  "failedToBanUser2": "Failed to ban user: {error}",
-  "@failedToBanUser2": {
-    "description": "UI text: Failed to ban user: {toString}",
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
-  "unbanUserConfirmation": "Are you sure you want to unban {username}?",
-  "@unbanUserConfirmation": {
-    "description": "UI text: Are you sure you want to unban {username}?",
-    "placeholders": {
-      "username": {
-        "type": "Object"
-      }
-    }
-  },
-  "failedToUnbanUser2": "Failed to unban user: {error}",
-  "@failedToUnbanUser2": {
-    "description": "UI text: Failed to unban user: {toString}",
-    "placeholders": {
-      "error": {
         "type": "Object"
       }
     }
@@ -2362,10 +2248,6 @@
   "failedToPostReplyPleaseTryAgain": "Failed to post reply. Please try again.",
   "@failedToPostReplyPleaseTryAgain": {
     "description": "UI text: Failed to post reply. Please try again."
-  },
-  "pleaseWaitForTheThreadToLoad": "Please wait for the thread to load",
-  "@pleaseWaitForTheThreadToLoad": {
-    "description": "UI text: Please wait for the thread to load"
   },
   "failedToUpdatePostPleaseTryAgain": "Failed to update post. Please try again.",
   "@failedToUpdatePostPleaseTryAgain": {
@@ -4752,5 +4634,133 @@
   "topicStatusDeletedHelp": "This topic is deleted and hidden from other users",
   "@topicStatusDeletedHelp": {
     "description": "Help text of the deleted-topic icon before the title (staff only see deleted topics)"
+  },
+  "flagAction": "Flag",
+  "@flagAction": {
+    "description": "Discourse post.controls.flag_action: the post menu item that opens the flag dialog"
+  },
+  "flagPost": "Flag Post",
+  "@flagPost": {
+    "description": "Discourse flagging.action: title of the flag dialog"
+  },
+  "signUp": "Sign Up",
+  "@signUp": {
+    "description": "Discourse sign_up: the button that opens the forum sign-up page"
+  },
+  "suspendUser": "Suspend User",
+  "@suspendUser": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "unsuspend": "Unsuspend",
+  "@unsuspend": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendUntil": "Suspend user until",
+  "@suspendUntil": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendForever": "Suspend forever",
+  "@suspendForever": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "failedToSuspendUser": "Something went wrong suspending this user: {error}",
+  "@failedToSuspendUser": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUnsuspendUser": "Something went wrong unsuspending this user: {error}",
+  "@failedToUnsuspendUser": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "suspendReasonNotListening": "Would not listen to staff feedback",
+  "@suspendReasonNotListening": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendReasonStaffTime": "Consumed disproportionate amounts of staff time",
+  "@suspendReasonStaffTime": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendReasonCombative": "Too combative",
+  "@suspendReasonCombative": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendReasonWrongPlace": "In the wrong place",
+  "@suspendReasonWrongPlace": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendReasonNoPurpose": "No constructive purpose to their actions other than creating dissent within the community",
+  "@suspendReasonNoPurpose": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendReasonCustom": "Custom…",
+  "@suspendReasonCustom": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendReasonQuestion": "Why are you suspending? This text will be shown to the user when they try to log in. Keep it short.",
+  "@suspendReasonQuestion": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "closedLabel": "Closed",
+  "@closedLabel": {
+    "description": "Badge on a closed topic in topic lists"
+  },
+  "flaggingPost": "Flagging post…",
+  "@flaggingPost": {
+    "description": "Snackbar while a flag is being sent"
+  },
+  "setSuspensionFor": "How long should {username} be suspended?",
+  "@setSuspensionFor": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseSelectSuspensionEndDate": "Choose when the suspension ends",
+  "@pleaseSelectSuspensionEndDate": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "suspendingUser": "Suspending user…",
+  "@suspendingUser": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "unsuspendingUser": "Unsuspending user…",
+  "@unsuspendingUser": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "userSuspended": "User suspended",
+  "@userSuspended": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "userUnsuspended": "User unsuspended",
+  "@userUnsuspended": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)"
+  },
+  "unsuspendUserConfirmation": "Unsuspend {username}? They will be able to log in again.",
+  "@unsuspendUserConfirmation": {
+    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "noCategoriesToDisplay": "There are no categories to display.",
+  "@noCategoriesToDisplay": {
+    "description": "Empty state of the Categories view"
+  },
+  "noPermissionToViewCategory": "You do not have permission to view topics in this category.",
+  "@noPermissionToViewCategory": {
+    "description": "Notice on a category whose topics the reader may not see"
   }
 }

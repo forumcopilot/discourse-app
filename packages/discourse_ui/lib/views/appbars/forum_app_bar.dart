@@ -110,7 +110,7 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
           // Show sign-in/register menu items when not logged in
           return [
             _buildMenuItem('sign_in', Icons.login_rounded, AppLocalizations.of(context)?.signIn ?? 'Sign In', colorScheme, textTheme),
-            _buildMenuItem('register', Icons.person_add_rounded, AppLocalizations.of(context)?.register ?? 'Register', colorScheme, textTheme),
+            _buildMenuItem('register', Icons.person_add_rounded, AppLocalizations.of(context)!.signUp, colorScheme, textTheme),
           ];
         }
       },

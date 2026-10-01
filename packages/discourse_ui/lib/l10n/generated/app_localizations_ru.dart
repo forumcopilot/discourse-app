@@ -225,45 +225,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get markRead => 'Отметить как прочитанное';
 
   @override
-  String get spamOrAdvertising => 'Спам или реклама';
-
-  @override
-  String get otherPleaseSpecify => 'Другое (пожалуйста, укажите)';
-
-  @override
   String get pleaseSpecifyReason => 'Пожалуйста, укажите причину';
-
-  @override
-  String get banUser => 'Заблокировать пользователя';
-
-  @override
-  String get unbanUser => 'Разблокировать пользователя';
-
-  @override
-  String pleaseSelectReasonForBanningUser(String username) {
-    return 'Пожалуйста, выберите причину блокировки $username';
-  }
-
-  @override
-  String get violationOfCommunityGuidelines => 'Нарушение правил сообщества';
-
-  @override
-  String get harassmentOrAbusiveBehavior =>
-      'Преследование или оскорбительное поведение';
-
-  @override
-  String get postingInappropriateContent => 'Публикация неуместного контента';
-
-  @override
-  String get accountCompromiseOrSecurityIssue =>
-      'Компрометация аккаунта или проблема безопасности';
-
-  @override
-  String get enterReasonForBanningUser =>
-      'Введите причину блокировки этого пользователя';
-
-  @override
-  String get banUntil => 'Заблокировать до';
 
   @override
   String get selectDate => 'Выбрать дату';
@@ -371,9 +333,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get areYouSureYouWantToLogout => 'Вы уверены, что хотите выйти?';
 
   @override
-  String get register => 'Зарегистрироваться';
-
-  @override
   String get signIn => 'Войти';
 
   @override
@@ -470,25 +429,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get next => 'Далее';
 
   @override
-  String get permanent => 'Постоянный';
-
-  @override
   String get temporary => 'Временный';
 
   @override
-  String setBanDurationFor(String username) {
-    return 'Установить длительность бана для $username';
-  }
-
-  @override
-  String get pleaseSelectEndDateForTemporaryBan =>
-      'Пожалуйста, выберите дату окончания временного бана';
-
-  @override
   String get back => 'Назад';
-
-  @override
-  String get unban => 'Разблокировать';
 
   @override
   String get confirm => 'Подтвердить';
@@ -686,18 +630,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pleaseSelectEndDate => 'Пожалуйста, выберите дату окончания';
 
   @override
-  String get userBannedSuccessfully => 'Пользователь успешно заблокирован';
-
-  @override
-  String get failedToBanUser => 'Не удалось заблокировать пользователя';
-
-  @override
-  String get userUnbannedSuccessfully => 'Пользователь успешно разблокирован';
-
-  @override
-  String get failedToUnbanUser => 'Не удалось разблокировать пользователя';
-
-  @override
   String get spamCleanUser => 'Очистить спам пользователя';
 
   @override
@@ -772,15 +704,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get mentionUser => 'Упомянуть пользователя';
-
-  @override
-  String get submittingReport => 'Отправка отчёта...';
-
-  @override
-  String get banningUser => 'Блокировка пользователя...';
-
-  @override
-  String get unbanningUser => 'Разблокировка пользователя...';
 
   @override
   String get cleaningSpam => 'Очистка спама...';
@@ -864,9 +787,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get edit => 'Редактировать';
-
-  @override
-  String get report => 'Пожаловаться';
 
   @override
   String get remove => 'Удалить';
@@ -1462,9 +1382,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Войдите, чтобы просматривать профили.';
 
   @override
-  String get announcement => 'Объявление';
-
-  @override
   String get solved => 'Решено';
 
   @override
@@ -1472,9 +1389,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pinned => 'Закреплено';
-
-  @override
-  String get subscribedLabel => 'Подписка';
 
   @override
   String get locked => 'Закрыто';
@@ -1486,10 +1400,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String errorLoadingContent(Object error) {
     return 'Ошибка загрузки содержимого: $error';
   }
-
-  @override
-  String get noPermissionToViewSubforum =>
-      'У вас нет прав на просмотр тем в этом подфоруме.';
 
   @override
   String get noDiscussionsYet => 'Обсуждений пока нет.';
@@ -1911,13 +1821,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get initializingForum => 'Инициализация форума…';
 
   @override
-  String get unableToLoadForums => 'Не удалось загрузить форумы';
-
-  @override
-  String get noForumsToDisplayExplanation =>
-      'Нет форумов для отображения. Возможно, дело в правах доступа или структуре форума.';
-
-  @override
   String get subscribedForums => 'Подписки на форумы';
 
   @override
@@ -1928,7 +1831,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get noNewNotificationsExplanation =>
-      'Новых уведомлений нет. Загляните позже, чтобы увидеть обновления в темах, на которые вы подписаны.';
+      'На этой панели будут отображаться уведомления об активности на форуме, имеющей прямое отношение к вам, включая ответы на ваши темы и публикации, @упоминание и цитирование вас, ответы на темы, которые вы отслеживаете. Уведомления также будут отправлены на вашу электронную почту, если вы отсутствовали на форуме в течение некоторого времени.';
 
   @override
   String noTagsMatch(Object filter) {
@@ -1938,21 +1841,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String noTopicsTagged(Object tag) {
     return 'Нет тем с тегом «$tag»';
-  }
-
-  @override
-  String failedToBanUser2(Object error) {
-    return 'Не удалось заблокировать пользователя: $error';
-  }
-
-  @override
-  String unbanUserConfirmation(Object username) {
-    return 'Разблокировать $username?';
-  }
-
-  @override
-  String failedToUnbanUser2(Object error) {
-    return 'Не удалось разблокировать пользователя: $error';
   }
 
   @override
@@ -2060,9 +1948,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get failedToPostReplyPleaseTryAgain =>
       'Не удалось отправить ответ. Попробуйте ещё раз.';
-
-  @override
-  String get pleaseWaitForTheThreadToLoad => 'Дождитесь загрузки темы';
 
   @override
   String get failedToUpdatePostPleaseTryAgain =>
@@ -3904,4 +3789,99 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get topicStatusDeletedHelp =>
       'Тема удалена и скрыта от других пользователей';
+
+  @override
+  String get flagAction => 'Пометить';
+
+  @override
+  String get flagPost => 'Пожаловаться на сообщение';
+
+  @override
+  String get signUp => 'Регистрация';
+
+  @override
+  String get suspendUser => 'Блокировка пользователя';
+
+  @override
+  String get unsuspend => 'Разблокировать';
+
+  @override
+  String get suspendUntil => 'Блокировка пользователя до';
+
+  @override
+  String get suspendForever => 'Бессрочная блокировка';
+
+  @override
+  String failedToSuspendUser(String error) {
+    return 'Ошибка блокировки пользователя: $error';
+  }
+
+  @override
+  String failedToUnsuspendUser(String error) {
+    return 'Ошибка разблокировки пользователя: $error';
+  }
+
+  @override
+  String get suspendReasonNotListening =>
+      'Не прислушался к рекомендациям персонала';
+
+  @override
+  String get suspendReasonStaffTime =>
+      'Потрачено слишком много времени персонала';
+
+  @override
+  String get suspendReasonCombative => 'Агрессивное поведение';
+
+  @override
+  String get suspendReasonWrongPlace => 'Обсуждение не в том месте';
+
+  @override
+  String get suspendReasonNoPurpose =>
+      'У действий пользователя нет никакой конструктивной цели, кроме внесения раскола в сообщество';
+
+  @override
+  String get suspendReasonCustom => 'Другое…';
+
+  @override
+  String get suspendReasonQuestion =>
+      'Укажите причину блокировки. Этот текст будет показан пользователю, когда он попытается войти в систему. Введите краткое описание.';
+
+  @override
+  String get closedLabel => 'Закрыта';
+
+  @override
+  String get flaggingPost => 'Отправка жалобы…';
+
+  @override
+  String setSuspensionFor(String username) {
+    return 'На какой срок заблокировать $username?';
+  }
+
+  @override
+  String get pleaseSelectSuspensionEndDate =>
+      'Выберите, когда закончится блокировка';
+
+  @override
+  String get suspendingUser => 'Блокировка пользователя…';
+
+  @override
+  String get unsuspendingUser => 'Разблокировка пользователя…';
+
+  @override
+  String get userSuspended => 'Пользователь заблокирован';
+
+  @override
+  String get userUnsuspended => 'Пользователь разблокирован';
+
+  @override
+  String unsuspendUserConfirmation(String username) {
+    return 'Разблокировать $username? Пользователь снова сможет входить.';
+  }
+
+  @override
+  String get noCategoriesToDisplay => 'Нет категорий для показа.';
+
+  @override
+  String get noPermissionToViewCategory =>
+      'У вас нет прав на просмотр тем в этой категории.';
 }

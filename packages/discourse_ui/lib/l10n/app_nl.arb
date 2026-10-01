@@ -100,26 +100,7 @@
   },
   "newTopic": "Nieuw onderwerp",
   "markRead": "Als gelezen markeren",
-  "spamOrAdvertising": "Spam of reclame",
-  "otherPleaseSpecify": "Anders (geef op)",
   "pleaseSpecifyReason": "Geef de reden op",
-  "banUser": "Gebruiker blokkeren",
-  "unbanUser": "Blokkering opheffen",
-  "pleaseSelectReasonForBanningUser": "Selecteer een reden voor het blokkeren van {username}",
-  "@pleaseSelectReasonForBanningUser": {
-    "description": "Message asking to select reason for banning user",
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-  "violationOfCommunityGuidelines": "Overtreding van de communityrichtlijnen",
-  "harassmentOrAbusiveBehavior": "Intimidatie of misbruik",
-  "postingInappropriateContent": "Plaatsen van ongepaste inhoud",
-  "accountCompromiseOrSecurityIssue": "Accountcompromittering of beveiligingsprobleem",
-  "enterReasonForBanningUser": "Voer de reden voor het blokkeren van deze gebruiker in",
-  "banUntil": "Blokkeren tot",
   "selectDate": "Selecteer datum",
   "moreOptions": "Meer opties",
   "topicClosed": "Onderwerp gesloten",
@@ -176,7 +157,6 @@
   "search": "Zoeken",
   "logout": "Uitloggen",
   "areYouSureYouWantToLogout": "Weet u zeker dat u wilt uitloggen?",
-  "register": "Registreren",
   "signIn": "Inloggen",
   "markForumRead": "Forum als gelezen markeren",
   "notificationTest": "Meldingstest",
@@ -245,20 +225,8 @@
   "location": "Locatie",
   "website": "Website",
   "next": "Volgende",
-  "permanent": "Permanent",
   "temporary": "Tijdelijk",
-  "setBanDurationFor": "Stel de blokkeerduur in voor {username}",
-  "@setBanDurationFor": {
-    "description": "Message asking to set ban duration",
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-  "pleaseSelectEndDateForTemporaryBan": "Selecteer een einddatum voor tijdelijke blokkering",
   "back": "Terug",
-  "unban": "Blokkering opheffen",
   "confirm": "Bevestigen",
   "spamClean": "Spam opruimen {username}",
   "@spamClean": {
@@ -419,25 +387,6 @@
   "@pleaseSelectEndDate": {
     "description": "Error message when end date is not selected"
   },
-  "@banUser": {
-    "description": "Button to ban a user"
-  },
-  "userBannedSuccessfully": "Gebruiker succesvol geblokkeerd",
-  "@userBannedSuccessfully": {
-    "description": "Success message after banning a user"
-  },
-  "failedToBanUser": "Kon gebruiker niet blokkeren",
-  "@failedToBanUser": {
-    "description": "Error message when banning user fails"
-  },
-  "userUnbannedSuccessfully": "Gebruiker succesvol gedeblokkeerd",
-  "@userUnbannedSuccessfully": {
-    "description": "Success message after unbanning a user"
-  },
-  "failedToUnbanUser": "Kon blokkering niet opheffen",
-  "@failedToUnbanUser": {
-    "description": "Error message when unbanning user fails"
-  },
   "spamCleanUser": "Spam opruimen gebruiker",
   "@spamCleanUser": {
     "description": "Title for spam clean user dialog"
@@ -544,18 +493,6 @@
   "mentionUser": "Gebruiker vermelden",
   "@mentionUser": {
     "description": "Tooltip for mention user button"
-  },
-  "submittingReport": "Melding verzenden...",
-  "@submittingReport": {
-    "description": "Status message when submitting report"
-  },
-  "banningUser": "Gebruiker blokkeren...",
-  "@banningUser": {
-    "description": "Status message when banning user"
-  },
-  "unbanningUser": "Blokkering opheffen...",
-  "@unbanningUser": {
-    "description": "Status message when unbanning user"
   },
   "cleaningSpam": "Spam opruimen...",
   "@cleaningSpam": {
@@ -679,10 +616,6 @@
   "edit": "Bewerken",
   "@edit": {
     "description": "Button text to edit"
-  },
-  "report": "Melden",
-  "@report": {
-    "description": "Button text to report"
   },
   "remove": "Verwijderen",
   "@remove": {
@@ -952,15 +885,12 @@
   "solution": "Oplossing",
   "deleted": "VERWIJDERD",
   "pleaseLoginToViewUserProfiles": "Meld je aan om gebruikersprofielen te bekijken.",
-  "announcement": "Aankondiging",
   "solved": "Opgelost",
   "hot": "Populair",
   "pinned": "Vastgezet",
-  "subscribedLabel": "Geabonneerd",
   "locked": "Vergrendeld",
   "poll": "Peiling",
   "errorLoadingContent": "Fout bij laden van inhoud: {error}",
-  "noPermissionToViewSubforum": "Je hebt geen toestemming om onderwerpen in dit subforum te bekijken.",
   "noDiscussionsYet": "Nog geen discussies.",
   "jumpToPost": "Ga naar bericht",
   "jump": "Ga",
@@ -1077,17 +1007,12 @@
   "sendResetEmail": "Herstel-e-mail verzenden",
   "deleteAccountDialogBody": "Je account wordt beheerd door het forum. Neem rechtstreeks contact op met de forumstaf om verwijdering aan te vragen. \"Doorgaan\" opent het forum in je browser zodat je de eigen contact-/stafberichtfunctie van de site kunt gebruiken.",
   "initializingForum": "Forum initialiseren…",
-  "unableToLoadForums": "Forums laden mislukt",
-  "noForumsToDisplayExplanation": "Er zijn geen forums om weer te geven. Dit kan door rechten of de forumstructuur komen.",
   "subscribedForums": "Geabonneerde forums",
   "errorLoadingNotifications": "Fout bij laden van meldingen",
   "pullDownToRefresh": "Trek omlaag om te vernieuwen",
-  "noNewNotificationsExplanation": "Je hebt geen nieuwe meldingen. Kom later terug voor updates over onderwerpen die je volgt.",
+  "noNewNotificationsExplanation": "Je krijgt een bericht in dit paneel over activiteit die direct relevant voor je is, inclusief reacties op je topics en berichten, wanneer iemand je @vermeldt of citeert en reacties geeft op topics die je observeert. Er worden ook meldingen gestuurd naar je e-mail wanneer je je een tijdje niet hebt aangemeld.",
   "noTagsMatch": "Geen tags komen overeen met \"{filter}\".",
   "noTopicsTagged": "Geen onderwerpen met tag \"{tag}\"",
-  "failedToBanUser2": "Gebruiker verbannen mislukt: {error}",
-  "unbanUserConfirmation": "Weet je zeker dat je de verbanning van {username} wilt opheffen?",
-  "failedToUnbanUser2": "Verbanning opheffen mislukt: {error}",
   "deletePostsProfilePostsAndComments": "Berichten, profielberichten en reacties verwijderen",
   "spamCleanConfirmation": "Weet je zeker dat je spam van {username} wilt opruimen?",
   "failedToCleanSpam": "Spam opruimen mislukt: {error}",
@@ -1113,7 +1038,6 @@
   "fileTooLargeForForum": "{fileName} is {fileBytes}. Dit forum staat maximaal {maxBytes} toe.",
   "resizeToFitExplanation": "Hij kan net genoeg worden verkleind om te passen, met behoud van formaat en zoveel detail als de limiet toelaat.",
   "failedToPostReplyPleaseTryAgain": "Reactie plaatsen mislukt. Probeer het opnieuw.",
-  "pleaseWaitForTheThreadToLoad": "Wacht tot het onderwerp is geladen",
   "failedToUpdatePostPleaseTryAgain": "Bericht bijwerken mislukt. Probeer het opnieuw.",
   "postDeletedSuccessfully": "Bericht verwijderd",
   "failedToDeletePost": "Bericht verwijderen mislukt: {error}",
@@ -1553,5 +1477,32 @@
   "timeLeftMinutes": "{count, plural, =1{over 1 minuut} other{over {count} minuten}}",
   "timeLeftHours": "{count, plural, =1{over 1 uur} other{over {count} uur}}",
   "timeLeftDays": "{count, plural, =1{over 1 dag} other{over {count} dagen}}",
-  "topicStatusDeletedHelp": "Dit onderwerp is verwijderd en verborgen voor andere gebruikers"
+  "topicStatusDeletedHelp": "Dit onderwerp is verwijderd en verborgen voor andere gebruikers",
+  "flagAction": "Markeren",
+  "flagPost": "Bericht markeren",
+  "signUp": "Registreren",
+  "suspendUser": "Gebruiker schorsen",
+  "unsuspend": "Schorsing opheffen",
+  "suspendUntil": "Gebruiker schorsen tot",
+  "suspendForever": "Voor altijd schorsen",
+  "failedToSuspendUser": "Er is iets misgegaan bij het schorsen van deze gebruiker: {error}",
+  "failedToUnsuspendUser": "Er is iets misgegaan bij het opheffen van de schorsing van deze gebruiker: {error}",
+  "suspendReasonNotListening": "Wilde niet naar feedback van medewerkers luisteren",
+  "suspendReasonStaffTime": "Heeft onevenredig veel tijd van medewerkers verbruikt",
+  "suspendReasonCombative": "Te strijdlustig",
+  "suspendReasonWrongPlace": "Op de verkeerde plek",
+  "suspendReasonNoPurpose": "Geen constructief doel voor hun acties, anders dan het creëren van onenigheid binnen de community",
+  "suspendReasonCustom": "Aangepast…",
+  "suspendReasonQuestion": "Waarom schors je? Deze tekst wordt aan de gebruiker weergegeven wanneer deze zich probeert aan te melden. Houd het kort.",
+  "closedLabel": "Gesloten",
+  "flaggingPost": "Bericht markeren…",
+  "setSuspensionFor": "Hoe lang moet {username} geschorst worden?",
+  "pleaseSelectSuspensionEndDate": "Kies wanneer de schorsing eindigt",
+  "suspendingUser": "Gebruiker schorsen…",
+  "unsuspendingUser": "Schorsing opheffen…",
+  "userSuspended": "Gebruiker geschorst",
+  "userUnsuspended": "Schorsing opgeheven",
+  "unsuspendUserConfirmation": "Schorsing van {username} opheffen? Diegene kan dan weer inloggen.",
+  "noCategoriesToDisplay": "Er zijn geen categorieën om weer te geven.",
+  "noPermissionToViewCategory": "Je hebt geen toestemming om topics in deze categorie te bekijken."
 }
