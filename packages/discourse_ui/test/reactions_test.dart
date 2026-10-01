@@ -126,6 +126,13 @@ void main() {
       expect(find.byType(ReactionGlyph), findsNWidgets(4));
       expect(find.text('2'), findsOneWidget, reason: 'hearts on this post');
       expect(find.text('Tap your reaction again to remove it.'), findsOneWidget);
+      // Every row is centred in the sheet, not only the last: the grid was
+      // as wide as its widest row and sat against the left edge.
+      final sheet = tester.getRect(find.byType(ReactionPickerSheet));
+      final tiles = find.byType(ReactionGlyph);
+      final left = tester.getCenter(tiles.first).dx - sheet.left;
+      final right = sheet.right - tester.getCenter(tiles.at(3)).dx;
+      expect((left - right).abs(), lessThan(2));
     });
 
     testWidgets('hands back the choice', (tester) async {

@@ -1,4 +1,5 @@
-import 'package:discourse_core/discourse_core.dart' show DiscourseValidReactions;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseValidReactions;
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
@@ -69,12 +70,14 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
     // The forum's set is usually known from the topic that is open, so the
     // sheet opens with its choices, without a spinner.
     final site = widget.siteContext;
-    _available = site == null ? null : DiscourseValidReactions.forSite(site.site.url);
+    _available =
+        site == null ? null : DiscourseValidReactions.forSite(site.site.url);
     if (_available == null) _load();
   }
 
   Future<void> _load() async {
-    final result = await SiteProxyService.getPostProxy().getAvailableReactionsAsync();
+    final result =
+        await SiteProxyService.getPostProxy().getAvailableReactionsAsync();
     if (!mounted) return;
     setState(() => _available = result.reactions);
   }
@@ -91,64 +94,82 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
     // stopped offering it.
     final choices = available == null
         ? null
-        : [...available, if (mine != null && !available.contains(mine.id)) mine.id];
+        : [
+            ...available,
+            if (mine != null && !available.contains(mine.id)) mine.id
+          ];
     final note = widget.locked
         ? l10n.reactionLockedMessage
         : (mine != null ? l10n.reactionTapAgainToRemove : null);
 
+    // Full width: sized by its content, the sheet shrank to the width of
+    // the emoji grid and sat inset from both edges.
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(bottom: DesignTokens.spacingM),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SheetTitle(l10n.react),
-            if (note != null)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  DesignTokens.spacingL, 0, DesignTokens.spacingL, DesignTokens.spacingS),
-                child: Text(
-                  note,
-                  style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+        child: SizedBox(
+          width: double.infinity,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SheetTitle(l10n.react),
+              if (note != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(DesignTokens.spacingL, 0,
+                      DesignTokens.spacingL, DesignTokens.spacingS),
+                  child: Text(
+                    note,
+                    style: textTheme.bodyMedium
+                        ?.copyWith(color: colorScheme.onSurfaceVariant),
+                  ),
                 ),
-              ),
-            if (choices == null)
-              const Padding(
-                padding: EdgeInsets.all(DesignTokens.spacingL),
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (choices.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(DesignTokens.spacingL),
-                child: Text(
-                  l10n.reactionsAreNotEnabledOnThisForum,
-                  style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+              if (choices == null)
+                const Padding(
+                  padding: EdgeInsets.all(DesignTokens.spacingL),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (choices.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(DesignTokens.spacingL),
+                  child: Text(
+                    l10n.reactionsAreNotEnabledOnThisForum,
+                    style: textTheme.bodyMedium
+                        ?.copyWith(color: colorScheme.onSurfaceVariant),
+                  ),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: DesignTokens.spacingL,
+                    vertical: DesignTokens.spacingS,
+                  ),
+                  // The grid's own width is its widest row; given the
+                  // sheet's, every row centres, not just the last.
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: DesignTokens.spacingM,
+                      runSpacing: DesignTokens.spacingM,
+                      children: [
+                        for (final r in choices)
+                          _ReactionTile(
+                            reaction: r,
+                            count: counts[r] ?? 0,
+                            siteContext: widget.siteContext,
+                            selected: r == mine?.id,
+                            onTap: widget.locked
+                                ? null
+                                : () => context.popOwnRoute(r),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingL,
-                  vertical: DesignTokens.spacingS,
-                ),
-                child: Wrap(
-                  spacing: DesignTokens.spacingM,
-                  runSpacing: DesignTokens.spacingM,
-                  children: [
-                    for (final r in choices)
-                      _ReactionTile(
-                        reaction: r,
-                        count: counts[r] ?? 0,
-                        siteContext: widget.siteContext,
-                        selected: r == mine?.id,
-                        onTap: widget.locked ? null : () => context.popOwnRoute(r),
-                      ),
-                  ],
-                ),
-              ),
-            const SizedBox(height: DesignTokens.spacingS),
-          ],
+              const SizedBox(height: DesignTokens.spacingS),
+            ],
+          ),
         ),
       ),
     );
@@ -189,11 +210,13 @@ class _ReactionTile extends StatelessWidget {
         border: Border.all(
           color: selected
               ? colorScheme.primary
-              : colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
+              : colorScheme.outlineVariant
+                  .withValues(alpha: DesignTokens.opacityMediumLow),
           width: selected ? 2 : 0.5,
         ),
       ),
-      child: ReactionGlyph(reactionId: reaction, size: 26, siteContext: siteContext),
+      child: ReactionGlyph(
+          reactionId: reaction, size: 26, siteContext: siteContext),
     );
     return Semantics(
       label: count > 0 ? l10n.reactionFilterSemantics(name, count) : name,
@@ -220,17 +243,23 @@ class _ReactionTile extends StatelessWidget {
                     bottom: 0,
                     child: Container(
                       constraints: const BoxConstraints(minWidth: 22),
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: selected ? colorScheme.primary : colorScheme.surface,
-                        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+                        color: selected
+                            ? colorScheme.primary
+                            : colorScheme.surface,
+                        borderRadius:
+                            BorderRadius.circular(DesignTokens.radiusM),
                         border: Border.all(color: colorScheme.outlineVariant),
                       ),
                       child: Text(
                         '$count',
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: selected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                              color: selected
+                                  ? colorScheme.onPrimary
+                                  : colorScheme.onSurfaceVariant,
                             ),
                       ),
                     ),

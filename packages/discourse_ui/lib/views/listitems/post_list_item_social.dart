@@ -247,11 +247,14 @@ class _ReactionSummary extends StatelessWidget {
             minHeight: kMinInteractiveDimension,
             minWidth: kMinInteractiveDimension,
           ),
+          // Packed against the react button it counts for: a bare "2" sat
+          // centred in its 48dp target, adrift from the heart.
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingS),
+            padding: const EdgeInsetsDirectional.only(
+                start: DesignTokens.spacingS, end: DesignTokens.spacingXS),
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 for (final r in shown) ...[
                   ReactionGlyph(reactionId: r.id, size: glyphSize, siteContext: siteContext),
