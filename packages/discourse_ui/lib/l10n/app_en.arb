@@ -3804,5 +3804,454 @@
   "changeEmailSubtitle": "We'll send a verification link to the new address",
   "@changeEmailSubtitle": {
     "description": "Account and privacy page: under Change email"
+  },
+  "aboutMe": "About me",
+  "@aboutMe": {
+    "description": "Edit profile: the bio row and its editor's title"
+  },
+  "aboutMeHelper": "Shown at the top of your profile",
+  "@aboutMeHelper": {
+    "description": "About me editor: under the field"
+  },
+  "aboutMeMarkdownHint": "Markdown works: **bold**, links, :emoji:",
+  "@aboutMeMarkdownHint": {
+    "description": "About me editor: beside the formatting buttons"
+  },
+  "addCover": "Add cover",
+  "@addCover": {
+    "description": "Edit profile: button on an empty cover"
+  },
+  "changeCover": "Change cover",
+  "@changeCover": {
+    "description": "Edit profile: button on the cover photo"
+  },
+  "birthdayHint": "The forum celebrates it with you. No year is kept.",
+  "@birthdayHint": {
+    "description": "Birthday dialog: explanation"
+  },
+  "birthdayRemoved": "Birthday removed",
+  "@birthdayRemoved": {
+    "description": "Snackbar after removing the birthday"
+  },
+  "birthdaySaved": "Birthday saved",
+  "@birthdaySaved": {
+    "description": "Snackbar after setting the birthday"
+  },
+  "cardBackground": "Card background",
+  "@cardBackground": {
+    "description": "Edit profile: the user card's background image"
+  },
+  "cardBackgroundExplanation": "Behind your user card on the forum's website",
+  "@cardBackgroundExplanation": {
+    "description": "Edit profile: under Card background"
+  },
+  "cardBackgroundRemoved": "Card background removed",
+  "@cardBackgroundRemoved": {
+    "description": "Snackbar after removing the card background, with Undo"
+  },
+  "cardBackgroundSheetHint": "Shown behind your user card. Wide photos work best.",
+  "@cardBackgroundSheetHint": {
+    "description": "Card background sheet: explanation"
+  },
+  "changeProfilePicture": "Change profile picture",
+  "@changeProfilePicture": {
+    "description": "Tooltip of the camera button on your picture"
+  },
+  "changeUsername": "Change username",
+  "@changeUsername": {
+    "description": "Change username dialog title and its confirm button"
+  },
+  "changeUsernameExplanation": "Mentions and quotes of @{username} in posts switch to the new name. Old links to your profile stop working.",
+  "@changeUsernameExplanation": {
+    "description": "Change username dialog: what changing it does",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseFromLibrary": "Choose from library",
+  "@chooseFromLibrary": {
+    "description": "Photo sheets: pick a photo from the phone's library"
+  },
+  "coverPhoto": "Cover photo",
+  "@coverPhoto": {
+    "description": "Cover photo sheet title"
+  },
+  "coverPhotoSheetHint": "Shown across the top of your profile, behind your picture. Wide photos work best, about 3 to 1.",
+  "@coverPhotoSheetHint": {
+    "description": "Cover photo sheet: explanation"
+  },
+  "coverRemoved": "Cover removed",
+  "@coverRemoved": {
+    "description": "Snackbar after removing the cover, with Undo"
+  },
+  "day": "Day",
+  "@day": {
+    "description": "Birthday dialog: day of the month"
+  },
+  "month": "Month",
+  "@month": {
+    "description": "Birthday dialog: month"
+  },
+  "displayName": "Display name",
+  "@displayName": {
+    "description": "Edit profile: the person's name (not their username)"
+  },
+  "displayNameHelper": "Shown with your posts. Your username stays @{username}.",
+  "@displayNameHelper": {
+    "description": "Display name dialog: helper under the field",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "emailPasswordInAccount": "Email, password and sign-in",
+  "@emailPasswordInAccount": {
+    "description": "Edit profile: link at the bottom to Account and privacy"
+  },
+  "featureATopic": "Feature a topic",
+  "@featureATopic": {
+    "description": "Featured topic sheet title"
+  },
+  "featureATopicHint": "Pin one of your topics to the top of your profile.",
+  "@featureATopicHint": {
+    "description": "Featured topic sheet: explanation"
+  },
+  "featuredTopicChanged": "Featured topic changed",
+  "@featuredTopicChanged": {
+    "description": "Snackbar after featuring a topic, with Undo"
+  },
+  "featuredTopicNone": "None. Pin one of your topics to your profile.",
+  "@featuredTopicNone": {
+    "description": "Edit profile: featured topic row when none is set"
+  },
+  "featuredTopicRemoved": "Featured topic removed",
+  "@featuredTopicRemoved": {
+    "description": "Snackbar after removing the featured topic, with Undo"
+  },
+  "featuredTopicRules": "Messages and topics in private categories can't be featured.",
+  "@featuredTopicRules": {
+    "description": "Featured topic sheet: footnote"
+  },
+  "fieldManagedBySignIn": "This forum manages it through its own sign-in. Change it there.",
+  "@fieldManagedBySignIn": {
+    "description": "Snackbar when tapping a locked profile row"
+  },
+  "flair": "Flair",
+  "@flair": {
+    "description": "Edit profile: the group badge shown on the person's picture"
+  },
+  "flairChangedTo": "Flair changed to {group}",
+  "@flairChangedTo": {
+    "description": "Snackbar after choosing a flair, with Undo",
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "flairRemoved": "Flair removed",
+  "@flairRemoved": {
+    "description": "Snackbar after removing the flair, with Undo"
+  },
+  "flairSheetHint": "A small badge on your picture, from a group you're in.",
+  "@flairSheetHint": {
+    "description": "Flair sheet: explanation"
+  },
+  "forumPictureN": "Forum picture {number}",
+  "@forumPictureN": {
+    "description": "Accessibility label of one of the forum's own profile pictures",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "forumQuestionNeedsAnswer": "{question} needs an answer",
+  "@forumQuestionNeedsAnswer": {
+    "description": "Edit profile: More about you row when a required question is unanswered",
+    "placeholders": {
+      "question": {
+        "type": "String"
+      }
+    }
+  },
+  "forumQuestionRequired": "This forum asks everyone to answer",
+  "@forumQuestionRequired": {
+    "description": "More about you: error under an unanswered required question"
+  },
+  "forumQuestionSetByStaff": "Set by the forum's staff",
+  "@forumQuestionSetByStaff": {
+    "description": "More about you: helper under a question only staff can change"
+  },
+  "forumQuestionsIntro": "Questions from this forum. * means required.",
+  "@forumQuestionsIntro": {
+    "description": "More about you page: intro"
+  },
+  "forumQuestionsNoneAnswered": "Not answered yet",
+  "@forumQuestionsNoneAnswered": {
+    "description": "Edit profile: More about you row when nothing is answered"
+  },
+  "fromThisForum": "From this forum",
+  "@fromThisForum": {
+    "description": "Profile picture sheet: heading over the forum's own pictures"
+  },
+  "hideMyProfile": "Hide my public profile",
+  "@hideMyProfile": {
+    "description": "Edit profile: switch"
+  },
+  "hideMyProfileExplanation": "Others see only your name, picture and posts",
+  "@hideMyProfileExplanation": {
+    "description": "Edit profile: under Hide my public profile"
+  },
+  "letterAvatar": "Letter",
+  "@letterAvatar": {
+    "description": "Profile picture sheet: the forum's letter avatar"
+  },
+  "moreAboutYou": "More about you",
+  "@moreAboutYou": {
+    "description": "Edit profile: the forum's own profile questions, and that page's title"
+  },
+  "namesAndMore": "{names} and {count, plural, =1{1 more} other{{count} more}}",
+  "@namesAndMore": {
+    "description": "Edit profile: a list cut short, e.g. 'Pronouns, Company, Tool and 3 more'",
+    "placeholders": {
+      "names": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "newUsername": "New username",
+  "@newUsername": {
+    "description": "Change username dialog: field label"
+  },
+  "noFlair": "No flair",
+  "@noFlair": {
+    "description": "Flair sheet: wear none"
+  },
+  "noGravatarFound": "{service} has no picture for your email address",
+  "@noGravatarFound": {
+    "description": "Profile picture sheet: Gravatar chosen but none exists",
+    "placeholders": {
+      "service": {
+        "type": "String"
+      }
+    }
+  },
+  "noTitle": "No title",
+  "@noTitle": {
+    "description": "Title sheet: wear none"
+  },
+  "noTopicsMatch": "None of your topics match",
+  "@noTopicsMatch": {
+    "description": "Featured topic sheet: search found nothing"
+  },
+  "noTopicsToFeature": "You haven't started any topics yet",
+  "@noTopicsToFeature": {
+    "description": "Featured topic sheet: no topics"
+  },
+  "notSet": "Not set",
+  "@notSet": {
+    "description": "Edit profile: a value that is empty"
+  },
+  "orUse": "Or use",
+  "@orUse": {
+    "description": "Profile picture sheet: heading over the letter avatar, Gravatar and earlier photo"
+  },
+  "pictureManagedBySignIn": "This forum sets your picture through its own sign-in",
+  "@pictureManagedBySignIn": {
+    "description": "Profile picture: locked by the forum's sign-in"
+  },
+  "primaryGroup": "Primary group",
+  "@primaryGroup": {
+    "description": "Edit profile: the person's main group"
+  },
+  "primaryGroupChangedTo": "Primary group changed to {group}",
+  "@primaryGroupChangedTo": {
+    "description": "Snackbar after choosing a primary group, with Undo",
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "primaryGroupRemoved": "Primary group removed",
+  "@primaryGroupRemoved": {
+    "description": "Snackbar after removing the primary group, with Undo"
+  },
+  "primaryGroupSheetHint": "Your main group, shown on your user card.",
+  "@primaryGroupSheetHint": {
+    "description": "Primary group sheet: explanation"
+  },
+  "profileLoadFailed": "Couldn't load your profile",
+  "@profileLoadFailed": {
+    "description": "Edit profile: loading failed"
+  },
+  "profileNowHidden": "Your profile is hidden",
+  "@profileNowHidden": {
+    "description": "Snackbar after hiding the profile, with Undo"
+  },
+  "profileNowPublic": "Your profile is public",
+  "@profileNowPublic": {
+    "description": "Snackbar after showing the profile, with Undo"
+  },
+  "profilePicture": "Profile picture",
+  "@profilePicture": {
+    "description": "Profile picture sheet title"
+  },
+  "profilePictureChanged": "Profile picture changed",
+  "@profilePictureChanged": {
+    "description": "Snackbar after changing the profile picture"
+  },
+  "profileSaveFailed": "Couldn't save. Try again.",
+  "@profileSaveFailed": {
+    "description": "Edit profile: a save failed with no message from the forum"
+  },
+  "profileSectionNameAndAbout": "Name and about",
+  "@profileSectionNameAndAbout": {
+    "description": "Edit profile: section heading"
+  },
+  "profileSectionNextToName": "Next to your name",
+  "@profileSectionNextToName": {
+    "description": "Edit profile: section heading over title, flair and primary group"
+  },
+  "profileSectionOnProfile": "On your profile",
+  "@profileSectionOnProfile": {
+    "description": "Edit profile: section heading over featured topic and the forum's questions"
+  },
+  "profileSectionPrivacyAndTime": "Privacy and time",
+  "@profileSectionPrivacyAndTime": {
+    "description": "Edit profile: section heading"
+  },
+  "removeCardBackground": "Remove card background",
+  "@removeCardBackground": {
+    "description": "Card background sheet: remove"
+  },
+  "removeCover": "Remove cover",
+  "@removeCover": {
+    "description": "Cover photo sheet: remove"
+  },
+  "removeFeaturedTopic": "Remove featured topic",
+  "@removeFeaturedTopic": {
+    "description": "Featured topic sheet: clear"
+  },
+  "searchTimezones": "Search time zones",
+  "@searchTimezones": {
+    "description": "Time zone sheet: search field"
+  },
+  "searchYourTopics": "Search your topics",
+  "@searchYourTopics": {
+    "description": "Featured topic sheet: search field"
+  },
+  "seeProfileAsOthersDo": "See your profile as others do",
+  "@seeProfileAsOthersDo": {
+    "description": "Edit profile: app bar button"
+  },
+  "timezone": "Time zone",
+  "@timezone": {
+    "description": "Edit profile: the person's time zone, and its sheet's title"
+  },
+  "timezoneChangedTo": "Time zone changed to {zone}",
+  "@timezoneChangedTo": {
+    "description": "Snackbar after choosing a time zone, with Undo",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "timezoneWithTime": "{zone} · {time} now",
+  "@timezoneWithTime": {
+    "description": "Edit profile: the time zone and the time there now",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "timezonesMatchingPhone": "Matches this phone's clock ({offset})",
+  "@timezonesMatchingPhone": {
+    "description": "Time zone sheet: heading over the zones at the phone's UTC offset",
+    "placeholders": {
+      "offset": {
+        "type": "String"
+      }
+    }
+  },
+  "titleChangedTo": "Title changed to {title}",
+  "@titleChangedTo": {
+    "description": "Snackbar after choosing a title, with Undo",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "titleFromBadge": "Badge",
+  "@titleFromBadge": {
+    "description": "Title sheet: the title comes from a badge"
+  },
+  "titleFromBadgeEarned": "Badge · earned {date}",
+  "@titleFromBadgeEarned": {
+    "description": "Title sheet: the title comes from a badge earned then",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "titleFromGroup": "{group} group",
+  "@titleFromGroup": {
+    "description": "Title sheet: the title comes from this group",
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "titleGrantedByStaff": "Given by the forum's staff",
+  "@titleGrantedByStaff": {
+    "description": "Title sheet: the current title was set by staff"
+  },
+  "titleRemoved": "Title removed",
+  "@titleRemoved": {
+    "description": "Snackbar after removing the title, with Undo"
+  },
+  "titleSheetHint": "Shown after your name on your profile and posts.",
+  "@titleSheetHint": {
+    "description": "Title sheet: explanation"
+  },
+  "username": "Username",
+  "@username": {
+    "description": "Edit profile: the person's @username"
+  },
+  "usernameAvailable": "Available",
+  "@usernameAvailable": {
+    "description": "Change username dialog: the name is free"
+  },
+  "usernameChanged": "Your username is now @{username}",
+  "@usernameChanged": {
+    "description": "Snackbar after changing the username",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "usernameLockedExplanation": "This forum lets members change their username only shortly after joining. A moderator can change it for you.",
+  "@usernameLockedExplanation": {
+    "description": "Snackbar when tapping a locked username"
+  },
+  "yourPhoto": "Your photo",
+  "@yourPhoto": {
+    "description": "Profile picture sheet: the photo uploaded earlier"
   }
 }

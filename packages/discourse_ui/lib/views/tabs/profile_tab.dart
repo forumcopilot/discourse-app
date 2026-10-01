@@ -320,15 +320,11 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab>
                   child: OutlinedButton(
                     onPressed: info == null
                         ? null
-                        : () async {
-                            final saved = await Navigator.of(context).push<bool>(
-                              MaterialPageRoute(
-                                builder: (_) => EditProfilePage(
-                                    siteContext: site, userInfo: info),
-                              ),
-                            );
-                            if (saved == true && mounted) _refresh();
-                          },
+                        // Each change saves as it is made: refresh
+                        // whenever Edit profile closes.
+                        : () => _push(
+                            EditProfilePage(siteContext: site, userInfo: info),
+                            refreshAfter: true),
                     child: Text(l10n.editProfile),
                   ),
                 ),

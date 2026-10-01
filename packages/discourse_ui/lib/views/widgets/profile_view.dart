@@ -268,16 +268,14 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
+  /// Edit profile saves each change as it is made, so the profile is
+  /// refetched whenever the reader comes back from it.
   Future<void> _openEdit() async {
-    final saved = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        builder: (_) => EditProfilePage(
-          siteContext: widget.siteContext,
-          userInfo: _userInfo,
-        ),
-      ),
+    await AppNavigation.push<void>(
+      context,
+      EditProfilePage(siteContext: widget.siteContext, userInfo: _userInfo),
     );
-    if (saved == true) widget.onEdited?.call();
+    if (mounted) widget.onEdited?.call();
   }
 
   void _viewAvatar() {

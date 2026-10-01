@@ -1,14 +1,10 @@
-import 'dart:io';
-
-import 'package:discourse_ui/core/logging/app_logger.dart';
-import 'package:discourse_ui/utils/file_picker_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
+import '../profile/profile_common.dart';
+import '../profile/profile_pickers.dart';
 import 'full_screen_image_viewer.dart';
 import 'user_avatar.dart';
 
@@ -17,8 +13,8 @@ import 'user_avatar.dart';
 ///
 /// Tapping the picture opens it full screen; the badge picks a photo (camera
 /// or library on phones, a file on desktop), uploads it and refreshes the
-/// avatar stored with the session, then calls [onChanged]. The badge shows
-/// only where the forum lets this reader upload an avatar.
+/// avatar stored with the session, then calls [onChanged]. The badge opens
+/// the profile picture sheet, which offers what the forum allows.
 class EditableProfileAvatar extends StatefulWidget {
   const EditableProfileAvatar({
     super.key,
@@ -40,88 +36,23 @@ class EditableProfileAvatar extends StatefulWidget {
 }
 
 class _EditableProfileAvatarState extends State<EditableProfileAvatar> {
-  File? _picked;
   bool _uploading = false;
 
-  bool get _canUpload =>
-      widget.siteContext.loginDataOutput?.canUploadAvatar ?? false;
-
+  /// The profile picture sheet: a new photo, the letter avatar, the
+  /// Gravatar, an earlier upload or one of the forum's own pictures —
+  /// whichever the forum allows. The session's copy of the picture (the
+  /// drawer and headers read it) is refreshed after a change.
   Future<void> _change() async {
-    final l10n = AppLocalizations.of(context)!;
-    final messenger = ScaffoldMessenger.of(context);
-    XFile? image;
-    try {
-      if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
-        image = await FilePickerUtils.pickImage(imageQuality: ImageQuality.high);
-      } else {
-        // Camera or library. An avatar is shown small, so unlike a post's
-        // images it is scaled and recompressed on the way.
-        final source = await showModalBottomSheet<ImageSource>(
-          context: context,
-          builder: (sheet) => SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.photo_camera_outlined),
-                  title: Text(l10n.takePhoto),
-                  onTap: () => Navigator.pop(sheet, ImageSource.camera),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.photo_library_outlined),
-                  title: Text(l10n.uploadImage),
-                  onTap: () => Navigator.pop(sheet, ImageSource.gallery),
-                ),
-              ],
-            ),
-          ),
-        );
-        if (source == null) return;
-        image = await ImagePicker().pickImage(
-          source: source,
-          maxWidth: 1024,
-          maxHeight: 1024,
-          imageQuality: 85,
-        );
-      }
-      if (image == null || !mounted) return;
-      setState(() {
-        _picked = File(image!.path);
-        _uploading = true;
-      });
-      final result = await SiteProxyFactory.getAttachmentProxy()
-          .uploadAvatarAsync('jpg', await image.readAsBytes());
-      if (result.result != true) throw Exception(result.resultText);
-      await _refreshSessionAvatar();
-      if (!mounted) return;
-      setState(() {
-        _uploading = false;
-        _picked = null;
-      });
-      messenger.showSnackBar(
-          SnackBar(content: Text(l10n.avatarUploadedSuccessfully)));
-      widget.onChanged?.call();
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _uploading = false;
-        _picked = null;
-      });
-      messenger.showSnackBar(SnackBar(content: Text(l10n.failedToPickImage2(e))));
-    }
-  }
-
-  /// The session keeps the reader's avatar URL (the drawer and headers
-  /// read it), so it is refreshed from the server after an upload.
-  Future<void> _refreshSessionAvatar() async {
-    try {
-      final info = await SiteProxyFactory.getUserProxy()
-          .getUserInfoAsync(widget.username, null);
-      widget.siteContext.loginDataOutput?.user?.iconUrl = info.iconUrl ?? '';
-      await widget.siteContext.saveToDevice();
-    } catch (e) {
-      AppLogger.debug('EditableProfileAvatar: refresh after upload failed: $e');
-    }
+    final changed = await changeProfilePicture(
+      context: context,
+      siteContext: widget.siteContext,
+      onUploading: (busy) {
+        if (mounted) setState(() => _uploading = busy);
+      },
+    );
+    if (!changed) return;
+    await refreshSessionAvatar(widget.siteContext);
+    if (mounted) widget.onChanged?.call();
   }
 
   void _viewFull() {
@@ -151,16 +82,11 @@ class _EditableProfileAvatarState extends State<EditableProfileAvatar> {
             top: 0,
             child: GestureDetector(
               onTap: _viewFull,
-              child: _picked != null
-                  ? ClipOval(
-                      child: Image.file(_picked!,
-                          width: size, height: size, fit: BoxFit.cover),
-                    )
-                  : UserAvatar(
-                      username: widget.username,
-                      iconUrl: widget.avatarUrl,
-                      radius: widget.radius,
-                    ),
+              child: UserAvatar(
+                username: widget.username,
+                iconUrl: widget.avatarUrl,
+                radius: widget.radius,
+              ),
             ),
           ),
           if (_uploading)
@@ -182,15 +108,14 @@ class _EditableProfileAvatarState extends State<EditableProfileAvatar> {
                 ),
               ),
             ),
-          if (_canUpload)
-            // A 28dp badge in a 44dp target: the padding around it takes
+          // A 28dp badge in a 44dp target: the padding around it takes
             // the tap too, so it is not a fingertip-sized hunt.
             Positioned(
               right: -8,
               bottom: -8,
               child: Semantics(
                 button: true,
-                label: AppLocalizations.of(context)!.uploadImage,
+                label: AppLocalizations.of(context)!.changeProfilePicture,
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: _uploading ? null : _change,

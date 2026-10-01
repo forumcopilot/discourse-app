@@ -5205,6 +5205,558 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We\'ll send a verification link to the new address'**
   String get changeEmailSubtitle;
+
+  /// Edit profile: the bio row and its editor's title
+  ///
+  /// In en, this message translates to:
+  /// **'About me'**
+  String get aboutMe;
+
+  /// About me editor: under the field
+  ///
+  /// In en, this message translates to:
+  /// **'Shown at the top of your profile'**
+  String get aboutMeHelper;
+
+  /// About me editor: beside the formatting buttons
+  ///
+  /// In en, this message translates to:
+  /// **'Markdown works: **bold**, links, :emoji:'**
+  String get aboutMeMarkdownHint;
+
+  /// Edit profile: button on an empty cover
+  ///
+  /// In en, this message translates to:
+  /// **'Add cover'**
+  String get addCover;
+
+  /// Edit profile: button on the cover photo
+  ///
+  /// In en, this message translates to:
+  /// **'Change cover'**
+  String get changeCover;
+
+  /// Birthday dialog: explanation
+  ///
+  /// In en, this message translates to:
+  /// **'The forum celebrates it with you. No year is kept.'**
+  String get birthdayHint;
+
+  /// Snackbar after removing the birthday
+  ///
+  /// In en, this message translates to:
+  /// **'Birthday removed'**
+  String get birthdayRemoved;
+
+  /// Snackbar after setting the birthday
+  ///
+  /// In en, this message translates to:
+  /// **'Birthday saved'**
+  String get birthdaySaved;
+
+  /// Edit profile: the user card's background image
+  ///
+  /// In en, this message translates to:
+  /// **'Card background'**
+  String get cardBackground;
+
+  /// Edit profile: under Card background
+  ///
+  /// In en, this message translates to:
+  /// **'Behind your user card on the forum\'s website'**
+  String get cardBackgroundExplanation;
+
+  /// Snackbar after removing the card background, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Card background removed'**
+  String get cardBackgroundRemoved;
+
+  /// Card background sheet: explanation
+  ///
+  /// In en, this message translates to:
+  /// **'Shown behind your user card. Wide photos work best.'**
+  String get cardBackgroundSheetHint;
+
+  /// Tooltip of the camera button on your picture
+  ///
+  /// In en, this message translates to:
+  /// **'Change profile picture'**
+  String get changeProfilePicture;
+
+  /// Change username dialog title and its confirm button
+  ///
+  /// In en, this message translates to:
+  /// **'Change username'**
+  String get changeUsername;
+
+  /// Change username dialog: what changing it does
+  ///
+  /// In en, this message translates to:
+  /// **'Mentions and quotes of @{username} in posts switch to the new name. Old links to your profile stop working.'**
+  String changeUsernameExplanation(String username);
+
+  /// Photo sheets: pick a photo from the phone's library
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from library'**
+  String get chooseFromLibrary;
+
+  /// Cover photo sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Cover photo'**
+  String get coverPhoto;
+
+  /// Cover photo sheet: explanation
+  ///
+  /// In en, this message translates to:
+  /// **'Shown across the top of your profile, behind your picture. Wide photos work best, about 3 to 1.'**
+  String get coverPhotoSheetHint;
+
+  /// Snackbar after removing the cover, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Cover removed'**
+  String get coverRemoved;
+
+  /// Birthday dialog: day of the month
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get day;
+
+  /// Birthday dialog: month
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get month;
+
+  /// Edit profile: the person's name (not their username)
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get displayName;
+
+  /// Display name dialog: helper under the field
+  ///
+  /// In en, this message translates to:
+  /// **'Shown with your posts. Your username stays @{username}.'**
+  String displayNameHelper(String username);
+
+  /// Edit profile: link at the bottom to Account and privacy
+  ///
+  /// In en, this message translates to:
+  /// **'Email, password and sign-in'**
+  String get emailPasswordInAccount;
+
+  /// Featured topic sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Feature a topic'**
+  String get featureATopic;
+
+  /// Featured topic sheet: explanation
+  ///
+  /// In en, this message translates to:
+  /// **'Pin one of your topics to the top of your profile.'**
+  String get featureATopicHint;
+
+  /// Snackbar after featuring a topic, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Featured topic changed'**
+  String get featuredTopicChanged;
+
+  /// Edit profile: featured topic row when none is set
+  ///
+  /// In en, this message translates to:
+  /// **'None. Pin one of your topics to your profile.'**
+  String get featuredTopicNone;
+
+  /// Snackbar after removing the featured topic, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Featured topic removed'**
+  String get featuredTopicRemoved;
+
+  /// Featured topic sheet: footnote
+  ///
+  /// In en, this message translates to:
+  /// **'Messages and topics in private categories can\'t be featured.'**
+  String get featuredTopicRules;
+
+  /// Snackbar when tapping a locked profile row
+  ///
+  /// In en, this message translates to:
+  /// **'This forum manages it through its own sign-in. Change it there.'**
+  String get fieldManagedBySignIn;
+
+  /// Edit profile: the group badge shown on the person's picture
+  ///
+  /// In en, this message translates to:
+  /// **'Flair'**
+  String get flair;
+
+  /// Snackbar after choosing a flair, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Flair changed to {group}'**
+  String flairChangedTo(String group);
+
+  /// Snackbar after removing the flair, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Flair removed'**
+  String get flairRemoved;
+
+  /// Flair sheet: explanation
+  ///
+  /// In en, this message translates to:
+  /// **'A small badge on your picture, from a group you\'re in.'**
+  String get flairSheetHint;
+
+  /// Accessibility label of one of the forum's own profile pictures
+  ///
+  /// In en, this message translates to:
+  /// **'Forum picture {number}'**
+  String forumPictureN(int number);
+
+  /// Edit profile: More about you row when a required question is unanswered
+  ///
+  /// In en, this message translates to:
+  /// **'{question} needs an answer'**
+  String forumQuestionNeedsAnswer(String question);
+
+  /// More about you: error under an unanswered required question
+  ///
+  /// In en, this message translates to:
+  /// **'This forum asks everyone to answer'**
+  String get forumQuestionRequired;
+
+  /// More about you: helper under a question only staff can change
+  ///
+  /// In en, this message translates to:
+  /// **'Set by the forum\'s staff'**
+  String get forumQuestionSetByStaff;
+
+  /// More about you page: intro
+  ///
+  /// In en, this message translates to:
+  /// **'Questions from this forum. * means required.'**
+  String get forumQuestionsIntro;
+
+  /// Edit profile: More about you row when nothing is answered
+  ///
+  /// In en, this message translates to:
+  /// **'Not answered yet'**
+  String get forumQuestionsNoneAnswered;
+
+  /// Profile picture sheet: heading over the forum's own pictures
+  ///
+  /// In en, this message translates to:
+  /// **'From this forum'**
+  String get fromThisForum;
+
+  /// Edit profile: switch
+  ///
+  /// In en, this message translates to:
+  /// **'Hide my public profile'**
+  String get hideMyProfile;
+
+  /// Edit profile: under Hide my public profile
+  ///
+  /// In en, this message translates to:
+  /// **'Others see only your name, picture and posts'**
+  String get hideMyProfileExplanation;
+
+  /// Profile picture sheet: the forum's letter avatar
+  ///
+  /// In en, this message translates to:
+  /// **'Letter'**
+  String get letterAvatar;
+
+  /// Edit profile: the forum's own profile questions, and that page's title
+  ///
+  /// In en, this message translates to:
+  /// **'More about you'**
+  String get moreAboutYou;
+
+  /// Edit profile: a list cut short, e.g. 'Pronouns, Company, Tool and 3 more'
+  ///
+  /// In en, this message translates to:
+  /// **'{names} and {count, plural, =1{1 more} other{{count} more}}'**
+  String namesAndMore(String names, int count);
+
+  /// Change username dialog: field label
+  ///
+  /// In en, this message translates to:
+  /// **'New username'**
+  String get newUsername;
+
+  /// Flair sheet: wear none
+  ///
+  /// In en, this message translates to:
+  /// **'No flair'**
+  String get noFlair;
+
+  /// Profile picture sheet: Gravatar chosen but none exists
+  ///
+  /// In en, this message translates to:
+  /// **'{service} has no picture for your email address'**
+  String noGravatarFound(String service);
+
+  /// Title sheet: wear none
+  ///
+  /// In en, this message translates to:
+  /// **'No title'**
+  String get noTitle;
+
+  /// Featured topic sheet: search found nothing
+  ///
+  /// In en, this message translates to:
+  /// **'None of your topics match'**
+  String get noTopicsMatch;
+
+  /// Featured topic sheet: no topics
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t started any topics yet'**
+  String get noTopicsToFeature;
+
+  /// Edit profile: a value that is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get notSet;
+
+  /// Profile picture sheet: heading over the letter avatar, Gravatar and earlier photo
+  ///
+  /// In en, this message translates to:
+  /// **'Or use'**
+  String get orUse;
+
+  /// Profile picture: locked by the forum's sign-in
+  ///
+  /// In en, this message translates to:
+  /// **'This forum sets your picture through its own sign-in'**
+  String get pictureManagedBySignIn;
+
+  /// Edit profile: the person's main group
+  ///
+  /// In en, this message translates to:
+  /// **'Primary group'**
+  String get primaryGroup;
+
+  /// Snackbar after choosing a primary group, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Primary group changed to {group}'**
+  String primaryGroupChangedTo(String group);
+
+  /// Snackbar after removing the primary group, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Primary group removed'**
+  String get primaryGroupRemoved;
+
+  /// Primary group sheet: explanation
+  ///
+  /// In en, this message translates to:
+  /// **'Your main group, shown on your user card.'**
+  String get primaryGroupSheetHint;
+
+  /// Edit profile: loading failed
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your profile'**
+  String get profileLoadFailed;
+
+  /// Snackbar after hiding the profile, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile is hidden'**
+  String get profileNowHidden;
+
+  /// Snackbar after showing the profile, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile is public'**
+  String get profileNowPublic;
+
+  /// Profile picture sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Profile picture'**
+  String get profilePicture;
+
+  /// Snackbar after changing the profile picture
+  ///
+  /// In en, this message translates to:
+  /// **'Profile picture changed'**
+  String get profilePictureChanged;
+
+  /// Edit profile: a save failed with no message from the forum
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save. Try again.'**
+  String get profileSaveFailed;
+
+  /// Edit profile: section heading
+  ///
+  /// In en, this message translates to:
+  /// **'Name and about'**
+  String get profileSectionNameAndAbout;
+
+  /// Edit profile: section heading over title, flair and primary group
+  ///
+  /// In en, this message translates to:
+  /// **'Next to your name'**
+  String get profileSectionNextToName;
+
+  /// Edit profile: section heading over featured topic and the forum's questions
+  ///
+  /// In en, this message translates to:
+  /// **'On your profile'**
+  String get profileSectionOnProfile;
+
+  /// Edit profile: section heading
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy and time'**
+  String get profileSectionPrivacyAndTime;
+
+  /// Card background sheet: remove
+  ///
+  /// In en, this message translates to:
+  /// **'Remove card background'**
+  String get removeCardBackground;
+
+  /// Cover photo sheet: remove
+  ///
+  /// In en, this message translates to:
+  /// **'Remove cover'**
+  String get removeCover;
+
+  /// Featured topic sheet: clear
+  ///
+  /// In en, this message translates to:
+  /// **'Remove featured topic'**
+  String get removeFeaturedTopic;
+
+  /// Time zone sheet: search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search time zones'**
+  String get searchTimezones;
+
+  /// Featured topic sheet: search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search your topics'**
+  String get searchYourTopics;
+
+  /// Edit profile: app bar button
+  ///
+  /// In en, this message translates to:
+  /// **'See your profile as others do'**
+  String get seeProfileAsOthersDo;
+
+  /// Edit profile: the person's time zone, and its sheet's title
+  ///
+  /// In en, this message translates to:
+  /// **'Time zone'**
+  String get timezone;
+
+  /// Snackbar after choosing a time zone, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Time zone changed to {zone}'**
+  String timezoneChangedTo(String zone);
+
+  /// Edit profile: the time zone and the time there now
+  ///
+  /// In en, this message translates to:
+  /// **'{zone} · {time} now'**
+  String timezoneWithTime(String zone, String time);
+
+  /// Time zone sheet: heading over the zones at the phone's UTC offset
+  ///
+  /// In en, this message translates to:
+  /// **'Matches this phone\'s clock ({offset})'**
+  String timezonesMatchingPhone(String offset);
+
+  /// Snackbar after choosing a title, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Title changed to {title}'**
+  String titleChangedTo(String title);
+
+  /// Title sheet: the title comes from a badge
+  ///
+  /// In en, this message translates to:
+  /// **'Badge'**
+  String get titleFromBadge;
+
+  /// Title sheet: the title comes from a badge earned then
+  ///
+  /// In en, this message translates to:
+  /// **'Badge · earned {date}'**
+  String titleFromBadgeEarned(String date);
+
+  /// Title sheet: the title comes from this group
+  ///
+  /// In en, this message translates to:
+  /// **'{group} group'**
+  String titleFromGroup(String group);
+
+  /// Title sheet: the current title was set by staff
+  ///
+  /// In en, this message translates to:
+  /// **'Given by the forum\'s staff'**
+  String get titleGrantedByStaff;
+
+  /// Snackbar after removing the title, with Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Title removed'**
+  String get titleRemoved;
+
+  /// Title sheet: explanation
+  ///
+  /// In en, this message translates to:
+  /// **'Shown after your name on your profile and posts.'**
+  String get titleSheetHint;
+
+  /// Edit profile: the person's @username
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get username;
+
+  /// Change username dialog: the name is free
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get usernameAvailable;
+
+  /// Snackbar after changing the username
+  ///
+  /// In en, this message translates to:
+  /// **'Your username is now @{username}'**
+  String usernameChanged(String username);
+
+  /// Snackbar when tapping a locked username
+  ///
+  /// In en, this message translates to:
+  /// **'This forum lets members change their username only shortly after joining. A moderator can change it for you.'**
+  String get usernameLockedExplanation;
+
+  /// Profile picture sheet: the photo uploaded earlier
+  ///
+  /// In en, this message translates to:
+  /// **'Your photo'**
+  String get yourPhoto;
 }
 
 class _AppLocalizationsDelegate
