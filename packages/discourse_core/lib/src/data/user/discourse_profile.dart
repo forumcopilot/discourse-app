@@ -138,7 +138,9 @@ class DiscourseProfileSettings {
   /// `allow_profile_backgrounds`: web shows the cover and card images.
   final bool allowProfileBackgrounds;
 
-  /// `cakeday_birthday_enabled` (the bundled cakeday plugin).
+  /// The bundled cakeday plugin is on (`cakeday_enabled`) with its
+  /// birthdays (`cakeday_birthday_enabled`). The second alone means
+  /// nothing: with the plugin off, a saved birthday is never shown.
   final bool birthdaysEnabled;
 
   /// `discourse_connect_overrides_avatar`: the forum's own sign-in sets
@@ -179,7 +181,8 @@ class DiscourseProfileSettings {
           : gravatarName,
       selectableAvatars: avatars,
       allowProfileBackgrounds: flag('allow_profile_backgrounds', true),
-      birthdaysEnabled: flag('cakeday_birthday_enabled', false),
+      birthdaysEnabled: flag('cakeday_enabled', false) &&
+          flag('cakeday_birthday_enabled', false),
       avatarManagedBySignIn: flag('enable_discourse_connect', false) &&
           flag('discourse_connect_overrides_avatar', false),
       displayLocalTime: flag('display_local_time_in_user_card', false),

@@ -126,6 +126,7 @@ void main() {
         'enable_user_status': true,
         'selectable_avatars_mode': 'no_one',
         'selectable_avatars': '/uploads/a.png|/uploads/b.png',
+        'cakeday_enabled': true,
         'cakeday_birthday_enabled': true,
         'user_selected_primary_groups': true,
         'gravatar_name': 'Libravatar',
@@ -136,6 +137,11 @@ void main() {
         'https://forum.example/uploads/b.png',
       ]);
       expect(s.birthdaysEnabled, isTrue);
+      expect(
+          DiscourseProfileSettings.fromClientSettings(
+              {'cakeday_birthday_enabled': true}).birthdaysEnabled,
+          isFalse,
+          reason: 'with the cakeday plugin off, a birthday is never shown');
       expect(s.userSelectedPrimaryGroups, isTrue);
       expect(s.gravatarName, 'Libravatar');
 
