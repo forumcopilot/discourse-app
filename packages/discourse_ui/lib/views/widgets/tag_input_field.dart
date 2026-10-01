@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 
+import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
 
 /// A composer-friendly tag input: text field + chip row + autocomplete
@@ -41,15 +42,15 @@ class TagInputField extends StatefulWidget {
   final bool allowCreate;
 
   /// Label shown above the chips when the user hasn't entered any
-  /// tags yet.
-  final String label;
+  /// tags yet; null for "Tags".
+  final String? label;
 
   const TagInputField({
     super.key,
     this.initial = const [],
     this.onChanged,
     this.maxTags = 5,
-    this.label = 'Tags',
+    this.label,
     this.allowCreate = true,
   });
 
@@ -149,6 +150,7 @@ class _TagInputFieldState extends State<TagInputField> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     final cap = widget.maxTags;
     final atCap = cap != null && _tags.length >= cap;
 
@@ -163,10 +165,10 @@ class _TagInputFieldState extends State<TagInputField> {
           focusNode: _focusNode,
           enabled: !atCap,
           decoration: InputDecoration(
-            labelText: widget.label,
+            labelText: widget.label ?? l10n.tags,
             hintText: atCap
-                ? 'Max tags reached'
-                : (_tags.isEmpty ? 'Add a tag…' : '+ tag'),
+                ? l10n.tagInputMaxReached
+                : (_tags.isEmpty ? l10n.tagInputAddTag : l10n.tagInputAddAnother),
             counterText: cap == null ? null : '${_tags.length}/$cap',
           ),
           textInputAction: TextInputAction.done,

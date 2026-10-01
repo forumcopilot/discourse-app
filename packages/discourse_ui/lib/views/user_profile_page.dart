@@ -14,6 +14,7 @@ import 'login_page.dart';
 import '../theme/design_tokens.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../utils/error_message.dart';
+import 'package:discourse_ui/l10n/app_l10n.dart';
 
 class UserProfilePage extends StatefulWidget {
   final SiteContext siteContext;
@@ -113,9 +114,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
       });
     } catch (e) {
       AppLogger.debug('Error fetching user info: $e');
-      showErrorDialog('Failed to load user info: $e');
+      final l10n = appL10n();
+      showErrorDialog(l10n.userInfoLoadFailedWithError('$e'));
       setState(() {
-        _error = describeError(e, fallback: 'Failed to load user info.');
+        _error = describeError(e, fallback: l10n.userInfoLoadFailed);
         _isLoading = false;
       });
     }
@@ -150,7 +152,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: _isLoading
-            ? Text(AppLocalizations.of(context)?.loading ?? 'Loading...')
+            ? Text(AppLocalizations.of(context)!.loading)
             : _userInfo != null
                 ? (widget.siteContext.loginDataOutput != null && widget.siteContext.loginDataOutput?.user?.id != _userInfo!.id)
                     ? const SizedBox.shrink() // Hide title when viewing another user's profile
@@ -159,7 +161,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       )
-                : Text(AppLocalizations.of(context)?.userProfile ?? 'User Profile'),
+                : Text(AppLocalizations.of(context)!.userProfile),
         actions: [
           // Share and Copy link for anyone's profile (your own too); the
           // moderation items below only where the server allows them.
@@ -241,8 +243,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         const SizedBox(width: DesignTokens.spacingM),
                         Text(
                           _userInfo!.isIgnored
-                              ? 'Unignore user'
-                              : 'Ignore user',
+                              ? AppLocalizations.of(context)!
+                                  .profileMenuUnignoreUser
+                              : AppLocalizations.of(context)!
+                                  .profileMenuIgnoreUser,
                         ),
                       ],
                     ),
@@ -287,14 +291,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
           : _error != null
               ? EmptyStateView.error(
                   icon: Icons.error_outline_rounded,
-                  message: AppLocalizations.of(context)?.unableToLoadProfile ?? 'Unable to Load Profile',
+                  message: AppLocalizations.of(context)!.unableToLoadProfile,
                   hint: describeError(_error, context: context),
                   onRetry: _fetchUserInfo,
                 )
               : _userInfo == null
                   ? EmptyStateView(
                       icon: Icons.person_off_outlined,
-                      message: AppLocalizations.of(context)?.userInformationNotAvailable ?? 'User information not available',
+                      message: AppLocalizations.of(context)!.userInformationNotAvailable,
                     )
                   : RefreshIndicator(
                       onRefresh: _refreshProfile,
@@ -334,6 +338,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     if (_userInfo == null) return;
     final wantIgnore = !_userInfo!.isIgnored;
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final username = _userInfo!.username;
     // Optimistic flip — the menu's next render shows the new state.
     // Reverted on failure. `isIgnored` is a mutable field on FCUser
@@ -354,7 +359,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             content: Text(
               result.resultText?.isNotEmpty == true
                   ? result.resultText!
-                  : "Couldn't update ignore state",
+                  : l10n.ignoreStateUpdateFailed,
             ),
           ),
         );
@@ -364,8 +369,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
         SnackBar(
           content: Text(
             wantIgnore
-                ? "You're ignoring @$username. Their posts will be hidden."
-                : "Stopped ignoring @$username.",
+                ? l10n.profileNowIgnoringUser(username)
+                : l10n.stoppedIgnoringUser(username),
           ),
         ),
       );
@@ -375,7 +380,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         _userInfo!.isIgnored = !wantIgnore;
       });
       messenger.showSnackBar(
-        SnackBar(content: Text(describeError(e, fallback: 'Ignore toggle failed.'))),
+        SnackBar(content: Text(describeError(e, fallback: l10n.profileIgnoreToggleFailed))),
       );
     }
   }
@@ -496,7 +501,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
                             Navigator.of(context).pop(reason);
                           },
-                    child: Text(AppLocalizations.of(context)?.next ?? 'Next'),
+                    child: Text(AppLocalizations.of(context)!.next),
                   ),
                 ],
               );
@@ -564,7 +569,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       ),
                       RadioListTile<String>(
                         title: Text(
-                          AppLocalizations.of(context)?.temporary ?? 'Temporary',
+                          AppLocalizations.of(context)!.temporary,
                           style: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurface,
                           ),
@@ -631,7 +636,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         if (selectedEndDate == null) ...[
                           const SizedBox(height: DesignTokens.spacingXS),
                           Text(
-                            AppLocalizations.of(context)?.pleaseSelectEndDate ?? 'Please select an end date',
+                            AppLocalizations.of(context)!.pleaseSelectEndDate,
                             style: textTheme.bodySmall?.copyWith(
                               color: colorScheme.error,
                             ),
@@ -644,7 +649,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(null),
-                    child: Text(AppLocalizations.of(context)?.back ?? 'Back'),
+                    child: Text(AppLocalizations.of(context)!.back),
                   ),
                   FilledButton(
                     onPressed: () {

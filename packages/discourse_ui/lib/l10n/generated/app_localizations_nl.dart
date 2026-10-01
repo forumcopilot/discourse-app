@@ -53,37 +53,37 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get accountPendingApproval =>
-      'Uw account wacht op goedkeuring. U kunt het forum bekijken maar niet posten tot een moderator uw account goedkeurt.';
+      'Je account wacht op goedkeuring. Je kunt het forum bekijken, maar niet posten tot een moderator je account goedkeurt.';
 
   @override
   String get checkEmailToConfirm =>
-      'Controleer uw e-mail om uw account te bevestigen. Klik op de bevestigingslink in de e-mail die we u hebben gestuurd.';
+      'Controleer je e-mail om je account te bevestigen. Klik op de bevestigingslink in de e-mail die we je hebben gestuurd.';
 
   @override
   String get checkNewEmailToConfirm =>
-      'Controleer uw nieuwe e-mailadres om de wijziging te bevestigen. Uw oude e-mail blijft actief tot u de nieuwe bevestigt.';
+      'Controleer je nieuwe e-mailadres om de wijziging te bevestigen. Je oude e-mail blijft actief tot je de nieuwe bevestigt.';
 
   @override
   String get emailAddressInvalid =>
-      'Uw e-mailadres lijkt ongeldig of weigert e-mails. Werk uw e-mailadres bij in de accountinstellingen.';
+      'Je e-mailadres lijkt ongeldig of weigert e-mails. Werk je e-mailadres bij in de accountinstellingen.';
 
   @override
   String get accountDisabled =>
-      'Uw account is uitgeschakeld. Neem contact op met een beheerder voor hulp.';
+      'Je account is uitgeschakeld. Neem contact op met een beheerder voor hulp.';
 
   @override
   String get accountRegistrationRejected =>
-      'Uw registratie is afgewezen. Neem contact op met een beheerder voor meer informatie.';
+      'Je registratie is afgewezen. Neem contact op met een beheerder voor meer informatie.';
 
   @override
   String get welcomeToForumCopilot => 'Welkom bij Forum Copilot!';
 
   @override
-  String get successfullyLoggedOut => 'U bent succesvol uitgelogd';
+  String get successfullyLoggedOut => 'Je bent afgemeld';
 
   @override
   String get accountStatusRequiresAttention =>
-      'Uw accountstatus vereist aandacht. Neem contact op met een beheerder bij vragen.';
+      'Je accountstatus vereist aandacht. Neem contact op met een beheerder als je vragen hebt.';
 
   @override
   String get updateEmail => 'E-mail bijwerken';
@@ -92,34 +92,34 @@ class AppLocalizationsNl extends AppLocalizations {
   String get resend => 'Opnieuw verzenden';
 
   @override
-  String get noLatestTopics => 'Geen nieuwste onderwerpen';
+  String get noLatestTopics => 'Geen nieuwste topics';
 
   @override
   String get noRecentTopicsToDisplay =>
-      'Er zijn geen recente onderwerpen om weer te geven. Kom later terug voor nieuwe discussies.';
+      'Er zijn geen recente topics om weer te geven. Kom later terug voor nieuwe discussies.';
 
   @override
   String get signInToViewLatestTopics =>
-      'Log in om nieuwste onderwerpen te bekijken';
+      'Log in om nieuwste topics te bekijken';
 
   @override
   String get youNeedToBeSignedInToViewLatestTopics =>
-      'U moet ingelogd zijn om nieuwste onderwerpen te bekijken.';
+      'Je moet aangemeld zijn om de nieuwste topics te bekijken.';
 
   @override
   String get thereAreNoUnreadTopics =>
-      'Er zijn geen ongelezen onderwerpen. Kom later terug voor nieuwe discussies.';
+      'Er zijn geen ongelezen topics. Kom later terug voor nieuwe discussies.';
 
   @override
-  String get youAreAllCaughtUp => 'U bent helemaal bij!';
+  String get youAreAllCaughtUp => 'Je bent helemaal bij!';
 
   @override
   String get signInToViewUnreadTopics =>
-      'Log in om ongelezen onderwerpen te bekijken';
+      'Log in om ongelezen topics te bekijken';
 
   @override
   String get youNeedToBeSignedInToViewUnreadTopics =>
-      'U moet ingelogd zijn om uw ongelezen onderwerpen te bekijken.';
+      'Je moet aangemeld zijn om je ongelezen topics te bekijken.';
 
   @override
   String get latest => 'Nieuwste';
@@ -152,60 +152,25 @@ class AppLocalizationsNl extends AppLocalizations {
   String get all => 'Alles';
 
   @override
-  String get topicsOnly => 'Alleen onderwerpen';
+  String get topicsOnly => 'Alleen topics';
 
   @override
   String get titlesOnly => 'Alleen titels';
 
   @override
   String failedToShareTopic(String error) {
-    return 'Kon onderwerp niet delen: $error';
+    return 'Kon topic niet delen: $error';
   }
 
   @override
   String get youCannotReplyToThisThread =>
-      'U kunt niet op dit onderwerp reageren';
+      'Je kunt niet op dit topic antwoorden';
 
   @override
-  String get pleaseWaitForThreadToLoad => 'Wacht tot het onderwerp is geladen';
-
-  @override
-  String get postCanBeRestoredLater => 'Bericht kan later worden hersteld';
-
-  @override
-  String get postWillBePermanentlyDeleted =>
-      'Bericht wordt permanent verwijderd';
-
-  @override
-  String get enterReasonForDeletingPost =>
-      'Voer de reden voor het verwijderen van dit bericht in';
-
-  @override
-  String get reportPost => 'Bericht melden';
-
-  @override
-  String get pleaseProvideReasonForReporting =>
-      'Geef een reden op voor het melden van dit bericht.';
+  String get pleaseWaitForThreadToLoad => 'Wacht tot het topic is geladen';
 
   @override
   String get reason => 'Reden';
-
-  @override
-  String get enterReasonForReportingPost =>
-      'Voer de reden voor het melden van dit bericht in';
-
-  @override
-  String get pleaseEnterReason => 'Voer een reden in';
-
-  @override
-  String get submitReport => 'Melding verzenden';
-
-  @override
-  String get selectedActions => 'Geselecteerde acties:';
-
-  @override
-  String get thisActionCannotBeUndone =>
-      'Deze actie kan niet ongedaan worden gemaakt.';
 
   @override
   String get participantsLabel => 'Deelnemers';
@@ -221,10 +186,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get newTopic => 'Nieuw onderwerp';
-
-  @override
-  String get markRead => 'Als gelezen markeren';
+  String get newTopic => 'Nieuw topic';
 
   @override
   String get pleaseSpecifyReason => 'Geef de reden op';
@@ -236,27 +198,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get moreOptions => 'Meer opties';
 
   @override
-  String get topicClosed => 'Onderwerp gesloten';
+  String get topicClosed => 'Topic gesloten';
 
   @override
-  String get topicOpened => 'Onderwerp geopend';
-
-  @override
-  String cannotEditMessage(String error) {
-    return 'Dit bericht kan niet worden bewerkt: $error';
-  }
-
-  @override
-  String get confirmSpamClean => 'Spam opruimen bevestigen';
-
-  @override
-  String get handleThreads => 'Onderwerpen afhandelen';
-
-  @override
-  String get deleteMessages => 'Berichten verwijderen';
-
-  @override
-  String get deleteConversations => 'Berichten verwijderen';
+  String get topicOpened => 'Topic geopend';
 
   @override
   String get noConversations => 'Je hebt geen berichten';
@@ -283,28 +228,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get loginRequired => 'Inloggen vereist';
 
   @override
-  String get spamCleaner => 'Spam opruimer';
-
-  @override
   String get sendMessage => 'Bericht';
-
-  @override
-  String get memberSince => 'Lid sinds';
-
-  @override
-  String get lastActivity => 'Laatste activiteit';
 
   @override
   String get likesReceived => 'Ontvangen likes';
 
   @override
-  String get likesGiven => 'Gegeven likes';
-
-  @override
   String get showMore => 'Meer tonen';
-
-  @override
-  String get cleanSpam => 'Spam opruimen';
 
   @override
   String get failedToSaveConversation => 'Bericht kon niet worden opgeslagen';
@@ -332,19 +262,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get logout => 'Uitloggen';
 
   @override
-  String get areYouSureYouWantToLogout => 'Weet u zeker dat u wilt uitloggen?';
+  String get areYouSureYouWantToLogout =>
+      'Weet je zeker dat je je wilt afmelden?';
 
   @override
   String get signIn => 'Inloggen';
 
   @override
-  String get markForumRead => 'Forum als gelezen markeren';
-
-  @override
   String get notificationTest => 'Meldingstest';
 
   @override
-  String get forum => 'Forum';
+  String get forum => 'Categorie';
 
   @override
   String get profile => 'Profiel';
@@ -383,11 +311,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get youNeedToBeSignedInToViewConversations =>
       'Je moet ingelogd zijn om je berichten te zien.';
-
-  @override
-  String errorLoadingConversations(String error) {
-    return 'Fout bij het laden van berichten: $error';
-  }
 
   @override
   String failedToLeaveConversation(String error) {
@@ -440,44 +363,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get confirm => 'Bevestigen';
 
   @override
-  String spamClean(String username) {
-    return 'Spam opruimen $username';
-  }
-
-  @override
-  String get selectActionsToPerform => 'Selecteer de uit te voeren acties:';
-
-  @override
-  String get moveOrDeleteThreadsBasedOnAdminSettings =>
-      'Verplaats of verwijder onderwerpen op basis van beheerderinstellingen';
-
-  @override
-  String get messageUpdatedSuccessfully => 'Bericht succesvol bijgewerkt';
-
-  @override
   String error(String error) {
     return 'Fout: $error';
   }
-
-  @override
-  String failedToRemoveAttachment(String error) {
-    return 'Kon bijlage niet verwijderen: $error';
-  }
-
-  @override
-  String failedToLoadMessage(String error) {
-    return 'Kon bericht niet laden: $error';
-  }
-
-  @override
-  String get editMessage => 'Bericht bewerken';
 
   @override
   String get removeAttachment => 'Bijlage verwijderen';
 
   @override
   String get areYouSureYouWantToRemoveThisAttachment =>
-      'Weet u zeker dat u deze bijlage wilt verwijderen?';
+      'Weet je zeker dat je deze bijlage wilt verwijderen?';
 
   @override
   String get none => 'Geen';
@@ -543,7 +438,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enterKeywordsToSearchTopics =>
-      'Voer zoekwoorden in om onderwerpen te zoeken...';
+      'Voer zoekwoorden in om topics te zoeken...';
 
   @override
   String get refresh => 'Vernieuwen';
@@ -595,7 +490,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enterKeywordsToFindTopicsAndPosts =>
-      'Voer zoekwoorden in om onderwerpen en berichten te vinden';
+      'Voer zoekwoorden in om topics en berichten te vinden';
 
   @override
   String get light => 'Licht';
@@ -621,39 +516,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get banned => 'GEBLOKKEERD';
 
   @override
-  String get reportSubmittedSuccessfully => 'Melding succesvol verzonden';
-
-  @override
   String get deleteTopic => 'Topic verwijderen';
 
   @override
   String get pleaseSelectEndDate => 'Selecteer een einddatum';
-
-  @override
-  String get spamCleanUser => 'Spam opruimen gebruiker';
-
-  @override
-  String get deletePrivateConversations => 'Persoonlijke berichten verwijderen';
-
-  @override
-  String get banTheUserAccount => 'Gebruikersaccount blokkeren';
-
-  @override
-  String get handledThreads => 'Onderwerpen afgehandeld';
-
-  @override
-  String get deletedMessages => 'Berichten verwijderd';
-
-  @override
-  String get deletedConversations => 'Verwijderde berichten';
-
-  @override
-  String get bannedUser => 'Gebruiker geblokkeerd';
-
-  @override
-  String successfullyCleanedSpam(String username, String actions) {
-    return 'Spam succesvol opgeruimd voor $username. Acties: $actions';
-  }
 
   @override
   String get home => 'Start';
@@ -662,33 +528,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get notifications => 'Meldingen';
 
   @override
-  String get forums => 'Forums';
-
-  @override
-  String get markAllForumsAsRead => 'Alle forums als gelezen markeren?';
-
-  @override
-  String get markAllForumsAsReadMessage =>
-      'Dit markeert alle forums en onderwerpen als gelezen. Deze actie kan niet ongedaan worden gemaakt.';
-
-  @override
-  String get markAsRead => 'Als gelezen markeren';
+  String get forums => 'Categorieën';
 
   @override
   String get content => 'Inhoud';
-
-  @override
-  String get insertImage => 'Afbeelding invoegen';
-
-  @override
-  String get howWouldYouLikeToInsertImage =>
-      'Hoe wilt u deze afbeelding invoegen?';
-
-  @override
-  String get thumbnail => 'Miniatuur';
-
-  @override
-  String get fullSize => 'Volledige grootte';
 
   @override
   String get pleaseEnterTitle => 'Voer een titel in';
@@ -706,16 +549,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get mentionUser => 'Gebruiker vermelden';
 
   @override
-  String get cleaningSpam => 'Spam opruimen...';
+  String get writeYourMessage => 'Schrijf je bericht…';
 
   @override
-  String get writeYourMessage => 'Schrijf uw bericht...';
-
-  @override
-  String get writeYourReply => 'Schrijf uw antwoord...';
-
-  @override
-  String get conversationCreatedSuccessfully => 'Bericht verzonden';
+  String get writeYourReply => 'Schrijf je antwoord…';
 
   @override
   String get conversationMarkedAsUnread => 'Bericht gemarkeerd als ongelezen';
@@ -727,19 +564,8 @@ class AppLocalizationsNl extends AppLocalizations {
   String get conversationOpened => 'Bericht geopend';
 
   @override
-  String get pleaseLoginToLikeMessages => 'Log in om berichten te liken';
-
-  @override
-  String get loadEarlierMessages => 'Eerdere berichten laden';
-
-  @override
   String failedToLoadQuote(String error) {
     return 'Failed to load quote: \n$error';
-  }
-
-  @override
-  String failedToSendReply(String error) {
-    return 'Kon antwoord niet verzenden: $error';
   }
 
   @override
@@ -755,11 +581,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String failedToOpenConversation(String error) {
     return 'Kon bericht niet openen: $error';
-  }
-
-  @override
-  String failedToJumpToMessage(String error) {
-    return 'Kon niet naar bericht springen: $error';
   }
 
   @override
@@ -805,20 +626,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get goBack => 'Terug';
 
   @override
-  String failedToLoadPost(String error) {
-    return 'Failed to load post: \n$error';
-  }
-
-  @override
-  String failedToLikeOrUnlikeMessage(String action, String error) {
-    return 'Kon bericht niet $action: $error';
-  }
-
-  @override
   String get like => 'liken';
-
-  @override
-  String get unlike => 'unliken';
 
   @override
   String get download => 'Downloaden';
@@ -836,14 +644,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String errorDownloading(String filename, String error) {
     return 'Fout bij downloaden $filename: $error';
-  }
-
-  @override
-  String get failedToNavigateToForum => 'Kon niet naar forum navigeren';
-
-  @override
-  String forumNotFoundById(String forumId) {
-    return 'Forum niet gevonden: $forumId';
   }
 
   @override
@@ -868,7 +668,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get pleaseEnterYourAuthenticationCode =>
-      'Voer uw authenticatiecode in';
+      'Voer je authenticatiecode in';
 
   @override
   String codeMustBeDigits(int count) {
@@ -969,26 +769,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String nVotes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count stemmen',
-      one: '1 stem',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get lastSeen => 'Gezien';
-
-  @override
   String get chat => 'Chat';
-
-  @override
-  String comingSoon(String label) {
-    return '$label — binnenkort';
-  }
 
   @override
   String moreBadges(Object count) {
@@ -1059,9 +840,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get discard => 'Verwerpen';
 
   @override
-  String get discardDraftQuestion => 'Concept verwerpen?';
-
-  @override
   String get doNotDisturb => 'Niet storen';
 
   @override
@@ -1083,7 +861,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get failedToLoadMoreTopics =>
-      'Meer onderwerpen laden mislukt. Scroll om opnieuw te proberen.';
+      'Meer topics laden mislukt. Scroll om opnieuw te proberen.';
 
   @override
   String get failedToUpdateNotificationLevel =>
@@ -1131,7 +909,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get merge => 'Samenvoegen';
 
   @override
-  String get mergeIntoTopic => 'Samenvoegen in onderwerp';
+  String get mergeIntoTopic => 'Samenvoegen in topic';
 
   @override
   String get newInviteLink => 'Nieuwe uitnodigingslink';
@@ -1188,7 +966,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get removeVote => 'Stem verwijderen';
 
   @override
-  String get renameTopic => 'Onderwerp hernoemen';
+  String get renameTopic => 'Topic hernoemen';
 
   @override
   String reportedBy(String username) {
@@ -1210,11 +988,8 @@ class AppLocalizationsNl extends AppLocalizations {
   String get resizeAndUpload => 'Verkleinen en uploaden';
 
   @override
-  String get retryConnection => 'Verbinding opnieuw proberen';
-
-  @override
   String get checkConnectionAndRetry =>
-      'Controleer uw internetverbinding en probeer het opnieuw.';
+      'Controleer je internetverbinding en probeer het opnieuw.';
 
   @override
   String get reviewQueue => 'Beoordelingswachtrij';
@@ -1244,9 +1019,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get signOut => 'Afmelden';
 
   @override
-  String get signOutQuestion => 'Afmelden?';
-
-  @override
   String get signInCancelledNoPayload =>
       'Aanmelden geannuleerd — geen antwoord ontvangen';
 
@@ -1262,17 +1034,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String stoppedIgnoringUser(String username) {
     return 'Je negeert @$username niet meer';
   }
-
-  @override
-  String get submit => 'Verzenden';
-
-  @override
-  String get discardDraftWarning =>
-      'Het opgeslagen concept wordt permanent verwijderd.';
-
-  @override
-  String get deleteChatMessageWarning =>
-      'Het bericht wordt voor iedereen verwijderd.';
 
   @override
   String get titleOnly => 'Alleen titel';
@@ -1318,17 +1079,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voor extra veiligheid kan Discourse vragen om bevestiging via de link in de e-mail. Controleer je spammap als je hem niet ziet.';
 
   @override
-  String get newDirectMessage => 'Nieuw direct bericht';
-
-  @override
   String get noMessagesYetSayHi => 'Nog geen berichten — zeg hallo.';
 
   @override
   String get edited => 'bewerkt';
-
-  @override
-  String get editProfileManagedOnWebNote =>
-      'Weergavenaam, e-mail, wachtwoord en andere accountinstellingen beheer je onder Account → Account beheren op het web. Je avatar wijzig je door op het camerapictogram op je foto te tikken.';
 
   @override
   String get approvedButRelayUnreachable =>
@@ -1340,7 +1094,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get pleaseLoginToCreateANewTopic =>
-      'Meld je aan om een nieuw onderwerp te maken';
+      'Meld je aan om een nieuw topic te maken';
 
   @override
   String get pleaseLoginToSubscribeToForums =>
@@ -1366,9 +1120,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get protected => 'Beveiligd';
-
-  @override
   String get solution => 'Oplossing';
 
   @override
@@ -1392,11 +1143,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get poll => 'Peiling';
-
-  @override
-  String errorLoadingContent(Object error) {
-    return 'Fout bij laden van inhoud: $error';
-  }
 
   @override
   String get noDiscussionsYet => 'Nog geen discussies.';
@@ -1464,9 +1210,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get leaveConversation2 => 'Bericht verlaten';
 
   @override
-  String get reportConversation2 => 'Bericht melden';
-
-  @override
   String get closeConversation2 => 'Bericht sluiten';
 
   @override
@@ -1492,27 +1235,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get leaveConversationConfirmation =>
       'Weet je zeker dat je jezelf uit dit bericht wilt verwijderen? Je kunt het dan niet meer zien of erop antwoorden.';
-
-  @override
-  String errorLoadingConversation(Object error) {
-    return 'Fout bij het laden van het bericht: $error';
-  }
-
-  @override
-  String get conversationNotFound => 'Bericht niet gevonden';
-
-  @override
-  String get conversationClosedBanner =>
-      'Dit bericht is gesloten; nieuwe antwoorden zijn niet meer mogelijk';
-
-  @override
-  String get noMessagesFound => 'Geen berichten gevonden';
-
-  @override
-  String get endOfConversation => 'Einde van de discussie';
-
-  @override
-  String get jumpToMessage => 'Ga naar bericht';
 
   @override
   String get editConversation2 => 'Titel bewerken';
@@ -1649,9 +1371,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get chatPlaceholderGroup => 'Chatten in groep';
-
-  @override
   String get chatPlaceholderSelf => 'Schrijf iets';
 
   @override
@@ -1734,11 +1453,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'We hebben je nieuwe bericht ontvangen, maar dit moet eerst door een moderator worden goedgekeurd voordat het zichtbaar wordt. Heb geduld.';
 
   @override
-  String failedToCreateConversation(Object error) {
-    return 'Kon bericht niet verzenden: $error';
-  }
-
-  @override
   String maximumAttachmentsAllowed(Object count) {
     return 'Maximaal $count bijlage(n) toegestaan';
   }
@@ -1748,14 +1462,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Geen afbeeldingen gevonden om weer te geven.';
 
   @override
-  String get pleaseLoginToViewThisAttachment =>
-      'Meld je aan om deze bijlage te bekijken';
+  String get searchForTopics => 'Topics zoeken';
 
   @override
-  String get searchForTopics => 'Onderwerpen zoeken';
-
-  @override
-  String get noTopicsFound => 'Geen onderwerpen gevonden';
+  String get noTopicsFound => 'Geen topics gevonden';
 
   @override
   String get trySearchingWithDifferentKeywords => 'Probeer andere zoekwoorden';
@@ -1765,7 +1475,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get perTopicNotificationLevelsNote =>
-      'Meldingsniveaus per categorie en per onderwerp stel je op die schermen zelf in — tik op het belpictogram van een onderwerp of categorie.';
+      'Meldingsniveaus per categorie en per topic stel je op die schermen zelf in — tik op het belpictogram van een topic of categorie.';
 
   @override
   String get pushNotActiveForThisLogin =>
@@ -1777,10 +1487,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get doNotDisturbExplanation =>
       'Pauzeer meldingen een tijdje — Discourse houdt ze vast tot de periode voorbij is';
-
-  @override
-  String get emailSettingsSubtitle =>
-      'E-mailfrequentie, samengevoegde likes, digestschema';
 
   @override
   String get manageAccountSubtitle =>
@@ -1817,13 +1523,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get initializingForum => 'Forum initialiseren…';
 
   @override
-  String get subscribedForums => 'Geabonneerde forums';
-
-  @override
   String get errorLoadingNotifications => 'Fout bij laden van meldingen';
-
-  @override
-  String get pullDownToRefresh => 'Trek omlaag om te vernieuwen';
 
   @override
   String get noNewNotificationsExplanation =>
@@ -1836,21 +1536,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String noTopicsTagged(Object tag) {
-    return 'Geen onderwerpen met tag \"$tag\"';
-  }
-
-  @override
-  String get deletePostsProfilePostsAndComments =>
-      'Berichten, profielberichten en reacties verwijderen';
-
-  @override
-  String spamCleanConfirmation(Object username) {
-    return 'Weet je zeker dat je spam van $username wilt opruimen?';
-  }
-
-  @override
-  String failedToCleanSpam(Object error) {
-    return 'Spam opruimen mislukt: $error';
+    return 'Geen topics met tag \"$tag\"';
   }
 
   @override
@@ -1861,10 +1547,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get imageNotAvailable => 'Afbeelding niet beschikbaar';
-
-  @override
-  String get allForumTopicsHaveBeenMarkedAs =>
-      'Alle forumonderwerpen zijn gemarkeerd als gelezen';
 
   @override
   String postsCount(Object count) {
@@ -1888,30 +1570,10 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get failedToPickFile => 'Bestand kiezen mislukt';
-
-  @override
   String onlyNMoreAttachmentsAllowed(
       Object remainingSlots, Object remainingSlots2) {
     return 'Nog maar $remainingSlots bijlage(n) toegestaan. De eerste $remainingSlots2 afbeelding(en) worden verwerkt.';
   }
-
-  @override
-  String get attachmentLimitReachedSkippingRemainingImages =>
-      'Bijlagelimiet bereikt. Overige afbeeldingen worden overgeslagen.';
-
-  @override
-  String failedToUploadImagePleaseTryAgain(Object fileName) {
-    return '$fileName: afbeelding uploaden mislukt. Probeer het opnieuw.';
-  }
-
-  @override
-  String failedToUploadImage2(Object errorMessage, Object fileName) {
-    return '$fileName: afbeelding uploaden mislukt: $errorMessage';
-  }
-
-  @override
-  String get failedToPickImage => 'Afbeelding kiezen mislukt';
 
   @override
   String failedToRemoveAttachment2(Object error) {
@@ -1957,25 +1619,8 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String failedToSubmitReport2(Object error) {
-    return 'Melding verzenden mislukt: $error';
-  }
-
-  @override
   String get editHistoryNotAvailable =>
       'Bewerkingsgeschiedenis is niet beschikbaar voor dit bericht';
-
-  @override
-  String get noPermissionToUploadAvatar =>
-      'Je hebt geen toestemming om avatars te uploaden';
-
-  @override
-  String get avatarUploadedSuccessfully => 'Avatar geüpload';
-
-  @override
-  String failedToPickImage2(Object error) {
-    return 'Afbeelding kiezen mislukt: $error';
-  }
 
   @override
   String get react => 'Reageren';
@@ -1991,18 +1636,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get searchFilters => 'Zoekfilters';
 
   @override
-  String signOutWarning(Object siteName) {
-    return 'Je wordt afgemeld bij $siteName. Je kunt je op elk moment opnieuw aanmelden.';
-  }
-
-  @override
-  String get suggestedTopics => 'Voorgestelde onderwerpen';
+  String get suggestedTopics => 'Voorgestelde topics';
 
   @override
   String get suggestedMessages => 'Voorgestelde berichten';
-
-  @override
-  String get newLabel => 'NIEUW';
 
   @override
   String get voteRemoved => 'Stem verwijderd';
@@ -2034,9 +1671,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get couldNotLoadCategories => 'Categorieën laden mislukt.';
 
   @override
-  String get explore => 'Ontdekken';
-
-  @override
   String get tags => 'Tags';
 
   @override
@@ -2062,11 +1696,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Privacybeleid';
-
-  @override
-  String signedInAs(String username) {
-    return 'Aangemeld als $username';
-  }
 
   @override
   String get notSignedIn => 'Niet aangemeld';
@@ -2098,7 +1727,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String actionCodeTopicCreated(String when) {
-    return 'Created this topic $when';
+    return 'Heeft dit topic $when gemaakt';
   }
 
   @override
@@ -2362,79 +1991,89 @@ class AppLocalizationsNl extends AppLocalizations {
   String get notificationSettings => 'Meldingsinstellingen';
 
   @override
-  String get topicIsNew => 'New topic';
+  String get topicIsNew => 'Nieuw topic';
 
   @override
   String get noNewTopicsSinceLastVisit =>
-      'No new topics since your last visit.';
+      'Geen nieuwe topics sinds je laatste bezoek.';
 
   @override
-  String get messageIsNew => 'New message';
+  String get messageIsNew => 'Nieuw bericht';
 
   @override
   String topicUnreadReplies(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count unread replies',
-      one: '1 unread reply',
+      other: '$count ongelezen antwoorden',
+      one: '1 ongelezen antwoord',
     );
     return '$_temp0';
   }
 
   @override
   String filterNewWithCount(int count) {
-    return 'New ($count)';
+    return 'Nieuw ($count)';
   }
 
   @override
   String filterUnreadWithCount(int count) {
-    return 'Unread ($count)';
+    return 'Ongelezen ($count)';
   }
 
   @override
   String categoryNewTopics(int count) {
-    return '$count new';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count nieuw',
+    );
+    return '$_temp0';
   }
 
   @override
   String categoryUnreadTopics(int count) {
-    return '$count unread';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ongelezen',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get dismissNew => 'Dismiss new';
+  String get dismissNew => 'Nieuwe negeren';
 
   @override
-  String get dismissUnread => 'Dismiss unread';
+  String get dismissUnread => 'Ongelezen negeren';
 
   @override
-  String get dismissNewTitle => 'Dismiss new topics?';
+  String get dismissNewTitle => 'Nieuwe topics negeren?';
 
   @override
-  String get dismissNewMessage => 'They will no longer show as new.';
+  String get dismissNewMessage => 'Ze worden niet meer als nieuw getoond.';
 
   @override
-  String get dismissUnreadTitle => 'Dismiss all unread?';
+  String get dismissUnreadTitle => 'Alle ongelezen negeren?';
 
   @override
   String get dismissUnreadMessage =>
-      'Their new replies will be marked as read.';
+      'Hun nieuwe antwoorden worden als gelezen gemarkeerd.';
 
   @override
   String get dismissUnreadStopTracking =>
-      'Stop tracking these topics so they never show up as unread for me again';
+      'Volgen van deze topics stoppen, zodat ze nooit meer als ongelezen verschijnen voor mij';
 
   @override
-  String get dismissNewAndUnread => 'Dismiss new and unread';
+  String get dismissNewAndUnread => 'Nieuwe en ongelezen negeren';
 
   @override
   String dismissNewAndUnreadMessage(String category) {
-    return 'Topics in $category will no longer show as new or unread.';
+    return 'Topics in $category worden niet meer als nieuw of ongelezen getoond.';
   }
 
   @override
-  String get dismissedTopics => 'Dismissed';
+  String get dismissedTopics => 'Genegeerd';
 
   @override
   String topicMapViews(int count) {
@@ -2578,7 +2217,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get relatedTopics => 'Gerelateerde onderwerpen';
+  String get relatedTopics => 'Gerelateerde topics';
 
   @override
   String get relatedMessages => 'Gerelateerde berichten';
@@ -2589,7 +2228,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get latestTopics => 'Nieuwste onderwerpen';
+  String get latestTopics => 'Nieuwste topics';
 
   @override
   String get pushGroupMessages => 'Berichten en chat';
@@ -2668,7 +2307,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get activityReplied => 'Beantwoord';
 
   @override
-  String get activityStartedTopic => 'Onderwerp gestart';
+  String get activityStartedTopic => 'Topic gestart';
 
   @override
   String get activityLiked => 'Geliket';
@@ -2683,7 +2322,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get activityAwaitingApproval => 'Wacht op goedkeuring';
 
   @override
-  String get activityFilterTopics => 'Onderwerpen';
+  String get activityFilterTopics => 'Topics';
 
   @override
   String get activityFilterReplies => 'Antwoorden';
@@ -2722,10 +2361,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get myPostsEmptyHint =>
-      'Onderwerpen die je start en antwoorden die je schrijft verschijnen hier.';
+      'Topics die je start en antwoorden die je schrijft verschijnen hier.';
 
   @override
-  String get activityEmptyTopics => 'Nog geen onderwerpen';
+  String get activityEmptyTopics => 'Nog geen topics';
 
   @override
   String get activityEmptyReplies => 'Nog geen antwoorden';
@@ -2787,7 +2426,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get guestBenefitPost => 'Antwoorden en onderwerpen starten';
+  String get guestBenefitPost => 'Antwoorden en topics starten';
 
   @override
   String get guestBenefitNotify => 'Een melding krijgen als iemand reageert';
@@ -2832,7 +2471,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get summaryTopReplies => 'Topantwoorden';
 
   @override
-  String get summaryTopTopics => 'Toponderwerpen';
+  String get summaryTopTopics => 'Toptopics';
 
   @override
   String get summaryMostLikedBy => 'Meest geliket door';
@@ -2850,7 +2489,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get summaryTopCategories => 'Topcategorieën';
 
   @override
-  String get featuredTopic => 'Uitgelicht onderwerp';
+  String get featuredTopic => 'Uitgelicht topic';
 
   @override
   String get profileDetails => 'Details';
@@ -2871,7 +2510,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get bookmarksFilterReminders => 'Herinneringen';
 
   @override
-  String get bookmarkWholeTopic => 'Heel onderwerp';
+  String get bookmarkWholeTopic => 'Heel topic';
 
   @override
   String bookmarkSaved(String when) {
@@ -2933,7 +2572,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Zet een bladwijzer bij een bericht via de acties en het wacht hier op je.';
 
   @override
-  String get draftKindNewTopic => 'Nieuw onderwerp';
+  String get draftKindNewTopic => 'Nieuw topic';
 
   @override
   String draftMessageTo(String names) {
@@ -2941,7 +2580,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get untitledTopic => 'Onderwerp zonder titel';
+  String get untitledTopic => 'Topic zonder titel';
 
   @override
   String get draftDiscarded => 'Concept verwijderd';
@@ -2951,7 +2590,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get draftsEmptyHint =>
-      'Concepten worden opgeslagen terwijl je typt. Begin een antwoord of onderwerp en het wacht hier op je.';
+      'Concepten worden opgeslagen terwijl je typt. Begin een antwoord of topic en het wacht hier op je.';
 
   @override
   String get privacySection => 'Privacy';
@@ -3041,25 +2680,25 @@ class AppLocalizationsNl extends AppLocalizations {
   String get emailPasswordInAccount => 'E-mail, wachtwoord en inloggen';
 
   @override
-  String get featureATopic => 'Een onderwerp uitlichten';
+  String get featureATopic => 'Een topic uitlichten';
 
   @override
   String get featureATopicHint =>
-      'Zet een van je onderwerpen bovenaan je profiel vast.';
+      'Zet een van je topics bovenaan je profiel vast.';
 
   @override
-  String get featuredTopicChanged => 'Uitgelicht onderwerp gewijzigd';
+  String get featuredTopicChanged => 'Uitgelicht topic gewijzigd';
 
   @override
   String get featuredTopicNone =>
-      'Geen. Zet een van je onderwerpen vast op je profiel.';
+      'Geen. Zet een van je topics vast op je profiel.';
 
   @override
-  String get featuredTopicRemoved => 'Uitgelicht onderwerp verwijderd';
+  String get featuredTopicRemoved => 'Uitgelicht topic verwijderd';
 
   @override
   String get featuredTopicRules =>
-      'Berichten en onderwerpen in privécategorieën kunnen niet worden uitgelicht.';
+      'Berichten en topics in privécategorieën kunnen niet worden uitgelicht.';
 
   @override
   String get fieldManagedBySignIn =>
@@ -3146,10 +2785,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get noTitle => 'Geen titel';
 
   @override
-  String get noTopicsMatch => 'Geen van je onderwerpen komt overeen';
+  String get noTopicsMatch => 'Geen van je topics komt overeen';
 
   @override
-  String get noTopicsToFeature => 'Je bent nog geen onderwerpen begonnen';
+  String get noTopicsToFeature => 'Je bent nog geen topics begonnen';
 
   @override
   String get notSet => 'Niet ingesteld';
@@ -3213,13 +2852,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get removeCover => 'Omslag verwijderen';
 
   @override
-  String get removeFeaturedTopic => 'Uitgelicht onderwerp verwijderen';
+  String get removeFeaturedTopic => 'Uitgelicht topic verwijderen';
 
   @override
   String get searchTimezones => 'Tijdzones zoeken';
 
   @override
-  String get searchYourTopics => 'Zoek in je onderwerpen';
+  String get searchYourTopics => 'Zoek in je topics';
 
   @override
   String get seeProfileAsOthersDo => 'Bekijk je profiel zoals anderen het zien';
@@ -3373,7 +3012,7 @@ class AppLocalizationsNl extends AppLocalizations {
       other: 'de $count berichten',
       one: 'het bericht',
     );
-    return 'Alleen $_temp0 van $name in dit onderwerp tonen';
+    return 'Alleen $_temp0 van $name in dit topic tonen';
   }
 
   @override
@@ -3384,7 +3023,7 @@ class AppLocalizationsNl extends AppLocalizations {
       other: 'je $count berichten',
       one: 'je bericht',
     );
-    return 'Alleen $_temp0 in dit onderwerp tonen';
+    return 'Alleen $_temp0 in dit topic tonen';
   }
 
   @override
@@ -3757,7 +3396,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get topicStatusDeletedHelp =>
-      'Dit onderwerp is verwijderd en verborgen voor andere gebruikers';
+      'Dit topic is verwijderd en verborgen voor andere gebruikers';
 
   @override
   String get flagAction => 'Markeren';
@@ -3854,4 +3493,1386 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get noPermissionToViewCategory =>
       'Je hebt geen toestemming om topics in deze categorie te bekijken.';
+
+  @override
+  String get featureTopicTitle => 'Dit topic uitlichten';
+
+  @override
+  String get pinTopicMenu => 'Topic vastmaken...';
+
+  @override
+  String pinInCategoryUntil(String category) {
+    return 'Laat dit topic bovenaan de categorie $category weergeven tot';
+  }
+
+  @override
+  String get pinGloballyUntil =>
+      'Laat dit topic bovenaan alle topiclijsten weergeven tot';
+
+  @override
+  String get pinNote =>
+      'Gebruikers kunnen het topic individueel losmaken voor zichzelf.';
+
+  @override
+  String get pinUntil => 'Vastmaken tot';
+
+  @override
+  String get pinDateRequired =>
+      'Er is een datum vereist om dit topic vast te maken.';
+
+  @override
+  String get pinTopicGlobally => 'Topic globaal vastmaken';
+
+  @override
+  String get flagThanks =>
+      'Bedankt voor het beschaafd houden van onze community!';
+
+  @override
+  String get flagReviewProcess =>
+      'Alle markeren worden ontvangen door moderators en zo snel mogelijk beoordeeld.';
+
+  @override
+  String get flagCant => 'Sorry, je kunt dit bericht momenteel niet markeren.';
+
+  @override
+  String get flagSendMessage => 'Bericht';
+
+  @override
+  String get flagMessageForUser => 'Bericht voor de gebruiker';
+
+  @override
+  String get flagMessageForModerators => 'Bericht voor de moderators';
+
+  @override
+  String get flagPlaceholderNotifyUser =>
+      'Wees specifiek, opbouwend en altijd beleefd.';
+
+  @override
+  String get flagPlaceholderNotifyModerators =>
+      'Laat ons met name weten waar je je zorgen om maakt en geef relevante links en voorbeelden waar mogelijk.';
+
+  @override
+  String get flagPlaceholderIllegal =>
+      'Laat ons met name weten waarom je denkt dat deze content illegaal is en geef waar mogelijk relevante links en voorbeelden.';
+
+  @override
+  String get flagConfirmIllegal =>
+      'Wat ik hierboven heb geschreven is juist en volledig.';
+
+  @override
+  String flagMessageAtLeast(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'voer minimaal $count tekens in',
+      one: 'voer minimaal $count teken in',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get flagMessageSent => 'Je bericht is verzonden.';
+
+  @override
+  String get mergeTopicError =>
+      'Er is een fout opgetreden bij het verplaatsen van berichten naar dat topic.';
+
+  @override
+  String get topicTitlePlaceholder =>
+      'Waar gaat deze discussie over in één korte zin?';
+
+  @override
+  String get topicMoved => 'Topic verplaatst';
+
+  @override
+  String get topicMerged => 'Topic samengevoegd';
+
+  @override
+  String get mergeTopicExplanation =>
+      'Alle berichten in dit topic worden naar het gekozen topic verplaatst. Dit kan in de app niet ongedaan worden gemaakt.';
+
+  @override
+  String get destinationTopicId => 'ID van het doeltopic';
+
+  @override
+  String get topicAuthorUnknown => 'Onbekend';
+
+  @override
+  String get noHotTopics => 'Er zijn geen populaire topics.';
+
+  @override
+  String get signInToViewNewTopics =>
+      'Meld je aan om nieuwe topics te bekijken';
+
+  @override
+  String get newTopicsSignInMessage =>
+      'Nieuwe topics tonen wat er sinds je laatste bezoek is aangemaakt.';
+
+  @override
+  String get topPeriodAllTime => 'Altijd';
+
+  @override
+  String get topPeriodYear => 'Jaar';
+
+  @override
+  String get topPeriodQuarter => 'Kwartaal';
+
+  @override
+  String get topPeriodMonth => 'Maand';
+
+  @override
+  String get topPeriodWeek => 'Week';
+
+  @override
+  String get topPeriodToday => 'Vandaag';
+
+  @override
+  String noTopTopicsForPeriod(String period) {
+    String _temp0 = intl.Intl.selectLogic(
+      period,
+      {
+        'all': 'Geen toptopics aller tijden.',
+        'yearly': 'Geen toptopics dit jaar.',
+        'quarterly': 'Geen toptopics dit kwartaal.',
+        'monthly': 'Geen toptopics deze maand.',
+        'weekly': 'Geen toptopics deze week.',
+        'daily': 'Geen toptopics vandaag.',
+        'other': 'Er zijn geen toptopics.',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get connectionTimedOutSiteUnreachable =>
+      'Time-out van de verbinding. De site kan offline of onbereikbaar zijn.';
+
+  @override
+  String get failedToMarkNotificationsRead =>
+      'Meldingen markeren als gelezen mislukt';
+
+  @override
+  String get forumNameFallback => 'Forum';
+
+  @override
+  String get noForumDescription => 'Geen beschrijving beschikbaar.';
+
+  @override
+  String get dismissAllNotifications => 'Alles negeren';
+
+  @override
+  String get notificationPostIdMissing =>
+      'Bericht-ID ontbreekt. Kan niet naar het bericht gaan.';
+
+  @override
+  String get notificationTopicIdMissingForPost =>
+      'Topic-ID ontbreekt. Kan niet naar het bericht gaan.';
+
+  @override
+  String get notificationTopicIdMissing =>
+      'Topic-ID ontbreekt. Kan het topic niet openen.';
+
+  @override
+  String get notificationUsernameMissing =>
+      'Gebruikersnaam ontbreekt. Kan het profiel niet openen.';
+
+  @override
+  String get notificationChannelIdMissing =>
+      'Kanaal-ID ontbreekt. Kan de chat niet openen.';
+
+  @override
+  String get notificationGroupNameMissingForInbox =>
+      'Groepsnaam ontbreekt. Kan de inbox niet openen.';
+
+  @override
+  String get notificationGroupNameMissing =>
+      'Groepsnaam ontbreekt. Kan de groep niet openen.';
+
+  @override
+  String get notificationNoActionUrl =>
+      'Geen actie-URL beschikbaar voor dit type melding.';
+
+  @override
+  String get notificationBadgeUnavailable =>
+      'Badgegegevens zijn niet beschikbaar.';
+
+  @override
+  String get notificationBadgeLoadFailed => 'Kan deze badge niet laden.';
+
+  @override
+  String get personalMessageTitleFallback => 'Persoonlijk bericht';
+
+  @override
+  String get topicTitleFallback => 'Topic';
+
+  @override
+  String get signInToViewNotifications =>
+      'Meld je aan om meldingen te bekijken';
+
+  @override
+  String get youNeedToBeSignedInToViewNotifications =>
+      'Je moet aangemeld zijn om je meldingen te bekijken.';
+
+  @override
+  String get noUnreadNotifications => 'Geen ongelezen meldingen';
+
+  @override
+  String get noNotificationsYet => 'Nog geen meldingen';
+
+  @override
+  String get newNotificationFallbackBody => 'Nieuwe melding';
+
+  @override
+  String get unableToOpenNotification => 'Kan melding niet openen';
+
+  @override
+  String get notificationMissingSiteInfo =>
+      'Site-informatie ontbreekt (site_id).';
+
+  @override
+  String get notificationInvalidSiteInfo =>
+      'Ongeldige site-informatie (site_id).';
+
+  @override
+  String get notificationMissingPostInfo =>
+      'Berichtinformatie ontbreekt (content_id).';
+
+  @override
+  String get notificationMissingMessageInfo =>
+      'Informatie over het persoonlijke bericht ontbreekt (conversation_id).';
+
+  @override
+  String get notificationMissingUserInfo =>
+      'Gebruikersinformatie ontbreekt (sender_id).';
+
+  @override
+  String get notificationUnsupportedType => 'Niet-ondersteund meldingstype.';
+
+  @override
+  String get notificationForumNotFound => 'Forum niet gevonden voor deze site.';
+
+  @override
+  String get notificationForumOpenFailed =>
+      'Initialiseren van het forum mislukt.';
+
+  @override
+  String get notificationMissingTopicInfo =>
+      'Topicinformatie ontbreekt (topic_id).';
+
+  @override
+  String get failedToLoadTags => 'Tags laden mislukt.';
+
+  @override
+  String get searchTagsHint => 'Tags zoeken…';
+
+  @override
+  String get tagsSortedByCountTooltip =>
+      'Gesorteerd op aantal topics — tik om te wisselen naar A→Z';
+
+  @override
+  String get tagsSortedAlphabeticallyTooltip =>
+      'Alfabetisch gesorteerd — tik om te wisselen naar populariteit';
+
+  @override
+  String get noTagsYet => 'Nog geen tags op dit forum.';
+
+  @override
+  String get tagNotificationLevelTooltip => 'Meldingsniveau';
+
+  @override
+  String get tagTopicsLoadFailed => 'Laden mislukt';
+
+  @override
+  String searchFailedWithError(String error) {
+    return 'Zoeken mislukt: $error';
+  }
+
+  @override
+  String get searchFiltersButtonTooltip => 'Filters';
+
+  @override
+  String get searchFilterStatusSection => 'Status';
+
+  @override
+  String get searchFilterMyActivitySection => 'Mijn activiteit';
+
+  @override
+  String get searchFilterMatchTypeSection => 'Soort overeenkomst';
+
+  @override
+  String get searchTagsFilterHelper =>
+      'Gescheiden door spaties of komma\'s. Elke tag is vereist.';
+
+  @override
+  String get searchSortBy => 'Sorteren op';
+
+  @override
+  String get searchStatusOpen => 'Open';
+
+  @override
+  String get searchStatusArchived => 'Gearchiveerd';
+
+  @override
+  String get searchStatusNoReplies => 'Zonder antwoorden';
+
+  @override
+  String get searchStatusPublicOnly => 'Alleen openbaar';
+
+  @override
+  String get searchStatusUnsolved => 'Onopgelost';
+
+  @override
+  String get searchInBookmarked => 'Met bladwijzer';
+
+  @override
+  String get searchInMyMessages => 'In mijn berichten';
+
+  @override
+  String get searchInLiked => 'Door mij geliket';
+
+  @override
+  String get searchInPosted => 'Waarin ik iets heb geplaatst';
+
+  @override
+  String get searchInWatching => 'Die ik observeer';
+
+  @override
+  String get searchInTracking => 'Die ik volg';
+
+  @override
+  String get searchInSeen => 'Die ik heb gelezen';
+
+  @override
+  String get searchInUnseen => 'Die ik niet heb gelezen';
+
+  @override
+  String get searchSortLatestPost => 'Nieuwste bericht';
+
+  @override
+  String get searchSortMostLiked => 'Meest geliket';
+
+  @override
+  String get searchSortMostViewed => 'Meest bekeken';
+
+  @override
+  String get searchSortLatestTopic => 'Nieuwste topic';
+
+  @override
+  String get searchFieldHint => 'Zoeken…';
+
+  @override
+  String get bookmarksUnavailable => 'Bladwijzers zijn niet beschikbaar';
+
+  @override
+  String get failedToLoadBookmarks => 'Bladwijzers laden mislukt';
+
+  @override
+  String get failedToRemoveBookmark => 'Bladwijzer verwijderen mislukt';
+
+  @override
+  String get failedToUpdateBookmark => 'Bladwijzer bijwerken mislukt';
+
+  @override
+  String get bookmarkWithReminder => 'Bladwijzer met herinnering';
+
+  @override
+  String get noReminder => 'Geen herinnering';
+
+  @override
+  String get failedToLoadDrafts => 'Concepten laden mislukt.';
+
+  @override
+  String get failedToDiscardDraft => 'Concept verwijderen mislukt';
+
+  @override
+  String get messagesLoadFailed => 'Berichten laden mislukt';
+
+  @override
+  String get moreMessagesLoadFailed => 'Meer berichten laden mislukt';
+
+  @override
+  String get messageUnknownUser => 'Onbekend';
+
+  @override
+  String get unknownErrorFallback => 'Onbekende fout';
+
+  @override
+  String get chatComposerDefaultHint => 'Typ een bericht…';
+
+  @override
+  String chatChannelNumbered(Object id) {
+    return 'kanaal $id';
+  }
+
+  @override
+  String get chatSendFailed => 'Bericht verzenden mislukt.';
+
+  @override
+  String get chatEditFailed => 'Bericht bewerken mislukt.';
+
+  @override
+  String get chatDeleteFailed => 'Bericht verwijderen mislukt.';
+
+  @override
+  String get chatReactionsUnsupported =>
+      'Reacties worden hier niet ondersteund.';
+
+  @override
+  String get chatReactionFailed => 'Reactie bijwerken mislukt.';
+
+  @override
+  String get attachmentDefaultName => 'Bijlage';
+
+  @override
+  String get fileTypeAudio => 'Audio';
+
+  @override
+  String get fileTypeText => 'Tekst';
+
+  @override
+  String get fileTypeArchive => 'Archief';
+
+  @override
+  String get fileTypeFile => 'Bestand';
+
+  @override
+  String downloadFailedHttpStatus(String status) {
+    return 'Bestand downloaden mislukt: HTTP $status';
+  }
+
+  @override
+  String get downloadedFileEmpty => 'Het gedownloade bestand is leeg';
+
+  @override
+  String downloadFileFailed(String error) {
+    return 'Bestand downloaden mislukt: $error';
+  }
+
+  @override
+  String attachmentTypeNotAllowed(String extension, String allowed) {
+    return 'Bestandstype .$extension is niet toegestaan. Toegestane types: $allowed';
+  }
+
+  @override
+  String attachmentFileTooLarge(String size, String max) {
+    return 'Bestandsgrootte ($size) overschrijdt het maximum van $max';
+  }
+
+  @override
+  String get attachmentValidationFailed => 'Bestandscontrole mislukt';
+
+  @override
+  String get uploadMissingReference =>
+      'Uploaden gelukt, maar de server gaf geen verwijzing naar het bestand terug.';
+
+  @override
+  String get imageFileNotFound => 'Afbeeldingsbestand niet gevonden';
+
+  @override
+  String get failedToLoadVideo => 'Video laden mislukt';
+
+  @override
+  String get userInfoLoadFailed => 'Kon gebruikersinformatie niet laden.';
+
+  @override
+  String userInfoLoadFailedWithError(String error) {
+    return 'Kon gebruikersinformatie niet laden: $error';
+  }
+
+  @override
+  String get profileMenuIgnoreUser => 'Gebruiker negeren';
+
+  @override
+  String get profileMenuUnignoreUser => 'Gebruiker niet meer negeren';
+
+  @override
+  String get ignoreStateUpdateFailed => 'Kon negeerstatus niet bijwerken';
+
+  @override
+  String profileNowIgnoringUser(String username) {
+    return 'Je negeert @$username. Hun berichten worden verborgen.';
+  }
+
+  @override
+  String get profileIgnoreToggleFailed =>
+      'Negeren in- of uitschakelen mislukt.';
+
+  @override
+  String get profileStatsLoadFailed => 'Kon statistieken niet laden.';
+
+  @override
+  String get profileFollowFailed => 'Volgen mislukt';
+
+  @override
+  String get profileUnfollowFailed => 'Ontvolgen mislukt';
+
+  @override
+  String get profileChatOpenFailed =>
+      'Kon geen chat met deze gebruiker openen.';
+
+  @override
+  String summaryLikeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count likes',
+      one: '1 like',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String summaryLinkClicks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count klikken',
+      one: '1 klik',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get directoryPeriodAllTime => 'Altijd';
+
+  @override
+  String get directoryPeriodYear => 'Jaar';
+
+  @override
+  String get directoryPeriodQuarter => 'Kwartaal';
+
+  @override
+  String get directoryPeriodMonth => 'Maand';
+
+  @override
+  String get directoryPeriodWeek => 'Week';
+
+  @override
+  String get directoryPeriodToday => 'Vandaag';
+
+  @override
+  String get directoryOrderReceived => 'Ontvangen';
+
+  @override
+  String get directoryOrderReplies => 'Antwoorden';
+
+  @override
+  String get directoryOrderTopics => 'Topics';
+
+  @override
+  String get directoryOrderVisits => 'Bezoeken';
+
+  @override
+  String get directoryLoadFailed => 'Kon de gebruikerslijst niet laden.';
+
+  @override
+  String get directoryNoUsersMatch => 'Geen gebruikers met die naam.';
+
+  @override
+  String get directoryNoUsersForPeriod =>
+      'Geen gebruikers gevonden voor deze periode.';
+
+  @override
+  String get userSearchNoResults => 'Geen gebruikers gevonden';
+
+  @override
+  String get userSearchTryDifferentUsername =>
+      'Probeer te zoeken met een andere gebruikersnaam';
+
+  @override
+  String get userSearchPromptTitle => 'Zoeken naar gebruikers';
+
+  @override
+  String get userSearchPromptHint =>
+      'Voer een gebruikersnaam in om gebruikers te vinden en uit te nodigen';
+
+  @override
+  String get ignoredUsersUnignoreFailed => 'Niet meer negeren mislukt.';
+
+  @override
+  String get ignoredUsersEmpty => 'Je negeert niemand.';
+
+  @override
+  String get ignoredUsersEmptyHint =>
+      'Open een gebruikersprofiel en kies \"Gebruiker negeren\" in het menu om hun berichten en meldingen te verbergen.';
+
+  @override
+  String get badgesLoadFailed => 'Kon badges niet laden.';
+
+  @override
+  String get badgesEmpty => 'Geen badges op dit forum.';
+
+  @override
+  String get badgeTierGold => 'Goud';
+
+  @override
+  String get badgeTierSilver => 'Zilver';
+
+  @override
+  String get badgeTierBronze => 'Brons';
+
+  @override
+  String badgeEarnedAgo(String time) {
+    return 'Verdiend $time';
+  }
+
+  @override
+  String badgeEarnedByUsers(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Verdiend door $formatted gebruikers',
+      one: 'Verdiend door $formatted gebruiker',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trustLevelNameNewUser => 'Nieuwe gebruiker';
+
+  @override
+  String get trustLevelNameBasic => 'Basisgebruiker';
+
+  @override
+  String get trustLevelNameMember => 'Lid';
+
+  @override
+  String get trustLevelNameRegular => 'Vaste gebruiker';
+
+  @override
+  String get trustLevelNameLeader => 'Leider';
+
+  @override
+  String get trustLevelSummary0 =>
+      'Net lid geworden. Kan lezen en berichten plaatsen, met beperkingen voor links, afbeeldingen en berichten.';
+
+  @override
+  String get trustLevelSummary1 =>
+      'Ontgrendelt de belangrijkste functies: afbeeldingen en bijlagen, meer links, berichten markeren.';
+
+  @override
+  String get trustLevelSummary2 =>
+      'Kan uitnodigingen versturen, gebruikers negeren en eigen berichten langer bewerken.';
+
+  @override
+  String get trustLevelSummary3 =>
+      'Kan topics hercategoriseren en hernoemen, tags maken, en spammarkeringen wegen zwaarder.';
+
+  @override
+  String get trustLevelSummary4 =>
+      'Toegekend door staf. Kan elk bericht bewerken en topics vastzetten, sluiten, splitsen of samenvoegen.';
+
+  @override
+  String trustLevelRowTitle(int level, String name) {
+    return 'TL$level · $name';
+  }
+
+  @override
+  String get profileNoUserSpecified => 'Geen gebruiker opgegeven';
+
+  @override
+  String get userTopicsLoadFailed => 'Kon topics niet laden';
+
+  @override
+  String get userTopicsEmpty => 'Nog geen topics gestart.';
+
+  @override
+  String get userRecentPostsLoadFailed => 'Kon recente berichten niet laden';
+
+  @override
+  String get activityUnknownTopic => 'Onbekend topic';
+
+  @override
+  String groupJoinedSnack(String group) {
+    return 'Je bent lid geworden van $group';
+  }
+
+  @override
+  String get groupJoinFailed => 'Lid worden van groep mislukt';
+
+  @override
+  String groupLeftSnack(String group) {
+    return 'Je hebt $group verlaten';
+  }
+
+  @override
+  String get groupLeaveFailed => 'Groep verlaten mislukt';
+
+  @override
+  String get groupMembershipRequestHint =>
+      'Waarom wil je lid worden? Groepseigenaren zien dit bij je aanvraag.';
+
+  @override
+  String get groupMembershipReasonRequired =>
+      'Een reden is vereist om lidmaatschap aan te vragen';
+
+  @override
+  String get groupMembershipRequestSent =>
+      'Aanvraag verzonden — een groepseigenaar moet deze goedkeuren';
+
+  @override
+  String get groupMembershipRequestFailed =>
+      'Lidmaatschapsaanvraag verzenden mislukt';
+
+  @override
+  String get groupMemberBadge => 'Lid';
+
+  @override
+  String get groupRequestPending => 'Aanvraag in behandeling';
+
+  @override
+  String get groupJoining => 'Lid worden…';
+
+  @override
+  String get groupJoinButton => 'Lid worden van groep';
+
+  @override
+  String get groupsLoadFailed => 'Kon groepen niet laden.';
+
+  @override
+  String get groupBuiltIn => 'Ingebouwde groep';
+
+  @override
+  String invitesPendingWithCount(int count) {
+    return 'Wachtend ($count)';
+  }
+
+  @override
+  String invitesExpiredWithCount(int count) {
+    return 'Verlopen ($count)';
+  }
+
+  @override
+  String invitesRedeemedWithCount(int count) {
+    return 'Verzilverd ($count)';
+  }
+
+  @override
+  String get invitesLoadFailed => 'Kon uitnodigingen niet laden.';
+
+  @override
+  String get inviteLinkCreateFailed => 'Kon uitnodigingslink niet maken';
+
+  @override
+  String get inviteEmailAddressLabel => 'E-mailadres';
+
+  @override
+  String get inviteEmailInvalid => 'Voer een geldig e-mailadres in';
+
+  @override
+  String get inviteMessageOptionalLabel => 'Bericht (optioneel)';
+
+  @override
+  String get inviteSendFailed => 'Kon uitnodiging niet versturen';
+
+  @override
+  String get revokeInviteLinkWarning =>
+      'De uitnodigingslink werkt dan niet meer.';
+
+  @override
+  String revokeInviteEmailWarning(String email) {
+    return 'De uitnodiging aan $email werkt dan niet meer.';
+  }
+
+  @override
+  String get inviteRevokeFailed => 'Kon uitnodiging niet intrekken';
+
+  @override
+  String get inviteNoPermission => 'Je hebt geen toestemming om uit te nodigen';
+
+  @override
+  String get invitesEmptyPending => 'Geen wachtende uitnodigingen';
+
+  @override
+  String get invitesEmptyExpired => 'Geen verlopen uitnodigingen';
+
+  @override
+  String get invitesEmptyRedeemed => 'Geen verzilverde uitnodigingen';
+
+  @override
+  String get invitesEmptyPendingHint =>
+      'Maak een uitnodigingslink om mensen naar het forum te halen.';
+
+  @override
+  String get inviteLinkFallbackTitle => 'Uitnodigingslink';
+
+  @override
+  String inviteRedeemedOn(String date) {
+    return 'Verzilverd op $date';
+  }
+
+  @override
+  String inviteRedemptions(int count, int max) {
+    return '$count van $max verzilverd';
+  }
+
+  @override
+  String get inviteEmailSent => 'E-mail verzonden';
+
+  @override
+  String get inviteEmailNotSent => 'E-mail niet verzonden';
+
+  @override
+  String inviteExpiredOn(String date) {
+    return 'Verlopen op $date';
+  }
+
+  @override
+  String get inviteRevokeTooltip => 'Uitnodiging intrekken';
+
+  @override
+  String get reviewStatusPending => 'Wachtend';
+
+  @override
+  String get reviewStatusApproved => 'Goedgekeurd';
+
+  @override
+  String get reviewStatusRejected => 'Geweigerd';
+
+  @override
+  String get reviewStatusAll => 'Alles';
+
+  @override
+  String get reviewStatusIgnored => 'Markering genegeerd';
+
+  @override
+  String get reviewStatusDeleted => 'Topic of bericht verwijderd';
+
+  @override
+  String get reviewQueueUnavailable =>
+      'De beoordelingswachtrij is niet beschikbaar op dit forum.';
+
+  @override
+  String get reviewQueueLoadFailed => 'Kon beoordelingswachtrij niet laden';
+
+  @override
+  String get reviewableChangedByOther =>
+      'Dit item is door een andere moderator gewijzigd. Vernieuwen…';
+
+  @override
+  String get reviewActionFailed => 'Kon actie niet uitvoeren';
+
+  @override
+  String reviewActionDone(String action) {
+    return '$action — klaar';
+  }
+
+  @override
+  String get reviewRejectReasonHint => 'Waarom wordt dit geweigerd?';
+
+  @override
+  String get reviewTypeFlaggedPost => 'Gemarkeerd bericht';
+
+  @override
+  String get reviewTypeQueuedPost => 'Bericht in wachtrij';
+
+  @override
+  String get reviewTypeQueuedTopic => 'Topic in wachtrij';
+
+  @override
+  String get reviewTypeUser => 'Gebruiker';
+
+  @override
+  String get reviewTypePost => 'Bericht';
+
+  @override
+  String get reviewTypeChatMessage => 'Gemarkeerd chatbericht';
+
+  @override
+  String get reviewModeratorAccessRequired => 'Moderatortoegang vereist';
+
+  @override
+  String reviewableScore(String score) {
+    return 'Score $score';
+  }
+
+  @override
+  String get postRepliesLoadFailed => 'Antwoorden konden niet worden geladen.';
+
+  @override
+  String get postMakeWiki => 'Wiki maken';
+
+  @override
+  String get postRemoveWiki => 'Wiki verwijderen';
+
+  @override
+  String get postBookmarkRemoveFailed => 'Bladwijzer verwijderen mislukt';
+
+  @override
+  String get postBookmarkFailed => 'Bladwijzer voor bericht maken mislukt';
+
+  @override
+  String get postBookmarkReminderUpdateFailed =>
+      'Herinnering bijwerken mislukt';
+
+  @override
+  String get postBookmarkReminderSet => 'Herinnering ingesteld';
+
+  @override
+  String get postBookmarkReminderCleared => 'Herinnering gewist';
+
+  @override
+  String get solutionMarkFailed => 'Markeren als oplossing mislukt';
+
+  @override
+  String get solutionUnmarkFailed => 'Markering als oplossing opheffen mislukt';
+
+  @override
+  String get postUnknownDate => 'Onbekende datum';
+
+  @override
+  String get postBookmarkAction => 'Bladwijzer voor bericht maken';
+
+  @override
+  String postReactionsSemanticsReacted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Je hebt gereageerd. $count reacties. Tik om te wijzigen, houd ingedrukt om te zien wie er reageerde.',
+      one:
+          'Je hebt gereageerd. 1 reactie. Tik om te wijzigen, houd ingedrukt om te zien wie er reageerde.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String postReactionsSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count reacties. Tik om te reageren, houd ingedrukt om te zien wie er reageerde.',
+      one:
+          '1 reactie. Tik om te reageren, houd ingedrukt om te zien wie er reageerde.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get postLikeAction => 'Bericht liken';
+
+  @override
+  String get postUnlikeAction => 'Like ongedaan maken';
+
+  @override
+  String get postVoteRemoveFailed =>
+      'Stem verwijderen mislukt (tijd om ongedaan te maken verstreken?)';
+
+  @override
+  String get postVoteCastFailed => 'Stemmen mislukt';
+
+  @override
+  String get postUpvote => 'Omhoog stemmen';
+
+  @override
+  String get postDownvote => 'Omlaag stemmen';
+
+  @override
+  String get pollVoteFailed => 'Stemmen mislukt. Probeer het opnieuw.';
+
+  @override
+  String get pollRemoveVoteFailed =>
+      'Je stem kon niet worden verwijderd. Probeer het opnieuw.';
+
+  @override
+  String get pollVotersLoadFailed => 'Stemmers konden niet worden geladen.';
+
+  @override
+  String get pollVotersNotVisible =>
+      'De stemmers van deze peiling zijn niet zichtbaar.';
+
+  @override
+  String solutionSolvedByInPost(String name, int postNumber) {
+    return 'Opgelost door $name in bericht #$postNumber';
+  }
+
+  @override
+  String solutionMarkedBy(String name) {
+    return 'gemarkeerd door $name';
+  }
+
+  @override
+  String reactAgainInSeconds(int seconds) {
+    return 'Je kunt over ${seconds}s opnieuw op dit bericht reageren';
+  }
+
+  @override
+  String get reactionUpdateFailed => 'Reactie bijwerken mislukt.';
+
+  @override
+  String get reactionsNotSupported =>
+      'Reacties worden op dit forum niet ondersteund.';
+
+  @override
+  String get reactionsLoadFailed => 'Reacties konden niet worden geladen.';
+
+  @override
+  String viewProfileOfUser(String username) {
+    return 'Profiel van $username bekijken';
+  }
+
+  @override
+  String get failedToSavePost => 'Bericht opslaan mislukt';
+
+  @override
+  String failedToSavePostWithError(String error) {
+    return 'Bericht opslaan mislukt: $error';
+  }
+
+  @override
+  String get failedToRemoveAttachmentCheckPermissions =>
+      'Bijlage verwijderen mislukt. Controleer je rechten.';
+
+  @override
+  String get editPostTitle => 'Bericht bewerken';
+
+  @override
+  String get editYourPostHint => 'Bewerk je bericht…';
+
+  @override
+  String get failedToPostReply => 'Reactie plaatsen mislukt';
+
+  @override
+  String failedToPostReplyWithError(String error) {
+    return 'Reactie plaatsen mislukt: $error';
+  }
+
+  @override
+  String get failedToCreateTopic => 'Topic aanmaken mislukt';
+
+  @override
+  String get writeYourTopicTitle => 'Schrijf de titel van je topic…';
+
+  @override
+  String get writeYourTopicContent => 'Schrijf de inhoud van je topic…';
+
+  @override
+  String get composerTitleHint => 'Schrijf je titel…';
+
+  @override
+  String get composerContentHint => 'Schrijf je inhoud…';
+
+  @override
+  String imageTooLargeCouldNotResize(
+      String fileName, String size, String limit) {
+    return '$fileName: te groot ($size) en kon niet worden verkleind. De limiet is $limit.';
+  }
+
+  @override
+  String imageResizedToFitLimit(
+      String fileName, String size, String dimensions, String limit) {
+    return '$fileName verkleind tot $size$dimensions om binnen de limiet van $limit te blijven.';
+  }
+
+  @override
+  String get composerAttachFileHint => 'Een bestand aan dit bericht toevoegen';
+
+  @override
+  String get composerUploadImageHint =>
+      'Een afbeelding naar dit bericht uploaden';
+
+  @override
+  String get composerFormattingHint => 'Opmaakopties openen';
+
+  @override
+  String get whisperStaffOnly => 'Fluisteren (alleen medewerkers)';
+
+  @override
+  String get whisperOnStaffOnly => 'Fluisteren aan (alleen medewerkers)';
+
+  @override
+  String get tagInputMaxReached => 'Maximaal aantal tags bereikt';
+
+  @override
+  String get tagInputAddTag => 'Tag toevoegen…';
+
+  @override
+  String get tagInputAddAnother => '+ tag';
+
+  @override
+  String get editHistoryUnavailable =>
+      'Bewerkingsgeschiedenis is niet beschikbaar op dit forum.';
+
+  @override
+  String get editHistoryLoadFailed => 'Bewerkingsgeschiedenis laden mislukt.';
+
+  @override
+  String get previousRevision => 'Vorige revisie';
+
+  @override
+  String get nextRevision => 'Volgende revisie';
+
+  @override
+  String get notificationPrefsLoadFailed =>
+      'Kon de meldingsvoorkeuren niet laden.';
+
+  @override
+  String get notificationPrefsSaveFailed =>
+      'Opslaan mislukt — controleer je verbinding';
+
+  @override
+  String get signInToManageNotificationPrefs =>
+      'Meld je aan om je meldingsvoorkeuren te beheren.';
+
+  @override
+  String get notificationSettingsPushSection => 'Push';
+
+  @override
+  String get notificationSettingsEmailSection => 'E-mail';
+
+  @override
+  String get emailWhenAwayTitle => 'E-mail bij afwezigheid';
+
+  @override
+  String get emailLevelDescription =>
+      'Stuur me een e-mail wanneer ik word geciteerd of beantwoord, wanneer mijn @gebruikersnaam wordt genoemd of wanneer er nieuwe activiteit is in mijn geobserveerde categorieën, tags of topics';
+
+  @override
+  String get notificationPrefAlways => 'Altijd';
+
+  @override
+  String get notificationPrefOnlyWhenAway => 'Alleen wanneer afwezig';
+
+  @override
+  String get notificationPrefNever => 'Nooit';
+
+  @override
+  String get emailForMessagesTitle => 'E-mail bij berichten';
+
+  @override
+  String get emailMessagesLevelDescription =>
+      'Stuur me een e-mail als ik een persoonlijk bericht ontvang';
+
+  @override
+  String get activitySummaryTitle => 'Activiteitsamenvatting';
+
+  @override
+  String get activitySummaryDescription =>
+      'Als ik hier niet kom, stuur me dan een e-mailsamenvatting van populaire topics en antwoorden';
+
+  @override
+  String get activitySummaryFrequencyTitle =>
+      'Frequentie van de activiteitsamenvatting';
+
+  @override
+  String get activitySummaryDaily => 'Dagelijks';
+
+  @override
+  String get activitySummaryWeekly => 'Wekelijks';
+
+  @override
+  String get activitySummaryMonthly => 'Maandelijks';
+
+  @override
+  String get mailingListModeTitle => 'Mailinglijstmodus';
+
+  @override
+  String get mailingListModeDescription =>
+      'Mail me elk bericht (schakelt de activiteitsamenvatting uit). Niet aanbevolen op drukke forums.';
+
+  @override
+  String get likeNotificationFrequencyTitle => 'Melding sturen bij like';
+
+  @override
+  String get likeNotificationFirstTimeAndDaily =>
+      'Eerste keer dat een bericht wordt geliket en dagelijks';
+
+  @override
+  String get likeNotificationFirstTime =>
+      'Eerste keer dat een bericht is geliket';
+
+  @override
+  String get whenPostingTitle => 'Bij het plaatsen';
+
+  @override
+  String get whenPostingDescription =>
+      'Wat er gebeurt met een topic waarop je antwoordt';
+
+  @override
+  String get whenPostingWatchTopic => 'Topic observeren';
+
+  @override
+  String get whenPostingTrackTopic => 'Topic volgen';
+
+  @override
+  String get whenPostingDoNothing => 'Niets doen';
+
+  @override
+  String get pauseNotificationsUntilTomorrow => 'Tot morgen';
+
+  @override
+  String get couldNotEnableDoNotDisturb => 'Kon Niet storen niet inschakelen';
+
+  @override
+  String get couldNotTurnOffDoNotDisturb => 'Kon Niet storen niet uitschakelen';
+
+  @override
+  String get passwordResetEmailSent =>
+      'E-mail om je wachtwoord opnieuw in te stellen is verzonden.';
+
+  @override
+  String get couldNotSendResetEmail => 'Kon de herstel-e-mail niet verzenden';
+
+  @override
+  String get accountRequestFailed => 'Verzoek mislukt.';
+
+  @override
+  String get forumUrlUnavailable => 'De forum-URL is niet beschikbaar.';
+
+  @override
+  String get couldNotOpenPreferencesPage =>
+      'Kon de voorkeurenpagina niet openen.';
+
+  @override
+  String get couldNotOpenForumUrl => 'Kon de forum-URL niet openen.';
+
+  @override
+  String get couldNotRequestEmailChange =>
+      'Kon de e-mailwijziging niet aanvragen';
+
+  @override
+  String get newEmailLabel => 'Nieuw e-mailadres';
+
+  @override
+  String get enterAnEmailAddress => 'Voer een e-mailadres in';
+
+  @override
+  String get emailLooksInvalid => 'Dat lijkt geen e-mailadres';
+
+  @override
+  String get emailNoSpaces => 'Geen spaties in e-mailadressen';
+
+  @override
+  String get allowNotificationsSheetTitle => 'Meldingen toestaan';
+
+  @override
+  String get notificationsGrantNoPayload =>
+      'De toestemming gaf geen antwoord terug.';
+
+  @override
+  String get thisForumFallback => 'dit forum';
+
+  @override
+  String signInToDomain(String domain) {
+    return 'Inloggen bij $domain';
+  }
+
+  @override
+  String get loginResultTitle => 'Aanmeldresultaat';
+
+  @override
+  String get invalidAuthenticationCode => 'Ongeldige authenticatiecode';
+
+  @override
+  String get tfaVerificationError =>
+      'Er is een fout opgetreden bij de verificatie. Probeer het opnieuw.';
+
+  @override
+  String get passwordFieldLabel => 'Wachtwoord';
+
+  @override
+  String get somethingWentWrongTryAgain =>
+      'Er ging iets mis. Probeer het opnieuw.';
+
+  @override
+  String get unexpectedErrorTryAgain =>
+      'Er is een onverwachte fout opgetreden. Probeer het opnieuw.';
+
+  @override
+  String get errorNoInternetConnection =>
+      'Geen internetverbinding. Controleer je netwerkinstellingen.';
+
+  @override
+  String get errorRequestTimedOut =>
+      'Time-out bij het verzoek. Probeer het opnieuw.';
+
+  @override
+  String get errorServerTryLater =>
+      'Er is een serverfout opgetreden. Probeer het later opnieuw.';
+
+  @override
+  String get errorInvalidCredentials =>
+      'Ongeldige gebruikersnaam of wachtwoord.';
+
+  @override
+  String get errorSessionExpired =>
+      'Je sessie is verlopen. Meld je opnieuw aan.';
+
+  @override
+  String get errorAccountSuspended =>
+      'Je account is geschorst. Neem contact op met de forumstaf.';
+
+  @override
+  String get errorForumNotFound => 'Forum niet gevonden.';
+
+  @override
+  String get errorForumAccessDenied =>
+      'Je hebt geen toestemming om dit forum te openen.';
+
+  @override
+  String get errorForumUnavailable =>
+      'Het forum is momenteel niet beschikbaar. Probeer het later opnieuw.';
+
+  @override
+  String get errorDataNotFound => 'Opgevraagde gegevens niet gevonden.';
+
+  @override
+  String get errorDataCorrupted =>
+      'De gegevens lijken beschadigd. Vernieuw de pagina.';
+
+  @override
+  String get errorCacheLoadFailed =>
+      'Kon gegevens uit de cache niet laden. Probeer het opnieuw.';
+
+  @override
+  String errorInvalidField(String field) {
+    return 'Ongeldige waarde voor $field.';
+  }
+
+  @override
+  String errorFieldRequired(String field) {
+    return '$field is verplicht.';
+  }
+
+  @override
+  String errorPermissionDeniedFor(String action) {
+    return 'Je hebt geen toestemming voor: $action.';
+  }
+
+  @override
+  String errorFeatureNotAvailable(String feature) {
+    return '$feature is niet beschikbaar op dit forum.';
+  }
+
+  @override
+  String get errorStorageFull => 'De opslag is vol. Maak wat ruimte vrij.';
+
+  @override
+  String get errorStorageAccessDenied =>
+      'Toegang tot opslag geweigerd. Controleer de app-machtigingen.';
+
+  @override
+  String get errorNetworkTryAgain =>
+      'Er is een netwerkfout opgetreden. Probeer het opnieuw.';
+
+  @override
+  String get errorAuthenticationTryAgain =>
+      'Authenticatie mislukt. Probeer het opnieuw.';
+
+  @override
+  String get errorForumTryAgain =>
+      'Er is een forumfout opgetreden. Probeer het opnieuw.';
+
+  @override
+  String get connectionErrorTitle => 'Verbindingsfout';
+
+  @override
+  String get authenticationErrorTitle => 'Authenticatiefout';
+
+  @override
+  String get forumErrorTitle => 'Forumfout';
+
+  @override
+  String get permissionErrorTitle => 'Toestemmingsfout';
 }

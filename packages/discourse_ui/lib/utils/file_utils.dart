@@ -6,7 +6,11 @@ import 'package:dio/dio.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
-/// Returns a human-readable file type for a given filename or extension.
+import '../l10n/app_l10n.dart';
+
+/// Returns a human-readable file type for a given filename or extension, in
+/// the app's language — a label to show, not to match on ([getFileIcon] and
+/// [getFileTypeColor] take the filename).
 String getFileType(String filename) {
   final extension = filename.split('.').last.toLowerCase();
   switch (extension) {
@@ -20,7 +24,7 @@ String getFileType(String filename) {
     case 'svg':
     case 'heic':
     case 'heif':
-      return 'Image';
+      return appL10n().image;
 
     // Media
     case 'mp4':
@@ -30,13 +34,13 @@ String getFileType(String filename) {
     case 'flv':
     case 'mkv':
     case 'webm':
-      return 'Video';
+      return appL10n().video;
     case 'mp3':
     case 'wav':
     case 'ogg':
     case 'm4a':
     case 'flac':
-      return 'Audio';
+      return appL10n().fileTypeAudio;
 
     // Documents
     case 'pdf':
@@ -51,7 +55,7 @@ String getFileType(String filename) {
     case 'pptx':
       return 'PowerPoint';
     case 'txt':
-      return 'Text';
+      return appL10n().fileTypeText;
 
     // Archives
     case 'zip':
@@ -59,14 +63,14 @@ String getFileType(String filename) {
     case '7z':
     case 'tar':
     case 'gz':
-      return 'Archive';
+      return appL10n().fileTypeArchive;
 
     default:
-      // For unknown, return the extension in uppercase or 'File'
+      // For unknown, return the extension in uppercase or "File"
       if (extension.length <= 5) {
         return extension.toUpperCase();
       }
-      return 'File';
+      return appL10n().fileTypeFile;
   }
 }
 
@@ -93,6 +97,8 @@ IconData getFileIcon(String filenameOrType) {
     case 'bmp':
     case 'webp':
     case 'svg':
+    case 'heic':
+    case 'heif':
     case 'image':
       return Icons.image;
     // Video
@@ -226,6 +232,17 @@ bool isVideoFile(String filenameOrUrl) {
       .contains(extension);
 }
 
+/// Why a download failed, in the app's language. Its text is the whole
+/// message — no "Exception: " in front — since callers show it as it is.
+class _DownloadError implements Exception {
+  const _DownloadError(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
 /// Downloads a file from the given URL and saves it appropriately for each platform.
 /// - iOS: Uses Share Sheet to let user save to Files app
 /// - Android/macOS/Desktop: Saves to Downloads folder
@@ -235,7 +252,8 @@ bool isVideoFile(String filenameOrUrl) {
 /// [filename] - The desired filename for the downloaded file
 ///
 /// Returns the path to the downloaded file (or empty string on iOS after sharing).
-/// Throws an exception if the download fails.
+/// Throws an exception, whose text says why in the app's language, if the
+/// download fails.
 Future<String> downloadFileToDownloads(String url, String filename) async {
   // iOS uses Share Sheet instead of direct file saving
   if (Platform.isIOS) {
@@ -251,12 +269,13 @@ Future<String> downloadFileToDownloads(String url, String filename) async {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to download file: HTTP ${response.statusCode}');
+      throw _DownloadError(
+          appL10n().downloadFailedHttpStatus('${response.statusCode}'));
     }
 
     final bytes = response.data;
     if (bytes == null || bytes.isEmpty) {
-      throw Exception('Downloaded file is empty');
+      throw _DownloadError(appL10n().downloadedFileEmpty);
     }
 
     // Get the Downloads directory
@@ -419,7 +438,8 @@ Future<String> downloadFileToDownloads(String url, String filename) async {
       }
     }
   } catch (e) {
-    throw Exception('Failed to download file: $e');
+    if (e is _DownloadError) rethrow;
+    throw _DownloadError(appL10n().downloadFileFailed('$e'));
   }
 }
 
@@ -436,12 +456,13 @@ Future<String> _downloadFileIOS(String url, String filename) async {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to download file: HTTP ${response.statusCode}');
+      throw _DownloadError(
+          appL10n().downloadFailedHttpStatus('${response.statusCode}'));
     }
 
     final bytes = response.data;
     if (bytes == null || bytes.isEmpty) {
-      throw Exception('Downloaded file is empty');
+      throw _DownloadError(appL10n().downloadedFileEmpty);
     }
 
     // Save to temporary directory
@@ -462,7 +483,8 @@ Future<String> _downloadFileIOS(String url, String filename) async {
     // The file in temp directory will be cleaned up by the system
     return '';
   } catch (e) {
-    throw Exception('Failed to download file on iOS: $e');
+    if (e is _DownloadError) rethrow;
+    throw _DownloadError(appL10n().downloadFileFailed('$e'));
   }
 }
 

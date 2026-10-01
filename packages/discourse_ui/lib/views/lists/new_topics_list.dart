@@ -174,11 +174,8 @@ class NewTopicsListState extends FCStatefulWidget<NewTopicsList>
     if (!widget.siteContext.isLoggedIn) {
       return NotSignedInView(
         siteContext: widget.siteContext,
-        title:
-            AppLocalizations.of(context)?.signInToViewUnreadTopics ??
-                'Sign in to view new topics',
-        message:
-            'New topics show what was created since your last visit.',
+        title: AppLocalizations.of(context)!.signInToViewNewTopics,
+        message: AppLocalizations.of(context)!.newTopicsSignInMessage,
         icon: Icons.fiber_new,
       );
     }

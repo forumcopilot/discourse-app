@@ -1,5 +1,10 @@
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseMessageDetails, DiscourseSiteCapabilities, DiscourseTopicStatus;
+    show
+        DiscourseMessageDetails,
+        DiscourseModerationProxy,
+        DiscourseSiteCapabilities,
+        DiscourseSiteContextExtension,
+        DiscourseTopicStatus;
 import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
 import 'package:flutter/material.dart';
 import '../core/errors/action_refused.dart';
@@ -15,6 +20,7 @@ import 'appbars/posts_page_app_bar.dart';
 import '../utils/url_utils.dart';
 import 'widgets/sheet_title.dart';
 import 'widgets/category_badge.dart';
+import 'widgets/feature_topic_sheet.dart';
 import 'private_messaging/message_actions.dart';
 import 'private_messaging/message_participants_sheet.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
@@ -268,18 +274,40 @@ class _PostPageState extends State<PostPage> {
     }, closed ? l10n.topicOpened : l10n.topicClosed);
   }
 
-  /// Pins or un-pins the topic for everyone, at the top of its category
-  /// (web's "Pin Topic…" without an end date).
-  void _handlePin() {
-    final pinned = _status?.isPinnedByStaff ?? false;
+  /// Web's "Pin Topic…": pins the topic for everyone, in its category or
+  /// (staff and trust level 4) globally, until a date staff pick in the
+  /// sheet. Un-Pin acts at once.
+  void _handlePin() async {
+    final status = _status;
     final proxy = SiteProxyFactory.getModerationProxy();
     final l10n = AppLocalizations.of(context)!;
+    if (status?.isPinnedByStaff ?? false) {
+      _runTopicAction(() async {
+        final r = await proxy.unstickTopicAsync(widget.topicId);
+        return (ok: r.result, message: r.resultText);
+      }, l10n.topicUnpinned);
+      return;
+    }
+    if (proxy is! DiscourseModerationProxy) return;
+    final user = widget.siteContext.loginDataOutput?.user;
+    final staff = user != null &&
+        (user.canModerate || user.userType == 'admin' || user.userType == 'moderator');
+    final choice = await showFeatureTopicSheet(
+      context,
+      categoryName: DiscourseSiteCapabilities.forSite(widget.siteContext.site.pluginUrl)
+              .categoryNameFor(_forumId ?? '') ??
+          '',
+      // Discourse's own rule (feature-topic modal): pin_unpin permission,
+      // and staff or trust level 4 (guardian.can_moderate?).
+      canPinGlobally: (status?.canPinUnpin ?? false) &&
+          (staff || widget.siteContext.trustLevel == 4),
+    );
+    if (choice == null || !mounted) return;
     _runTopicAction(() async {
-      final r = pinned
-          ? await proxy.unstickTopicAsync(widget.topicId)
-          : await proxy.stickTopicAsync(widget.topicId);
+      final r = await proxy.pinTopicAsync(widget.topicId,
+          globally: choice.globally, until: choice.until);
       return (ok: r.result, message: r.resultText);
-    }, pinned ? l10n.topicUnpinned : l10n.topicPinned);
+    }, l10n.topicPinned);
   }
 
   void _handleArchive() {
@@ -316,11 +344,10 @@ class _PostPageState extends State<PostPage> {
       _appBarKey.currentState?.updateTitle(pending);
       _refreshCallback?.call();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                'Failed to rename: ${result.resultText ?? "unknown error"}')),
-      );
+      SnackbarHelper.showError(
+          context,
+          AppLocalizations.of(context)!.topicActionFailed(
+              result.resultText ?? AppLocalizations.of(context)!.anErrorOccurred));
     }
   }
 
@@ -398,10 +425,11 @@ class _PostPageState extends State<PostPage> {
     messenger.showSnackBar(
       SnackBar(
         content: Text(result.result
-            ? 'Moved.'
-            : result.resultText?.isNotEmpty == true
-                ? result.resultText!
-                : "Couldn't move topic"),
+            ? AppLocalizations.of(context)!.topicMoved
+            : AppLocalizations.of(context)!.topicActionFailed(
+                result.resultText?.isNotEmpty == true
+                    ? result.resultText!
+                    : AppLocalizations.of(context)!.anErrorOccurred)),
       ),
     );
     if (result.result) _refreshCallback?.call();
@@ -427,9 +455,7 @@ class _PostPageState extends State<PostPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "All posts from this topic will be moved into the "
-                "target topic. This can't be undone via the app — "
-                'recover via web admin if needed.',
+                AppLocalizations.of(context)!.mergeTopicExplanation,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -438,10 +464,10 @@ class _PostPageState extends State<PostPage> {
               TextField(
                 controller: controller,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Destination topic id',
-                  hintText: 'e.g. 1234',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.destinationTopicId,
+                  hintText: '1234',
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ],
@@ -482,10 +508,10 @@ class _PostPageState extends State<PostPage> {
     messenger.showSnackBar(
       SnackBar(
         content: Text(result.result
-            ? 'Merged.'
+            ? AppLocalizations.of(context)!.topicMerged
             : result.resultText?.isNotEmpty == true
                 ? result.resultText!
-                : "Couldn't merge topic"),
+                : AppLocalizations.of(context)!.mergeTopicError),
       ),
     );
     if (result.result && mounted) context.popOwnRoute();

@@ -248,6 +248,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
   }
 
   Future<void> _loadConversations() async {
+    final l10n = AppLocalizations.of(context)!;
     final startNum = _currentPage * _itemsPerPage;
     final lastNum = startNum + _itemsPerPage - 1;
     AppLogger.debug('[ConversationList] Loading conversations (page $_currentPage, startNum: $startNum, lastNum: $lastNum)');
@@ -261,7 +262,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
       // error state (with Retry) via loadConversations' catch instead.
       throw Exception(conversationsData.resultText?.isNotEmpty == true
           ? conversationsData.resultText
-          : 'Failed to load messages');
+          : l10n.messagesLoadFailed);
     }
 
     if (mounted) {
@@ -303,7 +304,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)?.failedToLeaveConversation(e.toString()) ?? 'Failed to leave message: $e'),
+            content: Text(AppLocalizations.of(context)!.failedToLeaveConversation(e.toString())),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -321,7 +322,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
           siteContext: widget.siteContext,
           topicId: conversation.conv_id ?? '',
           title: conversation.subject ??
-              (AppLocalizations.of(context)?.noSubject ?? 'No subject'),
+              AppLocalizations.of(context)!.noSubject,
           forumId: '',
         ),
       ),
@@ -382,8 +383,8 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
         if (!isLoggedIn) {
           return NotSignedInView(
             siteContext: widget.siteContext,
-            title: AppLocalizations.of(context)?.signInToViewMessages ?? 'Sign in to view messages',
-            message: AppLocalizations.of(context)?.youNeedToBeSignedInToViewConversations ?? 'You need to be signed in to view your messages.',
+            title: AppLocalizations.of(context)!.signInToViewMessages,
+            message: AppLocalizations.of(context)!.youNeedToBeSignedInToViewConversations,
             icon: Icons.mail_outline_rounded,
           );
         }
@@ -482,7 +483,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)?.errorLoadingMoreConversations(e.toString()) ?? 'Error loading more messages: $e'),
+            content: Text(AppLocalizations.of(context)!.errorLoadingMoreConversations(e.toString())),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -497,6 +498,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
   }
 
   Future<void> _loadMoreConversations() async {
+    final l10n = AppLocalizations.of(context)!;
     AppLogger.debug('[ConversationList] Loading more conversations (page ${_currentPage + 1})');
     final conversationProxy = SiteProxyFactory.getPrivateConversationProxy();
 
@@ -511,7 +513,7 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
       // silently ending pagination.
       throw Exception(conversationsData.resultText?.isNotEmpty == true
           ? conversationsData.resultText
-          : 'Failed to load more messages');
+          : l10n.moreMessagesLoadFailed);
     }
 
     if (mounted) {

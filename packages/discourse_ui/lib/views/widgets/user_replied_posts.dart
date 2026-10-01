@@ -10,6 +10,7 @@ import 'package:discourse_ui/views/lists/posts_list.dart';
 import 'package:discourse_ui/controllers/login_controller.dart';
 import 'package:discourse_ui/views/login_page.dart';
 import '../../l10n/generated/app_localizations.dart';
+import 'package:discourse_ui/l10n/app_l10n.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/error_message.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -104,7 +105,8 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
   Future<void> _fetchRecentPosts({bool loadMore = false}) async {
     if (widget.userName == null && widget.userId == null) {
       setState(() {
-        _error = 'No user specified';
+        // Can run from initState, before the context may look anything up.
+        _error = appL10n().profileNoUserSpecified;
         _isLoading = false;
       });
       return;
@@ -160,7 +162,7 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
       AppLogger.debug('Stack trace: $stack');
       if (mounted) {
         setState(() {
-          _error = 'Failed to load recent posts';
+          _error = AppLocalizations.of(context)!.userRecentPostsLoadFailed;
           _isLoading = false;
           _isLoadingMore = false;
         });
@@ -327,7 +329,7 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
   /// "accepted". Naming the actor without saying what they did would read
   /// as a byline and credit the wrong person for the post.
   String? get _actorLabel => widget.actionFilter == ActivityFilters.solved
-      ? (AppLocalizations.of(context)?.activityAcceptedBy ?? 'accepted by')
+      ? AppLocalizations.of(context)!.activityAcceptedBy
       : null;
 
   Widget _buildPostItem(BuildContext context, FCUserReply post) {
@@ -337,7 +339,9 @@ class _UserRepliedPostsState extends State<UserRepliedPosts> {
           ? null
           : activityKindLabel(l10n,
               filter: widget.actionFilter, postNumber: post.replyNumber),
-      title: post.topicTitle.isNotEmpty ? post.topicTitle : 'Unknown Topic',
+      title: post.topicTitle.isNotEmpty
+          ? post.topicTitle
+          : AppLocalizations.of(context)!.activityUnknownTopic,
       excerpt: post.shortContent,
       time: post.postTime,
       // `replyNumber` is the post's position in its topic, not a count of

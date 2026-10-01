@@ -85,28 +85,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String get resend => '重新发送';
 
   @override
-  String get noLatestTopics => '无最新主题';
+  String get noLatestTopics => '无最新话题';
 
   @override
-  String get noRecentTopicsToDisplay => '没有要显示的最新主题。稍后再来查看新讨论。';
+  String get noRecentTopicsToDisplay => '没有要显示的最新话题。稍后再来查看新讨论。';
 
   @override
-  String get signInToViewLatestTopics => '登录以查看最新主题';
+  String get signInToViewLatestTopics => '登录以查看最新话题';
 
   @override
-  String get youNeedToBeSignedInToViewLatestTopics => '您需要登录才能查看最新主题';
+  String get youNeedToBeSignedInToViewLatestTopics => '您需要登录才能查看最新话题';
 
   @override
-  String get thereAreNoUnreadTopics => '没有未读主题。稍后再来查看新讨论。';
+  String get thereAreNoUnreadTopics => '没有未读话题。稍后再来查看新讨论。';
 
   @override
   String get youAreAllCaughtUp => '您已全部查看完毕！';
 
   @override
-  String get signInToViewUnreadTopics => '登录以查看未读主题';
+  String get signInToViewUnreadTopics => '登录以查看未读话题';
 
   @override
-  String get youNeedToBeSignedInToViewUnreadTopics => '您需要登录才能查看未读主题';
+  String get youNeedToBeSignedInToViewUnreadTopics => '您需要登录才能查看未读话题';
 
   @override
   String get latest => '最新';
@@ -138,54 +138,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get all => '全部';
 
   @override
-  String get topicsOnly => '仅主题';
+  String get topicsOnly => '仅话题';
 
   @override
   String get titlesOnly => '仅标题';
 
   @override
   String failedToShareTopic(String error) {
-    return '分享主题失败: $error';
+    return '分享话题失败: $error';
   }
 
   @override
-  String get youCannotReplyToThisThread => '您无法回复此主题';
+  String get youCannotReplyToThisThread => '您无法回复此话题';
 
   @override
-  String get pleaseWaitForThreadToLoad => '请等待主题加载';
-
-  @override
-  String get postCanBeRestoredLater => '帖子稍后可以恢复';
-
-  @override
-  String get postWillBePermanentlyDeleted => '帖子将被永久删除';
-
-  @override
-  String get enterReasonForDeletingPost => '输入删除此帖子的原因';
-
-  @override
-  String get reportPost => '举报帖子';
-
-  @override
-  String get pleaseProvideReasonForReporting => '请提供举报此帖子的原因。';
+  String get pleaseWaitForThreadToLoad => '请等待话题加载';
 
   @override
   String get reason => '原因';
-
-  @override
-  String get enterReasonForReportingPost => '输入举报此帖子的原因';
-
-  @override
-  String get pleaseEnterReason => '请输入原因';
-
-  @override
-  String get submitReport => '提交举报';
-
-  @override
-  String get selectedActions => '选定的操作:';
-
-  @override
-  String get thisActionCannotBeUndone => '此操作无法撤销。';
 
   @override
   String get participantsLabel => '参与者';
@@ -201,10 +171,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get newTopic => '新主题';
-
-  @override
-  String get markRead => '标记为已读';
+  String get newTopic => '新话题';
 
   @override
   String get pleaseSpecifyReason => '请说明原因';
@@ -216,27 +183,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreOptions => '更多选项';
 
   @override
-  String get topicClosed => '主题已关闭';
+  String get topicClosed => '话题已关闭';
 
   @override
-  String get topicOpened => '主题已打开';
-
-  @override
-  String cannotEditMessage(String error) {
-    return '无法编辑此消息: $error';
-  }
-
-  @override
-  String get confirmSpamClean => '确认清理垃圾邮件';
-
-  @override
-  String get handleThreads => '处理主题';
-
-  @override
-  String get deleteMessages => '删除消息';
-
-  @override
-  String get deleteConversations => '删除消息';
+  String get topicOpened => '话题已打开';
 
   @override
   String get noConversations => '您没有任何消息';
@@ -262,28 +212,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get loginRequired => '需要登录';
 
   @override
-  String get spamCleaner => '垃圾清理';
-
-  @override
   String get sendMessage => '私信';
-
-  @override
-  String get memberSince => '注册日期';
-
-  @override
-  String get lastActivity => '最后活动';
 
   @override
   String get likesReceived => '收到的赞';
 
   @override
-  String get likesGiven => '给出的赞';
-
-  @override
   String get showMore => '显示更多';
-
-  @override
-  String get cleanSpam => '清理垃圾信息';
 
   @override
   String get failedToSaveConversation => '无法保存消息';
@@ -317,13 +252,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get signIn => '登录';
 
   @override
-  String get markForumRead => '标记论坛为已读';
-
-  @override
   String get notificationTest => '通知测试';
 
   @override
-  String get forum => '论坛';
+  String get forum => '类别';
 
   @override
   String get profile => '资料';
@@ -361,11 +293,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get youNeedToBeSignedInToViewConversations => '登录后才能查看您的消息。';
-
-  @override
-  String errorLoadingConversations(String error) {
-    return '加载消息出错：$error';
-  }
 
   @override
   String failedToLeaveConversation(String error) {
@@ -417,36 +344,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirm => '确认';
 
   @override
-  String spamClean(String username) {
-    return '清理 $username 的垃圾邮件';
-  }
-
-  @override
-  String get selectActionsToPerform => '选择要执行的操作:';
-
-  @override
-  String get moveOrDeleteThreadsBasedOnAdminSettings => '根据管理员设置移动或删除主题';
-
-  @override
-  String get messageUpdatedSuccessfully => '消息更新成功';
-
-  @override
   String error(String error) {
     return '错误: $error';
   }
-
-  @override
-  String failedToRemoveAttachment(String error) {
-    return '删除附件失败: $error';
-  }
-
-  @override
-  String failedToLoadMessage(String error) {
-    return '加载消息失败: $error';
-  }
-
-  @override
-  String get editMessage => '编辑消息';
 
   @override
   String get removeAttachment => '删除附件';
@@ -517,7 +417,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get invite => '邀请';
 
   @override
-  String get enterKeywordsToSearchTopics => '输入关键词以搜索主题...';
+  String get enterKeywordsToSearchTopics => '输入关键词以搜索话题...';
 
   @override
   String get refresh => '刷新';
@@ -562,7 +462,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reactedBy => '已反应';
 
   @override
-  String get enterKeywordsToFindTopicsAndPosts => '输入关键词以查找主题和帖子';
+  String get enterKeywordsToFindTopicsAndPosts => '输入关键词以查找话题和帖子';
 
   @override
   String get light => '浅色';
@@ -588,39 +488,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get banned => '已封禁';
 
   @override
-  String get reportSubmittedSuccessfully => '举报提交成功';
-
-  @override
   String get deleteTopic => '删除话题';
 
   @override
   String get pleaseSelectEndDate => '请选择结束日期';
-
-  @override
-  String get spamCleanUser => '清理用户垃圾信息';
-
-  @override
-  String get deletePrivateConversations => '删除私信';
-
-  @override
-  String get banTheUserAccount => '封禁用户账户';
-
-  @override
-  String get handledThreads => '已处理的线程';
-
-  @override
-  String get deletedMessages => '已删除的消息';
-
-  @override
-  String get deletedConversations => '已删除的消息';
-
-  @override
-  String get bannedUser => '已封禁的用户';
-
-  @override
-  String successfullyCleanedSpam(String username, String actions) {
-    return '成功清理 $username 的垃圾信息。操作: $actions';
-  }
 
   @override
   String get home => '首页';
@@ -629,31 +500,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notifications => '通知';
 
   @override
-  String get forums => '论坛';
-
-  @override
-  String get markAllForumsAsRead => '将所有论坛标记为已读？';
-
-  @override
-  String get markAllForumsAsReadMessage => '这将把所有论坛和主题标记为已读。此操作无法撤销。';
-
-  @override
-  String get markAsRead => '标记为已读';
+  String get forums => '类别';
 
   @override
   String get content => '内容';
-
-  @override
-  String get insertImage => '插入图片';
-
-  @override
-  String get howWouldYouLikeToInsertImage => '您想如何插入此图片？';
-
-  @override
-  String get thumbnail => '缩略图';
-
-  @override
-  String get fullSize => '完整尺寸';
 
   @override
   String get pleaseEnterTitle => '请输入标题';
@@ -671,16 +521,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mentionUser => '提及用户';
 
   @override
-  String get cleaningSpam => '清理垃圾信息中...';
-
-  @override
   String get writeYourMessage => '编写您的消息...';
 
   @override
   String get writeYourReply => '编写您的回复...';
-
-  @override
-  String get conversationCreatedSuccessfully => '消息已发送';
 
   @override
   String get conversationMarkedAsUnread => '消息已标记为未读';
@@ -692,19 +536,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get conversationOpened => '消息已打开';
 
   @override
-  String get pleaseLoginToLikeMessages => '请登录以点赞消息';
-
-  @override
-  String get loadEarlierMessages => '加载更早的消息';
-
-  @override
   String failedToLoadQuote(String error) {
     return '加载引用失败: \n$error';
-  }
-
-  @override
-  String failedToSendReply(String error) {
-    return '发送回复失败: $error';
   }
 
   @override
@@ -720,11 +553,6 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String failedToOpenConversation(String error) {
     return '无法打开消息：$error';
-  }
-
-  @override
-  String failedToJumpToMessage(String error) {
-    return '跳转到消息失败: $error';
   }
 
   @override
@@ -769,20 +597,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get goBack => '返回';
 
   @override
-  String failedToLoadPost(String error) {
-    return '加载帖子失败: \n$error';
-  }
-
-  @override
-  String failedToLikeOrUnlikeMessage(String action, String error) {
-    return '对消息$action失败: $error';
-  }
-
-  @override
   String get like => '点赞';
-
-  @override
-  String get unlike => '取消点赞';
 
   @override
   String get download => '下载';
@@ -800,14 +615,6 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String errorDownloading(String filename, String error) {
     return '下载$filename时出错: $error';
-  }
-
-  @override
-  String get failedToNavigateToForum => '导航到论坛失败';
-
-  @override
-  String forumNotFoundById(String forumId) {
-    return '未找到论坛: $forumId';
   }
 
   @override
@@ -928,25 +735,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String nVotes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 票',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get lastSeen => '最后访问';
-
-  @override
   String get chat => '聊天';
-
-  @override
-  String comingSoon(String label) {
-    return '$label — 即将推出';
-  }
 
   @override
   String moreBadges(Object count) {
@@ -1016,9 +805,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get discard => '放弃';
 
   @override
-  String get discardDraftQuestion => '放弃草稿？';
-
-  @override
   String get doNotDisturb => '请勿打扰';
 
   @override
@@ -1039,7 +825,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pushEnabledForThisLogin => '已为此次登录启用';
 
   @override
-  String get failedToLoadMoreTopics => '无法加载更多主题。滚动以重试。';
+  String get failedToLoadMoreTopics => '无法加载更多话题。滚动以重试。';
 
   @override
   String get failedToUpdateNotificationLevel => '无法更新通知级别';
@@ -1086,7 +872,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get merge => '合并';
 
   @override
-  String get mergeIntoTopic => '合并到主题';
+  String get mergeIntoTopic => '合并到话题';
 
   @override
   String get newInviteLink => '新邀请链接';
@@ -1141,7 +927,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get removeVote => '撤销投票';
 
   @override
-  String get renameTopic => '重命名主题';
+  String get renameTopic => '重命名话题';
 
   @override
   String reportedBy(String username) {
@@ -1161,9 +947,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get resizeAndUpload => '缩小并上传';
-
-  @override
-  String get retryConnection => '重试连接';
 
   @override
   String get checkConnectionAndRetry => '请检查网络连接，然后重试。';
@@ -1196,9 +979,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get signOut => '退出登录';
 
   @override
-  String get signOutQuestion => '退出登录？';
-
-  @override
   String get signInCancelledNoPayload => '登录已取消 — 未收到响应';
 
   @override
@@ -1213,15 +993,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String stoppedIgnoringUser(String username) {
     return '已取消忽略 @$username';
   }
-
-  @override
-  String get submit => '提交';
-
-  @override
-  String get discardDraftWarning => '已保存的草稿将被永久删除。';
-
-  @override
-  String get deleteChatMessageWarning => '此消息将对所有人删除。';
 
   @override
   String get titleOnly => '仅标题';
@@ -1250,7 +1021,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get loginFailed => '登录失败';
 
   @override
-  String get moveToCategory => '移动到分类';
+  String get moveToCategory => '移动到类别';
 
   @override
   String get undeleteTopic => '取消删除话题';
@@ -1266,17 +1037,10 @@ class AppLocalizationsZh extends AppLocalizations {
       '为了安全，Discourse 可能要求你通过邮件中的链接确认。如果没有收到，请检查垃圾邮件文件夹。';
 
   @override
-  String get newDirectMessage => '新私信';
-
-  @override
   String get noMessagesYetSayHi => '还没有消息 — 打个招呼吧。';
 
   @override
   String get edited => '已编辑';
-
-  @override
-  String get editProfileManagedOnWebNote =>
-      '显示名称、邮箱、密码及其他账户设置在“账户 → 在网页上管理账户”中管理。点击照片上的相机图标可更换头像。';
 
   @override
   String get approvedButRelayUnreachable => '已批准，但无法连接通知服务器以完成设置。请稍后在“设置”中重试。';
@@ -1285,7 +1049,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notificationsAreTurnedOffForThisApp => '此应用的通知已关闭';
 
   @override
-  String get pleaseLoginToCreateANewTopic => '请登录后创建新主题';
+  String get pleaseLoginToCreateANewTopic => '请登录后创建新话题';
 
   @override
   String get pleaseLoginToSubscribeToForums => '请登录后订阅论坛';
@@ -1310,9 +1074,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get protected => '受保护';
-
-  @override
   String get solution => '解决方案';
 
   @override
@@ -1335,11 +1096,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get poll => '投票';
-
-  @override
-  String errorLoadingContent(Object error) {
-    return '加载内容出错：$error';
-  }
 
   @override
   String get noDiscussionsYet => '还没有讨论。';
@@ -1404,9 +1160,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get leaveConversation2 => '离开消息';
 
   @override
-  String get reportConversation2 => '举报消息';
-
-  @override
   String get closeConversation2 => '关闭消息';
 
   @override
@@ -1429,26 +1182,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get leaveConversationConfirmation => '确定要从此消息中移除自己吗？您将无法再看到或回复它。';
-
-  @override
-  String errorLoadingConversation(Object error) {
-    return '加载消息出错：$error';
-  }
-
-  @override
-  String get conversationNotFound => '未找到消息';
-
-  @override
-  String get conversationClosedBanner => '此消息已关闭；不再接受新回复';
-
-  @override
-  String get noMessagesFound => '未找到消息';
-
-  @override
-  String get endOfConversation => '讨论结束';
-
-  @override
-  String get jumpToMessage => '跳转到消息';
 
   @override
   String get editConversation2 => '编辑标题';
@@ -1580,9 +1313,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get chatPlaceholderGroup => '群聊';
-
-  @override
   String get chatPlaceholderSelf => '做些记录';
 
   @override
@@ -1657,11 +1387,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get postNeedsApprovalBody => '我们已收到您的帖子，不过需要由版主批准才能显示。请耐心等待。';
 
   @override
-  String failedToCreateConversation(Object error) {
-    return '无法发送消息：$error';
-  }
-
-  @override
   String maximumAttachmentsAllowed(Object count) {
     return '最多允许 $count 个附件';
   }
@@ -1670,13 +1395,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noImagesFoundToDisplay => '没有可显示的图片。';
 
   @override
-  String get pleaseLoginToViewThisAttachment => '请登录后查看此附件';
+  String get searchForTopics => '搜索话题';
 
   @override
-  String get searchForTopics => '搜索主题';
-
-  @override
-  String get noTopicsFound => '未找到主题';
+  String get noTopicsFound => '未找到话题';
 
   @override
   String get trySearchingWithDifferentKeywords => '请尝试其他关键词';
@@ -1686,7 +1408,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get perTopicNotificationLevelsNote =>
-      '按分类和按主题的通知级别在相应页面直接设置 — 点击任意主题或分类上的铃铛图标。';
+      '按类别和按话题的通知级别在相应页面直接设置 — 点击任意话题或类别上的铃铛图标。';
 
   @override
   String get pushNotActiveForThisLogin => '此次登录未启用 — 请退出并重新登录以授权推送通知';
@@ -1696,9 +1418,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get doNotDisturbExplanation => '暂停通知一段时间 — Discourse 会保留它们直到时段结束';
-
-  @override
-  String get emailSettingsSubtitle => '邮件频率、点赞汇总、摘要计划';
 
   @override
   String get manageAccountSubtitle => '资料、邮箱、密码、安全、高级设置';
@@ -1730,13 +1449,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get initializingForum => '正在初始化论坛…';
 
   @override
-  String get subscribedForums => '已订阅的论坛';
-
-  @override
   String get errorLoadingNotifications => '加载通知出错';
-
-  @override
-  String get pullDownToRefresh => '下拉刷新';
 
   @override
   String get noNewNotificationsExplanation =>
@@ -1749,20 +1462,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String noTopicsTagged(Object tag) {
-    return '没有带“$tag”标签的主题';
-  }
-
-  @override
-  String get deletePostsProfilePostsAndComments => '删除帖子、个人资料帖子和评论';
-
-  @override
-  String spamCleanConfirmation(Object username) {
-    return '确定要清理 $username 的垃圾内容吗？';
-  }
-
-  @override
-  String failedToCleanSpam(Object error) {
-    return '清理垃圾内容失败：$error';
+    return '没有带“$tag”标签的话题';
   }
 
   @override
@@ -1773,9 +1473,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get imageNotAvailable => '图片不可用';
-
-  @override
-  String get allForumTopicsHaveBeenMarkedAs => '所有论坛主题已标记为已读';
 
   @override
   String postsCount(Object count) {
@@ -1797,29 +1494,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get failedToPickFile => '选择文件失败';
-
-  @override
   String onlyNMoreAttachmentsAllowed(
       Object remainingSlots, Object remainingSlots2) {
     return '仅允许再添加 $remainingSlots 个附件。将处理前 $remainingSlots2 张图片。';
   }
-
-  @override
-  String get attachmentLimitReachedSkippingRemainingImages => '已达到附件上限。跳过剩余图片。';
-
-  @override
-  String failedToUploadImagePleaseTryAgain(Object fileName) {
-    return '$fileName：图片上传失败。请重试。';
-  }
-
-  @override
-  String failedToUploadImage2(Object errorMessage, Object fileName) {
-    return '$fileName：图片上传失败：$errorMessage';
-  }
-
-  @override
-  String get failedToPickImage => '选择图片失败';
 
   @override
   String failedToRemoveAttachment2(Object error) {
@@ -1861,23 +1539,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String failedToSubmitReport2(Object error) {
-    return '提交举报失败：$error';
-  }
-
-  @override
   String get editHistoryNotAvailable => '此帖子没有可用的编辑历史';
-
-  @override
-  String get noPermissionToUploadAvatar => '你没有上传头像的权限';
-
-  @override
-  String get avatarUploadedSuccessfully => '头像已上传';
-
-  @override
-  String failedToPickImage2(Object error) {
-    return '选择图片失败：$error';
-  }
 
   @override
   String get react => '添加反应';
@@ -1892,18 +1554,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchFilters => '搜索筛选';
 
   @override
-  String signOutWarning(Object siteName) {
-    return '你将退出 $siteName。你可以随时重新登录。';
-  }
-
-  @override
-  String get suggestedTopics => '推荐主题';
+  String get suggestedTopics => '推荐话题';
 
   @override
   String get suggestedMessages => '建议的消息';
-
-  @override
-  String get newLabel => '新';
 
   @override
   String get voteRemoved => '已撤销投票';
@@ -1930,10 +1584,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dontAskAgainAlwaysResize => '不再询问 — 始终缩小以适应';
 
   @override
-  String get couldNotLoadCategories => '无法加载分类。';
-
-  @override
-  String get explore => '探索';
+  String get couldNotLoadCategories => '无法加载类别。';
 
   @override
   String get tags => '标签';
@@ -1963,11 +1614,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get privacyPolicy => '隐私政策';
 
   @override
-  String signedInAs(String username) {
-    return '已登录：$username';
-  }
-
-  @override
   String get notSignedIn => '未登录';
 
   @override
@@ -1994,7 +1640,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String actionCodeTopicCreated(String when) {
-    return 'Created this topic $when';
+    return '$when创建了此话题';
   }
 
   @override
@@ -2249,79 +1895,85 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notificationSettings => '通知设置';
 
   @override
-  String get topicIsNew => 'New topic';
+  String get topicIsNew => '新话题';
 
   @override
-  String get noNewTopicsSinceLastVisit =>
-      'No new topics since your last visit.';
+  String get noNewTopicsSinceLastVisit => '自你上次访问以来没有新话题。';
 
   @override
-  String get messageIsNew => 'New message';
+  String get messageIsNew => '新消息';
 
   @override
   String topicUnreadReplies(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count unread replies',
-      one: '1 unread reply',
+      other: '$count 条未读回复',
     );
     return '$_temp0';
   }
 
   @override
   String filterNewWithCount(int count) {
-    return 'New ($count)';
+    return '新 ($count)';
   }
 
   @override
   String filterUnreadWithCount(int count) {
-    return 'Unread ($count)';
+    return '未读 ($count)';
   }
 
   @override
   String categoryNewTopics(int count) {
-    return '$count new';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 新',
+    );
+    return '$_temp0';
   }
 
   @override
   String categoryUnreadTopics(int count) {
-    return '$count unread';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 未读',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get dismissNew => 'Dismiss new';
+  String get dismissNew => '忽略新话题';
 
   @override
-  String get dismissUnread => 'Dismiss unread';
+  String get dismissUnread => '忽略未读话题';
 
   @override
-  String get dismissNewTitle => 'Dismiss new topics?';
+  String get dismissNewTitle => '忽略新话题？';
 
   @override
-  String get dismissNewMessage => 'They will no longer show as new.';
+  String get dismissNewMessage => '它们将不再显示为新话题。';
 
   @override
-  String get dismissUnreadTitle => 'Dismiss all unread?';
+  String get dismissUnreadTitle => '忽略所有未读话题？';
 
   @override
-  String get dismissUnreadMessage =>
-      'Their new replies will be marked as read.';
+  String get dismissUnreadMessage => '它们的新回复将被标记为已读。';
 
   @override
-  String get dismissUnreadStopTracking =>
-      'Stop tracking these topics so they never show up as unread for me again';
+  String get dismissUnreadStopTracking => '停止跟踪这些话题，以便它们不再显示为我的未读话题';
 
   @override
-  String get dismissNewAndUnread => 'Dismiss new and unread';
+  String get dismissNewAndUnread => '忽略新话题和未读话题';
 
   @override
   String dismissNewAndUnreadMessage(String category) {
-    return 'Topics in $category will no longer show as new or unread.';
+    return '$category 中的话题将不再显示为新话题或未读话题。';
   }
 
   @override
-  String get dismissedTopics => 'Dismissed';
+  String get dismissedTopics => '已忽略';
 
   @override
   String topicMapViews(int count) {
@@ -2457,18 +2109,18 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get relatedTopics => '相关主题';
+  String get relatedTopics => '相关话题';
 
   @override
   String get relatedMessages => '相关消息';
 
   @override
   String moreInCategory(String category) {
-    return '$category 中的更多主题';
+    return '$category 中的更多话题';
   }
 
   @override
-  String get latestTopics => '最新主题';
+  String get latestTopics => '最新话题';
 
   @override
   String get pushGroupMessages => '消息和聊天';
@@ -2539,7 +2191,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get activityReplied => '回复了';
 
   @override
-  String get activityStartedTopic => '发起了主题';
+  String get activityStartedTopic => '发起了话题';
 
   @override
   String get activityLiked => '赞了';
@@ -2554,7 +2206,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get activityAwaitingApproval => '等待审核';
 
   @override
-  String get activityFilterTopics => '主题';
+  String get activityFilterTopics => '话题';
 
   @override
   String get activityFilterReplies => '回复';
@@ -2591,10 +2243,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get myPostsEmpty => '还没有帖子';
 
   @override
-  String get myPostsEmptyHint => '你发起的主题和写的回复会显示在这里。';
+  String get myPostsEmptyHint => '你发起的话题和写的回复会显示在这里。';
 
   @override
-  String get activityEmptyTopics => '还没有主题';
+  String get activityEmptyTopics => '还没有话题';
 
   @override
   String get activityEmptyReplies => '还没有回复';
@@ -2653,7 +2305,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get guestBenefitPost => '回复和发起主题';
+  String get guestBenefitPost => '回复和发起话题';
 
   @override
   String get guestBenefitNotify => '有人回复时收到通知';
@@ -2698,7 +2350,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get summaryTopReplies => '热门回复';
 
   @override
-  String get summaryTopTopics => '热门主题';
+  String get summaryTopTopics => '热门话题';
 
   @override
   String get summaryMostLikedBy => '最常点赞者';
@@ -2713,10 +2365,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get summaryTopLinks => '热门链接';
 
   @override
-  String get summaryTopCategories => '常去的分类';
+  String get summaryTopCategories => '常去的类别';
 
   @override
-  String get featuredTopic => '精选主题';
+  String get featuredTopic => '精选话题';
 
   @override
   String get profileDetails => '详细信息';
@@ -2737,7 +2389,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get bookmarksFilterReminders => '提醒';
 
   @override
-  String get bookmarkWholeTopic => '整个主题';
+  String get bookmarkWholeTopic => '整个话题';
 
   @override
   String bookmarkSaved(String when) {
@@ -2798,7 +2450,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get bookmarksEmptyHint => '从帖子的操作中添加书签，它会在这里等你。';
 
   @override
-  String get draftKindNewTopic => '新主题';
+  String get draftKindNewTopic => '新话题';
 
   @override
   String draftMessageTo(String names) {
@@ -2806,7 +2458,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get untitledTopic => '无标题主题';
+  String get untitledTopic => '无标题话题';
 
   @override
   String get draftDiscarded => '已丢弃草稿';
@@ -2815,7 +2467,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get draftsEmpty => '还没有草稿';
 
   @override
-  String get draftsEmptyHint => '草稿会在你输入时自动保存。开始写回复或主题，它会在这里等你。';
+  String get draftsEmptyHint => '草稿会在你输入时自动保存。开始写回复或话题，它会在这里等你。';
 
   @override
   String get privacySection => '隐私';
@@ -2900,22 +2552,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get emailPasswordInAccount => '邮箱、密码和登录';
 
   @override
-  String get featureATopic => '设置精选主题';
+  String get featureATopic => '设置精选话题';
 
   @override
-  String get featureATopicHint => '将你的一个主题置顶在个人资料顶部。';
+  String get featureATopicHint => '将你的一个话题置顶在个人资料顶部。';
 
   @override
-  String get featuredTopicChanged => '已更改精选主题';
+  String get featuredTopicChanged => '已更改精选话题';
 
   @override
-  String get featuredTopicNone => '无。将你的一个主题置顶到个人资料。';
+  String get featuredTopicNone => '无。将你的一个话题置顶到个人资料。';
 
   @override
-  String get featuredTopicRemoved => '已移除精选主题';
+  String get featuredTopicRemoved => '已移除精选话题';
 
   @override
-  String get featuredTopicRules => '消息和私密分类中的主题无法设为精选。';
+  String get featuredTopicRules => '消息和私密类别中的话题无法设为精选。';
 
   @override
   String get fieldManagedBySignIn => '此论坛通过自己的登录系统管理此项。请在那里更改。';
@@ -2996,10 +2648,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noTitle => '不显示头衔';
 
   @override
-  String get noTopicsMatch => '没有匹配的主题';
+  String get noTopicsMatch => '没有匹配的话题';
 
   @override
-  String get noTopicsToFeature => '你还没有发起任何主题';
+  String get noTopicsToFeature => '你还没有发起任何话题';
 
   @override
   String get notSet => '未设置';
@@ -3061,13 +2713,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get removeCover => '移除封面';
 
   @override
-  String get removeFeaturedTopic => '移除精选主题';
+  String get removeFeaturedTopic => '移除精选话题';
 
   @override
   String get searchTimezones => '搜索时区';
 
   @override
-  String get searchYourTopics => '搜索你的主题';
+  String get searchYourTopics => '搜索你的话题';
 
   @override
   String get seeProfileAsOthersDo => '以他人视角查看个人资料';
@@ -3218,7 +2870,7 @@ class AppLocalizationsZh extends AppLocalizations {
       locale: localeName,
       other: '$count 条',
     );
-    return '只显示 $name 在此主题中的帖子（$_temp0）';
+    return '只显示 $name 在此话题中的帖子（$_temp0）';
   }
 
   @override
@@ -3228,7 +2880,7 @@ class AppLocalizationsZh extends AppLocalizations {
       locale: localeName,
       other: '$count 条',
     );
-    return '只显示你在此主题中的帖子（$_temp0）';
+    return '只显示你在此话题中的帖子（$_temp0）';
   }
 
   @override
@@ -3560,7 +3212,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get topicStatusDeletedHelp => '此主题已删除并对其他用户隐藏';
+  String get topicStatusDeletedHelp => '此话题已删除并对其他用户隐藏';
 
   @override
   String get flagAction => '举报';
@@ -3650,4 +3302,1280 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noPermissionToViewCategory => '您无权查看此类别中的话题。';
+
+  @override
+  String get featureTopicTitle => '将此话题设为精选';
+
+  @override
+  String get pinTopicMenu => '置顶话题…';
+
+  @override
+  String pinInCategoryUntil(String category) {
+    return '将此话题置于$category类别顶部至';
+  }
+
+  @override
+  String get pinGloballyUntil => '将此话题置于所有话题列表顶部至';
+
+  @override
+  String get pinNote => '用户可以为自己单独取消置顶话题。';
+
+  @override
+  String get pinUntil => '置顶至';
+
+  @override
+  String get pinDateRequired => '置顶此话题需要一个日期。';
+
+  @override
+  String get pinTopicGlobally => '全站置顶话题';
+
+  @override
+  String get flagThanks => '感谢您维护社区的文明！';
+
+  @override
+  String get flagReviewProcess => '版主收到举报后将尽快进行审核。';
+
+  @override
+  String get flagCant => '抱歉，您目前无法举报此帖子。';
+
+  @override
+  String get flagSendMessage => '消息';
+
+  @override
+  String get flagMessageForUser => '给用户的消息';
+
+  @override
+  String get flagMessageForModerators => '给版主的消息';
+
+  @override
+  String get flagPlaceholderNotifyUser => '具体，有建设性，并始终保持友善。';
+
+  @override
+  String get flagPlaceholderNotifyModerators => '让我们具体了解您关心的问题，并尽可能提供相关的链接和示例。';
+
+  @override
+  String get flagPlaceholderIllegal => '请向我们说明您认为此内容违法的具体原因，并尽可能提供相关链接和示例。';
+
+  @override
+  String get flagConfirmIllegal => '我上面所写的内容准确且完整。';
+
+  @override
+  String flagMessageAtLeast(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '至少输入 $count 个字符',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get flagMessageSent => '您的消息已发送。';
+
+  @override
+  String get mergeTopicError => '将帖子移至该话题时出错。';
+
+  @override
+  String get topicTitlePlaceholder => '用一句话概括讨论内容…';
+
+  @override
+  String get topicMoved => '话题已移动';
+
+  @override
+  String get topicMerged => '话题已合并';
+
+  @override
+  String get mergeTopicExplanation => '此话题中的所有帖子都将移至你选择的话题。此操作无法在应用中撤销。';
+
+  @override
+  String get destinationTopicId => '目标话题 ID';
+
+  @override
+  String get topicAuthorUnknown => '未知';
+
+  @override
+  String get noHotTopics => '没有热门话题。';
+
+  @override
+  String get signInToViewNewTopics => '登录以查看新话题';
+
+  @override
+  String get newTopicsSignInMessage => '新话题显示自您上次访问以来创建的内容。';
+
+  @override
+  String get topPeriodAllTime => '所有时间';
+
+  @override
+  String get topPeriodYear => '年';
+
+  @override
+  String get topPeriodQuarter => '季度';
+
+  @override
+  String get topPeriodMonth => '月';
+
+  @override
+  String get topPeriodWeek => '周';
+
+  @override
+  String get topPeriodToday => '今天';
+
+  @override
+  String noTopTopicsForPeriod(String period) {
+    String _temp0 = intl.Intl.selectLogic(
+      period,
+      {
+        'all': '没有所有时间的热门话题。',
+        'yearly': '今年没有热门话题。',
+        'quarterly': '本季度没有热门话题。',
+        'monthly': '本月没有热门话题。',
+        'weekly': '本周没有热门话题。',
+        'daily': '今天没有热门话题。',
+        'other': '没有热门话题。',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get connectionTimedOutSiteUnreachable => '连接超时。网站可能已关闭或无法访问。';
+
+  @override
+  String get failedToMarkNotificationsRead => '无法将通知标记为已读';
+
+  @override
+  String get forumNameFallback => '论坛';
+
+  @override
+  String get noForumDescription => '暂无描述。';
+
+  @override
+  String get dismissAllNotifications => '全部忽略';
+
+  @override
+  String get notificationPostIdMissing => '缺少帖子 ID。无法跳转到该帖子。';
+
+  @override
+  String get notificationTopicIdMissingForPost => '缺少话题 ID。无法跳转到该帖子。';
+
+  @override
+  String get notificationTopicIdMissing => '缺少话题 ID。无法打开该话题。';
+
+  @override
+  String get notificationUsernameMissing => '缺少用户名。无法打开用户资料。';
+
+  @override
+  String get notificationChannelIdMissing => '缺少频道 ID。无法打开聊天。';
+
+  @override
+  String get notificationGroupNameMissingForInbox => '缺少群组名称。无法打开收件箱。';
+
+  @override
+  String get notificationGroupNameMissing => '缺少群组名称。无法打开该群组。';
+
+  @override
+  String get notificationNoActionUrl => '此通知类型没有可用的操作 URL。';
+
+  @override
+  String get notificationBadgeUnavailable => '徽章详情不可用。';
+
+  @override
+  String get notificationBadgeLoadFailed => '无法加载此徽章。';
+
+  @override
+  String get personalMessageTitleFallback => '个人消息';
+
+  @override
+  String get topicTitleFallback => '话题';
+
+  @override
+  String get signInToViewNotifications => '登录以查看通知';
+
+  @override
+  String get youNeedToBeSignedInToViewNotifications => '您需要登录才能查看通知。';
+
+  @override
+  String get noUnreadNotifications => '没有未读通知';
+
+  @override
+  String get noNotificationsYet => '还没有通知';
+
+  @override
+  String get newNotificationFallbackBody => '新通知';
+
+  @override
+  String get unableToOpenNotification => '无法打开通知';
+
+  @override
+  String get notificationMissingSiteInfo => '缺少站点信息（site_id）。';
+
+  @override
+  String get notificationInvalidSiteInfo => '站点信息无效（site_id）。';
+
+  @override
+  String get notificationMissingPostInfo => '缺少帖子信息（content_id）。';
+
+  @override
+  String get notificationMissingMessageInfo => '缺少消息信息（conversation_id）。';
+
+  @override
+  String get notificationMissingUserInfo => '缺少用户信息（sender_id）。';
+
+  @override
+  String get notificationUnsupportedType => '不支持的通知类型。';
+
+  @override
+  String get notificationForumNotFound => '找不到此站点的论坛。';
+
+  @override
+  String get notificationForumOpenFailed => '无法初始化论坛。';
+
+  @override
+  String get notificationMissingTopicInfo => '缺少话题信息（topic_id）。';
+
+  @override
+  String get failedToLoadTags => '无法加载标签。';
+
+  @override
+  String get searchTagsHint => '搜索标签…';
+
+  @override
+  String get tagsSortedByCountTooltip => '按话题数排序 — 点按切换为 A→Z';
+
+  @override
+  String get tagsSortedAlphabeticallyTooltip => '按字母顺序排序 — 点按切换为按热度排序';
+
+  @override
+  String get noTagsYet => '此论坛还没有标签。';
+
+  @override
+  String get tagNotificationLevelTooltip => '通知级别';
+
+  @override
+  String get tagTopicsLoadFailed => '加载失败';
+
+  @override
+  String searchFailedWithError(String error) {
+    return '搜索失败：$error';
+  }
+
+  @override
+  String get searchFiltersButtonTooltip => '筛选';
+
+  @override
+  String get searchFilterStatusSection => '状态';
+
+  @override
+  String get searchFilterMyActivitySection => '我的活动';
+
+  @override
+  String get searchFilterMatchTypeSection => '匹配类型';
+
+  @override
+  String get searchTagsFilterHelper => '用空格或逗号分隔。须包含每个标签。';
+
+  @override
+  String get searchSortBy => '排序依据';
+
+  @override
+  String get searchStatusOpen => '开放';
+
+  @override
+  String get searchStatusArchived => '已归档';
+
+  @override
+  String get searchStatusNoReplies => '无回复';
+
+  @override
+  String get searchStatusPublicOnly => '仅公开';
+
+  @override
+  String get searchStatusUnsolved => '未解决';
+
+  @override
+  String get searchInBookmarked => '我已加入书签';
+
+  @override
+  String get searchInMyMessages => '在我的消息中';
+
+  @override
+  String get searchInLiked => '我赞过';
+
+  @override
+  String get searchInPosted => '我发过帖';
+
+  @override
+  String get searchInWatching => '我正在关注';
+
+  @override
+  String get searchInTracking => '我正在跟踪';
+
+  @override
+  String get searchInSeen => '我读过';
+
+  @override
+  String get searchInUnseen => '我还没读过';
+
+  @override
+  String get searchSortLatestPost => '最新帖子';
+
+  @override
+  String get searchSortMostLiked => '赞最多';
+
+  @override
+  String get searchSortMostViewed => '浏览最多';
+
+  @override
+  String get searchSortLatestTopic => '最新话题';
+
+  @override
+  String get searchFieldHint => '搜索…';
+
+  @override
+  String get bookmarksUnavailable => '书签不可用';
+
+  @override
+  String get failedToLoadBookmarks => '无法加载书签';
+
+  @override
+  String get failedToRemoveBookmark => '无法移除书签';
+
+  @override
+  String get failedToUpdateBookmark => '无法更新书签';
+
+  @override
+  String get bookmarkWithReminder => '带提醒的书签';
+
+  @override
+  String get noReminder => '无提醒';
+
+  @override
+  String get failedToLoadDrafts => '无法加载草稿。';
+
+  @override
+  String get failedToDiscardDraft => '无法丢弃草稿';
+
+  @override
+  String get messagesLoadFailed => '无法加载消息';
+
+  @override
+  String get moreMessagesLoadFailed => '无法加载更多消息';
+
+  @override
+  String get messageUnknownUser => '未知';
+
+  @override
+  String get unknownErrorFallback => '未知错误';
+
+  @override
+  String get chatComposerDefaultHint => '输入消息…';
+
+  @override
+  String chatChannelNumbered(Object id) {
+    return '频道 $id';
+  }
+
+  @override
+  String get chatSendFailed => '消息发送失败。';
+
+  @override
+  String get chatEditFailed => '消息编辑失败。';
+
+  @override
+  String get chatDeleteFailed => '消息删除失败。';
+
+  @override
+  String get chatReactionsUnsupported => '此处不支持回应。';
+
+  @override
+  String get chatReactionFailed => '回应更新失败。';
+
+  @override
+  String get attachmentDefaultName => '附件';
+
+  @override
+  String get fileTypeAudio => '音频';
+
+  @override
+  String get fileTypeText => '文本';
+
+  @override
+  String get fileTypeArchive => '压缩包';
+
+  @override
+  String get fileTypeFile => '文件';
+
+  @override
+  String downloadFailedHttpStatus(String status) {
+    return '文件下载失败：HTTP $status';
+  }
+
+  @override
+  String get downloadedFileEmpty => '下载的文件为空';
+
+  @override
+  String downloadFileFailed(String error) {
+    return '文件下载失败：$error';
+  }
+
+  @override
+  String attachmentTypeNotAllowed(String extension, String allowed) {
+    return '不允许 .$extension 文件类型。允许的类型：$allowed';
+  }
+
+  @override
+  String attachmentFileTooLarge(String size, String max) {
+    return '文件大小（$size）超过上限 $max';
+  }
+
+  @override
+  String get attachmentValidationFailed => '文件验证失败';
+
+  @override
+  String get uploadMissingReference => '上传成功，但服务器未返回该文件的引用。';
+
+  @override
+  String get imageFileNotFound => '未找到图片文件';
+
+  @override
+  String get failedToLoadVideo => '无法加载视频';
+
+  @override
+  String get userInfoLoadFailed => '无法加载用户信息。';
+
+  @override
+  String userInfoLoadFailedWithError(String error) {
+    return '无法加载用户信息：$error';
+  }
+
+  @override
+  String get profileMenuIgnoreUser => '忽略用户';
+
+  @override
+  String get profileMenuUnignoreUser => '取消忽略用户';
+
+  @override
+  String get ignoreStateUpdateFailed => '无法更新忽略状态';
+
+  @override
+  String profileNowIgnoringUser(String username) {
+    return '你正在忽略 @$username。其帖子将被隐藏。';
+  }
+
+  @override
+  String get profileIgnoreToggleFailed => '切换忽略失败。';
+
+  @override
+  String get profileStatsLoadFailed => '无法加载统计数据。';
+
+  @override
+  String get profileFollowFailed => '关注失败';
+
+  @override
+  String get profileUnfollowFailed => '取消关注失败';
+
+  @override
+  String get profileChatOpenFailed => '无法与此用户开始聊天。';
+
+  @override
+  String summaryLikeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个赞',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String summaryLinkClicks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次点击',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get directoryPeriodAllTime => '所有时间';
+
+  @override
+  String get directoryPeriodYear => '年';
+
+  @override
+  String get directoryPeriodQuarter => '季度';
+
+  @override
+  String get directoryPeriodMonth => '月';
+
+  @override
+  String get directoryPeriodWeek => '周';
+
+  @override
+  String get directoryPeriodToday => '今天';
+
+  @override
+  String get directoryOrderReceived => '已收到';
+
+  @override
+  String get directoryOrderReplies => '回复';
+
+  @override
+  String get directoryOrderTopics => '话题';
+
+  @override
+  String get directoryOrderVisits => '访问天数';
+
+  @override
+  String get directoryLoadFailed => '无法加载用户列表。';
+
+  @override
+  String get directoryNoUsersMatch => '没有与该名称匹配的用户。';
+
+  @override
+  String get directoryNoUsersForPeriod => '此时间段内没有找到用户。';
+
+  @override
+  String get userSearchNoResults => '未找到用户';
+
+  @override
+  String get userSearchTryDifferentUsername => '请尝试使用其他用户名搜索';
+
+  @override
+  String get userSearchPromptTitle => '搜索用户';
+
+  @override
+  String get userSearchPromptHint => '输入用户名以查找并邀请用户';
+
+  @override
+  String get ignoredUsersUnignoreFailed => '取消忽略失败。';
+
+  @override
+  String get ignoredUsersEmpty => '你没有忽略任何人。';
+
+  @override
+  String get ignoredUsersEmptyHint => '打开用户的个人资料，在菜单中选择“忽略用户”，即可隐藏其帖子和通知。';
+
+  @override
+  String get badgesLoadFailed => '无法加载徽章。';
+
+  @override
+  String get badgesEmpty => '此论坛没有徽章。';
+
+  @override
+  String get badgeTierGold => '金牌';
+
+  @override
+  String get badgeTierSilver => '银牌';
+
+  @override
+  String get badgeTierBronze => '铜牌';
+
+  @override
+  String badgeEarnedAgo(String time) {
+    return '$time获得';
+  }
+
+  @override
+  String badgeEarnedByUsers(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted 位用户已获得',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trustLevelNameNewUser => '新用户';
+
+  @override
+  String get trustLevelNameBasic => '基本用户';
+
+  @override
+  String get trustLevelNameMember => '成员';
+
+  @override
+  String get trustLevelNameRegular => '活跃用户';
+
+  @override
+  String get trustLevelNameLeader => '领导者';
+
+  @override
+  String get trustLevelSummary0 => '刚刚加入。可以阅读和发帖，但链接、图片和消息受限。';
+
+  @override
+  String get trustLevelSummary1 => '解锁核心发帖功能：图片和附件、更多链接、举报帖子。';
+
+  @override
+  String get trustLevelSummary2 => '可以发送邀请、忽略用户，并能在更长时间内编辑自己的帖子。';
+
+  @override
+  String get trustLevelSummary3 => '可以更改话题的类别和标题、创建标签，其垃圾信息举报的权重更高。';
+
+  @override
+  String get trustLevelSummary4 => '由管理人员授予。可以编辑任何帖子，并置顶、关闭、拆分或合并话题。';
+
+  @override
+  String trustLevelRowTitle(int level, String name) {
+    return 'TL$level · $name';
+  }
+
+  @override
+  String get profileNoUserSpecified => '未指定用户';
+
+  @override
+  String get userTopicsLoadFailed => '无法加载话题';
+
+  @override
+  String get userTopicsEmpty => '尚未创建任何话题。';
+
+  @override
+  String get userRecentPostsLoadFailed => '无法加载最近的帖子';
+
+  @override
+  String get activityUnknownTopic => '未知话题';
+
+  @override
+  String groupJoinedSnack(String group) {
+    return '你已加入 $group';
+  }
+
+  @override
+  String get groupJoinFailed => '加入群组失败';
+
+  @override
+  String groupLeftSnack(String group) {
+    return '你已退出 $group';
+  }
+
+  @override
+  String get groupLeaveFailed => '退出群组失败';
+
+  @override
+  String get groupMembershipRequestHint => '你为什么想加入？群组所有者会在你的申请中看到这段说明。';
+
+  @override
+  String get groupMembershipReasonRequired => '申请加入需要填写理由';
+
+  @override
+  String get groupMembershipRequestSent => '申请已发送，需要群组所有者批准';
+
+  @override
+  String get groupMembershipRequestFailed => '发送加入申请失败';
+
+  @override
+  String get groupMemberBadge => '成员';
+
+  @override
+  String get groupRequestPending => '申请待处理';
+
+  @override
+  String get groupJoining => '正在加入…';
+
+  @override
+  String get groupJoinButton => '加入群组';
+
+  @override
+  String get groupsLoadFailed => '无法加载群组。';
+
+  @override
+  String get groupBuiltIn => '内置群组';
+
+  @override
+  String invitesPendingWithCount(int count) {
+    return '待处理 ($count)';
+  }
+
+  @override
+  String invitesExpiredWithCount(int count) {
+    return '已过期 ($count)';
+  }
+
+  @override
+  String invitesRedeemedWithCount(int count) {
+    return '已确认 ($count)';
+  }
+
+  @override
+  String get invitesLoadFailed => '无法加载邀请。';
+
+  @override
+  String get inviteLinkCreateFailed => '无法创建邀请链接';
+
+  @override
+  String get inviteEmailAddressLabel => '电子邮件地址';
+
+  @override
+  String get inviteEmailInvalid => '请输入有效的电子邮件地址';
+
+  @override
+  String get inviteMessageOptionalLabel => '消息（可选）';
+
+  @override
+  String get inviteSendFailed => '无法发送邀请';
+
+  @override
+  String get revokeInviteLinkWarning => '该邀请链接将失效。';
+
+  @override
+  String revokeInviteEmailWarning(String email) {
+    return '发送给 $email 的邀请将失效。';
+  }
+
+  @override
+  String get inviteRevokeFailed => '无法撤销邀请';
+
+  @override
+  String get inviteNoPermission => '你没有邀请的权限';
+
+  @override
+  String get invitesEmptyPending => '没有待处理的邀请';
+
+  @override
+  String get invitesEmptyExpired => '没有已过期的邀请';
+
+  @override
+  String get invitesEmptyRedeemed => '没有已确认的邀请';
+
+  @override
+  String get invitesEmptyPendingHint => '创建邀请链接，邀请大家来论坛。';
+
+  @override
+  String get inviteLinkFallbackTitle => '邀请链接';
+
+  @override
+  String inviteRedeemedOn(String date) {
+    return '$date 已确认';
+  }
+
+  @override
+  String inviteRedemptions(int count, int max) {
+    return '已确认 $count/$max';
+  }
+
+  @override
+  String get inviteEmailSent => '邮件已发送';
+
+  @override
+  String get inviteEmailNotSent => '邮件未发送';
+
+  @override
+  String inviteExpiredOn(String date) {
+    return '已于 $date 过期';
+  }
+
+  @override
+  String get inviteRevokeTooltip => '撤销邀请';
+
+  @override
+  String get reviewStatusPending => '待处理';
+
+  @override
+  String get reviewStatusApproved => '已批准';
+
+  @override
+  String get reviewStatusRejected => '已拒绝';
+
+  @override
+  String get reviewStatusAll => '一切';
+
+  @override
+  String get reviewStatusIgnored => '举报已忽略';
+
+  @override
+  String get reviewStatusDeleted => '话题或帖子已删除';
+
+  @override
+  String get reviewQueueUnavailable => '此论坛不提供审核队列。';
+
+  @override
+  String get reviewQueueLoadFailed => '无法加载审核队列';
+
+  @override
+  String get reviewableChangedByOther => '此项目已被其他版主更改。正在刷新…';
+
+  @override
+  String get reviewActionFailed => '无法执行操作';
+
+  @override
+  String reviewActionDone(String action) {
+    return '$action：已完成';
+  }
+
+  @override
+  String get reviewRejectReasonHint => '为什么要拒绝？';
+
+  @override
+  String get reviewTypeFlaggedPost => '被举报的帖子';
+
+  @override
+  String get reviewTypeQueuedPost => '已加入队列的帖子';
+
+  @override
+  String get reviewTypeQueuedTopic => '已加入队列的话题';
+
+  @override
+  String get reviewTypeUser => '用户';
+
+  @override
+  String get reviewTypePost => '帖子';
+
+  @override
+  String get reviewTypeChatMessage => '被举报的聊天消息';
+
+  @override
+  String get reviewModeratorAccessRequired => '需要版主权限';
+
+  @override
+  String reviewableScore(String score) {
+    return '分数 $score';
+  }
+
+  @override
+  String get postRepliesLoadFailed => '无法加载回复。';
+
+  @override
+  String get postMakeWiki => '设为 Wiki';
+
+  @override
+  String get postRemoveWiki => '移除 Wiki';
+
+  @override
+  String get postBookmarkRemoveFailed => '移除书签失败';
+
+  @override
+  String get postBookmarkFailed => '将帖子加入书签失败';
+
+  @override
+  String get postBookmarkReminderUpdateFailed => '更新提醒失败';
+
+  @override
+  String get postBookmarkReminderSet => '提醒已设置';
+
+  @override
+  String get postBookmarkReminderCleared => '提醒已清除';
+
+  @override
+  String get solutionMarkFailed => '标记为解决方案失败';
+
+  @override
+  String get solutionUnmarkFailed => '取消标记解决方案失败';
+
+  @override
+  String get postUnknownDate => '日期未知';
+
+  @override
+  String get postBookmarkAction => '将帖子加入书签';
+
+  @override
+  String postReactionsSemanticsReacted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '你已做出反应。$count 个反应。点按可更改，长按可查看谁做出了反应。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String postReactionsSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个反应。点按可做出反应，长按可查看谁做出了反应。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get postLikeAction => '点赞帖子';
+
+  @override
+  String get postUnlikeAction => '取消点赞';
+
+  @override
+  String get postVoteRemoveFailed => '无法撤销投票（可能已超过撤销时限）';
+
+  @override
+  String get postVoteCastFailed => '投票失败';
+
+  @override
+  String get postUpvote => '投赞成票';
+
+  @override
+  String get postDownvote => '投反对票';
+
+  @override
+  String get pollVoteFailed => '投票失败。请重试。';
+
+  @override
+  String get pollRemoveVoteFailed => '无法撤销你的投票。请重试。';
+
+  @override
+  String get pollVotersLoadFailed => '无法加载投票者。';
+
+  @override
+  String get pollVotersNotVisible => '此投票的投票者不可见。';
+
+  @override
+  String solutionSolvedByInPost(String name, int postNumber) {
+    return '由 $name 在帖子 #$postNumber 中解决';
+  }
+
+  @override
+  String solutionMarkedBy(String name) {
+    return '由 $name 标记';
+  }
+
+  @override
+  String reactAgainInSeconds(int seconds) {
+    return '$seconds 秒后可再次对此帖子做出反应';
+  }
+
+  @override
+  String get reactionUpdateFailed => '无法更新反应。';
+
+  @override
+  String get reactionsNotSupported => '此论坛不支持反应。';
+
+  @override
+  String get reactionsLoadFailed => '无法加载反应。';
+
+  @override
+  String viewProfileOfUser(String username) {
+    return '查看 $username 的个人资料';
+  }
+
+  @override
+  String get failedToSavePost => '保存帖子失败';
+
+  @override
+  String failedToSavePostWithError(String error) {
+    return '保存帖子失败：$error';
+  }
+
+  @override
+  String get failedToRemoveAttachmentCheckPermissions => '删除附件失败。请检查您的权限。';
+
+  @override
+  String get editPostTitle => '编辑帖子';
+
+  @override
+  String get editYourPostHint => '编辑您的帖子...';
+
+  @override
+  String get failedToPostReply => '回复发布失败';
+
+  @override
+  String failedToPostReplyWithError(String error) {
+    return '回复发布失败：$error';
+  }
+
+  @override
+  String get failedToCreateTopic => '创建话题失败';
+
+  @override
+  String get writeYourTopicTitle => '编写您的话题标题...';
+
+  @override
+  String get writeYourTopicContent => '编写您的话题内容...';
+
+  @override
+  String get composerTitleHint => '编写您的标题...';
+
+  @override
+  String get composerContentHint => '编写您的内容...';
+
+  @override
+  String imageTooLargeCouldNotResize(
+      String fileName, String size, String limit) {
+    return '$fileName：文件过大（$size），且无法缩小。上限为 $limit。';
+  }
+
+  @override
+  String imageResizedToFitLimit(
+      String fileName, String size, String dimensions, String limit) {
+    return '$fileName 已缩小至 $size$dimensions，以符合 $limit 的上限。';
+  }
+
+  @override
+  String get composerAttachFileHint => '为此帖子附加文件';
+
+  @override
+  String get composerUploadImageHint => '为此帖子上传图片';
+
+  @override
+  String get composerFormattingHint => '打开格式选项';
+
+  @override
+  String get whisperStaffOnly => '密语（仅限管理人员）';
+
+  @override
+  String get whisperOnStaffOnly => '密语已开启（仅限管理人员）';
+
+  @override
+  String get tagInputMaxReached => '已达到标签上限';
+
+  @override
+  String get tagInputAddTag => '添加标签…';
+
+  @override
+  String get tagInputAddAnother => '+ 标签';
+
+  @override
+  String get editHistoryUnavailable => '此论坛不提供编辑历史。';
+
+  @override
+  String get editHistoryLoadFailed => '加载编辑历史失败。';
+
+  @override
+  String get previousRevision => '上一个修订';
+
+  @override
+  String get nextRevision => '下一个修订';
+
+  @override
+  String get notificationPrefsLoadFailed => '无法加载通知偏好设置。';
+
+  @override
+  String get notificationPrefsSaveFailed => '无法保存 — 请检查网络连接';
+
+  @override
+  String get signInToManageNotificationPrefs => '登录以管理你的通知偏好设置。';
+
+  @override
+  String get notificationSettingsPushSection => '推送';
+
+  @override
+  String get notificationSettingsEmailSection => '电子邮件';
+
+  @override
+  String get emailWhenAwayTitle => '离开时发送邮件';
+
+  @override
+  String get emailLevelDescription =>
+      '当我被引用、回复、我的用户名被提及 (@) 或当我关注的类别、标签或话题有新的活动时给我发送电子邮件';
+
+  @override
+  String get notificationPrefAlways => '始终';
+
+  @override
+  String get notificationPrefOnlyWhenAway => '只在离开时';
+
+  @override
+  String get notificationPrefNever => '从不';
+
+  @override
+  String get emailForMessagesTitle => '消息邮件通知';
+
+  @override
+  String get emailMessagesLevelDescription => '当我收到个人消息时给我发电子邮件';
+
+  @override
+  String get activitySummaryTitle => '活动总结';
+
+  @override
+  String get activitySummaryDescription => '当我不访问这里时，向我发送热门话题和回复的电子邮件总结';
+
+  @override
+  String get activitySummaryFrequencyTitle => '活动总结频率';
+
+  @override
+  String get activitySummaryDaily => '每天';
+
+  @override
+  String get activitySummaryWeekly => '每周';
+
+  @override
+  String get activitySummaryMonthly => '每月';
+
+  @override
+  String get mailingListModeTitle => '邮寄名单模式';
+
+  @override
+  String get mailingListModeDescription =>
+      '每个帖子都通过电子邮件发给我（会停用活动总结）。不建议在高流量论坛上使用。';
+
+  @override
+  String get likeNotificationFrequencyTitle => '被赞时通知';
+
+  @override
+  String get likeNotificationFirstTimeAndDaily => '每日帖子第一次被赞';
+
+  @override
+  String get likeNotificationFirstTime => '帖子第一次被赞';
+
+  @override
+  String get whenPostingTitle => '发帖时';
+
+  @override
+  String get whenPostingDescription => '回复话题后如何处理该话题';
+
+  @override
+  String get whenPostingWatchTopic => '关注话题';
+
+  @override
+  String get whenPostingTrackTopic => '跟踪话题';
+
+  @override
+  String get whenPostingDoNothing => '不进行操作';
+
+  @override
+  String get pauseNotificationsUntilTomorrow => '直到明天';
+
+  @override
+  String get couldNotEnableDoNotDisturb => '无法开启请勿打扰';
+
+  @override
+  String get couldNotTurnOffDoNotDisturb => '无法关闭请勿打扰';
+
+  @override
+  String get passwordResetEmailSent => '已发送密码重置邮件。';
+
+  @override
+  String get couldNotSendResetEmail => '无法发送重置邮件';
+
+  @override
+  String get accountRequestFailed => '请求失败。';
+
+  @override
+  String get forumUrlUnavailable => '论坛网址不可用。';
+
+  @override
+  String get couldNotOpenPreferencesPage => '无法打开偏好设置页面。';
+
+  @override
+  String get couldNotOpenForumUrl => '无法打开论坛网址。';
+
+  @override
+  String get couldNotRequestEmailChange => '无法请求更改邮箱';
+
+  @override
+  String get newEmailLabel => '新电子邮件地址';
+
+  @override
+  String get enterAnEmailAddress => '请输入电子邮件地址';
+
+  @override
+  String get emailLooksInvalid => '这看起来不像电子邮件地址';
+
+  @override
+  String get emailNoSpaces => '电子邮件地址中不能有空格';
+
+  @override
+  String get allowNotificationsSheetTitle => '允许通知';
+
+  @override
+  String get notificationsGrantNoPayload => '授权未返回任何响应。';
+
+  @override
+  String get thisForumFallback => '此论坛';
+
+  @override
+  String signInToDomain(String domain) {
+    return '登录 $domain';
+  }
+
+  @override
+  String get loginResultTitle => '登录结果';
+
+  @override
+  String get invalidAuthenticationCode => '验证码无效';
+
+  @override
+  String get tfaVerificationError => '验证时出错。请重试。';
+
+  @override
+  String get passwordFieldLabel => '密码';
+
+  @override
+  String get somethingWentWrongTryAgain => '出了点问题。请重试。';
+
+  @override
+  String get unexpectedErrorTryAgain => '发生意外错误。请重试。';
+
+  @override
+  String get errorNoInternetConnection => '没有网络连接。请检查网络设置。';
+
+  @override
+  String get errorRequestTimedOut => '请求超时。请重试。';
+
+  @override
+  String get errorServerTryLater => '服务器出错。请稍后再试。';
+
+  @override
+  String get errorInvalidCredentials => '用户名或密码无效。';
+
+  @override
+  String get errorSessionExpired => '你的会话已过期。请重新登录。';
+
+  @override
+  String get errorAccountSuspended => '你的账户已被封禁。请联系论坛管理团队。';
+
+  @override
+  String get errorForumNotFound => '未找到论坛。';
+
+  @override
+  String get errorForumAccessDenied => '你没有访问此论坛的权限。';
+
+  @override
+  String get errorForumUnavailable => '论坛暂时不可用。请稍后再试。';
+
+  @override
+  String get errorDataNotFound => '未找到请求的数据。';
+
+  @override
+  String get errorDataCorrupted => '数据似乎已损坏。请刷新页面。';
+
+  @override
+  String get errorCacheLoadFailed => '无法加载缓存数据。请重试。';
+
+  @override
+  String errorInvalidField(String field) {
+    return '提供的$field无效。';
+  }
+
+  @override
+  String errorFieldRequired(String field) {
+    return '$field为必填项。';
+  }
+
+  @override
+  String errorPermissionDeniedFor(String action) {
+    return '你没有权限：$action。';
+  }
+
+  @override
+  String errorFeatureNotAvailable(String feature) {
+    return '此论坛不支持$feature。';
+  }
+
+  @override
+  String get errorStorageFull => '存储空间已满。请释放一些空间。';
+
+  @override
+  String get errorStorageAccessDenied => '存储访问被拒绝。请检查应用权限。';
+
+  @override
+  String get errorNetworkTryAgain => '发生网络错误。请重试。';
+
+  @override
+  String get errorAuthenticationTryAgain => '身份验证失败。请重试。';
+
+  @override
+  String get errorForumTryAgain => '论坛出错。请重试。';
+
+  @override
+  String get connectionErrorTitle => '连接错误';
+
+  @override
+  String get authenticationErrorTitle => '身份验证错误';
+
+  @override
+  String get forumErrorTitle => '论坛错误';
+
+  @override
+  String get permissionErrorTitle => '权限错误';
 }

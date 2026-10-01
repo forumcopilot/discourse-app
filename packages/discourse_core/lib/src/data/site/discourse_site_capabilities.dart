@@ -178,6 +178,16 @@ class DiscourseSiteCapabilities {
   /// Null until read.
   DiscourseProfileSettings? profileSettings;
 
+  /// The ways a reader may flag a post, in the forum's order and language
+  /// (`post_action_types` in `/site.json`, flags only): Discourse's own
+  /// (off-topic, inappropriate, spam, illegal, something else, a message to
+  /// the author) and any the forum added. Empty until read.
+  List<DiscourseFlagType> flagTypes = const [];
+
+  /// `min_personal_message_post_length`: the shortest message a flag that
+  /// asks for one will take.
+  int minPersonalMessageLength = 10;
+
   /// True once a real payload has been parsed for this forum. Distinguishes
   /// "asked, offers nothing" from "never asked".
   bool resolved = false;
@@ -228,6 +238,11 @@ class DiscourseSiteCapabilities {
         .toList(growable: false);
     caps.tosUrl = (site['tos_url'] as String?)?.trim();
     caps.privacyPolicyUrl = (site['privacy_policy_url'] as String?)?.trim();
+    caps.flagTypes = ((site['post_action_types'] as List?) ?? const [])
+        .whereType<Map>()
+        .map((t) => DiscourseFlagType.fromJson(t.cast<String, dynamic>()))
+        .whereType<DiscourseFlagType>()
+        .toList(growable: false);
     caps.userFields = ((site['user_fields'] as List?) ?? const [])
         .whereType<Map>()
         .map((f) => DiscourseUserFieldDef.fromJson(f.cast<String, dynamic>()))
@@ -370,6 +385,13 @@ class DiscourseSiteCapabilities {
         split(settings['default_navigation_menu_tags']);
     caps.profileSettings =
         DiscourseProfileSettings.fromClientSettings(settings, siteUrl: pluginUrl);
+    final minMessage = settings['min_personal_message_post_length'];
+    final parsedMin = minMessage is num
+        ? minMessage.toInt()
+        : int.tryParse(minMessage?.toString() ?? '');
+    if (parsedMin != null && parsedMin > 0) {
+      caps.minPersonalMessageLength = parsedMin;
+    }
   }
 
   /// Records each category's topics of the past week from a
@@ -554,4 +576,52 @@ class DiscourseCategoryStyle {
       slug: str(c['slug']),
     );
   }
+}
+
+/// One way to flag a post, as `/site.json` lists it (PostActionTypeSerializer):
+/// already in the forum's language, as web's flag modal shows it.
+class DiscourseFlagType {
+  const DiscourseFlagType({
+    required this.id,
+    required this.nameKey,
+    required this.name,
+    this.description = '',
+    this.requireMessage = false,
+  });
+
+  /// A flag that applies to posts and is turned on, else null (a like, a
+  /// topic- or chat-only flag, a disabled one).
+  static DiscourseFlagType? fromJson(Map<String, dynamic> j) {
+    final id = (j['id'] as num?)?.toInt();
+    if (id == null || j['is_flag'] != true || j['enabled'] == false) return null;
+    final appliesTo = j['applies_to'];
+    if (appliesTo is List && !appliesTo.contains('Post')) return null;
+    return DiscourseFlagType(
+      id: id,
+      nameKey: (j['name_key'] ?? '').toString(),
+      name: stripHtmlToText((j['name'] ?? '').toString()).trim(),
+      description: stripHtmlToText((j['description'] ?? '').toString()).trim(),
+      requireMessage: j['require_message'] == true,
+    );
+  }
+
+  final int id;
+
+  /// `notify_user`, `off_topic`, `inappropriate`, `spam`, `illegal`,
+  /// `notify_moderators`, or a custom flag's key.
+  final String nameKey;
+
+  /// "Off-Topic"; for [nameKey] `notify_user`, "Send @%{username} a message".
+  final String name;
+  final String description;
+
+  /// Whether Discourse refuses it without a message.
+  final bool requireMessage;
+
+  /// Goes to the post's author as a personal message, not to staff.
+  bool get isMessageToAuthor => nameKey == 'notify_user';
+
+  /// [name] with the post's author filled in.
+  String nameFor(String username) =>
+      name.replaceAll('%{username}', username).replaceAll('@@', '@');
 }

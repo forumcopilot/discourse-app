@@ -163,49 +163,14 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get youCannotReplyToThisThread => 'No puedes responder a este hilo';
+  String get youCannotReplyToThisThread => 'No puedes responder a este tema';
 
   @override
   String get pleaseWaitForThreadToLoad =>
-      'Por favor espera a que el hilo se cargue';
-
-  @override
-  String get postCanBeRestoredLater =>
-      'La publicación puede ser restaurada más tarde';
-
-  @override
-  String get postWillBePermanentlyDeleted =>
-      'La publicación será eliminada permanentemente';
-
-  @override
-  String get enterReasonForDeletingPost =>
-      'Ingresa la razón para eliminar esta publicación';
-
-  @override
-  String get reportPost => 'Reportar publicación';
-
-  @override
-  String get pleaseProvideReasonForReporting =>
-      'Por favor proporciona una razón para reportar esta publicación.';
+      'Por favor, espera a que se cargue el tema';
 
   @override
   String get reason => 'Razón';
-
-  @override
-  String get enterReasonForReportingPost =>
-      'Ingresa la razón para reportar esta publicación';
-
-  @override
-  String get pleaseEnterReason => 'Por favor ingresa una razón';
-
-  @override
-  String get submitReport => 'Enviar reporte';
-
-  @override
-  String get selectedActions => 'Acciones seleccionadas:';
-
-  @override
-  String get thisActionCannotBeUndone => 'Esta acción no se puede deshacer.';
 
   @override
   String get participantsLabel => 'Participantes';
@@ -224,9 +189,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get newTopic => 'Nuevo tema';
 
   @override
-  String get markRead => 'Marcar como leído';
-
-  @override
   String get pleaseSpecifyReason => 'Por favor especifica el motivo';
 
   @override
@@ -240,23 +202,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get topicOpened => 'Tema abierto';
-
-  @override
-  String cannotEditMessage(String error) {
-    return 'No se puede editar este mensaje: $error';
-  }
-
-  @override
-  String get confirmSpamClean => 'Confirmar Limpieza de Spam';
-
-  @override
-  String get handleThreads => 'Gestionar Hilos';
-
-  @override
-  String get deleteMessages => 'Eliminar Mensajes';
-
-  @override
-  String get deleteConversations => 'Eliminar mensajes';
 
   @override
   String get noConversations => 'No tienes ningún mensaje';
@@ -283,28 +228,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get loginRequired => 'Inicio de Sesión Requerido';
 
   @override
-  String get spamCleaner => 'Limpiador de Spam';
-
-  @override
   String get sendMessage => 'Mensaje';
-
-  @override
-  String get memberSince => 'Miembro Desde';
-
-  @override
-  String get lastActivity => 'Última Actividad';
 
   @override
   String get likesReceived => 'Me Gusta Recibidos';
 
   @override
-  String get likesGiven => 'Me Gusta Dados';
-
-  @override
   String get showMore => 'Mostrar más';
-
-  @override
-  String get cleanSpam => 'Limpiar spam';
 
   @override
   String get failedToSaveConversation => 'No se pudo guardar el mensaje';
@@ -339,13 +269,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get signIn => 'Iniciar sesión';
 
   @override
-  String get markForumRead => 'Marcar foro como leído';
-
-  @override
   String get notificationTest => 'Prueba de notificaciones';
 
   @override
-  String get forum => 'Foro';
+  String get forum => 'Categoría';
 
   @override
   String get profile => 'Perfil';
@@ -384,11 +311,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get youNeedToBeSignedInToViewConversations =>
       'Debes iniciar sesión para ver tus mensajes.';
-
-  @override
-  String errorLoadingConversations(String error) {
-    return 'Error al cargar los mensajes: $error';
-  }
 
   @override
   String failedToLeaveConversation(String error) {
@@ -441,37 +363,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get confirm => 'Confirmar';
 
   @override
-  String spamClean(String username) {
-    return 'Limpiar Spam de $username';
-  }
-
-  @override
-  String get selectActionsToPerform => 'Selecciona las acciones a realizar:';
-
-  @override
-  String get moveOrDeleteThreadsBasedOnAdminSettings =>
-      'Mover o eliminar hilos según la configuración del administrador';
-
-  @override
-  String get messageUpdatedSuccessfully => 'Mensaje actualizado exitosamente';
-
-  @override
   String error(String error) {
     return 'Error: $error';
   }
-
-  @override
-  String failedToRemoveAttachment(String error) {
-    return 'Error al eliminar adjunto: $error';
-  }
-
-  @override
-  String failedToLoadMessage(String error) {
-    return 'Error al cargar mensaje: $error';
-  }
-
-  @override
-  String get editMessage => 'Editar Mensaje';
 
   @override
   String get removeAttachment => 'Eliminar Adjunto';
@@ -622,40 +516,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get banned => 'BLOQUEADO';
 
   @override
-  String get reportSubmittedSuccessfully => 'Reporte enviado exitosamente';
-
-  @override
   String get deleteTopic => 'Eliminar tema';
 
   @override
   String get pleaseSelectEndDate =>
       'Por favor selecciona una fecha de finalización';
-
-  @override
-  String get spamCleanUser => 'Limpiar spam del usuario';
-
-  @override
-  String get deletePrivateConversations => 'Eliminar mensajes personales';
-
-  @override
-  String get banTheUserAccount => 'Bloquear la cuenta del usuario';
-
-  @override
-  String get handledThreads => 'Temas manejados';
-
-  @override
-  String get deletedMessages => 'Mensajes eliminados';
-
-  @override
-  String get deletedConversations => 'Mensajes eliminados';
-
-  @override
-  String get bannedUser => 'Usuario bloqueado';
-
-  @override
-  String successfullyCleanedSpam(String username, String actions) {
-    return 'Spam limpiado exitosamente para $username. Acciones: $actions';
-  }
 
   @override
   String get home => 'Inicio';
@@ -664,33 +529,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get notifications => 'Notificaciones';
 
   @override
-  String get forums => 'Foros';
-
-  @override
-  String get markAllForumsAsRead => '¿Marcar todos los foros como leídos?';
-
-  @override
-  String get markAllForumsAsReadMessage =>
-      'Esto marcará todos los foros y temas como leídos. Esta acción no se puede deshacer.';
-
-  @override
-  String get markAsRead => 'Marcar como leído';
+  String get forums => 'Categorías';
 
   @override
   String get content => 'Contenido';
-
-  @override
-  String get insertImage => 'Insertar imagen';
-
-  @override
-  String get howWouldYouLikeToInsertImage =>
-      '¿Cómo te gustaría insertar esta imagen?';
-
-  @override
-  String get thumbnail => 'Miniatura';
-
-  @override
-  String get fullSize => 'Tamaño completo';
 
   @override
   String get pleaseEnterTitle => 'Por favor ingresa un título';
@@ -708,16 +550,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get mentionUser => 'Mencionar usuario';
 
   @override
-  String get cleaningSpam => 'Limpiando spam...';
-
-  @override
   String get writeYourMessage => 'Escribe tu mensaje...';
 
   @override
   String get writeYourReply => 'Escribe tu respuesta...';
-
-  @override
-  String get conversationCreatedSuccessfully => 'Mensaje enviado';
 
   @override
   String get conversationMarkedAsUnread => 'Mensaje marcado como no leído';
@@ -729,20 +565,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get conversationOpened => 'Mensaje abierto';
 
   @override
-  String get pleaseLoginToLikeMessages =>
-      'Por favor inicia sesión para dar me gusta a los mensajes';
-
-  @override
-  String get loadEarlierMessages => 'Cargar mensajes anteriores';
-
-  @override
   String failedToLoadQuote(String error) {
     return 'Error al cargar cita: \n$error';
-  }
-
-  @override
-  String failedToSendReply(String error) {
-    return 'Error al enviar respuesta: $error';
   }
 
   @override
@@ -758,11 +582,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String failedToOpenConversation(String error) {
     return 'No se pudo abrir el mensaje: $error';
-  }
-
-  @override
-  String failedToJumpToMessage(String error) {
-    return 'Error al saltar al mensaje: $error';
   }
 
   @override
@@ -808,20 +627,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get goBack => 'Volver';
 
   @override
-  String failedToLoadPost(String error) {
-    return 'Error al cargar publicación: \n$error';
-  }
-
-  @override
-  String failedToLikeOrUnlikeMessage(String action, String error) {
-    return 'Error al $action mensaje: $error';
-  }
-
-  @override
   String get like => 'dar me gusta a';
-
-  @override
-  String get unlike => 'quitar me gusta a';
 
   @override
   String get download => 'Descargar';
@@ -839,14 +645,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String errorDownloading(String filename, String error) {
     return 'Error al descargar $filename: $error';
-  }
-
-  @override
-  String get failedToNavigateToForum => 'Error al navegar al foro';
-
-  @override
-  String forumNotFoundById(String forumId) {
-    return 'Foro no encontrado: $forumId';
   }
 
   @override
@@ -956,7 +754,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get profileViews => 'Visitas';
 
   @override
-  String get badges => 'Insignias';
+  String get badges => 'Medallas';
 
   @override
   String get chatWithUser => 'Chat';
@@ -973,26 +771,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String nVotes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count votos',
-      one: '1 voto',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get lastSeen => 'Visto';
-
-  @override
   String get chat => 'Chat';
-
-  @override
-  String comingSoon(String label) {
-    return '$label — próximamente';
-  }
 
   @override
   String moreBadges(Object count) {
@@ -1061,9 +840,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get discard => 'Descartar';
-
-  @override
-  String get discardDraftQuestion => '¿Descartar borrador?';
 
   @override
   String get doNotDisturb => 'No molestar';
@@ -1213,9 +989,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get resizeAndUpload => 'Reducir y subir';
 
   @override
-  String get retryConnection => 'Reintentar conexión';
-
-  @override
   String get checkConnectionAndRetry =>
       'Comprueba tu conexión a internet e inténtalo de nuevo.';
 
@@ -1247,9 +1020,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get signOut => 'Cerrar sesión';
 
   @override
-  String get signOutQuestion => '¿Cerrar sesión?';
-
-  @override
   String get signInCancelledNoPayload =>
       'Inicio de sesión cancelado: no se recibió respuesta';
 
@@ -1265,16 +1035,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String stoppedIgnoringUser(String username) {
     return 'Dejaste de ignorar a @$username';
   }
-
-  @override
-  String get submit => 'Enviar';
-
-  @override
-  String get discardDraftWarning =>
-      'El borrador guardado se eliminará de forma permanente.';
-
-  @override
-  String get deleteChatMessageWarning => 'El mensaje se eliminará para todos.';
 
   @override
   String get titleOnly => 'Solo título';
@@ -1320,17 +1080,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Por seguridad, Discourse puede pedirte confirmar mediante el enlace del correo. Revisa la carpeta de spam si no lo ves.';
 
   @override
-  String get newDirectMessage => 'Nuevo mensaje directo';
-
-  @override
   String get noMessagesYetSayHi => 'Aún no hay mensajes: saluda.';
 
   @override
   String get edited => 'editado';
-
-  @override
-  String get editProfileManagedOnWebNote =>
-      'El nombre visible, el correo, la contraseña y otros ajustes de la cuenta se gestionan en Cuenta → Administrar cuenta en la web. Puedes cambiar tu avatar tocando el icono de cámara en tu foto.';
 
   @override
   String get approvedButRelayUnreachable =>
@@ -1368,9 +1121,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get protected => 'Protegido';
-
-  @override
   String get solution => 'Solución';
 
   @override
@@ -1394,11 +1144,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get poll => 'Encuesta';
-
-  @override
-  String errorLoadingContent(Object error) {
-    return 'Error al cargar el contenido: $error';
-  }
 
   @override
   String get noDiscussionsYet => 'Aún no hay discusiones.';
@@ -1466,9 +1211,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get leaveConversation2 => 'Abandonar mensaje';
 
   @override
-  String get reportConversation2 => 'Denunciar mensaje';
-
-  @override
   String get closeConversation2 => 'Cerrar mensaje';
 
   @override
@@ -1494,27 +1236,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get leaveConversationConfirmation =>
       '¿Seguro que quieres salir de este mensaje? Ya no podrás verlo ni responder.';
-
-  @override
-  String errorLoadingConversation(Object error) {
-    return 'Error al cargar el mensaje: $error';
-  }
-
-  @override
-  String get conversationNotFound => 'Mensaje no encontrado';
-
-  @override
-  String get conversationClosedBanner =>
-      'Este mensaje está cerrado; ya no se aceptan respuestas nuevas';
-
-  @override
-  String get noMessagesFound => 'No se encontraron mensajes';
-
-  @override
-  String get endOfConversation => 'Fin de la discusión';
-
-  @override
-  String get jumpToMessage => 'Ir al mensaje';
 
   @override
   String get editConversation2 => 'Editar título';
@@ -1651,9 +1372,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get chatPlaceholderGroup => 'Chatear en grupo';
-
-  @override
   String get chatPlaceholderSelf => 'Anota algo';
 
   @override
@@ -1735,11 +1453,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Hemos recibido tu nueva publicación, pero debe ser aprobada por un moderador antes de que aparezca. Por favor, ten paciencia.';
 
   @override
-  String failedToCreateConversation(Object error) {
-    return 'No se pudo enviar el mensaje: $error';
-  }
-
-  @override
   String maximumAttachmentsAllowed(Object count) {
     return 'Máximo de $count adjunto(s) permitido(s)';
   }
@@ -1747,10 +1460,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get noImagesFoundToDisplay =>
       'No se encontraron imágenes para mostrar.';
-
-  @override
-  String get pleaseLoginToViewThisAttachment =>
-      'Inicia sesión para ver este adjunto';
 
   @override
   String get searchForTopics => 'Buscar temas';
@@ -1779,10 +1488,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get doNotDisturbExplanation =>
       'Pausa las notificaciones un tiempo: Discourse las retiene hasta que termine el periodo';
-
-  @override
-  String get emailSettingsSubtitle =>
-      'Frecuencia de correo, agrupación de me gusta, resumen periódico';
 
   @override
   String get manageAccountSubtitle =>
@@ -1819,13 +1524,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get initializingForum => 'Inicializando foro…';
 
   @override
-  String get subscribedForums => 'Foros suscritos';
-
-  @override
   String get errorLoadingNotifications => 'Error al cargar las notificaciones';
-
-  @override
-  String get pullDownToRefresh => 'Desliza hacia abajo para actualizar';
 
   @override
   String get noNewNotificationsExplanation =>
@@ -1842,20 +1541,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get deletePostsProfilePostsAndComments =>
-      'Eliminar publicaciones, publicaciones de perfil y comentarios';
-
-  @override
-  String spamCleanConfirmation(Object username) {
-    return '¿Seguro que quieres limpiar el spam de $username?';
-  }
-
-  @override
-  String failedToCleanSpam(Object error) {
-    return 'No se pudo limpiar el spam: $error';
-  }
-
-  @override
   String get searchUser => 'Buscar usuario';
 
   @override
@@ -1863,10 +1548,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get imageNotAvailable => 'Imagen no disponible';
-
-  @override
-  String get allForumTopicsHaveBeenMarkedAs =>
-      'Todos los temas del foro se marcaron como leídos';
 
   @override
   String postsCount(Object count) {
@@ -1890,30 +1571,10 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get failedToPickFile => 'No se pudo seleccionar el archivo';
-
-  @override
   String onlyNMoreAttachmentsAllowed(
       Object remainingSlots, Object remainingSlots2) {
     return 'Solo se permiten $remainingSlots adjunto(s) más. Se procesarán las primeras $remainingSlots2 imágenes.';
   }
-
-  @override
-  String get attachmentLimitReachedSkippingRemainingImages =>
-      'Límite de adjuntos alcanzado. Se omiten las imágenes restantes.';
-
-  @override
-  String failedToUploadImagePleaseTryAgain(Object fileName) {
-    return '$fileName: no se pudo subir la imagen. Inténtalo de nuevo.';
-  }
-
-  @override
-  String failedToUploadImage2(Object errorMessage, Object fileName) {
-    return '$fileName: no se pudo subir la imagen: $errorMessage';
-  }
-
-  @override
-  String get failedToPickImage => 'No se pudo seleccionar la imagen';
 
   @override
   String failedToRemoveAttachment2(Object error) {
@@ -1960,25 +1621,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String failedToSubmitReport2(Object error) {
-    return 'No se pudo enviar el reporte: $error';
-  }
-
-  @override
   String get editHistoryNotAvailable =>
       'El historial de ediciones no está disponible para esta publicación';
-
-  @override
-  String get noPermissionToUploadAvatar =>
-      'No tienes permiso para subir avatares';
-
-  @override
-  String get avatarUploadedSuccessfully => 'Avatar subido';
-
-  @override
-  String failedToPickImage2(Object error) {
-    return 'No se pudo seleccionar la imagen: $error';
-  }
 
   @override
   String get react => 'Reaccionar';
@@ -1994,18 +1638,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get searchFilters => 'Filtros de búsqueda';
 
   @override
-  String signOutWarning(Object siteName) {
-    return 'Cerrarás sesión en $siteName. Puedes volver a iniciar sesión cuando quieras.';
-  }
-
-  @override
   String get suggestedTopics => 'Temas sugeridos';
 
   @override
   String get suggestedMessages => 'Mensajes sugeridos';
-
-  @override
-  String get newLabel => 'NUEVO';
 
   @override
   String get voteRemoved => 'Voto eliminado';
@@ -2037,9 +1673,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get couldNotLoadCategories => 'No se pudieron cargar las categorías.';
 
   @override
-  String get explore => 'Explorar';
-
-  @override
   String get tags => 'Etiquetas';
 
   @override
@@ -2065,11 +1698,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Política de privacidad';
-
-  @override
-  String signedInAs(String username) {
-    return 'Sesión iniciada como $username';
-  }
 
   @override
   String get notSignedIn => 'Sin iniciar sesión';
@@ -2101,7 +1729,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String actionCodeTopicCreated(String when) {
-    return 'Created this topic $when';
+    return 'Creó este tema $when';
   }
 
   @override
@@ -2366,79 +1994,96 @@ class AppLocalizationsEs extends AppLocalizations {
   String get notificationSettings => 'Ajustes de notificaciones';
 
   @override
-  String get topicIsNew => 'New topic';
+  String get topicIsNew => 'Tema nuevo';
 
   @override
   String get noNewTopicsSinceLastVisit =>
-      'No new topics since your last visit.';
+      'No hay temas nuevos desde tu última visita.';
 
   @override
-  String get messageIsNew => 'New message';
+  String get messageIsNew => 'Mensaje nuevo';
 
   @override
   String topicUnreadReplies(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count unread replies',
-      one: '1 unread reply',
+      other: '$count respuestas sin leer',
+      one: '1 respuesta sin leer',
     );
     return '$_temp0';
   }
 
   @override
   String filterNewWithCount(int count) {
-    return 'New ($count)';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Nuevos ($count)',
+      one: 'Nuevo ($count)',
+    );
+    return '$_temp0';
   }
 
   @override
   String filterUnreadWithCount(int count) {
-    return 'Unread ($count)';
+    return 'Sin leer ($count)';
   }
 
   @override
   String categoryNewTopics(int count) {
-    return '$count new';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count nuevos',
+      one: '$count nuevo',
+    );
+    return '$_temp0';
   }
 
   @override
   String categoryUnreadTopics(int count) {
-    return '$count unread';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sin leer',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get dismissNew => 'Dismiss new';
+  String get dismissNew => 'Descartar nuevos';
 
   @override
-  String get dismissUnread => 'Dismiss unread';
+  String get dismissUnread => 'Descartar sin leer';
 
   @override
-  String get dismissNewTitle => 'Dismiss new topics?';
+  String get dismissNewTitle => '¿Descartar los temas nuevos?';
 
   @override
-  String get dismissNewMessage => 'They will no longer show as new.';
+  String get dismissNewMessage => 'Ya no aparecerán como nuevos.';
 
   @override
-  String get dismissUnreadTitle => 'Dismiss all unread?';
+  String get dismissUnreadTitle => '¿Descartar todos los temas sin leer?';
 
   @override
   String get dismissUnreadMessage =>
-      'Their new replies will be marked as read.';
+      'Sus respuestas nuevas se marcarán como leídas.';
 
   @override
   String get dismissUnreadStopTracking =>
-      'Stop tracking these topics so they never show up as unread for me again';
+      'Dejar de seguir estos temas para que no aparezcan más en mis mensajes no leídos';
 
   @override
-  String get dismissNewAndUnread => 'Dismiss new and unread';
+  String get dismissNewAndUnread => 'Descartar nuevos y sin leer';
 
   @override
   String dismissNewAndUnreadMessage(String category) {
-    return 'Topics in $category will no longer show as new or unread.';
+    return 'Los temas de $category ya no aparecerán como nuevos ni sin leer.';
   }
 
   @override
-  String get dismissedTopics => 'Dismissed';
+  String get dismissedTopics => 'Descartados';
 
   @override
   String topicMapViews(int count) {
@@ -2620,7 +2265,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get pushGroupOtherHint =>
-      'Insignias, recordatorios, respuestas aceptadas y más';
+      'Medallas, recordatorios, respuestas aceptadas y más';
 
   @override
   String get pushChannelOther => 'Otras notificaciones';
@@ -3251,11 +2896,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get titleFromBadge => 'Insignia';
+  String get titleFromBadge => 'Medalla';
 
   @override
   String titleFromBadgeEarned(String date) {
-    return 'Insignia · obtenida el $date';
+    return 'Medalla · obtenida el $date';
   }
 
   @override
@@ -3857,4 +3502,1396 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get noPermissionToViewCategory =>
       'No tienes permiso para ver los temas de esta categoría.';
+
+  @override
+  String get featureTopicTitle => 'Características de este tema';
+
+  @override
+  String get pinTopicMenu => 'Anclar tema...';
+
+  @override
+  String pinInCategoryUntil(String category) {
+    return 'Hacer que este tema aparezca de primero en la categoría $category hasta';
+  }
+
+  @override
+  String get pinGloballyUntil =>
+      'Hacer que este tema aparezca de primero en todas las listas de temas hasta';
+
+  @override
+  String get pinNote =>
+      'Los usuarios pueden desanclar el tema de forma individual por sí mismos.';
+
+  @override
+  String get pinUntil => 'Anclar hasta';
+
+  @override
+  String get pinDateRequired =>
+      'Es obligatorio especificar una fecha para anclar este tema.';
+
+  @override
+  String get pinTopicGlobally => 'Anclar tema globalmente';
+
+  @override
+  String get flagThanks =>
+      '¡Gracias por ayudar a mantener una comunidad civilizada!';
+
+  @override
+  String get flagReviewProcess =>
+      'Los moderadores reciben todas las denuncias y las revisan con la mayor brevedad posible.';
+
+  @override
+  String get flagCant =>
+      'Lo sentimos, no puedes denunciar esta publicación en este momento.';
+
+  @override
+  String get flagSendMessage => 'Mensaje';
+
+  @override
+  String get flagMessageForUser => 'Mensaje para el usuario';
+
+  @override
+  String get flagMessageForModerators => 'Mensaje para los moderadores';
+
+  @override
+  String get flagPlaceholderNotifyUser =>
+      'Sé específico, constructivo y siempre amable.';
+
+  @override
+  String get flagPlaceholderNotifyModerators =>
+      'Haznos saber qué te preocupa específicamente y, siempre que sea posible, incluye enlaces y ejemplos relevantes.';
+
+  @override
+  String get flagPlaceholderIllegal =>
+      'Indícanos exactamente por qué consideras este contenido ilegal, y proporciona enlaces y ejemplos relevantes cuando sea posible.';
+
+  @override
+  String get flagConfirmIllegal =>
+      'Lo que he escrito más arriba es preciso y completo.';
+
+  @override
+  String flagMessageAtLeast(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ingresa al menos $count caracteres',
+      one: 'introduce al menos $count caracteres',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get flagMessageSent => 'Tu mensaje ha sido enviado.';
+
+  @override
+  String get mergeTopicError =>
+      'Se produjo un error al mover las publicaciones a ese tema.';
+
+  @override
+  String get topicTitlePlaceholder =>
+      'En una frase breve, ¿de qué trata este tema?';
+
+  @override
+  String get topicMoved => 'Tema movido';
+
+  @override
+  String get topicMerged => 'Tema fusionado';
+
+  @override
+  String get mergeTopicExplanation =>
+      'Todas las publicaciones de este tema se moverán al tema que elijas. No se puede deshacer en la aplicación.';
+
+  @override
+  String get destinationTopicId => 'ID del tema de destino';
+
+  @override
+  String get topicAuthorUnknown => 'Desconocido';
+
+  @override
+  String get noHotTopics => 'No hay temas candentes.';
+
+  @override
+  String get signInToViewNewTopics => 'Inicia sesión para ver temas nuevos';
+
+  @override
+  String get newTopicsSignInMessage =>
+      'Los temas nuevos muestran lo que se ha creado desde tu última visita.';
+
+  @override
+  String get topPeriodAllTime => 'Siempre';
+
+  @override
+  String get topPeriodYear => 'Año';
+
+  @override
+  String get topPeriodQuarter => 'Trimestre';
+
+  @override
+  String get topPeriodMonth => 'Mes';
+
+  @override
+  String get topPeriodWeek => 'Semana';
+
+  @override
+  String get topPeriodToday => 'Hoy';
+
+  @override
+  String noTopTopicsForPeriod(String period) {
+    String _temp0 = intl.Intl.selectLogic(
+      period,
+      {
+        'all': 'No hay temas destacados de todos los tiempos.',
+        'yearly': 'No hay temas destacados este año.',
+        'quarterly': 'No hay temas destacados este trimestre.',
+        'monthly': 'No hay temas destacados este mes.',
+        'weekly': 'No hay temas destacados esta semana.',
+        'daily': 'No hay temas destacados hoy.',
+        'other': 'No hay temas destacados.',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get connectionTimedOutSiteUnreachable =>
+      'Se agotó el tiempo de conexión. El sitio puede estar caído o inaccesible.';
+
+  @override
+  String get failedToMarkNotificationsRead =>
+      'No se pudieron marcar las notificaciones como leídas';
+
+  @override
+  String get forumNameFallback => 'Foro';
+
+  @override
+  String get noForumDescription => 'No hay descripción disponible.';
+
+  @override
+  String get dismissAllNotifications => 'Descartar todo';
+
+  @override
+  String get notificationPostIdMissing =>
+      'Falta el ID de la publicación. No se puede ir a la publicación.';
+
+  @override
+  String get notificationTopicIdMissingForPost =>
+      'Falta el ID del tema. No se puede ir a la publicación.';
+
+  @override
+  String get notificationTopicIdMissing =>
+      'Falta el ID del tema. No se puede abrir el tema.';
+
+  @override
+  String get notificationUsernameMissing =>
+      'Falta el nombre de usuario. No se puede abrir el perfil.';
+
+  @override
+  String get notificationChannelIdMissing =>
+      'Falta el ID del canal. No se puede abrir el chat.';
+
+  @override
+  String get notificationGroupNameMissingForInbox =>
+      'Falta el nombre del grupo. No se puede abrir la bandeja de entrada.';
+
+  @override
+  String get notificationGroupNameMissing =>
+      'Falta el nombre del grupo. No se puede abrir el grupo.';
+
+  @override
+  String get notificationNoActionUrl =>
+      'No hay ninguna URL de acción para este tipo de notificación.';
+
+  @override
+  String get notificationBadgeUnavailable =>
+      'Los detalles de la medalla no están disponibles.';
+
+  @override
+  String get notificationBadgeLoadFailed => 'No se pudo cargar esta medalla.';
+
+  @override
+  String get personalMessageTitleFallback => 'Mensaje personal';
+
+  @override
+  String get topicTitleFallback => 'Tema';
+
+  @override
+  String get signInToViewNotifications =>
+      'Inicia sesión para ver las notificaciones';
+
+  @override
+  String get youNeedToBeSignedInToViewNotifications =>
+      'Debes iniciar sesión para ver tus notificaciones.';
+
+  @override
+  String get noUnreadNotifications => 'No hay notificaciones sin leer';
+
+  @override
+  String get noNotificationsYet => 'Aún no hay notificaciones';
+
+  @override
+  String get newNotificationFallbackBody => 'Nueva notificación';
+
+  @override
+  String get unableToOpenNotification => 'No se puede abrir la notificación';
+
+  @override
+  String get notificationMissingSiteInfo =>
+      'Falta la información del sitio (site_id).';
+
+  @override
+  String get notificationInvalidSiteInfo =>
+      'Información del sitio no válida (site_id).';
+
+  @override
+  String get notificationMissingPostInfo =>
+      'Falta la información de la publicación (content_id).';
+
+  @override
+  String get notificationMissingMessageInfo =>
+      'Falta la información del mensaje (conversation_id).';
+
+  @override
+  String get notificationMissingUserInfo =>
+      'Falta la información del usuario (sender_id).';
+
+  @override
+  String get notificationUnsupportedType =>
+      'Tipo de notificación no compatible.';
+
+  @override
+  String get notificationForumNotFound =>
+      'No se encontró el foro de este sitio.';
+
+  @override
+  String get notificationForumOpenFailed => 'No se pudo inicializar el foro.';
+
+  @override
+  String get notificationMissingTopicInfo =>
+      'Falta la información del tema (topic_id).';
+
+  @override
+  String get failedToLoadTags => 'No se pudieron cargar las etiquetas.';
+
+  @override
+  String get searchTagsHint => 'Buscar etiquetas…';
+
+  @override
+  String get tagsSortedByCountTooltip =>
+      'Ordenadas por número de temas: toca para cambiar a A→Z';
+
+  @override
+  String get tagsSortedAlphabeticallyTooltip =>
+      'Ordenadas alfabéticamente: toca para cambiar a popularidad';
+
+  @override
+  String get noTagsYet => 'Aún no hay etiquetas en este foro.';
+
+  @override
+  String get tagNotificationLevelTooltip => 'Nivel de notificación';
+
+  @override
+  String get tagTopicsLoadFailed => 'No se pudo cargar';
+
+  @override
+  String searchFailedWithError(String error) {
+    return 'Búsqueda fallida: $error';
+  }
+
+  @override
+  String get searchFiltersButtonTooltip => 'Filtros';
+
+  @override
+  String get searchFilterStatusSection => 'Estado';
+
+  @override
+  String get searchFilterMyActivitySection => 'Mi actividad';
+
+  @override
+  String get searchFilterMatchTypeSection => 'Tipo de coincidencia';
+
+  @override
+  String get searchTagsFilterHelper =>
+      'Separadas por espacios o comas. Cada etiqueta es obligatoria.';
+
+  @override
+  String get searchSortBy => 'Ordenar por';
+
+  @override
+  String get searchStatusOpen => 'Abierto';
+
+  @override
+  String get searchStatusArchived => 'Archivado';
+
+  @override
+  String get searchStatusNoReplies => 'Sin respuestas';
+
+  @override
+  String get searchStatusPublicOnly => 'Solo públicos';
+
+  @override
+  String get searchStatusUnsolved => 'Sin solución';
+
+  @override
+  String get searchInBookmarked => 'En mis marcadores';
+
+  @override
+  String get searchInMyMessages => 'En mis mensajes';
+
+  @override
+  String get searchInLiked => 'Me gustaron';
+
+  @override
+  String get searchInPosted => 'He publicado en ellos';
+
+  @override
+  String get searchInWatching => 'Estoy vigilando';
+
+  @override
+  String get searchInTracking => 'Estoy siguiendo';
+
+  @override
+  String get searchInSeen => 'He leído';
+
+  @override
+  String get searchInUnseen => 'No he leído';
+
+  @override
+  String get searchSortLatestPost => 'Publicación más reciente';
+
+  @override
+  String get searchSortMostLiked => 'Más me gusta recibidos';
+
+  @override
+  String get searchSortMostViewed => 'Más visto';
+
+  @override
+  String get searchSortLatestTopic => 'Tema más reciente';
+
+  @override
+  String get searchFieldHint => 'Buscar…';
+
+  @override
+  String get bookmarksUnavailable => 'Los marcadores no están disponibles';
+
+  @override
+  String get failedToLoadBookmarks => 'No se pudieron cargar los marcadores';
+
+  @override
+  String get failedToRemoveBookmark => 'No se pudo quitar el marcador';
+
+  @override
+  String get failedToUpdateBookmark => 'No se pudo actualizar el marcador';
+
+  @override
+  String get bookmarkWithReminder => 'Marcador con recordatorio';
+
+  @override
+  String get noReminder => 'Sin recordatorio';
+
+  @override
+  String get failedToLoadDrafts => 'No se pudieron cargar los borradores.';
+
+  @override
+  String get failedToDiscardDraft => 'No se pudo descartar el borrador';
+
+  @override
+  String get messagesLoadFailed => 'No se pudieron cargar los mensajes';
+
+  @override
+  String get moreMessagesLoadFailed => 'No se pudieron cargar más mensajes';
+
+  @override
+  String get messageUnknownUser => 'Desconocido';
+
+  @override
+  String get unknownErrorFallback => 'Error desconocido';
+
+  @override
+  String get chatComposerDefaultHint => 'Escribe un mensaje…';
+
+  @override
+  String chatChannelNumbered(Object id) {
+    return 'canal $id';
+  }
+
+  @override
+  String get chatSendFailed => 'No se pudo enviar el mensaje.';
+
+  @override
+  String get chatEditFailed => 'No se pudo editar el mensaje.';
+
+  @override
+  String get chatDeleteFailed => 'No se pudo eliminar el mensaje.';
+
+  @override
+  String get chatReactionsUnsupported =>
+      'Las reacciones no están disponibles aquí.';
+
+  @override
+  String get chatReactionFailed => 'No se pudo actualizar la reacción.';
+
+  @override
+  String get attachmentDefaultName => 'Archivo adjunto';
+
+  @override
+  String get fileTypeAudio => 'Audio';
+
+  @override
+  String get fileTypeText => 'Texto';
+
+  @override
+  String get fileTypeArchive => 'Archivo comprimido';
+
+  @override
+  String get fileTypeFile => 'Archivo';
+
+  @override
+  String downloadFailedHttpStatus(String status) {
+    return 'No se pudo descargar el archivo: HTTP $status';
+  }
+
+  @override
+  String get downloadedFileEmpty => 'El archivo descargado está vacío';
+
+  @override
+  String downloadFileFailed(String error) {
+    return 'No se pudo descargar el archivo: $error';
+  }
+
+  @override
+  String attachmentTypeNotAllowed(String extension, String allowed) {
+    return 'El tipo de archivo .$extension no está permitido. Tipos permitidos: $allowed';
+  }
+
+  @override
+  String attachmentFileTooLarge(String size, String max) {
+    return 'El tamaño del archivo ($size) supera el máximo de $max';
+  }
+
+  @override
+  String get attachmentValidationFailed => 'La validación del archivo falló';
+
+  @override
+  String get uploadMissingReference =>
+      'La subida se completó, pero el servidor no devolvió ninguna referencia al archivo.';
+
+  @override
+  String get imageFileNotFound => 'No se encontró el archivo de imagen';
+
+  @override
+  String get failedToLoadVideo => 'No se pudo cargar el video';
+
+  @override
+  String get userInfoLoadFailed =>
+      'No se pudo cargar la información del usuario.';
+
+  @override
+  String userInfoLoadFailedWithError(String error) {
+    return 'No se pudo cargar la información del usuario: $error';
+  }
+
+  @override
+  String get profileMenuIgnoreUser => 'Ignorar usuario';
+
+  @override
+  String get profileMenuUnignoreUser => 'Dejar de ignorar al usuario';
+
+  @override
+  String get ignoreStateUpdateFailed =>
+      'No se pudo cambiar el estado de ignorado';
+
+  @override
+  String profileNowIgnoringUser(String username) {
+    return 'Estás ignorando a @$username. Sus publicaciones se ocultarán.';
+  }
+
+  @override
+  String get profileIgnoreToggleFailed =>
+      'No se pudo cambiar la opción de ignorar.';
+
+  @override
+  String get profileStatsLoadFailed =>
+      'No se pudieron cargar las estadísticas.';
+
+  @override
+  String get profileFollowFailed => 'No se pudo seguir';
+
+  @override
+  String get profileUnfollowFailed => 'No se pudo dejar de seguir';
+
+  @override
+  String get profileChatOpenFailed =>
+      'No se pudo abrir un chat con este usuario.';
+
+  @override
+  String summaryLikeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count me gusta',
+      one: '1 me gusta',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String summaryLinkClicks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count clics',
+      one: '1 clic',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get directoryPeriodAllTime => 'Siempre';
+
+  @override
+  String get directoryPeriodYear => 'Año';
+
+  @override
+  String get directoryPeriodQuarter => 'Trimestre';
+
+  @override
+  String get directoryPeriodMonth => 'Mes';
+
+  @override
+  String get directoryPeriodWeek => 'Semana';
+
+  @override
+  String get directoryPeriodToday => 'Hoy';
+
+  @override
+  String get directoryOrderReceived => 'Recibidos';
+
+  @override
+  String get directoryOrderReplies => 'Respuestas';
+
+  @override
+  String get directoryOrderTopics => 'Temas';
+
+  @override
+  String get directoryOrderVisits => 'Visitas';
+
+  @override
+  String get directoryLoadFailed => 'No se pudo cargar el directorio.';
+
+  @override
+  String get directoryNoUsersMatch => 'Ningún usuario coincide con ese nombre.';
+
+  @override
+  String get directoryNoUsersForPeriod =>
+      'No se encontraron usuarios en este período.';
+
+  @override
+  String get userSearchNoResults => 'No se encontraron usuarios';
+
+  @override
+  String get userSearchTryDifferentUsername =>
+      'Prueba a buscar con otro nombre de usuario';
+
+  @override
+  String get userSearchPromptTitle => 'Buscar usuarios';
+
+  @override
+  String get userSearchPromptHint =>
+      'Introduce un nombre de usuario para encontrar e invitar usuarios';
+
+  @override
+  String get ignoredUsersUnignoreFailed => 'No se pudo dejar de ignorar.';
+
+  @override
+  String get ignoredUsersEmpty => 'No estás ignorando a nadie.';
+
+  @override
+  String get ignoredUsersEmptyHint =>
+      'Abre un perfil de usuario y usa «Ignorar usuario» en el menú para ocultar sus publicaciones y notificaciones.';
+
+  @override
+  String get badgesLoadFailed => 'No se pudieron cargar las medallas.';
+
+  @override
+  String get badgesEmpty => 'No hay medallas en este foro.';
+
+  @override
+  String get badgeTierGold => 'Oro';
+
+  @override
+  String get badgeTierSilver => 'Plata';
+
+  @override
+  String get badgeTierBronze => 'Bronce';
+
+  @override
+  String badgeEarnedAgo(String time) {
+    return 'Obtenida $time';
+  }
+
+  @override
+  String badgeEarnedByUsers(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Obtenida por $formatted usuarios',
+      one: 'Obtenida por $formatted usuario',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trustLevelNameNewUser => 'Usuario nuevo';
+
+  @override
+  String get trustLevelNameBasic => 'Usuario básico';
+
+  @override
+  String get trustLevelNameMember => 'Miembro';
+
+  @override
+  String get trustLevelNameRegular => 'Habitual';
+
+  @override
+  String get trustLevelNameLeader => 'Líder';
+
+  @override
+  String get trustLevelSummary0 =>
+      'Recién llegado. Puede leer y publicar, con límites en enlaces, imágenes y mensajes.';
+
+  @override
+  String get trustLevelSummary1 =>
+      'Desbloquea las funciones básicas de publicación: imágenes y adjuntos, más enlaces y denunciar publicaciones.';
+
+  @override
+  String get trustLevelSummary2 =>
+      'Puede enviar invitaciones, ignorar usuarios y editar sus propias publicaciones durante más tiempo.';
+
+  @override
+  String get trustLevelSummary3 =>
+      'Puede cambiar la categoría y el título de los temas, crear etiquetas, y sus denuncias de spam tienen más peso.';
+
+  @override
+  String get trustLevelSummary4 =>
+      'Otorgado por el equipo. Puede editar cualquier publicación y fijar, cerrar, dividir o combinar temas.';
+
+  @override
+  String trustLevelRowTitle(int level, String name) {
+    return 'NC$level · $name';
+  }
+
+  @override
+  String get profileNoUserSpecified => 'No se especificó ningún usuario';
+
+  @override
+  String get userTopicsLoadFailed => 'No se pudieron cargar los temas';
+
+  @override
+  String get userTopicsEmpty => 'Aún no ha creado temas.';
+
+  @override
+  String get userRecentPostsLoadFailed =>
+      'No se pudieron cargar las publicaciones recientes';
+
+  @override
+  String get activityUnknownTopic => 'Tema desconocido';
+
+  @override
+  String groupJoinedSnack(String group) {
+    return 'Te uniste a $group';
+  }
+
+  @override
+  String get groupJoinFailed => 'No se pudo unir al grupo';
+
+  @override
+  String groupLeftSnack(String group) {
+    return 'Saliste de $group';
+  }
+
+  @override
+  String get groupLeaveFailed => 'No se pudo salir del grupo';
+
+  @override
+  String get groupMembershipRequestHint =>
+      '¿Por qué quieres unirte? Los propietarios del grupo verán esto con tu solicitud.';
+
+  @override
+  String get groupMembershipReasonRequired =>
+      'Se necesita un motivo para solicitar unirse';
+
+  @override
+  String get groupMembershipRequestSent =>
+      'Solicitud enviada: un propietario del grupo debe aprobarla';
+
+  @override
+  String get groupMembershipRequestFailed =>
+      'No se pudo enviar la solicitud de membresía';
+
+  @override
+  String get groupMemberBadge => 'Miembro';
+
+  @override
+  String get groupRequestPending => 'Solicitud pendiente';
+
+  @override
+  String get groupJoining => 'Uniéndote…';
+
+  @override
+  String get groupJoinButton => 'Unirse al grupo';
+
+  @override
+  String get groupsLoadFailed => 'No se pudieron cargar los grupos.';
+
+  @override
+  String get groupBuiltIn => 'Grupo integrado';
+
+  @override
+  String invitesPendingWithCount(int count) {
+    return 'Pendientes ($count)';
+  }
+
+  @override
+  String invitesExpiredWithCount(int count) {
+    return 'Caducado ($count)';
+  }
+
+  @override
+  String invitesRedeemedWithCount(int count) {
+    return 'Canjeados ($count)';
+  }
+
+  @override
+  String get invitesLoadFailed => 'No se pudieron cargar las invitaciones.';
+
+  @override
+  String get inviteLinkCreateFailed =>
+      'No se pudo crear el enlace de invitación';
+
+  @override
+  String get inviteEmailAddressLabel => 'Correo electrónico';
+
+  @override
+  String get inviteEmailInvalid => 'Introduce un correo electrónico válido';
+
+  @override
+  String get inviteMessageOptionalLabel => 'Mensaje (opcional)';
+
+  @override
+  String get inviteSendFailed => 'No se pudo enviar la invitación';
+
+  @override
+  String get revokeInviteLinkWarning =>
+      'El enlace de invitación dejará de funcionar.';
+
+  @override
+  String revokeInviteEmailWarning(String email) {
+    return 'La invitación a $email dejará de funcionar.';
+  }
+
+  @override
+  String get inviteRevokeFailed => 'No se pudo revocar la invitación';
+
+  @override
+  String get inviteNoPermission => 'No tienes permiso para invitar';
+
+  @override
+  String get invitesEmptyPending => 'No hay invitaciones pendientes';
+
+  @override
+  String get invitesEmptyExpired => 'No hay invitaciones caducadas';
+
+  @override
+  String get invitesEmptyRedeemed => 'No hay invitaciones canjeadas';
+
+  @override
+  String get invitesEmptyPendingHint =>
+      'Crea un enlace de invitación para traer gente al foro.';
+
+  @override
+  String get inviteLinkFallbackTitle => 'Enlace de invitación';
+
+  @override
+  String inviteRedeemedOn(String date) {
+    return 'Aceptada el $date';
+  }
+
+  @override
+  String inviteRedemptions(int count, int max) {
+    return 'Canjeadas $count de $max';
+  }
+
+  @override
+  String get inviteEmailSent => 'Correo enviado';
+
+  @override
+  String get inviteEmailNotSent => 'Correo no enviado';
+
+  @override
+  String inviteExpiredOn(String date) {
+    return 'Caducó el $date';
+  }
+
+  @override
+  String get inviteRevokeTooltip => 'Revocar invitación';
+
+  @override
+  String get reviewStatusPending => 'Pendiente';
+
+  @override
+  String get reviewStatusApproved => 'Aprobado';
+
+  @override
+  String get reviewStatusRejected => 'Rechazado';
+
+  @override
+  String get reviewStatusAll => 'Todo';
+
+  @override
+  String get reviewStatusIgnored => 'Denuncia ignorada';
+
+  @override
+  String get reviewStatusDeleted => 'Tema o publicación eliminada';
+
+  @override
+  String get reviewQueueUnavailable =>
+      'La cola de revisión no está disponible en este foro.';
+
+  @override
+  String get reviewQueueLoadFailed => 'No se pudo cargar la cola de revisión';
+
+  @override
+  String get reviewableChangedByOther =>
+      'Otro moderador cambió este elemento. Actualizando…';
+
+  @override
+  String get reviewActionFailed => 'No se pudo realizar la acción';
+
+  @override
+  String reviewActionDone(String action) {
+    return '$action: hecho';
+  }
+
+  @override
+  String get reviewRejectReasonHint => '¿Por qué se rechaza?';
+
+  @override
+  String get reviewTypeFlaggedPost => 'Publicación denunciada';
+
+  @override
+  String get reviewTypeQueuedPost => 'Publicación en cola';
+
+  @override
+  String get reviewTypeQueuedTopic => 'Tema en cola';
+
+  @override
+  String get reviewTypeUser => 'Usuario';
+
+  @override
+  String get reviewTypePost => 'Publicación';
+
+  @override
+  String get reviewTypeChatMessage => 'Mensaje de chat denunciado';
+
+  @override
+  String get reviewModeratorAccessRequired => 'Se requiere acceso de moderador';
+
+  @override
+  String reviewableScore(String score) {
+    return 'Puntuación $score';
+  }
+
+  @override
+  String get postRepliesLoadFailed => 'No se pudieron cargar las respuestas.';
+
+  @override
+  String get postMakeWiki => 'Transformar en formato wiki';
+
+  @override
+  String get postRemoveWiki => 'Deshacer formato wiki';
+
+  @override
+  String get postBookmarkRemoveFailed => 'No se pudo quitar el marcador';
+
+  @override
+  String get postBookmarkFailed =>
+      'No se pudo guardar la publicación en marcadores';
+
+  @override
+  String get postBookmarkReminderUpdateFailed =>
+      'No se pudo actualizar el recordatorio';
+
+  @override
+  String get postBookmarkReminderSet => 'Recordatorio establecido';
+
+  @override
+  String get postBookmarkReminderCleared => 'Recordatorio borrado';
+
+  @override
+  String get solutionMarkFailed =>
+      'No se pudo marcar la respuesta como solución';
+
+  @override
+  String get solutionUnmarkFailed => 'No se pudo desmarcar la solución';
+
+  @override
+  String get postUnknownDate => 'Fecha desconocida';
+
+  @override
+  String get postBookmarkAction => 'Guardar publicación en marcadores';
+
+  @override
+  String postReactionsSemanticsReacted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Reaccionaste. $count reacciones. Toca para cambiarla, mantén pulsado para ver quién reaccionó.',
+      one:
+          'Reaccionaste. 1 reacción. Toca para cambiarla, mantén pulsado para ver quién reaccionó.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String postReactionsSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count reacciones. Toca para reaccionar, mantén pulsado para ver quién reaccionó.',
+      one:
+          '1 reacción. Toca para reaccionar, mantén pulsado para ver quién reaccionó.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get postLikeAction => 'Me gusta la publicación';
+
+  @override
+  String get postUnlikeAction => 'Deshacer me gusta';
+
+  @override
+  String get postVoteRemoveFailed =>
+      'No se pudo quitar el voto (¿se agotó el tiempo para deshacerlo?)';
+
+  @override
+  String get postVoteCastFailed => 'No se pudo votar';
+
+  @override
+  String get postUpvote => 'Votar a favor';
+
+  @override
+  String get postDownvote => 'Votar en contra';
+
+  @override
+  String get pollVoteFailed => 'No se pudo votar. Inténtalo de nuevo.';
+
+  @override
+  String get pollRemoveVoteFailed =>
+      'No se pudo quitar tu voto. Inténtalo de nuevo.';
+
+  @override
+  String get pollVotersLoadFailed => 'No se pudieron cargar los votantes.';
+
+  @override
+  String get pollVotersNotVisible =>
+      'Los votantes de esta encuesta no son visibles.';
+
+  @override
+  String solutionSolvedByInPost(String name, int postNumber) {
+    return 'Resuelto por $name en la publicación #$postNumber';
+  }
+
+  @override
+  String solutionMarkedBy(String name) {
+    return 'marcado por $name';
+  }
+
+  @override
+  String reactAgainInSeconds(int seconds) {
+    return 'Puedes volver a reaccionar a esta publicación en ${seconds}s';
+  }
+
+  @override
+  String get reactionUpdateFailed => 'No se pudo actualizar la reacción.';
+
+  @override
+  String get reactionsNotSupported => 'Este foro no admite reacciones.';
+
+  @override
+  String get reactionsLoadFailed => 'No se pudieron cargar las reacciones.';
+
+  @override
+  String viewProfileOfUser(String username) {
+    return 'Ver el perfil de $username';
+  }
+
+  @override
+  String get failedToSavePost => 'No se pudo guardar la publicación';
+
+  @override
+  String failedToSavePostWithError(String error) {
+    return 'No se pudo guardar la publicación: $error';
+  }
+
+  @override
+  String get failedToRemoveAttachmentCheckPermissions =>
+      'No se pudo quitar el adjunto. Comprueba tus permisos.';
+
+  @override
+  String get editPostTitle => 'Editar publicación';
+
+  @override
+  String get editYourPostHint => 'Edita tu publicación...';
+
+  @override
+  String get failedToPostReply => 'No se pudo publicar la respuesta';
+
+  @override
+  String failedToPostReplyWithError(String error) {
+    return 'No se pudo publicar la respuesta: $error';
+  }
+
+  @override
+  String get failedToCreateTopic => 'No se pudo crear el tema';
+
+  @override
+  String get writeYourTopicTitle => 'Escribe el título de tu tema...';
+
+  @override
+  String get writeYourTopicContent => 'Escribe el contenido de tu tema...';
+
+  @override
+  String get composerTitleHint => 'Escribe tu título...';
+
+  @override
+  String get composerContentHint => 'Escribe tu contenido...';
+
+  @override
+  String imageTooLargeCouldNotResize(
+      String fileName, String size, String limit) {
+    return '$fileName: demasiado grande ($size) y no se pudo reducir. El límite es $limit.';
+  }
+
+  @override
+  String imageResizedToFitLimit(
+      String fileName, String size, String dimensions, String limit) {
+    return '$fileName se redujo a $size$dimensions para ajustarse al límite de $limit.';
+  }
+
+  @override
+  String get composerAttachFileHint => 'Adjuntar un archivo a esta publicación';
+
+  @override
+  String get composerUploadImageHint => 'Subir una imagen a esta publicación';
+
+  @override
+  String get composerFormattingHint => 'Abrir opciones de formato';
+
+  @override
+  String get whisperStaffOnly => 'Susurrar (solo personal)';
+
+  @override
+  String get whisperOnStaffOnly => 'Susurro activado (solo personal)';
+
+  @override
+  String get tagInputMaxReached => 'Se alcanzó el máximo de etiquetas';
+
+  @override
+  String get tagInputAddTag => 'Añadir una etiqueta…';
+
+  @override
+  String get tagInputAddAnother => '+ etiqueta';
+
+  @override
+  String get editHistoryUnavailable =>
+      'El historial de ediciones no está disponible en este foro.';
+
+  @override
+  String get editHistoryLoadFailed =>
+      'No se pudo cargar el historial de ediciones.';
+
+  @override
+  String get previousRevision => 'Edición anterior';
+
+  @override
+  String get nextRevision => 'Siguiente edición';
+
+  @override
+  String get notificationPrefsLoadFailed =>
+      'No se pudieron cargar las preferencias de notificaciones.';
+
+  @override
+  String get notificationPrefsSaveFailed =>
+      'No se pudo guardar: comprueba tu conexión';
+
+  @override
+  String get signInToManageNotificationPrefs =>
+      'Inicia sesión para gestionar tus preferencias de notificaciones.';
+
+  @override
+  String get notificationSettingsPushSection => 'Push';
+
+  @override
+  String get notificationSettingsEmailSection => 'Correo electrónico';
+
+  @override
+  String get emailWhenAwayTitle => 'Correo cuando no estés';
+
+  @override
+  String get emailLevelDescription =>
+      'Enviadme un correo cuando alguien me cite, responda, mencione mi @nombre de usuario o cuando haya nueva actividad en las categorías, etiquetas o temas que vigile';
+
+  @override
+  String get notificationPrefAlways => 'Siempre';
+
+  @override
+  String get notificationPrefOnlyWhenAway => 'Solo cuando no esté en la página';
+
+  @override
+  String get notificationPrefNever => 'Nunca';
+
+  @override
+  String get emailForMessagesTitle => 'Correo por mensajes';
+
+  @override
+  String get emailMessagesLevelDescription =>
+      'Enviadme un correo cuando me manden un mensaje personal';
+
+  @override
+  String get activitySummaryTitle => 'Resumen de actividad';
+
+  @override
+  String get activitySummaryDescription =>
+      'Cuando no visite el sitio, enviarme un correo electrónico con un resumen de los temas y respuestas populares';
+
+  @override
+  String get activitySummaryFrequencyTitle =>
+      'Frecuencia del resumen de actividad';
+
+  @override
+  String get activitySummaryDaily => 'Diariamente';
+
+  @override
+  String get activitySummaryWeekly => 'Semanalmente';
+
+  @override
+  String get activitySummaryMonthly => 'Cada mes';
+
+  @override
+  String get mailingListModeTitle => 'Modo lista de correo';
+
+  @override
+  String get mailingListModeDescription =>
+      'Enviarme por correo cada publicación (desactiva el resumen de actividad). No recomendado en foros con mucho tráfico.';
+
+  @override
+  String get likeNotificationFrequencyTitle =>
+      'Notificar cuando me dan me gusta';
+
+  @override
+  String get likeNotificationFirstTimeAndDaily =>
+      'Cuando mi publicación reciba el primer me gusta y luego diariamente si recibe más';
+
+  @override
+  String get likeNotificationFirstTime =>
+      'Cuando mi publicación reciba el primer me gusta';
+
+  @override
+  String get whenPostingTitle => 'Al publicar';
+
+  @override
+  String get whenPostingDescription => 'Qué pasa con un tema al que respondes';
+
+  @override
+  String get whenPostingWatchTopic => 'Ver tema';
+
+  @override
+  String get whenPostingTrackTopic => 'Seguir tema';
+
+  @override
+  String get whenPostingDoNothing => 'No hacer nada';
+
+  @override
+  String get pauseNotificationsUntilTomorrow => 'Hasta mañana';
+
+  @override
+  String get couldNotEnableDoNotDisturb => 'No se pudo activar No molestar';
+
+  @override
+  String get couldNotTurnOffDoNotDisturb => 'No se pudo desactivar No molestar';
+
+  @override
+  String get passwordResetEmailSent =>
+      'Correo para restablecer la contraseña enviado.';
+
+  @override
+  String get couldNotSendResetEmail =>
+      'No se pudo enviar el correo de restablecimiento';
+
+  @override
+  String get accountRequestFailed => 'La solicitud falló.';
+
+  @override
+  String get forumUrlUnavailable => 'La URL del foro no está disponible.';
+
+  @override
+  String get couldNotOpenPreferencesPage =>
+      'No se pudo abrir la página de preferencias.';
+
+  @override
+  String get couldNotOpenForumUrl => 'No se pudo abrir la URL del foro.';
+
+  @override
+  String get couldNotRequestEmailChange =>
+      'No se pudo solicitar el cambio de correo';
+
+  @override
+  String get newEmailLabel => 'Correo electrónico nuevo';
+
+  @override
+  String get enterAnEmailAddress =>
+      'Introduce una dirección de correo electrónico';
+
+  @override
+  String get emailLooksInvalid => 'Eso no parece un correo electrónico';
+
+  @override
+  String get emailNoSpaces => 'Los correos no pueden contener espacios';
+
+  @override
+  String get allowNotificationsSheetTitle => 'Permitir notificaciones';
+
+  @override
+  String get notificationsGrantNoPayload =>
+      'La autorización no devolvió ninguna respuesta.';
+
+  @override
+  String get thisForumFallback => 'este foro';
+
+  @override
+  String signInToDomain(String domain) {
+    return 'Iniciar sesión en $domain';
+  }
+
+  @override
+  String get loginResultTitle => 'Resultado del inicio de sesión';
+
+  @override
+  String get invalidAuthenticationCode => 'Código de autenticación no válido';
+
+  @override
+  String get tfaVerificationError =>
+      'Se produjo un error durante la verificación. Inténtalo de nuevo.';
+
+  @override
+  String get passwordFieldLabel => 'Contraseña';
+
+  @override
+  String get somethingWentWrongTryAgain =>
+      'Algo salió mal. Inténtalo de nuevo.';
+
+  @override
+  String get unexpectedErrorTryAgain =>
+      'Se produjo un error inesperado. Inténtalo de nuevo.';
+
+  @override
+  String get errorNoInternetConnection =>
+      'Sin conexión a internet. Comprueba la configuración de red.';
+
+  @override
+  String get errorRequestTimedOut =>
+      'La solicitud tardó demasiado. Inténtalo de nuevo.';
+
+  @override
+  String get errorServerTryLater =>
+      'Se produjo un error del servidor. Inténtalo de nuevo más tarde.';
+
+  @override
+  String get errorInvalidCredentials =>
+      'Nombre de usuario o contraseña no válidos.';
+
+  @override
+  String get errorSessionExpired =>
+      'Tu sesión ha caducado. Vuelve a iniciar sesión.';
+
+  @override
+  String get errorAccountSuspended =>
+      'Tu cuenta ha sido suspendida. Contacta con el equipo del foro.';
+
+  @override
+  String get errorForumNotFound => 'Foro no encontrado.';
+
+  @override
+  String get errorForumAccessDenied =>
+      'No tienes permiso para acceder a este foro.';
+
+  @override
+  String get errorForumUnavailable =>
+      'El foro no está disponible en este momento. Inténtalo de nuevo más tarde.';
+
+  @override
+  String get errorDataNotFound => 'No se encontraron los datos solicitados.';
+
+  @override
+  String get errorDataCorrupted =>
+      'Los datos parecen estar dañados. Actualiza la página.';
+
+  @override
+  String get errorCacheLoadFailed =>
+      'No se pudieron cargar los datos en caché. Inténtalo de nuevo.';
+
+  @override
+  String errorInvalidField(String field) {
+    return 'Valor no válido para $field.';
+  }
+
+  @override
+  String errorFieldRequired(String field) {
+    return '$field es obligatorio.';
+  }
+
+  @override
+  String errorPermissionDeniedFor(String action) {
+    return 'No tienes permiso para: $action.';
+  }
+
+  @override
+  String errorFeatureNotAvailable(String feature) {
+    return '$feature no está disponible en este foro.';
+  }
+
+  @override
+  String get errorStorageFull =>
+      'El almacenamiento está lleno. Libera algo de espacio.';
+
+  @override
+  String get errorStorageAccessDenied =>
+      'Acceso al almacenamiento denegado. Revisa los permisos de la aplicación.';
+
+  @override
+  String get errorNetworkTryAgain =>
+      'Se produjo un error de red. Inténtalo de nuevo.';
+
+  @override
+  String get errorAuthenticationTryAgain =>
+      'Error de autenticación. Inténtalo de nuevo.';
+
+  @override
+  String get errorForumTryAgain =>
+      'Se produjo un error en el foro. Inténtalo de nuevo.';
+
+  @override
+  String get connectionErrorTitle => 'Error de conexión';
+
+  @override
+  String get authenticationErrorTitle => 'Error de autenticación';
+
+  @override
+  String get forumErrorTitle => 'Error del foro';
+
+  @override
+  String get permissionErrorTitle => 'Error de permisos';
 }

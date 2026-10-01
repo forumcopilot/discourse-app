@@ -234,7 +234,7 @@ class _MetaRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final metaColor = colorScheme.onSurfaceVariant;
     final style = textTheme.bodySmall?.copyWith(color: metaColor);
     const iconSize = DesignTokens.iconSizeS;
@@ -257,13 +257,12 @@ class _MetaRow extends StatelessWidget {
     final hasTime = topic.timestamp != DateTime.fromMillisecondsSinceEpoch(0);
     final String activity;
     if (topic.lastPosterName != null && topic.lastPostedAt != null) {
-      activity = l10n?.topicLastReplyBy(topic.lastPosterName!,
-              formatSmartDateTime(topic.lastPostedAt!, context)) ??
-          '${topic.lastPosterName} replied '
-              '${formatSmartDateTime(topic.lastPostedAt!, context)}';
+      activity = l10n.topicLastReplyBy(topic.lastPosterName!,
+          formatSmartDateTime(topic.lastPostedAt!, context));
     } else {
-      final author =
-          topic.authorName.isNotEmpty ? topic.authorName : 'Unknown';
+      final author = topic.authorName.isNotEmpty
+          ? topic.authorName
+          : l10n.topicAuthorUnknown;
       activity = hasTime
           ? '$author · ${formatSmartDateTime(topic.timestamp, context)}'
           : author;
@@ -273,23 +272,23 @@ class _MetaRow extends StatelessWidget {
     // A pinned-globally topic leads a category list (forum_topic_list);
     // Discourse calls it "Pinned Globally".
     final (IconData, String, Color)? badge = topicIcon != null
-        ? (topicIcon!, l10n?.topicStatusPinnedGloballyTitle ?? 'Pinned Globally', metaColor)
+        ? (topicIcon!, l10n.topicStatusPinnedGloballyTitle, metaColor)
         : topic.isSolved
-            ? (Icons.check_circle, l10n?.solved ?? 'Solved', ForumColors.of(context).success)
+            ? (Icons.check_circle, l10n.solved, ForumColors.of(context).success)
             : topic.isClosed
-                ? (Icons.lock_outlined, l10n?.closedLabel ?? 'Closed', metaColor)
+                ? (Icons.lock_outlined, l10n.closedLabel, metaColor)
                 : topic.isHot
-                    ? (Icons.local_fire_department, l10n?.hot ?? 'Hot', Colors.deepOrange.shade400)
+                    ? (Icons.local_fire_department, l10n.hot, Colors.deepOrange.shade400)
                     : topic.isPinned
-                        ? (Icons.push_pin_outlined, l10n?.pinned ?? 'Pinned', metaColor)
+                        ? (Icons.push_pin_outlined, l10n.pinned, metaColor)
                         : topic.hasPoll
-                            ? (Icons.poll_outlined, l10n?.poll ?? 'Poll', metaColor)
+                            ? (Icons.poll_outlined, l10n.poll, metaColor)
                             // The reader's level by Discourse's name for it;
                             // nothing when the list did not say which.
                             : notificationLevel == 3
-                                ? (Icons.notifications_active_outlined, l10n?.notificationLevelWatching ?? 'Watching', metaColor)
+                                ? (Icons.notifications_active_outlined, l10n.notificationLevelWatching, metaColor)
                                 : notificationLevel == 2
-                                    ? (Icons.notifications_outlined, l10n?.notificationLevelTracking ?? 'Tracking', metaColor)
+                                    ? (Icons.notifications_outlined, l10n.notificationLevelTracking, metaColor)
                                     : null;
 
     // The activity text gives way to the counts beside it, and both to the

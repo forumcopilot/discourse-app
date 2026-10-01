@@ -82,7 +82,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         if (!result.result) {
           _error = result.resultText?.isNotEmpty == true
               ? result.resultText
-              : 'Failed to load notification preferences.';
+              : AppLocalizations.of(context)!.notificationPrefsLoadFailed;
           return;
         }
         _prefs = result.prefs ?? FCNotificationPrefs();
@@ -114,7 +114,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         previous,
         result.resultText?.isNotEmpty == true
             ? result.resultText!
-            : "Couldn't save — check your connection",
+            : AppLocalizations.of(context)!.notificationPrefsSaveFailed,
       );
     } else {
       setState(() {
@@ -153,18 +153,19 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         onRetry: _load,
       );
     }
+    final l10n = AppLocalizations.of(context)!;
     final prefs = _prefs;
     if (prefs == null) {
-      return const EmptyStateView(
+      return EmptyStateView(
         icon: Icons.notifications_off_outlined,
-        message: 'Sign in to manage your notification preferences.',
+        message: l10n.signInToManageNotificationPrefs,
       );
     }
     return ListView(
       padding: EdgeInsets.only(bottom: DesignTokens.spacingXL),
       children: [
         if (_saving) const LinearProgressIndicator(minHeight: 2),
-        _Section(label: 'Push'),
+        _Section(label: l10n.notificationSettingsPushSection),
         // Two different mechanisms with different states: the notifications
         // grant (a backend polls the forum with a key the user approved) and
         // the relay (Discourse pushes to an allowlisted URL). Show the one
@@ -179,20 +180,19 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         // Only meaningful for a signed-in user; the tile manages its
         // own status fetch so the prefs load above stays untouched.
         if (_siteContext?.isLoggedIn ?? false) ...[
-          _Section(label: 'Do not disturb'),
+          _Section(label: l10n.doNotDisturb),
           DoNotDisturbTile(siteContext: _siteContext!),
           const Divider(height: 1),
         ],
-        _Section(label: 'Email'),
+        _Section(label: l10n.notificationSettingsEmailSection),
         _EnumTile(
-          title: 'Email when away',
-          subtitle: 'When to send emails about replies, mentions, '
-              'and other topic activity',
+          title: l10n.emailWhenAwayTitle,
+          subtitle: l10n.emailLevelDescription,
           value: prefs.emailLevel,
-          options: const [
-            _EnumOption(value: 0, label: 'Always'),
-            _EnumOption(value: 1, label: 'Only when away'),
-            _EnumOption(value: 2, label: 'Never'),
+          options: [
+            _EnumOption(value: 0, label: l10n.notificationPrefAlways),
+            _EnumOption(value: 1, label: l10n.notificationPrefOnlyWhenAway),
+            _EnumOption(value: 2, label: l10n.notificationPrefNever),
           ],
           onChanged: (v) => _save(
             prefs.copyWith(emailLevel: v),
@@ -200,13 +200,13 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           ),
         ),
         _EnumTile(
-          title: 'Email for messages',
-          subtitle: 'PMs are tracked separately from topic activity',
+          title: l10n.emailForMessagesTitle,
+          subtitle: l10n.emailMessagesLevelDescription,
           value: prefs.emailMessagesLevel,
-          options: const [
-            _EnumOption(value: 0, label: 'Always'),
-            _EnumOption(value: 1, label: 'Only when away'),
-            _EnumOption(value: 2, label: 'Never'),
+          options: [
+            _EnumOption(value: 0, label: l10n.notificationPrefAlways),
+            _EnumOption(value: 1, label: l10n.notificationPrefOnlyWhenAway),
+            _EnumOption(value: 2, label: l10n.notificationPrefNever),
           ],
           onChanged: (v) => _save(
             prefs.copyWith(emailMessagesLevel: v),
@@ -214,8 +214,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           ),
         ),
         _BoolTile(
-          title: 'Send activity digest',
-          subtitle: 'Periodic email summarising activity you missed',
+          title: l10n.activitySummaryTitle,
+          subtitle: l10n.activitySummaryDescription,
           value: prefs.emailDigests && !prefs.mailingListMode,
           enabled: !prefs.mailingListMode,
           onChanged: (v) => _save(
@@ -225,12 +225,12 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         ),
         if (prefs.emailDigests && !prefs.mailingListMode)
           _EnumTile(
-            title: 'Digest frequency',
+            title: l10n.activitySummaryFrequencyTitle,
             value: prefs.digestAfterMinutes,
-            options: const [
-              _EnumOption(value: 1440, label: 'Daily'),
-              _EnumOption(value: 10080, label: 'Weekly'),
-              _EnumOption(value: 43200, label: 'Monthly'),
+            options: [
+              _EnumOption(value: 1440, label: l10n.activitySummaryDaily),
+              _EnumOption(value: 10080, label: l10n.activitySummaryWeekly),
+              _EnumOption(value: 43200, label: l10n.activitySummaryMonthly),
             ],
             onChanged: (v) => _save(
               prefs.copyWith(digestAfterMinutes: v),
@@ -238,9 +238,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             ),
           ),
         _BoolTile(
-          title: 'Mailing list mode',
-          subtitle: 'Email me every post (disables digest). '
-              'Not recommended on high-traffic forums.',
+          title: l10n.mailingListModeTitle,
+          subtitle: l10n.mailingListModeDescription,
           value: prefs.mailingListMode,
           onChanged: (v) => _save(
             prefs.copyWith(mailingListMode: v),
@@ -248,15 +247,17 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           ),
         ),
         const Divider(height: 1),
-        _Section(label: 'Activity'),
+        _Section(label: l10n.activity),
         _EnumTile(
-          title: 'When someone likes my post',
+          // Discourse's words (user.like_notification_frequency).
+          title: l10n.likeNotificationFrequencyTitle,
           value: prefs.likeNotificationFrequency,
-          options: const [
-            _EnumOption(value: 0, label: 'Always notify'),
-            _EnumOption(value: 1, label: 'First time, then daily summary'),
-            _EnumOption(value: 2, label: 'First time only'),
-            _EnumOption(value: 3, label: 'Never'),
+          options: [
+            _EnumOption(value: 0, label: l10n.notificationPrefAlways),
+            _EnumOption(
+                value: 1, label: l10n.likeNotificationFirstTimeAndDaily),
+            _EnumOption(value: 2, label: l10n.likeNotificationFirstTime),
+            _EnumOption(value: 3, label: l10n.notificationPrefNever),
           ],
           onChanged: (v) => _save(
             prefs.copyWith(likeNotificationFrequency: v),
@@ -265,13 +266,13 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         ),
         _EnumTile(
           // Discourse's words (user.notification_level_when_replying).
-          title: 'When posting',
-          subtitle: 'What happens to a topic you reply to',
+          title: l10n.whenPostingTitle,
+          subtitle: l10n.whenPostingDescription,
           value: prefs.notificationLevelWhenReplying,
-          options: const [
-            _EnumOption(value: 3, label: 'Watch topic'),
-            _EnumOption(value: 2, label: 'Track topic'),
-            _EnumOption(value: 1, label: 'Do nothing'),
+          options: [
+            _EnumOption(value: 3, label: l10n.whenPostingWatchTopic),
+            _EnumOption(value: 2, label: l10n.whenPostingTrackTopic),
+            _EnumOption(value: 1, label: l10n.whenPostingDoNothing),
           ],
           onChanged: (v) => _save(
             prefs.copyWith(notificationLevelWhenReplying: v),
@@ -286,7 +287,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             DesignTokens.spacingS,
           ),
           child: Text(
-            AppLocalizations.of(context)!.perTopicNotificationLevelsNote,
+            l10n.perTopicNotificationLevelsNote,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -548,13 +549,14 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
   bool _busy = false;
   DateTime? _endsAt;
 
-  static const _durations = [
-    _DndDuration(value: '30', label: '30 minutes'),
-    _DndDuration(value: '60', label: '1 hour'),
-    _DndDuration(value: '480', label: '8 hours'),
-    _DndDuration(value: '1440', label: '24 hours'),
-    _DndDuration(value: 'tomorrow', label: 'Until tomorrow'),
-  ];
+  static List<_DndDuration> _durations(AppLocalizations l10n) => [
+        _DndDuration(value: '30', label: l10n.durationMinutes(30)),
+        _DndDuration(value: '60', label: l10n.durationHours(1)),
+        _DndDuration(value: '480', label: l10n.durationHours(8)),
+        _DndDuration(value: '1440', label: l10n.durationHours(24)),
+        _DndDuration(
+            value: 'tomorrow', label: l10n.pauseNotificationsUntilTomorrow),
+      ];
 
   bool get _isActive =>
       _endsAt != null && _endsAt!.isAfter(DateTime.now().toUtc());
@@ -602,7 +604,7 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
         SnackBar(
           content: Text(result.resultText.isNotEmpty
               ? result.resultText
-              : "Couldn't enable do not disturb"),
+              : AppLocalizations.of(context)!.couldNotEnableDoNotDisturb),
         ),
       );
     }
@@ -624,7 +626,7 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
         SnackBar(
           content: Text(result.resultText.isNotEmpty
               ? result.resultText
-              : "Couldn't turn off do not disturb"),
+              : AppLocalizations.of(context)!.couldNotTurnOffDoNotDisturb),
         ),
       );
     }
@@ -641,7 +643,7 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SheetTitle(AppLocalizations.of(context)!.pauseNotificationsFor),
-              ..._durations.map(
+              ..._durations(AppLocalizations.of(context)!).map(
                 (d) => ListTile(
                   title: Text(d.label),
                   onTap: () => Navigator.of(sheetContext).pop(d.value),

@@ -43,7 +43,7 @@ class TopicStatsBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     // Server's count first. Falls back to the posters-summary length only
     // when the payload did not report one — that list is capped, so it is
@@ -55,15 +55,15 @@ class TopicStatsBar extends StatelessWidget {
     final stats = <Widget>[
       if (topic.viewCount > 0)
         _stat(context, topic.viewCount,
-            l10n?.topicMapViews(topic.viewCount) ?? 'views'),
+            l10n.topicMapViews(topic.viewCount)),
       if (topic.likeCount > 0)
         _stat(context, topic.likeCount,
-            l10n?.topicMapLikes(topic.likeCount) ?? 'likes'),
+            l10n.topicMapLikes(topic.likeCount)),
       if (topic.linkCount > 0)
         _stat(context, topic.linkCount,
-            l10n?.topicMapLinks(topic.linkCount) ?? 'links'),
+            l10n.topicMapLinks(topic.linkCount)),
       if (userCount > 0)
-        _stat(context, userCount, l10n?.topicMapUsers(userCount) ?? 'users'),
+        _stat(context, userCount, l10n.topicMapUsers(userCount)),
     ];
     final faces = topic.participantIconUrls.length >= _minAvatars
         ? topic.participantIconUrls.take(_maxAvatars).toList()

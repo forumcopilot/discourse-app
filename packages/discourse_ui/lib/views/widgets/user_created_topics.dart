@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/generated/app_localizations.dart';
+import 'package:discourse_ui/l10n/app_l10n.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/views/post_page.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseUserProxy;
@@ -124,7 +125,8 @@ class _UserCreatedTopicsState extends State<UserCreatedTopics> {
   Future<void> _fetch() async {
     if (widget.userName == null && widget.userId == null) {
       setState(() {
-        _error = 'No user specified';
+        // Can run from initState, before the context may look anything up.
+        _error = appL10n().profileNoUserSpecified;
         _loading = false;
       });
       return;
@@ -155,7 +157,7 @@ class _UserCreatedTopicsState extends State<UserCreatedTopics> {
       if (!mounted) return;
       setState(() {
         _loading = false;
-        _error = 'Failed to load topics';
+        _error = AppLocalizations.of(context)!.userTopicsLoadFailed;
       });
     }
   }
@@ -176,9 +178,9 @@ class _UserCreatedTopicsState extends State<UserCreatedTopics> {
     }
     final topics = _topics ?? const [];
     if (topics.isEmpty) {
-      return const EmptyStateView(
+      return EmptyStateView(
         icon: Icons.topic_outlined,
-        message: 'No topics started yet.',
+        message: AppLocalizations.of(context)!.userTopicsEmpty,
       );
     }
     return Column(

@@ -331,8 +331,7 @@ class _PostListItemState extends State<PostListItem> {
     if (count <= 0) return null;
     // The one reply is the next post: already on screen.
     if (count == 1 && widget.replyDirectlyBelow) return null;
-    final l10n = AppLocalizations.of(context);
-    final label = l10n?.nReplies(count) ?? (count == 1 ? '1 reply' : '$count replies');
+    final label = AppLocalizations.of(context)!.nReplies(count);
 
     return Semantics(
       button: true,
@@ -488,7 +487,9 @@ class _PostListItemState extends State<PostListItem> {
       _isLoadingReplies = false;
       _repliesExpanded = true;
       _replies = replies;
-      _repliesError = replies == null ? "Couldn't load replies." : null;
+      _repliesError = replies == null
+          ? AppLocalizations.of(context)!.postRepliesLoadFailed
+          : null;
     });
   }
 
@@ -496,10 +497,10 @@ class _PostListItemState extends State<PostListItem> {
       BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
     final target = widget.post.replyToPostNumber!;
     final username = widget.post.replyToUsername;
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final label = username != null && username.isNotEmpty
-        ? (l10n?.inReplyToUser(username) ?? 'in reply to $username')
-        : (l10n?.inReplyToPost(target) ?? 'in reply to post #$target');
+        ? l10n.inReplyToUser(username)
+        : l10n.inReplyToPost(target);
     final color = colorScheme.onSurfaceVariant;
 
     return InkWell(
@@ -757,10 +758,8 @@ class _PostListItemState extends State<PostListItem> {
                   const SizedBox(width: DesignTokens.spacingXS),
                   Text(
                     widget.isTranslating && widget.translatedContent == null
-                        ? (AppLocalizations.of(context)?.translating ??
-                            'Translating...')
-                        : (AppLocalizations.of(context)?.translated ??
-                            'Translated'),
+                        ? AppLocalizations.of(context)!.translating
+                        : AppLocalizations.of(context)!.translated,
                     style: textTheme.labelMedium?.copyWith(
                       color: widget.isTranslating &&
                               widget.translatedContent == null
@@ -799,7 +798,7 @@ class _PostListItemState extends State<PostListItem> {
               actions: widget.actions,
               context: context,
               isInline: false,
-              title: AppLocalizations.of(context)?.attachments ?? 'Attachments',
+              title: AppLocalizations.of(context)!.attachments,
             ),
           ],
           if (data.inlineAttachments.isNotEmpty) ...[
@@ -991,15 +990,14 @@ class _PostListItemState extends State<PostListItem> {
     return PostActionButton(
       icon: Icons.reply_rounded,
       emphasized: true,
-      semanticLabel:
-          AppLocalizations.of(context)?.reply ?? 'Reply',
+      semanticLabel: AppLocalizations.of(context)!.reply,
       onTap: () {
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text(
-                AppLocalizations.of(context)?.replyOptions ?? 'Reply Options',
+                AppLocalizations.of(context)!.replyOptions,
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1008,7 +1006,7 @@ class _PostListItemState extends State<PostListItem> {
                     leading:
                         Icon(Icons.reply_rounded, color: colorScheme.primary),
                     title: Text(
-                      AppLocalizations.of(context)?.reply ?? 'Reply',
+                      AppLocalizations.of(context)!.reply,
                       style: textTheme.titleMedium?.copyWith(
                         color: colorScheme.onSurface,
                       ),
@@ -1022,8 +1020,7 @@ class _PostListItemState extends State<PostListItem> {
                     leading: Icon(Icons.format_quote_rounded,
                         color: colorScheme.primary),
                     title: Text(
-                      AppLocalizations.of(context)?.replyWithQuote ??
-                          'Reply with Quote',
+                      AppLocalizations.of(context)!.replyWithQuote,
                       style: textTheme.titleMedium?.copyWith(
                         color: colorScheme.onSurface,
                       ),
@@ -1119,7 +1116,7 @@ class _PostListItemState extends State<PostListItem> {
     // covers unmarking too — web gates its unaccept button the same way.
     if (widget.siteContext.isLoggedIn && widget.post.canAcceptAnswer) {
       final solved = widget.post.isSolution;
-      final l10n = AppLocalizations.of(context);
+      final l10n = AppLocalizations.of(context)!;
       items.add(
         PopupMenuItem<String>(
           value: solved ? 'unaccept_answer' : 'accept_answer',
@@ -1134,9 +1131,8 @@ class _PostListItemState extends State<PostListItem> {
               // and "Lösungsmarkierung entfernen" at a large text size is
               // wider than that.
               Flexible(
-                child: Text(solved
-                    ? (l10n?.unmarkAsSolution ?? 'Unmark as solution')
-                    : (l10n?.markAsSolution ?? 'Mark as solution')),
+                child: Text(
+                    solved ? l10n.unmarkAsSolution : l10n.markAsSolution),
               ),
             ],
           ),
@@ -1152,7 +1148,7 @@ class _PostListItemState extends State<PostListItem> {
               Icon(Icons.edit,
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: DesignTokens.spacingM),
-              Text(AppLocalizations.of(context)?.edit ?? 'Edit'),
+              Text(AppLocalizations.of(context)!.edit),
             ],
           ),
         ),
@@ -1167,7 +1163,7 @@ class _PostListItemState extends State<PostListItem> {
               Icon(Icons.delete,
                   color: Theme.of(context).colorScheme.error),
               const SizedBox(width: DesignTokens.spacingM),
-              Text(AppLocalizations.of(context)?.delete ?? 'Delete'),
+              Text(AppLocalizations.of(context)!.delete),
             ],
           ),
         ),
@@ -1203,7 +1199,9 @@ class _PostListItemState extends State<PostListItem> {
               Icon(isWiki ? Icons.edit_off : Icons.edit_note,
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: DesignTokens.spacingM),
-              Text(isWiki ? 'Remove wiki' : 'Make wiki'),
+              Text(isWiki
+                  ? AppLocalizations.of(context)!.postRemoveWiki
+                  : AppLocalizations.of(context)!.postMakeWiki),
             ],
           ),
         ),
@@ -1358,8 +1356,8 @@ class _PostListItemState extends State<PostListItem> {
           content: Text(errText?.isNotEmpty == true
               ? errText!
               : (wasBookmarked
-                  ? 'Failed to remove bookmark'
-                  : 'Failed to bookmark post')),
+                  ? AppLocalizations.of(context)!.postBookmarkRemoveFailed
+                  : AppLocalizations.of(context)!.postBookmarkFailed)),
         ),
       );
     }
@@ -1464,7 +1462,7 @@ class _PostListItemState extends State<PostListItem> {
         SnackBar(
           content: Text(errText?.isNotEmpty == true
               ? errText!
-              : 'Failed to bookmark post'),
+              : AppLocalizations.of(context)!.postBookmarkFailed),
         ),
       );
     }
@@ -1487,7 +1485,7 @@ class _PostListItemState extends State<PostListItem> {
     }
     final choice = await BookmarkReminderSheet.show(
       context,
-      title: 'Edit reminder',
+      title: AppLocalizations.of(context)!.editReminder,
       currentReminderAt: entry.reminderAt,
     );
     if (choice == null || !mounted) return;
@@ -1505,15 +1503,15 @@ class _PostListItemState extends State<PostListItem> {
         SnackBar(
           content: Text(result.resultText?.isNotEmpty == true
               ? result.resultText!
-              : 'Failed to update reminder'),
+              : AppLocalizations.of(context)!.postBookmarkReminderUpdateFailed),
         ),
       );
     } else {
       messenger.showSnackBar(
         SnackBar(
           content: Text(choice.reminderAt != null
-              ? 'Reminder set'
-              : 'Reminder cleared'),
+              ? AppLocalizations.of(context)!.postBookmarkReminderSet
+              : AppLocalizations.of(context)!.postBookmarkReminderCleared),
         ),
       );
     }
@@ -1581,8 +1579,8 @@ class _PostListItemState extends State<PostListItem> {
               result.resultText?.isNotEmpty == true
                   ? result.resultText!
                   : (wasSolution
-                      ? 'Failed to unmark answer'
-                      : 'Failed to mark answer'),
+                      ? AppLocalizations.of(context)!.solutionUnmarkFailed
+                      : AppLocalizations.of(context)!.solutionMarkFailed),
             ),
           ),
         );

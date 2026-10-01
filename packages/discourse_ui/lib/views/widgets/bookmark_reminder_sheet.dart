@@ -22,7 +22,7 @@ class BookmarkReminderSheet {
 
   static Future<BookmarkReminderChoice?> show(
     BuildContext context, {
-    String title = 'Bookmark with reminder',
+    String? title,
     DateTime? currentReminderAt,
   }) {
     return showModalBottomSheet<BookmarkReminderChoice>(
@@ -57,11 +57,12 @@ class BookmarkReminderSheet {
 }
 
 class _BookmarkReminderSheetBody extends StatelessWidget {
-  final String title;
+  /// "Bookmark with reminder" when null.
+  final String? title;
   final DateTime? currentReminderAt;
 
   const _BookmarkReminderSheetBody({
-    required this.title,
+    this.title,
     this.currentReminderAt,
   });
 
@@ -129,7 +130,10 @@ class _BookmarkReminderSheetBody extends StatelessWidget {
                 Icon(Icons.alarm, color: colorScheme.primary),
                 const SizedBox(width: DesignTokens.spacingS),
                 Expanded(
-                  child: Text(title, style: textTheme.titleMedium),
+                  child: Text(
+                      title ??
+                          AppLocalizations.of(context)!.bookmarkWithReminder,
+                      style: textTheme.titleMedium),
                 ),
                 if (currentReminderAt != null)
                   Text(
@@ -167,7 +171,9 @@ class _BookmarkReminderSheetBody extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.alarm_off, color: colorScheme.onSurfaceVariant),
             title: Text(
-              currentReminderAt != null ? 'Clear reminder' : 'No reminder',
+              currentReminderAt != null
+                  ? AppLocalizations.of(context)!.clearReminder
+                  : AppLocalizations.of(context)!.noReminder,
             ),
             onTap: () => _pick(context, null),
           ),

@@ -304,7 +304,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
                 setState(() {
                   _waitingForInitialization = false;
                 });
-                _showErrorAndGoBack(currentSite, 'Connection timed out. The site may be down or unreachable.');
+                _showErrorAndGoBack(currentSite, AppLocalizations.of(context)!.connectionTimedOutSiteUnreachable);
               }
             } catch (e) {
               AppLogger.error('🏁 [SITE_HOME] ❌ Site verification failed: $e - site may be down');
@@ -691,7 +691,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
         SnackBar(
           content: Text(result.resultText?.isNotEmpty == true
               ? result.resultText!
-              : 'Failed to mark notifications as read'),
+              : AppLocalizations.of(context)!.failedToMarkNotificationsRead),
         ),
       );
     }
@@ -724,12 +724,22 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
   int _getTabIndex(String tabType) => _enabledTabs.indexOf(tabType);
   bool _isCurrentTab(String tabType) => _tabController.index == _getTabIndex(tabType);
 
+  /// Stands in for the forum while it is being opened: its name is the
+  /// word for loading.
+  SiteContext _loadingSiteContext() => SiteContext(
+      siteType: 'none',
+      site: Site(
+          name: AppLocalizations.of(context)!.loading,
+          url: '',
+          description: '',
+          siteType: 'none'));
+
   // Build the appropriate app bar for the current tab. Home has none: its
   // header is the forum's own, inside the tab's scroll view.
   PreferredSizeWidget? _buildAppBarForCurrentTab(bool isLoggedIn, bool canSendPM) {
     if (_siteContext == null) {
       return ForumAppBar(
-        siteContext: SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
+        siteContext: _loadingSiteContext(),
         isLoggedIn: false,
       );
     }
@@ -802,7 +812,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
       // The DiscourseGlobalLoaderController will show the loading overlay
       return Scaffold(
         appBar: TopicsTabAppBar(
-          siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
+          siteContext: _siteContext ?? _loadingSiteContext(),
           isLoggedIn: false, // Not logged in during initialization
         ),
         body: const SizedBox.shrink(), // Empty body, loading overlay will show
@@ -829,7 +839,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
       // Return minimal error state while navigating back
       return Scaffold(
         appBar: AppBar(
-          title: Text(AppLocalizations.of(context)?.errorTitle ?? 'Error'),
+          title: Text(AppLocalizations.of(context)!.errorTitle),
         ),
         body: const Center(
           child: CircularProgressIndicator(),
@@ -975,31 +985,31 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           return TopicListTab(
               key: _topicListKey,
               isActive: _isCurrentTab(_topicsTab),
-              siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
+              siteContext: _siteContext ?? _loadingSiteContext(),
               boardStats: _boardStats);
         case _chatTab:
           return ChatChannelListPage(
             key: _chatListKey,
-            siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
+            siteContext: _siteContext ?? _loadingSiteContext(),
             embedded: true,
           );
         case _messagesTab:
           return PrivateMessageListTab(
               key: _pmListKey,
               isActive: _isCurrentTab(_messagesTab),
-              siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')));
+              siteContext: _siteContext ?? _loadingSiteContext());
         case _notificationsTab:
           return NotificationListTab(
               key: _notificationTabKey,
               isActive: _isCurrentTab(_notificationsTab),
-              siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')));
+              siteContext: _siteContext ?? _loadingSiteContext());
         case _profileTab:
           return ProfileTab(
             key: _profileTabKey,
             isActive: _isCurrentTab(_profileTab),
             autoShowLogin: SiteHomePage.triggerProfileAutoLogin,
             boardStats: _boardStats,
-            siteContext: _siteContext ?? SiteContext(siteType: 'none', site: Site(name: 'Loading...', url: '', description: '', siteType: 'none')),
+            siteContext: _siteContext ?? _loadingSiteContext(),
           );
         default:
           throw ArgumentError('Unknown tab type: $tabType');

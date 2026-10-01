@@ -372,8 +372,8 @@ class UnreadTopicsListState extends FCStatefulWidget<UnreadTopicsList> with FCLi
       if (errorMessage.contains('not logged in') || errorMessage.contains('do not have permission') || errorMessage.contains('permission to do this action')) {
         return NotSignedInView(
           siteContext: widget.siteContext,
-          title: AppLocalizations.of(context)?.signInToViewUnreadTopics ?? 'Sign in to view unread topics',
-          message: 'You need to be signed in to view topics your unread topics.',
+          title: AppLocalizations.of(context)!.signInToViewUnreadTopics,
+          message: AppLocalizations.of(context)!.youNeedToBeSignedInToViewUnreadTopics,
           icon: Icons.lock_outline_rounded,
         );
       }

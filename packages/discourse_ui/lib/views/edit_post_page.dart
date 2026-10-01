@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'widgets/empty_state_view.dart';
 import '../utils/error_message.dart';
 import '../services/attachment_upload_service.dart';
+import '../l10n/generated/app_localizations.dart';
 
 class EditPostPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -73,6 +74,7 @@ class _EditPostPageState extends State<EditPostPage> {
   }
 
   Future<bool> _handleSubmit(String title, String content) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       var postProxy = SiteProxyFactory.getPostProxy();
 
@@ -106,24 +108,23 @@ class _EditPostPageState extends State<EditPostPage> {
         if (errorMessage != null && errorMessage.isNotEmpty) {
           throw Exception(errorMessage);
         } else {
-          throw Exception('Failed to save post');
+          throw Exception(l10n.failedToSavePost);
         }
       }
     } catch (e) {
-      // Only wrap if it's not already a clean server error message
-      // Check if the exception message doesn't start with "Failed to save post"
+      // A plain Exception already carries a clean message (the server's,
+      // or the one above): re-throw it as-is. Wrap anything else.
       final message = e.toString();
-      if (message.startsWith('Exception: ') && !message.contains('Failed to save post')) {
-        // This is already a clean server message, re-throw as-is
+      if (message.startsWith('Exception: ')) {
         rethrow;
       } else {
-        // Wrap other exceptions
-        throw Exception('Failed to save post: ${e.toString()}');
+        throw Exception(l10n.failedToSavePostWithError(e.toString()));
       }
     }
   }
 
   Future<bool> _handleRemoveExistingAttachment(String attachmentId) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       var attachmentProxy = SiteProxyFactory.getAttachmentProxy();
       var forumId = _forumId ?? "";
@@ -154,7 +155,7 @@ class _EditPostPageState extends State<EditPostPage> {
         if (errorMessage != null && errorMessage.isNotEmpty) {
           throw Exception(errorMessage);
         } else {
-          throw Exception('Failed to remove attachment. Please check your permissions.');
+          throw Exception(l10n.failedToRemoveAttachmentCheckPermissions);
         }
       }
     } catch (e) {
@@ -266,14 +267,14 @@ class _EditPostPageState extends State<EditPostPage> {
         // Loading and failure keep the app bar, so there is always a way back.
         if (isLoading) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Edit Post')),
+            appBar: AppBar(title: Text(AppLocalizations.of(context)!.editPostTitle)),
             body: const Center(child: CircularProgressIndicator()),
           );
         }
 
         if (hasError) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Edit Post')),
+            appBar: AppBar(title: Text(AppLocalizations.of(context)!.editPostTitle)),
             body: EmptyStateView.error(
               message: describeError(snapshot.error, context: context),
               onRetry: _retryLoad,
@@ -286,12 +287,12 @@ class _EditPostPageState extends State<EditPostPage> {
         Widget compose = MessageComposePage(
           key: const ValueKey('edit_post_compose'),
           siteContext: widget.siteContext,
-          title: 'Edit Post',
+          title: AppLocalizations.of(context)!.editPostTitle,
           showTitleField: canEditTitle, // Only show title field if user can edit it
           requireTitle: false, // Allow empty titles for post editing
           titleController: _titleController,
           contentController: _contentController,
-          contentHint: 'Edit your post...',
+          contentHint: AppLocalizations.of(context)!.editYourPostHint,
           autoFocusContent: false, // Don't auto-focus any field when editing
           onSubmit: _handleSubmit,
           isEdit: true,

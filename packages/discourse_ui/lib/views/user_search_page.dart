@@ -170,7 +170,7 @@ class _UserSearchPageState extends State<UserSearchPage> {
             child: SearchTextField(
               controller: _searchController,
               focusNode: _searchFocusNode,
-              hintText: AppLocalizations.of(context)?.searchUsers ?? 'Search users...',
+              hintText: AppLocalizations.of(context)!.searchUsers,
               onSearch: _handleSearch,
               autoSearch: true,
               onClear: _handleClear,
@@ -188,7 +188,7 @@ class _UserSearchPageState extends State<UserSearchPage> {
     if (_error != null) {
       return EmptyStateView.error(
         icon: Icons.error_outline_rounded,
-        message: AppLocalizations.of(context)?.searchFailed ?? 'Search failed',
+        message: AppLocalizations.of(context)!.searchFailed,
         hint: describeError(_error, context: context),
         onRetry: () => _searchUsers(reset: true),
       );
@@ -201,18 +201,18 @@ class _UserSearchPageState extends State<UserSearchPage> {
     }
 
     if (_users.isEmpty && _hasSearched) {
-      return const EmptyStateView(
+      return EmptyStateView(
         icon: Icons.search_off_rounded,
-        message: 'No users found',
-        hint: 'Try searching with a different username',
+        message: AppLocalizations.of(context)!.userSearchNoResults,
+        hint: AppLocalizations.of(context)!.userSearchTryDifferentUsername,
       );
     }
 
     if (_users.isEmpty && !_hasSearched) {
-      return const EmptyStateView(
+      return EmptyStateView(
         icon: Icons.person_search_rounded,
-        message: 'Search for users',
-        hint: 'Enter a username to find and invite users',
+        message: AppLocalizations.of(context)!.userSearchPromptTitle,
+        hint: AppLocalizations.of(context)!.userSearchPromptHint,
       );
     }
 

@@ -168,7 +168,7 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab>
         setState(() {
           _userInfoError = (info.resultText?.isNotEmpty ?? false)
               ? info.resultText
-              : 'Could not load your profile.';
+              : AppLocalizations.of(context)!.profileLoadFailed;
         });
         _hasLoaded = false;
         return;

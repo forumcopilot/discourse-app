@@ -69,7 +69,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)?.titleCannotBeEmpty ?? 'Title cannot be empty'),
+            content: Text(AppLocalizations.of(context)!.titleCannotBeEmpty),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -99,7 +99,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(errorMessage ?? AppLocalizations.of(context)?.failedToSaveConversation ?? 'Failed to save message'),
+              content: Text(errorMessage ?? AppLocalizations.of(context)!.failedToSaveConversation),
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
@@ -110,7 +110,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)?.conversationUpdatedSuccessfully ?? 'Message updated successfully'),
+            content: Text(AppLocalizations.of(context)!.conversationUpdatedSuccessfully),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
@@ -189,7 +189,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text(AppLocalizations.of(context)?.goBack ?? 'Go Back'),
+                  child: Text(AppLocalizations.of(context)!.goBack),
                 ),
               ],
             );
@@ -199,13 +199,14 @@ class _EditConversationPageState extends State<EditConversationPage> {
             return EmptyStateView(
               icon: Icons.error_outline,
               message: AppLocalizations.of(context)!.cannotEditThisConversation,
-              hint: snapshot.data?.resultText ?? 'Unknown error',
+              hint: snapshot.data?.resultText ??
+                  AppLocalizations.of(context)!.unknownErrorFallback,
               actions: [
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text(AppLocalizations.of(context)?.goBack ?? 'Go Back'),
+                  child: Text(AppLocalizations.of(context)!.goBack),
                 ),
               ],
             );
@@ -240,7 +241,7 @@ class _EditConversationPageState extends State<EditConversationPage> {
                   controller: _titleController,
                   decoration: InputDecoration(
                     labelText: AppLocalizations.of(context)!.title,
-                    hintText: AppLocalizations.of(context)?.enterConversationTitle ?? 'Enter message title',
+                    hintText: AppLocalizations.of(context)!.enterConversationTitle,
                   ),
                   textInputAction: TextInputAction.next,
                 ),

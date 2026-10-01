@@ -14,6 +14,7 @@ import '../widgets/empty_state_view.dart';
 import '../widgets/resettable_widget.dart';
 import '../../utils/error_message.dart';
 import '../widgets/topic_list_skeleton.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Discourse Top periods. Matches the URL fragments
 /// `/top/{period}.json` accepts. `all` collapses to plain `/top.json`.
@@ -21,20 +22,23 @@ enum TopPeriod { all, yearly, quarterly, monthly, weekly, daily }
 
 extension on TopPeriod {
   String get apiName => name;
-  String get label {
+
+  /// The chip's name, as Discourse's period picker words it
+  /// (`js.filters.top.all_time`, `this_year`, …).
+  String label(AppLocalizations l10n) {
     switch (this) {
       case TopPeriod.all:
-        return 'All';
+        return l10n.topPeriodAllTime;
       case TopPeriod.yearly:
-        return 'Year';
+        return l10n.topPeriodYear;
       case TopPeriod.quarterly:
-        return 'Quarter';
+        return l10n.topPeriodQuarter;
       case TopPeriod.monthly:
-        return 'Month';
+        return l10n.topPeriodMonth;
       case TopPeriod.weekly:
-        return 'Week';
+        return l10n.topPeriodWeek;
       case TopPeriod.daily:
-        return 'Today';
+        return l10n.topPeriodToday;
     }
   }
 }
@@ -192,7 +196,8 @@ class TopTopicsListState extends FCStatefulWidget<TopTopicsList>
     // Hot / New chips directly above them.
     return FilterChipBar(
       options: [
-        for (final p in TopPeriod.values) FilterChipOption(label: p.label),
+        for (final p in TopPeriod.values)
+          FilterChipOption(label: p.label(AppLocalizations.of(context)!)),
       ],
       selectedIndex: TopPeriod.values.indexOf(_period),
       onSelected: (i) => _switchPeriod(TopPeriod.values[i]),
@@ -249,7 +254,7 @@ class TopTopicsListState extends FCStatefulWidget<TopTopicsList>
     }
     return EmptyStateView(
       icon: Icons.local_fire_department_outlined,
-      message: 'No top topics in the ${_period.label.toLowerCase()} period.',
+      message: AppLocalizations.of(context)!.noTopTopicsForPeriod(_period.apiName),
     );
   }
 

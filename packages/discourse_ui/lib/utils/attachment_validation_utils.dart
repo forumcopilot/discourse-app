@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
 import 'file_utils.dart';
+import '../l10n/app_l10n.dart';
 
 /// Result of file validation
 class AttachmentValidationResult {
@@ -45,7 +46,7 @@ Future<AttachmentValidationResult> validateFile(
     if (currentAttachmentCount >= constraints.count!) {
       return AttachmentValidationResult(
         isValid: false,
-        errorMessage: 'Maximum of ${constraints.count!} attachment(s) allowed per post/message',
+        errorMessage: appL10n().maximumAttachmentsAllowed(constraints.count!),
         currentSize: await file.length(),
       );
     }
@@ -67,7 +68,8 @@ Future<AttachmentValidationResult> validateFile(
           // Cannot convert - JPG not allowed
           return AttachmentValidationResult(
             isValid: false,
-            errorMessage: 'File type .$extension is not allowed. Allowed types: ${constraints.extensions!.join(', ')}',
+            errorMessage: appL10n().attachmentTypeNotAllowed(
+                extension, constraints.extensions!.join(', ')),
             currentSize: await file.length(),
           );
         }
@@ -75,7 +77,8 @@ Future<AttachmentValidationResult> validateFile(
         // Non-image file with unsupported extension - cannot convert
         return AttachmentValidationResult(
           isValid: false,
-          errorMessage: 'File type .$extension is not allowed. Allowed types: ${constraints.extensions!.join(', ')}',
+          errorMessage: appL10n().attachmentTypeNotAllowed(
+              extension, constraints.extensions!.join(', ')),
           currentSize: await file.length(),
         );
       }
@@ -94,7 +97,8 @@ Future<AttachmentValidationResult> validateFile(
         // Non-images cannot be optimized
         return AttachmentValidationResult(
           isValid: false,
-          errorMessage: 'File size (${formatFileSize(fileSize)}) exceeds maximum of ${formatFileSize(constraints.size!)})',
+          errorMessage: appL10n().attachmentFileTooLarge(
+              formatFileSize(fileSize), formatFileSize(constraints.size!)),
           currentSize: fileSize,
         );
       }

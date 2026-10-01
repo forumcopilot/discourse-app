@@ -10,6 +10,7 @@ import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
 import 'widgets/section_header.dart';
 import 'widgets/remote_circle_avatar.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Phase 5.18c-3 — Badges directory, third drawer destination under
 /// **Community**. Lists every visible badge on the forum, grouped
@@ -58,7 +59,7 @@ class _BadgesDirectoryPageState extends State<BadgesDirectoryPage> {
           _badges = const [];
           _error = result.resultText?.isNotEmpty == true
               ? result.resultText
-              : 'Failed to load badges.';
+              : AppLocalizations.of(context)!.badgesLoadFailed;
         }
         _loading = false;
       });
@@ -74,7 +75,7 @@ class _BadgesDirectoryPageState extends State<BadgesDirectoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleListAppBar(title: 'Badges'),
+      appBar: SimpleListAppBar(title: AppLocalizations.of(context)!.badges),
       body: _buildBody(),
     );
   }
@@ -90,9 +91,9 @@ class _BadgesDirectoryPageState extends State<BadgesDirectoryPage> {
       );
     }
     if (_badges.isEmpty) {
-      return const EmptyStateView(
+      return EmptyStateView(
         icon: Icons.emoji_events_outlined,
-        message: 'No badges on this forum.',
+        message: AppLocalizations.of(context)!.badgesEmpty,
       );
     }
     // Group by tier — gold/silver/bronze sections. Within each
@@ -108,15 +109,17 @@ class _BadgesDirectoryPageState extends State<BadgesDirectoryPage> {
         .where((b) => b.tier == FCBadgeTier.bronze)
         .toList(growable: false);
 
+    final l10n = AppLocalizations.of(context)!;
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView(
         children: [
-          if (gold.isNotEmpty) _BadgeSection(label: 'Gold', badges: gold),
+          if (gold.isNotEmpty)
+            _BadgeSection(label: l10n.badgeTierGold, badges: gold),
           if (silver.isNotEmpty)
-            _BadgeSection(label: 'Silver', badges: silver),
+            _BadgeSection(label: l10n.badgeTierSilver, badges: silver),
           if (bronze.isNotEmpty)
-            _BadgeSection(label: 'Bronze', badges: bronze),
+            _BadgeSection(label: l10n.badgeTierBronze, badges: bronze),
         ],
       ),
     );

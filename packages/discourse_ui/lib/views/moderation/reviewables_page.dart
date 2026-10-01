@@ -14,6 +14,7 @@ import '../post_page.dart';
 import '../widgets/empty_state_view.dart';
 import '../../utils/error_message.dart';
 import '../../l10n/generated/app_localizations.dart';
+import 'package:discourse_ui/l10n/app_l10n.dart';
 
 /// Discourse-native moderator review queue (`/review.json`). Staff (and
 /// reviewer-group members) see flagged posts, queued posts, and queued
@@ -36,12 +37,13 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
   // reviewables_controller.rb).
   static const int _pageSize = 10;
 
-  static const List<(String, String)> _statusFilters = [
-    ('pending', 'Pending'),
-    ('approved', 'Approved'),
-    ('rejected', 'Rejected'),
-    ('all', 'All'),
-  ];
+  /// Discourse's review status filters, named as on its review page.
+  static List<(String, String)> _statusFilters(AppLocalizations l10n) => [
+        ('pending', l10n.reviewStatusPending),
+        ('approved', l10n.reviewStatusApproved),
+        ('rejected', l10n.reviewStatusRejected),
+        ('all', l10n.reviewStatusAll),
+      ];
 
   final List<DiscourseReviewable> _reviewables = [];
   final ScrollController _scrollController = ScrollController();
@@ -101,7 +103,8 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
     final proxy = _moderationProxy;
     if (proxy == null) {
       setState(() {
-        _error = 'Review queue is not available on this forum.';
+        // Runs from initState too, before the context may look anything up.
+        _error = appL10n().reviewQueueUnavailable;
         _hasMore = false;
       });
       return;
@@ -114,7 +117,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
       setState(() {
         _error = result.resultText.trim().isNotEmpty
             ? result.resultText.trim()
-            : 'Failed to load review queue';
+            : AppLocalizations.of(context)!.reviewQueueLoadFailed;
         _isLoading = false;
         _hasMore = false;
       });
@@ -186,8 +189,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
 
     if (result.conflict) {
       // Another moderator acted first — the queue row is stale, re-fetch.
-      _showSnackBar(
-          'This item was changed by another moderator. Refreshing…',
+      _showSnackBar(AppLocalizations.of(context)!.reviewableChangedByOther,
           isError: true);
       await _load(reset: true);
       return;
@@ -196,7 +198,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
       _showSnackBar(
         result.resultText.trim().isNotEmpty
             ? result.resultText.trim()
-            : 'Failed to perform action',
+            : AppLocalizations.of(context)!.reviewActionFailed,
         isError: true,
       );
       return;
@@ -210,7 +212,8 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
     });
     _showSnackBar(action.completedMessage?.trim().isNotEmpty == true
         ? action.completedMessage!.trim()
-        : '${action.label ?? action.id} — done');
+        : AppLocalizations.of(context)!
+            .reviewActionDone(action.label ?? action.id));
   }
 
   Future<bool?> _confirm(DiscourseReviewableAction action) {
@@ -251,10 +254,10 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
             ],
             TextField(
               controller: controller,
-              decoration: const InputDecoration(
-                labelText: 'Reason',
-                hintText: 'Why is this being rejected?',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.reason,
+                hintText: AppLocalizations.of(context)!.reviewRejectReasonHint,
+                border: const OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
@@ -289,8 +292,27 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
     );
   }
 
-  /// `ReviewableFlaggedPost` → `Flagged Post`, etc.
-  String _readableType(String type) {
+  /// The item's kind as Discourse's review queue names it — a queued post
+  /// with no topic yet is a queued topic, as there. A type from a plugin
+  /// the app doesn't know is spelled out from its class name
+  /// (`ReviewableFooBar` → `Foo Bar`).
+  String _readableType(DiscourseReviewable reviewable) {
+    final l10n = AppLocalizations.of(context)!;
+    final type = reviewable.type;
+    switch (type) {
+      case 'ReviewableFlaggedPost':
+        return l10n.reviewTypeFlaggedPost;
+      case 'ReviewableQueuedPost':
+        return reviewable.topicId == null
+            ? l10n.reviewTypeQueuedTopic
+            : l10n.reviewTypeQueuedPost;
+      case 'ReviewableUser':
+        return l10n.reviewTypeUser;
+      case 'ReviewablePost':
+        return l10n.reviewTypePost;
+      case 'ReviewableChatMessage':
+        return l10n.reviewTypeChatMessage;
+    }
     final stripped = type.startsWith('Reviewable')
         ? type.substring('Reviewable'.length)
         : type;
@@ -339,7 +361,8 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
       ),
       child: Row(
         children: [
-          for (final (value, label) in _statusFilters) ...[
+          for (final (value, label)
+              in _statusFilters(AppLocalizations.of(context)!)) ...[
             FilterChip(
               label: Text(label),
               selected: _status == value,
@@ -378,7 +401,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
       if (_looksLikeAccessDenied(_error!)) {
         return EmptyStateView.scrollable(
           icon: Icons.shield_outlined,
-          message: 'Moderator access required',
+          message: AppLocalizations.of(context)!.reviewModeratorAccessRequired,
           hint: AppLocalizations.of(context)!.reviewQueueStaffOnly,
         );
       }
@@ -432,7 +455,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
               children: [
                 Expanded(
                   child: Text(
-                    _readableType(reviewable.type),
+                    _readableType(reviewable),
                     style: textTheme.titleSmall?.copyWith(
                       color: colorScheme.onSurface,
                       fontWeight: DesignTokens.fontWeightMedium,
@@ -453,7 +476,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
                         BorderRadius.circular(DesignTokens.radiusS),
                   ),
                   child: Text(
-                    reviewable.statusName,
+                    _statusLabel(reviewable),
                     style: textTheme.labelSmall?.copyWith(
                       color: isPending
                           ? colorScheme.onTertiaryContainer
@@ -525,7 +548,8 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
                   _metaText(AppLocalizations.of(context)!.reportedBy(reviewable.createdByUsername!),
                       textTheme, colorScheme),
                 _metaText(
-                    'Score ${reviewable.score.toStringAsFixed(1)}',
+                    AppLocalizations.of(context)!.reviewableScore(
+                        reviewable.score.toStringAsFixed(1)),
                     textTheme,
                     colorScheme),
                 if (reviewable.createdAt != null)
@@ -655,6 +679,24 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
         label: Text(bundle.first.bundleLabel ?? bundle.first.label ?? ''),
       ),
     );
+  }
+
+  /// The item's status in Discourse's words (review.statuses).
+  String _statusLabel(DiscourseReviewable reviewable) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (reviewable.status) {
+      case 0:
+        return l10n.reviewStatusPending;
+      case 1:
+        return l10n.reviewStatusApproved;
+      case 2:
+        return l10n.reviewStatusRejected;
+      case 3:
+        return l10n.reviewStatusIgnored;
+      case 4:
+        return l10n.reviewStatusDeleted;
+    }
+    return reviewable.statusName;
   }
 
   Widget _metaText(

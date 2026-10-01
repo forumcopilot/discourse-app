@@ -91,8 +91,8 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
           content: Text(result.resultText?.isNotEmpty == true
               ? result.resultText!
               : (wasSameDirection
-                  ? 'Could not remove vote (past undo window?)'
-                  : 'Could not cast vote')),
+                  ? AppLocalizations.of(context)!.postVoteRemoveFailed
+                  : AppLocalizations.of(context)!.postVoteCastFailed)),
         ),
       );
     }
@@ -119,7 +119,7 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
             // so the vote column reads at the same visual weight as
             // the Like / Bookmark / Reply row.
             iconSize: DesignTokens.iconSizeMedium,
-            tooltip: 'Upvote',
+            tooltip: AppLocalizations.of(context)!.postUpvote,
             icon: Icon(
               upActive ? Icons.arrow_drop_up : Icons.arrow_drop_up_outlined,
               color: upActive
@@ -141,7 +141,7 @@ class _PostVoteColumnState extends State<PostVoteColumn> {
           ),
           IconButton(
             iconSize: DesignTokens.iconSizeMedium,
-            tooltip: 'Downvote',
+            tooltip: AppLocalizations.of(context)!.postDownvote,
             icon: Icon(
               downActive
                   ? Icons.arrow_drop_down

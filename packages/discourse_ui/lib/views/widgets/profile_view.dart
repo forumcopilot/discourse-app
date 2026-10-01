@@ -186,14 +186,15 @@ class _ProfileViewState extends State<ProfileView> {
             ? null
             : (result.resultText.isNotEmpty
                 ? result.resultText
-                : 'Could not load stats.');
+                : AppLocalizations.of(context)!.profileStatsLoadFailed);
         _summaryLoading = false;
       });
     } catch (e) {
       AppLogger.debug('Error fetching user summary: $e');
       if (!mounted) return;
       setState(() {
-        _summaryError = describeError(e, fallback: 'Could not load stats.');
+        _summaryError = describeError(e,
+            fallback: AppLocalizations.of(context)!.profileStatsLoadFailed);
         _summaryLoading = false;
       });
     }
@@ -215,6 +216,7 @@ class _ProfileViewState extends State<ProfileView> {
       _isTogglingFollow = true;
       _userInfo.isFollowing = !wasFollowing;
     });
+    final l10n = AppLocalizations.of(context)!;
     String? errorText;
     try {
       final result = wasFollowing
@@ -223,10 +225,12 @@ class _ProfileViewState extends State<ProfileView> {
       if (!result.result) {
         errorText = result.resultText?.isNotEmpty == true
             ? result.resultText
-            : (wasFollowing ? 'Failed to unfollow' : 'Failed to follow');
+            : (wasFollowing
+                ? l10n.profileUnfollowFailed
+                : l10n.profileFollowFailed);
       }
     } catch (e) {
-      errorText = 'Error: $e';
+      errorText = l10n.error('$e');
     }
     if (!mounted) return;
     setState(() {
@@ -253,7 +257,7 @@ class _ProfileViewState extends State<ProfileView> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(result.resultText?.isNotEmpty == true
               ? result.resultText!
-              : 'Could not open a chat with this user.'),
+              : AppLocalizations.of(context)!.profileChatOpenFailed),
         ));
         return;
       }
@@ -926,21 +930,21 @@ class _SummaryTab extends StatelessWidget {
         _SummaryPeopleStrip(
           title: l10n.summaryMostLikedBy,
           people: s.mostLikedByUsers,
-          countLabel: (n) => n == 1 ? '1 like' : '$n likes',
+          countLabel: l10n.summaryLikeCount,
           siteContext: siteContext,
         ),
       if (s.mostLikedUsers.isNotEmpty)
         _SummaryPeopleStrip(
           title: l10n.summaryMostLiked,
           people: s.mostLikedUsers,
-          countLabel: (n) => n == 1 ? '1 like' : '$n likes',
+          countLabel: l10n.summaryLikeCount,
           siteContext: siteContext,
         ),
       if (s.mostRepliedToUsers.isNotEmpty)
         _SummaryPeopleStrip(
           title: l10n.summaryMostRepliedTo,
           people: s.mostRepliedToUsers.take(5).toList(),
-          countLabel: (n) => n == 1 ? '1 reply' : '$n replies',
+          countLabel: l10n.nReplies,
           siteContext: siteContext,
         ),
       if (s.topCategories.isNotEmpty)
@@ -1109,12 +1113,12 @@ class _SummaryTopicRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
     final meta = <String>[
       if (data.createdAt != null) formatTimeAgo(data.createdAt!, context),
-      if (data.likeCount > 0)
-        '${data.likeCount} ${data.likeCount == 1 ? 'like' : 'likes'}',
+      if (data.likeCount > 0) l10n.summaryLikeCount(data.likeCount),
       if (data.replyCount != null && data.replyCount! > 0)
-        '${data.replyCount} ${data.replyCount == 1 ? 'reply' : 'replies'}',
+        l10n.nReplies(data.replyCount!),
     ];
     return Material(
       color: colorScheme.surface,
@@ -1204,7 +1208,7 @@ class _SummaryUnavailable extends StatelessWidget {
             ),
             TextButton(
               onPressed: onRetry,
-              child: Text(AppLocalizations.of(context)?.tryAgain ?? 'Retry'),
+              child: Text(AppLocalizations.of(context)!.tryAgain),
             ),
           ],
         ),
@@ -1227,7 +1231,7 @@ class _SummaryLinksSection extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return ProfileSection(
-      title: 'Top Links',
+      title: AppLocalizations.of(context)!.summaryTopLinks,
       contentPadding:
           EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
       child: Column(
@@ -1257,7 +1261,7 @@ class _SummaryLinksSection extends StatelessWidget {
                     ),
                     SizedBox(height: DesignTokens.spacingXS / 2),
                     Text(
-                      l.clicks == 1 ? '1 click' : '${l.clicks} clicks',
+                      AppLocalizations.of(context)!.summaryLinkClicks(l.clicks),
                       style: textTheme.bodySmall
                           ?.copyWith(color: colorScheme.onSurfaceVariant),
                     ),

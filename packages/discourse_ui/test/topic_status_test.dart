@@ -294,7 +294,7 @@ void main() {
     testWidgets("staff get web's topic actions, in Discourse's words",
         (tester) async {
       final items = await menu(tester, DiscourseTopicStatus.fromTopicView({'details': staff}));
-      expect(items, containsAll(['Close Topic', 'Pin Topic', 'Archive Topic', 'Unlist Topic', 'Delete Topic']));
+      expect(items, containsAll(['Close Topic', 'Pin Topic…', 'Archive Topic', 'Unlist Topic', 'Delete Topic']));
       expect(items, isNot(contains('Lock')));
       expect(items, isNot(contains('Stick')));
     });

@@ -67,11 +67,11 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     // Never the address: it ends in the upload's hash.
     final title = widget.title?.isNotEmpty == true
         ? widget.title!
-        : (l10n?.video ?? 'Video');
+        : l10n.video;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -104,7 +104,7 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  controller?.value.errorDescription ?? 'Failed to load video',
+                  controller?.value.errorDescription ?? l10n.failedToLoadVideo,
                   style: const TextStyle(color: Colors.white),
                   textAlign: TextAlign.center,
                 ),

@@ -155,43 +155,13 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get youCannotReplyToThisThread => '이 스레드에 답변할 수 없습니다';
+  String get youCannotReplyToThisThread => '이 글에 댓글을 달 수 없습니다';
 
   @override
-  String get pleaseWaitForThreadToLoad => '스레드가 로드될 때까지 기다려주세요';
-
-  @override
-  String get postCanBeRestoredLater => '게시물은 나중에 복원할 수 있습니다';
-
-  @override
-  String get postWillBePermanentlyDeleted => '게시물이 영구적으로 삭제됩니다';
-
-  @override
-  String get enterReasonForDeletingPost => '이 게시물을 삭제하는 사유를 입력하세요';
-
-  @override
-  String get reportPost => '게시물 신고';
-
-  @override
-  String get pleaseProvideReasonForReporting => '이 게시물을 신고하는 사유를 제공하세요.';
+  String get pleaseWaitForThreadToLoad => '글을 불러올 때까지 기다려 주세요';
 
   @override
   String get reason => '사유';
-
-  @override
-  String get enterReasonForReportingPost => '이 게시물을 신고하는 사유를 입력하세요';
-
-  @override
-  String get pleaseEnterReason => '사유를 입력하세요';
-
-  @override
-  String get submitReport => '신고 제출';
-
-  @override
-  String get selectedActions => '선택한 작업:';
-
-  @override
-  String get thisActionCannotBeUndone => '이 작업은 취소할 수 없습니다.';
 
   @override
   String get participantsLabel => '참가자';
@@ -210,9 +180,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get newTopic => '새 주제';
 
   @override
-  String get markRead => '읽음으로 표시';
-
-  @override
   String get pleaseSpecifyReason => '사유를 지정하세요';
 
   @override
@@ -226,23 +193,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get topicOpened => '주제 열림';
-
-  @override
-  String cannotEditMessage(String error) {
-    return '이 메시지를 편집할 수 없습니다: $error';
-  }
-
-  @override
-  String get confirmSpamClean => '스팸 정리 확인';
-
-  @override
-  String get handleThreads => '스레드 관리';
-
-  @override
-  String get deleteMessages => '메시지 삭제';
-
-  @override
-  String get deleteConversations => '메시지 삭제';
 
   @override
   String get noConversations => '메시지가 없습니다';
@@ -268,28 +218,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get loginRequired => '로그인 필요';
 
   @override
-  String get spamCleaner => '스팸 정리';
-
-  @override
   String get sendMessage => '메시지';
-
-  @override
-  String get memberSince => '회원 가입일';
-
-  @override
-  String get lastActivity => '마지막 활동';
 
   @override
   String get likesReceived => '받은 좋아요';
 
   @override
-  String get likesGiven => '준 좋아요';
-
-  @override
   String get showMore => '더 보기';
-
-  @override
-  String get cleanSpam => '스팸 정리';
 
   @override
   String get failedToSaveConversation => '메시지를 저장하지 못했습니다';
@@ -323,13 +258,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get signIn => '로그인';
 
   @override
-  String get markForumRead => '포럼을 읽음으로 표시';
-
-  @override
   String get notificationTest => '알림 테스트';
 
   @override
-  String get forum => '포럼';
+  String get forum => '카테고리';
 
   @override
   String get profile => '프로필';
@@ -367,11 +299,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get youNeedToBeSignedInToViewConversations => '메시지를 보려면 로그인해야 합니다.';
-
-  @override
-  String errorLoadingConversations(String error) {
-    return '메시지를 불러오는 중 오류: $error';
-  }
 
   @override
   String failedToLeaveConversation(String error) {
@@ -423,37 +350,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get confirm => '확인';
 
   @override
-  String spamClean(String username) {
-    return '$username의 스팸 정리';
-  }
-
-  @override
-  String get selectActionsToPerform => '수행할 작업 선택:';
-
-  @override
-  String get moveOrDeleteThreadsBasedOnAdminSettings =>
-      '관리자 설정에 따라 스레드를 이동하거나 삭제';
-
-  @override
-  String get messageUpdatedSuccessfully => '메시지가 성공적으로 업데이트되었습니다';
-
-  @override
   String error(String error) {
     return '오류: $error';
   }
-
-  @override
-  String failedToRemoveAttachment(String error) {
-    return '첨부 파일 제거 실패: $error';
-  }
-
-  @override
-  String failedToLoadMessage(String error) {
-    return '메시지 로드 실패: $error';
-  }
-
-  @override
-  String get editMessage => '메시지 편집';
 
   @override
   String get removeAttachment => '첨부 파일 제거';
@@ -595,39 +494,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get banned => '차단됨';
 
   @override
-  String get reportSubmittedSuccessfully => '신고가 성공적으로 제출되었습니다';
-
-  @override
   String get deleteTopic => '글 삭제';
 
   @override
   String get pleaseSelectEndDate => '종료일을 선택하세요';
-
-  @override
-  String get spamCleanUser => '사용자 스팸 정리';
-
-  @override
-  String get deletePrivateConversations => '개인 메시지 삭제';
-
-  @override
-  String get banTheUserAccount => '사용자 계정 차단';
-
-  @override
-  String get handledThreads => '처리된 스레드';
-
-  @override
-  String get deletedMessages => '삭제된 메시지';
-
-  @override
-  String get deletedConversations => '삭제된 메시지';
-
-  @override
-  String get bannedUser => '차단된 사용자';
-
-  @override
-  String successfullyCleanedSpam(String username, String actions) {
-    return '$username의 스팸이 성공적으로 정리되었습니다. 작업: $actions';
-  }
 
   @override
   String get home => '홈';
@@ -636,32 +506,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notifications => '알림';
 
   @override
-  String get forums => '포럼';
-
-  @override
-  String get markAllForumsAsRead => '모든 포럼을 읽음으로 표시하시겠습니까?';
-
-  @override
-  String get markAllForumsAsReadMessage =>
-      '모든 포럼과 주제가 읽음으로 표시됩니다. 이 작업은 취소할 수 없습니다.';
-
-  @override
-  String get markAsRead => '읽음으로 표시';
+  String get forums => '카테고리';
 
   @override
   String get content => '내용';
-
-  @override
-  String get insertImage => '이미지 삽입';
-
-  @override
-  String get howWouldYouLikeToInsertImage => '이 이미지를 어떻게 삽입하시겠습니까?';
-
-  @override
-  String get thumbnail => '썸네일';
-
-  @override
-  String get fullSize => '전체 크기';
 
   @override
   String get pleaseEnterTitle => '제목을 입력하세요';
@@ -679,16 +527,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mentionUser => '사용자 멘션';
 
   @override
-  String get cleaningSpam => '스팸 정리 중...';
-
-  @override
   String get writeYourMessage => '메시지 작성...';
 
   @override
   String get writeYourReply => '답장 작성...';
-
-  @override
-  String get conversationCreatedSuccessfully => '메시지를 보냈습니다';
 
   @override
   String get conversationMarkedAsUnread => '메시지를 읽지 않음으로 표시했습니다';
@@ -700,19 +542,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get conversationOpened => '메시지를 열었습니다';
 
   @override
-  String get pleaseLoginToLikeMessages => '메시지에 좋아요를 누르려면 로그인하세요';
-
-  @override
-  String get loadEarlierMessages => '이전 메시지 불러오기';
-
-  @override
   String failedToLoadQuote(String error) {
     return '인용문을 불러오지 못했습니다: \n$error';
-  }
-
-  @override
-  String failedToSendReply(String error) {
-    return '답장 전송에 실패했습니다: $error';
   }
 
   @override
@@ -728,11 +559,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String failedToOpenConversation(String error) {
     return '메시지를 열지 못했습니다: $error';
-  }
-
-  @override
-  String failedToJumpToMessage(String error) {
-    return '메시지로 이동하지 못했습니다: $error';
   }
 
   @override
@@ -777,20 +603,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get goBack => '돌아가기';
 
   @override
-  String failedToLoadPost(String error) {
-    return '게시물을 불러오지 못했습니다: \n$error';
-  }
-
-  @override
-  String failedToLikeOrUnlikeMessage(String action, String error) {
-    return '메시지 $action 실패: $error';
-  }
-
-  @override
   String get like => '좋아요';
-
-  @override
-  String get unlike => '좋아요 취소';
 
   @override
   String get download => '다운로드';
@@ -808,14 +621,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String errorDownloading(String filename, String error) {
     return '$filename 다운로드 오류: $error';
-  }
-
-  @override
-  String get failedToNavigateToForum => '포럼으로 이동 실패';
-
-  @override
-  String forumNotFoundById(String forumId) {
-    return '포럼을 찾을 수 없습니다: $forumId';
   }
 
   @override
@@ -936,25 +741,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String nVotes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count표',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get lastSeen => '마지막 접속';
-
-  @override
   String get chat => '채팅';
-
-  @override
-  String comingSoon(String label) {
-    return '$label — 곧 제공';
-  }
 
   @override
   String moreBadges(Object count) {
@@ -1022,9 +809,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get discard => '버리기';
-
-  @override
-  String get discardDraftQuestion => '임시 저장을 버릴까요?';
 
   @override
   String get doNotDisturb => '방해 금지';
@@ -1171,9 +955,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get resizeAndUpload => '크기 조정 후 업로드';
 
   @override
-  String get retryConnection => '다시 연결';
-
-  @override
   String get checkConnectionAndRetry => '인터넷 연결을 확인한 후 다시 시도하세요.';
 
   @override
@@ -1204,9 +985,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get signOut => '로그아웃';
 
   @override
-  String get signOutQuestion => '로그아웃할까요?';
-
-  @override
   String get signInCancelledNoPayload => '로그인이 취소되었습니다 — 응답이 없습니다';
 
   @override
@@ -1221,15 +999,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String stoppedIgnoringUser(String username) {
     return '@$username 무시를 해제했습니다';
   }
-
-  @override
-  String get submit => '제출';
-
-  @override
-  String get discardDraftWarning => '저장된 임시 글이 영구히 삭제됩니다.';
-
-  @override
-  String get deleteChatMessageWarning => '모든 사람에게서 메시지가 삭제됩니다.';
 
   @override
   String get titleOnly => '제목만';
@@ -1275,17 +1044,10 @@ class AppLocalizationsKo extends AppLocalizations {
       '보안을 위해 Discourse가 이메일의 링크로 확인을 요구할 수 있습니다. 보이지 않으면 스팸 폴더를 확인하세요.';
 
   @override
-  String get newDirectMessage => '새 다이렉트 메시지';
-
-  @override
   String get noMessagesYetSayHi => '아직 메시지가 없습니다 — 인사해 보세요.';
 
   @override
   String get edited => '수정됨';
-
-  @override
-  String get editProfileManagedOnWebNote =>
-      '표시 이름, 이메일, 비밀번호 및 기타 계정 설정은 계정 → 웹에서 계정 관리에서 변경합니다. 아바타는 사진의 카메라 배지를 탭하여 변경할 수 있습니다.';
 
   @override
   String get approvedButRelayUnreachable =>
@@ -1320,9 +1082,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get protected => '보호됨';
-
-  @override
   String get solution => '해결책';
 
   @override
@@ -1345,11 +1104,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get poll => '투표';
-
-  @override
-  String errorLoadingContent(Object error) {
-    return '콘텐츠 불러오기 오류: $error';
-  }
 
   @override
   String get noDiscussionsYet => '아직 토론이 없습니다.';
@@ -1414,9 +1168,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get leaveConversation2 => '메시지에서 나가기';
 
   @override
-  String get reportConversation2 => '메시지 신고';
-
-  @override
   String get closeConversation2 => '메시지 잠금';
 
   @override
@@ -1441,27 +1192,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get leaveConversationConfirmation =>
       '이 메시지에서 자신을 제거할까요? 더 이상 보거나 답글을 달 수 없습니다.';
-
-  @override
-  String errorLoadingConversation(Object error) {
-    return '메시지를 불러오는 중 오류: $error';
-  }
-
-  @override
-  String get conversationNotFound => '메시지를 찾을 수 없습니다';
-
-  @override
-  String get conversationClosedBanner =>
-      '이 메시지는 잠겨 있습니다. 더 이상 새 답글을 올릴 수 없습니다.';
-
-  @override
-  String get noMessagesFound => '메시지가 없습니다';
-
-  @override
-  String get endOfConversation => '토론 끝';
-
-  @override
-  String get jumpToMessage => '메시지로 이동';
 
   @override
   String get editConversation2 => '제목 수정';
@@ -1593,9 +1323,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get chatPlaceholderGroup => '그룹 채팅';
-
-  @override
   String get chatPlaceholderSelf => '메모하기';
 
   @override
@@ -1671,20 +1398,12 @@ class AppLocalizationsKo extends AppLocalizations {
       '새 게시물이 있습니다. 그러나 이 게시물이 보여지려면 운영자의 승인이 필요합니다. 잠시 기다려 주세요.';
 
   @override
-  String failedToCreateConversation(Object error) {
-    return '메시지를 보내지 못했습니다: $error';
-  }
-
-  @override
   String maximumAttachmentsAllowed(Object count) {
     return '최대 $count개의 첨부 파일만 허용됩니다';
   }
 
   @override
   String get noImagesFoundToDisplay => '표시할 이미지가 없습니다.';
-
-  @override
-  String get pleaseLoginToViewThisAttachment => '이 첨부 파일을 보려면 로그인하세요';
 
   @override
   String get searchForTopics => '주제 검색';
@@ -1712,9 +1431,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get doNotDisturbExplanation =>
       '알림을 잠시 멈춥니다 — 기간이 끝날 때까지 Discourse가 보관합니다';
-
-  @override
-  String get emailSettingsSubtitle => '이메일 빈도, 좋아요 모아보기, 다이제스트 일정';
 
   @override
   String get manageAccountSubtitle => '프로필, 이메일, 비밀번호, 보안, 고급 설정';
@@ -1747,13 +1463,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get initializingForum => '포럼 초기화 중…';
 
   @override
-  String get subscribedForums => '구독한 포럼';
-
-  @override
   String get errorLoadingNotifications => '알림 불러오기 오류';
-
-  @override
-  String get pullDownToRefresh => '아래로 당겨 새로고침';
 
   @override
   String get noNewNotificationsExplanation =>
@@ -1770,19 +1480,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get deletePostsProfilePostsAndComments => '게시물, 프로필 게시물, 댓글 삭제';
-
-  @override
-  String spamCleanConfirmation(Object username) {
-    return '$username의 스팸을 정리할까요?';
-  }
-
-  @override
-  String failedToCleanSpam(Object error) {
-    return '스팸 정리 실패: $error';
-  }
-
-  @override
   String get searchUser => '사용자 검색';
 
   @override
@@ -1790,9 +1487,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get imageNotAvailable => '이미지를 사용할 수 없습니다';
-
-  @override
-  String get allForumTopicsHaveBeenMarkedAs => '모든 포럼 주제를 읽음으로 표시했습니다';
 
   @override
   String postsCount(Object count) {
@@ -1814,30 +1508,10 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get failedToPickFile => '파일을 선택하지 못했습니다';
-
-  @override
   String onlyNMoreAttachmentsAllowed(
       Object remainingSlots, Object remainingSlots2) {
     return '$remainingSlots개의 첨부 파일만 더 추가할 수 있습니다. 처음 $remainingSlots2개의 이미지를 처리합니다.';
   }
-
-  @override
-  String get attachmentLimitReachedSkippingRemainingImages =>
-      '첨부 파일 한도에 도달했습니다. 나머지 이미지는 건너뜁니다.';
-
-  @override
-  String failedToUploadImagePleaseTryAgain(Object fileName) {
-    return '$fileName: 이미지를 업로드하지 못했습니다. 다시 시도하세요.';
-  }
-
-  @override
-  String failedToUploadImage2(Object errorMessage, Object fileName) {
-    return '$fileName: 이미지 업로드 실패: $errorMessage';
-  }
-
-  @override
-  String get failedToPickImage => '이미지를 선택하지 못했습니다';
 
   @override
   String failedToRemoveAttachment2(Object error) {
@@ -1881,23 +1555,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String failedToSubmitReport2(Object error) {
-    return '신고 제출 실패: $error';
-  }
-
-  @override
   String get editHistoryNotAvailable => '이 게시물의 편집 기록을 볼 수 없습니다';
-
-  @override
-  String get noPermissionToUploadAvatar => '아바타를 업로드할 권한이 없습니다';
-
-  @override
-  String get avatarUploadedSuccessfully => '아바타를 업로드했습니다';
-
-  @override
-  String failedToPickImage2(Object error) {
-    return '이미지 선택 실패: $error';
-  }
 
   @override
   String get react => '반응';
@@ -1912,18 +1570,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get searchFilters => '검색 필터';
 
   @override
-  String signOutWarning(Object siteName) {
-    return '$siteName에서 로그아웃됩니다. 언제든지 다시 로그인할 수 있습니다.';
-  }
-
-  @override
   String get suggestedTopics => '추천 주제';
 
   @override
   String get suggestedMessages => '제안된 메시지';
-
-  @override
-  String get newLabel => '신규';
 
   @override
   String get voteRemoved => '투표를 취소했습니다';
@@ -1954,9 +1604,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get couldNotLoadCategories => '카테고리를 불러오지 못했습니다.';
 
   @override
-  String get explore => '탐색';
-
-  @override
   String get tags => '태그';
 
   @override
@@ -1982,11 +1629,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get privacyPolicy => '개인정보 처리방침';
-
-  @override
-  String signedInAs(String username) {
-    return '$username(으)로 로그인됨';
-  }
 
   @override
   String get notSignedIn => '로그인하지 않음';
@@ -2016,7 +1658,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String actionCodeTopicCreated(String when) {
-    return 'Created this topic $when';
+    return '$when에 이 글을 작성함';
   }
 
   @override
@@ -2164,7 +1806,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String actionCodeReassigned(String who, String when) {
-    return 'Reassigned $who $when';
+    return '$when에 $who 님에게 재할당함';
   }
 
   @override
@@ -2189,19 +1831,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get eventEveryDay => '매일';
 
   @override
-  String get eventEveryWeekday => 'Every weekday';
+  String get eventEveryWeekday => '매 평일';
 
   @override
-  String get eventEveryWeek => 'Every week at this weekday';
+  String get eventEveryWeek => '매주 이 요일';
 
   @override
-  String get eventEveryTwoWeeks => 'Every two weeks at this weekday';
+  String get eventEveryTwoWeeks => '2주마다 이 요일';
 
   @override
-  String get eventEveryFourWeeks => 'Every four weeks at this weekday';
+  String get eventEveryFourWeeks => '4주마다 이 요일';
 
   @override
-  String get eventEveryMonth => 'Every month at this weekday';
+  String get eventEveryMonth => '매월 이 요일';
 
   @override
   String get errorNoConnection => '포럼에 연결할 수 없습니다. 연결을 확인하고 다시 시도하세요.';
@@ -2271,79 +1913,85 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notificationSettings => '알림 설정';
 
   @override
-  String get topicIsNew => 'New topic';
+  String get topicIsNew => '새 글';
 
   @override
-  String get noNewTopicsSinceLastVisit =>
-      'No new topics since your last visit.';
+  String get noNewTopicsSinceLastVisit => '마지막 방문 이후 새 글이 없습니다.';
 
   @override
-  String get messageIsNew => 'New message';
+  String get messageIsNew => '새 메시지';
 
   @override
   String topicUnreadReplies(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count unread replies',
-      one: '1 unread reply',
+      other: '읽지 않은 댓글 $count개',
     );
     return '$_temp0';
   }
 
   @override
   String filterNewWithCount(int count) {
-    return 'New ($count)';
+    return '새 글 ($count)';
   }
 
   @override
   String filterUnreadWithCount(int count) {
-    return 'Unread ($count)';
+    return '읽지 않음 ($count)';
   }
 
   @override
   String categoryNewTopics(int count) {
-    return '$count new';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '새 글 $count',
+    );
+    return '$_temp0';
   }
 
   @override
   String categoryUnreadTopics(int count) {
-    return '$count unread';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '읽지 않음 $count',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get dismissNew => 'Dismiss new';
+  String get dismissNew => '새 글 읽음으로 표시';
 
   @override
-  String get dismissUnread => 'Dismiss unread';
+  String get dismissUnread => '읽지 않은 항목 읽음으로 표시';
 
   @override
-  String get dismissNewTitle => 'Dismiss new topics?';
+  String get dismissNewTitle => '새 글을 읽음으로 표시할까요?';
 
   @override
-  String get dismissNewMessage => 'They will no longer show as new.';
+  String get dismissNewMessage => '더 이상 새 글로 표시되지 않습니다.';
 
   @override
-  String get dismissUnreadTitle => 'Dismiss all unread?';
+  String get dismissUnreadTitle => '읽지 않은 항목을 모두 읽음으로 표시할까요?';
 
   @override
-  String get dismissUnreadMessage =>
-      'Their new replies will be marked as read.';
+  String get dismissUnreadMessage => '새 댓글이 읽음으로 표시됩니다.';
 
   @override
-  String get dismissUnreadStopTracking =>
-      'Stop tracking these topics so they never show up as unread for me again';
+  String get dismissUnreadStopTracking => '이 글을 더 이상 추적하지 않고 읽지 않은 글에서 표시하지 않음';
 
   @override
-  String get dismissNewAndUnread => 'Dismiss new and unread';
+  String get dismissNewAndUnread => '새 글과 읽지 않은 글 읽음으로 표시';
 
   @override
   String dismissNewAndUnreadMessage(String category) {
-    return 'Topics in $category will no longer show as new or unread.';
+    return '$category의 글이 더 이상 새 글이나 읽지 않은 글로 표시되지 않습니다.';
   }
 
   @override
-  String get dismissedTopics => 'Dismissed';
+  String get dismissedTopics => '읽음으로 표시함';
 
   @override
   String topicMapViews(int count) {
@@ -3699,4 +3347,1295 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get noPermissionToViewCategory => '이 카테고리의 글을 볼 권한이 없습니다.';
+
+  @override
+  String get featureTopicTitle => '이 주제 추천';
+
+  @override
+  String get pinTopicMenu => '글 고정...';
+
+  @override
+  String pinInCategoryUntil(String category) {
+    return '이 주제를 다음 기간까지 $category 카테고리 상단에 표시';
+  }
+
+  @override
+  String get pinGloballyUntil => '이 주제를 다음 기간까지 모든 주제 목록의 상단에 고정';
+
+  @override
+  String get pinNote => '사용자가 개별적으로 직접 주제 고정을 취소할 수 있습니다.';
+
+  @override
+  String get pinUntil => '고정 기한';
+
+  @override
+  String get pinDateRequired => '주제를 고정하려면 날짜를 지정해야 합니다.';
+
+  @override
+  String get pinTopicGlobally => '전체적으로 주제 고정';
+
+  @override
+  String get flagThanks => '커뮤니티 질서 유지에 협조해 주셔서 감사합니다!';
+
+  @override
+  String get flagReviewProcess => '모든 신고는 운영진이 받아 가능한 한 빨리 검토합니다.';
+
+  @override
+  String get flagCant => '지금은 이 게시물을 신고할 수 없습니다';
+
+  @override
+  String get flagSendMessage => '메시지 보내기';
+
+  @override
+  String get flagMessageForUser => '사용자에게 보낼 메시지';
+
+  @override
+  String get flagMessageForModerators => '운영진에게 보낼 메시지';
+
+  @override
+  String get flagPlaceholderNotifyUser => '구체적으로 상세히 작성하고 친절한 어투를 사용하세요.';
+
+  @override
+  String get flagPlaceholderNotifyModerators =>
+      '걱정하는 내용을 구체적으로 알려주시고 가능한 한 모든 관련 링크 및 예시를 제공해 주세요.';
+
+  @override
+  String get flagPlaceholderIllegal =>
+      '이 콘텐츠가 불법이라고 생각하는 이유를 구체적으로 알려 주시고, 가능하면 관련 링크와 예시를 함께 제공해 주세요.';
+
+  @override
+  String get flagConfirmIllegal => '위에 작성한 내용은 정확하고 완전합니다.';
+
+  @override
+  String flagMessageAtLeast(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '최소 $count자 이상 입력하세요',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get flagMessageSent => '메시지를 보냈습니다.';
+
+  @override
+  String get mergeTopicError => '게시물을 이 주제로 이동하는 데 문제가 발생했습니다.';
+
+  @override
+  String get topicTitlePlaceholder => '토론 주제를 한 문장으로 적으세요';
+
+  @override
+  String get topicMoved => '글을 이동했습니다';
+
+  @override
+  String get topicMerged => '글을 병합했습니다';
+
+  @override
+  String get mergeTopicExplanation =>
+      '이 글의 모든 게시물이 선택한 글로 이동합니다. 앱에서는 되돌릴 수 없습니다.';
+
+  @override
+  String get destinationTopicId => '대상 글 ID';
+
+  @override
+  String get topicAuthorUnknown => '알 수 없음';
+
+  @override
+  String get noHotTopics => '인기 글이 없습니다.';
+
+  @override
+  String get signInToViewNewTopics => '새 글을 보려면 로그인하세요';
+
+  @override
+  String get newTopicsSignInMessage => '새 글에는 마지막 방문 이후 작성된 글이 표시됩니다.';
+
+  @override
+  String get topPeriodAllTime => '전체';
+
+  @override
+  String get topPeriodYear => '년';
+
+  @override
+  String get topPeriodQuarter => '분기';
+
+  @override
+  String get topPeriodMonth => '월';
+
+  @override
+  String get topPeriodWeek => '주';
+
+  @override
+  String get topPeriodToday => '오늘';
+
+  @override
+  String noTopTopicsForPeriod(String period) {
+    String _temp0 = intl.Intl.selectLogic(
+      period,
+      {
+        'all': '전체 기간의 주요 글이 없습니다.',
+        'yearly': '올해의 주요 글이 없습니다.',
+        'quarterly': '이번 분기의 주요 글이 없습니다.',
+        'monthly': '이번 달의 주요 글이 없습니다.',
+        'weekly': '이번 주의 주요 글이 없습니다.',
+        'daily': '오늘의 주요 글이 없습니다.',
+        'other': '주요 글이 없습니다.',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get connectionTimedOutSiteUnreachable =>
+      '연결 시간이 초과되었습니다. 사이트가 다운되었거나 접근할 수 없을 수 있습니다.';
+
+  @override
+  String get failedToMarkNotificationsRead => '알림을 읽음으로 표시하지 못했습니다';
+
+  @override
+  String get forumNameFallback => '포럼';
+
+  @override
+  String get noForumDescription => '설명이 없습니다.';
+
+  @override
+  String get dismissAllNotifications => '모두 해제';
+
+  @override
+  String get notificationPostIdMissing => '게시물 ID가 없습니다. 게시물로 이동할 수 없습니다.';
+
+  @override
+  String get notificationTopicIdMissingForPost =>
+      '글 ID가 없습니다. 게시물로 이동할 수 없습니다.';
+
+  @override
+  String get notificationTopicIdMissing => '글 ID가 없습니다. 글을 열 수 없습니다.';
+
+  @override
+  String get notificationUsernameMissing => '사용자 이름이 없습니다. 프로필을 열 수 없습니다.';
+
+  @override
+  String get notificationChannelIdMissing => '채널 ID가 없습니다. 채팅을 열 수 없습니다.';
+
+  @override
+  String get notificationGroupNameMissingForInbox =>
+      '그룹 이름이 없습니다. 받은 편지함을 열 수 없습니다.';
+
+  @override
+  String get notificationGroupNameMissing => '그룹 이름이 없습니다. 그룹을 열 수 없습니다.';
+
+  @override
+  String get notificationNoActionUrl => '이 알림 유형에는 사용할 수 있는 작업 URL이 없습니다.';
+
+  @override
+  String get notificationBadgeUnavailable => '배지 세부 정보를 사용할 수 없습니다.';
+
+  @override
+  String get notificationBadgeLoadFailed => '이 배지를 불러올 수 없습니다.';
+
+  @override
+  String get personalMessageTitleFallback => '개인 메시지';
+
+  @override
+  String get topicTitleFallback => '글';
+
+  @override
+  String get signInToViewNotifications => '알림을 보려면 로그인하세요';
+
+  @override
+  String get youNeedToBeSignedInToViewNotifications => '알림을 보려면 로그인해야 합니다.';
+
+  @override
+  String get noUnreadNotifications => '읽지 않은 알림이 없습니다';
+
+  @override
+  String get noNotificationsYet => '아직 알림이 없습니다';
+
+  @override
+  String get newNotificationFallbackBody => '새 알림';
+
+  @override
+  String get unableToOpenNotification => '알림을 열 수 없습니다';
+
+  @override
+  String get notificationMissingSiteInfo => '사이트 정보가 없습니다(site_id).';
+
+  @override
+  String get notificationInvalidSiteInfo => '사이트 정보가 잘못되었습니다(site_id).';
+
+  @override
+  String get notificationMissingPostInfo => '게시물 정보가 없습니다(content_id).';
+
+  @override
+  String get notificationMissingMessageInfo => '메시지 정보가 없습니다(conversation_id).';
+
+  @override
+  String get notificationMissingUserInfo => '사용자 정보가 없습니다(sender_id).';
+
+  @override
+  String get notificationUnsupportedType => '지원되지 않는 알림 유형입니다.';
+
+  @override
+  String get notificationForumNotFound => '이 사이트의 포럼을 찾을 수 없습니다.';
+
+  @override
+  String get notificationForumOpenFailed => '포럼을 초기화하지 못했습니다.';
+
+  @override
+  String get notificationMissingTopicInfo => '글 정보가 없습니다(topic_id).';
+
+  @override
+  String get failedToLoadTags => '태그를 불러오지 못했습니다.';
+
+  @override
+  String get searchTagsHint => '태그 검색…';
+
+  @override
+  String get tagsSortedByCountTooltip => '글 수 순으로 정렬됨 — 탭하여 A→Z로 전환';
+
+  @override
+  String get tagsSortedAlphabeticallyTooltip => '이름순으로 정렬됨 — 탭하여 인기순으로 전환';
+
+  @override
+  String get noTagsYet => '이 포럼에는 아직 태그가 없습니다.';
+
+  @override
+  String get tagNotificationLevelTooltip => '알림 수준';
+
+  @override
+  String get tagTopicsLoadFailed => '불러오지 못했습니다';
+
+  @override
+  String searchFailedWithError(String error) {
+    return '검색 실패: $error';
+  }
+
+  @override
+  String get searchFiltersButtonTooltip => '필터';
+
+  @override
+  String get searchFilterStatusSection => '상태';
+
+  @override
+  String get searchFilterMyActivitySection => '내 활동';
+
+  @override
+  String get searchFilterMatchTypeSection => '일치 유형';
+
+  @override
+  String get searchTagsFilterHelper => '공백 또는 쉼표로 구분합니다. 모든 태그가 있어야 합니다.';
+
+  @override
+  String get searchSortBy => '정렬 기준';
+
+  @override
+  String get searchStatusOpen => '열림';
+
+  @override
+  String get searchStatusArchived => '보관됨';
+
+  @override
+  String get searchStatusNoReplies => '댓글 없음';
+
+  @override
+  String get searchStatusPublicOnly => '공개만';
+
+  @override
+  String get searchStatusUnsolved => '미해결';
+
+  @override
+  String get searchInBookmarked => '내가 북마크함';
+
+  @override
+  String get searchInMyMessages => '내 메시지에서';
+
+  @override
+  String get searchInLiked => '내가 좋아요 누름';
+
+  @override
+  String get searchInPosted => '내가 게시한 위치';
+
+  @override
+  String get searchInWatching => '내가 구독 중';
+
+  @override
+  String get searchInTracking => '내가 추적 중';
+
+  @override
+  String get searchInSeen => '읽음';
+
+  @override
+  String get searchInUnseen => '읽지 않음';
+
+  @override
+  String get searchSortLatestPost => '최신 게시물';
+
+  @override
+  String get searchSortMostLiked => '가장 많은 좋아요';
+
+  @override
+  String get searchSortMostViewed => '가장 높은 조회수';
+
+  @override
+  String get searchSortLatestTopic => '최신 글';
+
+  @override
+  String get searchFieldHint => '검색…';
+
+  @override
+  String get bookmarksUnavailable => '북마크를 사용할 수 없습니다';
+
+  @override
+  String get failedToLoadBookmarks => '북마크를 불러오지 못했습니다';
+
+  @override
+  String get failedToRemoveBookmark => '북마크를 삭제하지 못했습니다';
+
+  @override
+  String get failedToUpdateBookmark => '북마크를 업데이트하지 못했습니다';
+
+  @override
+  String get bookmarkWithReminder => '미리 알림이 있는 북마크';
+
+  @override
+  String get noReminder => '미리 알림 안 함';
+
+  @override
+  String get failedToLoadDrafts => '초안을 불러오지 못했습니다.';
+
+  @override
+  String get failedToDiscardDraft => '초안을 삭제하지 못했습니다';
+
+  @override
+  String get messagesLoadFailed => '메시지를 불러오지 못했습니다';
+
+  @override
+  String get moreMessagesLoadFailed => '메시지를 더 불러오지 못했습니다';
+
+  @override
+  String get messageUnknownUser => '알 수 없음';
+
+  @override
+  String get unknownErrorFallback => '알 수 없는 오류';
+
+  @override
+  String get chatComposerDefaultHint => '메시지를 입력하세요…';
+
+  @override
+  String chatChannelNumbered(Object id) {
+    return '채널 $id';
+  }
+
+  @override
+  String get chatSendFailed => '메시지를 보내지 못했습니다.';
+
+  @override
+  String get chatEditFailed => '메시지를 수정하지 못했습니다.';
+
+  @override
+  String get chatDeleteFailed => '메시지를 삭제하지 못했습니다.';
+
+  @override
+  String get chatReactionsUnsupported => '여기에서는 반응을 사용할 수 없습니다.';
+
+  @override
+  String get chatReactionFailed => '반응을 업데이트하지 못했습니다.';
+
+  @override
+  String get attachmentDefaultName => '첨부파일';
+
+  @override
+  String get fileTypeAudio => '오디오';
+
+  @override
+  String get fileTypeText => '텍스트';
+
+  @override
+  String get fileTypeArchive => '압축 파일';
+
+  @override
+  String get fileTypeFile => '파일';
+
+  @override
+  String downloadFailedHttpStatus(String status) {
+    return '파일 다운로드 실패: HTTP $status';
+  }
+
+  @override
+  String get downloadedFileEmpty => '다운로드한 파일이 비어 있습니다';
+
+  @override
+  String downloadFileFailed(String error) {
+    return '파일 다운로드 실패: $error';
+  }
+
+  @override
+  String attachmentTypeNotAllowed(String extension, String allowed) {
+    return '.$extension 파일 형식은 허용되지 않습니다. 허용되는 형식: $allowed';
+  }
+
+  @override
+  String attachmentFileTooLarge(String size, String max) {
+    return '파일 크기($size)가 최대 크기 $max를 초과합니다';
+  }
+
+  @override
+  String get attachmentValidationFailed => '파일 검증에 실패했습니다';
+
+  @override
+  String get uploadMissingReference => '업로드는 완료되었지만 서버가 파일 참조를 반환하지 않았습니다.';
+
+  @override
+  String get imageFileNotFound => '이미지 파일을 찾을 수 없습니다';
+
+  @override
+  String get failedToLoadVideo => '동영상을 불러오지 못했습니다';
+
+  @override
+  String get userInfoLoadFailed => '사용자 정보를 불러오지 못했습니다.';
+
+  @override
+  String userInfoLoadFailedWithError(String error) {
+    return '사용자 정보를 불러오지 못했습니다: $error';
+  }
+
+  @override
+  String get profileMenuIgnoreUser => '사용자 무시';
+
+  @override
+  String get profileMenuUnignoreUser => '사용자 무시 해제';
+
+  @override
+  String get ignoreStateUpdateFailed => '무시 상태를 변경하지 못했습니다';
+
+  @override
+  String profileNowIgnoringUser(String username) {
+    return '@$username님을 무시합니다. 이 사용자의 게시물이 숨겨집니다.';
+  }
+
+  @override
+  String get profileIgnoreToggleFailed => '무시 전환에 실패했습니다.';
+
+  @override
+  String get profileStatsLoadFailed => '통계를 불러오지 못했습니다.';
+
+  @override
+  String get profileFollowFailed => '팔로우하지 못했습니다';
+
+  @override
+  String get profileUnfollowFailed => '언팔로우하지 못했습니다';
+
+  @override
+  String get profileChatOpenFailed => '이 사용자와 채팅을 열 수 없습니다.';
+
+  @override
+  String summaryLikeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '좋아요 $count개',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String summaryLinkClicks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '클릭 수 $count회',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get directoryPeriodAllTime => '전체';
+
+  @override
+  String get directoryPeriodYear => '년';
+
+  @override
+  String get directoryPeriodQuarter => '분기';
+
+  @override
+  String get directoryPeriodMonth => '월';
+
+  @override
+  String get directoryPeriodWeek => '주';
+
+  @override
+  String get directoryPeriodToday => '오늘';
+
+  @override
+  String get directoryOrderReceived => '받음';
+
+  @override
+  String get directoryOrderReplies => '댓글';
+
+  @override
+  String get directoryOrderTopics => '글';
+
+  @override
+  String get directoryOrderVisits => '방문';
+
+  @override
+  String get directoryLoadFailed => '사용자 목록을 불러오지 못했습니다.';
+
+  @override
+  String get directoryNoUsersMatch => '해당 이름과 일치하는 사용자가 없습니다.';
+
+  @override
+  String get directoryNoUsersForPeriod => '이 기간에 해당하는 사용자가 없습니다.';
+
+  @override
+  String get userSearchNoResults => '사용자를 찾을 수 없습니다';
+
+  @override
+  String get userSearchTryDifferentUsername => '다른 사용자 이름으로 검색해 보세요';
+
+  @override
+  String get userSearchPromptTitle => '사용자 검색';
+
+  @override
+  String get userSearchPromptHint => '사용자 이름을 입력하여 사용자를 찾고 초대하세요';
+
+  @override
+  String get ignoredUsersUnignoreFailed => '무시를 해제하지 못했습니다.';
+
+  @override
+  String get ignoredUsersEmpty => '무시하고 있는 사용자가 없습니다.';
+
+  @override
+  String get ignoredUsersEmptyHint =>
+      '사용자 프로필을 열고 메뉴에서 \"사용자 무시\"를 선택하면 해당 사용자의 게시물과 알림이 숨겨집니다.';
+
+  @override
+  String get badgesLoadFailed => '배지를 불러오지 못했습니다.';
+
+  @override
+  String get badgesEmpty => '이 포럼에는 배지가 없습니다.';
+
+  @override
+  String get badgeTierGold => '골드';
+
+  @override
+  String get badgeTierSilver => '실버';
+
+  @override
+  String get badgeTierBronze => '브론즈';
+
+  @override
+  String badgeEarnedAgo(String time) {
+    return '$time 획득';
+  }
+
+  @override
+  String badgeEarnedByUsers(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '사용자 $formatted명이 획득',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trustLevelNameNewUser => '신규 사용자';
+
+  @override
+  String get trustLevelNameBasic => '기본 사용자';
+
+  @override
+  String get trustLevelNameMember => '회원';
+
+  @override
+  String get trustLevelNameRegular => '정회원';
+
+  @override
+  String get trustLevelNameLeader => '리더';
+
+  @override
+  String get trustLevelSummary0 =>
+      '방금 가입했습니다. 읽고 글을 쓸 수 있지만 링크, 이미지, 메시지에 제한이 있습니다.';
+
+  @override
+  String get trustLevelSummary1 =>
+      '주요 게시 기능이 열립니다: 이미지와 첨부 파일, 더 많은 링크, 게시물 신고.';
+
+  @override
+  String get trustLevelSummary2 =>
+      '초대를 보내고, 사용자를 무시하고, 자신의 게시물을 더 오래 수정할 수 있습니다.';
+
+  @override
+  String get trustLevelSummary3 =>
+      '글의 카테고리와 제목을 변경하고 태그를 만들 수 있으며, 스팸 신고의 비중이 더 커집니다.';
+
+  @override
+  String get trustLevelSummary4 =>
+      '운영진이 부여합니다. 모든 게시물을 수정하고 글을 고정, 종료, 분할, 병합할 수 있습니다.';
+
+  @override
+  String trustLevelRowTitle(int level, String name) {
+    return 'TL$level · $name';
+  }
+
+  @override
+  String get profileNoUserSpecified => '사용자가 지정되지 않았습니다';
+
+  @override
+  String get userTopicsLoadFailed => '글을 불러오지 못했습니다';
+
+  @override
+  String get userTopicsEmpty => '아직 작성한 글이 없습니다.';
+
+  @override
+  String get userRecentPostsLoadFailed => '최근 게시물을 불러오지 못했습니다';
+
+  @override
+  String get activityUnknownTopic => '알 수 없는 글';
+
+  @override
+  String groupJoinedSnack(String group) {
+    return '$group에 가입했습니다';
+  }
+
+  @override
+  String get groupJoinFailed => '그룹에 가입하지 못했습니다';
+
+  @override
+  String groupLeftSnack(String group) {
+    return '$group에서 나갔습니다';
+  }
+
+  @override
+  String get groupLeaveFailed => '그룹에서 나가지 못했습니다';
+
+  @override
+  String get groupMembershipRequestHint =>
+      '가입하려는 이유는 무엇인가요? 그룹 소유자가 요청과 함께 확인합니다.';
+
+  @override
+  String get groupMembershipReasonRequired => '가입을 요청하려면 이유가 필요합니다';
+
+  @override
+  String get groupMembershipRequestSent => '요청을 보냈습니다. 그룹 소유자의 승인이 필요합니다';
+
+  @override
+  String get groupMembershipRequestFailed => '가입 요청을 보내지 못했습니다';
+
+  @override
+  String get groupMemberBadge => '회원';
+
+  @override
+  String get groupRequestPending => '요청 대기 중';
+
+  @override
+  String get groupJoining => '가입 중…';
+
+  @override
+  String get groupJoinButton => '그룹 가입';
+
+  @override
+  String get groupsLoadFailed => '그룹을 불러오지 못했습니다.';
+
+  @override
+  String get groupBuiltIn => '기본 제공 그룹';
+
+  @override
+  String invitesPendingWithCount(int count) {
+    return '보류 중($count)';
+  }
+
+  @override
+  String invitesExpiredWithCount(int count) {
+    return '만료됨($count)';
+  }
+
+  @override
+  String invitesRedeemedWithCount(int count) {
+    return '사용됨($count)';
+  }
+
+  @override
+  String get invitesLoadFailed => '초대를 불러오지 못했습니다.';
+
+  @override
+  String get inviteLinkCreateFailed => '초대 링크를 만들지 못했습니다';
+
+  @override
+  String get inviteEmailAddressLabel => '이메일 주소';
+
+  @override
+  String get inviteEmailInvalid => '올바른 이메일 주소를 입력하세요';
+
+  @override
+  String get inviteMessageOptionalLabel => '메시지(선택 사항)';
+
+  @override
+  String get inviteSendFailed => '초대를 보내지 못했습니다';
+
+  @override
+  String get revokeInviteLinkWarning => '초대 링크가 더 이상 작동하지 않습니다.';
+
+  @override
+  String revokeInviteEmailWarning(String email) {
+    return '$email에 보낸 초대가 더 이상 작동하지 않습니다.';
+  }
+
+  @override
+  String get inviteRevokeFailed => '초대를 취소하지 못했습니다';
+
+  @override
+  String get inviteNoPermission => '초대할 권한이 없습니다';
+
+  @override
+  String get invitesEmptyPending => '보류 중인 초대가 없습니다';
+
+  @override
+  String get invitesEmptyExpired => '만료된 초대가 없습니다';
+
+  @override
+  String get invitesEmptyRedeemed => '사용된 초대가 없습니다';
+
+  @override
+  String get invitesEmptyPendingHint => '초대 링크를 만들어 사람들을 포럼에 초대하세요.';
+
+  @override
+  String get inviteLinkFallbackTitle => '초대 링크';
+
+  @override
+  String inviteRedeemedOn(String date) {
+    return '$date 사용됨';
+  }
+
+  @override
+  String inviteRedemptions(int count, int max) {
+    return '$max회 중 $count회 사용됨';
+  }
+
+  @override
+  String get inviteEmailSent => '이메일 보냄';
+
+  @override
+  String get inviteEmailNotSent => '이메일 보내지 않음';
+
+  @override
+  String inviteExpiredOn(String date) {
+    return '$date 만료됨';
+  }
+
+  @override
+  String get inviteRevokeTooltip => '초대 취소';
+
+  @override
+  String get reviewStatusPending => '보류 중';
+
+  @override
+  String get reviewStatusApproved => '승인됨';
+
+  @override
+  String get reviewStatusRejected => '거부됨';
+
+  @override
+  String get reviewStatusAll => '모두';
+
+  @override
+  String get reviewStatusIgnored => '신고 무시됨';
+
+  @override
+  String get reviewStatusDeleted => '삭제된 글 또는 댓글';
+
+  @override
+  String get reviewQueueUnavailable => '이 포럼에서는 검토 대기열을 사용할 수 없습니다.';
+
+  @override
+  String get reviewQueueLoadFailed => '검토 대기열을 불러오지 못했습니다';
+
+  @override
+  String get reviewableChangedByOther => '다른 운영자가 이 항목을 변경했습니다. 새로 고치는 중…';
+
+  @override
+  String get reviewActionFailed => '작업을 수행하지 못했습니다';
+
+  @override
+  String reviewActionDone(String action) {
+    return '$action 완료';
+  }
+
+  @override
+  String get reviewRejectReasonHint => '거부하는 이유는 무엇인가요?';
+
+  @override
+  String get reviewTypeFlaggedPost => '신고된 게시물';
+
+  @override
+  String get reviewTypeQueuedPost => '대기 중인 게시물';
+
+  @override
+  String get reviewTypeQueuedTopic => '대기중인 글';
+
+  @override
+  String get reviewTypeUser => '사용자';
+
+  @override
+  String get reviewTypePost => '게시물';
+
+  @override
+  String get reviewTypeChatMessage => '신고된 채팅 메시지';
+
+  @override
+  String get reviewModeratorAccessRequired => '운영자 권한이 필요합니다';
+
+  @override
+  String reviewableScore(String score) {
+    return '점수 $score';
+  }
+
+  @override
+  String get postRepliesLoadFailed => '댓글을 불러오지 못했습니다.';
+
+  @override
+  String get postMakeWiki => '위키 만들기';
+
+  @override
+  String get postRemoveWiki => '위키 제거';
+
+  @override
+  String get postBookmarkRemoveFailed => '북마크를 삭제하지 못했습니다';
+
+  @override
+  String get postBookmarkFailed => '게시물을 북마크하지 못했습니다';
+
+  @override
+  String get postBookmarkReminderUpdateFailed => '알림을 수정하지 못했습니다';
+
+  @override
+  String get postBookmarkReminderSet => '알림을 설정했습니다';
+
+  @override
+  String get postBookmarkReminderCleared => '미리 알림을 해제했습니다';
+
+  @override
+  String get solutionMarkFailed => '해결책으로 표시하지 못했습니다';
+
+  @override
+  String get solutionUnmarkFailed => '해결책 표시를 해제하지 못했습니다';
+
+  @override
+  String get postUnknownDate => '날짜 알 수 없음';
+
+  @override
+  String get postBookmarkAction => '게시물 북마크';
+
+  @override
+  String postReactionsSemanticsReacted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '반응함. 반응 $count개. 탭하여 변경, 길게 눌러 반응한 사람 보기.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String postReactionsSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '반응 $count개. 탭하여 반응, 길게 눌러 반응한 사람 보기.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get postLikeAction => '게시물에 좋아요 표시';
+
+  @override
+  String get postUnlikeAction => '좋아요 취소';
+
+  @override
+  String get postVoteRemoveFailed => '투표를 취소하지 못했습니다(취소 가능 시간이 지났을 수 있습니다)';
+
+  @override
+  String get postVoteCastFailed => '투표하지 못했습니다';
+
+  @override
+  String get postUpvote => '추천';
+
+  @override
+  String get postDownvote => '비추천';
+
+  @override
+  String get pollVoteFailed => '투표하지 못했습니다. 다시 시도하세요.';
+
+  @override
+  String get pollRemoveVoteFailed => '투표를 취소하지 못했습니다. 다시 시도하세요.';
+
+  @override
+  String get pollVotersLoadFailed => '투표자를 불러오지 못했습니다.';
+
+  @override
+  String get pollVotersNotVisible => '이 투표의 투표자는 공개되지 않습니다.';
+
+  @override
+  String solutionSolvedByInPost(String name, int postNumber) {
+    return '$name님이 게시물 #$postNumber에서 해결';
+  }
+
+  @override
+  String solutionMarkedBy(String name) {
+    return '$name님이 표시';
+  }
+
+  @override
+  String reactAgainInSeconds(int seconds) {
+    return '$seconds초 후에 다시 반응할 수 있습니다';
+  }
+
+  @override
+  String get reactionUpdateFailed => '반응을 업데이트하지 못했습니다.';
+
+  @override
+  String get reactionsNotSupported => '이 포럼은 반응을 지원하지 않습니다.';
+
+  @override
+  String get reactionsLoadFailed => '반응을 불러오지 못했습니다.';
+
+  @override
+  String viewProfileOfUser(String username) {
+    return '$username님의 프로필 보기';
+  }
+
+  @override
+  String get failedToSavePost => '게시물을 저장하지 못했습니다';
+
+  @override
+  String failedToSavePostWithError(String error) {
+    return '게시물을 저장하지 못했습니다: $error';
+  }
+
+  @override
+  String get failedToRemoveAttachmentCheckPermissions =>
+      '첨부 파일을 삭제하지 못했습니다. 권한을 확인하세요.';
+
+  @override
+  String get editPostTitle => '게시물 편집';
+
+  @override
+  String get editYourPostHint => '게시물 편집...';
+
+  @override
+  String get failedToPostReply => '답글을 게시하지 못했습니다';
+
+  @override
+  String failedToPostReplyWithError(String error) {
+    return '답글을 게시하지 못했습니다: $error';
+  }
+
+  @override
+  String get failedToCreateTopic => '글을 작성하지 못했습니다';
+
+  @override
+  String get writeYourTopicTitle => '글 제목 작성...';
+
+  @override
+  String get writeYourTopicContent => '글 내용 작성...';
+
+  @override
+  String get composerTitleHint => '제목 작성...';
+
+  @override
+  String get composerContentHint => '내용 작성...';
+
+  @override
+  String imageTooLargeCouldNotResize(
+      String fileName, String size, String limit) {
+    return '$fileName: 너무 크며($size) 크기를 줄일 수 없습니다. 제한은 $limit입니다.';
+  }
+
+  @override
+  String imageResizedToFitLimit(
+      String fileName, String size, String dimensions, String limit) {
+    return '$fileName을(를) $limit 제한에 맞게 $size$dimensions(으)로 줄였습니다.';
+  }
+
+  @override
+  String get composerAttachFileHint => '이 게시물에 파일 첨부';
+
+  @override
+  String get composerUploadImageHint => '이 게시물에 이미지 업로드';
+
+  @override
+  String get composerFormattingHint => '서식 옵션 열기';
+
+  @override
+  String get whisperStaffOnly => '귓속말(운영진 전용)';
+
+  @override
+  String get whisperOnStaffOnly => '귓속말 켜짐(운영진 전용)';
+
+  @override
+  String get tagInputMaxReached => '태그 최대 개수에 도달했습니다';
+
+  @override
+  String get tagInputAddTag => '태그 추가…';
+
+  @override
+  String get tagInputAddAnother => '+ 태그';
+
+  @override
+  String get editHistoryUnavailable => '이 포럼에서는 편집 기록을 사용할 수 없습니다.';
+
+  @override
+  String get editHistoryLoadFailed => '편집 기록을 불러오지 못했습니다.';
+
+  @override
+  String get previousRevision => '이전 수정 버전';
+
+  @override
+  String get nextRevision => '다음 수정 버전';
+
+  @override
+  String get notificationPrefsLoadFailed => '알림 설정을 불러오지 못했습니다.';
+
+  @override
+  String get notificationPrefsSaveFailed => '저장하지 못했습니다 — 연결을 확인하세요';
+
+  @override
+  String get signInToManageNotificationPrefs => '알림 설정을 관리하려면 로그인하세요.';
+
+  @override
+  String get notificationSettingsPushSection => '푸시';
+
+  @override
+  String get notificationSettingsEmailSection => '이메일';
+
+  @override
+  String get emailWhenAwayTitle => '부재 시 이메일';
+
+  @override
+  String get emailLevelDescription =>
+      '내가 인용되거나 댓글을 받았을 때, 내 아이디(@username)가 언급되었을 때 또는 내가 구독한 카테고리, 태그 또는 글에 새로운 활동이 있을 때 이메일 보내기';
+
+  @override
+  String get notificationPrefAlways => '항상';
+
+  @override
+  String get notificationPrefOnlyWhenAway => '접속 중이 아닐 때만';
+
+  @override
+  String get notificationPrefNever => '거부';
+
+  @override
+  String get emailForMessagesTitle => '메시지 이메일';
+
+  @override
+  String get emailMessagesLevelDescription => '개인 메시지를 받으면 이메일 보내기';
+
+  @override
+  String get activitySummaryTitle => '활동 요약';
+
+  @override
+  String get activitySummaryDescription =>
+      '이곳을 방문하지 않을 경우 인기 글 및 댓글에 대한 요약 이메일 보내기';
+
+  @override
+  String get activitySummaryFrequencyTitle => '활동 요약 빈도';
+
+  @override
+  String get activitySummaryDaily => '매일';
+
+  @override
+  String get activitySummaryWeekly => '매주';
+
+  @override
+  String get activitySummaryMonthly => '매달';
+
+  @override
+  String get mailingListModeTitle => '메일링 리스트 모드';
+
+  @override
+  String get mailingListModeDescription =>
+      '모든 게시물을 이메일로 받습니다(활동 요약은 꺼짐). 활동이 많은 포럼에서는 권장하지 않습니다.';
+
+  @override
+  String get likeNotificationFrequencyTitle => '좋아요 받았을 때 알림';
+
+  @override
+  String get likeNotificationFirstTimeAndDaily => '게시물이 첫 좋아요를 받았을 때부터 매일 알림';
+
+  @override
+  String get likeNotificationFirstTime => '게시물이 첫 좋아요를 받았을 때';
+
+  @override
+  String get whenPostingTitle => '글 작성 시';
+
+  @override
+  String get whenPostingDescription => '댓글을 단 글을 어떻게 할지';
+
+  @override
+  String get whenPostingWatchTopic => '글 구독';
+
+  @override
+  String get whenPostingTrackTopic => '글 팔로우';
+
+  @override
+  String get whenPostingDoNothing => '아무것도하지 않음';
+
+  @override
+  String get pauseNotificationsUntilTomorrow => '내일까지';
+
+  @override
+  String get couldNotEnableDoNotDisturb => '방해 금지를 켤 수 없습니다';
+
+  @override
+  String get couldNotTurnOffDoNotDisturb => '방해 금지를 끌 수 없습니다';
+
+  @override
+  String get passwordResetEmailSent => '비밀번호 재설정 이메일을 보냈습니다.';
+
+  @override
+  String get couldNotSendResetEmail => '재설정 이메일을 보낼 수 없습니다';
+
+  @override
+  String get accountRequestFailed => '요청에 실패했습니다.';
+
+  @override
+  String get forumUrlUnavailable => '포럼 URL을 사용할 수 없습니다.';
+
+  @override
+  String get couldNotOpenPreferencesPage => '환경설정 페이지를 열 수 없습니다.';
+
+  @override
+  String get couldNotOpenForumUrl => '포럼 URL을 열 수 없습니다.';
+
+  @override
+  String get couldNotRequestEmailChange => '이메일 변경을 요청할 수 없습니다';
+
+  @override
+  String get newEmailLabel => '새로운 이메일';
+
+  @override
+  String get enterAnEmailAddress => '이메일 주소를 입력하세요';
+
+  @override
+  String get emailLooksInvalid => '이메일 형식이 아닌 것 같습니다';
+
+  @override
+  String get emailNoSpaces => '이메일에는 공백을 넣을 수 없습니다';
+
+  @override
+  String get allowNotificationsSheetTitle => '알림 허용';
+
+  @override
+  String get notificationsGrantNoPayload => '승인에서 응답이 반환되지 않았습니다.';
+
+  @override
+  String get thisForumFallback => '이 포럼';
+
+  @override
+  String signInToDomain(String domain) {
+    return '$domain에 로그인';
+  }
+
+  @override
+  String get loginResultTitle => '로그인 결과';
+
+  @override
+  String get invalidAuthenticationCode => '인증 코드가 올바르지 않습니다';
+
+  @override
+  String get tfaVerificationError => '인증 중 오류가 발생했습니다. 다시 시도하세요.';
+
+  @override
+  String get passwordFieldLabel => '비밀번호';
+
+  @override
+  String get somethingWentWrongTryAgain => '문제가 발생했습니다. 다시 시도하세요.';
+
+  @override
+  String get unexpectedErrorTryAgain => '예기치 않은 오류가 발생했습니다. 다시 시도하세요.';
+
+  @override
+  String get errorNoInternetConnection => '인터넷에 연결되어 있지 않습니다. 네트워크 설정을 확인하세요.';
+
+  @override
+  String get errorRequestTimedOut => '요청 시간이 초과되었습니다. 다시 시도하세요.';
+
+  @override
+  String get errorServerTryLater => '서버 오류가 발생했습니다. 나중에 다시 시도하세요.';
+
+  @override
+  String get errorInvalidCredentials => '사용자 이름 또는 비밀번호가 올바르지 않습니다.';
+
+  @override
+  String get errorSessionExpired => '세션이 만료되었습니다. 다시 로그인하세요.';
+
+  @override
+  String get errorAccountSuspended => '계정이 정지되었습니다. 포럼 스태프에게 문의하세요.';
+
+  @override
+  String get errorForumNotFound => '포럼을 찾을 수 없습니다.';
+
+  @override
+  String get errorForumAccessDenied => '이 포럼에 접근할 권한이 없습니다.';
+
+  @override
+  String get errorForumUnavailable => '포럼을 현재 사용할 수 없습니다. 나중에 다시 시도하세요.';
+
+  @override
+  String get errorDataNotFound => '요청한 데이터를 찾을 수 없습니다.';
+
+  @override
+  String get errorDataCorrupted => '데이터가 손상된 것 같습니다. 페이지를 새로 고치세요.';
+
+  @override
+  String get errorCacheLoadFailed => '캐시된 데이터를 불러오지 못했습니다. 다시 시도하세요.';
+
+  @override
+  String errorInvalidField(String field) {
+    return '$field이(가) 올바르지 않습니다.';
+  }
+
+  @override
+  String errorFieldRequired(String field) {
+    return '$field은(는) 필수입니다.';
+  }
+
+  @override
+  String errorPermissionDeniedFor(String action) {
+    return '$action 권한이 없습니다.';
+  }
+
+  @override
+  String errorFeatureNotAvailable(String feature) {
+    return '$feature은(는) 이 포럼에서 사용할 수 없습니다.';
+  }
+
+  @override
+  String get errorStorageFull => '저장 공간이 가득 찼습니다. 공간을 확보하세요.';
+
+  @override
+  String get errorStorageAccessDenied => '저장소 접근이 거부되었습니다. 앱 권한을 확인하세요.';
+
+  @override
+  String get errorNetworkTryAgain => '네트워크 오류가 발생했습니다. 다시 시도하세요.';
+
+  @override
+  String get errorAuthenticationTryAgain => '인증에 실패했습니다. 다시 시도하세요.';
+
+  @override
+  String get errorForumTryAgain => '포럼 오류가 발생했습니다. 다시 시도하세요.';
+
+  @override
+  String get connectionErrorTitle => '연결 오류';
+
+  @override
+  String get authenticationErrorTitle => '인증 오류';
+
+  @override
+  String get forumErrorTitle => '포럼 오류';
+
+  @override
+  String get permissionErrorTitle => '권한 오류';
 }

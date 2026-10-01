@@ -28,6 +28,8 @@ import 'package:discourse_core/discourse_core.dart' show DiscourseSocialProxy;
 import 'discourse_route_navigator.dart';
 import 'notification_route.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../l10n/app_l10n.dart';
+import '../utils/error_message.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
 
 class NotificationService with ServiceErrorHandlingMixin {
@@ -515,7 +517,7 @@ class NotificationService with ServiceErrorHandlingMixin {
       title: message.notification?.title ??
           message.data['site_name']?.toString() ??
           AppForumConfig.userApiApplicationName,
-      body: message.notification?.body ?? 'New notification',
+      body: message.notification?.body ?? _l10n().newNotificationFallbackBody,
       notificationDetails: details,
       payload: payload,
     );
@@ -567,7 +569,7 @@ class NotificationService with ServiceErrorHandlingMixin {
       // Validate required fields
       if (rawSiteId == null) {
         AppLogger.debug('⚠️ [NotificationService] Missing site_id in payload - opening app without navigation');
-        _showNotificationError('Unable to open notification', 'Missing site information (site_id).');
+        _showNotificationError(appL10n().notificationMissingSiteInfo);
         _openAppWithoutNavigation();
         return;
       }
@@ -580,7 +582,7 @@ class NotificationService with ServiceErrorHandlingMixin {
       final int? siteId = int.tryParse(siteIdStr);
       if (siteId == null) {
         AppLogger.debug('⚠️ [NotificationService] Unable to parse site_id: $rawSiteId - opening app without navigation');
-        _showNotificationError('Unable to open notification', 'Invalid site information (site_id).');
+        _showNotificationError(appL10n().notificationInvalidSiteInfo);
         _openAppWithoutNavigation();
         return;
       }
@@ -599,7 +601,7 @@ class NotificationService with ServiceErrorHandlingMixin {
         // content_id is the post ID
         if (!data.containsKey('content_id')) {
           AppLogger.debug('⚠️ [NotificationService] Missing content_id for post notification - opening app without navigation');
-          _showNotificationError('Unable to open notification', 'Missing post information (content_id).');
+          _showNotificationError(appL10n().notificationMissingPostInfo);
           _openAppWithoutNavigation();
           return;
         }
@@ -608,7 +610,7 @@ class NotificationService with ServiceErrorHandlingMixin {
         // New format: conversation messages use conversation_id
         if (!data.containsKey('conversation_id')) {
           AppLogger.debug('⚠️ [NotificationService] Missing conversation_id for conversation_message notification - opening app without navigation');
-          _showNotificationError('Unable to open notification', 'Missing conversation information (conversation_id).');
+          _showNotificationError(appL10n().notificationMissingMessageInfo);
           _openAppWithoutNavigation();
           return;
         }
@@ -618,19 +620,19 @@ class NotificationService with ServiceErrorHandlingMixin {
         // sender_id contains the user ID to open
         if (!data.containsKey('sender_id')) {
           AppLogger.debug('⚠️ [NotificationService] Missing sender_id for user notification - opening app without navigation');
-          _showNotificationError('Unable to open notification', 'Missing user information (sender_id).');
+          _showNotificationError(appL10n().notificationMissingUserInfo);
           _openAppWithoutNavigation();
           return;
         }
         await _handleUserNotification(data, siteId, siteIdStr);
       } else {
         AppLogger.debug('🔔 [NotificationService] Unknown content type: $contentType - opening app without navigation');
-        _showNotificationError('Unable to open notification', 'Unsupported notification type.');
+        _showNotificationError(appL10n().notificationUnsupportedType);
         _openAppWithoutNavigation();
       }
     } catch (e) {
       AppLogger.debug('❌ [NotificationService] Error navigating from notification: $e - opening app without navigation');
-      _showNotificationError('Unable to open notification', e.toString());
+      _showNotificationError(describeError(e));
       _openAppWithoutNavigation();
     }
   }
@@ -893,7 +895,7 @@ class NotificationService with ServiceErrorHandlingMixin {
 
       if (targetForum == null) {
         AppLogger.debug('❌ [NotificationService] Forum not found for site_id: $siteId');
-        _showNotificationError('Unable to open notification', 'Forum not found for this site.');
+        _showNotificationError(appL10n().notificationForumNotFound);
         _openAppWithoutNavigation();
         return;
       }
@@ -904,7 +906,7 @@ class NotificationService with ServiceErrorHandlingMixin {
       final siteController = await _initializeSiteAndWait(targetForum);
       if (siteController == null || siteController.currentSiteContext.value == null) {
         AppLogger.debug('⚠️ [NotificationService] Failed to initialize site');
-        _showNotificationError('Unable to open notification', 'Failed to initialize the forum.');
+        _showNotificationError(appL10n().notificationForumOpenFailed);
         _openAppWithoutNavigation();
         return;
       }
@@ -937,7 +939,7 @@ class NotificationService with ServiceErrorHandlingMixin {
       // content_id is the post ID used for getThreadByPost API call
       if (!data.containsKey('topic_id')) {
         AppLogger.debug('⚠️ [NotificationService] Topic ID missing from push notification payload - required for thread actions');
-        _showNotificationError('Unable to open notification', 'Missing thread information (topic_id).');
+        _showNotificationError(appL10n().notificationMissingTopicInfo);
         _openAppWithoutNavigation();
         return;
       }
@@ -965,7 +967,7 @@ class NotificationService with ServiceErrorHandlingMixin {
       AppNavigation.pushGlobal(postPageBuilder());
     } catch (e) {
       AppLogger.debug('❌ [NotificationService] Error handling post notification: $e');
-      _showNotificationError('Unable to open notification', e.toString());
+      _showNotificationError(describeError(e));
       _openAppWithoutNavigation();
     }
   }
@@ -1001,8 +1003,10 @@ class NotificationService with ServiceErrorHandlingMixin {
         }
       }
 
-      // Extract optional subject, default to "Message" if not provided
-      final String subject = data.containsKey('subject') ? data['subject'].toString() : 'Message';
+      // The message's subject, when the payload names it.
+      final String subject = data.containsKey('subject')
+          ? data['subject'].toString()
+          : appL10n().personalMessageTitleFallback;
 
       // Look up forum by site_id
       AppLogger.debug('🔎 [NotificationService] Looking up forum by site_id: $siteId');
@@ -1010,7 +1014,7 @@ class NotificationService with ServiceErrorHandlingMixin {
 
       if (targetForum == null) {
         AppLogger.debug('❌ [NotificationService] Forum not found for site_id: $siteId');
-        _showNotificationError('Unable to open notification', 'Forum not found for this site.');
+        _showNotificationError(appL10n().notificationForumNotFound);
         _openAppWithoutNavigation();
         return;
       }
@@ -1021,7 +1025,7 @@ class NotificationService with ServiceErrorHandlingMixin {
       final siteController = await _initializeSiteAndWait(targetForum);
       if (siteController == null || siteController.currentSiteContext.value == null) {
         AppLogger.debug('⚠️ [NotificationService] Failed to initialize site');
-        _showNotificationError('Unable to open notification', 'Failed to initialize the forum.');
+        _showNotificationError(appL10n().notificationForumOpenFailed);
         _openAppWithoutNavigation();
         return;
       }
@@ -1044,7 +1048,7 @@ class NotificationService with ServiceErrorHandlingMixin {
       AppNavigation.pushGlobal(postPageBuilder());
     } catch (e) {
       AppLogger.debug('❌ [NotificationService] Error handling conversation notification: $e');
-      _showNotificationError('Unable to open notification', e.toString());
+      _showNotificationError(describeError(e));
       _openAppWithoutNavigation();
     }
   }
@@ -1073,7 +1077,7 @@ class NotificationService with ServiceErrorHandlingMixin {
 
       if (targetForum == null) {
         AppLogger.debug('❌ [NotificationService] Forum not found for site_id: $siteId');
-        _showNotificationError('Unable to open notification', 'Forum not found for this site.');
+        _showNotificationError(appL10n().notificationForumNotFound);
         _openAppWithoutNavigation();
         return;
       }
@@ -1084,7 +1088,7 @@ class NotificationService with ServiceErrorHandlingMixin {
       final siteController = await _initializeSiteAndWait(targetForum);
       if (siteController == null || siteController.currentSiteContext.value == null) {
         AppLogger.debug('⚠️ [NotificationService] Failed to initialize site');
-        _showNotificationError('Unable to open notification', 'Failed to initialize the forum.');
+        _showNotificationError(appL10n().notificationForumOpenFailed);
         _openAppWithoutNavigation();
         return;
       }
@@ -1098,12 +1102,13 @@ class NotificationService with ServiceErrorHandlingMixin {
           ));
     } catch (e) {
       AppLogger.debug('❌ [NotificationService] Error handling user notification: $e');
-      _showNotificationError('Unable to open notification', e.toString());
+      _showNotificationError(describeError(e));
       _openAppWithoutNavigation();
     }
   }
 
-  void _showNotificationError(String title, String message) {
+  /// "Unable to open notification", and why.
+  void _showNotificationError(String message) {
     final context = Get.context;
     if (context == null) {
       AppLogger.debug('⚠️ [NotificationService] No context available for error dialog');
@@ -1116,9 +1121,10 @@ class NotificationService with ServiceErrorHandlingMixin {
         context: context,
         barrierDismissible: true,
         builder: (dialogContext) {
+          final l10n = AppLocalizations.of(dialogContext)!;
           return AlertDialog(
             title: Text(
-              title,
+              l10n.unableToOpenNotification,
             ),
             content: Text(
               message,
@@ -1126,7 +1132,7 @@ class NotificationService with ServiceErrorHandlingMixin {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(),
-                child: Text('OK'),
+                child: Text(l10n.okButton),
               ),
             ],
           );

@@ -180,7 +180,7 @@ class ForumHeaderWidget extends StatelessWidget {
           : DiscourseSiteCapabilities.forSite(site?.pluginUrl ?? '').logoFor(
               dark: isDarkMode,
             );
-      final siteName = site?.name ?? (AppLocalizations.of(context)?.forum ?? 'Forum');
+      final siteName = site?.name ?? AppLocalizations.of(context)!.forumNameFallback;
       // The forum's identity card: its wordmark on a gradient in its own
       // colour — its web header when that is branded, else its accent
       // (ForumBrandStyle). Colours come from the theme, which is the forum's
@@ -295,7 +295,7 @@ class ForumHeaderWidget extends StatelessWidget {
                             siteName, cardColor, caps),
                     SizedBox(height: DesignTokens.spacingS),
                     Text(
-                      site?.name ?? 'Forum',
+                      site?.name ?? AppLocalizations.of(context)!.forumNameFallback,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: fg,
                         fontWeight: DesignTokens.fontWeightMedium,
@@ -319,7 +319,8 @@ class ForumHeaderWidget extends StatelessWidget {
                     SizedBox(height: DesignTokens.spacingS),
                     // Forum Description
                     Text(
-                      site?.description ?? 'No description available.',
+                      site?.description ??
+                          AppLocalizations.of(context)!.noForumDescription,
                       style: TextStyle(
                         color: fg.withValues(alpha: DesignTokens.opacityHigh),
                         fontSize: DesignTokens.fontSizeS,
@@ -345,7 +346,7 @@ class ForumHeaderWidget extends StatelessWidget {
                             SizedBox(height: DesignTokens.spacingXS / 2),
                           if ((boardStats?.total_members ?? 0) > 0)
                             Text(
-                              AppLocalizations.of(context)?.membersCount(boardStats?.total_members ?? 0) ?? '${formatNumber(context, boardStats?.total_members ?? 0)} Members',
+                              AppLocalizations.of(context)!.membersCount(boardStats?.total_members ?? 0),
                               style: statsLineStyle,
                               textAlign: TextAlign.left,
                             ),

@@ -49,6 +49,8 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
     setState(() {
       _isSaving = true;
     });
+    // Looked up before the awaits below.
+    final l10n = AppLocalizations.of(context)!;
 
     try {
       final imageUrl = widget.imageUrls[_currentIndex];
@@ -88,7 +90,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                AppLocalizations.of(context)!.permissionDeniedToSaveImage,
+                l10n.permissionDeniedToSaveImage,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onErrorContainer,
                     ),
@@ -116,7 +118,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
         final imageData = await ImageLoader.fetchImageFile(imageUrl);
 
         if (!await imageData.file.exists()) {
-          throw Exception('Image file not found');
+          throw Exception(l10n.imageFileNotFound);
         }
 
         bytes = await imageData.file.readAsBytes();
@@ -137,8 +139,9 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
           SnackBar(
             content: Text(
               result.isSuccess 
-                ? (AppLocalizations.of(context)?.imageSavedToGallery ?? 'Image saved to gallery!')
-                : (AppLocalizations.of(context)?.failedToSaveImage(result.errorMessage ?? "Unknown error") ?? 'Failed to save image: ${result.errorMessage ?? "Unknown error"}'),
+                ? l10n.imageSavedToGallery
+                : l10n.failedToSaveImage(
+                    result.errorMessage ?? l10n.unknownErrorFallback),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: result.isSuccess
                         ? Theme.of(context).colorScheme.onInverseSurface
@@ -157,7 +160,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                AppLocalizations.of(context)?.failedToSaveImage(e.toString()) ?? 'Failed to save image: ${e.toString()}',
+                l10n.failedToSaveImage(e.toString()),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onErrorContainer,
                     ),

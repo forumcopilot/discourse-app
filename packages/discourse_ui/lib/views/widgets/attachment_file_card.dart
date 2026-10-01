@@ -77,7 +77,7 @@ class _AttachmentFileCardState extends State<AttachmentFileCard> {
       _progress = null;
     });
     final messenger = ScaffoldMessenger.maybeOf(context);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final origin = _origin();
 
@@ -86,7 +86,7 @@ class _AttachmentFileCardState extends State<AttachmentFileCard> {
       final reason = describeError(error, context: context);
       messenger?.showSnackBar(SnackBar(
         content: Text(
-          l10n?.errorDownloading(widget.name, reason) ?? 'Error downloading ${widget.name}: $reason',
+          l10n.errorDownloading(widget.name, reason),
           style: TextStyle(color: colorScheme.onErrorContainer),
         ),
         backgroundColor: colorScheme.errorContainer,
@@ -134,8 +134,8 @@ class _AttachmentFileCardState extends State<AttachmentFileCard> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final l10n = AppLocalizations.of(context);
-    final label = widget.name.isEmpty ? 'Attachment' : widget.name;
+    final l10n = AppLocalizations.of(context)!;
+    final label = widget.name.isEmpty ? l10n.attachmentDefaultName : widget.name;
     final hasUrl = widget.url.isNotEmpty;
     final progress = _progress;
 
@@ -151,7 +151,7 @@ class _AttachmentFileCardState extends State<AttachmentFileCard> {
             borderRadius: BorderRadius.circular(DesignTokens.radiusS),
           ),
           child: Icon(
-            getFileIcon(getFileType(label)),
+            getFileIcon(label),
             size: DesignTokens.iconSizeL,
             color: Colors.white,
           ),
@@ -163,14 +163,14 @@ class _AttachmentFileCardState extends State<AttachmentFileCard> {
         ].join(' • ')),
         trailing: [
           IconButton(
-            tooltip: l10n?.share ?? 'Share',
+            tooltip: l10n.share,
             onPressed: hasUrl ? _share : null,
             icon: Icon(Icons.share_outlined,
                 size: DesignTokens.iconSizeM, color: colorScheme.onSurfaceVariant),
           ),
           if (_busy)
             IconButton(
-              tooltip: l10n?.cancel ?? 'Cancel',
+              tooltip: l10n.cancel,
               onPressed: () => _cancel?.cancel(),
               icon: SizedBox(
                 width: DesignTokens.iconSizeM,
@@ -178,14 +178,14 @@ class _AttachmentFileCardState extends State<AttachmentFileCard> {
                 child: CircularProgressIndicator(
                   value: progress,
                   strokeWidth: 2.5,
-                  semanticsLabel: l10n?.downloading(label) ?? 'Downloading $label...',
+                  semanticsLabel: l10n.downloading(label),
                   semanticsValue: progress == null ? null : '${(progress * 100).round()}%',
                 ),
               ),
             )
           else
             IconButton(
-              tooltip: l10n?.download ?? 'Download',
+              tooltip: l10n.download,
               onPressed: hasUrl ? _open : null,
               icon: Icon(Icons.download_rounded,
                   size: DesignTokens.iconSizeM, color: colorScheme.primary),

@@ -18,6 +18,7 @@ import 'package:get/get.dart';
 import '../controllers/login_controller.dart';
 import 'login_page.dart';
 import 'widgets/search_filters_sheet.dart';
+import '../utils/error_message.dart';
 
 class SearchPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -263,9 +264,9 @@ class _SearchPageState extends State<SearchPage> {
     ScaffoldMessenger.maybeOf(context)?.showSnackBar(
       SnackBar(
         content: Text(
-            message == null || message.isEmpty ? 'Search failed' : message),
+            message == null || message.isEmpty ? AppLocalizations.of(context)!.searchFailed : message),
         action: SnackBarAction(
-          label: AppLocalizations.of(context)?.retry ?? 'Retry',
+          label: AppLocalizations.of(context)!.retry,
           onPressed: () {
             if (!mounted || seq != _querySeq) return;
             _errorSnackSeq = -1; // re-arm the snackbar if the retry fails
@@ -354,7 +355,9 @@ class _SearchPageState extends State<SearchPage> {
       }
     } catch (e) {
       if (!mounted || seq != _querySeq) return;
-      _reportSearchError(seq, 'Search failed: $e', topics: true);
+      _reportSearchError(seq,
+          AppLocalizations.of(context)!.searchFailedWithError(describeError(e, context: context)),
+          topics: true);
     } finally {
       if (mounted && seq == _querySeq) {
         setState(() {
@@ -435,7 +438,9 @@ class _SearchPageState extends State<SearchPage> {
       }
     } catch (e) {
       if (!mounted || seq != _querySeq) return;
-      _reportSearchError(seq, 'Search failed: $e', posts: true);
+      _reportSearchError(seq,
+          AppLocalizations.of(context)!.searchFailedWithError(describeError(e, context: context)),
+          posts: true);
     } finally {
       if (mounted && seq == _querySeq) {
         setState(() {
@@ -520,7 +525,9 @@ class _SearchPageState extends State<SearchPage> {
       }
     } catch (e) {
       if (!mounted || seq != _querySeq) return;
-      _reportSearchError(seq, 'Search failed: $e', titlesOnly: true);
+      _reportSearchError(seq,
+          AppLocalizations.of(context)!.searchFailedWithError(describeError(e, context: context)),
+          titlesOnly: true);
     } finally {
       if (mounted && seq == _querySeq) {
         setState(() {
@@ -538,7 +545,7 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context)?.search ?? 'Search',
+          AppLocalizations.of(context)!.search,
         ),
         actions: [
           IconButton(
@@ -561,7 +568,7 @@ class _SearchPageState extends State<SearchPage> {
                   ),
               ],
             ),
-            tooltip: 'Filters',
+            tooltip: AppLocalizations.of(context)!.searchFiltersButtonTooltip,
             onPressed: _openFiltersSheet,
           ),
         ],
@@ -584,7 +591,7 @@ class _SearchPageState extends State<SearchPage> {
               controller: _searchController,
               focusNode: _searchFocusNode,
               decoration: InputDecoration(
-                hintText: AppLocalizations.of(context)?.enterKeywordsToSearchTopics ?? 'Enter keywords to search topics...',
+                hintText: AppLocalizations.of(context)!.enterKeywordsToSearchTopics,
                 hintStyle: textTheme.bodyLarge?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -640,7 +647,7 @@ class _SearchPageState extends State<SearchPage> {
       return EmptyStateView(
         icon: Icons.search_outlined,
         message: AppLocalizations.of(context)!.searchForTopics,
-        hint: AppLocalizations.of(context)?.enterKeywordsToFindTopicsAndPosts ?? 'Enter keywords to find topics and posts',
+        hint: AppLocalizations.of(context)!.enterKeywordsToFindTopicsAndPosts,
       );
     }
 
@@ -705,7 +712,7 @@ class _SearchPageState extends State<SearchPage> {
     // snackbar that also reports it is gone after a few seconds).
     if (_topics.isEmpty && _topicsError) {
       return EmptyStateView.error(
-        message: AppLocalizations.of(context)?.searchFailed ?? 'Search failed',
+        message: AppLocalizations.of(context)!.searchFailed,
         onRetry: _fetchTopics,
       );
     }
@@ -769,7 +776,7 @@ class _SearchPageState extends State<SearchPage> {
     // snackbar that also reports it is gone after a few seconds).
     if (_posts.isEmpty && _postsError) {
       return EmptyStateView.error(
-        message: AppLocalizations.of(context)?.searchFailed ?? 'Search failed',
+        message: AppLocalizations.of(context)!.searchFailed,
         onRetry: _fetchPosts,
       );
     }
@@ -860,7 +867,7 @@ class _SearchPageState extends State<SearchPage> {
     // snackbar that also reports it is gone after a few seconds).
     if (_titlesOnlyTopics.isEmpty && _titlesOnlyError) {
       return EmptyStateView.error(
-        message: AppLocalizations.of(context)?.searchFailed ?? 'Search failed',
+        message: AppLocalizations.of(context)!.searchFailed,
         onRetry: _fetchTitlesOnly,
       );
     }

@@ -173,6 +173,7 @@ class ForumSettingsPage extends StatelessWidget {
     if (confirmed != true || !context.mounted) return;
 
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
     try {
       final proxy = SiteProxyFactory.getAccountProxy();
       // The XF-shape API passes (oldPassword, newPassword) — the
@@ -186,17 +187,19 @@ class ForumSettingsPage extends StatelessWidget {
             result.result
                 ? (result.resultText?.isNotEmpty == true
                     ? result.resultText!
-                    : 'Password-reset email sent.')
+                    : l10n.passwordResetEmailSent)
                 : (result.resultText?.isNotEmpty == true
                     ? result.resultText!
-                    : "Couldn't send reset email"),
+                    : l10n.couldNotSendResetEmail),
           ),
         ),
       );
     } catch (e) {
       if (!context.mounted) return;
       messenger.showSnackBar(
-        SnackBar(content: Text(describeError(e, fallback: 'Request failed.'))),
+        SnackBar(
+            content: Text(describeError(e,
+                fallback: l10n.accountRequestFailed, context: context))),
       );
     }
   }
@@ -207,9 +210,10 @@ class ForumSettingsPage extends StatelessWidget {
   /// security, group memberships — is well outside what we model in
   /// the app's typed prefs page.
   Future<void> _openWebPreferences(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final baseUrl = siteContext.site.url;
     if (baseUrl.isEmpty) {
-      _toast(context, 'Forum URL is unavailable.');
+      _toast(context, l10n.forumUrlUnavailable);
       return;
     }
     // Discourse maps `/my/preferences` to the current user's
@@ -219,7 +223,7 @@ class ForumSettingsPage extends StatelessWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      _toast(context, "Couldn't open the preferences page.");
+      _toast(context, l10n.couldNotOpenPreferencesPage);
     }
   }
 
@@ -343,16 +347,17 @@ class ForumSettingsPage extends StatelessWidget {
   }
 
   Future<void> _openForumHomePage(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final url = siteContext.site.url;
     if (url.isEmpty) {
-      _toast(context, 'Forum URL is unavailable.');
+      _toast(context, l10n.forumUrlUnavailable);
       return;
     }
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      _toast(context, "Couldn't open the forum URL.");
+      _toast(context, l10n.couldNotOpenForumUrl);
     }
   }
 

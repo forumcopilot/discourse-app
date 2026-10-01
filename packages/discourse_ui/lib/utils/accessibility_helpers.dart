@@ -103,41 +103,33 @@ class AccessibilityHelpers {
 
   /// Creates an accessibility label for like button.
   static String getLikeButtonLabel(BuildContext context, bool isLiked, int? count) {
-    if (isLiked) {
-      return 'Unlike post';
-    } else {
-      return 'Like post';
-    }
+    final localizations = AppLocalizations.of(context)!;
+    return isLiked ? localizations.postUnlikeAction : localizations.postLikeAction;
   }
 
   /// Creates an accessibility label for quote button.
   static String getQuoteButtonLabel(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
-    return localizations?.quote ?? 'Quote';
+    return AppLocalizations.of(context)!.quote;
   }
 
   /// Creates an accessibility label for reply button.
   static String getReplyButtonLabel(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
-    return localizations?.reply ?? 'Reply';
+    return AppLocalizations.of(context)!.reply;
   }
 
   /// Creates an accessibility label for edit button.
   static String getEditButtonLabel(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
-    return localizations?.edit ?? 'Edit';
+    return AppLocalizations.of(context)!.edit;
   }
 
   /// Creates an accessibility label for delete button.
   static String getDeleteButtonLabel(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
-    return localizations?.delete ?? 'Delete';
+    return AppLocalizations.of(context)!.delete;
   }
 
   /// Creates an accessibility label for share button.
   static String getShareButtonLabel(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
-    return localizations?.share ?? 'Share';
+    return AppLocalizations.of(context)!.share;
   }
 
   /// Creates an accessibility label for image with context.
@@ -148,8 +140,7 @@ class AccessibilityHelpers {
     if (description != null && description.isNotEmpty) {
       return description;
     }
-    final localizations = AppLocalizations.of(context);
-    return localizations?.image ?? 'Image';
+    return AppLocalizations.of(context)!.image;
   }
 
   /// Ensures minimum touch target size for interactive elements.

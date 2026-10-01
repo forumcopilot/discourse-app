@@ -15,6 +15,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
 import 'package:get/get.dart';
 
 import '../core/logging/app_logger.dart';
+import '../l10n/app_l10n.dart';
 
 /// Owns one chat channel view: message list + send/edit/delete actions, and
 /// the live updates that keep it current.
@@ -399,7 +400,7 @@ class ChatChannelController extends GetxController
       if (!result.result || result.message == null) {
         lastError.value = result.resultText?.isNotEmpty == true
             ? result.resultText!
-            : 'Failed to send message.';
+            : appL10n().chatSendFailed;
         return false;
       }
       final m = result.message!;
@@ -427,7 +428,7 @@ class ChatChannelController extends GetxController
       if (!result.result) {
         lastError.value = result.resultText?.isNotEmpty == true
             ? result.resultText!
-            : 'Failed to edit message.';
+            : appL10n().chatEditFailed;
         return false;
       }
       // Show the new text now. The bubble draws `cooked` first, and the old
@@ -468,7 +469,7 @@ class ChatChannelController extends GetxController
       if (!result.result) {
         lastError.value = result.resultText?.isNotEmpty == true
             ? result.resultText!
-            : 'Failed to delete message.';
+            : appL10n().chatDeleteFailed;
         return false;
       }
       messages.removeWhere((m) => m.id == messageId);
@@ -495,7 +496,7 @@ class ChatChannelController extends GetxController
       {required bool add}) async {
     final proxy = SiteProxyService.getChatProxy();
     if (proxy is! DiscourseChatProxy) {
-      lastError.value = 'Reactions are not supported here.';
+      lastError.value = appL10n().chatReactionsUnsupported;
       return false;
     }
     try {
@@ -508,7 +509,7 @@ class ChatChannelController extends GetxController
       if (!result.result) {
         lastError.value = result.resultText?.isNotEmpty == true
             ? result.resultText!
-            : 'Failed to update reaction.';
+            : appL10n().chatReactionFailed;
         return false;
       }
       _applyLocalReaction(messageId, emoji, add: add);

@@ -182,7 +182,7 @@ class BrokenImageWidget extends StatelessWidget {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(AppLocalizations.of(context)?.couldNotOpenLink(e.toString()) ?? 'Could not open link: ${e.toString()}'),
+                              content: Text(AppLocalizations.of(context)!.couldNotOpenLink(e.toString())),
                               duration: const Duration(seconds: 2),
                             ),
                           );

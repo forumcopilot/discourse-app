@@ -2,6 +2,12 @@
 ///
 /// This file defines all custom exceptions used throughout the application
 /// to provide better error handling and user experience.
+///
+/// An [AppException.message] is shown to the user (`ErrorHandler`), so the
+/// factories below word it in the app's language.
+library;
+
+import '../../l10n/app_l10n.dart';
 
 /// Base exception class for all app-specific exceptions
 abstract class AppException implements Exception {
@@ -22,7 +28,7 @@ abstract class AppException implements Exception {
 
   static UnknownException unknown(e, [StackTrace? stackTrace]) {
     return UnknownException(
-      message: 'An unexpected error occurred. Please try again.',
+      message: appL10n().unexpectedErrorTryAgain,
       code: 'UNKNOWN_ERROR',
       originalError: e,
       stackTrace: stackTrace,
@@ -46,16 +52,16 @@ class NetworkException extends AppException {
 
   /// No internet connection
   static NetworkException noConnection() {
-    return const NetworkException(
-      message: 'No internet connection. Please check your network settings.',
+    return NetworkException(
+      message: appL10n().errorNoInternetConnection,
       code: 'NO_CONNECTION',
     );
   }
 
   /// Request timeout
   static NetworkException timeout() {
-    return const NetworkException(
-      message: 'Request timed out. Please try again.',
+    return NetworkException(
+      message: appL10n().errorRequestTimedOut,
       code: 'TIMEOUT',
     );
   }
@@ -63,7 +69,7 @@ class NetworkException extends AppException {
   /// Server error
   static NetworkException serverError(int statusCode, String? message) {
     return NetworkException(
-      message: message ?? 'Server error occurred. Please try again later.',
+      message: message ?? appL10n().errorServerTryLater,
       code: 'SERVER_ERROR_$statusCode',
     );
   }
@@ -85,24 +91,24 @@ class AuthenticationException extends AppException {
 
   /// Invalid credentials
   static AuthenticationException invalidCredentials() {
-    return const AuthenticationException(
-      message: 'Invalid username or password.',
+    return AuthenticationException(
+      message: appL10n().errorInvalidCredentials,
       code: 'INVALID_CREDENTIALS',
     );
   }
 
   /// Session expired
   static AuthenticationException sessionExpired() {
-    return const AuthenticationException(
-      message: 'Your session has expired. Please log in again.',
+    return AuthenticationException(
+      message: appL10n().errorSessionExpired,
       code: 'SESSION_EXPIRED',
     );
   }
 
-  /// Account locked
+  /// Account suspended (Discourse's word for it; the code keeps its name)
   static AuthenticationException accountLocked() {
-    return const AuthenticationException(
-      message: 'Your account has been locked. Please contact support.',
+    return AuthenticationException(
+      message: appL10n().errorAccountSuspended,
       code: 'ACCOUNT_LOCKED',
     );
   }
@@ -124,24 +130,24 @@ class ForumException extends AppException {
 
   /// Forum not found
   static ForumException notFound() {
-    return const ForumException(
-      message: 'Forum not found.',
+    return ForumException(
+      message: appL10n().errorForumNotFound,
       code: 'FORUM_NOT_FOUND',
     );
   }
 
   /// Access denied
   static ForumException accessDenied() {
-    return const ForumException(
-      message: 'You do not have permission to access this forum.',
+    return ForumException(
+      message: appL10n().errorForumAccessDenied,
       code: 'ACCESS_DENIED',
     );
   }
 
   /// Forum unavailable
   static ForumException unavailable() {
-    return const ForumException(
-      message: 'Forum is currently unavailable. Please try again later.',
+    return ForumException(
+      message: appL10n().errorForumUnavailable,
       code: 'FORUM_UNAVAILABLE',
     );
   }
@@ -163,24 +169,24 @@ class DataException extends AppException {
 
   /// Data not found
   static DataException notFound() {
-    return const DataException(
-      message: 'Requested data not found.',
+    return DataException(
+      message: appL10n().errorDataNotFound,
       code: 'DATA_NOT_FOUND',
     );
   }
 
   /// Data corruption
   static DataException corrupted() {
-    return const DataException(
-      message: 'Data appears to be corrupted. Please refresh the page.',
+    return DataException(
+      message: appL10n().errorDataCorrupted,
       code: 'DATA_CORRUPTED',
     );
   }
 
   /// Cache error
   static DataException cacheError() {
-    return const DataException(
-      message: 'Failed to load cached data. Please try again.',
+    return DataException(
+      message: appL10n().errorCacheLoadFailed,
       code: 'CACHE_ERROR',
     );
   }
@@ -203,7 +209,7 @@ class ValidationException extends AppException {
   /// Invalid input
   static ValidationException invalidInput(String field) {
     return ValidationException(
-      message: 'Invalid $field provided.',
+      message: appL10n().errorInvalidField(field),
       code: 'INVALID_INPUT',
     );
   }
@@ -211,7 +217,7 @@ class ValidationException extends AppException {
   /// Required field missing
   static ValidationException requiredField(String field) {
     return ValidationException(
-      message: '$field is required.',
+      message: appL10n().errorFieldRequired(field),
       code: 'REQUIRED_FIELD',
     );
   }
@@ -234,7 +240,7 @@ class PermissionException extends AppException {
   /// Permission denied
   static PermissionException denied(String action) {
     return PermissionException(
-      message: 'You do not have permission to $action.',
+      message: appL10n().errorPermissionDeniedFor(action),
       code: 'PERMISSION_DENIED',
     );
   }
@@ -242,7 +248,7 @@ class PermissionException extends AppException {
   /// Feature not available
   static PermissionException featureNotAvailable(String feature) {
     return PermissionException(
-      message: '$feature is not available on this forum.',
+      message: appL10n().errorFeatureNotAvailable(feature),
       code: 'FEATURE_NOT_AVAILABLE',
     );
   }
@@ -264,16 +270,16 @@ class StorageException extends AppException {
 
   /// Storage full
   static StorageException full() {
-    return const StorageException(
-      message: 'Storage is full. Please free up some space.',
+    return StorageException(
+      message: appL10n().errorStorageFull,
       code: 'STORAGE_FULL',
     );
   }
 
   /// Storage access denied
   static StorageException accessDenied() {
-    return const StorageException(
-      message: 'Storage access denied. Please check app permissions.',
+    return StorageException(
+      message: appL10n().errorStorageAccessDenied,
       code: 'STORAGE_ACCESS_DENIED',
     );
   }
@@ -298,7 +304,7 @@ class UnknownException extends AppException {
     return UnknownException(
       // The raw error is kept in `originalError` for logging; it must not
       // be pasted into `message`, which is shown to the user.
-      message: 'An unexpected error occurred. Please try again.',
+      message: appL10n().unexpectedErrorTryAgain,
       code: 'UNKNOWN_ERROR',
       originalError: error,
       stackTrace: stackTrace,

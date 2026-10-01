@@ -79,9 +79,11 @@ class CategoriesListState extends State<CategoriesList> {
           await SiteProxyFactory.getForumProxy().getForumAsync(true, '', true);
       if (!mounted) return;
       if (!result.result) {
+        // No reason from the forum: the heading alone says it
+        // (buildErrorWidget), so the hint stays empty.
         _error = (result.resultText?.isNotEmpty ?? false)
             ? result.resultText
-            : 'Unable to load categories';
+            : '';
         _loading = false;
         _changed();
         // One quiet retry: a cold start's network is often not ready yet.
@@ -112,7 +114,7 @@ class CategoriesListState extends State<CategoriesList> {
     return EmptyStateView.error(
       icon: Icons.error_outline_rounded,
       message: AppLocalizations.of(context)!.couldNotLoadCategories,
-      hint: describeError(_error, context: context),
+      hint: _error!.isEmpty ? null : describeError(_error, context: context),
       onRetry: refreshList,
     );
   }

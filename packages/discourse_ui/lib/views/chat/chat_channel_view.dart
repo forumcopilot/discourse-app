@@ -17,6 +17,7 @@ import 'widgets/chat_composer.dart';
 import 'widgets/chat_message_bubble.dart';
 import 'widgets/chat_reaction_chips.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../l10n/app_l10n.dart';
 
 /// Embeds a single Discourse Chat channel — message list + composer —
 /// without its own Scaffold/AppBar so it can plug into a tab body or
@@ -535,7 +536,7 @@ String chatChannelTitle(FCChatChannel ch) {
   if (ch.chatableType == 'DirectMessage') {
     return ch.title;
   }
-  return '#${ch.title.isNotEmpty ? ch.title : 'channel ${ch.id}'}';
+  return '#${ch.title.isNotEmpty ? ch.title : appL10n().chatChannelNumbered(ch.id)}';
 }
 
 /// A channel as a full screen, titled from the channel once it loads — what

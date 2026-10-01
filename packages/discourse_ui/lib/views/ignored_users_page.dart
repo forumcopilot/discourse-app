@@ -76,6 +76,7 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
       _busy.add(user.username);
     });
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
     try {
       final proxy = SiteProxyFactory.getUserProxy();
       final result = await proxy.ignoreUserAsync(user.username, 0);
@@ -89,7 +90,7 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
           _busy.remove(user.username);
         });
         messenger.showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.stoppedIgnoringUser(user.username))),
+          SnackBar(content: Text(l10n.stoppedIgnoringUser(user.username))),
         );
       } else {
         setState(() {
@@ -100,7 +101,7 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
             content: Text(
               result.resultText?.isNotEmpty == true
                   ? result.resultText!
-                  : "Couldn't update ignore state",
+                  : l10n.ignoreStateUpdateFailed,
             ),
           ),
         );
@@ -111,7 +112,9 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
         _busy.remove(user.username);
       });
       messenger.showSnackBar(
-        SnackBar(content: Text(describeError(e, fallback: 'Unignore failed.'))),
+        SnackBar(
+            content: Text(describeError(e,
+                fallback: l10n.ignoredUsersUnignoreFailed))),
       );
     }
   }
@@ -119,7 +122,8 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleListAppBar(title: 'Ignored users'),
+      appBar: SimpleListAppBar(
+          title: AppLocalizations.of(context)!.ignoredUsers),
       body: _buildBody(),
     );
   }
@@ -137,11 +141,10 @@ class _IgnoredUsersPageState extends State<IgnoredUsersPage> {
     }
     final users = _users ?? const <FCIgnoredUser>[];
     if (users.isEmpty) {
-      return const EmptyStateView(
+      return EmptyStateView(
         icon: Icons.notifications_off_outlined,
-        message: "You're not ignoring anyone.",
-        hint: 'Open a user profile and use "Ignore user" in the '
-            'overflow menu to hide their posts and notifications.',
+        message: AppLocalizations.of(context)!.ignoredUsersEmpty,
+        hint: AppLocalizations.of(context)!.ignoredUsersEmptyHint,
       );
     }
     return RefreshIndicator(

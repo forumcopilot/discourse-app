@@ -398,71 +398,11 @@ abstract class AppLocalizations {
   /// **'Please wait for the topic to load'**
   String get pleaseWaitForThreadToLoad;
 
-  /// No description provided for @postCanBeRestoredLater.
-  ///
-  /// In en, this message translates to:
-  /// **'Post can be restored later'**
-  String get postCanBeRestoredLater;
-
-  /// No description provided for @postWillBePermanentlyDeleted.
-  ///
-  /// In en, this message translates to:
-  /// **'Post will be permanently deleted'**
-  String get postWillBePermanentlyDeleted;
-
-  /// No description provided for @enterReasonForDeletingPost.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the reason for deleting this post'**
-  String get enterReasonForDeletingPost;
-
-  /// No description provided for @reportPost.
-  ///
-  /// In en, this message translates to:
-  /// **'Report Post'**
-  String get reportPost;
-
-  /// No description provided for @pleaseProvideReasonForReporting.
-  ///
-  /// In en, this message translates to:
-  /// **'Please provide a reason for reporting this post.'**
-  String get pleaseProvideReasonForReporting;
-
   /// No description provided for @reason.
   ///
   /// In en, this message translates to:
   /// **'Reason'**
   String get reason;
-
-  /// No description provided for @enterReasonForReportingPost.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the reason for reporting this post'**
-  String get enterReasonForReportingPost;
-
-  /// No description provided for @pleaseEnterReason.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter a reason'**
-  String get pleaseEnterReason;
-
-  /// Button to submit a report
-  ///
-  /// In en, this message translates to:
-  /// **'Submit Report'**
-  String get submitReport;
-
-  /// No description provided for @selectedActions.
-  ///
-  /// In en, this message translates to:
-  /// **'Selected actions:'**
-  String get selectedActions;
-
-  /// No description provided for @thisActionCannotBeUndone.
-  ///
-  /// In en, this message translates to:
-  /// **'This action cannot be undone.'**
-  String get thisActionCannotBeUndone;
 
   /// Label for participants (without count)
   ///
@@ -487,12 +427,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New Topic'**
   String get newTopic;
-
-  /// No description provided for @markRead.
-  ///
-  /// In en, this message translates to:
-  /// **'Mark Read'**
-  String get markRead;
 
   /// No description provided for @pleaseSpecifyReason.
   ///
@@ -523,36 +457,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Topic opened'**
   String get topicOpened;
-
-  /// Error message when cannot edit message
-  ///
-  /// In en, this message translates to:
-  /// **'Cannot edit this message: {error}'**
-  String cannotEditMessage(String error);
-
-  /// No description provided for @confirmSpamClean.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm Spam Clean'**
-  String get confirmSpamClean;
-
-  /// No description provided for @handleThreads.
-  ///
-  /// In en, this message translates to:
-  /// **'Handle topics'**
-  String get handleThreads;
-
-  /// No description provided for @deleteMessages.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Messages'**
-  String get deleteMessages;
-
-  /// No description provided for @deleteConversations.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Messages'**
-  String get deleteConversations;
 
   /// No description provided for @noConversations.
   ///
@@ -596,29 +500,11 @@ abstract class AppLocalizations {
   /// **'Login Required'**
   String get loginRequired;
 
-  /// Menu item for spam cleaner tool
-  ///
-  /// In en, this message translates to:
-  /// **'Spam Cleaner'**
-  String get spamCleaner;
-
   /// Button to send a message to a user
   ///
   /// In en, this message translates to:
   /// **'Message'**
   String get sendMessage;
-
-  /// No description provided for @memberSince.
-  ///
-  /// In en, this message translates to:
-  /// **'Member Since'**
-  String get memberSince;
-
-  /// No description provided for @lastActivity.
-  ///
-  /// In en, this message translates to:
-  /// **'Last Activity'**
-  String get lastActivity;
 
   /// No description provided for @likesReceived.
   ///
@@ -626,23 +512,11 @@ abstract class AppLocalizations {
   /// **'Likes Received'**
   String get likesReceived;
 
-  /// No description provided for @likesGiven.
-  ///
-  /// In en, this message translates to:
-  /// **'Likes Given'**
-  String get likesGiven;
-
   /// Button to show more content
   ///
   /// In en, this message translates to:
   /// **'Show More'**
   String get showMore;
-
-  /// Button to execute spam clean
-  ///
-  /// In en, this message translates to:
-  /// **'Clean Spam'**
-  String get cleanSpam;
 
   /// Error message when saving conversation fails
   ///
@@ -691,12 +565,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in'**
   String get signIn;
-
-  /// No description provided for @markForumRead.
-  ///
-  /// In en, this message translates to:
-  /// **'Mark category read'**
-  String get markForumRead;
 
   /// No description provided for @notificationTest.
   ///
@@ -775,12 +643,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You need to be signed in to view your messages.'**
   String get youNeedToBeSignedInToViewConversations;
-
-  /// Error message when loading conversations fails
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading messages: {error}'**
-  String errorLoadingConversations(String error);
 
   /// Error message when leaving conversation fails
   ///
@@ -872,53 +734,11 @@ abstract class AppLocalizations {
   /// **'Confirm'**
   String get confirm;
 
-  /// Title for spam clean dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Spam Clean {username}'**
-  String spamClean(String username);
-
-  /// No description provided for @selectActionsToPerform.
-  ///
-  /// In en, this message translates to:
-  /// **'Select the actions to perform:'**
-  String get selectActionsToPerform;
-
-  /// No description provided for @moveOrDeleteThreadsBasedOnAdminSettings.
-  ///
-  /// In en, this message translates to:
-  /// **'Move or delete topics based on admin settings'**
-  String get moveOrDeleteThreadsBasedOnAdminSettings;
-
-  /// No description provided for @messageUpdatedSuccessfully.
-  ///
-  /// In en, this message translates to:
-  /// **'Message updated successfully'**
-  String get messageUpdatedSuccessfully;
-
   /// Generic error message
   ///
   /// In en, this message translates to:
   /// **'Error: {error}'**
   String error(String error);
-
-  /// Error message when removing attachment fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to remove attachment: {error}'**
-  String failedToRemoveAttachment(String error);
-
-  /// Error message when loading message fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load message: {error}'**
-  String failedToLoadMessage(String error);
-
-  /// No description provided for @editMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Edit Message'**
-  String get editMessage;
 
   /// No description provided for @removeAttachment.
   ///
@@ -1178,12 +998,6 @@ abstract class AppLocalizations {
   /// **'BANNED'**
   String get banned;
 
-  /// Success message after submitting a report
-  ///
-  /// In en, this message translates to:
-  /// **'Report submitted successfully'**
-  String get reportSubmittedSuccessfully;
-
   /// Title for delete topic dialog
   ///
   /// In en, this message translates to:
@@ -1195,54 +1009,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please select an end date'**
   String get pleaseSelectEndDate;
-
-  /// Title for spam clean user dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Spam Clean User'**
-  String get spamCleanUser;
-
-  /// Option to delete private conversations in spam clean
-  ///
-  /// In en, this message translates to:
-  /// **'Delete personal messages'**
-  String get deletePrivateConversations;
-
-  /// Option to ban user account in spam clean
-  ///
-  /// In en, this message translates to:
-  /// **'Ban the user account'**
-  String get banTheUserAccount;
-
-  /// Action performed: handled threads
-  ///
-  /// In en, this message translates to:
-  /// **'Handled topics'**
-  String get handledThreads;
-
-  /// Action performed: deleted messages
-  ///
-  /// In en, this message translates to:
-  /// **'Deleted messages'**
-  String get deletedMessages;
-
-  /// Action performed: deleted conversations
-  ///
-  /// In en, this message translates to:
-  /// **'Deleted messages'**
-  String get deletedConversations;
-
-  /// Action performed: banned user
-  ///
-  /// In en, this message translates to:
-  /// **'Banned user'**
-  String get bannedUser;
-
-  /// Success message after spam clean
-  ///
-  /// In en, this message translates to:
-  /// **'Successfully cleaned spam for {username}. Actions: {actions}'**
-  String successfullyCleanedSpam(String username, String actions);
 
   /// Home tab title
   ///
@@ -1262,53 +1028,11 @@ abstract class AppLocalizations {
   /// **'Categories'**
   String get forums;
 
-  /// Dialog title for marking all forums as read
-  ///
-  /// In en, this message translates to:
-  /// **'Mark all categories as read?'**
-  String get markAllForumsAsRead;
-
-  /// Message explaining mark all forums as read action
-  ///
-  /// In en, this message translates to:
-  /// **'This will mark all categories and topics as read. This action cannot be undone.'**
-  String get markAllForumsAsReadMessage;
-
-  /// Button text to mark as read
-  ///
-  /// In en, this message translates to:
-  /// **'Mark as Read'**
-  String get markAsRead;
-
   /// Content label for message compose
   ///
   /// In en, this message translates to:
   /// **'Content'**
   String get content;
-
-  /// Dialog title for inserting image
-  ///
-  /// In en, this message translates to:
-  /// **'Insert Image'**
-  String get insertImage;
-
-  /// Question asking how to insert image
-  ///
-  /// In en, this message translates to:
-  /// **'How would you like to insert this image?'**
-  String get howWouldYouLikeToInsertImage;
-
-  /// Option to insert image as thumbnail
-  ///
-  /// In en, this message translates to:
-  /// **'Thumbnail'**
-  String get thumbnail;
-
-  /// Option to insert image at full size
-  ///
-  /// In en, this message translates to:
-  /// **'Full Size'**
-  String get fullSize;
 
   /// Validation message when title is empty
   ///
@@ -1340,12 +1064,6 @@ abstract class AppLocalizations {
   /// **'Mention User'**
   String get mentionUser;
 
-  /// Status message when cleaning spam
-  ///
-  /// In en, this message translates to:
-  /// **'Cleaning spam...'**
-  String get cleaningSpam;
-
   /// Hint text for writing message
   ///
   /// In en, this message translates to:
@@ -1357,12 +1075,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Write your reply...'**
   String get writeYourReply;
-
-  /// Success message after creating conversation
-  ///
-  /// In en, this message translates to:
-  /// **'Message sent'**
-  String get conversationCreatedSuccessfully;
 
   /// Success message when marking conversation as unread
   ///
@@ -1382,29 +1094,11 @@ abstract class AppLocalizations {
   /// **'Message opened'**
   String get conversationOpened;
 
-  /// Message asking user to login to like messages
-  ///
-  /// In en, this message translates to:
-  /// **'Please login to like messages'**
-  String get pleaseLoginToLikeMessages;
-
-  /// Button to load earlier messages
-  ///
-  /// In en, this message translates to:
-  /// **'Load Earlier Messages'**
-  String get loadEarlierMessages;
-
   /// Error message when loading quote fails
   ///
   /// In en, this message translates to:
   /// **'Failed to load quote: \n{error}'**
   String failedToLoadQuote(String error);
-
-  /// Error message when sending reply fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to send reply: {error}'**
-  String failedToSendReply(String error);
 
   /// Error message when marking conversation as unread fails
   ///
@@ -1423,12 +1117,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to open message: {error}'**
   String failedToOpenConversation(String error);
-
-  /// Error message when jumping to message fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to jump to message: {error}'**
-  String failedToJumpToMessage(String error);
 
   /// Tooltip for go to top button
   ///
@@ -1508,29 +1196,11 @@ abstract class AppLocalizations {
   /// **'Go Back'**
   String get goBack;
 
-  /// Error message when loading post fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load post: \n{error}'**
-  String failedToLoadPost(String error);
-
-  /// Error message when liking/unliking message fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to {action} message: {error}'**
-  String failedToLikeOrUnlikeMessage(String action, String error);
-
   /// Action verb: like
   ///
   /// In en, this message translates to:
   /// **'like'**
   String get like;
-
-  /// Action verb: unlike
-  ///
-  /// In en, this message translates to:
-  /// **'unlike'**
-  String get unlike;
 
   /// Button tooltip: download a file from a post or chat message and open it (Discourse lightbox.download)
   ///
@@ -1555,18 +1225,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error downloading {filename}: {error}'**
   String errorDownloading(String filename, String error);
-
-  /// Error message when navigation to category fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to navigate to category'**
-  String get failedToNavigateToForum;
-
-  /// Error message when forum is not found by ID
-  ///
-  /// In en, this message translates to:
-  /// **'Category not found: {forumId}'**
-  String forumNotFoundById(String forumId);
 
   /// Error message when opening link fails
   ///
@@ -1718,29 +1376,11 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 reply} other{{count} replies}}'**
   String nReplies(int count);
 
-  /// Vote count on a topic row
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 vote} other{{count} votes}}'**
-  String nVotes(int count);
-
-  /// Profile stat: when the user was last online
-  ///
-  /// In en, this message translates to:
-  /// **'Seen'**
-  String get lastSeen;
-
   /// UI text: Chat
   ///
   /// In en, this message translates to:
   /// **'Chat'**
   String get chat;
-
-  /// UI text: {label} — coming soon
-  ///
-  /// In en, this message translates to:
-  /// **'{label} — coming soon'**
-  String comingSoon(String label);
 
   /// UI text: +{count} more
   ///
@@ -1855,12 +1495,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Discard'**
   String get discard;
-
-  /// UI text: Discard draft?
-  ///
-  /// In en, this message translates to:
-  /// **'Discard draft?'**
-  String get discardDraftQuestion;
 
   /// UI text: Do not disturb
   ///
@@ -2126,12 +1760,6 @@ abstract class AppLocalizations {
   /// **'Resize and upload'**
   String get resizeAndUpload;
 
-  /// UI text: Retry connection
-  ///
-  /// In en, this message translates to:
-  /// **'Retry connection'**
-  String get retryConnection;
-
   /// Shown when a forum being opened did not answer at all (offline, or no response in time), under the failed-to-connect heading and above the Retry button.
   ///
   /// In en, this message translates to:
@@ -2192,12 +1820,6 @@ abstract class AppLocalizations {
   /// **'Sign out'**
   String get signOut;
 
-  /// UI text: Sign out?
-  ///
-  /// In en, this message translates to:
-  /// **'Sign out?'**
-  String get signOutQuestion;
-
   /// UI text: Sign-in cancelled — no payload returned
   ///
   /// In en, this message translates to:
@@ -2221,24 +1843,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stopped ignoring @{username}'**
   String stoppedIgnoringUser(String username);
-
-  /// UI text: Submit
-  ///
-  /// In en, this message translates to:
-  /// **'Submit'**
-  String get submit;
-
-  /// UI text: This will permanently remove the saved draft.
-  ///
-  /// In en, this message translates to:
-  /// **'This will permanently remove the saved draft.'**
-  String get discardDraftWarning;
-
-  /// UI text: This will remove the message for everyone.
-  ///
-  /// In en, this message translates to:
-  /// **'This will remove the message for everyone.'**
-  String get deleteChatMessageWarning;
 
   /// UI text: Title only
   ///
@@ -2318,12 +1922,6 @@ abstract class AppLocalizations {
   /// **'For added security, Discourse may require you to confirm via the link in the email. Check your spam folder if you don’t see it.'**
   String get changeEmailSecurityNote;
 
-  /// UI text: New direct message
-  ///
-  /// In en, this message translates to:
-  /// **'New direct message'**
-  String get newDirectMessage;
-
   /// UI text: No messages yet — say hi.
   ///
   /// In en, this message translates to:
@@ -2335,12 +1933,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'edited'**
   String get edited;
-
-  /// UI text: Display name, email, password, and other account settings ar
-  ///
-  /// In en, this message translates to:
-  /// **'Display name, email, password, and other account settings are managed under Account → Manage account on web. Your avatar can be changed by tapping the camera badge on your photo.'**
-  String get editProfileManagedOnWebNote;
 
   /// UI text: push approved but relay unreachable
   ///
@@ -2396,12 +1988,6 @@ abstract class AppLocalizations {
   /// **'Expires {date}'**
   String expiresOn(Object date);
 
-  /// UI text: Protected
-  ///
-  /// In en, this message translates to:
-  /// **'Protected'**
-  String get protected;
-
   /// UI text: Solution
   ///
   /// In en, this message translates to:
@@ -2449,12 +2035,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Poll'**
   String get poll;
-
-  /// UI text: Error loading content: {error}
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading content: {error}'**
-  String errorLoadingContent(Object error);
 
   /// UI text: No discussions yet.
   ///
@@ -2564,12 +2144,6 @@ abstract class AppLocalizations {
   /// **'Leave message'**
   String get leaveConversation2;
 
-  /// UI text: Report message
-  ///
-  /// In en, this message translates to:
-  /// **'Report message'**
-  String get reportConversation2;
-
   /// UI text: Close message
   ///
   /// In en, this message translates to:
@@ -2617,42 +2191,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to remove yourself from this message? You will no longer be able to see or reply to it.'**
   String get leaveConversationConfirmation;
-
-  /// UI text: Error loading message: {error}
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading message: {error}'**
-  String errorLoadingConversation(Object error);
-
-  /// UI text: Message not found
-  ///
-  /// In en, this message translates to:
-  /// **'Message not found'**
-  String get conversationNotFound;
-
-  /// UI text: This message is closed; it no longer accepts new replies
-  ///
-  /// In en, this message translates to:
-  /// **'This message is closed; it no longer accepts new replies'**
-  String get conversationClosedBanner;
-
-  /// UI text: No messages found
-  ///
-  /// In en, this message translates to:
-  /// **'No messages found'**
-  String get noMessagesFound;
-
-  /// UI text: End of the discussion
-  ///
-  /// In en, this message translates to:
-  /// **'End of the discussion'**
-  String get endOfConversation;
-
-  /// UI text: Jump to Message
-  ///
-  /// In en, this message translates to:
-  /// **'Jump to Message'**
-  String get jumpToMessage;
 
   /// UI text: Edit title
   ///
@@ -2870,12 +2408,6 @@ abstract class AppLocalizations {
   /// **'Chat with {names}'**
   String chatPlaceholderUsers(String names);
 
-  /// UI text (Discourse chat): Chat in group
-  ///
-  /// In en, this message translates to:
-  /// **'Chat in group'**
-  String get chatPlaceholderGroup;
-
   /// UI text (Discourse chat): Jot something down
   ///
   /// In en, this message translates to:
@@ -3020,12 +2552,6 @@ abstract class AppLocalizations {
   /// **'We\'ve received your new post but it needs to be approved by a moderator before it will appear. Please be patient.'**
   String get postNeedsApprovalBody;
 
-  /// UI text: Failed to send message: {error}
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to send message: {error}'**
-  String failedToCreateConversation(Object error);
-
   /// UI text: Maximum of {count} attachment(s) allowed
   ///
   /// In en, this message translates to:
@@ -3037,12 +2563,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No images found to display.'**
   String get noImagesFoundToDisplay;
-
-  /// UI text: Please login to view this attachment
-  ///
-  /// In en, this message translates to:
-  /// **'Please login to view this attachment'**
-  String get pleaseLoginToViewThisAttachment;
 
   /// UI text: Search for topics
   ///
@@ -3091,12 +2611,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pause notifications for a while — Discourse holds them until the window ends'**
   String get doNotDisturbExplanation;
-
-  /// UI text: Email frequency, like aggregation, digest schedule
-  ///
-  /// In en, this message translates to:
-  /// **'Email frequency, like aggregation, digest schedule'**
-  String get emailSettingsSubtitle;
 
   /// UI text: Profile, email, password, security, advanced settings
   ///
@@ -3152,23 +2666,11 @@ abstract class AppLocalizations {
   /// **'Initializing forum…'**
   String get initializingForum;
 
-  /// UI text: Subscribed Forums
-  ///
-  /// In en, this message translates to:
-  /// **'Subscribed Forums'**
-  String get subscribedForums;
-
   /// UI text: Error loading notifications
   ///
   /// In en, this message translates to:
   /// **'Error loading notifications'**
   String get errorLoadingNotifications;
-
-  /// UI text: Pull down to refresh
-  ///
-  /// In en, this message translates to:
-  /// **'Pull down to refresh'**
-  String get pullDownToRefresh;
 
   /// UI text: You have no new notifications. Check back later for updates
   ///
@@ -3188,24 +2690,6 @@ abstract class AppLocalizations {
   /// **'No topics tagged \"{tag}\"'**
   String noTopicsTagged(Object tag);
 
-  /// UI text: Delete posts, profile posts, and comments
-  ///
-  /// In en, this message translates to:
-  /// **'Delete posts, profile posts, and comments'**
-  String get deletePostsProfilePostsAndComments;
-
-  /// UI text: Are you sure you want to spam clean {username}?
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to spam clean {username}?'**
-  String spamCleanConfirmation(Object username);
-
-  /// UI text: Failed to clean spam: {toString}
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to clean spam: {error}'**
-  String failedToCleanSpam(Object error);
-
   /// UI text: Search User
   ///
   /// In en, this message translates to:
@@ -3223,12 +2707,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Image not available'**
   String get imageNotAvailable;
-
-  /// UI text: All forum topics have been marked as read
-  ///
-  /// In en, this message translates to:
-  /// **'All forum topics have been marked as read'**
-  String get allForumTopicsHaveBeenMarkedAs;
 
   /// UI text: {total_posts0} Posts
   ///
@@ -3260,42 +2738,12 @@ abstract class AppLocalizations {
   /// **'Failed to upload file: {errorMessage}'**
   String failedToUploadFile2(Object errorMessage);
 
-  /// UI text: Failed to pick file
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to pick file'**
-  String get failedToPickFile;
-
   /// UI text: Only {remainingSlots} more attachment(s) allowed. Processing
   ///
   /// In en, this message translates to:
   /// **'Only {remainingSlots} more attachment(s) allowed. Processing first {remainingSlots2} image(s).'**
   String onlyNMoreAttachmentsAllowed(
       Object remainingSlots, Object remainingSlots2);
-
-  /// UI text: Attachment limit reached. Skipping remaining images.
-  ///
-  /// In en, this message translates to:
-  /// **'Attachment limit reached. Skipping remaining images.'**
-  String get attachmentLimitReachedSkippingRemainingImages;
-
-  /// UI text: {name}: Failed to upload image. Please try again.
-  ///
-  /// In en, this message translates to:
-  /// **'{fileName}: Failed to upload image. Please try again.'**
-  String failedToUploadImagePleaseTryAgain(Object fileName);
-
-  /// UI text: {name}: Failed to upload image: {errorMessage}
-  ///
-  /// In en, this message translates to:
-  /// **'{fileName}: Failed to upload image: {errorMessage}'**
-  String failedToUploadImage2(Object errorMessage, Object fileName);
-
-  /// UI text: Failed to pick image
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to pick image'**
-  String get failedToPickImage;
 
   /// UI text: Failed to remove attachment: {toString}
   ///
@@ -3358,35 +2806,11 @@ abstract class AppLocalizations {
   /// **'Failed to delete post: {error}'**
   String failedToDeletePost(Object error);
 
-  /// UI text: Failed to submit report: {toString}
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to submit report: {error}'**
-  String failedToSubmitReport2(Object error);
-
   /// UI text: Edit history is not available for this post
   ///
   /// In en, this message translates to:
   /// **'Edit history is not available for this post'**
   String get editHistoryNotAvailable;
-
-  /// UI text: You do not have permission to upload avatars
-  ///
-  /// In en, this message translates to:
-  /// **'You do not have permission to upload avatars'**
-  String get noPermissionToUploadAvatar;
-
-  /// UI text: Avatar uploaded successfully
-  ///
-  /// In en, this message translates to:
-  /// **'Avatar uploaded successfully'**
-  String get avatarUploadedSuccessfully;
-
-  /// UI text: Failed to pick image: {e}
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to pick image: {error}'**
-  String failedToPickImage2(Object error);
 
   /// UI text: React
   ///
@@ -3412,12 +2836,6 @@ abstract class AppLocalizations {
   /// **'Search filters'**
   String get searchFilters;
 
-  /// UI text: You will be signed out of {name}. You can sign back in any t
-  ///
-  /// In en, this message translates to:
-  /// **'You will be signed out of {siteName}. You can sign back in any time.'**
-  String signOutWarning(Object siteName);
-
   /// UI text: Suggested Topics
   ///
   /// In en, this message translates to:
@@ -3429,12 +2847,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Suggested Messages'**
   String get suggestedMessages;
-
-  /// UI text: NEW
-  ///
-  /// In en, this message translates to:
-  /// **'NEW'**
-  String get newLabel;
 
   /// UI text: Vote removed
   ///
@@ -3490,12 +2902,6 @@ abstract class AppLocalizations {
   /// **'Couldn\'t load categories.'**
   String get couldNotLoadCategories;
 
-  /// Drawer: Explore
-  ///
-  /// In en, this message translates to:
-  /// **'Explore'**
-  String get explore;
-
   /// Drawer: Tags
   ///
   /// In en, this message translates to:
@@ -3549,12 +2955,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy Policy'**
   String get privacyPolicy;
-
-  /// Drawer header
-  ///
-  /// In en, this message translates to:
-  /// **'Signed in as {username}'**
-  String signedInAs(String username);
 
   /// Drawer header
   ///
@@ -6255,6 +5655,2300 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You do not have permission to view topics in this category.'**
   String get noPermissionToViewCategory;
+
+  /// Title of the staff sheet that pins a topic (Discourse topic.feature_topic.title)
+  ///
+  /// In en, this message translates to:
+  /// **'Feature this topic'**
+  String get featureTopicTitle;
+
+  /// Topic ⋮ menu item that opens the pin sheet (Discourse topic.actions.pin)
+  ///
+  /// In en, this message translates to:
+  /// **'Pin Topic…'**
+  String get pinTopicMenu;
+
+  /// Pin sheet: pin in the topic's category, followed by a date
+  ///
+  /// In en, this message translates to:
+  /// **'Make this topic appear at the top of the {category} category until'**
+  String pinInCategoryUntil(String category);
+
+  /// Pin sheet: pin at the top of every topic list, followed by a date
+  ///
+  /// In en, this message translates to:
+  /// **'Make this topic appear at the top of all topic lists until'**
+  String get pinGloballyUntil;
+
+  /// Pin sheet note
+  ///
+  /// In en, this message translates to:
+  /// **'Users can unpin the topic individually for themselves.'**
+  String get pinNote;
+
+  /// Pin sheet: the end-date field's label
+  ///
+  /// In en, this message translates to:
+  /// **'Pin until'**
+  String get pinUntil;
+
+  /// Pin sheet: shown when no end date is chosen
+  ///
+  /// In en, this message translates to:
+  /// **'A date is required to pin this topic.'**
+  String get pinDateRequired;
+
+  /// Pin sheet button
+  ///
+  /// In en, this message translates to:
+  /// **'Pin Topic Globally'**
+  String get pinTopicGlobally;
+
+  /// Snackbar after a flag is filed
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for keeping our community civil!'**
+  String get flagThanks;
+
+  /// Flag dialog intro
+  ///
+  /// In en, this message translates to:
+  /// **'All flags are received by moderators and will be reviewed as soon as possible.'**
+  String get flagReviewProcess;
+
+  /// Flag dialog: flagging is not possible now
+  ///
+  /// In en, this message translates to:
+  /// **'Sorry, you can\'t flag this post at this time.'**
+  String get flagCant;
+
+  /// Flag dialog button when the choice messages the author
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get flagSendMessage;
+
+  /// Flag dialog: label of the message to the post's author
+  ///
+  /// In en, this message translates to:
+  /// **'Message for the user'**
+  String get flagMessageForUser;
+
+  /// Flag dialog: label of the message to staff
+  ///
+  /// In en, this message translates to:
+  /// **'Message for the moderators'**
+  String get flagMessageForModerators;
+
+  /// Flag dialog: hint for the message to the author
+  ///
+  /// In en, this message translates to:
+  /// **'Be specific, be constructive, and always be kind.'**
+  String get flagPlaceholderNotifyUser;
+
+  /// Flag dialog: hint for the message to staff
+  ///
+  /// In en, this message translates to:
+  /// **'Let us know specifically what you are concerned about, and provide relevant links and examples where possible.'**
+  String get flagPlaceholderNotifyModerators;
+
+  /// Flag dialog: hint for an illegal-content flag
+  ///
+  /// In en, this message translates to:
+  /// **'Let us know specifically why you believe this content is illegal, and provide relevant links and examples where possible.'**
+  String get flagPlaceholderIllegal;
+
+  /// Flag dialog: checkbox required for an illegal-content flag
+  ///
+  /// In en, this message translates to:
+  /// **'What I’ve written above is accurate and complete.'**
+  String get flagConfirmIllegal;
+
+  /// Flag dialog: the message is too short
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{enter at least {count} character} other{enter at least {count} characters}}'**
+  String flagMessageAtLeast(int count);
+
+  /// Snackbar after the message to the post's author is sent
+  ///
+  /// In en, this message translates to:
+  /// **'Your message has been sent.'**
+  String get flagMessageSent;
+
+  /// Snackbar when merging a topic fails (Discourse topic.merge_topic.error)
+  ///
+  /// In en, this message translates to:
+  /// **'There was an error moving posts into that topic.'**
+  String get mergeTopicError;
+
+  /// Hint in the rename-topic field (Discourse composer.title_placeholder)
+  ///
+  /// In en, this message translates to:
+  /// **'What is this discussion about in one brief sentence?'**
+  String get topicTitlePlaceholder;
+
+  /// Snackbar after staff move a topic to another category
+  ///
+  /// In en, this message translates to:
+  /// **'Topic moved'**
+  String get topicMoved;
+
+  /// Snackbar after staff merge a topic into another
+  ///
+  /// In en, this message translates to:
+  /// **'Topic merged'**
+  String get topicMerged;
+
+  /// Merge-into-topic dialog text
+  ///
+  /// In en, this message translates to:
+  /// **'Every post in this topic moves into the topic you choose. This can\'t be undone in the app.'**
+  String get mergeTopicExplanation;
+
+  /// Merge-into-topic dialog: the target topic id field
+  ///
+  /// In en, this message translates to:
+  /// **'Destination topic ID'**
+  String get destinationTopicId;
+
+  /// Topic list row: author name when the forum did not send one
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get topicAuthorUnknown;
+
+  /// Home, Hot view: empty state (Discourse js.topics.none.hot)
+  ///
+  /// In en, this message translates to:
+  /// **'There are no hot topics.'**
+  String get noHotTopics;
+
+  /// Home, New view, signed out: heading
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to view new topics'**
+  String get signInToViewNewTopics;
+
+  /// Home, New view, signed out: explanation under the heading
+  ///
+  /// In en, this message translates to:
+  /// **'New topics show what was created since your last visit.'**
+  String get newTopicsSignInMessage;
+
+  /// Home, Top view: period chip (Discourse js.filters.top.all_time)
+  ///
+  /// In en, this message translates to:
+  /// **'All time'**
+  String get topPeriodAllTime;
+
+  /// Home, Top view: period chip (Discourse js.filters.top.this_year)
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get topPeriodYear;
+
+  /// Home, Top view: period chip (Discourse js.filters.top.this_quarter)
+  ///
+  /// In en, this message translates to:
+  /// **'Quarter'**
+  String get topPeriodQuarter;
+
+  /// Home, Top view: period chip (Discourse js.filters.top.this_month)
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get topPeriodMonth;
+
+  /// Home, Top view: period chip (Discourse js.filters.top.this_week)
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get topPeriodWeek;
+
+  /// Home, Top view: period chip (Discourse js.filters.top.today)
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get topPeriodToday;
+
+  /// Home, Top view: empty state for the chosen period. period is the API name of the period chip: all, yearly, quarterly, monthly, weekly or daily (Discourse js.topics.none.top for other)
+  ///
+  /// In en, this message translates to:
+  /// **'{period, select, all{No top topics of all time.} yearly{No top topics this year.} quarterly{No top topics this quarter.} monthly{No top topics this month.} weekly{No top topics this week.} daily{No top topics today.} other{There are no top topics.}}'**
+  String noTopTopicsForPeriod(String period);
+
+  /// Forum home: error when re-checking an already opened forum timed out
+  ///
+  /// In en, this message translates to:
+  /// **'Connection timed out. The site may be down or unreachable.'**
+  String get connectionTimedOutSiteUnreachable;
+
+  /// Notifications tab: snackbar when Dismiss all fails and the forum gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to mark notifications as read'**
+  String get failedToMarkNotificationsRead;
+
+  /// Forum header / app bar: the forum's name before it is known (the whole site, not a category)
+  ///
+  /// In en, this message translates to:
+  /// **'Forum'**
+  String get forumNameFallback;
+
+  /// Forum header: shown when the forum has no description
+  ///
+  /// In en, this message translates to:
+  /// **'No description available.'**
+  String get noForumDescription;
+
+  /// Notifications tab app bar: tooltip of the button that marks every notification read (Discourse js.user.dismiss_notifications)
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss all'**
+  String get dismissAllNotifications;
+
+  /// Notifications tab: error dialog when a tapped notification names no post
+  ///
+  /// In en, this message translates to:
+  /// **'Post ID is missing. Cannot navigate to the post.'**
+  String get notificationPostIdMissing;
+
+  /// Notifications tab: error dialog when a post notification names no topic
+  ///
+  /// In en, this message translates to:
+  /// **'Topic ID is missing. Cannot navigate to the post.'**
+  String get notificationTopicIdMissingForPost;
+
+  /// Notifications tab: error dialog when a topic notification names no topic
+  ///
+  /// In en, this message translates to:
+  /// **'Topic ID is missing. Cannot open the topic.'**
+  String get notificationTopicIdMissing;
+
+  /// Notifications tab: error dialog when a user notification names no user
+  ///
+  /// In en, this message translates to:
+  /// **'Username is missing. Cannot open user profile.'**
+  String get notificationUsernameMissing;
+
+  /// Notifications tab: error dialog when a chat notification names no channel
+  ///
+  /// In en, this message translates to:
+  /// **'Channel ID is missing. Cannot open the chat.'**
+  String get notificationChannelIdMissing;
+
+  /// Notifications tab: error dialog when a group message notification names no group
+  ///
+  /// In en, this message translates to:
+  /// **'Group name is missing. Cannot open the inbox.'**
+  String get notificationGroupNameMissingForInbox;
+
+  /// Notifications tab: error dialog when a group notification names no group
+  ///
+  /// In en, this message translates to:
+  /// **'Group name is missing. Cannot open the group.'**
+  String get notificationGroupNameMissing;
+
+  /// Notifications tab: error dialog for a notification the app cannot open
+  ///
+  /// In en, this message translates to:
+  /// **'No action URL available for this notification type.'**
+  String get notificationNoActionUrl;
+
+  /// Notifications tab: error dialog when a badge notification cannot be resolved
+  ///
+  /// In en, this message translates to:
+  /// **'Badge details are unavailable.'**
+  String get notificationBadgeUnavailable;
+
+  /// Notifications tab: error dialog when the earned badge could not be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this badge.'**
+  String get notificationBadgeLoadFailed;
+
+  /// Title of a personal message opened from a notification that does not name its subject
+  ///
+  /// In en, this message translates to:
+  /// **'Personal message'**
+  String get personalMessageTitleFallback;
+
+  /// Title of a topic opened from a notification that does not name it (Discourse js.topic.title)
+  ///
+  /// In en, this message translates to:
+  /// **'Topic'**
+  String get topicTitleFallback;
+
+  /// Notifications tab, signed out: heading
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to view notifications'**
+  String get signInToViewNotifications;
+
+  /// Notifications tab, signed out: explanation under the heading
+  ///
+  /// In en, this message translates to:
+  /// **'You need to be signed in to view your notifications.'**
+  String get youNeedToBeSignedInToViewNotifications;
+
+  /// Notifications tab, Unread filter: empty state
+  ///
+  /// In en, this message translates to:
+  /// **'No unread notifications'**
+  String get noUnreadNotifications;
+
+  /// Notifications tab, All filter: empty state
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet'**
+  String get noNotificationsYet;
+
+  /// Phone notification: body text when the push carried none
+  ///
+  /// In en, this message translates to:
+  /// **'New notification'**
+  String get newNotificationFallbackBody;
+
+  /// Dialog title when a tapped phone notification cannot be opened
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open notification'**
+  String get unableToOpenNotification;
+
+  /// Dialog under 'Unable to open notification': the push named no site
+  ///
+  /// In en, this message translates to:
+  /// **'Missing site information (site_id).'**
+  String get notificationMissingSiteInfo;
+
+  /// Dialog under 'Unable to open notification': the push's site could not be read
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid site information (site_id).'**
+  String get notificationInvalidSiteInfo;
+
+  /// Dialog under 'Unable to open notification': the push named no post
+  ///
+  /// In en, this message translates to:
+  /// **'Missing post information (content_id).'**
+  String get notificationMissingPostInfo;
+
+  /// Dialog under 'Unable to open notification': the push named no personal message
+  ///
+  /// In en, this message translates to:
+  /// **'Missing message information (conversation_id).'**
+  String get notificationMissingMessageInfo;
+
+  /// Dialog under 'Unable to open notification': the push named no user
+  ///
+  /// In en, this message translates to:
+  /// **'Missing user information (sender_id).'**
+  String get notificationMissingUserInfo;
+
+  /// Dialog under 'Unable to open notification': a kind of push the app does not know
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported notification type.'**
+  String get notificationUnsupportedType;
+
+  /// Dialog under 'Unable to open notification': the push's forum is not one the app has
+  ///
+  /// In en, this message translates to:
+  /// **'Forum not found for this site.'**
+  String get notificationForumNotFound;
+
+  /// Dialog under 'Unable to open notification': the forum could not be opened
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to initialize the forum.'**
+  String get notificationForumOpenFailed;
+
+  /// Dialog under 'Unable to open notification': the push named no topic
+  ///
+  /// In en, this message translates to:
+  /// **'Missing topic information (topic_id).'**
+  String get notificationMissingTopicInfo;
+
+  /// Tags page: error when the tag list fails and the forum gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load tags.'**
+  String get failedToLoadTags;
+
+  /// Tags page: placeholder of the filter field
+  ///
+  /// In en, this message translates to:
+  /// **'Search tags…'**
+  String get searchTagsHint;
+
+  /// Tags page: tooltip of the sort button while sorted by topic count
+  ///
+  /// In en, this message translates to:
+  /// **'Sorted by topic count — tap to switch to A→Z'**
+  String get tagsSortedByCountTooltip;
+
+  /// Tags page: tooltip of the sort button while sorted A→Z
+  ///
+  /// In en, this message translates to:
+  /// **'Sorted alphabetically — tap to switch to popularity'**
+  String get tagsSortedAlphabeticallyTooltip;
+
+  /// Tags page: empty state when the forum has no tags
+  ///
+  /// In en, this message translates to:
+  /// **'No tags yet on this forum.'**
+  String get noTagsYet;
+
+  /// Tags page and a tag's topic list: tooltip of the bell that sets the tag's notification level
+  ///
+  /// In en, this message translates to:
+  /// **'Notification level'**
+  String get tagNotificationLevelTooltip;
+
+  /// A tag's topic list: error when it fails to load and the forum gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get tagTopicsLoadFailed;
+
+  /// Search page: snackbar when a search fails, with the reason
+  ///
+  /// In en, this message translates to:
+  /// **'Search failed: {error}'**
+  String searchFailedWithError(String error);
+
+  /// Search page app bar: tooltip of the button that opens the search filters
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get searchFiltersButtonTooltip;
+
+  /// Search filters sheet: heading over the topic status chips
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get searchFilterStatusSection;
+
+  /// Search filters sheet: heading over the chips about the reader's own activity
+  ///
+  /// In en, this message translates to:
+  /// **'My activity'**
+  String get searchFilterMyActivitySection;
+
+  /// Search filters sheet: heading over the Title only / First posts only chips
+  ///
+  /// In en, this message translates to:
+  /// **'Match type'**
+  String get searchFilterMatchTypeSection;
+
+  /// Search filters sheet: help under the tags field
+  ///
+  /// In en, this message translates to:
+  /// **'Space- or comma-separated. Each tag is required.'**
+  String get searchTagsFilterHelper;
+
+  /// Search filters sheet: heading over the sort chips (Discourse js.search.sort_by)
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by'**
+  String get searchSortBy;
+
+  /// Search filters sheet: status chip, topics that are open
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get searchStatusOpen;
+
+  /// Search filters sheet: status chip, topics that are archived
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get searchStatusArchived;
+
+  /// Search filters sheet: status chip, topics with zero replies
+  ///
+  /// In en, this message translates to:
+  /// **'No replies'**
+  String get searchStatusNoReplies;
+
+  /// Search filters sheet: status chip, only public topics
+  ///
+  /// In en, this message translates to:
+  /// **'Public only'**
+  String get searchStatusPublicOnly;
+
+  /// Search filters sheet: status chip, topics without a solution (discourse-solved topic_status_filter.unsolved)
+  ///
+  /// In en, this message translates to:
+  /// **'Unsolved'**
+  String get searchStatusUnsolved;
+
+  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.bookmarks)
+  ///
+  /// In en, this message translates to:
+  /// **'I bookmarked'**
+  String get searchInBookmarked;
+
+  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.private)
+  ///
+  /// In en, this message translates to:
+  /// **'In my messages'**
+  String get searchInMyMessages;
+
+  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.likes)
+  ///
+  /// In en, this message translates to:
+  /// **'I liked'**
+  String get searchInLiked;
+
+  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.posted)
+  ///
+  /// In en, this message translates to:
+  /// **'I posted in'**
+  String get searchInPosted;
+
+  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.watching)
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m watching'**
+  String get searchInWatching;
+
+  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.tracking)
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m tracking'**
+  String get searchInTracking;
+
+  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.seen)
+  ///
+  /// In en, this message translates to:
+  /// **'I read'**
+  String get searchInSeen;
+
+  /// Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.unseen)
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ve not read'**
+  String get searchInUnseen;
+
+  /// Search filters sheet: sort chip (Discourse js.search.latest_post)
+  ///
+  /// In en, this message translates to:
+  /// **'Latest post'**
+  String get searchSortLatestPost;
+
+  /// Search filters sheet: sort chip (Discourse js.search.most_liked)
+  ///
+  /// In en, this message translates to:
+  /// **'Most liked'**
+  String get searchSortMostLiked;
+
+  /// Search filters sheet: sort chip (Discourse js.search.most_viewed)
+  ///
+  /// In en, this message translates to:
+  /// **'Most viewed'**
+  String get searchSortMostViewed;
+
+  /// Search filters sheet: sort chip (Discourse js.search.latest_topic)
+  ///
+  /// In en, this message translates to:
+  /// **'Latest topic'**
+  String get searchSortLatestTopic;
+
+  /// Default placeholder of the app's search fields (Discourse js.multi_select.search)
+  ///
+  /// In en, this message translates to:
+  /// **'Search...'**
+  String get searchFieldHint;
+
+  /// Bookmarks page: error when the forum's bookmarks cannot be reached at all
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarks are unavailable'**
+  String get bookmarksUnavailable;
+
+  /// Bookmarks page: error when the list fails and the forum gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load bookmarks'**
+  String get failedToLoadBookmarks;
+
+  /// Bookmarks page: snackbar when removing a bookmark fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to remove bookmark'**
+  String get failedToRemoveBookmark;
+
+  /// Bookmarks page: snackbar when changing a bookmark's label, reminder or pin fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update bookmark'**
+  String get failedToUpdateBookmark;
+
+  /// Bookmark reminder sheet: default title
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark with reminder'**
+  String get bookmarkWithReminder;
+
+  /// Bookmark reminder sheet: option to bookmark without a reminder (Discourse keyboard_shortcuts_help.bookmarks.none)
+  ///
+  /// In en, this message translates to:
+  /// **'No reminder'**
+  String get noReminder;
+
+  /// Drafts page: error when the list fails and the forum gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load drafts.'**
+  String get failedToLoadDrafts;
+
+  /// Drafts page: snackbar when discarding a draft fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to discard draft'**
+  String get failedToDiscardDraft;
+
+  /// Message list (Inbox, Sent, Archive…): shown when the forum could not return the list and gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load messages'**
+  String get messagesLoadFailed;
+
+  /// Message list: shown when the next page of messages could not be loaded and the forum gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load more messages'**
+  String get moreMessagesLoadFailed;
+
+  /// Message list row: stands in for the name of who wrote last when the forum did not say
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get messageUnknownUser;
+
+  /// Error detail when the forum or the system gave no reason (edit message page, saving an image). Discourse login.error
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown error'**
+  String get unknownErrorFallback;
+
+  /// Chat composer placeholder when the channel gives none
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message…'**
+  String get chatComposerDefaultHint;
+
+  /// Chat channel title when the channel has no name, after a '#': '#channel 12'
+  ///
+  /// In en, this message translates to:
+  /// **'channel {id}'**
+  String chatChannelNumbered(Object id);
+
+  /// Chat: a message could not be sent and the forum gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send message.'**
+  String get chatSendFailed;
+
+  /// Chat: an edit to a message could not be saved and the forum gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to edit message.'**
+  String get chatEditFailed;
+
+  /// Chat: a message could not be deleted and the forum gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete message.'**
+  String get chatDeleteFailed;
+
+  /// Chat: shown when reacting to a message is not possible on this forum
+  ///
+  /// In en, this message translates to:
+  /// **'Reactions are not supported here.'**
+  String get chatReactionsUnsupported;
+
+  /// Chat: adding or removing a reaction failed and the forum gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update reaction.'**
+  String get chatReactionFailed;
+
+  /// Name shown for a file in a post or chat message that has no name of its own
+  ///
+  /// In en, this message translates to:
+  /// **'Attachment'**
+  String get attachmentDefaultName;
+
+  /// File type label under an attached file's name (shown in capitals): an audio file
+  ///
+  /// In en, this message translates to:
+  /// **'Audio'**
+  String get fileTypeAudio;
+
+  /// File type label under an attached file's name (shown in capitals): a plain text file
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get fileTypeText;
+
+  /// File type label under an attached file's name (shown in capitals): a compressed archive (zip, rar, 7z…)
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get fileTypeArchive;
+
+  /// File type label under an attached file's name (shown in capitals) when the type is unknown
+  ///
+  /// In en, this message translates to:
+  /// **'File'**
+  String get fileTypeFile;
+
+  /// Why downloading an attached file failed: the server answered with an HTTP error code
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to download file: HTTP {status}'**
+  String downloadFailedHttpStatus(String status);
+
+  /// Why downloading an attached file failed: the server sent nothing
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded file is empty'**
+  String get downloadedFileEmpty;
+
+  /// Why downloading an attached file failed, with the system's reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to download file: {error}'**
+  String downloadFileFailed(String error);
+
+  /// Composer: a picked file's extension is not one the forum allows; {allowed} is the forum's list, e.g. 'jpg, png, pdf'
+  ///
+  /// In en, this message translates to:
+  /// **'File type .{extension} is not allowed. Allowed types: {allowed}'**
+  String attachmentTypeNotAllowed(String extension, String allowed);
+
+  /// Composer: a picked file (not an image, which can be resized) is larger than the forum allows; sizes like '12.3 MB'
+  ///
+  /// In en, this message translates to:
+  /// **'File size ({size}) exceeds maximum of {max}'**
+  String attachmentFileTooLarge(String size, String max);
+
+  /// Composer: a picked file was refused before upload, with no more specific reason
+  ///
+  /// In en, this message translates to:
+  /// **'File validation failed'**
+  String get attachmentValidationFailed;
+
+  /// Composer: the forum accepted an upload but did not say how to refer to it in the post, so it cannot be added
+  ///
+  /// In en, this message translates to:
+  /// **'Upload succeeded but the server returned no reference for the file.'**
+  String get uploadMissingReference;
+
+  /// Full-screen image viewer: saving failed because the image is no longer in the cache (after 'Failed to save image:')
+  ///
+  /// In en, this message translates to:
+  /// **'Image file not found'**
+  String get imageFileNotFound;
+
+  /// Full-screen video player: the video could not be played and the player gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load video'**
+  String get failedToLoadVideo;
+
+  /// User profile page: shown when the user's profile could not be loaded and there is no more specific error
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load user info.'**
+  String get userInfoLoadFailed;
+
+  /// User profile page: error dialog when the user's profile could not be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load user info: {error}'**
+  String userInfoLoadFailedWithError(String error);
+
+  /// User profile page overflow menu: ignore this user (Discourse's Ignore User)
+  ///
+  /// In en, this message translates to:
+  /// **'Ignore user'**
+  String get profileMenuIgnoreUser;
+
+  /// User profile page overflow menu: stop ignoring this user
+  ///
+  /// In en, this message translates to:
+  /// **'Unignore user'**
+  String get profileMenuUnignoreUser;
+
+  /// Snackbar when ignoring or unignoring a user failed (profile page, ignored users page)
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t update ignore state'**
+  String get ignoreStateUpdateFailed;
+
+  /// Snackbar after ignoring a user from their profile
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re ignoring @{username}. Their posts will be hidden.'**
+  String profileNowIgnoringUser(String username);
+
+  /// Snackbar fallback when ignoring/unignoring a user from their profile threw an error
+  ///
+  /// In en, this message translates to:
+  /// **'Ignore toggle failed.'**
+  String get profileIgnoreToggleFailed;
+
+  /// Profile: the user's summary/stats could not be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load stats.'**
+  String get profileStatsLoadFailed;
+
+  /// Profile: snackbar when following a user failed
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to follow'**
+  String get profileFollowFailed;
+
+  /// Profile: snackbar when unfollowing a user failed
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to unfollow'**
+  String get profileUnfollowFailed;
+
+  /// Profile: snackbar when opening a chat (direct message channel) with the user failed
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open a chat with this user.'**
+  String get profileChatOpenFailed;
+
+  /// Profile summary: number of likes on a topic/reply row, or between the user and another person ('Most liked by')
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 like} other{{count} likes}}'**
+  String summaryLikeCount(int count);
+
+  /// Profile summary 'Top links': how many times a link was clicked (Discourse topic_map.clicks)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 click} other{{count} clicks}}'**
+  String summaryLinkClicks(int count);
+
+  /// Users directory period chip (Discourse filters.top.all_time)
+  ///
+  /// In en, this message translates to:
+  /// **'All time'**
+  String get directoryPeriodAllTime;
+
+  /// Users directory period chip (Discourse filters.top.this_year)
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get directoryPeriodYear;
+
+  /// Users directory period chip (Discourse filters.top.this_quarter)
+  ///
+  /// In en, this message translates to:
+  /// **'Quarter'**
+  String get directoryPeriodQuarter;
+
+  /// Users directory period chip (Discourse filters.top.this_month)
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get directoryPeriodMonth;
+
+  /// Users directory period chip (Discourse filters.top.this_week)
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get directoryPeriodWeek;
+
+  /// Users directory period chip (Discourse filters.top.today)
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get directoryPeriodToday;
+
+  /// Users directory sort chip, next to a heart icon: likes received (Discourse directory.likes_received)
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get directoryOrderReceived;
+
+  /// Users directory sort chip: replies posted (Discourse directory.post_count)
+  ///
+  /// In en, this message translates to:
+  /// **'Replies'**
+  String get directoryOrderReplies;
+
+  /// Users directory sort chip: topics created (Discourse directory.topic_count)
+  ///
+  /// In en, this message translates to:
+  /// **'Topics'**
+  String get directoryOrderTopics;
+
+  /// Users directory sort chip: days visited (Discourse directory.days_visited)
+  ///
+  /// In en, this message translates to:
+  /// **'Visits'**
+  String get directoryOrderVisits;
+
+  /// Users directory: the list could not be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load directory.'**
+  String get directoryLoadFailed;
+
+  /// Users directory: a name search found nobody
+  ///
+  /// In en, this message translates to:
+  /// **'No users match that name.'**
+  String get directoryNoUsersMatch;
+
+  /// Users directory: nobody in the chosen period
+  ///
+  /// In en, this message translates to:
+  /// **'No users found for this period.'**
+  String get directoryNoUsersForPeriod;
+
+  /// User picker search: nothing found
+  ///
+  /// In en, this message translates to:
+  /// **'No users found'**
+  String get userSearchNoResults;
+
+  /// User picker search: hint under "No users found"
+  ///
+  /// In en, this message translates to:
+  /// **'Try searching with a different username'**
+  String get userSearchTryDifferentUsername;
+
+  /// User picker: empty state before anything is searched
+  ///
+  /// In en, this message translates to:
+  /// **'Search for users'**
+  String get userSearchPromptTitle;
+
+  /// User picker: hint under "Search for users"
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a username to find and invite users'**
+  String get userSearchPromptHint;
+
+  /// Ignored users page: snackbar fallback when unignoring threw an error
+  ///
+  /// In en, this message translates to:
+  /// **'Unignore failed.'**
+  String get ignoredUsersUnignoreFailed;
+
+  /// Ignored users page: empty state
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re not ignoring anyone.'**
+  String get ignoredUsersEmpty;
+
+  /// Ignored users page: hint under the empty state; the quoted menu item is profileMenuIgnoreUser
+  ///
+  /// In en, this message translates to:
+  /// **'Open a user profile and use \"Ignore user\" in the overflow menu to hide their posts and notifications.'**
+  String get ignoredUsersEmptyHint;
+
+  /// Badges page: the list could not be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load badges.'**
+  String get badgesLoadFailed;
+
+  /// Badges page: the forum has no badges
+  ///
+  /// In en, this message translates to:
+  /// **'No badges on this forum.'**
+  String get badgesEmpty;
+
+  /// Badge tier (section header on the badges page, label in the badge sheet)
+  ///
+  /// In en, this message translates to:
+  /// **'Gold'**
+  String get badgeTierGold;
+
+  /// Badge tier (section header on the badges page, label in the badge sheet)
+  ///
+  /// In en, this message translates to:
+  /// **'Silver'**
+  String get badgeTierSilver;
+
+  /// Badge tier (section header on the badges page, label in the badge sheet)
+  ///
+  /// In en, this message translates to:
+  /// **'Bronze'**
+  String get badgeTierBronze;
+
+  /// Badge sheet: when the user earned the badge; {time} is a relative time such as '3 days ago'
+  ///
+  /// In en, this message translates to:
+  /// **'Earned {time}'**
+  String badgeEarnedAgo(String time);
+
+  /// Badge sheet: how many users on the forum have the badge; {formatted} is the compact count (e.g. 1.2k)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Earned by {formatted} user} other{Earned by {formatted} users}}'**
+  String badgeEarnedByUsers(int count, String formatted);
+
+  /// Trust level 0 name (Discourse trust_levels.names.newuser)
+  ///
+  /// In en, this message translates to:
+  /// **'New user'**
+  String get trustLevelNameNewUser;
+
+  /// Trust level 1 name (Discourse trust_levels.names.basic)
+  ///
+  /// In en, this message translates to:
+  /// **'Basic user'**
+  String get trustLevelNameBasic;
+
+  /// Trust level 2 name (Discourse trust_levels.names.member)
+  ///
+  /// In en, this message translates to:
+  /// **'Member'**
+  String get trustLevelNameMember;
+
+  /// Trust level 3 name (Discourse trust_levels.names.regular)
+  ///
+  /// In en, this message translates to:
+  /// **'Regular'**
+  String get trustLevelNameRegular;
+
+  /// Trust level 4 name (Discourse trust_levels.names.leader)
+  ///
+  /// In en, this message translates to:
+  /// **'Leader'**
+  String get trustLevelNameLeader;
+
+  /// Trust levels sheet: what trust level 0 (new user) means
+  ///
+  /// In en, this message translates to:
+  /// **'Just joined. Can read and post, with limits on links, images and messages.'**
+  String get trustLevelSummary0;
+
+  /// Trust levels sheet: what trust level 1 (basic user) means
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocks core posting features: images and attachments, more links, flagging posts.'**
+  String get trustLevelSummary1;
+
+  /// Trust levels sheet: what trust level 2 (member) means
+  ///
+  /// In en, this message translates to:
+  /// **'Can send invites, ignore users, and edit their own posts for longer.'**
+  String get trustLevelSummary2;
+
+  /// Trust levels sheet: what trust level 3 (regular) means
+  ///
+  /// In en, this message translates to:
+  /// **'Can recategorize and rename topics, create tags, and their spam flags carry more weight.'**
+  String get trustLevelSummary3;
+
+  /// Trust levels sheet: what trust level 4 (leader) means
+  ///
+  /// In en, this message translates to:
+  /// **'Granted by staff. Can edit any post and pin, close, split or merge topics.'**
+  String get trustLevelSummary4;
+
+  /// Trust levels sheet row title: abbreviated level and its name, e.g. 'TL2 · Member' (TL = trust level; Discourse de uses VS, es NC)
+  ///
+  /// In en, this message translates to:
+  /// **'TL{level} · {name}'**
+  String trustLevelRowTitle(int level, String name);
+
+  /// Profile activity list: shown when the list was opened without a user
+  ///
+  /// In en, this message translates to:
+  /// **'No user specified'**
+  String get profileNoUserSpecified;
+
+  /// Profile: the user's topics could not be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load topics'**
+  String get userTopicsLoadFailed;
+
+  /// Profile: the user has not started any topics
+  ///
+  /// In en, this message translates to:
+  /// **'No topics started yet.'**
+  String get userTopicsEmpty;
+
+  /// Profile: the user's recent posts could not be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load recent posts'**
+  String get userRecentPostsLoadFailed;
+
+  /// Profile activity row: title when the post's topic has no title
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Topic'**
+  String get activityUnknownTopic;
+
+  /// Group page: snackbar after joining the group
+  ///
+  /// In en, this message translates to:
+  /// **'You joined {group}'**
+  String groupJoinedSnack(String group);
+
+  /// Group page: joining the group failed
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to join group'**
+  String get groupJoinFailed;
+
+  /// Group page: snackbar after leaving the group
+  ///
+  /// In en, this message translates to:
+  /// **'You left {group}'**
+  String groupLeftSnack(String group);
+
+  /// Group page: leaving the group failed
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to leave group'**
+  String get groupLeaveFailed;
+
+  /// Group page, request-to-join dialog: hint in the reason field
+  ///
+  /// In en, this message translates to:
+  /// **'Why do you want to join? Group owners see this with your request.'**
+  String get groupMembershipRequestHint;
+
+  /// Group page: the request-to-join reason was left empty
+  ///
+  /// In en, this message translates to:
+  /// **'A reason is required to request membership'**
+  String get groupMembershipReasonRequired;
+
+  /// Group page: snackbar after sending a request to join
+  ///
+  /// In en, this message translates to:
+  /// **'Request sent — a group owner has to approve it'**
+  String get groupMembershipRequestSent;
+
+  /// Group page: sending the request to join failed
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send membership request'**
+  String get groupMembershipRequestFailed;
+
+  /// Group page: chip shown when you are a member of the group and cannot leave it (Discourse groups.index.is_group_user)
+  ///
+  /// In en, this message translates to:
+  /// **'Member'**
+  String get groupMemberBadge;
+
+  /// Group page: chip shown after you asked to join the group
+  ///
+  /// In en, this message translates to:
+  /// **'Request pending'**
+  String get groupRequestPending;
+
+  /// Group page: the join button while joining
+  ///
+  /// In en, this message translates to:
+  /// **'Joining…'**
+  String get groupJoining;
+
+  /// Group page: button to join a group anyone may join
+  ///
+  /// In en, this message translates to:
+  /// **'Join group'**
+  String get groupJoinButton;
+
+  /// Groups page: the list could not be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load groups.'**
+  String get groupsLoadFailed;
+
+  /// Groups page: subtitle of an automatic group (admins, staff, trust level groups)
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in group'**
+  String get groupBuiltIn;
+
+  /// Invites page filter chip (Discourse user.invited.pending_tab_with_count)
+  ///
+  /// In en, this message translates to:
+  /// **'Pending ({count})'**
+  String invitesPendingWithCount(int count);
+
+  /// Invites page filter chip (Discourse user.invited.expired_tab_with_count)
+  ///
+  /// In en, this message translates to:
+  /// **'Expired ({count})'**
+  String invitesExpiredWithCount(int count);
+
+  /// Invites page filter chip (Discourse user.invited.redeemed_tab_with_count)
+  ///
+  /// In en, this message translates to:
+  /// **'Redeemed ({count})'**
+  String invitesRedeemedWithCount(int count);
+
+  /// Invites page: the list could not be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load invites.'**
+  String get invitesLoadFailed;
+
+  /// Invites page: creating an invite link failed
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create invite link'**
+  String get inviteLinkCreateFailed;
+
+  /// Invite by email dialog: email field label
+  ///
+  /// In en, this message translates to:
+  /// **'Email address'**
+  String get inviteEmailAddressLabel;
+
+  /// Invite by email dialog: the email field is empty or not an address
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address'**
+  String get inviteEmailInvalid;
+
+  /// Invite by email dialog: optional personal note field label
+  ///
+  /// In en, this message translates to:
+  /// **'Message (optional)'**
+  String get inviteMessageOptionalLabel;
+
+  /// Invites page: sending an email invite failed
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send invite'**
+  String get inviteSendFailed;
+
+  /// Revoke invite dialog body for a link invite
+  ///
+  /// In en, this message translates to:
+  /// **'The invite link will stop working.'**
+  String get revokeInviteLinkWarning;
+
+  /// Revoke invite dialog body for an email invite
+  ///
+  /// In en, this message translates to:
+  /// **'The invite to {email} will stop working.'**
+  String revokeInviteEmailWarning(String email);
+
+  /// Invites page: revoking an invite failed
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to revoke invite'**
+  String get inviteRevokeFailed;
+
+  /// Invites page: the user may not create invites
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to invite'**
+  String get inviteNoPermission;
+
+  /// Invites page: no pending invites
+  ///
+  /// In en, this message translates to:
+  /// **'No pending invites'**
+  String get invitesEmptyPending;
+
+  /// Invites page: no expired invites
+  ///
+  /// In en, this message translates to:
+  /// **'No expired invites'**
+  String get invitesEmptyExpired;
+
+  /// Invites page: no redeemed invites
+  ///
+  /// In en, this message translates to:
+  /// **'No redeemed invites'**
+  String get invitesEmptyRedeemed;
+
+  /// Invites page: hint under "No pending invites"
+  ///
+  /// In en, this message translates to:
+  /// **'Create an invite link to bring people to the forum.'**
+  String get invitesEmptyPendingHint;
+
+  /// Invites page: row title of a link invite whose URL is missing (Discourse user.invited.invite_link.title)
+  ///
+  /// In en, this message translates to:
+  /// **'Invite link'**
+  String get inviteLinkFallbackTitle;
+
+  /// Invites page row: when the invite was redeemed; {date} is a date
+  ///
+  /// In en, this message translates to:
+  /// **'Redeemed {date}'**
+  String inviteRedeemedOn(String date);
+
+  /// Invites page row: how many times a link invite was used out of its maximum
+  ///
+  /// In en, this message translates to:
+  /// **'Redeemed {count} of {max}'**
+  String inviteRedemptions(int count, int max);
+
+  /// Invites page row: the email invite was sent
+  ///
+  /// In en, this message translates to:
+  /// **'Email sent'**
+  String get inviteEmailSent;
+
+  /// Invites page row: the email invite was saved but not emailed
+  ///
+  /// In en, this message translates to:
+  /// **'Email not sent'**
+  String get inviteEmailNotSent;
+
+  /// Invites page row: when the invite expired; {date} is a date
+  ///
+  /// In en, this message translates to:
+  /// **'Expired {date}'**
+  String inviteExpiredOn(String date);
+
+  /// Invites page row: tooltip of the revoke (delete) button
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke invite'**
+  String get inviteRevokeTooltip;
+
+  /// Review queue status (filter chip and card badge; Discourse review.statuses.pending)
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get reviewStatusPending;
+
+  /// Review queue status (filter chip and card badge; Discourse review.statuses.approved)
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get reviewStatusApproved;
+
+  /// Review queue status (filter chip and card badge; Discourse review.statuses.rejected)
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get reviewStatusRejected;
+
+  /// Review queue status filter chip: every status (Discourse review.statuses.all)
+  ///
+  /// In en, this message translates to:
+  /// **'Everything'**
+  String get reviewStatusAll;
+
+  /// Review queue card badge (Discourse review.statuses.ignored)
+  ///
+  /// In en, this message translates to:
+  /// **'Flag ignored'**
+  String get reviewStatusIgnored;
+
+  /// Review queue card badge (Discourse review.statuses.deleted)
+  ///
+  /// In en, this message translates to:
+  /// **'Topic or post deleted'**
+  String get reviewStatusDeleted;
+
+  /// Review queue: the forum connection has no review queue
+  ///
+  /// In en, this message translates to:
+  /// **'Review queue is not available on this forum.'**
+  String get reviewQueueUnavailable;
+
+  /// Review queue: the list could not be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load review queue'**
+  String get reviewQueueLoadFailed;
+
+  /// Review queue: another moderator acted on the item first; the list reloads
+  ///
+  /// In en, this message translates to:
+  /// **'This item was changed by another moderator. Refreshing…'**
+  String get reviewableChangedByOther;
+
+  /// Review queue: an approve/reject/… action failed
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to perform action'**
+  String get reviewActionFailed;
+
+  /// Review queue: snackbar after an action, when the server sent no message of its own; {action} is the action's label (e.g. 'Keep post')
+  ///
+  /// In en, this message translates to:
+  /// **'{action} — done'**
+  String reviewActionDone(String action);
+
+  /// Review queue, reject dialog: hint in the reason field
+  ///
+  /// In en, this message translates to:
+  /// **'Why is this being rejected?'**
+  String get reviewRejectReasonHint;
+
+  /// Review queue card title (Discourse review.types.reviewable_flagged_post)
+  ///
+  /// In en, this message translates to:
+  /// **'Flagged Post'**
+  String get reviewTypeFlaggedPost;
+
+  /// Review queue card title (Discourse review.types.reviewable_queued_post)
+  ///
+  /// In en, this message translates to:
+  /// **'Queued Post'**
+  String get reviewTypeQueuedPost;
+
+  /// Review queue card title (Discourse review.types.reviewable_queued_topic)
+  ///
+  /// In en, this message translates to:
+  /// **'Queued Topic'**
+  String get reviewTypeQueuedTopic;
+
+  /// Review queue card title (Discourse review.types.reviewable_user)
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get reviewTypeUser;
+
+  /// Review queue card title (Discourse review.types.reviewable_post)
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get reviewTypePost;
+
+  /// Review queue card title (Discourse chat plugin review.types.reviewable_chat_message)
+  ///
+  /// In en, this message translates to:
+  /// **'Flagged chat message'**
+  String get reviewTypeChatMessage;
+
+  /// Review queue: the viewer is not staff
+  ///
+  /// In en, this message translates to:
+  /// **'Moderator access required'**
+  String get reviewModeratorAccessRequired;
+
+  /// Review queue card: the item's score (Discourse review.scores.score); {score} is a number like 12.5
+  ///
+  /// In en, this message translates to:
+  /// **'Score {score}'**
+  String reviewableScore(String score);
+
+  /// Under a post, when its list of direct replies fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load replies.'**
+  String get postRepliesLoadFailed;
+
+  /// Post menu item that turns the post into a wiki (Discourse's "Make Wiki")
+  ///
+  /// In en, this message translates to:
+  /// **'Make wiki'**
+  String get postMakeWiki;
+
+  /// Post menu item that turns a wiki post back into a normal post (Discourse's "Remove Wiki")
+  ///
+  /// In en, this message translates to:
+  /// **'Remove wiki'**
+  String get postRemoveWiki;
+
+  /// Snackbar when removing the bookmark from a post fails and the server gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to remove bookmark'**
+  String get postBookmarkRemoveFailed;
+
+  /// Snackbar when bookmarking a post fails and the server gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to bookmark post'**
+  String get postBookmarkFailed;
+
+  /// Snackbar when changing a post bookmark's reminder fails and the server gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update reminder'**
+  String get postBookmarkReminderUpdateFailed;
+
+  /// Snackbar after setting a reminder on a post's bookmark (Discourse's "Reminder set!")
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder set'**
+  String get postBookmarkReminderSet;
+
+  /// Snackbar after clearing the reminder on a post's bookmark (Discourse's "Reminder cleared")
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder cleared'**
+  String get postBookmarkReminderCleared;
+
+  /// Snackbar when marking a reply as the solution (discourse-solved) fails and the server gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to mark answer'**
+  String get solutionMarkFailed;
+
+  /// Snackbar when unmarking the solution (discourse-solved) fails and the server gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to unmark answer'**
+  String get solutionUnmarkFailed;
+
+  /// In a post's header, in place of its date when the post has none
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown date'**
+  String get postUnknownDate;
+
+  /// Screen-reader label of a post's bookmark button when the post is not bookmarked
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark post'**
+  String get postBookmarkAction;
+
+  /// Screen-reader label of a post's reactions button when the reader has reacted; count is the post's total reactions
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{You reacted. 1 reaction. Tap to change, long press to see who.} other{You reacted. {count} reactions. Tap to change, long press to see who.}}'**
+  String postReactionsSemanticsReacted(int count);
+
+  /// Screen-reader label of a post's reactions button when the reader has not reacted; count is the post's total reactions
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 reaction. Tap to react, long press to see who.} other{{count} reactions. Tap to react, long press to see who.}}'**
+  String postReactionsSemantics(int count);
+
+  /// Screen-reader label of a post's like (heart) button when the reader has not liked it
+  ///
+  /// In en, this message translates to:
+  /// **'Like post'**
+  String get postLikeAction;
+
+  /// Screen-reader label of a post's like (heart) button when the reader has liked it
+  ///
+  /// In en, this message translates to:
+  /// **'Unlike post'**
+  String get postUnlikeAction;
+
+  /// Snackbar when taking back an up/down vote on a post (discourse-post-voting) fails and the server gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Could not remove vote (past undo window?)'**
+  String get postVoteRemoveFailed;
+
+  /// Snackbar when an up/down vote on a post (discourse-post-voting) fails and the server gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Could not cast vote'**
+  String get postVoteCastFailed;
+
+  /// Tooltip of the up arrow beside a post in a post-voting topic (discourse-post-voting's "Upvote")
+  ///
+  /// In en, this message translates to:
+  /// **'Upvote'**
+  String get postUpvote;
+
+  /// Tooltip of the down arrow beside a post in a post-voting topic (discourse-post-voting's "Downvote")
+  ///
+  /// In en, this message translates to:
+  /// **'Downvote'**
+  String get postDownvote;
+
+  /// Error when voting in a post's poll fails
+  ///
+  /// In en, this message translates to:
+  /// **'Vote failed. Please try again.'**
+  String get pollVoteFailed;
+
+  /// Error when taking back one's vote in a poll fails
+  ///
+  /// In en, this message translates to:
+  /// **'Could not remove your vote. Please try again.'**
+  String get pollRemoveVoteFailed;
+
+  /// Error when the list of a poll's voters cannot be opened
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load voters.'**
+  String get pollVotersLoadFailed;
+
+  /// In the poll voters sheet, when the forum will not say who voted (a private poll)
+  ///
+  /// In en, this message translates to:
+  /// **'Voters are not visible for this poll.'**
+  String get pollVotersNotVisible;
+
+  /// Byline of the solution card under a solved topic's first post: who wrote the accepted answer and its post number
+  ///
+  /// In en, this message translates to:
+  /// **'Solved by {name} in post #{postNumber}'**
+  String solutionSolvedByInPost(String name, int postNumber);
+
+  /// Appended to the solution card's byline: who marked the answer as the solution
+  ///
+  /// In en, this message translates to:
+  /// **'marked by {name}'**
+  String solutionMarkedBy(String name);
+
+  /// In the reaction picker, when the post's reaction limit is used up for now
+  ///
+  /// In en, this message translates to:
+  /// **'You can react to this post again in {seconds}s'**
+  String reactAgainInSeconds(int seconds);
+
+  /// In the reaction picker, when adding or changing a reaction fails and the server gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update reaction.'**
+  String get reactionUpdateFailed;
+
+  /// In the who-reacted sheet, when the forum has no way to list reactions
+  ///
+  /// In en, this message translates to:
+  /// **'Reactions are not supported on this forum.'**
+  String get reactionsNotSupported;
+
+  /// In the who-reacted sheet, when the list fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load reactions.'**
+  String get reactionsLoadFailed;
+
+  /// Screen-reader label of a user row in the who-reacted sheet
+  ///
+  /// In en, this message translates to:
+  /// **'View profile of {username}'**
+  String viewProfileOfUser(String username);
+
+  /// Error when saving an edited post fails and the server gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save post'**
+  String get failedToSavePost;
+
+  /// Error when saving an edited post fails, with the underlying error
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save post: {error}'**
+  String failedToSavePostWithError(String error);
+
+  /// Error when removing an existing attachment while editing a post fails and the server gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to remove attachment. Please check your permissions.'**
+  String get failedToRemoveAttachmentCheckPermissions;
+
+  /// Title of the page for editing a post (Discourse's "Edit Post")
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Post'**
+  String get editPostTitle;
+
+  /// Hint in the text field when editing a post
+  ///
+  /// In en, this message translates to:
+  /// **'Edit your post...'**
+  String get editYourPostHint;
+
+  /// Error when posting a reply fails and the server gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to post reply'**
+  String get failedToPostReply;
+
+  /// Error when posting a reply fails, with the underlying error
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to post reply: {error}'**
+  String failedToPostReplyWithError(String error);
+
+  /// Error when creating a topic fails and the server gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create topic'**
+  String get failedToCreateTopic;
+
+  /// Hint in the title field of the new-topic composer
+  ///
+  /// In en, this message translates to:
+  /// **'Write your topic title...'**
+  String get writeYourTopicTitle;
+
+  /// Hint in the text field of the new-topic composer
+  ///
+  /// In en, this message translates to:
+  /// **'Write your topic content...'**
+  String get writeYourTopicContent;
+
+  /// Default hint in a composer's title field, when the page gives none of its own
+  ///
+  /// In en, this message translates to:
+  /// **'Write your title...'**
+  String get composerTitleHint;
+
+  /// Default hint in a composer's text field, when the page gives none of its own
+  ///
+  /// In en, this message translates to:
+  /// **'Write your content...'**
+  String get composerContentHint;
+
+  /// Composer error when a picked image is over the forum's upload limit and shrinking it failed; size and limit are formatted file sizes
+  ///
+  /// In en, this message translates to:
+  /// **'{fileName}: too large ({size}) and could not be resized. Limit is {limit}.'**
+  String imageTooLargeCouldNotResize(
+      String fileName, String size, String limit);
+
+  /// Composer notice after an oversized image was shrunk to fit the forum's upload limit; size and limit are formatted file sizes; dimensions is empty or ' (1200×800 → 900×600)' with a leading space
+  ///
+  /// In en, this message translates to:
+  /// **'{fileName} resized to {size}{dimensions} to fit the {limit} limit.'**
+  String imageResizedToFitLimit(
+      String fileName, String size, String dimensions, String limit);
+
+  /// Screen-reader hint of the composer's attach-file button
+  ///
+  /// In en, this message translates to:
+  /// **'Attach a file to this post'**
+  String get composerAttachFileHint;
+
+  /// Screen-reader hint of the composer's upload-image button
+  ///
+  /// In en, this message translates to:
+  /// **'Upload an image to this post'**
+  String get composerUploadImageHint;
+
+  /// Screen-reader hint of the composer's formatting menu button
+  ///
+  /// In en, this message translates to:
+  /// **'Open formatting options'**
+  String get composerFormattingHint;
+
+  /// Tooltip of the reply composer's whisper toggle (staff only), when off
+  ///
+  /// In en, this message translates to:
+  /// **'Whisper (staff only)'**
+  String get whisperStaffOnly;
+
+  /// Tooltip of the reply composer's whisper toggle (staff only), when on
+  ///
+  /// In en, this message translates to:
+  /// **'Whisper on (staff only)'**
+  String get whisperOnStaffOnly;
+
+  /// Hint in the new-topic tag field once the topic has as many tags as the forum allows
+  ///
+  /// In en, this message translates to:
+  /// **'Max tags reached'**
+  String get tagInputMaxReached;
+
+  /// Hint in the new-topic tag field before any tag is added
+  ///
+  /// In en, this message translates to:
+  /// **'Add a tag…'**
+  String get tagInputAddTag;
+
+  /// Short hint in the new-topic tag field once it has a tag: add another
+  ///
+  /// In en, this message translates to:
+  /// **'+ tag'**
+  String get tagInputAddAnother;
+
+  /// Edit history page, when the forum offers no post revisions
+  ///
+  /// In en, this message translates to:
+  /// **'Edit history is not available on this forum.'**
+  String get editHistoryUnavailable;
+
+  /// Edit history page, when a revision fails to load and the server gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load edit history.'**
+  String get editHistoryLoadFailed;
+
+  /// Tooltip of the edit history page's back arrow (Discourse's "Previous revision")
+  ///
+  /// In en, this message translates to:
+  /// **'Previous revision'**
+  String get previousRevision;
+
+  /// Tooltip of the edit history page's forward arrow (Discourse's "Next revision")
+  ///
+  /// In en, this message translates to:
+  /// **'Next revision'**
+  String get nextRevision;
+
+  /// Notification settings page: loading the forum's notification preferences failed
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load notification preferences.'**
+  String get notificationPrefsLoadFailed;
+
+  /// Notification settings page: snackbar when a changed preference could not be saved (the change is undone)
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save — check your connection'**
+  String get notificationPrefsSaveFailed;
+
+  /// Notification settings page: empty state for a signed-out reader
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to manage your notification preferences.'**
+  String get signInToManageNotificationPrefs;
+
+  /// Notification settings page: section header over the push notification row
+  ///
+  /// In en, this message translates to:
+  /// **'Push'**
+  String get notificationSettingsPushSection;
+
+  /// Notification settings page: section header over the email preferences (Discourse user.email_settings)
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get notificationSettingsEmailSection;
+
+  /// Notification settings page: row for Discourse's email_level preference (when to email about replies, mentions and watched activity)
+  ///
+  /// In en, this message translates to:
+  /// **'Email when away'**
+  String get emailWhenAwayTitle;
+
+  /// Notification settings page: explanation of the email_level preference, shown in its picker (Discourse user.email_level.title)
+  ///
+  /// In en, this message translates to:
+  /// **'Email me when I am quoted, replied to, my @username is mentioned, or when there is new activity in my watched categories, tags or topics'**
+  String get emailLevelDescription;
+
+  /// Notification settings page: option 'Always' for email and like notification preferences (Discourse like_notification_frequency.always)
+  ///
+  /// In en, this message translates to:
+  /// **'Always'**
+  String get notificationPrefAlways;
+
+  /// Notification settings page: email option 'only when away' (Discourse user.email_level.only_when_away)
+  ///
+  /// In en, this message translates to:
+  /// **'Only when away'**
+  String get notificationPrefOnlyWhenAway;
+
+  /// Notification settings page: option 'Never' for email and like notification preferences (Discourse like_notification_frequency.never)
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get notificationPrefNever;
+
+  /// Notification settings page: row for Discourse's email_messages_level preference (emails about personal messages)
+  ///
+  /// In en, this message translates to:
+  /// **'Email for messages'**
+  String get emailForMessagesTitle;
+
+  /// Notification settings page: explanation of email_messages_level, shown in its picker (Discourse user.email_messages_level)
+  ///
+  /// In en, this message translates to:
+  /// **'Email me when I am sent a personal message'**
+  String get emailMessagesLevelDescription;
+
+  /// Notification settings page: switch for Discourse's email digest (Discourse user.email_activity_summary)
+  ///
+  /// In en, this message translates to:
+  /// **'Activity summary'**
+  String get activitySummaryTitle;
+
+  /// Notification settings page: what the activity summary switch does (Discourse user.email_digests.title)
+  ///
+  /// In en, this message translates to:
+  /// **'When I don’t visit here, send me an email summary of popular topics and replies'**
+  String get activitySummaryDescription;
+
+  /// Notification settings page: row choosing how often the activity summary email is sent
+  ///
+  /// In en, this message translates to:
+  /// **'Activity summary frequency'**
+  String get activitySummaryFrequencyTitle;
+
+  /// Notification settings page: activity summary frequency option (Discourse user.email_digests.daily)
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get activitySummaryDaily;
+
+  /// Notification settings page: activity summary frequency option (Discourse user.email_digests.weekly)
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get activitySummaryWeekly;
+
+  /// Notification settings page: activity summary frequency option (Discourse user.email_digests.every_month)
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get activitySummaryMonthly;
+
+  /// Notification settings page: switch for Discourse's mailing list mode (Discourse user.mailing_list_mode.label)
+  ///
+  /// In en, this message translates to:
+  /// **'Mailing list mode'**
+  String get mailingListModeTitle;
+
+  /// Notification settings page: what mailing list mode does
+  ///
+  /// In en, this message translates to:
+  /// **'Email me every post (disables the activity summary). Not recommended on high-traffic forums.'**
+  String get mailingListModeDescription;
+
+  /// Notification settings page: row for when to be notified about likes (Discourse user.like_notification_frequency.title)
+  ///
+  /// In en, this message translates to:
+  /// **'Notify when liked'**
+  String get likeNotificationFrequencyTitle;
+
+  /// Notification settings page: like notification option (Discourse user.like_notification_frequency.first_time_and_daily)
+  ///
+  /// In en, this message translates to:
+  /// **'First time a post is liked and daily'**
+  String get likeNotificationFirstTimeAndDaily;
+
+  /// Notification settings page: like notification option (Discourse user.like_notification_frequency.first_time)
+  ///
+  /// In en, this message translates to:
+  /// **'First time a post is liked'**
+  String get likeNotificationFirstTime;
+
+  /// Notification settings page: row for what happens to a topic you reply to (Discourse user.notification_level_when_replying.label)
+  ///
+  /// In en, this message translates to:
+  /// **'When posting'**
+  String get whenPostingTitle;
+
+  /// Notification settings page: explanation of the 'When posting' preference, shown in its picker
+  ///
+  /// In en, this message translates to:
+  /// **'What happens to a topic you reply to'**
+  String get whenPostingDescription;
+
+  /// Notification settings page: 'When posting' option (Discourse user.notification_level_when_replying.watch_topic)
+  ///
+  /// In en, this message translates to:
+  /// **'Watch topic'**
+  String get whenPostingWatchTopic;
+
+  /// Notification settings page: 'When posting' option (Discourse user.notification_level_when_replying.track_topic)
+  ///
+  /// In en, this message translates to:
+  /// **'Track topic'**
+  String get whenPostingTrackTopic;
+
+  /// Notification settings page: 'When posting' option (Discourse user.notification_level_when_replying.do_nothing)
+  ///
+  /// In en, this message translates to:
+  /// **'Do nothing'**
+  String get whenPostingDoNothing;
+
+  /// Do not disturb duration picker: pause until tomorrow (Discourse pause_notifications.options.tomorrow)
+  ///
+  /// In en, this message translates to:
+  /// **'Until tomorrow'**
+  String get pauseNotificationsUntilTomorrow;
+
+  /// Snackbar when turning on Do not disturb failed
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t enable do not disturb'**
+  String get couldNotEnableDoNotDisturb;
+
+  /// Snackbar when turning off Do not disturb failed
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t turn off do not disturb'**
+  String get couldNotTurnOffDoNotDisturb;
+
+  /// Account and privacy page: snackbar after the password-reset email was requested
+  ///
+  /// In en, this message translates to:
+  /// **'Password-reset email sent.'**
+  String get passwordResetEmailSent;
+
+  /// Account and privacy page: snackbar when the password-reset email could not be requested
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t send reset email'**
+  String get couldNotSendResetEmail;
+
+  /// Account and privacy / Change email: snackbar when a request failed with nothing more specific to say
+  ///
+  /// In en, this message translates to:
+  /// **'Request failed.'**
+  String get accountRequestFailed;
+
+  /// Account and privacy page: the forum's web address is unknown, so it cannot be opened
+  ///
+  /// In en, this message translates to:
+  /// **'Forum URL is unavailable.'**
+  String get forumUrlUnavailable;
+
+  /// Account and privacy page: the forum's preferences page could not be opened in the browser
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the preferences page.'**
+  String get couldNotOpenPreferencesPage;
+
+  /// Account and privacy page: the forum could not be opened in the browser
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the forum URL.'**
+  String get couldNotOpenForumUrl;
+
+  /// Change email page: snackbar when the forum did not accept the change request
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t request email change'**
+  String get couldNotRequestEmailChange;
+
+  /// Change email page: label of the new address field
+  ///
+  /// In en, this message translates to:
+  /// **'New email'**
+  String get newEmailLabel;
+
+  /// Change email page: validation error when the field is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an email address'**
+  String get enterAnEmailAddress;
+
+  /// Change email page: validation error for an address without @ or a dot
+  ///
+  /// In en, this message translates to:
+  /// **'That doesn’t look like an email'**
+  String get emailLooksInvalid;
+
+  /// Change email page: validation error for an address containing a space
+  ///
+  /// In en, this message translates to:
+  /// **'No spaces in emails'**
+  String get emailNoSpaces;
+
+  /// Enable notifications page: title of the forum's approval page opened to grant notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Allow notifications'**
+  String get allowNotificationsSheetTitle;
+
+  /// Enable notifications page: the forum's approval page came back without the key (shown after 'Could not enable notifications:')
+  ///
+  /// In en, this message translates to:
+  /// **'No payload returned from the grant.'**
+  String get notificationsGrantNoPayload;
+
+  /// Stands in for the forum's name when the forum has none
+  ///
+  /// In en, this message translates to:
+  /// **'this forum'**
+  String get thisForumFallback;
+
+  /// Title of the forum's sign-in page, e.g. 'Sign in to meta.discourse.org'
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to {domain}'**
+  String signInToDomain(String domain);
+
+  /// Title of the snackbar reporting a failed sign-in
+  ///
+  /// In en, this message translates to:
+  /// **'Login result'**
+  String get loginResultTitle;
+
+  /// Two-factor dialog: the code entered was not accepted
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid authentication code'**
+  String get invalidAuthenticationCode;
+
+  /// Two-factor dialog: checking the code failed for another reason
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred during verification. Please try again.'**
+  String get tfaVerificationError;
+
+  /// Name of the password field, used in 'Password is required.' (Discourse user.password.title)
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordFieldLabel;
+
+  /// Generic error message when an error has no readable text of its own
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get somethingWentWrongTryAgain;
+
+  /// Error dialog: message for an unexpected error
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred. Please try again.'**
+  String get unexpectedErrorTryAgain;
+
+  /// Error dialog: the device is offline
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Please check your network settings.'**
+  String get errorNoInternetConnection;
+
+  /// Error dialog: a request took too long
+  ///
+  /// In en, this message translates to:
+  /// **'Request timed out. Please try again.'**
+  String get errorRequestTimedOut;
+
+  /// Error dialog: the server failed without a message of its own
+  ///
+  /// In en, this message translates to:
+  /// **'Server error occurred. Please try again later.'**
+  String get errorServerTryLater;
+
+  /// Error dialog: sign-in rejected the username or password
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid username or password.'**
+  String get errorInvalidCredentials;
+
+  /// Error dialog: the reader's session has expired
+  ///
+  /// In en, this message translates to:
+  /// **'Your session has expired. Please log in again.'**
+  String get errorSessionExpired;
+
+  /// Error dialog: the forum has suspended the reader's account
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been suspended. Please contact the forum\'s staff.'**
+  String get errorAccountSuspended;
+
+  /// Error dialog: the forum could not be found
+  ///
+  /// In en, this message translates to:
+  /// **'Forum not found.'**
+  String get errorForumNotFound;
+
+  /// Error dialog: the reader may not access the forum
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to access this forum.'**
+  String get errorForumAccessDenied;
+
+  /// Error dialog: the forum is unavailable
+  ///
+  /// In en, this message translates to:
+  /// **'Forum is currently unavailable. Please try again later.'**
+  String get errorForumUnavailable;
+
+  /// Error dialog: requested data was not found
+  ///
+  /// In en, this message translates to:
+  /// **'Requested data not found.'**
+  String get errorDataNotFound;
+
+  /// Error dialog: data looks corrupted
+  ///
+  /// In en, this message translates to:
+  /// **'Data appears to be corrupted. Please refresh the page.'**
+  String get errorDataCorrupted;
+
+  /// Error dialog: cached data could not be read
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load cached data. Please try again.'**
+  String get errorCacheLoadFailed;
+
+  /// Error dialog: a value was invalid; {field} names it
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid {field} provided.'**
+  String errorInvalidField(String field);
+
+  /// Error dialog: a required value is missing, e.g. 'Password is required.'
+  ///
+  /// In en, this message translates to:
+  /// **'{field} is required.'**
+  String errorFieldRequired(String field);
+
+  /// Error dialog: the reader may not do {action}
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to {action}.'**
+  String errorPermissionDeniedFor(String action);
+
+  /// Error dialog: a feature, e.g. Passkeys, is not available on this forum
+  ///
+  /// In en, this message translates to:
+  /// **'{feature} is not available on this forum.'**
+  String errorFeatureNotAvailable(String feature);
+
+  /// Error dialog: the device's storage is full
+  ///
+  /// In en, this message translates to:
+  /// **'Storage is full. Please free up some space.'**
+  String get errorStorageFull;
+
+  /// Error dialog: the app may not use the device's storage
+  ///
+  /// In en, this message translates to:
+  /// **'Storage access denied. Please check app permissions.'**
+  String get errorStorageAccessDenied;
+
+  /// Error dialog: a network error without more detail
+  ///
+  /// In en, this message translates to:
+  /// **'Network error occurred. Please try again.'**
+  String get errorNetworkTryAgain;
+
+  /// Error dialog: signing in failed without more detail
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication failed. Please try again.'**
+  String get errorAuthenticationTryAgain;
+
+  /// Error dialog: the forum reported an error without more detail
+  ///
+  /// In en, this message translates to:
+  /// **'Forum error occurred. Please try again.'**
+  String get errorForumTryAgain;
+
+  /// Error dialog title for a connection problem
+  ///
+  /// In en, this message translates to:
+  /// **'Connection Error'**
+  String get connectionErrorTitle;
+
+  /// Error dialog title for a sign-in problem
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication Error'**
+  String get authenticationErrorTitle;
+
+  /// Error dialog title for an error the forum reported
+  ///
+  /// In en, this message translates to:
+  /// **'Forum Error'**
+  String get forumErrorTitle;
+
+  /// Error dialog title for a missing permission
+  ///
+  /// In en, this message translates to:
+  /// **'Permission Error'**
+  String get permissionErrorTitle;
 }
 
 class _AppLocalizationsDelegate

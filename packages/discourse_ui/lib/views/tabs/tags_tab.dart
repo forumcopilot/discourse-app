@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:discourse_core/discourse_core.dart' show DiscourseTagProxy;
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -87,7 +88,7 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
           _allTags = const [];
           _error = result.resultText?.isNotEmpty == true
               ? result.resultText
-              : 'Failed to load tags.';
+              : AppLocalizations.of(context)!.failedToLoadTags;
           return;
         }
         // An empty list is not an error: _buildBody shows it as the
@@ -203,7 +204,7 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
                   child: TextField(
                     controller: _filterController,
                     decoration: InputDecoration(
-                      hintText: 'Search tags…',
+                      hintText: AppLocalizations.of(context)!.searchTagsHint,
                       prefixIcon: Icon(Icons.search,
                           color: colorScheme.onSurfaceVariant),
                       // The app's search bar: a filled pill, 56dp high.
@@ -241,8 +242,8 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
                     color: colorScheme.onSurfaceVariant,
                   ),
                   tooltip: _sort == _SortMode.byCount
-                      ? 'Sorted by topic count — tap to switch to A→Z'
-                      : 'Sorted alphabetically — tap to switch to popularity',
+                      ? AppLocalizations.of(context)!.tagsSortedByCountTooltip
+                      : AppLocalizations.of(context)!.tagsSortedAlphabeticallyTooltip,
                   onPressed: () => setState(() {
                     _sort = _sort == _SortMode.byCount
                         ? _SortMode.alphabetical
@@ -259,11 +260,11 @@ class _TagsTabState extends State<TagsTab> with AutomaticKeepAliveClientMixin {
             child: EmptyStateView.error(message: describeError(_error, context: context), onRetry: _refresh),
           )
         else if (_allTags.isEmpty && _loaded)
-          const SliverFillRemaining(
+          SliverFillRemaining(
             hasScrollBody: false,
             child: EmptyStateView(
               icon: Icons.label_outline,
-              message: 'No tags yet on this forum.',
+              message: AppLocalizations.of(context)!.noTagsYet,
             ),
           )
         else if (filtered.isEmpty)
@@ -353,7 +354,7 @@ class _TagTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  _formatCount(tag.count),
+                  _formatCount(context, tag.count),
                   style: textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontFeatures: const [FontFeature.tabularFigures()],
@@ -365,7 +366,7 @@ class _TagTile extends StatelessWidget {
                 IconButton(
                   icon: Icon(Icons.notifications_none,
                       color: colorScheme.onSurfaceVariant),
-                  tooltip: 'Notification level',
+                  tooltip: AppLocalizations.of(context)!.tagNotificationLevelTooltip,
                   onPressed: onBellTap,
                 ),
               ],
@@ -384,9 +385,8 @@ class _TagTile extends StatelessWidget {
     );
   }
 
-  String _formatCount(int n) {
-    if (n < 1000) return n.toString();
-    if (n < 10000) return '${(n / 1000).toStringAsFixed(1)}k';
-    return '${(n / 1000).floor()}k';
-  }
+  /// 950, 1.2K, 12K — in the reader's language (1,2 тыс., 1.2万).
+  String _formatCount(BuildContext context, int n) =>
+      NumberFormat.compact(locale: Localizations.localeOf(context).toString())
+          .format(n);
 }

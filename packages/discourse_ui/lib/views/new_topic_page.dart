@@ -117,6 +117,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
   /// Throws with the forum's reason when it refuses the topic ("Title is
   /// too short (minimum is 15 characters)"); the composer shows it.
   Future<bool> _handleSubmit(String title, String content) async {
+    final l10n = AppLocalizations.of(context)!;
     final topicProxy = SiteProxyFactory.getTopicProxy();
     final result = await topicProxy.newTopic(
       widget.forumId,
@@ -129,7 +130,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
 
     if (!result.result) {
       final reason = result.resultText?.trim() ?? '';
-      throw Exception(reason.isNotEmpty ? reason : 'Failed to create topic');
+      throw Exception(reason.isNotEmpty ? reason : l10n.failedToCreateTopic);
     }
     if (result.state == 1) {
       // Queued for a moderator: there is no topic to open yet.
@@ -175,10 +176,10 @@ class _NewTopicPageState extends State<NewTopicPage> {
     return MessageComposePage(
       submitLabel: AppLocalizations.of(context)!.createTopic,
       siteContext: widget.siteContext,
-      title: AppLocalizations.of(context)?.newTopic ?? 'New Topic',
+      title: AppLocalizations.of(context)!.newTopic,
       showTitleField: true,
-      titleHint: 'Write your topic title...',
-      contentHint: 'Write your topic content...',
+      titleHint: AppLocalizations.of(context)!.writeYourTopicTitle,
+      contentHint: AppLocalizations.of(context)!.writeYourTopicContent,
       titleController: _titleController,
       contentController: _contentController,
       onSubmit: _handleSubmitWithDraftDiscard,

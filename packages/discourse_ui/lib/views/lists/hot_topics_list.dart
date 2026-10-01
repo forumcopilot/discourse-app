@@ -12,6 +12,7 @@ import '../../utils/app_navigation.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/resettable_widget.dart';
 import '../../utils/error_message.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../widgets/topic_list_skeleton.dart';
 
 /// Home tab — **Hot** sub-segment. Backed by `/hot.json` (Discourse-
@@ -184,9 +185,11 @@ class HotTopicsListState extends FCStatefulWidget<HotTopicsList>
     if (_error != null) {
       return EmptyStateView.error(message: describeError(_error, context: context), onRetry: refreshList);
     }
-    return const EmptyStateView(
+    // Discourse's own words for an empty Hot list; this used to borrow
+    // New's "since your last visit", which Hot is not about.
+    return EmptyStateView(
       icon: Icons.fiber_new,
-      message: 'No new topics since your last visit.',
+      message: AppLocalizations.of(context)!.noHotTopics,
     );
   }
 

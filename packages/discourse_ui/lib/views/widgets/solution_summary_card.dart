@@ -111,7 +111,7 @@ class SolutionSummaryCard extends StatelessWidget {
                     SizedBox(width: DesignTokens.spacingS),
                     Expanded(
                       child: Text(
-                        _byline(),
+                        _byline(AppLocalizations.of(context)!),
                         style: textTheme.bodySmall
                             ?.copyWith(color: colorScheme.onSurfaceVariant),
                         maxLines: 2,
@@ -140,10 +140,12 @@ class SolutionSummaryCard extends StatelessWidget {
 
   /// "solved by X in post #N" — plus who marked it, when the forum exposes that
   /// (`show_who_marked_solved`; Discourse omits the accepter fields when it is off).
-  String _byline() {
+  String _byline(AppLocalizations l10n) {
     final base =
-        'Solved by ${answer.solverDisplayName} in post #${answer.postNumber}';
+        l10n.solutionSolvedByInPost(answer.solverDisplayName, answer.postNumber);
     final accepter = answer.accepterDisplayName;
-    return accepter == null ? base : '$base  ·  marked by $accepter';
+    return accepter == null
+        ? base
+        : '$base  ·  ${l10n.solutionMarkedBy(accepter)}';
   }
 }

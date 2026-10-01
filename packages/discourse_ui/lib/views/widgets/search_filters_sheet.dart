@@ -109,14 +109,15 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return SafeArea(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           SheetTitle(
-            AppLocalizations.of(context)!.searchFilters,
-            trailing: TextButton(onPressed: _reset, child: Text(AppLocalizations.of(context)!.reset)),
+            l10n.searchFilters,
+            trailing: TextButton(onPressed: _reset, child: Text(l10n.reset)),
           ),
           Expanded(
             child: ListView(
@@ -125,11 +126,11 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
                 vertical: DesignTokens.spacingS,
               ),
               children: [
-                _section('Status', textTheme, colorScheme),
+                _section(l10n.searchFilterStatusSection, textTheme, colorScheme),
                 _wrap([
                   for (final s in FCSearchStatus.values)
                     FilterChip(
-                      label: Text(s.label),
+                      label: Text(_statusLabel(l10n, s)),
                       selected: _status.contains(s),
                       onSelected: (sel) {
                         setState(() {
@@ -144,11 +145,11 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
                 ]),
                 if (widget.loggedIn) ...[
                   const SizedBox(height: DesignTokens.spacingM),
-                  _section('My activity', textTheme, colorScheme),
+                  _section(l10n.searchFilterMyActivitySection, textTheme, colorScheme),
                   _wrap([
                     for (final p in FCSearchPersonal.values)
                       FilterChip(
-                        label: Text(p.label),
+                        label: Text(_personalLabel(l10n, p)),
                         selected: _personal.contains(p),
                         onSelected: (sel) {
                           setState(() {
@@ -163,38 +164,38 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
                   ]),
                 ],
                 const SizedBox(height: DesignTokens.spacingM),
-                _section('Match type', textTheme, colorScheme),
+                _section(l10n.searchFilterMatchTypeSection, textTheme, colorScheme),
                 _wrap([
                   FilterChip(
-                    label: Text(AppLocalizations.of(context)!.titleOnly),
+                    label: Text(l10n.titleOnly),
                     selected: _titleOnly,
                     onSelected: (v) => setState(() => _titleOnly = v),
                   ),
                   FilterChip(
-                    label: Text(AppLocalizations.of(context)!.firstPostsOnly),
+                    label: Text(l10n.firstPostsOnly),
                     selected: _firstPostsOnly,
                     onSelected: (v) => setState(() => _firstPostsOnly = v),
                   ),
                 ]),
                 const SizedBox(height: DesignTokens.spacingM),
-                _section('Tags', textTheme, colorScheme),
+                _section(l10n.tags, textTheme, colorScheme),
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: TextField(
                     controller: _tagController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
+                      // Example tag names, not words to translate.
                       hintText: 'foo bar baz',
-                      helperText:
-                          'Space- or comma-separated. Each tag is required.',
-                      border: OutlineInputBorder(),
+                      helperText: l10n.searchTagsFilterHelper,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 ),
                 const SizedBox(height: DesignTokens.spacingM),
-                _section('Sort', textTheme, colorScheme),
+                _section(l10n.searchSortBy, textTheme, colorScheme),
                 _wrap([
                   ChoiceChip(
-                    label: Text(AppLocalizations.of(context)!.relevance),
+                    label: Text(l10n.relevance),
                     selected: _sort == null,
                     onSelected: (v) {
                       if (v) setState(() => _sort = null);
@@ -202,7 +203,7 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
                   ),
                   for (final s in FCSearchSort.values)
                     ChoiceChip(
-                      label: Text(s.label),
+                      label: Text(_sortLabel(l10n, s)),
                       selected: _sort == s,
                       onSelected: (v) {
                         setState(() => _sort = v ? s : null);
@@ -226,14 +227,14 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: Text(AppLocalizations.of(context)!.cancel),
+                    child: Text(l10n.cancel),
                   ),
                 ),
                 const SizedBox(width: DesignTokens.spacingM),
                 Expanded(
                   child: FilledButton(
                     onPressed: _apply,
-                    child: Text(AppLocalizations.of(context)!.apply),
+                    child: Text(l10n.apply),
                   ),
                 ),
               ],
@@ -243,6 +244,39 @@ class _SearchFiltersSheetState extends State<SearchFiltersSheet> {
       ),
     );
   }
+
+  // The SDK's enums carry English labels; the chips use the app's strings,
+  // in Discourse's advanced-search wording where it has one.
+  static String _statusLabel(AppLocalizations l10n, FCSearchStatus s) =>
+      switch (s) {
+        FCSearchStatus.open => l10n.searchStatusOpen,
+        FCSearchStatus.closed => l10n.closedLabel,
+        FCSearchStatus.archived => l10n.searchStatusArchived,
+        FCSearchStatus.noReplies => l10n.searchStatusNoReplies,
+        FCSearchStatus.publicOnly => l10n.searchStatusPublicOnly,
+        FCSearchStatus.solved => l10n.solved,
+        FCSearchStatus.unsolved => l10n.searchStatusUnsolved,
+      };
+
+  static String _personalLabel(AppLocalizations l10n, FCSearchPersonal p) =>
+      switch (p) {
+        FCSearchPersonal.bookmarks => l10n.searchInBookmarked,
+        FCSearchPersonal.messages => l10n.searchInMyMessages,
+        FCSearchPersonal.liked => l10n.searchInLiked,
+        FCSearchPersonal.posted => l10n.searchInPosted,
+        FCSearchPersonal.watching => l10n.searchInWatching,
+        FCSearchPersonal.tracking => l10n.searchInTracking,
+        FCSearchPersonal.seen => l10n.searchInSeen,
+        FCSearchPersonal.unseen => l10n.searchInUnseen,
+      };
+
+  static String _sortLabel(AppLocalizations l10n, FCSearchSort s) =>
+      switch (s) {
+        FCSearchSort.latest => l10n.searchSortLatestPost,
+        FCSearchSort.likes => l10n.searchSortMostLiked,
+        FCSearchSort.views => l10n.searchSortMostViewed,
+        FCSearchSort.latestTopic => l10n.searchSortLatestTopic,
+      };
 
   Widget _section(String title, TextTheme textTheme, ColorScheme colorScheme) {
     return Padding(

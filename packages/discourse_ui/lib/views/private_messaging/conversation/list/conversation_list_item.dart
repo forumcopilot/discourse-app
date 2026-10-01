@@ -53,9 +53,10 @@ class ConversationListItem extends StatelessWidget {
   Widget _buildRow(BuildContext context, TopicReadMark mark) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     // Get the last reply person's profile picture and username
-    String displayUsername = 'Unknown';
+    String displayUsername = l10n.messageUnknownUser;
     String? displayAvatar;
 
     // Use the last user who posted in the conversation
@@ -131,7 +132,7 @@ class ConversationListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          conversation.conv_subject ?? 'No subject',
+                          conversation.conv_subject ?? l10n.noSubject,
                           style: textTheme.titleMedium?.copyWith(
                             // Only a message read to the end steps back.
                             color: mark.isRead
@@ -153,7 +154,7 @@ class ConversationListItem extends StatelessWidget {
                             Text(
                               displayUsername.isNotEmpty
                                   ? displayUsername
-                                  : 'Unknown',
+                                  : l10n.messageUnknownUser,
                               style: metaStyle,
                             ),
                             if ((conversation.participant_count ?? 0) > 0)
@@ -181,9 +182,8 @@ class ConversationListItem extends StatelessWidget {
                         UnreadBadge(
                           count: mark.unreadCount,
                           semanticLabel: mark.unreadCount > 0
-                              ? AppLocalizations.of(context)!
-                                  .topicUnreadReplies(mark.unreadCount)
-                              : AppLocalizations.of(context)!.messageIsNew,
+                              ? l10n.topicUnreadReplies(mark.unreadCount)
+                              : l10n.messageIsNew,
                         ),
                       ],
                     ],

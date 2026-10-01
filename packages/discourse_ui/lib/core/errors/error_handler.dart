@@ -1,6 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../../l10n/app_l10n.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:get/get.dart';
 import 'package:discourse_core/discourse_core.dart'
@@ -101,7 +102,7 @@ class ErrorHandler {
         appException = NetworkException.noConnection();
       } else {
         appException = NetworkException(
-          message: 'Network error occurred. Please try again.',
+          message: appL10n().errorNetworkTryAgain,
           code: 'NETWORK_ERROR',
           originalError: error,
         );
@@ -132,7 +133,7 @@ class ErrorHandler {
         appException = AuthenticationException.accountLocked();
       } else {
         appException = AuthenticationException(
-          message: 'Authentication failed. Please try again.',
+          message: appL10n().errorAuthenticationTryAgain,
           code: 'AUTH_ERROR',
           originalError: error,
         );
@@ -163,7 +164,7 @@ class ErrorHandler {
         appException = ForumException.unavailable();
       } else {
         appException = ForumException(
-          message: 'Forum error occurred. Please try again.',
+          message: appL10n().errorForumTryAgain,
           code: 'FORUM_ERROR',
           originalError: error,
         );
@@ -212,14 +213,21 @@ class ErrorHandler {
     }
   }
 
+  /// The app's strings: the GetX app's, else [appL10n]'s.
+  static AppLocalizations _l10n() {
+    final context = Get.context;
+    return (context == null ? null : AppLocalizations.of(context)) ??
+        appL10n();
+  }
+
   /// Show user-friendly error message
   static Future<void> _showUserFriendlyError(
     dynamic error,
     String? context,
   ) async {
-    final l10n = Get.context == null ? null : AppLocalizations.of(Get.context!);
-    String message = 'An unexpected error occurred. Please try again.';
-    String title = l10n?.errorTitle ?? 'Error';
+    final l10n = _l10n();
+    String message = l10n.unexpectedErrorTryAgain;
+    String title = l10n.errorTitle;
     bool showRetry = true;
 
     // What the forum reported — a failed thread load, an API error — is
@@ -237,16 +245,16 @@ class ErrorHandler {
 
       // Customize title and retry option based on error type
       if (error is NetworkException) {
-        title = 'Connection Error';
+        title = l10n.connectionErrorTitle;
         showRetry = true;
       } else if (error is AuthenticationException) {
-        title = 'Authentication Error';
+        title = l10n.authenticationErrorTitle;
         showRetry = error.code != 'ACCOUNT_LOCKED';
       } else if (error is ForumException) {
-        title = 'Forum Error';
+        title = l10n.forumErrorTitle;
         showRetry = error.code != 'ACCESS_DENIED';
       } else if (error is PermissionException) {
-        title = 'Permission Error';
+        title = l10n.permissionErrorTitle;
         showRetry = false;
       }
     }
@@ -282,11 +290,11 @@ class ErrorHandler {
                   Get.back();
                   // Could trigger a retry mechanism here
                 },
-                child: Text(AppLocalizations.of(Get.context!)?.retryButton ?? 'Retry'),
+                child: Text(_l10n().retryButton),
               ),
             TextButton(
               onPressed: () => Get.back(),
-              child: Text(AppLocalizations.of(Get.context!)?.okButton ?? 'OK'),
+              child: Text(_l10n().okButton),
             ),
           ],
         ),

@@ -29,6 +29,7 @@ import 'package:discourse_ui/utils/passkey_platform_stub.dart'
     if (dart.library.io) 'package:discourse_ui/utils/passkey_platform_io.dart'
     as _passkey_platform;
 
+import '../l10n/app_l10n.dart';
 import '../l10n/generated/app_localizations.dart';
 /// Stable reason codes for push/login diagnostics.
 abstract class PushLoginReasonCode {
@@ -82,7 +83,7 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
       final context = Get.context;
       if (context != null && context.mounted) {
         Get.snackbar(
-          'Login result',
+          appL10n().loginResultTitle,
           message,
           backgroundColor: Get.theme.colorScheme.primaryContainer,
           colorText: Get.theme.colorScheme.onPrimaryContainer,
@@ -111,10 +112,10 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
     try {
       // Validate input
       if (username.trim().isEmpty) {
-        throw ValidationException.requiredField('username');
+        throw ValidationException.requiredField(appL10n().username);
       }
       if (password.trim().isEmpty) {
-        throw ValidationException.requiredField('password');
+        throw ValidationException.requiredField(appL10n().passwordFieldLabel);
       }
 
       final userProxy = SiteProxyService.getUserProxy();
@@ -126,12 +127,11 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
         null, // no trust code
         remember: true,
       );
-      final loginResultMessage =
-          loginResult.resultText?.trim().isNotEmpty == true
-              ? loginResult.resultText!
-              : (loginResult.result ? 'Login succeeded' : 'Login failed');
       if (!loginResult.result) {
-        _showLoginFailureSnackbar(loginResultMessage);
+        _showLoginFailureSnackbar(
+            loginResult.resultText?.trim().isNotEmpty == true
+                ? loginResult.resultText!
+                : appL10n().loginFailed);
       }
 
       // Check if 2FA is required
@@ -185,14 +185,11 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
                 trustDevice: true, // Always trust device when TFA is used
               );
             }
-            final tfaResultMessage =
-                tfaLoginResult.resultText?.trim().isNotEmpty == true
-                    ? tfaLoginResult.resultText!
-                    : (tfaLoginResult.result
-                        ? 'Login succeeded'
-                        : 'Login failed');
             if (!tfaLoginResult.result) {
-              _showLoginFailureSnackbar(tfaResultMessage);
+              _showLoginFailureSnackbar(
+                  tfaLoginResult.resultText?.trim().isNotEmpty == true
+                      ? tfaLoginResult.resultText!
+                      : appL10n().loginFailed);
             }
 
             if (tfaLoginResult.result && tfaLoginResult.user != null) {
@@ -220,8 +217,8 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
               break; // Exit loop on success
             } else {
               // TFA verification failed, show error and allow retry
-              errorMessage =
-                  tfaLoginResult.resultText ?? 'Invalid authentication code';
+              errorMessage = tfaLoginResult.resultText ??
+                  appL10n().invalidAuthenticationCode;
               if (showLoader) {
                 DiscourseGlobalLoaderController.to.hide();
               }
@@ -231,8 +228,7 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
             if (showLoader) {
               DiscourseGlobalLoaderController.to.hide();
             }
-            errorMessage =
-                'An error occurred during verification. Please try again.';
+            errorMessage = appL10n().tfaVerificationError;
             // Loop will continue to show dialog again with error message
           }
         }
@@ -299,7 +295,7 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
           DiscourseGlobalLoaderController.to.hide();
         }
 
-        String errorMessage = 'Login failed';
+        String errorMessage = appL10n().loginFailed;
         if (loginResult.resultText != null &&
             loginResult.resultText!.trim().isNotEmpty) {
           errorMessage = loginResult.resultText!;
@@ -509,12 +505,11 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
         null, // no trust code
         remember: true,
       );
-      final loginResultMessage =
-          loginResult.resultText?.trim().isNotEmpty == true
-              ? loginResult.resultText!
-              : (loginResult.result ? 'Login succeeded' : 'Login failed');
       if (!loginResult.result) {
-        _showLoginFailureSnackbar(loginResultMessage);
+        _showLoginFailureSnackbar(
+            loginResult.resultText?.trim().isNotEmpty == true
+                ? loginResult.resultText!
+                : appL10n().loginFailed);
       }
 
       // Check if 2FA is required for auto-login
@@ -566,14 +561,11 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
                 trustDevice: true, // Always trust device when TFA is used
               );
             }
-            final tfaResultMessage =
-                tfaLoginResult.resultText?.trim().isNotEmpty == true
-                    ? tfaLoginResult.resultText!
-                    : (tfaLoginResult.result
-                        ? 'Login succeeded'
-                        : 'Login failed');
             if (!tfaLoginResult.result) {
-              _showLoginFailureSnackbar(tfaResultMessage);
+              _showLoginFailureSnackbar(
+                  tfaLoginResult.resultText?.trim().isNotEmpty == true
+                      ? tfaLoginResult.resultText!
+                      : appL10n().loginFailed);
             }
 
             if (tfaLoginResult.result && tfaLoginResult.user != null) {
@@ -601,13 +593,12 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
               break; // Exit loop on success
             } else {
               // TFA verification failed, show error and allow retry
-              errorMessage =
-                  tfaLoginResult.resultText ?? 'Invalid authentication code';
+              errorMessage = tfaLoginResult.resultText ??
+                  appL10n().invalidAuthenticationCode;
               // Loop will continue to show dialog again with error message
             }
           } catch (e) {
-            errorMessage =
-                'An error occurred during verification. Please try again.';
+            errorMessage = appL10n().tfaVerificationError;
             // Loop will continue to show dialog again with error message
           }
         }
@@ -1333,7 +1324,7 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
             onPressed: () {
               Get.back();
             },
-            child: Text('OK'),
+            child: Text(appL10n().okButton),
           ),
         ],
         elevation: 8,
@@ -1368,7 +1359,7 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
             onPressed: () {
               Get.back();
             },
-            child: Text('OK'),
+            child: Text(appL10n().okButton),
           ),
         ],
         elevation: 8,

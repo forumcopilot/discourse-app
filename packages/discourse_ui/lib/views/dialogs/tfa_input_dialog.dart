@@ -127,22 +127,19 @@ class _TFAInputDialogState extends State<TFAInputDialog> {
       return null;
     }
 
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     if (value == null || value.isEmpty) {
-      return l10n?.pleaseEnterYourAuthenticationCode ??
-          'Please enter your authentication code';
+      return l10n.pleaseEnterYourAuthenticationCode;
     }
 
     final cleaned = value.replaceAll(RegExp(r'[\s-]'), '');
 
     if (cleaned.length != _expectedCodeLength) {
-      return l10n?.codeMustBeDigits(_expectedCodeLength) ??
-          'Code must be $_expectedCodeLength digits';
+      return l10n.codeMustBeDigits(_expectedCodeLength);
     }
 
     if (!RegExp(r'^\d+$').hasMatch(cleaned)) {
-      return l10n?.codeMustContainOnlyNumbers ??
-          'Code must contain only numbers';
+      return l10n.codeMustContainOnlyNumbers;
     }
 
     return null;
@@ -210,7 +207,7 @@ class _TFAInputDialogState extends State<TFAInputDialog> {
     FCTFAProvider provider,
     ColorScheme colorScheme,
     TextTheme textTheme,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
   ) {
     final isPasskeyProvider =
         provider.type == 'passkey' || provider.id == 'passkey';
@@ -225,7 +222,7 @@ class _TFAInputDialogState extends State<TFAInputDialog> {
           borderRadius: BorderRadius.circular(DesignTokens.radiusL),
         ),
         child: Text(
-          l10n?.passkeyContinuePrompt ?? 'Use your passkey to continue',
+          l10n.passkeyContinuePrompt,
           style: textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSecondaryContainer,
             fontWeight: DesignTokens.fontWeightMedium,
@@ -244,9 +241,8 @@ class _TFAInputDialogState extends State<TFAInputDialog> {
       onTapOutside: (_) => FocusScope.of(context).unfocus(),
       decoration: StyleBuilders.inputDecoration(
         colorScheme: colorScheme,
-        labelText: l10n?.authenticationCodeLabel ?? 'Authentication Code',
-        hintText: AppLocalizations.of(context)?.enterCode(expectedCodeLength) ??
-            'Enter $expectedCodeLength-digit code',
+        labelText: l10n.authenticationCodeLabel,
+        hintText: l10n.enterCode(expectedCodeLength),
         prefixIcon: Icons.lock_outline_rounded,
         fillColor: colorScheme.surface,
         contentPadding: const EdgeInsets.symmetric(
@@ -268,20 +264,20 @@ class _TFAInputDialogState extends State<TFAInputDialog> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     final effectiveProviders = _effectiveProviders;
     final providerOptions = effectiveProviders ?? const <FCTFAProvider>[];
     final hasMultipleProviders =
         effectiveProviders != null && effectiveProviders.length > 1;
     final actionLabel = _isPasskeySelected
-        ? (l10n?.usePasskey ?? 'Use Passkey')
-        : (l10n?.verifyButton ?? 'Verify');
+        ? l10n.usePasskey
+        : l10n.verifyButton;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          l10n?.twoFactorAuthentication ?? 'Two-Factor Authentication',
+          l10n.twoFactorAuthentication,
         ),
         leading: IconButton(
           icon: const Icon(Icons.close),
@@ -318,8 +314,7 @@ class _TFAInputDialogState extends State<TFAInputDialog> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Text(
-                                  l10n?.twoFactorAuthentication ??
-                                      'Two-Factor Authentication',
+                                  l10n.twoFactorAuthentication,
                                   style: textTheme.headlineSmall?.copyWith(
                                     color: colorScheme.onSurface,
                                     fontWeight: DesignTokens.fontWeightBold,

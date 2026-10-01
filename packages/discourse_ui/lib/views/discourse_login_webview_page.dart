@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
+import '../l10n/generated/app_localizations.dart';
 import 'widgets/themed_web_view.dart';
 
 /// In-app webview that hosts the Discourse User API Key authorization page.
@@ -19,14 +20,14 @@ class DiscourseLoginWebViewPage extends StatefulWidget {
   /// configured. Pass [DiscourseLoginService.isAuthCallback].
   final bool Function(Uri) redirectMatcher;
 
-  /// Optional title shown in the AppBar.
-  final String title;
+  /// Optional title shown in the AppBar; "Sign in" when null.
+  final String? title;
 
   const DiscourseLoginWebViewPage({
     super.key,
     required this.url,
     required this.redirectMatcher,
-    this.title = 'Sign in',
+    this.title,
   });
 
   @override
@@ -57,7 +58,7 @@ class _DiscourseLoginWebViewPageState extends State<DiscourseLoginWebViewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title ?? AppLocalizations.of(context)!.signIn),
         // ✕ leaves sign-in from any page; Back goes back a page first.
         leading: IconButton(
           icon: const Icon(Icons.close),

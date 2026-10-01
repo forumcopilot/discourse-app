@@ -694,6 +694,22 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   static const int flagNotifyModerators = 7;
   static const int flagSpam = 8;
 
+  /// The forum's flag types for a post (DiscourseSiteCapabilities.flagTypes),
+  /// reading `/site.json` first if this forum's has not been read yet.
+  Future<List<DiscourseFlagType>> flagTypesAsync() async {
+    final key = siteContext.site.pluginUrl;
+    var caps = DiscourseSiteCapabilities.forSite(key);
+    if (caps.flagTypes.isEmpty) {
+      try {
+        DiscourseSiteCapabilities.store(key, await apiGet('/site.json'));
+        caps = DiscourseSiteCapabilities.forSite(key);
+      } catch (_) {
+        // None known: the caller says flagging is unavailable.
+      }
+    }
+    return caps.flagTypes;
+  }
+
   /// Flag a post with a SPECIFIC Discourse flag type.
   ///
   /// Deliberately not part of [IFCPostProxy]: flag types are Discourse's vocabulary, and

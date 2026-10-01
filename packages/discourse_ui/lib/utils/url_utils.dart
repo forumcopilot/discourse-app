@@ -484,7 +484,8 @@ class UrlUtils {
       subforumPath: subforumPath,
     );
 
-    final title = shareTitle ?? 'Forum Post: $topicTitle';
+    // The topic's title over the link, as Discourse's share does.
+    final title = shareTitle ?? topicTitle;
     await shareUrl(postUrl, title: title);
   }
 
@@ -804,7 +805,8 @@ class UrlUtils {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not open link: ${url.length > 50 ? '${url.substring(0, 50)}...' : url}'),
+            content: Text(AppLocalizations.of(context)!.couldNotOpenLink(
+                url.length > 50 ? '${url.substring(0, 50)}...' : url)),
             duration: const Duration(seconds: 2),
           ),
         );

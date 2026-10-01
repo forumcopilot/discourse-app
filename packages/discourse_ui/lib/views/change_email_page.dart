@@ -64,7 +64,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             content: Text(
               result.resultText?.isNotEmpty == true
                   ? result.resultText!
-                  : "Couldn't request email change",
+                  : AppLocalizations.of(context)!.couldNotRequestEmailChange,
             ),
           ),
         );
@@ -73,13 +73,17 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       if (!mounted) return;
       setState(() => _submitting = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(describeError(e, fallback: 'Request failed.'))),
+        SnackBar(
+            content: Text(describeError(e,
+                fallback: AppLocalizations.of(context)!.accountRequestFailed,
+                context: context))),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return DiscardChangesScope(
@@ -89,7 +93,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       busy: _submitting,
       child: Scaffold(
       appBar: SimpleListAppBar(
-        title: 'Change email',
+        title: l10n.changeEmail,
         // The same labelled button every form ends its app bar with.
         actions: [
           Padding(
@@ -102,7 +106,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                       height: 18,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(AppLocalizations.of(context)!.send),
+                  : Text(l10n.send),
             ),
           ),
         ],
@@ -116,7 +120,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                AppLocalizations.of(context)!.changeEmailExplanation,
+                l10n.changeEmailExplanation,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -128,27 +132,27 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                 autocorrect: false,
                 textCapitalization: TextCapitalization.none,
                 decoration: InputDecoration(
-                  labelText: 'New email',
+                  labelText: l10n.newEmailLabel,
                   hintText: 'you@example.com',
                   prefixIcon: const Icon(Icons.alternate_email_rounded),
                   border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   final v = value?.trim() ?? '';
-                  if (v.isEmpty) return 'Enter an email address';
+                  if (v.isEmpty) return l10n.enterAnEmailAddress;
                   // Permissive email regex — Discourse re-validates
                   // server-side and would reject anything bad; we
                   // just want to catch obvious typos.
                   if (!v.contains('@') || !v.contains('.')) {
-                    return 'That doesn’t look like an email';
+                    return l10n.emailLooksInvalid;
                   }
-                  if (v.contains(' ')) return 'No spaces in emails';
+                  if (v.contains(' ')) return l10n.emailNoSpaces;
                   return null;
                 },
               ),
               const SizedBox(height: DesignTokens.spacingXL),
               Text(
-                AppLocalizations.of(context)!.changeEmailSecurityNote,
+                l10n.changeEmailSecurityNote,
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),

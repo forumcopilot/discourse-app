@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_badge.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/time_utils.dart';
 import 'remote_circle_avatar.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Opens the shared badge-detail bottom sheet for [badge].
 ///
@@ -82,14 +83,14 @@ class _BadgeDetailSheetState extends State<BadgeDetailSheet> {
     setState(() => _catalogEntry = catalog![widget.badge.id]);
   }
 
-  static String _tierLabel(FCBadgeTier tier) {
+  static String _tierLabel(AppLocalizations l10n, FCBadgeTier tier) {
     switch (tier) {
       case FCBadgeTier.gold:
-        return 'Gold';
+        return l10n.badgeTierGold;
       case FCBadgeTier.silver:
-        return 'Silver';
+        return l10n.badgeTierSilver;
       case FCBadgeTier.bronze:
-        return 'Bronze';
+        return l10n.badgeTierBronze;
     }
   }
 
@@ -103,6 +104,7 @@ class _BadgeDetailSheetState extends State<BadgeDetailSheet> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
     final badge = widget.badge;
 
     // Description: prefer what the badge instance carries, fall back to
@@ -122,7 +124,7 @@ class _BadgeDetailSheetState extends State<BadgeDetailSheet> {
 
     final earnedBits = <String>[
       if (badge.grantedAt != null)
-        'Earned ${formatTimeAgo(badge.grantedAt!, context)}',
+        l10n.badgeEarnedAgo(formatTimeAgo(badge.grantedAt!, context)),
       if (badge.granted && badge.grantCount > 1) '×${badge.grantCount}',
     ];
 
@@ -161,10 +163,9 @@ class _BadgeDetailSheetState extends State<BadgeDetailSheet> {
                       const SizedBox(height: 2),
                       Text(
                         totalGrants != null
-                            ? '${_tierLabel(badge.tier)} · '
-                                'Earned by ${_formatCount(totalGrants)} '
-                                '${totalGrants == 1 ? 'user' : 'users'}'
-                            : _tierLabel(badge.tier),
+                            ? '${_tierLabel(l10n, badge.tier)} · '
+                                '${l10n.badgeEarnedByUsers(totalGrants, _formatCount(totalGrants))}'
+                            : _tierLabel(l10n, badge.tier),
                         style: textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),

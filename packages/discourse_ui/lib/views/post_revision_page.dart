@@ -39,6 +39,11 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
   bool _isLoading = true;
   String? _error;
 
+  /// Not a Discourse forum: no edit history to show. A flag rather than
+  /// [_error]'s text, since it is known from initState, before the page
+  /// can look up its strings.
+  bool _unavailable = false;
+
   @override
   void initState() {
     super.initState();
@@ -54,7 +59,7 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
     if (postProxy is! DiscoursePostProxy) {
       setState(() {
         _isLoading = false;
-        _error = 'Edit history is not available on this forum.';
+        _unavailable = true;
       });
       return;
     }
@@ -71,7 +76,7 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
         // show the full-page message.
         _error = result.resultText.trim().isNotEmpty
             ? result.resultText.trim()
-            : 'Failed to load edit history.';
+            : AppLocalizations.of(context)!.editHistoryLoadFailed;
       }
     });
     if (_error != null && _revision != null && mounted) {
@@ -109,7 +114,9 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
       // history" 404s and "not visible" 403s from the proxy).
       return EmptyStateView.error(
         icon: Icons.history,
-        message: _error ?? 'Failed to load edit history.',
+        message: _unavailable
+            ? AppLocalizations.of(context)!.editHistoryUnavailable
+            : (_error ?? AppLocalizations.of(context)!.editHistoryLoadFailed),
         onRetry: _load,
       );
     }
@@ -307,7 +314,7 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
             children: [
               IconButton(
                 icon: const Icon(Icons.chevron_left),
-                tooltip: 'Previous revision',
+                tooltip: AppLocalizations.of(context)!.previousRevision,
                 onPressed: (_isLoading || rev.previousRevision == null)
                     ? null
                     : () => _load(revision: rev.previousRevision),
@@ -321,7 +328,7 @@ class _PostRevisionPageState extends State<PostRevisionPage> {
               ),
               IconButton(
                 icon: const Icon(Icons.chevron_right),
-                tooltip: 'Next revision',
+                tooltip: AppLocalizations.of(context)!.nextRevision,
                 onPressed: (_isLoading || rev.nextRevision == null)
                     ? null
                     : () => _load(revision: rev.nextRevision),

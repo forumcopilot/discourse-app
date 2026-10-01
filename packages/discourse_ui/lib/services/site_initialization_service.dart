@@ -126,10 +126,11 @@ class SiteInitializationService {
         siteContext.configDataOutput = configData;
       }
 
-      // Verify that the plugin URL is properly set after initialization
+      // The forum's address (Site.pluginUrl is its base URL; there is no
+      // server plugin) must be known before anything else can be fetched.
       final pluginUrl = siteContext.site.pluginUrl;
       if (pluginUrl.isEmpty) {
-        throw Exception('Plugin URL is empty after configuration - forum plugin may not be installed');
+        throw Exception('Failed to connect to forum: The forum address is missing.');
       }
       AppLogger.debug('Plugin URL set to: $pluginUrl');
 

@@ -73,6 +73,11 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
   bool _loading = true;
   bool _loadingMore = false;
   String? _error;
+
+  /// Not a Discourse forum, so nothing lists who reacted. A flag rather
+  /// than [_error]'s text: it is known from initState, before the sheet
+  /// can look up its strings.
+  bool _unsupported = false;
   int _total = 0;
   int _page = 0;
 
@@ -104,7 +109,7 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
       setState(() {
         _loading = false;
         _loadingMore = false;
-        _error = 'Reactions are not supported on this forum.';
+        _unsupported = true;
       });
       return;
     }
@@ -124,7 +129,7 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
           if (!more) {
             _error = result.resultText?.isNotEmpty == true
                 ? result.resultText!
-                : 'Could not load reactions.';
+                : AppLocalizations.of(context)!.reactionsLoadFailed;
           }
         });
         return;
@@ -144,7 +149,7 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
       setState(() {
         _loading = false;
         _loadingMore = false;
-        if (!more) _error = 'Could not load reactions.';
+        if (!more) _error = AppLocalizations.of(context)!.reactionsLoadFailed;
       });
     }
   }
@@ -177,9 +182,7 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final glyph = _glyphFor(widget.reactionId);
-    final title = widget.title ??
-        AppLocalizations.of(context)?.reactedBy ??
-        'Reacted by';
+    final title = widget.title ?? AppLocalizations.of(context)!.reactedBy;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.5,
@@ -212,7 +215,7 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
                     child: Text(title, style: textTheme.titleMedium),
                   ),
                   Semantics(
-                    label: 'Close',
+                    label: AppLocalizations.of(context)!.close,
                     button: true,
                     child: IconButton(
                       icon: const Icon(Icons.close),
@@ -238,7 +241,9 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final error = _error;
+    final error = _unsupported
+        ? AppLocalizations.of(context)!.reactionsNotSupported
+        : _error;
     if (error != null) {
       return EmptyStateView.error(
         message: error,
@@ -279,7 +284,7 @@ class _ReactionUsersSheetState extends State<ReactionUsersSheet> {
             ? user.reactionEmoji
             : _glyphFor(user.reactionName);
         return Semantics(
-          label: 'View profile of ${user.username}',
+          label: AppLocalizations.of(context)!.viewProfileOfUser(user.username),
           button: true,
           child: InkWell(
             onTap: () => _openProfile(user),

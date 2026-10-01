@@ -17,6 +17,7 @@ import 'widgets/empty_state_view.dart';
 import 'widgets/topic_taxonomy_chips.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../utils/error_message.dart';
 import 'private_messaging/conversation/pages/new_conversation_page.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
 
@@ -59,7 +60,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
           _loading = false;
           _error = result.resultText?.isNotEmpty == true
               ? result.resultText!
-              : 'Failed to load drafts.';
+              : AppLocalizations.of(context)!.failedToLoadDrafts;
         });
         return;
       }
@@ -72,7 +73,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
       setState(() {
         _drafts = const [];
         _loading = false;
-        _error = '$e';
+        _error = describeError(e);
       });
     }
   }
@@ -116,7 +117,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
       messenger.showSnackBar(SnackBar(
         content: Text(result.resultText?.isNotEmpty == true
             ? result.resultText!
-            : 'Failed to discard draft'),
+            : l10n.failedToDiscardDraft),
       ));
     });
   }

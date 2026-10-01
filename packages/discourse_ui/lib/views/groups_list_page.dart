@@ -8,6 +8,7 @@ import 'group_detail_page.dart';
 import 'widgets/empty_state_view.dart';
 import 'widgets/simple_list_app_bar.dart';
 import '../utils/error_message.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Phase 5.18c-2 — Groups directory, the second drawer destination
 /// under **Community**. Lists every visible group on the forum
@@ -76,7 +77,7 @@ class _GroupsListPageState extends State<GroupsListPage> {
           _hasMore = false;
           _error = result.resultText?.isNotEmpty == true
               ? result.resultText
-              : 'Failed to load groups.';
+              : AppLocalizations.of(context)!.groupsLoadFailed;
         } else if (result.groups.isEmpty) {
           _hasMore = false;
         } else {
@@ -104,7 +105,7 @@ class _GroupsListPageState extends State<GroupsListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleListAppBar(title: 'Groups'),
+      appBar: SimpleListAppBar(title: AppLocalizations.of(context)!.groups),
       body: _buildBody(),
     );
   }
@@ -189,7 +190,9 @@ class _GroupRow extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(
-        group.automatic ? 'Built-in group' : '@${group.name}',
+        group.automatic
+            ? AppLocalizations.of(context)!.groupBuiltIn
+            : '@${group.name}',
         style: textTheme.bodyMedium
             ?.copyWith(color: colorScheme.onSurfaceVariant),
         maxLines: 1,

@@ -14,6 +14,7 @@ import 'widgets/simple_list_app_bar.dart';
 import 'widgets/search_text_field.dart';
 import 'widgets/user_list_row.dart';
 import '../utils/error_message.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Phase 5.18c-1 — the Discourse Users directory.
 ///
@@ -40,20 +41,21 @@ class UsersDirectoryPage extends StatefulWidget {
 enum _DirectoryPeriod { all, yearly, quarterly, monthly, weekly, daily }
 
 extension _DirectoryPeriodX on _DirectoryPeriod {
-  String get label {
+  /// Discourse's own period names (the web's period chooser).
+  String label(AppLocalizations l10n) {
     switch (this) {
       case _DirectoryPeriod.all:
-        return 'All';
+        return l10n.directoryPeriodAllTime;
       case _DirectoryPeriod.yearly:
-        return 'Year';
+        return l10n.directoryPeriodYear;
       case _DirectoryPeriod.quarterly:
-        return 'Quarter';
+        return l10n.directoryPeriodQuarter;
       case _DirectoryPeriod.monthly:
-        return 'Month';
+        return l10n.directoryPeriodMonth;
       case _DirectoryPeriod.weekly:
-        return 'Week';
+        return l10n.directoryPeriodWeek;
       case _DirectoryPeriod.daily:
-        return 'Day';
+        return l10n.directoryPeriodToday;
     }
   }
 
@@ -78,16 +80,18 @@ extension _DirectoryPeriodX on _DirectoryPeriod {
 enum _DirectoryOrder { likesReceived, postCount, topicCount, daysVisited }
 
 extension _DirectoryOrderX on _DirectoryOrder {
-  String get label {
+  /// The web directory's column names; likes received is "Received"
+  /// beside a heart, as there.
+  String label(AppLocalizations l10n) {
     switch (this) {
       case _DirectoryOrder.likesReceived:
-        return 'Likes';
+        return l10n.directoryOrderReceived;
       case _DirectoryOrder.postCount:
-        return 'Posts';
+        return l10n.directoryOrderReplies;
       case _DirectoryOrder.topicCount:
-        return 'Topics';
+        return l10n.directoryOrderTopics;
       case _DirectoryOrder.daysVisited:
-        return 'Active';
+        return l10n.directoryOrderVisits;
     }
   }
 
@@ -223,7 +227,7 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
         if (!result.result) {
           _error = result.resultText?.isNotEmpty == true
               ? result.resultText
-              : 'Failed to load directory.';
+              : AppLocalizations.of(context)!.directoryLoadFailed;
           _hasMore = false;
         } else if (result.items.isEmpty) {
           _hasMore = false;
@@ -267,8 +271,9 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: const SimpleListAppBar(title: 'Users'),
+      appBar: SimpleListAppBar(title: l10n.users),
       body: Column(
         children: [
           Padding(
@@ -279,7 +284,7 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
             child: SearchTextField(
               controller: _searchController,
               focusNode: _searchFocusNode,
-              hintText: 'Search users...',
+              hintText: l10n.searchUsers,
               onSearch: _runSearch,
               autoSearch: true,
               onClear: () => _runSearch(''),
@@ -295,7 +300,7 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
             FilterChipBar(
               options: [
                 for (final o in _DirectoryOrder.values)
-                  FilterChipOption(label: o.label, icon: o.icon),
+                  FilterChipOption(label: o.label(l10n), icon: o.icon),
               ],
               selectedIndex: _DirectoryOrder.values.indexOf(_order),
               onSelected: (i) => _setOrder(_DirectoryOrder.values[i]),
@@ -305,7 +310,7 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
             FilterChipBar(
               options: [
                 for (final p in _DirectoryPeriod.values)
-                  FilterChipOption(label: p.label),
+                  FilterChipOption(label: p.label(l10n)),
               ],
               selectedIndex: _DirectoryPeriod.values.indexOf(_period),
               onSelected: (i) => _setPeriod(_DirectoryPeriod.values[i]),
@@ -334,9 +339,9 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_searchResults.isEmpty) {
-      return const EmptyStateView(
+      return EmptyStateView(
         icon: Icons.search_off_rounded,
-        message: 'No users match that name.',
+        message: AppLocalizations.of(context)!.directoryNoUsersMatch,
       );
     }
     final colorScheme = Theme.of(context).colorScheme;
@@ -376,9 +381,9 @@ class _UsersDirectoryPageState extends State<UsersDirectoryPage> {
       );
     }
     if (_items.isEmpty) {
-      return const EmptyStateView(
+      return EmptyStateView(
         icon: Icons.people_outline,
-        message: 'No users found for this period.',
+        message: AppLocalizations.of(context)!.directoryNoUsersForPeriod,
       );
     }
     return RefreshIndicator(

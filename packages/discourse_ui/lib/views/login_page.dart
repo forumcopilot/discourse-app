@@ -98,11 +98,13 @@ class _LoginPageState extends State<LoginPage> {
 
     // The system's browser sign-in sheet (see DiscourseAuthSession): saved
     // passwords, passkeys, Google, and signing up all work there.
+    final l10n = AppLocalizations.of(context)!;
+    final domain = _getSiteDomain();
     final redirectUrl = await DiscourseAuthSession.authorize(
       context,
       url: handshake.url,
       isCallback: loginService.isAuthCallback,
-      title: 'Sign in to ${_getSiteDomain()}',
+      title: domain == null ? l10n.signIn : l10n.signInToDomain(domain),
     );
     if (!mounted) return;
 
@@ -205,17 +207,17 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   /// Extract the host portion of the forum URL for the webview's
-  /// AppBar title. Falls back to "this forum" when the URL is
-  /// missing or unparseable.
-  String _getSiteDomain() {
+  /// AppBar title. Null when the URL is missing or unparseable, and the
+  /// title is then just "Sign in".
+  String? _getSiteDomain() {
     final siteController = Get.put(DiscourseSiteController());
     final siteUrl = siteController.currentSite.value?.url;
-    if (siteUrl == null || siteUrl.isEmpty) return 'this forum';
+    if (siteUrl == null || siteUrl.isEmpty) return null;
     try {
       final uri = Uri.parse(siteUrl);
-      return uri.host.isNotEmpty ? uri.host : 'this forum';
+      return uri.host.isNotEmpty ? uri.host : null;
     } catch (_) {
-      return 'this forum';
+      return null;
     }
   }
 

@@ -25,7 +25,7 @@ class ChatComposer extends StatefulWidget {
     required this.onSend,
     this.onUpload,
     this.enabled = true,
-    this.hintText = 'Type a message…',
+    this.hintText,
   });
 
   /// Sends [text] with the ids of the files uploaded for it.
@@ -38,7 +38,9 @@ class ChatComposer extends StatefulWidget {
   final Future<int?> Function(XFile file, int alreadyAttached)? onUpload;
 
   final bool enabled;
-  final String hintText;
+
+  /// The field's placeholder; a generic "Type a message…" when null.
+  final String? hintText;
 
   @override
   State<ChatComposer> createState() => _ChatComposerState();
@@ -226,7 +228,8 @@ class _ChatComposerState extends State<ChatComposer> {
                     // 16sp like every other composer (it was 14).
                     style: theme.textTheme.bodyLarge,
                     decoration: InputDecoration(
-                      hintText: widget.hintText,
+                      hintText: widget.hintText ??
+                          AppLocalizations.of(context)!.chatComposerDefaultHint,
                       hintStyle: theme.textTheme.bodyLarge
                           ?.copyWith(color: colorScheme.onSurfaceVariant),
                       border: OutlineInputBorder(

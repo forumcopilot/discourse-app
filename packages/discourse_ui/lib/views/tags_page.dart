@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 
+import '../l10n/generated/app_localizations.dart';
 import 'tabs/tags_tab.dart';
 import 'widgets/simple_list_app_bar.dart';
 
@@ -23,7 +24,7 @@ class TagsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleListAppBar(title: 'Tags'),
+      appBar: SimpleListAppBar(title: AppLocalizations.of(context)!.tags),
       body: TagsTab(
         isActive: true,
         siteContext: siteContext,

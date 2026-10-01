@@ -63,17 +63,7 @@
   },
   "youCannotReplyToThisThread": "You cannot reply to this topic",
   "pleaseWaitForThreadToLoad": "Please wait for the topic to load",
-  "postCanBeRestoredLater": "Post can be restored later",
-  "postWillBePermanentlyDeleted": "Post will be permanently deleted",
-  "enterReasonForDeletingPost": "Enter the reason for deleting this post",
-  "reportPost": "Report Post",
-  "pleaseProvideReasonForReporting": "Please provide a reason for reporting this post.",
   "reason": "Reason",
-  "enterReasonForReportingPost": "Enter the reason for reporting this post",
-  "pleaseEnterReason": "Please enter a reason",
-  "submitReport": "Submit Report",
-  "selectedActions": "Selected actions:",
-  "thisActionCannotBeUndone": "This action cannot be undone.",
   "participantsLabel": "Participants",
   "@participantsLabel": {
     "description": "Label for participants (without count)"
@@ -97,25 +87,11 @@
     }
   },
   "newTopic": "New Topic",
-  "markRead": "Mark Read",
   "pleaseSpecifyReason": "Please specify the reason",
   "selectDate": "Select date",
   "moreOptions": "More options",
   "topicClosed": "Topic closed",
   "topicOpened": "Topic opened",
-  "cannotEditMessage": "Cannot edit this message: {error}",
-  "@cannotEditMessage": {
-    "description": "Error message when cannot edit message",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "confirmSpamClean": "Confirm Spam Clean",
-  "handleThreads": "Handle topics",
-  "deleteMessages": "Delete Messages",
-  "deleteConversations": "Delete Messages",
   "noConversations": "You don't have any messages",
   "noConversationsMessage": "You have no messages yet. Start a new message to begin.",
   "imageSavedToGallery": "Image saved to gallery!",
@@ -131,14 +107,9 @@
   "userProfile": "User Profile",
   "deletePost": "Delete Post",
   "loginRequired": "Login Required",
-  "spamCleaner": "Spam Cleaner",
   "sendMessage": "Message",
-  "memberSince": "Member Since",
-  "lastActivity": "Last Activity",
   "likesReceived": "Likes Received",
-  "likesGiven": "Likes Given",
   "showMore": "Show More",
-  "cleanSpam": "Clean Spam",
   "failedToSaveConversation": "Failed to save message",
   "members": "Members",
   "membersCount": "{count} Members",
@@ -156,7 +127,6 @@
   "logout": "Logout",
   "areYouSureYouWantToLogout": "Are you sure you want to logout?",
   "signIn": "Sign in",
-  "markForumRead": "Mark category read",
   "notificationTest": "Notification Test",
   "forum": "Category",
   "profile": "Profile",
@@ -186,15 +156,6 @@
   },
   "signInToViewMessages": "Sign in to view messages",
   "youNeedToBeSignedInToViewConversations": "You need to be signed in to view your messages.",
-  "errorLoadingConversations": "Error loading messages: {error}",
-  "@errorLoadingConversations": {
-    "description": "Error message when loading conversations fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "failedToLeaveConversation": "Could not leave the message: {error}",
   "@failedToLeaveConversation": {
     "description": "Error message when leaving conversation fails",
@@ -226,18 +187,6 @@
   "temporary": "Temporary",
   "back": "Back",
   "confirm": "Confirm",
-  "spamClean": "Spam Clean {username}",
-  "@spamClean": {
-    "description": "Title for spam clean dialog",
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-  "selectActionsToPerform": "Select the actions to perform:",
-  "moveOrDeleteThreadsBasedOnAdminSettings": "Move or delete topics based on admin settings",
-  "messageUpdatedSuccessfully": "Message updated successfully",
   "error": "Error: {error}",
   "@error": {
     "description": "Generic error message",
@@ -247,25 +196,6 @@
       }
     }
   },
-  "failedToRemoveAttachment": "Failed to remove attachment: {error}",
-  "@failedToRemoveAttachment": {
-    "description": "Error message when removing attachment fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToLoadMessage": "Failed to load message: {error}",
-  "@failedToLoadMessage": {
-    "description": "Error message when loading message fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "editMessage": "Edit Message",
   "removeAttachment": "Remove Attachment",
   "areYouSureYouWantToRemoveThisAttachment": "Are you sure you want to remove this attachment?",
   "none": "None",
@@ -395,9 +325,6 @@
       }
     }
   },
-  "@spamCleaner": {
-    "description": "Menu item for spam cleaner tool"
-  },
   "unableToLoadProfile": "Unable to Load Profile",
   "@unableToLoadProfile": {
     "description": "Error message when profile cannot be loaded"
@@ -412,13 +339,6 @@
   "@showMore": {
     "description": "Button to show more content"
   },
-  "@submitReport": {
-    "description": "Button to submit a report"
-  },
-  "reportSubmittedSuccessfully": "Report submitted successfully",
-  "@reportSubmittedSuccessfully": {
-    "description": "Success message after submitting a report"
-  },
   "deleteTopic": "Delete Topic",
   "@deleteTopic": {
     "description": "Title for delete topic dialog"
@@ -426,49 +346,6 @@
   "pleaseSelectEndDate": "Please select an end date",
   "@pleaseSelectEndDate": {
     "description": "Error message when end date is not selected"
-  },
-  "spamCleanUser": "Spam Clean User",
-  "@spamCleanUser": {
-    "description": "Title for spam clean user dialog"
-  },
-  "deletePrivateConversations": "Delete personal messages",
-  "@deletePrivateConversations": {
-    "description": "Option to delete private conversations in spam clean"
-  },
-  "banTheUserAccount": "Ban the user account",
-  "@banTheUserAccount": {
-    "description": "Option to ban user account in spam clean"
-  },
-  "@cleanSpam": {
-    "description": "Button to execute spam clean"
-  },
-  "handledThreads": "Handled topics",
-  "@handledThreads": {
-    "description": "Action performed: handled threads"
-  },
-  "deletedMessages": "Deleted messages",
-  "@deletedMessages": {
-    "description": "Action performed: deleted messages"
-  },
-  "deletedConversations": "Deleted messages",
-  "@deletedConversations": {
-    "description": "Action performed: deleted conversations"
-  },
-  "bannedUser": "Banned user",
-  "@bannedUser": {
-    "description": "Action performed: banned user"
-  },
-  "successfullyCleanedSpam": "Successfully cleaned spam for {username}. Actions: {actions}",
-  "@successfullyCleanedSpam": {
-    "description": "Success message after spam clean",
-    "placeholders": {
-      "username": {
-        "type": "String"
-      },
-      "actions": {
-        "type": "String"
-      }
-    }
   },
   "home": "Home",
   "@home": {
@@ -482,37 +359,9 @@
   "@forums": {
     "description": "Categories tab title (Discourse-native term; the ARB key keeps the legacy 'forums' name for compatibility)"
   },
-  "markAllForumsAsRead": "Mark all categories as read?",
-  "@markAllForumsAsRead": {
-    "description": "Dialog title for marking all forums as read"
-  },
-  "markAllForumsAsReadMessage": "This will mark all categories and topics as read. This action cannot be undone.",
-  "@markAllForumsAsReadMessage": {
-    "description": "Message explaining mark all forums as read action"
-  },
-  "markAsRead": "Mark as Read",
-  "@markAsRead": {
-    "description": "Button text to mark as read"
-  },
   "content": "Content",
   "@content": {
     "description": "Content label for message compose"
-  },
-  "insertImage": "Insert Image",
-  "@insertImage": {
-    "description": "Dialog title for inserting image"
-  },
-  "howWouldYouLikeToInsertImage": "How would you like to insert this image?",
-  "@howWouldYouLikeToInsertImage": {
-    "description": "Question asking how to insert image"
-  },
-  "thumbnail": "Thumbnail",
-  "@thumbnail": {
-    "description": "Option to insert image as thumbnail"
-  },
-  "fullSize": "Full Size",
-  "@fullSize": {
-    "description": "Option to insert image at full size"
   },
   "pleaseEnterTitle": "Please enter a title",
   "@pleaseEnterTitle": {
@@ -534,10 +383,6 @@
   "@mentionUser": {
     "description": "Tooltip for mention user button"
   },
-  "cleaningSpam": "Cleaning spam...",
-  "@cleaningSpam": {
-    "description": "Status message when cleaning spam"
-  },
   "writeYourMessage": "Write your message...",
   "@writeYourMessage": {
     "description": "Hint text for writing message"
@@ -545,10 +390,6 @@
   "writeYourReply": "Write your reply...",
   "@writeYourReply": {
     "description": "Hint text for writing reply"
-  },
-  "conversationCreatedSuccessfully": "Message sent",
-  "@conversationCreatedSuccessfully": {
-    "description": "Success message after creating conversation"
   },
   "conversationMarkedAsUnread": "Message marked as unread",
   "@conversationMarkedAsUnread": {
@@ -562,26 +403,9 @@
   "@conversationOpened": {
     "description": "Success message when opening conversation"
   },
-  "pleaseLoginToLikeMessages": "Please login to like messages",
-  "@pleaseLoginToLikeMessages": {
-    "description": "Message asking user to login to like messages"
-  },
-  "loadEarlierMessages": "Load Earlier Messages",
-  "@loadEarlierMessages": {
-    "description": "Button to load earlier messages"
-  },
   "failedToLoadQuote": "Failed to load quote: \n{error}",
   "@failedToLoadQuote": {
     "description": "Error message when loading quote fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToSendReply": "Failed to send reply: {error}",
-  "@failedToSendReply": {
-    "description": "Error message when sending reply fails",
     "placeholders": {
       "error": {
         "type": "String"
@@ -609,15 +433,6 @@
   "failedToOpenConversation": "Failed to open message: {error}",
   "@failedToOpenConversation": {
     "description": "Error message when opening conversation fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToJumpToMessage": "Failed to jump to message: {error}",
-  "@failedToJumpToMessage": {
-    "description": "Error message when jumping to message fails",
     "placeholders": {
       "error": {
         "type": "String"
@@ -684,34 +499,9 @@
   "@signInToViewMessages": {
     "description": "Message asking user to sign in to view messages"
   },
-  "failedToLoadPost": "Failed to load post: \n{error}",
-  "@failedToLoadPost": {
-    "description": "Error message when loading post fails",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "failedToLikeOrUnlikeMessage": "Failed to {action} message: {error}",
-  "@failedToLikeOrUnlikeMessage": {
-    "description": "Error message when liking/unliking message fails",
-    "placeholders": {
-      "action": {
-        "type": "String"
-      },
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "like": "like",
   "@like": {
     "description": "Action verb: like"
-  },
-  "unlike": "unlike",
-  "@unlike": {
-    "description": "Action verb: unlike"
   },
   "download": "Download",
   "@download": {
@@ -747,21 +537,8 @@
       }
     }
   },
-  "failedToNavigateToForum": "Failed to navigate to category",
-  "@failedToNavigateToForum": {
-    "description": "Error message when navigation to category fails"
-  },
   "@failedToSaveConversation": {
     "description": "Error message when saving conversation fails"
-  },
-  "forumNotFoundById": "Category not found: {forumId}",
-  "@forumNotFoundById": {
-    "description": "Error message when forum is not found by ID",
-    "placeholders": {
-      "forumId": {
-        "type": "String"
-      }
-    }
   },
   "couldNotOpenLink": "Could not open link: {error}",
   "@couldNotOpenLink": {
@@ -927,31 +704,9 @@
       }
     }
   },
-  "nVotes": "{count, plural, =1{1 vote} other{{count} votes}}",
-  "@nVotes": {
-    "description": "Vote count on a topic row",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "lastSeen": "Seen",
-  "@lastSeen": {
-    "description": "Profile stat: when the user was last online"
-  },
   "chat": "Chat",
   "@chat": {
     "description": "UI text: Chat"
-  },
-  "comingSoon": "{label} — coming soon",
-  "@comingSoon": {
-    "description": "UI text: {label} — coming soon",
-    "placeholders": {
-      "label": {
-        "type": "String"
-      }
-    }
   },
   "moreBadges": "+{count} more",
   "@moreBadges": {
@@ -1053,10 +808,6 @@
   "discard": "Discard",
   "@discard": {
     "description": "UI text: Discard"
-  },
-  "discardDraftQuestion": "Discard draft?",
-  "@discardDraftQuestion": {
-    "description": "UI text: Discard draft?"
   },
   "doNotDisturb": "Do not disturb",
   "@doNotDisturb": {
@@ -1264,10 +1015,6 @@
   "@resizeAndUpload": {
     "description": "UI text: Resize and upload"
   },
-  "retryConnection": "Retry connection",
-  "@retryConnection": {
-    "description": "UI text: Retry connection"
-  },
   "checkConnectionAndRetry": "Check your internet connection and try again.",
   "@checkConnectionAndRetry": {
     "description": "Shown when a forum being opened did not answer at all (offline, or no response in time), under the failed-to-connect heading and above the Retry button."
@@ -1308,10 +1055,6 @@
   "@signOut": {
     "description": "UI text: Sign out"
   },
-  "signOutQuestion": "Sign out?",
-  "@signOutQuestion": {
-    "description": "UI text: Sign out?"
-  },
   "signInCancelledNoPayload": "Sign-in cancelled — no payload returned",
   "@signInCancelledNoPayload": {
     "description": "UI text: Sign-in cancelled — no payload returned"
@@ -1337,18 +1080,6 @@
         "type": "String"
       }
     }
-  },
-  "submit": "Submit",
-  "@submit": {
-    "description": "UI text: Submit"
-  },
-  "discardDraftWarning": "This will permanently remove the saved draft.",
-  "@discardDraftWarning": {
-    "description": "UI text: This will permanently remove the saved draft."
-  },
-  "deleteChatMessageWarning": "This will remove the message for everyone.",
-  "@deleteChatMessageWarning": {
-    "description": "UI text: This will remove the message for everyone."
   },
   "titleOnly": "Title only",
   "@titleOnly": {
@@ -1407,10 +1138,6 @@
   "@changeEmailSecurityNote": {
     "description": "UI text: For added security, Discourse may require you to confirm via"
   },
-  "newDirectMessage": "New direct message",
-  "@newDirectMessage": {
-    "description": "UI text: New direct message"
-  },
   "noMessagesYetSayHi": "No messages yet — say hi.",
   "@noMessagesYetSayHi": {
     "description": "UI text: No messages yet — say hi."
@@ -1418,10 +1145,6 @@
   "edited": "edited",
   "@edited": {
     "description": "UI text: edited"
-  },
-  "editProfileManagedOnWebNote": "Display name, email, password, and other account settings are managed under Account → Manage account on web. Your avatar can be changed by tapping the camera badge on your photo.",
-  "@editProfileManagedOnWebNote": {
-    "description": "UI text: Display name, email, password, and other account settings ar"
   },
   "approvedButRelayUnreachable": "Approved, but we could not reach the notifications server to finish setting up. Try again later from Settings.",
   "@approvedButRelayUnreachable": {
@@ -1469,10 +1192,6 @@
       }
     }
   },
-  "protected": "Protected",
-  "@protected": {
-    "description": "UI text: Protected"
-  },
   "solution": "Solution",
   "@solution": {
     "description": "UI text: Solution"
@@ -1504,15 +1223,6 @@
   "poll": "Poll",
   "@poll": {
     "description": "UI text: Poll"
-  },
-  "errorLoadingContent": "Error loading content: {error}",
-  "@errorLoadingContent": {
-    "description": "UI text: Error loading content: {error}",
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
   },
   "noDiscussionsYet": "No discussions yet.",
   "@noDiscussionsYet": {
@@ -1609,10 +1319,6 @@
   "@leaveConversation2": {
     "description": "UI text: Leave message"
   },
-  "reportConversation2": "Report message",
-  "@reportConversation2": {
-    "description": "UI text: Report message"
-  },
   "closeConversation2": "Close message",
   "@closeConversation2": {
     "description": "UI text: Close message"
@@ -1644,35 +1350,6 @@
   "leaveConversationConfirmation": "Are you sure you want to remove yourself from this message? You will no longer be able to see or reply to it.",
   "@leaveConversationConfirmation": {
     "description": "UI text: Are you sure you want to remove yourself from this message? You will no longer be able to see or reply to it."
-  },
-  "errorLoadingConversation": "Error loading message: {error}",
-  "@errorLoadingConversation": {
-    "description": "UI text: Error loading message: {error}",
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
-  "conversationNotFound": "Message not found",
-  "@conversationNotFound": {
-    "description": "UI text: Message not found"
-  },
-  "conversationClosedBanner": "This message is closed; it no longer accepts new replies",
-  "@conversationClosedBanner": {
-    "description": "UI text: This message is closed; it no longer accepts new replies"
-  },
-  "noMessagesFound": "No messages found",
-  "@noMessagesFound": {
-    "description": "UI text: No messages found"
-  },
-  "endOfConversation": "End of the discussion",
-  "@endOfConversation": {
-    "description": "UI text: End of the discussion"
-  },
-  "jumpToMessage": "Jump to Message",
-  "@jumpToMessage": {
-    "description": "UI text: Jump to Message"
   },
   "editConversation2": "Edit title",
   "@editConversation2": {
@@ -1850,10 +1527,6 @@
       }
     }
   },
-  "chatPlaceholderGroup": "Chat in group",
-  "@chatPlaceholderGroup": {
-    "description": "UI text (Discourse chat): Chat in group"
-  },
   "chatPlaceholderSelf": "Jot something down",
   "@chatPlaceholderSelf": {
     "description": "UI text (Discourse chat): Jot something down"
@@ -1955,15 +1628,6 @@
   "@postNeedsApprovalBody": {
     "description": "Body of that notice (Discourse review.approval.description)."
   },
-  "failedToCreateConversation": "Failed to send message: {error}",
-  "@failedToCreateConversation": {
-    "description": "UI text: Failed to send message: {error}",
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
   "maximumAttachmentsAllowed": "Maximum of {count} attachment(s) allowed",
   "@maximumAttachmentsAllowed": {
     "description": "UI text: Maximum of {count} attachment(s) allowed",
@@ -1976,10 +1640,6 @@
   "noImagesFoundToDisplay": "No images found to display.",
   "@noImagesFoundToDisplay": {
     "description": "UI text: No images found to display."
-  },
-  "pleaseLoginToViewThisAttachment": "Please login to view this attachment",
-  "@pleaseLoginToViewThisAttachment": {
-    "description": "UI text: Please login to view this attachment"
   },
   "searchForTopics": "Search for topics",
   "@searchForTopics": {
@@ -2012,10 +1672,6 @@
   "doNotDisturbExplanation": "Pause notifications for a while — Discourse holds them until the window ends",
   "@doNotDisturbExplanation": {
     "description": "UI text: Pause notifications for a while — Discourse holds them until"
-  },
-  "emailSettingsSubtitle": "Email frequency, like aggregation, digest schedule",
-  "@emailSettingsSubtitle": {
-    "description": "UI text: Email frequency, like aggregation, digest schedule"
   },
   "manageAccountSubtitle": "Profile, email, password, security, advanced settings",
   "@manageAccountSubtitle": {
@@ -2053,17 +1709,9 @@
   "@initializingForum": {
     "description": "UI text: Initializing forum…"
   },
-  "subscribedForums": "Subscribed Forums",
-  "@subscribedForums": {
-    "description": "UI text: Subscribed Forums"
-  },
   "errorLoadingNotifications": "Error loading notifications",
   "@errorLoadingNotifications": {
     "description": "UI text: Error loading notifications"
-  },
-  "pullDownToRefresh": "Pull down to refresh",
-  "@pullDownToRefresh": {
-    "description": "UI text: Pull down to refresh"
   },
   "noNewNotificationsExplanation": "You will be notified in this panel about activity directly relevant to you, including replies to your topics and posts, when someone @mentions you or quotes you, and replies to topics you are watching. Notifications will also be sent to your email when you haven’t logged in for a while.",
   "@noNewNotificationsExplanation": {
@@ -2087,28 +1735,6 @@
       }
     }
   },
-  "deletePostsProfilePostsAndComments": "Delete posts, profile posts, and comments",
-  "@deletePostsProfilePostsAndComments": {
-    "description": "UI text: Delete posts, profile posts, and comments"
-  },
-  "spamCleanConfirmation": "Are you sure you want to spam clean {username}?",
-  "@spamCleanConfirmation": {
-    "description": "UI text: Are you sure you want to spam clean {username}?",
-    "placeholders": {
-      "username": {
-        "type": "Object"
-      }
-    }
-  },
-  "failedToCleanSpam": "Failed to clean spam: {error}",
-  "@failedToCleanSpam": {
-    "description": "UI text: Failed to clean spam: {toString}",
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
   "searchUser": "Search User",
   "@searchUser": {
     "description": "UI text: Search User"
@@ -2120,10 +1746,6 @@
   "imageNotAvailable": "Image not available",
   "@imageNotAvailable": {
     "description": "UI text: Image not available"
-  },
-  "allForumTopicsHaveBeenMarkedAs": "All forum topics have been marked as read",
-  "@allForumTopicsHaveBeenMarkedAs": {
-    "description": "UI text: All forum topics have been marked as read"
   },
   "postsCount": "{count} Posts",
   "@postsCount": {
@@ -2155,10 +1777,6 @@
       }
     }
   },
-  "failedToPickFile": "Failed to pick file",
-  "@failedToPickFile": {
-    "description": "UI text: Failed to pick file"
-  },
   "onlyNMoreAttachmentsAllowed": "Only {remainingSlots} more attachment(s) allowed. Processing first {remainingSlots2} image(s).",
   "@onlyNMoreAttachmentsAllowed": {
     "description": "UI text: Only {remainingSlots} more attachment(s) allowed. Processing",
@@ -2170,35 +1788,6 @@
         "type": "Object"
       }
     }
-  },
-  "attachmentLimitReachedSkippingRemainingImages": "Attachment limit reached. Skipping remaining images.",
-  "@attachmentLimitReachedSkippingRemainingImages": {
-    "description": "UI text: Attachment limit reached. Skipping remaining images."
-  },
-  "failedToUploadImagePleaseTryAgain": "{fileName}: Failed to upload image. Please try again.",
-  "@failedToUploadImagePleaseTryAgain": {
-    "description": "UI text: {name}: Failed to upload image. Please try again.",
-    "placeholders": {
-      "fileName": {
-        "type": "Object"
-      }
-    }
-  },
-  "failedToUploadImage2": "{fileName}: Failed to upload image: {errorMessage}",
-  "@failedToUploadImage2": {
-    "description": "UI text: {name}: Failed to upload image: {errorMessage}",
-    "placeholders": {
-      "errorMessage": {
-        "type": "Object"
-      },
-      "fileName": {
-        "type": "Object"
-      }
-    }
-  },
-  "failedToPickImage": "Failed to pick image",
-  "@failedToPickImage": {
-    "description": "UI text: Failed to pick image"
   },
   "failedToRemoveAttachment2": "Failed to remove attachment: {error}",
   "@failedToRemoveAttachment2": {
@@ -2266,35 +1855,9 @@
       }
     }
   },
-  "failedToSubmitReport2": "Failed to submit report: {error}",
-  "@failedToSubmitReport2": {
-    "description": "UI text: Failed to submit report: {toString}",
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
   "editHistoryNotAvailable": "Edit history is not available for this post",
   "@editHistoryNotAvailable": {
     "description": "UI text: Edit history is not available for this post"
-  },
-  "noPermissionToUploadAvatar": "You do not have permission to upload avatars",
-  "@noPermissionToUploadAvatar": {
-    "description": "UI text: You do not have permission to upload avatars"
-  },
-  "avatarUploadedSuccessfully": "Avatar uploaded successfully",
-  "@avatarUploadedSuccessfully": {
-    "description": "UI text: Avatar uploaded successfully"
-  },
-  "failedToPickImage2": "Failed to pick image: {error}",
-  "@failedToPickImage2": {
-    "description": "UI text: Failed to pick image: {e}",
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
   },
   "react": "React",
   "@react": {
@@ -2312,15 +1875,6 @@
   "@searchFilters": {
     "description": "UI text: Search filters"
   },
-  "signOutWarning": "You will be signed out of {siteName}. You can sign back in any time.",
-  "@signOutWarning": {
-    "description": "UI text: You will be signed out of {name}. You can sign back in any t",
-    "placeholders": {
-      "siteName": {
-        "type": "Object"
-      }
-    }
-  },
   "suggestedTopics": "Suggested Topics",
   "suggestedMessages": "Suggested Messages",
   "@suggestedMessages": {
@@ -2328,10 +1882,6 @@
   },
   "@suggestedTopics": {
     "description": "UI text: Suggested Topics"
-  },
-  "newLabel": "NEW",
-  "@newLabel": {
-    "description": "UI text: NEW"
   },
   "voteRemoved": "Vote removed",
   "@voteRemoved": {
@@ -2369,10 +1919,6 @@
   "@couldNotLoadCategories": {
     "description": "Snackbar when the category list fails to load"
   },
-  "explore": "Explore",
-  "@explore": {
-    "description": "Drawer: Explore"
-  },
   "tags": "Tags",
   "@tags": {
     "description": "Drawer: Tags"
@@ -2408,15 +1954,6 @@
   "privacyPolicy": "Privacy Policy",
   "@privacyPolicy": {
     "description": "Drawer: Privacy Policy"
-  },
-  "signedInAs": "Signed in as {username}",
-  "@signedInAs": {
-    "description": "Drawer header",
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
   },
   "notSignedIn": "Not signed in",
   "@notSignedIn": {
@@ -4762,5 +4299,1776 @@
   "noPermissionToViewCategory": "You do not have permission to view topics in this category.",
   "@noPermissionToViewCategory": {
     "description": "Notice on a category whose topics the reader may not see"
+  },
+  "featureTopicTitle": "Feature this topic",
+  "@featureTopicTitle": {
+    "description": "Title of the staff sheet that pins a topic (Discourse topic.feature_topic.title)"
+  },
+  "pinTopicMenu": "Pin Topic…",
+  "@pinTopicMenu": {
+    "description": "Topic ⋮ menu item that opens the pin sheet (Discourse topic.actions.pin)"
+  },
+  "pinInCategoryUntil": "Make this topic appear at the top of the {category} category until",
+  "@pinInCategoryUntil": {
+    "description": "Pin sheet: pin in the topic's category, followed by a date",
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "pinGloballyUntil": "Make this topic appear at the top of all topic lists until",
+  "@pinGloballyUntil": {
+    "description": "Pin sheet: pin at the top of every topic list, followed by a date"
+  },
+  "pinNote": "Users can unpin the topic individually for themselves.",
+  "@pinNote": {
+    "description": "Pin sheet note"
+  },
+  "pinUntil": "Pin until",
+  "@pinUntil": {
+    "description": "Pin sheet: the end-date field's label"
+  },
+  "pinDateRequired": "A date is required to pin this topic.",
+  "@pinDateRequired": {
+    "description": "Pin sheet: shown when no end date is chosen"
+  },
+  "pinTopicGlobally": "Pin Topic Globally",
+  "@pinTopicGlobally": {
+    "description": "Pin sheet button"
+  },
+  "flagThanks": "Thanks for keeping our community civil!",
+  "@flagThanks": {
+    "description": "Snackbar after a flag is filed"
+  },
+  "flagReviewProcess": "All flags are received by moderators and will be reviewed as soon as possible.",
+  "@flagReviewProcess": {
+    "description": "Flag dialog intro"
+  },
+  "flagCant": "Sorry, you can't flag this post at this time.",
+  "@flagCant": {
+    "description": "Flag dialog: flagging is not possible now"
+  },
+  "flagSendMessage": "Message",
+  "@flagSendMessage": {
+    "description": "Flag dialog button when the choice messages the author"
+  },
+  "flagMessageForUser": "Message for the user",
+  "@flagMessageForUser": {
+    "description": "Flag dialog: label of the message to the post's author"
+  },
+  "flagMessageForModerators": "Message for the moderators",
+  "@flagMessageForModerators": {
+    "description": "Flag dialog: label of the message to staff"
+  },
+  "flagPlaceholderNotifyUser": "Be specific, be constructive, and always be kind.",
+  "@flagPlaceholderNotifyUser": {
+    "description": "Flag dialog: hint for the message to the author"
+  },
+  "flagPlaceholderNotifyModerators": "Let us know specifically what you are concerned about, and provide relevant links and examples where possible.",
+  "@flagPlaceholderNotifyModerators": {
+    "description": "Flag dialog: hint for the message to staff"
+  },
+  "flagPlaceholderIllegal": "Let us know specifically why you believe this content is illegal, and provide relevant links and examples where possible.",
+  "@flagPlaceholderIllegal": {
+    "description": "Flag dialog: hint for an illegal-content flag"
+  },
+  "flagConfirmIllegal": "What I’ve written above is accurate and complete.",
+  "@flagConfirmIllegal": {
+    "description": "Flag dialog: checkbox required for an illegal-content flag"
+  },
+  "flagMessageAtLeast": "{count, plural, =1{enter at least {count} character} other{enter at least {count} characters}}",
+  "@flagMessageAtLeast": {
+    "description": "Flag dialog: the message is too short",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "flagMessageSent": "Your message has been sent.",
+  "@flagMessageSent": {
+    "description": "Snackbar after the message to the post's author is sent"
+  },
+  "mergeTopicError": "There was an error moving posts into that topic.",
+  "@mergeTopicError": {
+    "description": "Snackbar when merging a topic fails (Discourse topic.merge_topic.error)"
+  },
+  "topicTitlePlaceholder": "What is this discussion about in one brief sentence?",
+  "@topicTitlePlaceholder": {
+    "description": "Hint in the rename-topic field (Discourse composer.title_placeholder)"
+  },
+  "topicMoved": "Topic moved",
+  "@topicMoved": {
+    "description": "Snackbar after staff move a topic to another category"
+  },
+  "topicMerged": "Topic merged",
+  "@topicMerged": {
+    "description": "Snackbar after staff merge a topic into another"
+  },
+  "mergeTopicExplanation": "Every post in this topic moves into the topic you choose. This can't be undone in the app.",
+  "@mergeTopicExplanation": {
+    "description": "Merge-into-topic dialog text"
+  },
+  "destinationTopicId": "Destination topic ID",
+  "@destinationTopicId": {
+    "description": "Merge-into-topic dialog: the target topic id field"
+  },
+  "topicAuthorUnknown": "Unknown",
+  "@topicAuthorUnknown": {
+    "description": "Topic list row: author name when the forum did not send one"
+  },
+  "noHotTopics": "There are no hot topics.",
+  "@noHotTopics": {
+    "description": "Home, Hot view: empty state (Discourse js.topics.none.hot)"
+  },
+  "signInToViewNewTopics": "Sign in to view new topics",
+  "@signInToViewNewTopics": {
+    "description": "Home, New view, signed out: heading"
+  },
+  "newTopicsSignInMessage": "New topics show what was created since your last visit.",
+  "@newTopicsSignInMessage": {
+    "description": "Home, New view, signed out: explanation under the heading"
+  },
+  "topPeriodAllTime": "All time",
+  "@topPeriodAllTime": {
+    "description": "Home, Top view: period chip (Discourse js.filters.top.all_time)"
+  },
+  "topPeriodYear": "Year",
+  "@topPeriodYear": {
+    "description": "Home, Top view: period chip (Discourse js.filters.top.this_year)"
+  },
+  "topPeriodQuarter": "Quarter",
+  "@topPeriodQuarter": {
+    "description": "Home, Top view: period chip (Discourse js.filters.top.this_quarter)"
+  },
+  "topPeriodMonth": "Month",
+  "@topPeriodMonth": {
+    "description": "Home, Top view: period chip (Discourse js.filters.top.this_month)"
+  },
+  "topPeriodWeek": "Week",
+  "@topPeriodWeek": {
+    "description": "Home, Top view: period chip (Discourse js.filters.top.this_week)"
+  },
+  "topPeriodToday": "Today",
+  "@topPeriodToday": {
+    "description": "Home, Top view: period chip (Discourse js.filters.top.today)"
+  },
+  "noTopTopicsForPeriod": "{period, select, all{No top topics of all time.} yearly{No top topics this year.} quarterly{No top topics this quarter.} monthly{No top topics this month.} weekly{No top topics this week.} daily{No top topics today.} other{There are no top topics.}}",
+  "@noTopTopicsForPeriod": {
+    "description": "Home, Top view: empty state for the chosen period. period is the API name of the period chip: all, yearly, quarterly, monthly, weekly or daily (Discourse js.topics.none.top for other)",
+    "placeholders": {
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "connectionTimedOutSiteUnreachable": "Connection timed out. The site may be down or unreachable.",
+  "@connectionTimedOutSiteUnreachable": {
+    "description": "Forum home: error when re-checking an already opened forum timed out"
+  },
+  "failedToMarkNotificationsRead": "Failed to mark notifications as read",
+  "@failedToMarkNotificationsRead": {
+    "description": "Notifications tab: snackbar when Dismiss all fails and the forum gave no reason"
+  },
+  "forumNameFallback": "Forum",
+  "@forumNameFallback": {
+    "description": "Forum header / app bar: the forum's name before it is known (the whole site, not a category)"
+  },
+  "noForumDescription": "No description available.",
+  "@noForumDescription": {
+    "description": "Forum header: shown when the forum has no description"
+  },
+  "dismissAllNotifications": "Dismiss all",
+  "@dismissAllNotifications": {
+    "description": "Notifications tab app bar: tooltip of the button that marks every notification read (Discourse js.user.dismiss_notifications)"
+  },
+  "notificationPostIdMissing": "Post ID is missing. Cannot navigate to the post.",
+  "@notificationPostIdMissing": {
+    "description": "Notifications tab: error dialog when a tapped notification names no post"
+  },
+  "notificationTopicIdMissingForPost": "Topic ID is missing. Cannot navigate to the post.",
+  "@notificationTopicIdMissingForPost": {
+    "description": "Notifications tab: error dialog when a post notification names no topic"
+  },
+  "notificationTopicIdMissing": "Topic ID is missing. Cannot open the topic.",
+  "@notificationTopicIdMissing": {
+    "description": "Notifications tab: error dialog when a topic notification names no topic"
+  },
+  "notificationUsernameMissing": "Username is missing. Cannot open user profile.",
+  "@notificationUsernameMissing": {
+    "description": "Notifications tab: error dialog when a user notification names no user"
+  },
+  "notificationChannelIdMissing": "Channel ID is missing. Cannot open the chat.",
+  "@notificationChannelIdMissing": {
+    "description": "Notifications tab: error dialog when a chat notification names no channel"
+  },
+  "notificationGroupNameMissingForInbox": "Group name is missing. Cannot open the inbox.",
+  "@notificationGroupNameMissingForInbox": {
+    "description": "Notifications tab: error dialog when a group message notification names no group"
+  },
+  "notificationGroupNameMissing": "Group name is missing. Cannot open the group.",
+  "@notificationGroupNameMissing": {
+    "description": "Notifications tab: error dialog when a group notification names no group"
+  },
+  "notificationNoActionUrl": "No action URL available for this notification type.",
+  "@notificationNoActionUrl": {
+    "description": "Notifications tab: error dialog for a notification the app cannot open"
+  },
+  "notificationBadgeUnavailable": "Badge details are unavailable.",
+  "@notificationBadgeUnavailable": {
+    "description": "Notifications tab: error dialog when a badge notification cannot be resolved"
+  },
+  "notificationBadgeLoadFailed": "Could not load this badge.",
+  "@notificationBadgeLoadFailed": {
+    "description": "Notifications tab: error dialog when the earned badge could not be loaded"
+  },
+  "personalMessageTitleFallback": "Personal message",
+  "@personalMessageTitleFallback": {
+    "description": "Title of a personal message opened from a notification that does not name its subject"
+  },
+  "topicTitleFallback": "Topic",
+  "@topicTitleFallback": {
+    "description": "Title of a topic opened from a notification that does not name it (Discourse js.topic.title)"
+  },
+  "signInToViewNotifications": "Sign in to view notifications",
+  "@signInToViewNotifications": {
+    "description": "Notifications tab, signed out: heading"
+  },
+  "youNeedToBeSignedInToViewNotifications": "You need to be signed in to view your notifications.",
+  "@youNeedToBeSignedInToViewNotifications": {
+    "description": "Notifications tab, signed out: explanation under the heading"
+  },
+  "noUnreadNotifications": "No unread notifications",
+  "@noUnreadNotifications": {
+    "description": "Notifications tab, Unread filter: empty state"
+  },
+  "noNotificationsYet": "No notifications yet",
+  "@noNotificationsYet": {
+    "description": "Notifications tab, All filter: empty state"
+  },
+  "newNotificationFallbackBody": "New notification",
+  "@newNotificationFallbackBody": {
+    "description": "Phone notification: body text when the push carried none"
+  },
+  "unableToOpenNotification": "Unable to open notification",
+  "@unableToOpenNotification": {
+    "description": "Dialog title when a tapped phone notification cannot be opened"
+  },
+  "notificationMissingSiteInfo": "Missing site information (site_id).",
+  "@notificationMissingSiteInfo": {
+    "description": "Dialog under 'Unable to open notification': the push named no site"
+  },
+  "notificationInvalidSiteInfo": "Invalid site information (site_id).",
+  "@notificationInvalidSiteInfo": {
+    "description": "Dialog under 'Unable to open notification': the push's site could not be read"
+  },
+  "notificationMissingPostInfo": "Missing post information (content_id).",
+  "@notificationMissingPostInfo": {
+    "description": "Dialog under 'Unable to open notification': the push named no post"
+  },
+  "notificationMissingMessageInfo": "Missing message information (conversation_id).",
+  "@notificationMissingMessageInfo": {
+    "description": "Dialog under 'Unable to open notification': the push named no personal message"
+  },
+  "notificationMissingUserInfo": "Missing user information (sender_id).",
+  "@notificationMissingUserInfo": {
+    "description": "Dialog under 'Unable to open notification': the push named no user"
+  },
+  "notificationUnsupportedType": "Unsupported notification type.",
+  "@notificationUnsupportedType": {
+    "description": "Dialog under 'Unable to open notification': a kind of push the app does not know"
+  },
+  "notificationForumNotFound": "Forum not found for this site.",
+  "@notificationForumNotFound": {
+    "description": "Dialog under 'Unable to open notification': the push's forum is not one the app has"
+  },
+  "notificationForumOpenFailed": "Failed to initialize the forum.",
+  "@notificationForumOpenFailed": {
+    "description": "Dialog under 'Unable to open notification': the forum could not be opened"
+  },
+  "notificationMissingTopicInfo": "Missing topic information (topic_id).",
+  "@notificationMissingTopicInfo": {
+    "description": "Dialog under 'Unable to open notification': the push named no topic"
+  },
+  "failedToLoadTags": "Failed to load tags.",
+  "@failedToLoadTags": {
+    "description": "Tags page: error when the tag list fails and the forum gave no reason"
+  },
+  "searchTagsHint": "Search tags…",
+  "@searchTagsHint": {
+    "description": "Tags page: placeholder of the filter field"
+  },
+  "tagsSortedByCountTooltip": "Sorted by topic count — tap to switch to A→Z",
+  "@tagsSortedByCountTooltip": {
+    "description": "Tags page: tooltip of the sort button while sorted by topic count"
+  },
+  "tagsSortedAlphabeticallyTooltip": "Sorted alphabetically — tap to switch to popularity",
+  "@tagsSortedAlphabeticallyTooltip": {
+    "description": "Tags page: tooltip of the sort button while sorted A→Z"
+  },
+  "noTagsYet": "No tags yet on this forum.",
+  "@noTagsYet": {
+    "description": "Tags page: empty state when the forum has no tags"
+  },
+  "tagNotificationLevelTooltip": "Notification level",
+  "@tagNotificationLevelTooltip": {
+    "description": "Tags page and a tag's topic list: tooltip of the bell that sets the tag's notification level"
+  },
+  "tagTopicsLoadFailed": "Failed to load",
+  "@tagTopicsLoadFailed": {
+    "description": "A tag's topic list: error when it fails to load and the forum gave no reason"
+  },
+  "searchFailedWithError": "Search failed: {error}",
+  "@searchFailedWithError": {
+    "description": "Search page: snackbar when a search fails, with the reason",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "searchFiltersButtonTooltip": "Filters",
+  "@searchFiltersButtonTooltip": {
+    "description": "Search page app bar: tooltip of the button that opens the search filters"
+  },
+  "searchFilterStatusSection": "Status",
+  "@searchFilterStatusSection": {
+    "description": "Search filters sheet: heading over the topic status chips"
+  },
+  "searchFilterMyActivitySection": "My activity",
+  "@searchFilterMyActivitySection": {
+    "description": "Search filters sheet: heading over the chips about the reader's own activity"
+  },
+  "searchFilterMatchTypeSection": "Match type",
+  "@searchFilterMatchTypeSection": {
+    "description": "Search filters sheet: heading over the Title only / First posts only chips"
+  },
+  "searchTagsFilterHelper": "Space- or comma-separated. Each tag is required.",
+  "@searchTagsFilterHelper": {
+    "description": "Search filters sheet: help under the tags field"
+  },
+  "searchSortBy": "Sort by",
+  "@searchSortBy": {
+    "description": "Search filters sheet: heading over the sort chips (Discourse js.search.sort_by)"
+  },
+  "searchStatusOpen": "Open",
+  "@searchStatusOpen": {
+    "description": "Search filters sheet: status chip, topics that are open"
+  },
+  "searchStatusArchived": "Archived",
+  "@searchStatusArchived": {
+    "description": "Search filters sheet: status chip, topics that are archived"
+  },
+  "searchStatusNoReplies": "No replies",
+  "@searchStatusNoReplies": {
+    "description": "Search filters sheet: status chip, topics with zero replies"
+  },
+  "searchStatusPublicOnly": "Public only",
+  "@searchStatusPublicOnly": {
+    "description": "Search filters sheet: status chip, only public topics"
+  },
+  "searchStatusUnsolved": "Unsolved",
+  "@searchStatusUnsolved": {
+    "description": "Search filters sheet: status chip, topics without a solution (discourse-solved topic_status_filter.unsolved)"
+  },
+  "searchInBookmarked": "I bookmarked",
+  "@searchInBookmarked": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.bookmarks)"
+  },
+  "searchInMyMessages": "In my messages",
+  "@searchInMyMessages": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.private)"
+  },
+  "searchInLiked": "I liked",
+  "@searchInLiked": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.likes)"
+  },
+  "searchInPosted": "I posted in",
+  "@searchInPosted": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.posted)"
+  },
+  "searchInWatching": "I'm watching",
+  "@searchInWatching": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.watching)"
+  },
+  "searchInTracking": "I'm tracking",
+  "@searchInTracking": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.tracking)"
+  },
+  "searchInSeen": "I read",
+  "@searchInSeen": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.seen)"
+  },
+  "searchInUnseen": "I've not read",
+  "@searchInUnseen": {
+    "description": "Search filters sheet: 'My activity' chip (Discourse js.search.advanced.filters.unseen)"
+  },
+  "searchSortLatestPost": "Latest post",
+  "@searchSortLatestPost": {
+    "description": "Search filters sheet: sort chip (Discourse js.search.latest_post)"
+  },
+  "searchSortMostLiked": "Most liked",
+  "@searchSortMostLiked": {
+    "description": "Search filters sheet: sort chip (Discourse js.search.most_liked)"
+  },
+  "searchSortMostViewed": "Most viewed",
+  "@searchSortMostViewed": {
+    "description": "Search filters sheet: sort chip (Discourse js.search.most_viewed)"
+  },
+  "searchSortLatestTopic": "Latest topic",
+  "@searchSortLatestTopic": {
+    "description": "Search filters sheet: sort chip (Discourse js.search.latest_topic)"
+  },
+  "searchFieldHint": "Search...",
+  "@searchFieldHint": {
+    "description": "Default placeholder of the app's search fields (Discourse js.multi_select.search)"
+  },
+  "bookmarksUnavailable": "Bookmarks are unavailable",
+  "@bookmarksUnavailable": {
+    "description": "Bookmarks page: error when the forum's bookmarks cannot be reached at all"
+  },
+  "failedToLoadBookmarks": "Failed to load bookmarks",
+  "@failedToLoadBookmarks": {
+    "description": "Bookmarks page: error when the list fails and the forum gave no reason"
+  },
+  "failedToRemoveBookmark": "Failed to remove bookmark",
+  "@failedToRemoveBookmark": {
+    "description": "Bookmarks page: snackbar when removing a bookmark fails"
+  },
+  "failedToUpdateBookmark": "Failed to update bookmark",
+  "@failedToUpdateBookmark": {
+    "description": "Bookmarks page: snackbar when changing a bookmark's label, reminder or pin fails"
+  },
+  "bookmarkWithReminder": "Bookmark with reminder",
+  "@bookmarkWithReminder": {
+    "description": "Bookmark reminder sheet: default title"
+  },
+  "noReminder": "No reminder",
+  "@noReminder": {
+    "description": "Bookmark reminder sheet: option to bookmark without a reminder (Discourse keyboard_shortcuts_help.bookmarks.none)"
+  },
+  "failedToLoadDrafts": "Failed to load drafts.",
+  "@failedToLoadDrafts": {
+    "description": "Drafts page: error when the list fails and the forum gave no reason"
+  },
+  "failedToDiscardDraft": "Failed to discard draft",
+  "@failedToDiscardDraft": {
+    "description": "Drafts page: snackbar when discarding a draft fails"
+  },
+  "messagesLoadFailed": "Failed to load messages",
+  "@messagesLoadFailed": {
+    "description": "Message list (Inbox, Sent, Archive…): shown when the forum could not return the list and gave no reason"
+  },
+  "moreMessagesLoadFailed": "Failed to load more messages",
+  "@moreMessagesLoadFailed": {
+    "description": "Message list: shown when the next page of messages could not be loaded and the forum gave no reason"
+  },
+  "messageUnknownUser": "Unknown",
+  "@messageUnknownUser": {
+    "description": "Message list row: stands in for the name of who wrote last when the forum did not say"
+  },
+  "unknownErrorFallback": "Unknown error",
+  "@unknownErrorFallback": {
+    "description": "Error detail when the forum or the system gave no reason (edit message page, saving an image). Discourse login.error"
+  },
+  "chatComposerDefaultHint": "Type a message…",
+  "@chatComposerDefaultHint": {
+    "description": "Chat composer placeholder when the channel gives none"
+  },
+  "chatChannelNumbered": "channel {id}",
+  "@chatChannelNumbered": {
+    "description": "Chat channel title when the channel has no name, after a '#': '#channel 12'",
+    "placeholders": {
+      "id": {
+        "type": "Object"
+      }
+    }
+  },
+  "chatSendFailed": "Failed to send message.",
+  "@chatSendFailed": {
+    "description": "Chat: a message could not be sent and the forum gave no reason"
+  },
+  "chatEditFailed": "Failed to edit message.",
+  "@chatEditFailed": {
+    "description": "Chat: an edit to a message could not be saved and the forum gave no reason"
+  },
+  "chatDeleteFailed": "Failed to delete message.",
+  "@chatDeleteFailed": {
+    "description": "Chat: a message could not be deleted and the forum gave no reason"
+  },
+  "chatReactionsUnsupported": "Reactions are not supported here.",
+  "@chatReactionsUnsupported": {
+    "description": "Chat: shown when reacting to a message is not possible on this forum"
+  },
+  "chatReactionFailed": "Failed to update reaction.",
+  "@chatReactionFailed": {
+    "description": "Chat: adding or removing a reaction failed and the forum gave no reason"
+  },
+  "attachmentDefaultName": "Attachment",
+  "@attachmentDefaultName": {
+    "description": "Name shown for a file in a post or chat message that has no name of its own"
+  },
+  "fileTypeAudio": "Audio",
+  "@fileTypeAudio": {
+    "description": "File type label under an attached file's name (shown in capitals): an audio file"
+  },
+  "fileTypeText": "Text",
+  "@fileTypeText": {
+    "description": "File type label under an attached file's name (shown in capitals): a plain text file"
+  },
+  "fileTypeArchive": "Archive",
+  "@fileTypeArchive": {
+    "description": "File type label under an attached file's name (shown in capitals): a compressed archive (zip, rar, 7z…)"
+  },
+  "fileTypeFile": "File",
+  "@fileTypeFile": {
+    "description": "File type label under an attached file's name (shown in capitals) when the type is unknown"
+  },
+  "downloadFailedHttpStatus": "Failed to download file: HTTP {status}",
+  "@downloadFailedHttpStatus": {
+    "description": "Why downloading an attached file failed: the server answered with an HTTP error code",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadedFileEmpty": "Downloaded file is empty",
+  "@downloadedFileEmpty": {
+    "description": "Why downloading an attached file failed: the server sent nothing"
+  },
+  "downloadFileFailed": "Failed to download file: {error}",
+  "@downloadFileFailed": {
+    "description": "Why downloading an attached file failed, with the system's reason",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "attachmentTypeNotAllowed": "File type .{extension} is not allowed. Allowed types: {allowed}",
+  "@attachmentTypeNotAllowed": {
+    "description": "Composer: a picked file's extension is not one the forum allows; {allowed} is the forum's list, e.g. 'jpg, png, pdf'",
+    "placeholders": {
+      "extension": {
+        "type": "String"
+      },
+      "allowed": {
+        "type": "String"
+      }
+    }
+  },
+  "attachmentFileTooLarge": "File size ({size}) exceeds maximum of {max}",
+  "@attachmentFileTooLarge": {
+    "description": "Composer: a picked file (not an image, which can be resized) is larger than the forum allows; sizes like '12.3 MB'",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "attachmentValidationFailed": "File validation failed",
+  "@attachmentValidationFailed": {
+    "description": "Composer: a picked file was refused before upload, with no more specific reason"
+  },
+  "uploadMissingReference": "Upload succeeded but the server returned no reference for the file.",
+  "@uploadMissingReference": {
+    "description": "Composer: the forum accepted an upload but did not say how to refer to it in the post, so it cannot be added"
+  },
+  "imageFileNotFound": "Image file not found",
+  "@imageFileNotFound": {
+    "description": "Full-screen image viewer: saving failed because the image is no longer in the cache (after 'Failed to save image:')"
+  },
+  "failedToLoadVideo": "Failed to load video",
+  "@failedToLoadVideo": {
+    "description": "Full-screen video player: the video could not be played and the player gave no reason"
+  },
+  "userInfoLoadFailed": "Failed to load user info.",
+  "@userInfoLoadFailed": {
+    "description": "User profile page: shown when the user's profile could not be loaded and there is no more specific error"
+  },
+  "userInfoLoadFailedWithError": "Failed to load user info: {error}",
+  "@userInfoLoadFailedWithError": {
+    "description": "User profile page: error dialog when the user's profile could not be loaded",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profileMenuIgnoreUser": "Ignore user",
+  "@profileMenuIgnoreUser": {
+    "description": "User profile page overflow menu: ignore this user (Discourse's Ignore User)"
+  },
+  "profileMenuUnignoreUser": "Unignore user",
+  "@profileMenuUnignoreUser": {
+    "description": "User profile page overflow menu: stop ignoring this user"
+  },
+  "ignoreStateUpdateFailed": "Couldn't update ignore state",
+  "@ignoreStateUpdateFailed": {
+    "description": "Snackbar when ignoring or unignoring a user failed (profile page, ignored users page)"
+  },
+  "profileNowIgnoringUser": "You're ignoring @{username}. Their posts will be hidden.",
+  "@profileNowIgnoringUser": {
+    "description": "Snackbar after ignoring a user from their profile",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "profileIgnoreToggleFailed": "Ignore toggle failed.",
+  "@profileIgnoreToggleFailed": {
+    "description": "Snackbar fallback when ignoring/unignoring a user from their profile threw an error"
+  },
+  "profileStatsLoadFailed": "Could not load stats.",
+  "@profileStatsLoadFailed": {
+    "description": "Profile: the user's summary/stats could not be loaded"
+  },
+  "profileFollowFailed": "Failed to follow",
+  "@profileFollowFailed": {
+    "description": "Profile: snackbar when following a user failed"
+  },
+  "profileUnfollowFailed": "Failed to unfollow",
+  "@profileUnfollowFailed": {
+    "description": "Profile: snackbar when unfollowing a user failed"
+  },
+  "profileChatOpenFailed": "Could not open a chat with this user.",
+  "@profileChatOpenFailed": {
+    "description": "Profile: snackbar when opening a chat (direct message channel) with the user failed"
+  },
+  "summaryLikeCount": "{count, plural, =1{1 like} other{{count} likes}}",
+  "@summaryLikeCount": {
+    "description": "Profile summary: number of likes on a topic/reply row, or between the user and another person ('Most liked by')",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "summaryLinkClicks": "{count, plural, =1{1 click} other{{count} clicks}}",
+  "@summaryLinkClicks": {
+    "description": "Profile summary 'Top links': how many times a link was clicked (Discourse topic_map.clicks)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "directoryPeriodAllTime": "All time",
+  "@directoryPeriodAllTime": {
+    "description": "Users directory period chip (Discourse filters.top.all_time)"
+  },
+  "directoryPeriodYear": "Year",
+  "@directoryPeriodYear": {
+    "description": "Users directory period chip (Discourse filters.top.this_year)"
+  },
+  "directoryPeriodQuarter": "Quarter",
+  "@directoryPeriodQuarter": {
+    "description": "Users directory period chip (Discourse filters.top.this_quarter)"
+  },
+  "directoryPeriodMonth": "Month",
+  "@directoryPeriodMonth": {
+    "description": "Users directory period chip (Discourse filters.top.this_month)"
+  },
+  "directoryPeriodWeek": "Week",
+  "@directoryPeriodWeek": {
+    "description": "Users directory period chip (Discourse filters.top.this_week)"
+  },
+  "directoryPeriodToday": "Today",
+  "@directoryPeriodToday": {
+    "description": "Users directory period chip (Discourse filters.top.today)"
+  },
+  "directoryOrderReceived": "Received",
+  "@directoryOrderReceived": {
+    "description": "Users directory sort chip, next to a heart icon: likes received (Discourse directory.likes_received)"
+  },
+  "directoryOrderReplies": "Replies",
+  "@directoryOrderReplies": {
+    "description": "Users directory sort chip: replies posted (Discourse directory.post_count)"
+  },
+  "directoryOrderTopics": "Topics",
+  "@directoryOrderTopics": {
+    "description": "Users directory sort chip: topics created (Discourse directory.topic_count)"
+  },
+  "directoryOrderVisits": "Visits",
+  "@directoryOrderVisits": {
+    "description": "Users directory sort chip: days visited (Discourse directory.days_visited)"
+  },
+  "directoryLoadFailed": "Failed to load directory.",
+  "@directoryLoadFailed": {
+    "description": "Users directory: the list could not be loaded"
+  },
+  "directoryNoUsersMatch": "No users match that name.",
+  "@directoryNoUsersMatch": {
+    "description": "Users directory: a name search found nobody"
+  },
+  "directoryNoUsersForPeriod": "No users found for this period.",
+  "@directoryNoUsersForPeriod": {
+    "description": "Users directory: nobody in the chosen period"
+  },
+  "userSearchNoResults": "No users found",
+  "@userSearchNoResults": {
+    "description": "User picker search: nothing found"
+  },
+  "userSearchTryDifferentUsername": "Try searching with a different username",
+  "@userSearchTryDifferentUsername": {
+    "description": "User picker search: hint under \"No users found\""
+  },
+  "userSearchPromptTitle": "Search for users",
+  "@userSearchPromptTitle": {
+    "description": "User picker: empty state before anything is searched"
+  },
+  "userSearchPromptHint": "Enter a username to find and invite users",
+  "@userSearchPromptHint": {
+    "description": "User picker: hint under \"Search for users\""
+  },
+  "ignoredUsersUnignoreFailed": "Unignore failed.",
+  "@ignoredUsersUnignoreFailed": {
+    "description": "Ignored users page: snackbar fallback when unignoring threw an error"
+  },
+  "ignoredUsersEmpty": "You're not ignoring anyone.",
+  "@ignoredUsersEmpty": {
+    "description": "Ignored users page: empty state"
+  },
+  "ignoredUsersEmptyHint": "Open a user profile and use \"Ignore user\" in the overflow menu to hide their posts and notifications.",
+  "@ignoredUsersEmptyHint": {
+    "description": "Ignored users page: hint under the empty state; the quoted menu item is profileMenuIgnoreUser"
+  },
+  "badgesLoadFailed": "Failed to load badges.",
+  "@badgesLoadFailed": {
+    "description": "Badges page: the list could not be loaded"
+  },
+  "badgesEmpty": "No badges on this forum.",
+  "@badgesEmpty": {
+    "description": "Badges page: the forum has no badges"
+  },
+  "badgeTierGold": "Gold",
+  "@badgeTierGold": {
+    "description": "Badge tier (section header on the badges page, label in the badge sheet)"
+  },
+  "badgeTierSilver": "Silver",
+  "@badgeTierSilver": {
+    "description": "Badge tier (section header on the badges page, label in the badge sheet)"
+  },
+  "badgeTierBronze": "Bronze",
+  "@badgeTierBronze": {
+    "description": "Badge tier (section header on the badges page, label in the badge sheet)"
+  },
+  "badgeEarnedAgo": "Earned {time}",
+  "@badgeEarnedAgo": {
+    "description": "Badge sheet: when the user earned the badge; {time} is a relative time such as '3 days ago'",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "badgeEarnedByUsers": "{count, plural, =1{Earned by {formatted} user} other{Earned by {formatted} users}}",
+  "@badgeEarnedByUsers": {
+    "description": "Badge sheet: how many users on the forum have the badge; {formatted} is the compact count (e.g. 1.2k)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "formatted": {
+        "type": "String"
+      }
+    }
+  },
+  "trustLevelNameNewUser": "New user",
+  "@trustLevelNameNewUser": {
+    "description": "Trust level 0 name (Discourse trust_levels.names.newuser)"
+  },
+  "trustLevelNameBasic": "Basic user",
+  "@trustLevelNameBasic": {
+    "description": "Trust level 1 name (Discourse trust_levels.names.basic)"
+  },
+  "trustLevelNameMember": "Member",
+  "@trustLevelNameMember": {
+    "description": "Trust level 2 name (Discourse trust_levels.names.member)"
+  },
+  "trustLevelNameRegular": "Regular",
+  "@trustLevelNameRegular": {
+    "description": "Trust level 3 name (Discourse trust_levels.names.regular)"
+  },
+  "trustLevelNameLeader": "Leader",
+  "@trustLevelNameLeader": {
+    "description": "Trust level 4 name (Discourse trust_levels.names.leader)"
+  },
+  "trustLevelSummary0": "Just joined. Can read and post, with limits on links, images and messages.",
+  "@trustLevelSummary0": {
+    "description": "Trust levels sheet: what trust level 0 (new user) means"
+  },
+  "trustLevelSummary1": "Unlocks core posting features: images and attachments, more links, flagging posts.",
+  "@trustLevelSummary1": {
+    "description": "Trust levels sheet: what trust level 1 (basic user) means"
+  },
+  "trustLevelSummary2": "Can send invites, ignore users, and edit their own posts for longer.",
+  "@trustLevelSummary2": {
+    "description": "Trust levels sheet: what trust level 2 (member) means"
+  },
+  "trustLevelSummary3": "Can recategorize and rename topics, create tags, and their spam flags carry more weight.",
+  "@trustLevelSummary3": {
+    "description": "Trust levels sheet: what trust level 3 (regular) means"
+  },
+  "trustLevelSummary4": "Granted by staff. Can edit any post and pin, close, split or merge topics.",
+  "@trustLevelSummary4": {
+    "description": "Trust levels sheet: what trust level 4 (leader) means"
+  },
+  "trustLevelRowTitle": "TL{level} · {name}",
+  "@trustLevelRowTitle": {
+    "description": "Trust levels sheet row title: abbreviated level and its name, e.g. 'TL2 · Member' (TL = trust level; Discourse de uses VS, es NC)",
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "profileNoUserSpecified": "No user specified",
+  "@profileNoUserSpecified": {
+    "description": "Profile activity list: shown when the list was opened without a user"
+  },
+  "userTopicsLoadFailed": "Failed to load topics",
+  "@userTopicsLoadFailed": {
+    "description": "Profile: the user's topics could not be loaded"
+  },
+  "userTopicsEmpty": "No topics started yet.",
+  "@userTopicsEmpty": {
+    "description": "Profile: the user has not started any topics"
+  },
+  "userRecentPostsLoadFailed": "Failed to load recent posts",
+  "@userRecentPostsLoadFailed": {
+    "description": "Profile: the user's recent posts could not be loaded"
+  },
+  "activityUnknownTopic": "Unknown Topic",
+  "@activityUnknownTopic": {
+    "description": "Profile activity row: title when the post's topic has no title"
+  },
+  "groupJoinedSnack": "You joined {group}",
+  "@groupJoinedSnack": {
+    "description": "Group page: snackbar after joining the group",
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "groupJoinFailed": "Failed to join group",
+  "@groupJoinFailed": {
+    "description": "Group page: joining the group failed"
+  },
+  "groupLeftSnack": "You left {group}",
+  "@groupLeftSnack": {
+    "description": "Group page: snackbar after leaving the group",
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "groupLeaveFailed": "Failed to leave group",
+  "@groupLeaveFailed": {
+    "description": "Group page: leaving the group failed"
+  },
+  "groupMembershipRequestHint": "Why do you want to join? Group owners see this with your request.",
+  "@groupMembershipRequestHint": {
+    "description": "Group page, request-to-join dialog: hint in the reason field"
+  },
+  "groupMembershipReasonRequired": "A reason is required to request membership",
+  "@groupMembershipReasonRequired": {
+    "description": "Group page: the request-to-join reason was left empty"
+  },
+  "groupMembershipRequestSent": "Request sent — a group owner has to approve it",
+  "@groupMembershipRequestSent": {
+    "description": "Group page: snackbar after sending a request to join"
+  },
+  "groupMembershipRequestFailed": "Failed to send membership request",
+  "@groupMembershipRequestFailed": {
+    "description": "Group page: sending the request to join failed"
+  },
+  "groupMemberBadge": "Member",
+  "@groupMemberBadge": {
+    "description": "Group page: chip shown when you are a member of the group and cannot leave it (Discourse groups.index.is_group_user)"
+  },
+  "groupRequestPending": "Request pending",
+  "@groupRequestPending": {
+    "description": "Group page: chip shown after you asked to join the group"
+  },
+  "groupJoining": "Joining…",
+  "@groupJoining": {
+    "description": "Group page: the join button while joining"
+  },
+  "groupJoinButton": "Join group",
+  "@groupJoinButton": {
+    "description": "Group page: button to join a group anyone may join"
+  },
+  "groupsLoadFailed": "Failed to load groups.",
+  "@groupsLoadFailed": {
+    "description": "Groups page: the list could not be loaded"
+  },
+  "groupBuiltIn": "Built-in group",
+  "@groupBuiltIn": {
+    "description": "Groups page: subtitle of an automatic group (admins, staff, trust level groups)"
+  },
+  "invitesPendingWithCount": "Pending ({count})",
+  "@invitesPendingWithCount": {
+    "description": "Invites page filter chip (Discourse user.invited.pending_tab_with_count)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invitesExpiredWithCount": "Expired ({count})",
+  "@invitesExpiredWithCount": {
+    "description": "Invites page filter chip (Discourse user.invited.expired_tab_with_count)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invitesRedeemedWithCount": "Redeemed ({count})",
+  "@invitesRedeemedWithCount": {
+    "description": "Invites page filter chip (Discourse user.invited.redeemed_tab_with_count)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invitesLoadFailed": "Failed to load invites.",
+  "@invitesLoadFailed": {
+    "description": "Invites page: the list could not be loaded"
+  },
+  "inviteLinkCreateFailed": "Failed to create invite link",
+  "@inviteLinkCreateFailed": {
+    "description": "Invites page: creating an invite link failed"
+  },
+  "inviteEmailAddressLabel": "Email address",
+  "@inviteEmailAddressLabel": {
+    "description": "Invite by email dialog: email field label"
+  },
+  "inviteEmailInvalid": "Enter a valid email address",
+  "@inviteEmailInvalid": {
+    "description": "Invite by email dialog: the email field is empty or not an address"
+  },
+  "inviteMessageOptionalLabel": "Message (optional)",
+  "@inviteMessageOptionalLabel": {
+    "description": "Invite by email dialog: optional personal note field label"
+  },
+  "inviteSendFailed": "Failed to send invite",
+  "@inviteSendFailed": {
+    "description": "Invites page: sending an email invite failed"
+  },
+  "revokeInviteLinkWarning": "The invite link will stop working.",
+  "@revokeInviteLinkWarning": {
+    "description": "Revoke invite dialog body for a link invite"
+  },
+  "revokeInviteEmailWarning": "The invite to {email} will stop working.",
+  "@revokeInviteEmailWarning": {
+    "description": "Revoke invite dialog body for an email invite",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteRevokeFailed": "Failed to revoke invite",
+  "@inviteRevokeFailed": {
+    "description": "Invites page: revoking an invite failed"
+  },
+  "inviteNoPermission": "You don't have permission to invite",
+  "@inviteNoPermission": {
+    "description": "Invites page: the user may not create invites"
+  },
+  "invitesEmptyPending": "No pending invites",
+  "@invitesEmptyPending": {
+    "description": "Invites page: no pending invites"
+  },
+  "invitesEmptyExpired": "No expired invites",
+  "@invitesEmptyExpired": {
+    "description": "Invites page: no expired invites"
+  },
+  "invitesEmptyRedeemed": "No redeemed invites",
+  "@invitesEmptyRedeemed": {
+    "description": "Invites page: no redeemed invites"
+  },
+  "invitesEmptyPendingHint": "Create an invite link to bring people to the forum.",
+  "@invitesEmptyPendingHint": {
+    "description": "Invites page: hint under \"No pending invites\""
+  },
+  "inviteLinkFallbackTitle": "Invite link",
+  "@inviteLinkFallbackTitle": {
+    "description": "Invites page: row title of a link invite whose URL is missing (Discourse user.invited.invite_link.title)"
+  },
+  "inviteRedeemedOn": "Redeemed {date}",
+  "@inviteRedeemedOn": {
+    "description": "Invites page row: when the invite was redeemed; {date} is a date",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteRedemptions": "Redeemed {count} of {max}",
+  "@inviteRedemptions": {
+    "description": "Invites page row: how many times a link invite was used out of its maximum",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteEmailSent": "Email sent",
+  "@inviteEmailSent": {
+    "description": "Invites page row: the email invite was sent"
+  },
+  "inviteEmailNotSent": "Email not sent",
+  "@inviteEmailNotSent": {
+    "description": "Invites page row: the email invite was saved but not emailed"
+  },
+  "inviteExpiredOn": "Expired {date}",
+  "@inviteExpiredOn": {
+    "description": "Invites page row: when the invite expired; {date} is a date",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteRevokeTooltip": "Revoke invite",
+  "@inviteRevokeTooltip": {
+    "description": "Invites page row: tooltip of the revoke (delete) button"
+  },
+  "reviewStatusPending": "Pending",
+  "@reviewStatusPending": {
+    "description": "Review queue status (filter chip and card badge; Discourse review.statuses.pending)"
+  },
+  "reviewStatusApproved": "Approved",
+  "@reviewStatusApproved": {
+    "description": "Review queue status (filter chip and card badge; Discourse review.statuses.approved)"
+  },
+  "reviewStatusRejected": "Rejected",
+  "@reviewStatusRejected": {
+    "description": "Review queue status (filter chip and card badge; Discourse review.statuses.rejected)"
+  },
+  "reviewStatusAll": "Everything",
+  "@reviewStatusAll": {
+    "description": "Review queue status filter chip: every status (Discourse review.statuses.all)"
+  },
+  "reviewStatusIgnored": "Flag ignored",
+  "@reviewStatusIgnored": {
+    "description": "Review queue card badge (Discourse review.statuses.ignored)"
+  },
+  "reviewStatusDeleted": "Topic or post deleted",
+  "@reviewStatusDeleted": {
+    "description": "Review queue card badge (Discourse review.statuses.deleted)"
+  },
+  "reviewQueueUnavailable": "Review queue is not available on this forum.",
+  "@reviewQueueUnavailable": {
+    "description": "Review queue: the forum connection has no review queue"
+  },
+  "reviewQueueLoadFailed": "Failed to load review queue",
+  "@reviewQueueLoadFailed": {
+    "description": "Review queue: the list could not be loaded"
+  },
+  "reviewableChangedByOther": "This item was changed by another moderator. Refreshing…",
+  "@reviewableChangedByOther": {
+    "description": "Review queue: another moderator acted on the item first; the list reloads"
+  },
+  "reviewActionFailed": "Failed to perform action",
+  "@reviewActionFailed": {
+    "description": "Review queue: an approve/reject/… action failed"
+  },
+  "reviewActionDone": "{action} — done",
+  "@reviewActionDone": {
+    "description": "Review queue: snackbar after an action, when the server sent no message of its own; {action} is the action's label (e.g. 'Keep post')",
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewRejectReasonHint": "Why is this being rejected?",
+  "@reviewRejectReasonHint": {
+    "description": "Review queue, reject dialog: hint in the reason field"
+  },
+  "reviewTypeFlaggedPost": "Flagged Post",
+  "@reviewTypeFlaggedPost": {
+    "description": "Review queue card title (Discourse review.types.reviewable_flagged_post)"
+  },
+  "reviewTypeQueuedPost": "Queued Post",
+  "@reviewTypeQueuedPost": {
+    "description": "Review queue card title (Discourse review.types.reviewable_queued_post)"
+  },
+  "reviewTypeQueuedTopic": "Queued Topic",
+  "@reviewTypeQueuedTopic": {
+    "description": "Review queue card title (Discourse review.types.reviewable_queued_topic)"
+  },
+  "reviewTypeUser": "User",
+  "@reviewTypeUser": {
+    "description": "Review queue card title (Discourse review.types.reviewable_user)"
+  },
+  "reviewTypePost": "Post",
+  "@reviewTypePost": {
+    "description": "Review queue card title (Discourse review.types.reviewable_post)"
+  },
+  "reviewTypeChatMessage": "Flagged chat message",
+  "@reviewTypeChatMessage": {
+    "description": "Review queue card title (Discourse chat plugin review.types.reviewable_chat_message)"
+  },
+  "reviewModeratorAccessRequired": "Moderator access required",
+  "@reviewModeratorAccessRequired": {
+    "description": "Review queue: the viewer is not staff"
+  },
+  "reviewableScore": "Score {score}",
+  "@reviewableScore": {
+    "description": "Review queue card: the item's score (Discourse review.scores.score); {score} is a number like 12.5",
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "postRepliesLoadFailed": "Couldn't load replies.",
+  "@postRepliesLoadFailed": {
+    "description": "Under a post, when its list of direct replies fails to load"
+  },
+  "postMakeWiki": "Make wiki",
+  "@postMakeWiki": {
+    "description": "Post menu item that turns the post into a wiki (Discourse's \"Make Wiki\")"
+  },
+  "postRemoveWiki": "Remove wiki",
+  "@postRemoveWiki": {
+    "description": "Post menu item that turns a wiki post back into a normal post (Discourse's \"Remove Wiki\")"
+  },
+  "postBookmarkRemoveFailed": "Failed to remove bookmark",
+  "@postBookmarkRemoveFailed": {
+    "description": "Snackbar when removing the bookmark from a post fails and the server gave no reason"
+  },
+  "postBookmarkFailed": "Failed to bookmark post",
+  "@postBookmarkFailed": {
+    "description": "Snackbar when bookmarking a post fails and the server gave no reason"
+  },
+  "postBookmarkReminderUpdateFailed": "Failed to update reminder",
+  "@postBookmarkReminderUpdateFailed": {
+    "description": "Snackbar when changing a post bookmark's reminder fails and the server gave no reason"
+  },
+  "postBookmarkReminderSet": "Reminder set",
+  "@postBookmarkReminderSet": {
+    "description": "Snackbar after setting a reminder on a post's bookmark (Discourse's \"Reminder set!\")"
+  },
+  "postBookmarkReminderCleared": "Reminder cleared",
+  "@postBookmarkReminderCleared": {
+    "description": "Snackbar after clearing the reminder on a post's bookmark (Discourse's \"Reminder cleared\")"
+  },
+  "solutionMarkFailed": "Failed to mark answer",
+  "@solutionMarkFailed": {
+    "description": "Snackbar when marking a reply as the solution (discourse-solved) fails and the server gave no reason"
+  },
+  "solutionUnmarkFailed": "Failed to unmark answer",
+  "@solutionUnmarkFailed": {
+    "description": "Snackbar when unmarking the solution (discourse-solved) fails and the server gave no reason"
+  },
+  "postUnknownDate": "Unknown date",
+  "@postUnknownDate": {
+    "description": "In a post's header, in place of its date when the post has none"
+  },
+  "postBookmarkAction": "Bookmark post",
+  "@postBookmarkAction": {
+    "description": "Screen-reader label of a post's bookmark button when the post is not bookmarked"
+  },
+  "postReactionsSemanticsReacted": "{count, plural, =1{You reacted. 1 reaction. Tap to change, long press to see who.} other{You reacted. {count} reactions. Tap to change, long press to see who.}}",
+  "@postReactionsSemanticsReacted": {
+    "description": "Screen-reader label of a post's reactions button when the reader has reacted; count is the post's total reactions",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "postReactionsSemantics": "{count, plural, =1{1 reaction. Tap to react, long press to see who.} other{{count} reactions. Tap to react, long press to see who.}}",
+  "@postReactionsSemantics": {
+    "description": "Screen-reader label of a post's reactions button when the reader has not reacted; count is the post's total reactions",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "postLikeAction": "Like post",
+  "@postLikeAction": {
+    "description": "Screen-reader label of a post's like (heart) button when the reader has not liked it"
+  },
+  "postUnlikeAction": "Unlike post",
+  "@postUnlikeAction": {
+    "description": "Screen-reader label of a post's like (heart) button when the reader has liked it"
+  },
+  "postVoteRemoveFailed": "Could not remove vote (past undo window?)",
+  "@postVoteRemoveFailed": {
+    "description": "Snackbar when taking back an up/down vote on a post (discourse-post-voting) fails and the server gave no reason"
+  },
+  "postVoteCastFailed": "Could not cast vote",
+  "@postVoteCastFailed": {
+    "description": "Snackbar when an up/down vote on a post (discourse-post-voting) fails and the server gave no reason"
+  },
+  "postUpvote": "Upvote",
+  "@postUpvote": {
+    "description": "Tooltip of the up arrow beside a post in a post-voting topic (discourse-post-voting's \"Upvote\")"
+  },
+  "postDownvote": "Downvote",
+  "@postDownvote": {
+    "description": "Tooltip of the down arrow beside a post in a post-voting topic (discourse-post-voting's \"Downvote\")"
+  },
+  "pollVoteFailed": "Vote failed. Please try again.",
+  "@pollVoteFailed": {
+    "description": "Error when voting in a post's poll fails"
+  },
+  "pollRemoveVoteFailed": "Could not remove your vote. Please try again.",
+  "@pollRemoveVoteFailed": {
+    "description": "Error when taking back one's vote in a poll fails"
+  },
+  "pollVotersLoadFailed": "Could not load voters.",
+  "@pollVotersLoadFailed": {
+    "description": "Error when the list of a poll's voters cannot be opened"
+  },
+  "pollVotersNotVisible": "Voters are not visible for this poll.",
+  "@pollVotersNotVisible": {
+    "description": "In the poll voters sheet, when the forum will not say who voted (a private poll)"
+  },
+  "solutionSolvedByInPost": "Solved by {name} in post #{postNumber}",
+  "@solutionSolvedByInPost": {
+    "description": "Byline of the solution card under a solved topic's first post: who wrote the accepted answer and its post number",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "postNumber": {
+        "type": "int"
+      }
+    }
+  },
+  "solutionMarkedBy": "marked by {name}",
+  "@solutionMarkedBy": {
+    "description": "Appended to the solution card's byline: who marked the answer as the solution",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reactAgainInSeconds": "You can react to this post again in {seconds}s",
+  "@reactAgainInSeconds": {
+    "description": "In the reaction picker, when the post's reaction limit is used up for now",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "reactionUpdateFailed": "Could not update reaction.",
+  "@reactionUpdateFailed": {
+    "description": "In the reaction picker, when adding or changing a reaction fails and the server gave no reason"
+  },
+  "reactionsNotSupported": "Reactions are not supported on this forum.",
+  "@reactionsNotSupported": {
+    "description": "In the who-reacted sheet, when the forum has no way to list reactions"
+  },
+  "reactionsLoadFailed": "Could not load reactions.",
+  "@reactionsLoadFailed": {
+    "description": "In the who-reacted sheet, when the list fails to load"
+  },
+  "viewProfileOfUser": "View profile of {username}",
+  "@viewProfileOfUser": {
+    "description": "Screen-reader label of a user row in the who-reacted sheet",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToSavePost": "Failed to save post",
+  "@failedToSavePost": {
+    "description": "Error when saving an edited post fails and the server gave no reason"
+  },
+  "failedToSavePostWithError": "Failed to save post: {error}",
+  "@failedToSavePostWithError": {
+    "description": "Error when saving an edited post fails, with the underlying error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToRemoveAttachmentCheckPermissions": "Failed to remove attachment. Please check your permissions.",
+  "@failedToRemoveAttachmentCheckPermissions": {
+    "description": "Error when removing an existing attachment while editing a post fails and the server gave no reason"
+  },
+  "editPostTitle": "Edit Post",
+  "@editPostTitle": {
+    "description": "Title of the page for editing a post (Discourse's \"Edit Post\")"
+  },
+  "editYourPostHint": "Edit your post...",
+  "@editYourPostHint": {
+    "description": "Hint in the text field when editing a post"
+  },
+  "failedToPostReply": "Failed to post reply",
+  "@failedToPostReply": {
+    "description": "Error when posting a reply fails and the server gave no reason"
+  },
+  "failedToPostReplyWithError": "Failed to post reply: {error}",
+  "@failedToPostReplyWithError": {
+    "description": "Error when posting a reply fails, with the underlying error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToCreateTopic": "Failed to create topic",
+  "@failedToCreateTopic": {
+    "description": "Error when creating a topic fails and the server gave no reason"
+  },
+  "writeYourTopicTitle": "Write your topic title...",
+  "@writeYourTopicTitle": {
+    "description": "Hint in the title field of the new-topic composer"
+  },
+  "writeYourTopicContent": "Write your topic content...",
+  "@writeYourTopicContent": {
+    "description": "Hint in the text field of the new-topic composer"
+  },
+  "composerTitleHint": "Write your title...",
+  "@composerTitleHint": {
+    "description": "Default hint in a composer's title field, when the page gives none of its own"
+  },
+  "composerContentHint": "Write your content...",
+  "@composerContentHint": {
+    "description": "Default hint in a composer's text field, when the page gives none of its own"
+  },
+  "imageTooLargeCouldNotResize": "{fileName}: too large ({size}) and could not be resized. Limit is {limit}.",
+  "@imageTooLargeCouldNotResize": {
+    "description": "Composer error when a picked image is over the forum's upload limit and shrinking it failed; size and limit are formatted file sizes",
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "imageResizedToFitLimit": "{fileName} resized to {size}{dimensions} to fit the {limit} limit.",
+  "@imageResizedToFitLimit": {
+    "description": "Composer notice after an oversized image was shrunk to fit the forum's upload limit; size and limit are formatted file sizes; dimensions is empty or ' (1200×800 → 900×600)' with a leading space",
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      },
+      "dimensions": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "composerAttachFileHint": "Attach a file to this post",
+  "@composerAttachFileHint": {
+    "description": "Screen-reader hint of the composer's attach-file button"
+  },
+  "composerUploadImageHint": "Upload an image to this post",
+  "@composerUploadImageHint": {
+    "description": "Screen-reader hint of the composer's upload-image button"
+  },
+  "composerFormattingHint": "Open formatting options",
+  "@composerFormattingHint": {
+    "description": "Screen-reader hint of the composer's formatting menu button"
+  },
+  "whisperStaffOnly": "Whisper (staff only)",
+  "@whisperStaffOnly": {
+    "description": "Tooltip of the reply composer's whisper toggle (staff only), when off"
+  },
+  "whisperOnStaffOnly": "Whisper on (staff only)",
+  "@whisperOnStaffOnly": {
+    "description": "Tooltip of the reply composer's whisper toggle (staff only), when on"
+  },
+  "tagInputMaxReached": "Max tags reached",
+  "@tagInputMaxReached": {
+    "description": "Hint in the new-topic tag field once the topic has as many tags as the forum allows"
+  },
+  "tagInputAddTag": "Add a tag…",
+  "@tagInputAddTag": {
+    "description": "Hint in the new-topic tag field before any tag is added"
+  },
+  "tagInputAddAnother": "+ tag",
+  "@tagInputAddAnother": {
+    "description": "Short hint in the new-topic tag field once it has a tag: add another"
+  },
+  "editHistoryUnavailable": "Edit history is not available on this forum.",
+  "@editHistoryUnavailable": {
+    "description": "Edit history page, when the forum offers no post revisions"
+  },
+  "editHistoryLoadFailed": "Failed to load edit history.",
+  "@editHistoryLoadFailed": {
+    "description": "Edit history page, when a revision fails to load and the server gave no reason"
+  },
+  "previousRevision": "Previous revision",
+  "@previousRevision": {
+    "description": "Tooltip of the edit history page's back arrow (Discourse's \"Previous revision\")"
+  },
+  "nextRevision": "Next revision",
+  "@nextRevision": {
+    "description": "Tooltip of the edit history page's forward arrow (Discourse's \"Next revision\")"
+  },
+  "notificationPrefsLoadFailed": "Failed to load notification preferences.",
+  "@notificationPrefsLoadFailed": {
+    "description": "Notification settings page: loading the forum's notification preferences failed"
+  },
+  "notificationPrefsSaveFailed": "Couldn't save — check your connection",
+  "@notificationPrefsSaveFailed": {
+    "description": "Notification settings page: snackbar when a changed preference could not be saved (the change is undone)"
+  },
+  "signInToManageNotificationPrefs": "Sign in to manage your notification preferences.",
+  "@signInToManageNotificationPrefs": {
+    "description": "Notification settings page: empty state for a signed-out reader"
+  },
+  "notificationSettingsPushSection": "Push",
+  "@notificationSettingsPushSection": {
+    "description": "Notification settings page: section header over the push notification row"
+  },
+  "notificationSettingsEmailSection": "Email",
+  "@notificationSettingsEmailSection": {
+    "description": "Notification settings page: section header over the email preferences (Discourse user.email_settings)"
+  },
+  "emailWhenAwayTitle": "Email when away",
+  "@emailWhenAwayTitle": {
+    "description": "Notification settings page: row for Discourse's email_level preference (when to email about replies, mentions and watched activity)"
+  },
+  "emailLevelDescription": "Email me when I am quoted, replied to, my @username is mentioned, or when there is new activity in my watched categories, tags or topics",
+  "@emailLevelDescription": {
+    "description": "Notification settings page: explanation of the email_level preference, shown in its picker (Discourse user.email_level.title)"
+  },
+  "notificationPrefAlways": "Always",
+  "@notificationPrefAlways": {
+    "description": "Notification settings page: option 'Always' for email and like notification preferences (Discourse like_notification_frequency.always)"
+  },
+  "notificationPrefOnlyWhenAway": "Only when away",
+  "@notificationPrefOnlyWhenAway": {
+    "description": "Notification settings page: email option 'only when away' (Discourse user.email_level.only_when_away)"
+  },
+  "notificationPrefNever": "Never",
+  "@notificationPrefNever": {
+    "description": "Notification settings page: option 'Never' for email and like notification preferences (Discourse like_notification_frequency.never)"
+  },
+  "emailForMessagesTitle": "Email for messages",
+  "@emailForMessagesTitle": {
+    "description": "Notification settings page: row for Discourse's email_messages_level preference (emails about personal messages)"
+  },
+  "emailMessagesLevelDescription": "Email me when I am sent a personal message",
+  "@emailMessagesLevelDescription": {
+    "description": "Notification settings page: explanation of email_messages_level, shown in its picker (Discourse user.email_messages_level)"
+  },
+  "activitySummaryTitle": "Activity summary",
+  "@activitySummaryTitle": {
+    "description": "Notification settings page: switch for Discourse's email digest (Discourse user.email_activity_summary)"
+  },
+  "activitySummaryDescription": "When I don’t visit here, send me an email summary of popular topics and replies",
+  "@activitySummaryDescription": {
+    "description": "Notification settings page: what the activity summary switch does (Discourse user.email_digests.title)"
+  },
+  "activitySummaryFrequencyTitle": "Activity summary frequency",
+  "@activitySummaryFrequencyTitle": {
+    "description": "Notification settings page: row choosing how often the activity summary email is sent"
+  },
+  "activitySummaryDaily": "Daily",
+  "@activitySummaryDaily": {
+    "description": "Notification settings page: activity summary frequency option (Discourse user.email_digests.daily)"
+  },
+  "activitySummaryWeekly": "Weekly",
+  "@activitySummaryWeekly": {
+    "description": "Notification settings page: activity summary frequency option (Discourse user.email_digests.weekly)"
+  },
+  "activitySummaryMonthly": "Monthly",
+  "@activitySummaryMonthly": {
+    "description": "Notification settings page: activity summary frequency option (Discourse user.email_digests.every_month)"
+  },
+  "mailingListModeTitle": "Mailing list mode",
+  "@mailingListModeTitle": {
+    "description": "Notification settings page: switch for Discourse's mailing list mode (Discourse user.mailing_list_mode.label)"
+  },
+  "mailingListModeDescription": "Email me every post (disables the activity summary). Not recommended on high-traffic forums.",
+  "@mailingListModeDescription": {
+    "description": "Notification settings page: what mailing list mode does"
+  },
+  "likeNotificationFrequencyTitle": "Notify when liked",
+  "@likeNotificationFrequencyTitle": {
+    "description": "Notification settings page: row for when to be notified about likes (Discourse user.like_notification_frequency.title)"
+  },
+  "likeNotificationFirstTimeAndDaily": "First time a post is liked and daily",
+  "@likeNotificationFirstTimeAndDaily": {
+    "description": "Notification settings page: like notification option (Discourse user.like_notification_frequency.first_time_and_daily)"
+  },
+  "likeNotificationFirstTime": "First time a post is liked",
+  "@likeNotificationFirstTime": {
+    "description": "Notification settings page: like notification option (Discourse user.like_notification_frequency.first_time)"
+  },
+  "whenPostingTitle": "When posting",
+  "@whenPostingTitle": {
+    "description": "Notification settings page: row for what happens to a topic you reply to (Discourse user.notification_level_when_replying.label)"
+  },
+  "whenPostingDescription": "What happens to a topic you reply to",
+  "@whenPostingDescription": {
+    "description": "Notification settings page: explanation of the 'When posting' preference, shown in its picker"
+  },
+  "whenPostingWatchTopic": "Watch topic",
+  "@whenPostingWatchTopic": {
+    "description": "Notification settings page: 'When posting' option (Discourse user.notification_level_when_replying.watch_topic)"
+  },
+  "whenPostingTrackTopic": "Track topic",
+  "@whenPostingTrackTopic": {
+    "description": "Notification settings page: 'When posting' option (Discourse user.notification_level_when_replying.track_topic)"
+  },
+  "whenPostingDoNothing": "Do nothing",
+  "@whenPostingDoNothing": {
+    "description": "Notification settings page: 'When posting' option (Discourse user.notification_level_when_replying.do_nothing)"
+  },
+  "pauseNotificationsUntilTomorrow": "Until tomorrow",
+  "@pauseNotificationsUntilTomorrow": {
+    "description": "Do not disturb duration picker: pause until tomorrow (Discourse pause_notifications.options.tomorrow)"
+  },
+  "couldNotEnableDoNotDisturb": "Couldn't enable do not disturb",
+  "@couldNotEnableDoNotDisturb": {
+    "description": "Snackbar when turning on Do not disturb failed"
+  },
+  "couldNotTurnOffDoNotDisturb": "Couldn't turn off do not disturb",
+  "@couldNotTurnOffDoNotDisturb": {
+    "description": "Snackbar when turning off Do not disturb failed"
+  },
+  "passwordResetEmailSent": "Password-reset email sent.",
+  "@passwordResetEmailSent": {
+    "description": "Account and privacy page: snackbar after the password-reset email was requested"
+  },
+  "couldNotSendResetEmail": "Couldn't send reset email",
+  "@couldNotSendResetEmail": {
+    "description": "Account and privacy page: snackbar when the password-reset email could not be requested"
+  },
+  "accountRequestFailed": "Request failed.",
+  "@accountRequestFailed": {
+    "description": "Account and privacy / Change email: snackbar when a request failed with nothing more specific to say"
+  },
+  "forumUrlUnavailable": "Forum URL is unavailable.",
+  "@forumUrlUnavailable": {
+    "description": "Account and privacy page: the forum's web address is unknown, so it cannot be opened"
+  },
+  "couldNotOpenPreferencesPage": "Couldn't open the preferences page.",
+  "@couldNotOpenPreferencesPage": {
+    "description": "Account and privacy page: the forum's preferences page could not be opened in the browser"
+  },
+  "couldNotOpenForumUrl": "Couldn't open the forum URL.",
+  "@couldNotOpenForumUrl": {
+    "description": "Account and privacy page: the forum could not be opened in the browser"
+  },
+  "couldNotRequestEmailChange": "Couldn't request email change",
+  "@couldNotRequestEmailChange": {
+    "description": "Change email page: snackbar when the forum did not accept the change request"
+  },
+  "newEmailLabel": "New email",
+  "@newEmailLabel": {
+    "description": "Change email page: label of the new address field"
+  },
+  "enterAnEmailAddress": "Enter an email address",
+  "@enterAnEmailAddress": {
+    "description": "Change email page: validation error when the field is empty"
+  },
+  "emailLooksInvalid": "That doesn’t look like an email",
+  "@emailLooksInvalid": {
+    "description": "Change email page: validation error for an address without @ or a dot"
+  },
+  "emailNoSpaces": "No spaces in emails",
+  "@emailNoSpaces": {
+    "description": "Change email page: validation error for an address containing a space"
+  },
+  "allowNotificationsSheetTitle": "Allow notifications",
+  "@allowNotificationsSheetTitle": {
+    "description": "Enable notifications page: title of the forum's approval page opened to grant notifications"
+  },
+  "notificationsGrantNoPayload": "No payload returned from the grant.",
+  "@notificationsGrantNoPayload": {
+    "description": "Enable notifications page: the forum's approval page came back without the key (shown after 'Could not enable notifications:')"
+  },
+  "thisForumFallback": "this forum",
+  "@thisForumFallback": {
+    "description": "Stands in for the forum's name when the forum has none"
+  },
+  "signInToDomain": "Sign in to {domain}",
+  "@signInToDomain": {
+    "description": "Title of the forum's sign-in page, e.g. 'Sign in to meta.discourse.org'",
+    "placeholders": {
+      "domain": {
+        "type": "String"
+      }
+    }
+  },
+  "loginResultTitle": "Login result",
+  "@loginResultTitle": {
+    "description": "Title of the snackbar reporting a failed sign-in"
+  },
+  "invalidAuthenticationCode": "Invalid authentication code",
+  "@invalidAuthenticationCode": {
+    "description": "Two-factor dialog: the code entered was not accepted"
+  },
+  "tfaVerificationError": "An error occurred during verification. Please try again.",
+  "@tfaVerificationError": {
+    "description": "Two-factor dialog: checking the code failed for another reason"
+  },
+  "passwordFieldLabel": "Password",
+  "@passwordFieldLabel": {
+    "description": "Name of the password field, used in 'Password is required.' (Discourse user.password.title)"
+  },
+  "somethingWentWrongTryAgain": "Something went wrong. Please try again.",
+  "@somethingWentWrongTryAgain": {
+    "description": "Generic error message when an error has no readable text of its own"
+  },
+  "unexpectedErrorTryAgain": "An unexpected error occurred. Please try again.",
+  "@unexpectedErrorTryAgain": {
+    "description": "Error dialog: message for an unexpected error"
+  },
+  "errorNoInternetConnection": "No internet connection. Please check your network settings.",
+  "@errorNoInternetConnection": {
+    "description": "Error dialog: the device is offline"
+  },
+  "errorRequestTimedOut": "Request timed out. Please try again.",
+  "@errorRequestTimedOut": {
+    "description": "Error dialog: a request took too long"
+  },
+  "errorServerTryLater": "Server error occurred. Please try again later.",
+  "@errorServerTryLater": {
+    "description": "Error dialog: the server failed without a message of its own"
+  },
+  "errorInvalidCredentials": "Invalid username or password.",
+  "@errorInvalidCredentials": {
+    "description": "Error dialog: sign-in rejected the username or password"
+  },
+  "errorSessionExpired": "Your session has expired. Please log in again.",
+  "@errorSessionExpired": {
+    "description": "Error dialog: the reader's session has expired"
+  },
+  "errorAccountSuspended": "Your account has been suspended. Please contact the forum's staff.",
+  "@errorAccountSuspended": {
+    "description": "Error dialog: the forum has suspended the reader's account"
+  },
+  "errorForumNotFound": "Forum not found.",
+  "@errorForumNotFound": {
+    "description": "Error dialog: the forum could not be found"
+  },
+  "errorForumAccessDenied": "You do not have permission to access this forum.",
+  "@errorForumAccessDenied": {
+    "description": "Error dialog: the reader may not access the forum"
+  },
+  "errorForumUnavailable": "Forum is currently unavailable. Please try again later.",
+  "@errorForumUnavailable": {
+    "description": "Error dialog: the forum is unavailable"
+  },
+  "errorDataNotFound": "Requested data not found.",
+  "@errorDataNotFound": {
+    "description": "Error dialog: requested data was not found"
+  },
+  "errorDataCorrupted": "Data appears to be corrupted. Please refresh the page.",
+  "@errorDataCorrupted": {
+    "description": "Error dialog: data looks corrupted"
+  },
+  "errorCacheLoadFailed": "Failed to load cached data. Please try again.",
+  "@errorCacheLoadFailed": {
+    "description": "Error dialog: cached data could not be read"
+  },
+  "errorInvalidField": "Invalid {field} provided.",
+  "@errorInvalidField": {
+    "description": "Error dialog: a value was invalid; {field} names it",
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "errorFieldRequired": "{field} is required.",
+  "@errorFieldRequired": {
+    "description": "Error dialog: a required value is missing, e.g. 'Password is required.'",
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "errorPermissionDeniedFor": "You do not have permission to {action}.",
+  "@errorPermissionDeniedFor": {
+    "description": "Error dialog: the reader may not do {action}",
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "errorFeatureNotAvailable": "{feature} is not available on this forum.",
+  "@errorFeatureNotAvailable": {
+    "description": "Error dialog: a feature, e.g. Passkeys, is not available on this forum",
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "errorStorageFull": "Storage is full. Please free up some space.",
+  "@errorStorageFull": {
+    "description": "Error dialog: the device's storage is full"
+  },
+  "errorStorageAccessDenied": "Storage access denied. Please check app permissions.",
+  "@errorStorageAccessDenied": {
+    "description": "Error dialog: the app may not use the device's storage"
+  },
+  "errorNetworkTryAgain": "Network error occurred. Please try again.",
+  "@errorNetworkTryAgain": {
+    "description": "Error dialog: a network error without more detail"
+  },
+  "errorAuthenticationTryAgain": "Authentication failed. Please try again.",
+  "@errorAuthenticationTryAgain": {
+    "description": "Error dialog: signing in failed without more detail"
+  },
+  "errorForumTryAgain": "Forum error occurred. Please try again.",
+  "@errorForumTryAgain": {
+    "description": "Error dialog: the forum reported an error without more detail"
+  },
+  "connectionErrorTitle": "Connection Error",
+  "@connectionErrorTitle": {
+    "description": "Error dialog title for a connection problem"
+  },
+  "authenticationErrorTitle": "Authentication Error",
+  "@authenticationErrorTitle": {
+    "description": "Error dialog title for a sign-in problem"
+  },
+  "forumErrorTitle": "Forum Error",
+  "@forumErrorTitle": {
+    "description": "Error dialog title for an error the forum reported"
+  },
+  "permissionErrorTitle": "Permission Error",
+  "@permissionErrorTitle": {
+    "description": "Error dialog title for a missing permission"
   }
 }

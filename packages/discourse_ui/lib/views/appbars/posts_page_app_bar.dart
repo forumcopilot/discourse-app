@@ -164,7 +164,7 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
       if (s != null && s.canPinUnpin && !s.deleted)
         s.isPinnedByStaff
             ? item('pin', Icons.push_pin_outlined, l10n.unpinTopic)
-            : item('pin', Icons.push_pin_outlined, l10n.pinTopic),
+            : item('pin', Icons.push_pin_outlined, l10n.pinTopicMenu),
       if (s != null && s.canArchive)
         s.archived
             ? item('archive', Icons.unarchive_outlined, l10n.unarchiveTopic)
@@ -310,9 +310,9 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
           content: TextField(
             controller: controller,
             autofocus: true,
-            decoration: const InputDecoration(
-              hintText: 'New title',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintText: AppLocalizations.of(context)!.topicTitlePlaceholder,
+              border: const OutlineInputBorder(),
             ),
             maxLength: 255,
             textInputAction: TextInputAction.done,

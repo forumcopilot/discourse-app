@@ -26,12 +26,13 @@ class NotificationsTabAppBar extends StatelessWidget
     return AppBar(
       // Phase 5.18a — auto-imply true so the drawer hamburger renders.
       title: Text(
-        AppLocalizations.of(context)?.notifications ?? 'Notifications',
+        AppLocalizations.of(context)!.notifications,
       ),
       actions: [
         if (isLoggedIn && onMarkAllRead != null)
           IconButton(
-            tooltip: 'Mark all read',
+            // Discourse's name for PUT /notifications/mark-read.
+            tooltip: AppLocalizations.of(context)!.dismissAllNotifications,
             icon: const Icon(Icons.done_all_rounded),
             onPressed: onMarkAllRead,
           ),

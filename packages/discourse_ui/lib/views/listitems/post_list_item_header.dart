@@ -247,7 +247,9 @@ class PostListItemHeader extends StatelessWidget {
                       SizedBox(width: DesignTokens.spacingS),
                     ],
                     Text(
-                      post.timestamp != null ? formatSmartDateTime(post.timestamp!, context) : 'Unknown date',
+                      post.timestamp != null
+                          ? formatSmartDateTime(post.timestamp!, context)
+                          : AppLocalizations.of(context)!.postUnknownDate,
                       style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                         letterSpacing: DesignTokens.letterSpacingWide,

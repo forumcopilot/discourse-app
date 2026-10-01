@@ -39,6 +39,33 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
         errorResult: (m) => FCStickTopicResult(result: false, resultText: m));
   }
 
+  /// Discourse-only: web's "Pin Topic…" — pinned at the top of its
+  /// category, or with [globally] at the top of every topic list
+  /// (`pinned_globally`, staff and trust level 4), until [until] when given;
+  /// Discourse unpins it then.
+  Future<FCStickTopicResult> pinTopicAsync(String topicId,
+      {bool globally = false, DateTime? until}) async {
+    try {
+      await apiPut('/t/$topicId/status.json', body: {
+        'status': globally ? 'pinned_globally' : 'pinned',
+        'enabled': 'true',
+        if (until != null)
+          'until': '${until.year.toString().padLeft(4, '0')}-'
+              '${until.month.toString().padLeft(2, '0')}-'
+              '${until.day.toString().padLeft(2, '0')}',
+      });
+      _recordStatus(
+          topicId,
+          (s) => s.copyWith(
+              pinned: true, unpinned: false, pinnedGlobally: globally));
+      return FCStickTopicResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCStickTopicResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCStickTopicResult(result: false, resultText: describeApiError(e));
+    }
+  }
+
   @override
   Future<FCStickTopicResult> unstickTopicAsync(String topicId) async {
     return _setStatus(topicId,

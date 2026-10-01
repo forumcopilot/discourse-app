@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 
 import '../core/logging/app_logger.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../l10n/app_l10n.dart';
 import '../theme/design_tokens.dart';
 import '../utils/error_message.dart';
 import '../utils/time_utils.dart';
@@ -104,7 +105,9 @@ class _BookmarksPageState extends State<BookmarksPage> {
       final proxy = _proxy;
       if (proxy == null) {
         setState(() {
-          _error = 'Bookmarks are unavailable';
+          // appL10n: the first load runs from initState, before this
+          // State may look anything up through its context.
+          _error = appL10n().bookmarksUnavailable;
           _isLoading = false;
           _hasMore = false;
         });
@@ -118,7 +121,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
           if (reset) _entries.clear();
           _error = result.resultText?.isNotEmpty == true
               ? result.resultText
-              : 'Failed to load bookmarks';
+              : AppLocalizations.of(context)!.failedToLoadBookmarks;
           _isLoading = false;
           _hasMore = false;
         });
@@ -202,7 +205,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
       messenger.showSnackBar(SnackBar(
         content: Text(result.resultText?.isNotEmpty == true
             ? result.resultText!
-            : 'Failed to remove bookmark'),
+            : l10n.failedToRemoveBookmark),
       ));
     });
   }
@@ -275,7 +278,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(result.resultText?.isNotEmpty == true
             ? result.resultText!
-            : 'Failed to update bookmark'),
+            : AppLocalizations.of(context)!.failedToUpdateBookmark),
       ));
     }
   }
@@ -289,7 +292,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(result.resultText?.isNotEmpty == true
             ? result.resultText!
-            : 'Failed to update bookmark'),
+            : AppLocalizations.of(context)!.failedToUpdateBookmark),
       ));
       return;
     }

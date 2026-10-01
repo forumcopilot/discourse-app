@@ -12,6 +12,7 @@ import '../services/notification_key_service.dart';
 import '../services/notification_permission.dart';
 import '../theme/design_tokens.dart';
 import '../theme/forum_identity.dart';
+import '../utils/error_message.dart';
 import 'widgets/forum_icon_tile.dart';
 import '../services/discourse_auth_session.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -104,7 +105,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
         context,
         url: handshake.url,
         isCallback: loginService.isAuthCallback,
-        title: 'Allow notifications',
+        title: AppLocalizations.of(context)!.allowNotificationsSheetTitle,
       );
       if (!mounted) return;
 
@@ -116,7 +117,10 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
 
       final payload = loginService.extractPayload(redirectUrl);
       if (payload == null || payload.isEmpty) {
-        throw StateError('No payload returned from the grant.');
+        // An Exception, not a StateError: its text is shown below, and
+        // describeError drops "Exception: " but not "Bad state: ".
+        throw Exception(
+            AppLocalizations.of(context)!.notificationsGrantNoPayload);
       }
 
       final key = await loginService.finishNotificationsGrant(payload);
@@ -159,6 +163,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
       // defunct and the message would go nowhere.
       final messenger = ScaffoldMessenger.of(context);
       final l10n = AppLocalizations.of(context)!;
+      final forumName = _forumName;
       Navigator.of(context).pop(uploaded);
       if (!uploaded) {
         messenger.showSnackBar(
@@ -170,7 +175,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
         // rather than let the user wait for notifications that never come.
         messenger.showSnackBar(
           SnackBar(
-            content: Text(l10n.forumBlocksNotificationServer(_forumName)),
+            content: Text(l10n.forumBlocksNotificationServer(forumName)),
             duration: const Duration(seconds: 8),
           ),
         );
@@ -182,7 +187,8 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(AppLocalizations.of(context)!
-                .couldNotEnableNotifications(e.toString()))),
+                .couldNotEnableNotifications(
+                    describeError(e, context: context)))),
       );
     }
   }
@@ -234,7 +240,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
 
   String get _forumName => widget.siteContext.site.name.isNotEmpty
       ? widget.siteContext.site.name
-      : 'this forum';
+      : AppLocalizations.of(context)!.thisForumFallback;
 
   @override
   Widget build(BuildContext context) {

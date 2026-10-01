@@ -175,8 +175,8 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
       }
     });
     if (result.result) {
-      SnackbarHelper.showSuccess(
-          context, 'You joined ${group.displayName}');
+      SnackbarHelper.showSuccess(context,
+          AppLocalizations.of(context)!.groupJoinedSnack(group.displayName));
       // Pull the fresh member list so the user appears in it.
       _load();
     } else {
@@ -184,7 +184,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
           context,
           result.resultText?.isNotEmpty == true
               ? result.resultText!
-              : 'Failed to join group');
+              : AppLocalizations.of(context)!.groupJoinFailed);
     }
   }
 
@@ -230,14 +230,15 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
       }
     });
     if (result.result) {
-      SnackbarHelper.showInfo(context, 'You left ${group.displayName}');
+      SnackbarHelper.showInfo(context,
+          AppLocalizations.of(context)!.groupLeftSnack(group.displayName));
       _load();
     } else {
       SnackbarHelper.showError(
           context,
           result.resultText?.isNotEmpty == true
               ? result.resultText!
-              : 'Failed to leave group');
+              : AppLocalizations.of(context)!.groupLeaveFailed);
     }
   }
 
@@ -254,10 +255,10 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
           autofocus: true,
           maxLines: 3,
           textCapitalization: TextCapitalization.sentences,
-          decoration: const InputDecoration(
-            hintText: 'Why do you want to join? '
-                'Group owners see this with your request.',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText:
+                AppLocalizations.of(context)!.groupMembershipRequestHint,
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
@@ -276,8 +277,8 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
     controller.dispose();
     if (reason == null || !mounted) return;
     if (reason.isEmpty) {
-      SnackbarHelper.showError(
-          context, 'A reason is required to request membership');
+      SnackbarHelper.showError(context,
+          AppLocalizations.of(context)!.groupMembershipReasonRequired);
       return;
     }
     setState(() => _membershipBusy = true);
@@ -289,14 +290,14 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
       if (result.result) _requestPending = true;
     });
     if (result.result) {
-      SnackbarHelper.showSuccess(
-          context, 'Request sent — a group owner has to approve it');
+      SnackbarHelper.showSuccess(context,
+          AppLocalizations.of(context)!.groupMembershipRequestSent);
     } else {
       SnackbarHelper.showError(
           context,
           result.resultText?.isNotEmpty == true
               ? result.resultText!
-              : 'Failed to send membership request');
+              : AppLocalizations.of(context)!.groupMembershipRequestFailed);
     }
   }
 
@@ -496,7 +497,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
           colorScheme,
           textTheme,
           icon: Icons.check_rounded,
-          label: 'Member',
+          label: AppLocalizations.of(context)!.groupMemberBadge,
         );
       }
     } else if (_requestPending) {
@@ -504,7 +505,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
         colorScheme,
         textTheme,
         icon: Icons.hourglass_top_rounded,
-        label: 'Request pending',
+        label: AppLocalizations.of(context)!.groupRequestPending,
       );
     } else if (group.publicAdmission) {
       child = FilledButton.icon(
@@ -519,7 +520,9 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
                 ),
               )
             : const Icon(Icons.group_add_rounded),
-        label: Text(_membershipBusy ? 'Joining…' : 'Join group'),
+        label: Text(_membershipBusy
+            ? AppLocalizations.of(context)!.groupJoining
+            : AppLocalizations.of(context)!.groupJoinButton),
       );
     } else if (group.allowMembershipRequests) {
       child = FilledButton.tonalIcon(

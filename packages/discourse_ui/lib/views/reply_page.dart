@@ -170,6 +170,7 @@ class _ReplyPageState extends State<ReplyPage> {
   }
 
   Future<bool> _handleSubmit(String title, String content) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       AppLogger.debug('🟢 [REPLY_PAGE] _handleSubmit called');
       AppLogger.debug('   - widget.forumId: ${widget.forumId}');
@@ -255,7 +256,7 @@ class _ReplyPageState extends State<ReplyPage> {
         if (errorMessage != null && errorMessage.isNotEmpty) {
           throw Exception(errorMessage);
         } else {
-          throw Exception('Failed to post reply');
+          throw Exception(l10n.failedToPostReply);
         }
       }
     } catch (e) {
@@ -270,15 +271,13 @@ class _ReplyPageState extends State<ReplyPage> {
         AppLogger.debug('     - request path: ${e.requestOptions.path}');
         AppLogger.debug('     - request data: ${e.requestOptions.data}');
       }
-      // Only wrap if it's not already a clean server error message
-      // Check if the exception message doesn't start with "Failed to post reply"
+      // A plain Exception already carries a clean message (the server's,
+      // or the one above): re-throw it as-is. Wrap anything else.
       final message = e.toString();
-      if (message.startsWith('Exception: ') && !message.contains('Failed to post reply')) {
-        // This is already a clean server message, re-throw as-is
+      if (message.startsWith('Exception: ')) {
         rethrow;
       } else {
-        // Wrap other exceptions
-        throw Exception('Failed to post reply: ${e.toString()}');
+        throw Exception(l10n.failedToPostReplyWithError(e.toString()));
       }
     }
   }
@@ -346,12 +345,12 @@ class _ReplyPageState extends State<ReplyPage> {
             key: ValueKey('reply_with_quote_${widget.postId}'),
             submitLabel: AppLocalizations.of(context)!.reply,
             siteContext: widget.siteContext,
-            title: AppLocalizations.of(context)?.reply ?? 'Reply',
+            title: AppLocalizations.of(context)!.reply,
             showTitleField: false,
             initialContent: quoteContent,
             titleController: _titleController,
             contentController: _contentController,
-            contentHint: AppLocalizations.of(context)?.writeYourReply ?? 'Write your reply...',
+            contentHint: AppLocalizations.of(context)!.writeYourReply,
             onSubmit: _handleSubmitWithDraftDiscard,
             hasChanges: () => _draftController.changedSinceOpened,
             onSaveDraft: _draftController.flushNow,
@@ -397,7 +396,7 @@ class _ReplyPageState extends State<ReplyPage> {
               ],
             );
           } else if (hasError) {
-            _reportQuoteError(AppLocalizations.of(context)?.failedToLoadQuote(snapshot.error.toString()) ?? 'Failed to load quote: \n${snapshot.error}');
+            _reportQuoteError(AppLocalizations.of(context)!.failedToLoadQuote(snapshot.error.toString()));
             return compose;
           } else {
             return compose;
@@ -408,12 +407,12 @@ class _ReplyPageState extends State<ReplyPage> {
       return MessageComposePage(
         submitLabel: AppLocalizations.of(context)!.reply,
         siteContext: widget.siteContext,
-        title: AppLocalizations.of(context)?.reply ?? 'Reply',
+        title: AppLocalizations.of(context)!.reply,
         showTitleField: false,
         initialContent: _getInitialContent(),
         titleController: _titleController,
         contentController: _contentController,
-        contentHint: 'Write your reply...',
+        contentHint: AppLocalizations.of(context)!.writeYourReply,
         onSubmit: _handleSubmitWithDraftDiscard,
         hasChanges: () => _draftController.changedSinceOpened,
         onSaveDraft: _draftController.flushNow,

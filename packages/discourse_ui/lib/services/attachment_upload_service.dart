@@ -8,6 +8,7 @@ import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
 
 import '../core/logging/app_logger.dart';
+import '../l10n/app_l10n.dart';
 import '../settings_context.dart';
 import '../utils/attachment_constraints_utils.dart';
 import '../utils/attachment_validation_utils.dart';
@@ -88,7 +89,7 @@ class AttachmentUploadService {
     if (!canAddMoreAttachments(currentAttachmentCount, constraints)) {
       return AttachmentUploadOutcome(
         errorMessage:
-            'Maximum of ${constraints?.count} attachment(s) allowed',
+            appL10n().maximumAttachmentsAllowed(constraints?.count ?? 0),
       );
     }
 
@@ -110,7 +111,8 @@ class AttachmentUploadService {
       );
       if (!validation.isValid) {
         return AttachmentUploadOutcome(
-          errorMessage: validation.errorMessage ?? 'File validation failed',
+          errorMessage:
+              validation.errorMessage ?? appL10n().attachmentValidationFailed,
         );
       }
 
@@ -135,16 +137,16 @@ class AttachmentUploadService {
       );
       if (!result.result) {
         return AttachmentUploadOutcome(
-          errorMessage: result.resultText ?? 'Failed to upload file',
+          errorMessage: result.resultText ??
+              appL10n().failedToUploadFilePleaseTryAgain,
         );
       }
       // Discourse's short_url arrives in `groupId` — the SDK slot is
       // XenForo-shaped and the numeric attachmentId is useless here.
       final shortUrl = result.groupId;
       if (shortUrl == null || shortUrl.isEmpty) {
-        return const AttachmentUploadOutcome(
-          errorMessage: 'Upload succeeded but the server returned no '
-              'reference for the file.',
+        return AttachmentUploadOutcome(
+          errorMessage: appL10n().uploadMissingReference,
         );
       }
       return AttachmentUploadOutcome(
@@ -156,7 +158,7 @@ class AttachmentUploadService {
     } catch (e) {
       AppLogger.debug('Attachment upload failed: $e');
       return AttachmentUploadOutcome(
-        errorMessage: 'Failed to upload file: $e',
+        errorMessage: appL10n().failedToUploadFile2('$e'),
       );
     }
   }

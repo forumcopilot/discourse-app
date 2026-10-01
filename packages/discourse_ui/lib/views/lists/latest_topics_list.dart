@@ -315,7 +315,7 @@ class LatestTopicsListState extends FCStatefulWidget<LatestTopicsList> with FCLi
           return NotSignedInView(
             siteContext: widget.siteContext,
             title: AppLocalizations.of(context)!.signInToViewLatestTopics,
-            message: AppLocalizations.of(context)?.youNeedToBeSignedInToViewLatestTopics ?? resultText,
+            message: AppLocalizations.of(context)!.youNeedToBeSignedInToViewLatestTopics,
             icon: Icons.lock_outline_rounded,
           );
         }

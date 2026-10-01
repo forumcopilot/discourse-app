@@ -25,7 +25,7 @@ class MessagesTabAppBar extends StatelessWidget implements PreferredSizeWidget {
       // back button instead. Same widget, right leading icon in both
       // contexts.
       title: Text(
-        AppLocalizations.of(context)?.messages ?? 'Messages',
+        AppLocalizations.of(context)!.messages,
       ),
       actions: [
         if (isLoggedIn) _buildMembersButton(context, colorScheme),
@@ -36,7 +36,7 @@ class MessagesTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildMembersButton(BuildContext context, ColorScheme colorScheme) {
     return IconButton(
       icon: const Icon(Icons.people_alt_rounded),
-      tooltip: 'Users',
+      tooltip: AppLocalizations.of(context)!.users,
       onPressed: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => UsersDirectoryPage(siteContext: siteContext)),

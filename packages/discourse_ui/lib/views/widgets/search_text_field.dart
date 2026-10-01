@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../theme/design_tokens.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// A reusable search text field with clear button, auto-search, and debouncing.
 class SearchTextField extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode? focusNode;
-  final String hintText;
+  /// The placeholder; "Search…" in the reader's language when null.
+  final String? hintText;
   final Function(String query) onSearch;
   final int? minLength;
   final Duration debounceDuration;
@@ -17,7 +19,7 @@ class SearchTextField extends StatefulWidget {
     Key? key,
     required this.controller,
     this.focusNode,
-    this.hintText = 'Search...',
+    this.hintText,
     required this.onSearch,
     this.minLength,
     this.debounceDuration = const Duration(milliseconds: 500),
@@ -98,7 +100,8 @@ class _SearchTextFieldState extends State<SearchTextField> {
       enableSuggestions: false,
       textCapitalization: TextCapitalization.none,
       decoration: InputDecoration(
-        hintText: widget.hintText,
+        hintText:
+            widget.hintText ?? AppLocalizations.of(context)!.searchFieldHint,
         hintStyle: textTheme.bodyLarge?.copyWith(
           color: colorScheme.onSurfaceVariant,
         ),

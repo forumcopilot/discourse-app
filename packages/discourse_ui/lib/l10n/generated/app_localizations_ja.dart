@@ -158,43 +158,13 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get youCannotReplyToThisThread => 'このスレッドに返信できません';
+  String get youCannotReplyToThisThread => 'このトピックに返信できません';
 
   @override
-  String get pleaseWaitForThreadToLoad => 'スレッドの読み込みを待ってください';
-
-  @override
-  String get postCanBeRestoredLater => '投稿は後で復元できます';
-
-  @override
-  String get postWillBePermanentlyDeleted => '投稿は完全に削除されます';
-
-  @override
-  String get enterReasonForDeletingPost => 'この投稿を削除する理由を入力してください';
-
-  @override
-  String get reportPost => '投稿を報告';
-
-  @override
-  String get pleaseProvideReasonForReporting => 'この投稿を報告する理由を入力してください。';
+  String get pleaseWaitForThreadToLoad => 'トピックの読み込みを待ってください';
 
   @override
   String get reason => '理由';
-
-  @override
-  String get enterReasonForReportingPost => 'この投稿を報告する理由を入力してください';
-
-  @override
-  String get pleaseEnterReason => '理由を入力してください';
-
-  @override
-  String get submitReport => '報告を送信';
-
-  @override
-  String get selectedActions => '選択されたアクション:';
-
-  @override
-  String get thisActionCannotBeUndone => 'このアクションは元に戻せません。';
 
   @override
   String get participantsLabel => '参加者';
@@ -213,9 +183,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get newTopic => '新しいトピック';
 
   @override
-  String get markRead => '既読にする';
-
-  @override
   String get pleaseSpecifyReason => '理由を指定してください';
 
   @override
@@ -229,23 +196,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get topicOpened => 'トピックが開かれました';
-
-  @override
-  String cannotEditMessage(String error) {
-    return 'このメッセージを編集できません: $error';
-  }
-
-  @override
-  String get confirmSpamClean => 'スパムクリーンを確認';
-
-  @override
-  String get handleThreads => 'スレッドを処理';
-
-  @override
-  String get deleteMessages => 'メッセージを削除';
-
-  @override
-  String get deleteConversations => 'メッセージを削除';
 
   @override
   String get noConversations => 'メッセージはありません';
@@ -271,28 +221,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get loginRequired => 'ログインが必要です';
 
   @override
-  String get spamCleaner => 'スパムクリーナー';
-
-  @override
   String get sendMessage => 'メッセージ';
-
-  @override
-  String get memberSince => 'メンバー登録日';
-
-  @override
-  String get lastActivity => '最終アクティビティ';
 
   @override
   String get likesReceived => '受け取ったいいね';
 
   @override
-  String get likesGiven => '与えたいいね';
-
-  @override
   String get showMore => 'もっと見る';
-
-  @override
-  String get cleanSpam => 'スパムをクリーンアップ';
 
   @override
   String get failedToSaveConversation => 'メッセージを保存できませんでした';
@@ -326,13 +261,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get signIn => 'ログイン';
 
   @override
-  String get markForumRead => 'フォーラムを既読にする';
-
-  @override
   String get notificationTest => '通知テスト';
 
   @override
-  String get forum => 'フォーラム';
+  String get forum => 'カテゴリ';
 
   @override
   String get profile => 'プロフィール';
@@ -370,11 +302,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get youNeedToBeSignedInToViewConversations => 'メッセージを見るにはサインインが必要です。';
-
-  @override
-  String errorLoadingConversations(String error) {
-    return 'メッセージの読み込みエラー: $error';
-  }
 
   @override
   String failedToLeaveConversation(String error) {
@@ -426,37 +353,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get confirm => '確認';
 
   @override
-  String spamClean(String username) {
-    return '$usernameのスパムをクリーン';
-  }
-
-  @override
-  String get selectActionsToPerform => '実行するアクションを選択:';
-
-  @override
-  String get moveOrDeleteThreadsBasedOnAdminSettings =>
-      '管理者設定に基づいてスレッドを移動または削除';
-
-  @override
-  String get messageUpdatedSuccessfully => 'メッセージが正常に更新されました';
-
-  @override
   String error(String error) {
     return 'エラー: $error';
   }
-
-  @override
-  String failedToRemoveAttachment(String error) {
-    return '添付ファイルの削除に失敗しました: $error';
-  }
-
-  @override
-  String failedToLoadMessage(String error) {
-    return 'メッセージの読み込みに失敗しました: $error';
-  }
-
-  @override
-  String get editMessage => 'メッセージを編集';
 
   @override
   String get removeAttachment => '添付ファイルを削除';
@@ -599,39 +498,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get banned => '禁止';
 
   @override
-  String get reportSubmittedSuccessfully => '報告が正常に送信されました';
-
-  @override
   String get deleteTopic => 'トピックを削除';
 
   @override
   String get pleaseSelectEndDate => '終了日を選択してください';
-
-  @override
-  String get spamCleanUser => 'ユーザーのスパムをクリーンアップ';
-
-  @override
-  String get deletePrivateConversations => '個人メッセージを削除';
-
-  @override
-  String get banTheUserAccount => 'ユーザーアカウントを禁止';
-
-  @override
-  String get handledThreads => '処理されたスレッド';
-
-  @override
-  String get deletedMessages => '削除されたメッセージ';
-
-  @override
-  String get deletedConversations => '削除されたメッセージ';
-
-  @override
-  String get bannedUser => '禁止されたユーザー';
-
-  @override
-  String successfullyCleanedSpam(String username, String actions) {
-    return '$usernameのスパムが正常にクリーンアップされました。アクション: $actions';
-  }
 
   @override
   String get home => 'ホーム';
@@ -640,32 +510,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notifications => '通知';
 
   @override
-  String get forums => 'フォーラム';
-
-  @override
-  String get markAllForumsAsRead => 'すべてのフォーラムを既読にしますか？';
-
-  @override
-  String get markAllForumsAsReadMessage =>
-      'これにより、すべてのフォーラムとトピックが既読としてマークされます。この操作は元に戻せません。';
-
-  @override
-  String get markAsRead => '既読にする';
+  String get forums => 'カテゴリ';
 
   @override
   String get content => 'コンテンツ';
-
-  @override
-  String get insertImage => '画像を挿入';
-
-  @override
-  String get howWouldYouLikeToInsertImage => 'この画像をどのように挿入しますか？';
-
-  @override
-  String get thumbnail => 'サムネイル';
-
-  @override
-  String get fullSize => 'フルサイズ';
 
   @override
   String get pleaseEnterTitle => 'タイトルを入力してください';
@@ -683,16 +531,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mentionUser => 'ユーザーをメンション';
 
   @override
-  String get cleaningSpam => 'スパムをクリーンアップ中...';
-
-  @override
   String get writeYourMessage => 'メッセージを書く...';
 
   @override
   String get writeYourReply => '返信を書く...';
-
-  @override
-  String get conversationCreatedSuccessfully => 'メッセージを送信しました';
 
   @override
   String get conversationMarkedAsUnread => 'メッセージを未読にしました';
@@ -704,19 +546,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get conversationOpened => 'メッセージをオープンしました';
 
   @override
-  String get pleaseLoginToLikeMessages => 'メッセージにいいねするにはログインしてください';
-
-  @override
-  String get loadEarlierMessages => '以前のメッセージを読み込む';
-
-  @override
   String failedToLoadQuote(String error) {
     return '引用の読み込みに失敗しました: \n$error';
-  }
-
-  @override
-  String failedToSendReply(String error) {
-    return '返信の送信に失敗しました: $error';
   }
 
   @override
@@ -732,11 +563,6 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String failedToOpenConversation(String error) {
     return 'メッセージをオープンできませんでした: $error';
-  }
-
-  @override
-  String failedToJumpToMessage(String error) {
-    return 'メッセージにジャンプできませんでした: $error';
   }
 
   @override
@@ -782,20 +608,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get goBack => '戻る';
 
   @override
-  String failedToLoadPost(String error) {
-    return '投稿の読み込みに失敗しました: \n$error';
-  }
-
-  @override
-  String failedToLikeOrUnlikeMessage(String action, String error) {
-    return 'メッセージの$actionに失敗しました: $error';
-  }
-
-  @override
   String get like => 'いいね';
-
-  @override
-  String get unlike => 'いいねを取り消す';
 
   @override
   String get download => 'ダウンロード';
@@ -813,14 +626,6 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String errorDownloading(String filename, String error) {
     return '$filenameのダウンロードエラー: $error';
-  }
-
-  @override
-  String get failedToNavigateToForum => 'フォーラムへの移動に失敗しました';
-
-  @override
-  String forumNotFoundById(String forumId) {
-    return 'フォーラムが見つかりません: $forumId';
   }
 
   @override
@@ -941,25 +746,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String nVotes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 票',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get lastSeen => '最終アクセス';
-
-  @override
   String get chat => 'チャット';
-
-  @override
-  String comingSoon(String label) {
-    return '$label — 近日公開';
-  }
 
   @override
   String moreBadges(Object count) {
@@ -1027,9 +814,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get discard => '破棄';
-
-  @override
-  String get discardDraftQuestion => '下書きを破棄しますか？';
 
   @override
   String get doNotDisturb => 'おやすみモード';
@@ -1176,9 +960,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get resizeAndUpload => '縮小してアップロード';
 
   @override
-  String get retryConnection => '再接続';
-
-  @override
   String get checkConnectionAndRetry => 'インターネット接続を確認して、もう一度お試しください。';
 
   @override
@@ -1209,9 +990,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get signOut => 'サインアウト';
 
   @override
-  String get signOutQuestion => 'サインアウトしますか？';
-
-  @override
   String get signInCancelledNoPayload => 'サインインがキャンセルされました — 応答がありません';
 
   @override
@@ -1226,15 +1004,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String stoppedIgnoringUser(String username) {
     return '@$username の無視を解除しました';
   }
-
-  @override
-  String get submit => '送信';
-
-  @override
-  String get discardDraftWarning => '保存した下書きは完全に削除されます。';
-
-  @override
-  String get deleteChatMessageWarning => 'このメッセージは全員から削除されます。';
 
   @override
   String get titleOnly => 'タイトルのみ';
@@ -1280,17 +1049,10 @@ class AppLocalizationsJa extends AppLocalizations {
       'セキュリティのため、Discourse からメール内のリンクで確認を求められることがあります。届かない場合は迷惑メールフォルダを確認してください。';
 
   @override
-  String get newDirectMessage => '新しいダイレクトメッセージ';
-
-  @override
   String get noMessagesYetSayHi => 'まだメッセージはありません — 挨拶してみましょう。';
 
   @override
   String get edited => '編集済み';
-
-  @override
-  String get editProfileManagedOnWebNote =>
-      '表示名、メール、パスワードなどのアカウント設定は「アカウント → ウェブでアカウントを管理」から変更します。アバターは写真のカメラアイコンをタップして変更できます。';
 
   @override
   String get approvedButRelayUnreachable =>
@@ -1325,9 +1087,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get protected => '保護中';
-
-  @override
   String get solution => '解決策';
 
   @override
@@ -1350,11 +1109,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get poll => '投票';
-
-  @override
-  String errorLoadingContent(Object error) {
-    return 'コンテンツの読み込みエラー: $error';
-  }
 
   @override
   String get noDiscussionsYet => 'まだ議論はありません。';
@@ -1419,9 +1173,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get leaveConversation2 => 'メッセージから退出';
 
   @override
-  String get reportConversation2 => 'メッセージを通報';
-
-  @override
   String get closeConversation2 => 'メッセージをクローズ';
 
   @override
@@ -1445,26 +1196,6 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get leaveConversationConfirmation =>
       'このメッセージから自分自身を削除してもよろしいですか？このメッセージの閲覧または返信を行えなくなります。';
-
-  @override
-  String errorLoadingConversation(Object error) {
-    return 'メッセージの読み込みエラー: $error';
-  }
-
-  @override
-  String get conversationNotFound => 'メッセージが見つかりません';
-
-  @override
-  String get conversationClosedBanner => 'このメッセージはクローズしています。新たに返信することはできません。';
-
-  @override
-  String get noMessagesFound => 'メッセージが見つかりません';
-
-  @override
-  String get endOfConversation => '議論の終わり';
-
-  @override
-  String get jumpToMessage => 'メッセージへ移動';
 
   @override
   String get editConversation2 => 'タイトルを編集';
@@ -1597,9 +1328,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get chatPlaceholderGroup => 'グループチャット';
-
-  @override
   String get chatPlaceholderSelf => 'メモを書き留める';
 
   @override
@@ -1675,20 +1403,12 @@ class AppLocalizationsJa extends AppLocalizations {
       'あなたの新しい投稿を受領しましたが、表示するにはモデレーターの承認が必要です。しばらくお待ちください。';
 
   @override
-  String failedToCreateConversation(Object error) {
-    return 'メッセージを送信できませんでした: $error';
-  }
-
-  @override
   String maximumAttachmentsAllowed(Object count) {
     return '添付ファイルは最大 $count 件までです';
   }
 
   @override
   String get noImagesFoundToDisplay => '表示できる画像がありません。';
-
-  @override
-  String get pleaseLoginToViewThisAttachment => 'この添付ファイルを見るにはログインしてください';
 
   @override
   String get searchForTopics => 'トピックを検索';
@@ -1716,9 +1436,6 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get doNotDisturbExplanation =>
       '通知をしばらく停止します — 期間が終わるまで Discourse が保留します';
-
-  @override
-  String get emailSettingsSubtitle => 'メールの頻度、いいねの集約、ダイジェストの予定';
 
   @override
   String get manageAccountSubtitle => 'プロフィール、メール、パスワード、セキュリティ、詳細設定';
@@ -1752,13 +1469,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get initializingForum => 'フォーラムを初期化しています…';
 
   @override
-  String get subscribedForums => '購読中のフォーラム';
-
-  @override
   String get errorLoadingNotifications => '通知の読み込みエラー';
-
-  @override
-  String get pullDownToRefresh => '下に引いて更新';
 
   @override
   String get noNewNotificationsExplanation =>
@@ -1775,19 +1486,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get deletePostsProfilePostsAndComments => '投稿、プロフィール投稿、コメントを削除';
-
-  @override
-  String spamCleanConfirmation(Object username) {
-    return '$username のスパムを一掃しますか？';
-  }
-
-  @override
-  String failedToCleanSpam(Object error) {
-    return 'スパムを一掃できませんでした: $error';
-  }
-
-  @override
   String get searchUser => 'ユーザーを検索';
 
   @override
@@ -1795,9 +1493,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get imageNotAvailable => '画像を表示できません';
-
-  @override
-  String get allForumTopicsHaveBeenMarkedAs => 'フォーラムの全トピックを既読にしました';
 
   @override
   String postsCount(Object count) {
@@ -1820,30 +1515,10 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get failedToPickFile => 'ファイルを選択できませんでした';
-
-  @override
   String onlyNMoreAttachmentsAllowed(
       Object remainingSlots, Object remainingSlots2) {
     return 'あと $remainingSlots 件のみ添付できます。最初の $remainingSlots2 枚を処理します。';
   }
-
-  @override
-  String get attachmentLimitReachedSkippingRemainingImages =>
-      '添付ファイルの上限に達しました。残りの画像はスキップします。';
-
-  @override
-  String failedToUploadImagePleaseTryAgain(Object fileName) {
-    return '$fileName: 画像をアップロードできませんでした。もう一度お試しください。';
-  }
-
-  @override
-  String failedToUploadImage2(Object errorMessage, Object fileName) {
-    return '$fileName: 画像をアップロードできませんでした: $errorMessage';
-  }
-
-  @override
-  String get failedToPickImage => '画像を選択できませんでした';
 
   @override
   String failedToRemoveAttachment2(Object error) {
@@ -1887,23 +1562,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String failedToSubmitReport2(Object error) {
-    return '報告を送信できませんでした: $error';
-  }
-
-  @override
   String get editHistoryNotAvailable => 'この投稿の編集履歴は利用できません';
-
-  @override
-  String get noPermissionToUploadAvatar => 'アバターをアップロードする権限がありません';
-
-  @override
-  String get avatarUploadedSuccessfully => 'アバターをアップロードしました';
-
-  @override
-  String failedToPickImage2(Object error) {
-    return '画像を選択できませんでした: $error';
-  }
 
   @override
   String get react => 'リアクション';
@@ -1918,18 +1577,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get searchFilters => '検索フィルター';
 
   @override
-  String signOutWarning(Object siteName) {
-    return '$siteName からサインアウトします。いつでも再度サインインできます。';
-  }
-
-  @override
   String get suggestedTopics => 'おすすめのトピック';
 
   @override
   String get suggestedMessages => '推奨メッセージ';
-
-  @override
-  String get newLabel => '新着';
 
   @override
   String get voteRemoved => '投票を取り消しました';
@@ -1960,9 +1611,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get couldNotLoadCategories => 'カテゴリを読み込めませんでした。';
 
   @override
-  String get explore => '探索';
-
-  @override
   String get tags => 'タグ';
 
   @override
@@ -1988,11 +1636,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'プライバシーポリシー';
-
-  @override
-  String signedInAs(String username) {
-    return '$username としてサインイン中';
-  }
 
   @override
   String get notSignedIn => 'サインインしていません';
@@ -2022,7 +1665,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String actionCodeTopicCreated(String when) {
-    return 'Created this topic $when';
+    return '$whenにこのトピックを作成しました';
   }
 
   @override
@@ -2278,79 +1921,85 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notificationSettings => '通知設定';
 
   @override
-  String get topicIsNew => 'New topic';
+  String get topicIsNew => '新しいトピック';
 
   @override
-  String get noNewTopicsSinceLastVisit =>
-      'No new topics since your last visit.';
+  String get noNewTopicsSinceLastVisit => '前回の訪問以降、新しいトピックはありません。';
 
   @override
-  String get messageIsNew => 'New message';
+  String get messageIsNew => '新しいメッセージ';
 
   @override
   String topicUnreadReplies(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count unread replies',
-      one: '1 unread reply',
+      other: '未読の返信 $count 件',
     );
     return '$_temp0';
   }
 
   @override
   String filterNewWithCount(int count) {
-    return 'New ($count)';
+    return '新規 ($count)';
   }
 
   @override
   String filterUnreadWithCount(int count) {
-    return 'Unread ($count)';
+    return '未読 ($count)';
   }
 
   @override
   String categoryNewTopics(int count) {
-    return '$count new';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '新規 $count',
+    );
+    return '$_temp0';
   }
 
   @override
   String categoryUnreadTopics(int count) {
-    return '$count unread';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '未読 $count',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get dismissNew => 'Dismiss new';
+  String get dismissNew => '新規を閉じる';
 
   @override
-  String get dismissUnread => 'Dismiss unread';
+  String get dismissUnread => '未読を閉じる';
 
   @override
-  String get dismissNewTitle => 'Dismiss new topics?';
+  String get dismissNewTitle => '新しいトピックを閉じますか？';
 
   @override
-  String get dismissNewMessage => 'They will no longer show as new.';
+  String get dismissNewMessage => '新規として表示されなくなります。';
 
   @override
-  String get dismissUnreadTitle => 'Dismiss all unread?';
+  String get dismissUnreadTitle => '未読をすべて閉じますか？';
 
   @override
-  String get dismissUnreadMessage =>
-      'Their new replies will be marked as read.';
+  String get dismissUnreadMessage => '新しい返信は既読になります。';
 
   @override
-  String get dismissUnreadStopTracking =>
-      'Stop tracking these topics so they never show up as unread for me again';
+  String get dismissUnreadStopTracking => 'これらのトピックの追跡を停止して、未読として表示されないようにする';
 
   @override
-  String get dismissNewAndUnread => 'Dismiss new and unread';
+  String get dismissNewAndUnread => '新規と未読を閉じる';
 
   @override
   String dismissNewAndUnreadMessage(String category) {
-    return 'Topics in $category will no longer show as new or unread.';
+    return '$category のトピックは新規・未読として表示されなくなります。';
   }
 
   @override
-  String get dismissedTopics => 'Dismissed';
+  String get dismissedTopics => '閉じました';
 
   @override
   String topicMapViews(int count) {
@@ -3702,4 +3351,1292 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get noPermissionToViewCategory => 'このカテゴリのトピックを表示する権限がありません。';
+
+  @override
+  String get featureTopicTitle => 'これを注目のトピックにする';
+
+  @override
+  String get pinTopicMenu => 'トピックを固定...';
+
+  @override
+  String pinInCategoryUntil(String category) {
+    return 'このトピックを $category カテゴリのトップに次の期間表示する:';
+  }
+
+  @override
+  String get pinGloballyUntil => 'このトピックをすべてのトピックリストのトップに表示する';
+
+  @override
+  String get pinNote => 'ユーザーはトピックごとに固定表示を解除できます。';
+
+  @override
+  String get pinUntil => '固定期限';
+
+  @override
+  String get pinDateRequired => 'このトピックを固定するには日付が必要です。';
+
+  @override
+  String get pinTopicGlobally => 'トピックを全体に固定';
+
+  @override
+  String get flagThanks => 'ご報告ありがとうございます！';
+
+  @override
+  String get flagReviewProcess => 'すべての通報はモデレーターが受け取り、できるだけ速やかにレビューされます。';
+
+  @override
+  String get flagCant => '現在、この投稿を通報することはできません。';
+
+  @override
+  String get flagSendMessage => 'メッセージ';
+
+  @override
+  String get flagMessageForUser => 'ユーザーへのメッセージ';
+
+  @override
+  String get flagMessageForModerators => 'モデレーターへのメッセージ';
+
+  @override
+  String get flagPlaceholderNotifyUser => '具体的に、建設的に、そして常に親切に説明しましょう。';
+
+  @override
+  String get flagPlaceholderNotifyModerators =>
+      '具体的にどのような問題が発生しているか説明してください。可能なら、関連するリンクや例を含めてください。';
+
+  @override
+  String get flagPlaceholderIllegal =>
+      '具体的になぜこのコンテンツが違法だと思うのか説明してください。可能なら、関連するリンクと例を含めてください。';
+
+  @override
+  String get flagConfirmIllegal => '上記の記述は正確かつ完全です。';
+
+  @override
+  String flagMessageAtLeast(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 文字以上を入力してください',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get flagMessageSent => 'メッセージを送信しました。';
+
+  @override
+  String get mergeTopicError => '指定されたトピックへの投稿移動中にエラーが発生しました。';
+
+  @override
+  String get topicTitlePlaceholder => 'トピックのタイトルを入力してください';
+
+  @override
+  String get topicMoved => 'トピックを移動しました';
+
+  @override
+  String get topicMerged => 'トピックを統合しました';
+
+  @override
+  String get mergeTopicExplanation =>
+      'このトピックのすべての投稿が選んだトピックに移動します。アプリでは元に戻せません。';
+
+  @override
+  String get destinationTopicId => '移動先トピックの ID';
+
+  @override
+  String get topicAuthorUnknown => '不明';
+
+  @override
+  String get noHotTopics => 'ホットなトピックはありません。';
+
+  @override
+  String get signInToViewNewTopics => '新しいトピックを表示するにはログインしてください';
+
+  @override
+  String get newTopicsSignInMessage => '新しいトピックには、前回の訪問以降に作成されたものが表示されます。';
+
+  @override
+  String get topPeriodAllTime => '全期間';
+
+  @override
+  String get topPeriodYear => '今年';
+
+  @override
+  String get topPeriodQuarter => '今季';
+
+  @override
+  String get topPeriodMonth => '今月';
+
+  @override
+  String get topPeriodWeek => '今週';
+
+  @override
+  String get topPeriodToday => '今日';
+
+  @override
+  String noTopTopicsForPeriod(String period) {
+    String _temp0 = intl.Intl.selectLogic(
+      period,
+      {
+        'all': '全期間の人気のトピックはありません。',
+        'yearly': '今年の人気のトピックはありません。',
+        'quarterly': '今季の人気のトピックはありません。',
+        'monthly': '今月の人気のトピックはありません。',
+        'weekly': '今週の人気のトピックはありません。',
+        'daily': '今日の人気のトピックはありません。',
+        'other': '人気のトピックはありません。',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get connectionTimedOutSiteUnreachable =>
+      '接続がタイムアウトしました。サイトがダウンしているか、アクセスできない可能性があります。';
+
+  @override
+  String get failedToMarkNotificationsRead => '通知を既読にできませんでした';
+
+  @override
+  String get forumNameFallback => 'フォーラム';
+
+  @override
+  String get noForumDescription => '説明はありません。';
+
+  @override
+  String get dismissAllNotifications => 'すべて閉じる';
+
+  @override
+  String get notificationPostIdMissing => '投稿IDがありません。投稿に移動できません。';
+
+  @override
+  String get notificationTopicIdMissingForPost => 'トピックIDがありません。投稿に移動できません。';
+
+  @override
+  String get notificationTopicIdMissing => 'トピックIDがありません。トピックを開けません。';
+
+  @override
+  String get notificationUsernameMissing => 'ユーザー名がありません。プロフィールを開けません。';
+
+  @override
+  String get notificationChannelIdMissing => 'チャンネルIDがありません。チャットを開けません。';
+
+  @override
+  String get notificationGroupNameMissingForInbox => 'グループ名がありません。受信トレイを開けません。';
+
+  @override
+  String get notificationGroupNameMissing => 'グループ名がありません。グループを開けません。';
+
+  @override
+  String get notificationNoActionUrl => 'この種類の通知にはアクションURLがありません。';
+
+  @override
+  String get notificationBadgeUnavailable => 'バッジの詳細は利用できません。';
+
+  @override
+  String get notificationBadgeLoadFailed => 'このバッジを読み込めませんでした。';
+
+  @override
+  String get personalMessageTitleFallback => '個人メッセージ';
+
+  @override
+  String get topicTitleFallback => 'トピック';
+
+  @override
+  String get signInToViewNotifications => '通知を表示するにはログインしてください';
+
+  @override
+  String get youNeedToBeSignedInToViewNotifications => '通知を見るにはログインが必要です。';
+
+  @override
+  String get noUnreadNotifications => '未読の通知はありません';
+
+  @override
+  String get noNotificationsYet => 'まだ通知はありません';
+
+  @override
+  String get newNotificationFallbackBody => '新しい通知';
+
+  @override
+  String get unableToOpenNotification => '通知を開けません';
+
+  @override
+  String get notificationMissingSiteInfo => 'サイト情報がありません（site_id）。';
+
+  @override
+  String get notificationInvalidSiteInfo => 'サイト情報が無効です（site_id）。';
+
+  @override
+  String get notificationMissingPostInfo => '投稿情報がありません（content_id）。';
+
+  @override
+  String get notificationMissingMessageInfo =>
+      'メッセージ情報がありません（conversation_id）。';
+
+  @override
+  String get notificationMissingUserInfo => 'ユーザー情報がありません（sender_id）。';
+
+  @override
+  String get notificationUnsupportedType => 'サポートされていない通知の種類です。';
+
+  @override
+  String get notificationForumNotFound => 'このサイトのフォーラムが見つかりません。';
+
+  @override
+  String get notificationForumOpenFailed => 'フォーラムを初期化できませんでした。';
+
+  @override
+  String get notificationMissingTopicInfo => 'トピック情報がありません（topic_id）。';
+
+  @override
+  String get failedToLoadTags => 'タグを読み込めませんでした。';
+
+  @override
+  String get searchTagsHint => 'タグを検索…';
+
+  @override
+  String get tagsSortedByCountTooltip => 'トピック数順 — タップしてA→Z順に切り替え';
+
+  @override
+  String get tagsSortedAlphabeticallyTooltip => 'アルファベット順 — タップして人気順に切り替え';
+
+  @override
+  String get noTagsYet => 'このフォーラムにはまだタグがありません。';
+
+  @override
+  String get tagNotificationLevelTooltip => '通知レベル';
+
+  @override
+  String get tagTopicsLoadFailed => '読み込めませんでした';
+
+  @override
+  String searchFailedWithError(String error) {
+    return '検索に失敗しました: $error';
+  }
+
+  @override
+  String get searchFiltersButtonTooltip => 'フィルター';
+
+  @override
+  String get searchFilterStatusSection => 'ステータス';
+
+  @override
+  String get searchFilterMyActivitySection => '自分のアクティビティ';
+
+  @override
+  String get searchFilterMatchTypeSection => '一致の種類';
+
+  @override
+  String get searchTagsFilterHelper => 'スペースまたはカンマで区切ります。すべてのタグが必要です。';
+
+  @override
+  String get searchSortBy => '並べ替え';
+
+  @override
+  String get searchStatusOpen => 'オープン';
+
+  @override
+  String get searchStatusArchived => 'アーカイブ済み';
+
+  @override
+  String get searchStatusNoReplies => '返信なし';
+
+  @override
+  String get searchStatusPublicOnly => '公開のみ';
+
+  @override
+  String get searchStatusUnsolved => '未解決';
+
+  @override
+  String get searchInBookmarked => 'ブックマーク済み';
+
+  @override
+  String get searchInMyMessages => 'メッセージ内';
+
+  @override
+  String get searchInLiked => '「いいね！」した項目';
+
+  @override
+  String get searchInPosted => '投稿したもの';
+
+  @override
+  String get searchInWatching => 'ウォッチ中';
+
+  @override
+  String get searchInTracking => '追跡中';
+
+  @override
+  String get searchInSeen => '既読';
+
+  @override
+  String get searchInUnseen => '未読';
+
+  @override
+  String get searchSortLatestPost => '最新の投稿';
+
+  @override
+  String get searchSortMostLiked => '「いいね！」の多い項目';
+
+  @override
+  String get searchSortMostViewed => '最も閲覧されている項目';
+
+  @override
+  String get searchSortLatestTopic => '最新のトピック';
+
+  @override
+  String get searchFieldHint => '検索…';
+
+  @override
+  String get bookmarksUnavailable => 'ブックマークは利用できません';
+
+  @override
+  String get failedToLoadBookmarks => 'ブックマークを読み込めませんでした';
+
+  @override
+  String get failedToRemoveBookmark => 'ブックマークを削除できませんでした';
+
+  @override
+  String get failedToUpdateBookmark => 'ブックマークを更新できませんでした';
+
+  @override
+  String get bookmarkWithReminder => 'リマインダー付きブックマーク';
+
+  @override
+  String get noReminder => 'リマインダーなし';
+
+  @override
+  String get failedToLoadDrafts => '下書きを読み込めませんでした。';
+
+  @override
+  String get failedToDiscardDraft => '下書きを破棄できませんでした';
+
+  @override
+  String get messagesLoadFailed => 'メッセージを読み込めませんでした';
+
+  @override
+  String get moreMessagesLoadFailed => 'さらにメッセージを読み込めませんでした';
+
+  @override
+  String get messageUnknownUser => '不明';
+
+  @override
+  String get unknownErrorFallback => '不明なエラー';
+
+  @override
+  String get chatComposerDefaultHint => 'メッセージを入力…';
+
+  @override
+  String chatChannelNumbered(Object id) {
+    return 'チャンネル $id';
+  }
+
+  @override
+  String get chatSendFailed => 'メッセージを送信できませんでした。';
+
+  @override
+  String get chatEditFailed => 'メッセージを編集できませんでした。';
+
+  @override
+  String get chatDeleteFailed => 'メッセージを削除できませんでした。';
+
+  @override
+  String get chatReactionsUnsupported => 'ここではリアクションを使用できません。';
+
+  @override
+  String get chatReactionFailed => 'リアクションを更新できませんでした。';
+
+  @override
+  String get attachmentDefaultName => '添付ファイル';
+
+  @override
+  String get fileTypeAudio => '音声';
+
+  @override
+  String get fileTypeText => 'テキスト';
+
+  @override
+  String get fileTypeArchive => '圧縮ファイル';
+
+  @override
+  String get fileTypeFile => 'ファイル';
+
+  @override
+  String downloadFailedHttpStatus(String status) {
+    return 'ファイルをダウンロードできませんでした: HTTP $status';
+  }
+
+  @override
+  String get downloadedFileEmpty => 'ダウンロードしたファイルが空です';
+
+  @override
+  String downloadFileFailed(String error) {
+    return 'ファイルをダウンロードできませんでした: $error';
+  }
+
+  @override
+  String attachmentTypeNotAllowed(String extension, String allowed) {
+    return 'ファイル形式 .$extension は許可されていません。許可されている形式: $allowed';
+  }
+
+  @override
+  String attachmentFileTooLarge(String size, String max) {
+    return 'ファイルサイズ ($size) が上限の $max を超えています';
+  }
+
+  @override
+  String get attachmentValidationFailed => 'ファイルの検証に失敗しました';
+
+  @override
+  String get uploadMissingReference =>
+      'アップロードは完了しましたが、サーバーからファイルの参照が返されませんでした。';
+
+  @override
+  String get imageFileNotFound => '画像ファイルが見つかりません';
+
+  @override
+  String get failedToLoadVideo => '動画を読み込めませんでした';
+
+  @override
+  String get userInfoLoadFailed => 'ユーザー情報を読み込めませんでした。';
+
+  @override
+  String userInfoLoadFailedWithError(String error) {
+    return 'ユーザー情報を読み込めませんでした: $error';
+  }
+
+  @override
+  String get profileMenuIgnoreUser => 'ユーザーを無視';
+
+  @override
+  String get profileMenuUnignoreUser => 'ユーザーの無視を解除';
+
+  @override
+  String get ignoreStateUpdateFailed => '無視の設定を更新できませんでした';
+
+  @override
+  String profileNowIgnoringUser(String username) {
+    return '@$username を無視しています。この人の投稿は非表示になります。';
+  }
+
+  @override
+  String get profileIgnoreToggleFailed => '無視の切り替えに失敗しました。';
+
+  @override
+  String get profileStatsLoadFailed => '統計を読み込めませんでした。';
+
+  @override
+  String get profileFollowFailed => 'フォローできませんでした';
+
+  @override
+  String get profileUnfollowFailed => 'フォローを解除できませんでした';
+
+  @override
+  String get profileChatOpenFailed => 'このユーザーとのチャットを開けませんでした。';
+
+  @override
+  String summaryLikeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'いいね $count 件',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String summaryLinkClicks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count クリック',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get directoryPeriodAllTime => '全期間';
+
+  @override
+  String get directoryPeriodYear => '今年';
+
+  @override
+  String get directoryPeriodQuarter => '今季';
+
+  @override
+  String get directoryPeriodMonth => '今月';
+
+  @override
+  String get directoryPeriodWeek => '今週';
+
+  @override
+  String get directoryPeriodToday => '今日';
+
+  @override
+  String get directoryOrderReceived => '受け取った';
+
+  @override
+  String get directoryOrderReplies => '返信';
+
+  @override
+  String get directoryOrderTopics => 'トピック';
+
+  @override
+  String get directoryOrderVisits => 'アクセス';
+
+  @override
+  String get directoryLoadFailed => 'ユーザー一覧を読み込めませんでした。';
+
+  @override
+  String get directoryNoUsersMatch => 'その名前に一致するユーザーはいません。';
+
+  @override
+  String get directoryNoUsersForPeriod => 'この期間のユーザーは見つかりませんでした。';
+
+  @override
+  String get userSearchNoResults => 'ユーザーが見つかりません';
+
+  @override
+  String get userSearchTryDifferentUsername => '別のユーザー名で検索してみてください';
+
+  @override
+  String get userSearchPromptTitle => 'ユーザーを検索';
+
+  @override
+  String get userSearchPromptHint => 'ユーザー名を入力してユーザーを検索・招待します';
+
+  @override
+  String get ignoredUsersUnignoreFailed => '無視を解除できませんでした。';
+
+  @override
+  String get ignoredUsersEmpty => '無視しているユーザーはいません。';
+
+  @override
+  String get ignoredUsersEmptyHint =>
+      'ユーザーのプロフィールを開き、メニューの「ユーザーを無視」を使うと、その人の投稿と通知が非表示になります。';
+
+  @override
+  String get badgesLoadFailed => 'バッジを読み込めませんでした。';
+
+  @override
+  String get badgesEmpty => 'このフォーラムにはバッジがありません。';
+
+  @override
+  String get badgeTierGold => 'ゴールド';
+
+  @override
+  String get badgeTierSilver => 'シルバー';
+
+  @override
+  String get badgeTierBronze => 'ブロンズ';
+
+  @override
+  String badgeEarnedAgo(String time) {
+    return '$timeに獲得';
+  }
+
+  @override
+  String badgeEarnedByUsers(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted 人のユーザーが獲得',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trustLevelNameNewUser => '新規ユーザー';
+
+  @override
+  String get trustLevelNameBasic => '基本ユーザー';
+
+  @override
+  String get trustLevelNameMember => 'メンバー';
+
+  @override
+  String get trustLevelNameRegular => 'レギュラー';
+
+  @override
+  String get trustLevelNameLeader => 'リーダー';
+
+  @override
+  String get trustLevelSummary0 => '参加したばかり。閲覧と投稿はできますが、リンク、画像、メッセージに制限があります。';
+
+  @override
+  String get trustLevelSummary1 =>
+      '主要な投稿機能が使えるようになります：画像と添付ファイル、より多くのリンク、投稿の通報。';
+
+  @override
+  String get trustLevelSummary2 => '招待の送信、ユーザーの無視ができ、自分の投稿をより長く編集できます。';
+
+  @override
+  String get trustLevelSummary3 => 'トピックのカテゴリ変更や名前変更、タグの作成ができ、スパムの通報がより重視されます。';
+
+  @override
+  String get trustLevelSummary4 =>
+      'スタッフが付与します。任意の投稿を編集でき、トピックの固定、クローズ、分割、統合ができます。';
+
+  @override
+  String trustLevelRowTitle(int level, String name) {
+    return 'TL$level · $name';
+  }
+
+  @override
+  String get profileNoUserSpecified => 'ユーザーが指定されていません';
+
+  @override
+  String get userTopicsLoadFailed => 'トピックを読み込めませんでした';
+
+  @override
+  String get userTopicsEmpty => 'まだトピックを作成していません。';
+
+  @override
+  String get userRecentPostsLoadFailed => '最近の投稿を読み込めませんでした';
+
+  @override
+  String get activityUnknownTopic => '不明なトピック';
+
+  @override
+  String groupJoinedSnack(String group) {
+    return '$group に参加しました';
+  }
+
+  @override
+  String get groupJoinFailed => 'グループに参加できませんでした';
+
+  @override
+  String groupLeftSnack(String group) {
+    return '$group から退出しました';
+  }
+
+  @override
+  String get groupLeaveFailed => 'グループから退出できませんでした';
+
+  @override
+  String get groupMembershipRequestHint =>
+      '参加したい理由は何ですか？グループオーナーがリクエストと一緒に確認します。';
+
+  @override
+  String get groupMembershipReasonRequired => '参加リクエストには理由が必要です';
+
+  @override
+  String get groupMembershipRequestSent => 'リクエストを送信しました。グループオーナーの承認が必要です';
+
+  @override
+  String get groupMembershipRequestFailed => '参加リクエストを送信できませんでした';
+
+  @override
+  String get groupMemberBadge => 'メンバー';
+
+  @override
+  String get groupRequestPending => 'リクエスト保留中';
+
+  @override
+  String get groupJoining => '参加中…';
+
+  @override
+  String get groupJoinButton => 'グループに参加';
+
+  @override
+  String get groupsLoadFailed => 'グループを読み込めませんでした。';
+
+  @override
+  String get groupBuiltIn => '組み込みグループ';
+
+  @override
+  String invitesPendingWithCount(int count) {
+    return '保留中 ($count)';
+  }
+
+  @override
+  String invitesExpiredWithCount(int count) {
+    return '期限切れ ($count)';
+  }
+
+  @override
+  String invitesRedeemedWithCount(int count) {
+    return '承諾済み ($count)';
+  }
+
+  @override
+  String get invitesLoadFailed => '招待を読み込めませんでした。';
+
+  @override
+  String get inviteLinkCreateFailed => '招待リンクを作成できませんでした';
+
+  @override
+  String get inviteEmailAddressLabel => 'メールアドレス';
+
+  @override
+  String get inviteEmailInvalid => '有効なメールアドレスを入力してください';
+
+  @override
+  String get inviteMessageOptionalLabel => 'メッセージ（任意）';
+
+  @override
+  String get inviteSendFailed => '招待を送信できませんでした';
+
+  @override
+  String get revokeInviteLinkWarning => '招待リンクは使えなくなります。';
+
+  @override
+  String revokeInviteEmailWarning(String email) {
+    return '$email への招待は使えなくなります。';
+  }
+
+  @override
+  String get inviteRevokeFailed => '招待を取り消せませんでした';
+
+  @override
+  String get inviteNoPermission => '招待する権限がありません';
+
+  @override
+  String get invitesEmptyPending => '保留中の招待はありません';
+
+  @override
+  String get invitesEmptyExpired => '期限切れの招待はありません';
+
+  @override
+  String get invitesEmptyRedeemed => '承諾済みの招待はありません';
+
+  @override
+  String get invitesEmptyPendingHint => '招待リンクを作成して、フォーラムに人を招きましょう。';
+
+  @override
+  String get inviteLinkFallbackTitle => '招待リンク';
+
+  @override
+  String inviteRedeemedOn(String date) {
+    return '$date に承諾';
+  }
+
+  @override
+  String inviteRedemptions(int count, int max) {
+    return '$max 件中 $count 件承諾済み';
+  }
+
+  @override
+  String get inviteEmailSent => 'メール送信済み';
+
+  @override
+  String get inviteEmailNotSent => 'メール未送信';
+
+  @override
+  String inviteExpiredOn(String date) {
+    return '$date に期限切れ';
+  }
+
+  @override
+  String get inviteRevokeTooltip => '招待を取り消す';
+
+  @override
+  String get reviewStatusPending => '保留中';
+
+  @override
+  String get reviewStatusApproved => '承認済み';
+
+  @override
+  String get reviewStatusRejected => '却下';
+
+  @override
+  String get reviewStatusAll => 'すべて';
+
+  @override
+  String get reviewStatusIgnored => '通報が無視されました';
+
+  @override
+  String get reviewStatusDeleted => 'トピックまたは投稿が削除されました';
+
+  @override
+  String get reviewQueueUnavailable => 'このフォーラムではレビューキューを利用できません。';
+
+  @override
+  String get reviewQueueLoadFailed => 'レビューキューを読み込めませんでした';
+
+  @override
+  String get reviewableChangedByOther => 'この項目は別のモデレーターによって変更されました。更新しています…';
+
+  @override
+  String get reviewActionFailed => '操作を実行できませんでした';
+
+  @override
+  String reviewActionDone(String action) {
+    return '$action：完了';
+  }
+
+  @override
+  String get reviewRejectReasonHint => '却下する理由は何ですか？';
+
+  @override
+  String get reviewTypeFlaggedPost => '通報された投稿';
+
+  @override
+  String get reviewTypeQueuedPost => '待機中の投稿';
+
+  @override
+  String get reviewTypeQueuedTopic => '待機中のトピック';
+
+  @override
+  String get reviewTypeUser => 'ユーザー';
+
+  @override
+  String get reviewTypePost => '投稿';
+
+  @override
+  String get reviewTypeChatMessage => '通報されたチャットメッセージ';
+
+  @override
+  String get reviewModeratorAccessRequired => 'モデレーター権限が必要です';
+
+  @override
+  String reviewableScore(String score) {
+    return 'スコア $score';
+  }
+
+  @override
+  String get postRepliesLoadFailed => '返信を読み込めませんでした。';
+
+  @override
+  String get postMakeWiki => 'ウィキにする';
+
+  @override
+  String get postRemoveWiki => 'ウィキから削除';
+
+  @override
+  String get postBookmarkRemoveFailed => 'ブックマークを解除できませんでした';
+
+  @override
+  String get postBookmarkFailed => '投稿をブックマークできませんでした';
+
+  @override
+  String get postBookmarkReminderUpdateFailed => 'リマインダーを更新できませんでした';
+
+  @override
+  String get postBookmarkReminderSet => 'リマインダーを設定しました';
+
+  @override
+  String get postBookmarkReminderCleared => 'リマインダーをクリアしました';
+
+  @override
+  String get solutionMarkFailed => '解決策としてマークできませんでした';
+
+  @override
+  String get solutionUnmarkFailed => '解決策のマークを解除できませんでした';
+
+  @override
+  String get postUnknownDate => '日付不明';
+
+  @override
+  String get postBookmarkAction => '投稿をブックマーク';
+
+  @override
+  String postReactionsSemanticsReacted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'リアクション済み。リアクション $count 件。タップで変更、長押しでリアクションした人を表示。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String postReactionsSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'リアクション $count 件。タップでリアクション、長押しでリアクションした人を表示。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get postLikeAction => '投稿に「いいね！」する';
+
+  @override
+  String get postUnlikeAction => '「いいね！」を取り消す';
+
+  @override
+  String get postVoteRemoveFailed => '投票を取り消せませんでした（取り消せる時間を過ぎた可能性があります）';
+
+  @override
+  String get postVoteCastFailed => '投票できませんでした';
+
+  @override
+  String get postUpvote => '賛成票';
+
+  @override
+  String get postDownvote => '反対票';
+
+  @override
+  String get pollVoteFailed => '投票できませんでした。もう一度お試しください。';
+
+  @override
+  String get pollRemoveVoteFailed => '投票を取り消せませんでした。もう一度お試しください。';
+
+  @override
+  String get pollVotersLoadFailed => '投票者を読み込めませんでした。';
+
+  @override
+  String get pollVotersNotVisible => 'この投票の投票者は表示されません。';
+
+  @override
+  String solutionSolvedByInPost(String name, int postNumber) {
+    return '$name さんが投稿 #$postNumber で解決';
+  }
+
+  @override
+  String solutionMarkedBy(String name) {
+    return '$name さんがマーク';
+  }
+
+  @override
+  String reactAgainInSeconds(int seconds) {
+    return '$seconds秒後にもう一度リアクションできます';
+  }
+
+  @override
+  String get reactionUpdateFailed => 'リアクションを更新できませんでした。';
+
+  @override
+  String get reactionsNotSupported => 'このフォーラムはリアクションに対応していません。';
+
+  @override
+  String get reactionsLoadFailed => 'リアクションを読み込めませんでした。';
+
+  @override
+  String viewProfileOfUser(String username) {
+    return '$username さんのプロフィールを見る';
+  }
+
+  @override
+  String get failedToSavePost => '投稿を保存できませんでした';
+
+  @override
+  String failedToSavePostWithError(String error) {
+    return '投稿を保存できませんでした: $error';
+  }
+
+  @override
+  String get failedToRemoveAttachmentCheckPermissions =>
+      '添付ファイルを削除できませんでした。権限を確認してください。';
+
+  @override
+  String get editPostTitle => '投稿を編集';
+
+  @override
+  String get editYourPostHint => '投稿を編集...';
+
+  @override
+  String get failedToPostReply => '返信を投稿できませんでした';
+
+  @override
+  String failedToPostReplyWithError(String error) {
+    return '返信を投稿できませんでした: $error';
+  }
+
+  @override
+  String get failedToCreateTopic => 'トピックを作成できませんでした';
+
+  @override
+  String get writeYourTopicTitle => 'トピックのタイトルを書く...';
+
+  @override
+  String get writeYourTopicContent => 'トピックの内容を書く...';
+
+  @override
+  String get composerTitleHint => 'タイトルを書く...';
+
+  @override
+  String get composerContentHint => '内容を書く...';
+
+  @override
+  String imageTooLargeCouldNotResize(
+      String fileName, String size, String limit) {
+    return '$fileName: サイズが大きすぎ（$size）、縮小できませんでした。上限は $limit です。';
+  }
+
+  @override
+  String imageResizedToFitLimit(
+      String fileName, String size, String dimensions, String limit) {
+    return '$fileName を上限 $limit に収まるよう $size$dimensions に縮小しました。';
+  }
+
+  @override
+  String get composerAttachFileHint => 'この投稿にファイルを添付';
+
+  @override
+  String get composerUploadImageHint => 'この投稿に画像をアップロード';
+
+  @override
+  String get composerFormattingHint => '書式オプションを開く';
+
+  @override
+  String get whisperStaffOnly => 'ささやき（スタッフのみ）';
+
+  @override
+  String get whisperOnStaffOnly => 'ささやきオン（スタッフのみ）';
+
+  @override
+  String get tagInputMaxReached => 'タグの上限に達しました';
+
+  @override
+  String get tagInputAddTag => 'タグを追加…';
+
+  @override
+  String get tagInputAddAnother => '+ タグ';
+
+  @override
+  String get editHistoryUnavailable => 'このフォーラムでは編集履歴を利用できません。';
+
+  @override
+  String get editHistoryLoadFailed => '編集履歴を読み込めませんでした。';
+
+  @override
+  String get previousRevision => '前のリビジョン';
+
+  @override
+  String get nextRevision => '次のリビジョン';
+
+  @override
+  String get notificationPrefsLoadFailed => '通知設定を読み込めませんでした。';
+
+  @override
+  String get notificationPrefsSaveFailed => '保存できませんでした — 接続を確認してください';
+
+  @override
+  String get signInToManageNotificationPrefs => '通知設定を管理するにはログインしてください。';
+
+  @override
+  String get notificationSettingsPushSection => 'プッシュ';
+
+  @override
+  String get notificationSettingsEmailSection => 'メール';
+
+  @override
+  String get emailWhenAwayTitle => '不在時のメール';
+
+  @override
+  String get emailLevelDescription =>
+      '引用されたとき、返信されたとき、自分の@ユーザー名がメンションされたとき、またはウォッチ中のカテゴリ、タグ、またはトピックに新しいアクティビティがあったときに、メールで通知する';
+
+  @override
+  String get notificationPrefAlways => '常時';
+
+  @override
+  String get notificationPrefOnlyWhenAway => '離れている時のみ';
+
+  @override
+  String get notificationPrefNever => '通知しない';
+
+  @override
+  String get emailForMessagesTitle => 'メッセージのメール';
+
+  @override
+  String get emailMessagesLevelDescription => '個人メッセージが届いたときにメールで通知する';
+
+  @override
+  String get activitySummaryTitle => 'アクティビティの概要';
+
+  @override
+  String get activitySummaryDescription => 'ここを訪れない場合、人気のトピックと返信の要約をメールで送信する';
+
+  @override
+  String get activitySummaryFrequencyTitle => 'アクティビティの概要の頻度';
+
+  @override
+  String get activitySummaryDaily => '毎日';
+
+  @override
+  String get activitySummaryWeekly => '毎週';
+
+  @override
+  String get activitySummaryMonthly => '毎月';
+
+  @override
+  String get mailingListModeTitle => 'メーリングリストモード';
+
+  @override
+  String get mailingListModeDescription =>
+      'すべての投稿をメールで受け取ります（アクティビティの概要はオフになります）。投稿の多いフォーラムではおすすめしません。';
+
+  @override
+  String get likeNotificationFrequencyTitle => '「いいね！」された時に通知する';
+
+  @override
+  String get likeNotificationFirstTimeAndDaily => '投稿の最初の「いいね！」と毎日';
+
+  @override
+  String get likeNotificationFirstTime => '投稿の最初の「いいね！」';
+
+  @override
+  String get whenPostingTitle => '投稿時';
+
+  @override
+  String get whenPostingDescription => '返信したトピックの扱い';
+
+  @override
+  String get whenPostingWatchTopic => 'トピックをウォッチ';
+
+  @override
+  String get whenPostingTrackTopic => 'トピックを追跡';
+
+  @override
+  String get whenPostingDoNothing => '何もしない';
+
+  @override
+  String get pauseNotificationsUntilTomorrow => '明日まで';
+
+  @override
+  String get couldNotEnableDoNotDisturb => 'おやすみモードをオンにできませんでした';
+
+  @override
+  String get couldNotTurnOffDoNotDisturb => 'おやすみモードをオフにできませんでした';
+
+  @override
+  String get passwordResetEmailSent => 'パスワードリセットのメールを送信しました。';
+
+  @override
+  String get couldNotSendResetEmail => 'リセットメールを送信できませんでした';
+
+  @override
+  String get accountRequestFailed => 'リクエストに失敗しました。';
+
+  @override
+  String get forumUrlUnavailable => 'フォーラムのURLがありません。';
+
+  @override
+  String get couldNotOpenPreferencesPage => '設定ページを開けませんでした。';
+
+  @override
+  String get couldNotOpenForumUrl => 'フォーラムのURLを開けませんでした。';
+
+  @override
+  String get couldNotRequestEmailChange => 'メールアドレスの変更をリクエストできませんでした';
+
+  @override
+  String get newEmailLabel => '新しいメール';
+
+  @override
+  String get enterAnEmailAddress => 'メールアドレスを入力してください';
+
+  @override
+  String get emailLooksInvalid => 'メールアドレスの形式ではないようです';
+
+  @override
+  String get emailNoSpaces => 'メールアドレスにスペースは使えません';
+
+  @override
+  String get allowNotificationsSheetTitle => '通知を許可';
+
+  @override
+  String get notificationsGrantNoPayload => '許可から応答が返されませんでした。';
+
+  @override
+  String get thisForumFallback => 'このフォーラム';
+
+  @override
+  String signInToDomain(String domain) {
+    return '$domain にログイン';
+  }
+
+  @override
+  String get loginResultTitle => 'ログイン結果';
+
+  @override
+  String get invalidAuthenticationCode => '認証コードが正しくありません';
+
+  @override
+  String get tfaVerificationError => '認証中にエラーが発生しました。もう一度お試しください。';
+
+  @override
+  String get passwordFieldLabel => 'パスワード';
+
+  @override
+  String get somethingWentWrongTryAgain => '問題が発生しました。もう一度お試しください。';
+
+  @override
+  String get unexpectedErrorTryAgain => '予期しないエラーが発生しました。もう一度お試しください。';
+
+  @override
+  String get errorNoInternetConnection =>
+      'インターネットに接続されていません。ネットワーク設定を確認してください。';
+
+  @override
+  String get errorRequestTimedOut => 'リクエストがタイムアウトしました。もう一度お試しください。';
+
+  @override
+  String get errorServerTryLater => 'サーバーエラーが発生しました。後でもう一度お試しください。';
+
+  @override
+  String get errorInvalidCredentials => 'ユーザー名またはパスワードが正しくありません。';
+
+  @override
+  String get errorSessionExpired => 'セッションの有効期限が切れました。もう一度ログインしてください。';
+
+  @override
+  String get errorAccountSuspended => 'アカウントは凍結されています。フォーラムのスタッフにお問い合わせください。';
+
+  @override
+  String get errorForumNotFound => 'フォーラムが見つかりません。';
+
+  @override
+  String get errorForumAccessDenied => 'このフォーラムにアクセスする権限がありません。';
+
+  @override
+  String get errorForumUnavailable => 'フォーラムは現在利用できません。後でもう一度お試しください。';
+
+  @override
+  String get errorDataNotFound => '要求されたデータが見つかりません。';
+
+  @override
+  String get errorDataCorrupted => 'データが破損しているようです。ページを更新してください。';
+
+  @override
+  String get errorCacheLoadFailed => 'キャッシュされたデータを読み込めませんでした。もう一度お試しください。';
+
+  @override
+  String errorInvalidField(String field) {
+    return '$field が無効です。';
+  }
+
+  @override
+  String errorFieldRequired(String field) {
+    return '$field は必須です。';
+  }
+
+  @override
+  String errorPermissionDeniedFor(String action) {
+    return '$action の権限がありません。';
+  }
+
+  @override
+  String errorFeatureNotAvailable(String feature) {
+    return '$feature はこのフォーラムでは利用できません。';
+  }
+
+  @override
+  String get errorStorageFull => 'ストレージがいっぱいです。空き容量を確保してください。';
+
+  @override
+  String get errorStorageAccessDenied => 'ストレージへのアクセスが拒否されました。アプリの権限を確認してください。';
+
+  @override
+  String get errorNetworkTryAgain => 'ネットワークエラーが発生しました。もう一度お試しください。';
+
+  @override
+  String get errorAuthenticationTryAgain => '認証に失敗しました。もう一度お試しください。';
+
+  @override
+  String get errorForumTryAgain => 'フォーラムでエラーが発生しました。もう一度お試しください。';
+
+  @override
+  String get connectionErrorTitle => '接続エラー';
+
+  @override
+  String get authenticationErrorTitle => '認証エラー';
+
+  @override
+  String get forumErrorTitle => 'フォーラムエラー';
+
+  @override
+  String get permissionErrorTitle => '権限エラー';
 }

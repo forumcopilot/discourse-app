@@ -7,6 +7,7 @@ import 'package:discourse_ui/views/widgets/post_action_button.dart';
 import '../../theme/design_tokens.dart';
 import '../widgets/reaction_glyph.dart';
 import '../../theme/forum_colors.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Action row under a post, laid out as Discourse web's post menu: the
 /// "N replies" disclosure ([leading]) on the left, the actions packed on
@@ -152,7 +153,9 @@ class PostListItemSocial extends StatelessWidget {
           // Long-press opens the bookmark-reminder sheet when
           // wired (Discourse); plain tap still toggles.
           onLongPress: onLongPressBookmark,
-          semanticLabel: isBookmarked ? 'Remove bookmark' : 'Bookmark post',
+          semanticLabel: isBookmarked
+              ? AppLocalizations.of(context)!.removeBookmark
+              : AppLocalizations.of(context)!.postBookmarkAction,
         ),
       if (trailing != null) trailing!,
     ];
@@ -219,8 +222,8 @@ class _ReactionClusterButton extends StatelessWidget {
 
     return Semantics(
       label: viewerReacted
-          ? 'You reacted. $total reactions. Tap to change, long press to see who.'
-          : '$total reactions. Tap to react, long press to see who.',
+          ? AppLocalizations.of(context)!.postReactionsSemanticsReacted(total)
+          : AppLocalizations.of(context)!.postReactionsSemantics(total),
       button: true,
       selected: viewerReacted,
       child: InkWell(

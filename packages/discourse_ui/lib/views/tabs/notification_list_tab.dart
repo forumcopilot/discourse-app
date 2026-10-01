@@ -355,13 +355,13 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
     if (contentType == 'post') {
       // For post type: use getThreadByPost with the post_id
       if (alert.postId == null || alert.postId!.isEmpty) {
-        _showErrorDialog(context, 'Post ID is missing. Cannot navigate to the post.');
+        _showErrorDialog(context, AppLocalizations.of(context)!.notificationPostIdMissing);
         return;
       }
 
       // topicId is now always provided by the API for post alerts
       if (alert.topicId == null || alert.topicId!.isEmpty) {
-        _showErrorDialog(context, 'Topic ID is missing. Cannot navigate to the post.');
+        _showErrorDialog(context, AppLocalizations.of(context)!.notificationTopicIdMissingForPost);
         return;
       }
 
@@ -382,7 +382,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
       // For thread type: open the topic
       final topicId = alert.topic_id ?? alert.content_id;
       if (topicId == null || topicId.isEmpty) {
-        _showErrorDialog(context, 'Topic ID is missing. Cannot open the topic.');
+        _showErrorDialog(context, AppLocalizations.of(context)!.notificationTopicIdMissing);
         return;
       }
 
@@ -463,7 +463,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
       // For user type: open user profile page
       final username = alert.fromUsername ?? alert.username;
       if (username.isEmpty) {
-        _showErrorDialog(context, 'Username is missing. Cannot open user profile.');
+        _showErrorDialog(context, AppLocalizations.of(context)!.notificationUsernameMissing);
         return;
       }
 
@@ -482,7 +482,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
     } else if (contentType == 'chat_channel') {
       final channelId = int.tryParse(alert.content_id ?? '');
       if (channelId == null) {
-        _showErrorDialog(context, 'Channel ID is missing. Cannot open the chat.');
+        _showErrorDialog(context, AppLocalizations.of(context)!.notificationChannelIdMissing);
         return;
       }
 
@@ -501,7 +501,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
       // A group message summary: the group's inbox, where the messages are.
       final groupName = alert.content_id ?? '';
       if (groupName.isEmpty) {
-        _showErrorDialog(context, 'Group name is missing. Cannot open the inbox.');
+        _showErrorDialog(context, AppLocalizations.of(context)!.notificationGroupNameMissingForInbox);
         return;
       }
       Navigator.push(
@@ -517,7 +517,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
     } else if (contentType == 'group') {
       final groupName = alert.content_id ?? '';
       if (groupName.isEmpty) {
-        _showErrorDialog(context, 'Group name is missing. Cannot open the group.');
+        _showErrorDialog(context, AppLocalizations.of(context)!.notificationGroupNameMissing);
         return;
       }
 
@@ -541,7 +541,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
       final actionUrl = alert.actionUrl;
       if (actionUrl == null || actionUrl.isEmpty) {
         AppLogger.debug('Content type "${alert.content_type}" has no actionUrl. Cannot navigate.');
-        _showErrorDialog(context, 'No action URL available for this notification type.');
+        _showErrorDialog(context, AppLocalizations.of(context)!.notificationNoActionUrl);
         return;
       }
 
@@ -558,7 +558,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
     final badgeId = int.tryParse(alert.content_id ?? '');
     final username = widget.siteContext.currentUsername;
     if (badgeId == null || username == null || username.isEmpty) {
-      _showErrorDialog(context, 'Badge details are unavailable.');
+      _showErrorDialog(context, AppLocalizations.of(context)!.notificationBadgeUnavailable);
       return;
     }
 
@@ -578,7 +578,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
 
     if (!mounted) return;
     if (badge == null) {
-      _showErrorDialog(context, 'Could not load this badge.');
+      _showErrorDialog(context, AppLocalizations.of(context)!.notificationBadgeLoadFailed);
       return;
     }
 
@@ -595,7 +595,7 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('OK'),
+            child: Text(AppLocalizations.of(ctx)!.okButton),
           ),
         ],
       ),
@@ -605,13 +605,13 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
   String _extractSubjectFromMessage(String message) {
     // Extract subject from message like 'sent you a message "Re: I've just gifted you a Silver Award"'
     final match = RegExp(r'"([^"]*)"').firstMatch(message);
-    return match?.group(1) ?? 'Private Message';
+    return match?.group(1) ?? AppLocalizations.of(context)!.personalMessageTitleFallback;
   }
 
   String _extractTopicTitleFromMessage(String message) {
     // Extract topic title from message like 'replied to "First sugar mummy provider in Singapore. "'
     final match = RegExp(r'"([^"]*)"').firstMatch(message);
-    return match?.group(1) ?? 'Topic';
+    return match?.group(1) ?? AppLocalizations.of(context)!.topicTitleFallback;
   }
 
   void _showErrorDialog(BuildContext context, String message) {
@@ -621,14 +621,14 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            AppLocalizations.of(context)?.errorTitle ?? 'Error',
+            AppLocalizations.of(context)!.errorTitle,
           ),
           content: Text(
             message,
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: Text(AppLocalizations.of(context)!.okButton),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -645,8 +645,8 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
     if (!widget.siteContext.isLoggedIn) {
       return NotSignedInView(
         siteContext: widget.siteContext,
-        title: 'Sign in to view notifications',
-        message: 'You need to be signed in to view your notifications.',
+        title: AppLocalizations.of(context)!.signInToViewNotifications,
+        message: AppLocalizations.of(context)!.youNeedToBeSignedInToViewNotifications,
         icon: Icons.notifications_outlined,
       );
     }
@@ -688,9 +688,11 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
               onRefresh: _onRefresh,
               child: EmptyStateView.scrollable(
                 icon: Icons.notifications_none,
-                message: _unreadOnly ? 'No unread notifications' : 'No notifications yet',
+                message: _unreadOnly
+                    ? AppLocalizations.of(context)!.noUnreadNotifications
+                    : AppLocalizations.of(context)!.noNotificationsYet,
                 hint: _unreadOnly
-                    ? "You're all caught up."
+                    ? AppLocalizations.of(context)!.youAreAllCaughtUp
                     : AppLocalizations.of(context)!.noNewNotificationsExplanation,
               ),
             ),
@@ -746,9 +748,9 @@ class NotificationListTabState extends FCStatefulWidget<NotificationListTab> wit
   /// however many read ones came back first.
   Widget _buildFilterBar() {
     return FilterChipBar(
-      options: const [
-        FilterChipOption(label: 'All'),
-        FilterChipOption(label: 'Unread'),
+      options: [
+        FilterChipOption(label: AppLocalizations.of(context)!.all),
+        FilterChipOption(label: AppLocalizations.of(context)!.unread),
       ],
       selectedIndex: _unreadOnly ? 1 : 0,
       onSelected: (i) => _setUnreadOnly(i == 1),

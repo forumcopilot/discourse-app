@@ -27,44 +27,41 @@ class TrustLevelSheet extends StatelessWidget {
     );
   }
 
-  // One-liners kept faithful to stock Discourse defaults.
-  static const _levels = <_TrustLevelEntry>[
-    _TrustLevelEntry(
-      level: 0,
-      name: 'New',
-      summary: 'Just joined. Can read and post, with limits on links, '
-          'images and messages.',
-    ),
-    _TrustLevelEntry(
-      level: 1,
-      name: 'Basic',
-      summary: 'Unlocks core posting features: images and attachments, '
-          'more links, flagging posts.',
-    ),
-    _TrustLevelEntry(
-      level: 2,
-      name: 'Member',
-      summary: 'Can send invites, ignore users, and edit their own posts '
-          'for longer.',
-    ),
-    _TrustLevelEntry(
-      level: 3,
-      name: 'Regular',
-      summary: 'Can recategorize and rename topics, create tags, and their '
-          'spam flags carry more weight.',
-    ),
-    _TrustLevelEntry(
-      level: 4,
-      name: 'Leader',
-      summary: 'Granted by staff. Can edit any post and pin, close, split '
-          'or merge topics.',
-    ),
-  ];
+  // Discourse's names for the levels (trust_levels.names); the one-liners
+  // are kept faithful to stock Discourse defaults.
+  static List<_TrustLevelEntry> _levels(AppLocalizations l10n) => [
+        _TrustLevelEntry(
+          level: 0,
+          name: l10n.trustLevelNameNewUser,
+          summary: l10n.trustLevelSummary0,
+        ),
+        _TrustLevelEntry(
+          level: 1,
+          name: l10n.trustLevelNameBasic,
+          summary: l10n.trustLevelSummary1,
+        ),
+        _TrustLevelEntry(
+          level: 2,
+          name: l10n.trustLevelNameMember,
+          summary: l10n.trustLevelSummary2,
+        ),
+        _TrustLevelEntry(
+          level: 3,
+          name: l10n.trustLevelNameRegular,
+          summary: l10n.trustLevelSummary3,
+        ),
+        _TrustLevelEntry(
+          level: 4,
+          name: l10n.trustLevelNameLeader,
+          summary: l10n.trustLevelSummary4,
+        ),
+      ];
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     // Scrolls, and may grow past the default 9/16 of the screen: at a
     // larger text size or on a short phone the options no longer fit.
@@ -75,7 +72,7 @@ class TrustLevelSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SheetTitle(AppLocalizations.of(context)!.trustLevels),
+            SheetTitle(l10n.trustLevels),
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 DesignTokens.spacingL,
@@ -84,15 +81,15 @@ class TrustLevelSheet extends StatelessWidget {
                 DesignTokens.spacingM,
               ),
               child: Text(
-                AppLocalizations.of(context)!.trustLevelsExplanation,
+                l10n.trustLevelsExplanation,
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
             const Divider(height: 1),
-            for (final entry in _levels)
-              _buildRow(entry, colorScheme, textTheme),
+            for (final entry in _levels(l10n))
+              _buildRow(entry, l10n, colorScheme, textTheme),
           ],
         ),
       ),
@@ -101,6 +98,7 @@ class TrustLevelSheet extends StatelessWidget {
 
   Widget _buildRow(
     _TrustLevelEntry entry,
+    AppLocalizations l10n,
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
@@ -122,7 +120,7 @@ class TrustLevelSheet extends StatelessWidget {
           ),
         ),
       ),
-      title: Text('TL${entry.level} · ${entry.name}'),
+      title: Text(l10n.trustLevelRowTitle(entry.level, entry.name)),
       subtitle: Text(entry.summary),
       trailing: isCurrent ? const Icon(Icons.check) : null,
     );

@@ -86,7 +86,9 @@ class _TagTopicsPageState extends State<TagTopicsPage> {
           if (result.topics.length < _pageSize) _hasMore = false;
           _page++;
         } else {
-          _error = (result.resultText?.isEmpty ?? true) ? 'Failed to load' : result.resultText;
+          _error = (result.resultText?.isEmpty ?? true)
+              ? AppLocalizations.of(context)!.tagTopicsLoadFailed
+              : result.resultText;
           _hasMore = false;
         }
         _isLoading = false;
@@ -186,7 +188,7 @@ class _TagTopicsPageState extends State<TagTopicsPage> {
                 _notificationLevelIcon(
                     _notificationLevel ?? FCNotificationLevel.normal),
               ),
-              tooltip: 'Notification level',
+              tooltip: AppLocalizations.of(context)!.tagNotificationLevelTooltip,
               onPressed: _showNotificationLevelSheet,
             ),
         ],

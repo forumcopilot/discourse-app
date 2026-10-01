@@ -40,8 +40,9 @@ class MessageComposePage extends StatefulWidget {
   // Returns attachment ID on success, null on failure
   // If null, attachment upload buttons will be hidden
   final Future<String?> Function(XFile file)? onFileUpload;
-  final String titleHint;
-  final String contentHint;
+  /// The fields' hints; null for the generic "Write your title/content".
+  final String? titleHint;
+  final String? contentHint;
   final bool showAppBar;
   final bool autoFocusContent;
   final String? forumName;
@@ -120,8 +121,8 @@ class MessageComposePage extends StatefulWidget {
     this.showTitleField = false,
     this.requireTitle = true, // Default to true to maintain existing behavior
     this.initialContent,
-    this.titleHint = 'Write your title...',
-    this.contentHint = 'Write your content...',
+    this.titleHint,
+    this.contentHint,
     this.showAppBar = true,
     this.autoFocusContent = true,
     this.forumName,
@@ -355,8 +356,11 @@ class _MessageComposePageState extends State<MessageComposePage> {
     if (shrunk == null) {
       if (mounted) {
         _showAttachmentError(
-          '${image.name}: too large (${formatFileSize(pickedBytes)}) and '
-          'could not be resized. Limit is ${formatFileSize(maxBytes)}.',
+          AppLocalizations.of(context)!.imageTooLargeCouldNotResize(
+            image.name,
+            formatFileSize(pickedBytes),
+            formatFileSize(maxBytes),
+          ),
         );
       }
       return null;
@@ -368,8 +372,12 @@ class _MessageComposePageState extends State<MessageComposePage> {
           ? ' (${from.width}×${from.height} → ${to.width}×${to.height})'
           : '';
       _showAttachmentNotice(
-        '${image.name} resized to ${formatFileSize(shrunk.newBytes)}$dims '
-        'to fit the ${formatFileSize(maxBytes)} limit.',
+        AppLocalizations.of(context)!.imageResizedToFitLimit(
+          image.name,
+          formatFileSize(shrunk.newBytes),
+          dims,
+          formatFileSize(maxBytes),
+        ),
       );
     }
     return XFile(shrunk.file.path, name: image.name);
@@ -688,21 +696,21 @@ class _MessageComposePageState extends State<MessageComposePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context)?.removeAttachment ?? 'Remove Attachment'),
+          title: Text(AppLocalizations.of(context)!.removeAttachment),
           content: Text(
-            AppLocalizations.of(context)?.areYouSureYouWantToRemoveThisAttachment ?? 'Are you sure you want to remove this attachment?',
+            AppLocalizations.of(context)!.areYouSureYouWantToRemoveThisAttachment,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.error,
               ),
-              child: Text(AppLocalizations.of(context)?.delete ?? 'Delete'),
+              child: Text(AppLocalizations.of(context)!.delete),
             ),
           ],
         );
@@ -948,12 +956,12 @@ class _MessageComposePageState extends State<MessageComposePage> {
 
   Future<void> _submit() async {
     if (widget.showTitleField && widget.requireTitle && _titleController.text.trim().isEmpty) {
-      _showNotice(AppLocalizations.of(context)?.pleaseEnterTitle ?? 'Please enter a title');
+      _showNotice(AppLocalizations.of(context)!.pleaseEnterTitle);
       return;
     }
 
     if (_contentController.text.trim().isEmpty) {
-      _showNotice(AppLocalizations.of(context)?.pleaseEnterContent ?? 'Please enter some content');
+      _showNotice(AppLocalizations.of(context)!.pleaseEnterContent);
       return;
     }
 
@@ -975,7 +983,8 @@ class _MessageComposePageState extends State<MessageComposePage> {
       
       // Append signature if enabled
       if (widget.showSignatureToggle && _includeSignature) {
-        final signature = 'Sent from ${widget.siteContext.site.name} mobile app';
+        final signature = AppLocalizations.of(context)!
+            .sentFromMobileApp(widget.siteContext.site.name);
         // Add two line breaks before signature
         content = '$content\n\n$signature';
       }
@@ -1071,51 +1080,51 @@ class _MessageComposePageState extends State<MessageComposePage> {
               // File attachment button - only show if onFileUpload is provided
               if (widget.onFileUpload != null)
                 Semantics(
-                  label: AppLocalizations.of(context)?.attachFile ?? 'Attach File',
-                  hint: 'Attach a file to this message',
+                  label: AppLocalizations.of(context)!.attachFile,
+                  hint: AppLocalizations.of(context)!.composerAttachFileHint,
                   button: true,
                   child: IconButton(
                     icon: Icon(
                       Icons.attach_file,
                       color: colorScheme.onSurfaceVariant,
                     ),
-                    tooltip: AppLocalizations.of(context)?.attachFile ?? 'Attach File',
+                    tooltip: AppLocalizations.of(context)!.attachFile,
                     onPressed: _handleFileUpload,
                   ),
                 ),
               // Image upload button - only show if onFileUpload is provided
               if (widget.onFileUpload != null)
                 Semantics(
-                  label: AppLocalizations.of(context)?.uploadImage ?? 'Upload Image',
-                  hint: 'Upload an image to this message',
+                  label: AppLocalizations.of(context)!.uploadImage,
+                  hint: AppLocalizations.of(context)!.composerUploadImageHint,
                   button: true,
                   child: IconButton(
                     icon: Icon(
                       Icons.image,
                       color: colorScheme.onSurfaceVariant,
                     ),
-                    tooltip: AppLocalizations.of(context)?.uploadImage ?? 'Upload Image',
+                    tooltip: AppLocalizations.of(context)!.uploadImage,
                     onPressed: _handleImageUpload,
                   ),
                 ),
               // Camera button - same as above, straight from the camera
               if (widget.onFileUpload != null && FilePickerUtils.canTakePhoto)
                 Semantics(
-                  label: AppLocalizations.of(context)?.takePhoto ?? 'Take photo',
+                  label: AppLocalizations.of(context)!.takePhoto,
                   button: true,
                   child: IconButton(
                     icon: Icon(
                       Icons.photo_camera,
                       color: colorScheme.onSurfaceVariant,
                     ),
-                    tooltip: AppLocalizations.of(context)?.takePhoto ?? 'Take photo',
+                    tooltip: AppLocalizations.of(context)!.takePhoto,
                     onPressed: () => _handleImageUpload(fromCamera: true),
                   ),
                 ),
               // Formatting button
               Semantics(
-                label: AppLocalizations.of(context)?.formatting ?? 'Formatting',
-                hint: 'Open formatting options',
+                label: AppLocalizations.of(context)!.formatting,
+                hint: AppLocalizations.of(context)!.composerFormattingHint,
                 button: true,
                 enabled: _isContentFieldFocused,
                 child: PopupMenuButton<String>(
@@ -1125,7 +1134,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   // bold glyph reads as a bold *button* — so the other twelve
                   // looked absent rather than one tap away.
                   icon: Icon(Icons.text_format, color: _isContentFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
-                  tooltip: AppLocalizations.of(context)?.formatting ?? 'Formatting',
+                  tooltip: AppLocalizations.of(context)!.formatting,
                   onSelected: _insertMarkup,
                 itemBuilder: (context) => [
                   // Text formatting
@@ -1135,7 +1144,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_bold, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.bold ?? 'Bold'),
+                        Text(AppLocalizations.of(context)!.bold),
                       ],
                     ),
                   ),
@@ -1145,7 +1154,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_italic, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.italic ?? 'Italic'),
+                        Text(AppLocalizations.of(context)!.italic),
                       ],
                     ),
                   ),
@@ -1155,7 +1164,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_underline, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.underline ?? 'Underline'),
+                        Text(AppLocalizations.of(context)!.underline),
                       ],
                     ),
                   ),
@@ -1165,7 +1174,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.strikethrough_s, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.strikethrough ?? 'Strikethrough'),
+                        Text(AppLocalizations.of(context)!.strikethrough),
                       ],
                     ),
                   ),
@@ -1177,7 +1186,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.link, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.link ?? 'Link'),
+                        Text(AppLocalizations.of(context)!.link),
                       ],
                     ),
                   ),
@@ -1187,7 +1196,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.image, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.image ?? 'Image'),
+                        Text(AppLocalizations.of(context)!.image),
                       ],
                     ),
                   ),
@@ -1197,7 +1206,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.videocam, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.video ?? 'Video'),
+                        Text(AppLocalizations.of(context)!.video),
                       ],
                     ),
                   ),
@@ -1209,7 +1218,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_quote, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.quote ?? 'Quote'),
+                        Text(AppLocalizations.of(context)!.quote),
                       ],
                     ),
                   ),
@@ -1219,7 +1228,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.code, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.code ?? 'Code'),
+                        Text(AppLocalizations.of(context)!.code),
                       ],
                     ),
                   ),
@@ -1229,7 +1238,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.visibility_off, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.spoiler ?? 'Spoiler'),
+                        Text(AppLocalizations.of(context)!.spoiler),
                       ],
                     ),
                   ),
@@ -1241,7 +1250,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_list_bulleted, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.bulletList ?? 'Bullet List'),
+                        Text(AppLocalizations.of(context)!.bulletList),
                       ],
                     ),
                   ),
@@ -1251,7 +1260,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.format_list_numbered, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.numberedList ?? 'Numbered List'),
+                        Text(AppLocalizations.of(context)!.numberedList),
                       ],
                     ),
                   ),
@@ -1261,7 +1270,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                       children: [
                         Icon(Icons.subdirectory_arrow_right, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)?.listItem ?? 'List Item'),
+                        Text(AppLocalizations.of(context)!.listItem),
                       ],
                     ),
                   ),
@@ -1275,7 +1284,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
               // Mention button
               IconButton(
                 icon: Icon(Icons.alternate_email, color: _isContentFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
-                tooltip: AppLocalizations.of(context)?.mentionUser ?? 'Mention User',
+                tooltip: AppLocalizations.of(context)!.mentionUser,
                 onPressed: _isContentFieldFocused ? _handleMention : null,
               ),
               // Discourse whisper toggle (staff-only reply mode)
@@ -1285,7 +1294,9 @@ class _MessageComposePageState extends State<MessageComposePage> {
                     _isWhisper ? Icons.visibility_off : Icons.visibility_off_outlined,
                     color: _isWhisper ? colorScheme.primary : colorScheme.onSurfaceVariant,
                   ),
-                  tooltip: _isWhisper ? 'Whisper on (staff only)' : 'Whisper (staff only)',
+                  tooltip: _isWhisper
+                      ? AppLocalizations.of(context)!.whisperOnStaffOnly
+                      : AppLocalizations.of(context)!.whisperStaffOnly,
                   onPressed: () {
                     setState(() => _isWhisper = !_isWhisper);
                     widget.onWhisperChanged?.call(_isWhisper);
@@ -1433,7 +1444,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                               Row(
                                 children: [
                                   Text(
-                                    AppLocalizations.of(context)?.forum ?? 'Forum',
+                                    AppLocalizations.of(context)!.forum,
                                     style: textTheme.bodyMedium?.copyWith(
                                       color: colorScheme.onSurfaceVariant,
                                     ),
@@ -1465,7 +1476,9 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                 focusNode: _titleFocusNode,
                                 decoration: InputDecoration(
                                   labelText: AppLocalizations.of(context)!.title,
-                                  hintText: widget.titleHint,
+                                  hintText: widget.titleHint ??
+                                      AppLocalizations.of(context)!
+                                          .composerTitleHint,
                                 ),
                                 textCapitalization: TextCapitalization.sentences,
                                 enabled: !_isSubmitting,
@@ -1480,9 +1493,10 @@ class _MessageComposePageState extends State<MessageComposePage> {
                               textCapitalization: TextCapitalization.sentences,
                               decoration: InputDecoration(
                                 labelText: widget.contentLabel ??
-                                    AppLocalizations.of(context)?.content ??
-                                    'Content',
-                                hintText: widget.contentHint,
+                                    AppLocalizations.of(context)!.content,
+                                hintText: widget.contentHint ??
+                                    AppLocalizations.of(context)!
+                                        .composerContentHint,
                                 alignLabelWithHint: true,
                                 floatingLabelBehavior: FloatingLabelBehavior.always,
                               ),

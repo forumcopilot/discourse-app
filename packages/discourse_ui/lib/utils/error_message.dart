@@ -3,6 +3,7 @@ import 'package:discourse_core/discourse_core.dart'
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
+import '../l10n/app_l10n.dart';
 import '../l10n/generated/app_localizations.dart';
 
 /// Turns a caught error into something worth showing a person.
@@ -21,12 +22,12 @@ import '../l10n/generated/app_localizations.dart';
 /// of "Payment Required", "Not authorized (HTTP 403)" or "An unexpected
 /// error occurred". Anything else keeps the forum's own message.
 String describeError(Object? error, {String? fallback, BuildContext? context}) {
-  final text = _describe(error, fallback: fallback);
+  final ctx = context ?? Get.context;
+  final l10n = (ctx == null ? null : AppLocalizations.of(ctx)) ?? appL10n();
+  final text =
+      _describe(error, fallback: fallback ?? l10n.somethingWentWrongTryAgain);
   final kind = error is DiscourseApiException ? error.kind : discourseErrorKindOf(text);
   if (kind == null) return text;
-  final ctx = context ?? Get.context;
-  final l10n = ctx == null ? null : AppLocalizations.of(ctx);
-  if (l10n == null) return text;
   return switch (kind) {
     DiscourseErrorKind.noConnection => l10n.errorNoConnection,
     DiscourseErrorKind.timedOut => l10n.errorTimedOut,
@@ -39,22 +40,18 @@ String describeError(Object? error, {String? fallback, BuildContext? context}) {
   };
 }
 
-String _describe(Object? error, {String? fallback}) {
-  if (error == null) {
-    return fallback ?? 'Something went wrong. Please try again.';
-  }
+String _describe(Object? error, {required String fallback}) {
+  if (error == null) return fallback;
   if (error is DiscourseApiException) return error.userMessage;
 
   // Dart prepends "Exception: " to the message of a bare Exception; it means
   // nothing to a reader.
   final text = error.toString().replaceFirst(RegExp(r'^Exception:\s*'), '');
-  if (text.isEmpty) {
-    return fallback ?? 'Something went wrong. Please try again.';
-  }
+  if (text.isEmpty) return fallback;
   // Anything long or markup-shaped is a machine detail that escaped; prefer
   // the caller's wording over dumping it.
   if (text.length > 200 || text.contains('<html') || text.contains('<!DOCTYPE')) {
-    return fallback ?? 'Something went wrong. Please try again.';
+    return fallback;
   }
   return text;
 }

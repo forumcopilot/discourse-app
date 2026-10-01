@@ -477,153 +477,21 @@ class PostActionsHandler {
     }
   }
 
-  Future<void> handleReport(BuildContext context, String postId) async {
-    AppLogger.debug('Handling report of post: $postId');
-
-    // Discourse has a real flag taxonomy (off-topic / inappropriate / spam / notify
-    // moderators / message the author) and its own modal for it. The free-text dialog
-    // below can only ever file "Something Else", so Discourse gets its own.
-    // XenForo keeps this path unchanged — flag types are not its vocabulary.
-    if (siteContext.siteType == 'discourse') {
-      await showDiscourseReportDialog(context, postId: postId);
-      return;
-    }
-
-    final TextEditingController reasonController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-
-    final result = await showDialog<String?>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)?.reportPost ?? 'Report Post'),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.pleaseProvideReasonForReporting,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: reasonController,
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.reason,
-                    hintText: AppLocalizations.of(context)!.enterReasonForReportingPost,
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return AppLocalizations.of(context)!.pleaseEnterReason;
-                    }
-                    return null;
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(null),
-              child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
-            ),
-            FilledButton(
-              onPressed: () {
-                if (formKey.currentState?.validate() ?? false) {
-                  Navigator.of(context).pop(reasonController.text.trim());
-                }
-              },
-              child: Text(AppLocalizations.of(context)!.submitReport),
-            ),
-          ],
-        );
-      },
+  /// Flags a post with the forum's own flag types (web's flag modal). The
+  /// author's name goes into "Send @… a message", which is not offered on
+  /// the reader's own post.
+  Future<void> handleReport(BuildContext context, String postId,
+      {String? authorUsername}) async {
+    AppLogger.debug('Handling flag of post: $postId');
+    final me = siteContext.loginDataOutput?.user?.username;
+    await showDiscourseReportDialog(
+      context,
+      postId: postId,
+      authorUsername: authorUsername,
+      ownPost: me != null &&
+          authorUsername != null &&
+          me.toLowerCase() == authorUsername.toLowerCase(),
     );
-
-    if (result != null && context.mounted) {
-      // Show loading indicator
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Theme.of(context).colorScheme.onInverseSurface,
-                ),
-              ),
-              const SizedBox(width: DesignTokens.spacingM),
-              Text(
-                AppLocalizations.of(context)!.flaggingPost,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onInverseSurface,
-                    ),
-              ),
-            ],
-          ),
-          backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          duration: const Duration(seconds: 30), // Longer duration for loading
-        ),
-      );
-
-      try {
-        AppLogger.debug('Submitting report for post: $postId with reason: $result');
-        final postProxy = SiteProxyFactory.getPostProxy();
-        final reportResult = await postProxy.reportPostAsync(postId, result);
-
-        AppLogger.debug('Report result: ${reportResult.result}, resultText: ${reportResult.resultText}');
-
-        if (context.mounted) {
-          // Hide loading snackbar
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-          // Check if the report was successful
-          if (reportResult.result) {
-            AppLogger.debug('Report submitted successfully for post: $postId');
-            // Show success message
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    Icon(
-                      Icons.check_circle_outline,
-                      color: Theme.of(context).colorScheme.onInverseSurface,
-                    ),
-                    const SizedBox(width: DesignTokens.spacingM),
-                    Text(
-                      AppLocalizations.of(context)!.reportSubmittedSuccessfully,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onInverseSurface,
-                          ),
-                    ),
-                  ],
-                ),
-                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-                duration: const Duration(seconds: 4),
-              ),
-            );
-          } else {
-            // Show error message with server response
-            final errorMessage = (reportResult.resultText != null && reportResult.resultText!.isNotEmpty) ? reportResult.resultText! : 'Failed to submit report';
-
-            AppLogger.debug('Report failed for post: $postId, error: $errorMessage');
-            SnackbarHelper.showError(context, errorMessage);
-          }
-        }
-      } catch (e) {
-        AppLogger.debug('Exception occurred while reporting post: $postId, error: $e');
-        if (context.mounted) {
-          // Replaces the loading snackbar.
-          SnackbarHelper.showError(context, AppLocalizations.of(context)!.failedToSubmitReport2(describeError(e, context: context)));
-        }
-      }
-    }
   }
 
   /// Opens the Discourse edit-history viewer for [postId]. Posts that

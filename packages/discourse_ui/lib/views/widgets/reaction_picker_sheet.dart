@@ -101,11 +101,11 @@ class _ReactionPickerSheetState extends State<ReactionPickerSheet> {
       setState(() {
         _toggling = null;
         _error = cooldown != null
-            ? 'You can react to this post again in '
-                '${LikeCooldown.secondsLeft(widget.postId)}s'
+            ? AppLocalizations.of(context)!
+                .reactAgainInSeconds(LikeCooldown.secondsLeft(widget.postId))
             : (result.resultText?.isNotEmpty == true
                 ? result.resultText!
-                : 'Could not update reaction.');
+                : AppLocalizations.of(context)!.reactionUpdateFailed);
       });
     }
   }

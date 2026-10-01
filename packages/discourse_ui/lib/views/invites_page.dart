@@ -34,11 +34,32 @@ class InvitesPage extends StatefulWidget {
 }
 
 class _InvitesPageState extends State<InvitesPage> {
-  static const _filters = [
-    (value: 'pending', label: 'Pending'),
-    (value: 'expired', label: 'Expired'),
-    (value: 'redeemed', label: 'Redeemed'),
-  ];
+  static const _filters = ['pending', 'expired', 'redeemed'];
+
+  /// A filter chip's label with its count, in Discourse's words.
+  String _filterLabel(AppLocalizations l10n, String filter) {
+    final count = _countFor(filter);
+    switch (filter) {
+      case 'expired':
+        return l10n.invitesExpiredWithCount(count);
+      case 'redeemed':
+        return l10n.invitesRedeemedWithCount(count);
+      default:
+        return l10n.invitesPendingWithCount(count);
+    }
+  }
+
+  /// The empty list's message for a filter.
+  String _emptyMessage(AppLocalizations l10n, String filter) {
+    switch (filter) {
+      case 'expired':
+        return l10n.invitesEmptyExpired;
+      case 'redeemed':
+        return l10n.invitesEmptyRedeemed;
+      default:
+        return l10n.invitesEmptyPending;
+    }
+  }
 
   String _filter = 'pending';
   List<DiscourseInvite>? _invites;
@@ -88,7 +109,7 @@ class _InvitesPageState extends State<InvitesPage> {
           } else {
             _error = result.resultText?.isNotEmpty == true
                 ? result.resultText
-                : 'Failed to load invites.';
+                : AppLocalizations.of(context)!.invitesLoadFailed;
           }
           return;
         }
@@ -123,7 +144,7 @@ class _InvitesPageState extends State<InvitesPage> {
         SnackBar(
           content: Text(result.resultText?.isNotEmpty == true
               ? result.resultText!
-              : 'Failed to create invite link'),
+              : AppLocalizations.of(context)!.inviteLinkCreateFailed),
         ),
       );
       return;
@@ -239,14 +260,15 @@ class _InvitesPageState extends State<InvitesPage> {
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                   autofocus: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Email address',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText:
+                        AppLocalizations.of(context)!.inviteEmailAddressLabel,
+                    border: const OutlineInputBorder(),
                   ),
                   validator: (value) {
                     final v = value?.trim() ?? '';
                     if (v.isEmpty || !v.contains('@')) {
-                      return 'Enter a valid email address';
+                      return AppLocalizations.of(context)!.inviteEmailInvalid;
                     }
                     return null;
                   },
@@ -255,9 +277,10 @@ class _InvitesPageState extends State<InvitesPage> {
                 TextFormField(
                   controller: messageController,
                   maxLines: 3,
-                  decoration: const InputDecoration(
-                    labelText: 'Message (optional)',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!
+                        .inviteMessageOptionalLabel,
+                    border: const OutlineInputBorder(),
                   ),
                 ),
               ],
@@ -298,7 +321,7 @@ class _InvitesPageState extends State<InvitesPage> {
         SnackBar(
           content: Text(result.resultText?.isNotEmpty == true
               ? result.resultText!
-              : 'Failed to send invite'),
+              : AppLocalizations.of(context)!.inviteSendFailed),
         ),
       );
       return;
@@ -316,8 +339,9 @@ class _InvitesPageState extends State<InvitesPage> {
         title: Text(AppLocalizations.of(context)!.revokeInviteQuestion),
         content: Text(
           invite.isLinkInvite
-              ? 'The invite link will stop working.'
-              : 'The invite to ${invite.email} will stop working.',
+              ? AppLocalizations.of(context)!.revokeInviteLinkWarning
+              : AppLocalizations.of(context)!
+                  .revokeInviteEmailWarning(invite.email ?? ''),
         ),
         actions: [
           TextButton(
@@ -345,7 +369,7 @@ class _InvitesPageState extends State<InvitesPage> {
         SnackBar(
           content: Text(result.resultText?.isNotEmpty == true
               ? result.resultText!
-              : 'Failed to revoke invite'),
+              : AppLocalizations.of(context)!.inviteRevokeFailed),
         ),
       );
     }
@@ -368,12 +392,12 @@ class _InvitesPageState extends State<InvitesPage> {
     final forbidden = _forbiddenText != null;
     return Scaffold(
       appBar: SimpleListAppBar(
-        title: 'Invites',
+        title: AppLocalizations.of(context)!.invites,
         actions: [
           if (!forbidden)
             IconButton(
               icon: const Icon(Icons.mail_outline),
-              tooltip: 'Invite by email',
+              tooltip: AppLocalizations.of(context)!.inviteByEmail,
               onPressed: _showEmailInviteDialog,
             ),
         ],
@@ -400,7 +424,7 @@ class _InvitesPageState extends State<InvitesPage> {
     if (_forbiddenText != null) {
       return EmptyStateView(
         icon: Icons.lock_outline,
-        message: "You don't have permission to invite",
+        message: AppLocalizations.of(context)!.inviteNoPermission,
         hint: _forbiddenText,
       );
     }
@@ -434,12 +458,12 @@ class _InvitesPageState extends State<InvitesPage> {
         children: [
           for (final f in _filters) ...[
             ChoiceChip(
-              label: Text('${f.label} (${_countFor(f.value)})'),
-              selected: _filter == f.value,
+              label: Text(_filterLabel(AppLocalizations.of(context)!, f)),
+              selected: _filter == f,
               onSelected: (selected) {
-                if (!selected || _filter == f.value) return;
+                if (!selected || _filter == f) return;
                 setState(() {
-                  _filter = f.value;
+                  _filter = f;
                   _invites = null;
                 });
                 _load();
@@ -468,9 +492,9 @@ class _InvitesPageState extends State<InvitesPage> {
     if (invites.isEmpty) {
       return EmptyStateView.scrollable(
         icon: Icons.person_add_alt_outlined,
-        message: 'No $_filter invites',
+        message: _emptyMessage(AppLocalizations.of(context)!, _filter),
         hint: _filter == 'pending'
-            ? 'Create an invite link to bring people to the forum.'
+            ? AppLocalizations.of(context)!.invitesEmptyPendingHint
             : null,
       );
     }
@@ -518,6 +542,7 @@ class _InviteRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context).toString();
     final dateFormat = DateFormat.yMMMd(locale);
 
@@ -525,27 +550,32 @@ class _InviteRow extends StatelessWidget {
     final title = isRedeemed && invite.redeemedUsername != null
         ? '@${invite.redeemedUsername}'
         : invite.isLinkInvite
-            ? (invite.link.isNotEmpty ? invite.link : 'Invite link')
+            ? (invite.link.isNotEmpty
+                ? invite.link
+                : l10n.inviteLinkFallbackTitle)
             : (invite.email ?? '');
 
     final details = <String>[];
     if (isRedeemed) {
-      details.add('Redeemed ${dateFormat.format(invite.redeemedAt!.toLocal())}');
+      details.add(l10n
+          .inviteRedeemedOn(dateFormat.format(invite.redeemedAt!.toLocal())));
     } else {
       if (invite.maxRedemptionsAllowed != null) {
-        details.add(
-          'Redeemed ${invite.redemptionCount ?? 0} of '
-          '${invite.maxRedemptionsAllowed}',
-        );
+        details.add(l10n.inviteRedemptions(
+          invite.redemptionCount ?? 0,
+          invite.maxRedemptionsAllowed!,
+        ));
       }
       if (!invite.isLinkInvite) {
-        details.add(invite.emailed ? 'Email sent' : 'Email not sent');
+        details.add(
+            invite.emailed ? l10n.inviteEmailSent : l10n.inviteEmailNotSent);
       }
       if (invite.expiresAt != null) {
         details.add(
           invite.expired
-              ? 'Expired ${dateFormat.format(invite.expiresAt!.toLocal())}'
-              : 'Expires ${dateFormat.format(invite.expiresAt!.toLocal())}',
+              ? l10n.inviteExpiredOn(
+                  dateFormat.format(invite.expiresAt!.toLocal()))
+              : l10n.expiresOn(dateFormat.format(invite.expiresAt!.toLocal())),
         );
       }
     }
@@ -579,7 +609,7 @@ class _InviteRow extends StatelessWidget {
       trailing: onDelete != null
           ? IconButton(
               icon: Icon(Icons.delete_outline, color: colorScheme.error),
-              tooltip: 'Revoke invite',
+              tooltip: l10n.inviteRevokeTooltip,
               onPressed: onDelete,
             )
           : null,

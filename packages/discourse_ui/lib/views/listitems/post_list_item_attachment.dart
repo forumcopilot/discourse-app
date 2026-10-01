@@ -12,7 +12,7 @@ class PostListItemAttachment extends StatelessWidget {
   final dynamic actions;
   final BuildContext context;
   final bool isInline;
-  final String title;
+  final String? title;
 
   const PostListItemAttachment({
     super.key,
@@ -20,7 +20,7 @@ class PostListItemAttachment extends StatelessWidget {
     required this.actions,
     required this.context,
     this.isInline = false,
-    this.title = 'Attachments',
+    this.title,
   });
 
   @override
@@ -117,8 +117,7 @@ class PostListItemAttachment extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: Text(AppLocalizations.of(context)?.downloading(filename) ??
-                  'Downloading $filename...'),
+              child: Text(AppLocalizations.of(context)!.downloading(filename)),
             ),
           ],
         ),
@@ -137,8 +136,7 @@ class PostListItemAttachment extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                AppLocalizations.of(context)?.openingShareSheet(filename) ??
-                    'Opening share sheet for $filename',
+                AppLocalizations.of(context)!.openingShareSheet(filename),
               ),
               backgroundColor: Theme.of(context).colorScheme.primary,
               duration: const Duration(seconds: 2),
@@ -150,10 +148,8 @@ class PostListItemAttachment extends StatelessWidget {
               (filePath.contains('Downloads') &&
                   !filePath.contains('Containers'));
           final locationMessage = isInDownloads
-              ? (AppLocalizations.of(context)?.fileSavedToDownloads(filename) ??
-                  'File saved to Downloads: $filename')
-              : (AppLocalizations.of(context)?.fileSavedToDocuments(filename) ??
-                  'File saved to Documents: $filename');
+              ? AppLocalizations.of(context)!.fileSavedToDownloads(filename)
+              : AppLocalizations.of(context)!.fileSavedToDocuments(filename);
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -169,9 +165,8 @@ class PostListItemAttachment extends StatelessWidget {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)
-                    ?.errorDownloading(filename, e.toString()) ??
-                'Error downloading $filename: $e'),
+            content: Text(AppLocalizations.of(context)!
+                .errorDownloading(filename, e.toString())),
             backgroundColor: Theme.of(context).colorScheme.error,
             duration: const Duration(seconds: 4),
           ),

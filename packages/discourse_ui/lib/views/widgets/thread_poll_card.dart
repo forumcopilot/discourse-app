@@ -86,7 +86,7 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
           ),
         );
       } else if (mounted) {
-        _showError('Vote failed. Please try again.');
+        _showError(AppLocalizations.of(context)!.pollVoteFailed);
       }
     } catch (e) {
       if (mounted) _showError(e.toString());
@@ -129,7 +129,7 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
           ),
         );
       } else {
-        _showError('Could not remove your vote. Please try again.');
+        _showError(AppLocalizations.of(context)!.pollRemoveVoteFailed);
       }
     } catch (e) {
       if (mounted) _showError(e.toString());
@@ -144,7 +144,7 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
     if (proxy is! DiscoursePostProxy) return;
     final postId = _hostPostId;
     if (postId == null) {
-      _showError('Could not load voters.');
+      _showError(AppLocalizations.of(context)!.pollVotersLoadFailed);
       return;
     }
     await showModalBottomSheet(
@@ -464,7 +464,7 @@ class _PollVotersSheetState extends State<_PollVotersSheet> {
         // list. The affordance is gated on publicVotes, so this is rare.
         _error = result.resultText.isNotEmpty
             ? result.resultText
-            : 'Voters are not visible for this poll.';
+            : AppLocalizations.of(context)!.pollVotersNotVisible;
         return;
       }
       result.votersByOption.forEach((optionId, voters) {
@@ -515,7 +515,7 @@ class _PollVotersSheetState extends State<_PollVotersSheet> {
     for (final r in widget.poll.responses) {
       if (r.id == optionId) return r.text;
     }
-    return 'Voters';
+    return AppLocalizations.of(context)!.voters;
   }
 
   @override
