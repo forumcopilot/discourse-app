@@ -7937,6 +7937,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Permission Error'**
   String get permissionErrorTitle;
+
+  /// Snackbar when taking a person or group off a personal message fails and Discourse gave no reason
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t remove {name} from this message.'**
+  String errorRemovingFromMessage(String name);
 }
 
 class _AppLocalizationsDelegate

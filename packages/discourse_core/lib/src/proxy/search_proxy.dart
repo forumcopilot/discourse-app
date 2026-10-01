@@ -490,6 +490,8 @@ class DiscourseSearchProxy extends BaseDiscourseProxy
       shortContent: (t['excerpt'] as String?) ?? '',
       isPinned: (t['pinned'] as bool?) ?? false,
       isAnnouncement: false,
+      // discourse-solved adds it to SearchTopicListItemSerializer too.
+      isSolved: (t['has_accepted_answer'] as bool?) ?? false,
       canReply: !(t['closed'] == true || t['archived'] == true),
       canReport: true,
       canLike: true,

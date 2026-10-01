@@ -1477,5 +1477,6 @@
   "dismissUnreadStopTracking": "これらのトピックの追跡を停止して、未読として表示されないようにする",
   "dismissNewAndUnread": "新規と未読を閉じる",
   "dismissNewAndUnreadMessage": "{category} のトピックは新規・未読として表示されなくなります。",
-  "dismissedTopics": "閉じました"
+  "dismissedTopics": "閉じました",
+  "errorRemovingFromMessage": "このメッセージから {name} を削除できませんでした。"
 }

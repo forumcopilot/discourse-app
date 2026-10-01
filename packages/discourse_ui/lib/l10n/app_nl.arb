@@ -1634,5 +1634,6 @@
   "dismissUnreadStopTracking": "Volgen van deze topics stoppen, zodat ze nooit meer als ongelezen verschijnen voor mij",
   "dismissNewAndUnread": "Nieuwe en ongelezen negeren",
   "dismissNewAndUnreadMessage": "Topics in {category} worden niet meer als nieuw of ongelezen getoond.",
-  "dismissedTopics": "Genegeerd"
+  "dismissedTopics": "Genegeerd",
+  "errorRemovingFromMessage": "Kon {name} niet uit dit bericht verwijderen."
 }

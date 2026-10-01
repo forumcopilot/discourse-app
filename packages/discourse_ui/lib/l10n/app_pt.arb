@@ -1477,5 +1477,6 @@
   "dismissUnreadStopTracking": "Parar de monitorar estes tópicos para que eles deixem de aparecer como não lidos para mim",
   "dismissNewAndUnread": "Descartar novos e não lidos",
   "dismissNewAndUnreadMessage": "Os tópicos em {category} não aparecerão mais como novos ou não lidos.",
-  "dismissedTopics": "Descartados"
+  "dismissedTopics": "Descartados",
+  "errorRemovingFromMessage": "Não foi possível remover {name} desta mensagem."
 }

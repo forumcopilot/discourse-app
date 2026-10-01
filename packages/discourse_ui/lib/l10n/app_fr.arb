@@ -1477,5 +1477,6 @@
   "dismissUnreadStopTracking": "Arrêter de suivre ces sujets pour qu'ils ne soient plus jamais marqués comme non lus",
   "dismissNewAndUnread": "Ignorer les nouveaux et les non lus",
   "dismissNewAndUnreadMessage": "Les sujets de {category} n'apparaîtront plus comme nouveaux ou non lus.",
-  "dismissedTopics": "Ignorés"
+  "dismissedTopics": "Ignorés",
+  "errorRemovingFromMessage": "Impossible de retirer {name} de ce message."
 }

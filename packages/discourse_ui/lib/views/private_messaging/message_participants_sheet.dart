@@ -172,9 +172,10 @@ class MessageParticipantsSheet {
     if (!sheet.mounted) return;
     if (!r.result) {
       messenger.showSnackBar(SnackBar(
+        // Removing, not inviting: this said "Error inviting user: ".
         content: Text(r.resultText?.isNotEmpty == true
             ? r.resultText!
-            : l10n.errorInvitingUser('')),
+            : l10n.errorRemovingFromMessage(label)),
         backgroundColor: errorColor,
       ));
       return;
@@ -242,7 +243,9 @@ class MessageParticipantsSheet {
         onInviteSuccess?.call();
       } else {
         messenger.showSnackBar(SnackBar(
-          content: Text(r.resultText ?? l10n.errorInvitingUser('')),
+          content: Text(r.resultText?.isNotEmpty == true
+              ? r.resultText!
+              : l10n.errorInvitingUser(l10n.anErrorOccurred)),
           backgroundColor: colorScheme.error,
         ));
       }

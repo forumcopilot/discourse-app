@@ -6057,5 +6057,14 @@
   "permissionErrorTitle": "Permission Error",
   "@permissionErrorTitle": {
     "description": "Error dialog title for a missing permission"
+  },
+  "errorRemovingFromMessage": "Couldn't remove {name} from this message.",
+  "@errorRemovingFromMessage": {
+    "description": "Snackbar when taking a person or group off a personal message fails and Discourse gave no reason",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

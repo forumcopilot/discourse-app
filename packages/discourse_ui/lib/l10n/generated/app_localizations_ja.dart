@@ -4631,4 +4631,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get permissionErrorTitle => '権限エラー';
+
+  @override
+  String errorRemovingFromMessage(String name) {
+    return 'このメッセージから $name を削除できませんでした。';
+  }
 }

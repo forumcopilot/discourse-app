@@ -1477,5 +1477,6 @@
   "dismissUnreadStopTracking": "Перестать следить за этими темами, чтобы они никогда больше не высвечивались как непрочитанные",
   "dismissNewAndUnread": "Отложить новые и непрочитанные",
   "dismissNewAndUnreadMessage": "Темы в {category} больше не будут отмечены как новые или непрочитанные.",
-  "dismissedTopics": "Отложено"
+  "dismissedTopics": "Отложено",
+  "errorRemovingFromMessage": "Не удалось удалить {name} из этого сообщения."
 }

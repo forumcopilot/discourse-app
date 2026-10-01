@@ -4570,4 +4570,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get permissionErrorTitle => '权限错误';
+
+  @override
+  String errorRemovingFromMessage(String name) {
+    return '无法将 $name 从此消息中移除。';
+  }
 }

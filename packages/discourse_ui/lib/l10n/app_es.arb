@@ -1477,5 +1477,6 @@
   "dismissUnreadStopTracking": "Dejar de seguir estos temas para que no aparezcan más en mis mensajes no leídos",
   "dismissNewAndUnread": "Descartar nuevos y sin leer",
   "dismissNewAndUnreadMessage": "Los temas de {category} ya no aparecerán como nuevos ni sin leer.",
-  "dismissedTopics": "Descartados"
+  "dismissedTopics": "Descartados",
+  "errorRemovingFromMessage": "No se pudo quitar a {name} de este mensaje."
 }

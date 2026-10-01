@@ -4892,4 +4892,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get permissionErrorTitle => 'Errore di autorizzazione';
+
+  @override
+  String errorRemovingFromMessage(String name) {
+    return 'Impossibile rimuovere $name da questo messaggio.';
+  }
 }

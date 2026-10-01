@@ -4918,4 +4918,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get permissionErrorTitle => 'Ошибка доступа';
+
+  @override
+  String errorRemovingFromMessage(String name) {
+    return 'Не удалось удалить $name из этого сообщения.';
+  }
 }

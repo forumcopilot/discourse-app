@@ -1477,5 +1477,6 @@
   "dismissUnreadStopTracking": "Diese Themen nicht mehr verfolgen, sodass mir diese nicht mehr als ungelesen angezeigt werden",
   "dismissNewAndUnread": "Neue und ungelesene verwerfen",
   "dismissNewAndUnreadMessage": "Themen in {category} werden nicht mehr als neu oder ungelesen angezeigt.",
-  "dismissedTopics": "Verworfen"
+  "dismissedTopics": "Verworfen",
+  "errorRemovingFromMessage": "{name} konnte nicht aus dieser Nachricht entfernt werden."
 }

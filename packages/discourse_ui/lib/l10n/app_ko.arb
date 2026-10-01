@@ -1477,5 +1477,6 @@
   "eventEveryWeek": "매주 이 요일",
   "eventEveryTwoWeeks": "2주마다 이 요일",
   "eventEveryFourWeeks": "4주마다 이 요일",
-  "eventEveryMonth": "매월 이 요일"
+  "eventEveryMonth": "매월 이 요일",
+  "errorRemovingFromMessage": "이 메시지에서 {name} 님을 제거할 수 없습니다."
 }

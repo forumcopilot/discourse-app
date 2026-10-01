@@ -69,6 +69,11 @@ class _SearchPageState extends State<SearchPage> {
   bool _hasMoreTitlesOnly = true;
   final List<FCTopic> _topics = [];
   final List<FCPost> _posts = [];
+
+  /// The topics the post results belong to, as the same search returned
+  /// them: a post row shows its topic's category and status (closed,
+  /// pinned, solved, tags) from here.
+  final Map<String, FCTopic> _postTopics = {};
   final List<FCTopic> _titlesOnlyTopics = [];
   final ScrollController _topicScrollController = ScrollController();
   final ScrollController _postScrollController = ScrollController();
@@ -190,6 +195,7 @@ class _SearchPageState extends State<SearchPage> {
   void _resetResultState() {
     _topics.clear();
     _posts.clear();
+    _postTopics.clear();
     _titlesOnlyTopics.clear();
     _topicPage = 1;
     _postPage = 1;
@@ -388,6 +394,9 @@ class _SearchPageState extends State<SearchPage> {
         if (!mounted || seq != _querySeq) return;
         setState(() {
           _posts.addAll(result.posts);
+          for (final t in result.topics) {
+            _postTopics[t.id] = t;
+          }
           _hasMorePosts = result.hasMore;
           if (_hasMorePosts) _postPage++;
         });
@@ -795,15 +804,15 @@ class _SearchPageState extends State<SearchPage> {
       itemBuilder: (context, index) {
         if (index < _posts.length) {
           final p = _posts[index];
-          // A post result carries no category; the same search's topic
-          // results do. Empty when the topic is not among them — the id
-          // passed here used to be the topic's, which the category badge
-          // would have read as some unrelated category.
-          final categoryId = _topics
-                  .where((t) => t.id == p.topicId)
-                  .firstOrNull
-                  ?.forumId ??
-              '';
+          // A post result carries nothing about its topic; the same
+          // search's topics do (its category, and whether it is closed,
+          // pinned or solved, which the row's badge shows). Empty when the
+          // topic is not among them: the id passed here used to be the
+          // topic's, which the category badge read as some unrelated
+          // category, and every row said nothing of its topic's state.
+          final topic = _postTopics[p.topicId] ??
+              _topics.where((t) => t.id == p.topicId).firstOrNull;
+          final categoryId = topic?.forumId ?? '';
           return TopicListItem(
             siteContext: widget.siteContext,
             topic: FCTopic(
@@ -818,8 +827,11 @@ class _SearchPageState extends State<SearchPage> {
               forumId: categoryId,
               forumName: '',
               replyCount: 0,
-              isPinned: false,
+              isClosed: topic?.isClosed ?? false,
+              isPinned: topic?.isPinned ?? false,
               isAnnouncement: false,
+              isSolved: topic?.isSolved ?? false,
+              tags: topic?.tags ?? const [],
               isSubscribed: false,
             ),
             onTap: () async {

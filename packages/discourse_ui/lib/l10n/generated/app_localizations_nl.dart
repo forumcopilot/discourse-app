@@ -4867,4 +4867,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get permissionErrorTitle => 'Toestemmingsfout';
+
+  @override
+  String errorRemovingFromMessage(String name) {
+    return 'Kon $name niet uit dit bericht verwijderen.';
+  }
 }

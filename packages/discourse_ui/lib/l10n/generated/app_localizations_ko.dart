@@ -4630,4 +4630,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get permissionErrorTitle => '권한 오류';
+
+  @override
+  String errorRemovingFromMessage(String name) {
+    return '이 메시지에서 $name 님을 제거할 수 없습니다.';
+  }
 }

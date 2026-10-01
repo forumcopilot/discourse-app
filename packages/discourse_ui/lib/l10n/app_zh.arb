@@ -1477,5 +1477,6 @@
   "dismissUnreadStopTracking": "停止跟踪这些话题，以便它们不再显示为我的未读话题",
   "dismissNewAndUnread": "忽略新话题和未读话题",
   "dismissNewAndUnreadMessage": "{category} 中的话题将不再显示为新话题或未读话题。",
-  "dismissedTopics": "已忽略"
+  "dismissedTopics": "已忽略",
+  "errorRemovingFromMessage": "无法将 {name} 从此消息中移除。"
 }
