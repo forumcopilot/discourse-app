@@ -521,9 +521,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get deleteTopic => 'Thema löschen';
 
   @override
-  String get pleaseSelectEndDate => 'Bitte wählen Sie ein Enddatum';
-
-  @override
   String get home => 'Startseite';
 
   @override
@@ -3476,11 +3473,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get flaggingPost => 'Beitrag wird gemeldet…';
-
-  @override
-  String setSuspensionFor(String username) {
-    return 'Wie lange soll $username gesperrt werden?';
-  }
 
   @override
   String get pleaseSelectSuspensionEndDate => 'Wähle, wann die Sperre endet';

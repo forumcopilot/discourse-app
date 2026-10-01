@@ -343,10 +343,6 @@
   "@deleteTopic": {
     "description": "Title for delete topic dialog"
   },
-  "pleaseSelectEndDate": "Please select an end date",
-  "@pleaseSelectEndDate": {
-    "description": "Error message when end date is not selected"
-  },
   "home": "Home",
   "@home": {
     "description": "Home tab title"
@@ -4253,15 +4249,6 @@
   "flaggingPost": "Flagging post…",
   "@flaggingPost": {
     "description": "Snackbar while a flag is being sent"
-  },
-  "setSuspensionFor": "How long should {username} be suspended?",
-  "@setSuspensionFor": {
-    "description": "Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)",
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
   },
   "pleaseSelectSuspensionEndDate": "Choose when the suspension ends",
   "@pleaseSelectSuspensionEndDate": {

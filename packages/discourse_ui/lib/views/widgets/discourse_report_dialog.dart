@@ -8,7 +8,7 @@ import '../../theme/design_tokens.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../utils/snackbar_helper.dart';
 
-/// Web's flag modal: the forum's own flag types, in its order and language
+/// Web's flag modal, as a full-screen dialog: the forum's own flag types, in its order and language
 /// (`post_action_types` in `/site.json`), and the chosen one filed with
 /// POST /post_actions.
 ///
@@ -43,16 +43,19 @@ Future<void> showDiscourseReportDialog(
     return;
   }
 
-  final result = await showDialog<({DiscourseFlagType type, String message})>(
-    context: context,
-    builder: (dialogContext) => _FlagDialog(
+  // A full-screen dialog, not a popup: the list is long and a flag may need
+  // a message, which a popup squeezed under the keyboard on a phone.
+  final result = await Navigator.of(context)
+      .push<({DiscourseFlagType type, String message})>(MaterialPageRoute(
+    fullscreenDialog: true,
+    builder: (pageContext) => _FlagDialog(
       types: types,
       authorUsername: authorUsername ?? '',
       minMessageLength: DiscourseSiteCapabilities.forSite(
               proxy.siteContext.site.pluginUrl)
           .minPersonalMessageLength,
     ),
-  );
+  ));
   if (result == null || !context.mounted) return;
 
   final messenger = ScaffoldMessenger.of(context);
@@ -126,6 +129,69 @@ class _FlagDialogState extends State<_FlagDialog> {
     );
   }
 
+  final _fieldsKey = GlobalKey();
+
+  double _keyboardInset = 0;
+
+  /// Brings the message box into view: when a flag that needs one is
+  /// picked, and again as the keyboard opens and shrinks the dialog.
+  void _revealFields() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = _fieldsKey.currentContext;
+      if (mounted && context != null && context.mounted) {
+        Scrollable.ensureVisible(context,
+            duration: const Duration(milliseconds: 150), alignment: 0.5);
+      }
+    });
+  }
+
+  /// The message [type] needs, and an illegal-content flag's confirmation.
+  List<Widget> _messageFields(AppLocalizations l10n, DiscourseFlagType type) => [
+        if (type.requireMessage)
+          Padding(
+            key: _fieldsKey,
+            padding: const EdgeInsets.only(
+                left: DesignTokens.spacingXXXL, bottom: DesignTokens.spacingS),
+            child: TextField(
+              key: const ValueKey('flag-message'),
+              controller: _messageController,
+              maxLines: 3,
+              autofocus: true,
+              onTap: _revealFields,
+              onChanged: (_) {
+                if (_showMessageError) setState(() => _showMessageError = false);
+              },
+              decoration: InputDecoration(
+                labelText: type.isMessageToAuthor
+                    ? l10n.flagMessageForUser
+                    : l10n.flagMessageForModerators,
+                hintText: type.isMessageToAuthor
+                    ? l10n.flagPlaceholderNotifyUser
+                    : _isIllegal
+                        ? l10n.flagPlaceholderIllegal
+                        : l10n.flagPlaceholderNotifyModerators,
+                hintMaxLines: 4,
+                border: const OutlineInputBorder(),
+                errorText: _showMessageError
+                    ? l10n.flagMessageAtLeast(widget.minMessageLength)
+                    : null,
+              ),
+            ),
+          ),
+        if (type.nameKey == 'illegal')
+          Padding(
+            padding: const EdgeInsets.only(left: DesignTokens.spacingXL),
+            child: CheckboxListTile(
+              key: const ValueKey('flag-confirm-illegal'),
+              value: _confirmedIllegal,
+              onChanged: (v) => setState(() => _confirmedIllegal = v ?? false),
+              contentPadding: EdgeInsets.zero,
+              controlAffinity: ListTileControlAffinity.leading,
+              title: Text(l10n.flagConfirmIllegal),
+            ),
+          ),
+      ];
+
   String _label(DiscourseFlagType t) =>
       t.isMessageToAuthor ? t.nameFor(widget.authorUsername) : t.name;
 
@@ -135,19 +201,44 @@ class _FlagDialogState extends State<_FlagDialog> {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     final selected = _selected;
-    return AlertDialog(
-      title: Text(l10n.flagPost),
-      content: SingleChildScrollView(
+    final inset = MediaQuery.viewInsetsOf(context).bottom;
+    if (inset != _keyboardInset) {
+      _keyboardInset = inset;
+      if (_needsMessage) _revealFields();
+    }
+    final canSubmit =
+        selected != null && !(_isIllegal && !_confirmedIllegal);
+    return Scaffold(
+      appBar: AppBar(
+        leading: const CloseButton(),
+        title: Text(l10n.flagPost),
+        actions: [
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: DesignTokens.spacingS),
+            child: FilledButton(
+              key: const ValueKey('flag-submit'),
+              onPressed: canSubmit ? _submit : null,
+              child: Text(selected?.isMessageToAuthor ?? false
+                  ? l10n.flagSendMessage
+                  : l10n.flagPost),
+            ),
+          ),
+        ],
+      ),
+      body: SafeArea(
         child: RadioGroup<DiscourseFlagType>(
           groupValue: selected,
-          onChanged: (v) => setState(() {
-            _selected = v;
-            _showMessageError = false;
-            _confirmedIllegal = false;
-          }),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          onChanged: (v) {
+            setState(() {
+              _selected = v;
+              _showMessageError = false;
+              _confirmedIllegal = false;
+            });
+            if (v?.requireMessage ?? false) _revealFields();
+          },
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(DesignTokens.spacingL,
+                DesignTokens.spacingS, DesignTokens.spacingL, DesignTokens.spacingXL),
             children: [
               Text(
                 l10n.flagReviewProcess,
@@ -156,8 +247,10 @@ class _FlagDialogState extends State<_FlagDialog> {
               ),
               const SizedBox(height: DesignTokens.spacingS),
               // M3's radio rows: the label at bodyLarge beside the radio,
-              // the description under it at bodyMedium.
-              for (final type in widget.types)
+              // the description under it at bodyMedium. The message a flag
+              // needs goes directly under it, as on web, so it is in view
+              // when the keyboard comes up.
+              for (final type in widget.types) ...[
                 RadioListTile<DiscourseFlagType>(
                   key: ValueKey('flag-${type.nameKey}'),
                   value: type,
@@ -173,63 +266,12 @@ class _FlagDialogState extends State<_FlagDialog> {
                   subtitle:
                       type.description.isEmpty ? null : Text(type.description),
                 ),
-
-              // Only the flags Discourse refuses without a message ask for
-              // one, so the field appears exactly when it is required.
-              if (selected != null && _needsMessage) ...[
-                const SizedBox(height: DesignTokens.spacingM),
-                TextField(
-                  key: const ValueKey('flag-message'),
-                  controller: _messageController,
-                  maxLines: 3,
-                  autofocus: true,
-                  onChanged: (_) {
-                    if (_showMessageError) setState(() => _showMessageError = false);
-                  },
-                  decoration: InputDecoration(
-                    labelText: selected.isMessageToAuthor
-                        ? l10n.flagMessageForUser
-                        : l10n.flagMessageForModerators,
-                    hintText: selected.isMessageToAuthor
-                        ? l10n.flagPlaceholderNotifyUser
-                        : _isIllegal
-                            ? l10n.flagPlaceholderIllegal
-                            : l10n.flagPlaceholderNotifyModerators,
-                    hintMaxLines: 4,
-                    border: const OutlineInputBorder(),
-                    errorText: _showMessageError
-                        ? l10n.flagMessageAtLeast(widget.minMessageLength)
-                        : null,
-                  ),
-                ),
+                if (type == selected) ..._messageFields(l10n, type),
               ],
-              if (_isIllegal)
-                CheckboxListTile(
-                  key: const ValueKey('flag-confirm-illegal'),
-                  value: _confirmedIllegal,
-                  onChanged: (v) => setState(() => _confirmedIllegal = v ?? false),
-                  contentPadding: EdgeInsets.zero,
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: Text(l10n.flagConfirmIllegal),
-                ),
             ],
           ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.cancel),
-        ),
-        FilledButton(
-          onPressed: selected == null || (_isIllegal && !_confirmedIllegal)
-              ? null
-              : _submit,
-          child: Text(selected?.isMessageToAuthor ?? false
-              ? l10n.flagSendMessage
-              : l10n.flagPost),
-        ),
-      ],
     );
   }
 }

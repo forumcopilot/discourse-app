@@ -491,9 +491,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteTopic => '删除话题';
 
   @override
-  String get pleaseSelectEndDate => '请选择结束日期';
-
-  @override
   String get home => '首页';
 
   @override
@@ -3271,11 +3268,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get flaggingPost => '正在举报帖子…';
-
-  @override
-  String setSuspensionFor(String username) {
-    return '要封禁 $username 多久？';
-  }
 
   @override
   String get pleaseSelectSuspensionEndDate => '请选择封禁结束时间';

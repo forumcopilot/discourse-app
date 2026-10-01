@@ -519,9 +519,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get deleteTopic => 'Topic verwijderen';
 
   @override
-  String get pleaseSelectEndDate => 'Selecteer een einddatum';
-
-  @override
   String get home => 'Start';
 
   @override
@@ -3459,11 +3456,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get flaggingPost => 'Bericht markeren…';
-
-  @override
-  String setSuspensionFor(String username) {
-    return 'Hoe lang moet $username geschorst worden?';
-  }
 
   @override
   String get pleaseSelectSuspensionEndDate =>

@@ -1004,12 +1004,6 @@ abstract class AppLocalizations {
   /// **'Delete Topic'**
   String get deleteTopic;
 
-  /// Error message when end date is not selected
-  ///
-  /// In en, this message translates to:
-  /// **'Please select an end date'**
-  String get pleaseSelectEndDate;
-
   /// Home tab title
   ///
   /// In en, this message translates to:
@@ -5601,12 +5595,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Flagging post…'**
   String get flaggingPost;
-
-  /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
-  ///
-  /// In en, this message translates to:
-  /// **'How long should {username} be suspended?'**
-  String setSuspensionFor(String username);
 
   /// Staff suspending a user from their profile, in Discourse's admin wording (admin.user.suspend*)
   ///

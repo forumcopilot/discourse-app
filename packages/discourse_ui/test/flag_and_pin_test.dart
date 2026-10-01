@@ -3,6 +3,8 @@ import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/theme/app_theme.dart';
 import 'package:discourse_ui/views/widgets/discourse_report_dialog.dart';
 import 'package:discourse_ui/views/widgets/feature_topic_sheet.dart';
+import 'package:discourse_ui/views/widgets/suspend_user_page.dart';
+import 'package:discourse_ui/views/widgets/text_entry_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
@@ -144,6 +146,8 @@ void main() {
     });
   });
 
+  _fullScreenTests();
+
   group('Pin Topic…', () {
     Future<FeatureTopicChoice?> open(WidgetTester tester,
         {required bool canPinGlobally}) async {
@@ -177,6 +181,81 @@ void main() {
       await tester.tap(find.text('Pin Topic'));
       await tester.pump();
       expect(find.text('A date is required to pin this topic.'), findsOneWidget);
+    });
+  });
+}
+
+void _fullScreenTests() {
+  group('long choices and text get the whole screen', () {
+    testWidgets('flagging is a full-screen dialog, its action in the top bar',
+        (tester) async {
+      await tester.pumpWidget(_app((context) => showDiscourseReportDialog(
+          context, postId: '11', authorUsername: 'bob')));
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(find.byType(CloseButton), findsOneWidget);
+      expect(
+          find.descendant(
+              of: find.byType(AppBar), matching: find.byKey(const ValueKey('flag-submit'))),
+          findsOneWidget);
+    });
+
+    testWidgets('Suspend User: how long and why on one page', (tester) async {
+      SuspendUserChoice? choice;
+      await tester.pumpWidget(_app((context) async {
+        choice = await showSuspendUserPage(context);
+      }));
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(find.text('Suspend forever'), findsOneWidget);
+      await tester.tap(find.text('Too combative'));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('suspend-submit')));
+      await tester.pumpAndSettle();
+      expect(choice, (reason: 'Too combative', expires: 0));
+    });
+
+    testWidgets('a custom suspension reason must be written', (tester) async {
+      // A phone's screen, so every reason is on it.
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.6;
+      addTearDown(tester.view.reset);
+      SuspendUserChoice? choice;
+      await tester.pumpWidget(_app((context) async {
+        choice = await showSuspendUserPage(context);
+      }));
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Custom…'));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('suspend-submit')));
+      await tester.pump();
+      expect(choice, isNull);
+      await tester.enterText(
+          find.byKey(const ValueKey('suspend-custom-reason')), 'Spamming DMs');
+      await tester.tap(find.byKey(const ValueKey('suspend-submit')));
+      await tester.pumpAndSettle();
+      expect(choice?.reason, 'Spamming DMs');
+    });
+
+    testWidgets('a long message: the whole screen, sent from the top bar',
+        (tester) async {
+      String? text;
+      await tester.pumpWidget(_app((context) async {
+        text = await showTextEntryPage(context,
+            title: 'Request to join', actionLabel: 'Send', requiredMessage: 'Required');
+      }));
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('text-entry-submit')));
+      await tester.pump();
+      expect(find.text('Required'), findsOneWidget);
+      await tester.enterText(find.byKey(const ValueKey('text-entry-field')), '  Hello  ');
+      await tester.tap(find.byKey(const ValueKey('text-entry-submit')));
+      await tester.pumpAndSettle();
+      expect(text, 'Hello');
     });
   });
 }

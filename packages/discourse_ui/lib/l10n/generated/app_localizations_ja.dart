@@ -501,9 +501,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deleteTopic => 'トピックを削除';
 
   @override
-  String get pleaseSelectEndDate => '終了日を選択してください';
-
-  @override
   String get home => 'ホーム';
 
   @override
@@ -3320,11 +3317,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get flaggingPost => '投稿を通報しています…';
-
-  @override
-  String setSuspensionFor(String username) {
-    return '$username をどのくらいの期間凍結しますか？';
-  }
 
   @override
   String get pleaseSelectSuspensionEndDate => '凍結の終了日時を選択してください';

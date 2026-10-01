@@ -518,9 +518,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get deleteTopic => 'Excluir tópico';
 
   @override
-  String get pleaseSelectEndDate => 'Por favor, selecione uma data de término';
-
-  @override
   String get home => 'Início';
 
   @override
@@ -3469,11 +3466,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get flaggingPost => 'Sinalizando a postagem…';
-
-  @override
-  String setSuspensionFor(String username) {
-    return 'Por quanto tempo $username ficará suspenso(a)?';
-  }
 
   @override
   String get pleaseSelectSuspensionEndDate =>

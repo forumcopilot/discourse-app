@@ -303,10 +303,6 @@
   "@deleteTopic": {
     "description": "Title for delete topic dialog"
   },
-  "pleaseSelectEndDate": "Selecteer een einddatum",
-  "@pleaseSelectEndDate": {
-    "description": "Error message when end date is not selected"
-  },
   "home": "Start",
   "@home": {
     "description": "Home tab title"
@@ -1230,7 +1226,6 @@
   "suspendReasonQuestion": "Waarom schors je? Deze tekst wordt aan de gebruiker weergegeven wanneer deze zich probeert aan te melden. Houd het kort.",
   "closedLabel": "Gesloten",
   "flaggingPost": "Bericht markeren…",
-  "setSuspensionFor": "Hoe lang moet {username} geschorst worden?",
   "pleaseSelectSuspensionEndDate": "Kies wanneer de schorsing eindigt",
   "suspendingUser": "Gebruiker schorsen…",
   "unsuspendingUser": "Schorsing opheffen…",

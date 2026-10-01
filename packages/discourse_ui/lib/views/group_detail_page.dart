@@ -13,6 +13,7 @@ import 'widgets/trust_level_chip.dart';
 import '../utils/error_message.dart';
 import 'widgets/remote_circle_avatar.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'widgets/text_entry_page.dart';
 
 /// Phase 5.18c-2 — single-group screen. Fetches the group's metadata
 /// (`/groups/{name}.json`) and the first page of members
@@ -245,42 +246,15 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
   Future<void> _handleRequestMembership() async {
     final group = _group;
     if (group == null || _membershipBusy) return;
-    final controller = TextEditingController();
-    final reason = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.requestToJoinGroup(group.displayName)),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLines: 3,
-          textCapitalization: TextCapitalization.sentences,
-          decoration: InputDecoration(
-            hintText:
-                AppLocalizations.of(context)!.groupMembershipRequestHint,
-            border: const OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(AppLocalizations.of(context)!.cancel),
-          ),
-          FilledButton(
-            onPressed: () =>
-                Navigator.of(dialogContext).pop(controller.text.trim()),
-            child: Text(AppLocalizations.of(context)!.sendRequest),
-          ),
-        ],
-      ),
+    // A full-screen page, not a popup: the request may run to a few lines.
+    final reason = await showTextEntryPage(
+      context,
+      title: AppLocalizations.of(context)!.requestToJoinGroup(group.displayName),
+      hint: AppLocalizations.of(context)!.groupMembershipRequestHint,
+      actionLabel: AppLocalizations.of(context)!.sendRequest,
+      requiredMessage: AppLocalizations.of(context)!.groupMembershipReasonRequired,
     );
-    controller.dispose();
-    if (reason == null || !mounted) return;
-    if (reason.isEmpty) {
-      SnackbarHelper.showError(context,
-          AppLocalizations.of(context)!.groupMembershipReasonRequired);
-      return;
-    }
+    if (reason == null || reason.isEmpty || !mounted) return;
     setState(() => _membershipBusy = true);
     final result = await SiteProxyService.getGroupProxy()
         .requestMembershipAsync(group.name, reason);

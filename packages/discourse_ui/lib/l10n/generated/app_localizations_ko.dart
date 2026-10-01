@@ -497,9 +497,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get deleteTopic => '글 삭제';
 
   @override
-  String get pleaseSelectEndDate => '종료일을 선택하세요';
-
-  @override
   String get home => '홈';
 
   @override
@@ -3316,11 +3313,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get flaggingPost => '게시물 신고 중…';
-
-  @override
-  String setSuspensionFor(String username) {
-    return '$username 님을 얼마 동안 정지할까요?';
-  }
 
   @override
   String get pleaseSelectSuspensionEndDate => '정지가 끝나는 날짜를 선택하세요';

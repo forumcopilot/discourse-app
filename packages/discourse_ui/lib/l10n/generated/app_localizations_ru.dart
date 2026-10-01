@@ -520,9 +520,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deleteTopic => 'Удалить тему';
 
   @override
-  String get pleaseSelectEndDate => 'Пожалуйста, выберите дату окончания';
-
-  @override
   String get home => 'Главная';
 
   @override
@@ -3499,11 +3496,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get flaggingPost => 'Отправка жалобы…';
-
-  @override
-  String setSuspensionFor(String username) {
-    return 'На какой срок заблокировать $username?';
-  }
 
   @override
   String get pleaseSelectSuspensionEndDate =>
