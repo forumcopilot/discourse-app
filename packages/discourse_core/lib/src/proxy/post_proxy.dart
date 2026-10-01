@@ -996,6 +996,8 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       final hasCount = o.containsKey('votes');
       return FCPollResponse(
         id: id,
+        // Cooked HTML, the option's `<li>` as the post has it (emoji
+        // images, links, bold…); the app draws it as inline cooked text.
         text: (o['html'] ?? o['text'] ?? '').toString(),
         voteCount: hasCount ? (o['votes'] as num?)?.toInt() : null,
         viewerVotedFor: voted.contains(id),
@@ -1012,6 +1014,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       pollId: name,
       topicId: topicId,
       postId: postId.toString(),
+      // Cooked HTML too, the `.poll-title`'s; usually absent.
       question: (pollJson['title'] ?? '').toString(),
       responses: options,
       voterCount: canViewResults ? voters : null,

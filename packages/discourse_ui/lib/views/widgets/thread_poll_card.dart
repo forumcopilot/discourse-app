@@ -6,11 +6,15 @@ import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
 import '../../l10n/generated/app_localizations.dart';
+import 'cooked_inline_text.dart';
 import 'post_body_extensions.dart';
 import 'sheet_title.dart';
 import 'user_avatar.dart';
 
 /// Twitter/X-style poll card shown at the top of a thread when the thread has a poll.
+///
+/// On Discourse the poll's title and each option's text are cooked HTML
+/// (emoji images, links, bold, code), drawn by [CookedInlineText].
 class ThreadPollCard extends StatefulWidget {
   final FCPoll poll;
   final String topicId;
@@ -203,8 +207,10 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
           // Discourse polls usually have no title; an empty question left
           // a blank band across the top of the card.
           if (widget.poll.question.trim().isNotEmpty) ...[
-            Text(
+            CookedInlineText(
               widget.poll.question,
+              siteContext: widget.siteContext,
+              openLinks: true,
               style: textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurface,
               ),
@@ -350,10 +356,13 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
                         ),
                       ),
                     // The whole option, wrapped: an option cut off cannot be
-                    // chosen knowingly.
+                    // chosen knowingly. While it can be chosen, a tap
+                    // anywhere on it chooses it, a link in its text too.
                     Expanded(
-                      child: Text(
+                      child: CookedInlineText(
                         r.text,
+                        siteContext: widget.siteContext,
+                        openLinks: !canVote,
                         style: textTheme.bodyLarge?.copyWith(
                           color: colorScheme.onSurface,
                           fontWeight: r.viewerVotedFor ? DesignTokens.fontWeightMedium : null,
@@ -501,6 +510,7 @@ class _PollVotersSheetState extends State<_PollVotersSheet> {
     return filled.startsWith('/') ? '$base$filled' : '$base/$filled';
   }
 
+  /// The option's cooked text, for [CookedInlineText].
   String _optionText(String optionId) {
     for (final r in widget.poll.responses) {
       if (r.id == optionId) return r.text;
@@ -573,8 +583,9 @@ class _PollVotersSheetState extends State<_PollVotersSheet> {
                             DesignTokens.spacingL,
                             DesignTokens.spacingXS,
                           ),
-                          child: Text(
+                          child: CookedInlineText(
                             _optionText(optionId),
+                            siteContext: widget.siteContext,
                             style: textTheme.labelLarge?.copyWith(
                               color: colorScheme.primary,
                             ),

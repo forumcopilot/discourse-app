@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import 'package:discourse_ui/theme/design_tokens.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../theme/style_builders.dart';
+import 'cooked_inline_text.dart';
 import 'post_body_extensions.dart';
 
 /// Compact fixed header showing a mini version of the thread poll when the user
@@ -11,10 +13,14 @@ class ThreadPollMiniCard extends StatelessWidget {
   final FCPoll poll;
   final VoidCallback onTap;
 
+  /// The poll's forum, for a forum emoji in its title.
+  final SiteContext? siteContext;
+
   const ThreadPollMiniCard({
     super.key,
     required this.poll,
     required this.onTap,
+    this.siteContext,
   });
 
   @override
@@ -69,11 +75,13 @@ class ThreadPollMiniCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        // The title is cooked HTML, as on the poll card.
+                        CookedInlineText(
                           // Untitled polls (the usual kind) read "Poll".
                           poll.question.trim().isNotEmpty
                               ? poll.question
                               : (AppLocalizations.of(context)?.poll ?? 'Poll'),
+                          siteContext: siteContext,
                           style: StyleBuilders.bodyTextStyle(
                             colorScheme: colorScheme,
                             textTheme: textTheme,

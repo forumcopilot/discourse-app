@@ -56,3 +56,16 @@ const int _variationSelector16 = 0xfe0f;
 /// `http://` out of ordinary prose.
 final RegExp _shortcode =
     RegExp(r':([a-z0-9_+-]+)(?::t([1-6]))?:', caseSensitive: false);
+
+/// The character for a cooked emoji image's `alt` — `:name:`, or
+/// `:name:tN:` when a skin tone was applied, as Discourse writes
+/// `<img class="emoji">` — or null for a forum's own emoji, which is drawn
+/// as its image.
+String? discourseEmojiForAlt(String alt) {
+  final m = _emojiAlt.firstMatch(alt.trim());
+  if (m == null) return null;
+  return discourseEmojiChar(m.group(1)!, tone: m.group(2));
+}
+
+final RegExp _emojiAlt =
+    RegExp(r'^:([a-z0-9_+-]+)(?::t([1-6]))?:$', caseSensitive: false);

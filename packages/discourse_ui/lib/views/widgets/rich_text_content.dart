@@ -289,23 +289,19 @@ class RichTextContent extends StatelessWidget {
 
             if (isEmoji) {
               // alt is `:name:` or `:name:tN:` for a skin-toned emoji.
-              final m = _emojiAlt.firstMatch(alt.trim());
-              if (m != null) {
-                final unicode =
-                    discourseEmojiChar(m.group(1)!, tone: m.group(2));
-                if (unicode != null) {
-                  return Text(
-                    unicode,
-                    style: body.copyWith(
-                      // Bump emoji slightly so they sit nicely with text; a
-                      // post of nothing but emoji shows them large, as the
-                      // web does (`img.emoji.only-emoji`, 32px) — the same
-                      // size as an image emoji there.
-                      fontSize: onlyEmoji ? _onlyEmojiSize : (body.fontSize ?? 14) * 1.15,
-                      height: 1.0,
-                    ),
-                  );
-                }
+              final unicode = discourseEmojiForAlt(alt);
+              if (unicode != null) {
+                return Text(
+                  unicode,
+                  style: body.copyWith(
+                    // Bump emoji slightly so they sit nicely with text; a
+                    // post of nothing but emoji shows them large, as the
+                    // web does (`img.emoji.only-emoji`, 32px) — the same
+                    // size as an image emoji there.
+                    fontSize: onlyEmoji ? _onlyEmojiSize : (body.fontSize ?? 14) * kEmojiGlyphScale,
+                    height: 1.0,
+                  ),
+                );
               }
               // Fall through to the image renderer (forum-custom emoji,
               // shortcodes our table doesn't know).
@@ -526,37 +522,45 @@ class RichTextContent extends StatelessWidget {
     );
   }
 
-  String _resolveUrl(String url) {
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    // Protocol-relative, as Discourse writes its own uploads (`//host/
-    // uploads/…`): the forum's scheme, as a browser takes the page's. This
-    // always said https, so a forum served over http — a local one, an
-    // intranet — showed no picture at all.
-    if (url.startsWith('//')) {
-      final scheme = Uri.tryParse(siteContext.site.url)?.scheme;
-      return '${scheme == 'http' ? 'http' : 'https'}:$url';
-    }
-    // Join safely: a trailing-slash base must not produce double slashes.
-    var base = siteContext.site.url;
-    while (base.endsWith('/')) {
-      base = base.substring(0, base.length - 1);
-    }
-    if (url.startsWith('/')) {
-      // Discourse writes a subfolder install's own paths with the
-      // subfolder in them (`/forum/t/…`, `/forum/uploads/…`); joined to the
-      // base they came out as /forum/forum/….
-      final forum = Uri.tryParse(base);
-      final basePath = forum?.path ?? '';
-      if (forum != null &&
-          forum.hasAuthority &&
-          basePath.isNotEmpty &&
-          (url == basePath || url.startsWith('$basePath/'))) {
-        return '${forum.origin}$url';
-      }
-      return '$base$url';
-    }
-    return '$base/$url';
+  String _resolveUrl(String url) => resolveForumUrl(siteContext, url);
+}
+
+/// An emoji glyph in text is drawn this much larger than the text around
+/// it, so it sits as the web's 20px emoji image does beside 16px text.
+const double kEmojiGlyphScale = 1.15;
+
+/// [url] from cooked HTML (an `img src`, an `a href`) as an absolute
+/// address on [siteContext]'s forum.
+String resolveForumUrl(SiteContext siteContext, String url) {
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  // Protocol-relative, as Discourse writes its own uploads (`//host/
+  // uploads/…`): the forum's scheme, as a browser takes the page's. This
+  // always said https, so a forum served over http — a local one, an
+  // intranet — showed no picture at all.
+  if (url.startsWith('//')) {
+    final scheme = Uri.tryParse(siteContext.site.url)?.scheme;
+    return '${scheme == 'http' ? 'http' : 'https'}:$url';
   }
+  // Join safely: a trailing-slash base must not produce double slashes.
+  var base = siteContext.site.url;
+  while (base.endsWith('/')) {
+    base = base.substring(0, base.length - 1);
+  }
+  if (url.startsWith('/')) {
+    // Discourse writes a subfolder install's own paths with the
+    // subfolder in them (`/forum/t/…`, `/forum/uploads/…`); joined to the
+    // base they came out as /forum/forum/….
+    final forum = Uri.tryParse(base);
+    final basePath = forum?.path ?? '';
+    if (forum != null &&
+        forum.hasAuthority &&
+        basePath.isNotEmpty &&
+        (url == basePath || url.startsWith('$basePath/'))) {
+      return '${forum.origin}$url';
+    }
+    return '$base$url';
+  }
+  return '$base/$url';
 }
 
 /// Code's one size, block and inline, in posts, messages and chat.
@@ -714,11 +718,6 @@ String _plainTextOf(String html) {
 /// anchor would leave "(117 Bytes)" stranded beside the card. Moving it
 /// onto the element lets the card show name and size together, the way
 /// the composer's own attachment row does.
-/// The `alt` Discourse puts on an inline emoji image: `:name:`, or
-/// `:name:tN:` when a skin tone was applied.
-final RegExp _emojiAlt =
-    RegExp(r'^:([a-z0-9_+-]+)(?::t([1-6]))?:$', caseSensitive: false);
-
 final RegExp _attachmentSizePattern = RegExp(
   r'(<a\s+class="attachment"[^>]*>.*?</a>)\s*\(([^)]{1,20})\)',
   caseSensitive: false,

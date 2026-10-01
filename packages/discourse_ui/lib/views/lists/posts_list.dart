@@ -1611,6 +1611,7 @@ class _PostsState extends State<PostsList> {
                     top: 0,
                     child: ThreadPollMiniCard(
                       poll: data.topic.poll!,
+                      siteContext: widget.siteContext,
                       onTap: _jumpToFirstPost,
                     ),
                   ),
