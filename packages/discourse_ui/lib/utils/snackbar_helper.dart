@@ -44,11 +44,15 @@ class SnackbarHelper {
   /// Surface a neutral informational message. Uses
   /// `colorScheme.surfaceContainerHighest` to sit unobtrusively above the
   /// surface without competing with primary content.
+  ///
+  /// [persist] false keeps an [action] ("Undo" after a change already
+  /// saved) on its timer instead of staying up until it is used.
   static void showInfo(
     BuildContext context,
     String message, {
     SnackBarAction? action,
     Duration? duration,
+    bool? persist,
   }) =>
       _show(
         context,
@@ -57,6 +61,7 @@ class SnackbarHelper {
         foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
         action: action,
         duration: duration,
+        persist: persist,
       );
 
   /// Surface a positive confirmation (e.g. "Saved", "Posted"). Uses
@@ -95,6 +100,7 @@ class SnackbarHelper {
     bool showCloseIcon = false,
     SnackBarAction? action,
     Duration? duration,
+    bool? persist,
   }) {
     final messenger = ScaffoldMessenger.maybeOf(context);
     if (messenger == null) return;
@@ -121,6 +127,7 @@ class SnackbarHelper {
               ),
         backgroundColor: backgroundColor,
         action: action,
+        persist: persist,
         showCloseIcon: showCloseIcon,
         closeIconColor: foregroundColor,
         duration: duration ?? readingTime(message),

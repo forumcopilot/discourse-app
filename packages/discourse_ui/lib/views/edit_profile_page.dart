@@ -103,9 +103,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (!mounted) return false;
       setState(() => _profile = updated ?? _profile);
       if (done != null) {
+        // Timed even with Undo: the change is already saved, and an Undo
+        // that stays until tapped would hold the next message back.
         SnackbarHelper.showInfo(
           context,
           done,
+          persist: false,
           action: undo == null
               ? null
               : SnackBarAction(
