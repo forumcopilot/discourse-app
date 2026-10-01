@@ -449,7 +449,13 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> {
     final error = _tried && f.editable && f.required && _empty(f)
         ? l10n.forumQuestionRequired
         : null;
-    final helper = !f.editable ? l10n.forumQuestionSetByStaff : f.description;
+    // Forums often fill the required description with the question
+    // itself; shown twice it reads as a glitch.
+    final description = f.description?.trim().toLowerCase() ==
+            f.name.trim().toLowerCase()
+        ? null
+        : f.description;
+    final helper = !f.editable ? l10n.forumQuestionSetByStaff : description;
     final enabled = f.editable && !_saving;
 
     switch (f.type) {

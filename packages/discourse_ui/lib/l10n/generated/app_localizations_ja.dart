@@ -3031,407 +3031,393 @@ class AppLocalizationsJa extends AppLocalizations {
   String get changeEmailSubtitle => '新しいアドレスに確認リンクを送信します';
 
   @override
-  String get aboutMe => 'About me';
+  String get aboutMe => '自己紹介';
 
   @override
-  String get aboutMeHelper => 'Shown at the top of your profile';
+  String get aboutMeHelper => 'プロフィールの上部に表示されます';
 
   @override
-  String get aboutMeMarkdownHint => 'Markdown works: **bold**, links, :emoji:';
+  String get aboutMeMarkdownHint => 'Markdown が使えます: **太字**、リンク、:emoji:';
 
   @override
-  String get addCover => 'Add cover';
+  String get addCover => 'カバーを追加';
 
   @override
-  String get changeCover => 'Change cover';
+  String get changeCover => 'カバーを変更';
 
   @override
-  String get birthdayHint =>
-      'The forum celebrates it with you. No year is kept.';
+  String get birthdayHint => 'フォーラムが一緒にお祝いします。年は保存されません。';
 
   @override
-  String get birthdayRemoved => 'Birthday removed';
+  String get birthdayRemoved => '誕生日を削除しました';
 
   @override
-  String get birthdaySaved => 'Birthday saved';
+  String get birthdaySaved => '誕生日を保存しました';
 
   @override
-  String get cardBackground => 'Card background';
+  String get cardBackground => 'カード背景';
 
   @override
-  String get cardBackgroundExplanation =>
-      'Behind your user card on the forum\'s website';
+  String get cardBackgroundExplanation => '誰かがあなたの写真をタップしたとき、ユーザーカードの背景に表示されます';
 
   @override
-  String get cardBackgroundRemoved => 'Card background removed';
+  String get cardBackgroundRemoved => 'カード背景を削除しました';
 
   @override
-  String get cardBackgroundSheetHint =>
-      'Shown behind your user card. Wide photos work best.';
+  String get cardBackgroundSheetHint => 'ユーザーカードの背景に表示されます。横長の写真が最適です。';
 
   @override
-  String get changeProfilePicture => 'Change profile picture';
+  String get changeProfilePicture => 'プロフィール画像を変更';
 
   @override
-  String get changeUsername => 'Change username';
+  String get changeUsername => 'ユーザー名を変更';
 
   @override
   String changeUsernameExplanation(String username) {
-    return 'Mentions and quotes of @$username in posts switch to the new name. Old links to your profile stop working.';
+    return '投稿内の @$username へのメンションや引用は新しい名前に切り替わります。プロフィールへの古いリンクは使えなくなります。';
   }
 
   @override
-  String get chooseFromLibrary => 'Choose from library';
+  String get chooseFromLibrary => 'ライブラリから選択';
 
   @override
-  String get coverPhoto => 'Cover photo';
+  String get coverPhoto => 'カバー写真';
 
   @override
   String get coverPhotoSheetHint =>
-      'Shown across the top of your profile, behind your picture. Wide photos work best, about 3 to 1.';
+      'プロフィールの上部、プロフィール画像の背後に表示されます。横長の写真（3:1 程度）が最適です。';
 
   @override
-  String get coverRemoved => 'Cover removed';
+  String get coverRemoved => 'カバーを削除しました';
 
   @override
-  String get day => 'Day';
+  String get day => '日';
 
   @override
-  String get month => 'Month';
+  String get month => '月';
 
   @override
-  String get displayName => 'Display name';
+  String get displayName => '表示名';
 
   @override
   String displayNameHelper(String username) {
-    return 'Shown with your posts. Your username stays @$username.';
+    return '投稿と一緒に表示されます。ユーザー名は @$username のままです。';
   }
 
   @override
-  String get emailPasswordInAccount => 'Email, password and sign-in';
+  String get emailPasswordInAccount => 'メール、パスワード、サインイン';
 
   @override
-  String get featureATopic => 'Feature a topic';
+  String get featureATopic => '注目のトピックを選択';
 
   @override
-  String get featureATopicHint =>
-      'Pin one of your topics to the top of your profile.';
+  String get featureATopicHint => '自分のトピックを 1 つプロフィールの上部に固定します。';
 
   @override
-  String get featuredTopicChanged => 'Featured topic changed';
+  String get featuredTopicChanged => '注目のトピックを変更しました';
 
   @override
-  String get featuredTopicNone =>
-      'None. Pin one of your topics to your profile.';
+  String get featuredTopicNone => 'なし。自分のトピックをプロフィールに固定できます。';
 
   @override
-  String get featuredTopicRemoved => 'Featured topic removed';
+  String get featuredTopicRemoved => '注目のトピックを解除しました';
 
   @override
-  String get featuredTopicRules =>
-      'Messages and topics in private categories can\'t be featured.';
+  String get featuredTopicRules => 'メッセージと非公開カテゴリのトピックは注目のトピックにできません。';
 
   @override
-  String get fieldManagedBySignIn =>
-      'This forum manages it through its own sign-in. Change it there.';
+  String get fieldManagedBySignIn => 'このフォーラムでは独自のサインインで管理されています。そちらで変更してください。';
 
   @override
-  String get flair => 'Flair';
+  String get flair => 'フレア';
 
   @override
   String flairChangedTo(String group) {
-    return 'Flair changed to $group';
+    return 'フレアを $group に変更しました';
   }
 
   @override
-  String get flairRemoved => 'Flair removed';
+  String get flairRemoved => 'フレアを削除しました';
 
   @override
-  String get flairSheetHint =>
-      'A small badge on your picture, from a group you\'re in.';
+  String get flairSheetHint => '参加しているグループの小さなアイコンをプロフィール画像に表示します。';
 
   @override
   String forumPictureN(int number) {
-    return 'Forum picture $number';
+    return 'フォーラムの画像 $number';
   }
 
   @override
   String forumQuestionNeedsAnswer(String question) {
-    return '$question needs an answer';
+    return '$question に回答が必要です';
   }
 
   @override
-  String get forumQuestionRequired => 'This forum asks everyone to answer';
+  String get forumQuestionRequired => 'このフォーラムでは全員に回答をお願いしています';
 
   @override
-  String get forumQuestionSetByStaff => 'Set by the forum\'s staff';
+  String get forumQuestionSetByStaff => 'フォーラムのスタッフが設定します';
 
   @override
-  String get forumQuestionsIntro =>
-      'Questions from this forum. * means required.';
+  String get forumQuestionsIntro => 'このフォーラムからの質問です。* は必須です。';
 
   @override
-  String get forumQuestionsNoneAnswered => 'Not answered yet';
+  String get forumQuestionsNoneAnswered => '未回答';
 
   @override
-  String get fromThisForum => 'From this forum';
+  String get fromThisForum => 'このフォーラムから';
 
   @override
-  String get hideMyProfile => 'Hide my public profile';
+  String get hideMyProfile => '公開プロフィールを非表示にする';
 
   @override
-  String get hideMyProfileExplanation =>
-      'Others see only your name, picture and posts';
+  String get hideMyProfileExplanation => '他の人には名前、プロフィール画像、投稿のみが表示されます';
 
   @override
-  String get letterAvatar => 'Letter';
+  String get letterAvatar => 'イニシャル';
 
   @override
-  String get moreAboutYou => 'More about you';
+  String get moreAboutYou => 'その他の情報';
 
   @override
   String namesAndMore(String names, int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count more',
-      one: '1 more',
+      other: '$count 件',
     );
-    return '$names and $_temp0';
+    return '$names ほか $_temp0';
   }
 
   @override
-  String get newUsername => 'New username';
+  String get newUsername => '新しいユーザー名';
 
   @override
-  String get noFlair => 'No flair';
+  String get noFlair => 'フレアなし';
 
   @override
   String noGravatarFound(String service) {
-    return '$service has no picture for your email address';
+    return '$service にはあなたのメールアドレスの画像がありません';
   }
 
   @override
-  String get noTitle => 'No title';
+  String get noTitle => '称号なし';
 
   @override
-  String get noTopicsMatch => 'None of your topics match';
+  String get noTopicsMatch => '一致するトピックはありません';
 
   @override
-  String get noTopicsToFeature => 'You haven\'t started any topics yet';
+  String get noTopicsToFeature => 'まだトピックを作成していません';
 
   @override
-  String get notSet => 'Not set';
+  String get notSet => '未設定';
 
   @override
-  String get orUse => 'Or use';
+  String get orUse => 'または次を使用';
 
   @override
-  String get pictureManagedBySignIn =>
-      'This forum sets your picture through its own sign-in';
+  String get pictureManagedBySignIn => 'このフォーラムでは独自のサインインでプロフィール画像が設定されます';
 
   @override
-  String get primaryGroup => 'Primary group';
+  String get primaryGroup => 'プライマリグループ';
 
   @override
   String primaryGroupChangedTo(String group) {
-    return 'Primary group changed to $group';
+    return 'プライマリグループを $group に変更しました';
   }
 
   @override
-  String get primaryGroupRemoved => 'Primary group removed';
+  String get primaryGroupRemoved => 'プライマリグループを削除しました';
 
   @override
-  String get primaryGroupSheetHint =>
-      'Your main group, shown on your user card.';
+  String get primaryGroupSheetHint => 'ユーザーカードに表示されるメインのグループです。';
 
   @override
-  String get profileLoadFailed => 'Couldn\'t load your profile';
+  String get profileLoadFailed => 'プロフィールを読み込めませんでした';
 
   @override
-  String get profileNowHidden => 'Your profile is hidden';
+  String get profileNowHidden => 'プロフィールを非公開にしました';
 
   @override
-  String get profileNowPublic => 'Your profile is public';
+  String get profileNowPublic => 'プロフィールを公開しました';
 
   @override
-  String get profilePicture => 'Profile picture';
+  String get profilePicture => 'プロフィール画像';
 
   @override
-  String get profilePictureChanged => 'Profile picture changed';
+  String get profilePictureChanged => 'プロフィール画像を変更しました';
 
   @override
-  String get profileSaveFailed => 'Couldn\'t save. Try again.';
+  String get profileSaveFailed => '保存できませんでした。もう一度お試しください。';
 
   @override
-  String get profileSectionNameAndAbout => 'Name and about';
+  String get profileSectionNameAndAbout => '名前と自己紹介';
 
   @override
-  String get profileSectionNextToName => 'Next to your name';
+  String get profileSectionNextToName => '名前の横';
 
   @override
-  String get profileSectionOnProfile => 'On your profile';
+  String get profileSectionOnProfile => 'プロフィール';
 
   @override
-  String get profileSectionPrivacyAndTime => 'Privacy and time';
+  String get profileSectionPrivacyAndTime => 'プライバシーと時刻';
 
   @override
-  String get removeCardBackground => 'Remove card background';
+  String get removeCardBackground => 'カード背景を削除';
 
   @override
-  String get removeCover => 'Remove cover';
+  String get removeCover => 'カバーを削除';
 
   @override
-  String get removeFeaturedTopic => 'Remove featured topic';
+  String get removeFeaturedTopic => '注目のトピックを解除';
 
   @override
-  String get searchTimezones => 'Search time zones';
+  String get searchTimezones => 'タイムゾーンを検索';
 
   @override
-  String get searchYourTopics => 'Search your topics';
+  String get searchYourTopics => '自分のトピックを検索';
 
   @override
-  String get seeProfileAsOthersDo => 'See your profile as others do';
+  String get seeProfileAsOthersDo => '他の人から見たプロフィールを表示';
 
   @override
-  String get timezone => 'Time zone';
+  String get timezone => 'タイムゾーン';
 
   @override
   String timezoneChangedTo(String zone) {
-    return 'Time zone changed to $zone';
+    return 'タイムゾーンを $zone に変更しました';
   }
 
   @override
   String timezoneWithTime(String zone, String time) {
-    return '$zone · $time now';
+    return '$zone · 現在 $time';
   }
 
   @override
   String timezonesMatchingPhone(String offset) {
-    return 'Matches this phone\'s clock ($offset)';
+    return 'この端末の時計と一致 ($offset)';
   }
 
   @override
   String titleChangedTo(String title) {
-    return 'Title changed to $title';
+    return '称号を $title に変更しました';
   }
 
   @override
-  String get titleFromBadge => 'Badge';
+  String get titleFromBadge => 'バッジ';
 
   @override
   String titleFromBadgeEarned(String date) {
-    return 'Badge · earned $date';
+    return 'バッジ · $date に獲得';
   }
 
   @override
   String titleFromGroup(String group) {
-    return '$group group';
+    return '$group グループ';
   }
 
   @override
-  String get titleGrantedByStaff => 'Given by the forum\'s staff';
+  String get titleGrantedByStaff => 'フォーラムのスタッフが付与';
 
   @override
-  String get titleRemoved => 'Title removed';
+  String get titleRemoved => '称号を削除しました';
 
   @override
-  String get titleSheetHint =>
-      'Shown after your name on your profile and posts.';
+  String get titleSheetHint => 'プロフィールと投稿で名前の後に表示されます。';
 
   @override
-  String get username => 'Username';
+  String get username => 'ユーザー名';
 
   @override
-  String get usernameAvailable => 'Available';
+  String get usernameAvailable => '使用できます';
 
   @override
   String usernameChanged(String username) {
-    return 'Your username is now @$username';
+    return 'ユーザー名が @$username になりました';
   }
 
   @override
   String get usernameLockedExplanation =>
-      'This forum lets members change their username only shortly after joining. A moderator can change it for you.';
+      'このフォーラムでは、ユーザー名を変更できるのは参加直後の短い期間だけです。モデレーターに変更を依頼できます。';
 
   @override
-  String get yourPhoto => 'Your photo';
+  String get yourPhoto => '自分の写真';
 
   @override
-  String get chooseEmoji => 'Choose emoji';
+  String get chooseEmoji => '絵文字を選択';
 
   @override
-  String get clearStatus => 'Clear status';
+  String get clearStatus => 'ステータスを解除';
 
   @override
-  String get clearText => 'Clear';
+  String get clearText => 'クリア';
 
   @override
-  String get inOneHour => 'In one hour';
+  String get inOneHour => '1時間後';
 
   @override
-  String get never => 'Never';
+  String get never => '解除しない';
 
   @override
-  String get pauseNotifications => 'Pause notifications';
+  String get pauseNotifications => '通知を一時停止';
 
   @override
-  String get pauseNotificationsUntilStatusClears => 'Until your status clears';
+  String get pauseNotificationsUntilStatusClears => 'ステータスが解除されるまで';
 
   @override
-  String get pickATime => 'Pick a time';
+  String get pickATime => '時間を選択';
 
   @override
-  String get removeStatusAfter => 'Remove status';
+  String get removeStatusAfter => 'ステータスの解除';
 
   @override
-  String get searchEmoji => 'Search emoji';
+  String get searchEmoji => '絵文字を検索';
 
   @override
-  String get setStatus => 'Set status';
+  String get setStatus => 'ステータスを設定';
 
   @override
-  String get setAStatus => 'Set a status';
+  String get setAStatus => 'ステータスを設定';
 
   @override
-  String get statusUpdated => 'Status updated';
+  String get statusUpdated => 'ステータスを更新しました';
 
   @override
-  String get whatAreYouDoing => 'What are you doing?';
+  String get whatAreYouDoing => '何をしていますか？';
 
   @override
   String cardPosted(String when) {
-    return 'Posted $when';
+    return '$whenに投稿';
   }
 
   @override
-  String get change => 'Change';
+  String get change => '変更';
 
   @override
-  String get copyProfileLink => 'Copy link to profile';
+  String get copyProfileLink => 'プロフィールのリンクをコピー';
 
   @override
-  String get ignore => 'Ignore';
+  String get ignore => '無視';
 
   @override
   String memberOfGroup(String group) {
-    return 'Member of $group';
+    return '$group のメンバー';
   }
 
   @override
-  String get mute => 'Mute';
+  String get mute => 'ミュート';
 
   @override
-  String get unmute => 'Unmute';
+  String get unmute => 'ミュートを解除';
 
   @override
   String openProfileOf(String username) {
-    return 'Open @$username\'s profile';
+    return '@$username のプロフィールを開く';
   }
 
   @override
   String profileIsPrivate(String username) {
-    return '$username keeps their profile private.';
+    return '$username はプロフィールを非公開にしています。';
   }
 
   @override
@@ -3439,10 +3425,9 @@ class AppLocalizationsJa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count posts',
-      one: 'post',
+      other: '$count 件',
     );
-    return 'Show only $name\'s $_temp0 in this topic';
+    return 'このトピックで $name の投稿（$_temp0）のみを表示';
   }
 
   @override
@@ -3450,27 +3435,26 @@ class AppLocalizationsJa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count posts',
-      one: 'post',
+      other: '$count 件',
     );
-    return 'Show only your $_temp0 in this topic';
+    return 'このトピックで自分の投稿（$_temp0）のみを表示';
   }
 
   @override
   String userIgnoredFor4Months(String username) {
-    return 'Ignoring @$username for 4 months';
+    return '@$username を4か月間無視します';
   }
 
   @override
   String userMuted(String username) {
-    return 'Muted @$username';
+    return '@$username をミュートしました';
   }
 
   @override
   String userUnmuted(String username) {
-    return 'Unmuted @$username';
+    return '@$username のミュートを解除しました';
   }
 
   @override
-  String get youParenthetical => '(you)';
+  String get youParenthetical => '（あなた）';
 }

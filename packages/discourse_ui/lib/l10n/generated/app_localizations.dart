@@ -5263,7 +5263,7 @@ abstract class AppLocalizations {
   /// Edit profile: under Card background
   ///
   /// In en, this message translates to:
-  /// **'Behind your user card on the forum\'s website'**
+  /// **'Behind your user card when people tap your picture'**
   String get cardBackgroundExplanation;
 
   /// Snackbar after removing the card background, with Undo

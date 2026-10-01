@@ -621,50 +621,45 @@ class _UserCardSheetState extends State<UserCardSheet> {
           children: _isSelf
               ? [
                   Expanded(
-                    child: FilledButton.tonalIcon(
+                    child: FilledButton.tonal(
                       onPressed: () => _go(EditProfilePage(
                           siteContext: widget.siteContext,
                           userInfo: _selfInfo(card))),
-                      icon: const Icon(Icons.edit_outlined),
-                      label: Text(l10n.editProfile),
+                      child: _ButtonLabel(l10n.editProfile),
                     ),
                   ),
                   const SizedBox(width: DesignTokens.spacingS),
                   Expanded(
-                    child: OutlinedButton.icon(
+                    child: OutlinedButton(
                       onPressed: _openProfile,
-                      icon: const Icon(Icons.account_circle_outlined),
-                      label: Text(l10n.viewProfile),
+                      child: _ButtonLabel(l10n.viewProfile),
                     ),
                   ),
                 ]
               : [
                   if (card.canSendPrivateMessage) ...[
                     Expanded(
-                      child: FilledButton.tonalIcon(
+                      child: FilledButton.tonal(
                         onPressed: _message,
-                        icon: const Icon(Icons.mail_outline),
-                        label: Text(l10n.sendMessage),
+                        child: _ButtonLabel(l10n.sendMessage),
                       ),
                     ),
                     const SizedBox(width: DesignTokens.spacingS),
                   ],
                   if (card.canChat && !card.profileHidden) ...[
                     Expanded(
-                      child: OutlinedButton.icon(
+                      child: OutlinedButton(
                         onPressed: _startingChat ? null : _chat,
-                        icon: const Icon(Icons.chat_bubble_outline),
-                        label: Text(l10n.chatWithUser),
+                        child: _ButtonLabel(l10n.chatWithUser),
                       ),
                     ),
                     const SizedBox(width: DesignTokens.spacingS),
                   ],
                   if (!card.profileHidden)
                     Expanded(
-                      child: OutlinedButton.icon(
+                      child: OutlinedButton(
                         onPressed: _openProfile,
-                        icon: const Icon(Icons.account_circle_outlined),
-                        label: Text(l10n.profile),
+                        child: _ButtonLabel(l10n.profile),
                       ),
                     ),
                 ],
@@ -679,4 +674,18 @@ class _UserCardSheetState extends State<UserCardSheet> {
         3 => const Color(0xFFA0622D),
         _ => scheme.onSurfaceVariant,
       };
+}
+
+/// A button label on one line: up to three buttons share the card's
+/// width, and a long word in a large font shrinks rather than breaking
+/// ("Messa / ge").
+class _ButtonLabel extends StatelessWidget {
+  const _ButtonLabel(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(text, maxLines: 1, softWrap: false),
+      );
 }

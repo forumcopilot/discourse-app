@@ -3024,407 +3024,394 @@ class AppLocalizationsKo extends AppLocalizations {
   String get changeEmailSubtitle => '새 주소로 인증 링크를 보내드립니다';
 
   @override
-  String get aboutMe => 'About me';
+  String get aboutMe => '자기소개';
 
   @override
-  String get aboutMeHelper => 'Shown at the top of your profile';
+  String get aboutMeHelper => '프로필 상단에 표시됩니다';
 
   @override
-  String get aboutMeMarkdownHint => 'Markdown works: **bold**, links, :emoji:';
+  String get aboutMeMarkdownHint => 'Markdown 사용 가능: **굵게**, 링크, :emoji:';
 
   @override
-  String get addCover => 'Add cover';
+  String get addCover => '커버 추가';
 
   @override
-  String get changeCover => 'Change cover';
+  String get changeCover => '커버 변경';
 
   @override
-  String get birthdayHint =>
-      'The forum celebrates it with you. No year is kept.';
+  String get birthdayHint => '포럼이 함께 축하해 드립니다. 연도는 저장되지 않습니다.';
 
   @override
-  String get birthdayRemoved => 'Birthday removed';
+  String get birthdayRemoved => '생일을 삭제했습니다';
 
   @override
-  String get birthdaySaved => 'Birthday saved';
+  String get birthdaySaved => '생일을 저장했습니다';
 
   @override
-  String get cardBackground => 'Card background';
+  String get cardBackground => '카드 배경';
 
   @override
-  String get cardBackgroundExplanation =>
-      'Behind your user card on the forum\'s website';
+  String get cardBackgroundExplanation => '다른 사람이 내 사진을 탭하면 사용자 카드 뒤에 표시됩니다';
 
   @override
-  String get cardBackgroundRemoved => 'Card background removed';
+  String get cardBackgroundRemoved => '카드 배경을 삭제했습니다';
 
   @override
   String get cardBackgroundSheetHint =>
-      'Shown behind your user card. Wide photos work best.';
+      '사용자 카드 뒤에 표시됩니다. 가로로 넓은 사진이 가장 잘 어울립니다.';
 
   @override
-  String get changeProfilePicture => 'Change profile picture';
+  String get changeProfilePicture => '프로필 사진 변경';
 
   @override
-  String get changeUsername => 'Change username';
+  String get changeUsername => '사용자 이름 변경';
 
   @override
   String changeUsernameExplanation(String username) {
-    return 'Mentions and quotes of @$username in posts switch to the new name. Old links to your profile stop working.';
+    return '게시물 속 @$username 멘션과 인용이 새 이름으로 바뀝니다. 프로필로 연결되는 이전 링크는 더 이상 작동하지 않습니다.';
   }
 
   @override
-  String get chooseFromLibrary => 'Choose from library';
+  String get chooseFromLibrary => '앨범에서 선택';
 
   @override
-  String get coverPhoto => 'Cover photo';
+  String get coverPhoto => '커버 사진';
 
   @override
   String get coverPhotoSheetHint =>
-      'Shown across the top of your profile, behind your picture. Wide photos work best, about 3 to 1.';
+      '프로필 상단, 프로필 사진 뒤에 표시됩니다. 약 3:1 비율의 가로로 넓은 사진이 가장 잘 어울립니다.';
 
   @override
-  String get coverRemoved => 'Cover removed';
+  String get coverRemoved => '커버를 삭제했습니다';
 
   @override
-  String get day => 'Day';
+  String get day => '일';
 
   @override
-  String get month => 'Month';
+  String get month => '월';
 
   @override
-  String get displayName => 'Display name';
+  String get displayName => '표시 이름';
 
   @override
   String displayNameHelper(String username) {
-    return 'Shown with your posts. Your username stays @$username.';
+    return '게시물과 함께 표시됩니다. 사용자 이름은 @$username(으)로 유지됩니다.';
   }
 
   @override
-  String get emailPasswordInAccount => 'Email, password and sign-in';
+  String get emailPasswordInAccount => '이메일, 비밀번호 및 로그인';
 
   @override
-  String get featureATopic => 'Feature a topic';
+  String get featureATopic => '추천 주제 선택';
 
   @override
-  String get featureATopicHint =>
-      'Pin one of your topics to the top of your profile.';
+  String get featureATopicHint => '내 주제 하나를 프로필 상단에 고정합니다.';
 
   @override
-  String get featuredTopicChanged => 'Featured topic changed';
+  String get featuredTopicChanged => '추천 주제를 변경했습니다';
 
   @override
-  String get featuredTopicNone =>
-      'None. Pin one of your topics to your profile.';
+  String get featuredTopicNone => '없음. 내 주제 하나를 프로필에 고정하세요.';
 
   @override
-  String get featuredTopicRemoved => 'Featured topic removed';
+  String get featuredTopicRemoved => '추천 주제를 삭제했습니다';
 
   @override
-  String get featuredTopicRules =>
-      'Messages and topics in private categories can\'t be featured.';
+  String get featuredTopicRules => '메시지와 비공개 카테고리의 주제는 추천할 수 없습니다.';
 
   @override
-  String get fieldManagedBySignIn =>
-      'This forum manages it through its own sign-in. Change it there.';
+  String get fieldManagedBySignIn => '이 포럼은 자체 로그인으로 이 항목을 관리합니다. 그곳에서 변경하세요.';
 
   @override
-  String get flair => 'Flair';
+  String get flair => '플레어';
 
   @override
   String flairChangedTo(String group) {
-    return 'Flair changed to $group';
+    return '플레어를 $group(으)로 변경했습니다';
   }
 
   @override
-  String get flairRemoved => 'Flair removed';
+  String get flairRemoved => '플레어를 삭제했습니다';
 
   @override
-  String get flairSheetHint =>
-      'A small badge on your picture, from a group you\'re in.';
+  String get flairSheetHint => '내가 속한 그룹의 작은 아이콘이 프로필 사진에 표시됩니다.';
 
   @override
   String forumPictureN(int number) {
-    return 'Forum picture $number';
+    return '포럼 이미지 $number';
   }
 
   @override
   String forumQuestionNeedsAnswer(String question) {
-    return '$question needs an answer';
+    return '$question: 답변 필요';
   }
 
   @override
-  String get forumQuestionRequired => 'This forum asks everyone to answer';
+  String get forumQuestionRequired => '이 포럼은 모든 회원에게 답변을 요청합니다';
 
   @override
-  String get forumQuestionSetByStaff => 'Set by the forum\'s staff';
+  String get forumQuestionSetByStaff => '포럼 운영진이 설정합니다';
 
   @override
-  String get forumQuestionsIntro =>
-      'Questions from this forum. * means required.';
+  String get forumQuestionsIntro => '이 포럼의 질문입니다. *는 필수 항목입니다.';
 
   @override
-  String get forumQuestionsNoneAnswered => 'Not answered yet';
+  String get forumQuestionsNoneAnswered => '아직 답변하지 않음';
 
   @override
-  String get fromThisForum => 'From this forum';
+  String get fromThisForum => '이 포럼에서 제공';
 
   @override
-  String get hideMyProfile => 'Hide my public profile';
+  String get hideMyProfile => '공개 프로필 숨기기';
 
   @override
-  String get hideMyProfileExplanation =>
-      'Others see only your name, picture and posts';
+  String get hideMyProfileExplanation => '다른 사람에게는 이름, 사진, 게시물만 표시됩니다';
 
   @override
-  String get letterAvatar => 'Letter';
+  String get letterAvatar => '이니셜';
 
   @override
-  String get moreAboutYou => 'More about you';
+  String get moreAboutYou => '추가 정보';
 
   @override
   String namesAndMore(String names, int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count more',
-      one: '1 more',
+      other: '$count개',
     );
-    return '$names and $_temp0';
+    return '$names 외 $_temp0';
   }
 
   @override
-  String get newUsername => 'New username';
+  String get newUsername => '새 사용자 이름';
 
   @override
-  String get noFlair => 'No flair';
+  String get noFlair => '플레어 없음';
 
   @override
   String noGravatarFound(String service) {
-    return '$service has no picture for your email address';
+    return '$service에 내 이메일 주소의 사진이 없습니다';
   }
 
   @override
-  String get noTitle => 'No title';
+  String get noTitle => '칭호 없음';
 
   @override
-  String get noTopicsMatch => 'None of your topics match';
+  String get noTopicsMatch => '일치하는 내 주제가 없습니다';
 
   @override
-  String get noTopicsToFeature => 'You haven\'t started any topics yet';
+  String get noTopicsToFeature => '아직 시작한 주제가 없습니다';
 
   @override
-  String get notSet => 'Not set';
+  String get notSet => '설정 안 함';
 
   @override
-  String get orUse => 'Or use';
+  String get orUse => '또는 다음 사용';
 
   @override
-  String get pictureManagedBySignIn =>
-      'This forum sets your picture through its own sign-in';
+  String get pictureManagedBySignIn => '이 포럼은 자체 로그인으로 프로필 사진을 설정합니다';
 
   @override
-  String get primaryGroup => 'Primary group';
+  String get primaryGroup => '기본 그룹';
 
   @override
   String primaryGroupChangedTo(String group) {
-    return 'Primary group changed to $group';
+    return '기본 그룹을 $group(으)로 변경했습니다';
   }
 
   @override
-  String get primaryGroupRemoved => 'Primary group removed';
+  String get primaryGroupRemoved => '기본 그룹을 삭제했습니다';
 
   @override
-  String get primaryGroupSheetHint =>
-      'Your main group, shown on your user card.';
+  String get primaryGroupSheetHint => '사용자 카드에 표시되는 대표 그룹입니다.';
 
   @override
-  String get profileLoadFailed => 'Couldn\'t load your profile';
+  String get profileLoadFailed => '프로필을 불러오지 못했습니다';
 
   @override
-  String get profileNowHidden => 'Your profile is hidden';
+  String get profileNowHidden => '프로필이 숨겨졌습니다';
 
   @override
-  String get profileNowPublic => 'Your profile is public';
+  String get profileNowPublic => '프로필이 공개되었습니다';
 
   @override
-  String get profilePicture => 'Profile picture';
+  String get profilePicture => '프로필 사진';
 
   @override
-  String get profilePictureChanged => 'Profile picture changed';
+  String get profilePictureChanged => '프로필 사진을 변경했습니다';
 
   @override
-  String get profileSaveFailed => 'Couldn\'t save. Try again.';
+  String get profileSaveFailed => '저장하지 못했습니다. 다시 시도하세요.';
 
   @override
-  String get profileSectionNameAndAbout => 'Name and about';
+  String get profileSectionNameAndAbout => '이름 및 소개';
 
   @override
-  String get profileSectionNextToName => 'Next to your name';
+  String get profileSectionNextToName => '이름 옆';
 
   @override
-  String get profileSectionOnProfile => 'On your profile';
+  String get profileSectionOnProfile => '프로필에 표시';
 
   @override
-  String get profileSectionPrivacyAndTime => 'Privacy and time';
+  String get profileSectionPrivacyAndTime => '개인정보 및 시간';
 
   @override
-  String get removeCardBackground => 'Remove card background';
+  String get removeCardBackground => '카드 배경 삭제';
 
   @override
-  String get removeCover => 'Remove cover';
+  String get removeCover => '커버 삭제';
 
   @override
-  String get removeFeaturedTopic => 'Remove featured topic';
+  String get removeFeaturedTopic => '추천 주제 삭제';
 
   @override
-  String get searchTimezones => 'Search time zones';
+  String get searchTimezones => '시간대 검색';
 
   @override
-  String get searchYourTopics => 'Search your topics';
+  String get searchYourTopics => '내 주제 검색';
 
   @override
-  String get seeProfileAsOthersDo => 'See your profile as others do';
+  String get seeProfileAsOthersDo => '다른 사람에게 보이는 프로필 보기';
 
   @override
-  String get timezone => 'Time zone';
+  String get timezone => '시간대';
 
   @override
   String timezoneChangedTo(String zone) {
-    return 'Time zone changed to $zone';
+    return '시간대를 $zone(으)로 변경했습니다';
   }
 
   @override
   String timezoneWithTime(String zone, String time) {
-    return '$zone · $time now';
+    return '$zone · 현재 $time';
   }
 
   @override
   String timezonesMatchingPhone(String offset) {
-    return 'Matches this phone\'s clock ($offset)';
+    return '이 휴대폰의 시계와 일치 ($offset)';
   }
 
   @override
   String titleChangedTo(String title) {
-    return 'Title changed to $title';
+    return '칭호를 $title(으)로 변경했습니다';
   }
 
   @override
-  String get titleFromBadge => 'Badge';
+  String get titleFromBadge => '배지';
 
   @override
   String titleFromBadgeEarned(String date) {
-    return 'Badge · earned $date';
+    return '배지 · $date 획득';
   }
 
   @override
   String titleFromGroup(String group) {
-    return '$group group';
+    return '$group 그룹';
   }
 
   @override
-  String get titleGrantedByStaff => 'Given by the forum\'s staff';
+  String get titleGrantedByStaff => '포럼 운영진이 부여함';
 
   @override
-  String get titleRemoved => 'Title removed';
+  String get titleRemoved => '칭호를 삭제했습니다';
 
   @override
-  String get titleSheetHint =>
-      'Shown after your name on your profile and posts.';
+  String get titleSheetHint => '프로필과 게시물에서 이름 뒤에 표시됩니다.';
 
   @override
-  String get username => 'Username';
+  String get username => '사용자 이름';
 
   @override
-  String get usernameAvailable => 'Available';
+  String get usernameAvailable => '사용 가능';
 
   @override
   String usernameChanged(String username) {
-    return 'Your username is now @$username';
+    return '사용자 이름이 @$username(으)로 변경되었습니다';
   }
 
   @override
   String get usernameLockedExplanation =>
-      'This forum lets members change their username only shortly after joining. A moderator can change it for you.';
+      '이 포럼에서는 가입 직후 잠시 동안만 사용자 이름을 변경할 수 있습니다. 운영자에게 변경을 요청할 수 있습니다.';
 
   @override
-  String get yourPhoto => 'Your photo';
+  String get yourPhoto => '내 사진';
 
   @override
-  String get chooseEmoji => 'Choose emoji';
+  String get chooseEmoji => '이모지 선택';
 
   @override
-  String get clearStatus => 'Clear status';
+  String get clearStatus => '상태 지우기';
 
   @override
-  String get clearText => 'Clear';
+  String get clearText => '지우기';
 
   @override
-  String get inOneHour => 'In one hour';
+  String get inOneHour => '한 시간 후';
 
   @override
-  String get never => 'Never';
+  String get never => '안 함';
 
   @override
-  String get pauseNotifications => 'Pause notifications';
+  String get pauseNotifications => '알림 일시 중지';
 
   @override
-  String get pauseNotificationsUntilStatusClears => 'Until your status clears';
+  String get pauseNotificationsUntilStatusClears => '상태가 삭제될 때까지';
 
   @override
-  String get pickATime => 'Pick a time';
+  String get pickATime => '시간 선택';
 
   @override
-  String get removeStatusAfter => 'Remove status';
+  String get removeStatusAfter => '상태 삭제';
 
   @override
-  String get searchEmoji => 'Search emoji';
+  String get searchEmoji => '이모지 검색';
 
   @override
-  String get setStatus => 'Set status';
+  String get setStatus => '상태 설정';
 
   @override
-  String get setAStatus => 'Set a status';
+  String get setAStatus => '상태 설정하기';
 
   @override
-  String get statusUpdated => 'Status updated';
+  String get statusUpdated => '상태를 업데이트했습니다';
 
   @override
-  String get whatAreYouDoing => 'What are you doing?';
+  String get whatAreYouDoing => '무엇을 하고 있나요?';
 
   @override
   String cardPosted(String when) {
-    return 'Posted $when';
+    return '$when 게시';
   }
 
   @override
-  String get change => 'Change';
+  String get change => '변경';
 
   @override
-  String get copyProfileLink => 'Copy link to profile';
+  String get copyProfileLink => '프로필 링크 복사';
 
   @override
-  String get ignore => 'Ignore';
+  String get ignore => '무시';
 
   @override
   String memberOfGroup(String group) {
-    return 'Member of $group';
+    return '$group 구성원';
   }
 
   @override
-  String get mute => 'Mute';
+  String get mute => '뮤트';
 
   @override
-  String get unmute => 'Unmute';
+  String get unmute => '뮤트 해제';
 
   @override
   String openProfileOf(String username) {
-    return 'Open @$username\'s profile';
+    return '@$username님의 프로필 열기';
   }
 
   @override
   String profileIsPrivate(String username) {
-    return '$username keeps their profile private.';
+    return '$username님은 프로필을 비공개로 설정했습니다.';
   }
 
   @override
@@ -3432,10 +3419,9 @@ class AppLocalizationsKo extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count posts',
-      one: 'post',
+      other: '$count개',
     );
-    return 'Show only $name\'s $_temp0 in this topic';
+    return '이 주제에서 $name님의 게시물 $_temp0만 보기';
   }
 
   @override
@@ -3443,27 +3429,26 @@ class AppLocalizationsKo extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count posts',
-      one: 'post',
+      other: '$count개',
     );
-    return 'Show only your $_temp0 in this topic';
+    return '이 주제에서 내 게시물 $_temp0만 보기';
   }
 
   @override
   String userIgnoredFor4Months(String username) {
-    return 'Ignoring @$username for 4 months';
+    return '@$username님을 4개월 동안 무시합니다';
   }
 
   @override
   String userMuted(String username) {
-    return 'Muted @$username';
+    return '@$username님을 뮤트했습니다';
   }
 
   @override
   String userUnmuted(String username) {
-    return 'Unmuted @$username';
+    return '@$username님의 뮤트를 해제했습니다';
   }
 
   @override
-  String get youParenthetical => '(you)';
+  String get youParenthetical => '(나)';
 }

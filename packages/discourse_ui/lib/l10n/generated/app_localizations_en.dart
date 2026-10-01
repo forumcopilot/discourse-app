@@ -3169,7 +3169,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cardBackgroundExplanation =>
-      'Behind your user card on the forum\'s website';
+      'Behind your user card when people tap your picture';
 
   @override
   String get cardBackgroundRemoved => 'Card background removed';

@@ -3841,7 +3841,7 @@
   "@cardBackground": {
     "description": "Edit profile: the user card's background image"
   },
-  "cardBackgroundExplanation": "Behind your user card on the forum's website",
+  "cardBackgroundExplanation": "Behind your user card when people tap your picture",
   "@cardBackgroundExplanation": {
     "description": "Edit profile: under Card background"
   },

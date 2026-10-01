@@ -3155,407 +3155,408 @@ class AppLocalizationsEs extends AppLocalizations {
       'Te enviaremos un enlace de verificación a la nueva dirección';
 
   @override
-  String get aboutMe => 'About me';
+  String get aboutMe => 'Sobre mí';
 
   @override
-  String get aboutMeHelper => 'Shown at the top of your profile';
+  String get aboutMeHelper => 'Se muestra en la parte superior de tu perfil';
 
   @override
-  String get aboutMeMarkdownHint => 'Markdown works: **bold**, links, :emoji:';
+  String get aboutMeMarkdownHint =>
+      'Admite Markdown: **negrita**, enlaces, :emoji:';
 
   @override
-  String get addCover => 'Add cover';
+  String get addCover => 'Añadir portada';
 
   @override
-  String get changeCover => 'Change cover';
+  String get changeCover => 'Cambiar portada';
 
   @override
-  String get birthdayHint =>
-      'The forum celebrates it with you. No year is kept.';
+  String get birthdayHint => 'El foro lo celebra contigo. No se guarda el año.';
 
   @override
-  String get birthdayRemoved => 'Birthday removed';
+  String get birthdayRemoved => 'Cumpleaños eliminado';
 
   @override
-  String get birthdaySaved => 'Birthday saved';
+  String get birthdaySaved => 'Cumpleaños guardado';
 
   @override
-  String get cardBackground => 'Card background';
+  String get cardBackground => 'Fondo de la tarjeta';
 
   @override
   String get cardBackgroundExplanation =>
-      'Behind your user card on the forum\'s website';
+      'Detrás de tu tarjeta de usuario cuando alguien toca tu foto';
 
   @override
-  String get cardBackgroundRemoved => 'Card background removed';
+  String get cardBackgroundRemoved => 'Fondo de la tarjeta eliminado';
 
   @override
   String get cardBackgroundSheetHint =>
-      'Shown behind your user card. Wide photos work best.';
+      'Se muestra detrás de tu tarjeta de usuario. Las fotos anchas quedan mejor.';
 
   @override
-  String get changeProfilePicture => 'Change profile picture';
+  String get changeProfilePicture => 'Cambiar foto de perfil';
 
   @override
-  String get changeUsername => 'Change username';
+  String get changeUsername => 'Cambiar nombre de usuario';
 
   @override
   String changeUsernameExplanation(String username) {
-    return 'Mentions and quotes of @$username in posts switch to the new name. Old links to your profile stop working.';
+    return 'Las menciones y citas de @$username en las publicaciones pasarán al nuevo nombre. Los enlaces antiguos a tu perfil dejarán de funcionar.';
   }
 
   @override
-  String get chooseFromLibrary => 'Choose from library';
+  String get chooseFromLibrary => 'Elegir de la galería';
 
   @override
-  String get coverPhoto => 'Cover photo';
+  String get coverPhoto => 'Foto de portada';
 
   @override
   String get coverPhotoSheetHint =>
-      'Shown across the top of your profile, behind your picture. Wide photos work best, about 3 to 1.';
+      'Se muestra en la parte superior de tu perfil, detrás de tu foto. Las fotos anchas quedan mejor, de unos 3 a 1.';
 
   @override
-  String get coverRemoved => 'Cover removed';
+  String get coverRemoved => 'Portada eliminada';
 
   @override
-  String get day => 'Day';
+  String get day => 'Día';
 
   @override
-  String get month => 'Month';
+  String get month => 'Mes';
 
   @override
-  String get displayName => 'Display name';
+  String get displayName => 'Nombre visible';
 
   @override
   String displayNameHelper(String username) {
-    return 'Shown with your posts. Your username stays @$username.';
+    return 'Se muestra junto a tus publicaciones. Tu nombre de usuario sigue siendo @$username.';
   }
 
   @override
-  String get emailPasswordInAccount => 'Email, password and sign-in';
+  String get emailPasswordInAccount => 'Correo, contraseña e inicio de sesión';
 
   @override
-  String get featureATopic => 'Feature a topic';
+  String get featureATopic => 'Destacar un tema';
 
   @override
   String get featureATopicHint =>
-      'Pin one of your topics to the top of your profile.';
+      'Fija uno de tus temas en la parte superior de tu perfil.';
 
   @override
-  String get featuredTopicChanged => 'Featured topic changed';
+  String get featuredTopicChanged => 'Tema destacado cambiado';
 
   @override
   String get featuredTopicNone =>
-      'None. Pin one of your topics to your profile.';
+      'Ninguno. Fija uno de tus temas en tu perfil.';
 
   @override
-  String get featuredTopicRemoved => 'Featured topic removed';
+  String get featuredTopicRemoved => 'Tema destacado eliminado';
 
   @override
   String get featuredTopicRules =>
-      'Messages and topics in private categories can\'t be featured.';
+      'No se pueden destacar mensajes ni temas de categorías privadas.';
 
   @override
   String get fieldManagedBySignIn =>
-      'This forum manages it through its own sign-in. Change it there.';
+      'Este foro lo gestiona con su propio inicio de sesión. Cámbialo allí.';
 
   @override
-  String get flair => 'Flair';
+  String get flair => 'Distintivo';
 
   @override
   String flairChangedTo(String group) {
-    return 'Flair changed to $group';
+    return 'Distintivo cambiado a $group';
   }
 
   @override
-  String get flairRemoved => 'Flair removed';
+  String get flairRemoved => 'Distintivo eliminado';
 
   @override
   String get flairSheetHint =>
-      'A small badge on your picture, from a group you\'re in.';
+      'Un pequeño distintivo sobre tu foto, de un grupo al que perteneces.';
 
   @override
   String forumPictureN(int number) {
-    return 'Forum picture $number';
+    return 'Imagen del foro $number';
   }
 
   @override
   String forumQuestionNeedsAnswer(String question) {
-    return '$question needs an answer';
+    return '$question necesita una respuesta';
   }
 
   @override
-  String get forumQuestionRequired => 'This forum asks everyone to answer';
+  String get forumQuestionRequired => 'Este foro pide a todos que respondan';
 
   @override
-  String get forumQuestionSetByStaff => 'Set by the forum\'s staff';
+  String get forumQuestionSetByStaff => 'Lo establece el equipo del foro';
 
   @override
   String get forumQuestionsIntro =>
-      'Questions from this forum. * means required.';
+      'Preguntas de este foro. * indica obligatorio.';
 
   @override
-  String get forumQuestionsNoneAnswered => 'Not answered yet';
+  String get forumQuestionsNoneAnswered => 'Aún sin responder';
 
   @override
-  String get fromThisForum => 'From this forum';
+  String get fromThisForum => 'De este foro';
 
   @override
-  String get hideMyProfile => 'Hide my public profile';
+  String get hideMyProfile => 'Ocultar mi perfil público';
 
   @override
   String get hideMyProfileExplanation =>
-      'Others see only your name, picture and posts';
+      'Los demás solo ven tu nombre, tu foto y tus publicaciones';
 
   @override
-  String get letterAvatar => 'Letter';
+  String get letterAvatar => 'Inicial';
 
   @override
-  String get moreAboutYou => 'More about you';
+  String get moreAboutYou => 'Más sobre ti';
 
   @override
   String namesAndMore(String names, int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count more',
-      one: '1 more',
+      other: '$count más',
+      one: '1 más',
     );
-    return '$names and $_temp0';
+    return '$names y $_temp0';
   }
 
   @override
-  String get newUsername => 'New username';
+  String get newUsername => 'Nuevo nombre de usuario';
 
   @override
-  String get noFlair => 'No flair';
+  String get noFlair => 'Sin distintivo';
 
   @override
   String noGravatarFound(String service) {
-    return '$service has no picture for your email address';
+    return '$service no tiene ninguna imagen para tu correo electrónico';
   }
 
   @override
-  String get noTitle => 'No title';
+  String get noTitle => 'Sin título';
 
   @override
-  String get noTopicsMatch => 'None of your topics match';
+  String get noTopicsMatch => 'Ninguno de tus temas coincide';
 
   @override
-  String get noTopicsToFeature => 'You haven\'t started any topics yet';
+  String get noTopicsToFeature => 'Aún no has creado ningún tema';
 
   @override
-  String get notSet => 'Not set';
+  String get notSet => 'Sin definir';
 
   @override
-  String get orUse => 'Or use';
+  String get orUse => 'O usa';
 
   @override
   String get pictureManagedBySignIn =>
-      'This forum sets your picture through its own sign-in';
+      'Este foro define tu foto con su propio inicio de sesión';
 
   @override
-  String get primaryGroup => 'Primary group';
+  String get primaryGroup => 'Grupo principal';
 
   @override
   String primaryGroupChangedTo(String group) {
-    return 'Primary group changed to $group';
+    return 'Grupo principal cambiado a $group';
   }
 
   @override
-  String get primaryGroupRemoved => 'Primary group removed';
+  String get primaryGroupRemoved => 'Grupo principal eliminado';
 
   @override
   String get primaryGroupSheetHint =>
-      'Your main group, shown on your user card.';
+      'Tu grupo principal, que se muestra en tu tarjeta de usuario.';
 
   @override
-  String get profileLoadFailed => 'Couldn\'t load your profile';
+  String get profileLoadFailed => 'No se pudo cargar tu perfil';
 
   @override
-  String get profileNowHidden => 'Your profile is hidden';
+  String get profileNowHidden => 'Tu perfil está oculto';
 
   @override
-  String get profileNowPublic => 'Your profile is public';
+  String get profileNowPublic => 'Tu perfil es público';
 
   @override
-  String get profilePicture => 'Profile picture';
+  String get profilePicture => 'Foto de perfil';
 
   @override
-  String get profilePictureChanged => 'Profile picture changed';
+  String get profilePictureChanged => 'Foto de perfil cambiada';
 
   @override
-  String get profileSaveFailed => 'Couldn\'t save. Try again.';
+  String get profileSaveFailed => 'No se pudo guardar. Inténtalo de nuevo.';
 
   @override
-  String get profileSectionNameAndAbout => 'Name and about';
+  String get profileSectionNameAndAbout => 'Nombre y sobre mí';
 
   @override
-  String get profileSectionNextToName => 'Next to your name';
+  String get profileSectionNextToName => 'Junto a tu nombre';
 
   @override
-  String get profileSectionOnProfile => 'On your profile';
+  String get profileSectionOnProfile => 'En tu perfil';
 
   @override
-  String get profileSectionPrivacyAndTime => 'Privacy and time';
+  String get profileSectionPrivacyAndTime => 'Privacidad y hora';
 
   @override
-  String get removeCardBackground => 'Remove card background';
+  String get removeCardBackground => 'Quitar fondo de la tarjeta';
 
   @override
-  String get removeCover => 'Remove cover';
+  String get removeCover => 'Quitar portada';
 
   @override
-  String get removeFeaturedTopic => 'Remove featured topic';
+  String get removeFeaturedTopic => 'Quitar tema destacado';
 
   @override
-  String get searchTimezones => 'Search time zones';
+  String get searchTimezones => 'Buscar zonas horarias';
 
   @override
-  String get searchYourTopics => 'Search your topics';
+  String get searchYourTopics => 'Buscar en tus temas';
 
   @override
-  String get seeProfileAsOthersDo => 'See your profile as others do';
+  String get seeProfileAsOthersDo => 'Ver tu perfil como lo ven los demás';
 
   @override
-  String get timezone => 'Time zone';
+  String get timezone => 'Zona horaria';
 
   @override
   String timezoneChangedTo(String zone) {
-    return 'Time zone changed to $zone';
+    return 'Zona horaria cambiada a $zone';
   }
 
   @override
   String timezoneWithTime(String zone, String time) {
-    return '$zone · $time now';
+    return '$zone · ahora $time';
   }
 
   @override
   String timezonesMatchingPhone(String offset) {
-    return 'Matches this phone\'s clock ($offset)';
+    return 'Coincide con el reloj de este teléfono ($offset)';
   }
 
   @override
   String titleChangedTo(String title) {
-    return 'Title changed to $title';
+    return 'Título cambiado a $title';
   }
 
   @override
-  String get titleFromBadge => 'Badge';
+  String get titleFromBadge => 'Insignia';
 
   @override
   String titleFromBadgeEarned(String date) {
-    return 'Badge · earned $date';
+    return 'Insignia · obtenida el $date';
   }
 
   @override
   String titleFromGroup(String group) {
-    return '$group group';
+    return 'Grupo $group';
   }
 
   @override
-  String get titleGrantedByStaff => 'Given by the forum\'s staff';
+  String get titleGrantedByStaff => 'Otorgado por el equipo del foro';
 
   @override
-  String get titleRemoved => 'Title removed';
+  String get titleRemoved => 'Título eliminado';
 
   @override
   String get titleSheetHint =>
-      'Shown after your name on your profile and posts.';
+      'Se muestra después de tu nombre en tu perfil y tus publicaciones.';
 
   @override
-  String get username => 'Username';
+  String get username => 'Nombre de usuario';
 
   @override
-  String get usernameAvailable => 'Available';
+  String get usernameAvailable => 'Disponible';
 
   @override
   String usernameChanged(String username) {
-    return 'Your username is now @$username';
+    return 'Tu nombre de usuario ahora es @$username';
   }
 
   @override
   String get usernameLockedExplanation =>
-      'This forum lets members change their username only shortly after joining. A moderator can change it for you.';
+      'Este foro solo permite cambiar el nombre de usuario poco después de registrarse. Un moderador puede cambiarlo por ti.';
 
   @override
-  String get yourPhoto => 'Your photo';
+  String get yourPhoto => 'Tu foto';
 
   @override
-  String get chooseEmoji => 'Choose emoji';
+  String get chooseEmoji => 'Elegir emoji';
 
   @override
-  String get clearStatus => 'Clear status';
+  String get clearStatus => 'Borrar estado';
 
   @override
-  String get clearText => 'Clear';
+  String get clearText => 'Borrar';
 
   @override
-  String get inOneHour => 'In one hour';
+  String get inOneHour => 'En una hora';
 
   @override
-  String get never => 'Never';
+  String get never => 'Nunca';
 
   @override
-  String get pauseNotifications => 'Pause notifications';
+  String get pauseNotifications => 'Pausar notificaciones';
 
   @override
-  String get pauseNotificationsUntilStatusClears => 'Until your status clears';
+  String get pauseNotificationsUntilStatusClears =>
+      'Hasta que se quite tu estado';
 
   @override
-  String get pickATime => 'Pick a time';
+  String get pickATime => 'Elegir una hora';
 
   @override
-  String get removeStatusAfter => 'Remove status';
+  String get removeStatusAfter => 'Quitar estado';
 
   @override
-  String get searchEmoji => 'Search emoji';
+  String get searchEmoji => 'Buscar emoji';
 
   @override
-  String get setStatus => 'Set status';
+  String get setStatus => 'Establecer estado';
 
   @override
-  String get setAStatus => 'Set a status';
+  String get setAStatus => 'Establecer un estado';
 
   @override
-  String get statusUpdated => 'Status updated';
+  String get statusUpdated => 'Estado actualizado';
 
   @override
-  String get whatAreYouDoing => 'What are you doing?';
+  String get whatAreYouDoing => '¿Qué estás haciendo?';
 
   @override
   String cardPosted(String when) {
-    return 'Posted $when';
+    return 'Publicó $when';
   }
 
   @override
-  String get change => 'Change';
+  String get change => 'Cambiar';
 
   @override
-  String get copyProfileLink => 'Copy link to profile';
+  String get copyProfileLink => 'Copiar enlace al perfil';
 
   @override
-  String get ignore => 'Ignore';
+  String get ignore => 'Ignorar';
 
   @override
   String memberOfGroup(String group) {
-    return 'Member of $group';
+    return 'Miembro de $group';
   }
 
   @override
-  String get mute => 'Mute';
+  String get mute => 'Silenciar';
 
   @override
-  String get unmute => 'Unmute';
+  String get unmute => 'Dejar de silenciar';
 
   @override
   String openProfileOf(String username) {
-    return 'Open @$username\'s profile';
+    return 'Abrir el perfil de @$username';
   }
 
   @override
   String profileIsPrivate(String username) {
-    return '$username keeps their profile private.';
+    return '$username mantiene su perfil privado.';
   }
 
   @override
@@ -3563,10 +3564,10 @@ class AppLocalizationsEs extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count posts',
-      one: 'post',
+      other: 'las $count publicaciones',
+      one: 'la publicación',
     );
-    return 'Show only $name\'s $_temp0 in this topic';
+    return 'Mostrar solo $_temp0 de $name en este tema';
   }
 
   @override
@@ -3574,27 +3575,27 @@ class AppLocalizationsEs extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count posts',
-      one: 'post',
+      other: 'tus $count publicaciones',
+      one: 'tu publicación',
     );
-    return 'Show only your $_temp0 in this topic';
+    return 'Mostrar solo $_temp0 en este tema';
   }
 
   @override
   String userIgnoredFor4Months(String username) {
-    return 'Ignoring @$username for 4 months';
+    return 'Ignorarás a @$username durante 4 meses';
   }
 
   @override
   String userMuted(String username) {
-    return 'Muted @$username';
+    return 'Silenciaste a @$username';
   }
 
   @override
   String userUnmuted(String username) {
-    return 'Unmuted @$username';
+    return 'Dejaste de silenciar a @$username';
   }
 
   @override
-  String get youParenthetical => '(you)';
+  String get youParenthetical => '(tú)';
 }

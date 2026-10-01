@@ -2998,407 +2998,391 @@ class AppLocalizationsZh extends AppLocalizations {
   String get changeEmailSubtitle => '我们会向新地址发送验证链接';
 
   @override
-  String get aboutMe => 'About me';
+  String get aboutMe => '关于我';
 
   @override
-  String get aboutMeHelper => 'Shown at the top of your profile';
+  String get aboutMeHelper => '显示在你的个人资料顶部';
 
   @override
-  String get aboutMeMarkdownHint => 'Markdown works: **bold**, links, :emoji:';
+  String get aboutMeMarkdownHint => '支持 Markdown：**粗体**、链接、:emoji:';
 
   @override
-  String get addCover => 'Add cover';
+  String get addCover => '添加封面';
 
   @override
-  String get changeCover => 'Change cover';
+  String get changeCover => '更换封面';
 
   @override
-  String get birthdayHint =>
-      'The forum celebrates it with you. No year is kept.';
+  String get birthdayHint => '论坛会和你一起庆祝。不会保存年份。';
 
   @override
-  String get birthdayRemoved => 'Birthday removed';
+  String get birthdayRemoved => '已移除生日';
 
   @override
-  String get birthdaySaved => 'Birthday saved';
+  String get birthdaySaved => '已保存生日';
 
   @override
-  String get cardBackground => 'Card background';
+  String get cardBackground => '卡片背景';
 
   @override
-  String get cardBackgroundExplanation =>
-      'Behind your user card on the forum\'s website';
+  String get cardBackgroundExplanation => '有人点按你的头像时，显示在你的用户卡片后面';
 
   @override
-  String get cardBackgroundRemoved => 'Card background removed';
+  String get cardBackgroundRemoved => '已移除卡片背景';
 
   @override
-  String get cardBackgroundSheetHint =>
-      'Shown behind your user card. Wide photos work best.';
+  String get cardBackgroundSheetHint => '显示在你的用户卡片后面。宽幅照片效果最佳。';
 
   @override
-  String get changeProfilePicture => 'Change profile picture';
+  String get changeProfilePicture => '更换头像';
 
   @override
-  String get changeUsername => 'Change username';
+  String get changeUsername => '更改用户名';
 
   @override
   String changeUsernameExplanation(String username) {
-    return 'Mentions and quotes of @$username in posts switch to the new name. Old links to your profile stop working.';
+    return '帖子中对 @$username 的提及和引用会改为新名称。指向你个人资料的旧链接将失效。';
   }
 
   @override
-  String get chooseFromLibrary => 'Choose from library';
+  String get chooseFromLibrary => '从相册选择';
 
   @override
-  String get coverPhoto => 'Cover photo';
+  String get coverPhoto => '封面照片';
 
   @override
-  String get coverPhotoSheetHint =>
-      'Shown across the top of your profile, behind your picture. Wide photos work best, about 3 to 1.';
+  String get coverPhotoSheetHint => '显示在你的个人资料顶部、头像后面。宽幅照片效果最佳，约 3:1。';
 
   @override
-  String get coverRemoved => 'Cover removed';
+  String get coverRemoved => '已移除封面';
 
   @override
-  String get day => 'Day';
+  String get day => '日';
 
   @override
-  String get month => 'Month';
+  String get month => '月';
 
   @override
-  String get displayName => 'Display name';
+  String get displayName => '显示名称';
 
   @override
   String displayNameHelper(String username) {
-    return 'Shown with your posts. Your username stays @$username.';
+    return '与你的帖子一起显示。你的用户名仍为 @$username。';
   }
 
   @override
-  String get emailPasswordInAccount => 'Email, password and sign-in';
+  String get emailPasswordInAccount => '邮箱、密码和登录';
 
   @override
-  String get featureATopic => 'Feature a topic';
+  String get featureATopic => '设置精选主题';
 
   @override
-  String get featureATopicHint =>
-      'Pin one of your topics to the top of your profile.';
+  String get featureATopicHint => '将你的一个主题置顶在个人资料顶部。';
 
   @override
-  String get featuredTopicChanged => 'Featured topic changed';
+  String get featuredTopicChanged => '已更改精选主题';
 
   @override
-  String get featuredTopicNone =>
-      'None. Pin one of your topics to your profile.';
+  String get featuredTopicNone => '无。将你的一个主题置顶到个人资料。';
 
   @override
-  String get featuredTopicRemoved => 'Featured topic removed';
+  String get featuredTopicRemoved => '已移除精选主题';
 
   @override
-  String get featuredTopicRules =>
-      'Messages and topics in private categories can\'t be featured.';
+  String get featuredTopicRules => '消息和私密分类中的主题无法设为精选。';
 
   @override
-  String get fieldManagedBySignIn =>
-      'This forum manages it through its own sign-in. Change it there.';
+  String get fieldManagedBySignIn => '此论坛通过自己的登录系统管理此项。请在那里更改。';
 
   @override
-  String get flair => 'Flair';
+  String get flair => '徽记';
 
   @override
   String flairChangedTo(String group) {
-    return 'Flair changed to $group';
+    return '徽记已更改为 $group';
   }
 
   @override
-  String get flairRemoved => 'Flair removed';
+  String get flairRemoved => '已移除徽记';
 
   @override
-  String get flairSheetHint =>
-      'A small badge on your picture, from a group you\'re in.';
+  String get flairSheetHint => '显示在你头像上的小标志，来自你所在的群组。';
 
   @override
   String forumPictureN(int number) {
-    return 'Forum picture $number';
+    return '论坛图片 $number';
   }
 
   @override
   String forumQuestionNeedsAnswer(String question) {
-    return '$question needs an answer';
+    return '$question 需要回答';
   }
 
   @override
-  String get forumQuestionRequired => 'This forum asks everyone to answer';
+  String get forumQuestionRequired => '此论坛要求所有人回答';
 
   @override
-  String get forumQuestionSetByStaff => 'Set by the forum\'s staff';
+  String get forumQuestionSetByStaff => '由论坛管理人员设置';
 
   @override
-  String get forumQuestionsIntro =>
-      'Questions from this forum. * means required.';
+  String get forumQuestionsIntro => '来自此论坛的问题。* 表示必填。';
 
   @override
-  String get forumQuestionsNoneAnswered => 'Not answered yet';
+  String get forumQuestionsNoneAnswered => '尚未回答';
 
   @override
-  String get fromThisForum => 'From this forum';
+  String get fromThisForum => '来自此论坛';
 
   @override
-  String get hideMyProfile => 'Hide my public profile';
+  String get hideMyProfile => '隐藏我的公开个人资料';
 
   @override
-  String get hideMyProfileExplanation =>
-      'Others see only your name, picture and posts';
+  String get hideMyProfileExplanation => '其他人只能看到你的名称、头像和帖子';
 
   @override
-  String get letterAvatar => 'Letter';
+  String get letterAvatar => '首字母';
 
   @override
-  String get moreAboutYou => 'More about you';
+  String get moreAboutYou => '更多关于你';
 
   @override
   String namesAndMore(String names, int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count more',
-      one: '1 more',
+      other: '$count 项',
     );
-    return '$names and $_temp0';
+    return '$names及另外 $_temp0';
   }
 
   @override
-  String get newUsername => 'New username';
+  String get newUsername => '新用户名';
 
   @override
-  String get noFlair => 'No flair';
+  String get noFlair => '不显示徽记';
 
   @override
   String noGravatarFound(String service) {
-    return '$service has no picture for your email address';
+    return '$service 没有与你的邮箱地址关联的图片';
   }
 
   @override
-  String get noTitle => 'No title';
+  String get noTitle => '不显示头衔';
 
   @override
-  String get noTopicsMatch => 'None of your topics match';
+  String get noTopicsMatch => '没有匹配的主题';
 
   @override
-  String get noTopicsToFeature => 'You haven\'t started any topics yet';
+  String get noTopicsToFeature => '你还没有发起任何主题';
 
   @override
-  String get notSet => 'Not set';
+  String get notSet => '未设置';
 
   @override
-  String get orUse => 'Or use';
+  String get orUse => '或使用';
 
   @override
-  String get pictureManagedBySignIn =>
-      'This forum sets your picture through its own sign-in';
+  String get pictureManagedBySignIn => '此论坛通过自己的登录系统设置你的头像';
 
   @override
-  String get primaryGroup => 'Primary group';
+  String get primaryGroup => '主要群组';
 
   @override
   String primaryGroupChangedTo(String group) {
-    return 'Primary group changed to $group';
+    return '主要群组已更改为 $group';
   }
 
   @override
-  String get primaryGroupRemoved => 'Primary group removed';
+  String get primaryGroupRemoved => '已移除主要群组';
 
   @override
-  String get primaryGroupSheetHint =>
-      'Your main group, shown on your user card.';
+  String get primaryGroupSheetHint => '你的主要群组，显示在你的用户卡片上。';
 
   @override
-  String get profileLoadFailed => 'Couldn\'t load your profile';
+  String get profileLoadFailed => '无法加载你的个人资料';
 
   @override
-  String get profileNowHidden => 'Your profile is hidden';
+  String get profileNowHidden => '你的个人资料已隐藏';
 
   @override
-  String get profileNowPublic => 'Your profile is public';
+  String get profileNowPublic => '你的个人资料已公开';
 
   @override
-  String get profilePicture => 'Profile picture';
+  String get profilePicture => '头像';
 
   @override
-  String get profilePictureChanged => 'Profile picture changed';
+  String get profilePictureChanged => '已更换头像';
 
   @override
-  String get profileSaveFailed => 'Couldn\'t save. Try again.';
+  String get profileSaveFailed => '无法保存。请重试。';
 
   @override
-  String get profileSectionNameAndAbout => 'Name and about';
+  String get profileSectionNameAndAbout => '名称和简介';
 
   @override
-  String get profileSectionNextToName => 'Next to your name';
+  String get profileSectionNextToName => '名称旁边';
 
   @override
-  String get profileSectionOnProfile => 'On your profile';
+  String get profileSectionOnProfile => '个人资料中';
 
   @override
-  String get profileSectionPrivacyAndTime => 'Privacy and time';
+  String get profileSectionPrivacyAndTime => '隐私和时间';
 
   @override
-  String get removeCardBackground => 'Remove card background';
+  String get removeCardBackground => '移除卡片背景';
 
   @override
-  String get removeCover => 'Remove cover';
+  String get removeCover => '移除封面';
 
   @override
-  String get removeFeaturedTopic => 'Remove featured topic';
+  String get removeFeaturedTopic => '移除精选主题';
 
   @override
-  String get searchTimezones => 'Search time zones';
+  String get searchTimezones => '搜索时区';
 
   @override
-  String get searchYourTopics => 'Search your topics';
+  String get searchYourTopics => '搜索你的主题';
 
   @override
-  String get seeProfileAsOthersDo => 'See your profile as others do';
+  String get seeProfileAsOthersDo => '以他人视角查看个人资料';
 
   @override
-  String get timezone => 'Time zone';
+  String get timezone => '时区';
 
   @override
   String timezoneChangedTo(String zone) {
-    return 'Time zone changed to $zone';
+    return '时区已更改为 $zone';
   }
 
   @override
   String timezoneWithTime(String zone, String time) {
-    return '$zone · $time now';
+    return '$zone · 现在 $time';
   }
 
   @override
   String timezonesMatchingPhone(String offset) {
-    return 'Matches this phone\'s clock ($offset)';
+    return '与此手机时钟一致（$offset）';
   }
 
   @override
   String titleChangedTo(String title) {
-    return 'Title changed to $title';
+    return '头衔已更改为 $title';
   }
 
   @override
-  String get titleFromBadge => 'Badge';
+  String get titleFromBadge => '徽章';
 
   @override
   String titleFromBadgeEarned(String date) {
-    return 'Badge · earned $date';
+    return '徽章 · 获得于 $date';
   }
 
   @override
   String titleFromGroup(String group) {
-    return '$group group';
+    return '$group 群组';
   }
 
   @override
-  String get titleGrantedByStaff => 'Given by the forum\'s staff';
+  String get titleGrantedByStaff => '由论坛管理人员授予';
 
   @override
-  String get titleRemoved => 'Title removed';
+  String get titleRemoved => '已移除头衔';
 
   @override
-  String get titleSheetHint =>
-      'Shown after your name on your profile and posts.';
+  String get titleSheetHint => '显示在你的个人资料和帖子中的名称后面。';
 
   @override
-  String get username => 'Username';
+  String get username => '用户名';
 
   @override
-  String get usernameAvailable => 'Available';
+  String get usernameAvailable => '可用';
 
   @override
   String usernameChanged(String username) {
-    return 'Your username is now @$username';
+    return '你的用户名现在是 @$username';
   }
 
   @override
-  String get usernameLockedExplanation =>
-      'This forum lets members change their username only shortly after joining. A moderator can change it for you.';
+  String get usernameLockedExplanation => '此论坛只允许成员在加入后不久更改用户名。版主可以帮你更改。';
 
   @override
-  String get yourPhoto => 'Your photo';
+  String get yourPhoto => '你的照片';
 
   @override
-  String get chooseEmoji => 'Choose emoji';
+  String get chooseEmoji => '选择表情符号';
 
   @override
-  String get clearStatus => 'Clear status';
+  String get clearStatus => '清除状态';
 
   @override
-  String get clearText => 'Clear';
+  String get clearText => '清除';
 
   @override
-  String get inOneHour => 'In one hour';
+  String get inOneHour => '一小时后';
 
   @override
-  String get never => 'Never';
+  String get never => '从不';
 
   @override
-  String get pauseNotifications => 'Pause notifications';
+  String get pauseNotifications => '暂停通知';
 
   @override
-  String get pauseNotificationsUntilStatusClears => 'Until your status clears';
+  String get pauseNotificationsUntilStatusClears => '直到状态被清除';
 
   @override
-  String get pickATime => 'Pick a time';
+  String get pickATime => '选择时间';
 
   @override
-  String get removeStatusAfter => 'Remove status';
+  String get removeStatusAfter => '移除状态';
 
   @override
-  String get searchEmoji => 'Search emoji';
+  String get searchEmoji => '搜索表情符号';
 
   @override
-  String get setStatus => 'Set status';
+  String get setStatus => '设置状态';
 
   @override
-  String get setAStatus => 'Set a status';
+  String get setAStatus => '设置状态';
 
   @override
-  String get statusUpdated => 'Status updated';
+  String get statusUpdated => '状态已更新';
 
   @override
-  String get whatAreYouDoing => 'What are you doing?';
+  String get whatAreYouDoing => '你在做什么？';
 
   @override
   String cardPosted(String when) {
-    return 'Posted $when';
+    return '$when发帖';
   }
 
   @override
-  String get change => 'Change';
+  String get change => '更改';
 
   @override
-  String get copyProfileLink => 'Copy link to profile';
+  String get copyProfileLink => '复制个人资料链接';
 
   @override
-  String get ignore => 'Ignore';
+  String get ignore => '忽略';
 
   @override
   String memberOfGroup(String group) {
-    return 'Member of $group';
+    return '$group 成员';
   }
 
   @override
-  String get mute => 'Mute';
+  String get mute => '静音';
 
   @override
-  String get unmute => 'Unmute';
+  String get unmute => '取消静音';
 
   @override
   String openProfileOf(String username) {
-    return 'Open @$username\'s profile';
+    return '打开 @$username 的个人资料';
   }
 
   @override
   String profileIsPrivate(String username) {
-    return '$username keeps their profile private.';
+    return '$username 的个人资料不公开。';
   }
 
   @override
@@ -3406,10 +3390,9 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count posts',
-      one: 'post',
+      other: '$count 条',
     );
-    return 'Show only $name\'s $_temp0 in this topic';
+    return '只显示 $name 在此主题中的帖子（$_temp0）';
   }
 
   @override
@@ -3417,27 +3400,26 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count posts',
-      one: 'post',
+      other: '$count 条',
     );
-    return 'Show only your $_temp0 in this topic';
+    return '只显示你在此主题中的帖子（$_temp0）';
   }
 
   @override
   String userIgnoredFor4Months(String username) {
-    return 'Ignoring @$username for 4 months';
+    return '将忽略 @$username 4 个月';
   }
 
   @override
   String userMuted(String username) {
-    return 'Muted @$username';
+    return '已静音 @$username';
   }
 
   @override
   String userUnmuted(String username) {
-    return 'Unmuted @$username';
+    return '已取消静音 @$username';
   }
 
   @override
-  String get youParenthetical => '(you)';
+  String get youParenthetical => '（你）';
 }

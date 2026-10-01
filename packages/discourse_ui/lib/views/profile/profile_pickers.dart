@@ -824,8 +824,14 @@ class _TimezonePickerState extends State<_TimezonePicker> {
     final matches = q.isEmpty
         ? _zones
         : _zones.where((z) => z.name.toLowerCase().contains(q)).toList();
-    final suggested =
-        q.isEmpty ? _zones.where((z) => z.offset == phone).toList() : const [];
+    final current = q.isEmpty
+        ? _zones.where((z) => z.name == widget.current).toList()
+        : const <({String name, Duration offset})>[];
+    final suggested = q.isEmpty
+        ? _zones
+            .where((z) => z.offset == phone && z.name != widget.current)
+            .toList()
+        : const <({String name, Duration offset})>[];
     Widget row(({String name, Duration offset}) z) => ListTile(
           title: Text(z.name.replaceAll('_', ' ')),
           subtitle: Text(_offsetLabel(z.offset)),
@@ -850,6 +856,8 @@ class _TimezonePickerState extends State<_TimezonePicker> {
         Expanded(
           child: ListView(
             children: [
+              for (final z in current) row(z),
+              if (current.isNotEmpty) const Divider(),
               if (suggested.isNotEmpty) ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(DesignTokens.spacingL,
