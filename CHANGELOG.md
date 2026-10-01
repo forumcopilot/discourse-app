@@ -6,6 +6,21 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.45] - 2026-09-30
+
+### Added
+- **Edit profile covers everything the forum lets you change.** It was About me, Location and Website behind one Save. It is now a short overview in groups, each row showing what is set: photos (cover, picture, card background), name and about (username, display name, About me, location, website), next to your name (title, flair, primary group), on your profile (featured topic, and the forum's own profile questions such as Pronouns), and privacy and time (time zone, birthday, hide my profile). Each change saves when it is made: one line in a dialog, About me and the forum's questions on a page of their own, a choice in a sheet with Undo, a switch when flipped. Rows the forum doesn't allow are left out. Fields the forum's own sign-in manages are locked and say so; the old form sent them and reported "saved" while Discourse ignored them.
+- **Choose your picture the way the forum allows**: a new photo, the letter avatar, Gravatar, an earlier upload, or one of the forum's own pictures. The Profile tab's camera opens the same choices.
+- **A cover photo and a card background**, uploaded from the app; the cover shows across the top of your profile, taller than the plain band.
+- **Set a status** where the forum has them: from the chip under your name in the Profile tab (tap to change, × to clear) or from your profile. An emoji, a line, when it clears, and whether notifications pause until then, as on the website.
+- **The user card.** Tapping someone's picture or name on a post, an @mention, a chat message or the member directory opens their card over the page you are reading instead of leaving for their profile: their card background, picture with flair, name, title, status, bio, location and local time, the forum's card fields, featured badges, and when they joined, posted and were seen. Opened from a topic it offers only their posts in it. Message, Chat and Profile where the forum allows each; the menu mutes, ignores or copies the link. A private profile shows who they are and Message only. Your own card offers Edit profile and your status.
+
+### Changed
+- **Profiles show more of what people chose**: the flair of their group on their picture, their cover photo at full height, the forum's profile questions they answered, and bio links that can be tapped.
+
+### Fixed
+- **Undo after a change no longer stays on screen until tapped**, holding the next message back (`SnackbarHelper.showInfo(persist: false)`).
+
 ## [1.0.44] - 2026-09-29
 
 ### Added
