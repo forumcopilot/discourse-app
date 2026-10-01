@@ -18,25 +18,36 @@ import 'package:discourse_ui/utils/app_navigation.dart';
 /// For per-category and per-tag sheets, [allowWatchingFirstPost] adds a
 /// fifth option which Discourse only honors at those levels (topics have
 /// no "first post" to watch).
+/// What the levels are set on, which picks Discourse's description for
+/// each (`topic.notifications`, the `_pm` variants, `category.notifications`,
+/// `tagging.notifications`).
+enum NotificationLevelTarget { topic, message, category, tag }
+
 class NotificationLevelSheet extends StatefulWidget {
   final FCNotificationLevel? initialLevel;
   final Future<bool> Function(FCNotificationLevel level) onLevelChanged;
-  final bool allowWatchingFirstPost;
-  final String title;
+  final NotificationLevelTarget target;
 
   const NotificationLevelSheet({
     super.key,
     required this.onLevelChanged,
     this.initialLevel,
-    this.allowWatchingFirstPost = false,
-    this.title = 'Notification level',
+    this.target = NotificationLevelTarget.topic,
   });
 
-  /// Convenience opener for a topic. Loads the current level on demand.
+  /// Watching First Post is a category and tag level; topics have no
+  /// first post to watch for.
+  bool get allowWatchingFirstPost =>
+      target == NotificationLevelTarget.category ||
+      target == NotificationLevelTarget.tag;
+
+  /// Convenience opener for a topic (or a message, with [isMessage]). Loads
+  /// the current level on demand.
   static Future<void> showForTopic({
     required BuildContext context,
     required String topicId,
     FCNotificationLevel? currentLevel,
+    bool isMessage = false,
     VoidCallback? onChanged,
   }) async {
     final proxy = SiteProxyService.getSubscriptionProxy();
@@ -53,7 +64,9 @@ class NotificationLevelSheet extends StatefulWidget {
       builder: (sheetContext) {
         return NotificationLevelSheet(
           initialLevel: level,
-          title: 'Topic notification level',
+          target: isMessage
+              ? NotificationLevelTarget.message
+              : NotificationLevelTarget.topic,
           onLevelChanged: (newLevel) async {
             final result =
                 await proxy.setTopicNotificationLevelAsync(topicId, newLevel);
@@ -87,8 +100,7 @@ class NotificationLevelSheet extends StatefulWidget {
       builder: (sheetContext) {
         return NotificationLevelSheet(
           initialLevel: level,
-          title: 'Category notification level',
-          allowWatchingFirstPost: true,
+          target: NotificationLevelTarget.category,
           onLevelChanged: (newLevel) async {
             final result = await proxy.setCategoryNotificationLevelAsync(
                 categoryId, newLevel);
@@ -127,8 +139,7 @@ class NotificationLevelSheet extends StatefulWidget {
       builder: (sheetContext) {
         return NotificationLevelSheet(
           initialLevel: level,
-          title: 'Tag notification level',
-          allowWatchingFirstPost: true,
+          target: NotificationLevelTarget.tag,
           onLevelChanged: (newLevel) async {
             final result =
                 await tagProxy.setTagNotificationLevelAsync(tagName, newLevel);
@@ -177,36 +188,67 @@ class _NotificationLevelSheetState extends State<NotificationLevelSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    // Discourse's names and descriptions; the icons are web's bells
+    // (`d-watching`, `d-tracking`, `d-regular`, `d-muted`).
+    final (watching, tracking, normal, muted) = switch (widget.target) {
+      NotificationLevelTarget.topic => (
+          l10n.topicWatchingDescription,
+          l10n.topicTrackingDescription,
+          l10n.topicNormalDescription,
+          l10n.topicMutedDescription,
+        ),
+      NotificationLevelTarget.message => (
+          l10n.messageWatchingDescription,
+          l10n.messageTrackingDescription,
+          l10n.messageNormalDescription,
+          l10n.messageMutedDescription,
+        ),
+      NotificationLevelTarget.category => (
+          l10n.categoryWatchingDescription,
+          l10n.categoryTrackingDescription,
+          l10n.categoryNormalDescription,
+          l10n.categoryMutedDescription,
+        ),
+      NotificationLevelTarget.tag => (
+          l10n.tagWatchingDescription,
+          l10n.tagTrackingDescription,
+          l10n.tagNormalDescription,
+          l10n.tagMutedDescription,
+        ),
+    };
     final entries = <_LevelEntry>[
-      const _LevelEntry(
+      _LevelEntry(
         level: FCNotificationLevel.watching,
-        title: 'Watching',
-        description: 'Notified of every new reply.',
+        title: l10n.notificationLevelWatching,
+        description: watching,
         icon: Icons.notifications_active,
       ),
       if (widget.allowWatchingFirstPost)
-        const _LevelEntry(
+        _LevelEntry(
           level: FCNotificationLevel.watchingFirstPost,
-          title: 'Watching First Post',
-          description: 'Notified only for the first post of each new topic.',
+          title: l10n.notificationLevelWatchingFirstPost,
+          description: widget.target == NotificationLevelTarget.tag
+              ? l10n.tagWatchingFirstPostDescription
+              : l10n.categoryWatchingFirstPostDescription,
           icon: Icons.fiber_new,
         ),
-      const _LevelEntry(
+      _LevelEntry(
         level: FCNotificationLevel.tracking,
-        title: 'Tracking',
-        description: 'Shown in your unread list. No email.',
-        icon: Icons.visibility,
+        title: l10n.notificationLevelTracking,
+        description: tracking,
+        icon: Icons.notifications,
       ),
-      const _LevelEntry(
+      _LevelEntry(
         level: FCNotificationLevel.normal,
-        title: 'Normal',
-        description: 'Notified only when @mentioned or directly replied to.',
+        title: l10n.notificationLevelNormal,
+        description: normal,
         icon: Icons.notifications_none,
       ),
-      const _LevelEntry(
+      _LevelEntry(
         level: FCNotificationLevel.muted,
-        title: 'Muted',
-        description: 'No notifications, hidden from latest/unread.',
+        title: l10n.notificationLevelMuted,
+        description: muted,
         icon: Icons.notifications_off,
       ),
     ];
@@ -220,7 +262,7 @@ class _NotificationLevelSheetState extends State<NotificationLevelSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SheetTitle(widget.title),
+            SheetTitle(l10n.notifications),
             // The theme's selected row (primary icon and text) plus a
             // check, as the trust-level sheet does; the colours and weight
             // were set by hand here, and the descriptions were 12sp.

@@ -1,5 +1,6 @@
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseMessageDetails, DiscourseSiteCapabilities;
+    show DiscourseMessageDetails, DiscourseSiteCapabilities, DiscourseTopicStatus;
+import 'package:forumcopilot_sdk/models/entities/fc_notification_level.dart';
 import 'package:flutter/material.dart';
 import '../core/errors/action_refused.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -7,12 +8,9 @@ import '../utils/error_message.dart';
 import '../utils/snackbar_helper.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
-import 'package:discourse_core/discourse_core.dart' show DiscourseSubscriptionProxy;
 import 'widgets/notification_level_sheet.dart';
 import '../theme/design_tokens.dart';
-import '../core/logging/app_logger.dart';
 import 'lists/posts_list.dart';
-import 'widgets/delete_topic_dialog.dart';
 import 'appbars/posts_page_app_bar.dart';
 import '../utils/url_utils.dart';
 import 'widgets/sheet_title.dart';
@@ -75,28 +73,17 @@ class _PostPageState extends State<PostPage> {
   /// Refresh callback from PostsList. When [scrollToPostId] is passed (e.g. after reply),
   /// the list refreshes by loading the thread at that post and scrolling to it in place.
   void Function([String? scrollToPostId])? _refreshCallback;
-  bool _isSubscribed = false;
-  bool _isClosed = false;
-  bool _isSticky = false;
-  bool _isDeleted = false;
-  bool _isArchived = false;
-  bool _isVisible = true;
-  bool _showDeletedBanner = true;
-  bool _showClosedBanner = true;
-  bool _showStickyBanner = true;
-  bool _showSubscribedBanner = true;
-  bool _canSubscribe = false;
-  bool _canClose = false;
-  bool _canSticky = false;
-  bool _canDelete = false;
-  bool _canArchive = false;
-  bool _canRename = false;
-  // Phase 5.26 — move/merge ride on the same mod cap cluster as
-  // close/archive/rename/unlist (Discourse's `can_perform_action`
-  // for mods).
-  bool _canMove = false;
-  bool _canMerge = false;
-  bool _canToggleVisibility = false;
+  /// The topic's state and what the viewer may do about it, as its last
+  /// load (or an action since) recorded it; null until it has loaded. The
+  /// title's status icons, the footer and the ⋮ menu all read it, so they
+  /// cannot disagree.
+  DiscourseTopicStatus? get _status =>
+      DiscourseTopicStatus.forTopic(widget.siteContext.site.url, widget.topicId);
+
+  void _onStatusChanged() {
+    if (mounted) setState(() {});
+  }
+
   bool _isRefreshing = false; // Add loading state for refresh
   String _actualTopicTitle = ''; // Track the actual topic title from server
 
@@ -150,10 +137,11 @@ class _PostPageState extends State<PostPage> {
               if (saved) _refreshCallback?.call();
             }
           : null,
-      isClosed: _isClosed,
+      isClosed: _status?.closed ?? false,
       onClose: m.canClose
           ? () async {
-              if (await MessageActions.setClosed(context, id, !_isClosed)) {
+              if (await MessageActions.setClosed(
+                  context, id, !(_status?.closed ?? false))) {
                 _refreshCallback?.call();
               }
             }
@@ -180,10 +168,12 @@ class _PostPageState extends State<PostPage> {
     if (widget.forumId != null) {
       _forumId = widget.forumId;
     }
+    DiscourseTopicStatus.changes.addListener(_onStatusChanged);
   }
 
   @override
   void dispose() {
+    DiscourseTopicStatus.changes.removeListener(_onStatusChanged);
     super.dispose();
   }
 
@@ -228,159 +218,88 @@ class _PostPageState extends State<PostPage> {
     await UrlUtils.openUrl(_threadUrl!);
   }
 
-  void _handleSubscribe() async {
-    // Check if user is logged in before proceeding with subscription
-    if (!widget.siteContext.isLoggedIn) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.pleaseLoginToSubscribe,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onInverseSurface,
-                ),
-          ),
-          backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-          duration: const Duration(seconds: 3),
-        ),
-      );
-      return;
-    }
-
-    final proxy = SiteProxyFactory.getSubscriptionProxy();
-    if (proxy is DiscourseSubscriptionProxy) {
-      // Discourse-native: surface the full 4-level Watching/Tracking/
-      // Normal/Muted picker instead of a binary toggle.
-      await NotificationLevelSheet.showForTopic(
-        context: context,
-        topicId: widget.topicId,
-        // Left for the sheet to read (the topic's own level): a guess from
-        // the subscribed flag showed Tracking as Watching and Muted as
-        // Normal.
-        currentLevel: null,
-        onChanged: () {
-          if (!mounted) return;
-          // Refresh /t/{id}.json so the subscribed banner + bell icon
-          // reflect the new level. We intentionally don't try to mirror
-          // the chosen level locally — the picker may set Tracking or
-          // Muted, neither of which maps cleanly to _isSubscribed.
-          if (_refreshCallback != null) _refreshCallback!();
-        },
-      );
-      return;
-    }
-
-    try {
-      final subscriptionProxy = proxy;
-
-      if (_isSubscribed) {
-        await subscriptionProxy.unsubscribeTopicAsync(widget.topicId);
-      } else {
-        await subscriptionProxy.subscribeTopicAsync(widget.topicId, 1); // mode 1 for subscribe
-      }
-
-      if (mounted) {
-        setState(() {
-          _isSubscribed = !_isSubscribed;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        SnackbarHelper.showError(context, AppLocalizations.of(context)!.failedToSubscribeToThread);
-      }
-    }
+  /// The topic's notification level (Discourse's Watching / Tracking /
+  /// Normal / Muted), the same picker as the footer's.
+  void _handleNotifications() async {
+    final status = _status;
+    await NotificationLevelSheet.showForTopic(
+      context: context,
+      topicId: widget.topicId,
+      isMessage: status?.isMessage ?? _message != null,
+      currentLevel: status == null
+          ? null
+          : FCNotificationLevel.fromInt(status.notificationLevel),
+    );
   }
 
-  void _handleClose() async {
-    final moderationProxy = SiteProxyFactory.getModerationProxy();
+  /// Runs a staff action on the topic and reports it the way web leaves it:
+  /// the status icon changes at once (the proxy records the change), the
+  /// reload brings the "Closed 1 minute ago" line into the stream, and a
+  /// snackbar says what happened.
+  Future<void> _runTopicAction(
+      Future<({bool ok, String? message})> Function() action,
+      String done) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
-      final r = _isClosed
-          ? await moderationProxy.uncloseTopicAsync(widget.topicId)
-          : await moderationProxy.closeTopicAsync(widget.topicId);
-      // A refusal (not staff, not the topic's owner) went on to say the
-      // topic was closed or opened.
-      if (!r.result) throw ActionRefused(r.resultText ?? '');
-      if (mounted) {
-        setState(() {
-          _isClosed = !_isClosed;
-        });
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(SnackBar(content: Text(_isClosed ? AppLocalizations.of(context)!.topicClosed : AppLocalizations.of(context)!.topicOpened), duration: const Duration(seconds: 2)));
-        _refreshCallback?.call();
-      }
-    } catch (e) {
-      if (mounted) {
-        SnackbarHelper.showError(context, 'Failed to ${_isClosed ? 'open' : 'close'} topic: ${describeError(e, context: context)}');
-      }
-    }
-  }
-
-  void _handleSticky() async {
-    final moderationProxy = SiteProxyFactory.getModerationProxy();
-    try {
-      final r = _isSticky
-          ? await moderationProxy.unstickTopicAsync(widget.topicId)
-          : await moderationProxy.stickTopicAsync(widget.topicId);
-      // As for close: a refusal must not read as success.
-      if (!r.result) throw ActionRefused(r.resultText ?? '');
-      if (mounted) {
-        setState(() {
-          _isSticky = !_isSticky;
-        });
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(SnackBar(content: Text(_isSticky ? AppLocalizations.of(context)!.topicStickied : AppLocalizations.of(context)!.topicUnstickied), duration: const Duration(seconds: 2)));
-        _refreshCallback?.call();
-      }
-    } catch (e) {
-      if (mounted) {
-        SnackbarHelper.showError(context, 'Failed to ${_isSticky ? 'unstick' : 'stick'} topic: ${describeError(e, context: context)}');
-      }
-    }
-  }
-
-  void _handleArchive() async {
-    final wasArchived = _isArchived;
-    setState(() => _isArchived = !wasArchived);
-    final result = await SiteProxyFactory.getModerationProxy()
-        .archiveTopicAsync(widget.topicId, archived: !wasArchived);
-    if (!mounted) return;
-    if (!result.result) {
-      setState(() => _isArchived = wasArchived);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.resultText?.isNotEmpty == true
-              ? result.resultText!
-              : (wasArchived
-                  ? 'Failed to unarchive topic'
-                  : 'Failed to archive topic')),
-        ),
-      );
-    } else {
+      final r = await action();
+      if (!r.ok) throw ActionRefused(r.message ?? '');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text(done), duration: const Duration(seconds: 2)));
       _refreshCallback?.call();
+    } catch (e) {
+      if (mounted) {
+        SnackbarHelper.showError(
+            context, l10n.topicActionFailed(describeError(e, context: context)));
+      }
     }
   }
 
-  void _handleToggleVisibility() async {
-    final wasVisible = _isVisible;
-    setState(() => _isVisible = !wasVisible);
-    final result = await SiteProxyFactory.getModerationProxy()
-        .setTopicVisibilityAsync(widget.topicId, visible: !wasVisible);
-    if (!mounted) return;
-    if (!result.result) {
-      setState(() => _isVisible = wasVisible);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.resultText?.isNotEmpty == true
-              ? result.resultText!
-              : (wasVisible
-                  ? 'Failed to unlist topic'
-                  : 'Failed to list topic')),
-        ),
-      );
-    } else {
-      _refreshCallback?.call();
-    }
+  void _handleClose() {
+    final closed = _status?.closed ?? false;
+    final proxy = SiteProxyFactory.getModerationProxy();
+    final l10n = AppLocalizations.of(context)!;
+    _runTopicAction(() async {
+      final r = closed
+          ? await proxy.uncloseTopicAsync(widget.topicId)
+          : await proxy.closeTopicAsync(widget.topicId);
+      return (ok: r.result, message: r.resultText);
+    }, closed ? l10n.topicOpened : l10n.topicClosed);
+  }
+
+  /// Pins or un-pins the topic for everyone, at the top of its category
+  /// (web's "Pin Topic…" without an end date).
+  void _handlePin() {
+    final pinned = _status?.isPinnedByStaff ?? false;
+    final proxy = SiteProxyFactory.getModerationProxy();
+    final l10n = AppLocalizations.of(context)!;
+    _runTopicAction(() async {
+      final r = pinned
+          ? await proxy.unstickTopicAsync(widget.topicId)
+          : await proxy.stickTopicAsync(widget.topicId);
+      return (ok: r.result, message: r.resultText);
+    }, pinned ? l10n.topicUnpinned : l10n.topicPinned);
+  }
+
+  void _handleArchive() {
+    final archived = _status?.archived ?? false;
+    final l10n = AppLocalizations.of(context)!;
+    _runTopicAction(() async {
+      final r = await SiteProxyFactory.getModerationProxy()
+          .archiveTopicAsync(widget.topicId, archived: !archived);
+      return (ok: r.result, message: r.resultText);
+    }, archived ? l10n.topicUnarchived : l10n.topicArchived);
+  }
+
+  void _handleToggleVisibility() {
+    final visible = _status?.visible ?? true;
+    final l10n = AppLocalizations.of(context)!;
+    _runTopicAction(() async {
+      final r = await SiteProxyFactory.getModerationProxy()
+          .setTopicVisibilityAsync(widget.topicId, visible: !visible);
+      return (ok: r.result, message: r.resultText);
+    }, visible ? l10n.topicUnlisted : l10n.topicListed);
   }
 
   void _handleRename() async {
@@ -572,70 +491,100 @@ class _PostPageState extends State<PostPage> {
     if (result.result && mounted) context.popOwnRoute();
   }
 
+  /// Web's Delete Topic, behind its confirmation. Staff keep seeing the
+  /// deleted topic (and may un-delete it); an author deleting their own
+  /// topic loses access to it, so the page closes.
   void _handleDelete() async {
-    final moderationProxy = SiteProxyFactory.getModerationProxy();
-
-    // Handle undelete with simple confirmation (already handled in app bar)
-    if (_isDeleted) {
-      try {
-        final r = await moderationProxy.undeleteTopicAsync(widget.topicId, '');
-        if (!r.result) throw ActionRefused(r.resultText ?? '');
-        if (mounted) {
-          setState(() {
-            _isDeleted = false;
-          });
-          _refreshCallback?.call();
-        }
-      } catch (e) {
-        // Error handling - no toast message
-      }
-      return;
-    }
-
-    // Handle delete with comprehensive dialog
-    final result = await DeleteTopicDialog.show(
-      context,
-      topicTitle: widget.title,
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.deleteTopic),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.deleteTopicConfirmNo),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.error,
+              foregroundColor: colorScheme.onError,
+            ),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.deleteTopicConfirmYes),
+          ),
+        ],
+      ),
     );
-
-    if (result == null) {
-      // User cancelled
-      return;
-    }
-
-    final hardDelete = result['hardDelete'] as bool;
-    final reason = result['reason'] as String? ?? '';
-
+    if (confirmed != true || !mounted) return;
+    final staysVisible = _status?.canClose == true || _status?.canPinUnpin == true;
     try {
-      // Phase 5.42 — deleteTopicExtendedAsync is on IFCModerationProxy
-      // now; no more is-DiscourseModerationProxy cast.
-      final deleteResult = await moderationProxy.deleteTopicExtendedAsync(
-        widget.topicId,
-        hardDelete: hardDelete,
-      );
-      // The XF-shaped `reason` parameter doesn't round-trip on
-      // Discourse; preserve it for audit trail in the snackbar only.
-      if (reason.isNotEmpty) {
-        AppLogger.debug('Topic delete reason (Discourse drops): $reason');
-      }
-
-      if (!deleteResult.result) {
-        throw Exception(deleteResult.resultText ?? 'Failed to delete topic');
-      }
-
-      if (mounted) {
-        setState(() {
-          _isDeleted = true;
-        });
+      final r = await SiteProxyFactory.getModerationProxy()
+          .deleteTopicExtendedAsync(widget.topicId);
+      if (!r.result) throw ActionRefused(r.resultText ?? '');
+      if (!mounted) return;
+      if (staysVisible) {
         _refreshCallback?.call();
-
-        // If hard delete was successful, navigate back to previous screen
-        if (hardDelete) {
-          context.popOwnRoute();
-        }
+      } else {
+        context.popOwnRoute();
       }
     } catch (e) {
-      // Error handling - no toast message
+      if (mounted) {
+        SnackbarHelper.showError(
+            context, l10n.topicActionFailed(describeError(e, context: context)));
+      }
+    }
+  }
+
+  /// Web's Un-Delete Topic: no confirmation, it only restores.
+  void _handleRecover() {
+    final l10n = AppLocalizations.of(context)!;
+    _runTopicAction(() async {
+      final r = await SiteProxyFactory.getModerationProxy()
+          .undeleteTopicAsync(widget.topicId, '');
+      return (ok: r.result, message: r.resultText);
+    }, l10n.topicRecovered);
+  }
+
+  /// Removes a deleted topic from the database, which Discourse offers
+  /// only to admins on a site that allows it, after the topic has been
+  /// deleted for a while.
+  void _handlePermanentlyDelete() async {
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.permanentlyDelete),
+        content: Text(l10n.permanentlyDeleteTopicConfirmation),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.error,
+              foregroundColor: colorScheme.onError,
+            ),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.permanentlyDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      final r = await SiteProxyFactory.getModerationProxy()
+          .deleteTopicExtendedAsync(widget.topicId, hardDelete: true);
+      if (!r.result) throw ActionRefused(r.resultText ?? '');
+      if (mounted) context.popOwnRoute();
+    } catch (e) {
+      if (mounted) {
+        SnackbarHelper.showError(
+            context, l10n.topicActionFailed(describeError(e, context: context)));
+      }
     }
   }
 
@@ -649,10 +598,13 @@ class _PostPageState extends State<PostPage> {
         title: widget.title,
         onShare: _handleShare,
         onViewOnWeb: _threadUrl != null && _threadUrl!.isNotEmpty ? _handleViewOnWeb : null,
-        onSubscribe: _handleSubscribe,
+        topicStatus: _status,
+        onNotifications: _handleNotifications,
         onClose: _handleClose,
-        onSticky: _handleSticky,
+        onPin: _handlePin,
         onDelete: _handleDelete,
+        onRecover: _handleRecover,
+        onPermanentlyDelete: _handlePermanentlyDelete,
         onArchive: _handleArchive,
         onRename: _handleRename,
         onMove: _handleMoveTopic,
@@ -682,236 +634,11 @@ class _PostPageState extends State<PostPage> {
             }
           }
         },
-        isSubscribed: _isSubscribed,
-        showMarkRead: false,
-        isClosed: _isClosed,
-        isDeleted: _isDeleted,
-        isSticky: _isSticky,
-        canSubscribe: _canSubscribe,
-        canClose: _canClose,
-        canSticky: _canSticky,
-        canDelete: _canDelete,
-        canArchive: _canArchive,
-        canRename: _canRename,
-        canMove: _canMove,
-        canMerge: _canMerge,
-        canToggleVisibility: _canToggleVisibility,
-        isArchived: _isArchived,
-        isVisible: _isVisible,
       ),
       body: Stack(
         children: [
           Column(
             children: [
-              // Status banners
-              if ((_isDeleted && _showDeletedBanner) || (_isClosed && _showClosedBanner) || (_isSticky && _showStickyBanner) || (_isSubscribed && _showSubscribedBanner && _message == null)) ...[
-                // Deleted banner
-                if (_isDeleted && _showDeletedBanner)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                      DesignTokens.spacingL,
-                      DesignTokens.spacingXS,
-                      DesignTokens.spacingXS,
-                      DesignTokens.spacingXS,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: DesignTokens.opacityHigh),
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
-                          width: DesignTokens.borderWidthThin,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.delete_rounded,
-                          size: DesignTokens.iconSizeM,
-                          color: Theme.of(context).colorScheme.onErrorContainer,
-                        ),
-                        const SizedBox(width: DesignTokens.spacingM),
-                        Expanded(
-                          child: Text(
-                            AppLocalizations.of(context)!.topicDeletedBanner,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onErrorContainer,
-                                ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.close,
-                            size: DesignTokens.iconSizeM,
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _showDeletedBanner = false;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                // Closed banner
-                if (_isClosed && _showClosedBanner)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                      DesignTokens.spacingL,
-                      DesignTokens.spacingXS,
-                      DesignTokens.spacingXS,
-                      DesignTokens.spacingXS,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.tertiaryContainer.withValues(alpha: DesignTokens.opacityHigh),
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
-                          width: DesignTokens.borderWidthThin,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.lock_rounded,
-                          size: DesignTokens.iconSizeM,
-                          color: Theme.of(context).colorScheme.onTertiaryContainer,
-                        ),
-                        const SizedBox(width: DesignTokens.spacingM),
-                        Expanded(
-                          child: Text(
-                            AppLocalizations.of(context)!.topicClosedBanner,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onTertiaryContainer,
-                                ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.close,
-                            size: DesignTokens.iconSizeM,
-                            color: Theme.of(context).colorScheme.onTertiaryContainer,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _showClosedBanner = false;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                // Sticky banner
-                if (_isSticky && _showStickyBanner)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                      DesignTokens.spacingL,
-                      DesignTokens.spacingXS,
-                      DesignTokens.spacingXS,
-                      DesignTokens.spacingXS,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: DesignTokens.opacityHigh),
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
-                          width: DesignTokens.borderWidthThin,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.push_pin_outlined,
-                          size: DesignTokens.iconSizeM,
-                          color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        ),
-                        const SizedBox(width: DesignTokens.spacingM),
-                        Expanded(
-                          child: Text(
-                            AppLocalizations.of(context)!.topicPinnedBanner,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                                ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.close,
-                            size: DesignTokens.iconSizeM,
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _showStickyBanner = false;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                // Subscribed banner
-                // Not for a message: every message is watched, so it
-                // would sit on all of them.
-                if (_isSubscribed && _showSubscribedBanner && _message == null)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                      DesignTokens.spacingL,
-                      DesignTokens.spacingXS,
-                      DesignTokens.spacingXS,
-                      DesignTokens.spacingXS,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: DesignTokens.opacityHigh),
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: DesignTokens.opacityMediumLow),
-                          width: DesignTokens.borderWidthThin,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.notifications_outlined,
-                          size: DesignTokens.iconSizeM,
-                          color: Theme.of(context).colorScheme.onSecondaryContainer,
-                        ),
-                        const SizedBox(width: DesignTokens.spacingM),
-                        Expanded(
-                          child: Text(
-                            AppLocalizations.of(context)!.youAreSubscribedToThisTopic,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSecondaryContainer,
-                                ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.close,
-                            size: DesignTokens.iconSizeM,
-                            color: Theme.of(context).colorScheme.onSecondaryContainer,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _showSubscribedBanner = false;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
               // Posts list
               Expanded(
                 child: PostsList(
@@ -930,55 +657,6 @@ class _PostPageState extends State<PostPage> {
                   onRefreshAvailable: (refreshCallback) {
                     setState(() {
                       _refreshCallback = refreshCallback;
-                    });
-                  },
-                  onSubscriptionStatusChanged: (isSubscribed) {
-                    setState(() {
-                      _isSubscribed = isSubscribed;
-                    });
-                  },
-                  onClosedStatusChanged: (isClosed) {
-                    setState(() {
-                      _isClosed = isClosed;
-                    });
-                  },
-                  onStickyStatusChanged: (isSticky) {
-                    setState(() {
-                      _isSticky = isSticky;
-                    });
-                  },
-                  onDeletedStatusChanged: (isDeleted) {
-                    setState(() {
-                      _isDeleted = isDeleted;
-                    });
-                  },
-                  onCanSubscribeChanged: (canSubscribe) {
-                    setState(() {
-                      _canSubscribe = canSubscribe;
-                    });
-                  },
-                  onCanCloseChanged: (canClose) {
-                    setState(() {
-                      _canClose = canClose;
-                      // Discourse mods who can close can also archive,
-                      // unlist, and rename. We piggyback on canClose
-                      // rather than wiring three more PostsList
-                      // callbacks for caps that always move together.
-                      _canArchive = canClose;
-                      _canRename = canClose;
-                      _canToggleVisibility = canClose;
-                      _canMove = canClose;
-                      _canMerge = canClose;
-                    });
-                  },
-                  onCanStickyChanged: (canSticky) {
-                    setState(() {
-                      _canSticky = canSticky;
-                    });
-                  },
-                  onCanDeleteChanged: (canDelete) {
-                    setState(() {
-                      _canDelete = canDelete;
                     });
                   },
                   onTopicTitleLoaded: (topicTitle) {

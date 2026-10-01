@@ -149,40 +149,19 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get pleaseLoginToSubscribe => '请登录以null此主题';
-
-  @override
-  String get subscribe => '订阅';
-
-  @override
-  String get failedToSubscribeToThread => '无法null主题';
-
-  @override
   String get youCannotReplyToThisThread => '您无法回复此主题';
 
   @override
   String get pleaseWaitForThreadToLoad => '请等待主题加载';
 
   @override
-  String get softDelete => '软删除';
-
-  @override
   String get postCanBeRestoredLater => '帖子稍后可以恢复';
-
-  @override
-  String get hardDelete => '硬删除';
 
   @override
   String get postWillBePermanentlyDeleted => '帖子将被永久删除';
 
   @override
-  String get reasonForDeletion => '删除原因';
-
-  @override
   String get enterReasonForDeletingPost => '输入删除此帖子的原因';
-
-  @override
-  String get pleaseEnterReasonForDeletion => '请输入删除原因';
 
   @override
   String get reportPost => '举报帖子';
@@ -276,12 +255,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get topicOpened => '主题已打开';
-
-  @override
-  String get topicStickied => '主题已置顶';
-
-  @override
-  String get topicUnstickied => '主题已取消置顶';
 
   @override
   String cannotEditMessage(String error) {
@@ -599,9 +572,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enterKeywordsToSearchTopics => '输入关键词以搜索主题...';
 
   @override
-  String get undelete => '恢复';
-
-  @override
   String get refresh => '刷新';
 
   @override
@@ -609,18 +579,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get viewOnWeb => '在网页中查看';
-
-  @override
-  String get unlock => '解锁';
-
-  @override
-  String get lock => '锁定';
-
-  @override
-  String get stick => '置顶';
-
-  @override
-  String get unstick => '取消置顶';
 
   @override
   String get reply => '回复';
@@ -685,16 +643,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reportSubmittedSuccessfully => '举报提交成功';
 
   @override
-  String get deleteTopic => '删除主题';
-
-  @override
-  String get topicCanBeRestoredLater => '主题可以稍后恢复';
-
-  @override
-  String get topicWillBePermanentlyDeleted => '主题将被永久删除';
-
-  @override
-  String get enterReasonForDeletingTopic => '输入删除此主题的原因';
+  String get deleteTopic => '删除话题';
 
   @override
   String get pleaseSelectEndDate => '请选择结束日期';
@@ -1380,10 +1329,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moveToCategory => '移动到分类';
 
   @override
-  String get undeleteTopic => '恢复主题';
-
-  @override
-  String get undeleteTopicConfirmation => '确定要恢复此主题吗？它将再次对其他用户可见。';
+  String get undeleteTopic => '取消删除话题';
 
   @override
   String get send => '发送';
@@ -1502,18 +1448,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String refreshFailed(Object error) {
     return '刷新失败：$error';
   }
-
-  @override
-  String get topicDeletedBanner => '此主题已删除并对其他用户隐藏';
-
-  @override
-  String get topicClosedBanner => '此主题已关闭，不再接受回复';
-
-  @override
-  String get topicPinnedBanner => '此主题已置顶';
-
-  @override
-  String get youAreSubscribedToThisTopic => '你已订阅此主题';
 
   @override
   String get refreshing => '正在刷新...';
@@ -3422,4 +3356,317 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get youParenthetical => '（你）';
+
+  @override
+  String get topicStatusClosedHelp => '此话题已被关闭；不再接受新回复';
+
+  @override
+  String get topicStatusArchivedHelp => '此话题已被归档；已被冻结，无法更改';
+
+  @override
+  String get topicStatusClosedArchivedHelp => '此话题已被关闭并存档；不再接受新回复且无法更改';
+
+  @override
+  String get topicStatusPinnedTitle => '已置顶';
+
+  @override
+  String get topicStatusPinnedHelp => '此话题已对您置顶；它将显示在所属类别的顶部';
+
+  @override
+  String get topicStatusPinnedGloballyTitle => '已全站置顶';
+
+  @override
+  String get topicStatusPinnedGloballyHelp => '此话题已被全站置顶；它将显示在最新话题列表及其所属类别的顶部';
+
+  @override
+  String get topicStatusUnpinnedTitle => '已取消置顶';
+
+  @override
+  String get topicStatusUnpinnedHelp => '此话题已对您取消置顶；它将以常规顺序显示';
+
+  @override
+  String get topicStatusUnlistedHelp => '此话题已被取消公开；它不会显示在话题列表中，只能通过直接链接访问。';
+
+  @override
+  String get topicStatusWarningHelp => '这是一个官方警告。';
+
+  @override
+  String get notificationReasonWatchingTag => '由于您正在关注此话题的一个标签，您将收到通知。';
+
+  @override
+  String get notificationReasonWatchingCategory => '由于您正在关注此类别，您将收到通知。';
+
+  @override
+  String get notificationReasonWatchingAuto => '由于您已开始自动关注此话题，您将收到通知。';
+
+  @override
+  String get notificationReasonWatching => '由于您正在关注此话题，您将收到通知。';
+
+  @override
+  String get notificationReasonWatchingCreated => '由于您创建了此话题，您将收到通知。';
+
+  @override
+  String get notificationReasonTrackingCategory => '由于您正在跟踪此类别，您将看到新回复的数量。';
+
+  @override
+  String get notificationReasonTrackingReplied => '由于您发表过对此话题的回复，您将看到新回复的数量。';
+
+  @override
+  String get notificationReasonTracking => '由于您正在跟踪此话题，您将看到新回复的数量。';
+
+  @override
+  String get notificationReasonTrackingRead => '由于您阅读过此话题，您将看到新回复的数量。';
+
+  @override
+  String get notificationReasonNormal => '您会在别人 @ 您或回复您时收到通知。';
+
+  @override
+  String get notificationReasonMutedCategory => '您将忽略此类别中的所有通知。';
+
+  @override
+  String get notificationReasonMuted => '您将忽略有关此话题的所有通知。';
+
+  @override
+  String get notificationLevelWatching => '关注';
+
+  @override
+  String get notificationLevelWatchingFirstPost => '关注第一个帖子';
+
+  @override
+  String get notificationLevelTracking => '跟踪';
+
+  @override
+  String get notificationLevelNormal => '常规';
+
+  @override
+  String get notificationLevelMuted => '已设为免打扰';
+
+  @override
+  String get topicWatchingDescription => '您将在此话题有新回复时收到通知，并且会显示新回复数量。';
+
+  @override
+  String get topicTrackingDescription => '将显示此话题的新回复数量。您会在别人 @ 您或回复您时收到通知。';
+
+  @override
+  String get topicNormalDescription => '您会在别人 @ 您或回复您时收到通知。';
+
+  @override
+  String get topicMutedDescription => '您永远不会收到有关此话题的任何通知，它也不会出现在最新话题中。';
+
+  @override
+  String get messageWatchingDescription => '您将在此消息有新回复时收到通知，并且会显示新回复数量。';
+
+  @override
+  String get messageTrackingDescription => '将显示此消息的新回复数量。您会在别人 @ 您或回复您时收到通知。';
+
+  @override
+  String get messageNormalDescription => '您会在别人 @ 您或回复您时收到通知。';
+
+  @override
+  String get messageMutedDescription => '您永远不会收到有关此消息的任何通知。';
+
+  @override
+  String get categoryWatchingDescription =>
+      '您将自动关注此类别中的所有话题。您会收到每个话题中每个新帖子的通知，并且会显示新回复数量。';
+
+  @override
+  String get categoryWatchingFirstPostDescription =>
+      '您将收到此类别中新话题的通知，但不会收到话题回复。';
+
+  @override
+  String get categoryTrackingDescription =>
+      '您将自动跟踪此类别中的所有话题。您会在别人 @ 您或回复您时收到通知，并且会显示新回复数量。';
+
+  @override
+  String get categoryNormalDescription => '您会在别人 @ 您或回复您时收到通知。';
+
+  @override
+  String get categoryMutedDescription => '您不会收到有关此类别中新话题的任何通知，它们也不会出现在最新话题页面上。';
+
+  @override
+  String get tagWatchingDescription =>
+      '您将自动关注带有此标签的所有话题。您会收到所有新帖子和话题的通知，话题旁还会显示未读和新帖子的数量。';
+
+  @override
+  String get tagWatchingFirstPostDescription => '您将收到此标签中新话题的通知，但不会收到话题回复。';
+
+  @override
+  String get tagTrackingDescription => '您将自动跟踪带有此标签的所有话题。未读和新帖子的数量将显示在话题旁边。';
+
+  @override
+  String get tagNormalDescription => '您会在别人 @ 您或回复您的帖子时收到通知。';
+
+  @override
+  String get tagMutedDescription => '您不会收到有关带有此标签的新话题的任何通知，它们也不会出现在您的未读标签页上。';
+
+  @override
+  String topicTimerAutoOpen(String timeLeft) {
+    return '此话题将在$timeLeft自动开启。';
+  }
+
+  @override
+  String topicTimerAutoClose(String timeLeft) {
+    return '此话题将在$timeLeft自动关闭。';
+  }
+
+  @override
+  String topicTimerAutoPublish(String categoryName, String timeLeft) {
+    return '此话题将在$timeLeft发布到 #$categoryName。';
+  }
+
+  @override
+  String topicTimerAutoCloseAfterLastPost(String duration) {
+    return '此话题将在最后一个回复的$duration后关闭。';
+  }
+
+  @override
+  String topicTimerAutoDeleteAfterLastPost(String duration) {
+    return '此话题将在最后一个回复的$duration后删除。';
+  }
+
+  @override
+  String topicTimerAutoDelete(String timeLeft) {
+    return '此话题将在$timeLeft自动删除。';
+  }
+
+  @override
+  String topicTimerAutoBump(String timeLeft) {
+    return '此话题将在$timeLeft被自动顶帖。';
+  }
+
+  @override
+  String topicTimerAutoDeleteReplies(String duration) {
+    return '此话题的回复会在$duration后自动删除。';
+  }
+
+  @override
+  String slowModeNotice(String duration) {
+    return '请在此话题的两次发帖之间等待 $duration。';
+  }
+
+  @override
+  String get closeTopic => '关闭话题';
+
+  @override
+  String get openTopic => '打开话题';
+
+  @override
+  String get pinTopic => '置顶话题';
+
+  @override
+  String get unpinTopic => '取消置顶话题';
+
+  @override
+  String get archiveTopic => '归档话题';
+
+  @override
+  String get unarchiveTopic => '取消归档话题';
+
+  @override
+  String get unlistTopic => '取消公开话题';
+
+  @override
+  String get listTopic => '公开话题';
+
+  @override
+  String get permanentlyDelete => '永久删除';
+
+  @override
+  String get permanentlyDeleteTopicConfirmation =>
+      '此操作无法撤销。这将永久删除此话题并将其从数据库中移除。';
+
+  @override
+  String get deleteTopicConfirmYes => '是，删除此话题';
+
+  @override
+  String get deleteTopicConfirmNo => '否，保留此话题';
+
+  @override
+  String get topicPinned => '话题已置顶';
+
+  @override
+  String get topicUnpinned => '话题已取消置顶';
+
+  @override
+  String get topicArchived => '话题已归档';
+
+  @override
+  String get topicUnarchived => '话题已取消归档';
+
+  @override
+  String get topicUnlisted => '话题已取消公开';
+
+  @override
+  String get topicListed => '话题已公开';
+
+  @override
+  String get topicRecovered => '已取消删除话题';
+
+  @override
+  String topicActionFailed(String error) {
+    return '无法更新话题：$error';
+  }
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 分钟',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 小时',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 天',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 分钟后',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 小时后',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 天后',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get topicStatusDeletedHelp => '此主题已删除并对其他用户隐藏';
 }

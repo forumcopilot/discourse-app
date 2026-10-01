@@ -161,43 +161,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get pleaseLoginToSubscribe =>
-      'Please login to change notifications on this topic';
-
-  @override
-  String get subscribe => 'Notifications';
-
-  @override
-  String get failedToSubscribeToThread => 'Failed to update notifications';
-
-  @override
   String get youCannotReplyToThisThread => 'You cannot reply to this topic';
 
   @override
   String get pleaseWaitForThreadToLoad => 'Please wait for the topic to load';
 
   @override
-  String get softDelete => 'Soft Delete';
-
-  @override
   String get postCanBeRestoredLater => 'Post can be restored later';
-
-  @override
-  String get hardDelete => 'Hard Delete';
 
   @override
   String get postWillBePermanentlyDeleted => 'Post will be permanently deleted';
 
   @override
-  String get reasonForDeletion => 'Reason for deletion';
-
-  @override
   String get enterReasonForDeletingPost =>
       'Enter the reason for deleting this post';
-
-  @override
-  String get pleaseEnterReasonForDeletion =>
-      'Please enter a reason for deletion';
 
   @override
   String get reportPost => 'Report Post';
@@ -296,12 +273,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get topicOpened => 'Topic opened';
-
-  @override
-  String get topicStickied => 'Topic stickied';
-
-  @override
-  String get topicUnstickied => 'Topic unstickied';
 
   @override
   String cannotEditMessage(String error) {
@@ -625,9 +596,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter keywords to search topics...';
 
   @override
-  String get undelete => 'Undelete';
-
-  @override
   String get refresh => 'Refresh';
 
   @override
@@ -635,18 +603,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get viewOnWeb => 'View on Web';
-
-  @override
-  String get unlock => 'Unlock';
-
-  @override
-  String get lock => 'Lock';
-
-  @override
-  String get stick => 'Stick';
-
-  @override
-  String get unstick => 'Unstick';
 
   @override
   String get reply => 'Reply';
@@ -719,17 +675,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteTopic => 'Delete Topic';
-
-  @override
-  String get topicCanBeRestoredLater => 'Topic can be restored later';
-
-  @override
-  String get topicWillBePermanentlyDeleted =>
-      'Topic will be permanently deleted';
-
-  @override
-  String get enterReasonForDeletingTopic =>
-      'Enter the reason for deleting this topic';
 
   @override
   String get pleaseSelectEndDate => 'Please select an end date';
@@ -1431,11 +1376,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moveToCategory => 'Move to category';
 
   @override
-  String get undeleteTopic => 'Undelete Topic';
-
-  @override
-  String get undeleteTopicConfirmation =>
-      'Are you sure you want to undelete this topic? It will be visible to other users again.';
+  String get undeleteTopic => 'Un-Delete Topic';
 
   @override
   String get send => 'Send';
@@ -1562,21 +1503,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String refreshFailed(Object error) {
     return 'Refresh failed: $error';
   }
-
-  @override
-  String get topicDeletedBanner =>
-      'This topic is deleted and hidden from other users';
-
-  @override
-  String get topicClosedBanner =>
-      'This topic is closed and no longer accepting replies';
-
-  @override
-  String get topicPinnedBanner =>
-      'This topic is pinned to the top of the forum';
-
-  @override
-  String get youAreSubscribedToThisTopic => 'You are subscribed to this topic';
 
   @override
   String get refreshing => 'Refreshing...';
@@ -3582,4 +3508,357 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get youParenthetical => '(you)';
+
+  @override
+  String get topicStatusClosedHelp =>
+      'This topic is closed; it no longer accepts new replies';
+
+  @override
+  String get topicStatusArchivedHelp =>
+      'This topic is archived; it is frozen and cannot be changed';
+
+  @override
+  String get topicStatusClosedArchivedHelp =>
+      'This topic is closed and archived; it no longer accepts new replies and cannot be changed';
+
+  @override
+  String get topicStatusPinnedTitle => 'Pinned';
+
+  @override
+  String get topicStatusPinnedHelp =>
+      'This topic is pinned for you; it will display at the top of its category';
+
+  @override
+  String get topicStatusPinnedGloballyTitle => 'Pinned Globally';
+
+  @override
+  String get topicStatusPinnedGloballyHelp =>
+      'This topic is pinned globally; it will display at the top of latest and its category';
+
+  @override
+  String get topicStatusUnpinnedTitle => 'Unpinned';
+
+  @override
+  String get topicStatusUnpinnedHelp =>
+      'This topic is unpinned for you; it will display in regular order';
+
+  @override
+  String get topicStatusUnlistedHelp =>
+      'This topic is unlisted; it will not be displayed in topic lists, and can only be accessed via a direct link.';
+
+  @override
+  String get topicStatusWarningHelp => 'This is an official warning.';
+
+  @override
+  String get notificationReasonWatchingTag =>
+      'You will receive notifications because you are watching a tag on this topic.';
+
+  @override
+  String get notificationReasonWatchingCategory =>
+      'You will receive notifications because you are watching this category.';
+
+  @override
+  String get notificationReasonWatchingAuto =>
+      'You will receive notifications because you started watching this topic automatically.';
+
+  @override
+  String get notificationReasonWatching =>
+      'You will receive notifications because you are watching this topic.';
+
+  @override
+  String get notificationReasonWatchingCreated =>
+      'You will receive notifications because you created this topic.';
+
+  @override
+  String get notificationReasonTrackingCategory =>
+      'You will see a count of new replies because you are tracking this category.';
+
+  @override
+  String get notificationReasonTrackingReplied =>
+      'You will see a count of new replies because you posted a reply to this topic.';
+
+  @override
+  String get notificationReasonTracking =>
+      'You will see a count of new replies because you are tracking this topic.';
+
+  @override
+  String get notificationReasonTrackingRead =>
+      'You will see a count of new replies because you read this topic.';
+
+  @override
+  String get notificationReasonNormal =>
+      'You will be notified if someone mentions your @name or replies to you.';
+
+  @override
+  String get notificationReasonMutedCategory =>
+      'You are ignoring all notifications in this category.';
+
+  @override
+  String get notificationReasonMuted =>
+      'You are ignoring all notifications on this topic.';
+
+  @override
+  String get notificationLevelWatching => 'Watching';
+
+  @override
+  String get notificationLevelWatchingFirstPost => 'Watching First Post';
+
+  @override
+  String get notificationLevelTracking => 'Tracking';
+
+  @override
+  String get notificationLevelNormal => 'Normal';
+
+  @override
+  String get notificationLevelMuted => 'Muted';
+
+  @override
+  String get topicWatchingDescription =>
+      'You will be notified of every new reply in this topic, and a count of new replies will be shown.';
+
+  @override
+  String get topicTrackingDescription =>
+      'A count of new replies will be shown for this topic. You will be notified if someone mentions your @name or replies to you.';
+
+  @override
+  String get topicNormalDescription =>
+      'You will be notified if someone mentions your @name or replies to you.';
+
+  @override
+  String get topicMutedDescription =>
+      'You will never be notified of anything about this topic, and it will not appear in latest.';
+
+  @override
+  String get messageWatchingDescription =>
+      'You will be notified of every new reply in this message, and a count of new replies will be shown.';
+
+  @override
+  String get messageTrackingDescription =>
+      'A count of new replies will be shown for this message. You will be notified if someone mentions your @name or replies to you.';
+
+  @override
+  String get messageNormalDescription =>
+      'You will be notified if someone mentions your @name or replies to you.';
+
+  @override
+  String get messageMutedDescription =>
+      'You will never be notified of anything about this message.';
+
+  @override
+  String get categoryWatchingDescription =>
+      'You will automatically watch all topics in this category. You will be notified of every new post in every topic, and a count of new replies will be shown.';
+
+  @override
+  String get categoryWatchingFirstPostDescription =>
+      'You will be notified of new topics in this category but not replies to the topics.';
+
+  @override
+  String get categoryTrackingDescription =>
+      'You will automatically track all topics in this category. You will be notified if someone mentions your @name or replies to you, and a count of new replies will be shown.';
+
+  @override
+  String get categoryNormalDescription =>
+      'You will be notified if someone mentions your @name or replies to you.';
+
+  @override
+  String get categoryMutedDescription =>
+      'You will never be notified of anything about new topics in this category, and they will not appear in latest.';
+
+  @override
+  String get tagWatchingDescription =>
+      'You will automatically watch all topics with this tag. You will be notified of all new posts and topics, plus the count of unread and new posts will also appear next to the topic.';
+
+  @override
+  String get tagWatchingFirstPostDescription =>
+      'You will be notified of new topics in this tag but not replies to the topics.';
+
+  @override
+  String get tagTrackingDescription =>
+      'You will automatically track all topics with this tag. A count of unread and new posts will appear next to the topic.';
+
+  @override
+  String get tagNormalDescription =>
+      'You will be notified if someone mentions your @name or replies to your post.';
+
+  @override
+  String get tagMutedDescription =>
+      'You will not be notified of anything about new topics with this tag, and they will not appear on your unread tab.';
+
+  @override
+  String topicTimerAutoOpen(String timeLeft) {
+    return 'This topic will automatically open $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoClose(String timeLeft) {
+    return 'This topic will automatically close $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoPublish(String categoryName, String timeLeft) {
+    return 'This topic will be published to #$categoryName $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoCloseAfterLastPost(String duration) {
+    return 'This topic will close $duration after the last reply.';
+  }
+
+  @override
+  String topicTimerAutoDeleteAfterLastPost(String duration) {
+    return 'This topic will be deleted $duration after the last reply.';
+  }
+
+  @override
+  String topicTimerAutoDelete(String timeLeft) {
+    return 'This topic will be automatically deleted $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoBump(String timeLeft) {
+    return 'This topic will be automatically bumped $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoDeleteReplies(String duration) {
+    return 'Replies on this topic are automatically deleted after $duration.';
+  }
+
+  @override
+  String slowModeNotice(String duration) {
+    return 'Please wait $duration between your posts in this topic.';
+  }
+
+  @override
+  String get closeTopic => 'Close Topic';
+
+  @override
+  String get openTopic => 'Open Topic';
+
+  @override
+  String get pinTopic => 'Pin Topic';
+
+  @override
+  String get unpinTopic => 'Un-Pin Topic';
+
+  @override
+  String get archiveTopic => 'Archive Topic';
+
+  @override
+  String get unarchiveTopic => 'Unarchive Topic';
+
+  @override
+  String get unlistTopic => 'Unlist Topic';
+
+  @override
+  String get listTopic => 'List Topic';
+
+  @override
+  String get permanentlyDelete => 'Permanently delete';
+
+  @override
+  String get permanentlyDeleteTopicConfirmation =>
+      'This action cannot be undone. This will permanently delete this topic and remove it from the database.';
+
+  @override
+  String get deleteTopicConfirmYes => 'Yes, delete this topic';
+
+  @override
+  String get deleteTopicConfirmNo => 'No, keep this topic';
+
+  @override
+  String get topicPinned => 'Topic pinned';
+
+  @override
+  String get topicUnpinned => 'Topic unpinned';
+
+  @override
+  String get topicArchived => 'Topic archived';
+
+  @override
+  String get topicUnarchived => 'Topic unarchived';
+
+  @override
+  String get topicUnlisted => 'Topic unlisted';
+
+  @override
+  String get topicListed => 'Topic listed';
+
+  @override
+  String get topicRecovered => 'Topic un-deleted';
+
+  @override
+  String topicActionFailed(String error) {
+    return 'Couldn\'t update the topic: $error';
+  }
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutes',
+      one: '1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hours',
+      one: '1 hour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'in $count minutes',
+      one: 'in 1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'in $count hours',
+      one: 'in 1 hour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'in $count days',
+      one: 'in 1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get topicStatusDeletedHelp =>
+      'This topic is deleted and hidden from other users';
 }

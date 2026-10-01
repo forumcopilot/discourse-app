@@ -155,40 +155,19 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get pleaseLoginToSubscribe => '이 스레드를 null하려면 로그인하세요';
-
-  @override
-  String get subscribe => '구독';
-
-  @override
-  String get failedToSubscribeToThread => '스레드 null 실패';
-
-  @override
   String get youCannotReplyToThisThread => '이 스레드에 답변할 수 없습니다';
 
   @override
   String get pleaseWaitForThreadToLoad => '스레드가 로드될 때까지 기다려주세요';
 
   @override
-  String get softDelete => '소프트 삭제';
-
-  @override
   String get postCanBeRestoredLater => '게시물은 나중에 복원할 수 있습니다';
-
-  @override
-  String get hardDelete => '완전 삭제';
 
   @override
   String get postWillBePermanentlyDeleted => '게시물이 영구적으로 삭제됩니다';
 
   @override
-  String get reasonForDeletion => '삭제 이유';
-
-  @override
   String get enterReasonForDeletingPost => '이 게시물을 삭제하는 사유를 입력하세요';
-
-  @override
-  String get pleaseEnterReasonForDeletion => '삭제 이유를 입력하세요';
 
   @override
   String get reportPost => '게시물 신고';
@@ -282,12 +261,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get topicOpened => '주제 열림';
-
-  @override
-  String get topicStickied => '주제 고정됨';
-
-  @override
-  String get topicUnstickied => '주제 고정 해제됨';
 
   @override
   String cannotEditMessage(String error) {
@@ -606,9 +579,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get enterKeywordsToSearchTopics => '주제를 검색할 키워드 입력...';
 
   @override
-  String get undelete => '복원';
-
-  @override
   String get refresh => '새로고침';
 
   @override
@@ -616,18 +586,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get viewOnWeb => '웹에서 보기';
-
-  @override
-  String get unlock => '잠금 해제';
-
-  @override
-  String get lock => '잠금';
-
-  @override
-  String get stick => '고정';
-
-  @override
-  String get unstick => '고정 해제';
 
   @override
   String get reply => '답장';
@@ -692,16 +650,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportSubmittedSuccessfully => '신고가 성공적으로 제출되었습니다';
 
   @override
-  String get deleteTopic => '주제 삭제';
-
-  @override
-  String get topicCanBeRestoredLater => '주제는 나중에 복원할 수 있습니다';
-
-  @override
-  String get topicWillBePermanentlyDeleted => '주제가 영구적으로 삭제됩니다';
-
-  @override
-  String get enterReasonForDeletingTopic => '이 주제를 삭제하는 이유를 입력하세요';
+  String get deleteTopic => '글 삭제';
 
   @override
   String get pleaseSelectEndDate => '종료일을 선택하세요';
@@ -1388,10 +1337,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moveToCategory => '카테고리로 이동';
 
   @override
-  String get undeleteTopic => '주제 복원';
-
-  @override
-  String get undeleteTopicConfirmation => '이 주제를 복원할까요? 다른 사용자에게 다시 표시됩니다.';
+  String get undeleteTopic => '주제 삭제 취소';
 
   @override
   String get send => '보내기';
@@ -1512,18 +1458,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String refreshFailed(Object error) {
     return '새로고침 실패: $error';
   }
-
-  @override
-  String get topicDeletedBanner => '이 주제는 삭제되어 다른 사용자에게 보이지 않습니다';
-
-  @override
-  String get topicClosedBanner => '이 주제는 닫혀 더 이상 답글을 받지 않습니다';
-
-  @override
-  String get topicPinnedBanner => '이 주제는 포럼 상단에 고정되어 있습니다';
-
-  @override
-  String get youAreSubscribedToThisTopic => '이 주제를 구독 중입니다';
 
   @override
   String get refreshing => '새로고침 중...';
@@ -3451,4 +3385,338 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get youParenthetical => '(나)';
+
+  @override
+  String get topicStatusClosedHelp => '이 글은 잠금 처리되었습니다. 더 이상 새 댓글을 올릴 수 없습니다.';
+
+  @override
+  String get topicStatusArchivedHelp => '이 주제는 보관 중입니다. 고정되어 변경이 불가합니다';
+
+  @override
+  String get topicStatusClosedArchivedHelp =>
+      '이 글은 잠금 처리되어 보관 중 입니다. 더 이상 새 댓글을 작성하거나 변경이 불가합니다.';
+
+  @override
+  String get topicStatusPinnedTitle => '핀 지정됨';
+
+  @override
+  String get topicStatusPinnedHelp => '이 주제는 고정되었습니다. 카테고리의 상단에 표시됩니다.';
+
+  @override
+  String get topicStatusPinnedGloballyTitle => '전체적으로 고정됨';
+
+  @override
+  String get topicStatusPinnedGloballyHelp =>
+      '이 주제는 전체적으로 고정되어 있으며 최신 항목 및 카테고리 상단에 표시됩니다.';
+
+  @override
+  String get topicStatusUnpinnedTitle => '고정 해제';
+
+  @override
+  String get topicStatusUnpinnedHelp => '이 주제가 고정 해제되었습니다. 일반적인 순서로 표시됩니다';
+
+  @override
+  String get topicStatusUnlistedHelp =>
+      '이 주제는 목록에서 감춰졌습니다. 주제 목록에 표시되지 않으며 직접 링크로만 볼 수 있습니다.';
+
+  @override
+  String get topicStatusWarningHelp => '공식 경고입니다.';
+
+  @override
+  String get notificationReasonWatchingTag => '이 글에 대한 태그를 구독 중이므로 알림을 받게 됩니다.';
+
+  @override
+  String get notificationReasonWatchingCategory =>
+      '이 카테고리를 구독 중이므로 알림을 받게 됩니다.';
+
+  @override
+  String get notificationReasonWatchingAuto =>
+      '이 글을 자동으로 구독하기 시작했으므로 알림을 받게 됩니다.';
+
+  @override
+  String get notificationReasonWatching => '이 글을 구독 중이므로 알림을 받게 됩니다.';
+
+  @override
+  String get notificationReasonWatchingCreated => '이 글을 작성 했으므로 알림을 받게됩니다.';
+
+  @override
+  String get notificationReasonTrackingCategory =>
+      '이 카테고리를 추적 중이므로 새 댓글 수가 표시됩니다.';
+
+  @override
+  String get notificationReasonTrackingReplied =>
+      '이 글에 댓글을 작성했기 때문에 새 글 수가 표시됩니다.';
+
+  @override
+  String get notificationReasonTracking => '이 글을 팔로우 중이므로 새 댓글 수가 표시됩니다.';
+
+  @override
+  String get notificationReasonTrackingRead => '이 글을 읽었으므로 새 댓글 수가 표시됩니다.';
+
+  @override
+  String get notificationReasonNormal =>
+      '누군가 나를 @이름 형식으로 멘션하거나 나에게 댓글을 달면 알림을 받습니다.';
+
+  @override
+  String get notificationReasonMutedCategory => '이 카테고리의 모든 알림을 무시하고 있습니다.';
+
+  @override
+  String get notificationReasonMuted => '이 글에 대한 모든 알림을 무시하고 있습니다.';
+
+  @override
+  String get notificationLevelWatching => '구독';
+
+  @override
+  String get notificationLevelWatchingFirstPost => '첫 게시물 구독';
+
+  @override
+  String get notificationLevelTracking => '추적';
+
+  @override
+  String get notificationLevelNormal => '일반';
+
+  @override
+  String get notificationLevelMuted => '뮤트';
+
+  @override
+  String get topicWatchingDescription =>
+      '이 글의 모든 새 댓글에 대한 알림을 받으며 새 댓글 수가 표시됩니다.';
+
+  @override
+  String get topicTrackingDescription =>
+      '이 주제의 새 댓글 수가 표시됩니다. 누군가가 @이름 형식으로 나를 멘션하거나 나에게 댓글을 달면 알림을 받게 됩니다.';
+
+  @override
+  String get topicNormalDescription =>
+      '누군가 나를 @이름 형식으로 멘션하거나 나에게 댓글을 달면 알림을 받습니다.';
+
+  @override
+  String get topicMutedDescription =>
+      '이 주제에 대한 어떠한 알림도 받지 않고 최신 항목에 표시되지 않습니다.';
+
+  @override
+  String get messageWatchingDescription =>
+      '이 메시지의 모든 새 댓글에 대한 알림을 받으며 새 댓글 수가 표시됩니다.';
+
+  @override
+  String get messageTrackingDescription =>
+      '이 메시지의 새 댓글 수가 표시됩니다. 누군가가 @이름 형식으로 나를 멘션하거나 나에게 댓글을 달면 알림을 받게 됩니다.';
+
+  @override
+  String get messageNormalDescription =>
+      '누군가 나를 @이름 형식으로 멘션하거나 나에게 댓글을 달면 알림을 받습니다.';
+
+  @override
+  String get messageMutedDescription => '이 메시지에 대해 어떠한 알림도 받지 않지 않습니다.';
+
+  @override
+  String get categoryWatchingDescription =>
+      '이 카테고리의 모든 주제를 자동으로 봅니다. 모든 주제의 새 게시물에 대한 알림이 전송되며 새 댓글 수도 표시됩니다.';
+
+  @override
+  String get categoryWatchingFirstPostDescription =>
+      '이 카테고리의 새 주제에 대한 알림을 받지만 주제 댓글은 제외합니다.';
+
+  @override
+  String get categoryTrackingDescription =>
+      '이 카테고리의 모든 주제를 자동으로 추적합니다. 누군가 나를 @이름 형식으로 멘션하거나 나에게 댓글을 달면 알림을 받으며 새 댓글 수가 표시됩니다.';
+
+  @override
+  String get categoryNormalDescription =>
+      '누군가 나를 @이름 형식으로 멘션하거나 나에게 댓글을 달면 알림을 받습니다.';
+
+  @override
+  String get categoryMutedDescription =>
+      '이 카테고리의 새 주제에 대한 어떠한 알림도 받지 않으며 최신 항목에 표시되지 않습니다.';
+
+  @override
+  String get tagWatchingDescription =>
+      '이 태그의 모든 주제를 자동으로 봅니다. 모든 새 게시물과 주제에 대한 알림이 전송되며 읽지 않은 게시물과 새 게시물 수도 주제 옆에 표시됩니다.';
+
+  @override
+  String get tagWatchingFirstPostDescription =>
+      '이 태그의 새 주제에 대한 알림을 받지만 주제 댓글은 제외합니다.';
+
+  @override
+  String get tagTrackingDescription =>
+      '이 태그의 모든 주제를 자동 추적합니다. 읽지 않은 게시물과 새 게시물 수가 주제 옆에 표시됩니다.';
+
+  @override
+  String get tagNormalDescription =>
+      '누군가 나를 @이름 형식으로 멘션하거나 내 게시물에 댓글을 달면 알림을 받습니다.';
+
+  @override
+  String get tagMutedDescription =>
+      '이 태그가 있는 새 주제에 대한 어떠한 알림도 받지 않으며 읽지 않음 탭에 표시되지 않습니다.';
+
+  @override
+  String topicTimerAutoOpen(String timeLeft) {
+    return '이 글은 $timeLeft에 자동으로 열립니다.';
+  }
+
+  @override
+  String topicTimerAutoClose(String timeLeft) {
+    return '이 글은 $timeLeft에 자동으로 닫힙니다.';
+  }
+
+  @override
+  String topicTimerAutoPublish(String categoryName, String timeLeft) {
+    return '이 글은 $timeLeft #$categoryName에 게시됩니다.';
+  }
+
+  @override
+  String topicTimerAutoCloseAfterLastPost(String duration) {
+    return '이 글은 마지막 댓글이 달리고 $duration 후 닫힙니다.';
+  }
+
+  @override
+  String topicTimerAutoDeleteAfterLastPost(String duration) {
+    return '이 글은 마지막 댓글이 달리고 $duration 후 삭제됩니다.';
+  }
+
+  @override
+  String topicTimerAutoDelete(String timeLeft) {
+    return '이 글은 $timeLeft에 자동으로 삭제됩니다.';
+  }
+
+  @override
+  String topicTimerAutoBump(String timeLeft) {
+    return '이 글은 $timeLeft에 자동으로 끌어 올림 됩니다.';
+  }
+
+  @override
+  String topicTimerAutoDeleteReplies(String duration) {
+    return '이 글에 대한 댓글은 $duration 후 자동으로 삭제됩니다.';
+  }
+
+  @override
+  String slowModeNotice(String duration) {
+    return '이 글에서는 게시물 사이에 $duration 기다려 주세요.';
+  }
+
+  @override
+  String get closeTopic => '글 잠금';
+
+  @override
+  String get openTopic => '글 열기';
+
+  @override
+  String get pinTopic => '글 고정';
+
+  @override
+  String get unpinTopic => '주제 고정 해제';
+
+  @override
+  String get archiveTopic => '글 보관';
+
+  @override
+  String get unarchiveTopic => '글 보관 취소';
+
+  @override
+  String get unlistTopic => '목록에서 감추기';
+
+  @override
+  String get listTopic => '목록에 게시하기';
+
+  @override
+  String get permanentlyDelete => '영구 삭제';
+
+  @override
+  String get permanentlyDeleteTopicConfirmation =>
+      '이 작업은 되돌릴 수 없습니다. 이 주제가 영구적으로 삭제되고 데이터베이스에서 제거됩니다.';
+
+  @override
+  String get deleteTopicConfirmYes => '예, 이 주제를 삭제합니다';
+
+  @override
+  String get deleteTopicConfirmNo => '아니요, 이 주제를 유지합니다';
+
+  @override
+  String get topicPinned => '글을 고정했습니다';
+
+  @override
+  String get topicUnpinned => '글 고정을 해제했습니다';
+
+  @override
+  String get topicArchived => '글을 보관했습니다';
+
+  @override
+  String get topicUnarchived => '글 보관을 취소했습니다';
+
+  @override
+  String get topicUnlisted => '글을 목록에서 감췄습니다';
+
+  @override
+  String get topicListed => '글을 목록에 게시했습니다';
+
+  @override
+  String get topicRecovered => '주제 삭제를 취소했습니다';
+
+  @override
+  String topicActionFailed(String error) {
+    return '글을 업데이트할 수 없습니다: $error';
+  }
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count분',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count시간',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count일',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count분 후',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count시간 후',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count일 후',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get topicStatusDeletedHelp => '이 주제는 삭제되어 다른 사용자에게 보이지 않습니다';
 }

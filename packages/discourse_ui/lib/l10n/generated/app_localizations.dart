@@ -386,24 +386,6 @@ abstract class AppLocalizations {
   /// **'Failed to share topic: {error}'**
   String failedToShareTopic(String error);
 
-  /// Message asking user to login before changing topic notifications
-  ///
-  /// In en, this message translates to:
-  /// **'Please login to change notifications on this topic'**
-  String get pleaseLoginToSubscribe;
-
-  /// No description provided for @subscribe.
-  ///
-  /// In en, this message translates to:
-  /// **'Notifications'**
-  String get subscribe;
-
-  /// Error message when changing notification level fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to update notifications'**
-  String get failedToSubscribeToThread;
-
   /// No description provided for @youCannotReplyToThisThread.
   ///
   /// In en, this message translates to:
@@ -416,23 +398,11 @@ abstract class AppLocalizations {
   /// **'Please wait for the topic to load'**
   String get pleaseWaitForThreadToLoad;
 
-  /// Option for soft delete (can be restored)
-  ///
-  /// In en, this message translates to:
-  /// **'Soft Delete'**
-  String get softDelete;
-
   /// No description provided for @postCanBeRestoredLater.
   ///
   /// In en, this message translates to:
   /// **'Post can be restored later'**
   String get postCanBeRestoredLater;
-
-  /// Option for hard delete (permanent)
-  ///
-  /// In en, this message translates to:
-  /// **'Hard Delete'**
-  String get hardDelete;
 
   /// No description provided for @postWillBePermanentlyDeleted.
   ///
@@ -440,23 +410,11 @@ abstract class AppLocalizations {
   /// **'Post will be permanently deleted'**
   String get postWillBePermanentlyDeleted;
 
-  /// Label for deletion reason field
-  ///
-  /// In en, this message translates to:
-  /// **'Reason for deletion'**
-  String get reasonForDeletion;
-
   /// No description provided for @enterReasonForDeletingPost.
   ///
   /// In en, this message translates to:
   /// **'Enter the reason for deleting this post'**
   String get enterReasonForDeletingPost;
-
-  /// Validation message for deletion reason
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter a reason for deletion'**
-  String get pleaseEnterReasonForDeletion;
 
   /// No description provided for @reportPost.
   ///
@@ -631,18 +589,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Topic opened'**
   String get topicOpened;
-
-  /// No description provided for @topicStickied.
-  ///
-  /// In en, this message translates to:
-  /// **'Topic stickied'**
-  String get topicStickied;
-
-  /// No description provided for @topicUnstickied.
-  ///
-  /// In en, this message translates to:
-  /// **'Topic unstickied'**
-  String get topicUnstickied;
 
   /// Error message when cannot edit message
   ///
@@ -1208,12 +1154,6 @@ abstract class AppLocalizations {
   /// **'Enter keywords to search topics...'**
   String get enterKeywordsToSearchTopics;
 
-  /// No description provided for @undelete.
-  ///
-  /// In en, this message translates to:
-  /// **'Undelete'**
-  String get undelete;
-
   /// Menu item to refresh content
   ///
   /// In en, this message translates to:
@@ -1231,30 +1171,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View on Web'**
   String get viewOnWeb;
-
-  /// Menu item to unlock a topic
-  ///
-  /// In en, this message translates to:
-  /// **'Unlock'**
-  String get unlock;
-
-  /// Menu item to lock a topic
-  ///
-  /// In en, this message translates to:
-  /// **'Lock'**
-  String get lock;
-
-  /// Menu item to stick/pin a topic
-  ///
-  /// In en, this message translates to:
-  /// **'Stick'**
-  String get stick;
-
-  /// Menu item to unstick/unpin a topic
-  ///
-  /// In en, this message translates to:
-  /// **'Unstick'**
-  String get unstick;
 
   /// Button to reply to a post or message
   ///
@@ -1369,24 +1285,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete Topic'**
   String get deleteTopic;
-
-  /// Description for soft delete option
-  ///
-  /// In en, this message translates to:
-  /// **'Topic can be restored later'**
-  String get topicCanBeRestoredLater;
-
-  /// Description for hard delete option
-  ///
-  /// In en, this message translates to:
-  /// **'Topic will be permanently deleted'**
-  String get topicWillBePermanentlyDeleted;
-
-  /// Hint text for deletion reason field
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the reason for deleting this topic'**
-  String get enterReasonForDeletingTopic;
 
   /// Error message when end date is not selected
   ///
@@ -2543,14 +2441,8 @@ abstract class AppLocalizations {
   /// UI text: Undelete Topic
   ///
   /// In en, this message translates to:
-  /// **'Undelete Topic'**
+  /// **'Un-Delete Topic'**
   String get undeleteTopic;
-
-  /// UI text: Are you sure you want to undelete this topic? It will be vis
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to undelete this topic? It will be visible to other users again.'**
-  String get undeleteTopicConfirmation;
 
   /// UI text: Send
   ///
@@ -2767,30 +2659,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Refresh failed: {error}'**
   String refreshFailed(Object error);
-
-  /// UI text: This topic is deleted and hidden from other users
-  ///
-  /// In en, this message translates to:
-  /// **'This topic is deleted and hidden from other users'**
-  String get topicDeletedBanner;
-
-  /// UI text: This topic is closed and no longer accepting replies
-  ///
-  /// In en, this message translates to:
-  /// **'This topic is closed and no longer accepting replies'**
-  String get topicClosedBanner;
-
-  /// UI text: This topic is pinned to the top of the forum
-  ///
-  /// In en, this message translates to:
-  /// **'This topic is pinned to the top of the forum'**
-  String get topicPinnedBanner;
-
-  /// UI text: You are subscribed to this topic
-  ///
-  /// In en, this message translates to:
-  /// **'You are subscribed to this topic'**
-  String get youAreSubscribedToThisTopic;
 
   /// UI text: Refreshing...
   ///
@@ -5931,6 +5799,498 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'(you)'**
   String get youParenthetical;
+
+  /// Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button
+  ///
+  /// In en, this message translates to:
+  /// **'This topic is closed; it no longer accepts new replies'**
+  String get topicStatusClosedHelp;
+
+  /// Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button
+  ///
+  /// In en, this message translates to:
+  /// **'This topic is archived; it is frozen and cannot be changed'**
+  String get topicStatusArchivedHelp;
+
+  /// Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button
+  ///
+  /// In en, this message translates to:
+  /// **'This topic is closed and archived; it no longer accepts new replies and cannot be changed'**
+  String get topicStatusClosedArchivedHelp;
+
+  /// Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned'**
+  String get topicStatusPinnedTitle;
+
+  /// Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button
+  ///
+  /// In en, this message translates to:
+  /// **'This topic is pinned for you; it will display at the top of its category'**
+  String get topicStatusPinnedHelp;
+
+  /// Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned Globally'**
+  String get topicStatusPinnedGloballyTitle;
+
+  /// Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button
+  ///
+  /// In en, this message translates to:
+  /// **'This topic is pinned globally; it will display at the top of latest and its category'**
+  String get topicStatusPinnedGloballyHelp;
+
+  /// Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button
+  ///
+  /// In en, this message translates to:
+  /// **'Unpinned'**
+  String get topicStatusUnpinnedTitle;
+
+  /// Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button
+  ///
+  /// In en, this message translates to:
+  /// **'This topic is unpinned for you; it will display in regular order'**
+  String get topicStatusUnpinnedHelp;
+
+  /// Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button
+  ///
+  /// In en, this message translates to:
+  /// **'This topic is unlisted; it will not be displayed in topic lists, and can only be accessed via a direct link.'**
+  String get topicStatusUnlistedHelp;
+
+  /// Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button
+  ///
+  /// In en, this message translates to:
+  /// **'This is an official warning.'**
+  String get topicStatusWarningHelp;
+
+  /// Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button
+  ///
+  /// In en, this message translates to:
+  /// **'You will receive notifications because you are watching a tag on this topic.'**
+  String get notificationReasonWatchingTag;
+
+  /// Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button
+  ///
+  /// In en, this message translates to:
+  /// **'You will receive notifications because you are watching this category.'**
+  String get notificationReasonWatchingCategory;
+
+  /// Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button
+  ///
+  /// In en, this message translates to:
+  /// **'You will receive notifications because you started watching this topic automatically.'**
+  String get notificationReasonWatchingAuto;
+
+  /// Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button
+  ///
+  /// In en, this message translates to:
+  /// **'You will receive notifications because you are watching this topic.'**
+  String get notificationReasonWatching;
+
+  /// Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button
+  ///
+  /// In en, this message translates to:
+  /// **'You will receive notifications because you created this topic.'**
+  String get notificationReasonWatchingCreated;
+
+  /// Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button
+  ///
+  /// In en, this message translates to:
+  /// **'You will see a count of new replies because you are tracking this category.'**
+  String get notificationReasonTrackingCategory;
+
+  /// Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button
+  ///
+  /// In en, this message translates to:
+  /// **'You will see a count of new replies because you posted a reply to this topic.'**
+  String get notificationReasonTrackingReplied;
+
+  /// Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button
+  ///
+  /// In en, this message translates to:
+  /// **'You will see a count of new replies because you are tracking this topic.'**
+  String get notificationReasonTracking;
+
+  /// Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button
+  ///
+  /// In en, this message translates to:
+  /// **'You will see a count of new replies because you read this topic.'**
+  String get notificationReasonTrackingRead;
+
+  /// Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button
+  ///
+  /// In en, this message translates to:
+  /// **'You will be notified if someone mentions your @name or replies to you.'**
+  String get notificationReasonNormal;
+
+  /// Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button
+  ///
+  /// In en, this message translates to:
+  /// **'You are ignoring all notifications in this category.'**
+  String get notificationReasonMutedCategory;
+
+  /// Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button
+  ///
+  /// In en, this message translates to:
+  /// **'You are ignoring all notifications on this topic.'**
+  String get notificationReasonMuted;
+
+  /// Discourse notification level name
+  ///
+  /// In en, this message translates to:
+  /// **'Watching'**
+  String get notificationLevelWatching;
+
+  /// Discourse notification level name
+  ///
+  /// In en, this message translates to:
+  /// **'Watching First Post'**
+  String get notificationLevelWatchingFirstPost;
+
+  /// Discourse notification level name
+  ///
+  /// In en, this message translates to:
+  /// **'Tracking'**
+  String get notificationLevelTracking;
+
+  /// Discourse notification level name
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get notificationLevelNormal;
+
+  /// Discourse notification level name
+  ///
+  /// In en, this message translates to:
+  /// **'Muted'**
+  String get notificationLevelMuted;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will be notified of every new reply in this topic, and a count of new replies will be shown.'**
+  String get topicWatchingDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'A count of new replies will be shown for this topic. You will be notified if someone mentions your @name or replies to you.'**
+  String get topicTrackingDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will be notified if someone mentions your @name or replies to you.'**
+  String get topicNormalDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will never be notified of anything about this topic, and it will not appear in latest.'**
+  String get topicMutedDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will be notified of every new reply in this message, and a count of new replies will be shown.'**
+  String get messageWatchingDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'A count of new replies will be shown for this message. You will be notified if someone mentions your @name or replies to you.'**
+  String get messageTrackingDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will be notified if someone mentions your @name or replies to you.'**
+  String get messageNormalDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will never be notified of anything about this message.'**
+  String get messageMutedDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will automatically watch all topics in this category. You will be notified of every new post in every topic, and a count of new replies will be shown.'**
+  String get categoryWatchingDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will be notified of new topics in this category but not replies to the topics.'**
+  String get categoryWatchingFirstPostDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will automatically track all topics in this category. You will be notified if someone mentions your @name or replies to you, and a count of new replies will be shown.'**
+  String get categoryTrackingDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will be notified if someone mentions your @name or replies to you.'**
+  String get categoryNormalDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will never be notified of anything about new topics in this category, and they will not appear in latest.'**
+  String get categoryMutedDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will automatically watch all topics with this tag. You will be notified of all new posts and topics, plus the count of unread and new posts will also appear next to the topic.'**
+  String get tagWatchingDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will be notified of new topics in this tag but not replies to the topics.'**
+  String get tagWatchingFirstPostDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will automatically track all topics with this tag. A count of unread and new posts will appear next to the topic.'**
+  String get tagTrackingDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will be notified if someone mentions your @name or replies to your post.'**
+  String get tagNormalDescription;
+
+  /// Discourse notification level description in the level picker
+  ///
+  /// In en, this message translates to:
+  /// **'You will not be notified of anything about new topics with this tag, and they will not appear on your unread tab.'**
+  String get tagMutedDescription;
+
+  /// Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as "in 3 days"; {duration} a length such as "3 days"
+  ///
+  /// In en, this message translates to:
+  /// **'This topic will automatically open {timeLeft}.'**
+  String topicTimerAutoOpen(String timeLeft);
+
+  /// Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as "in 3 days"; {duration} a length such as "3 days"
+  ///
+  /// In en, this message translates to:
+  /// **'This topic will automatically close {timeLeft}.'**
+  String topicTimerAutoClose(String timeLeft);
+
+  /// Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as "in 3 days"; {duration} a length such as "3 days"
+  ///
+  /// In en, this message translates to:
+  /// **'This topic will be published to #{categoryName} {timeLeft}.'**
+  String topicTimerAutoPublish(String categoryName, String timeLeft);
+
+  /// Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as "in 3 days"; {duration} a length such as "3 days"
+  ///
+  /// In en, this message translates to:
+  /// **'This topic will close {duration} after the last reply.'**
+  String topicTimerAutoCloseAfterLastPost(String duration);
+
+  /// Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as "in 3 days"; {duration} a length such as "3 days"
+  ///
+  /// In en, this message translates to:
+  /// **'This topic will be deleted {duration} after the last reply.'**
+  String topicTimerAutoDeleteAfterLastPost(String duration);
+
+  /// Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as "in 3 days"; {duration} a length such as "3 days"
+  ///
+  /// In en, this message translates to:
+  /// **'This topic will be automatically deleted {timeLeft}.'**
+  String topicTimerAutoDelete(String timeLeft);
+
+  /// Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as "in 3 days"; {duration} a length such as "3 days"
+  ///
+  /// In en, this message translates to:
+  /// **'This topic will be automatically bumped {timeLeft}.'**
+  String topicTimerAutoBump(String timeLeft);
+
+  /// Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as "in 3 days"; {duration} a length such as "3 days"
+  ///
+  /// In en, this message translates to:
+  /// **'Replies on this topic are automatically deleted after {duration}.'**
+  String topicTimerAutoDeleteReplies(String duration);
+
+  /// Discourse topic.slow_mode_notice.duration, under the last post of a topic in slow mode
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait {duration} between your posts in this topic.'**
+  String slowModeNotice(String duration);
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Close Topic'**
+  String get closeTopic;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Open Topic'**
+  String get openTopic;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Pin Topic'**
+  String get pinTopic;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Un-Pin Topic'**
+  String get unpinTopic;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Topic'**
+  String get archiveTopic;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Unarchive Topic'**
+  String get unarchiveTopic;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Unlist Topic'**
+  String get unlistTopic;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'List Topic'**
+  String get listTopic;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete'**
+  String get permanentlyDelete;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone. This will permanently delete this topic and remove it from the database.'**
+  String get permanentlyDeleteTopicConfirmation;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, delete this topic'**
+  String get deleteTopicConfirmYes;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'No, keep this topic'**
+  String get deleteTopicConfirmNo;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Topic pinned'**
+  String get topicPinned;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Topic unpinned'**
+  String get topicUnpinned;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Topic archived'**
+  String get topicArchived;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Topic unarchived'**
+  String get topicUnarchived;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Topic unlisted'**
+  String get topicUnlisted;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Topic listed'**
+  String get topicListed;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Topic un-deleted'**
+  String get topicRecovered;
+
+  /// Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t update the topic: {error}'**
+  String topicActionFailed(String error);
+
+  /// A length of time, e.g. "3 days"
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 minute} other{{count} minutes}}'**
+  String durationMinutes(int count);
+
+  /// A length of time, e.g. "3 days"
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 hour} other{{count} hours}}'**
+  String durationHours(int count);
+
+  /// A length of time, e.g. "3 days"
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day} other{{count} days}}'**
+  String durationDays(int count);
+
+  /// A time from now, e.g. "in 3 days", for the topic timer notices
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{in 1 minute} other{in {count} minutes}}'**
+  String timeLeftMinutes(int count);
+
+  /// A time from now, e.g. "in 3 days", for the topic timer notices
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{in 1 hour} other{in {count} hours}}'**
+  String timeLeftHours(int count);
+
+  /// A time from now, e.g. "in 3 days", for the topic timer notices
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{in 1 day} other{in {count} days}}'**
+  String timeLeftDays(int count);
+
+  /// Help text of the deleted-topic icon before the title (staff only see deleted topics)
+  ///
+  /// In en, this message translates to:
+  /// **'This topic is deleted and hidden from other users'**
+  String get topicStatusDeletedHelp;
 }
 
 class _AppLocalizationsDelegate

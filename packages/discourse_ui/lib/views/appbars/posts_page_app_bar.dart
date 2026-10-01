@@ -4,6 +4,8 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/emoji_shortcodes.dart';
 import '../widgets/adaptive_app_bar_title.dart';
+import '../widgets/topic_status.dart' show notificationLevelLabel;
+import 'package:discourse_core/discourse_core.dart' show DiscourseTopicStatus;
 
 /// What the app bar offers when the topic page shows a private message (a
 /// Discourse message is a topic): who is on it, and filing it away. Its
@@ -44,34 +46,21 @@ class PostsPageAppBar extends StatefulWidget implements PreferredSizeWidget {
     required this.siteContext,
     this.message,
     required String title,
+    this.topicStatus,
     this.onShare,
     this.onViewOnWeb,
-    this.onSubscribe,
+    this.onNotifications,
     this.onClose,
-    this.onSticky,
-    this.onDelete,
+    this.onPin,
     this.onArchive,
-    this.onRename,
     this.onToggleVisibility,
+    this.onRename,
     this.onMove,
     this.onMerge,
+    this.onDelete,
+    this.onRecover,
+    this.onPermanentlyDelete,
     this.onRefresh,
-    this.isSubscribed = false,
-    this.showMarkRead = false,
-    this.isClosed = false,
-    this.isDeleted = false,
-    this.isSticky = false,
-    this.isArchived = false,
-    this.isVisible = true,
-    this.canSubscribe = false,
-    this.canClose = false,
-    this.canSticky = false,
-    this.canDelete = false,
-    this.canArchive = false,
-    this.canRename = false,
-    this.canToggleVisibility = false,
-    this.canMove = false,
-    this.canMerge = false,
     super.key,
   }) : _title = title;
 
@@ -80,34 +69,24 @@ class PostsPageAppBar extends StatefulWidget implements PreferredSizeWidget {
 
   /// Set when the page shows a private message.
   final PostsPageMessageMenu? message;
+
+  /// The topic's state and the viewer's permissions on it, once loaded:
+  /// which of web's topic actions to offer, and which way round.
+  final DiscourseTopicStatus? topicStatus;
   final VoidCallback? onShare;
   final VoidCallback? onViewOnWeb;
-  final VoidCallback? onSubscribe;
+  final VoidCallback? onNotifications;
   final VoidCallback? onClose;
-  final VoidCallback? onSticky;
-  final VoidCallback? onDelete;
+  final VoidCallback? onPin;
   final VoidCallback? onArchive;
-  final VoidCallback? onRename;
   final VoidCallback? onToggleVisibility;
+  final VoidCallback? onRename;
   final VoidCallback? onMove;
   final VoidCallback? onMerge;
+  final VoidCallback? onDelete;
+  final VoidCallback? onRecover;
+  final VoidCallback? onPermanentlyDelete;
   final VoidCallback? onRefresh;
-  final bool isSubscribed;
-  final bool showMarkRead;
-  final bool isClosed;
-  final bool isDeleted;
-  final bool isSticky;
-  final bool isArchived;
-  final bool isVisible;
-  final bool canSubscribe;
-  final bool canClose;
-  final bool canSticky;
-  final bool canDelete;
-  final bool canArchive;
-  final bool canRename;
-  final bool canToggleVisibility;
-  final bool canMove;
-  final bool canMerge;
 
   @override
   State<PostsPageAppBar> createState() => PostsPageAppBarState();
@@ -152,7 +131,6 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
 
   List<Widget> _buildActions(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     final message = widget.message;
     final l10n = AppLocalizations.of(context)!;
@@ -165,11 +143,54 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
               Icon(icon,
                   color: danger ? colorScheme.error : colorScheme.onSurfaceVariant),
               const SizedBox(width: DesignTokens.spacingM),
-              Text(label,
-                  style: danger ? TextStyle(color: colorScheme.error) : null),
+              Flexible(
+                child: Text(label,
+                    style: danger ? TextStyle(color: colorScheme.error) : null),
+              ),
             ],
           ),
         );
+
+    // Web's topic admin menu, for whoever Discourse lets act on the topic
+    // (TopicViewDetailsSerializer's can_* flags). A message keeps its own
+    // actions instead.
+    final s = message == null ? widget.topicStatus : null;
+    final level = widget.topicStatus?.notificationLevel ?? 1;
+    final staffItems = <PopupMenuEntry<String>>[
+      if (s != null && s.canClose)
+        s.closed
+            ? item('close', Icons.lock_open_rounded, l10n.openTopic)
+            : item('close', Icons.lock_outline_rounded, l10n.closeTopic),
+      if (s != null && s.canPinUnpin && !s.deleted)
+        s.isPinnedByStaff
+            ? item('pin', Icons.push_pin_outlined, l10n.unpinTopic)
+            : item('pin', Icons.push_pin_outlined, l10n.pinTopic),
+      if (s != null && s.canArchive)
+        s.archived
+            ? item('archive', Icons.unarchive_outlined, l10n.unarchiveTopic)
+            : item('archive', Icons.archive_outlined, l10n.archiveTopic),
+      if (s != null && s.canToggleVisibility)
+        s.visible
+            ? item('visibility', Icons.visibility_off_outlined, l10n.unlistTopic)
+            : item('visibility', Icons.visibility_outlined, l10n.listTopic),
+      if (s != null && s.canEdit)
+        item('rename', Icons.edit_outlined, l10n.renameTopic),
+      if (s != null && s.canEdit)
+        item('move', Icons.drive_file_move_outline, l10n.moveToCategory),
+      if (s != null && s.canMovePosts)
+        item('merge', Icons.merge_type_rounded, l10n.mergeIntoTopic),
+    ];
+    final deleteItems = <PopupMenuEntry<String>>[
+      if (s != null && s.deleted && s.canRecover)
+        item('recover', Icons.restore_from_trash_rounded, l10n.undeleteTopic),
+      if (s != null && s.deleted && s.canPermanentlyDelete)
+        item('permanently_delete', Icons.delete_forever_outlined,
+            l10n.permanentlyDelete,
+            danger: true),
+      if (s != null && !s.deleted && s.canDelete)
+        item('delete', Icons.delete_outline_rounded, l10n.deleteTopic,
+            danger: true),
+    ];
 
     return [
       if (message != null)
@@ -187,42 +208,11 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
           borderRadius: BorderRadius.circular(DesignTokens.radiusM),
         ),
         itemBuilder: (context) => [
-          PopupMenuItem(
-            value: 'refresh',
-            child: Row(
-              children: [
-                Icon(
-                  Icons.refresh_rounded,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: DesignTokens.spacingM),
-                Text(
-                  AppLocalizations.of(context)?.refresh ?? 'Refresh',
-                ),
-              ],
-            ),
-          ),
-          if (widget.siteContext.isLoggedIn && widget.canSubscribe && widget.onSubscribe != null)
-            PopupMenuItem(
-              value: 'subscribe',
-              child: Row(
-                children: [
-                  Icon(
-                    // Bell is filled when the user is at least at the
-                    // Tracking level on Discourse (the proxy maps this
-                    // to isSubscribed).
-                    widget.isSubscribed
-                        ? Icons.notifications_active
-                        : Icons.notifications_none,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Text(
-                    AppLocalizations.of(context)?.subscribe ?? 'Notifications',
-                  ),
-                ],
-              ),
-            ),
+          item('refresh', Icons.refresh_rounded, l10n.refresh),
+          if (widget.siteContext.isLoggedIn && widget.onNotifications != null)
+            // The bell of the reader's level, as web's tracking button.
+            item('notifications', notificationLevelLabel(l10n, level).$2,
+                l10n.notifications),
           // A message's own actions, as its page used to offer them.
           if (message != null) ...[
             message.isArchived
@@ -236,180 +226,18 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
                   ? item('msg_close', Icons.lock_open_outlined, l10n.openConversation)
                   : item('msg_close', Icons.lock_outline, l10n.closeConversation),
           ],
-          if (widget.siteContext.isLoggedIn && widget.canClose)
-            PopupMenuItem(
-              value: 'lock',
-              child: Row(
-                children: [
-                  Icon(
-                    widget.isClosed ? Icons.lock_open_rounded : Icons.lock_outline_rounded,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Text(
-                    widget.isClosed 
-                        ? (AppLocalizations.of(context)?.unlock ?? 'Unlock')
-                        : (AppLocalizations.of(context)?.lock ?? 'Lock'),
-                  ),
-                ],
-              ),
-            ),
-          if (widget.siteContext.isLoggedIn && widget.canSticky)
-            PopupMenuItem(
-              value: 'sticky',
-              child: Row(
-                children: [
-                  Icon(
-                    widget.isSticky ? Icons.push_pin_rounded : Icons.push_pin_outlined,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Text(
-                    widget.isSticky 
-                        ? (AppLocalizations.of(context)?.unstick ?? 'Unstick')
-                        : (AppLocalizations.of(context)?.stick ?? 'Stick'),
-                  ),
-                ],
-              ),
-            ),
-          if (widget.siteContext.isLoggedIn && widget.canArchive)
-            PopupMenuItem(
-              value: 'archive',
-              child: Row(
-                children: [
-                  Icon(
-                    widget.isArchived
-                        ? Icons.unarchive_outlined
-                        : Icons.archive_outlined,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Text(
-                    widget.isArchived ? 'Unarchive' : 'Archive',
-                  ),
-                ],
-              ),
-            ),
-          if (widget.siteContext.isLoggedIn && widget.canToggleVisibility)
-            PopupMenuItem(
-              value: 'visibility',
-              child: Row(
-                children: [
-                  Icon(
-                    widget.isVisible
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Text(
-                    widget.isVisible ? 'Unlist topic' : 'List topic',
-                  ),
-                ],
-              ),
-            ),
-          if (widget.siteContext.isLoggedIn && widget.canRename)
-            PopupMenuItem(
-              value: 'rename',
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.edit_outlined,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Text(
-                    AppLocalizations.of(context)!.renameTopic,
-                  ),
-                ],
-              ),
-            ),
-          // Phase 5.26 — Move topic (re-categorise). Rides on the
-          // same mod permissions as rename.
-          if (widget.siteContext.isLoggedIn && widget.canMove)
-            PopupMenuItem(
-              value: 'move',
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.drive_file_move_outline,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Text(
-                    AppLocalizations.of(context)!.moveToCategory,
-                  ),
-                ],
-              ),
-            ),
-          // Phase 5.26 — Merge into another topic. Mod-only.
-          if (widget.siteContext.isLoggedIn && widget.canMerge)
-            PopupMenuItem(
-              value: 'merge',
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.merge_type_rounded,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Text(
-                    AppLocalizations.of(context)!.mergeIntoTopic,
-                  ),
-                ],
-              ),
-            ),
-          if (widget.siteContext.isLoggedIn && widget.canDelete)
-            PopupMenuItem(
-              value: 'delete',
-              child: Row(
-                children: [
-                  Icon(
-                    widget.isDeleted ? Icons.restore_from_trash_rounded : Icons.delete_outline_rounded,
-                    color: colorScheme.error,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Text(
-                    widget.isDeleted ? (AppLocalizations.of(context)?.undelete ?? 'Undelete') : (AppLocalizations.of(context)?.delete ?? 'Delete'),
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.error,
-                    ),
-                  ),
-                ],
-              ),
-            ),
           if (widget.onShare != null)
-            PopupMenuItem(
-              value: 'share',
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.share_rounded,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Text(
-                    AppLocalizations.of(context)?.share ?? 'Share',
-                  ),
-                ],
-              ),
-            ),
+            item('share', Icons.share_rounded, l10n.share),
           if (widget.onViewOnWeb != null)
-            PopupMenuItem(
-              value: 'view_on_web',
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.open_in_browser_rounded,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingM),
-                  Text(
-                    AppLocalizations.of(context)?.viewOnWeb ?? 'View on Web',
-                  ),
-                ],
-              ),
-            ),
+            item('view_on_web', Icons.open_in_browser_rounded, l10n.viewOnWeb),
+          if (staffItems.isNotEmpty) ...[
+            const PopupMenuDivider(),
+            ...staffItems,
+          ],
+          if (deleteItems.isNotEmpty) ...[
+            const PopupMenuDivider(),
+            ...deleteItems,
+          ],
           if (message?.onLeave != null || message?.onDelete != null)
             const PopupMenuDivider(),
           if (message?.onLeave != null)
@@ -423,218 +251,51 @@ class PostsPageAppBarState extends State<PostsPageAppBar> {
           switch (value) {
             case 'msg_archive':
               message?.onArchive();
-              break;
             case 'msg_unread':
               message?.onMarkUnread();
-              break;
             case 'msg_edit':
               message?.onEditTitle?.call();
-              break;
             case 'msg_close':
               message?.onClose?.call();
-              break;
             case 'msg_leave':
               message?.onLeave?.call();
-              break;
             case 'msg_delete':
               message?.onDelete?.call();
-              break;
             case 'refresh':
               widget.onRefresh?.call();
-              break;
-            case 'subscribe':
-              widget.onSubscribe?.call();
-              break;
+            case 'notifications':
+              widget.onNotifications?.call();
             case 'share':
               widget.onShare?.call();
-              break;
             case 'view_on_web':
               widget.onViewOnWeb?.call();
-              break;
+            // Web acts on these at once: each is undone from the same menu,
+            // and leaves a "Closed 1 minute ago" line in the topic.
+            case 'close':
+              widget.onClose?.call();
+            case 'pin':
+              widget.onPin?.call();
             case 'archive':
-              _confirmAndDo(
-                context: context,
-                title: widget.isArchived ? 'Unarchive Topic' : 'Archive Topic',
-                body: widget.isArchived
-                    ? 'Reopen the topic for replies and edits?'
-                    : 'Archiving locks the topic against any further '
-                        'replies and edits. Existing content stays visible.',
-                confirmLabel: widget.isArchived ? 'Unarchive' : 'Archive',
-                onConfirm: () => widget.onArchive?.call(),
-              );
-              break;
+              widget.onArchive?.call();
             case 'visibility':
-              _confirmAndDo(
-                context: context,
-                title: widget.isVisible ? 'Unlist Topic' : 'List Topic',
-                body: widget.isVisible
-                    ? 'Unlisted topics stay accessible by URL but are '
-                        'hidden from category and Latest listings.'
-                    : 'Re-list this topic so it appears in category and '
-                        'Latest listings again.',
-                confirmLabel:
-                    widget.isVisible ? 'Unlist' : 'List',
-                onConfirm: () => widget.onToggleVisibility?.call(),
-              );
-              break;
+              widget.onToggleVisibility?.call();
             case 'rename':
               _showRenameDialog(context: context);
-              break;
-            // Phase 5.26 — Move + Merge handlers fire callbacks
-            // owned by `post_page.dart`. The handlers there show
-            // their own picker UI (category sheet for move; topic-
-            // id dialog for merge) and call the moderation proxy.
+            // Move and merge show their own pickers (post_page.dart).
             case 'move':
               widget.onMove?.call();
-              break;
             case 'merge':
               widget.onMerge?.call();
-              break;
-            case 'lock':
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text(
-                      widget.isClosed ? 'Unlock Topic' : 'Lock Topic',
-                    ),
-                    content: Text(
-                      widget.isClosed
-                          ? 'Are you sure you want to unlock this topic? Other users will be able to reply and interact with it again.'
-                          : 'Are you sure you want to lock this topic? Other users will not be able to reply or interact with it.',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(AppLocalizations.of(context)!.cancel),
-                      ),
-                      FilledButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          widget.onClose?.call();
-                        },
-                        child: Text(widget.isClosed ? 'Unlock' : 'Lock'),
-                      ),
-                    ],
-                  );
-                },
-              );
-              break;
-            case 'sticky':
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text(
-                      widget.isSticky ? 'Unstick Topic' : 'Stick Topic',
-                    ),
-                    content: Text(
-                      widget.isSticky
-                          ? 'Are you sure you want to unstick this topic? It will no longer appear at the top of the forum.'
-                          : 'Are you sure you want to stick this topic? It will appear at the top of the forum for all users.',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(AppLocalizations.of(context)!.cancel),
-                      ),
-                      FilledButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          widget.onSticky?.call();
-                        },
-                        child: Text(widget.isSticky ? 'Unstick' : 'Stick'),
-                      ),
-                    ],
-                  );
-                },
-              );
-              break;
             case 'delete':
-              // For undelete, show simple confirmation dialog
-              if (widget.isDeleted) {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text(
-                        AppLocalizations.of(context)!.undeleteTopic,
-                      ),
-                      content: Text(
-                        AppLocalizations.of(context)!.undeleteTopicConfirmation,
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(AppLocalizations.of(context)!.cancel),
-                        ),
-                        FilledButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            widget.onDelete?.call();
-                          },
-                          style: FilledButton.styleFrom(
-                            backgroundColor: colorScheme.error,
-                            foregroundColor: colorScheme.onError,
-                          ),
-                          child: Text(
-                            AppLocalizations.of(context)?.undelete ?? 'Undelete',
-                            style: textTheme.labelLarge?.copyWith(
-                              color: colorScheme.onError,
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              } else {
-                // For delete, let _handleDelete show the comprehensive dialog
-                widget.onDelete?.call();
-              }
-              break;
+              widget.onDelete?.call();
+            case 'recover':
+              widget.onRecover?.call();
+            case 'permanently_delete':
+              widget.onPermanentlyDelete?.call();
           }
         },
       ),
     ];
-  }
-
-  /// Generic confirm-dialog helper used by the archive / unlist actions.
-  void _confirmAndDo({
-    required BuildContext context,
-    required String title,
-    required String body,
-    required String confirmLabel,
-    required VoidCallback onConfirm,
-  }) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(body),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(AppLocalizations.of(context)!.cancel),
-            ),
-            FilledButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                onConfirm();
-              },
-              child: Text(confirmLabel),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   /// Rename-topic dialog. Pre-fills the current title and emits the

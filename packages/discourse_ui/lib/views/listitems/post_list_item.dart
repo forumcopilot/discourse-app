@@ -28,6 +28,7 @@ import '../../utils/like_cooldown.dart';
 import '../widgets/post_actions.dart';
 import '../widgets/thread_poll_card.dart';
 import 'small_action_notice.dart';
+import '../widgets/topic_status.dart';
 import '../../controllers/post_controller.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import '../../utils/cooked_content.dart';
@@ -647,11 +648,22 @@ class _PostListItemState extends State<PostListItem> {
           // Show topic title for the first post (topic starter)
           if (widget.post.postNumber == 1 && widget.topicTitle.isNotEmpty) ...[
             // The page's headline: titleLarge, as the app bar sets the
-            // same title (it was 16sp w700, smaller than the bar's).
-            Text(
-              widget.topicTitle,
-              style: textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurface,
+            // same title (it was 16sp w700, smaller than the bar's). Led,
+            // as on web, by the topic's status icons: closed, pinned,
+            // unlisted.
+            TopicStatusBuilder(
+              siteContext: widget.siteContext,
+              topicId: widget.threadId,
+              builder: (context, status) => Text.rich(
+                TextSpan(children: [
+                  ...topicStatusSpans(context, status,
+                      size: MediaQuery.textScalerOf(context).scale(
+                          (textTheme.titleLarge?.fontSize ?? 22) * 0.8)),
+                  TextSpan(text: widget.topicTitle),
+                ]),
+                style: textTheme.titleLarge?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
               ),
             ),
             // A message has no category: who is on it goes here instead.

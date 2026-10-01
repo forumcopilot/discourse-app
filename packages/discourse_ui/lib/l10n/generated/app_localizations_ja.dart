@@ -158,40 +158,19 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get pleaseLoginToSubscribe => 'このスレッドを null するにはログインしてください';
-
-  @override
-  String get subscribe => '購読';
-
-  @override
-  String get failedToSubscribeToThread => 'スレッドの null に失敗しました';
-
-  @override
   String get youCannotReplyToThisThread => 'このスレッドに返信できません';
 
   @override
   String get pleaseWaitForThreadToLoad => 'スレッドの読み込みを待ってください';
 
   @override
-  String get softDelete => 'ソフト削除';
-
-  @override
   String get postCanBeRestoredLater => '投稿は後で復元できます';
-
-  @override
-  String get hardDelete => '完全削除';
 
   @override
   String get postWillBePermanentlyDeleted => '投稿は完全に削除されます';
 
   @override
-  String get reasonForDeletion => '削除理由';
-
-  @override
   String get enterReasonForDeletingPost => 'この投稿を削除する理由を入力してください';
-
-  @override
-  String get pleaseEnterReasonForDeletion => '削除理由を入力してください';
 
   @override
   String get reportPost => '投稿を報告';
@@ -285,12 +264,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get topicOpened => 'トピックが開かれました';
-
-  @override
-  String get topicStickied => 'トピックが固定されました';
-
-  @override
-  String get topicUnstickied => 'トピックの固定が解除されました';
 
   @override
   String cannotEditMessage(String error) {
@@ -610,9 +583,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get enterKeywordsToSearchTopics => 'トピックを検索するキーワードを入力...';
 
   @override
-  String get undelete => '復元';
-
-  @override
   String get refresh => '更新';
 
   @override
@@ -620,18 +590,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get viewOnWeb => 'Webで表示';
-
-  @override
-  String get unlock => 'ロック解除';
-
-  @override
-  String get lock => 'ロック';
-
-  @override
-  String get stick => '固定';
-
-  @override
-  String get unstick => '固定解除';
 
   @override
   String get reply => '返信';
@@ -697,15 +655,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get deleteTopic => 'トピックを削除';
-
-  @override
-  String get topicCanBeRestoredLater => 'トピックは後で復元できます';
-
-  @override
-  String get topicWillBePermanentlyDeleted => 'トピックは完全に削除されます';
-
-  @override
-  String get enterReasonForDeletingTopic => 'このトピックを削除する理由を入力してください';
 
   @override
   String get pleaseSelectEndDate => '終了日を選択してください';
@@ -1393,10 +1342,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moveToCategory => 'カテゴリに移動';
 
   @override
-  String get undeleteTopic => 'トピックを復元';
-
-  @override
-  String get undeleteTopicConfirmation => 'このトピックを復元しますか？他のユーザーに再び表示されます。';
+  String get undeleteTopic => 'トピックの削除を取り消す';
 
   @override
   String get send => '送信';
@@ -1517,18 +1463,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String refreshFailed(Object error) {
     return '更新に失敗しました: $error';
   }
-
-  @override
-  String get topicDeletedBanner => 'このトピックは削除され、他のユーザーには表示されません';
-
-  @override
-  String get topicClosedBanner => 'このトピックはクローズされ、返信できません';
-
-  @override
-  String get topicPinnedBanner => 'このトピックはフォーラムの先頭に固定されています';
-
-  @override
-  String get youAreSubscribedToThisTopic => 'このトピックを購読しています';
 
   @override
   String get refreshing => '更新中...';
@@ -3457,4 +3391,335 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get youParenthetical => '（あなた）';
+
+  @override
+  String get topicStatusClosedHelp => 'このトピックはクローズしています。新たに返信することはできません。';
+
+  @override
+  String get topicStatusArchivedHelp => 'このトピックはアーカイブされています。凍結状態のため一切の変更ができません';
+
+  @override
+  String get topicStatusClosedArchivedHelp =>
+      'このトピックはクローズされ、アーカイブされています。新しい返信を受け入れず、変更することはできません';
+
+  @override
+  String get topicStatusPinnedTitle => '固定';
+
+  @override
+  String get topicStatusPinnedHelp => 'このトピックは固定されています。常にカテゴリのトップに表示されます';
+
+  @override
+  String get topicStatusPinnedGloballyTitle => '全体に固定';
+
+  @override
+  String get topicStatusPinnedGloballyHelp =>
+      'このトピックは全体に固定されています。常に最新とカテゴリのトップに表示されます';
+
+  @override
+  String get topicStatusUnpinnedTitle => '固定解除';
+
+  @override
+  String get topicStatusUnpinnedHelp => 'このトピックは固定解除されています。 通常の順番で表示されます';
+
+  @override
+  String get topicStatusUnlistedHelp =>
+      'このトピックは未掲載です。トピックリストには表示されません。直リンクでのみアクセス可能です。';
+
+  @override
+  String get topicStatusWarningHelp => 'これは運営スタッフからの警告です。';
+
+  @override
+  String get notificationReasonWatchingTag => 'このトピックのタグをウォッチしているため通知されます。';
+
+  @override
+  String get notificationReasonWatchingCategory => 'このカテゴリをウォッチしているため通知されます。';
+
+  @override
+  String get notificationReasonWatchingAuto => 'このトピックを自動的にウォッチし始めたため通知されます。';
+
+  @override
+  String get notificationReasonWatching => 'このトピックをウォッチしているため通知されます。';
+
+  @override
+  String get notificationReasonWatchingCreated => 'このトピックを作成したため通知されます。';
+
+  @override
+  String get notificationReasonTrackingCategory =>
+      'このカテゴリを追跡しているため、新しい返信の件数が表示されます。';
+
+  @override
+  String get notificationReasonTrackingReplied =>
+      'このトピックに返信したので、新しい返信の件数が表示されます。';
+
+  @override
+  String get notificationReasonTracking => 'このトピックを追跡しているので、新しい返信の件数が表示されます。';
+
+  @override
+  String get notificationReasonTrackingRead =>
+      'このトピックを読んでいるため、新しい返信の件数が表示されます。';
+
+  @override
+  String get notificationReasonNormal =>
+      '誰かが @ユーザー名であなたをメンションしたり、あなたに返信したりすると通知が送信されます。';
+
+  @override
+  String get notificationReasonMutedCategory => 'このカテゴリのすべての通知を無視しています。';
+
+  @override
+  String get notificationReasonMuted => 'このトピックのすべての通知を無視しています。';
+
+  @override
+  String get notificationLevelWatching => 'ウォッチ中';
+
+  @override
+  String get notificationLevelWatchingFirstPost => '最初の投稿をウォッチ中';
+
+  @override
+  String get notificationLevelTracking => '追跡中';
+
+  @override
+  String get notificationLevelNormal => '通常';
+
+  @override
+  String get notificationLevelMuted => 'ミュート';
+
+  @override
+  String get topicWatchingDescription => 'このトピックに返信があるたびに通知され、新しい返信の件数が表示されます。';
+
+  @override
+  String get topicTrackingDescription =>
+      'このトピックの新しい返信の件数が表示されます。誰かが@ユーザー名であなたをメンションしたり、あなたに返信したりすると通知が送信されます。';
+
+  @override
+  String get topicNormalDescription =>
+      '誰かが @ユーザー名であなたをメンションしたり、あなたに返信したりすると通知が送信されます。';
+
+  @override
+  String get topicMutedDescription => 'このトピックについて何も通知されず、最新にも表示されません。';
+
+  @override
+  String get messageWatchingDescription =>
+      'このメッセージに返信があるたびに通知され、新しい返信の件数が表示されます。';
+
+  @override
+  String get messageTrackingDescription =>
+      'このメッセージの新しい返信の件数が表示されます。誰かが@ユーザー名であなたをメンションしたり、あなたに返信したりすると通知が送信されます。';
+
+  @override
+  String get messageNormalDescription =>
+      '誰かが @ユーザー名であなたをメンションしたり、あなたに返信したりすると通知が送信されます。';
+
+  @override
+  String get messageMutedDescription => 'このメッセージに関する通知を受け取りません。';
+
+  @override
+  String get categoryWatchingDescription =>
+      'このカテゴリのすべてのトピックを自動的にウォッチします。各トピックに新しい投稿があるたびに通知され、新しい返信の数が表示されます。';
+
+  @override
+  String get categoryWatchingFirstPostDescription =>
+      'このカテゴリの新しいトピックについて通知されますが、トピックへの返信は通知されません。';
+
+  @override
+  String get categoryTrackingDescription =>
+      'カテゴリ内のすべてのトピックを自動的に追跡します。誰かがあなたを @name でメンションした場合やあなたに返信した場合は通知され、新しい返信の数が表示されます。';
+
+  @override
+  String get categoryNormalDescription =>
+      '誰かが @ユーザー名であなたをメンションしたり、あなたに返信したりすると通知が送信されます。';
+
+  @override
+  String get categoryMutedDescription =>
+      'このカテゴリの新しいトピックについて何も通知されません。また最新にも表示されません。';
+
+  @override
+  String get tagWatchingDescription =>
+      'このタグのついたすべてのトピックを自動的にウォッチします。すべての新しい投稿とトピックが通知され、トピックの隣に未読と新しい投稿の件数が表示されます。';
+
+  @override
+  String get tagWatchingFirstPostDescription =>
+      'このタグの新規トピックは通知されますが、トピックへの返信は通知されません。';
+
+  @override
+  String get tagTrackingDescription =>
+      'このタグが付いたすべてのトピックを自動的に追跡します。トピックの隣に未読と新しい投稿の件数が表示されます。';
+
+  @override
+  String get tagNormalDescription =>
+      '誰かが @ユーザー名であなたをメンションしたり、あなたの投稿に返信したりすると通知が送信されます。';
+
+  @override
+  String get tagMutedDescription =>
+      'このタグのついた新しいトピックについては何も通知されず、未読タブにも表示されません。';
+
+  @override
+  String topicTimerAutoOpen(String timeLeft) {
+    return 'このトピックは$timeLeftに自動的にオープンします。';
+  }
+
+  @override
+  String topicTimerAutoClose(String timeLeft) {
+    return 'このトピックは$timeLeftに自動的にクローズします。';
+  }
+
+  @override
+  String topicTimerAutoPublish(String categoryName, String timeLeft) {
+    return 'このトピックは$timeLeftに #$categoryName に公開されます。';
+  }
+
+  @override
+  String topicTimerAutoCloseAfterLastPost(String duration) {
+    return 'このトピックは最後の返信から$duration後にクローズされます。';
+  }
+
+  @override
+  String topicTimerAutoDeleteAfterLastPost(String duration) {
+    return 'このトピックは最後の返信から$duration後に削除されます。';
+  }
+
+  @override
+  String topicTimerAutoDelete(String timeLeft) {
+    return 'このトピックは$timeLeftに自動的に削除されます。';
+  }
+
+  @override
+  String topicTimerAutoBump(String timeLeft) {
+    return 'このトピックは$timeLeftに自動的にバンプされます。';
+  }
+
+  @override
+  String topicTimerAutoDeleteReplies(String duration) {
+    return 'このトピックへの返信は、$duration後に自動的に削除されます。';
+  }
+
+  @override
+  String slowModeNotice(String duration) {
+    return 'このトピックでは次の投稿まで$durationお待ちください。';
+  }
+
+  @override
+  String get closeTopic => 'トピックをクローズ';
+
+  @override
+  String get openTopic => 'トピックをオープン';
+
+  @override
+  String get pinTopic => 'トピックを固定';
+
+  @override
+  String get unpinTopic => 'トピックを固定解除';
+
+  @override
+  String get archiveTopic => 'トピックをアーカイブ';
+
+  @override
+  String get unarchiveTopic => 'トピックをアーカイブ解除';
+
+  @override
+  String get unlistTopic => 'トピックを非表示';
+
+  @override
+  String get listTopic => 'トピックを表示';
+
+  @override
+  String get permanentlyDelete => '永久に削除';
+
+  @override
+  String get permanentlyDeleteTopicConfirmation =>
+      'この操作は取り消せません。このトピックは完全に削除され、データベースから消去されます。';
+
+  @override
+  String get deleteTopicConfirmYes => 'はい。このトピックを削除する';
+
+  @override
+  String get deleteTopicConfirmNo => 'いいえ。このトピックを維持する';
+
+  @override
+  String get topicPinned => 'トピックを固定しました';
+
+  @override
+  String get topicUnpinned => 'トピックの固定を解除しました';
+
+  @override
+  String get topicArchived => 'トピックをアーカイブしました';
+
+  @override
+  String get topicUnarchived => 'トピックのアーカイブを解除しました';
+
+  @override
+  String get topicUnlisted => 'トピックを非表示にしました';
+
+  @override
+  String get topicListed => 'トピックを表示しました';
+
+  @override
+  String get topicRecovered => 'トピックの削除を取り消しました';
+
+  @override
+  String topicActionFailed(String error) {
+    return 'トピックを更新できませんでした: $error';
+  }
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count分',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count時間',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count日',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count分後',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count時間後',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count日後',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get topicStatusDeletedHelp => 'このトピックは削除され、他のユーザーには表示されません';
 }

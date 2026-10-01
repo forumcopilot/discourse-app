@@ -163,15 +163,6 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get pleaseLoginToSubscribe => 'Accedi per null questo thread';
-
-  @override
-  String get subscribe => 'Iscriviti';
-
-  @override
-  String get failedToSubscribeToThread => 'Impossibile null thread';
-
-  @override
   String get youCannotReplyToThisThread =>
       'Non puoi rispondere a questo thread';
 
@@ -179,29 +170,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get pleaseWaitForThreadToLoad => 'Attendi che il thread si carichi';
 
   @override
-  String get softDelete => 'Eliminazione soft';
-
-  @override
   String get postCanBeRestoredLater =>
       'Il post può essere ripristinato in seguito';
-
-  @override
-  String get hardDelete => 'Eliminazione permanente';
 
   @override
   String get postWillBePermanentlyDeleted =>
       'Il post verrà eliminato permanentemente';
 
   @override
-  String get reasonForDeletion => 'Motivo dell\'eliminazione';
-
-  @override
   String get enterReasonForDeletingPost =>
       'Inserisci il motivo per eliminare questo post';
-
-  @override
-  String get pleaseEnterReasonForDeletion =>
-      'Inserisci un motivo per l\'eliminazione';
 
   @override
   String get reportPost => 'Segnala post';
@@ -302,12 +280,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get topicOpened => 'Argomento aperto';
-
-  @override
-  String get topicStickied => 'Argomento in evidenza';
-
-  @override
-  String get topicUnstickied => 'Argomento rimosso da evidenza';
 
   @override
   String cannotEditMessage(String error) {
@@ -632,9 +604,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Inserisci parole chiave per cercare argomenti...';
 
   @override
-  String get undelete => 'Ripristina';
-
-  @override
   String get refresh => 'Aggiorna';
 
   @override
@@ -642,18 +611,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get viewOnWeb => 'Visualizza sul Web';
-
-  @override
-  String get unlock => 'Sblocca';
-
-  @override
-  String get lock => 'Blocca';
-
-  @override
-  String get stick => 'Appunta';
-
-  @override
-  String get unstick => 'Rimuovi appuntamento';
 
   @override
   String get reply => 'Rispondi';
@@ -725,19 +682,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get reportSubmittedSuccessfully => 'Segnalazione inviata con successo';
 
   @override
-  String get deleteTopic => 'Elimina argomento';
-
-  @override
-  String get topicCanBeRestoredLater =>
-      'L\'argomento può essere ripristinato in seguito';
-
-  @override
-  String get topicWillBePermanentlyDeleted =>
-      'L\'argomento sarà eliminato permanentemente';
-
-  @override
-  String get enterReasonForDeletingTopic =>
-      'Inserisci il motivo per eliminare questo argomento';
+  String get deleteTopic => 'Cancella Argomento';
 
   @override
   String get pleaseSelectEndDate => 'Seleziona una data di fine';
@@ -1445,11 +1390,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get moveToCategory => 'Sposta in categoria';
 
   @override
-  String get undeleteTopic => 'Ripristina argomento';
-
-  @override
-  String get undeleteTopicConfirmation =>
-      'Ripristinare questo argomento? Tornerà visibile agli altri utenti.';
+  String get undeleteTopic => 'Ripristina Argomento';
 
   @override
   String get send => 'Invia';
@@ -1576,21 +1517,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String refreshFailed(Object error) {
     return 'Aggiornamento non riuscito: $error';
   }
-
-  @override
-  String get topicDeletedBanner =>
-      'Questo argomento è stato eliminato ed è nascosto agli altri utenti';
-
-  @override
-  String get topicClosedBanner =>
-      'Questo argomento è chiuso e non accetta più risposte';
-
-  @override
-  String get topicPinnedBanner =>
-      'Questo argomento è in evidenza in cima al forum';
-
-  @override
-  String get youAreSubscribedToThisTopic => 'Sei iscritto a questo argomento';
 
   @override
   String get refreshing => 'Aggiornamento...';
@@ -3605,4 +3531,358 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get youParenthetical => '(tu)';
+
+  @override
+  String get topicStatusClosedHelp =>
+      'Questo argomento è chiuso; non sono ammesse nuove risposte';
+
+  @override
+  String get topicStatusArchivedHelp =>
+      'Questo argomento è archiviato; è bloccato e non può essere modificato';
+
+  @override
+  String get topicStatusClosedArchivedHelp =>
+      'Questo argomento è chiuso e archiviato; non sono ammesse nuove risposte e non può essere modificato';
+
+  @override
+  String get topicStatusPinnedTitle => 'Appuntato';
+
+  @override
+  String get topicStatusPinnedHelp =>
+      'Questo argomento è appuntato per te; verrà mostrato in cima alla sua categoria';
+
+  @override
+  String get topicStatusPinnedGloballyTitle => 'Appuntato Globalmente';
+
+  @override
+  String get topicStatusPinnedGloballyHelp =>
+      'Questo argomento è appuntato globalmente; verrà mostrato sempre in cima sia agli argomenti recenti sia nella sua categoria.';
+
+  @override
+  String get topicStatusUnpinnedTitle => 'Spuntato';
+
+  @override
+  String get topicStatusUnpinnedHelp =>
+      'Questo argomento è sbloccato per te; verrà visualizzato in ordine normale';
+
+  @override
+  String get topicStatusUnlistedHelp =>
+      'Questo argomento è invisibile: non verrà mostrato negli elenchi argomenti ed è possibile accedervi solo tramite collegamento diretto.';
+
+  @override
+  String get topicStatusWarningHelp => 'Questo è un avvertimento ufficiale.';
+
+  @override
+  String get notificationReasonWatchingTag =>
+      'Riceverai notifiche perché stai osservando un\'etichetta in questo argomento.';
+
+  @override
+  String get notificationReasonWatchingCategory =>
+      'Riceverai notifiche perché stai osservando questa categoria.';
+
+  @override
+  String get notificationReasonWatchingAuto =>
+      'Riceverai notifiche poiché hai iniziato ad osservare questo argomento automaticamente.';
+
+  @override
+  String get notificationReasonWatching =>
+      'Riceverai notifiche perché stai osservando questo argomento.';
+
+  @override
+  String get notificationReasonWatchingCreated =>
+      'Riceverai notifiche perché hai creato questo argomento.';
+
+  @override
+  String get notificationReasonTrackingCategory =>
+      'Vedrai un conteggio delle nuove risposte perché stai seguendo questa categoria.';
+
+  @override
+  String get notificationReasonTrackingReplied =>
+      'Vedrai un conteggio delle nuove risposte perché hai pubblicato una risposta in questo argomento.';
+
+  @override
+  String get notificationReasonTracking =>
+      'Vedrai un conteggio delle nuove risposte perché stai seguendo questo argomento.';
+
+  @override
+  String get notificationReasonTrackingRead =>
+      'Vedrai un conteggio delle nuove risposte perché hai letto questo argomento.';
+
+  @override
+  String get notificationReasonNormal =>
+      'Riceverai notifiche se qualcuno menziona il tuo @nome o ti risponde.';
+
+  @override
+  String get notificationReasonMutedCategory =>
+      'Stai ignorando tutte le notifiche di questa categoria.';
+
+  @override
+  String get notificationReasonMuted =>
+      'Stai ignorando tutte le notifiche di questo argomento.';
+
+  @override
+  String get notificationLevelWatching => 'In osservazione';
+
+  @override
+  String get notificationLevelWatchingFirstPost =>
+      'Osservazione Primo Messaggio';
+
+  @override
+  String get notificationLevelTracking => 'Seguito';
+
+  @override
+  String get notificationLevelNormal => 'Normale';
+
+  @override
+  String get notificationLevelMuted => 'Silenziato';
+
+  @override
+  String get topicWatchingDescription =>
+      'Riceverai una notifica per ogni nuova risposta in questo argomento, e comparirà un conteggio delle nuove risposte.';
+
+  @override
+  String get topicTrackingDescription =>
+      'Per questo argomento apparirà un conteggio delle nuove risposte. Riceverai una notifica se qualcuno menziona il tuo @nome o ti risponde.';
+
+  @override
+  String get topicNormalDescription =>
+      'Riceverai una notifica se qualcuno menziona il tuo @nome o ti risponde.';
+
+  @override
+  String get topicMutedDescription =>
+      'Non riceverai mai notifiche di alcun tipo su questo argomento, che non apparirà tra i più recenti.';
+
+  @override
+  String get messageWatchingDescription =>
+      'Riceverai una notifica per ogni nuova risposta a questo messaggio, e comparirà un conteggio delle nuove risposte.';
+
+  @override
+  String get messageTrackingDescription =>
+      'Per questo messaggio personale apparirà un conteggio delle nuove risposte. Riceverai una notifica se qualcuno menziona il tuo @nome o ti risponde.';
+
+  @override
+  String get messageNormalDescription =>
+      'Riceverai una notifica se qualcuno menziona il tuo @nome o ti risponde.';
+
+  @override
+  String get messageMutedDescription =>
+      'Non riceverai mai notifiche di alcun tipo per questo messaggio.';
+
+  @override
+  String get categoryWatchingDescription =>
+      'Osserverai automaticamente tutti gli argomenti in questa categoria. Riceverai notifiche per ogni nuovo messaggio in ogni argomento, e apparirà il conteggio delle nuove risposte.';
+
+  @override
+  String get categoryWatchingFirstPostDescription =>
+      'Riceverai una notifica di nuovi argomenti in questa categoria, ma non per le risposte agli argomenti.';
+
+  @override
+  String get categoryTrackingDescription =>
+      'Seguirai automaticamente tutti gli argomenti in questa categoria. Riceverai una notifica se qualcuno menziona il tuo @nome o ti risponde, e apparirà un conteggio delle nuove risposte.';
+
+  @override
+  String get categoryNormalDescription =>
+      'Riceverai una notifica se qualcuno menziona il tuo @nome o ti risponde.';
+
+  @override
+  String get categoryMutedDescription =>
+      'Non riceverai notifiche circa i nuovi argomenti in questa categoria, inoltre essi non appariranno tra i \"Più recenti\".';
+
+  @override
+  String get tagWatchingDescription =>
+      'Visualizzerai automaticamente tutti gli Argomenti con questa Etichetta. Riceverai una notifica per tutti i nuovi messaggi e Argomenti. Inoltre, accanto all\'Argomento apparirà il conteggio dei messaggi non letti e di quelli nuovi.';
+
+  @override
+  String get tagWatchingFirstPostDescription =>
+      'Riceverai una notifica se saranno aperti nuovi Argomenti in questa Etichetta, ma non per le risposte agli Argomenti.';
+
+  @override
+  String get tagTrackingDescription =>
+      'Seguirai automaticamente tutti gli argomenti con questa etichetta. Accanto all\'argomento apparirà un conteggio dei messaggi non letti e nuovi.';
+
+  @override
+  String get tagNormalDescription =>
+      'Riceverai una notifica se qualcuno menziona il tuo @nome o risponde al tuo messaggio.';
+
+  @override
+  String get tagMutedDescription =>
+      'Non riceverai alcuna notifica per nuovi Argomenti con questa Etichetta, e non compariranno nella pagina dei messaggi non letti.';
+
+  @override
+  String topicTimerAutoOpen(String timeLeft) {
+    return 'Questo argomento verrà automaticamente aperto $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoClose(String timeLeft) {
+    return 'Questo argomento si chiuderà automaticamente $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoPublish(String categoryName, String timeLeft) {
+    return 'Questo argomento verrà pubblicato su #$categoryName $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoCloseAfterLastPost(String duration) {
+    return 'Questo Argomento si chiuderà $duration dopo l\'ultima risposta.';
+  }
+
+  @override
+  String topicTimerAutoDeleteAfterLastPost(String duration) {
+    return 'Questo argomento verrà cancellato $duration dopo l\'ultima risposta.';
+  }
+
+  @override
+  String topicTimerAutoDelete(String timeLeft) {
+    return 'Questo argomento verrà automaticamente cancellato $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoBump(String timeLeft) {
+    return 'Questo argomento sarà riproposto automaticamente $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoDeleteReplies(String duration) {
+    return 'Le risposte in questo argomento vengono automaticamente cancellate dopo $duration.';
+  }
+
+  @override
+  String slowModeNotice(String duration) {
+    return 'Attendi $duration tra un tuo messaggio e l\'altro in questo argomento.';
+  }
+
+  @override
+  String get closeTopic => 'Chiudi Argomento';
+
+  @override
+  String get openTopic => 'Apri Argomento';
+
+  @override
+  String get pinTopic => 'Appunta Argomento';
+
+  @override
+  String get unpinTopic => 'Spunta Argomento';
+
+  @override
+  String get archiveTopic => 'Archivia Argomento';
+
+  @override
+  String get unarchiveTopic => 'Annulla archiviazione Argomento';
+
+  @override
+  String get unlistTopic => 'Nascondi argomento';
+
+  @override
+  String get listTopic => 'Metti l\'argomento in elenco';
+
+  @override
+  String get permanentlyDelete => 'Elimina definitivamente';
+
+  @override
+  String get permanentlyDeleteTopicConfirmation =>
+      'Questa azione non può essere annullata. L\'argomento verrà eliminato definitivamente dal database.';
+
+  @override
+  String get deleteTopicConfirmYes => 'Sì, elimina questo argomento';
+
+  @override
+  String get deleteTopicConfirmNo => 'No, mantieni questo argomento';
+
+  @override
+  String get topicPinned => 'Argomento appuntato';
+
+  @override
+  String get topicUnpinned => 'Argomento non più appuntato';
+
+  @override
+  String get topicArchived => 'Argomento archiviato';
+
+  @override
+  String get topicUnarchived => 'Argomento non più archiviato';
+
+  @override
+  String get topicUnlisted => 'Argomento nascosto';
+
+  @override
+  String get topicListed => 'Argomento messo in elenco';
+
+  @override
+  String get topicRecovered => 'Argomento ripristinato';
+
+  @override
+  String topicActionFailed(String error) {
+    return 'Impossibile aggiornare l\'argomento: $error';
+  }
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minuti',
+      one: '1 minuto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ore',
+      one: '1 ora',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count giorni',
+      one: '1 giorno',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'tra $count minuti',
+      one: 'tra 1 minuto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'tra $count ore',
+      one: 'tra 1 ora',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'tra $count giorni',
+      one: 'tra 1 giorno',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get topicStatusDeletedHelp =>
+      'Questo argomento è stato eliminato ed è nascosto agli altri utenti';
 }

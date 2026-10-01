@@ -13,6 +13,7 @@ import '../context/discourse_site_context_extension.dart';
 import '../util/html_text.dart';
 import '../data/topic/discourse_topic_slugs.dart';
 import '../data/topic/discourse_topic_tracking.dart';
+import '../data/topic/discourse_topic_status.dart';
 import '../util/discourse_link.dart';
 import '../util/site_url.dart';
 
@@ -332,6 +333,30 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       return true;
     } catch (_) {
       return false;
+    }
+  }
+
+  /// Discourse-only: web's Pinned / Unpinned choice (PinnedOptions). A pin
+  /// is cleared per reader: PUT /t/{id}/clear-pin lists a pinned topic in
+  /// regular order for the viewer alone, PUT /t/{id}/re-pin puts it back on
+  /// top (TopicsController#clear_pin, #re_pin). The pin stays for everyone
+  /// else. Records the change in [DiscourseTopicStatus] on success; returns
+  /// null then, else why it failed.
+  Future<String?> setPinnedForMeAsync(String topicId,
+      {required bool pinned}) async {
+    try {
+      await apiPut('/t/$topicId/${pinned ? 're-pin' : 'clear-pin'}');
+      final status =
+          DiscourseTopicStatus.forTopic(siteContext.site.url, topicId);
+      if (status != null) {
+        DiscourseTopicStatus.store(siteContext.site.url, topicId,
+            status.copyWith(pinned: pinned, unpinned: !pinned));
+      }
+      return null;
+    } on DiscourseApiException catch (e) {
+      return e.userMessage;
+    } catch (e) {
+      return describeApiError(e);
     }
   }
 

@@ -163,16 +163,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get pleaseLoginToSubscribe =>
-      'Пожалуйста, войдите, чтобы null эту тему';
-
-  @override
-  String get subscribe => 'Подписаться';
-
-  @override
-  String get failedToSubscribeToThread => 'Не удалось null тему';
-
-  @override
   String get youCannotReplyToThisThread => 'Вы не можете ответить на эту тему';
 
   @override
@@ -180,27 +170,14 @@ class AppLocalizationsRu extends AppLocalizations {
       'Пожалуйста, подождите, пока тема загрузится';
 
   @override
-  String get softDelete => 'Мягкое удаление';
-
-  @override
   String get postCanBeRestoredLater => 'Сообщение можно восстановить позже';
-
-  @override
-  String get hardDelete => 'Жёсткое удаление';
 
   @override
   String get postWillBePermanentlyDeleted => 'Сообщение будет удалено навсегда';
 
   @override
-  String get reasonForDeletion => 'Причина удаления';
-
-  @override
   String get enterReasonForDeletingPost =>
       'Введите причину удаления этого сообщения';
-
-  @override
-  String get pleaseEnterReasonForDeletion =>
-      'Пожалуйста, введите причину удаления';
 
   @override
   String get reportPost => 'Пожаловаться на сообщение';
@@ -299,12 +276,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get topicOpened => 'Тема открыта';
-
-  @override
-  String get topicStickied => 'Тема закреплена';
-
-  @override
-  String get topicUnstickied => 'Тема откреплена';
 
   @override
   String cannotEditMessage(String error) {
@@ -629,9 +600,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Введите ключевые слова для поиска тем...';
 
   @override
-  String get undelete => 'Восстановить';
-
-  @override
   String get refresh => 'Обновить';
 
   @override
@@ -639,18 +607,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get viewOnWeb => 'Открыть в браузере';
-
-  @override
-  String get unlock => 'Разблокировать';
-
-  @override
-  String get lock => 'Заблокировать';
-
-  @override
-  String get stick => 'Закрепить';
-
-  @override
-  String get unstick => 'Открепить';
 
   @override
   String get reply => 'Ответить';
@@ -725,16 +681,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deleteTopic => 'Удалить тему';
-
-  @override
-  String get topicCanBeRestoredLater => 'Тему можно восстановить позже';
-
-  @override
-  String get topicWillBePermanentlyDeleted => 'Тема будет удалена навсегда';
-
-  @override
-  String get enterReasonForDeletingTopic =>
-      'Введите причину удаления этой темы';
 
   @override
   String get pleaseSelectEndDate => 'Пожалуйста, выберите дату окончания';
@@ -1442,11 +1388,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get moveToCategory => 'Переместить в категорию';
 
   @override
-  String get undeleteTopic => 'Восстановить тему';
-
-  @override
-  String get undeleteTopicConfirmation =>
-      'Восстановить эту тему? Она снова станет видна другим пользователям.';
+  String get undeleteTopic => 'Отменить удаление темы';
 
   @override
   String get send => 'Отправить';
@@ -1572,19 +1514,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String refreshFailed(Object error) {
     return 'Не удалось обновить: $error';
   }
-
-  @override
-  String get topicDeletedBanner =>
-      'Тема удалена и скрыта от других пользователей';
-
-  @override
-  String get topicClosedBanner => 'Тема закрыта и больше не принимает ответы';
-
-  @override
-  String get topicPinnedBanner => 'Тема закреплена вверху форума';
-
-  @override
-  String get youAreSubscribedToThisTopic => 'Вы подписаны на эту тему';
 
   @override
   String get refreshing => 'Обновление...';
@@ -3610,4 +3539,369 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get youParenthetical => '(вы)';
+
+  @override
+  String get topicStatusClosedHelp =>
+      'Тема закрыта; в ней больше нельзя отвечать';
+
+  @override
+  String get topicStatusArchivedHelp =>
+      'Тема заархивирована и не может быть изменена';
+
+  @override
+  String get topicStatusClosedArchivedHelp =>
+      'Тема закрыта и заархивирована; в ней больше нельзя отвечать она больше не может быть изменена';
+
+  @override
+  String get topicStatusPinnedTitle => 'Закреплена';
+
+  @override
+  String get topicStatusPinnedHelp =>
+      'Эта тема для вас закреплена; она будет показана в верхней части свой категории';
+
+  @override
+  String get topicStatusPinnedGloballyTitle => 'Закреплена глобально';
+
+  @override
+  String get topicStatusPinnedGloballyHelp =>
+      'Эта тема закреплена глобально; она будет отображаться вверху как на главной странице, так и в своём разделе';
+
+  @override
+  String get topicStatusUnpinnedTitle => 'Откреплена';
+
+  @override
+  String get topicStatusUnpinnedHelp =>
+      'Эта тема для вас откреплена; она будет отображаться в обычном порядке';
+
+  @override
+  String get topicStatusUnlistedHelp =>
+      'Тема скрыта — она не будет отображаться в списках тем. Доступ к ней возможен только по прямой ссылке.';
+
+  @override
+  String get topicStatusWarningHelp => 'Официальное предупреждение.';
+
+  @override
+  String get notificationReasonWatchingTag =>
+      'Вы будете получать уведомления, поскольку наблюдаете за тегом этой темы.';
+
+  @override
+  String get notificationReasonWatchingCategory =>
+      'Вы будете получать уведомления, поскольку наблюдаете за этой категорией.';
+
+  @override
+  String get notificationReasonWatchingAuto =>
+      'Вы будете получать уведомления, поскольку наблюдение за темой началось автоматически.';
+
+  @override
+  String get notificationReasonWatching =>
+      'Вы будете получать уведомления, поскольку наблюдаете за этой темой.';
+
+  @override
+  String get notificationReasonWatchingCreated =>
+      'Вы будете получать уведомления, поскольку создали эту тему.';
+
+  @override
+  String get notificationReasonTrackingCategory =>
+      'Вы увидите количество новых ответов, поскольку следите за этой категорией.';
+
+  @override
+  String get notificationReasonTrackingReplied =>
+      'Вы увидите количество новых ответов, поскольку вы размещали ответ в этой теме.';
+
+  @override
+  String get notificationReasonTracking =>
+      'Вы увидите количество новых ответов, поскольку следите за этой темой.';
+
+  @override
+  String get notificationReasonTrackingRead =>
+      'Вы увидите количество новых ответов, потому что прочитали эту тему.';
+
+  @override
+  String get notificationReasonNormal =>
+      'Вам придёт уведомление, если кто-нибудь упомянет ваше @имя или ответит вам.';
+
+  @override
+  String get notificationReasonMutedCategory =>
+      'Не получать уведомлений из этой категории.';
+
+  @override
+  String get notificationReasonMuted => 'Не получать уведомлений по этой теме.';
+
+  @override
+  String get notificationLevelWatching => 'Наблюдать';
+
+  @override
+  String get notificationLevelWatchingFirstPost =>
+      'Наблюдать за первым сообщением';
+
+  @override
+  String get notificationLevelTracking => 'Следить';
+
+  @override
+  String get notificationLevelNormal => 'Уведомлять';
+
+  @override
+  String get notificationLevelMuted => 'Без уведомлений';
+
+  @override
+  String get topicWatchingDescription =>
+      'Уведомлять по каждому новому ответу в этой теме и показывать количество новых непрочитанных ответов.';
+
+  @override
+  String get topicTrackingDescription =>
+      'Рядом с этой темой появится количество непрочитанных ответов. Вам придёт уведомление, если кто-нибудь упомянет ваше @имя или ответит вам.';
+
+  @override
+  String get topicNormalDescription =>
+      'Вам придёт уведомление, если кто-нибудь упомянет ваше @имя или ответит вам.';
+
+  @override
+  String get topicMutedDescription =>
+      'Не уведомлять об изменениях в этой теме и не отображать её в разделе «Последние».';
+
+  @override
+  String get messageWatchingDescription =>
+      'Уведомлять по каждому ответу на это сообщение и показывать количество новых непрочитанных ответов.';
+
+  @override
+  String get messageTrackingDescription =>
+      'Рядом с этим сообщением появится количество непрочитанных ответов. Вам придёт уведомление, если кто-нибудь упомянет ваше @имя или ответит вам.';
+
+  @override
+  String get messageNormalDescription =>
+      'Вам придёт уведомление, если кто-нибудь упомянет ваше @имя или ответит вам.';
+
+  @override
+  String get messageMutedDescription =>
+      'Никогда не получать уведомлений по этой теме.';
+
+  @override
+  String get categoryWatchingDescription =>
+      'Наблюдать за всеми темами этой категории. Уведомлять о каждом новом сообщении в любой из тем и показывать количество новых ответов.';
+
+  @override
+  String get categoryWatchingFirstPostDescription =>
+      'Вы будете получать уведомления о новых темах в этой категории, но не о новых ответах в них.';
+
+  @override
+  String get categoryTrackingDescription =>
+      'Вы будете автоматически отслеживать все темы в этой категории. Вы будете уведомлены, если кто-то упомянет ваше @имя или ответит вам. Также вам будет показано общее количество новых ответов.';
+
+  @override
+  String get categoryNormalDescription =>
+      'Вам придёт уведомление, если кто-нибудь упомянет ваше @имя или ответит вам.';
+
+  @override
+  String get categoryMutedDescription =>
+      'Не уведомлять о новых темах в этой категории и не отображать их в разделе «Последние».';
+
+  @override
+  String get tagWatchingDescription =>
+      'Автоматически наблюдать за всеми темами с этим тегом. Уведомлять обо всех новых темах и сообщениях, а также показывать количество непрочитанных и новых сообщений рядом с названиями тем.';
+
+  @override
+  String get tagWatchingFirstPostDescription =>
+      'Вы будете получать уведомления о новых темах, помеченных этим тегом, но не на ответы на них.';
+
+  @override
+  String get tagTrackingDescription =>
+      'Вы будете автоматически отслеживать все темы с этим тегом. Рядом с темой появится количество непрочитанных и новых сообщений.';
+
+  @override
+  String get tagNormalDescription =>
+      'Вам придет уведомление, если кто-нибудь упомянет ваше @имя или ответит на ваше сообщение.';
+
+  @override
+  String get tagMutedDescription =>
+      'Вы не будете получать уведомления о новых темах с этим тегом, и они не будут отображаться на вкладке «Непрочитанные».';
+
+  @override
+  String topicTimerAutoOpen(String timeLeft) {
+    return 'Тема автоматически откроется $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoClose(String timeLeft) {
+    return 'Тема автоматически закроется $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoPublish(String categoryName, String timeLeft) {
+    return 'Тема будет опубликована в категории #$categoryName $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoCloseAfterLastPost(String duration) {
+    return 'Тема будет закрыта через $duration после последнего ответа.';
+  }
+
+  @override
+  String topicTimerAutoDeleteAfterLastPost(String duration) {
+    return 'Эта тема будет удалена через $duration после последнего ответа.';
+  }
+
+  @override
+  String topicTimerAutoDelete(String timeLeft) {
+    return 'Тема будет автоматически удалена $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoBump(String timeLeft) {
+    return 'Тема будет автоматически поднята $timeLeft.';
+  }
+
+  @override
+  String topicTimerAutoDeleteReplies(String duration) {
+    return 'Ответы в этой теме автоматически удаляются через $duration.';
+  }
+
+  @override
+  String slowModeNotice(String duration) {
+    return 'Пожалуйста, подождите $duration между вашими сообщениями в этой теме.';
+  }
+
+  @override
+  String get closeTopic => 'Закрыть тему';
+
+  @override
+  String get openTopic => 'Открыть тему';
+
+  @override
+  String get pinTopic => 'Закрепить тему';
+
+  @override
+  String get unpinTopic => 'Открепить тему';
+
+  @override
+  String get archiveTopic => 'Архивировать тему';
+
+  @override
+  String get unarchiveTopic => 'Разархивировать тему';
+
+  @override
+  String get unlistTopic => 'Скрыть тему';
+
+  @override
+  String get listTopic => 'Показать тему';
+
+  @override
+  String get permanentlyDelete => 'Удалить навсегда';
+
+  @override
+  String get permanentlyDeleteTopicConfirmation =>
+      'Это действие нельзя отменить. Тема будет удалена навсегда и стёрта из базы данных.';
+
+  @override
+  String get deleteTopicConfirmYes => 'Да, удалить эту тему';
+
+  @override
+  String get deleteTopicConfirmNo => 'Нет, оставить эту тему';
+
+  @override
+  String get topicPinned => 'Тема закреплена';
+
+  @override
+  String get topicUnpinned => 'Тема откреплена';
+
+  @override
+  String get topicArchived => 'Тема архивирована';
+
+  @override
+  String get topicUnarchived => 'Тема разархивирована';
+
+  @override
+  String get topicUnlisted => 'Тема скрыта';
+
+  @override
+  String get topicListed => 'Тема показана';
+
+  @override
+  String get topicRecovered => 'Удаление темы отменено';
+
+  @override
+  String topicActionFailed(String error) {
+    return 'Не удалось изменить тему: $error';
+  }
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count минуты',
+      many: '$count минут',
+      few: '$count минуты',
+      one: '$count минуту',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count часа',
+      many: '$count часов',
+      few: '$count часа',
+      one: '$count час',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count дня',
+      many: '$count дней',
+      few: '$count дня',
+      one: '$count день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'через $count минуты',
+      many: 'через $count минут',
+      few: 'через $count минуты',
+      one: 'через $count минуту',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'через $count часа',
+      many: 'через $count часов',
+      few: 'через $count часа',
+      one: 'через $count час',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'через $count дня',
+      many: 'через $count дней',
+      few: 'через $count дня',
+      one: 'через $count день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get topicStatusDeletedHelp =>
+      'Тема удалена и скрыта от других пользователей';
 }

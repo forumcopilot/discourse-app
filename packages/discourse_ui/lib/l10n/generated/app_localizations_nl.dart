@@ -163,15 +163,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get pleaseLoginToSubscribe => 'Log in om null dit onderwerp';
-
-  @override
-  String get subscribe => 'Abonneren';
-
-  @override
-  String get failedToSubscribeToThread => 'Kon null onderwerp niet';
-
-  @override
   String get youCannotReplyToThisThread =>
       'U kunt niet op dit onderwerp reageren';
 
@@ -179,28 +170,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get pleaseWaitForThreadToLoad => 'Wacht tot het onderwerp is geladen';
 
   @override
-  String get softDelete => 'Zacht verwijderen';
-
-  @override
   String get postCanBeRestoredLater => 'Bericht kan later worden hersteld';
-
-  @override
-  String get hardDelete => 'Definitief verwijderen';
 
   @override
   String get postWillBePermanentlyDeleted =>
       'Bericht wordt permanent verwijderd';
 
   @override
-  String get reasonForDeletion => 'Reden voor verwijdering';
-
-  @override
   String get enterReasonForDeletingPost =>
       'Voer de reden voor het verwijderen van dit bericht in';
-
-  @override
-  String get pleaseEnterReasonForDeletion =>
-      'Voer een reden voor verwijdering in';
 
   @override
   String get reportPost => 'Bericht melden';
@@ -300,12 +278,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get topicOpened => 'Onderwerp geopend';
-
-  @override
-  String get topicStickied => 'Onderwerp vastgezet';
-
-  @override
-  String get topicUnstickied => 'Onderwerp losgemaakt';
 
   @override
   String cannotEditMessage(String error) {
@@ -630,9 +602,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voer zoekwoorden in om onderwerpen te zoeken...';
 
   @override
-  String get undelete => 'Verwijdering ongedaan maken';
-
-  @override
   String get refresh => 'Vernieuwen';
 
   @override
@@ -640,18 +609,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get viewOnWeb => 'Bekijken op web';
-
-  @override
-  String get unlock => 'Ontgrendelen';
-
-  @override
-  String get lock => 'Vergrendelen';
-
-  @override
-  String get stick => 'Vastzetten';
-
-  @override
-  String get unstick => 'Losmaken';
 
   @override
   String get reply => 'Beantwoorden';
@@ -723,18 +680,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get reportSubmittedSuccessfully => 'Melding succesvol verzonden';
 
   @override
-  String get deleteTopic => 'Onderwerp verwijderen';
-
-  @override
-  String get topicCanBeRestoredLater => 'Onderwerp kan later worden hersteld';
-
-  @override
-  String get topicWillBePermanentlyDeleted =>
-      'Onderwerp wordt permanent verwijderd';
-
-  @override
-  String get enterReasonForDeletingTopic =>
-      'Voer de reden voor het verwijderen van dit onderwerp in';
+  String get deleteTopic => 'Topic verwijderen';
 
   @override
   String get pleaseSelectEndDate => 'Selecteer een einddatum';
@@ -1438,11 +1384,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get moveToCategory => 'Verplaatsen naar categorie';
 
   @override
-  String get undeleteTopic => 'Onderwerp herstellen';
-
-  @override
-  String get undeleteTopicConfirmation =>
-      'Weet je zeker dat je dit onderwerp wilt herstellen? Het wordt weer zichtbaar voor andere gebruikers.';
+  String get undeleteTopic => 'Verwijdering van topic ongedaan maken';
 
   @override
   String get send => 'Verzenden';
@@ -1569,22 +1511,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String refreshFailed(Object error) {
     return 'Vernieuwen mislukt: $error';
   }
-
-  @override
-  String get topicDeletedBanner =>
-      'Dit onderwerp is verwijderd en verborgen voor andere gebruikers';
-
-  @override
-  String get topicClosedBanner =>
-      'Dit onderwerp is gesloten en accepteert geen reacties meer';
-
-  @override
-  String get topicPinnedBanner =>
-      'Dit onderwerp is bovenaan het forum vastgezet';
-
-  @override
-  String get youAreSubscribedToThisTopic =>
-      'Je bent geabonneerd op dit onderwerp';
 
   @override
   String get refreshing => 'Vernieuwen...';
@@ -3594,4 +3520,358 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get youParenthetical => '(jij)';
+
+  @override
+  String get topicStatusClosedHelp =>
+      'Dit topic is gesloten; nieuwe antwoorden zijn niet meer mogelijk';
+
+  @override
+  String get topicStatusArchivedHelp =>
+      'Dit topic is gearchiveerd; het kan niet meer worden gewijzigd';
+
+  @override
+  String get topicStatusClosedArchivedHelp =>
+      'Dit topic is gesloten en gearchiveerd; nieuwe antwoorden en wijzigingen zijn niet meer mogelijk';
+
+  @override
+  String get topicStatusPinnedTitle => 'Vastgemaakt';
+
+  @override
+  String get topicStatusPinnedHelp =>
+      'Dit topic is voor je vastgemaakt; het wordt weergegeven bovenaan de categorie';
+
+  @override
+  String get topicStatusPinnedGloballyTitle => 'Globaal vastgemaakt';
+
+  @override
+  String get topicStatusPinnedGloballyHelp =>
+      'Dit topic is globaal vastgemaakt; het wordt boven in Nieuwste en de categorie ervan weergegeven';
+
+  @override
+  String get topicStatusUnpinnedTitle => 'Losgemaakt';
+
+  @override
+  String get topicStatusUnpinnedHelp =>
+      'Dit topic is voor je losgemaakt; het wordt weergegeven in de normale volgorde';
+
+  @override
+  String get topicStatusUnlistedHelp =>
+      'Dit topic is niet zichtbaar; het wordt niet weergegeven in topiclijsten en is alleen toegankelijk via een rechtstreekse link.';
+
+  @override
+  String get topicStatusWarningHelp => 'Dit is een officiële waarschuwing.';
+
+  @override
+  String get notificationReasonWatchingTag =>
+      'Je ontvangt meldingen omdat je een tag in dit topic observeert.';
+
+  @override
+  String get notificationReasonWatchingCategory =>
+      'Je ontvangt meldingen omdat je deze categorie observeert.';
+
+  @override
+  String get notificationReasonWatchingAuto =>
+      'Je ontvangt meldingen omdat je dit topic automatisch observeert.';
+
+  @override
+  String get notificationReasonWatching =>
+      'Je ontvangt meldingen omdat je dit topic observeert.';
+
+  @override
+  String get notificationReasonWatchingCreated =>
+      'Je ontvangt meldingen omdat je dit topic hebt gemaakt.';
+
+  @override
+  String get notificationReasonTrackingCategory =>
+      'Je ziet het aantal nieuwe antwoorden omdat je deze categorie volgt.';
+
+  @override
+  String get notificationReasonTrackingReplied =>
+      'Je ziet het aantal nieuwe antwoorden omdat je een antwoord in dit topic hebt geplaatst.';
+
+  @override
+  String get notificationReasonTracking =>
+      'Je ziet het aantal nieuwe antwoorden omdat je dit topic volgt.';
+
+  @override
+  String get notificationReasonTrackingRead =>
+      'Je ziet een aantal nieuwe antwoorden omdat je dit topic hebt gelezen.';
+
+  @override
+  String get notificationReasonNormal =>
+      'Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.';
+
+  @override
+  String get notificationReasonMutedCategory =>
+      'Je negeert alle meldingen in deze categorie.';
+
+  @override
+  String get notificationReasonMuted =>
+      'Je negeert alle meldingen in dit topic.';
+
+  @override
+  String get notificationLevelWatching => 'Geobserveerd';
+
+  @override
+  String get notificationLevelWatchingFirstPost =>
+      'Eerste bericht geobserveerd';
+
+  @override
+  String get notificationLevelTracking => 'Volgen';
+
+  @override
+  String get notificationLevelNormal => 'Normaal';
+
+  @override
+  String get notificationLevelMuted => 'Gedempt';
+
+  @override
+  String get topicWatchingDescription =>
+      'Je ontvangt een melding voor elk nieuw antwoord in dit topic en het aantal nieuwe antwoorden wordt weergegeven.';
+
+  @override
+  String get topicTrackingDescription =>
+      'Het aantal nieuwe antwoorden op dit topic wordt weergegeven. Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.';
+
+  @override
+  String get topicNormalDescription =>
+      'Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.';
+
+  @override
+  String get topicMutedDescription =>
+      'Je ontvangt geen meldingen over dit topic en het wordt niet weergegeven in Nieuwste.';
+
+  @override
+  String get messageWatchingDescription =>
+      'Je ontvangt een melding voor elk nieuw antwoord op dit bericht en het aantal nieuwe antwoorden wordt weergegeven.';
+
+  @override
+  String get messageTrackingDescription =>
+      'Het aantal nieuwe antwoorden op dit bericht wordt weergegeven. Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.';
+
+  @override
+  String get messageNormalDescription =>
+      'Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.';
+
+  @override
+  String get messageMutedDescription =>
+      'Je ontvangt geen meldingen over dit bericht.';
+
+  @override
+  String get categoryWatchingDescription =>
+      'Je observeert automatisch alle nieuwe topics in deze categorieën. Je ontvangt meldingen bij elk nieuw bericht in elk topic en het aantal nieuwe antwoorden wordt weergegeven.';
+
+  @override
+  String get categoryWatchingFirstPostDescription =>
+      'Je ontvangt meldingen over nieuwe topics in deze categorie, maar niet over antwoorden op de topics.';
+
+  @override
+  String get categoryTrackingDescription =>
+      'Je volgt automatisch alle nieuwe topics in deze categorie. Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt en het aantal nieuwe antwoorden wordt weergeven.';
+
+  @override
+  String get categoryNormalDescription =>
+      'Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.';
+
+  @override
+  String get categoryMutedDescription =>
+      'Je ontvangt geen meldingen over nieuwe topics in deze categorie en ze worden niet weergegeven in Nieuwste.';
+
+  @override
+  String get tagWatchingDescription =>
+      'Je observeert automatisch alle nieuwe topics met deze tag. Je ontvangt meldingen bij alle nieuwe berichten en topics en het aantal ongelezen en nieuwe berichten wordt weergegeven naast het topic.';
+
+  @override
+  String get tagWatchingFirstPostDescription =>
+      'Je ontvangt meldingen over nieuwe topics in deze tag, maar niet over antwoorden op de topics.';
+
+  @override
+  String get tagTrackingDescription =>
+      'Je volgt automatisch alle topics met deze tag. Het aantal ongelezen en nieuwe berichten wordt weergegeven naast het topic.';
+
+  @override
+  String get tagNormalDescription =>
+      'Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.';
+
+  @override
+  String get tagMutedDescription =>
+      'Je ontvangt geen meldingen over nieuwe topics met deze tag en ze worden niet weergegeven op je tabblad Ongelezen.';
+
+  @override
+  String topicTimerAutoOpen(String timeLeft) {
+    return 'Dit topic wordt $timeLeft automatisch geopend.';
+  }
+
+  @override
+  String topicTimerAutoClose(String timeLeft) {
+    return 'Dit topic wordt $timeLeft automatisch gesloten.';
+  }
+
+  @override
+  String topicTimerAutoPublish(String categoryName, String timeLeft) {
+    return 'Dit topic wordt $timeLeft gepubliceerd in #$categoryName.';
+  }
+
+  @override
+  String topicTimerAutoCloseAfterLastPost(String duration) {
+    return 'Dit topic wordt $duration na het laatste antwoord gesloten.';
+  }
+
+  @override
+  String topicTimerAutoDeleteAfterLastPost(String duration) {
+    return 'Dit topic wordt $duration na het laatste antwoord verwijderd.';
+  }
+
+  @override
+  String topicTimerAutoDelete(String timeLeft) {
+    return 'Dit topic wordt $timeLeft automatisch verwijderd.';
+  }
+
+  @override
+  String topicTimerAutoBump(String timeLeft) {
+    return 'Dit topic wordt $timeLeft automatisch omhoog geplaatst.';
+  }
+
+  @override
+  String topicTimerAutoDeleteReplies(String duration) {
+    return 'Antwoorden op dit topic worden automatisch verwijderd na $duration.';
+  }
+
+  @override
+  String slowModeNotice(String duration) {
+    return 'Wacht $duration tussen jouw berichten in dit topic.';
+  }
+
+  @override
+  String get closeTopic => 'Topic sluiten';
+
+  @override
+  String get openTopic => 'Topic openen';
+
+  @override
+  String get pinTopic => 'Topic vastmaken';
+
+  @override
+  String get unpinTopic => 'Topic losmaken';
+
+  @override
+  String get archiveTopic => 'Topic archiveren';
+
+  @override
+  String get unarchiveTopic => 'Topic dearchiveren';
+
+  @override
+  String get unlistTopic => 'Topic onzichtbaar maken';
+
+  @override
+  String get listTopic => 'Topic zichtbaar maken';
+
+  @override
+  String get permanentlyDelete => 'Permanent verwijderen';
+
+  @override
+  String get permanentlyDeleteTopicConfirmation =>
+      'Deze actie kan niet ongedaan worden gemaakt. Dit topic wordt definitief verwijderd uit de database.';
+
+  @override
+  String get deleteTopicConfirmYes => 'Ja, dit topic verwijderen';
+
+  @override
+  String get deleteTopicConfirmNo => 'Nee, dit topic behouden';
+
+  @override
+  String get topicPinned => 'Topic vastgemaakt';
+
+  @override
+  String get topicUnpinned => 'Topic losgemaakt';
+
+  @override
+  String get topicArchived => 'Topic gearchiveerd';
+
+  @override
+  String get topicUnarchived => 'Topic gedearchiveerd';
+
+  @override
+  String get topicUnlisted => 'Topic onzichtbaar gemaakt';
+
+  @override
+  String get topicListed => 'Topic zichtbaar gemaakt';
+
+  @override
+  String get topicRecovered => 'Verwijdering van topic ongedaan gemaakt';
+
+  @override
+  String topicActionFailed(String error) {
+    return 'Kon het topic niet bijwerken: $error';
+  }
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minuten',
+      one: '1 minuut',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count uur',
+      one: '1 uur',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dagen',
+      one: '1 dag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'over $count minuten',
+      one: 'over 1 minuut',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'over $count uur',
+      one: 'over 1 uur',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeLeftDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'over $count dagen',
+      one: 'over 1 dag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get topicStatusDeletedHelp =>
+      'Dit onderwerp is verwijderd en verborgen voor andere gebruikers';
 }

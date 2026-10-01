@@ -61,24 +61,11 @@
       }
     }
   },
-  "pleaseLoginToSubscribe": "Please login to change notifications on this topic",
-  "@pleaseLoginToSubscribe": {
-    "description": "Message asking user to login before changing topic notifications"
-  },
-  "subscribe": "Notifications",
-  "failedToSubscribeToThread": "Failed to update notifications",
-  "@failedToSubscribeToThread": {
-    "description": "Error message when changing notification level fails"
-  },
   "youCannotReplyToThisThread": "You cannot reply to this topic",
   "pleaseWaitForThreadToLoad": "Please wait for the topic to load",
-  "softDelete": "Soft Delete",
   "postCanBeRestoredLater": "Post can be restored later",
-  "hardDelete": "Hard Delete",
   "postWillBePermanentlyDeleted": "Post will be permanently deleted",
-  "reasonForDeletion": "Reason for deletion",
   "enterReasonForDeletingPost": "Enter the reason for deleting this post",
-  "pleaseEnterReasonForDeletion": "Please enter a reason for deletion",
   "reportPost": "Report Post",
   "pleaseProvideReasonForReporting": "Please provide a reason for reporting this post.",
   "reason": "Reason",
@@ -135,8 +122,6 @@
   "moreOptions": "More options",
   "topicClosed": "Topic closed",
   "topicOpened": "Topic opened",
-  "topicStickied": "Topic stickied",
-  "topicUnstickied": "Topic unstickied",
   "cannotEditMessage": "Cannot edit this message: {error}",
   "@cannotEditMessage": {
     "description": "Error message when cannot edit message",
@@ -344,7 +329,6 @@
   "markAsUnread": "Mark unread",
   "invite": "Invite",
   "enterKeywordsToSearchTopics": "Enter keywords to search topics...",
-  "undelete": "Undelete",
   "refresh": "Refresh",
   "@refresh": {
     "description": "Menu item to refresh content"
@@ -356,22 +340,6 @@
   "viewOnWeb": "View on Web",
   "@viewOnWeb": {
     "description": "Menu item to view content on web browser"
-  },
-  "unlock": "Unlock",
-  "@unlock": {
-    "description": "Menu item to unlock a topic"
-  },
-  "lock": "Lock",
-  "@lock": {
-    "description": "Menu item to lock a topic"
-  },
-  "stick": "Stick",
-  "@stick": {
-    "description": "Menu item to stick/pin a topic"
-  },
-  "unstick": "Unstick",
-  "@unstick": {
-    "description": "Menu item to unstick/unpin a topic"
   },
   "reply": "Reply",
   "@reply": {
@@ -486,30 +454,6 @@
   "deleteTopic": "Delete Topic",
   "@deleteTopic": {
     "description": "Title for delete topic dialog"
-  },
-  "@softDelete": {
-    "description": "Option for soft delete (can be restored)"
-  },
-  "topicCanBeRestoredLater": "Topic can be restored later",
-  "@topicCanBeRestoredLater": {
-    "description": "Description for soft delete option"
-  },
-  "@hardDelete": {
-    "description": "Option for hard delete (permanent)"
-  },
-  "topicWillBePermanentlyDeleted": "Topic will be permanently deleted",
-  "@topicWillBePermanentlyDeleted": {
-    "description": "Description for hard delete option"
-  },
-  "@reasonForDeletion": {
-    "description": "Label for deletion reason field"
-  },
-  "enterReasonForDeletingTopic": "Enter the reason for deleting this topic",
-  "@enterReasonForDeletingTopic": {
-    "description": "Hint text for deletion reason field"
-  },
-  "@pleaseEnterReasonForDeletion": {
-    "description": "Validation message for deletion reason"
   },
   "pleaseSelectEndDate": "Please select an end date",
   "@pleaseSelectEndDate": {
@@ -1514,13 +1458,9 @@
   "@moveToCategory": {
     "description": "UI text: Move to category"
   },
-  "undeleteTopic": "Undelete Topic",
+  "undeleteTopic": "Un-Delete Topic",
   "@undeleteTopic": {
     "description": "UI text: Undelete Topic"
-  },
-  "undeleteTopicConfirmation": "Are you sure you want to undelete this topic? It will be visible to other users again.",
-  "@undeleteTopicConfirmation": {
-    "description": "UI text: Are you sure you want to undelete this topic? It will be vis"
   },
   "send": "Send",
   "@send": {
@@ -1685,22 +1625,6 @@
         "type": "Object"
       }
     }
-  },
-  "topicDeletedBanner": "This topic is deleted and hidden from other users",
-  "@topicDeletedBanner": {
-    "description": "UI text: This topic is deleted and hidden from other users"
-  },
-  "topicClosedBanner": "This topic is closed and no longer accepting replies",
-  "@topicClosedBanner": {
-    "description": "UI text: This topic is closed and no longer accepting replies"
-  },
-  "topicPinnedBanner": "This topic is pinned to the top of the forum",
-  "@topicPinnedBanner": {
-    "description": "UI text: This topic is pinned to the top of the forum"
-  },
-  "youAreSubscribedToThisTopic": "You are subscribed to this topic",
-  "@youAreSubscribedToThisTopic": {
-    "description": "UI text: You are subscribed to this topic"
   },
   "refreshing": "Refreshing...",
   "@refreshing": {
@@ -4417,5 +4341,416 @@
   "youParenthetical": "(you)",
   "@youParenthetical": {
     "description": "User card: after your own name"
+  },
+  "topicStatusClosedHelp": "This topic is closed; it no longer accepts new replies",
+  "@topicStatusClosedHelp": {
+    "description": "Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button"
+  },
+  "topicStatusArchivedHelp": "This topic is archived; it is frozen and cannot be changed",
+  "@topicStatusArchivedHelp": {
+    "description": "Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button"
+  },
+  "topicStatusClosedArchivedHelp": "This topic is closed and archived; it no longer accepts new replies and cannot be changed",
+  "@topicStatusClosedArchivedHelp": {
+    "description": "Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button"
+  },
+  "topicStatusPinnedTitle": "Pinned",
+  "@topicStatusPinnedTitle": {
+    "description": "Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button"
+  },
+  "topicStatusPinnedHelp": "This topic is pinned for you; it will display at the top of its category",
+  "@topicStatusPinnedHelp": {
+    "description": "Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button"
+  },
+  "topicStatusPinnedGloballyTitle": "Pinned Globally",
+  "@topicStatusPinnedGloballyTitle": {
+    "description": "Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button"
+  },
+  "topicStatusPinnedGloballyHelp": "This topic is pinned globally; it will display at the top of latest and its category",
+  "@topicStatusPinnedGloballyHelp": {
+    "description": "Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button"
+  },
+  "topicStatusUnpinnedTitle": "Unpinned",
+  "@topicStatusUnpinnedTitle": {
+    "description": "Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button"
+  },
+  "topicStatusUnpinnedHelp": "This topic is unpinned for you; it will display in regular order",
+  "@topicStatusUnpinnedHelp": {
+    "description": "Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button"
+  },
+  "topicStatusUnlistedHelp": "This topic is unlisted; it will not be displayed in topic lists, and can only be accessed via a direct link.",
+  "@topicStatusUnlistedHelp": {
+    "description": "Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button"
+  },
+  "topicStatusWarningHelp": "This is an official warning.",
+  "@topicStatusWarningHelp": {
+    "description": "Discourse topic_statuses.*: the help text of a status icon before the topic title, and the reason line beside the footer Pinned button"
+  },
+  "notificationReasonWatchingTag": "You will receive notifications because you are watching a tag on this topic.",
+  "@notificationReasonWatchingTag": {
+    "description": "Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button"
+  },
+  "notificationReasonWatchingCategory": "You will receive notifications because you are watching this category.",
+  "@notificationReasonWatchingCategory": {
+    "description": "Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button"
+  },
+  "notificationReasonWatchingAuto": "You will receive notifications because you started watching this topic automatically.",
+  "@notificationReasonWatchingAuto": {
+    "description": "Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button"
+  },
+  "notificationReasonWatching": "You will receive notifications because you are watching this topic.",
+  "@notificationReasonWatching": {
+    "description": "Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button"
+  },
+  "notificationReasonWatchingCreated": "You will receive notifications because you created this topic.",
+  "@notificationReasonWatchingCreated": {
+    "description": "Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button"
+  },
+  "notificationReasonTrackingCategory": "You will see a count of new replies because you are tracking this category.",
+  "@notificationReasonTrackingCategory": {
+    "description": "Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button"
+  },
+  "notificationReasonTrackingReplied": "You will see a count of new replies because you posted a reply to this topic.",
+  "@notificationReasonTrackingReplied": {
+    "description": "Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button"
+  },
+  "notificationReasonTracking": "You will see a count of new replies because you are tracking this topic.",
+  "@notificationReasonTracking": {
+    "description": "Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button"
+  },
+  "notificationReasonTrackingRead": "You will see a count of new replies because you read this topic.",
+  "@notificationReasonTrackingRead": {
+    "description": "Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button"
+  },
+  "notificationReasonNormal": "You will be notified if someone mentions your @name or replies to you.",
+  "@notificationReasonNormal": {
+    "description": "Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button"
+  },
+  "notificationReasonMutedCategory": "You are ignoring all notifications in this category.",
+  "@notificationReasonMutedCategory": {
+    "description": "Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button"
+  },
+  "notificationReasonMuted": "You are ignoring all notifications on this topic.",
+  "@notificationReasonMuted": {
+    "description": "Discourse topic.notifications.reasons.*: why the reader gets notifications about this topic, under the footer notification button"
+  },
+  "notificationLevelWatching": "Watching",
+  "@notificationLevelWatching": {
+    "description": "Discourse notification level name"
+  },
+  "notificationLevelWatchingFirstPost": "Watching First Post",
+  "@notificationLevelWatchingFirstPost": {
+    "description": "Discourse notification level name"
+  },
+  "notificationLevelTracking": "Tracking",
+  "@notificationLevelTracking": {
+    "description": "Discourse notification level name"
+  },
+  "notificationLevelNormal": "Normal",
+  "@notificationLevelNormal": {
+    "description": "Discourse notification level name"
+  },
+  "notificationLevelMuted": "Muted",
+  "@notificationLevelMuted": {
+    "description": "Discourse notification level name"
+  },
+  "topicWatchingDescription": "You will be notified of every new reply in this topic, and a count of new replies will be shown.",
+  "@topicWatchingDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "topicTrackingDescription": "A count of new replies will be shown for this topic. You will be notified if someone mentions your @name or replies to you.",
+  "@topicTrackingDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "topicNormalDescription": "You will be notified if someone mentions your @name or replies to you.",
+  "@topicNormalDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "topicMutedDescription": "You will never be notified of anything about this topic, and it will not appear in latest.",
+  "@topicMutedDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "messageWatchingDescription": "You will be notified of every new reply in this message, and a count of new replies will be shown.",
+  "@messageWatchingDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "messageTrackingDescription": "A count of new replies will be shown for this message. You will be notified if someone mentions your @name or replies to you.",
+  "@messageTrackingDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "messageNormalDescription": "You will be notified if someone mentions your @name or replies to you.",
+  "@messageNormalDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "messageMutedDescription": "You will never be notified of anything about this message.",
+  "@messageMutedDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "categoryWatchingDescription": "You will automatically watch all topics in this category. You will be notified of every new post in every topic, and a count of new replies will be shown.",
+  "@categoryWatchingDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "categoryWatchingFirstPostDescription": "You will be notified of new topics in this category but not replies to the topics.",
+  "@categoryWatchingFirstPostDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "categoryTrackingDescription": "You will automatically track all topics in this category. You will be notified if someone mentions your @name or replies to you, and a count of new replies will be shown.",
+  "@categoryTrackingDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "categoryNormalDescription": "You will be notified if someone mentions your @name or replies to you.",
+  "@categoryNormalDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "categoryMutedDescription": "You will never be notified of anything about new topics in this category, and they will not appear in latest.",
+  "@categoryMutedDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "tagWatchingDescription": "You will automatically watch all topics with this tag. You will be notified of all new posts and topics, plus the count of unread and new posts will also appear next to the topic.",
+  "@tagWatchingDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "tagWatchingFirstPostDescription": "You will be notified of new topics in this tag but not replies to the topics.",
+  "@tagWatchingFirstPostDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "tagTrackingDescription": "You will automatically track all topics with this tag. A count of unread and new posts will appear next to the topic.",
+  "@tagTrackingDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "tagNormalDescription": "You will be notified if someone mentions your @name or replies to your post.",
+  "@tagNormalDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "tagMutedDescription": "You will not be notified of anything about new topics with this tag, and they will not appear on your unread tab.",
+  "@tagMutedDescription": {
+    "description": "Discourse notification level description in the level picker"
+  },
+  "topicTimerAutoOpen": "This topic will automatically open {timeLeft}.",
+  "@topicTimerAutoOpen": {
+    "description": "Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as \"in 3 days\"; {duration} a length such as \"3 days\"",
+    "placeholders": {
+      "timeLeft": {
+        "type": "String"
+      }
+    }
+  },
+  "topicTimerAutoClose": "This topic will automatically close {timeLeft}.",
+  "@topicTimerAutoClose": {
+    "description": "Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as \"in 3 days\"; {duration} a length such as \"3 days\"",
+    "placeholders": {
+      "timeLeft": {
+        "type": "String"
+      }
+    }
+  },
+  "topicTimerAutoPublish": "This topic will be published to #{categoryName} {timeLeft}.",
+  "@topicTimerAutoPublish": {
+    "description": "Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as \"in 3 days\"; {duration} a length such as \"3 days\"",
+    "placeholders": {
+      "categoryName": {
+        "type": "String"
+      },
+      "timeLeft": {
+        "type": "String"
+      }
+    }
+  },
+  "topicTimerAutoCloseAfterLastPost": "This topic will close {duration} after the last reply.",
+  "@topicTimerAutoCloseAfterLastPost": {
+    "description": "Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as \"in 3 days\"; {duration} a length such as \"3 days\"",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "topicTimerAutoDeleteAfterLastPost": "This topic will be deleted {duration} after the last reply.",
+  "@topicTimerAutoDeleteAfterLastPost": {
+    "description": "Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as \"in 3 days\"; {duration} a length such as \"3 days\"",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "topicTimerAutoDelete": "This topic will be automatically deleted {timeLeft}.",
+  "@topicTimerAutoDelete": {
+    "description": "Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as \"in 3 days\"; {duration} a length such as \"3 days\"",
+    "placeholders": {
+      "timeLeft": {
+        "type": "String"
+      }
+    }
+  },
+  "topicTimerAutoBump": "This topic will be automatically bumped {timeLeft}.",
+  "@topicTimerAutoBump": {
+    "description": "Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as \"in 3 days\"; {duration} a length such as \"3 days\"",
+    "placeholders": {
+      "timeLeft": {
+        "type": "String"
+      }
+    }
+  },
+  "topicTimerAutoDeleteReplies": "Replies on this topic are automatically deleted after {duration}.",
+  "@topicTimerAutoDeleteReplies": {
+    "description": "Discourse topic.status_update_notice.*: the topic timer notice under the last post. {timeLeft} is a relative time such as \"in 3 days\"; {duration} a length such as \"3 days\"",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "slowModeNotice": "Please wait {duration} between your posts in this topic.",
+  "@slowModeNotice": {
+    "description": "Discourse topic.slow_mode_notice.duration, under the last post of a topic in slow mode",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "closeTopic": "Close Topic",
+  "@closeTopic": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "openTopic": "Open Topic",
+  "@openTopic": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "pinTopic": "Pin Topic",
+  "@pinTopic": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "unpinTopic": "Un-Pin Topic",
+  "@unpinTopic": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "archiveTopic": "Archive Topic",
+  "@archiveTopic": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "unarchiveTopic": "Unarchive Topic",
+  "@unarchiveTopic": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "unlistTopic": "Unlist Topic",
+  "@unlistTopic": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "listTopic": "List Topic",
+  "@listTopic": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "permanentlyDelete": "Permanently delete",
+  "@permanentlyDelete": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "permanentlyDeleteTopicConfirmation": "This action cannot be undone. This will permanently delete this topic and remove it from the database.",
+  "@permanentlyDeleteTopicConfirmation": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "deleteTopicConfirmYes": "Yes, delete this topic",
+  "@deleteTopicConfirmYes": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "deleteTopicConfirmNo": "No, keep this topic",
+  "@deleteTopicConfirmNo": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "topicPinned": "Topic pinned",
+  "@topicPinned": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "topicUnpinned": "Topic unpinned",
+  "@topicUnpinned": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "topicArchived": "Topic archived",
+  "@topicArchived": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "topicUnarchived": "Topic unarchived",
+  "@topicUnarchived": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "topicUnlisted": "Topic unlisted",
+  "@topicUnlisted": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "topicListed": "Topic listed",
+  "@topicListed": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "topicRecovered": "Topic un-deleted",
+  "@topicRecovered": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it"
+  },
+  "topicActionFailed": "Couldn't update the topic: {error}",
+  "@topicActionFailed": {
+    "description": "Discourse wording for a topic action or its confirmation (topic.actions, topic.feature, post.controls), or the snackbar after it",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "durationMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+  "@durationMinutes": {
+    "description": "A length of time, e.g. \"3 days\"",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHours": "{count, plural, =1{1 hour} other{{count} hours}}",
+  "@durationHours": {
+    "description": "A length of time, e.g. \"3 days\"",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "durationDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@durationDays": {
+    "description": "A length of time, e.g. \"3 days\"",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeLeftMinutes": "{count, plural, =1{in 1 minute} other{in {count} minutes}}",
+  "@timeLeftMinutes": {
+    "description": "A time from now, e.g. \"in 3 days\", for the topic timer notices",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeLeftHours": "{count, plural, =1{in 1 hour} other{in {count} hours}}",
+  "@timeLeftHours": {
+    "description": "A time from now, e.g. \"in 3 days\", for the topic timer notices",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeLeftDays": "{count, plural, =1{in 1 day} other{in {count} days}}",
+  "@timeLeftDays": {
+    "description": "A time from now, e.g. \"in 3 days\", for the topic timer notices",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "topicStatusDeletedHelp": "This topic is deleted and hidden from other users",
+  "@topicStatusDeletedHelp": {
+    "description": "Help text of the deleted-topic icon before the title (staff only see deleted topics)"
   }
 }

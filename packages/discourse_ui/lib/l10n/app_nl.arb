@@ -61,36 +61,13 @@
       }
     }
   },
-  "pleaseLoginToSubscribe": "Log in om {action} dit onderwerp",
-  "@pleaseLoginToSubscribe": {
-    "description": "Message asking user to login to subscribe/unsubscribe",
-    "placeholders": {
-      "action": {
-        "type": "String"
-      }
-    }
-  },
   "subscribeTo": "abonneren op",
   "unsubscribeFrom": "abonnement opzeggen van",
-  "subscribe": "Abonneren",
-  "failedToSubscribeToThread": "Kon {action} onderwerp niet",
-  "@failedToSubscribeToThread": {
-    "description": "Error message when subscribe/unsubscribe fails",
-    "placeholders": {
-      "action": {
-        "type": "String"
-      }
-    }
-  },
   "youCannotReplyToThisThread": "U kunt niet op dit onderwerp reageren",
   "pleaseWaitForThreadToLoad": "Wacht tot het onderwerp is geladen",
-  "softDelete": "Zacht verwijderen",
   "postCanBeRestoredLater": "Bericht kan later worden hersteld",
-  "hardDelete": "Definitief verwijderen",
   "postWillBePermanentlyDeleted": "Bericht wordt permanent verwijderd",
-  "reasonForDeletion": "Reden voor verwijdering",
   "enterReasonForDeletingPost": "Voer de reden voor het verwijderen van dit bericht in",
-  "pleaseEnterReasonForDeletion": "Voer een reden voor verwijdering in",
   "reportPost": "Bericht melden",
   "pleaseProvideReasonForReporting": "Geef een reden op voor het melden van dit bericht.",
   "reason": "Reden",
@@ -147,8 +124,6 @@
   "moreOptions": "Meer opties",
   "topicClosed": "Onderwerp gesloten",
   "topicOpened": "Onderwerp geopend",
-  "topicStickied": "Onderwerp vastgezet",
-  "topicUnstickied": "Onderwerp losgemaakt",
   "cannotEditMessage": "Dit bericht kan niet worden bewerkt: {error}",
   "@cannotEditMessage": {
     "description": "Error message when cannot edit message",
@@ -356,7 +331,6 @@
   "markAsUnread": "Markeren als ongelezen",
   "invite": "Uitnodigen",
   "enterKeywordsToSearchTopics": "Voer zoekwoorden in om onderwerpen te zoeken...",
-  "undelete": "Verwijdering ongedaan maken",
   "refresh": "Vernieuwen",
   "@refresh": {
     "description": "Menu item to refresh content"
@@ -368,22 +342,6 @@
   "viewOnWeb": "Bekijken op web",
   "@viewOnWeb": {
     "description": "Menu item to view content on web browser"
-  },
-  "unlock": "Ontgrendelen",
-  "@unlock": {
-    "description": "Menu item to unlock a topic"
-  },
-  "lock": "Vergrendelen",
-  "@lock": {
-    "description": "Menu item to lock a topic"
-  },
-  "stick": "Vastzetten",
-  "@stick": {
-    "description": "Menu item to stick/pin a topic"
-  },
-  "unstick": "Losmaken",
-  "@unstick": {
-    "description": "Menu item to unstick/unpin a topic"
   },
   "reply": "Beantwoorden",
   "@reply": {
@@ -453,33 +411,9 @@
   "@reportSubmittedSuccessfully": {
     "description": "Success message after submitting a report"
   },
-  "deleteTopic": "Onderwerp verwijderen",
+  "deleteTopic": "Topic verwijderen",
   "@deleteTopic": {
     "description": "Title for delete topic dialog"
-  },
-  "@softDelete": {
-    "description": "Option for soft delete (can be restored)"
-  },
-  "topicCanBeRestoredLater": "Onderwerp kan later worden hersteld",
-  "@topicCanBeRestoredLater": {
-    "description": "Description for soft delete option"
-  },
-  "@hardDelete": {
-    "description": "Option for hard delete (permanent)"
-  },
-  "topicWillBePermanentlyDeleted": "Onderwerp wordt permanent verwijderd",
-  "@topicWillBePermanentlyDeleted": {
-    "description": "Description for hard delete option"
-  },
-  "@reasonForDeletion": {
-    "description": "Label for deletion reason field"
-  },
-  "enterReasonForDeletingTopic": "Voer de reden voor het verwijderen van dit onderwerp in",
-  "@enterReasonForDeletingTopic": {
-    "description": "Hint text for deletion reason field"
-  },
-  "@pleaseEnterReasonForDeletion": {
-    "description": "Validation message for deletion reason"
   },
   "pleaseSelectEndDate": "Selecteer een einddatum",
   "@pleaseSelectEndDate": {
@@ -997,8 +931,7 @@
   "loginInfo": "Aanmeldinfo",
   "loginFailed": "Aanmelden mislukt",
   "moveToCategory": "Verplaatsen naar categorie",
-  "undeleteTopic": "Onderwerp herstellen",
-  "undeleteTopicConfirmation": "Weet je zeker dat je dit onderwerp wilt herstellen? Het wordt weer zichtbaar voor andere gebruikers.",
+  "undeleteTopic": "Verwijdering van topic ongedaan maken",
   "send": "Verzenden",
   "changeEmailExplanation": "We sturen een bevestigingslink naar je nieuwe e-mailadres. De wijziging gaat in zodra je erop klikt.",
   "changeEmailSecurityNote": "Voor extra veiligheid kan Discourse vragen om bevestiging via de link in de e-mail. Controleer je spammap als je hem niet ziet.",
@@ -1035,10 +968,6 @@
   "reviewQueueStaffOnly": "Alleen staf en beoordelaars kunnen de beoordelingswachtrij zien.",
   "nothingToReview": "Niets te beoordelen",
   "refreshFailed": "Vernieuwen mislukt: {error}",
-  "topicDeletedBanner": "Dit onderwerp is verwijderd en verborgen voor andere gebruikers",
-  "topicClosedBanner": "Dit onderwerp is gesloten en accepteert geen reacties meer",
-  "topicPinnedBanner": "Dit onderwerp is bovenaan het forum vastgezet",
-  "youAreSubscribedToThisTopic": "Je bent geabonneerd op dit onderwerp",
   "refreshing": "Vernieuwen...",
   "title": "Titel",
   "editedAt": "Bewerkt {time}",
@@ -1542,5 +1471,87 @@
   "userIgnoredFor4Months": "Je negeert @{username} 4 maanden lang",
   "userMuted": "@{username} gedempt",
   "userUnmuted": "@{username} niet meer gedempt",
-  "youParenthetical": "(jij)"
+  "youParenthetical": "(jij)",
+  "topicStatusClosedHelp": "Dit topic is gesloten; nieuwe antwoorden zijn niet meer mogelijk",
+  "topicStatusArchivedHelp": "Dit topic is gearchiveerd; het kan niet meer worden gewijzigd",
+  "topicStatusClosedArchivedHelp": "Dit topic is gesloten en gearchiveerd; nieuwe antwoorden en wijzigingen zijn niet meer mogelijk",
+  "topicStatusPinnedTitle": "Vastgemaakt",
+  "topicStatusPinnedHelp": "Dit topic is voor je vastgemaakt; het wordt weergegeven bovenaan de categorie",
+  "topicStatusPinnedGloballyTitle": "Globaal vastgemaakt",
+  "topicStatusPinnedGloballyHelp": "Dit topic is globaal vastgemaakt; het wordt boven in Nieuwste en de categorie ervan weergegeven",
+  "topicStatusUnpinnedTitle": "Losgemaakt",
+  "topicStatusUnpinnedHelp": "Dit topic is voor je losgemaakt; het wordt weergegeven in de normale volgorde",
+  "topicStatusUnlistedHelp": "Dit topic is niet zichtbaar; het wordt niet weergegeven in topiclijsten en is alleen toegankelijk via een rechtstreekse link.",
+  "topicStatusWarningHelp": "Dit is een officiële waarschuwing.",
+  "notificationReasonWatchingTag": "Je ontvangt meldingen omdat je een tag in dit topic observeert.",
+  "notificationReasonWatchingCategory": "Je ontvangt meldingen omdat je deze categorie observeert.",
+  "notificationReasonWatchingAuto": "Je ontvangt meldingen omdat je dit topic automatisch observeert.",
+  "notificationReasonWatching": "Je ontvangt meldingen omdat je dit topic observeert.",
+  "notificationReasonWatchingCreated": "Je ontvangt meldingen omdat je dit topic hebt gemaakt.",
+  "notificationReasonTrackingCategory": "Je ziet het aantal nieuwe antwoorden omdat je deze categorie volgt.",
+  "notificationReasonTrackingReplied": "Je ziet het aantal nieuwe antwoorden omdat je een antwoord in dit topic hebt geplaatst.",
+  "notificationReasonTracking": "Je ziet het aantal nieuwe antwoorden omdat je dit topic volgt.",
+  "notificationReasonTrackingRead": "Je ziet een aantal nieuwe antwoorden omdat je dit topic hebt gelezen.",
+  "notificationReasonNormal": "Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.",
+  "notificationReasonMutedCategory": "Je negeert alle meldingen in deze categorie.",
+  "notificationReasonMuted": "Je negeert alle meldingen in dit topic.",
+  "notificationLevelWatching": "Geobserveerd",
+  "notificationLevelWatchingFirstPost": "Eerste bericht geobserveerd",
+  "notificationLevelTracking": "Volgen",
+  "notificationLevelNormal": "Normaal",
+  "notificationLevelMuted": "Gedempt",
+  "topicWatchingDescription": "Je ontvangt een melding voor elk nieuw antwoord in dit topic en het aantal nieuwe antwoorden wordt weergegeven.",
+  "topicTrackingDescription": "Het aantal nieuwe antwoorden op dit topic wordt weergegeven. Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.",
+  "topicNormalDescription": "Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.",
+  "topicMutedDescription": "Je ontvangt geen meldingen over dit topic en het wordt niet weergegeven in Nieuwste.",
+  "messageWatchingDescription": "Je ontvangt een melding voor elk nieuw antwoord op dit bericht en het aantal nieuwe antwoorden wordt weergegeven.",
+  "messageTrackingDescription": "Het aantal nieuwe antwoorden op dit bericht wordt weergegeven. Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.",
+  "messageNormalDescription": "Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.",
+  "messageMutedDescription": "Je ontvangt geen meldingen over dit bericht.",
+  "categoryWatchingDescription": "Je observeert automatisch alle nieuwe topics in deze categorieën. Je ontvangt meldingen bij elk nieuw bericht in elk topic en het aantal nieuwe antwoorden wordt weergegeven.",
+  "categoryWatchingFirstPostDescription": "Je ontvangt meldingen over nieuwe topics in deze categorie, maar niet over antwoorden op de topics.",
+  "categoryTrackingDescription": "Je volgt automatisch alle nieuwe topics in deze categorie. Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt en het aantal nieuwe antwoorden wordt weergeven.",
+  "categoryNormalDescription": "Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.",
+  "categoryMutedDescription": "Je ontvangt geen meldingen over nieuwe topics in deze categorie en ze worden niet weergegeven in Nieuwste.",
+  "tagWatchingDescription": "Je observeert automatisch alle nieuwe topics met deze tag. Je ontvangt meldingen bij alle nieuwe berichten en topics en het aantal ongelezen en nieuwe berichten wordt weergegeven naast het topic.",
+  "tagWatchingFirstPostDescription": "Je ontvangt meldingen over nieuwe topics in deze tag, maar niet over antwoorden op de topics.",
+  "tagTrackingDescription": "Je volgt automatisch alle topics met deze tag. Het aantal ongelezen en nieuwe berichten wordt weergegeven naast het topic.",
+  "tagNormalDescription": "Je ontvangt een melding als iemand je @naam noemt of een bericht van je beantwoordt.",
+  "tagMutedDescription": "Je ontvangt geen meldingen over nieuwe topics met deze tag en ze worden niet weergegeven op je tabblad Ongelezen.",
+  "topicTimerAutoOpen": "Dit topic wordt {timeLeft} automatisch geopend.",
+  "topicTimerAutoClose": "Dit topic wordt {timeLeft} automatisch gesloten.",
+  "topicTimerAutoPublish": "Dit topic wordt {timeLeft} gepubliceerd in #{categoryName}.",
+  "topicTimerAutoCloseAfterLastPost": "Dit topic wordt {duration} na het laatste antwoord gesloten.",
+  "topicTimerAutoDeleteAfterLastPost": "Dit topic wordt {duration} na het laatste antwoord verwijderd.",
+  "topicTimerAutoDelete": "Dit topic wordt {timeLeft} automatisch verwijderd.",
+  "topicTimerAutoBump": "Dit topic wordt {timeLeft} automatisch omhoog geplaatst.",
+  "topicTimerAutoDeleteReplies": "Antwoorden op dit topic worden automatisch verwijderd na {duration}.",
+  "slowModeNotice": "Wacht {duration} tussen jouw berichten in dit topic.",
+  "closeTopic": "Topic sluiten",
+  "openTopic": "Topic openen",
+  "pinTopic": "Topic vastmaken",
+  "unpinTopic": "Topic losmaken",
+  "archiveTopic": "Topic archiveren",
+  "unarchiveTopic": "Topic dearchiveren",
+  "unlistTopic": "Topic onzichtbaar maken",
+  "listTopic": "Topic zichtbaar maken",
+  "permanentlyDelete": "Permanent verwijderen",
+  "permanentlyDeleteTopicConfirmation": "Deze actie kan niet ongedaan worden gemaakt. Dit topic wordt definitief verwijderd uit de database.",
+  "deleteTopicConfirmYes": "Ja, dit topic verwijderen",
+  "deleteTopicConfirmNo": "Nee, dit topic behouden",
+  "topicPinned": "Topic vastgemaakt",
+  "topicUnpinned": "Topic losgemaakt",
+  "topicArchived": "Topic gearchiveerd",
+  "topicUnarchived": "Topic gedearchiveerd",
+  "topicUnlisted": "Topic onzichtbaar gemaakt",
+  "topicListed": "Topic zichtbaar gemaakt",
+  "topicRecovered": "Verwijdering van topic ongedaan gemaakt",
+  "topicActionFailed": "Kon het topic niet bijwerken: {error}",
+  "durationMinutes": "{count, plural, =1{1 minuut} other{{count} minuten}}",
+  "durationHours": "{count, plural, =1{1 uur} other{{count} uur}}",
+  "durationDays": "{count, plural, =1{1 dag} other{{count} dagen}}",
+  "timeLeftMinutes": "{count, plural, =1{over 1 minuut} other{over {count} minuten}}",
+  "timeLeftHours": "{count, plural, =1{over 1 uur} other{over {count} uur}}",
+  "timeLeftDays": "{count, plural, =1{over 1 dag} other{over {count} dagen}}",
+  "topicStatusDeletedHelp": "Dit onderwerp is verwijderd en verborgen voor andere gebruikers"
 }

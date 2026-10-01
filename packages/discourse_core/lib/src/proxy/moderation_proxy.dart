@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/models/results/fc_moderation_result.dart';
 
 import '../base_discourse_proxy.dart';
 import '../data/moderation/discourse_reviewable.dart';
+import '../data/topic/discourse_topic_status.dart';
 import '../util/html_text.dart';
 
 /// Discourse implementation of [IFCModerationProxy].
@@ -110,6 +111,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
     // mode / reason are XF-specific; ignored.
     try {
       await apiDelete('/t/$topicId.json');
+      _recordStatus(topicId, (s) => s.copyWith(deleted: true));
       return FCDeleteTopicResult(
           result: true, resultText: '', isLoginMod: true);
     } on DiscourseApiException catch (e) {
@@ -126,6 +128,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
       String topicId, String reason) async {
     try {
       await apiPut('/t/$topicId/recover.json');
+      _recordStatus(topicId, (s) => s.copyWith(deleted: false));
       return FCUndeleteTopicResult(
           result: true, resultText: '', isLoginMod: true);
     } on DiscourseApiException catch (e) {
@@ -420,6 +423,7 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
     try {
       await apiDelete('/t/$topicId.json',
           query: hardDelete ? {'force_destroy': 'true'} : null);
+      _recordStatus(topicId, (s) => s.copyWith(deleted: true));
       return FCDeleteTopicResult(
           result: true, resultText: '', isLoginMod: true);
     } on DiscourseApiException catch (e) {
@@ -433,6 +437,16 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
 
   // ===== Helpers =====
 
+  /// Applies a successful action to the topic page's record of the topic
+  /// (DiscourseTopicStatus), ahead of the reload that confirms it.
+  void _recordStatus(String topicId,
+      DiscourseTopicStatus Function(DiscourseTopicStatus) change) {
+    final s = DiscourseTopicStatus.forTopic(siteContext.site.url, topicId);
+    if (s != null) {
+      DiscourseTopicStatus.store(siteContext.site.url, topicId, change(s));
+    }
+  }
+
   Future<R> _setStatus<R>(
     String topicId, {
     required String status,
@@ -445,6 +459,15 @@ class DiscourseModerationProxy extends BaseDiscourseProxy
         'status': status,
         'enabled': enabled.toString(),
       });
+      _recordStatus(topicId, (s) => switch (status) {
+            'closed' => s.copyWith(closed: enabled),
+            'archived' => s.copyWith(archived: enabled),
+            'visible' => s.copyWith(visible: enabled),
+            // Pinning for everyone resets each reader's own unpin.
+            'pinned' => s.copyWith(
+                pinned: enabled, unpinned: false, pinnedGlobally: false),
+            _ => s,
+          });
       return successResult();
     } on DiscourseApiException catch (e) {
       return errorResult(e.userMessage);

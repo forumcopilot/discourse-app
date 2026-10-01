@@ -4,6 +4,7 @@ import 'package:discourse_core/discourse_core.dart'
         DiscourseAcceptedAnswers,
         DiscourseMoreTopics,
         DiscourseSiteContextExtension,
+        DiscourseTopicStatus,
         DiscourseTopicTracking;
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -22,6 +23,7 @@ import 'package:discourse_ui/views/widgets/avatar_actions.dart';
 import 'package:discourse_ui/views/widgets/thread_poll_mini_card.dart';
 import 'package:discourse_ui/views/widgets/suggested_topics_card.dart';
 import 'package:discourse_ui/views/widgets/topic_stats_bar.dart';
+import 'package:discourse_ui/views/widgets/topic_status.dart';
 import 'package:discourse_ui/views/widgets/post_time_gap.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -39,19 +41,11 @@ class PostsList extends StatefulWidget {
     required this.topicTitle,
     this.onForumIdAvailable,
     this.onRefreshAvailable,
-    this.onSubscriptionStatusChanged,
-    this.onClosedStatusChanged,
-    this.onStickyStatusChanged,
-    this.onDeletedStatusChanged,
     this.mode = PostsListMode.normal,
     this.anchorPostId,
     this.gotoPage,
     this.gotoPostNumber,
     this.isAnnouncement = false,
-    this.onCanSubscribeChanged,
-    this.onCanCloseChanged,
-    this.onCanStickyChanged,
-    this.onCanDeleteChanged,
     this.onTopicTitleLoaded,
     this.onThreadUrlAvailable,
     this.forumId,
@@ -66,10 +60,6 @@ class PostsList extends StatefulWidget {
   /// the current page, or with [scrollToPostId] to refresh by loading the thread at that post
   /// and scrolling to it (used after replying so the new post is visible without replacing the route).
   final void Function(void Function([String? scrollToPostId]) refresh)? onRefreshAvailable;
-  final void Function(bool)? onSubscriptionStatusChanged;
-  final void Function(bool isClosed)? onClosedStatusChanged;
-  final void Function(bool isSticky)? onStickyStatusChanged;
-  final void Function(bool isDeleted)? onDeletedStatusChanged;
   final PostsListMode mode;
   final String? anchorPostId;
   final int? gotoPage;
@@ -81,18 +71,6 @@ class PostsList extends StatefulWidget {
   final int? gotoPostNumber;
   final bool isAnnouncement;
   final String? forumId;
-
-  /// Called with the thread's can_subscribe permission after loading thread data.
-  final void Function(bool canSubscribe)? onCanSubscribeChanged;
-
-  /// Called with the thread's can_close permission after loading thread data.
-  final void Function(bool canClose)? onCanCloseChanged;
-
-  /// Called with the thread's can_stick permission after loading thread data.
-  final void Function(bool canSticky)? onCanStickyChanged;
-
-  /// Called with the thread's can_delete permission after loading thread data.
-  final void Function(bool canDelete)? onCanDeleteChanged;
 
   /// Called with the actual topic title when it's loaded from the server.
   final void Function(String topicTitle)? onTopicTitleLoaded;
@@ -358,16 +336,6 @@ class _PostsState extends State<PostsList> {
         if (forumId != null && forumId.isNotEmpty) {
           widget.onForumIdAvailable?.call(forumId);
         }
-        widget.onSubscriptionStatusChanged?.call(data?.topic.isSubscribed ?? false);
-        // Notify closed and sticky status separately
-        widget.onClosedStatusChanged?.call(data?.topic.isClosed ?? false);
-        widget.onStickyStatusChanged?.call(data?.topic.isPinned ?? false);
-        widget.onDeletedStatusChanged?.call(data?.topic.isDeleted ?? false);
-        // Notify permission flags
-        widget.onCanSubscribeChanged?.call(data?.topic.canSubscribe ?? true);
-        widget.onCanCloseChanged?.call(data?.topic.canClose ?? true);
-        widget.onCanStickyChanged?.call(data?.topic.canStick ?? true);
-        widget.onCanDeleteChanged?.call(data?.topic.canDelete ?? true);
         widget.onTopicTitleLoaded?.call(data?.topic.title ?? '');
         widget.onThreadUrlAvailable?.call(data?.topic.url);
       });
@@ -1227,6 +1195,15 @@ class _PostsState extends State<PostsList> {
     final avatarActions = _avatarActions;
     final isLast = postIndex == postsListLength - 1;
     final moreTopicsFollow = isLast && _moreTopicsFollow(data);
+    // The topic's footer (web's TopicFooterButtons with their reasons, and
+    // the timer and slow-mode notices) closes the stream once its last post
+    // is in.
+    final topicStatus = isLast && !_hasMorePosts
+        ? DiscourseTopicStatus.forTopic(
+            widget.siteContext.site.url, _loadedTopicId(data))
+        : null;
+    final footerFollows = topicStatus != null &&
+        TopicFooter.hasContent(context, widget.siteContext, topicStatus);
     final imageActions = _imageActions;
     final postActionsHandler = _postActionsHandler;
 
@@ -1273,6 +1250,7 @@ class _PostsState extends State<PostsList> {
         // the topic summary and band instead.
         showBottomDivider: post.postNumber != 1 &&
             !moreTopicsFollow &&
+            !footerFollows &&
             (nextPost == null || _timeGapBetween(post, nextPost) == null),
         onVoteSuccess: (p) => _postsController.updateThreadPoll(p),
         actions: PostActions(
@@ -1324,14 +1302,29 @@ class _PostsState extends State<PostsList> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           postWidget,
+          if (footerFollows)
+            TopicStatusBuilder(
+              siteContext: widget.siteContext,
+              topicId: _loadedTopicId(data),
+              builder: (context, status) => status == null
+                  ? const SizedBox.shrink()
+                  : TopicFooter(
+                      siteContext: widget.siteContext,
+                      topicId: _loadedTopicId(data),
+                      status: status,
+                      // The opening post, when it is also the last, already
+                      // ends with the band.
+                      showTopBand: post.postNumber != 1,
+                    ),
+            ),
           if (moreTopicsFollow)
             SuggestedTopicsCard(
               siteContext: widget.siteContext,
               topicId: _loadedTopicId(data),
               categoryId: data.topic.forumId,
               // The opening post, when it is also the last, already ends
-              // with the band.
-              showTopBand: post.postNumber != 1,
+              // with the band; so does the footer when it shows.
+              showTopBand: post.postNumber != 1 || footerFollows,
             ),
           SizedBox(height: toolbarHeight),
         ],

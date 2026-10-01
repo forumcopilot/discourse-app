@@ -5,6 +5,7 @@ import 'package:forumcopilot_sdk/models/results/fc_notification_result.dart';
 import 'package:forumcopilot_sdk/models/results/fc_subscription_result.dart';
 
 import '../base_discourse_proxy.dart';
+import '../data/topic/discourse_topic_status.dart';
 import '../data/topic/discourse_topic_tracking.dart';
 import '../util/site_url.dart';
 
@@ -221,6 +222,17 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       await apiPost('/t/$topicId/notifications.json', body: {
         'notification_level': level.level,
       });
+      // The topic page's footer reads the level and its reason from here;
+      // a level set by hand has the reason "user_changed" (2).
+      final status =
+          DiscourseTopicStatus.forTopic(siteContext.site.url, topicId);
+      if (status != null) {
+        DiscourseTopicStatus.store(
+            siteContext.site.url,
+            topicId,
+            status.copyWith(
+                notificationLevel: level.level, notificationsReasonId: 2));
+      }
       return FCNotificationLevelResult(result: true, level: level);
     } on DiscourseApiException catch (e) {
       return FCNotificationLevelResult(
