@@ -91,6 +91,21 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
     return upload;
   }
 
+  /// Discourse-only: an image for the member's own profile, the cover
+  /// (`profile_background`) or the user card's (`card_background`), sent
+  /// with the upload type Discourse's preferences page uses. The result's
+  /// `url` is what `PUT /u/{username}.json` takes to set it.
+  Future<FCAttachmentUploadResult> uploadProfileImageAsync(
+    String uploadType,
+    String imageExtension,
+    Uint8List bytes,
+  ) {
+    final ext = imageExtension.startsWith('.')
+        ? imageExtension.substring(1)
+        : imageExtension;
+    return _upload('$uploadType.$ext', bytes, uploadType: uploadType);
+  }
+
   @override
   Future<FCAttachmentRemoveResult> removeAttachmentAsync(
     String attachmentId,

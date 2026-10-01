@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import '../../util/html_text.dart';
 import '../../util/site_url.dart';
+import '../user/discourse_profile.dart';
 
 /// What `/site.json` says this forum offers.
 ///
@@ -169,6 +170,14 @@ class DiscourseSiteCapabilities {
   /// it once per forum, so the children come for free.
   List<Map<String, dynamic>> categories = const [];
 
+  /// The forum's own profile questions (`user_fields` in `/site.json`), in
+  /// the forum's order. Empty when it defines none.
+  List<DiscourseUserFieldDef> userFields = const [];
+
+  /// What members may do with their profile, from `/site/settings.json`.
+  /// Null until read.
+  DiscourseProfileSettings? profileSettings;
+
   /// True once a real payload has been parsed for this forum. Distinguishes
   /// "asked, offers nothing" from "never asked".
   bool resolved = false;
@@ -219,6 +228,11 @@ class DiscourseSiteCapabilities {
         .toList(growable: false);
     caps.tosUrl = (site['tos_url'] as String?)?.trim();
     caps.privacyPolicyUrl = (site['privacy_policy_url'] as String?)?.trim();
+    caps.userFields = ((site['user_fields'] as List?) ?? const [])
+        .whereType<Map>()
+        .map((f) => DiscourseUserFieldDef.fromJson(f.cast<String, dynamic>()))
+        .whereType<DiscourseUserFieldDef>()
+        .toList(growable: false);
     caps.resolved = true;
   }
 
@@ -354,6 +368,8 @@ class DiscourseSiteCapabilities {
         .toList(growable: false);
     caps.defaultSidebarTags =
         split(settings['default_navigation_menu_tags']);
+    caps.profileSettings =
+        DiscourseProfileSettings.fromClientSettings(settings, siteUrl: pluginUrl);
   }
 
   /// Records each category's topics of the past week from a

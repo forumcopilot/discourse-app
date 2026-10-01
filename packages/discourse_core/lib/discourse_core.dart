@@ -25,6 +25,7 @@ export 'src/data/chat/discourse_chat_permissions.dart';
 export 'src/proxy/group_proxy.dart';
 export 'src/proxy/invite_proxy.dart';
 export 'src/proxy/tag_proxy.dart';
+export 'src/proxy/profile_proxy.dart';
 
 // Remaining XF-shaped surface: `private_message_proxy` is the only real
 // stub left (Discourse has no separate PM-inbox model — PMs are topics,
@@ -76,6 +77,7 @@ export 'src/data/moderation/discourse_reviewable.dart';
 export 'src/data/user/discourse_do_not_disturb.dart';
 export 'src/data/user/discourse_pending_post.dart';
 export 'src/data/user/discourse_user_profile_extras.dart';
+export 'src/data/user/discourse_profile.dart';
 export 'src/data/user/discourse_user_summary.dart';
 export 'src/data/attachment/discourse_media_optimization.dart';
 export 'src/data/attachment/discourse_upload_limits.dart';
