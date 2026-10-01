@@ -6,12 +6,25 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.46] - 2026-10-01
+
+### Added
+- **Pin Topic…**, web's "Feature this topic", for staff: pin a topic at the top of its category until a date, or at the top of every topic list where the forum allows it (staff and trust level 4). Un-Pin acts at once.
+- **The forum's own flags.** Flag Post lists the flag types the forum defines, in its order and language, instead of five fixed English options. That brings Illegal (with web's confirmation) and any flag a forum adds; a flag that needs a message asks for one as long as the forum requires. "Send @… a message" names the author and is not offered on your own post.
+
 ### Changed
+- **A topic shows its status the way Discourse web does.** The up to four banners over the posts are gone. Status icons lead the title (closed or archived, pinned, unpinned, unlisted, a warning, deleted), each with Discourse's explanation on tap, and a footer under the last post holds the topic timer, slow mode, your Pinned / Unpinned choice and your notification level with Discourse's reason for it. The staff menu now follows the topic's real permissions and state, in web's words (Close / Open Topic, Pin / Un-Pin, Archive, Unlist, Delete, Un-Delete), and acts at once; deleting asks as web does.
+- **The app in its own words, in all 11 languages.** About 450 strings that only existed in English are translated, with Discourse's own translations wherever it has the string, and the words left over from XenForo are Discourse's now: Closed, not Locked; Pinned Globally, not Announcement; Flag, not Report; Sign Up, not Register; category, not forum; your level by name (Watching, Tracking) instead of Subscribed; Discourse's names for notification preferences, trust levels and suspensions. Dutch and Chinese use Discourse's terms, and "thread" is now "topic" in Spanish, Italian, Japanese and Korean.
+- **Long choices and long text get the whole screen.** Flag Post, Suspend User and a request to join a group open as full-screen pages with the action in the top bar, so the keyboard no longer hides the message being written.
 - **Notification settings say where each setting applies.** The page is now two sections: *On this device*, the app's push from this forum to this device alone, and *Your (forum) account*, the forum's own settings (email, activity), which hold on the web, by email and on every device. The push row says whether push is on and, when it is off, that turning it on means approving once on the forum.
 - **"Turn off" is now *Stop push on this device*, and it asks first.** It sits below the per-type switches, which stay the way to quiet a kind of notification without losing push. The confirmation says what stopping does: only this device stops, the web and email don't change, and the permission given on the forum is deleted, so turning push back on means approving it there again. A single tap used to delete it without a word.
 - **Do not disturb is on the Profile tab only**, as the website keeps it in the user menu; Notification settings no longer repeats it.
 
 ### Fixed
+- **Polls show their options' emoji and formatting** instead of the HTML behind them: an option read `Door Lock <img src="…" class="emoji">`.
+- **Search results show their topic's state.** A post result (the All tab, which opens first) now shows Closed, Solved, Pinned and the topic's tags, which were always left off.
+- **Taking someone off a message says what failed**: "Couldn't remove {name} from this message." instead of an error that ended in a bare colon.
+- **A custom suspension reason in any language but English is kept**; the dialog compared the choice with the English label and dropped it.
 - **The Profile tab's Do not disturb row follows a status that pauses notifications.** Setting or clearing a status with "Pause notifications" left the row showing the old state until the tab was opened again.
 
 ## [1.0.45] - 2026-09-30
