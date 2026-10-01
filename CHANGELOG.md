@@ -6,6 +6,14 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Changed
+- **Notification settings say where each setting applies.** The page is now two sections: *On this device*, the app's push from this forum to this device alone, and *Your (forum) account*, the forum's own settings (email, activity), which hold on the web, by email and on every device. The push row says whether push is on and, when it is off, that turning it on means approving once on the forum.
+- **"Turn off" is now *Stop push on this device*, and it asks first.** It sits below the per-type switches, which stay the way to quiet a kind of notification without losing push. The confirmation says what stopping does: only this device stops, the web and email don't change, and the permission given on the forum is deleted, so turning push back on means approving it there again. A single tap used to delete it without a word.
+- **Do not disturb is on the Profile tab only**, as the website keeps it in the user menu; Notification settings no longer repeats it.
+
+### Fixed
+- **The Profile tab's Do not disturb row follows a status that pauses notifications.** Setting or clearing a status with "Pause notifications" left the row showing the old state until the tab was opened again.
+
 ## [1.0.45] - 2026-09-30
 
 ### Added

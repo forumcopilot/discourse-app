@@ -1638,20 +1638,63 @@ class AppLocalizationsKo extends AppLocalizations {
   String get openSettings => '설정 열기';
 
   @override
-  String get notificationsOnThisDevice => '이 기기의 알림';
+  String get notificationsThisDeviceSection => '이 기기';
 
   @override
-  String get notificationsGrantOnSubtitle => '이 포럼의 답글, 멘션, 메시지가 이 기기로 전달됩니다.';
+  String notificationsThisDeviceCaption(Object forumName) {
+    return '$forumName의 푸시는 이 기기에만 해당됩니다. 다른 기기와 웹에는 영향이 없습니다.';
+  }
 
   @override
-  String get notificationsGrantOffSubtitle =>
-      '포럼에서 한 번 승인하면 답글, 멘션, 메시지를 여기서 받을 수 있습니다.';
+  String notificationsAccountSection(Object forumName) {
+    return '$forumName 계정';
+  }
+
+  @override
+  String get notificationsAccountCaption => '웹, 이메일, 모든 기기에 공통으로 적용됩니다.';
+
+  @override
+  String pushOnThisDeviceSubtitle(Object forumName) {
+    return '켜짐: $forumName의 새 알림이 이 기기로 푸시됩니다.';
+  }
+
+  @override
+  String pushOffThisDeviceSubtitle(Object forumName) {
+    return '이 기기에서 꺼져 있습니다. 켜려면 $forumName에서 한 번 승인하세요.';
+  }
+
+  @override
+  String get stopPushOnThisDevice => '이 기기에서 푸시 중지';
+
+  @override
+  String stopPushTitle(Object forumName) {
+    return '이 기기에서 $forumName 푸시를 중지할까요?';
+  }
+
+  @override
+  String get stopPushOnlyThisDevice => '이 기기에서만 중지됩니다. 다른 기기는 계속 받습니다.';
+
+  @override
+  String get stopPushNothingElseChanges =>
+      '알림은 앱과 웹에서 계속 볼 수 있으며, 포럼 이메일도 바뀌지 않습니다.';
+
+  @override
+  String stopPushPermissionDeleted(Object forumName) {
+    return '$forumName에서 허용한 권한이 삭제됩니다. 푸시를 다시 켜려면 포럼에서 다시 승인해야 합니다.';
+  }
+
+  @override
+  String get stopPushQuietHint =>
+      '잠시 조용히 하고 싶다면 위에서 필요 없는 종류를 끄거나 프로필의 방해 금지를 사용하세요.';
+
+  @override
+  String get stopPush => '푸시 중지';
 
   @override
   String get turnOn => '켜기';
 
   @override
-  String get couldNotTurnOffNotifications => '알림을 끌 수 없습니다. 나중에 다시 시도해 주세요.';
+  String get couldNotTurnOffNotifications => '푸시를 중지할 수 없습니다. 나중에 다시 시도해 주세요.';
 
   @override
   String actionCodeTopicCreated(String when) {
@@ -4395,12 +4438,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get signInToManageNotificationPrefs => '알림 설정을 관리하려면 로그인하세요.';
-
-  @override
-  String get notificationSettingsPushSection => '푸시';
-
-  @override
-  String get notificationSettingsEmailSection => '이메일';
 
   @override
   String get emailWhenAwayTitle => '부재 시 이메일';

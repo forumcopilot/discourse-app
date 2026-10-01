@@ -1705,22 +1705,66 @@ class AppLocalizationsNl extends AppLocalizations {
   String get openSettings => 'Instellingen openen';
 
   @override
-  String get notificationsOnThisDevice => 'Meldingen op dit apparaat';
+  String get notificationsThisDeviceSection => 'Op dit apparaat';
 
   @override
-  String get notificationsGrantOnSubtitle =>
-      'Reacties, vermeldingen en berichten van dit forum worden hier bezorgd.';
+  String notificationsThisDeviceCaption(Object forumName) {
+    return 'Push van $forumName alleen naar dit apparaat. Je andere apparaten en het web veranderen niet.';
+  }
 
   @override
-  String get notificationsGrantOffSubtitle =>
-      'Keur het eenmalig goed op het forum om reacties, vermeldingen en berichten hier te ontvangen.';
+  String notificationsAccountSection(Object forumName) {
+    return 'Je account op $forumName';
+  }
+
+  @override
+  String get notificationsAccountCaption =>
+      'Gelden overal: op het web, per e-mail en op al je apparaten.';
+
+  @override
+  String pushOnThisDeviceSubtitle(Object forumName) {
+    return 'Aan: nieuwe meldingen van $forumName komen op dit apparaat binnen.';
+  }
+
+  @override
+  String pushOffThisDeviceSubtitle(Object forumName) {
+    return 'Uit op dit apparaat. Om het aan te zetten, keur je het eenmalig goed op $forumName.';
+  }
+
+  @override
+  String get stopPushOnThisDevice => 'Push op dit apparaat stoppen';
+
+  @override
+  String stopPushTitle(Object forumName) {
+    return 'Push van $forumName op dit apparaat stoppen?';
+  }
+
+  @override
+  String get stopPushOnlyThisDevice =>
+      'Alleen dit apparaat stopt. Je andere apparaten houden hun push.';
+
+  @override
+  String get stopPushNothingElseChanges =>
+      'Je meldingen blijven zichtbaar in de app en op het web, en de e-mails van het forum veranderen niet.';
+
+  @override
+  String stopPushPermissionDeleted(Object forumName) {
+    return 'De toestemming die je op $forumName gaf, wordt verwijderd. Om push weer aan te zetten, keur je het daar opnieuw goed.';
+  }
+
+  @override
+  String get stopPushQuietHint =>
+      'Wil je alleen even rust? Zet hierboven de soorten uit die je niet nodig hebt, of gebruik Niet storen in je profiel.';
+
+  @override
+  String get stopPush => 'Push stoppen';
 
   @override
   String get turnOn => 'Inschakelen';
 
   @override
   String get couldNotTurnOffNotifications =>
-      'Kon meldingen niet uitschakelen. Probeer het later opnieuw.';
+      'Kon push niet stoppen. Probeer het later opnieuw.';
 
   @override
   String actionCodeTopicCreated(String when) {
@@ -4606,12 +4650,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get signInToManageNotificationPrefs =>
       'Meld je aan om je meldingsvoorkeuren te beheren.';
-
-  @override
-  String get notificationSettingsPushSection => 'Push';
-
-  @override
-  String get notificationSettingsEmailSection => 'E-mail';
 
   @override
   String get emailWhenAwayTitle => 'E-mail bij afwezigheid';

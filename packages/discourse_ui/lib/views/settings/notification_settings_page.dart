@@ -8,7 +8,6 @@ import 'package:discourse_ui/theme/design_tokens.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_notification_prefs.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 import '../../controllers/site_controller.dart';
 import '../../services/discourse_login_service.dart';
@@ -44,8 +43,18 @@ import '../../l10n/generated/app_localizations.dart';
 /// Each control fires an immediate `PUT /u/{me}.json` with the
 /// changed field. Optimistic UI: state flips immediately, reverts on
 /// network failure with a snackbar.
+///
+/// Two sections, each saying where it applies, because they differ and
+/// nothing else on the page shows it: "On this device" is the app's push
+/// from this forum to this device alone; "Your [forum] account" is the
+/// reader's settings on the forum, which hold on the web, by email and on
+/// every device. Do Not Disturb is account-wide too, but it lives on the
+/// Profile tab (as web's lives in the user menu, not in preferences).
 class NotificationSettingsPage extends StatefulWidget {
-  const NotificationSettingsPage({super.key});
+  const NotificationSettingsPage({super.key, this.siteContext});
+
+  /// The forum; the open one when null.
+  final SiteContext? siteContext;
 
   @override
   State<NotificationSettingsPage> createState() =>
@@ -58,9 +67,11 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   bool _saving = false;
   String? _error;
 
-  SiteContext? get _siteContext => Get.isRegistered<DiscourseSiteController>()
-      ? Get.find<DiscourseSiteController>().currentSiteContext.value
-      : null;
+  SiteContext? get _siteContext =>
+      widget.siteContext ??
+      (Get.isRegistered<DiscourseSiteController>()
+          ? Get.find<DiscourseSiteController>().currentSiteContext.value
+          : null);
 
   @override
   void initState() {
@@ -161,30 +172,26 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         message: l10n.signInToManageNotificationPrefs,
       );
     }
+    final site = _siteContext;
+    final forumName = site == null ? '' : forumNameOf(site);
     return ListView(
       padding: EdgeInsets.only(bottom: DesignTokens.spacingXL),
       children: [
         if (_saving) const LinearProgressIndicator(minHeight: 2),
-        _Section(label: l10n.notificationSettingsPushSection),
+        _Section(label: l10n.notificationsThisDeviceSection),
+        _Caption(l10n.notificationsThisDeviceCaption(forumName)),
         // Two different mechanisms with different states: the notifications
         // grant (a backend polls the forum with a key the user approved) and
         // the relay (Discourse pushes to an allowlisted URL). Show the one
         // this build uses; a build with neither keeps the relay tile's
         // "not available" row so the section still says something.
-        if (AppForumConfig.isNotificationsGrantEnabled && _siteContext != null)
-          _NotificationsGrantTile(siteContext: _siteContext!)
+        if (AppForumConfig.isNotificationsGrantEnabled && site != null)
+          _NotificationsGrantTile(siteContext: site)
         else
           const _PushStatusTile(),
         const Divider(height: 1),
-        // Do not disturb — Discourse-native (`/do-not-disturb.json`).
-        // Only meaningful for a signed-in user; the tile manages its
-        // own status fetch so the prefs load above stays untouched.
-        if (_siteContext?.isLoggedIn ?? false) ...[
-          _Section(label: l10n.doNotDisturb),
-          DoNotDisturbTile(siteContext: _siteContext!),
-          const Divider(height: 1),
-        ],
-        _Section(label: l10n.notificationSettingsEmailSection),
+        _Section(label: l10n.notificationsAccountSection(forumName)),
+        _Caption(l10n.notificationsAccountCaption),
         _EnumTile(
           title: l10n.emailWhenAwayTitle,
           subtitle: l10n.emailLevelDescription,
@@ -246,8 +253,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             prefs,
           ),
         ),
-        const Divider(height: 1),
-        _Section(label: l10n.activity),
+        const Divider(
+            indent: DesignTokens.spacingL, endIndent: DesignTokens.spacingL),
         _EnumTile(
           // Discourse's words (user.like_notification_frequency).
           title: l10n.likeNotificationFrequencyTitle,
@@ -362,9 +369,11 @@ class _PushStatusTile extends StatelessWidget {
 /// The notifications grant for this device, with a way to change the answer
 /// given at sign-in. "On" means the backend holds a notifications-only key
 /// for this forum and polls it for this device; "Turn on" runs the same
-/// [EnableNotificationsPage] the sign-in flow shows, and "Turn off" tells the
-/// backend to stop and forgets the grant, so the next sign-in offers it
-/// again.
+/// [EnableNotificationsPage] the sign-in flow shows. While on, the per-type
+/// switches are the everyday control — they quiet a kind of notification
+/// and keep the grant — and "Stop push on this device", after
+/// [confirmStopPush], tells the backend to delete the key (it revokes it on
+/// the forum) and forgets the grant, so the next sign-in offers it again.
 ///
 /// The state is the locally remembered grant, not a server query: the
 /// backend has no read endpoint, and the flag is written only once the
@@ -445,6 +454,12 @@ class _NotificationsGrantTileState extends State<_NotificationsGrantTile> {
     await _load();
   }
 
+  Future<void> _stopPush() async {
+    final go = await confirmStopPush(context,
+        forumName: forumNameOf(widget.siteContext));
+    if (go && mounted) await _turnOff();
+  }
+
   Future<void> _turnOff() async {
     setState(() => _busy = true);
     final site = widget.siteContext.site;
@@ -477,6 +492,7 @@ class _NotificationsGrantTileState extends State<_NotificationsGrantTile> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context)!;
+    final forumName = forumNameOf(widget.siteContext);
 
     final tile = ListTile(
       leading: Icon(
@@ -485,243 +501,55 @@ class _NotificationsGrantTileState extends State<_NotificationsGrantTile> {
             : Icons.notifications_off_outlined,
         color: _granted ? colorScheme.primary : colorScheme.onSurfaceVariant,
       ),
-      title: Text(l10n.notificationsOnThisDevice),
+      title: Text(l10n.pushNotifications),
       subtitle: Text(_granted
-          ? l10n.notificationsGrantOnSubtitle
-          : l10n.notificationsGrantOffSubtitle),
+          ? l10n.pushOnThisDeviceSubtitle(forumName)
+          : l10n.pushOffThisDeviceSubtitle(forumName)),
       trailing: _loading || _busy
           ? const SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
-          : TextButton(
-              onPressed: _granted ? _turnOff : _turnOn,
-              child: Text(_granted ? l10n.turnOff : l10n.turnOn),
-            ),
+          : _granted
+              ? null
+              : TextButton(onPressed: _turnOn, child: Text(l10n.turnOn)),
     );
-    if (!_granted || !_installBound || _loading) return tile;
+    if (!_granted || _loading) return tile;
 
-    // Which kinds of notification this forum pushes to this phone. All on
-    // unless turned off; the backend skips what is off.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         tile,
-        for (final group in NotificationKeyService.pushGroups)
-          Builder(builder: (context) {
-            final (title, hint) = _groupLabel(group, l10n);
-            return SwitchListTile(
-              contentPadding: const EdgeInsets.only(
-                  left: DesignTokens.spacingXL * 2, right: DesignTokens.spacingM),
-              title: Text(title),
-              subtitle: Text(hint),
-              value: !_muted.contains(group),
-              onChanged: _savingGroup != null || _busy
-                  ? null
-                  : (on) => _setGroup(group, on),
-            );
-          }),
+        // Which kinds of notification this forum pushes to this device. All
+        // on unless turned off; the backend skips what is off. Only grants
+        // made under the phone's installation have them.
+        if (_installBound)
+          for (final group in NotificationKeyService.pushGroups)
+            Builder(builder: (context) {
+              final (title, hint) = _groupLabel(group, l10n);
+              return SwitchListTile(
+                contentPadding: const EdgeInsets.only(
+                    left: DesignTokens.spacingXL * 2,
+                    right: DesignTokens.spacingM),
+                title: Text(title),
+                subtitle: Text(hint),
+                value: !_muted.contains(group),
+                onChanged: _savingGroup != null || _busy
+                    ? null
+                    : (on) => _setGroup(group, on),
+              );
+            }),
+        ListTile(
+          leading: Icon(Icons.notifications_off_outlined,
+              color: colorScheme.error),
+          title: Text(l10n.stopPushOnThisDevice,
+              style: TextStyle(color: colorScheme.error)),
+          onTap: _busy ? null : _stopPush,
+        ),
       ],
     );
   }
-}
-
-/// Do-not-disturb control, backed by Discourse's native
-/// `POST`/`DELETE /do-not-disturb.json` (via `DiscourseUserProxy`).
-///
-/// On mount it reads the current DND deadline (Discourse only exposes it
-/// on `/session/current.json`, so this is one extra request). While a
-/// window is active the tile reports "until <time>" with a Turn off
-/// action; when inactive, tapping it opens a duration picker bottom
-/// sheet matching the `_EnumTile` picker cadence.
-class DoNotDisturbTile extends StatefulWidget {
-  final SiteContext siteContext;
-
-  const DoNotDisturbTile({super.key, required this.siteContext});
-
-  @override
-  State<DoNotDisturbTile> createState() => DoNotDisturbTileState();
-}
-
-class DoNotDisturbTileState extends State<DoNotDisturbTile> {
-  bool _loading = true;
-  bool _busy = false;
-  DateTime? _endsAt;
-
-  static List<_DndDuration> _durations(AppLocalizations l10n) => [
-        _DndDuration(value: '30', label: l10n.durationMinutes(30)),
-        _DndDuration(value: '60', label: l10n.durationHours(1)),
-        _DndDuration(value: '480', label: l10n.durationHours(8)),
-        _DndDuration(value: '1440', label: l10n.durationHours(24)),
-        _DndDuration(
-            value: 'tomorrow', label: l10n.pauseNotificationsUntilTomorrow),
-      ];
-
-  bool get _isActive =>
-      _endsAt != null && _endsAt!.isAfter(DateTime.now().toUtc());
-
-  DiscourseUserProxy get _proxy => DiscourseUserProxy(widget.siteContext);
-
-  @override
-  void initState() {
-    super.initState();
-    _loadStatus();
-  }
-
-  Future<void> _loadStatus() async {
-    final result = await _proxy.getDoNotDisturbStatusAsync();
-    if (!mounted) return;
-    setState(() {
-      _loading = false;
-      if (result.result) {
-        _endsAt = result.endsAt;
-      }
-    });
-    if (result.result) _reportToPushBackend();
-  }
-
-  /// The notifications backend polls with a key that cannot read Do Not
-  /// Disturb, so it learns the window from the app: nothing is pushed during
-  /// it, as Discourse drops its own push. A no-op without a grant here.
-  void _reportToPushBackend() {
-    unawaited(DiscourseLoginService(widget.siteContext).syncDoNotDisturb(_endsAt));
-  }
-
-  Future<void> _enter(String duration) async {
-    setState(() => _busy = true);
-    final result = await _proxy.enterDoNotDisturbAsync(duration);
-    if (!mounted) return;
-    setState(() {
-      _busy = false;
-      if (result.result) {
-        _endsAt = result.endsAt;
-      }
-    });
-    if (result.result) _reportToPushBackend();
-    if (!result.result) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.resultText.isNotEmpty
-              ? result.resultText
-              : AppLocalizations.of(context)!.couldNotEnableDoNotDisturb),
-        ),
-      );
-    }
-  }
-
-  Future<void> _leave() async {
-    setState(() => _busy = true);
-    final result = await _proxy.leaveDoNotDisturbAsync();
-    if (!mounted) return;
-    setState(() {
-      _busy = false;
-      if (result.result) {
-        _endsAt = null;
-      }
-    });
-    if (result.result) _reportToPushBackend();
-    if (!result.result) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.resultText.isNotEmpty
-              ? result.resultText
-              : AppLocalizations.of(context)!.couldNotTurnOffDoNotDisturb),
-        ),
-      );
-    }
-  }
-
-  Future<void> _showDurationPicker() async {
-    final duration = await showModalBottomSheet<String>(
-      context: context,
-      showDragHandle: true,
-      builder: (sheetContext) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SheetTitle(AppLocalizations.of(context)!.pauseNotificationsFor),
-              ..._durations(AppLocalizations.of(context)!).map(
-                (d) => ListTile(
-                  title: Text(d.label),
-                  onTap: () => Navigator.of(sheetContext).pop(d.value),
-                ),
-              ),
-              SizedBox(height: DesignTokens.spacingS),
-            ],
-          ),
-        );
-      },
-    );
-    if (duration != null) {
-      await _enter(duration);
-    }
-  }
-
-  String _untilLabel(BuildContext context, DateTime endsAt) {
-    final local = endsAt.toLocal();
-    final now = DateTime.now();
-    final locale = Localizations.localeOf(context).toString();
-    final sameDay = local.year == now.year &&
-        local.month == now.month &&
-        local.day == now.day;
-    return sameDay
-        ? DateFormat.jm(locale).format(local)
-        : DateFormat.yMMMd(locale).add_jm().format(local);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    if (_loading) {
-      return ListTile(
-        leading: Icon(Icons.do_not_disturb_on_outlined),
-        title: Text(AppLocalizations.of(context)!.doNotDisturb),
-        subtitle: Text(AppLocalizations.of(context)!.checkingStatus),
-        enabled: false,
-      );
-    }
-
-    if (_isActive) {
-      return ListTile(
-        leading: Icon(
-          Icons.do_not_disturb_on,
-          color: colorScheme.primary,
-        ),
-        title: Text(AppLocalizations.of(context)!.doNotDisturb),
-        subtitle: Text(AppLocalizations.of(context)!.doNotDisturbOnUntil(_untilLabel(context, _endsAt!))),
-        trailing: TextButton(
-          onPressed: _busy ? null : _leave,
-          child: Text(AppLocalizations.of(context)!.turnOff),
-        ),
-      );
-    }
-
-    return ListTile(
-      onTap: _busy ? null : _showDurationPicker,
-      leading: Icon(
-        Icons.do_not_disturb_on_outlined,
-        color: colorScheme.onSurfaceVariant,
-      ),
-      title: Text(AppLocalizations.of(context)!.doNotDisturb),
-      subtitle: Text(
-        AppLocalizations.of(context)!.doNotDisturbExplanation,
-      ),
-      trailing: Icon(
-        Icons.chevron_right_rounded,
-        color: colorScheme.onSurfaceVariant,
-      ),
-    );
-  }
-}
-
-class _DndDuration {
-  final String value;
-  final String label;
-  const _DndDuration({required this.value, required this.label});
 }
 
 class _Section extends StatelessWidget {
@@ -730,6 +558,90 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SectionHeader(label);
+}
+
+/// The line under a section header that says where its settings apply.
+class _Caption extends StatelessWidget {
+  final String text;
+  const _Caption(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(DesignTokens.spacingL, 0,
+          DesignTokens.spacingL, DesignTokens.spacingS),
+      child: Text(
+        text,
+        style: theme.textTheme.bodySmall
+            ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+      ),
+    );
+  }
+}
+
+/// The forum's name, or its address when it has none.
+String forumNameOf(SiteContext site) {
+  final name = site.site.name.trim();
+  if (name.isNotEmpty) return name;
+  return Uri.tryParse(site.site.url)?.host ?? site.site.url;
+}
+
+/// Asks before stopping push from [forumName] on this device, saying what
+/// that does and does not change — the button alone cannot: only this
+/// device, nothing on the web or by email, and the permission given on the
+/// forum is deleted, so turning push back on means approving it there again.
+/// True to go ahead.
+Future<bool> confirmStopPush(BuildContext context,
+    {required String forumName}) async {
+  final l10n = AppLocalizations.of(context)!;
+  final theme = Theme.of(context);
+  Widget fact(IconData icon, String text) => Padding(
+        padding: const EdgeInsets.only(bottom: DesignTokens.spacingM),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
+            const SizedBox(width: DesignTokens.spacingM),
+            Expanded(child: Text(text, style: theme.textTheme.bodyMedium)),
+          ],
+        ),
+      );
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialog) => AlertDialog(
+      title: Text(l10n.stopPushTitle(forumName)),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            fact(Icons.smartphone_outlined, l10n.stopPushOnlyThisDevice),
+            fact(Icons.public, l10n.stopPushNothingElseChanges),
+            fact(Icons.key_outlined, l10n.stopPushPermissionDeleted(forumName)),
+            Text(
+              l10n.stopPushQuietHint,
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialog).pop(false),
+          child: Text(l10n.cancel),
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+              foregroundColor: theme.colorScheme.error),
+          onPressed: () => Navigator.of(dialog).pop(true),
+          child: Text(l10n.stopPush),
+        ),
+      ],
+    ),
+  );
+  return confirmed == true;
 }
 
 class _BoolTile extends StatelessWidget {

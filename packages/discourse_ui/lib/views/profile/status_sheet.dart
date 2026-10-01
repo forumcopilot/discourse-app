@@ -11,6 +11,7 @@ import '../../theme/design_tokens.dart';
 import '../../utils/app_navigation.dart';
 import '../../utils/discourse_emoji_data.dart';
 import '../../utils/error_message.dart';
+import '../settings/do_not_disturb_tile.dart';
 import '../widgets/reaction_glyph.dart';
 import '../widgets/sheet_title.dart';
 
@@ -156,6 +157,7 @@ class _StatusSheetState extends State<_StatusSheet> {
       result = await widget.users.leaveDoNotDisturbAsync();
     }
     if (result != null && result.result) {
+      DoNotDisturbTile.notifyChanged();
       unawaited(DiscourseLoginService(widget.siteContext)
           .syncDoNotDisturb(on ? result.endsAt : null));
     }
@@ -464,6 +466,7 @@ Future<void> clearUserStatus(SiteContext siteContext,
   if (dnd.result && dnd.isActive) {
     final left = await u.leaveDoNotDisturbAsync();
     if (left.result) {
+      DoNotDisturbTile.notifyChanged();
       unawaited(DiscourseLoginService(siteContext).syncDoNotDisturb(null));
     }
   }

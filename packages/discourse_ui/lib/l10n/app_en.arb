@@ -1963,23 +1963,93 @@
   "@openSettings": {
     "description": "Button: open the app's page in the system settings"
   },
-  "notificationsOnThisDevice": "Notifications on this device",
-  "@notificationsOnThisDevice": {
-    "description": "Settings row title: the notifications grant"
+  "notificationsThisDeviceSection": "On this device",
+  "@notificationsThisDeviceSection": {
+    "description": "Notification settings section header: the app's push from this forum to this device"
   },
-  "notificationsGrantOnSubtitle": "Replies, mentions and messages from this forum are delivered here.",
-  "@notificationsGrantOnSubtitle": {
-    "description": "Settings row subtitle when the notifications grant is on"
+  "notificationsThisDeviceCaption": "Push from {forumName} to this device only. Your other devices and the web aren't affected.",
+  "@notificationsThisDeviceCaption": {
+    "description": "Line under the 'On this device' header saying the push settings affect only this device",
+    "placeholders": {
+      "forumName": {
+        "type": "Object"
+      }
+    }
   },
-  "notificationsGrantOffSubtitle": "Approve once on the forum to get its replies, mentions and messages here.",
-  "@notificationsGrantOffSubtitle": {
-    "description": "Settings row subtitle when the notifications grant is off"
+  "notificationsAccountSection": "Your {forumName} account",
+  "@notificationsAccountSection": {
+    "description": "Notification settings section header: the reader's settings on the forum (email, activity)",
+    "placeholders": {
+      "forumName": {
+        "type": "Object"
+      }
+    }
+  },
+  "notificationsAccountCaption": "These apply everywhere: on the web, by email and on all your devices.",
+  "@notificationsAccountCaption": {
+    "description": "Line under the account header saying these settings apply on the web, by email and on every device"
+  },
+  "pushOnThisDeviceSubtitle": "On: new notifications from {forumName} are pushed to this device.",
+  "@pushOnThisDeviceSubtitle": {
+    "description": "Push notifications row subtitle while push from this forum is on for this device",
+    "placeholders": {
+      "forumName": {
+        "type": "Object"
+      }
+    }
+  },
+  "pushOffThisDeviceSubtitle": "Off on this device. To turn it on, you approve it once on {forumName}.",
+  "@pushOffThisDeviceSubtitle": {
+    "description": "Push notifications row subtitle while it is off; turning it on means approving once on the forum",
+    "placeholders": {
+      "forumName": {
+        "type": "Object"
+      }
+    }
+  },
+  "stopPushOnThisDevice": "Stop push on this device",
+  "@stopPushOnThisDevice": {
+    "description": "Row (destructive): stop push from this forum on this device and delete the permission"
+  },
+  "stopPushTitle": "Stop push from {forumName} on this device?",
+  "@stopPushTitle": {
+    "description": "Title of the dialog confirming 'Stop push on this device'",
+    "placeholders": {
+      "forumName": {
+        "type": "Object"
+      }
+    }
+  },
+  "stopPushOnlyThisDevice": "Only this device stops. Your other devices keep theirs.",
+  "@stopPushOnlyThisDevice": {
+    "description": "Stop push dialog: only this device is affected"
+  },
+  "stopPushNothingElseChanges": "Your notifications still show in the app and on the web, and the forum's emails don't change.",
+  "@stopPushNothingElseChanges": {
+    "description": "Stop push dialog: notifications in the app, on the web and by email are unchanged"
+  },
+  "stopPushPermissionDeleted": "The permission you gave on {forumName} is deleted. To turn push back on, you'll approve it there again.",
+  "@stopPushPermissionDeleted": {
+    "description": "Stop push dialog: the permission granted on the forum is deleted; turning push back on needs approving there again",
+    "placeholders": {
+      "forumName": {
+        "type": "Object"
+      }
+    }
+  },
+  "stopPushQuietHint": "Want quiet for a while instead? Turn off the kinds you don't need above, or use Do not disturb on your profile.",
+  "@stopPushQuietHint": {
+    "description": "Stop push dialog footnote: the per-type switches and Do not disturb (on the Profile tab) are for quiet time"
+  },
+  "stopPush": "Stop push",
+  "@stopPush": {
+    "description": "Button (destructive) in the stop push dialog"
   },
   "turnOn": "Turn on",
   "@turnOn": {
     "description": "Button"
   },
-  "couldNotTurnOffNotifications": "Couldn't turn off notifications. Try again later.",
+  "couldNotTurnOffNotifications": "Couldn't stop push. Try again later.",
   "@couldNotTurnOffNotifications": {
     "description": "Snackbar when the notifications backend rejected the revoke"
   },
@@ -5736,14 +5806,6 @@
   "signInToManageNotificationPrefs": "Sign in to manage your notification preferences.",
   "@signInToManageNotificationPrefs": {
     "description": "Notification settings page: empty state for a signed-out reader"
-  },
-  "notificationSettingsPushSection": "Push",
-  "@notificationSettingsPushSection": {
-    "description": "Notification settings page: section header over the push notification row"
-  },
-  "notificationSettingsEmailSection": "Email",
-  "@notificationSettingsEmailSection": {
-    "description": "Notification settings page: section header over the email preferences (Discourse user.email_settings)"
   },
   "emailWhenAwayTitle": "Email when away",
   "@emailWhenAwayTitle": {

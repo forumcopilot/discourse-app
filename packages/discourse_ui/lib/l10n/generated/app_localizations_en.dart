@@ -1696,22 +1696,66 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openSettings => 'Open Settings';
 
   @override
-  String get notificationsOnThisDevice => 'Notifications on this device';
+  String get notificationsThisDeviceSection => 'On this device';
 
   @override
-  String get notificationsGrantOnSubtitle =>
-      'Replies, mentions and messages from this forum are delivered here.';
+  String notificationsThisDeviceCaption(Object forumName) {
+    return 'Push from $forumName to this device only. Your other devices and the web aren\'t affected.';
+  }
 
   @override
-  String get notificationsGrantOffSubtitle =>
-      'Approve once on the forum to get its replies, mentions and messages here.';
+  String notificationsAccountSection(Object forumName) {
+    return 'Your $forumName account';
+  }
+
+  @override
+  String get notificationsAccountCaption =>
+      'These apply everywhere: on the web, by email and on all your devices.';
+
+  @override
+  String pushOnThisDeviceSubtitle(Object forumName) {
+    return 'On: new notifications from $forumName are pushed to this device.';
+  }
+
+  @override
+  String pushOffThisDeviceSubtitle(Object forumName) {
+    return 'Off on this device. To turn it on, you approve it once on $forumName.';
+  }
+
+  @override
+  String get stopPushOnThisDevice => 'Stop push on this device';
+
+  @override
+  String stopPushTitle(Object forumName) {
+    return 'Stop push from $forumName on this device?';
+  }
+
+  @override
+  String get stopPushOnlyThisDevice =>
+      'Only this device stops. Your other devices keep theirs.';
+
+  @override
+  String get stopPushNothingElseChanges =>
+      'Your notifications still show in the app and on the web, and the forum\'s emails don\'t change.';
+
+  @override
+  String stopPushPermissionDeleted(Object forumName) {
+    return 'The permission you gave on $forumName is deleted. To turn push back on, you\'ll approve it there again.';
+  }
+
+  @override
+  String get stopPushQuietHint =>
+      'Want quiet for a while instead? Turn off the kinds you don\'t need above, or use Do not disturb on your profile.';
+
+  @override
+  String get stopPush => 'Stop push';
 
   @override
   String get turnOn => 'Turn on';
 
   @override
   String get couldNotTurnOffNotifications =>
-      'Couldn\'t turn off notifications. Try again later.';
+      'Couldn\'t stop push. Try again later.';
 
   @override
   String actionCodeTopicCreated(String when) {
@@ -4564,12 +4608,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get signInToManageNotificationPrefs =>
       'Sign in to manage your notification preferences.';
-
-  @override
-  String get notificationSettingsPushSection => 'Push';
-
-  @override
-  String get notificationSettingsEmailSection => 'Email';
 
   @override
   String get emailWhenAwayTitle => 'Email when away';

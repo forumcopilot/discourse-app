@@ -1715,22 +1715,66 @@ class AppLocalizationsDe extends AppLocalizations {
   String get openSettings => 'Einstellungen öffnen';
 
   @override
-  String get notificationsOnThisDevice => 'Benachrichtigungen auf diesem Gerät';
+  String get notificationsThisDeviceSection => 'Auf diesem Gerät';
 
   @override
-  String get notificationsGrantOnSubtitle =>
-      'Antworten, Erwähnungen und Nachrichten aus diesem Forum werden hierher zugestellt.';
+  String notificationsThisDeviceCaption(Object forumName) {
+    return 'Push von $forumName nur auf dieses Gerät. Deine anderen Geräte und das Web sind nicht betroffen.';
+  }
 
   @override
-  String get notificationsGrantOffSubtitle =>
-      'Einmal im Forum bestätigen, um Antworten, Erwähnungen und Nachrichten hier zu erhalten.';
+  String notificationsAccountSection(Object forumName) {
+    return 'Dein Konto bei $forumName';
+  }
+
+  @override
+  String get notificationsAccountCaption =>
+      'Gilt überall: im Web, per E-Mail und auf all deinen Geräten.';
+
+  @override
+  String pushOnThisDeviceSubtitle(Object forumName) {
+    return 'An: Neue Benachrichtigungen von $forumName kommen per Push auf dieses Gerät.';
+  }
+
+  @override
+  String pushOffThisDeviceSubtitle(Object forumName) {
+    return 'Auf diesem Gerät aus. Zum Einschalten bestätigst du es einmal bei $forumName.';
+  }
+
+  @override
+  String get stopPushOnThisDevice => 'Push auf diesem Gerät beenden';
+
+  @override
+  String stopPushTitle(Object forumName) {
+    return 'Push von $forumName auf diesem Gerät beenden?';
+  }
+
+  @override
+  String get stopPushOnlyThisDevice =>
+      'Nur dieses Gerät ist betroffen. Deine anderen Geräte behalten ihren Push.';
+
+  @override
+  String get stopPushNothingElseChanges =>
+      'Deine Benachrichtigungen erscheinen weiter in der App und im Web, und die E-Mails des Forums ändern sich nicht.';
+
+  @override
+  String stopPushPermissionDeleted(Object forumName) {
+    return 'Die Berechtigung, die du bei $forumName erteilt hast, wird gelöscht. Um Push wieder einzuschalten, bestätigst du es dort erneut.';
+  }
+
+  @override
+  String get stopPushQuietHint =>
+      'Nur eine Weile Ruhe? Schalte oben die Arten aus, die du nicht brauchst, oder nutze „Nicht stören“ in deinem Profil.';
+
+  @override
+  String get stopPush => 'Push beenden';
 
   @override
   String get turnOn => 'Einschalten';
 
   @override
   String get couldNotTurnOffNotifications =>
-      'Benachrichtigungen konnten nicht ausgeschaltet werden. Versuche es später erneut.';
+      'Push konnte nicht beendet werden. Versuche es später erneut.';
 
   @override
   String actionCodeTopicCreated(String when) {
@@ -4642,12 +4686,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get signInToManageNotificationPrefs =>
       'Melde dich an, um deine Benachrichtigungseinstellungen zu verwalten.';
-
-  @override
-  String get notificationSettingsPushSection => 'Push';
-
-  @override
-  String get notificationSettingsEmailSection => 'E-Mail';
 
   @override
   String get emailWhenAwayTitle => 'E-Mail bei Abwesenheit';

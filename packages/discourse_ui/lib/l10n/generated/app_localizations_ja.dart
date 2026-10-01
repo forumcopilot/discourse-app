@@ -1645,20 +1645,63 @@ class AppLocalizationsJa extends AppLocalizations {
   String get openSettings => '設定を開く';
 
   @override
-  String get notificationsOnThisDevice => 'この端末での通知';
+  String get notificationsThisDeviceSection => 'この端末';
 
   @override
-  String get notificationsGrantOnSubtitle => 'このフォーラムの返信、メンション、メッセージがここに届きます。';
+  String notificationsThisDeviceCaption(Object forumName) {
+    return '$forumName からのプッシュはこの端末だけが対象です。ほかの端末やウェブには影響しません。';
+  }
 
   @override
-  String get notificationsGrantOffSubtitle =>
-      'フォーラムで一度承認すると、返信、メンション、メッセージがここに届きます。';
+  String notificationsAccountSection(Object forumName) {
+    return '$forumName のアカウント';
+  }
+
+  @override
+  String get notificationsAccountCaption => 'ウェブ、メール、すべての端末に共通の設定です。';
+
+  @override
+  String pushOnThisDeviceSubtitle(Object forumName) {
+    return 'オン：$forumName の新しい通知がこの端末に届きます。';
+  }
+
+  @override
+  String pushOffThisDeviceSubtitle(Object forumName) {
+    return 'この端末ではオフです。オンにするには $forumName で一度承認します。';
+  }
+
+  @override
+  String get stopPushOnThisDevice => 'この端末へのプッシュを停止';
+
+  @override
+  String stopPushTitle(Object forumName) {
+    return 'この端末で $forumName のプッシュを停止しますか？';
+  }
+
+  @override
+  String get stopPushOnlyThisDevice => '停止するのはこの端末だけです。ほかの端末には引き続き届きます。';
+
+  @override
+  String get stopPushNothingElseChanges =>
+      '通知はアプリやウェブで引き続き確認でき、フォーラムからのメールも変わりません。';
+
+  @override
+  String stopPushPermissionDeleted(Object forumName) {
+    return '$forumName で許可した権限は削除されます。プッシュを再びオンにするには、フォーラムでもう一度承認が必要です。';
+  }
+
+  @override
+  String get stopPushQuietHint =>
+      'しばらく静かにしたいだけなら、上で不要な種類をオフにするか、プロフィールのおやすみモードを使ってください。';
+
+  @override
+  String get stopPush => 'プッシュを停止';
 
   @override
   String get turnOn => 'オンにする';
 
   @override
-  String get couldNotTurnOffNotifications => '通知をオフにできませんでした。後でもう一度お試しください。';
+  String get couldNotTurnOffNotifications => 'プッシュを停止できませんでした。後でもう一度お試しください。';
 
   @override
   String actionCodeTopicCreated(String when) {
@@ -4396,12 +4439,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get signInToManageNotificationPrefs => '通知設定を管理するにはログインしてください。';
-
-  @override
-  String get notificationSettingsPushSection => 'プッシュ';
-
-  @override
-  String get notificationSettingsEmailSection => 'メール';
 
   @override
   String get emailWhenAwayTitle => '不在時のメール';

@@ -1711,22 +1711,66 @@ class AppLocalizationsFr extends AppLocalizations {
   String get openSettings => 'Ouvrir les réglages';
 
   @override
-  String get notificationsOnThisDevice => 'Notifications sur cet appareil';
+  String get notificationsThisDeviceSection => 'Sur cet appareil';
 
   @override
-  String get notificationsGrantOnSubtitle =>
-      'Les réponses, mentions et messages de ce forum sont livrés ici.';
+  String notificationsThisDeviceCaption(Object forumName) {
+    return 'Push de $forumName vers cet appareil uniquement. Vos autres appareils et le web ne sont pas concernés.';
+  }
 
   @override
-  String get notificationsGrantOffSubtitle =>
-      'Approuvez une fois sur le forum pour recevoir ici ses réponses, mentions et messages.';
+  String notificationsAccountSection(Object forumName) {
+    return 'Votre compte sur $forumName';
+  }
+
+  @override
+  String get notificationsAccountCaption =>
+      'S’appliquent partout : sur le web, par e-mail et sur tous vos appareils.';
+
+  @override
+  String pushOnThisDeviceSubtitle(Object forumName) {
+    return 'Activé : les nouvelles notifications de $forumName arrivent sur cet appareil.';
+  }
+
+  @override
+  String pushOffThisDeviceSubtitle(Object forumName) {
+    return 'Désactivé sur cet appareil. Pour l’activer, vous l’approuvez une fois sur $forumName.';
+  }
+
+  @override
+  String get stopPushOnThisDevice => 'Arrêter le push sur cet appareil';
+
+  @override
+  String stopPushTitle(Object forumName) {
+    return 'Arrêter le push de $forumName sur cet appareil ?';
+  }
+
+  @override
+  String get stopPushOnlyThisDevice =>
+      'Seul cet appareil est concerné. Vos autres appareils gardent le leur.';
+
+  @override
+  String get stopPushNothingElseChanges =>
+      'Vos notifications restent visibles dans l’app et sur le web, et les e-mails du forum ne changent pas.';
+
+  @override
+  String stopPushPermissionDeleted(Object forumName) {
+    return 'L’autorisation que vous avez donnée sur $forumName est supprimée. Pour réactiver le push, vous devrez l’approuver à nouveau sur le forum.';
+  }
+
+  @override
+  String get stopPushQuietHint =>
+      'Vous voulez juste un peu de calme ? Désactivez ci-dessus les types inutiles, ou utilisez Ne pas déranger dans votre profil.';
+
+  @override
+  String get stopPush => 'Arrêter le push';
 
   @override
   String get turnOn => 'Activer';
 
   @override
   String get couldNotTurnOffNotifications =>
-      'Impossible de désactiver les notifications. Réessayez plus tard.';
+      'Impossible d’arrêter le push. Réessayez plus tard.';
 
   @override
   String actionCodeTopicCreated(String when) {
@@ -4636,12 +4680,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get signInToManageNotificationPrefs =>
       'Connectez-vous pour gérer vos préférences de notification.';
-
-  @override
-  String get notificationSettingsPushSection => 'Push';
-
-  @override
-  String get notificationSettingsEmailSection => 'E-mail';
 
   @override
   String get emailWhenAwayTitle => 'E-mail en cas d’absence';

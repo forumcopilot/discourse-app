@@ -1710,22 +1710,66 @@ class AppLocalizationsRu extends AppLocalizations {
   String get openSettings => 'Открыть настройки';
 
   @override
-  String get notificationsOnThisDevice => 'Уведомления на этом устройстве';
+  String get notificationsThisDeviceSection => 'На этом устройстве';
 
   @override
-  String get notificationsGrantOnSubtitle =>
-      'Ответы, упоминания и сообщения с этого форума доставляются сюда.';
+  String notificationsThisDeviceCaption(Object forumName) {
+    return 'Push от $forumName только на это устройство. Другие ваши устройства и веб-версия не затрагиваются.';
+  }
 
   @override
-  String get notificationsGrantOffSubtitle =>
-      'Подтвердите один раз на форуме, чтобы получать здесь ответы, упоминания и сообщения.';
+  String notificationsAccountSection(Object forumName) {
+    return 'Ваш аккаунт на $forumName';
+  }
+
+  @override
+  String get notificationsAccountCaption =>
+      'Действуют везде: в веб-версии, в письмах и на всех ваших устройствах.';
+
+  @override
+  String pushOnThisDeviceSubtitle(Object forumName) {
+    return 'Включено: новые уведомления $forumName приходят на это устройство.';
+  }
+
+  @override
+  String pushOffThisDeviceSubtitle(Object forumName) {
+    return 'На этом устройстве выключено. Чтобы включить, подтвердите один раз на $forumName.';
+  }
+
+  @override
+  String get stopPushOnThisDevice => 'Отключить push на этом устройстве';
+
+  @override
+  String stopPushTitle(Object forumName) {
+    return 'Отключить push от $forumName на этом устройстве?';
+  }
+
+  @override
+  String get stopPushOnlyThisDevice =>
+      'Отключится только это устройство. Другие ваши устройства продолжат получать push.';
+
+  @override
+  String get stopPushNothingElseChanges =>
+      'Уведомления по-прежнему видны в приложении и в веб-версии, а письма форума не меняются.';
+
+  @override
+  String stopPushPermissionDeleted(Object forumName) {
+    return 'Разрешение, выданное на $forumName, будет удалено. Чтобы снова включить push, его нужно будет подтвердить там ещё раз.';
+  }
+
+  @override
+  String get stopPushQuietHint =>
+      'Нужна тишина ненадолго? Отключите выше ненужные типы или включите «Не беспокоить» в профиле.';
+
+  @override
+  String get stopPush => 'Отключить push';
 
   @override
   String get turnOn => 'Включить';
 
   @override
   String get couldNotTurnOffNotifications =>
-      'Не удалось отключить уведомления. Повторите попытку позже.';
+      'Не удалось отключить push. Повторите попытку позже.';
 
   @override
   String actionCodeTopicCreated(String when) {
@@ -4661,12 +4705,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get signInToManageNotificationPrefs =>
       'Войдите, чтобы управлять настройками уведомлений.';
-
-  @override
-  String get notificationSettingsPushSection => 'Push';
-
-  @override
-  String get notificationSettingsEmailSection => 'Эл. почта';
 
   @override
   String get emailWhenAwayTitle => 'Письма, когда вас нет';

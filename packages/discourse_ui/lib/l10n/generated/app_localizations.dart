@@ -2968,23 +2968,83 @@ abstract class AppLocalizations {
   /// **'Open Settings'**
   String get openSettings;
 
-  /// Settings row title: the notifications grant
+  /// Notification settings section header: the app's push from this forum to this device
   ///
   /// In en, this message translates to:
-  /// **'Notifications on this device'**
-  String get notificationsOnThisDevice;
+  /// **'On this device'**
+  String get notificationsThisDeviceSection;
 
-  /// Settings row subtitle when the notifications grant is on
+  /// Line under the 'On this device' header saying the push settings affect only this device
   ///
   /// In en, this message translates to:
-  /// **'Replies, mentions and messages from this forum are delivered here.'**
-  String get notificationsGrantOnSubtitle;
+  /// **'Push from {forumName} to this device only. Your other devices and the web aren\'t affected.'**
+  String notificationsThisDeviceCaption(Object forumName);
 
-  /// Settings row subtitle when the notifications grant is off
+  /// Notification settings section header: the reader's settings on the forum (email, activity)
   ///
   /// In en, this message translates to:
-  /// **'Approve once on the forum to get its replies, mentions and messages here.'**
-  String get notificationsGrantOffSubtitle;
+  /// **'Your {forumName} account'**
+  String notificationsAccountSection(Object forumName);
+
+  /// Line under the account header saying these settings apply on the web, by email and on every device
+  ///
+  /// In en, this message translates to:
+  /// **'These apply everywhere: on the web, by email and on all your devices.'**
+  String get notificationsAccountCaption;
+
+  /// Push notifications row subtitle while push from this forum is on for this device
+  ///
+  /// In en, this message translates to:
+  /// **'On: new notifications from {forumName} are pushed to this device.'**
+  String pushOnThisDeviceSubtitle(Object forumName);
+
+  /// Push notifications row subtitle while it is off; turning it on means approving once on the forum
+  ///
+  /// In en, this message translates to:
+  /// **'Off on this device. To turn it on, you approve it once on {forumName}.'**
+  String pushOffThisDeviceSubtitle(Object forumName);
+
+  /// Row (destructive): stop push from this forum on this device and delete the permission
+  ///
+  /// In en, this message translates to:
+  /// **'Stop push on this device'**
+  String get stopPushOnThisDevice;
+
+  /// Title of the dialog confirming 'Stop push on this device'
+  ///
+  /// In en, this message translates to:
+  /// **'Stop push from {forumName} on this device?'**
+  String stopPushTitle(Object forumName);
+
+  /// Stop push dialog: only this device is affected
+  ///
+  /// In en, this message translates to:
+  /// **'Only this device stops. Your other devices keep theirs.'**
+  String get stopPushOnlyThisDevice;
+
+  /// Stop push dialog: notifications in the app, on the web and by email are unchanged
+  ///
+  /// In en, this message translates to:
+  /// **'Your notifications still show in the app and on the web, and the forum\'s emails don\'t change.'**
+  String get stopPushNothingElseChanges;
+
+  /// Stop push dialog: the permission granted on the forum is deleted; turning push back on needs approving there again
+  ///
+  /// In en, this message translates to:
+  /// **'The permission you gave on {forumName} is deleted. To turn push back on, you\'ll approve it there again.'**
+  String stopPushPermissionDeleted(Object forumName);
+
+  /// Stop push dialog footnote: the per-type switches and Do not disturb (on the Profile tab) are for quiet time
+  ///
+  /// In en, this message translates to:
+  /// **'Want quiet for a while instead? Turn off the kinds you don\'t need above, or use Do not disturb on your profile.'**
+  String get stopPushQuietHint;
+
+  /// Button (destructive) in the stop push dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Stop push'**
+  String get stopPush;
 
   /// Button
   ///
@@ -2995,7 +3055,7 @@ abstract class AppLocalizations {
   /// Snackbar when the notifications backend rejected the revoke
   ///
   /// In en, this message translates to:
-  /// **'Couldn\'t turn off notifications. Try again later.'**
+  /// **'Couldn\'t stop push. Try again later.'**
   String get couldNotTurnOffNotifications;
 
   /// One-line notice for a post that records a topic action, as Discourse words it (action_codes.topic_created). {when} is a relative date; {who} a username.
@@ -7493,18 +7553,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in to manage your notification preferences.'**
   String get signInToManageNotificationPrefs;
-
-  /// Notification settings page: section header over the push notification row
-  ///
-  /// In en, this message translates to:
-  /// **'Push'**
-  String get notificationSettingsPushSection;
-
-  /// Notification settings page: section header over the email preferences (Discourse user.email_settings)
-  ///
-  /// In en, this message translates to:
-  /// **'Email'**
-  String get notificationSettingsEmailSection;
 
   /// Notification settings page: row for Discourse's email_level preference (when to email about replies, mentions and watched activity)
   ///

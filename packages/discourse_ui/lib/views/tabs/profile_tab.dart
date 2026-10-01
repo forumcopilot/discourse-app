@@ -34,6 +34,7 @@ import '../in_app_web_view_page.dart';
 import '../invites_page.dart';
 import '../login_page.dart';
 import '../my_posts_page.dart';
+import '../settings/do_not_disturb_tile.dart';
 import '../settings/notification_settings_page.dart';
 import '../settings_page.dart';
 import '../user_profile_page.dart';
@@ -397,7 +398,7 @@ class ProfileTabState extends FCStatefulWidget<ProfileTab>
           _Row(
             icon: Icons.notifications_none,
             label: l10n.notificationSettings,
-            onTap: () => _push(const NotificationSettingsPage()),
+            onTap: () => _push(NotificationSettingsPage(siteContext: site)),
           ),
           DoNotDisturbTile(siteContext: site),
           if (DiscourseHost.showAppearanceSetting)

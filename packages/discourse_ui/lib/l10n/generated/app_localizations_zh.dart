@@ -1621,19 +1621,61 @@ class AppLocalizationsZh extends AppLocalizations {
   String get openSettings => '打开设置';
 
   @override
-  String get notificationsOnThisDevice => '此设备上的通知';
+  String get notificationsThisDeviceSection => '此设备';
 
   @override
-  String get notificationsGrantOnSubtitle => '此论坛的回复、提及和消息会送达此设备。';
+  String notificationsThisDeviceCaption(Object forumName) {
+    return '来自 $forumName 的推送仅发送到此设备，不影响你的其他设备和网页版。';
+  }
 
   @override
-  String get notificationsGrantOffSubtitle => '在论坛上批准一次，即可在此接收其回复、提及和消息。';
+  String notificationsAccountSection(Object forumName) {
+    return '你在 $forumName 的账户';
+  }
+
+  @override
+  String get notificationsAccountCaption => '这些设置在所有地方生效：网页、邮件以及你的所有设备。';
+
+  @override
+  String pushOnThisDeviceSubtitle(Object forumName) {
+    return '已开启：$forumName 的新通知会推送到此设备。';
+  }
+
+  @override
+  String pushOffThisDeviceSubtitle(Object forumName) {
+    return '此设备上已关闭。要开启，需在 $forumName 上批准一次。';
+  }
+
+  @override
+  String get stopPushOnThisDevice => '停止此设备上的推送';
+
+  @override
+  String stopPushTitle(Object forumName) {
+    return '停止此设备上来自 $forumName 的推送？';
+  }
+
+  @override
+  String get stopPushOnlyThisDevice => '只有此设备停止接收，你的其他设备不受影响。';
+
+  @override
+  String get stopPushNothingElseChanges => '你的通知仍会显示在应用和网页上，论坛的邮件也不会改变。';
+
+  @override
+  String stopPushPermissionDeleted(Object forumName) {
+    return '你在 $forumName 上授予的权限将被删除。要重新开启推送，需要在论坛上再次批准。';
+  }
+
+  @override
+  String get stopPushQuietHint => '只是想安静一会儿？在上方关闭不需要的类型，或使用个人资料中的“请勿打扰”。';
+
+  @override
+  String get stopPush => '停止推送';
 
   @override
   String get turnOn => '开启';
 
   @override
-  String get couldNotTurnOffNotifications => '无法关闭通知。请稍后再试。';
+  String get couldNotTurnOffNotifications => '无法停止推送。请稍后再试。';
 
   @override
   String actionCodeTopicCreated(String when) {
@@ -4336,12 +4378,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get signInToManageNotificationPrefs => '登录以管理你的通知偏好设置。';
-
-  @override
-  String get notificationSettingsPushSection => '推送';
-
-  @override
-  String get notificationSettingsEmailSection => '电子邮件';
 
   @override
   String get emailWhenAwayTitle => '离开时发送邮件';

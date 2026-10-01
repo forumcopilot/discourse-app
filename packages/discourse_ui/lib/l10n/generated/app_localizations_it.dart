@@ -1708,22 +1708,66 @@ class AppLocalizationsIt extends AppLocalizations {
   String get openSettings => 'Apri impostazioni';
 
   @override
-  String get notificationsOnThisDevice => 'Notifiche su questo dispositivo';
+  String get notificationsThisDeviceSection => 'Su questo dispositivo';
 
   @override
-  String get notificationsGrantOnSubtitle =>
-      'Risposte, menzioni e messaggi di questo forum vengono recapitati qui.';
+  String notificationsThisDeviceCaption(Object forumName) {
+    return 'Push da $forumName solo su questo dispositivo. Gli altri tuoi dispositivi e il web non cambiano.';
+  }
 
   @override
-  String get notificationsGrantOffSubtitle =>
-      'Approva una volta sul forum per ricevere qui risposte, menzioni e messaggi.';
+  String notificationsAccountSection(Object forumName) {
+    return 'Il tuo account su $forumName';
+  }
+
+  @override
+  String get notificationsAccountCaption =>
+      'Valgono ovunque: sul web, via email e su tutti i tuoi dispositivi.';
+
+  @override
+  String pushOnThisDeviceSubtitle(Object forumName) {
+    return 'Attive: le nuove notifiche di $forumName arrivano su questo dispositivo.';
+  }
+
+  @override
+  String pushOffThisDeviceSubtitle(Object forumName) {
+    return 'Disattivate su questo dispositivo. Per attivarle, approvi una volta su $forumName.';
+  }
+
+  @override
+  String get stopPushOnThisDevice => 'Interrompi push su questo dispositivo';
+
+  @override
+  String stopPushTitle(Object forumName) {
+    return 'Interrompere il push di $forumName su questo dispositivo?';
+  }
+
+  @override
+  String get stopPushOnlyThisDevice =>
+      'Si ferma solo questo dispositivo. Gli altri tuoi dispositivi mantengono il loro.';
+
+  @override
+  String get stopPushNothingElseChanges =>
+      'Le tue notifiche restano visibili nell’app e sul web, e le email del forum non cambiano.';
+
+  @override
+  String stopPushPermissionDeleted(Object forumName) {
+    return 'Il permesso che hai dato su $forumName viene eliminato. Per riattivare il push dovrai approvarlo di nuovo lì.';
+  }
+
+  @override
+  String get stopPushQuietHint =>
+      'Vuoi solo un po’ di silenzio? Disattiva qui sopra i tipi che non ti servono, oppure usa Non disturbare nel tuo profilo.';
+
+  @override
+  String get stopPush => 'Interrompi push';
 
   @override
   String get turnOn => 'Attiva';
 
   @override
   String get couldNotTurnOffNotifications =>
-      'Impossibile disattivare le notifiche. Riprova più tardi.';
+      'Impossibile interrompere il push. Riprova più tardi.';
 
   @override
   String actionCodeTopicCreated(String when) {
@@ -4630,12 +4674,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get signInToManageNotificationPrefs =>
       'Accedi per gestire le tue preferenze di notifica.';
-
-  @override
-  String get notificationSettingsPushSection => 'Push';
-
-  @override
-  String get notificationSettingsEmailSection => 'Email';
 
   @override
   String get emailWhenAwayTitle => 'Email quando sei assente';
