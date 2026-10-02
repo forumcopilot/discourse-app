@@ -56,11 +56,12 @@ void main() {
 
   test('a vote in a message\'s poll goes to that message\'s post', () async {
     final conversations = _ConversationProxy()..nextGet = message();
-    await conversations.getConversationAsync('55', 0, 20, true);
+    final conversation = await conversations.getConversationAsync('55', 0, 20, true);
 
     final posts = _PostProxy()
       ..nextPut = {'poll': poll('place', ['p1', 'p2']), 'vote': ['p1']};
-    final updated = await posts.votePollAsync('55', ['p1']);
+    final updated = await posts.votePollAsync('55', ['p1'],
+        poll: conversation.messages.first.polls.single);
 
     expect(posts.puts.single,
         'PUT /polls/vote {post_id: 501, poll_name: place, options: [p1]}');

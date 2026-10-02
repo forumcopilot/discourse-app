@@ -100,7 +100,7 @@ void main() {
 
   test('a vote in a reply\'s second poll goes to that post and poll', () async {
     proxy.nextGet = thread();
-    await proxy.getThreadAsync('7', 1, 20, true);
+    final threadResult = await proxy.getThreadAsync('7', 1, 20, true);
     // A busy thread: many more polls parsed after this one.
     for (var i = 0; i < 40; i++) {
       proxy.nextGet = {
@@ -115,7 +115,8 @@ void main() {
     }
 
     proxy.nextPut = {'poll': poll('second', ['c1', 'c2']), 'vote': ['c1']};
-    final updated = await proxy.votePollAsync('7', ['c1']);
+    final updated = await proxy.votePollAsync('7', ['c1'],
+        poll: threadResult.posts[3].polls[1]);
 
     expect(proxy.puts.single, 'PUT /polls/vote {post_id: 104, poll_name: second, options: [c1]}');
     expect(updated?.pollId, 'second');

@@ -802,29 +802,28 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     }
   }
 
+  /// Discourse votes require the displayed poll's post id and name. Option
+  /// digests are reusable across polls, posts, topics, and forums, so the SDK's
+  /// topic + options alone cannot identify a target safely. Callers must pass
+  /// [poll]; an older caller without that identity fails without sending a vote.
   @override
   Future<FCPoll?> votePollAsync(
-      String topicId, List<String> responseIds) async {
-    // Discourse poll vote: PUT /polls/vote { post_id, poll_name, options[] }.
-    // Every parsed FCPoll carries its hosting post's id ([FCPoll.postId])
-    // and the poll's name ([FCPoll.pollId]); the caller hands us back
-    // option ids (poll-option digests), so we resolve the poll from the
-    // recently-parsed list and vote without refetching the topic. When
-    // the poll instance isn't known (cold cache) we fall back to fetching
-    // /t/{id}.json to find the first post.
-    if (responseIds.isEmpty) return null;
-    int? postId;
-    String pollName = 'poll';
-    final poll = _lookupPollByResponseId(responseIds.first);
-    if (poll != null && poll.postId != null) {
-      postId = int.tryParse(poll.postId!);
-      pollName = poll.pollId;
+    String topicId,
+    List<String> responseIds, {
+    FCPoll? poll,
+  }) async {
+    final postId = int.tryParse(poll?.postId ?? '');
+    if (poll == null ||
+        postId == null ||
+        postId <= 0 ||
+        poll.pollId.isEmpty ||
+        topicId.isEmpty ||
+        poll.topicId != topicId ||
+        responseIds.isEmpty ||
+        responseIds.any((id) => !poll.responses.any((option) => option.id == id))) {
+      return null;
     }
-    if (postId == null) {
-      final fallback = await _findFirstPostId(topicId);
-      if (fallback == null) return null;
-      postId = fallback;
-    }
+    final pollName = poll.pollId;
     try {
       final response = await apiPut('/polls/vote', body: {
         'post_id': postId,
@@ -944,42 +943,6 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
     }).toList());
   }
 
-  /// Reverse-lookup helper: scans recently-parsed polls for one whose
-  /// option list contains [responseId], so [votePollAsync] (whose SDK
-  /// contract only carries topic id + option ids) can read the hosting
-  /// post id and poll name off the [FCPoll] itself.
-  static final List<_RecentPoll> _recentPolls = [];
-
-  FCPoll? _lookupPollByResponseId(String responseId) {
-    for (final entry in _recentPolls) {
-      for (final opt in entry.poll.responses) {
-        if (opt.id == responseId) {
-          return entry.poll;
-        }
-      }
-    }
-    return null;
-  }
-
-  Future<int?> _findFirstPostId(String topicId) async {
-    try {
-      final t = await apiGet('/t/$topicId.json');
-      final stream = (t['post_stream'] as Map<String, dynamic>?) ?? const {};
-      final posts = (stream['posts'] as List?) ?? const [];
-      for (final raw in posts.whereType<Map>()) {
-        final p = raw.cast<String, dynamic>();
-        if ((p['post_number'] as int?) == 1) {
-          return (p['id'] as num?)?.toInt();
-        }
-      }
-      // Some endpoints omit post_number; fall back to first.
-      if (posts.isNotEmpty) {
-        return ((posts.first as Map)['id'] as num?)?.toInt();
-      }
-    } catch (_) {}
-    return null;
-  }
-
   /// Build an FCPoll from a Discourse poll object (`p['polls'][0]`).
   /// The hosting post's id lands on [FCPoll.postId] (and the poll's
   /// name on [FCPoll.pollId]) so vote/voters calls can be made without
@@ -1051,20 +1014,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       hasVoted: hasVoted,
       canViewResults: canViewResults,
     );
-    _trackRecentPoll(poll);
     return poll;
-  }
-
-  static void _trackRecentPoll(FCPoll poll) {
-    _recentPolls.removeWhere((e) => e.poll.pollId == poll.pollId &&
-        e.poll.topicId == poll.topicId);
-    _recentPolls.insert(0, _RecentPoll(poll));
-    // Every poll of every post on screen is parsed now, not just the first
-    // post's; the cap must hold a busy thread's worth, or a vote in an
-    // older poll would fall back to the first post's.
-    if (_recentPolls.length > 200) {
-      _recentPolls.removeRange(200, _recentPolls.length);
-    }
   }
 
   /// Keeps what a private message says about itself (participants, groups,
@@ -1089,8 +1039,8 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
   /// Every poll in a Discourse post payload, with the viewer's votes.
   ///
   /// Public for the private-message proxy: a message is a post, its polls
-  /// arrive the same way, and parsing them here records them for
-  /// [votePollAsync]'s option-id lookup.
+  /// arrive the same way. The returned polls carry the post and poll identity
+  /// required by [votePollAsync].
   static List<FCPoll> pollsFromPostJson(Map<String, dynamic> p,
       {required String topicId}) {
     final polls = (p['polls'] as List?) ?? const [];
@@ -2064,13 +2014,4 @@ class DiscourseSetWikiResult {
     required this.result,
     required this.resultText,
   });
-}
-
-/// Holds a strong reference to a recently-parsed poll so
-/// [DiscoursePostProxy._lookupPollByResponseId] can resolve an option
-/// digest back to its poll during a vote round-trip. Ring-buffer cap
-/// at 20.
-class _RecentPoll {
-  final FCPoll poll;
-  _RecentPoll(this.poll);
 }
