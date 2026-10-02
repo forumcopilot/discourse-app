@@ -39,6 +39,7 @@ import '../widgets/topic_status.dart';
 import '../../controllers/post_controller.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_poll.dart';
 import '../../utils/cooked_content.dart';
+import '../../utils/emoji_shortcodes.dart';
 import '../../utils/url_utils.dart';
 import '../../theme/design_tokens.dart';
 import '../widgets/topic_taxonomy_chips.dart';
@@ -676,7 +677,7 @@ class _PostListItemState extends State<PostListItem> {
                   ...topicStatusSpans(context, status,
                       size: MediaQuery.textScalerOf(context).scale(
                           (textTheme.titleLarge?.fontSize ?? 22) * 0.8)),
-                  TextSpan(text: widget.topicTitle),
+                  TextSpan(text: withEmojiShortcodes(widget.topicTitle)),
                 ]),
                 style: textTheme.titleLarge?.copyWith(
                   color: colorScheme.onSurface,

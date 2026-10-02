@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
 import 'package:discourse_ui/utils/time_utils.dart';
 import 'package:discourse_ui/utils/number_utils.dart';
+import 'package:discourse_ui/utils/emoji_shortcodes.dart';
 import 'package:discourse_ui/views/widgets/user_avatar.dart';
 import '../../theme/design_tokens.dart';
 import '../widgets/unread_badge.dart';
@@ -230,7 +231,7 @@ class NotificationListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          topic.title,
+                          withEmojiShortcodes(topic.title),
                           style: textTheme.bodyLarge?.copyWith(
                             color: isUnread
                                 ? colorScheme.onSurface
