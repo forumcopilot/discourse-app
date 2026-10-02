@@ -1497,5 +1497,21 @@
   "dismissNewAndUnread": "Ignorer les nouveaux et les non lus",
   "dismissNewAndUnreadMessage": "Les sujets de {category} n'apparaîtront plus comme nouveaux ou non lus.",
   "dismissedTopics": "Ignorés",
-  "errorRemovingFromMessage": "Impossible de retirer {name} de ce message."
+  "errorRemovingFromMessage": "Impossible de retirer {name} de ce message.",
+  "chatNewMessage": "Nouveau message",
+  "chatStarred": "Favoris",
+  "chatBrowseChannels": "Parcourir les canaux",
+  "chatBrowseAllChannels": "Parcourir tous les canaux",
+  "chatFilterAll": "Tout",
+  "chatFilterOpen": "Ouvert",
+  "chatFilterClosed": "Fermé",
+  "chatFilterArchived": "Archivé",
+  "chatBrowseSearch": "Rechercher un canal par nom",
+  "chatJoin": "Rejoindre",
+  "chatJoined": "Rejoint",
+  "chatLeave": "Quitter",
+  "chatMembersCount": "{count, plural, one{{count} membre} other{{count} membres}}",
+  "chatYesterday": "Hier",
+  "chatNoChannelsFound": "Aucun canal trouvé",
+  "chatCloseDm": "Fermer ce chat personnel"
 }

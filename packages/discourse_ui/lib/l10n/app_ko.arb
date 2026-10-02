@@ -1497,5 +1497,21 @@
   "eventEveryTwoWeeks": "2주마다 이 요일",
   "eventEveryFourWeeks": "4주마다 이 요일",
   "eventEveryMonth": "매월 이 요일",
-  "errorRemovingFromMessage": "이 메시지에서 {name} 님을 제거할 수 없습니다."
+  "errorRemovingFromMessage": "이 메시지에서 {name} 님을 제거할 수 없습니다.",
+  "chatNewMessage": "새로운 메시지",
+  "chatStarred": "즐겨찾기",
+  "chatBrowseChannels": "채널 찾아보기",
+  "chatBrowseAllChannels": "모든 채널 찾아보기",
+  "chatFilterAll": "전체",
+  "chatFilterOpen": "열기",
+  "chatFilterClosed": "닫힘",
+  "chatFilterArchived": "보관됨",
+  "chatBrowseSearch": "이름으로 채널 검색",
+  "chatJoin": "가입",
+  "chatJoined": "가입됨",
+  "chatLeave": "나가기",
+  "chatMembersCount": "{count, plural, other{회원 {count}명}}",
+  "chatYesterday": "어제",
+  "chatNoChannelsFound": "채널을 찾을 수 없습니다.",
+  "chatCloseDm": "이 개인 채팅 닫기"
 }

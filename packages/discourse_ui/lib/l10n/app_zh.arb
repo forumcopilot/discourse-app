@@ -1497,5 +1497,21 @@
   "dismissNewAndUnread": "忽略新话题和未读话题",
   "dismissNewAndUnreadMessage": "{category} 中的话题将不再显示为新话题或未读话题。",
   "dismissedTopics": "已忽略",
-  "errorRemovingFromMessage": "无法将 {name} 从此消息中移除。"
+  "errorRemovingFromMessage": "无法将 {name} 从此消息中移除。",
+  "chatNewMessage": "新消息",
+  "chatStarred": "收藏",
+  "chatBrowseChannels": "浏览频道",
+  "chatBrowseAllChannels": "浏览所有频道",
+  "chatFilterAll": "所有",
+  "chatFilterOpen": "开放",
+  "chatFilterClosed": "已关闭",
+  "chatFilterArchived": "已归档",
+  "chatBrowseSearch": "按名称搜索频道",
+  "chatJoin": "加入",
+  "chatJoined": "已加入",
+  "chatLeave": "离开",
+  "chatMembersCount": "{count, plural, other{{count} 个成员}}",
+  "chatYesterday": "昨天",
+  "chatNoChannelsFound": "找不到频道",
+  "chatCloseDm": "关闭此个人聊天"
 }

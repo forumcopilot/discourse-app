@@ -1497,5 +1497,21 @@
   "dismissNewAndUnread": "新規と未読を閉じる",
   "dismissNewAndUnreadMessage": "{category} のトピックは新規・未読として表示されなくなります。",
   "dismissedTopics": "閉じました",
-  "errorRemovingFromMessage": "このメッセージから {name} を削除できませんでした。"
+  "errorRemovingFromMessage": "このメッセージから {name} を削除できませんでした。",
+  "chatNewMessage": "新しいメッセージ",
+  "chatStarred": "スター付き",
+  "chatBrowseChannels": "チャンネルを閲覧する",
+  "chatBrowseAllChannels": "すべてのチャンネルを閲覧する",
+  "chatFilterAll": "すべて",
+  "chatFilterOpen": "オープン",
+  "chatFilterClosed": "閉鎖",
+  "chatFilterArchived": "アーカイブ済み",
+  "chatBrowseSearch": "チャンネル名で検索",
+  "chatJoin": "参加",
+  "chatJoined": "参加中",
+  "chatLeave": "退出",
+  "chatMembersCount": "{count, plural, other{{count} 人のメンバー}}",
+  "chatYesterday": "昨日",
+  "chatNoChannelsFound": "チャンネルが見つかりません",
+  "chatCloseDm": "このパーソナルチャットを閉じる"
 }

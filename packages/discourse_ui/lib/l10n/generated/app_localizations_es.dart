@@ -4973,4 +4973,60 @@ class AppLocalizationsEs extends AppLocalizations {
   String errorRemovingFromMessage(String name) {
     return 'No se pudo quitar a $name de este mensaje.';
   }
+
+  @override
+  String get chatNewMessage => 'Nuevo mensaje';
+
+  @override
+  String get chatStarred => 'Favoritos';
+
+  @override
+  String get chatBrowseChannels => 'Examinar canales';
+
+  @override
+  String get chatBrowseAllChannels => 'Examinar todos los canales';
+
+  @override
+  String get chatFilterAll => 'Todos';
+
+  @override
+  String get chatFilterOpen => 'Abierto';
+
+  @override
+  String get chatFilterClosed => 'Cerrado';
+
+  @override
+  String get chatFilterArchived => 'Archivado';
+
+  @override
+  String get chatBrowseSearch => 'Buscar canal por nombre';
+
+  @override
+  String get chatJoin => 'Unirse';
+
+  @override
+  String get chatJoined => 'Se unió';
+
+  @override
+  String get chatLeave => 'Abandonar';
+
+  @override
+  String chatMembersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count miembros',
+      one: '$count miembro',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatYesterday => 'Ayer';
+
+  @override
+  String get chatNoChannelsFound => 'No se han encontrado canales';
+
+  @override
+  String get chatCloseDm => 'Cerrar este chat personal';
 }

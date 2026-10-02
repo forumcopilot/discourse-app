@@ -1497,5 +1497,21 @@
   "dismissNewAndUnread": "Ignora nuovi e non letti",
   "dismissNewAndUnreadMessage": "Gli argomenti in {category} non verranno più mostrati come nuovi o non letti.",
   "dismissedTopics": "Ignorati",
-  "errorRemovingFromMessage": "Impossibile rimuovere {name} da questo messaggio."
+  "errorRemovingFromMessage": "Impossibile rimuovere {name} da questo messaggio.",
+  "chatNewMessage": "Nuovo messaggio",
+  "chatStarred": "Preferiti",
+  "chatBrowseChannels": "Sfoglia i canali",
+  "chatBrowseAllChannels": "Sfoglia tutti i canali",
+  "chatFilterAll": "Tutti",
+  "chatFilterOpen": "Aperta",
+  "chatFilterClosed": "Chiusi",
+  "chatFilterArchived": "Archiviati",
+  "chatBrowseSearch": "Cerca canale per nome",
+  "chatJoin": "Partecipa",
+  "chatJoined": "Partecipante",
+  "chatLeave": "Esci",
+  "chatMembersCount": "{count, plural, one{{count} membro} other{{count} membri}}",
+  "chatYesterday": "Ieri",
+  "chatNoChannelsFound": "Nessun canale trovato",
+  "chatCloseDm": "Chiudi questa chat personale"
 }

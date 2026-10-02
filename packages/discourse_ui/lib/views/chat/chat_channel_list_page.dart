@@ -1,20 +1,34 @@
 import 'dart:async';
 
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseChatProxy, DiscourseChatable, DiscourseSiteContextExtension;
+    show
+        DiscourseChatChannelDetails,
+        DiscourseChatListChanged,
+        DiscourseChatListEvent,
+        DiscourseChatListNewMessage,
+        DiscourseChatListTracking,
+        DiscourseChatProxy,
+        DiscourseChatable,
+        DiscourseSiteContextExtension,
+        stripHtmlToText;
 import 'package:flutter/material.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_chat_channel.dart';
 
+import '../../services/chat_unread.dart';
 import '../../theme/design_tokens.dart';
+import '../../utils/chat_time.dart';
+import '../../utils/emoji_shortcodes.dart';
+import '../../utils/snackbar_helper.dart';
+import 'chat_browse_channels_page.dart';
+import 'widgets/chat_channel_avatar.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/not_signed_in_view.dart';
 import '../widgets/user_list_row.dart';
 import '../widgets/resettable_widget.dart';
 import '../widgets/user_avatar.dart';
 import 'chat_channel_view.dart';
-import '../widgets/unread_badge.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// DM channel titles come back from the serializer already filled with
@@ -65,7 +79,9 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
 
   /// Discourse keeps channels and direct messages apart (Channels / DMs);
   /// this list mixed them, sorted unread-first.
-  bool _showDms = false;
+  /// Null until the reader picks: then the list opens on DMs when they
+  /// have direct messages but have joined no channel.
+  bool? _showDms;
 
   // Track login state so the channel list reloads after an in-session
   // login/logout (same pattern as NotificationListTab). Without this
@@ -74,6 +90,10 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
   // IndexedStack, so initState only ever runs once.
   bool _wasLoggedIn = false;
   String? _lastLoadedUsername;
+
+  /// Stops following the listed channels' new messages and the reader's
+  /// unread counts (see DiscourseChatProxy.watchChannelList).
+  void Function()? _stopWatching;
   late final VoidCallback _authStateListener;
   bool _initialLoadStarted = false;
 
@@ -110,8 +130,78 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
 
   @override
   void dispose() {
+    _stopWatching?.call();
     widget.siteContext.isLoggedInNotifier.removeListener(_authStateListener);
     super.dispose();
+  }
+
+  /// Follows the listed channels live, as the web's list does, so a new
+  /// message moves its channel up with its excerpt and badge without a
+  /// pull to refresh.
+  void _watch() {
+    _stopWatching?.call();
+    _stopWatching = null;
+    final proxy = SiteProxyService.getChatProxy();
+    final channels = _channels;
+    if (proxy is! DiscourseChatProxy || channels == null || channels.isEmpty)
+      return;
+    _stopWatching =
+        proxy.watchChannelList([for (final c in channels) c.id], _onListEvent);
+  }
+
+  void _onListEvent(DiscourseChatListEvent event) {
+    if (!mounted) return;
+    switch (event) {
+      case DiscourseChatListChanged():
+        unawaited(_load());
+      case DiscourseChatListNewMessage(
+          :final channelId,
+          :final fromReader,
+          :final threadReply,
+          :final at
+        ):
+        final ch = _channels?.where((c) => c.id == channelId).firstOrNull;
+        if (ch == null || threadReply) return;
+        setState(() {
+          ch.lastMessageAt = at ?? DateTime.now();
+          // A guess until the tracking state says; it usually follows at once.
+          if (!fromReader) ch.unreadCount += 1;
+        });
+        _publishUnread();
+      case DiscourseChatListTracking(
+          :final channelId,
+          :final unreadCount,
+          :final mentionCount
+        ):
+        final ch = _channels?.where((c) => c.id == channelId).firstOrNull;
+        if (ch == null) return;
+        setState(() {
+          ch.unreadCount = unreadCount;
+          ch.mentionCount = mentionCount;
+        });
+        _publishUnread();
+    }
+  }
+
+  DiscourseChatChannelDetails? _details(FCChatChannel ch) =>
+      DiscourseChatChannelDetails.of(widget.siteContext.site.url, ch.id);
+
+  bool _isMuted(FCChatChannel ch) => _details(ch)?.muted ?? false;
+
+  /// For the Chat tab's badge: mentions in channels and unread direct
+  /// messages want the reader now; anything else unread is a dot.
+  void _publishUnread() {
+    final channels = _channels ?? const <FCChatChannel>[];
+    var urgent = 0;
+    var any = false;
+    for (final c in channels) {
+      if (_isMuted(c)) continue;
+      final dm = c.chatableType == 'DirectMessage';
+      urgent += dm ? c.unreadCount : c.mentionCount;
+      if (c.unreadCount > 0 || c.mentionCount > 0) any = true;
+    }
+    ChatUnread.set(
+        widget.siteContext, ChatUnreadState(urgent: urgent, any: any));
   }
 
   /// Called by SiteHomePage._resetAllTabs on login/logout and site
@@ -143,8 +233,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
       _error = null;
     });
     try {
-      final result =
-          await SiteProxyService.getChatProxy().getMyChannelsAsync();
+      final result = await SiteProxyService.getChatProxy().getMyChannelsAsync();
       if (!mounted) return;
       setState(() {
         _loading = false;
@@ -160,6 +249,8 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
         // browse and join channels themselves.)
         _channels = result.channels;
       });
+      _publishUnread();
+      _watch();
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -224,19 +315,19 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     );
     // Only people allowed to start direct messages get the button (Discourse:
     // `userCanDirectMessage`).
-    final fab = widget.siteContext.isLoggedIn &&
-            widget.siteContext.chatCanDirectMessage
-        // Labelled like Messages' "New Message" button beside it; the words
-        // are Discourse's sidebar link ("Start new DM").
-        ? FloatingActionButton.extended(
-            // No hero: embedded, this sits in Home's route beside Home's
-            // own button, and no other page has this one.
-            heroTag: null,
-            onPressed: _startNewDm,
-            icon: const Icon(Icons.add_comment_outlined),
-            label: Text(AppLocalizations.of(context)!.chatStartNewDm),
-          )
-        : null;
+    final fab =
+        widget.siteContext.isLoggedIn && widget.siteContext.chatCanDirectMessage
+            // Labelled like Messages' "New Message" button beside it; the words
+            // are Discourse's sidebar link ("Start new DM").
+            ? FloatingActionButton.extended(
+                // No hero: embedded, this sits in Home's route beside Home's
+                // own button, and no other page has this one.
+                heroTag: null,
+                onPressed: _startNewDm,
+                icon: const Icon(Icons.add_comment_outlined),
+                label: Text(AppLocalizations.of(context)!.chatNewMessage),
+              )
+            : null;
     // Embedded mode (Phase 5.18a bottom-nav Chat slot): caller owns
     // the Scaffold + AppBar. We just render the list (plus our own
     // overlaid FAB — the parent Scaffold's FAB slot belongs to the
@@ -277,8 +368,65 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     );
   }
 
+  Future<void> _browse() async {
+    await Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => ChatBrowseChannelsPage(siteContext: widget.siteContext),
+    ));
+    // Joined or left something there.
+    if (mounted) unawaited(_load());
+  }
+
+  /// Hides a DM until someone writes in it again, as a swipe does on the
+  /// web's list.
+  Future<bool> _closeDm(FCChatChannel ch) async {
+    final proxy = SiteProxyService.getChatProxy();
+    if (proxy is! DiscourseChatProxy) return false;
+    final result = await proxy.closeDirectMessageAsync(ch.id);
+    if (!mounted) return false;
+    if (!result.result) {
+      SnackbarHelper.showError(
+          context,
+          result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : AppLocalizations.of(context)!.chatNotAvailable);
+      return false;
+    }
+    setState(
+        () => _channels = [...?_channels]..removeWhere((c) => c.id == ch.id));
+    _publishUnread();
+    return true;
+  }
+
+  /// Most pressing first, as Discourse orders its chat list: channels with a
+  /// mention, then unread, then by name; direct messages unread first, then
+  /// by their latest message.
+  List<FCChatChannel> _sorted(List<FCChatChannel> list, {required bool dms}) {
+    int rank(FCChatChannel c) => dms
+        ? (c.unreadCount > 0 ? 0 : 1)
+        : (c.mentionCount > 0 ? 0 : (c.unreadCount > 0 ? 1 : 2));
+    DateTime last(FCChatChannel c) =>
+        _details(c)?.lastMessageAt ??
+        c.lastMessageAt ??
+        DateTime.fromMillisecondsSinceEpoch(0);
+    return [...list]..sort((a, b) {
+        final byRank = rank(a).compareTo(rank(b));
+        if (byRank != 0) return byRank;
+        return dms
+            ? last(b).compareTo(last(a))
+            : a.title.toLowerCase().compareTo(b.title.toLowerCase());
+      });
+  }
+
   Widget _buildBody() {
+    return ValueListenableBuilder<int>(
+      valueListenable: DiscourseChatChannelDetails.revision,
+      builder: (context, _, __) => _buildList(),
+    );
+  }
+
+  Widget _buildList() {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context)!;
     final channels = _channels;
 
@@ -292,7 +440,6 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
       );
     }
 
-    // Discourse's order: channels by name, DMs by latest message.
     final all = channels ?? const <FCChatChannel>[];
     // Which halves exist, as on Discourse: no Channels when the forum turned
     // public channels off, and no DMs for someone who may not start one and
@@ -301,17 +448,22 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     final canDm = widget.siteContext.chatCanDirectMessage;
     final hasChannels = widget.siteContext.chatPublicChannelsEnabled;
     final hasDms = canDm || all.any((c) => c.chatableType == 'DirectMessage');
-    final showDms = hasChannels && hasDms ? _showDms : !hasChannels;
-    final shown = all
+    final autoDms = !all.any((c) => c.chatableType != 'DirectMessage') &&
+        all.any((c) => c.chatableType == 'DirectMessage');
+    final showDms = hasChannels && hasDms ? (_showDms ?? autoDms) : !hasChannels;
+    final half = all
         .where((c) => (c.chatableType == 'DirectMessage') == showDms)
-        .toList()
-      ..sort(showDms
-          ? (a, b) => (b.lastMessageAt ?? DateTime(0))
-              .compareTo(a.lastMessageAt ?? DateTime(0))
-          : (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
-    int unreadIn(bool dms) => all
-        .where((c) => (c.chatableType == 'DirectMessage') == dms)
-        .fold(0, (n, c) => n + c.unreadCount);
+        .toList();
+    final starred = _sorted(
+        half.where((c) => _details(c)?.starred ?? false).toList(),
+        dms: showDms);
+    final rest = _sorted(
+        half.where((c) => !(_details(c)?.starred ?? false)).toList(),
+        dms: showDms);
+    bool unreadIn(bool dms) => all
+        .where(
+            (c) => (c.chatableType == 'DirectMessage') == dms && !_isMuted(c))
+        .any((c) => c.unreadCount > 0 || c.mentionCount > 0);
 
     final switcher = Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -328,7 +480,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
               value: false,
               icon: const Icon(Icons.tag),
               label: Badge(
-                isLabelVisible: unreadIn(false) > 0,
+                isLabelVisible: unreadIn(false),
                 smallSize: 8,
                 child: Text(l10n.chatChannels),
               ),
@@ -337,7 +489,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
               value: true,
               icon: const Icon(Icons.person_outline),
               label: Badge(
-                isLabelVisible: unreadIn(true) > 0,
+                isLabelVisible: unreadIn(true),
                 smallSize: 8,
                 child: Text(l10n.chatDms),
               ),
@@ -354,7 +506,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
         ? switcher
         : const SizedBox(height: DesignTokens.spacingS);
 
-    if (shown.isEmpty) {
+    if (half.isEmpty) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
@@ -364,132 +516,234 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
             icon: showDms ? Icons.person_outline : Icons.tag,
             message: showDms ? l10n.chatNoDms : l10n.chatNoChannels,
           ),
-          if (showDms && canDm)
+          // Never a dead end: an empty Channels half offers the channels
+          // there are to join, an empty DMs half the way to start one.
+          if (!showDms || canDm)
             Center(
               child: FilledButton.tonal(
-                onPressed: _startNewDm,
-                child: Text(l10n.chatNoDmsCta),
+                onPressed: showDms ? _startNewDm : _browse,
+                child:
+                    Text(showDms ? l10n.chatNoDmsCta : l10n.chatBrowseChannels),
               ),
             ),
         ],
       );
     }
-    return ListView.separated(
+
+    Widget sectionTitle(String text) => Padding(
+          padding: const EdgeInsets.fromLTRB(
+              DesignTokens.spacingL,
+              DesignTokens.spacingM,
+              DesignTokens.spacingL,
+              DesignTokens.spacingXS),
+          child: Text(text,
+              style: textTheme.titleSmall
+                  ?.copyWith(color: colorScheme.onSurfaceVariant)),
+        );
+
+    Widget tile(FCChatChannel ch) {
+      final row = _ChannelTile(
+        channel: ch,
+        details: _details(ch),
+        siteContext: widget.siteContext,
+        onTap: () => _open(ch),
+      );
+      if (ch.chatableType != 'DirectMessage') return row;
+      return Dismissible(
+        key: ValueKey('dm-${ch.id}'),
+        direction: DismissDirection.endToStart,
+        background: Container(
+          color: colorScheme.errorContainer,
+          alignment: AlignmentDirectional.centerEnd,
+          padding:
+              const EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.close, color: colorScheme.onErrorContainer),
+              const SizedBox(width: DesignTokens.spacingS),
+              Text(l10n.chatCloseDm,
+                  style: textTheme.labelLarge
+                      ?.copyWith(color: colorScheme.onErrorContainer)),
+            ],
+          ),
+        ),
+        confirmDismiss: (_) => _closeDm(ch),
+        child: row,
+      );
+    }
+
+    final rows = <Widget>[
+      header,
+      if (starred.isNotEmpty) ...[
+        sectionTitle(l10n.chatStarred),
+        for (final ch in starred) tile(ch),
+        if (rest.isNotEmpty)
+          sectionTitle(showDms ? l10n.chatDms : l10n.chatChannels),
+      ],
+      for (final ch in rest) tile(ch),
+      if (!showDms)
+        ListTile(
+          leading: SizedBox(
+            width: 44,
+            child: Icon(Icons.travel_explore, color: colorScheme.primary),
+          ),
+          title: Text(l10n.chatBrowseAllChannels,
+              style: textTheme.bodyLarge?.copyWith(color: colorScheme.primary)),
+          onTap: _browse,
+        ),
+      // Room for the floating button over the last row.
+      const SizedBox(height: 88),
+    ];
+    return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      itemCount: shown.length + 1,
-      separatorBuilder: (_, i) => i == 0
-          ? const SizedBox.shrink()
-          : Divider(
-              height: 1,
-              thickness: 1,
-              indent: 72,
-              color: colorScheme.outlineVariant,
-            ),
-      itemBuilder: (_, i) {
-        if (i == 0) return header;
-        final ch = shown[i - 1];
-        return _ChannelTile(channel: ch, onTap: () => _open(ch));
-      },
+      children: rows,
     );
   }
 }
 
+/// One chat in the list, laid out as Discourse's chat list on a phone: the
+/// channel's picture, its name and when it last spoke, then its last
+/// message and a badge (a number for mentions and direct messages, a dot
+/// for anything else unread). Muted chats are dimmed and carry no badge.
 class _ChannelTile extends StatelessWidget {
   final FCChatChannel channel;
+  final DiscourseChatChannelDetails? details;
+  final SiteContext siteContext;
   final VoidCallback onTap;
 
-  const _ChannelTile({required this.channel, required this.onTap});
-
-  IconData _iconFor() {
-    switch (channel.chatableType) {
-      case 'DirectMessage':
-        // A group chat is titled with its members' names, comma-separated.
-        return channel.title.contains(',')
-            ? Icons.group_outlined
-            : Icons.person_outline;
-      case 'Category':
-      default:
-        return Icons.tag;
-    }
-  }
+  const _ChannelTile({
+    required this.channel,
+    required this.details,
+    required this.siteContext,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final hasUnread = channel.unreadCount > 0;
-    final hasMention = channel.mentionCount > 0;
+    final muted = details?.muted ?? false;
+    final dm = channel.chatableType == 'DirectMessage';
+    final hasUnread =
+        !muted && (channel.unreadCount > 0 || channel.mentionCount > 0);
+    final count = dm ? channel.unreadCount : channel.mentionCount;
+    final when = details?.lastMessageAt ?? channel.lastMessageAt;
+    final rawExcerpt = details?.lastMessageExcerpt;
+    final excerpt = rawExcerpt == null
+        ? null
+        : withEmojiShortcodes(stripHtmlToText(rawExcerpt)).trim();
+    final subtitle = excerpt != null && excerpt.isNotEmpty
+        ? excerpt
+        : (channel.description?.isNotEmpty == true
+            ? channel.description!
+            : null);
 
-    return ListTile(
+    Widget? badge;
+    if (hasUnread && count > 0) {
+      badge = Badge(label: Text(count > 99 ? '99+' : '$count'));
+    } else if (hasUnread) {
+      badge = Container(
+        width: 10,
+        height: 10,
+        decoration:
+            BoxDecoration(color: colorScheme.primary, shape: BoxShape.circle),
+      );
+    }
+
+    final tile = InkWell(
       onTap: onTap,
-      leading: CircleAvatar(
-        radius: DesignTokens.avatarRadiusM,
-        backgroundColor: colorScheme.surfaceContainerHighest,
-        child: Icon(
-          _iconFor(),
-          color: colorScheme.onSurfaceVariant,
-        ),
-      ),
-      title: Row(
-        children: [
-          Expanded(
-            child: Text(
-              _channelDisplayTitle(context, channel),
-              // The list-row headline every list uses; unread by weight.
-              style: textTheme.titleMedium?.copyWith(
-                color: hasUnread
-                    ? colorScheme.onSurface
-                    : colorScheme.onSurfaceVariant,
-                fontWeight: hasUnread
-                    ? DesignTokens.fontWeightMedium
-                    : DesignTokens.fontWeightNormal,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+            horizontal: DesignTokens.spacingL,
+            vertical: DesignTokens.spacingS + 2),
+        child: Row(
+          children: [
+            ChatChannelAvatar(
+                channel: channel, details: details, siteContext: siteContext),
+            const SizedBox(width: DesignTokens.spacingM),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _channelDisplayTitle(context, channel),
+                          style: textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontWeight: hasUnread
+                                ? FontWeight.w700
+                                : DesignTokens.fontWeightMedium,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (!channel.isOpen) ...[
+                        const SizedBox(width: 6),
+                        Icon(
+                          // Discourse's status icons: closed is a lock,
+                          // read-only a crossed-out comment, archived a box.
+                          channel.isClosed
+                              ? Icons.lock_outline
+                              : channel.isReadOnly
+                                  ? Icons.comments_disabled_outlined
+                                  : Icons.archive_outlined,
+                          size: DesignTokens.iconSizeS,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ],
+                      if (muted) ...[
+                        const SizedBox(width: 6),
+                        Icon(Icons.notifications_off_outlined,
+                            size: DesignTokens.iconSizeS,
+                            color: colorScheme.onSurfaceVariant),
+                      ],
+                      if (when != null) ...[
+                        const SizedBox(width: DesignTokens.spacingS),
+                        Text(
+                          formatChatListTime(context, when),
+                          style: textTheme.bodySmall?.copyWith(
+                            color: hasUnread
+                                ? colorScheme.primary
+                                : colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          subtitle ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: hasUnread
+                                ? colorScheme.onSurface
+                                : colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                      if (badge != null) ...[
+                        const SizedBox(width: DesignTokens.spacingS),
+                        badge,
+                      ],
+                    ],
+                  ),
+                ],
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          if (!channel.isOpen) ...[
-            const SizedBox(width: 6),
-            Icon(
-              // Discourse's status icons: closed is a lock, read-only a
-              // crossed-out comment, archived a box. Closed channels used to
-              // get the archive icon.
-              channel.isClosed
-                  ? Icons.lock_outline
-                  : channel.isReadOnly
-                      ? Icons.comments_disabled_outlined
-                      : Icons.archive_outlined,
-              size: DesignTokens.iconSizeS,
-              color: colorScheme.onSurfaceVariant,
             ),
           ],
-        ],
+        ),
       ),
-      subtitle: channel.description != null && channel.description!.isNotEmpty
-          ? Text(
-              channel.description!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            )
-          : null,
-      // Mentions in Material 3's error badge, unread in the app's shared
-      // unread badge.
-      trailing: hasUnread || hasMention
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (hasMention) Badge(label: Text('@${channel.mentionCount}')),
-                if (hasUnread) ...[
-                  if (hasMention) const SizedBox(width: DesignTokens.spacingXS),
-                  UnreadBadge(count: channel.unreadCount),
-                ],
-              ],
-            )
-          : null,
     );
+    return muted ? Opacity(opacity: 0.6, child: tile) : tile;
   }
 }
 
@@ -546,8 +800,7 @@ class _NewDmSheetState extends State<_NewDmSheet> {
       setState(() => _suggestions = const []);
       return;
     }
-    _debounce =
-        Timer(const Duration(milliseconds: 300), () => _search(term));
+    _debounce = Timer(const Duration(milliseconds: 300), () => _search(term));
   }
 
   Future<void> _search(String term) async {
@@ -640,8 +893,14 @@ class _NewDmSheetState extends State<_NewDmSheet> {
     }
 
     try {
-      final users = [for (final c in chosen) if (!c.isGroup) c.name];
-      final groups = [for (final c in chosen) if (c.isGroup) c.name];
+      final users = [
+        for (final c in chosen)
+          if (!c.isGroup) c.name
+      ];
+      final groups = [
+        for (final c in chosen)
+          if (c.isGroup) c.name
+      ];
       final result = await proxy.createDirectMessageChannelAsync(
         users,
         groups: groups,
@@ -674,8 +933,8 @@ class _NewDmSheetState extends State<_NewDmSheet> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final canCreate = !_creating &&
-        (_selected.isNotEmpty || _input.text.trim().isNotEmpty);
+    final canCreate =
+        !_creating && (_selected.isNotEmpty || _input.text.trim().isNotEmpty);
 
     return Padding(
       // Under the theme's drag handle, at the app's 16dp margins.
@@ -741,23 +1000,23 @@ class _NewDmSheetState extends State<_NewDmSheet> {
           ),
           if (_suggestions.isNotEmpty) ...[
             const SizedBox(height: DesignTokens.spacingXS),
-              // Same row the user directory and the message recipient picker
-              // use, so a person looks identical wherever you pick them.
-              for (final u in _suggestions.take(5))
-                Opacity(
-                  // Someone who cannot chat stays visible, so the reader
-                  // learns why, but cannot be picked.
-                  opacity: u.canChat ? 1 : DesignTokens.opacityDisabled,
-                  child: UserListRow(
-                    username: u.name,
-                    subtitle: u.canChat
-                        ? u.label
-                        : AppLocalizations.of(context)!.chatDisabledUser,
-                    avatarUrl: u.avatarUrl,
-                    leadingIcon: u.isGroup ? Icons.groups_rounded : null,
-                    onTap: u.canChat ? () => _pick(u) : null,
-                  ),
+            // Same row the user directory and the message recipient picker
+            // use, so a person looks identical wherever you pick them.
+            for (final u in _suggestions.take(5))
+              Opacity(
+                // Someone who cannot chat stays visible, so the reader
+                // learns why, but cannot be picked.
+                opacity: u.canChat ? 1 : DesignTokens.opacityDisabled,
+                child: UserListRow(
+                  username: u.name,
+                  subtitle: u.canChat
+                      ? u.label
+                      : AppLocalizations.of(context)!.chatDisabledUser,
+                  avatarUrl: u.avatarUrl,
+                  leadingIcon: u.isGroup ? Icons.groups_rounded : null,
+                  onTap: u.canChat ? () => _pick(u) : null,
                 ),
+              ),
           ],
           if (_error != null) ...[
             const SizedBox(height: DesignTokens.spacingS),
@@ -771,8 +1030,7 @@ class _NewDmSheetState extends State<_NewDmSheet> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed:
-                    _creating ? null : () => Navigator.of(context).pop(),
+                onPressed: _creating ? null : () => Navigator.of(context).pop(),
                 child: Text(AppLocalizations.of(context)!.cancel),
               ),
               const SizedBox(width: DesignTokens.spacingS),

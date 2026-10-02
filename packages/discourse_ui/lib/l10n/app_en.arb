@@ -6190,5 +6190,74 @@
         "type": "String"
       }
     }
+  },
+  "chatNewMessage": "New message",
+  "@chatNewMessage": {
+    "description": "Button on the chat list that starts a direct message or group chat (Discourse's wording)"
+  },
+  "chatStarred": "Starred",
+  "@chatStarred": {
+    "description": "Heading over the reader's starred chat channels"
+  },
+  "chatBrowseChannels": "Browse channels",
+  "@chatBrowseChannels": {
+    "description": "Button that opens the list of all public chat channels to join"
+  },
+  "chatBrowseAllChannels": "Browse all channels",
+  "@chatBrowseAllChannels": {
+    "description": "Row at the end of the reader's channels that opens all public channels"
+  },
+  "chatFilterAll": "All",
+  "@chatFilterAll": {
+    "description": "Filter chip in Browse channels: every channel"
+  },
+  "chatFilterOpen": "Open",
+  "@chatFilterOpen": {
+    "description": "Filter chip in Browse channels: open channels"
+  },
+  "chatFilterClosed": "Closed",
+  "@chatFilterClosed": {
+    "description": "Filter chip in Browse channels: closed channels"
+  },
+  "chatFilterArchived": "Archived",
+  "@chatFilterArchived": {
+    "description": "Filter chip in Browse channels: archived channels"
+  },
+  "chatBrowseSearch": "Search channel by name",
+  "@chatBrowseSearch": {
+    "description": "Hint in the search field of Browse channels"
+  },
+  "chatJoin": "Join",
+  "@chatJoin": {
+    "description": "Button that joins a public chat channel"
+  },
+  "chatJoined": "Joined",
+  "@chatJoined": {
+    "description": "Label on a channel the reader has joined"
+  },
+  "chatLeave": "Leave",
+  "@chatLeave": {
+    "description": "Button that leaves a chat channel"
+  },
+  "chatMembersCount": "{count, plural, one{{count} member} other{{count} members}}",
+  "@chatMembersCount": {
+    "description": "How many people are in a chat channel",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatYesterday": "Yesterday",
+  "@chatYesterday": {
+    "description": "When a chat's last message was yesterday"
+  },
+  "chatNoChannelsFound": "No channels found",
+  "@chatNoChannelsFound": {
+    "description": "Browse channels found nothing for the search or filter"
+  },
+  "chatCloseDm": "Close this personal chat",
+  "@chatCloseDm": {
+    "description": "Swipe action on a direct message in the chat list: hide it until someone writes again"
   }
 }

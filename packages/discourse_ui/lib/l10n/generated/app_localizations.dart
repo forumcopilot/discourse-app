@@ -8057,6 +8057,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t remove {name} from this message.'**
   String errorRemovingFromMessage(String name);
+
+  /// Button on the chat list that starts a direct message or group chat (Discourse's wording)
+  ///
+  /// In en, this message translates to:
+  /// **'New message'**
+  String get chatNewMessage;
+
+  /// Heading over the reader's starred chat channels
+  ///
+  /// In en, this message translates to:
+  /// **'Starred'**
+  String get chatStarred;
+
+  /// Button that opens the list of all public chat channels to join
+  ///
+  /// In en, this message translates to:
+  /// **'Browse channels'**
+  String get chatBrowseChannels;
+
+  /// Row at the end of the reader's channels that opens all public channels
+  ///
+  /// In en, this message translates to:
+  /// **'Browse all channels'**
+  String get chatBrowseAllChannels;
+
+  /// Filter chip in Browse channels: every channel
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get chatFilterAll;
+
+  /// Filter chip in Browse channels: open channels
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get chatFilterOpen;
+
+  /// Filter chip in Browse channels: closed channels
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get chatFilterClosed;
+
+  /// Filter chip in Browse channels: archived channels
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get chatFilterArchived;
+
+  /// Hint in the search field of Browse channels
+  ///
+  /// In en, this message translates to:
+  /// **'Search channel by name'**
+  String get chatBrowseSearch;
+
+  /// Button that joins a public chat channel
+  ///
+  /// In en, this message translates to:
+  /// **'Join'**
+  String get chatJoin;
+
+  /// Label on a channel the reader has joined
+  ///
+  /// In en, this message translates to:
+  /// **'Joined'**
+  String get chatJoined;
+
+  /// Button that leaves a chat channel
+  ///
+  /// In en, this message translates to:
+  /// **'Leave'**
+  String get chatLeave;
+
+  /// How many people are in a chat channel
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} member} other{{count} members}}'**
+  String chatMembersCount(int count);
+
+  /// When a chat's last message was yesterday
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get chatYesterday;
+
+  /// Browse channels found nothing for the search or filter
+  ///
+  /// In en, this message translates to:
+  /// **'No channels found'**
+  String get chatNoChannelsFound;
+
+  /// Swipe action on a direct message in the chat list: hide it until someone writes again
+  ///
+  /// In en, this message translates to:
+  /// **'Close this personal chat'**
+  String get chatCloseDm;
 }
 
 class _AppLocalizationsDelegate

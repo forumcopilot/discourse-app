@@ -7,6 +7,7 @@ import 'package:forumcopilot_sdk/models/results/fc_chat_result.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import '../base_discourse_proxy.dart';
+import '../data/chat/discourse_chat_channel_details.dart';
 import '../data/chat/discourse_chat_event.dart';
 import '../data/chat/discourse_chatable.dart';
 import '../data/chat/discourse_chat_uploads.dart';
@@ -435,6 +436,226 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
 
   // ===== Live updates (Discourse-only) =====
 
+  /// Discourse-only: the forum's public channels the reader may see, for
+  /// browsing and joining (`GET /chat/api/channels`). [status] is `open`,
+  /// `closed` or `archived`; null for all. Pages of [limit].
+  Future<FCChatChannelListResult> browseChannelsAsync({
+    String filter = '',
+    String? status,
+    int offset = 0,
+    int limit = 25,
+  }) async {
+    try {
+      final response = await apiGet('/chat/api/channels', query: {
+        if (filter.trim().isNotEmpty) 'filter': filter.trim(),
+        if (status != null) 'status': status,
+        'offset': offset,
+        'limit': limit,
+      });
+      final channels = [
+        for (final raw in ((response['channels'] as List?) ?? const []).whereType<Map>())
+          _channelFromJson(raw.cast<String, dynamic>()),
+      ];
+      return FCChatChannelListResult(result: true, channels: channels);
+    } on DiscourseApiException catch (e) {
+      return FCChatChannelListResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCChatChannelListResult(result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Discourse-only: join a public channel (`POST …/memberships/me`).
+  Future<FCChatActionResult> joinChannelAsync(int channelId) =>
+      _action(() => apiPost('/chat/api/channels/$channelId/memberships/me'));
+
+  /// Discourse-only: leave a channel, or close a DM, as the web's Leave
+  /// does (`DELETE …/memberships/me`).
+  Future<FCChatActionResult> leaveChannelAsync(int channelId) =>
+      _action(() => apiDelete('/chat/api/channels/$channelId/memberships/me'));
+
+  /// Discourse-only: close a DM, as a swipe on the web's list does: it
+  /// leaves the list until someone writes in it again
+  /// (`DELETE …/memberships/me/follows`).
+  Future<FCChatActionResult> closeDirectMessageAsync(int channelId) =>
+      _action(() => apiDelete('/chat/api/channels/$channelId/memberships/me/follows'));
+
+  /// Discourse-only: star or unstar a channel for the reader
+  /// (`PUT …/memberships/me`, `starred`).
+  Future<FCChatActionResult> setChannelStarredAsync(int channelId, bool starred) async {
+    final result = await _action(() => apiPut(
+        '/chat/api/channels/$channelId/memberships/me',
+        body: {'starred': starred}));
+    if (result.result) {
+      DiscourseChatChannelDetails.update(
+          siteContext.site.url, channelId, (d) => d.copyWith(starred: starred));
+    }
+    return result;
+  }
+
+  /// Discourse-only: the reader's notifications for a channel
+  /// (`PUT …/notifications-settings/me`): [muted], and [level] one of
+  /// `never`, `mention`, `always`.
+  Future<FCChatActionResult> updateChannelNotificationsAsync(
+    int channelId, {
+    bool? muted,
+    String? level,
+  }) async {
+    final result = await _action(() => apiPut(
+          '/chat/api/channels/$channelId/notifications-settings/me',
+          body: {
+            'notifications_settings': {
+              if (muted != null) 'muted': muted,
+              if (level != null) 'notification_level': level,
+            },
+          },
+        ));
+    if (result.result) {
+      DiscourseChatChannelDetails.update(siteContext.site.url, channelId,
+          (d) => d.copyWith(muted: muted, notificationLevel: level));
+    }
+    return result;
+  }
+
+  /// Discourse-only: the people in a channel, a page at a time
+  /// (`GET …/memberships`), optionally filtered by [username].
+  Future<({bool result, String resultText, List<DiscourseChatUser> users, int total})>
+      getChannelMembersAsync(int channelId,
+          {int offset = 0, int limit = 50, String username = ''}) async {
+    try {
+      final response = await apiGet('/chat/api/channels/$channelId/memberships', query: {
+        'offset': offset,
+        'limit': limit,
+        if (username.trim().isNotEmpty) 'username': username.trim(),
+      });
+      final list = (response['memberships'] as List?) ?? (response['users'] as List?) ?? const [];
+      final users = <DiscourseChatUser>[
+        for (final raw in list.whereType<Map>())
+          if (DiscourseChatUser.fromJson(
+                  siteContext.site.url, raw['user'] ?? raw)
+              case final u?)
+            u,
+      ];
+      final meta = (response['meta'] as Map?)?.cast<String, dynamic>();
+      return (
+        result: true,
+        resultText: '',
+        users: users,
+        total: (meta?['total_rows'] as num?)?.toInt() ?? users.length,
+      );
+    } on DiscourseApiException catch (e) {
+      return (result: false, resultText: e.userMessage, users: const <DiscourseChatUser>[], total: 0);
+    } catch (e) {
+      return (result: false, resultText: describeApiError(e), users: const <DiscourseChatUser>[], total: 0);
+    }
+  }
+
+  /// Discourse-only: add people (or groups) to a group chat
+  /// (`POST …/memberships`).
+  Future<FCChatActionResult> addChannelMembersAsync(int channelId,
+          {List<String> usernames = const [], List<String> groups = const []}) =>
+      _action(() => apiPost('/chat/api/channels/$channelId/memberships', body: {
+            if (usernames.isNotEmpty) 'usernames': usernames,
+            if (groups.isNotEmpty) 'groups': groups,
+          }));
+
+  /// Discourse-only: remove someone from a channel (admins, group chat
+  /// owners; `DELETE …/memberships/:user_id`).
+  Future<FCChatActionResult> removeChannelMemberAsync(int channelId, int userId) =>
+      _action(() => apiDelete('/chat/api/channels/$channelId/memberships/$userId'));
+
+  /// Discourse-only: rename a channel or group chat (`PUT …/channels/:id`).
+  Future<FCChatChannelResult> renameChannelAsync(int channelId, String name) async {
+    try {
+      final response = await apiPut('/chat/api/channels/$channelId',
+          body: {'channel': {'name': name}});
+      final ch = (response['channel'] as Map?)?.cast<String, dynamic>();
+      return FCChatChannelResult(
+          result: true, channel: ch == null ? null : _channelFromJson(ch));
+    } on DiscourseApiException catch (e) {
+      return FCChatChannelResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCChatChannelResult(result: false, resultText: describeApiError(e));
+    }
+  }
+
+  Future<FCChatActionResult> _action(Future<Object?> Function() call) async {
+    try {
+      await call();
+      return FCChatActionResult(result: true);
+    } on DiscourseApiException catch (e) {
+      return FCChatActionResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCChatActionResult(result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Discourse-only: keeps a channel list current, as the web's sidebar is.
+  /// For each of [channelIds], `/chat/{id}/new-messages` carries every new
+  /// message (its excerpt, time and sender), and the reader's
+  /// `/chat/user-tracking-state/{id}` the authoritative unread and mention
+  /// counts whenever they change; `/chat/new-channel` announces a channel
+  /// the reader was just added to. All ride the forum's one long-poll.
+  /// Returns a function that stops watching, or null without live updates.
+  void Function()? watchChannelList(
+    List<int> channelIds,
+    void Function(DiscourseChatListEvent event) onEvent,
+  ) =>
+      watchChannelListOn(DiscourseMessageBus.of(siteContext), channelIds, onEvent);
+
+  /// [watchChannelList] on a given [bus] (tests).
+  @visibleForTesting
+  void Function()? watchChannelListOn(
+    DiscourseMessageBus bus,
+    List<int> channelIds,
+    void Function(DiscourseChatListEvent event) onEvent,
+  ) {
+    if (bus.isUnavailable) return null;
+    final siteUrl = siteContext.site.url;
+    final userId = int.tryParse(siteContext.loginDataOutput?.user?.id ?? '');
+    final stops = <void Function()>[];
+    for (final id in channelIds) {
+      final details = DiscourseChatChannelDetails.of(siteUrl, id);
+      stops.add(bus.subscribe('/chat/$id/new-messages', (data) {
+        final m = (data['message'] as Map?)?.cast<String, dynamic>();
+        if (m == null) return;
+        final excerpt = (m['excerpt'] ?? m['message'])?.toString();
+        final at = DateTime.tryParse(m['created_at']?.toString() ?? '');
+        final senderId = ((m['user'] as Map?)?['id'] as num?)?.toInt();
+        final isThreadReply = data['type'] == 'thread';
+        if (!isThreadReply) {
+          DiscourseChatChannelDetails.update(
+              siteUrl,
+              id,
+              (d) => d.copyWith(
+                  lastMessageExcerpt: excerpt, lastMessageAt: at, lastMessageUserId: senderId));
+        }
+        onEvent(DiscourseChatListNewMessage(
+          channelId: id,
+          fromReader: userId != null && senderId == userId,
+          threadReply: isThreadReply,
+          at: at,
+        ));
+      }, lastId: details?.newMessagesBusId ?? -1));
+    }
+    if (userId != null) {
+      stops.add(bus.subscribe('/chat/user-tracking-state/$userId', (data) {
+        final id = (data['channel_id'] as num?)?.toInt();
+        if (id == null) return;
+        onEvent(DiscourseChatListTracking(
+          channelId: id,
+          unreadCount: (data['unread_count'] as num?)?.toInt() ?? 0,
+          mentionCount: (data['mention_count'] as num?)?.toInt() ?? 0,
+        ));
+      }));
+    }
+    stops.add(bus.subscribe('/chat/new-channel', (_) => onEvent(const DiscourseChatListChanged())));
+    return () {
+      for (final stop in stops) {
+        stop();
+      }
+    };
+  }
+
   /// Each channel's MessageBus position as of its last fetch
   /// (`meta.message_bus_last_ids.channel_message_bus_last_id`), keyed by forum
   /// and channel: subscribing from there delivers exactly what was published
@@ -531,6 +752,10 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     }
     final lastMessage =
         (json['last_message'] as Map?)?.cast<String, dynamic>();
+    // Who is in a DM, the channel's emoji and colour, its last message and
+    // the reader's own settings: Discourse-only, kept beside the channel.
+    DiscourseChatChannelDetails.store(siteContext.site.url,
+        DiscourseChatChannelDetails.fromChannelJson(siteContext.site.url, json));
     return FCChatChannel(
       id: (json['id'] as num).toInt(),
       title: (json['title'] ?? json['name'] ?? '').toString(),

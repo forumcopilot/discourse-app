@@ -1654,5 +1654,21 @@
   "dismissNewAndUnread": "Nieuwe en ongelezen negeren",
   "dismissNewAndUnreadMessage": "Topics in {category} worden niet meer als nieuw of ongelezen getoond.",
   "dismissedTopics": "Genegeerd",
-  "errorRemovingFromMessage": "Kon {name} niet uit dit bericht verwijderen."
+  "errorRemovingFromMessage": "Kon {name} niet uit dit bericht verwijderen.",
+  "chatNewMessage": "Nieuw bericht",
+  "chatStarred": "Favorieten",
+  "chatBrowseChannels": "Kanalen bekijken",
+  "chatBrowseAllChannels": "Alle kanalen bekijken",
+  "chatFilterAll": "Alles",
+  "chatFilterOpen": "Open",
+  "chatFilterClosed": "Gesloten",
+  "chatFilterArchived": "Gearchiveerd",
+  "chatBrowseSearch": "Kanaal zoeken op naam",
+  "chatJoin": "Deelnemen",
+  "chatJoined": "Lid",
+  "chatLeave": "Verlaten",
+  "chatMembersCount": "{count, plural, one{{count} lid} other{{count} leden}}",
+  "chatYesterday": "Gisteren",
+  "chatNoChannelsFound": "Geen kanalen gevonden",
+  "chatCloseDm": "Deze privéchat sluiten"
 }

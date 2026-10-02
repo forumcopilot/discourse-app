@@ -4955,4 +4955,60 @@ class AppLocalizationsNl extends AppLocalizations {
   String errorRemovingFromMessage(String name) {
     return 'Kon $name niet uit dit bericht verwijderen.';
   }
+
+  @override
+  String get chatNewMessage => 'Nieuw bericht';
+
+  @override
+  String get chatStarred => 'Favorieten';
+
+  @override
+  String get chatBrowseChannels => 'Kanalen bekijken';
+
+  @override
+  String get chatBrowseAllChannels => 'Alle kanalen bekijken';
+
+  @override
+  String get chatFilterAll => 'Alles';
+
+  @override
+  String get chatFilterOpen => 'Open';
+
+  @override
+  String get chatFilterClosed => 'Gesloten';
+
+  @override
+  String get chatFilterArchived => 'Gearchiveerd';
+
+  @override
+  String get chatBrowseSearch => 'Kanaal zoeken op naam';
+
+  @override
+  String get chatJoin => 'Deelnemen';
+
+  @override
+  String get chatJoined => 'Lid';
+
+  @override
+  String get chatLeave => 'Verlaten';
+
+  @override
+  String chatMembersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count leden',
+      one: '$count lid',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatYesterday => 'Gisteren';
+
+  @override
+  String get chatNoChannelsFound => 'Geen kanalen gevonden';
+
+  @override
+  String get chatCloseDm => 'Deze privéchat sluiten';
 }

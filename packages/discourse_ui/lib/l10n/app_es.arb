@@ -1497,5 +1497,21 @@
   "dismissNewAndUnread": "Descartar nuevos y sin leer",
   "dismissNewAndUnreadMessage": "Los temas de {category} ya no aparecerán como nuevos ni sin leer.",
   "dismissedTopics": "Descartados",
-  "errorRemovingFromMessage": "No se pudo quitar a {name} de este mensaje."
+  "errorRemovingFromMessage": "No se pudo quitar a {name} de este mensaje.",
+  "chatNewMessage": "Nuevo mensaje",
+  "chatStarred": "Favoritos",
+  "chatBrowseChannels": "Examinar canales",
+  "chatBrowseAllChannels": "Examinar todos los canales",
+  "chatFilterAll": "Todos",
+  "chatFilterOpen": "Abierto",
+  "chatFilterClosed": "Cerrado",
+  "chatFilterArchived": "Archivado",
+  "chatBrowseSearch": "Buscar canal por nombre",
+  "chatJoin": "Unirse",
+  "chatJoined": "Se unió",
+  "chatLeave": "Abandonar",
+  "chatMembersCount": "{count, plural, one{{count} miembro} other{{count} miembros}}",
+  "chatYesterday": "Ayer",
+  "chatNoChannelsFound": "No se han encontrado canales",
+  "chatCloseDm": "Cerrar este chat personal"
 }

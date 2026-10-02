@@ -1497,5 +1497,21 @@
   "dismissNewAndUnread": "Neue und ungelesene verwerfen",
   "dismissNewAndUnreadMessage": "Themen in {category} werden nicht mehr als neu oder ungelesen angezeigt.",
   "dismissedTopics": "Verworfen",
-  "errorRemovingFromMessage": "{name} konnte nicht aus dieser Nachricht entfernt werden."
+  "errorRemovingFromMessage": "{name} konnte nicht aus dieser Nachricht entfernt werden.",
+  "chatNewMessage": "Neue Nachricht",
+  "chatStarred": "Mit Sternchen",
+  "chatBrowseChannels": "Kanäle durchsuchen",
+  "chatBrowseAllChannels": "Alle Kanäle durchsuchen",
+  "chatFilterAll": "Alle",
+  "chatFilterOpen": "Offen",
+  "chatFilterClosed": "Geschlossen",
+  "chatFilterArchived": "Archiviert",
+  "chatBrowseSearch": "Kanal nach Namen suchen",
+  "chatJoin": "Beitreten",
+  "chatJoined": "Beigetreten",
+  "chatLeave": "Verlassen",
+  "chatMembersCount": "{count, plural, one{{count} Mitglied} other{{count} Mitglieder}}",
+  "chatYesterday": "Gestern",
+  "chatNoChannelsFound": "Keine Kanäle gefunden",
+  "chatCloseDm": "Schließe diesen persönlichen Chat"
 }

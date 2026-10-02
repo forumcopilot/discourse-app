@@ -43,3 +43,49 @@ class DiscourseChatReaction extends DiscourseChatEvent {
   final String username;
   final bool added;
 }
+
+/// A change to the reader's channel list (see
+/// `DiscourseChatProxy.watchChannelList`).
+sealed class DiscourseChatListEvent {
+  const DiscourseChatListEvent();
+}
+
+/// A new message in a listed channel. The channel's details already carry
+/// its excerpt and time; the list bumps the channel and, for someone else's
+/// message, its unread count until the tracking state confirms it.
+class DiscourseChatListNewMessage extends DiscourseChatListEvent {
+  const DiscourseChatListNewMessage({
+    required this.channelId,
+    required this.fromReader,
+    required this.threadReply,
+    this.at,
+  });
+
+  final int channelId;
+  final bool fromReader;
+
+  /// A reply inside a thread, which does not change the channel's own last
+  /// message.
+  final bool threadReply;
+  final DateTime? at;
+}
+
+/// The reader's unread and mention counts for a channel, as the server
+/// counts them.
+class DiscourseChatListTracking extends DiscourseChatListEvent {
+  const DiscourseChatListTracking({
+    required this.channelId,
+    required this.unreadCount,
+    required this.mentionCount,
+  });
+
+  final int channelId;
+  final int unreadCount;
+  final int mentionCount;
+}
+
+/// The list itself changed (the reader was added to a channel): read it
+/// again.
+class DiscourseChatListChanged extends DiscourseChatListEvent {
+  const DiscourseChatListChanged();
+}

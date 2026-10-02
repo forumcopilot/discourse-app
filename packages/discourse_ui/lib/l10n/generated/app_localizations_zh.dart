@@ -4655,4 +4655,59 @@ class AppLocalizationsZh extends AppLocalizations {
   String errorRemovingFromMessage(String name) {
     return '无法将 $name 从此消息中移除。';
   }
+
+  @override
+  String get chatNewMessage => '新消息';
+
+  @override
+  String get chatStarred => '收藏';
+
+  @override
+  String get chatBrowseChannels => '浏览频道';
+
+  @override
+  String get chatBrowseAllChannels => '浏览所有频道';
+
+  @override
+  String get chatFilterAll => '所有';
+
+  @override
+  String get chatFilterOpen => '开放';
+
+  @override
+  String get chatFilterClosed => '已关闭';
+
+  @override
+  String get chatFilterArchived => '已归档';
+
+  @override
+  String get chatBrowseSearch => '按名称搜索频道';
+
+  @override
+  String get chatJoin => '加入';
+
+  @override
+  String get chatJoined => '已加入';
+
+  @override
+  String get chatLeave => '离开';
+
+  @override
+  String chatMembersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个成员',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatYesterday => '昨天';
+
+  @override
+  String get chatNoChannelsFound => '找不到频道';
+
+  @override
+  String get chatCloseDm => '关闭此个人聊天';
 }

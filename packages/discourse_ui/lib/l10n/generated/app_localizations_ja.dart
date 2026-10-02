@@ -4717,4 +4717,59 @@ class AppLocalizationsJa extends AppLocalizations {
   String errorRemovingFromMessage(String name) {
     return 'このメッセージから $name を削除できませんでした。';
   }
+
+  @override
+  String get chatNewMessage => '新しいメッセージ';
+
+  @override
+  String get chatStarred => 'スター付き';
+
+  @override
+  String get chatBrowseChannels => 'チャンネルを閲覧する';
+
+  @override
+  String get chatBrowseAllChannels => 'すべてのチャンネルを閲覧する';
+
+  @override
+  String get chatFilterAll => 'すべて';
+
+  @override
+  String get chatFilterOpen => 'オープン';
+
+  @override
+  String get chatFilterClosed => '閉鎖';
+
+  @override
+  String get chatFilterArchived => 'アーカイブ済み';
+
+  @override
+  String get chatBrowseSearch => 'チャンネル名で検索';
+
+  @override
+  String get chatJoin => '参加';
+
+  @override
+  String get chatJoined => '参加中';
+
+  @override
+  String get chatLeave => '退出';
+
+  @override
+  String chatMembersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 人のメンバー',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatYesterday => '昨日';
+
+  @override
+  String get chatNoChannelsFound => 'チャンネルが見つかりません';
+
+  @override
+  String get chatCloseDm => 'このパーソナルチャットを閉じる';
 }

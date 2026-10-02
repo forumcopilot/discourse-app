@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import '../services/chat_unread.dart';
 
 import 'package:flutter/material.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -1035,9 +1036,26 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
           // users can tell the two surfaces apart. Forum chat lives
           // under the chat-launch icon (chat_outlined / chat_rounded);
           // Topics is a single "speech bubble".
+          // Mentions and unread direct messages as a number, anything else
+          // unread as a dot, as Discourse's chat footer badges them (the
+          // chat list publishes them; see ChatUnread).
+          final chatSite = _siteContext;
+          Widget chatBadge(Widget icon) => chatSite == null
+              ? icon
+              : ValueListenableBuilder<ChatUnreadState>(
+                  valueListenable: ChatUnread.of(chatSite),
+                  builder: (context, unread, _) => Badge(
+                    label: unread.urgent > 0
+                        ? Text(unread.urgent > 99 ? '99+' : '${unread.urgent}')
+                        : null,
+                    smallSize: 8,
+                    isLabelVisible: unread.any,
+                    child: icon,
+                  ),
+                );
           return NavigationDestination(
-            selectedIcon: const Icon(Icons.chat_rounded),
-            icon: const Icon(Icons.chat_outlined),
+            selectedIcon: chatBadge(const Icon(Icons.chat_rounded)),
+            icon: chatBadge(const Icon(Icons.chat_outlined)),
             label: l10n.chat,
           );
         case _messagesTab:

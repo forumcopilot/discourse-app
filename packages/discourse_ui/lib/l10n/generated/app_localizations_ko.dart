@@ -4716,4 +4716,59 @@ class AppLocalizationsKo extends AppLocalizations {
   String errorRemovingFromMessage(String name) {
     return '이 메시지에서 $name 님을 제거할 수 없습니다.';
   }
+
+  @override
+  String get chatNewMessage => '새로운 메시지';
+
+  @override
+  String get chatStarred => '즐겨찾기';
+
+  @override
+  String get chatBrowseChannels => '채널 찾아보기';
+
+  @override
+  String get chatBrowseAllChannels => '모든 채널 찾아보기';
+
+  @override
+  String get chatFilterAll => '전체';
+
+  @override
+  String get chatFilterOpen => '열기';
+
+  @override
+  String get chatFilterClosed => '닫힘';
+
+  @override
+  String get chatFilterArchived => '보관됨';
+
+  @override
+  String get chatBrowseSearch => '이름으로 채널 검색';
+
+  @override
+  String get chatJoin => '가입';
+
+  @override
+  String get chatJoined => '가입됨';
+
+  @override
+  String get chatLeave => '나가기';
+
+  @override
+  String chatMembersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '회원 $count명',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatYesterday => '어제';
+
+  @override
+  String get chatNoChannelsFound => '채널을 찾을 수 없습니다.';
+
+  @override
+  String get chatCloseDm => '이 개인 채팅 닫기';
 }

@@ -1497,5 +1497,21 @@
   "dismissNewAndUnread": "Отложить новые и непрочитанные",
   "dismissNewAndUnreadMessage": "Темы в {category} больше не будут отмечены как новые или непрочитанные.",
   "dismissedTopics": "Отложено",
-  "errorRemovingFromMessage": "Не удалось удалить {name} из этого сообщения."
+  "errorRemovingFromMessage": "Не удалось удалить {name} из этого сообщения.",
+  "chatNewMessage": "Новое сообщение",
+  "chatStarred": "Отмечено звездочкой",
+  "chatBrowseChannels": "Просмотр каналов",
+  "chatBrowseAllChannels": "Просмотреть все каналы",
+  "chatFilterAll": "Все",
+  "chatFilterOpen": "Открытые",
+  "chatFilterClosed": "Закрытые",
+  "chatFilterArchived": "Архивные",
+  "chatBrowseSearch": "Поиск канала по названию",
+  "chatJoin": "Подписаться",
+  "chatJoined": "Подписан",
+  "chatLeave": "Отписаться",
+  "chatMembersCount": "{count, plural, one{{count} участник} few{{count} участника} many{{count} участников} other{{count} участников}}",
+  "chatYesterday": "Вчера",
+  "chatNoChannelsFound": "Каналы не обнаружены",
+  "chatCloseDm": "Закрыть личный чат"
 }

@@ -5004,4 +5004,62 @@ class AppLocalizationsRu extends AppLocalizations {
   String errorRemovingFromMessage(String name) {
     return 'Не удалось удалить $name из этого сообщения.';
   }
+
+  @override
+  String get chatNewMessage => 'Новое сообщение';
+
+  @override
+  String get chatStarred => 'Отмечено звездочкой';
+
+  @override
+  String get chatBrowseChannels => 'Просмотр каналов';
+
+  @override
+  String get chatBrowseAllChannels => 'Просмотреть все каналы';
+
+  @override
+  String get chatFilterAll => 'Все';
+
+  @override
+  String get chatFilterOpen => 'Открытые';
+
+  @override
+  String get chatFilterClosed => 'Закрытые';
+
+  @override
+  String get chatFilterArchived => 'Архивные';
+
+  @override
+  String get chatBrowseSearch => 'Поиск канала по названию';
+
+  @override
+  String get chatJoin => 'Подписаться';
+
+  @override
+  String get chatJoined => 'Подписан';
+
+  @override
+  String get chatLeave => 'Отписаться';
+
+  @override
+  String chatMembersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count участников',
+      many: '$count участников',
+      few: '$count участника',
+      one: '$count участник',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatYesterday => 'Вчера';
+
+  @override
+  String get chatNoChannelsFound => 'Каналы не обнаружены';
+
+  @override
+  String get chatCloseDm => 'Закрыть личный чат';
 }
