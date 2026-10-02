@@ -15,7 +15,8 @@ class DiscourseHost {
   /// Resolves the forum a push notification belongs to. Receives the
   /// notification's `site_id` (the host directory's id, if any) and the raw
   /// payload so a host without directory ids can match on a URL. Return
-  /// null to fall back to the module's own single-forum resolution.
+  /// null when the forum is unknown. When this hook is installed, its answer
+  /// is authoritative; the configured single-forum fallback is not used.
   static Future<Site?> Function(int siteId, Map<String, dynamic> data)?
       resolveForum;
 

@@ -29,6 +29,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'discourse_route_navigator.dart';
 import 'notification_route.dart';
+import 'notification_forum.dart';
 import 'notification_grant_cleanup.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../l10n/app_l10n.dart';
@@ -476,11 +477,11 @@ class NotificationService with ServiceErrorHandlingMixin {
   Future<void> _showLocalNotification(RemoteMessage message) async {
     if (DiscourseNotificationRoute.handles(message.data)) {
       final route = DiscourseNotificationRoute.from(message.data);
-      final forum = await _findForumForDiscourseNotification(route, message.data);
+      final forum = await _findForumForDiscourseNotification(message.data);
       if (forum == null) return;
       final live = Get.isRegistered<DiscourseSiteController>()
           ? Get.find<DiscourseSiteController>().currentSiteContext.value : null;
-      if (live != null && _isSameForum(live.site, forum)) {
+      if (live != null && NotificationForum.matches(live.site, forum)) {
         if (!route.permits(live)) return;
       } else {
         // Other forums need no network fetch or navigation to check the
@@ -673,7 +674,7 @@ class NotificationService with ServiceErrorHandlingMixin {
     final route = DiscourseNotificationRoute.from(data);
     AppLogger.debug('🔔 [NotificationService] Discourse notification → $route');
 
-    final targetForum = await _findForumForDiscourseNotification(route, data);
+    final targetForum = await _findForumForDiscourseNotification(data);
     if (targetForum == null) {
       AppLogger.debug('❌ [NotificationService] No forum to open this notification in');
       _openAppWithoutNavigation();
@@ -689,9 +690,9 @@ class NotificationService with ServiceErrorHandlingMixin {
     // navigator. Without that, a push for a forum left a moment ago opened
     // its topic straight over the host's list, with no forum under it: no
     // forum colours, and Back skipped the forum.
-    final alreadyHere = _isSameForum(siteController?.currentSite.value, targetForum) &&
+    final alreadyHere = NotificationForum.matches(siteController?.currentSite.value, targetForum) &&
         (siteController?.isInitialized.value ?? false) &&
-        siteController?.currentSiteContext.value != null &&
+        NotificationForum.matches(siteController?.currentSiteContext.value?.site, targetForum) &&
         (hostOpen == null || (siteController?.homeRoute?.isActive ?? false));
     if (!alreadyHere) {
       // A multi-forum host opens the forum itself, the same way it opens
@@ -726,67 +727,13 @@ class NotificationService with ServiceErrorHandlingMixin {
   /// The forum a backend notification belongs to.
   ///
   /// The same resolution as the plugin path — a multi-forum host is asked
-  /// first, the configured forum answers otherwise — but the backend keys
+  /// first, the configured forum answers only in standalone mode — but the backend keys
   /// forums by address and sends the same `site_id` for all of them, so the
   /// id carries no information here and `site_url` is what a host matches on.
   Future<Site?> _findForumForDiscourseNotification(
-    DiscourseNotificationRoute route,
     Map<String, dynamic> data,
   ) async {
-    final forum = await _findForumBySiteId(0, data);
-    final named = route.siteUrl;
-    if (forum != null && named != null) {
-      final want = Uri.tryParse(named)?.host.toLowerCase();
-      final got = Uri.tryParse(forum.url)?.host.toLowerCase();
-      if (want != null && got != null && want != got) {
-        AppLogger.debug(
-            '⚠️ [NotificationService] Notification names $want but this build resolved $got — opening $got');
-      }
-    }
-    return forum;
-  }
-
-  /// Whether two [Site]s are the same forum: by id when both have one, by
-  /// host otherwise. The host arm is what a multi-forum app opening forums by
-  /// address needs — every one of its forums has a null id, so an id-only
-  /// comparison answers "different forum" for the forum already on screen and
-  /// stacks a second copy of it on every notification.
-  static bool _isSameForum(Site? a, Site? b) {
-    if (a == null || b == null) return false;
-    if (a.id != null && b.id != null) return a.id == b.id;
-    final aHost = Uri.tryParse(a.url)?.host.toLowerCase();
-    final bHost = Uri.tryParse(b.url)?.host.toLowerCase();
-    return aHost != null && aHost.isNotEmpty && aHost == bHost;
-  }
-
-  // Resolve forum for notifications in single-forum mode.
-  Future<Site?> _findForumBySiteId(int siteId, Map<String, dynamic> data) async {
-    // A multi-forum host knows which of its forums this is; the template
-    // has exactly one and rebuilds it from config.
-    final resolve = DiscourseHost.resolveForum;
-    if (resolve != null) {
-      try {
-        final resolved = await resolve(siteId, data);
-        if (resolved != null) return resolved;
-        AppLogger.debug('⚠️ [NotificationService] Host could not resolve site_id $siteId; falling back to the configured forum');
-      } catch (e) {
-        AppLogger.debug('❌ [NotificationService] Host resolveForum failed: $e');
-      }
-    }
-    try {
-      final configuredSite = AppForumConfig.buildSite();
-
-      if (configuredSite.id != null && configuredSite.id != siteId) {
-        AppLogger.debug(
-          '⚠️ [NotificationService] Incoming site_id $siteId does not match configured site ID ${configuredSite.id}; using configured site',
-        );
-      }
-
-      return configuredSite;
-    } catch (e) {
-      AppLogger.debug('❌ [NotificationService] Error finding forum by site_id $siteId: $e');
-      return null;
-    }
+    return NotificationForum.resolve(0, data);
   }
 
   /// Initialize site and wait for it to be ready
@@ -800,8 +747,8 @@ class NotificationService with ServiceErrorHandlingMixin {
       // Ensure we only short-circuit when the initialized context matches the target forum.
       // This prevents returning stale contexts when switching forums via push notifications.
       final currentContext = siteController.currentSiteContext.value;
-      final isSameSite = _isSameForum(currentSite, targetForum);
-      final isContextMatching = _isSameForum(currentContext?.site, targetForum);
+      final isSameSite = NotificationForum.matches(currentSite, targetForum);
+      final isContextMatching = NotificationForum.matches(currentContext?.site, targetForum);
       final isAlreadyInitialized = siteController.isInitialized.value && currentContext != null && isContextMatching;
       if (isSameSite && isAlreadyInitialized) {
         AppLogger.debug('🔔 [NotificationService] Using already initialized forum ${targetForum.name} (${targetForum.id})');
@@ -824,7 +771,7 @@ class NotificationService with ServiceErrorHandlingMixin {
         final siteContext = siteController.currentSiteContext.value;
         final isContextReady = siteController.isInitialized.value &&
             siteContext != null &&
-            _isSameForum(siteContext.site, targetForum);
+            NotificationForum.matches(siteContext.site, targetForum);
         if (isContextReady) {
           // Initialization complete, but wait a bit more to ensure login and cookies are set
           // This gives time for auto-login to complete and cookies to be restored
@@ -892,7 +839,7 @@ class NotificationService with ServiceErrorHandlingMixin {
 
       // Look up forum by site_id
       AppLogger.debug('🔎 [NotificationService] Looking up forum by site_id: $siteId');
-      final Site? targetForum = await _findForumBySiteId(siteId, data);
+      final Site? targetForum = await NotificationForum.resolve(siteId, data);
 
       if (targetForum == null) {
         AppLogger.debug('❌ [NotificationService] Forum not found for site_id: $siteId');
@@ -1011,7 +958,7 @@ class NotificationService with ServiceErrorHandlingMixin {
 
       // Look up forum by site_id
       AppLogger.debug('🔎 [NotificationService] Looking up forum by site_id: $siteId');
-      final Site? targetForum = await _findForumBySiteId(siteId, data);
+      final Site? targetForum = await NotificationForum.resolve(siteId, data);
 
       if (targetForum == null) {
         AppLogger.debug('❌ [NotificationService] Forum not found for site_id: $siteId');
@@ -1074,7 +1021,7 @@ class NotificationService with ServiceErrorHandlingMixin {
 
       // Look up forum by site_id
       AppLogger.debug('🔎 [NotificationService] Looking up forum by site_id: $siteId');
-      final Site? targetForum = await _findForumBySiteId(siteId, data);
+      final Site? targetForum = await NotificationForum.resolve(siteId, data);
 
       if (targetForum == null) {
         AppLogger.debug('❌ [NotificationService] Forum not found for site_id: $siteId');
