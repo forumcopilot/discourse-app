@@ -24,7 +24,7 @@ import '../views/user_profile_page.dart';
 import '../core/errors/error_handling_mixins.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../host/discourse_host.dart';
-import 'package:discourse_core/discourse_core.dart' show DiscourseSocialProxy, DiscourseSiteContextExtension;
+import 'package:discourse_core/discourse_core.dart' show DiscourseSiteContextExtension;
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'discourse_route_navigator.dart';
@@ -699,7 +699,6 @@ class NotificationService with ServiceErrorHandlingMixin {
       if (hostOpen != null) {
         AppLogger.debug('🔔 [NotificationService] Host opens ${targetForum.url} at $route');
         await hostOpen(targetForum, route);
-        _markOpenedRead(targetForum, route);
         return;
       }
       await _resetToHomeIfNeeded();
@@ -722,31 +721,6 @@ class NotificationService with ServiceErrorHandlingMixin {
 
     AppLogger.debug('✅ [NotificationService] Opening $route');
     await DiscourseRouteNavigator.open(siteContext, route);
-    _markOpenedRead(targetForum, route);
-  }
-
-  /// Marks the notification behind an opened push read, as tapping it in
-  /// Discourse's own menu does — with the reader's session, once the forum
-  /// is open. A topic's notification would also clear as its posts are
-  /// read; a badge's, a chat's or a group's only clears this way.
-  /// Best-effort: a failure leaves it unread, nothing worse.
-  void _markOpenedRead(Site forum, DiscourseNotificationRoute route) {
-    final id = route.notificationId;
-    if (id == null) return;
-    final controller = Get.isRegistered<DiscourseSiteController>()
-        ? Get.find<DiscourseSiteController>()
-        : null;
-    final context = controller?.currentSiteContext.value;
-    if (context == null || !context.isLoggedIn || !_isSameForum(context.site, forum) ||
-        !route.permits(context)) {
-      return;
-    }
-    DiscourseSocialProxy(context)
-        .markNotificationReadAsync(id)
-        .then((r) => AppLogger.debug(
-            '🔔 [NotificationService] Marked notification $id read: ${r.result}'))
-        .catchError((Object e) => AppLogger.debug(
-            '⚠️ [NotificationService] Could not mark notification $id read: $e'));
   }
 
   /// The forum a backend notification belongs to.

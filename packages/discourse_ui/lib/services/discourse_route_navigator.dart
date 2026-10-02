@@ -1,5 +1,7 @@
+import 'dart:async';
+
 import 'package:forumcopilot_sdk/context/site_context.dart';
-import 'package:discourse_core/discourse_core.dart' show DiscourseSiteContextExtension;
+import 'package:discourse_core/discourse_core.dart' show DiscourseSiteContextExtension, DiscourseSocialProxy;
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:get/get.dart';
 
@@ -137,6 +139,15 @@ class DiscourseRouteNavigator {
           AppNavigation.pushGlobal(ForumListPage(
               siteContext: siteContext, tab: SiteHomeTab.notifications));
         }
+    }
+    // Host navigation may complete only when the entire forum page closes.
+    // Mark here instead, under the same session that opened the destination.
+    final id = route.notificationId;
+    if (route.isPush && id != null && stillAllowed()) {
+      unawaited(DiscourseSocialProxy(siteContext).markNotificationReadAsync(id)
+          .then<void>((_) {})
+          .catchError((Object e) => AppLogger.debug(
+              'Could not mark opened notification read: $e')));
     }
   }
 
