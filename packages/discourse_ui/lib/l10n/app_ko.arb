@@ -1518,5 +1518,18 @@
   "chatLastVisit": "마지막 방문",
   "chatNewMessagesCount": "{count, plural, other{새 메시지 {count}개}}",
   "chatScrollToBottom": "맨 아래로 스크롤",
-  "chatInReplyTo": "답장 대상"
+  "chatInReplyTo": "답장 대상",
+  "chatCopyText": "텍스트 복사",
+  "chatTextCopied": "텍스트를 클립보드에 복사했습니다",
+  "chatBookmark": "북마크",
+  "chatPinMessage": "메시지 고정",
+  "chatUnpinMessage": "메시지 고정 해제",
+  "chatFlag": "신고",
+  "chatReactWithEmoji": "이모지로 반응하기",
+  "chatReplyingTo": "{username}님에게 답장",
+  "chatEditingMessage": "메시지 수정 중",
+  "chatTypingOne": "{username}님이 입력 중",
+  "chatTypingTwo": "{commaSeparatedUsernames}님과 {lastUsername}님이 입력 중",
+  "chatTypingMany": "{count, plural, other{{commaSeparatedUsernames}님 외 {count}명이 입력 중}}",
+  "chatOpenThread": "스레드 열기"
 }

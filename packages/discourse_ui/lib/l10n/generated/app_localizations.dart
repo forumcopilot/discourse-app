@@ -8183,6 +8183,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'In reply to'**
   String get chatInReplyTo;
+
+  /// Action on a chat message: copy its text
+  ///
+  /// In en, this message translates to:
+  /// **'Copy text'**
+  String get chatCopyText;
+
+  /// Confirmation after copying a chat message's text
+  ///
+  /// In en, this message translates to:
+  /// **'Text copied to clipboard'**
+  String get chatTextCopied;
+
+  /// Action on a chat message: bookmark it
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark'**
+  String get chatBookmark;
+
+  /// Action on a chat message: pin it in the channel
+  ///
+  /// In en, this message translates to:
+  /// **'Pin message'**
+  String get chatPinMessage;
+
+  /// Action on a pinned chat message: unpin it
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin message'**
+  String get chatUnpinMessage;
+
+  /// Action on someone's chat message: flag it for the moderators
+  ///
+  /// In en, this message translates to:
+  /// **'Flag'**
+  String get chatFlag;
+
+  /// Button that opens the full emoji picker to react to a chat message
+  ///
+  /// In en, this message translates to:
+  /// **'React with emoji'**
+  String get chatReactWithEmoji;
+
+  /// Banner over the chat composer while writing a reply; username is the author of the message replied to
+  ///
+  /// In en, this message translates to:
+  /// **'Replying to {username}'**
+  String chatReplyingTo(String username);
+
+  /// Banner over the chat composer while editing one of the reader's messages
+  ///
+  /// In en, this message translates to:
+  /// **'Editing message'**
+  String get chatEditingMessage;
+
+  /// Under a chat conversation: one person is typing
+  ///
+  /// In en, this message translates to:
+  /// **'{username} is typing'**
+  String chatTypingOne(String username);
+
+  /// Under a chat conversation: several people are typing (all but the last, comma-separated, then the last)
+  ///
+  /// In en, this message translates to:
+  /// **'{commaSeparatedUsernames} and {lastUsername} are typing'**
+  String chatTypingTwo(String commaSeparatedUsernames, String lastUsername);
+
+  /// Under a chat conversation: many people are typing; the first few by name, then how many others
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{commaSeparatedUsernames} and {count} other are typing} other{{commaSeparatedUsernames} and {count} others are typing}}'**
+  String chatTypingMany(String commaSeparatedUsernames, int count);
+
+  /// Action on a chat message in a channel with threads: open (or start) its thread
+  ///
+  /// In en, this message translates to:
+  /// **'Open Thread'**
+  String get chatOpenThread;
 }
 
 class _AppLocalizationsDelegate

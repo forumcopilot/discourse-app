@@ -44,7 +44,7 @@ class DiscourseChatMessageExtras {
     this.thread,
     this.bookmarkId,
     this.pinned = false,
-    this.canFlag = false,
+    this.availableFlags = const [],
     this.flagged = false,
     this.authorTitle,
   });
@@ -58,8 +58,11 @@ class DiscourseChatMessageExtras {
   final int? bookmarkId;
   final bool pinned;
 
-  /// The reader may flag it (Discourse sends `available_flags`).
-  final bool canFlag;
+  /// The flag types the reader may use on it (`available_flags`, by name
+  /// key: `spam`, `inappropriate`, …); empty when they may not flag it.
+  final List<String> availableFlags;
+
+  bool get canFlag => availableFlags.isNotEmpty;
 
   /// The reader already flagged it.
   final bool flagged;
@@ -80,7 +83,7 @@ class DiscourseChatMessageExtras {
         thread: thread ?? this.thread,
         bookmarkId: clearBookmark ? null : (bookmarkId ?? this.bookmarkId),
         pinned: pinned ?? this.pinned,
-        canFlag: canFlag,
+        availableFlags: availableFlags,
         flagged: flagged ?? this.flagged,
         authorTitle: authorTitle,
       );
@@ -122,7 +125,7 @@ class DiscourseChatMessageExtras {
             ),
       bookmarkId: (bookmark?['id'] as num?)?.toInt(),
       pinned: json['pinned'] == true,
-      canFlag: flags is List && flags.isNotEmpty,
+      availableFlags: flags is List ? [for (final f in flags) if (f != null) f.toString()] : const [],
       flagged: json['user_flag_status'] != null,
       authorTitle: _text(user?['title']),
     );

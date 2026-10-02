@@ -1518,5 +1518,18 @@
   "chatLastVisit": "последнее посещение",
   "chatNewMessagesCount": "{count, plural, one{{count} новое сообщение} few{{count} новых сообщения} many{{count} новых сообщений} other{{count} нового сообщения}}",
   "chatScrollToBottom": "Прокрутка вниз",
-  "chatInReplyTo": "В ответ на"
+  "chatInReplyTo": "В ответ на",
+  "chatCopyText": "Копировать текст",
+  "chatTextCopied": "Текст скопирован в буфер обмена",
+  "chatBookmark": "Закладка",
+  "chatPinMessage": "Закрепить сообщение",
+  "chatUnpinMessage": "Открепить сообщение",
+  "chatFlag": "Пожаловаться",
+  "chatReactWithEmoji": "Реакция с помощью эмодзи",
+  "chatReplyingTo": "Ответ {username}",
+  "chatEditingMessage": "Редактирование сообщения",
+  "chatTypingOne": "{username} печатает",
+  "chatTypingTwo": "{commaSeparatedUsernames} и {lastUsername} печатают",
+  "chatTypingMany": "{count, plural, one{Отвечают {commaSeparatedUsernames} и ещё {count} пользователь} few{Отвечают {commaSeparatedUsernames} и ещё {count} пользователя} many{Отвечают {commaSeparatedUsernames} и ещё {count} пользователей} other{Отвечают {commaSeparatedUsernames} и ещё {count} пользователей}}",
+  "chatOpenThread": "Открыть цепочку"
 }

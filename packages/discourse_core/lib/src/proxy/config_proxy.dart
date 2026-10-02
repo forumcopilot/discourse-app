@@ -1,3 +1,4 @@
+import '../data/chat/discourse_chat_settings.dart';
 import 'dart:async';
 
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -268,6 +269,9 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       }
       final chatUploads = settings['chat_allow_uploads'];
       if (chatUploads is bool) siteContext.setChatAllowUploads(chatUploads);
+      // Group chat size, search, threads and pins, which change what chat
+      // offers.
+      DiscourseChatSettings.storeFromClientSettings(siteContext.site.url, settings);
     } catch (e) {
       if (e is DiscourseApiException && e.statusCode == 0) noResponse = e;
       // ignore: avoid_print

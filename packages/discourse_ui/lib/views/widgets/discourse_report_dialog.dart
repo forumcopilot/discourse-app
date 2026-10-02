@@ -21,11 +21,17 @@ import '../../utils/snackbar_helper.dart';
 /// Used for posts and private messages alike: a message is a post.
 /// [authorUsername] names the author in "Send @… a message", which is left
 /// out for the reader's own post ([ownPost]).
+///
+/// A chat message is flagged through the same dialog: [onlyTypes] narrows the
+/// list to the message's `available_flags`, and [submit] files the flag
+/// instead of POST /post_actions.
 Future<void> showDiscourseReportDialog(
   BuildContext context, {
   required String postId,
   String? authorUsername,
   bool ownPost = false,
+  Set<String>? onlyTypes,
+  Future<({bool result, String? resultText})> Function(DiscourseFlagType type, String message)? submit,
 }) async {
   final proxy = SiteProxyFactory.getPostProxy();
   if (proxy is! DiscoursePostProxy) {
@@ -36,6 +42,7 @@ Future<void> showDiscourseReportDialog(
   final types = (await proxy.flagTypesAsync())
       .where((t) =>
           !t.isMessageToAuthor || (!ownPost && (authorUsername ?? '').isNotEmpty))
+      .where((t) => onlyTypes == null || onlyTypes.contains(t.nameKey))
       .toList(growable: false);
   if (!context.mounted) return;
   if (types.isEmpty) {
@@ -61,11 +68,13 @@ Future<void> showDiscourseReportDialog(
   final messenger = ScaffoldMessenger.of(context);
   messenger.showSnackBar(SnackBar(content: Text(l10n.flaggingPost)));
 
-  final response = await proxy.flagPostAsync(
-    postId,
-    result.type.id,
-    message: result.message,
-  );
+  final response = submit != null
+      ? await submit(result.type, result.message)
+      : await proxy.flagPostAsync(
+          postId,
+          result.type.id,
+          message: result.message,
+        ).then((r) => (result: r.result, resultText: r.resultText));
 
   if (!context.mounted) return;
   messenger.hideCurrentSnackBar();

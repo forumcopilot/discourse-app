@@ -4794,4 +4794,56 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get chatInReplyTo => '返信先';
+
+  @override
+  String get chatCopyText => 'テキストをコピー';
+
+  @override
+  String get chatTextCopied => 'テキストをクリップボードにコピーしました';
+
+  @override
+  String get chatBookmark => 'ブックマーク';
+
+  @override
+  String get chatPinMessage => 'メッセージを固定';
+
+  @override
+  String get chatUnpinMessage => 'メッセージの固定を解除';
+
+  @override
+  String get chatFlag => '通報する';
+
+  @override
+  String get chatReactWithEmoji => '絵文字でリアクション';
+
+  @override
+  String chatReplyingTo(String username) {
+    return '$username さんに返信';
+  }
+
+  @override
+  String get chatEditingMessage => 'メッセージを編集中';
+
+  @override
+  String chatTypingOne(String username) {
+    return '$username が入力中です';
+  }
+
+  @override
+  String chatTypingTwo(String commaSeparatedUsernames, String lastUsername) {
+    return '$commaSeparatedUsernames と $lastUsername が入力中です';
+  }
+
+  @override
+  String chatTypingMany(String commaSeparatedUsernames, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$commaSeparatedUsernames と他 $count 人が入力中です',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatOpenThread => 'スレッドを開く';
 }

@@ -1675,5 +1675,18 @@
   "chatLastVisit": "laatste bezoek",
   "chatNewMessagesCount": "{count, plural, one{{count} nieuw bericht} other{{count} nieuwe berichten}}",
   "chatScrollToBottom": "Naar beneden scrollen",
-  "chatInReplyTo": "In antwoord op"
+  "chatInReplyTo": "In antwoord op",
+  "chatCopyText": "Tekst kopiëren",
+  "chatTextCopied": "Tekst gekopieerd naar klembord",
+  "chatBookmark": "Bladwijzer maken",
+  "chatPinMessage": "Bericht vastmaken",
+  "chatUnpinMessage": "Bericht losmaken",
+  "chatFlag": "Markeren",
+  "chatReactWithEmoji": "Reageren met emoji",
+  "chatReplyingTo": "Antwoord aan {username}",
+  "chatEditingMessage": "Bericht bewerken",
+  "chatTypingOne": "{username} is aan het typen",
+  "chatTypingTwo": "{commaSeparatedUsernames} en {lastUsername} zijn aan het typen",
+  "chatTypingMany": "{count, plural, one{{commaSeparatedUsernames} en {count} ander zijn aan het typen} other{{commaSeparatedUsernames} en {count} anderen zijn aan het typen}}",
+  "chatOpenThread": "Thread openen"
 }

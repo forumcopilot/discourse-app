@@ -1518,5 +1518,18 @@
   "chatLastVisit": "上次访问",
   "chatNewMessagesCount": "{count, plural, other{{count} 条新消息}}",
   "chatScrollToBottom": "滚动到底部",
-  "chatInReplyTo": "回复"
+  "chatInReplyTo": "回复",
+  "chatCopyText": "复制文本",
+  "chatTextCopied": "文本已复制到剪贴板",
+  "chatBookmark": "书签",
+  "chatPinMessage": "置顶消息",
+  "chatUnpinMessage": "取消置顶消息",
+  "chatFlag": "举报",
+  "chatReactWithEmoji": "使用表情符号回复",
+  "chatReplyingTo": "回复 {username}",
+  "chatEditingMessage": "正在编辑消息",
+  "chatTypingOne": "{username} 正在输入",
+  "chatTypingTwo": "{commaSeparatedUsernames} 和 {lastUsername} 正在输入",
+  "chatTypingMany": "{count, plural, other{{commaSeparatedUsernames} 和其他 {count} 人正在输入}}",
+  "chatOpenThread": "打开消息串"
 }

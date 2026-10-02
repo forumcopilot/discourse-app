@@ -1518,5 +1518,18 @@
   "chatLastVisit": "最後の訪問",
   "chatNewMessagesCount": "{count, plural, other{新しいメッセージ {count} 件}}",
   "chatScrollToBottom": "一番下にスクロール",
-  "chatInReplyTo": "返信先"
+  "chatInReplyTo": "返信先",
+  "chatCopyText": "テキストをコピー",
+  "chatTextCopied": "テキストをクリップボードにコピーしました",
+  "chatBookmark": "ブックマーク",
+  "chatPinMessage": "メッセージを固定",
+  "chatUnpinMessage": "メッセージの固定を解除",
+  "chatFlag": "通報する",
+  "chatReactWithEmoji": "絵文字でリアクション",
+  "chatReplyingTo": "{username} さんに返信",
+  "chatEditingMessage": "メッセージを編集中",
+  "chatTypingOne": "{username} が入力中です",
+  "chatTypingTwo": "{commaSeparatedUsernames} と {lastUsername} が入力中です",
+  "chatTypingMany": "{count, plural, other{{commaSeparatedUsernames} と他 {count} 人が入力中です}}",
+  "chatOpenThread": "スレッドを開く"
 }

@@ -1518,5 +1518,18 @@
   "chatLastVisit": "letzter Besuch",
   "chatNewMessagesCount": "{count, plural, one{{count} neue Nachricht} other{{count} neue Nachrichten}}",
   "chatScrollToBottom": "Nach unten scrollen",
-  "chatInReplyTo": "Als Antwort auf"
+  "chatInReplyTo": "Als Antwort auf",
+  "chatCopyText": "Text kopieren",
+  "chatTextCopied": "Text in die Zwischenablage kopiert",
+  "chatBookmark": "Lesezeichen",
+  "chatPinMessage": "Nachricht anheften",
+  "chatUnpinMessage": "Nachricht loslösen",
+  "chatFlag": "Melden",
+  "chatReactWithEmoji": "Mit Emoji reagieren",
+  "chatReplyingTo": "Antwort an {username}",
+  "chatEditingMessage": "Nachricht bearbeiten",
+  "chatTypingOne": "{username} schreibt",
+  "chatTypingTwo": "{commaSeparatedUsernames} und {lastUsername} schreiben",
+  "chatTypingMany": "{count, plural, one{{commaSeparatedUsernames} und {count} andere Person schreiben} other{{commaSeparatedUsernames} und {count} andere Personen schreiben}}",
+  "chatOpenThread": "Thread öffnen"
 }

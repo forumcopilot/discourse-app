@@ -1,7 +1,13 @@
 
+import 'dart:async';
+
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
+import '../../widgets/emoji_picker_sheet.dart';
 import '../../widgets/upload_tile.dart';
+import '../../widgets/user_avatar.dart';
+import '../../../utils/emoji_shortcodes.dart';
 
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../theme/design_tokens.dart';
@@ -19,6 +25,23 @@ import '../../../utils/file_utils.dart';
 /// Files go up as soon as they are picked, the way Discourse's chat composer
 /// does it, and the message then names them by upload id; a message may be
 /// files alone.
+///
+/// As Discourse's: a banner while replying or editing ([replyTo],
+/// [editing], cancelled by [onCancelContext]); an emoji button; suggestions
+/// for `@` people and `#` channels, categories and tags ([suggest]); the
+/// draft the channel was left with ([initialText]) and every change
+/// reported ([onTextChanged]) so it can be kept and others see "typing".
+class ChatSuggestion {
+  const ChatSuggestion({required this.insert, required this.title, this.subtitle, this.avatarUrl, this.icon});
+
+  /// What replaces the `@…` or `#…` being typed (without the trailing space).
+  final String insert;
+  final String title;
+  final String? subtitle;
+  final String? avatarUrl;
+  final IconData? icon;
+}
+
 class ChatComposer extends StatefulWidget {
   const ChatComposer({
     super.key,
@@ -26,7 +49,27 @@ class ChatComposer extends StatefulWidget {
     this.onUpload,
     this.enabled = true,
     this.hintText,
+    this.replyTo,
+    this.editing,
+    this.onCancelContext,
+    this.initialText,
+    this.onTextChanged,
+    this.suggest,
   });
+
+  /// The message being replied to, shown in a banner.
+  final FCChatMessage? replyTo;
+
+  /// The reader's message being edited: its text fills the field.
+  final FCChatMessage? editing;
+  final VoidCallback? onCancelContext;
+
+  /// Text to start with (the channel's draft).
+  final String? initialText;
+  final ValueChanged<String>? onTextChanged;
+
+  /// Suggestions for [trigger] (`@` or `#`) and what follows it.
+  final Future<List<ChatSuggestion>> Function(String trigger, String term)? suggest;
 
   /// Sends [text] with the ids of the files uploaded for it.
   final Future<bool> Function(String text, List<int> uploadIds) onSend;
@@ -66,17 +109,103 @@ class _ChatComposerState extends State<ChatComposer> {
   /// the message could only name the ones already done.
   bool get _canSend => !_uploading && (_hasText || _uploadIds.isNotEmpty);
 
+  List<ChatSuggestion> _suggestions = const [];
+  Timer? _suggestTimer;
+  String _lastText = '';
+
+  /// The `@` or `#` word being typed before the cursor.
+  static final RegExp _token = RegExp(r'(^|\s)([@#])([\w.\-]*)$');
+
   @override
   void initState() {
     super.initState();
-    _controller.addListener(() {
-      final has = _controller.text.trim().isNotEmpty;
-      if (has != _hasText) setState(() => _hasText = has);
+    final initial = widget.editing?.message ?? widget.initialText;
+    if (initial != null && initial.isNotEmpty) {
+      _controller.text = initial;
+      _hasText = initial.trim().isNotEmpty;
+    }
+    _lastText = _controller.text;
+    _controller.addListener(_onChanged);
+  }
+
+  @override
+  void didUpdateWidget(covariant ChatComposer old) {
+    super.didUpdateWidget(old);
+    final editing = widget.editing;
+    if (editing != null && editing.id != old.editing?.id) {
+      _controller.text = editing.message;
+      _controller.selection = TextSelection.collapsed(offset: _controller.text.length);
+      _focus.requestFocus();
+    } else if (editing == null && old.editing != null) {
+      _controller.clear();
+    }
+    if (widget.replyTo != null && widget.replyTo?.id != old.replyTo?.id) _focus.requestFocus();
+  }
+
+  void _onChanged() {
+    final text = _controller.text;
+    final has = text.trim().isNotEmpty;
+    if (has != _hasText) setState(() => _hasText = has);
+    if (text == _lastText) return;
+    _lastText = text;
+    widget.onTextChanged?.call(text);
+    _scheduleSuggestions();
+  }
+
+  void _scheduleSuggestions() {
+    _suggestTimer?.cancel();
+    final suggest = widget.suggest;
+    final sel = _controller.selection;
+    if (suggest == null || !sel.isValid || !sel.isCollapsed) return _clearSuggestions();
+    final before = _controller.text.substring(0, sel.baseOffset);
+    final m = _token.firstMatch(before);
+    if (m == null) return _clearSuggestions();
+    final trigger = m.group(2)!;
+    final term = m.group(3)!;
+    _suggestTimer = Timer(const Duration(milliseconds: 200), () async {
+      final found = await suggest(trigger, term);
+      if (!mounted) return;
+      setState(() => _suggestions = found.take(5).toList());
     });
+  }
+
+  void _clearSuggestions() {
+    if (_suggestions.isNotEmpty) setState(() => _suggestions = const []);
+  }
+
+  void _applySuggestion(ChatSuggestion s) {
+    final sel = _controller.selection;
+    final text = _controller.text;
+    final before = text.substring(0, sel.baseOffset);
+    final m = _token.firstMatch(before);
+    if (m == null) return;
+    final start = m.start + m.group(1)!.length;
+    final replaced = '${text.substring(0, start)}${s.insert} ';
+    _controller.value = TextEditingValue(
+      text: replaced + text.substring(sel.baseOffset),
+      selection: TextSelection.collapsed(offset: replaced.length),
+    );
+    setState(() => _suggestions = const []);
+  }
+
+  Future<void> _pickEmoji() async {
+    final name = await showEmojiPickerSheet(context);
+    if (name == null || !mounted) return;
+    final insert = discourseEmojiChar(name) ?? ':$name:';
+    final sel = _controller.selection;
+    final text = _controller.text;
+    final at = sel.isValid ? sel.baseOffset : text.length;
+    final next = text.substring(0, at) + insert + text.substring(sel.isValid ? sel.extentOffset : text.length);
+    _controller.value = TextEditingValue(
+      text: next,
+      selection: TextSelection.collapsed(offset: at + insert.length),
+    );
+    _focus.requestFocus();
   }
 
   @override
   void dispose() {
+    _suggestTimer?.cancel();
     _controller.dispose();
     _focus.dispose();
     super.dispose();
@@ -162,6 +291,72 @@ class _ChatComposerState extends State<ChatComposer> {
     }
   }
 
+  Widget _buildContextBanner(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final editing = widget.editing;
+    final reply = widget.replyTo;
+    final label = editing != null ? l10n.chatEditingMessage : l10n.chatReplyingTo(reply!.authorUsername);
+    final excerpt = editing != null ? null : (reply!.excerpt ?? reply.message);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: DesignTokens.spacingS),
+      child: Row(
+        children: [
+          Icon(editing != null ? Icons.edit_outlined : Icons.reply, size: 18, color: colorScheme.primary),
+          const SizedBox(width: DesignTokens.spacingS),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(label, style: textTheme.labelLarge?.copyWith(color: colorScheme.primary)),
+                if (excerpt != null && excerpt.trim().isNotEmpty)
+                  Text(excerpt.trim(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, size: 20),
+            tooltip: l10n.cancel,
+            onPressed: widget.onCancelContext,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSuggestions(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      margin: const EdgeInsets.only(bottom: DesignTokens.spacingS),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final s in _suggestions)
+            ListTile(
+              dense: true,
+              leading: s.icon != null
+                  ? Icon(s.icon)
+                  : UserAvatar(username: s.title, iconUrl: s.avatarUrl, radius: 14),
+              title: Text(s.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+              subtitle: s.subtitle == null || s.subtitle!.isEmpty
+                  ? null
+                  : Text(s.subtitle!, maxLines: 1, overflow: TextOverflow.ellipsis),
+              onTap: () => _applySuggestion(s),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -184,6 +379,8 @@ class _ChatComposerState extends State<ChatComposer> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (_suggestions.isNotEmpty) _buildSuggestions(context),
+            if (widget.replyTo != null || widget.editing != null) _buildContextBanner(context),
             if (_files.isNotEmpty)
               // The post composer's tiles: a thumbnail or the file's kind,
               // and a remove badge with a 48dp target (it was 28).
@@ -228,6 +425,13 @@ class _ChatComposerState extends State<ChatComposer> {
                     // 16sp like every other composer (it was 14).
                     style: theme.textTheme.bodyLarge,
                     decoration: InputDecoration(
+                      suffixIcon: widget.enabled
+                          ? IconButton(
+                              icon: const Icon(Icons.emoji_emotions_outlined),
+                              tooltip: AppLocalizations.of(context)!.chooseEmoji,
+                              onPressed: _sending ? null : _pickEmoji,
+                            )
+                          : null,
                       hintText: widget.hintText ??
                           AppLocalizations.of(context)!.chatComposerDefaultHint,
                       hintStyle: theme.textTheme.bodyLarge

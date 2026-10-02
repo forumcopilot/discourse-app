@@ -546,6 +546,9 @@ class DiscourseLoginService {
     siteContext.setChatCanDirectMessage(cu['can_direct_message'] == true ||
         cu['admin'] == true ||
         cu['moderator'] == true);
+    // Unsent chat messages, kept on the server: a channel opens with what
+    // the reader left in it, here or on the web.
+    DiscourseChatDrafts.storeFromCurrentUser(siteContext.site.url, cu['chat_drafts']);
   }
 
   /// The reader's own sidebar (their categories and tags) and trust level,

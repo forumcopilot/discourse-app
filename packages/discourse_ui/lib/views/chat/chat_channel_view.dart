@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:cross_file/cross_file.dart';
+import 'dart:async';
+
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseChatMessageExtras, DiscourseChatPermissions, DiscourseSiteContextExtension;
+    show
+        DiscourseChatChannelDetails,
+        DiscourseChatDrafts,
+        DiscourseChatMessageExtras,
+        DiscourseChatPermissions,
+        DiscourseChatProxy,
+        DiscourseChatUser,
+        DiscourseSiteContextExtension;
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:intl/intl.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import '../widgets/empty_state_view.dart';
@@ -13,12 +23,16 @@ import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/chat_channel_controller.dart';
+import '../../services/site_proxy_service.dart';
 import '../../services/attachment_upload_service.dart';
 import '../../theme/design_tokens.dart';
 import 'widgets/chat_composer.dart';
+import 'widgets/chat_message_actions.dart';
 import 'widgets/chat_message_row.dart';
+import '../widgets/discourse_report_dialog.dart';
+import '../widgets/emoji_picker_sheet.dart';
+import '../../utils/snackbar_helper.dart';
 import 'widgets/chat_reaction_chips.dart';
-import '../widgets/reaction_glyph.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../l10n/app_l10n.dart';
 
@@ -36,11 +50,15 @@ class ChatChannelView extends StatefulWidget {
     this.isActive = true,
     this.targetMessageId,
     this.onChannelLoaded,
+    this.onOpenThread,
   });
 
   final SiteContext siteContext;
   final int channelId;
   final bool isActive;
+
+  /// Opens (or starts) the thread of a message, in a channel with threads.
+  final void Function(FCChatMessage message)? onOpenThread;
 
   /// Open scrolled to this message, highlighted (from a notification).
   final int? targetMessageId;
@@ -87,6 +105,20 @@ class _ChatChannelViewState extends State<ChatChannelView> {
   final _arrivedWhileAway = ValueNotifier<int>(0);
 
   int? get _myId => int.tryParse(widget.siteContext.currentUserId ?? '');
+
+  /// The message being replied to or edited in the composer.
+  FCChatMessage? _replyTo;
+  FCChatMessage? _editing;
+
+  /// Who else is typing here ("X is typing…").
+  List<DiscourseChatUser> _typing = const [];
+  void Function()? _stopTypingWatch;
+  Timer? _draftTimer;
+
+  DiscourseChatProxy? get _discourse {
+    final proxy = SiteProxyService.getChatProxy();
+    return proxy is DiscourseChatProxy ? proxy : null;
+  }
 
   // One controller per view: the same channel opened twice (a notification
   // over the list) used to share one, and closing the top one tore down the
@@ -137,6 +169,12 @@ class _ChatChannelViewState extends State<ChatChannelView> {
       }
     });
     _scroll.addListener(_onScroll);
+    final discourse = _discourse;
+    if (discourse != null && widget.siteContext.isLoggedIn) {
+      _stopTypingWatch = discourse.watchTyping(widget.channelId, (typing) {
+        if (mounted) setState(() => _typing = typing);
+      });
+    }
   }
 
   void _takeFirstPosition() {
@@ -263,6 +301,9 @@ class _ChatChannelViewState extends State<ChatChannelView> {
     _scroll.dispose();
     _awayFromBottom.dispose();
     _arrivedWhileAway.dispose();
+    _stopTypingWatch?.call();
+    _draftTimer?.cancel();
+    unawaited(_discourse?.setTypingAsync(widget.channelId, typing: false));
     Get.delete<ChatChannelController>(tag: _tag);
     super.dispose();
   }
@@ -368,16 +409,31 @@ class _ChatChannelViewState extends State<ChatChannelView> {
           // Staff may still post in a closed channel; nobody while silenced.
           final readonly = ch != null &&
               !(_permissions?.canWriteIn(ch.status) ?? ch.isOpen);
-          return ChatComposer(
-            enabled: !readonly,
-            hintText: _composerHint(ch, readonly),
-            onSend: (text, uploadIds) =>
-                _controller.send(text, uploadIds: uploadIds),
-            onUpload: ch != null &&
-                    !readonly &&
-                    widget.siteContext.chatAllowUploads
-                ? _upload
-                : null,
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (_typing.isNotEmpty) _TypingLine(users: _typing),
+              ChatComposer(
+                enabled: !readonly,
+                hintText: _composerHint(ch, readonly),
+                replyTo: _replyTo,
+                editing: _editing,
+                onCancelContext: () => setState(() {
+                  _replyTo = null;
+                  _editing = null;
+                }),
+                initialText: DiscourseChatDrafts.of(widget.siteContext.site.url, widget.channelId),
+                onTextChanged: _onComposerChanged,
+                suggest: _discourse == null ? null : _suggest,
+                onSend: _send,
+                onUpload: ch != null &&
+                        !readonly &&
+                        widget.siteContext.chatAllowUploads
+                    ? _upload
+                    : null,
+              ),
+            ],
           );
         }),
       ],
@@ -453,7 +509,9 @@ class _ChatChannelViewState extends State<ChatChannelView> {
       siteContext: widget.siteContext,
       showHeader: showHeader,
       highlighted: m.id == _highlightedId,
-      onLongPress: loggedIn ? () => _showMessageActions(m, canEdit: canEdit, canDelete: canDelete) : null,
+      onLongPress: loggedIn
+          ? () => _showMessageActions(m, canEdit: canEdit, canDelete: canDelete, canWrite: canWrite)
+          : null,
       onToggleReaction: loggedIn && canWrite
           ? (emoji, {required bool add}) => _controller.toggleReaction(m.id, emoji, add: add)
           : null,
@@ -522,64 +580,161 @@ class _ChatChannelViewState extends State<ChatChannelView> {
   DiscourseChatPermissions? get _permissions => DiscourseChatPermissions.forChannel(
       widget.siteContext.site.url, widget.channelId);
 
-  void _showMessageActions(FCChatMessage m,
-      {required bool canEdit, required bool canDelete}) {
-    showModalBottomSheet(
-      context: context,
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Compact reaction picker — Discourse's default reaction set.
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingM,
-                vertical: DesignTokens.spacingS,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  for (final emoji in kChatDefaultReactions)
-                    InkWell(
-                      borderRadius:
-                          BorderRadius.circular(DesignTokens.radiusM),
-                      onTap: () {
-                        Navigator.pop(context);
-                        _controller.toggleReaction(m.id, emoji, add: true);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(DesignTokens.spacingS),
-                        child: ReactionGlyph(
-                            reactionId: emoji, size: 24, siteContext: widget.siteContext),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            if (canEdit || canDelete) const Divider(height: 1),
-            if (canEdit)
-              ListTile(
-                leading: const Icon(Icons.edit),
-                title: Text(AppLocalizations.of(context)!.edit),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showEditDialog(m.id, m.message);
-                },
-              ),
-            if (canDelete)
-              ListTile(
-                leading: const Icon(Icons.delete_outline),
-                title: Text(AppLocalizations.of(context)!.delete),
-                onTap: () async {
-                  Navigator.pop(context);
-                  final ok = await _confirmDelete();
-                  if (ok) await _controller.deleteMessage(m.id);
-                },
-              ),
-          ],
+  /// Sends what the composer holds: an edit of the reader's message, a reply,
+  /// or a new message. The draft and "typing" end with it.
+  Future<bool> _send(String text, List<int> uploadIds) async {
+    final editing = _editing;
+    final bool ok;
+    if (editing != null) {
+      ok = await _controller.edit(editing.id, text);
+    } else {
+      ok = await _controller.send(text, uploadIds: uploadIds, inReplyTo: _replyTo);
+    }
+    if (ok && mounted) {
+      setState(() {
+        _editing = null;
+        _replyTo = null;
+      });
+      _draftTimer?.cancel();
+      final discourse = _discourse;
+      if (discourse != null && editing == null) {
+        unawaited(discourse.saveChatDraftAsync(widget.channelId, ''));
+        unawaited(discourse.setTypingAsync(widget.channelId, typing: false));
+      }
+    }
+    return ok;
+  }
+
+  /// The draft is kept (on the server, as the web keeps it) a moment after
+  /// typing stops, and others see "typing" while there is text.
+  void _onComposerChanged(String text) {
+    final discourse = _discourse;
+    if (discourse == null || _editing != null) return;
+    unawaited(discourse.setTypingAsync(widget.channelId, typing: text.trim().isNotEmpty));
+    _draftTimer?.cancel();
+    _draftTimer = Timer(const Duration(seconds: 2), () {
+      unawaited(discourse.saveChatDraftAsync(widget.channelId, text));
+    });
+  }
+
+  Future<List<ChatSuggestion>> _suggest(String trigger, String term) async {
+    final discourse = _discourse;
+    if (discourse == null) return const [];
+    if (trigger == '@') {
+      final found = await discourse.searchMentionsAsync(term, channelId: widget.channelId);
+      return [
+        for (final u in found)
+          ChatSuggestion(
+            insert: '@${u.username}',
+            title: u.username,
+            subtitle: u.name,
+            avatarUrl: u.avatarUrl,
+            icon: u.isGroup ? Icons.group_outlined : null,
+          ),
+      ];
+    }
+    if (term.isEmpty) return const [];
+    final found = await discourse.searchHashtagsAsync(term);
+    return [
+      for (final h in found)
+        ChatSuggestion(
+          insert: '#${h.ref}',
+          title: h.text,
+          icon: h.type == 'tag' ? Icons.sell_outlined : (h.type == 'channel' ? Icons.forum_outlined : Icons.tag),
         ),
+    ];
+  }
+
+  /// The long-press sheet, and what was chosen in it.
+  Future<void> _showMessageActions(FCChatMessage m, {required bool canEdit, required bool canDelete, required bool canWrite}) async {
+    final site = widget.siteContext.site.url;
+    final extras = DiscourseChatMessageExtras.of(site, m.id);
+    final details = DiscourseChatChannelDetails.of(site, widget.channelId);
+    final isSelf = _myId != null && m.authorId == _myId;
+    final choice = await showChatMessageActions(
+      context,
+      message: m,
+      siteContext: widget.siteContext,
+      can: ChatMessagePermissions(
+        react: canWrite,
+        reply: canWrite,
+        thread: canWrite && (details?.threadingEnabled ?? false) && widget.onOpenThread != null,
+        edit: canEdit,
+        delete: canDelete,
+        pin: details?.canManagePins ?? false,
+        pinned: extras?.pinned ?? false,
+        flag: !isSelf && (extras?.canFlag ?? false) && !(extras?.flagged ?? false),
+        bookmark: _discourse != null,
+        bookmarked: extras?.bookmarkId != null,
       ),
     );
+    if (!mounted || choice == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final discourse = _discourse;
+    switch (choice) {
+      case ChatReact(:final emoji):
+        await _controller.toggleReaction(m.id, emoji, add: true);
+      case ChatMoreReactions():
+        final emoji = await showEmojiPickerSheet(context, first: kChatDefaultReactions);
+        if (emoji != null) await _controller.toggleReaction(m.id, emoji, add: true);
+      case ChatMessageActionChoice(:final action):
+        switch (action) {
+          case ChatMessageAction.reply:
+            setState(() {
+              _editing = null;
+              _replyTo = m;
+            });
+          case ChatMessageAction.thread:
+            widget.onOpenThread?.call(m);
+          case ChatMessageAction.copyText:
+            await Clipboard.setData(ClipboardData(text: m.message));
+            if (mounted) SnackbarHelper.showInfo(context, l10n.chatTextCopied);
+          case ChatMessageAction.copyLink:
+            final slug = _controller.channel.value?.slug;
+            final base = site.endsWith('/') ? site.substring(0, site.length - 1) : site;
+            await Clipboard.setData(ClipboardData(
+                text: '$base/chat/c/${slug == null || slug.isEmpty ? '-' : slug}/${widget.channelId}/${m.id}'));
+            if (mounted) SnackbarHelper.showInfo(context, l10n.linkCopied);
+          case ChatMessageAction.edit:
+            setState(() {
+              _replyTo = null;
+              _editing = m;
+            });
+          case ChatMessageAction.bookmark:
+            if (discourse == null) return;
+            final r = await discourse.setChatBookmarkAsync(m.id, bookmarked: extras?.bookmarkId == null);
+            if (!mounted) return;
+            if (r.result) {
+              _controller.messages.refresh();
+            } else {
+              SnackbarHelper.showError(context, r.resultText ?? l10n.chatNotAvailable);
+            }
+          case ChatMessageAction.pin:
+            if (discourse == null) return;
+            final r = await discourse.setChatPinnedAsync(widget.channelId, m.id, pinned: !(extras?.pinned ?? false));
+            if (!mounted) return;
+            if (r.result) {
+              _controller.messages.refresh();
+            } else {
+              SnackbarHelper.showError(context, r.resultText ?? l10n.chatNotAvailable);
+            }
+          case ChatMessageAction.flag:
+            if (discourse == null) return;
+            await showDiscourseReportDialog(
+              context,
+              postId: '${m.id}',
+              authorUsername: m.authorUsername,
+              onlyTypes: (extras?.availableFlags ?? const <String>[]).toSet(),
+              submit: (type, message) async {
+                final r = await discourse.flagChatMessageAsync(widget.channelId, m.id, type.id, message: message);
+                return (result: r.result, resultText: r.resultText);
+              },
+            );
+          case ChatMessageAction.delete:
+            final ok = await _confirmDelete();
+            if (ok) await _controller.deleteMessage(m.id);
+        }
+    }
   }
 
   Future<bool> _confirmDelete() async {
@@ -605,31 +760,6 @@ class _ChatChannelViewState extends State<ChatChannelView> {
     return result ?? false;
   }
 
-  void _showEditDialog(int id, String oldText) {
-    final ctrl = TextEditingController(text: oldText);
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.edit),
-        content: TextField(controller: ctrl, maxLines: 4, autofocus: true),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.cancel)),
-          ElevatedButton(
-            onPressed: () async {
-              final txt = ctrl.text.trim();
-              Navigator.pop(context);
-              if (txt.isNotEmpty && txt != oldText) {
-                await _controller.edit(id, txt);
-              }
-            },
-            child: Text(AppLocalizations.of(context)!.save),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _ErrorBanner extends StatelessWidget {
@@ -808,6 +938,36 @@ class _JumpToLatest extends StatelessWidget {
           }),
         );
       },
+    );
+  }
+}
+
+/// "X is typing…", as Discourse writes it, under the conversation.
+class _TypingLine extends StatelessWidget {
+  const _TypingLine({required this.users});
+
+  final List<DiscourseChatUser> users;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final names = [for (final u in users) u.username];
+    final String text;
+    if (names.length == 1) {
+      text = l10n.chatTypingOne(names.first);
+    } else if (names.length <= 3) {
+      text = l10n.chatTypingTwo(names.sublist(0, names.length - 1).join(', '), names.last);
+    } else {
+      text = l10n.chatTypingMany(names.take(2).join(', '), names.length - 2);
+    }
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(DesignTokens.spacingL, DesignTokens.spacingXS, DesignTokens.spacingL, 0),
+      child: Text(
+        '$text…',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+      ),
     );
   }
 }

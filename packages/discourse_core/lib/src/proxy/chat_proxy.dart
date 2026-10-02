@@ -1,4 +1,4 @@
-import 'dart:convert' show HtmlEscape;
+import 'dart:convert' show HtmlEscape, jsonEncode;
 
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_chat_proxy.dart';
@@ -10,7 +10,9 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import '../base_discourse_proxy.dart';
 import '../data/chat/discourse_chat_channel_details.dart';
+import '../data/chat/discourse_chat_drafts.dart';
 import '../data/chat/discourse_chat_event.dart';
+import '../data/chat/discourse_chat_thread.dart';
 import '../data/chat/discourse_chat_message_extras.dart';
 import '../data/chat/discourse_chatable.dart';
 import '../data/chat/discourse_chat_uploads.dart';
@@ -353,6 +355,7 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     List<String> usernames, {
     List<String> groups = const [],
     bool upsert = false,
+    String? name,
   }) async {
     final targets = usernames.where((u) => u.trim().isNotEmpty).toList();
     final targetGroups = groups.where((g) => g.trim().isNotEmpty).toList();
@@ -366,6 +369,8 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
         if (targets.isNotEmpty) 'target_usernames': targets,
         if (targetGroups.isNotEmpty) 'target_groups': targetGroups,
         if (upsert) 'upsert': true,
+        // A group chat's name; a named one is a group chat whatever its size.
+        if (name != null && name.trim().isNotEmpty) 'name': name.trim(),
       });
       final ch = (response['channel'] as Map?)?.cast<String, dynamic>();
       if (ch == null) {
@@ -608,6 +613,325 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       return FCChatChannelResult(result: false, resultText: e.userMessage);
     } catch (e) {
       return FCChatChannelResult(result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Discourse-only: flag a chat message (`POST …/messages/:id/flags`)
+  /// with one of the forum's flag types, and a [message] for the types
+  /// that take one.
+  Future<FCChatActionResult> flagChatMessageAsync(int channelId, int messageId, int flagTypeId,
+      {String? message}) async {
+    final result = await _action(() => apiPost(
+          '/chat/api/channels/$channelId/messages/$messageId/flags',
+          body: {
+            'flag_type_id': flagTypeId,
+            if (message != null && message.trim().isNotEmpty) 'message': message.trim(),
+          },
+        ));
+    if (result.result) {
+      DiscourseChatMessageExtras.update(siteContext.site.url, messageId, (e) => e.copyWith(flagged: true));
+    }
+    return result;
+  }
+
+  /// Discourse-only: bookmark a chat message for the reader
+  /// (`POST /bookmarks`, a `Chat::Message`), or remove their bookmark.
+  Future<FCChatActionResult> setChatBookmarkAsync(int messageId, {required bool bookmarked}) async {
+    final site = siteContext.site.url;
+    try {
+      if (bookmarked) {
+        final response = await apiPost('/bookmarks.json', body: {
+          'bookmarkable_type': 'Chat::Message',
+          'bookmarkable_id': messageId,
+        });
+        final id = (response['id'] as num?)?.toInt();
+        DiscourseChatMessageExtras.update(site, messageId, (e) => e.copyWith(bookmarkId: id ?? -1));
+      } else {
+        final id = DiscourseChatMessageExtras.of(site, messageId)?.bookmarkId;
+        if (id != null && id > 0) await apiDelete('/bookmarks/$id.json');
+        DiscourseChatMessageExtras.update(site, messageId, (e) => e.copyWith(clearBookmark: true));
+      }
+      return FCChatActionResult(result: true);
+    } on DiscourseApiException catch (e) {
+      return FCChatActionResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCChatActionResult(result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Discourse-only: pin or unpin a message in its channel (people in
+  /// `chat_pinning_messages_allowed_groups`).
+  Future<FCChatActionResult> setChatPinnedAsync(int channelId, int messageId, {required bool pinned}) async {
+    final path = '/chat/api/channels/$channelId/messages/$messageId/pin';
+    final result = await _action(() => pinned ? apiPost(path) : apiDelete(path));
+    if (result.result) {
+      DiscourseChatMessageExtras.update(siteContext.site.url, messageId, (e) => e.copyWith(pinned: pinned));
+    }
+    return result;
+  }
+
+  /// Discourse-only: keep the reader's unsent text for a channel (or a
+  /// thread) on the server, as the web's composer does; empty text drops
+  /// the draft.
+  Future<FCChatActionResult> saveChatDraftAsync(int channelId, String text, {int? threadId}) {
+    DiscourseChatDrafts.remember(siteContext.site.url, channelId, text, threadId: threadId);
+    final path = threadId == null
+        ? '/chat/api/channels/$channelId/drafts'
+        : '/chat/api/channels/$channelId/threads/$threadId/drafts';
+    return _action(() => apiPost(path, body: {
+          'data': text.trim().isEmpty ? '' : jsonEncode({'message': text}),
+        }));
+  }
+
+  /// Discourse-only: people and groups whose names start with [term], for
+  /// the composer's @mention suggestions (`/u/search/users`).
+  Future<List<({String username, String? name, String? avatarUrl, bool isGroup})>> searchMentionsAsync(
+      String term, {int? channelId}) async {
+    try {
+      final response = await apiGet('/u/search/users.json', query: {
+        'term': term,
+        'include_groups': true,
+        'limit': 6,
+        if (channelId != null) 'chat_channel_id': channelId,
+      });
+      return [
+        for (final raw in ((response['users'] as List?) ?? const []).whereType<Map>())
+          (
+            username: (raw['username'] ?? '').toString(),
+            name: raw['name']?.toString(),
+            avatarUrl: raw['avatar_template'] == null
+                ? null
+                : absoluteSiteUrl(siteContext.site.url,
+                    raw['avatar_template'].toString().replaceAll('{size}', '48')),
+            isGroup: false,
+          ),
+        for (final raw in ((response['groups'] as List?) ?? const []).whereType<Map>())
+          (
+            username: (raw['name'] ?? '').toString(),
+            name: raw['full_name']?.toString(),
+            avatarUrl: null,
+            isGroup: true,
+          ),
+      ];
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Discourse-only: channels, categories and tags matching [term], for the
+  /// composer's #hashtag suggestions (`/hashtags/search`).
+  Future<List<({String ref, String text, String type})>> searchHashtagsAsync(String term) async {
+    try {
+      final response = await apiGet('/hashtags/search.json', query: {
+        'term': term,
+        'order[]': ['channel', 'category', 'tag'],
+      });
+      return [
+        for (final raw in ((response['results'] as List?) ?? const []).whereType<Map>())
+          (
+            ref: (raw['ref'] ?? raw['slug'] ?? '').toString(),
+            text: (raw['text'] ?? '').toString(),
+            type: (raw['type'] ?? '').toString(),
+          ),
+      ];
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Discourse-only: who is typing in a channel (or a thread), as the web's
+  /// "X is typing…" shows it: the `/chat-reply/{id}` presence channel, read
+  /// once and then followed on the message bus. [onChange] gets everyone
+  /// typing except the reader. Returns a function that stops watching.
+  void Function() watchTyping(int channelId, void Function(List<DiscourseChatUser> typing) onChange,
+      {int? threadId}) {
+    final name = threadId == null ? '/chat-reply/$channelId' : '/chat-reply/$channelId/thread/$threadId';
+    final bus = DiscourseMessageBus.of(siteContext);
+    final me = int.tryParse(siteContext.currentUserId ?? '');
+    final typing = <int, DiscourseChatUser>{};
+    var stopped = false;
+    void Function()? unsubscribe;
+    void emit() {
+      if (!stopped) onChange(typing.values.where((u) => u.userId != me).toList());
+    }
+
+    () async {
+      int lastId = -1;
+      try {
+        final state = await apiGet('/presence/get', query: {'channels[]': [name]});
+        final channel = (state[name] as Map?)?.cast<String, dynamic>();
+        lastId = (channel?['last_message_id'] as num?)?.toInt() ?? -1;
+        for (final raw in ((channel?['users'] as List?) ?? const [])) {
+          final u = DiscourseChatUser.fromJson(siteContext.site.url, raw);
+          if (u != null) typing[u.userId] = u;
+        }
+        emit();
+      } catch (_) {}
+      if (stopped || bus.isUnavailable) return;
+      unsubscribe = bus.subscribe('/presence$name', (data) {
+        for (final raw in ((data['entering_users'] as List?) ?? const [])) {
+          final u = DiscourseChatUser.fromJson(siteContext.site.url, raw);
+          if (u != null) typing[u.userId] = u;
+        }
+        for (final id in ((data['leaving_user_ids'] as List?) ?? const [])) {
+          if (id is num) typing.remove(id.toInt());
+        }
+        emit();
+      }, lastId: lastId);
+    }();
+    return () {
+      stopped = true;
+      unsubscribe?.call();
+    };
+  }
+
+  final Map<String, DateTime> _typingSince = {};
+
+  /// Discourse-only: tell others the reader is typing ([typing] true) or
+  /// stopped. Announced at most every 30 s while typing (presence lasts a
+  /// minute), so a burst of keystrokes costs one request.
+  Future<void> setTypingAsync(int channelId, {required bool typing, int? threadId}) async {
+    final name = threadId == null ? '/chat-reply/$channelId' : '/chat-reply/$channelId/thread/$threadId';
+    final since = _typingSince[name];
+    if (typing && since != null && DateTime.now().difference(since) < const Duration(seconds: 30)) return;
+    if (!typing && since == null) return;
+    if (typing) {
+      _typingSince[name] = DateTime.now();
+    } else {
+      _typingSince.remove(name);
+    }
+    try {
+      await apiPost('/presence/update', body: {
+        'client_id': DiscourseMessageBus.of(siteContext).clientId,
+        if (typing) 'present_channels': [name] else 'leave_channels': [name],
+      });
+    } catch (_) {}
+  }
+
+  DiscourseChatThread _threadFromJson(Map<String, dynamic> t, {Map<String, dynamic>? tracking}) {
+    final site = siteContext.site.url;
+    final om = (t['original_message'] as Map?)?.cast<String, dynamic>();
+    final preview = (t['preview'] as Map?)?.cast<String, dynamic>();
+    final channel = (t['channel'] as Map?)?.cast<String, dynamic>();
+    final ids = ((t['meta'] as Map?)?['message_bus_last_ids'] as Map?);
+    final channelId = (t['channel_id'] as num?)?.toInt() ?? (channel?['id'] as num?)?.toInt() ?? 0;
+    FCChatMessage? original;
+    if (om != null && om['id'] != null) {
+      original = _messageFromJson({...om, 'chat_channel_id': om['chat_channel_id'] ?? channelId});
+    }
+    return DiscourseChatThread(
+      threadId: (t['id'] as num).toInt(),
+      channelId: channelId,
+      channelTitle: channel?['title']?.toString(),
+      title: (t['title']?.toString().trim().isEmpty ?? true) ? null : t['title'].toString().trim(),
+      originalMessage: original,
+      replyCount: (t['reply_count'] as num?)?.toInt() ?? (preview?['reply_count'] as num?)?.toInt() ?? 0,
+      lastReplyAt: DateTime.tryParse(preview?['last_reply_created_at']?.toString() ?? ''),
+      lastReplyExcerpt: preview?['last_reply_excerpt']?.toString(),
+      lastReplyUser: DiscourseChatUser.fromJson(site, preview?['last_reply_user']),
+      participants: [
+        for (final raw in ((preview?['participant_users'] as List?) ?? const []))
+          if (DiscourseChatUser.fromJson(site, raw) case final u?) u,
+      ],
+      unreadCount: (tracking?['unread_count'] as num?)?.toInt() ?? 0,
+      busLastId: (ids?['thread_message_bus_last_id'] as num?)?.toInt(),
+    );
+  }
+
+  /// Discourse-only: one thread, with its original message.
+  Future<DiscourseChatThread?> getThreadAsync(int channelId, int threadId) async {
+    try {
+      final response = await apiGet('/chat/api/channels/$channelId/threads/$threadId');
+      final t = (response['thread'] as Map?)?.cast<String, dynamic>();
+      return t == null ? null : _threadFromJson(t);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Discourse-only: a page of a thread's replies (`…/threads/:id/messages`),
+  /// the newest by default, or [direction] of [targetMessageId].
+  Future<FCChatMessageListResult> getThreadMessagesAsync(int channelId, int threadId,
+      {int pageSize = 50, int? targetMessageId, String direction = 'past'}) async {
+    try {
+      final response = await apiGet('/chat/api/channels/$channelId/threads/$threadId/messages', query: {
+        'page_size': pageSize,
+        if (targetMessageId != null) 'target_message_id': targetMessageId,
+        if (targetMessageId != null && direction.isNotEmpty) 'direction': direction,
+      });
+      final messages = [
+        for (final raw in ((response['messages'] as List?) ?? const []).whereType<Map>())
+          _messageFromJson(raw.cast<String, dynamic>()),
+      ].where((m) => !m.deleted).toList();
+      return FCChatMessageListResult(result: true, messages: messages);
+    } on DiscourseApiException catch (e) {
+      return FCChatMessageListResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCChatMessageListResult(result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Discourse-only: live changes in a thread (`/chat/{channel}/thread/{id}`,
+  /// the same events as a channel's).
+  void Function()? watchThread(int channelId, int threadId, void Function(DiscourseChatEvent event) onEvent,
+      {int lastId = -1}) {
+    final bus = DiscourseMessageBus.of(siteContext);
+    if (bus.isUnavailable) return null;
+    return bus.subscribe('/chat/$channelId/thread/$threadId', (data) {
+      final event = chatEventFrom(data);
+      if (event != null) onEvent(event);
+    }, lastId: lastId);
+  }
+
+  /// Discourse-only: the reader has read a thread up to [messageId].
+  Future<FCChatActionResult> markThreadReadAsync(int channelId, int threadId, {required int messageId}) =>
+      _action(() => apiPut('/chat/api/channels/$channelId/threads/$threadId/read',
+          body: {'message_id': messageId}));
+
+  /// Discourse-only: the threads the reader takes part in, newest activity
+  /// first (`/chat/api/me/threads`).
+  Future<({bool result, String resultText, List<DiscourseChatThread> threads})> getMyThreadsAsync() async {
+    try {
+      final response = await apiGet('/chat/api/me/threads');
+      final tracking = ((response['tracking'] as Map?)?['thread_tracking'] as Map?)?.cast<String, dynamic>();
+      final threads = [
+        for (final raw in ((response['threads'] as List?) ?? const []).whereType<Map>())
+          _threadFromJson(raw.cast<String, dynamic>(),
+              tracking: (tracking?['${raw['id']}'] as Map?)?.cast<String, dynamic>()),
+      ];
+      return (result: true, resultText: '', threads: threads);
+    } on DiscourseApiException catch (e) {
+      return (result: false, resultText: e.userMessage, threads: const <DiscourseChatThread>[]);
+    } catch (e) {
+      return (result: false, resultText: describeApiError(e), threads: const <DiscourseChatThread>[]);
+    }
+  }
+
+  /// Discourse-only: chat messages matching [query] (`/chat/api/search`),
+  /// across the reader's channels or in [channelId]. Each message carries
+  /// its channel's title.
+  Future<({bool result, String resultText, List<({FCChatMessage message, String channelTitle})> messages, bool hasMore})>
+      searchChatAsync(String query, {int? channelId, int offset = 0}) async {
+    try {
+      final response = await apiGet('/chat/api/search', query: {
+        'query': query,
+        if (channelId != null) 'channel_id': channelId,
+        'offset': offset,
+        'limit': 20,
+      });
+      final out = <({FCChatMessage message, String channelTitle})>[];
+      for (final raw in ((response['messages'] as List?) ?? const []).whereType<Map>()) {
+        final m = raw.cast<String, dynamic>();
+        final channel = (m['channel'] as Map?)?.cast<String, dynamic>();
+        if (channel != null) _channelFromJson(channel);
+        out.add((message: _messageFromJson(m), channelTitle: (channel?['title'] ?? '').toString()));
+      }
+      final meta = (response['meta'] as Map?)?.cast<String, dynamic>();
+      return (result: true, resultText: '', messages: out, hasMore: meta?['has_more'] == true);
+    } on DiscourseApiException catch (e) {
+      return (result: false, resultText: e.userMessage, messages: const <({FCChatMessage message, String channelTitle})>[], hasMore: false);
+    } catch (e) {
+      return (result: false, resultText: describeApiError(e), messages: const <({FCChatMessage message, String channelTitle})>[], hasMore: false);
     }
   }
 

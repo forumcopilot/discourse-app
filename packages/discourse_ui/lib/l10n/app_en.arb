@@ -6284,5 +6284,83 @@
   "chatInReplyTo": "In reply to",
   "@chatInReplyTo": {
     "description": "Screen-reader label before the message a chat reply answers"
+  },
+  "chatCopyText": "Copy text",
+  "@chatCopyText": {
+    "description": "Action on a chat message: copy its text"
+  },
+  "chatTextCopied": "Text copied to clipboard",
+  "@chatTextCopied": {
+    "description": "Confirmation after copying a chat message's text"
+  },
+  "chatBookmark": "Bookmark",
+  "@chatBookmark": {
+    "description": "Action on a chat message: bookmark it"
+  },
+  "chatPinMessage": "Pin message",
+  "@chatPinMessage": {
+    "description": "Action on a chat message: pin it in the channel"
+  },
+  "chatUnpinMessage": "Unpin message",
+  "@chatUnpinMessage": {
+    "description": "Action on a pinned chat message: unpin it"
+  },
+  "chatFlag": "Flag",
+  "@chatFlag": {
+    "description": "Action on someone's chat message: flag it for the moderators"
+  },
+  "chatReactWithEmoji": "React with emoji",
+  "@chatReactWithEmoji": {
+    "description": "Button that opens the full emoji picker to react to a chat message"
+  },
+  "chatReplyingTo": "Replying to {username}",
+  "@chatReplyingTo": {
+    "description": "Banner over the chat composer while writing a reply; username is the author of the message replied to",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "chatEditingMessage": "Editing message",
+  "@chatEditingMessage": {
+    "description": "Banner over the chat composer while editing one of the reader's messages"
+  },
+  "chatTypingOne": "{username} is typing",
+  "@chatTypingOne": {
+    "description": "Under a chat conversation: one person is typing",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "chatTypingTwo": "{commaSeparatedUsernames} and {lastUsername} are typing",
+  "@chatTypingTwo": {
+    "description": "Under a chat conversation: several people are typing (all but the last, comma-separated, then the last)",
+    "placeholders": {
+      "commaSeparatedUsernames": {
+        "type": "String"
+      },
+      "lastUsername": {
+        "type": "String"
+      }
+    }
+  },
+  "chatTypingMany": "{count, plural, one{{commaSeparatedUsernames} and {count} other are typing} other{{commaSeparatedUsernames} and {count} others are typing}}",
+  "@chatTypingMany": {
+    "description": "Under a chat conversation: many people are typing; the first few by name, then how many others",
+    "placeholders": {
+      "commaSeparatedUsernames": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatOpenThread": "Open Thread",
+  "@chatOpenThread": {
+    "description": "Action on a chat message in a channel with threads: open (or start) its thread"
   }
 }

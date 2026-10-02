@@ -1,3 +1,4 @@
+import '../widgets/emoji_picker_sheet.dart';
 import 'dart:async';
 
 import 'package:discourse_core/discourse_core.dart';
@@ -9,7 +10,6 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../services/discourse_login_service.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/app_navigation.dart';
-import '../../utils/discourse_emoji_data.dart';
 import '../../utils/error_message.dart';
 import '../settings/do_not_disturb_tile.dart';
 import '../widgets/reaction_glyph.dart';
@@ -140,7 +140,7 @@ class _StatusSheetState extends State<_StatusSheet> {
   }
 
   Future<void> _pickEmoji() async {
-    final picked = await showStatusEmojiPicker(context, widget.siteContext);
+    final picked = await showEmojiPickerSheet(context, first: _statusEmoji);
     if (picked != null && mounted) setState(() => _emoji = picked);
   }
 
@@ -369,92 +369,6 @@ const List<String> _statusEmoji = [
   'baby', 'birthday', 'tada', 'construction', 'mute', 'zzz', 'hourglass',
   'pray', 'heart', 'eyes', 'writing_hand', 'rocket', 'video_game',
 ];
-
-/// A grid of emoji with a search, for the status. Returns a shortcode.
-Future<String?> showStatusEmojiPicker(
-    BuildContext context, SiteContext siteContext) {
-  return showModalBottomSheet<String>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    builder: (_) => FractionallySizedBox(
-      heightFactor: 0.75,
-      child: _EmojiPicker(siteContext: siteContext),
-    ),
-  );
-}
-
-class _EmojiPicker extends StatefulWidget {
-  const _EmojiPicker({required this.siteContext});
-  final SiteContext siteContext;
-
-  @override
-  State<_EmojiPicker> createState() => _EmojiPickerState();
-}
-
-class _EmojiPickerState extends State<_EmojiPicker> {
-  String _query = '';
-
-  /// One name per character: the table lists aliases too.
-  static final List<String> _all = () {
-    final seen = <String>{};
-    return [
-      for (final e in discourseEmojiByName.entries)
-        if (seen.add(e.value)) e.key,
-    ];
-  }();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final q = _query.trim().toLowerCase().replaceAll(' ', '_');
-    final names = q.isEmpty
-        ? [
-            ..._statusEmoji.where(discourseEmojiByName.containsKey),
-            ..._all.where((n) => !_statusEmoji.contains(n)),
-          ]
-        : discourseEmojiByName.keys.where((n) => n.contains(q)).toList();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SheetTitle(l10n.chooseEmoji),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-              DesignTokens.spacingL, 0, DesignTokens.spacingL, DesignTokens.spacingS),
-          child: SearchBar(
-            hintText: l10n.searchEmoji,
-            leading: const Icon(Icons.search),
-            elevation: const WidgetStatePropertyAll(0),
-            onChanged: (v) => setState(() => _query = v),
-          ),
-        ),
-        Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingS),
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 52,
-            ),
-            itemCount: names.length,
-            itemBuilder: (context, i) {
-              final name = names[i];
-              return Tooltip(
-                message: ':$name:',
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusS),
-                  onTap: () => Navigator.pop(context, name),
-                  child: Center(
-                    child: Text(discourseEmojiByName[name] ?? '',
-                        style: const TextStyle(fontSize: 28)),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 /// Clears the status without the sheet (the × on the Profile tab's chip),
 /// and ends a Do Not Disturb that was paused for it, as web's does.

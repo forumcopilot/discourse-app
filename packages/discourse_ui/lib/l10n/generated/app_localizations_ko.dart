@@ -4793,4 +4793,56 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get chatInReplyTo => '답장 대상';
+
+  @override
+  String get chatCopyText => '텍스트 복사';
+
+  @override
+  String get chatTextCopied => '텍스트를 클립보드에 복사했습니다';
+
+  @override
+  String get chatBookmark => '북마크';
+
+  @override
+  String get chatPinMessage => '메시지 고정';
+
+  @override
+  String get chatUnpinMessage => '메시지 고정 해제';
+
+  @override
+  String get chatFlag => '신고';
+
+  @override
+  String get chatReactWithEmoji => '이모지로 반응하기';
+
+  @override
+  String chatReplyingTo(String username) {
+    return '$username님에게 답장';
+  }
+
+  @override
+  String get chatEditingMessage => '메시지 수정 중';
+
+  @override
+  String chatTypingOne(String username) {
+    return '$username님이 입력 중';
+  }
+
+  @override
+  String chatTypingTwo(String commaSeparatedUsernames, String lastUsername) {
+    return '$commaSeparatedUsernames님과 $lastUsername님이 입력 중';
+  }
+
+  @override
+  String chatTypingMany(String commaSeparatedUsernames, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$commaSeparatedUsernames님 외 $count명이 입력 중',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatOpenThread => '스레드 열기';
 }

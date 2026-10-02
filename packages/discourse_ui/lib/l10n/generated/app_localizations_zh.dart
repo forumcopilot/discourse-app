@@ -4732,4 +4732,56 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chatInReplyTo => '回复';
+
+  @override
+  String get chatCopyText => '复制文本';
+
+  @override
+  String get chatTextCopied => '文本已复制到剪贴板';
+
+  @override
+  String get chatBookmark => '书签';
+
+  @override
+  String get chatPinMessage => '置顶消息';
+
+  @override
+  String get chatUnpinMessage => '取消置顶消息';
+
+  @override
+  String get chatFlag => '举报';
+
+  @override
+  String get chatReactWithEmoji => '使用表情符号回复';
+
+  @override
+  String chatReplyingTo(String username) {
+    return '回复 $username';
+  }
+
+  @override
+  String get chatEditingMessage => '正在编辑消息';
+
+  @override
+  String chatTypingOne(String username) {
+    return '$username 正在输入';
+  }
+
+  @override
+  String chatTypingTwo(String commaSeparatedUsernames, String lastUsername) {
+    return '$commaSeparatedUsernames 和 $lastUsername 正在输入';
+  }
+
+  @override
+  String chatTypingMany(String commaSeparatedUsernames, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$commaSeparatedUsernames 和其他 $count 人正在输入',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatOpenThread => '打开消息串';
 }

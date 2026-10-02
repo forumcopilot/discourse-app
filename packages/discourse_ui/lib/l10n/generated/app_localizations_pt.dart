@@ -5050,4 +5050,57 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get chatInReplyTo => 'Em resposta a';
+
+  @override
+  String get chatCopyText => 'Copiar texto';
+
+  @override
+  String get chatTextCopied => 'Texto copiado para área de transferência';
+
+  @override
+  String get chatBookmark => 'Marcador';
+
+  @override
+  String get chatPinMessage => 'Fixar mensagem';
+
+  @override
+  String get chatUnpinMessage => 'Desafixar mensagem';
+
+  @override
+  String get chatFlag => 'Sinalizar';
+
+  @override
+  String get chatReactWithEmoji => 'Reagir com emoji';
+
+  @override
+  String chatReplyingTo(String username) {
+    return 'Respondendo a $username';
+  }
+
+  @override
+  String get chatEditingMessage => 'Editando mensagem';
+
+  @override
+  String chatTypingOne(String username) {
+    return '$username está digitando';
+  }
+
+  @override
+  String chatTypingTwo(String commaSeparatedUsernames, String lastUsername) {
+    return '$commaSeparatedUsernames e $lastUsername estão digitando';
+  }
+
+  @override
+  String chatTypingMany(String commaSeparatedUsernames, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$commaSeparatedUsernames e mais $count estão digitando',
+      one: '$commaSeparatedUsernames e mais $count estão digitando',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatOpenThread => 'Linha de discussão aberta';
 }

@@ -5087,4 +5087,59 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get chatInReplyTo => 'В ответ на';
+
+  @override
+  String get chatCopyText => 'Копировать текст';
+
+  @override
+  String get chatTextCopied => 'Текст скопирован в буфер обмена';
+
+  @override
+  String get chatBookmark => 'Закладка';
+
+  @override
+  String get chatPinMessage => 'Закрепить сообщение';
+
+  @override
+  String get chatUnpinMessage => 'Открепить сообщение';
+
+  @override
+  String get chatFlag => 'Пожаловаться';
+
+  @override
+  String get chatReactWithEmoji => 'Реакция с помощью эмодзи';
+
+  @override
+  String chatReplyingTo(String username) {
+    return 'Ответ $username';
+  }
+
+  @override
+  String get chatEditingMessage => 'Редактирование сообщения';
+
+  @override
+  String chatTypingOne(String username) {
+    return '$username печатает';
+  }
+
+  @override
+  String chatTypingTwo(String commaSeparatedUsernames, String lastUsername) {
+    return '$commaSeparatedUsernames и $lastUsername печатают';
+  }
+
+  @override
+  String chatTypingMany(String commaSeparatedUsernames, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Отвечают $commaSeparatedUsernames и ещё $count пользователей',
+      many: 'Отвечают $commaSeparatedUsernames и ещё $count пользователей',
+      few: 'Отвечают $commaSeparatedUsernames и ещё $count пользователя',
+      one: 'Отвечают $commaSeparatedUsernames и ещё $count пользователь',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatOpenThread => 'Открыть цепочку';
 }
