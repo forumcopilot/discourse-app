@@ -637,11 +637,13 @@ class _FeaturedTopicPicker extends StatefulWidget {
 }
 
 class _FeaturedTopicPickerState extends State<_FeaturedTopicPicker> {
-  List<({int id, String title, int replies, DateTime? createdAt, int? categoryId})>?
-      _topics;
+  List<DiscourseProfileTopic>? _topics;
   Object? _error;
   Timer? _debounce;
   String _query = '';
+  int? _nextPage;
+  int _generation = 0;
+  bool _loading = false;
 
   @override
   void initState() {
@@ -655,26 +657,48 @@ class _FeaturedTopicPickerState extends State<_FeaturedTopicPicker> {
     super.dispose();
   }
 
-  Future<void> _load() async {
-    final query = _query;
+  Future<void> _load({bool more = false}) async {
+    if (more && (_loading || _nextPage == null)) return;
+    final generation = more ? _generation : ++_generation;
+    final page = more ? _nextPage! : 0;
+    setState(() {
+      _loading = true;
+      _error = null;
+      if (!more) {
+        _topics = null;
+        _nextPage = null;
+      }
+    });
     try {
-      final topics = await widget.proxy.myTopics(query: query);
-      if (!mounted || query != _query) return;
+      final result = await widget.proxy.myTopicsPage(query: _query, page: page);
+      if (!mounted || generation != _generation) return;
       setState(() {
-        _topics = topics;
-        _error = null;
+        _topics = [if (more) ...?_topics, ...result.topics];
+        _nextPage = result.nextPage;
+        _loading = false;
       });
     } catch (e) {
-      if (mounted) setState(() => _error = e);
+      if (!mounted || generation != _generation) return;
+      setState(() {
+        _error = e;
+        _loading = false;
+      });
     }
   }
 
   void _search(String text) {
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () {
-      _query = text;
-      _load();
+    // Invalidate the old request immediately, including during the debounce
+    // and when a reader changes a query and then changes it back.
+    setState(() {
+      _query = text.trim();
+      ++_generation;
+      _topics = null;
+      _nextPage = null;
+      _error = null;
+      _loading = true;
     });
+    _debounce = Timer(const Duration(milliseconds: 300), () => _load());
   }
 
   @override
@@ -682,8 +706,6 @@ class _FeaturedTopicPickerState extends State<_FeaturedTopicPicker> {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final locale = Localizations.localeOf(context).toString();
-    final topics = _topics;
     final current = widget.profile.featuredTopicId;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -714,52 +736,71 @@ class _FeaturedTopicPickerState extends State<_FeaturedTopicPicker> {
             onTap: () =>
                 Navigator.pop(context, const FeaturedTopicChoice(null)),
           ),
-        Expanded(
-          child: topics == null
-              ? (_error == null
-                  ? const Center(child: CircularProgressIndicator())
-                  : Center(child: Text(describeError(_error))))
-              : topics.isEmpty
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(DesignTokens.spacingXL),
-                        child: Text(
-                          _query.isEmpty
-                              ? l10n.noTopicsToFeature
-                              : l10n.noTopicsMatch,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    )
-                  : RadioGroup<int>(
-                      groupValue: current ?? -1,
-                      onChanged: (v) =>
-                          Navigator.pop(context, FeaturedTopicChoice(v)),
-                      child: ListView(
-                        children: [
-                          for (final t in topics)
-                            RadioListTile<int>(
-                              value: t.id,
-                              selected: t.id == current,
-                              title: Text(withEmojiShortcodes(t.title)),
-                              subtitle: Text([
-                                l10n.nReplies(t.replies),
-                                if (t.createdAt != null)
-                                  DateFormat.yMMM(locale)
-                                      .format(t.createdAt!.toLocal()),
-                              ].join(' · ')),
-                            ),
-                          Padding(
-                            padding: const EdgeInsets.all(DesignTokens.spacingL),
-                            child: Text(l10n.featuredTopicRules,
-                                style: textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant)),
-                          ),
-                        ],
-                      ),
-                    ),
-        ),
+        Expanded(child: _buildTopics()),
       ],
+    );
+  }
+  Widget _buildTopics() {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final locale = Localizations.localeOf(context).toString();
+    final topics = _topics ?? const <DiscourseProfileTopic>[];
+    if (_topics == null && _loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_error == null && topics.isEmpty && _nextPage == null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(DesignTokens.spacingXL),
+          child: Text(_query.isEmpty ? l10n.noTopicsToFeature : l10n.noTopicsMatch,
+              textAlign: TextAlign.center),
+        ),
+      );
+    }
+    final current = widget.profile.featuredTopicId;
+    return RadioGroup<int>(
+      groupValue: current ?? -1,
+      onChanged: (v) => Navigator.pop(context, FeaturedTopicChoice(v)),
+      child: ListView(
+        key: ValueKey(_query),
+        children: [
+          for (final t in topics)
+            RadioListTile<int>(
+              value: t.id,
+              selected: t.id == current,
+              title: Text(withEmojiShortcodes(t.title)),
+              subtitle: Text([
+                l10n.nReplies(t.replies),
+                if (t.createdAt != null)
+                  DateFormat.yMMM(locale).format(t.createdAt!.toLocal()),
+              ].join(' · ')),
+            ),
+          if (_nextPage != null || _error != null)
+            Padding(
+              padding: const EdgeInsets.all(DesignTokens.spacingL),
+              child: Column(
+                children: [
+                  if (_error != null)
+                    Text(describeError(_error, context: context),
+                        textAlign: TextAlign.center),
+                  if (_loading)
+                    const CircularProgressIndicator()
+                  else
+                    TextButton(
+                      onPressed: () => _load(more: _nextPage != null),
+                      child: Text(_error == null ? l10n.loadMore : l10n.retry),
+                    ),
+                ],
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.all(DesignTokens.spacingL),
+            child: Text(l10n.featuredTopicRules,
+                style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant)),
+          ),
+        ],
+      ),
     );
   }
 }

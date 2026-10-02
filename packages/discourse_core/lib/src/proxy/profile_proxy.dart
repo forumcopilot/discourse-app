@@ -8,6 +8,15 @@ import '../data/site/discourse_site_capabilities.dart';
 import '../data/user/discourse_profile.dart';
 import 'attachment_proxy.dart';
 
+/// One topic available to the profile's featured-topic picker.
+typedef DiscourseProfileTopic = ({
+  int id,
+  String title,
+  int replies,
+  DateTime? createdAt,
+  int? categoryId,
+});
+
 /// Discourse-only: the signed-in member's own profile, everything Edit
 /// profile reads and writes, and the user card of anyone.
 ///
@@ -118,29 +127,42 @@ class DiscourseProfileProxy extends BaseDiscourseProxy {
     return list;
   }
 
-  /// The member's own topics, newest first, for choosing a featured one
-  /// (`/topics/created-by/{username}.json`). [query] narrows by title.
-  Future<List<({int id, String title, int replies, DateTime? createdAt, int? categoryId})>>
-      myTopics({String query = '', int page = 0}) async {
-    final body = await apiGet('/topics/created-by/$_me.json',
-        query: {if (page > 0) 'page': '$page'});
-    final topics = (((body['topic_list'] as Map?)?['topics'] as List?) ??
-            const [])
-        .whereType<Map>();
-    final q = query.trim().toLowerCase();
-    return [
-      for (final t in topics)
-        if (t['id'] is num &&
-            (q.isEmpty ||
-                (t['title']?.toString().toLowerCase().contains(q) ?? false)))
-          (
-            id: (t['id'] as num).toInt(),
-            title: (t['fancy_title'] ?? t['title'] ?? '').toString(),
-            replies: ((t['posts_count'] as num?)?.toInt() ?? 1) - 1,
-            createdAt: DateTime.tryParse(t['created_at']?.toString() ?? ''),
-            categoryId: (t['category_id'] as num?)?.toInt(),
-          ),
-    ];
+  /// The member's own topics on one page. For pagination metadata, use
+  /// [myTopicsPage]. [query] uses Discourse's full-text topic search.
+  Future<List<DiscourseProfileTopic>> myTopics(
+      {String query = '', int page = 0}) async =>
+      (await myTopicsPage(query: query, page: page)).topics;
+
+  /// Topics created by the signed-in member, with the server's indication
+  /// of another page. Search is applied by Discourse before pagination,
+  /// rather than filtering only the first downloaded page by title.
+  Future<({List<DiscourseProfileTopic> topics, int? nextPage})> myTopicsPage(
+      {String query = '', int page = 0}) async {
+    final body = await apiGet('/topics/created-by/$_me.json', query: {
+      if (page > 0) 'page': '$page',
+      if (query.trim().isNotEmpty) 'search': query.trim(),
+    });
+    final list = (body['topic_list'] as Map?) ?? const {};
+    final raw = (list['topics'] as List?) ?? const [];
+    final more = list['more_topics_url'];
+    return (
+      topics: [
+        for (final t in raw.whereType<Map>())
+          if (t['id'] is num)
+            (
+              id: (t['id'] as num).toInt(),
+              title: (t['fancy_title'] ?? t['title'] ?? '').toString(),
+              replies: ((t['posts_count'] as num?)?.toInt() ?? 1) - 1,
+              createdAt: DateTime.tryParse(t['created_at']?.toString() ?? ''),
+              categoryId: (t['category_id'] as num?)?.toInt(),
+            ),
+      ],
+      // Rebuild the known endpoint with the next page and same search;
+      // never send credentials to a URL supplied in the response.
+      nextPage: raw.isNotEmpty && more is String && more.isNotEmpty
+          ? page + 1
+          : null,
+    );
   }
 
   /// Someone's user card (`/u/{username}/card.json`). With [topicId], how
