@@ -6,6 +6,31 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.47] - 2026-10-02
+
+### Added
+- **Threads in chat.** A thread's summary (who took part, how many replies, the last one) shows under the message that started it and updates as replies arrive; a tap opens the thread on its own screen, read, written and followed live there. In a channel with threads, Reply opens the message's thread (starting it if needed), as on the web. A plain reply there used to start a thread the channel never showed.
+- **My Threads**, beside Channels and DMs where the forum has threads: the threads you take part in, newest activity first, with their channel and unread replies.
+- **Chat search**, from the chat list or a conversation's header: results open their conversation at the message, in its thread for a reply in one.
+- **A conversation header and settings.** The channel's or group chat's picture, name and member count, opening its settings: push notifications (Never, Only for mentions, For all activity), mute, star, the members, Add Member and Remove in a group chat, Leave (with web's warning for a group chat) or Close for a one-to-one chat. A channel opened from Browse offers Join instead.
+- **Group chats take a name**, and starting one counts against the forum's member limit.
+- **Every action on a chat message**: quick reactions and the full emoji picker, Reply, Edit in the composer, Copy text, Copy link, Bookmark, Pin (for those who may) and Flag with the forum's own flag types.
+- **A composer that knows chat**: an emoji button, @ suggestions for people and groups and # for channels, categories and tags, "X is typing…", and drafts kept on the forum, so a message started on the web or another device continues here.
+- **Messages: counts and group inboxes.** Unread and New say how many, counted as the web counts them and kept live. A group's inbox is picked from an inbox menu (Personal, then each group, with how many wait in each) and has its own Unread, New and Archive. Messages that arrive while a list is open are announced over it ("See 1 new or updated topic") rather than moving it.
+- **Swipe a message away**: a swipe archives it, or moves it back to the inbox from an archive, with Undo.
+
+### Changed
+- **The chat list is worth scanning.** Each chat shows its picture (the person, two people for a group chat, a channel's emoji or colour), the last message and its time, and a badge: a number for mentions and direct messages, a dot for anything else unread, nothing for a muted chat. Starred chats come first, channels and DMs are kept apart as on Discourse, the list updates live, and the Chat tab carries a badge. All channels can be browsed and joined, and a swipe closes a direct message.
+- **Conversations read like chat.** Messages are rows under one avatar and name per person's run (five minutes, as Discourse groups them) instead of a bubble each; a line marks each day and where your last visit ended; a conversation opens at your first unread message rather than at the bottom, and a button jumps back to the newest, counting what arrived meanwhile. Messages count as read once they have been on screen.
+- **Reactions.** The react button stays on every post and shows your own reaction; a tap likes or removes it, a long press picks another emoji. Beside it, up to three emoji and how many people reacted; a tap shows who, per emoji, you first. Counts update live while you read.
+- **A message row shows who you are writing with** (two pictures for a group message), never yourself, with their names under the subject.
+
+### Fixed
+- **Topic titles show their emoji, not the shortcode**, on the first post, notifications, the reply composer, drafts, bookmarks, the review queue and profiles.
+- **An empty channel no longer looks active "just now"** in the chat list.
+- **Each forum's reactions are its own**: the picker could offer another forum's set.
+- **The Messages tab no longer redraws continuously** while open (hidden lists kept their loading spinners animating).
+
 ## [1.0.46] - 2026-10-01
 
 ### Added
