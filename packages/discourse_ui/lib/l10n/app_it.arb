@@ -1562,5 +1562,6 @@
   "messageListNewCount": "{count, plural, one{Nuovo ({count})} other{Nuovi ({count})}}",
   "messagePersonal": "Personali",
   "messageListIncoming": "{count, plural, one{Visualizza {count} argomento nuovo o aggiornato} other{Visualizza {count} argomenti nuovi o aggiornati.}}",
-  "chatPlaceholderGroup": "Chatta in gruppo"
+  "chatPlaceholderGroup": "Chatta in gruppo",
+  "notificationAccountMismatch": "Questa notifica non può essere aperta con l’account attuale. Apri Notifiche per vedere gli aggiornamenti di questo account."
 }

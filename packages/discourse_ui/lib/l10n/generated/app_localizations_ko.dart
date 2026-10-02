@@ -4974,4 +4974,8 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get chatPlaceholderGroup => '그룹에서 채팅';
+
+  @override
+  String get notificationAccountMismatch =>
+      '현재 계정으로는 이 알림을 열 수 없습니다. 알림을 열어 이 계정의 업데이트를 확인하세요.';
 }

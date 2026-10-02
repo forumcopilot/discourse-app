@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../config/app_forum_config.dart';
 import '../core/logging/app_logger.dart';
 import 'notification_key_service.dart';
+import 'notification_grant_cleanup.dart';
 import 'notification_permission.dart';
 
 /// This phone, as the notifications backend knows it: one installation for
@@ -95,6 +96,7 @@ class NotificationInstallation {
   /// registering the key under it.
   static Future<bool> report({String? token, bool force = false}) async {
     if (!AppForumConfig.isNotificationsGrantEnabled) return false;
+    await NotificationGrantCleanup.instance.retryPending();
     if (!force && !await isRegistered()) return false;
 
     try {

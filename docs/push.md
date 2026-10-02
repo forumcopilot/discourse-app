@@ -39,7 +39,7 @@ With it set, the sign-in flow ends on `EnableNotificationsPage`, which
 asks the OS for notification permission (there, not at launch — the user
 has just read what the alerts are for) and then runs a second handshake:
 `notifications` scope only (four routes: `notifications#index`, `#totals`,
-`#mark_read`, `message_bus`), its own client id (`<install>:notify`), and
+`#mark_read`, `message_bus`), its own client id (`<install>:notify<random>`; legacy grants use `<install>:notify`), and
 the backend's `push_url` (`AppForumConfig.notificationsPushUrl`,
 `<base>/discourse/push`). The push_url does nothing until a forum's admin
 allowlists it — Discourse checks `allowed_user_api_push_urls` when it sends,
@@ -117,3 +117,21 @@ the code paths are byte-identical to pre-push behaviour when they are
 (checked in `app_forum_config_push_test` and
 `notifications_api_base_url_test`). Shipping with push optional is honest;
 holding a release for a server nobody has to run is not.
+
+
+### Account switching
+
+Logout persists a revocation outbox entry before clearing grant preferences.
+Retries run at startup, on resume/token reports, and once a minute while active.
+Each retired grant keeps its original forum and client ID; a new grant uses a
+fresh ID, so delayed cleanup cannot revoke the new account's grant. A network
+failure does not block logout. Cleanup remains pending until the relay confirms
+it; notifications already queued by FCM may still be shown by the OS.
+
+Push payloads must include `recipient_user_id` (the recipient's forum user ID,
+not the actor's username), for notification rows and message-bus chat alerts.
+The shared navigator checks the full forum URL and signed-in recipient before
+opening a destination. Read marking and foreground display use the same check.
+Older payloads without identity fail closed with an explanatory message; ordinary
+shared links continue to work. Deploy the backend payload update before releasing
+the app update. Live account switching and FCM delivery require device verification.

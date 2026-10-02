@@ -5223,4 +5223,8 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get chatPlaceholderGroup => 'Chatten in groep';
+
+  @override
+  String get notificationAccountMismatch =>
+      'Deze melding kan niet worden geopend met het huidige account. Open Meldingen om updates voor dit account te bekijken.';
 }

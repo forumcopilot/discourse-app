@@ -37,8 +37,8 @@ class NotificationKeyRegistration {
 /// The forum is identified by `site_url` — a host that opens forums by
 /// address has no directory ids — and `site_id` rides along only when the
 /// caller has one, for backends that key on it. The install is identified by
-/// the key's `client_id`, which is stable per install and forum, so a re-grant
-/// replaces the previous key rather than accumulating.
+/// the key's `client_id`, stable until that grant is retired. A later grant
+/// has a fresh ID so a delayed logout retry cannot revoke it.
 ///
 /// Every call is best-effort and answers false on any failure: the caller has
 /// already completed the grant on the forum, and the poller reconciles with
@@ -302,12 +302,18 @@ class NotificationKeyService {
   ) async =>
       await _request(method, path, body) != null;
 
+  @visibleForTesting
+  static Future<Map<String, dynamic>?> Function(
+      String method, String path, Map<String, dynamic> body)? requestOverride;
+
   /// The decoded JSON answer of a 200/201, or null on anything else.
   static Future<Map<String, dynamic>?> _request(
     String method,
     String path,
     Map<String, dynamic> body,
   ) async {
+    final override = requestOverride;
+    if (override != null) return override(method, path, body);
     final base = _baseUrl;
     if (base == null) {
       AppLogger.debug(

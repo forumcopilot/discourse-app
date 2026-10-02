@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:discourse_ui/services/discourse_login_service.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/config/app_forum_config.dart';
-import 'package:discourse_ui/services/notification_key_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/network/fc_api_exception.dart';
 import 'package:get/get.dart';
@@ -1045,27 +1044,17 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
   }
 
   /// Tell the notifications backend to stop polling for this install on this
-  /// forum, and forget the grant so the next sign-in offers it again. Never
-  /// throws — a failure here must not block signing out.
+  /// forum. Network failure is retried; storage failure must be surfaced
+  /// before forgetting the account and its cleanup request.
   Future<void> _revokeNotificationsKey(SiteContext siteContext) async {
     if (!AppForumConfig.isNotificationsGrantEnabled) return;
     try {
       final loginService = DiscourseLoginService(siteContext);
-      if (await loginService.hasNotificationsGrant()) {
-        final clientId = await loginService.notificationsClientId();
-        await NotificationKeyService.revoke(
-          siteUrl: siteContext.site.url,
-          siteId: siteContext.site.id,
-          clientId: clientId,
-        );
-      }
-      // Forgotten either way: the session it belonged to is ending, and a
-      // backend that could not be reached drops the key on its own once the
-      // forum starts rejecting it.
-      await loginService.clearNotificationsGrant();
+      await loginService.retireNotificationsGrant();
     } catch (e) {
       AppLogger.debug(
-          '🔔 [LOGOUT] Could not revoke the notifications key (continuing): $e');
+          'Could not persist notification cleanup: $e');
+      rethrow;
     }
   }
 
@@ -1076,8 +1065,7 @@ class DiscourseLoginController extends GetxController with ErrorHandlingMixin {
 
       // Stop our backend polling this user's notifications. Must run BEFORE
       // logoutUserAsync, which clears the credentials the client id is derived
-      // from. Best-effort: the key is scoped to notifications only, and the
-      // poller drops it on its own once Discourse starts rejecting it.
+      // from. Failed relay cleanup is persisted and retried after logout.
       await _revokeNotificationsKey(siteContext);
 
       // Call server logout

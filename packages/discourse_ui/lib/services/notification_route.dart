@@ -24,6 +24,7 @@
 library;
 
 import 'package:discourse_core/discourse_core.dart' show DiscourseLink;
+import 'package:forumcopilot_sdk/context/site_context.dart';
 
 /// What kind of destination a payload names.
 enum NotificationRouteKind {
@@ -76,6 +77,8 @@ class DiscourseNotificationRoute {
     this.groupName,
     this.username,
     this.notificationId,
+    this.isPush = false,
+    this.recipientUserId,
   });
 
   final NotificationRouteKind kind;
@@ -114,6 +117,25 @@ class DiscourseNotificationRoute {
   /// Null for chat messages, which have no notification row.
   final int? notificationId;
 
+  /// Pushes must name a recipient; ordinary shared links have no owner.
+  final bool isPush;
+  final String? recipientUserId;
+
+  bool permits(SiteContext context) {
+    if (!isPush) return true;
+    final target = Uri.tryParse(siteUrl ?? '');
+    final current = Uri.tryParse(context.site.pluginUrl);
+    if (target == null || current == null ||
+        target.scheme != current.scheme || target.host != current.host ||
+        target.port != current.port ||
+        target.path.replaceAll(RegExp(r'/+$'), '') !=
+            current.path.replaceAll(RegExp(r'/+$'), '')) {
+      return false;
+    }
+    return context.isLoggedIn && recipientUserId != null &&
+        recipientUserId == context.currentUserId;
+  }
+
   /// Posts per page, matching `PostsList`'s own page size — the page number
   /// is only useful if both sides agree on how long a page is.
   static const int postsPerPage = 20;
@@ -129,6 +151,8 @@ class DiscourseNotificationRoute {
   /// notification menu opens: a topic or message at its post, a chat
   /// channel at its message, a badge, a group's inbox or page, a profile.
   factory DiscourseNotificationRoute.from(Map<String, dynamic> data) {
+    final recipient = int.tryParse(data['recipient_user_id']?.toString() ?? '');
+    final recipientUserId = recipient != null && recipient > 0 ? '$recipient' : null;
     final topicId = _intFrom(data['topic_id']);
     final postId = _intFrom(data['content_id']);
     final postNumber = _intFrom(data['post_number']);
@@ -154,6 +178,8 @@ class DiscourseNotificationRoute {
         chatMessageId: threadId == null ? messageId : null,
         siteUrl: siteUrl,
         notificationId: notificationId,
+        isPush: true,
+        recipientUserId: recipientUserId,
       );
     }
 
@@ -169,6 +195,8 @@ class DiscourseNotificationRoute {
         postNumber: postNumber,
         siteUrl: siteUrl,
         notificationId: notificationId,
+        isPush: true,
+        recipientUserId: recipientUserId,
       );
     }
 
@@ -182,6 +210,8 @@ class DiscourseNotificationRoute {
         postNumber: postNumber,
         siteUrl: siteUrl,
         notificationId: notificationId,
+        isPush: true,
+        recipientUserId: recipientUserId,
       );
     }
     if (topicId != null && postNumber != null && postNumber > 0) {
@@ -192,6 +222,8 @@ class DiscourseNotificationRoute {
         page: ((postNumber - 1) ~/ postsPerPage) + 1,
         siteUrl: siteUrl,
         notificationId: notificationId,
+        isPush: true,
+        recipientUserId: recipientUserId,
       );
     }
     // A topic with no position at all still beats the notification list.
@@ -202,6 +234,8 @@ class DiscourseNotificationRoute {
         page: 1,
         siteUrl: siteUrl,
         notificationId: notificationId,
+        isPush: true,
+        recipientUserId: recipientUserId,
       );
     }
 
@@ -213,6 +247,8 @@ class DiscourseNotificationRoute {
         badgeId: badgeId,
         siteUrl: siteUrl,
         notificationId: notificationId,
+        isPush: true,
+        recipientUserId: recipientUserId,
       );
     }
     final group = _stringFrom(data['group_name']);
@@ -222,6 +258,8 @@ class DiscourseNotificationRoute {
         groupName: group,
         siteUrl: siteUrl,
         notificationId: notificationId,
+        isPush: true,
+        recipientUserId: recipientUserId,
       );
     }
     if (group != null && (type == 22 || type == 23)) {
@@ -230,6 +268,8 @@ class DiscourseNotificationRoute {
         groupName: group,
         siteUrl: siteUrl,
         notificationId: notificationId,
+        isPush: true,
+        recipientUserId: recipientUserId,
       );
     }
     // An invitee who joined, a new follower — and likes or links spread
@@ -242,12 +282,16 @@ class DiscourseNotificationRoute {
         username: username,
         siteUrl: siteUrl,
         notificationId: notificationId,
+        isPush: true,
+        recipientUserId: recipientUserId,
       );
     }
     return DiscourseNotificationRoute(
       kind: NotificationRouteKind.notificationsTab,
       siteUrl: siteUrl,
       notificationId: notificationId,
+      isPush: true,
+      recipientUserId: recipientUserId,
     );
   }
 

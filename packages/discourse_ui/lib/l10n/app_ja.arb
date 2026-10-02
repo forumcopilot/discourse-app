@@ -1562,5 +1562,6 @@
   "messageListNewCount": "{count, plural, other{新規 ({count})}}",
   "messagePersonal": "個人メッセージ",
   "messageListIncoming": "{count, plural, other{{count} 件の新規/更新トピックを見る}}",
-  "chatPlaceholderGroup": "グループチャット"
+  "chatPlaceholderGroup": "グループチャット",
+  "notificationAccountMismatch": "この通知は現在のアカウントでは開けません。「通知」を開くと、このアカウントの更新を確認できます。"
 }

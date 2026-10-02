@@ -4975,4 +4975,8 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get chatPlaceholderGroup => 'グループチャット';
+
+  @override
+  String get notificationAccountMismatch =>
+      'この通知は現在のアカウントでは開けません。「通知」を開くと、このアカウントの更新を確認できます。';
 }

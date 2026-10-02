@@ -5248,4 +5248,8 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get chatPlaceholderGroup => 'Chatta in gruppo';
+
+  @override
+  String get notificationAccountMismatch =>
+      'Questa notifica non può essere aperta con l’account attuale. Apri Notifiche per vedere gli aggiornamenti di questo account.';
 }

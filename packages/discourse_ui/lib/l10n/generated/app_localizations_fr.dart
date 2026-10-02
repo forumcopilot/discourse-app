@@ -5257,4 +5257,8 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get chatPlaceholderGroup => 'Discuter en groupe';
+
+  @override
+  String get notificationAccountMismatch =>
+      'Cette notification ne peut pas être ouverte avec le compte actuel. Ouvrez les notifications pour voir les nouveautés de ce compte.';
 }
