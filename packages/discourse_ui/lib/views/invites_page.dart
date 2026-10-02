@@ -27,7 +27,10 @@ import '../l10n/generated/app_localizations.dart';
 class InvitesPage extends StatefulWidget {
   final SiteContext siteContext;
 
-  const InvitesPage({super.key, required this.siteContext});
+  /// Optional override for hosts and tests; defaults to this forum's proxy.
+  final DiscourseInviteProxy? proxy;
+
+  const InvitesPage({super.key, required this.siteContext, this.proxy});
 
   @override
   State<InvitesPage> createState() => _InvitesPageState();
@@ -68,13 +71,17 @@ class _InvitesPageState extends State<InvitesPage> {
   int _redeemedCount = 0;
   bool _loading = true;
   bool _creating = false;
+  int? _nextOffset;
+  // Refreshes and filter changes invalidate older in-flight pages.
+  int _generation = 0;
   String? _error;
 
   /// Set when the server answered with a 403-flavored refusal — the
   /// user isn't in `invite_allowed_groups`. Carries the server text.
   String? _forbiddenText;
 
-  DiscourseInviteProxy get _proxy => DiscourseInviteProxy(widget.siteContext);
+  DiscourseInviteProxy get _proxy =>
+      widget.proxy ?? DiscourseInviteProxy(widget.siteContext);
 
   @override
   void initState() {
@@ -92,19 +99,29 @@ class _InvitesPageState extends State<InvitesPage> {
         t.contains('not permitted');
   }
 
-  Future<void> _load() async {
+  Future<void> _load({bool more = false}) async {
+    if (more && (_loading || _nextOffset == null)) return;
+    final generation = more ? _generation : ++_generation;
+    final filter = _filter;
+    final offset = more ? _nextOffset! : 0;
     setState(() {
       _loading = true;
       _error = null;
+      if (!more) {
+        _invites = null;
+        _nextOffset = null;
+        _forbiddenText = null;
+      }
     });
     try {
-      final result = await _proxy.getMyInvitesAsync(filter: _filter);
-      if (!mounted) return;
+      final result =
+          await _proxy.getMyInvitesAsync(filter: filter, offset: offset);
+      if (!mounted || generation != _generation) return;
       setState(() {
         _loading = false;
         if (!result.result) {
-          _invites = const [];
-          if (_looksForbidden(result.resultText)) {
+          if (!more) _invites = [];
+          if (!more && _looksForbidden(result.resultText)) {
             _forbiddenText = result.resultText;
           } else {
             _error = result.resultText?.isNotEmpty == true
@@ -114,16 +131,17 @@ class _InvitesPageState extends State<InvitesPage> {
           return;
         }
         _forbiddenText = null;
-        _invites = result.invites;
+        _invites = [if (more) ...?_invites, ...result.invites];
+        _nextOffset = result.nextOffset;
         _pendingCount = result.pendingCount;
         _expiredCount = result.expiredCount;
         _redeemedCount = result.redeemedCount;
       });
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted || generation != _generation) return;
       setState(() {
         _loading = false;
-        _invites = const [];
+        if (!more) _invites = [];
         _error = describeError(e);
       });
     }
@@ -180,7 +198,8 @@ class _InvitesPageState extends State<InvitesPage> {
                 if (invite.expiresAt != null) ...[
                   SizedBox(height: DesignTokens.spacingXS),
                   Text(
-                    AppLocalizations.of(context)!.expiresOn(DateFormat.yMMMd().format(invite.expiresAt!.toLocal())),
+                    AppLocalizations.of(context)!.expiresOn(
+                        DateFormat.yMMMd().format(invite.expiresAt!.toLocal())),
                     style: textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -212,7 +231,8 @@ class _InvitesPageState extends State<InvitesPage> {
                           if (!sheetContext.mounted) return;
                           ScaffoldMessenger.of(sheetContext).showSnackBar(
                             SnackBar(
-                              content: Text(AppLocalizations.of(context)!.inviteLinkCopied),
+                              content: Text(AppLocalizations.of(context)!
+                                  .inviteLinkCopied),
                               duration: Duration(seconds: 2),
                             ),
                           );
@@ -224,8 +244,8 @@ class _InvitesPageState extends State<InvitesPage> {
                     SizedBox(width: DesignTokens.spacingM),
                     Expanded(
                       child: FilledButton.icon(
-                        onPressed: () =>
-                            SharePlus.instance.share(ShareParams(text: invite.link)),
+                        onPressed: () => SharePlus.instance
+                            .share(ShareParams(text: invite.link)),
                         icon: const Icon(Icons.share_outlined),
                         label: Text(AppLocalizations.of(context)!.share),
                       ),
@@ -327,7 +347,8 @@ class _InvitesPageState extends State<InvitesPage> {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppLocalizations.of(context)!.inviteSentTo(email))),
+      SnackBar(
+          content: Text(AppLocalizations.of(context)!.inviteSentTo(email))),
     );
     await _load();
   }
@@ -428,9 +449,6 @@ class _InvitesPageState extends State<InvitesPage> {
         hint: _forbiddenText,
       );
     }
-    if (_loading && _invites == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
     return Column(
       children: [
         _buildFilterChips(),
@@ -489,7 +507,7 @@ class _InvitesPageState extends State<InvitesPage> {
     if (_loading && invites.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (invites.isEmpty) {
+    if (invites.isEmpty && _nextOffset == null) {
       return EmptyStateView.scrollable(
         icon: Icons.person_add_alt_outlined,
         message: _emptyMessage(AppLocalizations.of(context)!, _filter),
@@ -501,26 +519,51 @@ class _InvitesPageState extends State<InvitesPage> {
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.only(bottom: DesignTokens.spacingXXL * 2),
-      itemCount: invites.length,
+      key: ValueKey(_filter),
+      itemCount: invites.length + (_nextOffset != null ? 1 : 0),
       separatorBuilder: (_, __) => const Divider(height: 1),
-      itemBuilder: (context, index) => _InviteRow(
-        invite: invites[index],
-        onCopy: invites[index].link.isNotEmpty
-            ? () async {
-                await Clipboard.setData(
-                  ClipboardData(text: invites[index].link),
-                );
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(AppLocalizations.of(context)!.inviteLinkCopied),
-                    duration: Duration(seconds: 2),
+      itemBuilder: (context, index) {
+        if (index == invites.length) {
+          return Padding(
+            padding: DesignTokens.paddingL,
+            child: Column(
+              children: [
+                if (_error != null)
+                  Text(describeError(_error, context: context)),
+                if (_loading)
+                  const CircularProgressIndicator()
+                else
+                  TextButton(
+                    onPressed: () => _load(more: true),
+                    child: Text(_error == null
+                        ? AppLocalizations.of(context)!.loadMore
+                        : AppLocalizations.of(context)!.retry),
                   ),
-                );
-              }
-            : null,
-        onDelete: invites[index].canDelete ? () => _delete(invites[index]) : null,
-      ),
+              ],
+            ),
+          );
+        }
+        return _InviteRow(
+          invite: invites[index],
+          onCopy: invites[index].link.isNotEmpty
+              ? () async {
+                  await Clipboard.setData(
+                    ClipboardData(text: invites[index].link),
+                  );
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                          Text(AppLocalizations.of(context)!.inviteLinkCopied),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              : null,
+          onDelete:
+              invites[index].canDelete ? () => _delete(invites[index]) : null,
+        );
+      },
     );
   }
 }
@@ -587,9 +630,8 @@ class _InviteRow extends StatelessWidget {
             : invite.isLinkInvite
                 ? Icons.link
                 : Icons.mail_outline,
-        color: invite.expired
-            ? colorScheme.onSurfaceVariant
-            : colorScheme.primary,
+        color:
+            invite.expired ? colorScheme.onSurfaceVariant : colorScheme.primary,
       ),
       title: Text(
         title,
