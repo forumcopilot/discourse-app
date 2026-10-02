@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_attachment_proxy.dart';
 import 'package:forumcopilot_sdk/models/results/fc_attachment_result.dart';
-import 'package:forumcopilot_sdk/services/fc_http_client.dart';
 import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 
 import '../base_discourse_proxy.dart';
@@ -168,11 +167,19 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
         ...siteContext.userApiAuthHeaders(),
       };
 
-      final response = await FCHttpClient.post<String>(
-        url,
+      // A 303 can turn a multipart POST into a GET while retaining the
+      // custom API-key headers. Never replay uploads through a redirect.
+      final response = await FCDioClient.instance.request<String>(
+        'POST',
+        url.toString(),
         headers: headers,
-        body: form,
+        data: form,
         responseType: ResponseType.plain,
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) =>
+              status != null && status >= 200 && status < 400,
+        ),
       );
 
       final code = response.statusCode ?? 0;

@@ -6,6 +6,10 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Keep Discourse API credentials on their original origin when a server redirects a request. Reads follow at most five redirects with the same scheme, host, and port; writes and uploads are never replayed through redirects.
+
 ## [1.0.47] - 2026-10-02
 
 ### Added

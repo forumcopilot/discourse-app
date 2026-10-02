@@ -5,12 +5,11 @@ import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:dio/dio.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/network/fc_call_result.dart';
-import 'package:forumcopilot_sdk/services/fc_http_client.dart';
 import 'package:forumcopilot_sdk/services/fc_http_overrides.dart';
 
 import '../context/discourse_site_context_extension.dart';
 
-/// Thin HTTP wrapper around the SDK's [FCHttpClient] for talking to a
+/// Thin HTTP wrapper around the SDK's [FCDioClient] for talking to a
 /// Discourse forum.
 ///
 /// Auth model: User API Keys (https://meta.discourse.org/t/-/32504). When a
@@ -322,17 +321,18 @@ class DiscourseClient {
     while (true) {
       FCCallResult result;
       try {
-        final response = await FCHttpClient.request<String>(
+        final response = await _sendWithRedirects(
           method,
           url,
           headers: headers,
           body: encodedBody,
           queryParameters: effectiveQuery,
-          responseType: ResponseType.plain,
         );
-        result = _toCallResult(response, method: method, url: url);
+        result = _toCallResult(response,
+            method: method, url: response.requestOptions.uri);
       } on DioException catch (e) {
-        result = _toCallResultFromException(e, method: method, url: url);
+        result = _toCallResultFromException(e,
+            method: method, url: e.requestOptions.uri);
       } catch (e) {
         return FCCallResult(
           statusCode: 0,
@@ -369,6 +369,65 @@ class DiscourseClient {
       if (wait == null || wait > _maxAutoRetryDelay) return result;
       attempt++;
       await Future<void>.delayed(wait);
+    }
+  }
+
+  static const _maxRedirects = 5;
+  static const _redirectStatuses = {301, 302, 303, 307, 308};
+
+  static bool _sameOrigin(Uri a, Uri b) =>
+      a.scheme == b.scheme && a.host == b.host && a.port == b.port;
+
+  static Uri? _redirectTarget(Uri from, String? location) {
+    if (location == null || location.trim().isEmpty) return null;
+    try {
+      return from.resolve(location);
+    } on FormatException {
+      return null;
+    }
+  }
+
+  /// dart:io forwards custom User-Api-* headers across automatic redirects.
+  /// Check every hop before sending it through the SDK's cookie/Cloudflare
+  /// stack. Only reads on the original origin may be followed; a write must
+  /// never be replayed, nor turned into a GET by a 303.
+  Future<Response<String>> _sendWithRedirects(
+    String method,
+    Uri url, {
+    required Map<String, String> headers,
+    String? body,
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    var current = url;
+    for (var hop = 0;; hop++) {
+      final response = await FCDioClient.instance.request<String>(
+        method,
+        current.toString(),
+        headers: headers,
+        data: body,
+        queryParameters: hop == 0 ? queryParameters : null,
+        responseType: ResponseType.plain,
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) =>
+              status != null && status >= 200 && status < 400,
+        ),
+      );
+      if (method != 'GET' ||
+          body != null ||
+          !_redirectStatuses.contains(response.statusCode) ||
+          hop >= _maxRedirects) {
+        return response;
+      }
+      final target = _redirectTarget(
+          response.requestOptions.uri, response.headers.value('location'));
+      if (target == null ||
+          (target.scheme != 'http' && target.scheme != 'https') ||
+          target.userInfo.isNotEmpty ||
+          !_sameOrigin(url, target)) {
+        return response;
+      }
+      current = target;
     }
   }
 
@@ -500,12 +559,8 @@ class DiscourseClient {
   /// Turns a redirect into an actionable message instead of letting an edge
   /// server's HTML error page reach the user as "HTTP 302".
   ///
-  /// A 3xx surfacing here means the redirect was **not** followed, which in
-  /// practice only happens for requests with a body — so reads keep working
-  /// (Dart follows those transparently) while every write fails. That
-  /// asymmetry makes a wrong [SiteContext.site.url] look like a bug in the
-  /// app rather than a misconfiguration: the fix is almost always to point
-  /// `AppForumConfig.forumBaseUrl` at the origin the forum actually serves.
+  /// A 3xx surfacing here was not followed: it left the forum's origin,
+  /// tried to redirect a write, or exceeded the bounded read-redirect chain.
   String _redirectDiagnostic(
     int status,
     Map<String, String> headers, {
@@ -513,25 +568,20 @@ class DiscourseClient {
     required Uri url,
   }) {
     final location = headers['location'] ?? headers['Location'] ?? '';
-    final target = location.isEmpty ? null : Uri.tryParse(location);
-    final sameOrigin = target != null &&
-        target.host.toLowerCase() == url.host.toLowerCase() &&
-        target.scheme == url.scheme;
+    final target = _redirectTarget(url, location);
+    final sameOrigin = target != null && _sameOrigin(url, target);
 
     final String message;
     if (target == null) {
       message = 'The forum redirected $method ${url.path} (HTTP $status) '
-          'without saying where. Check that the forum URL is correct.';
+          'without a valid destination. Check that the forum URL is correct.';
     } else if (sameOrigin) {
       message = 'The forum redirected $method ${url.path} to '
           '${target.path} (HTTP $status). The request was not retried.';
     } else {
-      // The common case, and the one worth spelling out: the configured
-      // host is not the forum's canonical origin.
-      message = 'This forum is served from ${target.origin}, but the app is '
-          'configured for ${url.origin}. Reads still work because redirects '
-          'are followed automatically, but posting, replying and other '
-          'writes fail. Set AppForumConfig.forumBaseUrl to ${target.origin}.';
+      message = 'The forum redirected $method ${url.path} to another origin '
+          '(HTTP $status). For security, the request was not followed. '
+          'Check that the forum address is correct.';
     }
     return jsonEncode({
       'errors': [message],
