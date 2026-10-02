@@ -1562,5 +1562,6 @@
   "messageListNewCount": "{count, plural, other{新 ({count})}}",
   "messagePersonal": "个人",
   "messageListIncoming": "{count, plural, other{查看 {count} 个新的或更新的话题}}",
-  "chatPlaceholderGroup": "群聊"
+  "chatPlaceholderGroup": "群聊",
+  "notificationAccountMismatch": "无法使用当前账号打开此通知。请打开“通知”查看此账号的最新消息。"
 }

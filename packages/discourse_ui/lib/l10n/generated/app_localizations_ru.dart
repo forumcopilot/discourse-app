@@ -5289,4 +5289,8 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get chatPlaceholderGroup => 'Чат в группе';
+
+  @override
+  String get notificationAccountMismatch =>
+      'Это уведомление нельзя открыть в текущем аккаунте. Откройте уведомления, чтобы увидеть обновления для этого аккаунта.';
 }

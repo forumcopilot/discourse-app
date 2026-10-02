@@ -1,4 +1,5 @@
 import 'package:forumcopilot_sdk/context/site_context.dart';
+import 'package:discourse_core/discourse_core.dart' show DiscourseSiteContextExtension;
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:get/get.dart';
 
@@ -37,12 +38,21 @@ class DiscourseRouteNavigator {
     SiteContext siteContext,
     DiscourseNotificationRoute route,
   ) async {
+    if (!route.permits(siteContext)) {
+      final context = Get.context;
+      if (context != null) {
+        SnackbarHelper.showInfo(context, AppLocalizations.of(context)!.notificationAccountMismatch);
+      }
+      return;
+    }
+    final session = siteContext.configurationSession;
+    bool stillAllowed() => identical(session, siteContext.configurationSession) && route.permits(siteContext);
     switch (route.kind) {
       case NotificationRouteKind.post:
         final postId = route.postId;
         if (postId == null) return;
         final topicId = route.topicId ?? await _topicOfPost(siteContext, postId);
-        if (topicId == null) return;
+        if (topicId == null || !stillAllowed()) return;
         AppLogger.debug('🧭 [DiscourseRouteNavigator] Topic $topicId at post $postId');
         _openTopic(siteContext,
             topicId: topicId,
@@ -93,7 +103,7 @@ class DiscourseRouteNavigator {
         ));
       case NotificationRouteKind.badge:
         final badgeId = route.badgeId;
-        if (badgeId != null) await _openBadge(siteContext, badgeId);
+        if (badgeId != null) await _openBadge(siteContext, badgeId, stillAllowed);
       case NotificationRouteKind.groupInbox:
         final group = route.groupName;
         if (group == null) return;
@@ -133,12 +143,13 @@ class DiscourseRouteNavigator {
   /// A badge's sheet, found among the reader's own badges — a badge
   /// notification is always about the reader. Falls back to the
   /// notification list when the badge cannot be loaded.
-  static Future<void> _openBadge(SiteContext siteContext, int badgeId) async {
+  static Future<void> _openBadge(SiteContext siteContext, int badgeId, bool Function() stillAllowed) async {
     final username = siteContext.currentUsername;
     if (username != null && username.isNotEmpty) {
       try {
         final result =
             await SiteProxyService.getUserProxy().getUserBadgesAsync(username);
+        if (!stillAllowed()) return;
         final badge = result.badges.where((b) => b.id == badgeId).firstOrNull;
         final context = Get.context;
         if (badge != null && context != null && context.mounted) {
@@ -149,6 +160,7 @@ class DiscourseRouteNavigator {
         AppLogger.debug('⚠️ [DiscourseRouteNavigator] Badge $badgeId: $e');
       }
     }
+    if (!stillAllowed()) return;
     await open(siteContext, const DiscourseNotificationRoute(
         kind: NotificationRouteKind.notificationsTab));
   }

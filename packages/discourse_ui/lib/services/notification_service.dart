@@ -24,9 +24,12 @@ import '../views/user_profile_page.dart';
 import '../core/errors/error_handling_mixins.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../host/discourse_host.dart';
-import 'package:discourse_core/discourse_core.dart' show DiscourseSocialProxy;
+import 'package:discourse_core/discourse_core.dart' show DiscourseSocialProxy, DiscourseSiteContextExtension;
+import 'package:forumcopilot_sdk/context/site_context.dart';
+import 'package:forumcopilot_sdk/models/results/fc_user_result.dart';
 import 'discourse_route_navigator.dart';
 import 'notification_route.dart';
+import 'notification_grant_cleanup.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../l10n/app_l10n.dart';
 import '../utils/error_message.dart';
@@ -63,6 +66,7 @@ class NotificationService with ServiceErrorHandlingMixin {
 
   // Initialize the notification service
   Future<void> initialize() async {
+    NotificationGrantCleanup.instance.start();
     if (_isInitialized) return;
 
     try {
@@ -470,6 +474,28 @@ class NotificationService with ServiceErrorHandlingMixin {
 
   // Show local notification
   Future<void> _showLocalNotification(RemoteMessage message) async {
+    if (DiscourseNotificationRoute.handles(message.data)) {
+      final route = DiscourseNotificationRoute.from(message.data);
+      final forum = await _findForumForDiscourseNotification(route, message.data);
+      if (forum == null) return;
+      final live = Get.isRegistered<DiscourseSiteController>()
+          ? Get.find<DiscourseSiteController>().currentSiteContext.value : null;
+      if (live != null && _isSameForum(live.site, forum)) {
+        if (!route.permits(live)) return;
+      } else {
+        // Other forums need no network fetch or navigation to check the
+        // last signed-in identity. Logout deletes this persisted snapshot.
+        final saved = SiteContext(siteType: 'discourse', site: forum);
+        try {
+          final snapshot = await saved.readLoginSnapshot();
+          if (snapshot == null) return;
+          saved.setLoginData(FCLoginResultMapper.fromJson(snapshot));
+          if (!route.permits(saved)) return;
+        } catch (_) {
+          return;
+        }
+      }
+    }
     // Several forums share one app icon: group and thread by forum, as the
     // backend does for pushes shown while the app is closed.
     final forum = message.data['site_url']?.toString();
@@ -711,7 +737,8 @@ class NotificationService with ServiceErrorHandlingMixin {
         ? Get.find<DiscourseSiteController>()
         : null;
     final context = controller?.currentSiteContext.value;
-    if (context == null || !context.isLoggedIn || !_isSameForum(context.site, forum)) {
+    if (context == null || !context.isLoggedIn || !_isSameForum(context.site, forum) ||
+        !route.permits(context)) {
       return;
     }
     DiscourseSocialProxy(context)

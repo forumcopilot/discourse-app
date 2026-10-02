@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:discourse_core/discourse_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -14,6 +15,7 @@ import 'package:forumcopilot_sdk/network/fc_call_result.dart';
 import '../config/app_forum_config.dart';
 import '../core/logging/app_logger.dart';
 import 'notification_installation.dart';
+import 'notification_grant_cleanup.dart';
 import 'notification_key_service.dart';
 
 /// Drives the Discourse User API Key login flow from the app side.
@@ -72,21 +74,31 @@ class DiscourseLoginService {
   ///     The key is polled; the push_url does nothing until the forum's admin
   ///     allowlists it, and then gives instant push without a re-grant — a
   ///     key's push_url cannot be added later.
-  Future<DiscourseUserApiHandshakeRequest> beginNotificationsGrant() {
+  Future<DiscourseUserApiHandshakeRequest> beginNotificationsGrant() async {
+    final prefs = await SharedPreferences.getInstance();
+    var suffix = prefs.getString(_notificationsSuffixKey);
+    if (suffix == null) {
+      final random = Random.secure();
+      suffix = AppForumConfig.userApiNotificationsClientIdSuffix +
+          List.generate(16, (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
+      await prefs.setString(_notificationsSuffixKey, suffix);
+    }
     return _authManager.beginHandshake(
       applicationName: AppForumConfig.userApiApplicationName,
       scopes: AppForumConfig.userApiNotificationsScopes,
       authRedirect: authRedirect,
       pushUrl: AppForumConfig.notificationsPushUrl,
-      clientIdSuffix: AppForumConfig.userApiNotificationsClientIdSuffix,
+      clientIdSuffix: suffix,
     );
   }
 
   /// The client id the notifications key is stored under on our backend. Needed
   /// to revoke it at sign-out, when the key itself is already gone.
-  Future<String> notificationsClientId() {
+  Future<String> notificationsClientId() async {
+    final prefs = await SharedPreferences.getInstance();
     return _authManager.clientIdFor(
-      suffix: AppForumConfig.userApiNotificationsClientIdSuffix,
+      suffix: prefs.getString(_notificationsSuffixKey) ??
+          AppForumConfig.userApiNotificationsClientIdSuffix,
     );
   }
 
@@ -96,6 +108,12 @@ class DiscourseLoginService {
   static const String _prefNotificationsDndReported =
       '_notifications_dnd_reported';
   static const String _prefNotificationsMuted = '_notifications_muted_groups';
+
+  String get _notificationsOwnerKey =>
+      '${siteContext.discourseStoragePrefix}_notifications_recipient';
+
+  String get _notificationsSuffixKey =>
+      '${siteContext.discourseStoragePrefix}_notifications_client_suffix';
 
   String get _notificationsGrantKey =>
       '${siteContext.discourseStoragePrefix}$_prefNotificationsGranted';
@@ -116,20 +134,42 @@ class DiscourseLoginService {
   /// is granted separately.
   Future<bool> hasNotificationsGrant() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_notificationsGrantKey) ?? false;
+    final owner = prefs.getString(_notificationsOwnerKey);
+    return (prefs.getBool(_notificationsGrantKey) ?? false) &&
+        (owner == null || owner == siteContext.currentUserId);
   }
 
   /// Remember the grant. [installBound]: registered under this phone's
   /// installation, so its token and Do Not Disturb go through
   /// [NotificationInstallation] and [syncDoNotDisturb] rather than the legacy
   /// per-grant device call. Grants made by earlier app versions are not.
-  Future<void> markNotificationsGranted({bool installBound = false}) async {
+  Future<bool> markNotificationsGranted({
+    bool installBound = false,
+    Object? expectedSession,
+    String? expectedClientId,
+  }) async {
+    final session = expectedSession ?? siteContext.configurationSession;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_notificationsGrantKey, true);
-    await prefs.setBool(_notificationsInstallBoundKey, installBound);
-    await prefs.remove(_notificationsDndReportedKey);
-    // A new grant starts with everything on, on the backend too.
-    await prefs.remove(_notificationsMutedKey);
+    final suffix = prefs.getString(_notificationsSuffixKey);
+    if (expectedClientId != null &&
+        expectedClientId != await notificationsClientId()) {
+      return false;
+    }
+    bool current() => identical(session, siteContext.configurationSession) &&
+        prefs.getString(_notificationsSuffixKey) == suffix;
+    final owner = siteContext.currentUserId;
+    final writes = <Future<bool> Function()>[
+      if (owner != null) () => prefs.setString(_notificationsOwnerKey, owner),
+      () => prefs.setBool(_notificationsGrantKey, true),
+      () => prefs.setBool(_notificationsInstallBoundKey, installBound),
+      () => prefs.remove(_notificationsDndReportedKey),
+      () => prefs.remove(_notificationsMutedKey),
+    ];
+    for (final write in writes) {
+      if (!current()) return false;
+      if (!await write()) throw StateError('Could not persist notification grant');
+    }
+    return current();
   }
 
   /// Whether this forum's grant was registered under the phone's
@@ -170,10 +210,26 @@ class DiscourseLoginService {
   /// — so the next sign-in offers it again.
   Future<void> clearNotificationsGrant() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_notificationsOwnerKey);
+    await prefs.remove(_notificationsSuffixKey);
     await prefs.remove(_notificationsGrantKey);
     await prefs.remove(_notificationsInstallBoundKey);
     await prefs.remove(_notificationsDndReportedKey);
     await prefs.remove(_notificationsMutedKey);
+  }
+
+  /// Persist cleanup before forgetting local state. New grants then get a
+  /// different client ID; retries can safely outlive logout and app restarts.
+  Future<void> retireNotificationsGrant() async {
+    if (!AppForumConfig.isNotificationsGrantEnabled) return;
+    final prefs = await SharedPreferences.getInstance();
+    // A started grant may have reached the relay even if its response was lost.
+    if ((prefs.getBool(_notificationsGrantKey) ?? false) || prefs.containsKey(_notificationsSuffixKey)) {
+      await NotificationGrantCleanup.enqueue(
+          siteContext.site.url, await notificationsClientId());
+    }
+    await clearNotificationsGrant();
+    unawaited(NotificationGrantCleanup.instance.retryPending());
   }
 
   /// Tell the notifications backend about this forum's Do Not Disturb, so
@@ -332,6 +388,9 @@ class DiscourseLoginService {
     final cu = (data['current_user'] as Map<String, dynamic>?) ?? const {};
 
     final result = _loginResultFromCurrentUser(cu);
+    if (result.user?.id != siteContext.currentUserId) {
+      await retireNotificationsGrant();
+    }
 
     _applyChatFlags(cu);
 
@@ -376,6 +435,7 @@ class DiscourseLoginService {
       if (response.statusCode == 401 || response.statusCode == 403) {
         // Key revoked server-side. Drop locally (this also deletes the
         // cached login snapshot).
+        await retireNotificationsGrant();
         await siteContext.clearUserApiCredentials();
         return false;
       }
@@ -384,6 +444,11 @@ class DiscourseLoginService {
         final cu = (data['current_user'] as Map<String, dynamic>?) ?? const {};
         if (cu.isEmpty) return false;
         final result = _loginResultFromCurrentUser(cu);
+        final prefs = await SharedPreferences.getInstance();
+        final owner = prefs.getString(_notificationsOwnerKey);
+        if (owner != null && owner != result.user?.id) {
+          await retireNotificationsGrant();
+        }
         _applyChatFlags(cu);
         siteContext.setLoginData(result);
         // Refresh the cached identity for future offline launches.

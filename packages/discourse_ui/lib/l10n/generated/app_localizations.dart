@@ -8447,6 +8447,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Chat in group'**
   String get chatPlaceholderGroup;
+
+  /// No description provided for @notificationAccountMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'This notification cannot be opened with the current account. Open Notifications to see updates for this account.'**
+  String get notificationAccountMismatch;
 }
 
 class _AppLocalizationsDelegate

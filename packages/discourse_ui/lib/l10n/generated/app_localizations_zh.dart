@@ -4913,4 +4913,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chatPlaceholderGroup => '群聊';
+
+  @override
+  String get notificationAccountMismatch => '无法使用当前账号打开此通知。请打开“通知”查看此账号的最新消息。';
 }

@@ -1719,5 +1719,6 @@
   "messageListNewCount": "{count, plural, one{Nieuw ({count})} other{Nieuw ({count})}}",
   "messagePersonal": "Persoonlijk",
   "messageListIncoming": "{count, plural, one{{count} nieuw of bijgewerkt topic weergeven} other{{count} nieuwe of bijgewerkte topics weergeven}}",
-  "chatPlaceholderGroup": "Chatten in groep"
+  "chatPlaceholderGroup": "Chatten in groep",
+  "notificationAccountMismatch": "Deze melding kan niet worden geopend met het huidige account. Open Meldingen om updates voor dit account te bekijken."
 }

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:discourse_core/discourse_core.dart' show DiscourseUserApiKey;
+import 'package:discourse_core/discourse_core.dart' show DiscourseUserApiKey, DiscourseSiteContextExtension;
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -8,6 +8,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import '../core/logging/app_logger.dart';
 import '../services/discourse_login_service.dart';
 import '../services/notification_installation.dart';
+import '../services/notification_grant_cleanup.dart';
 import '../services/notification_key_service.dart';
 import '../services/notification_permission.dart';
 import '../theme/design_tokens.dart';
@@ -84,6 +85,7 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
   Future<void> _grantNotificationsAccess() async {
     setState(() => _granting = true);
     final loginService = DiscourseLoginService(widget.siteContext);
+    final session = widget.siteContext.configurationSession;
 
     try {
       // Ask the OS now, not at launch: the user has just read what the alerts
@@ -134,14 +136,32 @@ class _EnableNotificationsPageState extends State<EnableNotificationsPage>
 
       // The key is deliberately not persisted on the device — it is not this
       // session's credential, and its whole purpose is to live on the server.
+      if (!identical(session, widget.siteContext.configurationSession) ||
+          await loginService.notificationsClientId() != key.clientId) {
+        return;
+      }
       final registration = await _uploadKey(key);
+      if (!identical(session, widget.siteContext.configurationSession) ||
+          await loginService.notificationsClientId() != key.clientId) {
+        // Logout can race the upload. Retire this exact grant, never the new
+        // session's grant, even if the upload timed out after reaching relay.
+        await NotificationGrantCleanup.enqueue(widget.siteContext.site.url, key.clientId);
+        unawaited(NotificationGrantCleanup.instance.retryPending());
+        return;
+      }
       final uploaded = registration.ok;
 
       if (uploaded) {
         // Remembered per forum, so the next sign-in does not ask again and the
         // settings row and the token sync know there is a grant to serve.
         await NotificationInstallation.markRegistered();
-        await loginService.markNotificationsGranted(installBound: true);
+        final remembered = await loginService.markNotificationsGranted(
+          installBound: true, expectedSession: session, expectedClientId: key.clientId);
+        if (!remembered) {
+          await NotificationGrantCleanup.enqueue(widget.siteContext.site.url, key.clientId);
+          unawaited(NotificationGrantCleanup.instance.retryPending());
+          return;
+        }
 
         // On a first sign-in, FCM is often still initializing at this point,
         // so the upload above carried no device token and nothing could be

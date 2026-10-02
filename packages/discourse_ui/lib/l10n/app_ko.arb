@@ -1562,5 +1562,6 @@
   "messageListNewCount": "{count, plural, other{새글 ({count})}}",
   "messagePersonal": "개인",
   "messageListIncoming": "{count, plural, other{{count}개의 새글 또는 업데이트 된 글 보기}}",
-  "chatPlaceholderGroup": "그룹에서 채팅"
+  "chatPlaceholderGroup": "그룹에서 채팅",
+  "notificationAccountMismatch": "현재 계정으로는 이 알림을 열 수 없습니다. 알림을 열어 이 계정의 업데이트를 확인하세요."
 }
