@@ -680,7 +680,17 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       }
       // Open/closed toggle
       if (conversationOpen != null) {
-        await _setConversationClosed(conversationId, closed: !conversationOpen);
+        final statusResult = await _setConversationClosed(conversationId,
+            closed: !conversationOpen);
+        // The helper returns failures rather than throwing. The title may
+        // already be saved, but the editor must not report the whole save
+        // as successful when the requested status change failed.
+        if (!statusResult.result) {
+          return FCSaveRawConversationResult(
+            result: false,
+            resultText: statusResult.resultText,
+          );
+        }
       }
       return FCSaveRawConversationResult(
         result: true,
