@@ -28,8 +28,10 @@ class DiscourseClient {
     String path, {
     Map<String, dynamic>? query,
     Map<String, String>? extraHeaders,
+    bool useCache = true,
   }) =>
-      _request(context, 'GET', path, query: query, extraHeaders: extraHeaders);
+      _request(context, 'GET', path,
+          query: query, extraHeaders: extraHeaders, useCache: useCache);
 
   Future<FCCallResult> post(
     SiteContext context,
@@ -68,6 +70,7 @@ class DiscourseClient {
     Map<String, dynamic>? query,
     Object? body,
     Map<String, String>? extraHeaders,
+    bool useCache = true,
   }) async {
     await FCDioClient.instance.initialize();
 
@@ -104,7 +107,14 @@ class DiscourseClient {
       _inFlight.clear();
     }
 
-    final cacheKey = method == 'GET' ? '$url|${_canonicalQuery(effectiveQuery)}' : null;
+    final readKey = method == 'GET' ? '$url|${_canonicalQuery(effectiveQuery)}' : null;
+    if (!useCache && readKey != null) {
+      // A refresh must also stop a later ordinary read from going back to
+      // the previous response, including an older request still in flight.
+      _readCache.remove(readKey);
+      _inFlight.remove(readKey);
+    }
+    final cacheKey = useCache ? readKey : null;
     if (cacheKey != null) {
       // Identical GET already in flight → share its result instead of
       // issuing a second one. Two widgets mounting in the same frame ask
@@ -140,12 +150,15 @@ class DiscourseClient {
         final result = await future;
         // Only successful reads are worth repeating; an error must not be
         // pinned for the next few seconds.
-        if (result.statusCode >= 200 && result.statusCode < 300) {
+        if (identical(_inFlight[cacheKey], future) &&
+            result.statusCode >= 200 && result.statusCode < 300) {
           _readCache[cacheKey] = _CachedResponse(result, _ttlForPath(url.path));
         }
         return result;
       } finally {
-        _inFlight.remove(cacheKey);
+        if (identical(_inFlight[cacheKey], future)) {
+          _inFlight.remove(cacheKey);
+        }
       }
     }
 

@@ -58,10 +58,17 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
     // waits for the slowest of them, not for their sum. Future.wait rather
     // than a record's `.wait`, which would wrap the one error that can
     // escape (from _readAbout) in a ParallelWaitError.
-    final about = _readAbout();
-    final settings = _readClientSettings();
-    await Future.wait<void>(
-        [about, _probeChat(), _readSiteCapabilities(), settings]);
+    final snapshot = DiscourseSiteCapabilities.beginSession(
+        siteContext.site.pluginUrl, siteContext.configurationSession,
+        forceRefresh: forceRefresh);
+    final about = _readAbout(forceRefresh: forceRefresh);
+    final settings = _readClientSettings(snapshot, forceRefresh: forceRefresh);
+    await Future.wait<void>([
+      about,
+      _probeChat(snapshot, forceRefresh: forceRefresh),
+      _readSiteCapabilities(snapshot),
+      settings,
+    ]);
     final aboutRead = await about;
     final settingsRead = await settings;
     // No word from /about.json in time, so it cannot say whether the forum
@@ -82,7 +89,8 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
 
   /// The forum's version, and whether it is in read-only mode; null when
   /// `/about.json` did not answer within [_aboutTimeout].
-  Future<({String version, bool readOnly})?> _readAbout() async {
+  Future<({String version, bool readOnly})?> _readAbout(
+      {required bool forceRefresh}) async {
     final forum = siteContext.site.pluginUrl;
     if (_aboutStillPending.contains(forum)) {
       // ignore: avoid_print
@@ -92,7 +100,9 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
     }
     String version = 'discourse';
     bool readOnly = false;
-    final request = apiGetWithHeaders('/about.json');
+    final request = forceRefresh
+        ? apiGetWithHeadersFresh('/about.json')
+        : apiGetWithHeaders('/about.json');
     try {
       final (about, headers) = await request.timeout(_aboutTimeout);
       final aboutInner = (about['about'] as Map<String, dynamic>?) ?? const {};
@@ -134,7 +144,11 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
           h.key.toLowerCase() == 'discourse-readonly' &&
           h.value.toLowerCase() == 'true');
 
-  Future<void> _probeChat() async {
+  bool _isCurrent(DiscourseSiteCapabilities snapshot) => identical(
+      DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl), snapshot);
+
+  Future<void> _probeChat(DiscourseSiteCapabilities snapshot,
+      {required bool forceRefresh}) async {
     // Phase 5.18a — probe the chat plugin via its `/chat/api/me/channels`
     // route. Discourse's `/site.json` doesn't expose `enabled_plugins`
     // for anonymous viewers, so a route-probe is the most portable
@@ -142,23 +156,17 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
     // unauth'd requests against installed plugins) as "chat installed";
     // 404 means the chat plugin's routes aren't registered.
     //
-    // Asked once per forum, not once per getConfig. A cold launch calls
-    // getConfig three times in ~600ms (SiteInitializationService,
-    // SiteController._performSiteInitialization, and SiteHomePage's
-    // post-frame "is the site still up?" check). The other two reads here
-    // answer 2xx and so collapse into DiscourseClient's read cache, but a
-    // signed-out visitor gets 403 from this route, and that cache
-    // deliberately stores only 2xx — pinning an error would outlive
-    // whatever caused it. That left the probe as the one request in the
-    // launch sequence that repeated per caller: three 403s spent against
-    // the per-IP rate limit on a question whose answer cannot change.
-    // Skipping the call is better than caching its failure, and the
-    // answer is not session-dependent — 403 and 200 both mean "installed".
-    if (!siteContext.chatProbeResolved) {
+    // Normally remembered per forum: 403 and 200 both mean "installed",
+    // independent of the user. Explicit refreshes re-probe so a plugin
+    // installed or removed during this process can change the navigation.
+    if (forceRefresh || !siteContext.chatProbeResolved) {
       try {
-        await apiGet('/chat/api/me/channels');
-        siteContext.setChatEnabled(true);
+        await (forceRefresh
+            ? apiGetFresh('/chat/api/me/channels')
+            : apiGet('/chat/api/me/channels'));
+        if (_isCurrent(snapshot)) siteContext.setChatEnabled(true);
       } on DiscourseApiException catch (e) {
+        if (!_isCurrent(snapshot)) return;
         if (e.statusCode == 404) {
           // Route not registered → chat plugin absent.
           siteContext.setChatEnabled(false);
@@ -182,17 +190,27 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
     }
   }
 
-  Future<void> _readSiteCapabilities() async {
-    // Site capabilities (`/site.json`). Resolved once per forum for the
-    // same reason as the chat probe above: these describe the forum, not
-    // the session, so re-asking on every getConfig would spend rate-limit
-    // budget on a settled question. Fail soft — an unresolved capability
-    // reads as "not offered", which hides optional UI rather than
-    // showing something that 404s.
-    if (!DiscourseSiteCapabilities.isResolved(siteContext.site.pluginUrl)) {
+  static final Expando<Future<void>> _siteReads = Expando('siteCapabilityReads');
+
+  Future<void> _readSiteCapabilities(DiscourseSiteCapabilities snapshot) {
+    if (snapshot.resolved) return Future.value();
+    final pending = _siteReads[snapshot];
+    if (pending != null) return pending;
+    final request = _loadSiteCapabilities(snapshot);
+    _siteReads[snapshot] = request;
+    return request.whenComplete(() => _siteReads[snapshot] = null);
+  }
+
+  Future<void> _loadSiteCapabilities(DiscourseSiteCapabilities snapshot) async {
+    // /site.json includes current-user permissions and visible categories.
+    // Reuse it only within this credential session; unresolved reads bypass
+    // the URL-only HTTP cache, including anonymous requests still in flight.
+    if (!snapshot.resolved) {
       try {
-        final site = await apiGet('/site.json');
-        DiscourseSiteCapabilities.store(siteContext.site.pluginUrl, site);
+        final site = await apiGetFresh('/site.json');
+        if (_isCurrent(snapshot)) {
+          DiscourseSiteCapabilities.store(siteContext.site.pluginUrl, site);
+        }
       } catch (e) {
         // ignore: avoid_print
         print('⚠️ [DISCOURSE_CONFIG] /site.json failed '
@@ -210,7 +228,8 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
         int? minSearchLength,
         bool readOnly,
         DiscourseApiException? noResponse,
-      })> _readClientSettings() async {
+      })> _readClientSettings(DiscourseSiteCapabilities snapshot,
+          {required bool forceRefresh}) async {
     // Upload limits — Discourse publishes every `client: true` site setting
     // at `/site/settings.json` (SiteController#settings →
     // SiteSetting.client_settings_json). That's where the upload caps live:
@@ -225,8 +244,12 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
     bool readOnly = false;
     DiscourseApiException? noResponse;
     try {
-      final (settings, headers) =
-          await apiGetWithHeaders('/site/settings.json');
+      final (settings, headers) = await (forceRefresh
+          ? apiGetWithHeadersFresh('/site/settings.json')
+          : apiGetWithHeaders('/site/settings.json'));
+      if (!_isCurrent(snapshot)) {
+        return (minSearchLength: null, readOnly: false, noResponse: null);
+      }
       readOnly = _isReadOnly(headers);
       siteContext
           .setUploadLimits(DiscourseUploadLimits.fromClientSettings(settings));

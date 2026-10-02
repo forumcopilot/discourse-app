@@ -7,6 +7,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../storage/discourse_secure_storage.dart';
+import '../data/site/discourse_site_capabilities.dart';
 
 /// Discourse-specific authentication state attached to a [SiteContext].
 ///
@@ -48,6 +49,15 @@ extension DiscourseSiteContextExtension on SiteContext {
 
   Map<String, dynamic> _data() => _store[this] ??= <String, dynamic>{};
 
+  /// Opaque identity for user-dependent configuration; contains no key data.
+  Object get configurationSession =>
+      _data()['configurationSession'] ??= Object();
+
+  void _invalidateCapabilities() {
+    _data()['configurationSession'] = Object();
+    DiscourseSiteCapabilities.invalidate(site.pluginUrl);
+  }
+
   /// The User API Key returned by Discourse after a successful handshake.
   String? get userApiKey => _data()['userApiKey'] as String?;
 
@@ -84,6 +94,10 @@ extension DiscourseSiteContextExtension on SiteContext {
     bool pushEnabled = false,
   }) async {
     final data = _data();
+    if (data['userApiKey'] != userApiKey ||
+        data['userApiClientId'] != userApiClientId) {
+      _invalidateCapabilities();
+    }
     data['userApiKey'] = userApiKey;
     data['userApiClientId'] = userApiClientId;
     data['userApiPushEnabled'] = pushEnabled;
@@ -105,6 +119,7 @@ extension DiscourseSiteContextExtension on SiteContext {
   /// key must never leave a stale "logged in" identity behind.
   Future<void> clearUserApiCredentials() async {
     final data = _data();
+    _invalidateCapabilities();
     data.remove('userApiKey');
     data.remove('userApiClientId');
     data.remove('userApiPushEnabled');
@@ -214,8 +229,12 @@ extension DiscourseSiteContextExtension on SiteContext {
         await prefs.remove('${prefix}_user_api_key');
       }
     }
+    final clientId = prefs.getString('${prefix}_user_api_client_id');
+    if (data['userApiKey'] != key || data['userApiClientId'] != clientId) {
+      _invalidateCapabilities();
+    }
     data['userApiKey'] = key;
-    data['userApiClientId'] = prefs.getString('${prefix}_user_api_client_id');
+    data['userApiClientId'] = clientId;
     if (key == null && readError == null && data['userApiClientId'] != null) {
       // The signature of a lost key: the non-secret half of the credential
       // survived and the secret half did not. Sign-out and never-signed-in

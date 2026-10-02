@@ -11,10 +11,8 @@ import '../user/discourse_profile.dart';
 /// slice the UI can currently act on; the rest is catalogued in
 /// `docs/sdk-gap-audit-discourse.md`.
 ///
-/// Keyed by `site.pluginUrl` and resolved once per forum per process, for
-/// the same reason as the chat probe: these are properties of the forum,
-/// not of a session or a context object, and re-fetching them on every
-/// `getConfig` would spend rate-limit budget re-asking a settled question.
+/// Keyed by `site.pluginUrl` for UI lookup, but resolved per credential
+/// session: permissions and visible categories depend on the current user.
 class DiscourseSiteCapabilities {
   DiscourseSiteCapabilities._([this._siteKey = '']);
 
@@ -23,6 +21,25 @@ class DiscourseSiteCapabilities {
   final String _siteKey;
 
   static final Map<String, DiscourseSiteCapabilities> _bySite = {};
+
+  static final Map<String, Object> _sessions = {};
+
+  /// Start a configuration read. The returned snapshot also identifies this
+  /// generation, so late replies from a previous session/refresh are ignored.
+  static DiscourseSiteCapabilities beginSession(String pluginUrl, Object session,
+      {bool forceRefresh = false}) {
+    if (forceRefresh || !identical(_sessions[pluginUrl], session)) {
+      invalidate(pluginUrl);
+      _sessions[pluginUrl] = session;
+    }
+    return _bySite.putIfAbsent(
+        pluginUrl, () => DiscourseSiteCapabilities._(pluginUrl));
+  }
+
+  static void invalidate(String pluginUrl) {
+    _bySite.remove(pluginUrl);
+    _sessions.remove(pluginUrl);
+  }
 
   /// `top_menu_items` — the list routes this forum offers ("latest",
   /// "hot", "unread", …). Empty when unknown, which callers must treat as
@@ -439,7 +456,10 @@ class DiscourseSiteCapabilities {
       _bySite[pluginUrl]?.resolved ?? false;
 
   @visibleForTesting
-  static void reset() => _bySite.clear();
+  static void reset() {
+    _bySite.clear();
+    _sessions.clear();
+  }
 }
 
 /// `{colors: [{name, hex}, …]}` → `{name: hex}`, keeping only well-formed
