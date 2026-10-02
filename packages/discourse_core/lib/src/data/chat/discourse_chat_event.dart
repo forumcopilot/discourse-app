@@ -44,6 +44,14 @@ class DiscourseChatReaction extends DiscourseChatEvent {
   final bool added;
 }
 
+/// A thread's summary under its original message changed (a reply was
+/// posted in it); the new summary is in `DiscourseChatMessageExtras`.
+class DiscourseChatThreadUpdated extends DiscourseChatEvent {
+  const DiscourseChatThreadUpdated(this.originalMessageId);
+
+  final int originalMessageId;
+}
+
 /// A change to the reader's channel list (see
 /// `DiscourseChatProxy.watchChannelList`).
 sealed class DiscourseChatListEvent {

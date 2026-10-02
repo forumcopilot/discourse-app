@@ -6362,5 +6362,122 @@
   "chatOpenThread": "Open Thread",
   "@chatOpenThread": {
     "description": "Action on a chat message in a channel with threads: open (or start) its thread"
+  },
+  "chatMembers": "Members",
+  "@chatMembers": {
+    "description": "Heading of a chat channel's member list"
+  },
+  "chatAddMember": "Add Member",
+  "@chatAddMember": {
+    "description": "Button that adds people to a group chat"
+  },
+  "chatFindMembers": "Find members",
+  "@chatFindMembers": {
+    "description": "Hint in the search field over a chat channel's members"
+  },
+  "chatRemoveMember": "Remove",
+  "@chatRemoveMember": {
+    "description": "Action that removes someone from a chat channel"
+  },
+  "chatNotifyNever": "Never",
+  "@chatNotifyNever": {
+    "description": "Chat notification level: never"
+  },
+  "chatNotifyMention": "Only for mentions",
+  "@chatNotifyMention": {
+    "description": "Chat notification level: only for mentions"
+  },
+  "chatNotifyAlways": "For all activity",
+  "@chatNotifyAlways": {
+    "description": "Chat notification level: for all activity"
+  },
+  "chatNotificationLevel": "Send push notifications",
+  "@chatNotificationLevel": {
+    "description": "Label of a chat channel's notification level setting"
+  },
+  "chatMuteChannel": "Mute channel",
+  "@chatMuteChannel": {
+    "description": "Switch that mutes a chat channel"
+  },
+  "chatStarChannel": "Star channel",
+  "@chatStarChannel": {
+    "description": "Switch that stars a chat channel, listing it first"
+  },
+  "chatLeaveChannel": "Leave channel",
+  "@chatLeaveChannel": {
+    "description": "Button that leaves a chat channel or group chat"
+  },
+  "chatSearchTitle": "Search chat",
+  "@chatSearchTitle": {
+    "description": "Title of chat search"
+  },
+  "chatSearchNoResults": "No results found",
+  "@chatSearchNoResults": {
+    "description": "Chat search found nothing"
+  },
+  "chatMyThreads": "My Threads",
+  "@chatMyThreads": {
+    "description": "The reader's chat threads, as a switch beside Channels and DMs"
+  },
+  "chatThreadReplies": "{count, plural, one{{count} reply} other{{count} replies}}",
+  "@chatThreadReplies": {
+    "description": "How many replies a chat thread has",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatNoThreads": "You are not participating in any threads in this channel.",
+  "@chatNoThreads": {
+    "description": "The reader takes part in no chat threads"
+  },
+  "chatGroupName": "Group chat name (optional)",
+  "@chatGroupName": {
+    "description": "Field for an optional name when starting a group chat"
+  },
+  "chatMembersCounter": "{count, plural, one{{count}/{max} member} other{{count}/{max} members}}",
+  "@chatMembersCounter": {
+    "description": "How many people are picked for a new group chat, out of the forum's limit",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "chatTooManyMembers": "Maximum number of members reached",
+  "@chatTooManyMembers": {
+    "description": "A new group chat has as many people as the forum allows"
+  },
+  "chatThread": "Thread",
+  "@chatThread": {
+    "description": "Title of a chat thread's screen"
+  },
+  "chatChannelSettings": "Channel settings",
+  "@chatChannelSettings": {
+    "description": "Title of a chat channel's info and settings screen"
+  },
+  "chatSearchMessagesHint": "Search messages",
+  "@chatSearchMessagesHint": {
+    "description": "Hint in the chat search field"
+  },
+  "chatMyThreadsEmpty": "You don't have any threads yet. Threads you participate in will be displayed here.",
+  "@chatMyThreadsEmpty": {
+    "description": "Empty My Threads list (Discourse chat.empty_state.my_threads)"
+  },
+  "chatLeaveGroupInfo": "By leaving this group chat, you will no longer have access to it and won’t receive notifications related to it. To rejoin, you will need to be re-invited by a member of the group chat.",
+  "@chatLeaveGroupInfo": {
+    "description": "Confirmation before leaving a group chat (Discourse chat.channel_settings.leave_groupchat_info)"
+  },
+  "chatPlaceholderThread": "Chat in thread",
+  "@chatPlaceholderThread": {
+    "description": "Composer hint inside a chat thread (Discourse chat.placeholder_thread)"
+  },
+  "chatLastReply": "last reply",
+  "@chatLastReply": {
+    "description": "Before the time of a thread's latest reply, under its original message (Discourse chat.thread.last_reply)"
   }
 }

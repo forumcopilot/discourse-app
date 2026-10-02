@@ -5039,4 +5039,101 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatOpenThread => 'Open Thread';
+
+  @override
+  String get chatMembers => 'Members';
+
+  @override
+  String get chatAddMember => 'Add Member';
+
+  @override
+  String get chatFindMembers => 'Find members';
+
+  @override
+  String get chatRemoveMember => 'Remove';
+
+  @override
+  String get chatNotifyNever => 'Never';
+
+  @override
+  String get chatNotifyMention => 'Only for mentions';
+
+  @override
+  String get chatNotifyAlways => 'For all activity';
+
+  @override
+  String get chatNotificationLevel => 'Send push notifications';
+
+  @override
+  String get chatMuteChannel => 'Mute channel';
+
+  @override
+  String get chatStarChannel => 'Star channel';
+
+  @override
+  String get chatLeaveChannel => 'Leave channel';
+
+  @override
+  String get chatSearchTitle => 'Search chat';
+
+  @override
+  String get chatSearchNoResults => 'No results found';
+
+  @override
+  String get chatMyThreads => 'My Threads';
+
+  @override
+  String chatThreadReplies(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count replies',
+      one: '$count reply',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatNoThreads =>
+      'You are not participating in any threads in this channel.';
+
+  @override
+  String get chatGroupName => 'Group chat name (optional)';
+
+  @override
+  String chatMembersCounter(int count, int max) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count/$max members',
+      one: '$count/$max member',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatTooManyMembers => 'Maximum number of members reached';
+
+  @override
+  String get chatThread => 'Thread';
+
+  @override
+  String get chatChannelSettings => 'Channel settings';
+
+  @override
+  String get chatSearchMessagesHint => 'Search messages';
+
+  @override
+  String get chatMyThreadsEmpty =>
+      'You don\'t have any threads yet. Threads you participate in will be displayed here.';
+
+  @override
+  String get chatLeaveGroupInfo =>
+      'By leaving this group chat, you will no longer have access to it and won’t receive notifications related to it. To rejoin, you will need to be re-invited by a member of the group chat.';
+
+  @override
+  String get chatPlaceholderThread => 'Chat in thread';
+
+  @override
+  String get chatLastReply => 'last reply';
 }

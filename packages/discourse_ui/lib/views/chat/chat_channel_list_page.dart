@@ -8,7 +8,8 @@ import 'package:discourse_core/discourse_core.dart'
         DiscourseChatListNewMessage,
         DiscourseChatListTracking,
         DiscourseChatProxy,
-        DiscourseChatable,
+        DiscourseChatSettings,
+        DiscourseChatThread,
         DiscourseSiteContextExtension,
         stripHtmlToText;
 import 'package:flutter/material.dart';
@@ -22,10 +23,11 @@ import '../../utils/chat_time.dart';
 import '../../utils/emoji_shortcodes.dart';
 import '../../utils/snackbar_helper.dart';
 import 'chat_browse_channels_page.dart';
+import 'chat_people_sheet.dart';
+import 'chat_search_page.dart';
 import 'widgets/chat_channel_avatar.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/not_signed_in_view.dart';
-import '../widgets/user_list_row.dart';
 import '../widgets/resettable_widget.dart';
 import '../widgets/user_avatar.dart';
 import 'chat_channel_view.dart';
@@ -42,6 +44,9 @@ String _channelDisplayTitle(BuildContext context, FCChatChannel ch) {
       ? AppLocalizations.of(context)!.chatDirectMessage
       : '#${ch.id}';
 }
+
+/// The halves of the chat list, as Discourse's chat footer on a phone.
+enum _ChatHalf { channels, dms, threads }
 
 /// Top-level Chat surface: lists the user's joined channels and opens
 /// the selected one in a full-page route.
@@ -77,11 +82,17 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
   bool _loading = false;
   String? _error;
 
-  /// Discourse keeps channels and direct messages apart (Channels / DMs);
-  /// this list mixed them, sorted unread-first.
+  /// Discourse keeps channels and direct messages apart (Channels / DMs),
+  /// with the reader's threads beside them where threads are on; this list
+  /// mixed them, sorted unread-first.
   /// Null until the reader picks: then the list opens on DMs when they
   /// have direct messages but have joined no channel.
-  bool? _showDms;
+  _ChatHalf? _half;
+
+  /// The reader's threads (My Threads), loaded when that half is picked.
+  List<DiscourseChatThread>? _threads;
+  bool _threadsLoading = false;
+  String? _threadsError;
 
   // Track login state so the channel list reloads after an in-session
   // login/logout (same pattern as NotificationListTab). Without this
@@ -143,8 +154,9 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     _stopWatching = null;
     final proxy = SiteProxyService.getChatProxy();
     final channels = _channels;
-    if (proxy is! DiscourseChatProxy || channels == null || channels.isEmpty)
+    if (proxy is! DiscourseChatProxy || channels == null || channels.isEmpty) {
       return;
+    }
     _stopWatching =
         proxy.watchChannelList([for (final c in channels) c.id], _onListEvent);
   }
@@ -251,6 +263,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
       });
       _publishUnread();
       _watch();
+      if (_half == _ChatHalf.threads) unawaited(_loadThreads());
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -259,6 +272,43 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
         _error = '$e';
       });
     }
+  }
+
+  Future<void> _loadThreads() async {
+    final proxy = SiteProxyService.getChatProxy();
+    if (proxy is! DiscourseChatProxy) return;
+    setState(() {
+      _threadsLoading = true;
+      _threadsError = null;
+    });
+    final r = await proxy.getMyThreadsAsync();
+    if (!mounted) return;
+    setState(() {
+      _threadsLoading = false;
+      if (r.result) {
+        _threads = r.threads;
+      } else {
+        _threadsError = r.resultText.isNotEmpty ? r.resultText : AppLocalizations.of(context)!.chatNotAvailable;
+      }
+    });
+  }
+
+  Future<void> _openThread(DiscourseChatThread t) async {
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => ChatChannelScreen(
+        siteContext: widget.siteContext,
+        channelId: t.channelId,
+        threadId: t.threadId,
+        initialTitle: t.channelTitle == null ? '' : '#${t.channelTitle}',
+      ),
+    ));
+    if (mounted) unawaited(_loadThreads());
+  }
+
+  void _search() {
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => ChatSearchPage(siteContext: widget.siteContext),
+    ));
   }
 
   Future<void> _open(FCChatChannel ch) async {
@@ -283,7 +333,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     final channel = await showModalBottomSheet<FCChatChannel>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => const _NewDmSheet(),
+      builder: (_) => ChatPeopleSheet(siteContext: widget.siteContext),
     );
     if (channel == null || !mounted) return;
     // Refresh so the (possibly brand-new) channel shows up in the
@@ -450,7 +500,13 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     final hasDms = canDm || all.any((c) => c.chatableType == 'DirectMessage');
     final autoDms = !all.any((c) => c.chatableType != 'DirectMessage') &&
         all.any((c) => c.chatableType == 'DirectMessage');
-    final showDms = hasChannels && hasDms ? (_showDms ?? autoDms) : !hasChannels;
+    final site = widget.siteContext.site.url;
+    final discourse = SiteProxyService.getChatProxy() is DiscourseChatProxy;
+    final threadsOn = discourse && DiscourseChatSettings.forSite(site).threadsEnabled;
+    final searchOn = discourse && DiscourseChatSettings.forSite(site).searchEnabled;
+    final showThreads = threadsOn && _half == _ChatHalf.threads;
+    final picked = _half == null || _half == _ChatHalf.threads ? null : _half == _ChatHalf.dms;
+    final showDms = hasChannels && hasDms ? (picked ?? autoDms) : !hasChannels;
     final half = all
         .where((c) => (c.chatableType == 'DirectMessage') == showDms)
         .toList();
@@ -465,46 +521,68 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
             (c) => (c.chatableType == 'DirectMessage') == dms && !_isMuted(c))
         .any((c) => c.unreadCount > 0 || c.mentionCount > 0);
 
-    final switcher = Padding(
+    // With three halves the icons go, so the names fit a phone.
+    final three = hasChannels && hasDms && threadsOn;
+    Widget segmentLabel(String text, bool dot) => Badge(
+          isLabelVisible: dot,
+          smallSize: 8,
+          child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis),
+        );
+    final segments = <ButtonSegment<_ChatHalf>>[
+      if (hasChannels)
+        ButtonSegment(
+          value: _ChatHalf.channels,
+          icon: three ? null : const Icon(Icons.tag),
+          label: segmentLabel(l10n.chatChannels, unreadIn(false)),
+        ),
+      if (hasDms)
+        ButtonSegment(
+          value: _ChatHalf.dms,
+          icon: three ? null : const Icon(Icons.person_outline),
+          label: segmentLabel(l10n.chatDms, unreadIn(true)),
+        ),
+      if (threadsOn)
+        ButtonSegment(
+          value: _ChatHalf.threads,
+          icon: three ? null : const Icon(Icons.forum_outlined),
+          label: segmentLabel(l10n.chatMyThreads, (_threads ?? const []).any((t) => t.unreadCount > 0)),
+        ),
+    ];
+    final selected = showThreads ? _ChatHalf.threads : (showDms ? _ChatHalf.dms : _ChatHalf.channels);
+
+    final header = Padding(
       padding: const EdgeInsets.fromLTRB(
         DesignTokens.spacingL,
         DesignTokens.spacingS,
-        DesignTokens.spacingL,
+        DesignTokens.spacingS,
         DesignTokens.spacingXS,
       ),
-      child: SizedBox(
-        width: double.infinity,
-        child: SegmentedButton<bool>(
-          segments: [
-            ButtonSegment(
-              value: false,
-              icon: const Icon(Icons.tag),
-              label: Badge(
-                isLabelVisible: unreadIn(false),
-                smallSize: 8,
-                child: Text(l10n.chatChannels),
-              ),
+      child: Row(
+        children: [
+          Expanded(
+            child: segments.length > 1
+                ? SegmentedButton<_ChatHalf>(
+                    segments: segments,
+                    selected: {selected},
+                    showSelectedIcon: false,
+                    onSelectionChanged: (sel) {
+                      setState(() => _half = sel.first);
+                      if (sel.first == _ChatHalf.threads && _threads == null) unawaited(_loadThreads());
+                    },
+                  )
+                : const SizedBox.shrink(),
+          ),
+          if (searchOn)
+            IconButton(
+              icon: const Icon(Icons.search),
+              tooltip: l10n.chatSearchTitle,
+              onPressed: _search,
             ),
-            ButtonSegment(
-              value: true,
-              icon: const Icon(Icons.person_outline),
-              label: Badge(
-                isLabelVisible: unreadIn(true),
-                smallSize: 8,
-                child: Text(l10n.chatDms),
-              ),
-            ),
-          ],
-          selected: {showDms},
-          showSelectedIcon: false,
-          onSelectionChanged: (sel) => setState(() => _showDms = sel.first),
-        ),
+        ],
       ),
     );
 
-    final header = hasChannels && hasDms
-        ? switcher
-        : const SizedBox(height: DesignTokens.spacingS);
+    if (showThreads) return _buildThreads(header);
 
     if (half.isEmpty) {
       return ListView(
@@ -598,6 +676,141 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: rows,
+    );
+  }
+
+  /// My Threads: the threads the reader takes part in, newest activity
+  /// first, each with its channel, replies and unread count.
+  Widget _buildThreads(Widget header) {
+    final l10n = AppLocalizations.of(context)!;
+    final threads = _threads;
+    final Widget content;
+    if (threads == null && _threadsError == null) {
+      content = const Padding(
+        padding: EdgeInsets.all(DesignTokens.spacingXL),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    } else if (threads == null || threads.isEmpty) {
+      content = Padding(
+        padding: const EdgeInsets.only(top: DesignTokens.spacingXL),
+        child: EmptyStateView(icon: Icons.forum_outlined, message: _threadsError ?? l10n.chatMyThreadsEmpty),
+      );
+    } else {
+      content = Column(
+        children: [for (final t in threads) _ThreadTile(thread: t, onTap: () => _openThread(t))],
+      );
+    }
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        header,
+        if (_threadsLoading && threads != null) const LinearProgressIndicator(minHeight: 2),
+        content,
+        const SizedBox(height: 88),
+      ],
+    );
+  }
+}
+
+/// One of the reader's threads, as Discourse's My Threads list: who started
+/// it, its title (or its first words), its channel and replies, and when
+/// the last reply came, with a badge while unread.
+class _ThreadTile extends StatelessWidget {
+  const _ThreadTile({required this.thread, required this.onTap});
+
+  final DiscourseChatThread thread;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final om = thread.originalMessage;
+    final first = om == null
+        ? ''
+        : withEmojiShortcodes(stripHtmlToText(om.cooked.isNotEmpty ? om.cooked : om.message)).trim();
+    final title = thread.title ?? (first.isNotEmpty ? first : l10n.chatThread);
+    final unread = thread.unreadCount > 0;
+    final when = thread.lastReplyAt ?? om?.createdAt;
+    final last = thread.lastReplyExcerpt == null
+        ? null
+        : withEmojiShortcodes(stripHtmlToText(thread.lastReplyExcerpt!)).trim();
+    final channel = thread.channelTitle;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingM),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            UserAvatar(
+              username: om?.authorUsername ?? '',
+              iconUrl: om?.authorAvatarUrl?.isEmpty ?? true ? null : om?.authorAvatarUrl,
+              radius: 22,
+            ),
+            const SizedBox(width: DesignTokens.spacingM),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.titleSmall?.copyWith(fontWeight: unread ? FontWeight.w700 : FontWeight.w500),
+                        ),
+                      ),
+                      if (when != null) ...[
+                        const SizedBox(width: DesignTokens.spacingS),
+                        Text(formatChatListTime(context, when),
+                            style: textTheme.bodySmall?.copyWith(
+                                color: unread ? colorScheme.primary : colorScheme.onSurfaceVariant)),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    [if (channel != null && channel.isNotEmpty) '#$channel', l10n.chatThreadReplies(thread.replyCount)]
+                        .join(' · '),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                  ),
+                  if (last != null && last.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text.rich(
+                            TextSpan(children: [
+                              if (thread.lastReplyUser != null)
+                                TextSpan(
+                                    text: '${thread.lastReplyUser!.username}: ',
+                                    style: const TextStyle(fontWeight: FontWeight.w600)),
+                              TextSpan(text: last),
+                            ]),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                          ),
+                        ),
+                        if (unread) ...[
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Badge(label: Text('${thread.unreadCount}')),
+                        ],
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -744,313 +957,5 @@ class _ChannelTile extends StatelessWidget {
       ),
     );
     return muted ? Opacity(opacity: 0.6, child: tile) : tile;
-  }
-}
-
-/// "New direct message" bottom sheet: a username input with type-ahead
-/// suggestions from the same `/u/search/users` typeahead the mention /
-/// PM pickers use, plus plain comma-separated entry as a fallback.
-/// Pops with the created (or reused — 1:1 DMs are deduped server-side)
-/// [FCChatChannel]; policy failures (DMs disabled, target doesn't
-/// accept DMs, …) surface inline via the result's `resultText`.
-class _NewDmSheet extends StatefulWidget {
-  const _NewDmSheet();
-
-  @override
-  State<_NewDmSheet> createState() => _NewDmSheetState();
-}
-
-class _NewDmSheetState extends State<_NewDmSheet> {
-  final _input = TextEditingController();
-  final _selected = <DiscourseChatable>[];
-  List<DiscourseChatable> _suggestions = const [];
-  Timer? _debounce;
-  bool _searching = false;
-  bool _creating = false;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _input.addListener(_onQueryChanged);
-  }
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    _input.dispose();
-    super.dispose();
-  }
-
-  /// The fragment being typed — text after the last comma — so
-  /// comma-separated raw entry keeps working alongside the type-ahead.
-  String _currentTerm() {
-    final raw = _input.text;
-    final tail =
-        raw.contains(',') ? raw.substring(raw.lastIndexOf(',') + 1) : raw;
-    return tail.trim().replaceFirst(RegExp(r'^@'), '');
-  }
-
-  void _onQueryChanged() {
-    // Rebuild for the create-button enablement either way.
-    setState(() {});
-    _debounce?.cancel();
-    final term = _currentTerm();
-    if (term.isEmpty) {
-      setState(() => _suggestions = const []);
-      return;
-    }
-    _debounce = Timer(const Duration(milliseconds: 300), () => _search(term));
-  }
-
-  Future<void> _search(String term) async {
-    setState(() => _searching = true);
-    try {
-      // The chat plugin's own search: it says who can actually chat, which
-      // the general user search (used here before) does not.
-      final proxy = SiteProxyService.getChatProxy();
-      if (proxy is! DiscourseChatProxy) return;
-      final found = await proxy.searchChatablesAsync(term);
-      if (!mounted || term != _currentTerm()) return;
-      final picked = {for (final c in _selected) _key(c)};
-      setState(() {
-        _suggestions = found.where((c) => !picked.contains(_key(c))).toList();
-      });
-    } catch (_) {
-      // Suggestions are best-effort — typing a raw username still works.
-    } finally {
-      if (mounted) setState(() => _searching = false);
-    }
-  }
-
-  static String _key(DiscourseChatable c) =>
-      '${c.isGroup ? 'g' : 'u'}:${c.name.toLowerCase()}';
-
-  void _pick(DiscourseChatable chatable) {
-    if (!chatable.canChat) return;
-    setState(() {
-      _selected.add(chatable);
-      // Keep any comma-separated names typed before the current
-      // fragment; only the fragment was consumed by the pick.
-      final raw = _input.text;
-      _input.text =
-          raw.contains(',') ? raw.substring(0, raw.lastIndexOf(',') + 1) : '';
-      _suggestions = const [];
-    });
-  }
-
-  Future<void> _create() async {
-    final proxy = SiteProxyService.getChatProxy();
-    if (proxy is! DiscourseChatProxy) {
-      setState(() => _error = AppLocalizations.of(context)!.chatCannotCreate);
-      return;
-    }
-    setState(() {
-      _creating = true;
-      _error = null;
-    });
-
-    // Names typed without picking a suggestion are resolved first, by exact
-    // match against the chat search. Discourse drops a name it cannot use
-    // without saying so, and a request left with nobody else in it opens a
-    // DM with yourself — so an unknown name, or someone who cannot chat,
-    // stops here and nothing is created.
-    // Looked up before the awaits below.
-    final l10n = AppLocalizations.of(context)!;
-    final chosen = [..._selected];
-    final seen = {for (final c in chosen) _key(c)};
-    final problems = <String>[];
-    for (final part in _input.text.split(RegExp(r'[,\s]+'))) {
-      final name = part.trim().replaceFirst(RegExp(r'^@'), '');
-      if (name.isEmpty) continue;
-      if (seen.contains('u:${name.toLowerCase()}') ||
-          seen.contains('g:${name.toLowerCase()}')) {
-        continue;
-      }
-      final matches = await proxy.searchChatablesAsync(name);
-      final exact = matches
-          .where((c) => c.name.toLowerCase() == name.toLowerCase())
-          .toList();
-      final usable = exact.where((c) => c.canChat).toList();
-      if (usable.isEmpty) {
-        problems.add(exact.isEmpty
-            ? l10n.chatUserNotFound(name)
-            : '@$name ${l10n.chatDisabledUser}');
-        continue;
-      }
-      chosen.add(usable.first);
-      seen.add(_key(usable.first));
-    }
-    if (!mounted) return;
-    if (problems.isNotEmpty || chosen.isEmpty) {
-      setState(() {
-        _creating = false;
-        _error = chosen.isEmpty && problems.isEmpty
-            ? AppLocalizations.of(context)!.pleaseAddARecipient
-            : problems.join(' · ');
-      });
-      return;
-    }
-
-    try {
-      final users = [
-        for (final c in chosen)
-          if (!c.isGroup) c.name
-      ];
-      final groups = [
-        for (final c in chosen)
-          if (c.isGroup) c.name
-      ];
-      final result = await proxy.createDirectMessageChannelAsync(
-        users,
-        groups: groups,
-        // Reuse an existing group DM with the same member set instead
-        // of minting a duplicate (1:1 DMs are reused automatically).
-        upsert: users.length + groups.length > 1,
-      );
-      if (!mounted) return;
-      final channel = result.channel;
-      if (!result.result || channel == null) {
-        setState(() {
-          _creating = false;
-          _error = result.resultText?.isNotEmpty == true
-              ? result.resultText
-              : AppLocalizations.of(context)!.chatCouldNotStartDm;
-        });
-        return;
-      }
-      Navigator.of(context).pop(channel);
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _creating = false;
-        _error = '$e';
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final canCreate =
-        !_creating && (_selected.isNotEmpty || _input.text.trim().isNotEmpty);
-
-    return Padding(
-      // Under the theme's drag handle, at the app's 16dp margins.
-      padding: EdgeInsets.only(
-        left: DesignTokens.spacingL,
-        right: DesignTokens.spacingL,
-        bottom:
-            MediaQuery.of(context).viewInsets.bottom + DesignTokens.spacingL,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            AppLocalizations.of(context)!.chatCreatePersonal,
-            style: textTheme.titleMedium,
-          ),
-          const SizedBox(height: DesignTokens.spacingS),
-          if (_selected.isNotEmpty) ...[
-            Wrap(
-              spacing: DesignTokens.spacingXS,
-              runSpacing: DesignTokens.spacingXS,
-              children: [
-                for (final u in _selected)
-                  InputChip(
-                    avatar: u.isGroup
-                        ? const Icon(Icons.groups_rounded, size: 18)
-                        : UserAvatar(
-                            username: u.name,
-                            iconUrl: u.avatarUrl,
-                            radius: 12,
-                          ),
-                    label: Text(u.name),
-                    onDeleted: _creating
-                        ? null
-                        : () => setState(() => _selected.remove(u)),
-                  ),
-              ],
-            ),
-            const SizedBox(height: DesignTokens.spacingS),
-          ],
-          TextField(
-            controller: _input,
-            autofocus: true,
-            enabled: !_creating,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (_) => _create(),
-            decoration: InputDecoration(
-              hintText: _selected.isEmpty
-                  ? AppLocalizations.of(context)!.chatSearchPlaceholder
-                  : AppLocalizations.of(context)!.chatAddMorePlaceholder,
-              suffixIcon: _searching
-                  ? const Padding(
-                      padding: EdgeInsets.all(12),
-                      child: SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    )
-                  : null,
-            ),
-          ),
-          if (_suggestions.isNotEmpty) ...[
-            const SizedBox(height: DesignTokens.spacingXS),
-            // Same row the user directory and the message recipient picker
-            // use, so a person looks identical wherever you pick them.
-            for (final u in _suggestions.take(5))
-              Opacity(
-                // Someone who cannot chat stays visible, so the reader
-                // learns why, but cannot be picked.
-                opacity: u.canChat ? 1 : DesignTokens.opacityDisabled,
-                child: UserListRow(
-                  username: u.name,
-                  subtitle: u.canChat
-                      ? u.label
-                      : AppLocalizations.of(context)!.chatDisabledUser,
-                  avatarUrl: u.avatarUrl,
-                  leadingIcon: u.isGroup ? Icons.groups_rounded : null,
-                  onTap: u.canChat ? () => _pick(u) : null,
-                ),
-              ),
-          ],
-          if (_error != null) ...[
-            const SizedBox(height: DesignTokens.spacingS),
-            Text(
-              _error!,
-              style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
-            ),
-          ],
-          const SizedBox(height: DesignTokens.spacingM),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: _creating ? null : () => Navigator.of(context).pop(),
-                child: Text(AppLocalizations.of(context)!.cancel),
-              ),
-              const SizedBox(width: DesignTokens.spacingS),
-              FilledButton(
-                onPressed: canCreate ? _create : null,
-                child: _creating
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    // Discourse's wording once it is a group chat.
-                    : Text(_selected.length > 1
-                        ? AppLocalizations.of(context)!.chatCreateGroup
-                        : AppLocalizations.of(context)!.startChat),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 }

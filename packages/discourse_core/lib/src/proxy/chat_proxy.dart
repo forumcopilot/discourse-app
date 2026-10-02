@@ -849,6 +849,27 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
     }
   }
 
+  /// Discourse-only: starts a thread on [originalMessageId], as the web does
+  /// before the first reply in a channel with threads; returns it, or null.
+  Future<DiscourseChatThread?> createThreadAsync(int channelId, int originalMessageId) async {
+    try {
+      final response = await apiPost('/chat/api/channels/$channelId/threads',
+          body: {'original_message_id': originalMessageId});
+      final t = (response['thread'] as Map?)?.cast<String, dynamic>() ?? response;
+      if (t['id'] == null) return null;
+      final thread = _threadFromJson({...t, 'channel_id': t['channel_id'] ?? channelId});
+      DiscourseChatMessageExtras.update(
+          siteContext.site.url,
+          originalMessageId,
+          (e) => e.thread != null
+              ? e
+              : e.copyWith(thread: DiscourseChatThreadPreview(threadId: thread.threadId, title: thread.title)));
+      return thread;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Discourse-only: a page of a thread's replies (`…/threads/:id/messages`),
   /// the newest by default, or [direction] of [targetMessageId].
   Future<FCChatMessageListResult> getThreadMessagesAsync(int channelId, int threadId,
@@ -858,6 +879,9 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
         'page_size': pageSize,
         if (targetMessageId != null) 'target_message_id': targetMessageId,
         if (targetMessageId != null && direction.isNotEmpty) 'direction': direction,
+        // Without a target the server opens at the reader's last read reply,
+        // and the newest would never load.
+        if (targetMessageId == null) 'fetch_from_last_message': true,
       });
       final messages = [
         for (final raw in ((response['messages'] as List?) ?? const []).whereType<Map>())
@@ -1084,6 +1108,18 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
           username: user,
           added: data['action'] == 'add',
         );
+      case 'update_thread_original_message':
+        final om = (data['original_message_id'] as num?)?.toInt();
+        final threadId = (data['thread_id'] as num?)?.toInt();
+        final preview = (data['preview'] as Map?)?.cast<String, dynamic>();
+        if (om == null || threadId == null || preview == null) return null;
+        final site = siteContext.site.url;
+        DiscourseChatMessageExtras.update(
+            site,
+            om,
+            (e) => e.copyWith(
+                thread: DiscourseChatThreadPreview.fromPreviewJson(site, threadId, preview, title: e.thread?.title)));
+        return DiscourseChatThreadUpdated(om);
     }
     return null;
   }
@@ -1171,8 +1207,14 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
           absoluteSiteUrl(siteContext.site.url, filled);
     }
     final id = (json['id'] as num).toInt();
-    DiscourseChatMessageExtras.store(siteContext.site.url, id,
-        DiscourseChatMessageExtras.fromMessageJson(siteContext.site.url, json));
+    var extras = DiscourseChatMessageExtras.fromMessageJson(siteContext.site.url, json);
+    // A live edit of a thread's original message comes without the thread's
+    // summary: keep the one already known.
+    final known = DiscourseChatMessageExtras.of(siteContext.site.url, id)?.thread;
+    if (extras.thread == null && known != null && (json['thread_id'] as num?)?.toInt() == known.threadId) {
+      extras = extras.copyWith(thread: known);
+    }
+    DiscourseChatMessageExtras.store(siteContext.site.url, id, extras);
     DiscourseChatUploads.store(siteContext.site.url, id, [
       for (final raw in ((json['uploads'] as List?) ?? const []).whereType<Map>())
         _uploadFrom(raw.cast<String, dynamic>()),

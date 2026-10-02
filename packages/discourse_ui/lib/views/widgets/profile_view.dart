@@ -248,7 +248,8 @@ class _ProfileViewState extends State<ProfileView> {
     setState(() => _isStartingChat = true);
     try {
       // Discourse-only: creating a DM channel is not on IFCChatProxy.
-      final proxy = SiteProxyService.getChatProxy() as DiscourseChatProxy;
+      final proxy = SiteProxyService.getChatProxy();
+      if (proxy is! DiscourseChatProxy) return;
       final result = await proxy
           .createDirectMessageChannelAsync([_userInfo.username], upsert: true);
       if (!mounted) return;
@@ -263,12 +264,10 @@ class _ProfileViewState extends State<ProfileView> {
       }
       await Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => Scaffold(
-            appBar: AppBar(title: Text(_userInfo.username)),
-            body: ChatChannelView(
-              siteContext: widget.siteContext,
-              channelId: channel.id,
-            ),
+          builder: (_) => ChatChannelScreen(
+            siteContext: widget.siteContext,
+            channelId: channel.id,
+            initialTitle: _userInfo.username,
           ),
         ),
       );

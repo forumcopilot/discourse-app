@@ -4845,4 +4845,97 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get chatOpenThread => '스레드 열기';
+
+  @override
+  String get chatMembers => '회원';
+
+  @override
+  String get chatAddMember => '멤버 추가';
+
+  @override
+  String get chatFindMembers => '회원 찾기';
+
+  @override
+  String get chatRemoveMember => '제거';
+
+  @override
+  String get chatNotifyNever => '알림 받지 않기';
+
+  @override
+  String get chatNotifyMention => '멘션된 경우에만';
+
+  @override
+  String get chatNotifyAlways => '모든 활동';
+
+  @override
+  String get chatNotificationLevel => '푸시 알림 보내기';
+
+  @override
+  String get chatMuteChannel => '채널 음소거';
+
+  @override
+  String get chatStarChannel => '채널 즐겨찾기';
+
+  @override
+  String get chatLeaveChannel => '채널 나가기';
+
+  @override
+  String get chatSearchTitle => '채팅 검색';
+
+  @override
+  String get chatSearchNoResults => '검색된 결과가 없습니다';
+
+  @override
+  String get chatMyThreads => '내 스레드';
+
+  @override
+  String chatThreadReplies(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 댓글',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatNoThreads => '참여 중인 스레드가 없습니다.';
+
+  @override
+  String get chatGroupName => '그룹 채팅 이름(선택 사항)';
+
+  @override
+  String chatMembersCounter(int count, int max) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count/$max명',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatTooManyMembers => '최대 멤버 수에 도달했습니다';
+
+  @override
+  String get chatThread => '스레드';
+
+  @override
+  String get chatChannelSettings => '채널 설정';
+
+  @override
+  String get chatSearchMessagesHint => '메시지 검색';
+
+  @override
+  String get chatMyThreadsEmpty => '아직 스레드가 없습니다. 참여하는 스레드가 여기에 표시됩니다.';
+
+  @override
+  String get chatLeaveGroupInfo =>
+      '이 그룹 채팅에서 나가면 더 이상 접근할 수 없고 관련 알림도 받지 않습니다. 다시 참여하려면 그룹 채팅 멤버의 초대를 받아야 합니다.';
+
+  @override
+  String get chatPlaceholderThread => '스레드에서 채팅';
+
+  @override
+  String get chatLastReply => '마지막 답글';
 }

@@ -4846,4 +4846,97 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get chatOpenThread => 'スレッドを開く';
+
+  @override
+  String get chatMembers => 'メンバー';
+
+  @override
+  String get chatAddMember => 'メンバーを追加';
+
+  @override
+  String get chatFindMembers => 'メンバーを検索';
+
+  @override
+  String get chatRemoveMember => '削除';
+
+  @override
+  String get chatNotifyNever => 'なし';
+
+  @override
+  String get chatNotifyMention => 'メンションのみ';
+
+  @override
+  String get chatNotifyAlways => 'すべてのアクティビティ';
+
+  @override
+  String get chatNotificationLevel => 'プッシュ通知を送信';
+
+  @override
+  String get chatMuteChannel => 'チャンネルをミュート';
+
+  @override
+  String get chatStarChannel => 'チャンネルにスターを設定する';
+
+  @override
+  String get chatLeaveChannel => 'チャンネルから退出する';
+
+  @override
+  String get chatSearchTitle => 'チャットを検索';
+
+  @override
+  String get chatSearchNoResults => '何も見つかりませんでした';
+
+  @override
+  String get chatMyThreads => '自分のスレッド';
+
+  @override
+  String chatThreadReplies(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '返信: $count 件',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatNoThreads => 'このチャンネルのどのスレッドにも参加していません。';
+
+  @override
+  String get chatGroupName => 'グループチャット名 (オプション)';
+
+  @override
+  String chatMembersCounter(int count, int max) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'メンバー: $count 人 / 最大 $max 人',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatTooManyMembers => 'メンバーの最大数に達しました';
+
+  @override
+  String get chatThread => 'スレッド';
+
+  @override
+  String get chatChannelSettings => 'チャンネルの設定';
+
+  @override
+  String get chatSearchMessagesHint => 'メッセージを検索';
+
+  @override
+  String get chatMyThreadsEmpty => 'まだスレッドがありません。ここに、参加しているスレッドが表示されます。';
+
+  @override
+  String get chatLeaveGroupInfo =>
+      'このグループチャットから退出すると、それにアクセスできなくなり、そのチャットに関連する通知を受信しなくなります。もう一度参加するには、グループチャットのメンバーから招待を受ける必要があります。';
+
+  @override
+  String get chatPlaceholderThread => 'スレッド内でチャット';
+
+  @override
+  String get chatLastReply => '最後の返信';
 }

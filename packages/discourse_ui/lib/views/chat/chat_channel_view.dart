@@ -9,6 +9,8 @@ import 'package:discourse_core/discourse_core.dart'
         DiscourseChatMessageExtras,
         DiscourseChatPermissions,
         DiscourseChatProxy,
+        DiscourseChatSettings,
+        DiscourseChatThread,
         DiscourseChatUser,
         DiscourseSiteContextExtension;
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
@@ -26,6 +28,9 @@ import '../../controllers/chat_channel_controller.dart';
 import '../../services/site_proxy_service.dart';
 import '../../services/attachment_upload_service.dart';
 import '../../theme/design_tokens.dart';
+import 'chat_channel_info_page.dart';
+import 'chat_search_page.dart';
+import 'widgets/chat_channel_avatar.dart';
 import 'widgets/chat_composer.dart';
 import 'widgets/chat_message_actions.dart';
 import 'widgets/chat_message_row.dart';
@@ -33,6 +38,7 @@ import '../widgets/discourse_report_dialog.dart';
 import '../widgets/emoji_picker_sheet.dart';
 import '../../utils/snackbar_helper.dart';
 import 'widgets/chat_reaction_chips.dart';
+import 'widgets/chat_thread_indicator.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../l10n/app_l10n.dart';
 
@@ -48,17 +54,22 @@ class ChatChannelView extends StatefulWidget {
     required this.siteContext,
     required this.channelId,
     this.isActive = true,
+    this.threadId,
     this.targetMessageId,
     this.onChannelLoaded,
-    this.onOpenThread,
+    this.onThreadLoaded,
   });
 
   final SiteContext siteContext;
   final int channelId;
   final bool isActive;
 
-  /// Opens (or starts) the thread of a message, in a channel with threads.
-  final void Function(FCChatMessage message)? onOpenThread;
+  /// Called once the thread loads, in a thread, for its title.
+  final void Function(DiscourseChatThread thread)? onThreadLoaded;
+
+  /// Show this thread of the channel instead of the channel: its original
+  /// message and replies, with the thread's own composer.
+  final int? threadId;
 
   /// Open scrolled to this message, highlighted (from a notification).
   final int? targetMessageId;
@@ -124,7 +135,7 @@ class _ChatChannelViewState extends State<ChatChannelView> {
   // over the list) used to share one, and closing the top one tore down the
   // one underneath.
   late final String _tag =
-      'chatChannel-${widget.channelId}-${identityHashCode(this)}';
+      'chatChannel-${widget.channelId}-${widget.threadId ?? 0}-${identityHashCode(this)}';
 
   @override
   void initState() {
@@ -132,12 +143,16 @@ class _ChatChannelViewState extends State<ChatChannelView> {
     _controller = Get.put(
       ChatChannelController(
         channelId: widget.channelId,
+        threadId: widget.threadId,
         targetMessageId: widget.targetMessageId,
       ),
       tag: _tag,
     );
     ever<FCChatChannel?>(_controller.channel, (ch) {
       if (ch != null) widget.onChannelLoaded?.call(ch);
+    });
+    ever<DiscourseChatThread?>(_controller.thread, (t) {
+      if (t != null) widget.onThreadLoaded?.call(t);
     });
     if (widget.isActive) {
       _controller.start();
@@ -173,7 +188,7 @@ class _ChatChannelViewState extends State<ChatChannelView> {
     if (discourse != null && widget.siteContext.isLoggedIn) {
       _stopTypingWatch = discourse.watchTyping(widget.channelId, (typing) {
         if (mounted) setState(() => _typing = typing);
-      });
+      }, threadId: widget.threadId);
     }
   }
 
@@ -303,7 +318,7 @@ class _ChatChannelViewState extends State<ChatChannelView> {
     _arrivedWhileAway.dispose();
     _stopTypingWatch?.call();
     _draftTimer?.cancel();
-    unawaited(_discourse?.setTypingAsync(widget.channelId, typing: false));
+    unawaited(_discourse?.setTypingAsync(widget.channelId, typing: false, threadId: widget.threadId));
     Get.delete<ChatChannelController>(tag: _tag);
     super.dispose();
   }
@@ -423,7 +438,8 @@ class _ChatChannelViewState extends State<ChatChannelView> {
                   _replyTo = null;
                   _editing = null;
                 }),
-                initialText: DiscourseChatDrafts.of(widget.siteContext.site.url, widget.channelId),
+                initialText:
+                    DiscourseChatDrafts.of(widget.siteContext.site.url, widget.channelId, threadId: widget.threadId),
                 onTextChanged: _onComposerChanged,
                 suggest: _discourse == null ? null : _suggest,
                 onSend: _send,
@@ -504,6 +520,7 @@ class _ChatChannelViewState extends State<ChatChannelView> {
         (isSelf ? (perms?.canDeleteSelf ?? true) : (perms?.canDeleteOthers ?? false));
     final loggedIn = widget.siteContext.isLoggedIn;
     final isTarget = m.id == widget.targetMessageId;
+    final thread = DiscourseChatMessageExtras.of(widget.siteContext.site.url, m.id)?.thread;
     final row = ChatMessageRow(
       message: m,
       siteContext: widget.siteContext,
@@ -516,6 +533,9 @@ class _ChatChannelViewState extends State<ChatChannelView> {
           ? (emoji, {required bool add}) => _controller.toggleReaction(m.id, emoji, add: add)
           : null,
       onReplyTap: _goToMessage,
+      footer: thread != null && thread.replyCount > 0 && widget.threadId == null
+          ? ChatThreadIndicator(preview: thread, onTap: () => _openThread(m))
+          : null,
     );
     // What the reader has seen on screen is what counts as read.
     return VisibilityDetector(
@@ -540,6 +560,7 @@ class _ChatChannelViewState extends State<ChatChannelView> {
         _ => l10n.chatPlaceholderReadOnly,
       };
     }
+    if (widget.threadId != null) return l10n.chatPlaceholderThread;
     if (ch.chatableType == 'DirectMessage') {
       // A DM is titled with the other members; with nobody else it is the
       // viewer's own notes channel.
@@ -598,8 +619,8 @@ class _ChatChannelViewState extends State<ChatChannelView> {
       _draftTimer?.cancel();
       final discourse = _discourse;
       if (discourse != null && editing == null) {
-        unawaited(discourse.saveChatDraftAsync(widget.channelId, ''));
-        unawaited(discourse.setTypingAsync(widget.channelId, typing: false));
+        unawaited(discourse.saveChatDraftAsync(widget.channelId, '', threadId: widget.threadId));
+        unawaited(discourse.setTypingAsync(widget.channelId, typing: false, threadId: widget.threadId));
       }
     }
     return ok;
@@ -610,10 +631,10 @@ class _ChatChannelViewState extends State<ChatChannelView> {
   void _onComposerChanged(String text) {
     final discourse = _discourse;
     if (discourse == null || _editing != null) return;
-    unawaited(discourse.setTypingAsync(widget.channelId, typing: text.trim().isNotEmpty));
+    unawaited(discourse.setTypingAsync(widget.channelId, typing: text.trim().isNotEmpty, threadId: widget.threadId));
     _draftTimer?.cancel();
     _draftTimer = Timer(const Duration(seconds: 2), () {
-      unawaited(discourse.saveChatDraftAsync(widget.channelId, text));
+      unawaited(discourse.saveChatDraftAsync(widget.channelId, text, threadId: widget.threadId));
     });
   }
 
@@ -658,7 +679,9 @@ class _ChatChannelViewState extends State<ChatChannelView> {
       can: ChatMessagePermissions(
         react: canWrite,
         reply: canWrite,
-        thread: canWrite && (details?.threadingEnabled ?? false) && widget.onOpenThread != null,
+        // Reply opens the thread in a channel with threads; this opens one
+        // that already has replies.
+        thread: _threaded && (extras?.thread?.replyCount ?? 0) > 0,
         edit: canEdit,
         delete: canDelete,
         pin: details?.canManagePins ?? false,
@@ -680,20 +703,24 @@ class _ChatChannelViewState extends State<ChatChannelView> {
       case ChatMessageActionChoice(:final action):
         switch (action) {
           case ChatMessageAction.reply:
+            // In a channel with threads a reply goes in the message's thread,
+            // as on the web: a plain reply would start one there unseen.
+            if (_threaded) return _openThread(m);
             setState(() {
               _editing = null;
               _replyTo = m;
             });
           case ChatMessageAction.thread:
-            widget.onOpenThread?.call(m);
+            await _openThread(m);
           case ChatMessageAction.copyText:
             await Clipboard.setData(ClipboardData(text: m.message));
             if (mounted) SnackbarHelper.showInfo(context, l10n.chatTextCopied);
           case ChatMessageAction.copyLink:
             final slug = _controller.channel.value?.slug;
             final base = site.endsWith('/') ? site.substring(0, site.length - 1) : site;
+            final thread = widget.threadId == null ? '' : '/t/${widget.threadId}';
             await Clipboard.setData(ClipboardData(
-                text: '$base/chat/c/${slug == null || slug.isEmpty ? '-' : slug}/${widget.channelId}/${m.id}'));
+                text: '$base/chat/c/${slug == null || slug.isEmpty ? '-' : slug}/${widget.channelId}$thread/${m.id}'));
             if (mounted) SnackbarHelper.showInfo(context, l10n.linkCopied);
           case ChatMessageAction.edit:
             setState(() {
@@ -735,6 +762,35 @@ class _ChatChannelViewState extends State<ChatChannelView> {
             if (ok) await _controller.deleteMessage(m.id);
         }
     }
+  }
+
+  /// The channel has threads, and this is the channel (not a thread).
+  bool get _threaded =>
+      widget.threadId == null &&
+      (DiscourseChatChannelDetails.of(widget.siteContext.site.url, widget.channelId)?.threadingEnabled ?? false);
+
+  /// Opens [m]'s thread, starting it first when it has none (as the web
+  /// does on Reply).
+  Future<void> _openThread(FCChatMessage m) async {
+    final discourse = _discourse;
+    if (discourse == null) return;
+    var threadId = DiscourseChatMessageExtras.of(widget.siteContext.site.url, m.id)?.thread?.threadId;
+    threadId ??= (await discourse.createThreadAsync(widget.channelId, m.id))?.threadId;
+    if (!mounted) return;
+    if (threadId == null) {
+      SnackbarHelper.showError(context, AppLocalizations.of(context)!.chatNotAvailable);
+      return;
+    }
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => ChatChannelScreen(
+        siteContext: widget.siteContext,
+        channelId: widget.channelId,
+        threadId: threadId,
+        initialTitle: _controller.channel.value == null ? '' : chatChannelTitle(_controller.channel.value!),
+      ),
+    ));
+    // The summary may have changed while the thread was open.
+    if (mounted) _controller.messages.refresh();
   }
 
   Future<bool> _confirmDelete() async {
@@ -812,17 +868,24 @@ String chatChannelTitle(FCChatChannel ch) {
 /// A channel as a full screen, titled from the channel once it loads — what
 /// the channel list and a chat notification open. The notification list used
 /// to title it with the whole notification sentence.
+///
+/// Its header is the conversation's, as Discourse's: the channel's avatar,
+/// its name and how many are in it, opening the channel's info and
+/// settings; with search beside it. A thread ([threadId]) is titled with
+/// the thread and its channel.
 class ChatChannelScreen extends StatefulWidget {
   const ChatChannelScreen({
     super.key,
     required this.siteContext,
     required this.channelId,
+    this.threadId,
     this.initialTitle = '',
     this.targetMessageId,
   });
 
   final SiteContext siteContext;
   final int channelId;
+  final int? threadId;
   final String initialTitle;
   final int? targetMessageId;
 
@@ -832,20 +895,126 @@ class ChatChannelScreen extends StatefulWidget {
 
 class _ChatChannelScreenState extends State<ChatChannelScreen> {
   late String _title = widget.initialTitle;
+  FCChatChannel? _channel;
+  String? _threadTitle;
+
+  bool get _discourse => SiteProxyService.getChatProxy() is DiscourseChatProxy;
+
+  Future<void> _openInfo() async {
+    final ch = _channel;
+    if (ch == null || !_discourse || !widget.siteContext.isLoggedIn) return;
+    final left = await Navigator.of(context).push<bool>(MaterialPageRoute(
+      builder: (_) => ChatChannelInfoPage(siteContext: widget.siteContext, channel: ch),
+    ));
+    if (left == true && mounted) Navigator.of(context).pop();
+  }
+
+  void _openSearch() {
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => ChatSearchPage(siteContext: widget.siteContext, channelId: widget.channelId, channelTitle: _title),
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final inThread = widget.threadId != null;
+    final ch = _channel;
+    final canSearch = !inThread &&
+        _discourse &&
+        widget.siteContext.isLoggedIn &&
+        DiscourseChatSettings.forSite(widget.siteContext.site.url).searchEnabled;
+    final Widget title;
+    if (inThread) {
+      title = _HeaderTitle(title: _threadTitle ?? l10n.chatThread, subtitle: _title.isEmpty ? null : _title);
+    } else if (ch == null) {
+      title = Text(_title);
+    } else {
+      title = ValueListenableBuilder<int>(
+        valueListenable: DiscourseChatChannelDetails.revision,
+        builder: (context, _, __) {
+          final d = DiscourseChatChannelDetails.of(widget.siteContext.site.url, ch.id);
+          final group = d?.isGroup ?? false;
+          final count = d?.membershipsCount ?? 0;
+          final String? subtitle;
+          if (ch.chatableType == 'DirectMessage' && !group) {
+            final other = d?.members.firstOrNull;
+            subtitle = other != null && other.displayName != _title ? other.displayName : null;
+          } else {
+            subtitle = count > 0 ? l10n.chatMembersCount(count) : null;
+          }
+          return InkWell(
+            onTap: _discourse && widget.siteContext.isLoggedIn ? _openInfo : null,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingXS),
+              child: Row(
+                children: [
+                  ChatChannelAvatar(channel: ch, details: d, siteContext: widget.siteContext, size: 36),
+                  const SizedBox(width: DesignTokens.spacingM),
+                  Expanded(child: _HeaderTitle(title: _title, subtitle: subtitle)),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
     return Scaffold(
-      appBar: AppBar(title: Text(_title)),
+      appBar: AppBar(
+        titleSpacing: ch == null || inThread ? null : 0,
+        title: DefaultTextStyle.merge(style: theme.textTheme.titleMedium, child: title),
+        actions: [
+          if (canSearch)
+            IconButton(icon: const Icon(Icons.search), tooltip: l10n.chatSearchTitle, onPressed: _openSearch),
+          if (!inThread && ch != null && _discourse && widget.siteContext.isLoggedIn)
+            IconButton(icon: const Icon(Icons.info_outline), tooltip: l10n.chatChannelSettings, onPressed: _openInfo),
+        ],
+      ),
       body: ChatChannelView(
         siteContext: widget.siteContext,
         channelId: widget.channelId,
+        threadId: widget.threadId,
         targetMessageId: widget.targetMessageId,
         onChannelLoaded: (ch) {
           final t = chatChannelTitle(ch);
-          if (mounted && t != _title) setState(() => _title = t);
+          if (mounted) {
+            setState(() {
+              _title = t;
+              _channel = ch;
+            });
+          }
+        },
+        onThreadLoaded: (thread) {
+          if (mounted && thread.title != _threadTitle) setState(() => _threadTitle = thread.title);
         },
       ),
+    );
+  }
+}
+
+/// The header's name over a smaller line (members, or the channel).
+class _HeaderTitle extends StatelessWidget {
+  const _HeaderTitle({required this.title, this.subtitle});
+
+  final String title;
+  final String? subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleMedium),
+        if (subtitle != null)
+          Text(subtitle!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+      ],
     );
   }
 }

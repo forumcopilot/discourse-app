@@ -4784,4 +4784,97 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chatOpenThread => '打开消息串';
+
+  @override
+  String get chatMembers => '成员';
+
+  @override
+  String get chatAddMember => '添加成员';
+
+  @override
+  String get chatFindMembers => '查找成员';
+
+  @override
+  String get chatRemoveMember => '移除';
+
+  @override
+  String get chatNotifyNever => '永不';
+
+  @override
+  String get chatNotifyMention => '仅限提及';
+
+  @override
+  String get chatNotifyAlways => '所有活动';
+
+  @override
+  String get chatNotificationLevel => '发送推送通知';
+
+  @override
+  String get chatMuteChannel => '将频道设为免打扰';
+
+  @override
+  String get chatStarChannel => '收藏频道';
+
+  @override
+  String get chatLeaveChannel => '离开频道';
+
+  @override
+  String get chatSearchTitle => '搜索聊天';
+
+  @override
+  String get chatSearchNoResults => '找不到结果';
+
+  @override
+  String get chatMyThreads => '我的消息串';
+
+  @override
+  String chatThreadReplies(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个回复',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatNoThreads => '您没有参与此频道中的任何消息串。';
+
+  @override
+  String get chatGroupName => '群组聊天名称（可选）';
+
+  @override
+  String chatMembersCounter(int count, int max) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count/$max 成员',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatTooManyMembers => '已达到最大成员数';
+
+  @override
+  String get chatThread => '消息串';
+
+  @override
+  String get chatChannelSettings => '频道设置';
+
+  @override
+  String get chatSearchMessagesHint => '搜索消息';
+
+  @override
+  String get chatMyThreadsEmpty => '您还没有任何消息串。您参与的消息串将在此处显示。';
+
+  @override
+  String get chatLeaveGroupInfo =>
+      '离开此群组聊天后，您将无法再访问它，也不会收到与之相关的通知。要重新加入，需要群组聊天成员再次向您发送邀请。';
+
+  @override
+  String get chatPlaceholderThread => '在消息串中聊天';
+
+  @override
+  String get chatLastReply => '最后回复';
 }

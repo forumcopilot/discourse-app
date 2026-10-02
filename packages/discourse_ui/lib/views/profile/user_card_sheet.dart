@@ -162,7 +162,8 @@ class _UserCardSheetState extends State<UserCardSheet> {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _startingChat = true);
     try {
-      final proxy = SiteProxyFactory.getChatProxy() as DiscourseChatProxy;
+      final proxy = SiteProxyFactory.getChatProxy();
+      if (proxy is! DiscourseChatProxy) return;
       final result = await proxy
           .createDirectMessageChannelAsync([widget.username], upsert: true);
       if (!mounted) return;
@@ -175,11 +176,8 @@ class _UserCardSheetState extends State<UserCardSheet> {
                 : l10n.chatCouldNotStartDm);
         return;
       }
-      _go(Scaffold(
-        appBar: AppBar(title: Text(widget.username)),
-        body: ChatChannelView(
-            siteContext: widget.siteContext, channelId: channel.id),
-      ));
+      _go(ChatChannelScreen(
+          siteContext: widget.siteContext, channelId: channel.id, initialTitle: widget.username));
     } finally {
       if (mounted) setState(() => _startingChat = false);
     }

@@ -5142,4 +5142,106 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get chatOpenThread => 'Открыть цепочку';
+
+  @override
+  String get chatMembers => 'Участники';
+
+  @override
+  String get chatAddMember => 'Добавить участника';
+
+  @override
+  String get chatFindMembers => 'Найти участников';
+
+  @override
+  String get chatRemoveMember => 'Удалить';
+
+  @override
+  String get chatNotifyNever => 'Никогда';
+
+  @override
+  String get chatNotifyMention => 'Только для упоминаний';
+
+  @override
+  String get chatNotifyAlways => 'Для всех действий';
+
+  @override
+  String get chatNotificationLevel => 'Отправлять push-уведомления';
+
+  @override
+  String get chatMuteChannel => 'Отключить канал';
+
+  @override
+  String get chatStarChannel => 'Помеченные каналы';
+
+  @override
+  String get chatLeaveChannel => 'Покинуть канал';
+
+  @override
+  String get chatSearchTitle => 'Поиск чата';
+
+  @override
+  String get chatSearchNoResults => 'Ничего не найдено';
+
+  @override
+  String get chatMyThreads => 'Мои цепочки сообщений';
+
+  @override
+  String chatThreadReplies(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ответа',
+      many: '$count ответов',
+      few: '$count ответа',
+      one: '$count ответ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatNoThreads =>
+      'Вы не участвуете ни в одной цепочке сообщений на этом канале.';
+
+  @override
+  String get chatGroupName => 'Название группового чата (необязательно)';
+
+  @override
+  String chatMembersCounter(int count, int max) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Участников: $count/$max',
+      many: 'Участников: $count/$max',
+      few: 'Участников: $count/$max',
+      one: 'Участников: $count/$max',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatTooManyMembers =>
+      'Достигнуто максимальное количество участников';
+
+  @override
+  String get chatThread => 'Цепочка';
+
+  @override
+  String get chatChannelSettings => 'Настройки канала';
+
+  @override
+  String get chatSearchMessagesHint => 'Искать в сообщениях';
+
+  @override
+  String get chatMyThreadsEmpty =>
+      'У вас пока нет цепочек сообщений. Здесь появятся цепочки сообщений, в которых вы участвуете.';
+
+  @override
+  String get chatLeaveGroupInfo =>
+      'Покинув этот групповой чат, вы потеряете к нему доступ и не будете получать связанные с ним уведомления. Чтобы снова присоединиться, вам потребуется повторное приглашение от участника группового чата.';
+
+  @override
+  String get chatPlaceholderThread => 'Чат в цепочке сообщений';
+
+  @override
+  String get chatLastReply => 'последний ответ';
 }

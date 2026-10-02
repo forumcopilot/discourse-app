@@ -8261,6 +8261,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open Thread'**
   String get chatOpenThread;
+
+  /// Heading of a chat channel's member list
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get chatMembers;
+
+  /// Button that adds people to a group chat
+  ///
+  /// In en, this message translates to:
+  /// **'Add Member'**
+  String get chatAddMember;
+
+  /// Hint in the search field over a chat channel's members
+  ///
+  /// In en, this message translates to:
+  /// **'Find members'**
+  String get chatFindMembers;
+
+  /// Action that removes someone from a chat channel
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get chatRemoveMember;
+
+  /// Chat notification level: never
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get chatNotifyNever;
+
+  /// Chat notification level: only for mentions
+  ///
+  /// In en, this message translates to:
+  /// **'Only for mentions'**
+  String get chatNotifyMention;
+
+  /// Chat notification level: for all activity
+  ///
+  /// In en, this message translates to:
+  /// **'For all activity'**
+  String get chatNotifyAlways;
+
+  /// Label of a chat channel's notification level setting
+  ///
+  /// In en, this message translates to:
+  /// **'Send push notifications'**
+  String get chatNotificationLevel;
+
+  /// Switch that mutes a chat channel
+  ///
+  /// In en, this message translates to:
+  /// **'Mute channel'**
+  String get chatMuteChannel;
+
+  /// Switch that stars a chat channel, listing it first
+  ///
+  /// In en, this message translates to:
+  /// **'Star channel'**
+  String get chatStarChannel;
+
+  /// Button that leaves a chat channel or group chat
+  ///
+  /// In en, this message translates to:
+  /// **'Leave channel'**
+  String get chatLeaveChannel;
+
+  /// Title of chat search
+  ///
+  /// In en, this message translates to:
+  /// **'Search chat'**
+  String get chatSearchTitle;
+
+  /// Chat search found nothing
+  ///
+  /// In en, this message translates to:
+  /// **'No results found'**
+  String get chatSearchNoResults;
+
+  /// The reader's chat threads, as a switch beside Channels and DMs
+  ///
+  /// In en, this message translates to:
+  /// **'My Threads'**
+  String get chatMyThreads;
+
+  /// How many replies a chat thread has
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} reply} other{{count} replies}}'**
+  String chatThreadReplies(int count);
+
+  /// The reader takes part in no chat threads
+  ///
+  /// In en, this message translates to:
+  /// **'You are not participating in any threads in this channel.'**
+  String get chatNoThreads;
+
+  /// Field for an optional name when starting a group chat
+  ///
+  /// In en, this message translates to:
+  /// **'Group chat name (optional)'**
+  String get chatGroupName;
+
+  /// How many people are picked for a new group chat, out of the forum's limit
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count}/{max} member} other{{count}/{max} members}}'**
+  String chatMembersCounter(int count, int max);
+
+  /// A new group chat has as many people as the forum allows
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum number of members reached'**
+  String get chatTooManyMembers;
+
+  /// Title of a chat thread's screen
+  ///
+  /// In en, this message translates to:
+  /// **'Thread'**
+  String get chatThread;
+
+  /// Title of a chat channel's info and settings screen
+  ///
+  /// In en, this message translates to:
+  /// **'Channel settings'**
+  String get chatChannelSettings;
+
+  /// Hint in the chat search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search messages'**
+  String get chatSearchMessagesHint;
+
+  /// Empty My Threads list (Discourse chat.empty_state.my_threads)
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have any threads yet. Threads you participate in will be displayed here.'**
+  String get chatMyThreadsEmpty;
+
+  /// Confirmation before leaving a group chat (Discourse chat.channel_settings.leave_groupchat_info)
+  ///
+  /// In en, this message translates to:
+  /// **'By leaving this group chat, you will no longer have access to it and won’t receive notifications related to it. To rejoin, you will need to be re-invited by a member of the group chat.'**
+  String get chatLeaveGroupInfo;
+
+  /// Composer hint inside a chat thread (Discourse chat.placeholder_thread)
+  ///
+  /// In en, this message translates to:
+  /// **'Chat in thread'**
+  String get chatPlaceholderThread;
+
+  /// Before the time of a thread's latest reply, under its original message (Discourse chat.thread.last_reply)
+  ///
+  /// In en, this message translates to:
+  /// **'last reply'**
+  String get chatLastReply;
 }
 
 class _AppLocalizationsDelegate

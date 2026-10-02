@@ -8,11 +8,14 @@ import 'package:discourse_core/discourse_core.dart'
         DiscourseChatMessageChanged,
         DiscourseChatMessagesDeleted,
         DiscourseChatProxy,
-        DiscourseChatReaction;
+        DiscourseChatReaction,
+        DiscourseChatThread,
+        DiscourseChatThreadUpdated;
 import 'package:flutter/widgets.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_chat_channel.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart';
+import 'package:forumcopilot_sdk/models/results/fc_chat_result.dart';
 import 'package:get/get.dart';
 
 import '../core/logging/app_logger.dart';
@@ -37,11 +40,17 @@ class ChatChannelController extends GetxController
     with WidgetsBindingObserver {
   ChatChannelController({
     required this.channelId,
+    this.threadId,
     this.targetMessageId,
     this.fallbackPollInterval = const Duration(seconds: 30),
   });
 
   final int channelId;
+
+  /// A thread of the channel, shown on its own: its original message and
+  /// replies, live from the thread's MessageBus channel, read and sent
+  /// there. Null for the channel itself.
+  final int? threadId;
 
   /// Open on this message (from a notification): the first load fetches the
   /// messages around it rather than the newest.
@@ -169,9 +178,16 @@ class ChatChannelController extends GetxController
       final proxy = SiteProxyService.getChatProxy();
       final channelFuture = proxy.getChannelAsync(channelId);
       final messagesFuture = targetMessageId != null && !_bootstrapped
-          ? proxy.getMessagesAsync(channelId,
-              pageSize: 50, targetMessageId: targetMessageId, direction: '')
-          : proxy.getMessagesAsync(channelId, pageSize: 50);
+          ? _page(target: targetMessageId, direction: '')
+          : _page();
+      final t = threadId;
+      if (t != null && proxy is DiscourseChatProxy) {
+        final loaded = await proxy.getThreadAsync(channelId, t);
+        if (loaded != null) {
+          thread.value = loaded;
+          _threadBusLastId = loaded.busLastId;
+        }
+      }
       final channelResult = await channelFuture;
       final messagesResult = await messagesFuture;
       final ch = channelResult.channel;
@@ -223,6 +239,8 @@ class ChatChannelController extends GetxController
   /// and the newest wait below ([hasMoreNewer]). It used to open at the
   /// bottom, past everything unread.
   Future<void> _decideStartingPoint(dynamic proxy, FCChatChannel? ch) async {
+    // A thread opens at its newest reply.
+    if (threadId != null) return;
     final details = proxy is DiscourseChatProxy
         ? DiscourseChatChannelDetails.of(proxy.siteContext.site.url, channelId)
         : null;
@@ -265,12 +283,7 @@ class ChatChannelController extends GetxController
     if (isLoadingNewer.value || !hasMoreNewer.value || messages.isEmpty) return;
     isLoadingNewer.value = true;
     try {
-      final result = await SiteProxyService.getChatProxy().getMessagesAsync(
-        channelId,
-        pageSize: pageSize,
-        targetMessageId: messages.last.id,
-        direction: 'future',
-      );
+      final result = await _page(target: messages.last.id, direction: 'future', pageSize: pageSize);
       if (!result.result) return;
       final existing = {for (final m in messages) m.id};
       final newer = result.messages.where((m) => !existing.contains(m.id)).toList()
@@ -294,7 +307,7 @@ class ChatChannelController extends GetxController
     if (!hasMoreNewer.value) return;
     isLoadingNewer.value = true;
     try {
-      final result = await SiteProxyService.getChatProxy().getMessagesAsync(channelId, pageSize: 50);
+      final result = await _page();
       if (!result.result || result.messages.isEmpty) return;
       messages.assignAll(result.messages.toList()..sort((a, b) => a.id.compareTo(b.id)));
       _highWatermark = messages.last.id;
@@ -346,7 +359,10 @@ class ChatChannelController extends GetxController
     if (_disposed || !_wanted || !_foreground) return;
     final proxy = SiteProxyService.getChatProxy();
     if (proxy is DiscourseChatProxy) {
-      _unwatch = proxy.watchChannel(channelId, _onEvent);
+      final thread = threadId;
+      _unwatch = thread == null
+          ? proxy.watchChannel(channelId, _onEvent)
+          : proxy.watchThread(channelId, thread, _onEvent, lastId: _threadBusLastId ?? -1);
       if (_unwatch != null) return;
     }
     // No MessageBus for this key: fetch now and then.
@@ -393,6 +409,9 @@ class ChatChannelController extends GetxController
         messages.removeWhere((m) => messageIds.contains(m.id));
       case DiscourseChatReaction():
         _applyReactionEvent(event);
+      case DiscourseChatThreadUpdated():
+        // The summary under the original message: redraw it.
+        messages.refresh();
     }
   }
 
@@ -483,12 +502,11 @@ class ChatChannelController extends GetxController
     if (_disposed || _tickInFlight || hasMoreNewer.value) return;
     _tickInFlight = true;
     try {
-      final proxy = SiteProxyService.getChatProxy();
       // The newest page, merged: messages already on screen take the
       // server's version (edits, reactions — this is an authenticated
       // fetch, so "reacted by me" is right), new ones are added, and ones
       // missing from the page's range were deleted.
-      final result = await proxy.getMessagesAsync(channelId, pageSize: 50);
+      final result = await _page();
       if (!result.result || result.messages.isEmpty) return;
       final page = {for (final m in result.messages) m.id: m};
       final oldest = page.keys.reduce((a, b) => a < b ? a : b);
@@ -518,7 +536,7 @@ class ChatChannelController extends GetxController
       final proxy = SiteProxyService.getChatProxy();
       final result = proxy is DiscourseChatProxy
           ? await proxy.sendMessageAsync(channelId, text,
-              uploadIds: uploadIds, inReplyTo: inReplyTo, threadId: threadId)
+              uploadIds: uploadIds, inReplyTo: inReplyTo, threadId: threadId ?? this.threadId)
           : await proxy.sendMessageAsync(channelId, text);
       if (!result.result || result.message == null) {
         lastError.value = result.resultText?.isNotEmpty == true
@@ -697,12 +715,7 @@ class ChatChannelController extends GetxController
     }
     isLoadingOlder.value = true;
     try {
-      final result = await SiteProxyService.getChatProxy().getMessagesAsync(
-        channelId,
-        pageSize: pageSize,
-        targetMessageId: messages.first.id,
-        direction: 'past',
-      );
+      final result = await _page(target: messages.first.id, direction: 'past', pageSize: pageSize);
       if (!result.result) return;
       if (result.messages.isEmpty) {
         // The start of the history. It used to be asked for again on every
@@ -732,7 +745,30 @@ class ChatChannelController extends GetxController
     if (upTo == 0 || upTo <= _reportedReadId) return;
     _lastMarkRead = DateTime.now();
     _reportedReadId = upTo;
-    await SiteProxyService.getChatProxy()
-        .markChannelReadAsync(channelId, messageId: upTo);
+    final proxy = SiteProxyService.getChatProxy();
+    final thread = threadId;
+    if (thread != null) {
+      if (proxy is DiscourseChatProxy) await proxy.markThreadReadAsync(channelId, thread, messageId: upTo);
+      return;
+    }
+    await proxy.markChannelReadAsync(channelId, messageId: upTo);
+  }
+
+  /// Where the thread's MessageBus channel was when it loaded.
+  int? _threadBusLastId;
+
+  /// The thread itself (title, original message), in a thread.
+  final thread = Rxn<DiscourseChatThread>();
+
+  /// A page of the channel's messages, or of the thread's: the newest, or
+  /// [direction] of [target] (around it when [direction] is empty).
+  Future<FCChatMessageListResult> _page({int? target, String direction = 'past', int pageSize = 50}) {
+    final proxy = SiteProxyService.getChatProxy();
+    final t = threadId;
+    if (t != null && proxy is DiscourseChatProxy) {
+      return proxy.getThreadMessagesAsync(channelId, t,
+          pageSize: pageSize, targetMessageId: target, direction: direction);
+    }
+    return proxy.getMessagesAsync(channelId, pageSize: pageSize, targetMessageId: target, direction: direction);
   }
 }

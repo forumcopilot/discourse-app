@@ -31,6 +31,24 @@ class DiscourseChatThreadPreview {
   final DateTime? lastReplyAt;
   final String? lastReplyExcerpt;
   final DiscourseChatUser? lastReplyUser;
+
+  /// Reads `Chat::ThreadPreviewSerializer`'s JSON, from a message's `thread`
+  /// or a live `update_thread_original_message`.
+  static DiscourseChatThreadPreview fromPreviewJson(String siteUrl, int threadId, Map<String, dynamic> preview,
+          {String? title, int? replyCount}) =>
+      DiscourseChatThreadPreview(
+        threadId: threadId,
+        title: title,
+        replyCount: (preview['reply_count'] as num?)?.toInt() ?? replyCount ?? 0,
+        participants: [
+          for (final raw in ((preview['participant_users'] as List?) ?? const []))
+            if (DiscourseChatUser.fromJson(siteUrl, raw) case final u?) u,
+        ],
+        participantCount: (preview['participant_count'] as num?)?.toInt() ?? 0,
+        lastReplyAt: DateTime.tryParse(preview['last_reply_created_at']?.toString() ?? ''),
+        lastReplyExcerpt: DiscourseChatMessageExtras._text(preview['last_reply_excerpt']),
+        lastReplyUser: DiscourseChatUser.fromJson(siteUrl, preview['last_reply_user']),
+      );
 }
 
 /// What Discourse says about a chat message beyond the shared
@@ -108,21 +126,9 @@ class DiscourseChatMessageExtras {
             ),
       thread: threadId == null || preview == null
           ? null
-          : DiscourseChatThreadPreview(
-              threadId: threadId,
+          : DiscourseChatThreadPreview.fromPreviewJson(siteUrl, threadId, preview,
               title: _text(thread?['title']) ?? _text(json['thread_title']),
-              replyCount: (preview['reply_count'] as num?)?.toInt() ??
-                  (thread?['reply_count'] as num?)?.toInt() ??
-                  0,
-              participants: [
-                for (final raw in ((preview['participant_users'] as List?) ?? const []))
-                  if (DiscourseChatUser.fromJson(siteUrl, raw) case final u?) u,
-              ],
-              participantCount: (preview['participant_count'] as num?)?.toInt() ?? 0,
-              lastReplyAt: DateTime.tryParse(preview['last_reply_created_at']?.toString() ?? ''),
-              lastReplyExcerpt: _text(preview['last_reply_excerpt']),
-              lastReplyUser: DiscourseChatUser.fromJson(siteUrl, preview['last_reply_user']),
-            ),
+              replyCount: (thread?['reply_count'] as num?)?.toInt()),
       bookmarkId: (bookmark?['id'] as num?)?.toInt(),
       pinned: json['pinned'] == true,
       availableFlags: flags is List ? [for (final f in flags) if (f != null) f.toString()] : const [],
