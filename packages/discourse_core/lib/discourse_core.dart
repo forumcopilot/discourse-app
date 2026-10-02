@@ -20,6 +20,7 @@ export 'src/proxy/bookmark_proxy.dart';
 export 'src/proxy/chat_proxy.dart';
 export 'src/data/chat/discourse_chat_event.dart';
 export 'src/data/chat/discourse_chat_channel_details.dart';
+export 'src/data/chat/discourse_chat_message_extras.dart';
 export 'src/data/chat/discourse_chatable.dart';
 export 'src/data/chat/discourse_chat_uploads.dart';
 export 'src/data/chat/discourse_chat_permissions.dart';

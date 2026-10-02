@@ -1513,5 +1513,10 @@
   "chatMembersCount": "{count, plural, one{{count} участник} few{{count} участника} many{{count} участников} other{{count} участников}}",
   "chatYesterday": "Вчера",
   "chatNoChannelsFound": "Каналы не обнаружены",
-  "chatCloseDm": "Закрыть личный чат"
+  "chatCloseDm": "Закрыть личный чат",
+  "chatToday": "Сегодня",
+  "chatLastVisit": "последнее посещение",
+  "chatNewMessagesCount": "{count, plural, one{{count} новое сообщение} few{{count} новых сообщения} many{{count} новых сообщений} other{{count} нового сообщения}}",
+  "chatScrollToBottom": "Прокрутка вниз",
+  "chatInReplyTo": "В ответ на"
 }

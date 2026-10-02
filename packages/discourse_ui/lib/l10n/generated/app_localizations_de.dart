@@ -5055,4 +5055,27 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get chatCloseDm => 'Schließe diesen persönlichen Chat';
+
+  @override
+  String get chatToday => 'Heute';
+
+  @override
+  String get chatLastVisit => 'letzter Besuch';
+
+  @override
+  String chatNewMessagesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count neue Nachrichten',
+      one: '$count neue Nachricht',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatScrollToBottom => 'Nach unten scrollen';
+
+  @override
+  String get chatInReplyTo => 'Als Antwort auf';
 }

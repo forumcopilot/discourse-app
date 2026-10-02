@@ -1513,5 +1513,10 @@
   "chatMembersCount": "{count, plural, other{{count} 人のメンバー}}",
   "chatYesterday": "昨日",
   "chatNoChannelsFound": "チャンネルが見つかりません",
-  "chatCloseDm": "このパーソナルチャットを閉じる"
+  "chatCloseDm": "このパーソナルチャットを閉じる",
+  "chatToday": "今日",
+  "chatLastVisit": "最後の訪問",
+  "chatNewMessagesCount": "{count, plural, other{新しいメッセージ {count} 件}}",
+  "chatScrollToBottom": "一番下にスクロール",
+  "chatInReplyTo": "返信先"
 }

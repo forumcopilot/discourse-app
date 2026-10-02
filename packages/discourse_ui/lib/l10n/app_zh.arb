@@ -1513,5 +1513,10 @@
   "chatMembersCount": "{count, plural, other{{count} 个成员}}",
   "chatYesterday": "昨天",
   "chatNoChannelsFound": "找不到频道",
-  "chatCloseDm": "关闭此个人聊天"
+  "chatCloseDm": "关闭此个人聊天",
+  "chatToday": "今天",
+  "chatLastVisit": "上次访问",
+  "chatNewMessagesCount": "{count, plural, other{{count} 条新消息}}",
+  "chatScrollToBottom": "滚动到底部",
+  "chatInReplyTo": "回复"
 }

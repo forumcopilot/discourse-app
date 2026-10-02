@@ -1513,5 +1513,10 @@
   "chatMembersCount": "{count, plural, other{회원 {count}명}}",
   "chatYesterday": "어제",
   "chatNoChannelsFound": "채널을 찾을 수 없습니다.",
-  "chatCloseDm": "이 개인 채팅 닫기"
+  "chatCloseDm": "이 개인 채팅 닫기",
+  "chatToday": "오늘",
+  "chatLastVisit": "마지막 방문",
+  "chatNewMessagesCount": "{count, plural, other{새 메시지 {count}개}}",
+  "chatScrollToBottom": "맨 아래로 스크롤",
+  "chatInReplyTo": "답장 대상"
 }

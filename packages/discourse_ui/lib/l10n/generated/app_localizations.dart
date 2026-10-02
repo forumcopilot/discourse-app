@@ -8153,6 +8153,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close this personal chat'**
   String get chatCloseDm;
+
+  /// Date line in a chat conversation over today's messages
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get chatToday;
+
+  /// Line in a chat conversation where the reader's unread messages begin (Discourse's wording)
+  ///
+  /// In en, this message translates to:
+  /// **'last visit'**
+  String get chatLastVisit;
+
+  /// Button that jumps to the newest chat messages, with how many arrived while the reader was scrolled up
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} new message} other{{count} new messages}}'**
+  String chatNewMessagesCount(int count);
+
+  /// Screen-reader label of the button that jumps to the newest chat messages
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll to bottom'**
+  String get chatScrollToBottom;
+
+  /// Screen-reader label before the message a chat reply answers
+  ///
+  /// In en, this message translates to:
+  /// **'In reply to'**
+  String get chatInReplyTo;
 }
 
 class _AppLocalizationsDelegate

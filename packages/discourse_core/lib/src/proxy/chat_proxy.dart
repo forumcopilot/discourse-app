@@ -1,3 +1,5 @@
+import 'dart:convert' show HtmlEscape;
+
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_chat_proxy.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_chat_channel.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 import '../base_discourse_proxy.dart';
 import '../data/chat/discourse_chat_channel_details.dart';
 import '../data/chat/discourse_chat_event.dart';
+import '../data/chat/discourse_chat_message_extras.dart';
 import '../data/chat/discourse_chatable.dart';
 import '../data/chat/discourse_chat_uploads.dart';
 import '../data/chat/discourse_chat_permissions.dart';
@@ -161,11 +164,17 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
   /// [uploadIds] are files already uploaded from the chat composer
   /// (`/uploads.json`, `upload_type: chat-composer`). With them the text may
   /// be empty, as Chat::CreateMessage allows.
+  ///
+  /// [inReplyTo] makes it a reply to that message (`in_reply_to_id`; in a
+  /// channel with threads, Discourse starts or continues the thread), and
+  /// [threadId] sends it inside a thread.
   @override
   Future<FCChatMessageResult> sendMessageAsync(
     int channelId,
     String message, {
     List<int> uploadIds = const [],
+    FCChatMessage? inReplyTo,
+    int? threadId,
   }) async {
     if (message.trim().isEmpty && uploadIds.isEmpty) {
       return FCChatMessageResult(
@@ -179,6 +188,8 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       final response = await apiPost('/chat/$channelId', body: {
         'message': message,
         if (uploadIds.isNotEmpty) 'upload_ids': uploadIds,
+        if (inReplyTo != null) 'in_reply_to_id': inReplyTo.id,
+        if (threadId != null) 'thread_id': threadId,
       });
       // Response shape: success_json.merge(message_id:) — i.e.
       // { success: "OK", message_id: 123 }
@@ -196,15 +207,37 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
         DiscourseChatUploads.store(siteContext.site.url, messageId,
             DiscourseChatUploads.takeUploads(siteContext.site.url, uploadIds));
       }
+      if (inReplyTo != null) {
+        DiscourseChatMessageExtras.store(
+          siteContext.site.url,
+          messageId,
+          DiscourseChatMessageExtras(
+            replyTo: DiscourseChatReplyTo(
+              messageId: inReplyTo.id,
+              excerpt: inReplyTo.excerpt ?? inReplyTo.message,
+              user: DiscourseChatUser(
+                userId: inReplyTo.authorId,
+                username: inReplyTo.authorUsername,
+                name: inReplyTo.authorName,
+                avatarUrl: inReplyTo.authorAvatarUrl,
+              ),
+            ),
+          ),
+        );
+      }
       return FCChatMessageResult(
         result: true,
         message: FCChatMessage(
           id: messageId,
           channelId: channelId,
+          threadId: threadId,
           message: message,
-          cooked: message,
+          // Escaped paragraphs until the server's rendering arrives (it
+          // drew the raw markdown, `<` and all).
+          cooked: plainCooked(message),
           authorId: int.tryParse(siteContext.currentUserId ?? '') ?? 0,
           authorUsername: siteContext.currentUsername ?? '',
+          authorAvatarUrl: siteContext.currentAvatarUrl,
           // CLIENT clock, not a server timestamp: the create response
           // carries only `message_id` (see above), so this is the local
           // echo's own send time. Replaced by the server's `created_at`
@@ -814,6 +847,8 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
           absoluteSiteUrl(siteContext.site.url, filled);
     }
     final id = (json['id'] as num).toInt();
+    DiscourseChatMessageExtras.store(siteContext.site.url, id,
+        DiscourseChatMessageExtras.fromMessageJson(siteContext.site.url, json));
     DiscourseChatUploads.store(siteContext.site.url, id, [
       for (final raw in ((json['uploads'] as List?) ?? const []).whereType<Map>())
         _uploadFrom(raw.cast<String, dynamic>()),
@@ -840,4 +875,11 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       reactions: reactions,
     );
   }
+
+  /// [text] as escaped HTML paragraphs: a stand-in for the server's
+  /// rendering of a message just sent or edited.
+  static String plainCooked(String text) => text
+      .split(RegExp(r'\n{2,}'))
+      .map((p) => '<p>${const HtmlEscape().convert(p).replaceAll('\n', '<br>')}</p>')
+      .join();
 }

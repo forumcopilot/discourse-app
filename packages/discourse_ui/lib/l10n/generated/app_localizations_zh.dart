@@ -4710,4 +4710,26 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chatCloseDm => '关闭此个人聊天';
+
+  @override
+  String get chatToday => '今天';
+
+  @override
+  String get chatLastVisit => '上次访问';
+
+  @override
+  String chatNewMessagesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条新消息',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatScrollToBottom => '滚动到底部';
+
+  @override
+  String get chatInReplyTo => '回复';
 }

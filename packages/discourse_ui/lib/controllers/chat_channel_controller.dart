@@ -3,6 +3,7 @@ import 'dart:convert' show HtmlEscape;
 
 import 'package:discourse_core/discourse_core.dart'
     show
+        DiscourseChatChannelDetails,
         DiscourseChatEvent,
         DiscourseChatMessageChanged,
         DiscourseChatMessagesDeleted,
@@ -90,6 +91,34 @@ class ChatChannelController extends GetxController
   /// the channel's history is on screen.
   final hasMoreOlder = true.obs;
 
+  /// The first message the reader had not read when the channel opened
+  /// (someone else's, after `last_read_message_id`), where the view draws
+  /// its "last visit" line and opens. Null when nothing was unread.
+  final firstUnreadId = Rxn<int>();
+
+  /// True while the newest messages are not loaded: the channel opened at
+  /// an unread line or a notified message further back. Scrolling down
+  /// loads them ([loadNewer]); the jump button loads the newest ([jumpToLatest]).
+  final hasMoreNewer = false.obs;
+  final isLoadingNewer = false.obs;
+
+  /// Messages published while [hasMoreNewer] (not added, to leave no gap),
+  /// for the jump button's count.
+  final pendingNewer = 0.obs;
+
+  /// The newest message id known to exist, loaded or not.
+  int _newestKnownId = 0;
+
+  /// The newest message the reader has seen on screen ([noteSeen]): "mark
+  /// read" goes up to here, not to whatever happened to be loaded.
+  int _seenMax = 0;
+  bool _positionDecided = false;
+
+  int? get _myUserId {
+    final proxy = SiteProxyService.getChatProxy();
+    return proxy is DiscourseChatProxy ? int.tryParse(proxy.siteContext.currentUserId ?? '') : null;
+  }
+
   // ---- lifecycle -------------------------------------------------------
 
   @override
@@ -161,8 +190,9 @@ class ChatChannelController extends GetxController
         messages.assignAll(sorted);
         _highWatermark = sorted.last.id;
       }
-      if (_highWatermark > 0) {
-        unawaited(markRead());
+      if (!_positionDecided && channelResult.result && messagesResult.result) {
+        _positionDecided = true;
+        await _decideStartingPoint(proxy, ch);
       }
       _bootstrapped = channelResult.result && messagesResult.result;
       loadFailed.value = !_bootstrapped && messages.isEmpty;
@@ -184,6 +214,95 @@ class ChatChannelController extends GetxController
       _retryBootstrapLater();
     } finally {
       isLoadingInitial.value = false;
+    }
+  }
+
+  /// Where the conversation opens. With unread messages it opens at the
+  /// first one, under a "last visit" line, as Discourse does; when that is
+  /// further back than the newest page, the messages around it load instead
+  /// and the newest wait below ([hasMoreNewer]). It used to open at the
+  /// bottom, past everything unread.
+  Future<void> _decideStartingPoint(dynamic proxy, FCChatChannel? ch) async {
+    final details = proxy is DiscourseChatProxy
+        ? DiscourseChatChannelDetails.of(proxy.siteContext.site.url, channelId)
+        : null;
+    _newestKnownId = [
+      _newestKnownId,
+      details?.lastMessageId ?? 0,
+      if (messages.isNotEmpty) messages.last.id,
+    ].reduce((a, b) => a > b ? a : b);
+    final lastRead = ch?.lastReadMessageId;
+    if (targetMessageId == null && lastRead != null && (ch?.unreadCount ?? 0) > 0) {
+      if (messages.isNotEmpty && lastRead < messages.first.id) {
+        final around = await SiteProxyService.getChatProxy()
+            .getMessagesAsync(channelId, pageSize: 50, targetMessageId: lastRead, direction: '');
+        if (around.result && around.messages.isNotEmpty) {
+          messages.assignAll(around.messages.toList()..sort((a, b) => a.id.compareTo(b.id)));
+          _highWatermark = messages.last.id;
+        }
+      }
+      final me = _myUserId;
+      for (final m in messages) {
+        if (m.id > lastRead && m.authorId != me) {
+          firstUnreadId.value = m.id;
+          break;
+        }
+      }
+    }
+    hasMoreNewer.value = messages.isNotEmpty && messages.last.id < _newestKnownId;
+  }
+
+  /// The reader has seen [messageId] on screen.
+  void noteSeen(int messageId) {
+    if (messageId <= _seenMax) return;
+    _seenMax = messageId;
+    _scheduleMarkRead();
+  }
+
+  /// The next page after the newest loaded message, while scrolling down
+  /// from an unread line or a notified message.
+  Future<void> loadNewer({int pageSize = 50}) async {
+    if (isLoadingNewer.value || !hasMoreNewer.value || messages.isEmpty) return;
+    isLoadingNewer.value = true;
+    try {
+      final result = await SiteProxyService.getChatProxy().getMessagesAsync(
+        channelId,
+        pageSize: pageSize,
+        targetMessageId: messages.last.id,
+        direction: 'future',
+      );
+      if (!result.result) return;
+      final existing = {for (final m in messages) m.id};
+      final newer = result.messages.where((m) => !existing.contains(m.id)).toList()
+        ..sort((a, b) => a.id.compareTo(b.id));
+      messages.addAll(newer);
+      if (messages.isNotEmpty && messages.last.id > _highWatermark) _highWatermark = messages.last.id;
+      if (newer.isEmpty || messages.last.id >= _newestKnownId) {
+        hasMoreNewer.value = false;
+        pendingNewer.value = 0;
+      }
+    } catch (e) {
+      AppLogger.warning('ChatChannelController loadNewer error: $e');
+    } finally {
+      isLoadingNewer.value = false;
+    }
+  }
+
+  /// The newest page, replacing what is loaded (no gap to fill): the jump
+  /// button when the newest messages are not loaded.
+  Future<void> jumpToLatest() async {
+    if (!hasMoreNewer.value) return;
+    isLoadingNewer.value = true;
+    try {
+      final result = await SiteProxyService.getChatProxy().getMessagesAsync(channelId, pageSize: 50);
+      if (!result.result || result.messages.isEmpty) return;
+      messages.assignAll(result.messages.toList()..sort((a, b) => a.id.compareTo(b.id)));
+      _highWatermark = messages.last.id;
+      hasMoreNewer.value = false;
+      hasMoreOlder.value = true;
+      pendingNewer.value = 0;
+    } finally {
+      isLoadingNewer.value = false;
     }
   }
 
@@ -260,10 +379,15 @@ class ChatChannelController extends GetxController
           // An edit's payload is serialized for an anonymous viewer, so its
           // reactions lack "reacted by me": keep the ones on screen.
           messages[i] = message.copyWith(reactions: messages[i].reactions);
+        } else if (hasMoreNewer.value && isNew) {
+          // The newest messages are not loaded: adding this one would leave
+          // a gap. Count it for the jump button.
+          if (message.id > _newestKnownId) _newestKnownId = message.id;
+          if (message.authorId != _myUserId) pendingNewer.value++;
         } else if (isNew || event.kind == 'restore') {
           _insertSorted(message);
           if (message.id > _highWatermark) _highWatermark = message.id;
-          _scheduleMarkRead();
+          if (message.id > _newestKnownId) _newestKnownId = message.id;
         }
       case DiscourseChatMessagesDeleted(:final messageIds):
         messages.removeWhere((m) => messageIds.contains(m.id));
@@ -356,7 +480,7 @@ class ChatChannelController extends GetxController
   }
 
   Future<void> _tick() async {
-    if (_disposed || _tickInFlight) return;
+    if (_disposed || _tickInFlight || hasMoreNewer.value) return;
     _tickInFlight = true;
     try {
       final proxy = SiteProxyService.getChatProxy();
@@ -374,10 +498,7 @@ class ChatChannelController extends GetxController
         ...page.values,
       ]..sort((a, b) => a.id.compareTo(b.id));
       messages.assignAll(merged);
-      if (merged.last.id > _highWatermark) {
-        _highWatermark = merged.last.id;
-        _scheduleMarkRead();
-      }
+      if (merged.last.id > _highWatermark) _highWatermark = merged.last.id;
     } catch (e) {
       AppLogger.warning('ChatChannelController poll error: $e');
     } finally {
@@ -389,13 +510,15 @@ class ChatChannelController extends GetxController
 
   /// Sends [text] with any files already uploaded from the composer
   /// ([uploadIds]); either may be empty, not both.
-  Future<bool> send(String text, {List<int> uploadIds = const []}) async {
+  Future<bool> send(String text,
+      {List<int> uploadIds = const [], FCChatMessage? inReplyTo, int? threadId}) async {
     if (text.trim().isEmpty && uploadIds.isEmpty) return false;
     isSending.value = true;
     try {
       final proxy = SiteProxyService.getChatProxy();
       final result = proxy is DiscourseChatProxy
-          ? await proxy.sendMessageAsync(channelId, text, uploadIds: uploadIds)
+          ? await proxy.sendMessageAsync(channelId, text,
+              uploadIds: uploadIds, inReplyTo: inReplyTo, threadId: threadId)
           : await proxy.sendMessageAsync(channelId, text);
       if (!result.result || result.message == null) {
         lastError.value = result.resultText?.isNotEmpty == true
@@ -406,10 +529,12 @@ class ChatChannelController extends GetxController
       final m = result.message!;
       // Optimistic append; the next poll reconciles if the server
       // returns a slightly different shape.
+      if (hasMoreNewer.value) await jumpToLatest();
       if (!messages.any((x) => x.id == m.id)) {
         messages.add(m);
         if (m.id > _highWatermark) _highWatermark = m.id;
       }
+      noteSeen(m.id);
       return true;
     } catch (e) {
       lastError.value = e.toString();
@@ -598,11 +723,16 @@ class ChatChannelController extends GetxController
     }
   }
 
+  /// Tells Discourse the reader has read up to the newest message they
+  /// have seen ([noteSeen]). It used to report the newest message loaded as
+  /// soon as the channel opened, so a long unread stretch counted as read
+  /// before anyone scrolled to it.
   Future<void> markRead() async {
-    if (_highWatermark == 0 || _highWatermark == _reportedReadId) return;
+    final upTo = _seenMax;
+    if (upTo == 0 || upTo <= _reportedReadId) return;
     _lastMarkRead = DateTime.now();
-    _reportedReadId = _highWatermark;
+    _reportedReadId = upTo;
     await SiteProxyService.getChatProxy()
-        .markChannelReadAsync(channelId, messageId: _highWatermark);
+        .markChannelReadAsync(channelId, messageId: upTo);
   }
 }

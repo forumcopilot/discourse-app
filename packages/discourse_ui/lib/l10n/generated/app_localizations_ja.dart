@@ -4772,4 +4772,26 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get chatCloseDm => 'このパーソナルチャットを閉じる';
+
+  @override
+  String get chatToday => '今日';
+
+  @override
+  String get chatLastVisit => '最後の訪問';
+
+  @override
+  String chatNewMessagesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '新しいメッセージ $count 件',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatScrollToBottom => '一番下にスクロール';
+
+  @override
+  String get chatInReplyTo => '返信先';
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_chat_message.dart'
     show FCChatMessageReaction;
+
+import '../../widgets/reaction_glyph.dart';
 
 import '../../../theme/design_tokens.dart';
 
@@ -17,53 +20,6 @@ const List<String> kChatDefaultReactions = [
   'hugs',
 ];
 
-/// Discourse emoji name (no colons) → unicode for the common set.
-/// Anything not listed renders as `:name:`, mirroring how an uncooked
-/// emoji shortcode looks on the web.
-const Map<String, String> _emojiUnicode = {
-  'heart': '❤️',
-  '+1': '👍',
-  '-1': '👎',
-  'thumbsup': '👍',
-  'thumbsdown': '👎',
-  'laughing': '😆',
-  'open_mouth': '😮',
-  'clap': '👏',
-  'confetti_ball': '🎊',
-  'hugs': '🤗',
-  'tada': '🎉',
-  'smile': '😄',
-  'smiley': '😃',
-  'grin': '😁',
-  'grinning': '😀',
-  'joy': '😂',
-  'wink': '😉',
-  'cry': '😢',
-  'sob': '😭',
-  'angry': '😠',
-  'rage': '😡',
-  'thinking': '🤔',
-  'fire': '🔥',
-  'eyes': '👀',
-  'rocket': '🚀',
-  'heart_eyes': '😍',
-  'sunglasses': '😎',
-  'ok_hand': '👌',
-  'wave': '👋',
-  'raised_hands': '🙌',
-  'pray': '🙏',
-  'muscle': '💪',
-  '100': '💯',
-  'star': '⭐',
-  'white_check_mark': '✅',
-  'heavy_check_mark': '✔️',
-  'x': '❌',
-};
-
-/// Display label for a Discourse emoji name: unicode when known,
-/// `:name:` otherwise.
-String chatEmojiLabel(String name) => _emojiUnicode[name] ?? ':$name:';
-
 /// The row of reaction chips under a chat message.
 ///
 /// [reactions] is the message's own [FCChatMessageReaction] list
@@ -78,9 +34,15 @@ class ChatReactionChips extends StatefulWidget {
     super.key,
     required this.reactions,
     required this.onToggle,
+    this.siteContext,
   });
 
   final List<FCChatMessageReaction> reactions;
+
+  /// The forum, for its own emoji. Every emoji goes through ReactionGlyph,
+  /// as post reactions do; a fixed table of 37 names here showed any other
+  /// as `:name:`.
+  final SiteContext? siteContext;
 
   /// Performs the toggle; resolves false on failure (revert). Null
   /// renders the chips read-only (guests).
@@ -167,7 +129,14 @@ class _ChatReactionChipsState extends State<ChatReactionChips> {
       padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingS),
       labelPadding: EdgeInsets.zero,
       labelStyle: textTheme.labelMedium,
-      label: Text('${chatEmojiLabel(emoji)} $count'),
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ReactionGlyph(reactionId: emoji, size: 16, siteContext: widget.siteContext),
+          const SizedBox(width: 4),
+          Text('$count'),
+        ],
+      ),
     );
   }
 }

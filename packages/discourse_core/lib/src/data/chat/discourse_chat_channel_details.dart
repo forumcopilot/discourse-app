@@ -71,6 +71,7 @@ class DiscourseChatChannelDetails {
     this.lastMessageExcerpt,
     this.lastMessageAt,
     this.lastMessageUserId,
+    this.lastMessageId,
     this.starred = false,
     this.muted = false,
     this.notificationLevel = 'mention',
@@ -111,6 +112,10 @@ class DiscourseChatChannelDetails {
   /// the channel list does not).
   final int? lastMessageUserId;
 
+  /// The newest message's id, so a conversation opened partway (at an
+  /// unread line or a notified message) knows there is more after it.
+  final int? lastMessageId;
+
   final bool starred;
   final bool muted;
 
@@ -132,6 +137,7 @@ class DiscourseChatChannelDetails {
     String? lastMessageExcerpt,
     DateTime? lastMessageAt,
     int? lastMessageUserId,
+    int? lastMessageId,
     bool? starred,
     bool? muted,
     String? notificationLevel,
@@ -149,6 +155,7 @@ class DiscourseChatChannelDetails {
         lastMessageExcerpt: lastMessageExcerpt ?? this.lastMessageExcerpt,
         lastMessageAt: lastMessageAt ?? this.lastMessageAt,
         lastMessageUserId: lastMessageUserId ?? this.lastMessageUserId,
+        lastMessageId: lastMessageId ?? this.lastMessageId,
         starred: starred ?? this.starred,
         muted: muted ?? this.muted,
         notificationLevel: notificationLevel ?? this.notificationLevel,
@@ -189,6 +196,7 @@ class DiscourseChatChannelDetails {
       lastMessageAt: DateTime.tryParse(last?['created_at']?.toString() ?? '') ??
           DateTime.tryParse(json['last_message_sent_at']?.toString() ?? ''),
       lastMessageUserId: ((last?['user'] as Map?)?['id'] as num?)?.toInt(),
+      lastMessageId: (last?['id'] as num?)?.toInt(),
       starred: membership?['starred'] == true,
       muted: membership?['muted'] == true,
       notificationLevel: _nonEmpty(membership?['notification_level']) ?? 'mention',

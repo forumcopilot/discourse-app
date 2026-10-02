@@ -1513,5 +1513,10 @@
   "chatMembersCount": "{count, plural, one{{count} miembro} other{{count} miembros}}",
   "chatYesterday": "Ayer",
   "chatNoChannelsFound": "No se han encontrado canales",
-  "chatCloseDm": "Cerrar este chat personal"
+  "chatCloseDm": "Cerrar este chat personal",
+  "chatToday": "Hoy",
+  "chatLastVisit": "última visita",
+  "chatNewMessagesCount": "{count, plural, one{{count} mensaje nuevo} other{{count} mensajes nuevos}}",
+  "chatScrollToBottom": "Desplazar hacia abajo",
+  "chatInReplyTo": "En respuesta a"
 }

@@ -1670,5 +1670,10 @@
   "chatMembersCount": "{count, plural, one{{count} lid} other{{count} leden}}",
   "chatYesterday": "Gisteren",
   "chatNoChannelsFound": "Geen kanalen gevonden",
-  "chatCloseDm": "Deze privéchat sluiten"
+  "chatCloseDm": "Deze privéchat sluiten",
+  "chatToday": "Vandaag",
+  "chatLastVisit": "laatste bezoek",
+  "chatNewMessagesCount": "{count, plural, one{{count} nieuw bericht} other{{count} nieuwe berichten}}",
+  "chatScrollToBottom": "Naar beneden scrollen",
+  "chatInReplyTo": "In antwoord op"
 }

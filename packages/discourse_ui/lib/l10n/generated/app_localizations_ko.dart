@@ -4771,4 +4771,26 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get chatCloseDm => '이 개인 채팅 닫기';
+
+  @override
+  String get chatToday => '오늘';
+
+  @override
+  String get chatLastVisit => '마지막 방문';
+
+  @override
+  String chatNewMessagesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '새 메시지 $count개',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatScrollToBottom => '맨 아래로 스크롤';
+
+  @override
+  String get chatInReplyTo => '답장 대상';
 }

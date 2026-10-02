@@ -5062,4 +5062,29 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get chatCloseDm => 'Закрыть личный чат';
+
+  @override
+  String get chatToday => 'Сегодня';
+
+  @override
+  String get chatLastVisit => 'последнее посещение';
+
+  @override
+  String chatNewMessagesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count нового сообщения',
+      many: '$count новых сообщений',
+      few: '$count новых сообщения',
+      one: '$count новое сообщение',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatScrollToBottom => 'Прокрутка вниз';
+
+  @override
+  String get chatInReplyTo => 'В ответ на';
 }

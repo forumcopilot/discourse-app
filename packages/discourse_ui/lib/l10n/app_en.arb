@@ -6259,5 +6259,30 @@
   "chatCloseDm": "Close this personal chat",
   "@chatCloseDm": {
     "description": "Swipe action on a direct message in the chat list: hide it until someone writes again"
+  },
+  "chatToday": "Today",
+  "@chatToday": {
+    "description": "Date line in a chat conversation over today's messages"
+  },
+  "chatLastVisit": "last visit",
+  "@chatLastVisit": {
+    "description": "Line in a chat conversation where the reader's unread messages begin (Discourse's wording)"
+  },
+  "chatNewMessagesCount": "{count, plural, one{{count} new message} other{{count} new messages}}",
+  "@chatNewMessagesCount": {
+    "description": "Button that jumps to the newest chat messages, with how many arrived while the reader was scrolled up",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatScrollToBottom": "Scroll to bottom",
+  "@chatScrollToBottom": {
+    "description": "Screen-reader label of the button that jumps to the newest chat messages"
+  },
+  "chatInReplyTo": "In reply to",
+  "@chatInReplyTo": {
+    "description": "Screen-reader label before the message a chat reply answers"
   }
 }
