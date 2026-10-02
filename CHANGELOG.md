@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Fixed
 
+- Refresh user-specific site capabilities when credentials change and honor forced configuration refreshes. Ignore late replies from older sessions or refreshes, and prevent old HTTP responses from undoing a refresh.
 - Submit poll votes using the displayed post and poll name, eliminating cross-topic and cross-forum option-digest collisions. Votes without a complete target no longer guess the first post; stale cards cannot submit through another forum's active proxy.
 - Keep Discourse API credentials on their original origin when a server redirects a request. Reads follow at most five redirects with the same scheme, host, and port; writes and uploads are never replayed through redirects.
 

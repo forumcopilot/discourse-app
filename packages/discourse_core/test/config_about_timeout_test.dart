@@ -127,6 +127,7 @@ class _AboutNeverAnswers extends DiscourseClient {
     String path, {
     Map<String, dynamic>? query,
     Map<String, String>? extraHeaders,
+    bool useCache = true,
   }) async {
     if (path == '/about.json') {
       aboutRequests++;

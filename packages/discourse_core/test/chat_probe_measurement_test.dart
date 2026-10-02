@@ -87,17 +87,16 @@ void main() {
     await server.close(force: true);
   });
 
-  test('a signed-out cold launch probes the chat route once, not per getConfig',
+  test('ordinary signed-out loads probe the chat route once, not per getConfig',
       () async {
     final url = await startServer(chatStatus: 403);
     final context = contextFor(url);
     final proxy = DiscourseConfigProxy(context);
 
-    // The bootstrap calls getConfig three times in ~600ms:
-    // SiteInitializationService, SiteController._performSiteInitialization,
-    // and SiteHomePage's post-frame "is the site still up?" verification.
+    // Repeated ordinary loads reuse the probe. Explicit forceRefresh calls
+    // intentionally re-probe and are covered by config_session_refresh_test.
     for (var i = 0; i < 3; i++) {
-      await proxy.getConfig(url, forceRefresh: true);
+      await proxy.getConfig(url);
     }
 
     // Control: /about.json answers 200, so the existing read cache already
@@ -119,7 +118,7 @@ void main() {
     final proxy = DiscourseConfigProxy(context);
 
     for (var i = 0; i < 3; i++) {
-      await proxy.getConfig(url, forceRefresh: true);
+      await proxy.getConfig(url);
     }
 
     // `false` has to be a remembered answer, not "not yet asked" — otherwise
@@ -138,7 +137,7 @@ void main() {
     // instance-scoped memo would let each of them probe again.
     for (var i = 0; i < 3; i++) {
       await DiscourseConfigProxy(contextFor(url))
-          .getConfig(url, forceRefresh: true);
+          .getConfig(url);
     }
 
     expect(hits['/chat/api/me/channels'], 1);

@@ -335,6 +335,16 @@ class DiscourseLoginService {
 
     _applyChatFlags(cu);
 
+    // Permissions and visible categories change with the new API key. Load
+    // them before notifying the UI that login completed. A configuration
+    // outage must not discard an otherwise successful authentication.
+    try {
+      await DiscourseConfigProxy(siteContext, client: _client)
+          .getConfig(siteContext.site.pluginUrl, forceRefresh: true);
+    } catch (e) {
+      AppLogger.warning('Could not refresh configuration after sign-in: $e');
+    }
+
     siteContext.setLoginData(result);
     siteContext.resetOnLogin();
     await siteContext.saveToDevice();
