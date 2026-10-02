@@ -51,6 +51,69 @@ void main() {
         'POST /t/401970/invite-group.json {group: moderators}');
   });
 
+  group('saving conversation details', () {
+    for (final open in [false, true]) {
+      test('reports a refused ${open ? 'reopen' : 'close'} after title saves',
+          () async {
+        proxy.putErrors['/t/7/status.json'] = DiscourseApiException(
+          statusCode: 403,
+          method: 'PUT',
+          path: '/t/7/status.json',
+          body: '{"errors":["You cannot change this conversation status."]}',
+        );
+        final result = await proxy.saveRawConversationAsync('7',
+            conversationTitle: 'Updated title', conversationOpen: open);
+        expect(result.result, isFalse);
+        expect(result.resultText, 'You cannot change this conversation status.');
+        expect(proxy.calls, [
+          'PUT /t/7.json {title: Updated title}',
+          'PUT /t/7/status.json {status: closed, enabled: ${!open}}',
+        ]);
+      });
+
+      test('saves title and ${open ? 'reopens' : 'closes'} successfully', () async {
+        final result = await proxy.saveRawConversationAsync('7',
+            conversationTitle: 'Updated title', conversationOpen: open);
+        expect(result.result, isTrue);
+        expect(result.conversationTitle, 'Updated title');
+        expect(proxy.calls, [
+          'PUT /t/7.json {title: Updated title}',
+          'PUT /t/7/status.json {status: closed, enabled: ${!open}}',
+        ]);
+      });
+    }
+
+    test('reports an unexpected status request failure', () async {
+      proxy.putErrors['/t/7/status.json'] = StateError('connection interrupted');
+      final result = await proxy.saveRawConversationAsync('7',
+          conversationOpen: false);
+      expect(result.result, isFalse);
+      expect(result.resultText, isNotEmpty);
+      expect(proxy.calls, ['PUT /t/7/status.json {status: closed, enabled: true}']);
+    });
+
+    test('does not change status when the title update fails', () async {
+      proxy.putErrors['/t/7.json'] = DiscourseApiException(
+        statusCode: 422,
+        method: 'PUT',
+        path: '/t/7.json',
+        body: '{"errors":["Title is too short."]}',
+      );
+      final result = await proxy.saveRawConversationAsync('7',
+          conversationTitle: 'x', conversationOpen: false);
+      expect(result.result, isFalse);
+      expect(result.resultText, 'Title is too short.');
+      expect(proxy.calls, ['PUT /t/7.json {title: x}']);
+    });
+
+    test('title-only saves do not request a status change', () async {
+      final result = await proxy.saveRawConversationAsync('7',
+          conversationTitle: 'Updated title');
+      expect(result.result, isTrue);
+      expect(proxy.calls, ['PUT /t/7.json {title: Updated title}']);
+    });
+  });
+
   group('a loaded message', () {
     Map<String, dynamic> topic(Map<String, dynamic> details) => {
           'title': 'Hello',
@@ -113,6 +176,7 @@ class _RecordingPmProxy extends DiscoursePrivateConversationProxy {
 
   Map<String, dynamic> nextGet = const {};
   final List<String> calls = [];
+  final Map<String, Object> putErrors = {};
 
   @override
   Future<Map<String, dynamic>> apiGet(String path,
@@ -126,6 +190,15 @@ class _RecordingPmProxy extends DiscoursePrivateConversationProxy {
       {Map<String, dynamic>? query, Object? body}) async {
     calls.add('POST $path ${body ?? {}}');
     return const {};
+  }
+
+  @override
+  Future<Map<String, dynamic>> apiPut(String path,
+      {Map<String, dynamic>? query, Object? body}) async {
+    calls.add('PUT $path ${body ?? {}}');
+    final error = putErrors[path];
+    if (error != null) throw error;
+    return const {'success': 'OK'};
   }
 
   @override
