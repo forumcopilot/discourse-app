@@ -61,7 +61,8 @@ class DiscourseInviteProxy extends BaseDiscourseProxy {
     } on DiscourseApiException catch (e) {
       return DiscourseInviteResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return DiscourseInviteResult(result: false, resultText: describeApiError(e));
+      return DiscourseInviteResult(
+          result: false, resultText: describeApiError(e));
     }
   }
 
@@ -122,7 +123,8 @@ class DiscourseInviteProxy extends BaseDiscourseProxy {
     } on DiscourseApiException catch (e) {
       return DiscourseInviteResult(result: false, resultText: e.userMessage);
     } catch (e) {
-      return DiscourseInviteResult(result: false, resultText: describeApiError(e));
+      return DiscourseInviteResult(
+          result: false, resultText: describeApiError(e));
     }
   }
 
@@ -134,9 +136,11 @@ class DiscourseInviteProxy extends BaseDiscourseProxy {
   /// invites (link, email, expiry); `redeemed` rows carry the redeeming
   /// user's username and `redeemed_at` instead (`InvitedUserSerializer`).
   /// The response also includes pending/expired/redeemed counts, surfaced
-  /// on the result for tab badges.
+  /// on the result for tab badges. [offset] counts server rows, not pages;
+  /// the forum controls the page size through `invites_per_page`.
   Future<DiscourseInviteListResult> getMyInvitesAsync({
     String filter = 'pending',
+    int offset = 0,
   }) async {
     final username = siteContext.currentUsername;
     if (username == null || username.isEmpty) {
@@ -148,7 +152,7 @@ class DiscourseInviteProxy extends BaseDiscourseProxy {
     try {
       final response = await apiGet(
         '/u/${Uri.encodeComponent(username)}/invited.json',
-        query: {'filter': filter},
+        query: {'filter': filter, 'offset': offset},
       );
       final raw = (response['invites'] as List?) ?? const [];
       final invites = raw
@@ -157,17 +161,26 @@ class DiscourseInviteProxy extends BaseDiscourseProxy {
           .toList(growable: false);
       final counts = (response['counts'] as Map?)?.cast<String, dynamic>() ??
           const <String, dynamic>{};
+      final total = (counts[filter] as num?)?.toInt();
+      final nextOffset = offset + raw.length;
       return DiscourseInviteListResult(
         result: true,
         invites: invites,
+        // Stop on an empty page even if counts changed during pagination.
+        // Without a count, probe one more page after any nonempty response.
+        nextOffset: raw.isNotEmpty && (total == null || nextOffset < total)
+            ? nextOffset
+            : null,
         pendingCount: (counts['pending'] as num?)?.toInt() ?? 0,
         expiredCount: (counts['expired'] as num?)?.toInt() ?? 0,
         redeemedCount: (counts['redeemed'] as num?)?.toInt() ?? 0,
       );
     } on DiscourseApiException catch (e) {
-      return DiscourseInviteListResult(result: false, resultText: e.userMessage);
+      return DiscourseInviteListResult(
+          result: false, resultText: e.userMessage);
     } catch (e) {
-      return DiscourseInviteListResult(result: false, resultText: describeApiError(e));
+      return DiscourseInviteListResult(
+          result: false, resultText: describeApiError(e));
     }
   }
 
@@ -319,6 +332,9 @@ class DiscourseInviteListResult {
   final String? resultText;
   final List<DiscourseInvite> invites;
 
+  /// Next server row offset, or null when the list is exhausted.
+  final int? nextOffset;
+
   /// Server-side totals across all filters (for tab badges).
   final int pendingCount;
   final int expiredCount;
@@ -328,6 +344,7 @@ class DiscourseInviteListResult {
     required this.result,
     this.resultText,
     this.invites = const [],
+    this.nextOffset,
     this.pendingCount = 0,
     this.expiredCount = 0,
     this.redeemedCount = 0,
