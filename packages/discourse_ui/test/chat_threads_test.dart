@@ -137,6 +137,26 @@ void main() {
     expect(find.text('open'), findsOneWidget, reason: 'leaving closes the conversation too');
   });
 
+  testWidgets("a channel not joined yet: Join, and nothing to set or leave", (tester) async {
+    tall(tester);
+    chat.channel = {
+      ..._general(),
+      'current_user_membership': null,
+      'meta': {'can_join_chat_channel': true},
+    };
+    chat.messages = [_msg(10, 7, 'samr', 'hello')];
+    await openChannel(tester);
+    await tester.tap(find.byTooltip('Channel settings'));
+    await tester.pumpAndSettle();
+    expect(find.text('Star channel'), findsNothing);
+    expect(find.text('Leave channel'), findsNothing);
+    await tester.tap(find.widgetWithText(FilledButton, 'Join'));
+    await tester.pumpAndSettle();
+    expect(chat.calls, contains('POST /chat/api/channels/1/memberships/me'));
+    expect(find.text('Star channel'), findsOneWidget);
+    expect(find.text('Leave channel'), findsOneWidget);
+  });
+
   testWidgets('a group chat adds people from its settings', (tester) async {
     tall(tester);
     chat.channel = {
@@ -152,11 +172,18 @@ void main() {
     };
     chat.messages = [_msg(10, 8, 'priya', 'hi all')];
     await openChannel(tester);
+    expect(find.text('Chat in group'), findsOneWidget);
     await tester.tap(find.byTooltip('Channel settings'));
     await tester.pumpAndSettle();
     expect(find.text('Add Member'), findsOneWidget);
     expect(find.byTooltip('Remove'), findsNWidgets(2), reason: 'everyone but the reader');
-    expect(find.text('Leave channel'), findsOneWidget);
+    expect(find.text('Chat in group'), findsNothing, reason: 'the conversation is under the settings');
+    await tester.tap(find.text('Leave'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('re-invited'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(chat.calls.where((c) => c.startsWith('DELETE')), isEmpty);
   });
 
   testWidgets('a thread shows under its message, opens on a tap, and replies go in it', (tester) async {

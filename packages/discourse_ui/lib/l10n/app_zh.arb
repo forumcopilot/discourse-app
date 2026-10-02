@@ -1561,5 +1561,6 @@
   "messageListUnreadCount": "{count, plural, other{未读 ({count})}}",
   "messageListNewCount": "{count, plural, other{新 ({count})}}",
   "messagePersonal": "个人",
-  "messageListIncoming": "{count, plural, other{查看 {count} 个新的或更新的话题}}"
+  "messageListIncoming": "{count, plural, other{查看 {count} 个新的或更新的话题}}",
+  "chatPlaceholderGroup": "群聊"
 }

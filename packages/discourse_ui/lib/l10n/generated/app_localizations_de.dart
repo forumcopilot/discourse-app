@@ -5264,4 +5264,7 @@ class AppLocalizationsDe extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get chatPlaceholderGroup => 'In der Gruppe chatten';
 }

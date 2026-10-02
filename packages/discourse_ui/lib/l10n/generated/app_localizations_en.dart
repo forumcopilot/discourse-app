@@ -5172,4 +5172,7 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get chatPlaceholderGroup => 'Chat in group';
 }

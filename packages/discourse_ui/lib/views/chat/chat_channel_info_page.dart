@@ -37,6 +37,10 @@ class _ChatChannelInfoPageState extends State<ChatChannelInfoPage> {
   int _total = 0;
   bool _busy = false;
 
+  /// Whether the reader is in the channel: a channel opened from Browse is
+  /// a preview, with nothing to set or leave until they join.
+  late bool _member = widget.channel.isFollowing || widget.channel.chatableType == 'DirectMessage';
+
   DiscourseChatProxy? get _proxy {
     final p = SiteProxyService.getChatProxy();
     return p is DiscourseChatProxy ? p : null;
@@ -147,13 +151,43 @@ class _ChatChannelInfoPageState extends State<ChatChannelInfoPage> {
     await _loadMembers();
   }
 
+  Future<void> _join() async {
+    final proxy = _proxy;
+    if (proxy == null) return;
+    setState(() => _busy = true);
+    final r = await proxy.joinChannelAsync(widget.channel.id);
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      if (r.result) _member = true;
+    });
+    if (!r.result) return _error(r.resultText);
+    await _loadMembers();
+  }
+
   /// Leave a channel or group chat; a one-to-one DM is closed (it comes
   /// back when someone writes), as the web does.
   Future<void> _leave() async {
     final proxy = _proxy;
     if (proxy == null) return;
-    setState(() => _busy = true);
     final oneToOne = _isDm && !(_details?.isGroup ?? false);
+    // Coming back to a group chat takes an invitation: say so first, as the
+    // web does.
+    if (_isDm && !oneToOne) {
+      final l10n = AppLocalizations.of(context)!;
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (d) => AlertDialog(
+          content: Text(l10n.chatLeaveGroupInfo),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(d, false), child: Text(l10n.cancel)),
+            FilledButton(onPressed: () => Navigator.pop(d, true), child: Text(l10n.chatLeave)),
+          ],
+        ),
+      );
+      if (ok != true || !mounted) return;
+    }
+    setState(() => _busy = true);
     final r = oneToOne
         ? await proxy.closeDirectMessageAsync(widget.channel.id)
         : await proxy.leaveChannelAsync(widget.channel.id);
@@ -204,24 +238,31 @@ class _ChatChannelInfoPageState extends State<ChatChannelInfoPage> {
                   ],
                 ),
               ),
-              ListTile(
-                leading: const Icon(Icons.notifications_outlined),
-                title: Text(l10n.chatNotificationLevel),
-                subtitle: Text(level),
-                onTap: _setLevel,
-              ),
-              SwitchListTile(
-                secondary: const Icon(Icons.notifications_off_outlined),
-                title: Text(l10n.chatMuteChannel),
-                value: d?.muted ?? false,
-                onChanged: _setMuted,
-              ),
-              SwitchListTile(
-                secondary: const Icon(Icons.star_outline),
-                title: Text(l10n.chatStarChannel),
-                value: d?.starred ?? false,
-                onChanged: _setStarred,
-              ),
+              if (!_member && widget.channel.canJoin)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+                  child: FilledButton(onPressed: _busy ? null : _join, child: Text(l10n.chatJoin)),
+                ),
+              if (_member) ...[
+                ListTile(
+                  leading: const Icon(Icons.notifications_outlined),
+                  title: Text(l10n.chatNotificationLevel),
+                  subtitle: Text(level),
+                  onTap: _setLevel,
+                ),
+                SwitchListTile(
+                  secondary: const Icon(Icons.notifications_off_outlined),
+                  title: Text(l10n.chatMuteChannel),
+                  value: d?.muted ?? false,
+                  onChanged: _setMuted,
+                ),
+                SwitchListTile(
+                  secondary: const Icon(Icons.star_outline),
+                  title: Text(l10n.chatStarChannel),
+                  value: d?.starred ?? false,
+                  onChanged: _setStarred,
+                ),
+              ],
               const Divider(),
               Padding(
                 padding: const EdgeInsets.fromLTRB(
@@ -257,14 +298,21 @@ class _ChatChannelInfoPageState extends State<ChatChannelInfoPage> {
                           )
                         : null,
                   ),
-              const Divider(),
-              ListTile(
-                leading: Icon(Icons.logout, color: colorScheme.error),
-                title: Text(_isDm && !group ? l10n.chatCloseDm : l10n.chatLeaveChannel,
-                    style: TextStyle(color: colorScheme.error)),
-                enabled: !_busy,
-                onTap: _leave,
-              ),
+              if (_member) ...[
+                const Divider(),
+                ListTile(
+                  leading: Icon(Icons.logout, color: colorScheme.error),
+                  title: Text(
+                      _isDm && !group
+                          ? l10n.chatCloseDm
+                          : group
+                              ? l10n.chatLeave
+                              : l10n.chatLeaveChannel,
+                      style: TextStyle(color: colorScheme.error)),
+                  enabled: !_busy,
+                  onTap: _leave,
+                ),
+              ],
               const SizedBox(height: DesignTokens.spacingXL),
             ],
           ),

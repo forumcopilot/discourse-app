@@ -13,6 +13,19 @@ void main() {
   const site = 'https://chat.example';
   setUp(DiscourseChatChannelDetails.clear);
 
+  test("an empty channel has no last message, though Discourse sends one timed now", () {
+    final d = DiscourseChatChannelDetails.fromChannelJson('https://x.example', {
+      'id': 1,
+      'title': 'General',
+      'chatable_type': 'Category',
+      // Chat::NullMessage, serialized.
+      'last_message': {'id': null, 'message': null, 'created_at': DateTime.now().toUtc().toIso8601String()},
+    });
+    expect(d.lastMessageAt, isNull);
+    expect(d.lastMessageId, isNull);
+    expect(d.lastMessageExcerpt, isNull);
+  });
+
   Map<String, dynamic> dm({required int id, required List<Map<String, dynamic>> users, bool group = false}) => {
         'id': id,
         'title': users.map((u) => u['username']).join(', '),

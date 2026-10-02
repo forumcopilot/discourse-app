@@ -6510,5 +6510,9 @@
         "type": "int"
       }
     }
+  },
+  "chatPlaceholderGroup": "Chat in group",
+  "@chatPlaceholderGroup": {
+    "description": "Composer hint in a group chat (Discourse chat.placeholder_group)"
   }
 }

@@ -1561,5 +1561,6 @@
   "messageListUnreadCount": "{count, plural, other{읽지 않음({count})}}",
   "messageListNewCount": "{count, plural, other{새글 ({count})}}",
   "messagePersonal": "개인",
-  "messageListIncoming": "{count, plural, other{{count}개의 새글 또는 업데이트 된 글 보기}}"
+  "messageListIncoming": "{count, plural, other{{count}개의 새글 또는 업데이트 된 글 보기}}",
+  "chatPlaceholderGroup": "그룹에서 채팅"
 }

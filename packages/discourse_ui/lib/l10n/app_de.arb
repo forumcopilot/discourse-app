@@ -1561,5 +1561,6 @@
   "messageListUnreadCount": "{count, plural, one{Ungelesen ({count})} other{Ungelesen ({count})}}",
   "messageListNewCount": "{count, plural, one{Neu ({count})} other{Neu ({count})}}",
   "messagePersonal": "Persönlich",
-  "messageListIncoming": "{count, plural, one{Zeige {count} neues oder aktualisiertes Thema} other{Zeige {count} neue oder aktualisierte Themen}}"
+  "messageListIncoming": "{count, plural, one{Zeige {count} neues oder aktualisiertes Thema} other{Zeige {count} neue oder aktualisierte Themen}}",
+  "chatPlaceholderGroup": "In der Gruppe chatten"
 }

@@ -4910,4 +4910,7 @@ class AppLocalizationsZh extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get chatPlaceholderGroup => '群聊';
 }

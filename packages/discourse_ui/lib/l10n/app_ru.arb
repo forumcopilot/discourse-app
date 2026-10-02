@@ -1561,5 +1561,6 @@
   "messageListUnreadCount": "{count, plural, one{Непрочитанные ({count})} few{Непрочитанные ({count})} many{Непрочитанные ({count})} other{Непрочитанные ({count})}}",
   "messageListNewCount": "{count, plural, one{Новые ({count})} few{Новые ({count})} many{Новые ({count})} other{Новые ({count})}}",
   "messagePersonal": "Личные",
-  "messageListIncoming": "{count, plural, one{Есть {count} новая или обновлённая тема} few{Есть {count} новых или обновлённых темы} many{Есть {count} новых или обновлённых тем} other{Есть {count} новой или обновлённой темы}}"
+  "messageListIncoming": "{count, plural, one{Есть {count} новая или обновлённая тема} few{Есть {count} новых или обновлённых темы} many{Есть {count} новых или обновлённых тем} other{Есть {count} новой или обновлённой темы}}",
+  "chatPlaceholderGroup": "Чат в группе"
 }

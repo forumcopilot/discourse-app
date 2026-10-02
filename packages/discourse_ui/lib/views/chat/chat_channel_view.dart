@@ -561,6 +561,10 @@ class _ChatChannelViewState extends State<ChatChannelView> {
       };
     }
     if (widget.threadId != null) return l10n.chatPlaceholderThread;
+    if (ch.chatableType == 'DirectMessage' &&
+        (DiscourseChatChannelDetails.of(widget.siteContext.site.url, ch.id)?.isGroup ?? false)) {
+      return l10n.chatPlaceholderGroup;
+    }
     if (ch.chatableType == 'DirectMessage') {
       // A DM is titled with the other members; with nobody else it is the
       // viewer's own notes channel.

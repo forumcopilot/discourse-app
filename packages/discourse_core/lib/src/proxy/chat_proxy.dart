@@ -1168,8 +1168,11 @@ class DiscourseChatProxy extends BaseDiscourseProxy implements IFCChatProxy {
       isFollowing: membership?['following'] == true,
       canJoin: meta?['can_join_chat_channel'] == true,
       status: (json['status'] ?? 'open').toString(),
-      lastMessageAt: DateTime.tryParse(
-              lastMessage?['created_at']?.toString() ?? '') ??
+      // An empty channel's `last_message` is Discourse's NullMessage: no id,
+      // and "now" for its time, which listed a silent channel as just active.
+      lastMessageAt: (lastMessage?['id'] == null
+              ? null
+              : DateTime.tryParse(lastMessage?['created_at']?.toString() ?? '')) ??
           DateTime.tryParse(
               json['last_message_sent_at']?.toString() ?? ''),
     );

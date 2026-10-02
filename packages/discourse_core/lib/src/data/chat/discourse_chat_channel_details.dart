@@ -177,7 +177,10 @@ class DiscourseChatChannelDetails {
     final membership = (json['current_user_membership'] as Map?)?.cast<String, dynamic>();
     final meta = (json['meta'] as Map?)?.cast<String, dynamic>();
     final busIds = (meta?['message_bus_last_ids'] as Map?)?.cast<String, dynamic>();
-    final last = (json['last_message'] as Map?)?.cast<String, dynamic>();
+    // An empty channel's `last_message` is Discourse's NullMessage: no id,
+    // and "now" for its time.
+    final rawLast = (json['last_message'] as Map?)?.cast<String, dynamic>();
+    final last = rawLast?['id'] == null ? null : rawLast;
     final members = <DiscourseChatUser>[
       if (isDm)
         for (final raw in ((chatable?['users'] as List?) ?? const []))

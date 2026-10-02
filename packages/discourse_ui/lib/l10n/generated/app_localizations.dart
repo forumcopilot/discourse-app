@@ -8441,6 +8441,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, one{See {count} new or updated topic} other{See {count} new or updated topics}}'**
   String messageListIncoming(int count);
+
+  /// Composer hint in a group chat (Discourse chat.placeholder_group)
+  ///
+  /// In en, this message translates to:
+  /// **'Chat in group'**
+  String get chatPlaceholderGroup;
 }
 
 class _AppLocalizationsDelegate

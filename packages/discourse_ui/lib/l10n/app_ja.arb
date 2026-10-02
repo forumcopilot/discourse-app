@@ -1561,5 +1561,6 @@
   "messageListUnreadCount": "{count, plural, other{未読 ({count})}}",
   "messageListNewCount": "{count, plural, other{新規 ({count})}}",
   "messagePersonal": "個人メッセージ",
-  "messageListIncoming": "{count, plural, other{{count} 件の新規/更新トピックを見る}}"
+  "messageListIncoming": "{count, plural, other{{count} 件の新規/更新トピックを見る}}",
+  "chatPlaceholderGroup": "グループチャット"
 }

@@ -1718,5 +1718,6 @@
   "messageListUnreadCount": "{count, plural, one{Ongelezen ({count})} other{Ongelezen ({count})}}",
   "messageListNewCount": "{count, plural, one{Nieuw ({count})} other{Nieuw ({count})}}",
   "messagePersonal": "Persoonlijk",
-  "messageListIncoming": "{count, plural, one{{count} nieuw of bijgewerkt topic weergeven} other{{count} nieuwe of bijgewerkte topics weergeven}}"
+  "messageListIncoming": "{count, plural, one{{count} nieuw of bijgewerkt topic weergeven} other{{count} nieuwe of bijgewerkte topics weergeven}}",
+  "chatPlaceholderGroup": "Chatten in groep"
 }

@@ -5286,4 +5286,7 @@ class AppLocalizationsRu extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get chatPlaceholderGroup => 'Чат в группе';
 }
