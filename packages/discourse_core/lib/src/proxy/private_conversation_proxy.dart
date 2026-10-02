@@ -1130,7 +1130,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       canEdit: p['can_edit'] == true,
       messageNumber: p['post_number'] as int?,
       // A message is a post: its polls come as a post's do, and parsing
-      // them there lets a vote find its post and poll name.
+      // them there preserves the post and poll name for voting.
       polls: DiscoursePostProxy.pollsFromPostJson(
         p,
         topicId: (p['topic_id'] ?? topicId ?? '').toString(),

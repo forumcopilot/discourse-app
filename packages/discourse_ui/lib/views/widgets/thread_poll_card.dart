@@ -70,7 +70,17 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
     setState(() => _isSubmitting = true);
     try {
       final postProxy = SiteProxyService.getPostProxy();
-      final updated = await postProxy.votePollAsync(widget.topicId, _selectedIds.toList());
+      // Use the displayed poll's identity, and refuse to use a proxy for
+      // another forum if navigation changed the active site.
+      FCPoll? updated;
+      if (postProxy is DiscoursePostProxy) {
+        if (postProxy.siteContext.site.pluginUrl == widget.siteContext.site.pluginUrl) {
+          updated = await postProxy.votePollAsync(
+            widget.topicId, _selectedIds.toList(), poll: widget.poll);
+        }
+      } else {
+        updated = await postProxy.votePollAsync(widget.topicId, _selectedIds.toList());
+      }
       if (updated != null && mounted) {
         widget.onVoteSuccess(updated);
         ScaffoldMessenger.of(context).showSnackBar(
