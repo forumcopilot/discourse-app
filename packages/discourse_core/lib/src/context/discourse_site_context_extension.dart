@@ -49,7 +49,8 @@ extension DiscourseSiteContextExtension on SiteContext {
 
   Map<String, dynamic> _data() => _store[this] ??= <String, dynamic>{};
 
-  /// Opaque identity for user-dependent configuration; contains no key data.
+  /// Opaque identity for user-dependent configuration and HTTP reads.
+  /// Changes whenever credentials change; contains no key data.
   Object get configurationSession =>
       _data()['configurationSession'] ??= Object();
 
