@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 
 import 'package:dio/dio.dart';
@@ -74,6 +75,7 @@ class DiscourseClient {
   }) async {
     await FCDioClient.instance.initialize();
 
+    final session = context.configurationSession;
     final headers = <String, String>{
       'Accept': 'application/json',
       ...context.userApiAuthHeaders(),
@@ -107,7 +109,25 @@ class DiscourseClient {
       _inFlight.clear();
     }
 
-    final readKey = method == 'GET' ? '$url|${_canonicalQuery(effectiveQuery)}' : null;
+    // Both completed responses and pending requests belong to the session
+    // that issued them. A logout/re-login starts a new generation even if
+    // the same credentials are restored. Header overrides and SDK cookies
+    // can also change the identity/representation without changing context.
+    // Keep only a digest in the key, never raw credentials or cookie values.
+    final cookieValues = method == 'GET'
+        ? (await FCDioClient.instance.cookieJar?.loadForRequest(url) ?? [])
+            .map((cookie) => cookie.toString())
+            .toList()
+        : <String>[];
+    final headerNames = headers.keys.toList()..sort();
+    cookieValues.sort();
+    final variant = sha256.convert(utf8.encode(jsonEncode([
+      for (final name in headerNames) [name, headers[name]],
+      cookieValues,
+    ])));
+    final readKey = method == 'GET'
+        ? (session, '$url|${_canonicalQuery(effectiveQuery)}|$variant')
+        : null;
     if (!useCache && readKey != null) {
       // A refresh must also stop a later ordinary read from going back to
       // the previous response, including an older request still in flight.
@@ -150,8 +170,10 @@ class DiscourseClient {
         final result = await future;
         // Only successful reads are worth repeating; an error must not be
         // pinned for the next few seconds.
-        if (identical(_inFlight[cacheKey], future) &&
-            result.statusCode >= 200 && result.statusCode < 300) {
+        if (identical(context.configurationSession, session) &&
+            identical(_inFlight[cacheKey], future) &&
+            result.statusCode >= 200 &&
+            result.statusCode < 300) {
           _readCache[cacheKey] = _CachedResponse(result, _ttlForPath(url.path));
         }
         return result;
@@ -200,9 +222,8 @@ class DiscourseClient {
     );
   }
 
-  /// Concurrent identical GETs, keyed by URL + query.
-  static final Map<String, Future<FCCallResult>> _inFlight =
-      <String, Future<FCCallResult>>{};
+  /// Concurrent identical GETs, keyed by session, URL, query and headers/cookies.
+  static final Map<(Object, String), Future<FCCallResult>> _inFlight = {};
 
   /// Writes that change nothing the app subsequently reads, and so must not
   /// drop the read cache.
@@ -271,8 +292,7 @@ class DiscourseClient {
   /// Deliberately shorter than any human refresh gesture, and dropped
   /// wholesale on any write, so a user-initiated refresh always hits the
   /// network.
-  static final Map<String, _CachedResponse> _readCache =
-      <String, _CachedResponse>{};
+  static final Map<(Object, String), _CachedResponse> _readCache = {};
 
   /// Clears cached reads. Call when the session changes — a different user
   /// may see entirely different content at the same URLs.
