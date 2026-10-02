@@ -5209,4 +5209,40 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get chatLastReply => 'ultima risposta';
+
+  @override
+  String messageListUnreadCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Non letti ($count)',
+      one: 'Non letto ($count)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String messageListNewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Nuovi ($count)',
+      one: 'Nuovo ($count)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get messagePersonal => 'Personali';
+
+  @override
+  String messageListIncoming(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Visualizza $count argomenti nuovi o aggiornati.',
+      one: 'Visualizza $count argomento nuovo o aggiornato',
+    );
+    return '$_temp0';
+  }
 }

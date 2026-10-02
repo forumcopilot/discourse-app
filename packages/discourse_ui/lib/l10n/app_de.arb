@@ -1557,5 +1557,9 @@
   "chatMyThreadsEmpty": "Du hast noch keine Threads. Threads, an denen du teilnimmst, werden hier angezeigt.",
   "chatLeaveGroupInfo": "Wenn du den Gruppenchat verlässt, hast du keinen Zugriff mehr darauf und erhältst keine Benachrichtigungen mehr. Um wieder teilzunehmen, musst du von einem Mitglied des Gruppenchats erneut eingeladen werden.",
   "chatPlaceholderThread": "Chat im Thread",
-  "chatLastReply": "letzte Antw."
+  "chatLastReply": "letzte Antw.",
+  "messageListUnreadCount": "{count, plural, one{Ungelesen ({count})} other{Ungelesen ({count})}}",
+  "messageListNewCount": "{count, plural, one{Neu ({count})} other{Neu ({count})}}",
+  "messagePersonal": "Persönlich",
+  "messageListIncoming": "{count, plural, one{Zeige {count} neues oder aktualisiertes Thema} other{Zeige {count} neue oder aktualisierte Themen}}"
 }

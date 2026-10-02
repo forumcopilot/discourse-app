@@ -13,6 +13,8 @@ import 'post_proxy.dart' show DiscoursePostProxy;
 
 import '../base_discourse_proxy.dart';
 import '../data/message/discourse_message_details.dart';
+import '../data/message/discourse_message_tracking.dart';
+import '../network/discourse_message_bus.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../util/site_url.dart';
 
@@ -244,7 +246,7 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
   /// Sent, Archive, or a group's inbox) — its user-private-messages routes.
   Future<FCConversationsResult> getMessageListAsync(
       DiscourseMessageList list, int startNum, int lastNum) {
-    return _listMessages(list.lists, startNum, lastNum, group: list.group);
+    return _listMessages(list.lists, startNum, lastNum, group: list.group, groupFilter: list.groupFilter);
   }
 
   /// Discourse-only: the groups whose messages the viewer can read, for their
@@ -266,12 +268,62 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
     }
   }
 
+  /// Discourse-only: loads the reader's new and unread messages
+  /// (`/u/{username}/private-message-topic-tracking-state`,
+  /// UsersController#private_message_topic_tracking_state) into
+  /// [DiscourseMessageTracking], for the New and Unread counts. False when
+  /// signed out or the request failed.
+  Future<bool> loadMessageTrackingAsync() async {
+    final username = siteContext.currentUsername;
+    if (!siteContext.isLoggedIn || username == null || username.isEmpty) return false;
+    try {
+      final r = await apiGet(
+          '/u/${Uri.encodeComponent(username)}/private-message-topic-tracking-state.json');
+      // A bare JSON array, which apiGet wraps under `_value`.
+      final rows = r['_value'];
+      if (rows is! List) return false;
+      DiscourseMessageTracking.forSite(siteContext.site.url)
+          .replaceReport([for (final row in rows.whereType<Map>()) row.cast<String, dynamic>()]);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Discourse-only: keeps [DiscourseMessageTracking] current from the
+  /// reader's channel and each of [groupIds]'
+  /// (`/private-message-topic-tracking-state/user/{id}`, `…/group/{id}`),
+  /// and tells [onIncoming] of each new or updated message (the bus message
+  /// and its type), as the web's messages page hears them. Null when the
+  /// forum gives this key no MessageBus.
+  void Function()? watchMessageTracking(
+      List<int> groupIds, void Function(Map<String, dynamic> message, String type) onIncoming) {
+    final me = int.tryParse(siteContext.currentUserId ?? '');
+    final bus = DiscourseMessageBus.of(siteContext);
+    if (me == null || bus.isUnavailable) return null;
+    final tracking = DiscourseMessageTracking.forSite(siteContext.site.url);
+    void handle(Map<String, dynamic> data) {
+      final type = tracking.apply(data, myUserId: me);
+      if (type != null) onIncoming(data, type);
+    }
+
+    final stops = [
+      bus.subscribe('/private-message-topic-tracking-state/user/$me', handle),
+      for (final g in groupIds) bus.subscribe('/private-message-topic-tracking-state/group/$g', handle),
+    ];
+    return () {
+      for (final stop in stops) {
+        stop();
+      }
+    };
+  }
+
   /// One window of the merged lists at [lists] (the path segment after
   /// /topics/), newest activity first. The first list must succeed; the
   /// others are best-effort. A [group]'s inbox is under the viewer's name
   /// (/topics/private-messages-group/{u}/{group}).
   Future<FCConversationsResult> _listMessages(
-      List<String> lists, int startNum, int lastNum, {String? group}) async {
+      List<String> lists, int startNum, int lastNum, {String? group, String? groupFilter}) async {
     final username = siteContext.currentUsername;
     if (username == null || username.isEmpty) {
       return FCConversationsResult(
@@ -294,8 +346,9 @@ class DiscoursePrivateConversationProxy extends BaseDiscourseProxy
       final pageQuery = <String, dynamic>{
         if (page > 0) 'page': page.toString(),
       };
-      final groupPart =
-          group == null ? '' : '/${Uri.encodeComponent(group)}';
+      final groupPart = group == null
+          ? ''
+          : '/${Uri.encodeComponent(group)}${groupFilter == null ? '' : '/$groupFilter'}';
       Future<Map<String, dynamic>> fetch(String list) =>
           apiGet('/topics/$list/$encUser$groupPart.json', query: pageQuery);
       final responses = await Future.wait([

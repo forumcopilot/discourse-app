@@ -1557,5 +1557,9 @@
   "chatMyThreadsEmpty": "아직 스레드가 없습니다. 참여하는 스레드가 여기에 표시됩니다.",
   "chatLeaveGroupInfo": "이 그룹 채팅에서 나가면 더 이상 접근할 수 없고 관련 알림도 받지 않습니다. 다시 참여하려면 그룹 채팅 멤버의 초대를 받아야 합니다.",
   "chatPlaceholderThread": "스레드에서 채팅",
-  "chatLastReply": "마지막 답글"
+  "chatLastReply": "마지막 답글",
+  "messageListUnreadCount": "{count, plural, other{읽지 않음({count})}}",
+  "messageListNewCount": "{count, plural, other{새글 ({count})}}",
+  "messagePersonal": "개인",
+  "messageListIncoming": "{count, plural, other{{count}개의 새글 또는 업데이트 된 글 보기}}"
 }

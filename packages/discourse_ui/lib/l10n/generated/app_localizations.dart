@@ -8417,6 +8417,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'last reply'**
   String get chatLastReply;
+
+  /// The Unread messages filter with its count (Discourse user.messages.unread_with_count)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Unread ({count})} other{Unread ({count})}}'**
+  String messageListUnreadCount(int count);
+
+  /// The New messages filter with its count (Discourse user.messages.new_with_count)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{New ({count})} other{New ({count})}}'**
+  String messageListNewCount(int count);
+
+  /// The reader's own messages, as opposed to a group's inbox (Discourse user.messages.personal)
+  ///
+  /// In en, this message translates to:
+  /// **'Personal'**
+  String get messagePersonal;
+
+  /// Banner over the message list when messages arrived or changed; tap to show them (Discourse topic_count_latest, as the web's messages page)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{See {count} new or updated topic} other{See {count} new or updated topics}}'**
+  String messageListIncoming(int count);
 }
 
 class _AppLocalizationsDelegate

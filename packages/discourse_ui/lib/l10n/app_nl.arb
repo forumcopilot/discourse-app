@@ -1714,5 +1714,9 @@
   "chatMyThreadsEmpty": "Je hebt nog geen threads. Threads waaraan je deelneemt, worden hier weergegeven.",
   "chatLeaveGroupInfo": "Als je deze groepschat verlaat, heb je er geen toegang meer toe en ontvang je geen meldingen meer. Om weer deel te kunnen nemen, moet je opnieuw worden uitgenodigd door een lid van de groepschat.",
   "chatPlaceholderThread": "Chat in thread",
-  "chatLastReply": "laatste antwoord"
+  "chatLastReply": "laatste antwoord",
+  "messageListUnreadCount": "{count, plural, one{Ongelezen ({count})} other{Ongelezen ({count})}}",
+  "messageListNewCount": "{count, plural, one{Nieuw ({count})} other{Nieuw ({count})}}",
+  "messagePersonal": "Persoonlijk",
+  "messageListIncoming": "{count, plural, one{{count} nieuw of bijgewerkt topic weergeven} other{{count} nieuwe of bijgewerkte topics weergeven}}"
 }

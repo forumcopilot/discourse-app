@@ -1557,5 +1557,9 @@
   "chatMyThreadsEmpty": "У вас пока нет цепочек сообщений. Здесь появятся цепочки сообщений, в которых вы участвуете.",
   "chatLeaveGroupInfo": "Покинув этот групповой чат, вы потеряете к нему доступ и не будете получать связанные с ним уведомления. Чтобы снова присоединиться, вам потребуется повторное приглашение от участника группового чата.",
   "chatPlaceholderThread": "Чат в цепочке сообщений",
-  "chatLastReply": "последний ответ"
+  "chatLastReply": "последний ответ",
+  "messageListUnreadCount": "{count, plural, one{Непрочитанные ({count})} few{Непрочитанные ({count})} many{Непрочитанные ({count})} other{Непрочитанные ({count})}}",
+  "messageListNewCount": "{count, plural, one{Новые ({count})} few{Новые ({count})} many{Новые ({count})} other{Новые ({count})}}",
+  "messagePersonal": "Личные",
+  "messageListIncoming": "{count, plural, one{Есть {count} новая или обновлённая тема} few{Есть {count} новых или обновлённых темы} many{Есть {count} новых или обновлённых тем} other{Есть {count} новой или обновлённой темы}}"
 }

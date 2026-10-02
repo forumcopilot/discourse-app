@@ -1557,5 +1557,9 @@
   "chatMyThreadsEmpty": "Aún no tienes ningún tema. Los temas en los que participes se mostrarán aquí.",
   "chatLeaveGroupInfo": "Al abandonar este chat de grupo, dejarás de tener acceso al mismo y no recibirás notificaciones relacionadas con él. Para volver a unirte, deberás ser invitado de nuevo por un miembro del chat de grupo.",
   "chatPlaceholderThread": "Chatear en el hilo",
-  "chatLastReply": "última respuesta"
+  "chatLastReply": "última respuesta",
+  "messageListUnreadCount": "{count, plural, one{Sin leer ({count})} other{Sin leer ({count})}}",
+  "messageListNewCount": "{count, plural, one{Nuevo ({count})} other{Nuevo ({count})}}",
+  "messagePersonal": "Personal",
+  "messageListIncoming": "{count, plural, one{Ver {count} tema nuevo o actualizado} other{Ver {count} temas nuevos o actualizados}}"
 }

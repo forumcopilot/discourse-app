@@ -78,6 +78,9 @@ class NewConversationPage extends StatefulWidget {
 class _NewConversationPageState extends State<NewConversationPage> {
   final List<String> _recipients = [];
   final Map<String, String?> _recipientIcons = {};
+
+  /// Recipients that are groups (a message can go to a group's inbox).
+  final Set<String> _groupRecipients = {};
   final List<String> _attachmentIds = [];
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
@@ -201,6 +204,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
     _setRecipients(() {
       _recipients.add(username);
       _recipientIcons[username] = result['iconUrl'] as String?;
+      if (result['isGroup'] == true) _groupRecipients.add(username);
     });
   }
 
@@ -216,15 +220,18 @@ class _NewConversationPageState extends State<NewConversationPage> {
         children: [
           for (final username in _recipients)
             InputChip(
-              avatar: UserAvatar(
-                username: username,
-                iconUrl: _recipientIcons[username],
-                radius: DesignTokens.radiusM,
-              ),
+              avatar: _groupRecipients.contains(username)
+                  ? const Icon(Icons.groups_rounded)
+                  : UserAvatar(
+                      username: username,
+                      iconUrl: _recipientIcons[username],
+                      radius: DesignTokens.radiusM,
+                    ),
               label: Text(username),
               onDeleted: () => _setRecipients(() {
                 _recipients.remove(username);
                 _recipientIcons.remove(username);
+                _groupRecipients.remove(username);
               }),
             ),
           ActionChip(

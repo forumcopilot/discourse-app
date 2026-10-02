@@ -16,6 +16,7 @@ import 'package:discourse_ui/core/logging/app_logger.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../post_page.dart';
 import '../../../../utils/error_message.dart';
+import '../../../../utils/snackbar_helper.dart';
 import 'conversation_list_item.dart';
 
 class ConversationList extends StatefulWidget {
@@ -25,7 +26,7 @@ class ConversationList extends StatefulWidget {
   /// Archive, a group's inbox). Only the archive includes archived messages.
   final DiscourseMessageList list;
 
-  bool get archived => list == DiscourseMessageList.archive;
+  bool get archived => list.isArchive;
 
   /// A message opened from this list was read, marked unread, archived,
   /// moved to the inbox or left: the other lists are out of date.
@@ -290,26 +291,54 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
     loadConversations();
   }
 
-  Future<void> _deleteConversation(String conversationId) async {
-    try {
-      final conversationProxy = SiteProxyFactory.getPrivateConversationProxy();
-      await conversationProxy.leaveConversationAsync(conversationId, 1); // 1 = soft leave
-
-      if (mounted) {
-        setState(() {
-          _conversations?.removeWhere((conversation) => conversation.conv_id == conversationId);
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.failedToLeaveConversation(e.toString())),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
+  /// A swipe files a message away (Archive) or, in an archive, back to the
+  /// inbox, as Discourse's Archive and Move to Inbox do; Undo reverses it.
+  /// The row goes at once and comes back if the forum refused.
+  Future<void> _swipeArchive(FCConversationSummary conversation) async {
+    final proxy = SiteProxyFactory.getPrivateConversationProxy();
+    final list = _conversations;
+    if (list == null) return;
+    final index = list.indexOf(conversation);
+    final id = conversation.conv_id ?? '';
+    final archive = !widget.archived;
+    setState(() => list.remove(conversation));
+    final result = archive
+        ? await proxy.archiveConversationAsync(id)
+        : await proxy.unarchiveConversationAsync(id);
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    void putBack() {
+      if (!mounted || (_conversations?.contains(conversation) ?? true)) return;
+      setState(() => _conversations!.insert(index.clamp(0, _conversations!.length), conversation));
     }
+
+    if (!result.result) {
+      putBack();
+      SnackbarHelper.showError(
+          context,
+          archive
+              ? l10n.failedToArchiveMessage(result.resultText ?? '')
+              : l10n.failedToMoveMessageToInbox(result.resultText ?? ''));
+      return;
+    }
+    widget.onMessagesChanged?.call();
+    SnackbarHelper.showInfo(
+      context,
+      archive ? l10n.messageArchived : l10n.messageMovedToInbox,
+      persist: false,
+      action: SnackBarAction(
+        label: l10n.undo,
+        onPressed: () async {
+          final undone = archive
+              ? await proxy.unarchiveConversationAsync(id)
+              : await proxy.archiveConversationAsync(id);
+          if (undone.result) {
+            putBack();
+            widget.onMessagesChanged?.call();
+          }
+        },
+      ),
+    );
   }
 
   /// Opens the message in the topic page (a Discourse message is a topic)
@@ -438,11 +467,37 @@ class ConversationListState extends State<ConversationList> with AutomaticKeepAl
         itemBuilder: (context, index) {
           if (index < _conversations!.length) {
             final conversation = _conversations![index];
-            return ConversationListItem(
+            final item = ConversationListItem(
               conversation: conversation,
               siteContext: widget.siteContext,
               onTap: () => _onConversationTap(conversation),
-              onDelete: () => _deleteConversation(conversation.conv_id ?? ''),
+            );
+            if (widget.list == DiscourseMessageList.sent) return item;
+            final colorScheme = Theme.of(context).colorScheme;
+            final l10n = AppLocalizations.of(context)!;
+            return Dismissible(
+              key: ValueKey('pm-${widget.list.id}-${conversation.conv_id}'),
+              direction: DismissDirection.endToStart,
+              background: Container(
+                color: colorScheme.secondaryContainer,
+                alignment: AlignmentDirectional.centerEnd,
+                padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(widget.archived ? Icons.move_to_inbox_outlined : Icons.archive_outlined,
+                        color: colorScheme.onSecondaryContainer),
+                    const SizedBox(width: DesignTokens.spacingS),
+                    Text(widget.archived ? l10n.moveToInbox : l10n.messageArchive,
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelLarge
+                            ?.copyWith(color: colorScheme.onSecondaryContainer)),
+                  ],
+                ),
+              ),
+              onDismissed: (_) => _swipeArchive(conversation),
+              child: item,
             );
           } else {
             if (_hasMoreData) {

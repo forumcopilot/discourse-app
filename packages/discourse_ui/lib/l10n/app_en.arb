@@ -6479,5 +6479,36 @@
   "chatLastReply": "last reply",
   "@chatLastReply": {
     "description": "Before the time of a thread's latest reply, under its original message (Discourse chat.thread.last_reply)"
+  },
+  "messageListUnreadCount": "{count, plural, one{Unread ({count})} other{Unread ({count})}}",
+  "@messageListUnreadCount": {
+    "description": "The Unread messages filter with its count (Discourse user.messages.unread_with_count)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "messageListNewCount": "{count, plural, one{New ({count})} other{New ({count})}}",
+  "@messageListNewCount": {
+    "description": "The New messages filter with its count (Discourse user.messages.new_with_count)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "messagePersonal": "Personal",
+  "@messagePersonal": {
+    "description": "The reader's own messages, as opposed to a group's inbox (Discourse user.messages.personal)"
+  },
+  "messageListIncoming": "{count, plural, one{See {count} new or updated topic} other{See {count} new or updated topics}}",
+  "@messageListIncoming": {
+    "description": "Banner over the message list when messages arrived or changed; tap to show them (Discourse topic_count_latest, as the web's messages page)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

@@ -177,9 +177,13 @@ class DiscourseMessageDetails {
 class DiscourseMessageGroup {
   const DiscourseMessageGroup({
     required this.name,
+    this.id,
     this.displayName,
     this.userCount,
   });
+
+  /// For matching a message's `group_ids` (new and unread counts).
+  final int? id;
 
   /// The handle, e.g. `moderators` — what invite-group and profile links use.
   final String name;
@@ -199,6 +203,7 @@ class DiscourseMessageGroup {
     if (name.isEmpty) return null;
     return DiscourseMessageGroup(
       name: name,
+      id: (json['id'] as num?)?.toInt(),
       displayName: json['display_name'] as String?,
       userCount: json['user_count'] as int?,
     );
@@ -209,12 +214,23 @@ class DiscourseMessageGroup {
 /// the path segments after `/topics/` it merges, and a group for a group's
 /// inbox.
 class DiscourseMessageList {
-  const DiscourseMessageList._(this.id, this.lists, {this.group});
+  const DiscourseMessageList._(this.id, this.lists, {this.group, this.groupFilter});
 
   /// A stable name, e.g. for remembering the list last shown.
   final String id;
   final List<String> lists;
   final String? group;
+
+  /// In a group's inbox, `new`, `unread` or `archive` (the web's group
+  /// filters); null for its inbox itself.
+  final String? groupFilter;
+
+  /// Archived messages: the viewer's own archive, or a group's.
+  bool get isArchive => id == 'archive' || groupFilter == 'archive';
+
+  /// Which of the web's filters this is, whatever the inbox: `inbox`,
+  /// `unread`, `new`, `sent` or `archive`.
+  String get filter => group == null ? id : (groupFilter ?? 'inbox');
 
   /// Everything the viewer is on that is not archived. The web's "Latest"
   /// is /private-messages, which leaves out messages the viewer started and
@@ -229,8 +245,8 @@ class DiscourseMessageList {
   static const archive =
       DiscourseMessageList._('archive', ['private-messages-archive']);
 
-  /// A group's inbox.
-  factory DiscourseMessageList.group(String name) => DiscourseMessageList._(
-      'group:$name', const ['private-messages-group'],
-      group: name);
+  /// A group's inbox, or one of its [filter]s (`new`, `unread`, `archive`).
+  factory DiscourseMessageList.group(String name, {String? filter}) => DiscourseMessageList._(
+      filter == null ? 'group:$name' : 'group:$name:$filter', const ['private-messages-group'],
+      group: name, groupFilter: filter);
 }

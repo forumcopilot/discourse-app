@@ -4939,4 +4939,37 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get chatLastReply => '最後の返信';
+
+  @override
+  String messageListUnreadCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '未読 ($count)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String messageListNewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '新規 ($count)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get messagePersonal => '個人メッセージ';
+
+  @override
+  String messageListIncoming(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 件の新規/更新トピックを見る',
+    );
+    return '$_temp0';
+  }
 }

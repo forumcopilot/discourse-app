@@ -4877,4 +4877,37 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chatLastReply => '最后回复';
+
+  @override
+  String messageListUnreadCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '未读 ($count)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String messageListNewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '新 ($count)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get messagePersonal => '个人';
+
+  @override
+  String messageListIncoming(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '查看 $count 个新的或更新的话题',
+    );
+    return '$_temp0';
+  }
 }

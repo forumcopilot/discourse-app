@@ -5201,4 +5201,40 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get chatLastReply => 'última respuesta';
+
+  @override
+  String messageListUnreadCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Sin leer ($count)',
+      one: 'Sin leer ($count)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String messageListNewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Nuevo ($count)',
+      one: 'Nuevo ($count)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get messagePersonal => 'Personal';
+
+  @override
+  String messageListIncoming(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ver $count temas nuevos o actualizados',
+      one: 'Ver $count tema nuevo o actualizado',
+    );
+    return '$_temp0';
+  }
 }

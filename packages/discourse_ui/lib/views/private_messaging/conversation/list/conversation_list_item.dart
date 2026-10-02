@@ -11,7 +11,6 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 class ConversationListItem extends StatelessWidget {
   final FCConversationSummary conversation;
   final VoidCallback? onTap;
-  final VoidCallback? onDelete;
 
   /// The forum, for the read state the app keeps for each message (a PM is
   /// a topic), so the row changes as soon as you come back from reading
@@ -22,7 +21,6 @@ class ConversationListItem extends StatelessWidget {
     Key? key,
     required this.conversation,
     this.onTap,
-    this.onDelete,
     this.siteContext,
   }) : super(key: key);
 
@@ -82,6 +80,17 @@ class ConversationListItem extends StatelessWidget {
       }
     }
 
+    // Who else is in it: the people the reader is writing with, the latest
+    // poster first (the reader alone in their own notes).
+    final me = siteContext?.loginDataOutput?.user?.username;
+    final everyone = conversation.participants ?? const <FCParticipant>[];
+    final others = [
+      for (final p in everyone)
+        if (p.username != me) p,
+    ];
+    final latest = others.indexWhere((p) => p.userId == conversation.last_user_id);
+    if (latest > 0) others.insert(0, others.removeAt(latest));
+
     final replyCount = int.parse(conversation.reply_count ?? '0');
     final totalMessages = replyCount + 1; // replies + first message
     final lastTime = DateTime.tryParse(
@@ -121,10 +130,11 @@ class ConversationListItem extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  UserAvatar(
-                    username: displayUsername,
-                    iconUrl: displayAvatar,
-                    radius: DesignTokens.avatarRadiusM,
+                  _ParticipantAvatars(
+                    people: others.isEmpty
+                        ? [FCParticipant(userId: '', username: displayUsername, iconUrl: displayAvatar, isOnline: false)]
+                        : others,
+                    size: DesignTokens.avatarRadiusM * 2,
                   ),
                   const SizedBox(width: DesignTokens.spacingL),
                   Expanded(
@@ -199,6 +209,40 @@ class ConversationListItem extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// The people in a message: one avatar, or two overlapping for a message
+/// with several others (as a group chat shows in the chat list). It showed
+/// the last poster alone, often the reader themselves.
+class _ParticipantAvatars extends StatelessWidget {
+  const _ParticipantAvatars({required this.people, required this.size});
+
+  final List<FCParticipant> people;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    if (people.length < 2) {
+      final p = people.first;
+      return UserAvatar(username: p.username, iconUrl: p.iconUrl, radius: size / 2);
+    }
+    final ring = Theme.of(context).colorScheme.surface;
+    final small = size * 0.66;
+    Widget one(FCParticipant p) => Container(
+          decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: ring, width: 2)),
+          child: UserAvatar(username: p.username, iconUrl: p.iconUrl, radius: small / 2 - 2),
+        );
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        children: [
+          Positioned(left: 0, top: 0, child: one(people[1])),
+          Positioned(right: 0, bottom: 0, child: one(people[0])),
+        ],
       ),
     );
   }

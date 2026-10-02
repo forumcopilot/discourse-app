@@ -1557,5 +1557,9 @@
   "chatMyThreadsEmpty": "您还没有任何消息串。您参与的消息串将在此处显示。",
   "chatLeaveGroupInfo": "离开此群组聊天后，您将无法再访问它，也不会收到与之相关的通知。要重新加入，需要群组聊天成员再次向您发送邀请。",
   "chatPlaceholderThread": "在消息串中聊天",
-  "chatLastReply": "最后回复"
+  "chatLastReply": "最后回复",
+  "messageListUnreadCount": "{count, plural, other{未读 ({count})}}",
+  "messageListNewCount": "{count, plural, other{新 ({count})}}",
+  "messagePersonal": "个人",
+  "messageListIncoming": "{count, plural, other{查看 {count} 个新的或更新的话题}}"
 }

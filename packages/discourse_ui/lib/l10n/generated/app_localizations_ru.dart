@@ -5244,4 +5244,46 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get chatLastReply => 'последний ответ';
+
+  @override
+  String messageListUnreadCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Непрочитанные ($count)',
+      many: 'Непрочитанные ($count)',
+      few: 'Непрочитанные ($count)',
+      one: 'Непрочитанные ($count)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String messageListNewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Новые ($count)',
+      many: 'Новые ($count)',
+      few: 'Новые ($count)',
+      one: 'Новые ($count)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get messagePersonal => 'Личные';
+
+  @override
+  String messageListIncoming(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Есть $count новой или обновлённой темы',
+      many: 'Есть $count новых или обновлённых тем',
+      few: 'Есть $count новых или обновлённых темы',
+      one: 'Есть $count новая или обновлённая тема',
+    );
+    return '$_temp0';
+  }
 }

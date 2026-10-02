@@ -4938,4 +4938,37 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get chatLastReply => '마지막 답글';
+
+  @override
+  String messageListUnreadCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '읽지 않음($count)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String messageListNewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '새글 ($count)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get messagePersonal => '개인';
+
+  @override
+  String messageListIncoming(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count개의 새글 또는 업데이트 된 글 보기',
+    );
+    return '$_temp0';
+  }
 }
