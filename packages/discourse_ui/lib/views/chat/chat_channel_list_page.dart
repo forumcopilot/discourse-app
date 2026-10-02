@@ -523,9 +523,11 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
 
     // With three halves the icons go, so the names fit a phone.
     final three = hasChannels && hasDms && threadsOn;
+    // The dot sits past the end of the name, not on its last letter.
     Widget segmentLabel(String text, bool dot) => Badge(
           isLabelVisible: dot,
           smallSize: 8,
+          offset: const Offset(8, -2),
           child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis),
         );
     final segments = <ButtonSegment<_ChatHalf>>[

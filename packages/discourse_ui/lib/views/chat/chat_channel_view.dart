@@ -478,7 +478,10 @@ class _ChatChannelViewState extends State<ChatChannelView> {
       if (unreadLine) out.add(const _UnreadEntry());
       final replyTo = DiscourseChatMessageExtras.of(widget.siteContext.site.url, m.id)?.replyTo;
       final continues = !newDay && !unreadLine && chatMessageContinuesRun(previous, m, replyTo: replyTo);
-      out.add(_MessageEntry(m, showHeader: !continues));
+      // As the web: no "replying to" line inside a thread, nor over a reply
+      // to the message just above it.
+      final showReplyTo = widget.threadId == null && (replyTo == null || replyTo.messageId != previous?.id);
+      out.add(_MessageEntry(m, showHeader: !continues, showReplyTo: showReplyTo));
       previous = m;
     }
     return out;
@@ -501,12 +504,12 @@ class _ChatChannelViewState extends State<ChatChannelView> {
           key: _unreadKey,
           child: _Separator(label: l10n.chatLastVisit, color: theme.colorScheme.error, line: theme.colorScheme.error),
         );
-      case _MessageEntry(:final message, :final showHeader):
-        return _buildMessage(message, showHeader, theme);
+      case _MessageEntry(:final message, :final showHeader, :final showReplyTo):
+        return _buildMessage(message, showHeader, theme, showReplyTo: showReplyTo);
     }
   }
 
-  Widget _buildMessage(FCChatMessage m, bool showHeader, ThemeData theme) {
+  Widget _buildMessage(FCChatMessage m, bool showHeader, ThemeData theme, {bool showReplyTo = true}) {
     final isSelf = _myId != null && m.authorId == _myId;
     // Discourse's rules (see DiscourseChatPermissions): only in a channel
     // the viewer may write in; edit your own; delete your own or, as a
@@ -533,6 +536,7 @@ class _ChatChannelViewState extends State<ChatChannelView> {
           ? (emoji, {required bool add}) => _controller.toggleReaction(m.id, emoji, add: add)
           : null,
       onReplyTap: _goToMessage,
+      showReplyTo: showReplyTo,
       footer: thread != null && thread.replyCount > 0 && widget.threadId == null
           ? ChatThreadIndicator(preview: thread, onTap: () => _openThread(m))
           : null,
@@ -1037,9 +1041,10 @@ class _UnreadEntry extends _Entry {
 }
 
 class _MessageEntry extends _Entry {
-  const _MessageEntry(this.message, {required this.showHeader});
+  const _MessageEntry(this.message, {required this.showHeader, this.showReplyTo = true});
   final FCChatMessage message;
   final bool showHeader;
+  final bool showReplyTo;
 }
 
 /// A centred label between two rules: a day, or where the unread begins.

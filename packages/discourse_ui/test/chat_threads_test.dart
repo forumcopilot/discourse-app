@@ -281,7 +281,7 @@ void main() {
     await tester.enterText(find.byType(TextField), 'saturday');
     await tester.pump(const Duration(milliseconds: 500));
     await tester.pumpAndSettle();
-    expect(find.text('general'), findsOneWidget);
+    expect(find.text('#general'), findsOneWidget);
     await tester.tap(find.text('Dinner on Saturday?'));
     await tester.pumpAndSettle();
     expect(find.byType(ChatChannelScreen), findsOneWidget);

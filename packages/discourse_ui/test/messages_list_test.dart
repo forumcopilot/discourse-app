@@ -112,6 +112,8 @@ void main() {
     await pump(tester);
     final names = tester.widgetList<UserAvatar>(find.byType(UserAvatar)).map((a) => a.username).toList();
     expect(names, ['samr', 'samr', 'kim'], reason: 'never the reader; the latest poster in front');
+    expect(find.text('kim, samr'), findsOneWidget, reason: 'the names match the avatars');
+    expect(find.text('alice'), findsNothing);
   });
 
   testWidgets('a swipe archives, and Undo moves it back', (tester) async {

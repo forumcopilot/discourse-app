@@ -53,6 +53,7 @@ class ChatMessageRow extends StatelessWidget {
     this.onToggleReaction,
     this.onReplyTap,
     this.footer,
+    this.showReplyTo = true,
   });
 
   final FCChatMessage message;
@@ -63,6 +64,10 @@ class ChatMessageRow extends StatelessWidget {
   final Future<bool> Function(String emoji, {required bool add})? onToggleReaction;
   final void Function(int messageId)? onReplyTap;
   final Widget? footer;
+
+  /// Show what a reply answers above it (not inside a thread, nor for a
+  /// reply to the message just above).
+  final bool showReplyTo;
 
   static const double avatarSize = 40;
 
@@ -131,7 +136,7 @@ class ChatMessageRow extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (showHeader) header,
-        if (reply != null) _ReplyPreview(reply: reply, onTap: onReplyTap),
+        if (reply != null && showReplyTo) _ReplyPreview(reply: reply, onTap: onReplyTap),
         if (hasText)
           RichTextContent(
             siteContext: siteContext,

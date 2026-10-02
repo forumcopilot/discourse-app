@@ -250,7 +250,11 @@ class ChatChannelController extends GetxController
       if (messages.isNotEmpty) messages.last.id,
     ].reduce((a, b) => a > b ? a : b);
     final lastRead = ch?.lastReadMessageId;
-    if (targetMessageId == null && lastRead != null && (ch?.unreadCount ?? 0) > 0) {
+    // Unread when something newer than the last read message exists. The
+    // channel's own response carries no unread count (only the list's
+    // tracking does), so a channel opened from a link or a notification
+    // never showed its "last visit" line.
+    if (targetMessageId == null && lastRead != null && lastRead < _newestKnownId) {
       if (messages.isNotEmpty && lastRead < messages.first.id) {
         final around = await SiteProxyService.getChatProxy()
             .getMessagesAsync(channelId, pageSize: 50, targetMessageId: lastRead, direction: '');

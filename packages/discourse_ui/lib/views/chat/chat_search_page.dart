@@ -166,7 +166,12 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                             if (widget.channelId == null && channelTitle.isNotEmpty) ...[
                               const SizedBox(width: DesignTokens.spacingS),
                               Flexible(
-                                child: Text(channelTitle,
+                                child: Text(
+                                    (DiscourseChatChannelDetails.of(widget.siteContext.site.url, message.channelId)
+                                                ?.isDirectMessage ??
+                                            false)
+                                        ? channelTitle
+                                        : '#$channelTitle',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: theme.textTheme.bodySmall?.copyWith(color: muted)),

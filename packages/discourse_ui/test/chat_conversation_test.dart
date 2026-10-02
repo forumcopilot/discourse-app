@@ -150,12 +150,32 @@ void main() {
       chat.channel = {'id': 1, 'title': 'general', 'chatable_type': 'Category'};
       chat.messages = [
         _msg(20, 7, 'samr', now.subtract(const Duration(minutes: 30)), 'Can someone check the German?'),
-        _msg(21, 8, 'priya', now.subtract(const Duration(minutes: 1)), 'On it',
+        _msg(21, 9, 'kim', now.subtract(const Duration(minutes: 20)), 'Morning all'),
+        _msg(22, 8, 'priya', now.subtract(const Duration(minutes: 1)), 'On it',
             replyTo: {'id': 20, 'excerpt': 'Can someone check the German?', 'user': _user(7, 'samr')}),
+        _msg(23, 9, 'kim', now, 'Thanks!', replyTo: {'id': 22, 'excerpt': 'On it', 'user': _user(8, 'priya')}),
       ];
       await pump(tester);
       expect(find.text('Can someone check the German?'), findsNWidgets(2), reason: 'the message, and the preview');
+      // A reply to the message just above needs no preview, as on the web.
       expect(find.byIcon(Icons.reply), findsOneWidget);
+    });
+
+    testWidgets('the "last visit" line also when the channel says nothing of unread', (tester) async {
+      // A channel opened from a link: its own response has the last read
+      // message but no unread count.
+      final base = DateTime.now().subtract(const Duration(hours: 1));
+      chat.channel = {
+        'id': 1,
+        'title': 'general',
+        'chatable_type': 'Category',
+        'current_user_membership': {'last_read_message_id': 31},
+      };
+      chat.messages = [
+        for (var i = 0; i < 4; i++) _msg(30 + i, 7, 'samr', base.add(Duration(minutes: i * 10)), 'line $i'),
+      ];
+      await pump(tester);
+      expect(find.text('last visit'), findsOneWidget);
     });
   });
 }

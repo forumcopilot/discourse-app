@@ -161,10 +161,18 @@ class ConversationListItem extends StatelessWidget {
                           runSpacing: DesignTokens.spacingXS,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
+                            // The same people as the avatar: those the
+                            // reader writes with, not whoever posted last
+                            // (often the reader).
                             Text(
-                              displayUsername.isNotEmpty
-                                  ? displayUsername
-                                  : l10n.messageUnknownUser,
+                              others.isNotEmpty
+                                  ? [
+                                      others.take(2).map((p) => p.username).join(', '),
+                                      if (others.length > 2) '+${others.length - 2}',
+                                    ].join(' ')
+                                  : displayUsername.isNotEmpty
+                                      ? displayUsername
+                                      : l10n.messageUnknownUser,
                               style: metaStyle,
                             ),
                             if ((conversation.participant_count ?? 0) > 0)
