@@ -9,6 +9,7 @@ import 'package:discourse_core/discourse_core.dart'
         DiscourseReviewableScore;
 
 import '../../theme/design_tokens.dart';
+import '../../utils/emoji_shortcodes.dart';
 import '../../utils/time_utils.dart';
 import '../post_page.dart';
 import '../widgets/empty_state_view.dart';
@@ -499,7 +500,7 @@ class _ReviewablesPageState extends State<ReviewablesPage> {
                   child: Align(
                     alignment: AlignmentDirectional.centerStart,
                     child: Text(
-                      reviewable.topicTitle!,
+                      withEmojiShortcodes(reviewable.topicTitle!),
                       style: textTheme.bodyMedium?.copyWith(
                         color: reviewable.topicId != null
                             ? colorScheme.primary

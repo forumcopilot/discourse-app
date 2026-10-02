@@ -6,6 +6,7 @@ import 'package:discourse_core/discourse_core.dart'
         discourseUploadKind,
         discourseUploadMarkdown;
 import '../../utils/discourse_markup.dart';
+import '../../utils/emoji_shortcodes.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment.dart';
@@ -1425,7 +1426,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                   const SizedBox(width: DesignTokens.spacingS),
                                   Expanded(
                                     child: Text(
-                                      widget.topicTitle!,
+                                      withEmojiShortcodes(widget.topicTitle!),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                       style: textTheme.bodyMedium?.copyWith(

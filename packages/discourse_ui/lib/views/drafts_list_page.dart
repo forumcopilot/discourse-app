@@ -6,6 +6,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_draft.dart';
 
 import '../theme/design_tokens.dart';
+import '../utils/emoji_shortcodes.dart';
 import '../utils/markdown_preview.dart';
 import '../utils/time_utils.dart';
 import 'lists/posts_list.dart';
@@ -421,7 +422,7 @@ class _DraftTile extends StatelessWidget {
                             ? (kind == _DraftKind.message
                                 ? l10n.newConversation
                                 : l10n.untitledTopic)
-                            : title,
+                            : withEmojiShortcodes(title),
                         style: textTheme.titleMedium?.copyWith(
                           fontStyle: untitled ? FontStyle.italic : null,
                           color: untitled ? colorScheme.onSurfaceVariant : null,

@@ -21,6 +21,7 @@ import 'profile_section.dart';
 import '../../theme/design_tokens.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
+import 'package:discourse_ui/utils/emoji_shortcodes.dart';
 import 'package:discourse_ui/utils/error_message.dart';
 import 'package:discourse_ui/utils/time_utils.dart';
 import 'package:discourse_ui/views/post_page.dart';
@@ -873,7 +874,7 @@ class _SummaryTab extends StatelessWidget {
             title: l10n.featuredTopic,
             child: ListTile(
               leading: const Icon(Icons.push_pin_outlined),
-              title: Text(extras?.featuredTopicTitle ?? ''),
+              title: Text(withEmojiShortcodes(extras?.featuredTopicTitle ?? '')),
               onTap: () => AppNavigation.pushGlobal(PostPage(
                 siteContext: siteContext,
                 topicId: '$featuredId',
@@ -1132,7 +1133,7 @@ class _SummaryTopicRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                data.title,
+                withEmojiShortcodes(data.title),
                 style: textTheme.titleMedium?.copyWith(
                   color: colorScheme.onSurface,
                 ),

@@ -11,6 +11,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../../l10n/generated/app_localizations.dart';
 import '../../theme/design_tokens.dart';
 import '../../utils/app_navigation.dart';
+import '../../utils/emoji_shortcodes.dart';
 import '../../utils/error_message.dart';
 import '../../utils/local_dates.dart';
 import '../../utils/snackbar_helper.dart';
@@ -740,7 +741,7 @@ class _FeaturedTopicPickerState extends State<_FeaturedTopicPicker> {
                             RadioListTile<int>(
                               value: t.id,
                               selected: t.id == current,
-                              title: Text(t.title),
+                              title: Text(withEmojiShortcodes(t.title)),
                               subtitle: Text([
                                 l10n.nReplies(t.replies),
                                 if (t.createdAt != null)

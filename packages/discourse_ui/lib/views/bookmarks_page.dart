@@ -15,6 +15,7 @@ import '../core/logging/app_logger.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../l10n/app_l10n.dart';
 import '../theme/design_tokens.dart';
+import '../utils/emoji_shortcodes.dart';
 import '../utils/error_message.dart';
 import '../utils/time_utils.dart';
 import 'lists/posts_list.dart';
@@ -582,7 +583,9 @@ class _BookmarkTile extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final username = bookmark.username ?? '';
-    final title = (bookmark.title?.isNotEmpty ?? false) ? bookmark.title! : '—';
+    final title = (bookmark.title?.isNotEmpty ?? false)
+        ? withEmojiShortcodes(bookmark.title!)
+        : '—';
     final details =
         DiscourseBookmarkDetails.forBookmark(siteContext.site.url, bookmark.id);
     final label = (bookmark.name ?? '').trim();

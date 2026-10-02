@@ -8,6 +8,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../l10n/generated/app_localizations.dart';
 import '../theme/design_tokens.dart';
 import '../utils/app_navigation.dart';
+import '../utils/emoji_shortcodes.dart';
 import '../utils/error_message.dart';
 import '../utils/local_dates.dart';
 import '../utils/snackbar_helper.dart';
@@ -525,7 +526,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (s.allowFeaturedTopic)
         _ProfileRow(
           label: l10n.featuredTopic,
-          subtitle: p.featuredTopicTitle ?? l10n.featuredTopicNone,
+          subtitle: p.featuredTopicTitle == null
+              ? l10n.featuredTopicNone
+              : withEmojiShortcodes(p.featuredTopicTitle!),
           onTap: _changeFeaturedTopic,
         ),
       if (_fields.isNotEmpty)
