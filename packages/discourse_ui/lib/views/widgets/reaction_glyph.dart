@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 
 import '../../utils/emoji_shortcodes.dart';
+import '../../utils/discourse_emoji_data.dart';
 
 /// Renders a Discourse reaction id (an emoji shortcode like `heart`,
 /// `+1`, `party_parrot`) as a glyph.
@@ -57,6 +58,26 @@ class ReactionGlyph extends StatelessWidget {
     return discourseEmojiChar(clean);
   }
 
+  static final Map<String, List<String>> _namesByUnicode = () {
+    final names = <String, List<String>>{};
+    for (final entry in discourseEmojiByName.entries) {
+      (names[entry.value] ??= []).add(entry.key);
+    }
+    return names;
+  }();
+
+  String? _imageUrl(String siteUrl, String name, String? unicode) {
+    final exact = DiscourseCustomEmoji.urlFor(siteUrl, name);
+    if (exact != null || unicode == null) return exact;
+    // /emojis.json lists canonical names, while channel settings also accept
+    // aliases such as art (artist_palette) and computer (laptop).
+    for (final alias in _namesByUnicode[unicode] ?? const <String>[]) {
+      final url = DiscourseCustomEmoji.urlFor(siteUrl, alias);
+      if (url != null) return url;
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final unicode = unicodeFor(reactionId);
@@ -73,7 +94,7 @@ class ReactionGlyph extends StatelessWidget {
     return ValueListenableBuilder<int>(
       valueListenable: DiscourseCustomEmoji.revision,
       builder: (context, _, __) {
-        final url = DiscourseCustomEmoji.urlFor(site.site.url, name);
+        final url = _imageUrl(site.site.url, name, unicode);
         if (url == null) {
           if (!DiscourseCustomEmoji.isLoaded(site.site.url)) {
             // ignore: discarded_futures

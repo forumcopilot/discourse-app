@@ -276,14 +276,17 @@ void main() {
         reason: 'Unicode remains the loading fallback');
     arrived.complete({
       'default': [
-        {'name': 'art', 'url': '//cdn.example/emoji/art.png'}
+        {
+          'name': 'artist_palette',
+          'url': '//cdn.example/emoji/artist_palette.png'
+        }
       ]
     });
     await tester.pump();
     await tester.pump();
     final image = tester.widget<Image>(find.byType(Image));
     expect(((image.image as ResizeImage).imageProvider as NetworkImage).url,
-        'https://cdn.example/emoji/art.png');
+        'https://cdn.example/emoji/artist_palette.png');
   });
 
   group('on a post', () {
