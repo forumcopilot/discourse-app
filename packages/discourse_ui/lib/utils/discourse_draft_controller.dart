@@ -1,11 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:discourse_core/discourse_core.dart' show DiscourseComposerTiming;
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseComposerTiming;
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_draft.dart';
+import 'package:forumcopilot_sdk/interfaces/i_fc_draft_proxy.dart';
 
 import '../core/logging/app_logger.dart';
+import '../l10n/app_l10n.dart';
 
 /// Wraps a pair of [TextEditingController]s (title + content) and
 /// transparently mirrors their contents to a server-side draft at the
@@ -37,6 +40,10 @@ class DiscourseDraftController {
   /// Extra fields that change while writing (a message's recipients), read
   /// at each save and merged over [extraData]. Call [touch] when they change.
   final Map<String, dynamic> Function()? extraDataBuilder;
+
+  // Keep delayed saves on the forum that opened this composer, even if
+  // another forum becomes the globally selected site before they finish.
+  late final IFCDraftProxy _draftProxy = SiteProxyService.getDraftProxy();
 
   Timer? _debounce;
   bool _saving = false;
@@ -86,8 +93,7 @@ class DiscourseDraftController {
   Future<FCDraft?> initialize() async {
     FCDraft? restored;
     try {
-      final result =
-          await SiteProxyService.getDraftProxy().loadDraftAsync(draftKey);
+      final result = await _draftProxy.loadDraftAsync(draftKey);
       if (_disposed) return null;
       final draft = result.draft;
       if (result.result && draft != null) {
@@ -113,6 +119,7 @@ class DiscourseDraftController {
     } catch (e) {
       AppLogger.debug('DiscourseDraftController initial load failed: $e');
     }
+    if (_disposed) return null;
     _lastSavedExtra = _extra.toString();
     _openedReply = contentController.text;
     _openedTitle = titleController.text;
@@ -164,7 +171,7 @@ class DiscourseDraftController {
       _lastTimedText = text;
       DiscourseComposerTiming.instance.typed(_timingSession);
     }
-    if (!_loaded || _disposed) return;
+    if (!_loaded || _disposed || _discarded) return;
     _debounce?.cancel();
     // The timer fires into the void, so swallow save failures here —
     // otherwise a failed saveDraftAsync becomes an unhandled async
@@ -177,7 +184,7 @@ class DiscourseDraftController {
   }
 
   Future<void> _flush() async {
-    if (_disposed) return;
+    if (_disposed || _discarded) return;
     if (_saving) {
       // A save is already in flight — remember to re-flush when it
       // completes so edits made meanwhile aren't dropped.
@@ -198,29 +205,33 @@ class DiscourseDraftController {
   Future<void> _saveLoop() async {
     do {
       _pendingFlush = false;
-      final reply = contentController.text;
-      final title = titleController.text;
-      final extra = _extra;
-      final extraKey = extra.toString();
-      if (reply == _lastSavedReply &&
-          title == _lastSavedTitle &&
-          extraKey == _lastSavedExtra) {
-        return;
+      await _saveSnapshot(
+        contentController.text,
+        titleController.text,
+        _extra,
+      );
+      // Disposal captures a final snapshot; discard must never re-save it.
+    } while (_pendingFlush && !_disposed && !_discarded);
+  }
+
+  Future<void> _saveSnapshot(
+    String reply,
+    String title,
+    Map<String, dynamic> extra,
+  ) async {
+    final extraKey = extra.toString();
+    if (reply == _lastSavedReply &&
+        title == _lastSavedTitle &&
+        extraKey == _lastSavedExtra) {
+      return;
+    }
+    if (reply.trim().isEmpty && title.trim().isEmpty) {
+      if (_lastSavedReply.trim().isNotEmpty ||
+          _lastSavedTitle.trim().isNotEmpty) {
+        await _delete();
       }
-      // Nothing left to keep: the draft goes. The text used to be left on
-      // the server when the writer cleared it (only non-empty text was
-      // saved), and the next reply opened with it again.
-      if (reply.trim().isEmpty && title.trim().isEmpty) {
-        if (_lastSavedReply.trim().isNotEmpty ||
-            _lastSavedTitle.trim().isNotEmpty) {
-          await _delete();
-          _lastSavedReply = reply;
-          _lastSavedTitle = title;
-          _lastSavedExtra = extraKey;
-        }
-        return;
-      }
-      final result = await SiteProxyService.getDraftProxy().saveDraftAsync(
+    } else {
+      final result = await _draftProxy.saveDraftAsync(
         draftKey: draftKey,
         sequence: _sequence,
         data: {
@@ -229,14 +240,15 @@ class DiscourseDraftController {
           if (title.isNotEmpty) 'title': title,
         },
       );
-      if (result.result) {
-        _lastSavedReply = reply;
-        _lastSavedTitle = title;
-        _lastSavedExtra = extraKey;
-        if (result.sequence != null) _sequence = result.sequence!;
+      if (!result.result) {
+        throw Exception(
+            result.resultText ?? appL10n().somethingWentWrongTryAgain);
       }
-      // Re-run when a flush was requested while this save was in flight.
-    } while (_pendingFlush && !_disposed);
+      if (result.sequence != null) _sequence = result.sequence!;
+    }
+    _lastSavedReply = reply;
+    _lastSavedTitle = title;
+    _lastSavedExtra = extraKey;
   }
 
   /// Force a save right now (skipping the debounce). Useful when the
@@ -261,15 +273,31 @@ class DiscourseDraftController {
   Future<void> discard() async {
     _discarded = true;
     _debounce?.cancel();
-    await _delete();
+    // Deleting with the previous sequence while a save is in flight can
+    // silently do nothing, or the save can recreate a deleted draft.
+    await _waitForSave(_inFlightSave);
+    try {
+      await _delete();
+    } catch (_) {
+      // Cleanup after a successful post remains best-effort: it must not
+      // turn a successful submission into a retry that posts twice.
+    }
   }
 
   Future<void> _delete() async {
+    final result =
+        await _draftProxy.deleteDraftAsync(draftKey, sequence: _sequence);
+    if (!result.result) {
+      throw Exception(
+          result.resultText ?? appL10n().somethingWentWrongTryAgain);
+    }
+  }
+
+  Future<void> _waitForSave(Future<void>? save) async {
     try {
-      await SiteProxyService.getDraftProxy()
-          .deleteDraftAsync(draftKey, sequence: _sequence);
+      await save;
     } catch (_) {
-      // Best-effort; server-side drafts auto-expire.
+      // A failed earlier request must not prevent the final operation.
     }
   }
 
@@ -279,30 +307,23 @@ class DiscourseDraftController {
   /// words.
   void dispose() {
     DiscourseComposerTiming.instance.close(_timingSession);
-    final pending = _debounce?.isActive ?? false;
     _debounce?.cancel();
     contentController.removeListener(_onChanged);
     titleController.removeListener(_onChanged);
-    if (pending && _loaded && !_discarded && !_disposed) {
-      // The text is read now: the controllers are disposed next.
+    if (_loaded && !_discarded && !_disposed) {
+      // Capture before the page disposes its controllers. Even an expired
+      // debounce may have queued edits behind the active save. Serialize
+      // this snapshot (including a cleared draft) with that save's sequence.
       final reply = contentController.text;
       final title = titleController.text;
       final extra = _extra;
-      if (reply.trim().isNotEmpty || title.trim().isNotEmpty) {
-        SiteProxyService.getDraftProxy()
-            .saveDraftAsync(
-              draftKey: draftKey,
-              sequence: _sequence,
-              data: {
-                ...extra,
-                'reply': reply,
-                if (title.isNotEmpty) 'title': title,
-              },
-            )
-            .then<void>((_) {}, onError: (Object e) {
-          AppLogger.debug('DiscourseDraftController final save failed: $e');
-        });
-      }
+      final inFlight = _inFlightSave;
+      _disposed = true;
+      _waitForSave(inFlight)
+          .then((_) => _saveSnapshot(reply, title, extra))
+          .catchError((Object e) {
+        AppLogger.debug('DiscourseDraftController final save failed: $e');
+      });
     }
     _disposed = true;
   }

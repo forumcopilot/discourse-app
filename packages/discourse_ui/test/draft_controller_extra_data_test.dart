@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/utils/discourse_draft_controller.dart';
 import 'package:flutter/widgets.dart';
@@ -43,6 +45,99 @@ void main() {
         extraData: const {'action': 'privateMessage'},
         extraDataBuilder: () => {'recipients': recipients.join(',')},
       );
+
+  test('explicit save reports rejection and can be retried', () async {
+    final c = controller([]);
+    await c.initialize();
+    c.contentController.text = 'Keep this';
+    drafts.saveError = 'Draft limit reached';
+    await expectLater(c.flushNow(), throwsA(isA<Exception>()));
+    drafts.saveError = null;
+    await c.flushNow();
+    expect(drafts.saves.last['reply'], 'Keep this');
+    c.dispose();
+  });
+
+  test('discard waits for autosave and deletes its returned sequence',
+      () async {
+    final c = controller([]);
+    await c.initialize();
+    drafts.saveGate = Completer<void>();
+    c.contentController.text = 'Old words';
+    final saving = c.flushNow();
+    await Future<void>.delayed(Duration.zero);
+    c.contentController.text = 'New words';
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+    final discarding = c.discard();
+    final deletedEarly = drafts.deletes.isNotEmpty;
+    drafts.saveGate!.complete();
+    await saving;
+    await discarding;
+    c.dispose();
+    expect(deletedEarly, isFalse);
+    expect(drafts.saves, hasLength(1));
+    expect(drafts.deleteSequences, [1]);
+  });
+
+  for (final letDebounceFire in [false, true]) {
+    test(
+        'closing during autosave preserves final text (debounce: $letDebounceFire)',
+        () async {
+      final c = controller([]);
+      await c.initialize();
+      drafts.saveGate = Completer<void>();
+      c.contentController.text = 'Old words';
+      final saving = c.flushNow();
+      await Future<void>.delayed(Duration.zero);
+      c.contentController.text = 'Final words';
+      if (letDebounceFire) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
+      c.dispose();
+      c.contentController.dispose();
+      c.titleController.dispose();
+      final savesBeforeCompletion = drafts.saves.length;
+      drafts.saveGate!.complete();
+      await saving;
+      await Future<void>.delayed(Duration.zero);
+      expect(savesBeforeCompletion, 1);
+      expect(drafts.saves.last['reply'], 'Final words');
+      expect(drafts.saveSequences, [0, 1]);
+    });
+  }
+
+  test('clearing and closing deletes after the active save', () async {
+    final c = controller([]);
+    await c.initialize();
+    drafts.saveGate = Completer<void>();
+    c.contentController.text = 'Old words';
+    final saving = c.flushNow();
+    await Future<void>.delayed(Duration.zero);
+    c.contentController.clear();
+    c.dispose();
+    drafts.saveGate!.complete();
+    await saving;
+    await Future<void>.delayed(Duration.zero);
+    expect(drafts.deleteSequences, [1]);
+  });
+
+  test('a queued final save stays on the original forum proxy', () async {
+    final c = controller([]);
+    await c.initialize();
+    drafts.saveGate = Completer<void>();
+    c.contentController.text = 'Old words';
+    final saving = c.flushNow();
+    await Future<void>.delayed(Duration.zero);
+    c.contentController.text = 'Final words';
+    c.dispose();
+    final otherForum = _Drafts();
+    SiteProxyFactory.register('drafts-test', _Factory(otherForum));
+    drafts.saveGate!.complete();
+    await saving;
+    await Future<void>.delayed(Duration.zero);
+    expect(drafts.saves.last['reply'], 'Final words');
+    expect(otherForum.saves, isEmpty);
+  });
 
   test('the restored draft is handed back with its recipients', () async {
     drafts.stored = FCDraft(
@@ -96,8 +191,7 @@ void main() {
     c.dispose();
   });
 
-  test('what was typed just before closing is saved on the way out',
-      () async {
+  test('what was typed just before closing is saved on the way out', () async {
     final c = DiscourseDraftController(
       draftKey: 'topic_5',
       titleController: TextEditingController(),
@@ -167,6 +261,10 @@ void main() {
 
 class _Drafts implements IFCDraftProxy {
   FCDraft? stored;
+  Completer<void>? saveGate;
+  String? saveError;
+  final List<int> saveSequences = [];
+  final List<int> deleteSequences = [];
   final List<Map<String, dynamic>> saves = [];
   final List<String> deletes = [];
 
@@ -174,6 +272,7 @@ class _Drafts implements IFCDraftProxy {
   Future<FCDeleteDraftResult> deleteDraftAsync(String draftKey,
       {int sequence = 0}) async {
     deletes.add(draftKey);
+    deleteSequences.add(sequence);
     return FCDeleteDraftResult(result: true);
   }
 
@@ -188,6 +287,11 @@ class _Drafts implements IFCDraftProxy {
     int sequence = 0,
   }) async {
     saves.add(data);
+    saveSequences.add(sequence);
+    await saveGate?.future;
+    if (saveError != null) {
+      return FCSaveDraftResult(result: false, resultText: saveError);
+    }
     return FCSaveDraftResult(result: true, sequence: sequence + 1);
   }
 

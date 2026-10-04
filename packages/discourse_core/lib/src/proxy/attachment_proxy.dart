@@ -22,11 +22,11 @@ import '../data/chat/discourse_chat_uploads.dart';
 ///       file=<bytes>             — required
 ///       upload_type=<scope>      — composer | avatar | profile_background | …
 ///       for_private_message=true — set when the upload will be embedded in
-///                                  a PM, so Discourse scopes the upload's
-///                                  permissions to sender + recipient only.
-///                                  Without this flag the upload is public
-///                                  to anyone who knows the URL — a real
-///                                  privacy leak for PM attachments.
+///                                  a PM. With secure uploads enabled,
+///                                  Discourse uses this hint to secure the
+///                                  upload before it is attached to a post.
+///                                  Access control still depends on the
+///                                  forum's secure-upload configuration.
 ///
 /// The response is a JSON body with `id`, `url`, `short_url`,
 /// `original_filename`, `filesize`, `width`, `height`, `extension`. The
