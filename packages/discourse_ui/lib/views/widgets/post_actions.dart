@@ -206,12 +206,9 @@ class PostActionsHandler {
           if (context.mounted) onRefresh();
         });
       }
-    } else if (result == null && context.mounted) {
-      // If result is null, refresh to show the new post.
-      // Defer to next frame to avoid setState/markNeedsBuild while widget tree is locked after pop.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) onRefresh();
-      });
+      // null: the composer was closed (✕, Back, Discard, Save draft) and
+      // nothing was posted, so the topic stays scrolled where the reader
+      // left it. Refreshing here reloaded the page and lost their place.
     } else if (result == false && context.mounted) {
       SnackbarHelper.showError(context, AppLocalizations.of(context)!.failedToPostReplyPleaseTryAgain);
     }
@@ -326,11 +323,8 @@ class PostActionsHandler {
           if (context.mounted) onRefresh();
         });
       }
-    } else if (result == null && context.mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) onRefresh();
-      });
     }
+    // null: closed without posting; the topic keeps its place (see handleReply).
   }
 
   Future<void> handleEdit(BuildContext context, String postId, String currentText, String topicTitle, String topicId, String? forumId, void Function([String? scrollToPostId]) onRefresh) async {
