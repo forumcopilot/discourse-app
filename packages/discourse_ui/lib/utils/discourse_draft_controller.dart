@@ -51,6 +51,7 @@ class DiscourseDraftController {
   Future<void>? _inFlightSave;
   bool _disposed = false;
   bool _loaded = false;
+  bool _extraChangedBeforeLoad = false;
   int _sequence = 0;
   String _lastSavedReply = '';
   String _lastSavedTitle = '';
@@ -85,12 +86,16 @@ class DiscourseDraftController {
 
   /// Save soon although the text is unchanged: something in
   /// [extraDataBuilder] (e.g. the recipients) changed.
-  void touch() => _onChanged();
+  void touch() {
+    if (!_loaded) _extraChangedBeforeLoad = true;
+    _onChanged();
+  }
 
   /// Hydrate the controllers from the server-side draft (if any) and
   /// start watching for user changes. Returns the draft that was restored,
   /// for fields beyond the title and text (e.g. a message's recipients).
   Future<FCDraft?> initialize() async {
+    final openedExtra = _extra.toString();
     FCDraft? restored;
     try {
       final result = await _draftProxy.loadDraftAsync(draftKey);
@@ -120,12 +125,15 @@ class DiscourseDraftController {
       AppLogger.debug('DiscourseDraftController initial load failed: $e');
     }
     if (_disposed) return null;
-    _lastSavedExtra = _extra.toString();
+    // Metadata edited during the read has never been saved. Keep it
+    // dirty so completing the load cannot silently acknowledge it.
+    _lastSavedExtra = _extraChangedBeforeLoad ? '' : _extra.toString();
     _openedReply = contentController.text;
     _openedTitle = titleController.text;
-    _openedExtra = _lastSavedExtra;
+    _openedExtra = _extraChangedBeforeLoad ? openedExtra : _lastSavedExtra;
     _loaded = true;
     _attach();
+    if (_extraChangedBeforeLoad) _onChanged();
     return restored;
   }
 
@@ -136,6 +144,12 @@ class DiscourseDraftController {
   void markOpened() {
     _openedReply = contentController.text;
     _openedTitle = titleController.text;
+    markExtraDataOpened();
+  }
+
+  /// A page restored metadata after initialize (e.g. tags). Acknowledge
+  /// those fields without resetting the text's change baseline.
+  void markExtraDataOpened() {
     _openedExtra = _extra.toString();
     // They came from the draft, so they are saved already.
     _lastSavedExtra = _openedExtra!;

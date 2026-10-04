@@ -236,6 +236,24 @@ void main() {
     c.dispose();
   });
 
+  test('restored metadata does not mark edited text as unchanged', () async {
+    drafts.stored = FCDraft(
+      draftKey: 'new_private_message_1',
+      sequence: 3,
+      data: {'reply': 'Original', 'recipients': 'bob'},
+    );
+    final recipients = <String>[];
+    final c = controller(recipients);
+    await c.initialize();
+    c.contentController.text = 'Still editing';
+    recipients.add('bob');
+    c.markExtraDataOpened();
+    expect(c.changedSinceOpened, isTrue);
+    await c.flushNow();
+    expect(drafts.saves.last['reply'], 'Still editing');
+    c.dispose();
+  });
+
   test('changes are counted from what the composer opened with', () async {
     drafts.stored = FCDraft(
       draftKey: 'new_private_message_1',

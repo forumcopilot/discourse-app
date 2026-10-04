@@ -12,6 +12,7 @@ import 'package:discourse_core/discourse_core.dart'
     show DiscourseSiteCapabilities;
 import '../services/attachment_upload_service.dart';
 import '../utils/snackbar_helper.dart';
+import '../utils/draft_tags.dart';
 
 class NewTopicPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -54,6 +55,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
 
   // Discourse-native: tags attached to the new topic.
   List<String> _tags = const [];
+  bool _tagsChanged = false;
 
   // Server-side draft. Discourse uses 'new_topic' as a global key for the
   // current user, scoped per-category by data['categoryId']. We tag the
@@ -74,6 +76,9 @@ class _NewTopicPageState extends State<NewTopicPage> {
       draftKey: widget.draftKey,
       titleController: _titleController,
       contentController: _contentController,
+      extraDataBuilder: () => {
+        'tags': [for (final name in _tags) {'name': name}],
+      },
       extraData: {
         'action': 'createTopic',
         // A number, as Discourse's own composer stores it.
@@ -85,8 +90,12 @@ class _NewTopicPageState extends State<NewTopicPage> {
     // initialize() restores one asynchronously, so wait for it and fill
     // only a composer that is still empty. Getting this order wrong would
     // silently overwrite unsaved work with a blank skeleton.
-    _draftController.initialize().then((_) {
+    _draftController.initialize().then((draft) {
       if (!mounted) return;
+      if (!_tagsChanged) {
+        setState(() => _tags = draftTagNames(draft?.data['tags']));
+        _draftController.markExtraDataOpened();
+      }
       if (_contentController.text.trim().isNotEmpty) return;
       final template = DiscourseSiteCapabilities.forSite(
               widget.siteContext.site.pluginUrl)
@@ -210,7 +219,11 @@ class _NewTopicPageState extends State<NewTopicPage> {
               .canTagTopics
           ? TagInputField(
               initial: _tags,
-              onChanged: (tags) => _tags = tags,
+              onChanged: (tags) {
+                _tags = tags;
+                _tagsChanged = true;
+                _draftController.touch();
+              },
               allowCreate: DiscourseSiteCapabilities.forSite(
                       widget.siteContext.site.pluginUrl)
                   .canCreateTag,
