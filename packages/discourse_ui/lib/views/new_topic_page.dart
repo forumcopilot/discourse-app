@@ -164,7 +164,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
       currentAttachmentCount: _attachmentIds.length,
     );
 
-    if (outcome.cancelled) return null;
+    if (!mounted || outcome.cancelled) return null;
     if (!outcome.succeeded) {
       if (mounted && outcome.errorMessage != null) {
         SnackbarHelper.showError(context, outcome.errorMessage!);

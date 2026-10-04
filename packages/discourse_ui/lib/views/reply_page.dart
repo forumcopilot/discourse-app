@@ -297,7 +297,7 @@ class _ReplyPageState extends State<ReplyPage> {
       currentAttachmentCount: _attachmentIds.length,
     );
 
-    if (outcome.cancelled) return null;
+    if (!mounted || outcome.cancelled) return null;
     if (!outcome.succeeded) {
       if (mounted && outcome.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
