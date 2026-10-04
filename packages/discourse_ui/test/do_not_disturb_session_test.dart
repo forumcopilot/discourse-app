@@ -45,14 +45,19 @@ void main() {
     NotificationKeyService.requestOverride = null;
     AppForumConfig.setNotificationsApiBaseUrl(null);
   });
-  Future<void> open(WidgetTester tester) async {
+  Future<void> open(WidgetTester tester,
+      {Size size = const Size(800, 1400), double textScale = 1}) async {
     users.writeGate = Completer<DiscourseDoNotDisturbResult>();
-    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: TextScaler.linear(textScale)),
+          child: child!),
       home: Scaffold(body: DoNotDisturbTile(siteContext: site, users: users)),
     ));
   }
@@ -70,6 +75,27 @@ void main() {
     await prefs.setString(
         '${site.discourseStoragePrefix}_notifications_dnd_reported',
         'replacement-state');
+  }
+
+  for (final textScale in [1.0, 2.0]) {
+    testWidgets(
+        'short screen at text scale $textScale can select the last duration',
+        (tester) async {
+      await open(tester, size: const Size(640, 360), textScale: textScale);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Do not disturb'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.ensureVisible(find.text('Until tomorrow'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Until tomorrow'));
+      await tester.pumpAndSettle();
+      expect(users.lastDuration, 'tomorrow');
+      users.writeGate
+          .complete(DiscourseDoNotDisturbResult(result: true, endsAt: until));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
   }
 
   for (final operation in ['load', 'enter', 'leave']) {
@@ -139,6 +165,7 @@ class _Users extends DiscourseUserProxy {
   Completer<DiscourseDoNotDisturbResult>? loadGate;
   late Completer<DiscourseDoNotDisturbResult> writeGate;
   int enters = 0;
+  String? lastDuration;
   int leaves = 0;
   @override
   Future<DiscourseDoNotDisturbResult> getDoNotDisturbStatusAsync() async =>
@@ -146,6 +173,7 @@ class _Users extends DiscourseUserProxy {
   @override
   Future<DiscourseDoNotDisturbResult> enterDoNotDisturbAsync(String duration) {
     enters++;
+    lastDuration = duration;
     return writeGate.future;
   }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseSiteCapabilities;
+    show DiscourseSiteCapabilities, DiscourseSiteContextExtension;
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_draft.dart';
@@ -41,6 +41,26 @@ class _DraftsListPageState extends State<DraftsListPage> {
   // Keep requests (especially a delete after the Undo timeout) on the
   // forum that opened this page, even after the global forum changes.
   late final IFCDraftProxy _draftProxy = SiteProxyService.getDraftProxy();
+  late final SiteContext _siteContext;
+  late final Object _accountSession;
+  bool get _sessionCurrent =>
+      identical(_accountSession, _siteContext.configurationSession);
+
+  // A pending Undo may outlive this page, but must never act on credentials
+  // installed on the same forum context by a later sign-in.
+  bool _checkSession() {
+    if (_sessionCurrent) return true;
+    _pendingDeletes.clear();
+    if (mounted) {
+      setState(() {
+        _drafts = null;
+        _loading = false;
+        _error = null;
+      });
+    }
+    return false;
+  }
+
   List<FCDraft>? _drafts;
   final _pendingDeletes = <String>{};
   bool _loading = false;
@@ -53,10 +73,13 @@ class _DraftsListPageState extends State<DraftsListPage> {
   @override
   void initState() {
     super.initState();
+    _siteContext = widget.siteContext;
+    _accountSession = _siteContext.configurationSession;
     _load();
   }
 
   Future<void> _load({bool more = false}) async {
+    if (!mounted || !_checkSession()) return;
     if (more && (_loading || !_hasMore)) return;
     final generation = ++_loadGeneration;
     final page = more ? _nextPage : 0;
@@ -67,7 +90,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
     });
     try {
       final result = await _draftProxy.getMyDraftsAsync(page: page);
-      if (!mounted || generation != _loadGeneration) return;
+      if (!mounted || !_checkSession() || generation != _loadGeneration) return;
       if (!result.result) {
         throw Exception(result.resultText?.isNotEmpty == true
             ? result.resultText!
@@ -92,7 +115,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
         _loading = false;
       });
     } catch (e) {
-      if (!mounted || generation != _loadGeneration) return;
+      if (!mounted || !_checkSession() || generation != _loadGeneration) return;
       setState(() {
         _loading = false;
         _error = describeError(e);
@@ -104,6 +127,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
   /// closes without an Undo — in place of a confirm dialog before every
   /// discard. An undone discard comes back exactly as it was.
   void _delete(FCDraft draft) {
+    if (!mounted || !_checkSession()) return;
     final drafts = _drafts;
     if (drafts == null) return;
     final index = drafts.indexWhere((d) => d.draftKey == draft.draftKey);
@@ -122,7 +146,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
     ));
     void restore() {
       _pendingDeletes.remove(draft.draftKey);
-      if (!mounted) return;
+      if (!mounted || !_checkSession()) return;
       final now = [...?_drafts];
       if (now.any((d) => d.draftKey == draft.draftKey)) return;
       now.insert(index.clamp(0, now.length), draft);
@@ -130,6 +154,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
     }
 
     controller.closed.then((reason) async {
+      if (!_checkSession()) return;
       if (reason == SnackBarClosedReason.action) {
         restore();
         return;
@@ -137,6 +162,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
       try {
         final result = await _draftProxy.deleteDraftAsync(draft.draftKey,
             sequence: draft.sequence);
+        if (!_checkSession()) return;
         if (!result.result) {
           throw Exception(result.resultText?.isNotEmpty == true
               ? result.resultText!
@@ -147,6 +173,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
         // Load more cannot skip a draft shifted into the previous page.
         if (mounted) await _load();
       } catch (error) {
+        if (!_checkSession()) return;
         restore();
         if (!mounted) return;
         messenger.showSnackBar(SnackBar(
@@ -167,6 +194,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
   /// list used to stay as it was, so a sent draft stayed listed and tapping
   /// it opened an empty composer.
   Future<void> _resume(FCDraft draft) async {
+    if (!mounted || !_checkSession()) return;
     await _open(draft);
     if (mounted) await _load();
   }
@@ -235,6 +263,15 @@ class _DraftsListPageState extends State<DraftsListPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final drafts = _drafts;
+    if (!_sessionCurrent) {
+      return Scaffold(
+        appBar: SimpleListAppBar(title: l10n.drafts),
+        body: EmptyStateView.scrollable(
+          icon: Icons.account_circle_outlined,
+          message: l10n.accountSessionChanged,
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: SimpleListAppBar(title: l10n.drafts),

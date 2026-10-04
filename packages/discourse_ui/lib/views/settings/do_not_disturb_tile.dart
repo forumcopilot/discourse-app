@@ -164,19 +164,21 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
       showDragHandle: true,
       builder: (sheetContext) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SheetTitle(AppLocalizations.of(context)!.pauseNotificationsFor),
-              ..._durations(AppLocalizations.of(context)!).map(
-                (d) => ListTile(
-                  title: Text(d.label),
-                  onTap: () => Navigator.of(sheetContext).pop(d.value),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SheetTitle(AppLocalizations.of(context)!.pauseNotificationsFor),
+                ..._durations(AppLocalizations.of(context)!).map(
+                  (d) => ListTile(
+                    title: Text(d.label),
+                    onTap: () => Navigator.of(sheetContext).pop(d.value),
+                  ),
                 ),
-              ),
-              SizedBox(height: DesignTokens.spacingS),
-            ],
+                SizedBox(height: DesignTokens.spacingS),
+              ],
+            ),
           ),
         );
       },

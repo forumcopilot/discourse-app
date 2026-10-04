@@ -1,5 +1,9 @@
 import 'dart:async';
 
+import 'package:discourse_core/discourse_core.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/theme/app_theme.dart';
@@ -12,7 +16,12 @@ void main() {
   late _Drafts drafts;
   late SiteContext site;
 
-  setUp(() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+            const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
+            (_) async => null);
     drafts = _Drafts();
     site = SiteContext(
         siteType: 'draft-list-test',
@@ -23,6 +32,8 @@ void main() {
           description: '',
           siteType: 'draft-list-test',
         ));
+    await site.setUserApiCredentials(
+        userApiKey: 'first', userApiClientId: 'first');
     SiteProxyFactory.register('draft-list-test', _Factory(drafts));
     SiteProxyService.initialize(site);
   });
@@ -57,6 +68,109 @@ void main() {
   Future<void> refresh(WidgetTester tester) => tester
       .widget<RefreshIndicator>(find.byType(RefreshIndicator))
       .onRefresh();
+
+  Future<void> switchAccount() => site.setUserApiCredentials(
+      userApiKey: 'second', userApiClientId: 'second');
+
+  void expectStaleScreen() {
+    expect(find.text('Draft 0'), findsNothing);
+    expect(find.text('Your sign-in changed. Reopen this screen to continue.'),
+        findsOneWidget);
+  }
+
+  for (final action in ['timeout', 'undo', 'refresh', 'discard', 'resume']) {
+    testWidgets('$action after account change cannot reuse old drafts',
+        (tester) async {
+      await open(tester);
+      if (action == 'timeout' || action == 'undo') await discard(tester);
+      await switchAccount();
+      switch (action) {
+        case 'timeout':
+          await expireUndo(tester);
+        case 'undo':
+          await tester.tap(find.text('Undo'));
+          await tester.pumpAndSettle();
+        case 'refresh':
+          await refresh(tester);
+          await tester.pumpAndSettle();
+        case 'discard':
+          await discard(tester);
+          await expireUndo(tester);
+        case 'resume':
+          await tester.tap(find.text('Draft 0'));
+          await tester.pumpAndSettle();
+      }
+      expect(drafts.deleted, isEmpty);
+      expect(drafts.pages, [0]);
+      expectStaleScreen();
+    });
+  }
+
+  for (final success in [true, false]) {
+    testWidgets('late refresh $success cannot show the old account drafts',
+        (tester) async {
+      await open(tester);
+      final gate = Completer<FCDraftListResult>();
+      drafts.nextResult = gate;
+      final pending = refresh(tester);
+      await switchAccount();
+      gate.complete(FCDraftListResult(
+          result: success,
+          total: 1,
+          items: [_draft(0)],
+          resultText: 'Old error'));
+      await pending;
+      await tester.pumpAndSettle();
+      expectStaleScreen();
+      expect(find.text('Old error'), findsNothing);
+    });
+    testWidgets('late delete $success cannot reload or restore old drafts',
+        (tester) async {
+      await open(tester);
+      final gate = Completer<FCDeleteDraftResult>();
+      drafts.deleteGate = gate;
+      await discard(tester);
+      await expireUndo(tester);
+      expect(drafts.deleted, ['new_topic_0']);
+      await switchAccount();
+      gate.complete(
+          FCDeleteDraftResult(result: success, resultText: 'Old error'));
+      await tester.pumpAndSettle();
+      expect(drafts.pages, [0]);
+      expectStaleScreen();
+      expect(find.text('Old error'), findsNothing);
+    });
+  }
+
+  for (final changeAccount in [false, true]) {
+    testWidgets(
+        'pending delete after page disposal, account changed: $changeAccount',
+        (tester) async {
+      // Keep the messenger alive while removing only the page.
+      final showDrafts = ValueNotifier(true);
+      addTearDown(showDrafts.dispose);
+      await tester.pumpWidget(MaterialApp(
+        theme: AppTheme.lightTheme,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: ValueListenableBuilder<bool>(
+          valueListenable: showDrafts,
+          builder: (_, visible, __) => visible
+              ? DraftsListPage(siteContext: site)
+              : const Scaffold(body: Text('Away')),
+        ),
+      ));
+      await tester.pumpAndSettle();
+      await discard(tester);
+      showDrafts.value = false;
+      await tester.pump();
+      if (changeAccount) await switchAccount();
+      await expireUndo(tester);
+      expect(drafts.deleted, changeAccount ? isEmpty : ['new_topic_0']);
+      expect(drafts.pages, [0]);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets(
       'older drafts load beyond the first 50 and stop after a short page',
@@ -209,6 +323,7 @@ class _Drafts implements IFCDraftProxy {
   String? deleteError;
   bool throwDelete = false;
   Completer<FCDraftListResult>? nextResult;
+  Completer<FCDeleteDraftResult>? deleteGate;
 
   @override
   Future<FCDraftListResult> getMyDraftsAsync({int page = 0}) async {
@@ -229,6 +344,7 @@ class _Drafts implements IFCDraftProxy {
   Future<FCDeleteDraftResult> deleteDraftAsync(String key,
       {int sequence = 0}) async {
     deleted.add(key);
+    if (deleteGate != null) return deleteGate!.future;
     if (throwDelete) throw Exception(deleteError);
     if (deleteError == null) items.removeWhere((d) => d.draftKey == key);
     return FCDeleteDraftResult(
