@@ -9,6 +9,10 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
+  String get submissionUnconfirmed =>
+      'Não foi possível confirmar o envio. Seu texto foi mantido. Verifique o fórum antes de tentar novamente.';
+
+  @override
   String get loginTitle => 'Entrar';
 
   @override

@@ -9,6 +9,10 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
+  String get submissionUnconfirmed =>
+      '전송 여부를 확인하지 못했습니다. 작성한 내용은 유지되었습니다. 다시 시도하기 전에 포럼을 확인해 주세요.';
+
+  @override
   String get loginTitle => '로그인';
 
   @override

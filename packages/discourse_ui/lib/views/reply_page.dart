@@ -12,6 +12,7 @@ import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import '../utils/discourse_draft_controller.dart';
+import '../utils/post_submission.dart';
 import '../services/attachment_upload_service.dart';
 
 class ReplyPage extends StatefulWidget {
@@ -239,14 +240,8 @@ class _ReplyPageState extends State<ReplyPage> {
           _createdPostId = null;
           if (mounted) await showPostNeedsApproval(context);
         } else {
-          // Store the postId synchronously for immediate use in onSuccess callback
-          // Only store if postId is not null and not empty
-          if (result.postId != null && result.postId!.isNotEmpty) {
-            _createdPostId = result.postId;
-          } else {
-            _createdPostId = null;
-            debugPrint('⚠️ [REPLY] Warning: postId is null or empty after successful submission');
-          }
+          _createdPostId = confirmedPostId(
+              result.postId, l10n.submissionUnconfirmed);
         }
         return true;
       } else {

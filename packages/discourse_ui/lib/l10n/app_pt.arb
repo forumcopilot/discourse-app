@@ -1,5 +1,6 @@
 {
   "@@locale": "pt",
+  "submissionUnconfirmed": "Não foi possível confirmar o envio. Seu texto foi mantido. Verifique o fórum antes de tentar novamente.",
   "loginTitle": "Entrar",
   "usePasskey": "Use Passkey",
   "passkeyContinuePrompt": "Use your passkey to continue",

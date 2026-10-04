@@ -1,5 +1,6 @@
 {
   "@@locale": "fr",
+  "submissionUnconfirmed": "Nous n’avons pas pu confirmer l’envoi. Votre texte a été conservé. Vérifiez le forum avant de réessayer.",
   "loginTitle": "Connexion",
   "usePasskey": "Use Passkey",
   "passkeyContinuePrompt": "Use your passkey to continue",

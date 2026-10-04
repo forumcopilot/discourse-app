@@ -1,5 +1,6 @@
 {
   "@@locale": "ja",
+  "submissionUnconfirmed": "送信を確認できませんでした。入力した内容は保持されています。再試行する前にフォーラムを確認してください。",
   "loginTitle": "ログイン",
   "usePasskey": "Use Passkey",
   "passkeyContinuePrompt": "Use your passkey to continue",

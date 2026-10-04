@@ -1,5 +1,6 @@
 {
   "@@locale": "zh",
+  "submissionUnconfirmed": "无法确认是否已发送。您输入的内容已保留。请先查看论坛，再决定是否重试。",
   "loginTitle": "登录",
   "usePasskey": "Use Passkey",
   "passkeyContinuePrompt": "Use your passkey to continue",

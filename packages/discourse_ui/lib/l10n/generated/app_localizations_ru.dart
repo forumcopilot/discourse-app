@@ -9,6 +9,10 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
+  String get submissionUnconfirmed =>
+      'Не удалось подтвердить отправку. Ваш текст сохранён. Проверьте форум, прежде чем повторять попытку.';
+
+  @override
   String get loginTitle => 'Вход';
 
   @override

@@ -1,5 +1,6 @@
 {
   "@@locale": "nl",
+  "submissionUnconfirmed": "We konden niet bevestigen dat dit is verzonden. Je tekst is behouden. Controleer het forum voordat je het opnieuw probeert.",
   "loginTitle": "Inloggen",
   "usePasskey": "Use Passkey",
   "passkeyContinuePrompt": "Use your passkey to continue",

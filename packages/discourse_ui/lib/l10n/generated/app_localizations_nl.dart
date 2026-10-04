@@ -9,6 +9,10 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
+  String get submissionUnconfirmed =>
+      'We konden niet bevestigen dat dit is verzonden. Je tekst is behouden. Controleer het forum voordat je het opnieuw probeert.';
+
+  @override
   String get loginTitle => 'Inloggen';
 
   @override

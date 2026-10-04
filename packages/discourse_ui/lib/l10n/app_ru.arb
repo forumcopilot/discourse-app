@@ -1,5 +1,6 @@
 {
   "@@locale": "ru",
+  "submissionUnconfirmed": "Не удалось подтвердить отправку. Ваш текст сохранён. Проверьте форум, прежде чем повторять попытку.",
   "loginTitle": "Вход",
   "usePasskey": "Use Passkey",
   "passkeyContinuePrompt": "Use your passkey to continue",

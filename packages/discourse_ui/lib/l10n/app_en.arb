@@ -1,5 +1,9 @@
 {
   "@@locale": "en",
+  "submissionUnconfirmed": "We couldn't confirm that this was sent. Your text has been kept. Check the forum before trying again.",
+  "@submissionUnconfirmed": {
+    "description": "A successful post HTTP response lacked a usable ID; keep the editor and caution against duplicate submissions."
+  },
   "loginTitle": "Login",
   "usePasskey": "Use Passkey",
   "passkeyContinuePrompt": "Use your passkey to continue",

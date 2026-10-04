@@ -116,6 +116,12 @@ abstract class AppLocalizations {
     Locale('zh')
   ];
 
+  /// A successful post HTTP response lacked a usable ID; keep the editor and caution against duplicate submissions.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t confirm that this was sent. Your text has been kept. Check the forum before trying again.'**
+  String get submissionUnconfirmed;
+
   /// No description provided for @loginTitle.
   ///
   /// In en, this message translates to:

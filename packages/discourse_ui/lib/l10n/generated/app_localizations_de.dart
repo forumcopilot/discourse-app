@@ -9,6 +9,10 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
+  String get submissionUnconfirmed =>
+      'Wir konnten nicht bestätigen, dass dies gesendet wurde. Dein Text wurde beibehalten. Prüfe das Forum, bevor du es erneut versuchst.';
+
+  @override
   String get loginTitle => 'Anmelden';
 
   @override

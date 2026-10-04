@@ -13,6 +13,7 @@ import '../../../../services/attachment_upload_service.dart';
 import '../../../../theme/design_tokens.dart';
 import '../../../../utils/app_navigation.dart';
 import '../../../../utils/discourse_draft_controller.dart';
+import '../../../../utils/post_submission.dart';
 import '../../../lists/posts_list.dart' show PostsListMode;
 import '../../../post_page.dart';
 
@@ -162,8 +163,8 @@ class _NewConversationPageState extends State<NewConversationPage> {
           ? message
           : l10n.messageCouldNotBeSent);
     }
-    if (result.convId.isEmpty) throw Exception(l10n.messageSentWithoutId);
-    _created = (id: result.convId, title: title);
+    final id = confirmedPostId(result.convId, l10n.submissionUnconfirmed);
+    _created = (id: id, title: title);
     await _draft.discard(afterSubmit: true);
     return true;
   }

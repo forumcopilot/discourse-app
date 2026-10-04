@@ -13,6 +13,7 @@ import 'package:discourse_core/discourse_core.dart'
 import '../services/attachment_upload_service.dart';
 import '../utils/snackbar_helper.dart';
 import '../utils/draft_tags.dart';
+import '../utils/post_submission.dart';
 
 class NewTopicPage extends StatefulWidget {
   final SiteContext siteContext;
@@ -142,10 +143,9 @@ class _NewTopicPageState extends State<NewTopicPage> {
       if (mounted) await showPostNeedsApproval(context);
       return true;
     }
-    widget.onTopicCreated?.call(result.topicId.trim(), title);
-    if (result.topicId.trim().isNotEmpty) {
-      _created = (id: result.topicId.trim(), title: title);
-    }
+    final id = confirmedPostId(result.topicId, l10n.submissionUnconfirmed);
+    widget.onTopicCreated?.call(id, title);
+    _created = (id: id, title: title);
     return true;
   }
 
