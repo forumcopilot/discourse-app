@@ -24,8 +24,8 @@ import '../l10n/app_l10n.dart';
 /// Lifecycle:
 ///   1. `initialize()` — fetch any existing draft and prefill controllers.
 ///   2. While the user types, an internal listener debounces and saves.
-///   3. On successful submit, call `discard()` to clean up the draft on
-///      the server.
+///   3. On successful submit, call `discard(afterSubmit: true)` for
+///      best-effort cleanup of the server draft.
 ///   4. Always call `dispose()` from your widget's `dispose()`.
 class DiscourseDraftController {
   final String draftKey;
@@ -51,6 +51,8 @@ class DiscourseDraftController {
   Future<void>? _inFlightSave;
   bool _disposed = false;
   bool _loaded = false;
+  FCDraft? _loadedDraft;
+  bool _needsHydration = false;
   Future<FCDraft?>? _initialization;
   Object? _loadError;
   void Function(FCDraft?)? _onRestored;
@@ -135,41 +137,50 @@ class DiscourseDraftController {
         ..remove('title');
       _loadError = null;
       _loaded = true;
+      _loadedDraft = draft;
+      _needsHydration = true;
       // A queued close/discard still needs the sequence, but must never
       // read disposed controllers or hydrate a discarded composer.
       if (_disposed || _discarded) return null;
 
-      _restoring = true;
-      try {
-        if (!_replyChangedBeforeLoad && contentController.text.isEmpty) {
-          contentController.text = _lastSavedReply;
-          contentController.selection = TextSelection.collapsed(
-            offset: contentController.text.length,
-          );
-        }
-        if (!_titleChangedBeforeLoad && titleController.text.isEmpty) {
-          titleController.text = _lastSavedTitle;
-        }
-      } finally {
-        _restoring = false;
-        _observeText();
-      }
-      // Text entered during the read is work to save, not opening state.
-      if (!_replyChangedBeforeLoad) _openedReply = contentController.text;
-      if (!_titleChangedBeforeLoad) _openedTitle = titleController.text;
-      _lastSavedExtra = _extraChangedBeforeLoad ? '' : _extra.toString();
-      if (!_extraChangedBeforeLoad) _openedExtra = _lastSavedExtra;
-      _onRestored?.call(draft);
-      if (_replyChangedBeforeLoad ||
-          _titleChangedBeforeLoad ||
-          _extraChangedBeforeLoad) {
-        _scheduleSave();
-      }
+      _restoreLoadedDraft();
       return draft;
     } catch (e) {
       _loadError = e;
       AppLogger.debug('DiscourseDraftController initial load failed: $e');
       return null;
+    }
+  }
+
+  // A discard can finish loading the draft without hydrating the editor.
+  // If deletion fails, restore untouched fields before editing resumes.
+  void _restoreLoadedDraft() {
+    _needsHydration = false;
+    _restoring = true;
+    try {
+      if (!_replyChangedBeforeLoad && contentController.text.isEmpty) {
+        contentController.text = _lastSavedReply;
+        contentController.selection = TextSelection.collapsed(
+          offset: contentController.text.length,
+        );
+      }
+      if (!_titleChangedBeforeLoad && titleController.text.isEmpty) {
+        titleController.text = _lastSavedTitle;
+      }
+    } finally {
+      _restoring = false;
+      _observeText();
+    }
+    // Text entered during the read is work to save, not opening state.
+    if (!_replyChangedBeforeLoad) _openedReply = contentController.text;
+    if (!_titleChangedBeforeLoad) _openedTitle = titleController.text;
+    _lastSavedExtra = _extraChangedBeforeLoad ? '' : _extra.toString();
+    if (!_extraChangedBeforeLoad) _openedExtra = _lastSavedExtra;
+    _onRestored?.call(_loadedDraft);
+    if (_replyChangedBeforeLoad ||
+        _titleChangedBeforeLoad ||
+        _extraChangedBeforeLoad) {
+      _scheduleSave();
     }
   }
 
@@ -345,9 +356,10 @@ class DiscourseDraftController {
     await _flush();
   }
 
-  /// Delete the draft from the server. Call after a successful submit, or
-  /// when the writer discards it, so the next composer open starts fresh.
-  Future<void> discard() async {
+  /// Discard explicitly, reporting failures so the editor stays open.
+  /// After a successful post, set [afterSubmit]: cleanup must not turn a
+  /// posted message into a failed submission or allow it to be sent twice.
+  Future<void> discard({bool afterSubmit = false}) async {
     _discarded = true;
     _debounce?.cancel();
     // Deleting with the previous sequence while a save is in flight can
@@ -356,9 +368,17 @@ class DiscourseDraftController {
       await _ensureLoaded();
       await _waitForSave(_inFlightSave);
       await _delete();
-    } catch (_) {
-      // Cleanup after a successful post remains best-effort: it must not
-      // turn a successful submission into a retry that posts twice.
+    } catch (error) {
+      if (afterSubmit) {
+        AppLogger.debug('DiscourseDraftController post cleanup failed: $error');
+        return;
+      }
+      _discarded = false;
+      if (!_disposed) {
+        if (_needsHydration) _restoreLoadedDraft();
+        if (_loaded) _scheduleSave();
+      }
+      rethrow;
     }
   }
 

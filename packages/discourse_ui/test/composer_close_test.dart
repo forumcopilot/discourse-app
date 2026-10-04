@@ -127,6 +127,29 @@ void main() {
     expect(find.text('Topic'), findsOneWidget);
   });
 
+  testWidgets('failed Discard keeps writing visible and allows retry',
+      (tester) async {
+    var attempts = 0;
+    await open(tester, onDiscard: () async {
+      if (++attempts == 1) throw Exception('Cannot discard draft');
+    });
+    await type(tester, 'Do not lose this');
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Discard'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.text('Do not lose this'), findsOneWidget);
+    expect(find.text('Cannot discard draft'), findsOneWidget);
+    await tester.tap(find.descendant(
+        of: find.byType(AppBar), matching: find.byTooltip('Close')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Discard'));
+    await tester.pumpAndSettle();
+    expect(attempts, 2);
+    expect(find.text('Topic'), findsOneWidget);
+  });
+
   testWidgets('Back cannot start another close while a draft is saving',
       (tester) async {
     final saving = Completer<void>();

@@ -231,6 +231,91 @@ void main() {
     c.dispose();
   });
 
+  test('explicit discard reports refusal and can be retried', () async {
+    final c = controller([]);
+    await c.initialize();
+    c.contentController.text = 'Keep this';
+    drafts.deleteError = 'Cannot discard draft';
+    await expectLater(c.discard(), throwsA(isA<Exception>()));
+    expect(c.contentController.text, 'Keep this');
+    expect(c.changedSinceOpened, isTrue);
+    drafts.deleteError = null;
+    await c.discard();
+    c.dispose();
+    expect(drafts.deletes, hasLength(2));
+    expect(drafts.saves, isEmpty);
+  });
+
+  test('editing and autosave continue after a thrown discard error', () async {
+    final c = controller([]);
+    await c.initialize();
+    c.contentController.text = 'Keep this';
+    drafts.throwDelete = true;
+    await expectLater(c.discard(), throwsA(isA<Exception>()));
+    c.contentController.text = 'More writing';
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    expect(drafts.saves.last['reply'], 'More writing');
+    c.dispose();
+  });
+
+  test('discard load failure is reported and a retry uses the saved sequence',
+      () async {
+    storedDraft();
+    drafts.loadError = 'Cannot load draft';
+    final c = controller([]);
+    await c.initialize();
+    await expectLater(c.discard(), throwsA(isA<Exception>()));
+    expect(drafts.deletes, isEmpty);
+    drafts.loadError = null;
+    await c.discard();
+    c.dispose();
+    expect(drafts.deleteSequences, [7]);
+  });
+
+  test('failed discard during load restores untouched fields and metadata',
+      () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    drafts.deleteError = 'Cannot discard draft';
+    final c = controller([]);
+    FCDraft? restored;
+    final loading = c.initialize(onRestored: (draft) => restored = draft);
+    c.contentController.text = 'Early writing';
+    final rejected = expectLater(c.discard(), throwsA(isA<Exception>()));
+    drafts.loadGate!.complete();
+    await loading;
+    await rejected;
+    expect(c.contentController.text, 'Early writing');
+    expect(c.titleController.text, 'Server title');
+    expect(restored?.data['tags'], ['saved-tag']);
+    expect(c.changedSinceOpened, isTrue);
+    await c.flushNow();
+    expect(drafts.saves.last['reply'], 'Early writing');
+    expect(drafts.saveSequences, [7]);
+    c.dispose();
+  });
+
+  test('failed discard after autosave preserves later edits and sequence',
+      () async {
+    final c = controller([]);
+    await c.initialize();
+    drafts.saveGate = Completer<void>();
+    c.contentController.text = 'Old words';
+    final saving = c.flushNow();
+    await Future<void>.delayed(Duration.zero);
+    c.contentController.text = 'Later words';
+    drafts.deleteError = 'Cannot discard draft';
+    final rejected = expectLater(c.discard(), throwsA(isA<Exception>()));
+    drafts.saveGate!.complete();
+    await saving;
+    await rejected;
+    await c.flushNow();
+    expect(drafts.deleteSequences, [1]);
+    expect(drafts.saveSequences, [0, 1]);
+    expect(drafts.saves.last['reply'], 'Later words');
+    c.dispose();
+  });
+
   test('discard waits for autosave and deletes its returned sequence',
       () async {
     final c = controller([]);
@@ -457,6 +542,8 @@ class _Drafts implements IFCDraftProxy {
   String? loadError;
   int loads = 0;
   String? saveError;
+  String? deleteError;
+  bool throwDelete = false;
   final List<int> saveSequences = [];
   final List<int> deleteSequences = [];
   final List<Map<String, dynamic>> saves = [];
@@ -467,7 +554,9 @@ class _Drafts implements IFCDraftProxy {
       {int sequence = 0}) async {
     deletes.add(draftKey);
     deleteSequences.add(sequence);
-    return FCDeleteDraftResult(result: true);
+    if (throwDelete) throw Exception('Delete failed');
+    return FCDeleteDraftResult(
+        result: deleteError == null, resultText: deleteError);
   }
 
   @override

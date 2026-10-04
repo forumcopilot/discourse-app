@@ -164,7 +164,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
     }
     if (result.convId.isEmpty) throw Exception(l10n.messageSentWithoutId);
     _created = (id: result.convId, title: title);
-    await _draft.discard();
+    await _draft.discard(afterSubmit: true);
     return true;
   }
 

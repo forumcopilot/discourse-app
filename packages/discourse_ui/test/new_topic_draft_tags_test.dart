@@ -55,6 +55,37 @@ void main() {
   MessageComposePage composer(WidgetTester tester) =>
       tester.widget<MessageComposePage>(find.byType(MessageComposePage));
 
+  testWidgets('new topic explicit Discard reports a failed delete',
+      (tester) async {
+    await open(tester);
+    composer(tester).contentController!.text = 'Keep writing';
+    drafts.deleteError = 'Cannot discard draft';
+    await expectLater(composer(tester).onDiscard!(), throwsA(isA<Exception>()));
+    expect(composer(tester).contentController!.text, 'Keep writing');
+    await composer(tester).onSaveDraft!();
+    expect(drafts.saves.last['reply'], 'Keep writing');
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
+
+  for (final failLoad in [false, true]) {
+    testWidgets(
+        'successful topic stays successful if draft ${failLoad ? "read" : "delete"} fails',
+        (tester) async {
+      if (failLoad) drafts.loadError = 'Cannot load draft';
+      await open(tester);
+      topics.succeed = true;
+      drafts.deleteError = 'Cannot discard draft';
+      composer(tester).contentController!.text = 'Posted words';
+      expect(await composer(tester).onSubmit('Title', 'Posted words'), isTrue);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+      expect(drafts.saves, isEmpty,
+          reason: 'do not recreate a draft after posting');
+      expect(topics.calls, 1);
+    });
+  }
+
   for (final tags in <List<Object>>[
     ['design', 'mobile'],
     [
@@ -196,7 +227,13 @@ class _Drafts implements IFCDraftProxy {
   Map<String, dynamic> data = {};
   Completer<void>? loadGate;
   String? loadError;
+  String? deleteError;
   final saves = <Map<String, dynamic>>[];
+  @override
+  Future<FCDeleteDraftResult> deleteDraftAsync(String key,
+          {int sequence = 0}) async =>
+      FCDeleteDraftResult(result: deleteError == null, resultText: deleteError);
+
   @override
   Future<FCLoadDraftResult> loadDraftAsync(String key) async {
     await loadGate?.future;
@@ -222,6 +259,8 @@ class _Drafts implements IFCDraftProxy {
 
 class _Topics implements IFCTopicProxy {
   List<String>? tags;
+  bool succeed = false;
+  int calls = 0;
   @override
   Future<FCNewTopicResult> newTopic(
       String forumId, String subject, String textBody,
@@ -230,6 +269,8 @@ class _Topics implements IFCTopicProxy {
       String? groupId,
       List<String>? tags}) async {
     this.tags = tags;
+    calls++;
+    if (succeed) return FCNewTopicResult(result: true, topicId: '99');
     return FCNewTopicResult(
         result: false, resultText: 'Test refusal', topicId: '');
   }

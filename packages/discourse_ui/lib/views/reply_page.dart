@@ -164,7 +164,7 @@ class _ReplyPageState extends State<ReplyPage> {
   Future<bool> _handleSubmitWithDraftDiscard(String title, String content) async {
     final ok = await _handleSubmit(title, content);
     if (ok) {
-      await _draftController.discard();
+      await _draftController.discard(afterSubmit: true);
     }
     return ok;
   }
