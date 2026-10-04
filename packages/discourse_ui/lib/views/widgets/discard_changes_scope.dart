@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/generated/app_localizations.dart';
+import '../../utils/error_message.dart';
+import '../../utils/snackbar_helper.dart';
 
 /// Asks before a form with unsaved changes is closed, whichever way: its ✕,
 /// Back, Android's back gesture. The composers and edit forms used to close
@@ -56,6 +58,7 @@ enum _Choice { discard, saveDraft }
 
 class _DiscardChangesScopeState extends State<DiscardChangesScope> {
   bool _asking = false;
+  bool _closing = false;
 
   Future<void> _ask() async {
     if (_asking || widget.busy) return;
@@ -93,13 +96,27 @@ class _DiscardChangesScopeState extends State<DiscardChangesScope> {
         ],
       ),
     );
-    _asking = false;
-    if (choice == null || !mounted) return;
-    switch (choice) {
-      case _Choice.saveDraft:
-        await widget.onSaveDraft?.call();
-      case _Choice.discard:
-        await widget.onDiscard?.call();
+    if (choice == null || !mounted) {
+      _asking = false;
+      return;
+    }
+    setState(() => _closing = true);
+    try {
+      switch (choice) {
+        case _Choice.saveDraft:
+          await widget.onSaveDraft?.call();
+        case _Choice.discard:
+          await widget.onDiscard?.call();
+      }
+    } catch (error) {
+      if (mounted) {
+        SnackbarHelper.showError(
+            context, describeError(error, context: context));
+      }
+      return;
+    } finally {
+      _asking = false;
+      if (mounted) setState(() => _closing = false);
     }
     if (!mounted) return;
     final route = ModalRoute.of(context);
@@ -112,11 +129,11 @@ class _DiscardChangesScopeState extends State<DiscardChangesScope> {
     return ListenableBuilder(
       listenable: widget.listenable,
       builder: (context, child) => PopScope(
-        canPop: !widget.busy && !widget.hasChanges(),
+        canPop: !_closing && !widget.busy && !widget.hasChanges(),
         onPopInvokedWithResult: (didPop, _) {
           if (!didPop) _ask();
         },
-        child: child!,
+        child: AbsorbPointer(absorbing: _closing, child: child!),
       ),
       child: widget.child,
     );
