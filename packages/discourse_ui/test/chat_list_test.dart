@@ -442,8 +442,9 @@ class _Chat extends DiscourseChatProxy {
   Future<Map<String, dynamic>> apiGet(String path,
       {Map<String, dynamic>? query}) async {
     calls.add('GET $path');
-    if (path == '/chat/api/me/channels')
+    if (path == '/chat/api/me/channels') {
       return pendingList?.future ?? Future.value(list);
+    }
     if (path == '/chat/api/channels') {
       final offset = query?['offset'] as int? ?? 0;
       browseOffsets.add(offset);
