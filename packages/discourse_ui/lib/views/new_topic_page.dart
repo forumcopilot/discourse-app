@@ -19,11 +19,10 @@ class NewTopicPage extends StatefulWidget {
   final String forumId;
   final String forumName;
 
-  /// The server draft this composer saves to and restores from. `new_topic`
-  /// for one started here; a draft resumed from Drafts passes its own key —
-  /// the web keys new topics `new_topic_<timestamp>` (one draft each), and
-  /// resuming one under `new_topic` opened a different draft or none.
-  final String draftKey;
+  /// Pass an existing key when resuming from Drafts, including the legacy
+  /// `new_topic` key. Otherwise each new composer gets its own
+  /// `new_topic_<timestamp>` draft, as on the web.
+  final String? draftKey;
 
   /// Fired the moment the server confirms the topic was created. More
   /// reliable than the pop result: it still reaches the opener when a
@@ -41,7 +40,7 @@ class NewTopicPage extends StatefulWidget {
     required this.siteContext,
     required this.forumId,
     required this.forumName,
-    this.draftKey = 'new_topic',
+    this.draftKey,
     this.onTopicCreated,
   });
 
@@ -57,9 +56,8 @@ class _NewTopicPageState extends State<NewTopicPage> {
   List<String> _tags = const [];
   bool _tagsChanged = false;
 
-  // Server-side draft. Discourse uses 'new_topic' as a global key for the
-  // current user, scoped per-category by data['categoryId']. We tag the
-  // forumId here so resuming on a different category starts fresh.
+  // A category is draft metadata, not part of its server identity. New
+  // topics must not share a key or one category can overwrite another's work.
   late final TextEditingController _titleController;
   late final TextEditingController _contentController;
   late final DiscourseDraftController _draftController;
@@ -71,9 +69,17 @@ class _NewTopicPageState extends State<NewTopicPage> {
   void initState() {
     super.initState();
     _titleController = TextEditingController();
-    _contentController = TextEditingController();
+    // A template is initial content for a new topic. Applying it after a
+    // draft read can replace an intentionally empty saved/edited body.
+    _contentController = TextEditingController(
+      text: widget.draftKey == null
+          ? DiscourseSiteCapabilities.forSite(widget.siteContext.site.pluginUrl)
+              .topicTemplateFor(widget.forumId)
+          : null,
+    );
     _draftController = DiscourseDraftController(
-      draftKey: widget.draftKey,
+      draftKey: widget.draftKey ??
+          'new_topic_${DateTime.now().microsecondsSinceEpoch}',
       titleController: _titleController,
       contentController: _contentController,
       extraDataBuilder: () => {
@@ -86,22 +92,12 @@ class _NewTopicPageState extends State<NewTopicPage> {
           'categoryId': int.tryParse(widget.forumId) ?? widget.forumId,
       },
     );
-    // Prefill the category's topic template — but never over a draft.
-    // initialize() restores one asynchronously, so wait for it and fill
-    // only a composer that is still empty. Getting this order wrong would
-    // silently overwrite unsaved work with a blank skeleton.
     _draftController.initialize(onRestored: (draft) {
       if (!mounted) return;
       if (!_tagsChanged) {
         setState(() => _tags = draftTagNames(draft?.data['tags']));
         _draftController.markExtraDataOpened();
       }
-      if (_contentController.text.trim().isNotEmpty) return;
-      final template = DiscourseSiteCapabilities.forSite(
-              widget.siteContext.site.pluginUrl)
-          .topicTemplateFor(widget.forumId);
-      if (template == null) return;
-      setState(() => _contentController.text = template);
     });
   }
 
