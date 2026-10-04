@@ -1563,5 +1563,10 @@
   "messagePersonal": "Personnels",
   "messageListIncoming": "{count, plural, one{Voir {count} sujet récent ou mis à jour} other{Voir {count} sujets récents ou mis à jour}}",
   "chatPlaceholderGroup": "Discuter en groupe",
-  "notificationAccountMismatch": "Cette notification ne peut pas être ouverte avec le compte actuel. Ouvrez les notifications pour voir les nouveautés de ce compte."
+  "notificationAccountMismatch": "Cette notification ne peut pas être ouverte avec le compte actuel. Ouvrez les notifications pour voir les nouveautés de ce compte.",
+  "chatJoinedChannels": "Canaux rejoints",
+  "chatAvailableChannels": "Canaux disponibles",
+  "chatAvailableChannelsDescription": "Canaux que vous pouvez consulter ou rejoindre.",
+  "chatAllChannelsJoined": "Vous avez rejoint tous les canaux disponibles.",
+  "chatViewChannel": "Voir"
 }

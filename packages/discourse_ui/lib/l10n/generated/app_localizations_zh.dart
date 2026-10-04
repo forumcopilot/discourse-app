@@ -4916,4 +4916,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get notificationAccountMismatch => '无法使用当前账号打开此通知。请打开“通知”查看此账号的最新消息。';
+
+  @override
+  String get chatJoinedChannels => '已加入的频道';
+
+  @override
+  String get chatAvailableChannels => '可用频道';
+
+  @override
+  String get chatAvailableChannelsDescription => '您可以查看或加入的频道。';
+
+  @override
+  String get chatAllChannelsJoined => '您已加入所有可用频道。';
+
+  @override
+  String get chatViewChannel => '查看';
 }

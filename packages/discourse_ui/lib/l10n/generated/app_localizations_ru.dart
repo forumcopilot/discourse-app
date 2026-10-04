@@ -5293,4 +5293,21 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get notificationAccountMismatch =>
       'Это уведомление нельзя открыть в текущем аккаунте. Откройте уведомления, чтобы увидеть обновления для этого аккаунта.';
+
+  @override
+  String get chatJoinedChannels => 'Ваши каналы';
+
+  @override
+  String get chatAvailableChannels => 'Доступные каналы';
+
+  @override
+  String get chatAvailableChannelsDescription =>
+      'Каналы, которые можно просматривать или к которым можно присоединиться.';
+
+  @override
+  String get chatAllChannelsJoined =>
+      'Вы присоединились ко всем доступным каналам.';
+
+  @override
+  String get chatViewChannel => 'Просмотреть';
 }
