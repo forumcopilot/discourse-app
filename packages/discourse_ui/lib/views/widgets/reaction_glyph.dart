@@ -54,7 +54,15 @@ class ReactionGlyph extends StatelessWidget {
   Widget build(BuildContext context) {
     final unicode = unicodeFor(reactionId);
     if (unicode != null) {
-      return Text(unicode, style: TextStyle(fontSize: size));
+      return Text(unicode,
+          style: TextStyle(
+            fontSize: size,
+            fontFamilyFallback: const [
+              'Apple Color Emoji',
+              'Noto Color Emoji',
+              'Segoe UI Emoji',
+            ],
+          ));
     }
     final site = siteContext;
     final name = normalize(reactionId);
