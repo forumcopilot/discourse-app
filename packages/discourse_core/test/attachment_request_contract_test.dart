@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -6,6 +7,7 @@ import 'package:discourse_core/discourse_core.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 
 import 'discourse_client_measurement_test.dart' show CountingServer, contextFor;
 
@@ -19,6 +21,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     FlutterSecureStorage.setMockInitialValues({});
     DiscourseUploadMetadata.reset();
+    DiscourseChatUploads.clear();
     forum = await CountingServer.start();
   });
   tearDown(() => forum.close());
@@ -80,6 +83,97 @@ void main() {
           '![server-name|600x400](upload://contract.png)');
     });
   }
+
+  for (final type in ['post', 'pm', 'chat', 'avatar', 'profile']) {
+    for (final phase in ['initializing', 'response']) {
+      test(
+          '$type account change during $phase does not publish an upload result',
+          () async {
+        final context = contextFor(forum)
+          ..setLoginData(FCLoginResult(
+              result: true,
+              resultText: '',
+              user: FCUser(id: '2', username: 'writer')));
+        await context.setUserApiCredentials(
+            userApiKey: 'first-key', userApiClientId: 'first-client');
+        final received = Completer<void>();
+        final release = Completer<void>();
+        String? requestKey;
+        forum.routes['/uploads.json'] = (request) async {
+          requestKey = request.headers.value('User-Api-Key');
+          await request.drain<void>();
+          received.complete();
+          if (phase == 'response') await release.future;
+          request.response.write(jsonEncode({
+            'id': 91,
+            'short_url': 'upload://private.png',
+            'url': '/uploads/private.png',
+            'original_filename': 'private.png',
+            'filesize': 1,
+          }));
+        };
+        final proxy = DiscourseAttachmentProxy(context);
+        final bytes = Uint8List.fromList([1]);
+        final pending = switch (type) {
+          'avatar' => proxy.uploadAvatarAsync('png', bytes),
+          'profile' =>
+            proxy.uploadProfileImageAsync('profile_background', 'png', bytes),
+          _ =>
+            proxy.uploadAttachmentAsync(type, '42', '', 'private.png', bytes),
+        };
+        if (phase == 'response') await received.future;
+        // The credential setter changes the in-memory session before yielding.
+        await context.setUserApiCredentials(
+            userApiKey: 'second-key', userApiClientId: 'second-client');
+        if (phase == 'response') release.complete();
+        final result = await pending;
+        expect(result.result, isFalse);
+        expect(result.attachmentId, isNull);
+        expect(result.groupId, isNull);
+        expect(result.url, isNull);
+        expect(DiscourseUploadMetadata.forShortUrl('upload://private.png'),
+            isNull);
+        expect(
+            DiscourseChatUploads.takeUploads(context.site.url, [91]), isEmpty);
+        expect(forum.requests, hasLength(phase == 'initializing' ? 0 : 1));
+        if (phase == 'response') expect(requestKey, 'first-key');
+      });
+    }
+  }
+
+  test('account changes during avatar selection suppress its stale result',
+      () async {
+    final context = contextFor(forum)
+      ..setLoginData(FCLoginResult(
+          result: true,
+          resultText: '',
+          user: FCUser(id: '2', username: 'writer')));
+    await context.setUserApiCredentials(
+        userApiKey: 'first-key', userApiClientId: 'first-client');
+    final picked = Completer<void>();
+    final release = Completer<void>();
+    forum.routes['/uploads.json'] = (request) async {
+      await request.drain<void>();
+      request.response.write('{"id":91,"short_url":"upload://avatar.png"}');
+    };
+    forum.routes['/u/writer/preferences/avatar/pick.json'] = (request) async {
+      expect(request.headers.value('User-Api-Key'), 'first-key');
+      await request.drain<void>();
+      picked.complete();
+      await release.future;
+      request.response.write('{}');
+    };
+    final pending = DiscourseAttachmentProxy(context)
+        .uploadAvatarAsync('png', Uint8List.fromList([1]));
+    await picked.future;
+    await context.setUserApiCredentials(
+        userApiKey: 'second-key', userApiClientId: 'second-client');
+    release.complete();
+    final result = await pending;
+    expect(result.result, isFalse);
+    expect(result.attachmentId, isNull);
+    expect(forum.requests, hasLength(2));
+  });
 
   test('a rejected upload keeps the server reason and has no attachment',
       () async {

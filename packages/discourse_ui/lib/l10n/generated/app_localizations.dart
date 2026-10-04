@@ -116,6 +116,12 @@ abstract class AppLocalizations {
     Locale('zh')
   ];
 
+  /// An attachment upload overlapped a logout or credential change; its result cannot be used in the current session.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sign-in changed during the upload. Reopen this screen before trying again.'**
+  String get uploadSessionChanged;
+
   /// A successful post HTTP response lacked a usable ID; keep the editor and caution against duplicate submissions.
   ///
   /// In en, this message translates to:

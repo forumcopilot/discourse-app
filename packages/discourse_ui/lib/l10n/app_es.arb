@@ -1,4 +1,5 @@
 {
+  "uploadSessionChanged": "Tu sesión cambió durante la subida. Vuelve a abrir esta pantalla antes de intentarlo de nuevo.",
   "@@locale": "es",
   "submissionUnconfirmed": "No pudimos confirmar que se haya enviado. Se ha conservado tu texto. Revisa el foro antes de volver a intentarlo.",
   "loginTitle": "Iniciar sesión",

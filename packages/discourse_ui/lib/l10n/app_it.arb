@@ -1,4 +1,5 @@
 {
+  "uploadSessionChanged": "La tua sessione è cambiata durante il caricamento. Riapri questa schermata prima di riprovare.",
   "@@locale": "it",
   "submissionUnconfirmed": "Non è stato possibile confermare l’invio. Il testo è stato conservato. Controlla il forum prima di riprovare.",
   "loginTitle": "Accedi",

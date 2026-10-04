@@ -1,4 +1,6 @@
 {
+  "uploadSessionChanged": "Your sign-in changed during the upload. Reopen this screen before trying again.",
+  "@uploadSessionChanged": {"description": "An attachment upload overlapped a logout or credential change; its result cannot be used in the current session."},
   "@@locale": "en",
   "submissionUnconfirmed": "We couldn't confirm that this was sent. Your text has been kept. Check the forum before trying again.",
   "@submissionUnconfirmed": {

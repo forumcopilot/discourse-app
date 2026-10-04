@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseMediaOptimizationContext;
+    show DiscourseMediaOptimizationContext, DiscourseSiteContextExtension;
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
 
@@ -81,11 +81,17 @@ class AttachmentUploadService {
     if (!context.mounted) {
       return const AttachmentUploadOutcome(cancelled: true);
     }
+    final siteContext = SiteProxyFactory.context;
+    final session = siteContext?.configurationSession;
+    bool sessionChanged() =>
+        !identical(session, siteContext?.configurationSession);
+    AttachmentUploadOutcome changedAccount() => AttachmentUploadOutcome(
+          errorMessage: appL10n().uploadSessionChanged,
+        );
     try {
       // Resolve the proxy before file I/O or a resize prompt can yield to
       // navigation. The upload and its limits must belong to the same forum.
       final proxy = SiteProxyFactory.getAttachmentProxy();
-      final siteContext = SiteProxyFactory.context;
       final isImage = isImageFile(file.name);
       final constraints = getAttachmentConstraintsFromSiteContext(
         siteContext,
@@ -126,6 +132,7 @@ class AttachmentUploadService {
           if (!context.mounted) {
             return const AttachmentUploadOutcome(cancelled: true);
           }
+          if (sessionChanged()) return changedAccount();
           final prepared = await _prepareImage(context, toUpload, constraints);
           if (prepared == null) {
             return const AttachmentUploadOutcome(cancelled: true);
@@ -138,6 +145,7 @@ class AttachmentUploadService {
       if (!context.mounted) {
         return const AttachmentUploadOutcome(cancelled: true);
       }
+      if (sessionChanged()) return changedAccount();
       final result = await proxy.uploadAttachmentAsync(
         uploadType,
         targetId,
@@ -148,6 +156,7 @@ class AttachmentUploadService {
       if (!context.mounted) {
         return const AttachmentUploadOutcome(cancelled: true);
       }
+      if (sessionChanged()) return changedAccount();
       if (!result.result) {
         return AttachmentUploadOutcome(
           errorMessage:
@@ -169,6 +178,7 @@ class AttachmentUploadService {
         fileSize: bytes.length,
       );
     } catch (e) {
+      if (sessionChanged()) return changedAccount();
       AppLogger.debug('Attachment upload failed: $e');
       return AttachmentUploadOutcome(
         errorMessage: appL10n().failedToUploadFile2('$e'),

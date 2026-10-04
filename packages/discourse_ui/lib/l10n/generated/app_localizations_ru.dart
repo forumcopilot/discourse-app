@@ -9,6 +9,10 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
+  String get uploadSessionChanged =>
+      'Во время загрузки изменился сеанс входа. Откройте этот экран заново, прежде чем повторить попытку.';
+
+  @override
   String get submissionUnconfirmed =>
       'Не удалось подтвердить отправку. Ваш текст сохранён. Проверьте форум, прежде чем повторять попытку.';
 

@@ -17,6 +17,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 // ignore: depend_on_referenced_packages
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -24,6 +27,8 @@ void main() {
   late SiteContext site;
   late _Factory factory;
   setUp(() {
+    SharedPreferences.setMockInitialValues({});
+    FlutterSecureStorage.setMockInitialValues({});
     site = _site('first')
       ..setLoginData(FCLoginResult(
           result: true,
@@ -62,6 +67,63 @@ void main() {
         groupId: '',
         currentAttachmentCount: 0,
       );
+  for (final phase in ['reading', 'uploading']) {
+    for (final transition in ['switch', 'logout', 'sign back in']) {
+      testWidgets('$transition during $phase invalidates the upload',
+          (tester) async {
+        await site.setUserApiCredentials(
+            userApiKey: 'first-key', userApiClientId: 'first-client');
+        final context = await host(tester);
+        final file = _DelayedFile();
+        if (phase == 'uploading') {
+          factory.pending = Completer<FCAttachmentUploadResult>();
+        }
+        final pending = upload(context, file);
+        await file.started.future;
+        if (phase == 'uploading') {
+          file.bytes.complete(Uint8List.fromList([1]));
+          await tester.pump();
+          expect(factory.calls, hasLength(1));
+        }
+        if (transition == 'switch') {
+          await site.setUserApiCredentials(
+              userApiKey: 'second-key', userApiClientId: 'second-client');
+        } else {
+          await site.clearUserApiCredentials();
+          if (transition == 'sign back in') {
+            await site.setUserApiCredentials(
+                userApiKey: 'first-key', userApiClientId: 'first-client');
+          }
+        }
+        if (phase == 'reading') {
+          file.bytes.complete(Uint8List.fromList([1]));
+        } else {
+          factory.pending!.complete(_success());
+        }
+        final result = await pending;
+        expect(result.succeeded, isFalse);
+        expect(result.cancelled, isFalse);
+        expect(result.errorMessage,
+            'Your sign-in changed during the upload. Reopen this screen before trying again.');
+        expect(result.shortUrl, isNull);
+        expect(factory.calls, hasLength(phase == 'reading' ? 0 : 1));
+      });
+    }
+  }
+  testWidgets('refreshing unchanged credentials permits the pending upload',
+      (tester) async {
+    await site.setUserApiCredentials(
+        userApiKey: 'first-key', userApiClientId: 'first-client');
+    final context = await host(tester);
+    final file = _DelayedFile();
+    final pending = upload(context, file);
+    await file.started.future;
+    await site.setUserApiCredentials(
+        userApiKey: 'first-key', userApiClientId: 'first-client');
+    file.bytes.complete(Uint8List.fromList([1]));
+    expect((await pending).succeeded, isTrue);
+    expect(factory.calls, hasLength(1));
+  });
   testWidgets('unreadable file during validation returns a visible error',
       (tester) async {
     site.setUploadLimits(

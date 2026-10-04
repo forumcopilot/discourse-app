@@ -1,4 +1,5 @@
 {
+  "uploadSessionChanged": "Je aanmelding is tijdens het uploaden gewijzigd. Open dit scherm opnieuw voordat je het nogmaals probeert.",
   "@@locale": "nl",
   "submissionUnconfirmed": "We konden niet bevestigen dat dit is verzonden. Je tekst is behouden. Controleer het forum voordat je het opnieuw probeert.",
   "loginTitle": "Inloggen",

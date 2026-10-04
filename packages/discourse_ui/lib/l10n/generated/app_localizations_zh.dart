@@ -9,6 +9,9 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get uploadSessionChanged => '上传过程中登录状态已改变。请重新打开此页面后再试。';
+
+  @override
   String get submissionUnconfirmed => '无法确认是否已发送。您输入的内容已保留。请先查看论坛，再决定是否重试。';
 
   @override

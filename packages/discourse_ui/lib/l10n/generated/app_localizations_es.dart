@@ -9,6 +9,10 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get uploadSessionChanged =>
+      'Tu sesión cambió durante la subida. Vuelve a abrir esta pantalla antes de intentarlo de nuevo.';
+
+  @override
   String get submissionUnconfirmed =>
       'No pudimos confirmar que se haya enviado. Se ha conservado tu texto. Revisa el foro antes de volver a intentarlo.';
 

@@ -1,4 +1,5 @@
 {
+  "uploadSessionChanged": "Sua sessão mudou durante o envio. Reabra esta tela antes de tentar novamente.",
   "@@locale": "pt",
   "submissionUnconfirmed": "Não foi possível confirmar o envio. Seu texto foi mantido. Verifique o fórum antes de tentar novamente.",
   "loginTitle": "Entrar",

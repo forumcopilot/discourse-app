@@ -9,6 +9,10 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
+  String get uploadSessionChanged =>
+      'Deine Anmeldung hat sich während des Uploads geändert. Öffne diesen Bildschirm erneut, bevor du es noch einmal versuchst.';
+
+  @override
   String get submissionUnconfirmed =>
       'Wir konnten nicht bestätigen, dass dies gesendet wurde. Dein Text wurde beibehalten. Prüfe das Forum, bevor du es erneut versuchst.';
 

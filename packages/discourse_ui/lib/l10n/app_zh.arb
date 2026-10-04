@@ -1,4 +1,5 @@
 {
+  "uploadSessionChanged": "上传过程中登录状态已改变。请重新打开此页面后再试。",
   "@@locale": "zh",
   "submissionUnconfirmed": "无法确认是否已发送。您输入的内容已保留。请先查看论坛，再决定是否重试。",
   "loginTitle": "登录",

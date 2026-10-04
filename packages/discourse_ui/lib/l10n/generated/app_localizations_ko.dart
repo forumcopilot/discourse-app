@@ -9,6 +9,10 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
+  String get uploadSessionChanged =>
+      '업로드 중에 로그인 상태가 변경되었습니다. 이 화면을 다시 연 후 다시 시도해 주세요.';
+
+  @override
   String get submissionUnconfirmed =>
       '전송 여부를 확인하지 못했습니다. 작성한 내용은 유지되었습니다. 다시 시도하기 전에 포럼을 확인해 주세요.';
 

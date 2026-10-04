@@ -62,10 +62,14 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
     String imageExtension,
     Uint8List attachmentBytes,
   ) async {
+    final session = siteContext.configurationSession;
     final ext =
         imageExtension.startsWith('.') ? imageExtension.substring(1) : imageExtension;
     final filename = 'avatar.$ext';
     final upload = await _upload(filename, attachmentBytes, uploadType: 'avatar');
+    if (!identical(session, siteContext.configurationSession)) {
+      return _sessionChanged();
+    }
     if (!upload.result || upload.attachmentId == null) return upload;
 
     // Step 2: tell Discourse to use this upload as the user's avatar.
@@ -76,7 +80,13 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
           'upload_id': int.tryParse(upload.attachmentId!) ?? upload.attachmentId,
           'type': 'uploaded',
         });
+        if (!identical(session, siteContext.configurationSession)) {
+          return _sessionChanged();
+        }
       } catch (e) {
+        if (!identical(session, siteContext.configurationSession)) {
+          return _sessionChanged();
+        }
         return FCAttachmentUploadResult(
           result: false,
           resultText: 'Uploaded but could not set avatar: ${describeApiError(e)}',
@@ -128,12 +138,22 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
 
   // ===== Helpers =====
 
+  FCAttachmentUploadResult _sessionChanged() => FCAttachmentUploadResult(
+        result: false,
+        resultText: 'Your sign-in changed during the upload. '
+            'Reopen this screen before trying again.',
+      );
+
   Future<FCAttachmentUploadResult> _upload(
     String filename,
     Uint8List bytes, {
     required String uploadType,
     bool forPrivateMessage = false,
   }) async {
+    // A SiteContext survives account switches. Bind the whole operation to
+    // its starting credentials, including transport initialization and caches.
+    final session = siteContext.configurationSession;
+    bool current() => identical(session, siteContext.configurationSession);
     // Pre-flight validation against the site's published upload limits
     // (`/site/settings.json`, cached on the context by
     // DiscourseConfigProxy). Catching violations here — for every caller:
@@ -147,6 +167,7 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
     }
     try {
       await FCDioClient.instance.initialize();
+      if (!current()) return _sessionChanged();
       final base = Uri.parse(siteContext.site.url);
       final url = base.replace(path: _joinPath(base.path, '/uploads.json'));
 
@@ -182,6 +203,9 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
         ),
       );
 
+      // An older response must not populate side stores available to the
+      // new session or hand the old account's upload to a new composer.
+      if (!current()) return _sessionChanged();
       final code = response.statusCode ?? 0;
       if (code < 200 || code >= 300) {
         return FCAttachmentUploadResult(
@@ -230,6 +254,7 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
         url: body['url']?.toString(),
       );
     } on DioException catch (e) {
+      if (!current()) return _sessionChanged();
       final body = e.response?.data;
       final reason = body is Map ? (body['errors']?.toString() ?? body.toString()) : '$body';
       return FCAttachmentUploadResult(
@@ -237,6 +262,7 @@ class DiscourseAttachmentProxy extends BaseDiscourseProxy
         resultText: 'Upload failed: $reason',
       );
     } catch (e) {
+      if (!current()) return _sessionChanged();
       return FCAttachmentUploadResult(
         result: false,
         resultText: 'Upload error: ${describeApiError(e)}',

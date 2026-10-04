@@ -9,6 +9,10 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
+  String get uploadSessionChanged =>
+      'アップロード中にログイン状態が変わりました。この画面を開き直してから、もう一度お試しください。';
+
+  @override
   String get submissionUnconfirmed =>
       '送信を確認できませんでした。入力した内容は保持されています。再試行する前にフォーラムを確認してください。';
 

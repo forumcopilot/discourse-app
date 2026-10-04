@@ -9,6 +9,10 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
+  String get uploadSessionChanged =>
+      'Votre session a changé pendant le téléversement. Rouvrez cet écran avant de réessayer.';
+
+  @override
   String get submissionUnconfirmed =>
       'Nous n’avons pas pu confirmer l’envoi. Votre texte a été conservé. Vérifiez le forum avant de réessayer.';
 
