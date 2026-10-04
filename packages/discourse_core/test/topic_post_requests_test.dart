@@ -102,6 +102,46 @@ void main() {
   });
 
   group('drafts', () {
+    test('list pages use offset and preserve draft metadata', () async {
+      final proxy = _Draft(rec);
+      rec.nextGet = {
+        'drafts': [
+          {
+            'draft_key': 'topic_7',
+            'sequence': 4,
+            'topic_id': 7,
+            'title': 'Topic title',
+            'category_id': 9,
+            'data': {'reply': 'Draft reply', 'categoryId': 2},
+            'created_at': '2026-10-04T08:00:00Z',
+          },
+        ],
+      };
+      final first = await proxy.getMyDraftsAsync();
+      expect(rec.gets.last.$1, '/drafts.json');
+      expect(rec.gets.last.$2, {'limit': '50'});
+      expect(first.total, 1, reason: 'page length, not total drafts');
+      final draft = first.items.single;
+      expect(draft.draftKey, 'topic_7');
+      expect(draft.sequence, 4);
+      expect(draft.topicId, 7);
+      expect(draft.title, 'Topic title');
+      expect(draft.reply, 'Draft reply');
+      expect(draft.categoryId, 9, reason: 'server category wins');
+      expect(draft.updatedAt, DateTime.utc(2026, 10, 4, 8));
+      await proxy.getMyDraftsAsync(page: 2);
+      expect(rec.gets.last.$1, '/drafts.json');
+      expect(rec.gets.last.$2, {'limit': '50', 'offset': '100'});
+    });
+
+    test('delete encodes the key and sends its sequence', () async {
+      final proxy = _Draft(rec);
+      final result = await proxy.deleteDraftAsync('topic/a?b', sequence: 7);
+      expect(result.result, isTrue);
+      expect(proxy.deletes.single.$1, '/drafts/topic%2Fa%3Fb.json');
+      expect(proxy.deletes.single.$2, {'sequence': '7'});
+    });
+
     test('a category id stored as a string still loads', () async {
       final proxy = _Draft(rec);
       rec.nextGet = {
@@ -242,6 +282,13 @@ class _Post extends DiscoursePostProxy {
 class _Draft extends DiscourseDraftProxy {
   _Draft(this.rec) : super(_signedIn());
   final _Recorder rec;
+  final deletes = <(String, Map<String, dynamic>?)>[];
+  @override
+  Future<Map<String, dynamic>> apiDelete(String path,
+      {Map<String, dynamic>? query, Object? body}) async {
+    deletes.add((path, query));
+    return {};
+  }
   @override
   Future<Map<String, dynamic>> apiGet(String path,
           {Map<String, dynamic>? query}) =>

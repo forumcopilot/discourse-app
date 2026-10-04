@@ -4,6 +4,7 @@ import 'package:discourse_core/discourse_core.dart'
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_draft.dart';
+import 'package:forumcopilot_sdk/interfaces/i_fc_draft_proxy.dart';
 
 import '../theme/design_tokens.dart';
 import '../utils/emoji_shortcodes.dart';
@@ -37,8 +38,16 @@ class DraftsListPage extends StatefulWidget {
 }
 
 class _DraftsListPageState extends State<DraftsListPage> {
+  // Keep requests (especially a delete after the Undo timeout) on the
+  // forum that opened this page, even after the global forum changes.
+  late final IFCDraftProxy _draftProxy = SiteProxyService.getDraftProxy();
   List<FCDraft>? _drafts;
+  final _pendingDeletes = <String>{};
   bool _loading = false;
+  bool _hasMore = false;
+  bool _retryMore = false;
+  int _nextPage = 0;
+  int _loadGeneration = 0;
   String? _error;
 
   @override
@@ -47,33 +56,44 @@ class _DraftsListPageState extends State<DraftsListPage> {
     _load();
   }
 
-  Future<void> _load() async {
+  Future<void> _load({bool more = false}) async {
+    if (more && (_loading || !_hasMore)) return;
+    final generation = ++_loadGeneration;
+    final page = more ? _nextPage : 0;
     setState(() {
       _loading = true;
       _error = null;
+      _retryMore = more;
     });
     try {
-      final result =
-          await SiteProxyService.getDraftProxy().getMyDraftsAsync();
-      if (!mounted) return;
+      final result = await _draftProxy.getMyDraftsAsync(page: page);
+      if (!mounted || generation != _loadGeneration) return;
       if (!result.result) {
-        setState(() {
-          _drafts = const [];
-          _loading = false;
-          _error = result.resultText?.isNotEmpty == true
-              ? result.resultText!
-              : AppLocalizations.of(context)!.failedToLoadDrafts;
-        });
-        return;
+        throw Exception(result.resultText?.isNotEmpty == true
+            ? result.resultText!
+            : AppLocalizations.of(context)!.failedToLoadDrafts);
       }
       setState(() {
-        _drafts = result.items;
+        // Offset pages can overlap when drafts are edited elsewhere. Also
+        // keep a refreshed row hidden while its Undo/delete is pending.
+        _drafts = {
+          if (more)
+            for (final draft in _drafts ?? <FCDraft>[])
+              if (!_pendingDeletes.contains(draft.draftKey))
+                draft.draftKey: draft,
+          for (final draft in result.items)
+            if (!_pendingDeletes.contains(draft.draftKey))
+              draft.draftKey: draft,
+        }.values.toList();
+        // The Discourse proxy requests 50; total is this page's length,
+        // not a grand total. A full page may have another page after it.
+        _hasMore = result.items.length == 50;
+        _nextPage = page + 1;
         _loading = false;
       });
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       setState(() {
-        _drafts = const [];
         _loading = false;
         _error = describeError(e);
       });
@@ -87,7 +107,7 @@ class _DraftsListPageState extends State<DraftsListPage> {
     final drafts = _drafts;
     if (drafts == null) return;
     final index = drafts.indexWhere((d) => d.draftKey == draft.draftKey);
-    if (index < 0) return;
+    if (index < 0 || !_pendingDeletes.add(draft.draftKey)) return;
     setState(() => _drafts = [...drafts]..removeAt(index));
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context)!;
@@ -101,8 +121,10 @@ class _DraftsListPageState extends State<DraftsListPage> {
       duration: const Duration(seconds: 5),
     ));
     void restore() {
+      _pendingDeletes.remove(draft.draftKey);
       if (!mounted) return;
       final now = [...?_drafts];
+      if (now.any((d) => d.draftKey == draft.draftKey)) return;
       now.insert(index.clamp(0, now.length), draft);
       setState(() => _drafts = now);
     }
@@ -112,15 +134,25 @@ class _DraftsListPageState extends State<DraftsListPage> {
         restore();
         return;
       }
-      final result = await SiteProxyService.getDraftProxy()
-          .deleteDraftAsync(draft.draftKey, sequence: draft.sequence);
-      if (!mounted || result.result) return;
-      restore();
-      messenger.showSnackBar(SnackBar(
-        content: Text(result.resultText?.isNotEmpty == true
-            ? result.resultText!
-            : l10n.failedToDiscardDraft),
-      ));
+      try {
+        final result = await _draftProxy.deleteDraftAsync(draft.draftKey,
+            sequence: draft.sequence);
+        if (!result.result) {
+          throw Exception(result.resultText?.isNotEmpty == true
+              ? result.resultText!
+              : l10n.failedToDiscardDraft);
+        }
+        _pendingDeletes.remove(draft.draftKey);
+        // Deleting changes every later offset. Restart the listing so
+        // Load more cannot skip a draft shifted into the previous page.
+        if (mounted) await _load();
+      } catch (error) {
+        restore();
+        if (!mounted) return;
+        messenger.showSnackBar(SnackBar(
+          content: Text(describeError(error, context: context)),
+        ));
+      }
     });
   }
 
@@ -206,66 +238,101 @@ class _DraftsListPageState extends State<DraftsListPage> {
 
     return Scaffold(
       appBar: SimpleListAppBar(title: l10n.drafts),
-      body: RefreshIndicator(
-        onRefresh: _load,
-        child: () {
-          if (_loading && drafts == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if ((drafts == null || drafts.isEmpty) && _error != null) {
-            return EmptyStateView.scrollable(
-              icon: Icons.edit_note_outlined,
-              message: _error!,
-            );
-          }
-          if (drafts == null || drafts.isEmpty) {
-            return EmptyStateView.scrollable(
-              icon: Icons.edit_note_outlined,
-              message: l10n.draftsEmpty,
-              hint: l10n.draftsEmptyHint,
-            );
-          }
-          // Today, then Earlier, set apart by the topic page's band.
-          final rows = <Object>[];
-          bool? todayGroup;
-          for (final d in drafts) {
-            final isToday = _isToday(d.updatedAt);
-            if (isToday != todayGroup) {
-              rows.add(_Group(isToday, first: todayGroup == null));
-              todayGroup = isToday;
-            }
-            rows.add(d);
-          }
-          return ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: rows.length,
-            itemBuilder: (_, i) {
-              final row = rows[i];
-              if (row is _Group) return _groupHeader(context, l10n, row);
-              final d = row as FCDraft;
-              final next = i + 1 < rows.length ? rows[i + 1] : null;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _DraftTile(
-                    key: ValueKey('draft-${d.draftKey}'),
-                    siteContext: widget.siteContext,
-                    draft: d,
-                    kind: _kindOf(d),
-                    onTap: () => _resume(d),
-                    onDiscard: () => _delete(d),
-                  ),
-                  if (next is FCDraft)
-                    Divider(
-                      height: 1,
-                      indent: 72,
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                    ),
-                ],
+      body: Column(
+        children: [
+          if (_error != null && !_retryMore && drafts?.isNotEmpty == true)
+            MaterialBanner(
+              content: Text(_error!),
+              actions: [
+                TextButton(onPressed: () => _load(), child: Text(l10n.retry)),
+              ],
+            ),
+          Expanded(
+              child: RefreshIndicator(
+            onRefresh: _load,
+            child: () {
+              if (_loading && drafts == null) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if ((drafts == null || drafts.isEmpty) && _error != null) {
+                return EmptyStateView.error(
+                  message: _error!,
+                  scrollable: true,
+                  onRetry: () => _load(),
+                );
+              }
+              if (drafts == null || drafts.isEmpty) {
+                return EmptyStateView.scrollable(
+                  icon: Icons.edit_note_outlined,
+                  message: l10n.draftsEmpty,
+                  hint: l10n.draftsEmptyHint,
+                );
+              }
+              // Today, then Earlier, set apart by the topic page's band.
+              final rows = <Object>[];
+              bool? todayGroup;
+              for (final d in drafts) {
+                final isToday = _isToday(d.updatedAt);
+                if (isToday != todayGroup) {
+                  rows.add(_Group(isToday, first: todayGroup == null));
+                  todayGroup = isToday;
+                }
+                rows.add(d);
+              }
+              return ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: rows.length +
+                    ((_loading || (_error != null ? _retryMore : _hasMore))
+                        ? 1
+                        : 0),
+                itemBuilder: (_, i) {
+                  if (i == rows.length) {
+                    return Padding(
+                      padding: const EdgeInsets.all(DesignTokens.spacingL),
+                      child: _loading
+                          ? const Center(child: CircularProgressIndicator())
+                          : Column(
+                              children: [
+                                if (_error != null) Text(_error!),
+                                TextButton(
+                                  onPressed: () =>
+                                      _load(more: _error == null || _retryMore),
+                                  child: Text(_error == null
+                                      ? l10n.loadMore
+                                      : l10n.retry),
+                                ),
+                              ],
+                            ),
+                    );
+                  }
+                  final row = rows[i];
+                  if (row is _Group) return _groupHeader(context, l10n, row);
+                  final d = row as FCDraft;
+                  final next = i + 1 < rows.length ? rows[i + 1] : null;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _DraftTile(
+                        key: ValueKey('draft-${d.draftKey}'),
+                        siteContext: widget.siteContext,
+                        draft: d,
+                        kind: _kindOf(d),
+                        onTap: () => _resume(d),
+                        onDiscard: () => _delete(d),
+                      ),
+                      if (next is FCDraft)
+                        Divider(
+                          height: 1,
+                          indent: 72,
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
+                    ],
+                  );
+                },
               );
-            },
-          );
-        }(),
+            }(),
+          )),
+        ],
       ),
     );
   }
