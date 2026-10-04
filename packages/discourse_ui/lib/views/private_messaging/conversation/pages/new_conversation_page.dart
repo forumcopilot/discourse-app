@@ -77,6 +77,7 @@ class NewConversationPage extends StatefulWidget {
 
 class _NewConversationPageState extends State<NewConversationPage> {
   final List<String> _recipients = [];
+  bool _recipientsChanged = false;
   final Map<String, String?> _recipientIcons = {};
 
   /// Recipients that are groups (a message can go to a group's inbox).
@@ -112,7 +113,9 @@ class _NewConversationPageState extends State<NewConversationPage> {
     );
     _draft.initialize(onRestored: (draft) {
       final saved = draft?.data['recipients']?.toString() ?? '';
-      if (!mounted || saved.isEmpty) return;
+      // A late read (including a retry) must not add back a recipient the
+      // writer removed, or expand the audience they have already chosen.
+      if (!mounted || _recipientsChanged || saved.isEmpty) return;
       setState(() {
         for (final name in saved.split(',').map((n) => n.trim())) {
           if (name.isNotEmpty && !_recipients.contains(name)) {
@@ -133,6 +136,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
   }
 
   void _setRecipients(void Function() change) {
+    _recipientsChanged = true;
     setState(change);
     _draft.touch();
   }
