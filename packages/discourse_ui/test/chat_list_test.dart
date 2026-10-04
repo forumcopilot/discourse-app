@@ -91,11 +91,15 @@ void main() {
 
   setUp(() {
     DiscourseChatChannelDetails.clear();
+    DiscourseCustomEmoji.clear();
+    DiscourseCustomEmoji.fetchOverride = (_) async => <String, dynamic>{};
     ChatUnread.clear();
     chat = _Chat(_ctx());
     SiteProxyFactory.register('chat-test', _Factory(chat));
     SiteProxyService.initialize(_ctx());
   });
+
+  tearDown(() => DiscourseCustomEmoji.fetchOverride = null);
 
   Future<void> pump(WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
