@@ -51,6 +51,16 @@ class DiscourseDraftController {
   Future<void>? _inFlightSave;
   bool _disposed = false;
   bool _loaded = false;
+  Future<FCDraft?>? _initialization;
+  Object? _loadError;
+  void Function(FCDraft?)? _onRestored;
+  bool _attached = false;
+  bool _restoring = false;
+  bool _replyChangedBeforeLoad = false;
+  bool _titleChangedBeforeLoad = false;
+  String _observedReply = '';
+  String _observedTitle = '';
+  Map<String, dynamic> _loadedExtra = const {};
   bool _extraChangedBeforeLoad = false;
   int _sequence = 0;
   String _lastSavedReply = '';
@@ -94,47 +104,91 @@ class DiscourseDraftController {
   /// Hydrate the controllers from the server-side draft (if any) and
   /// start watching for user changes. Returns the draft that was restored,
   /// for fields beyond the title and text (e.g. a message's recipients).
-  Future<FCDraft?> initialize() async {
-    final openedExtra = _extra.toString();
-    FCDraft? restored;
+  Future<FCDraft?> initialize({void Function(FCDraft?)? onRestored}) {
+    // Keep page-owned metadata restoration attached when Save draft retries
+    // a failed read; a one-shot `.then` would miss the successful retry.
+    if (onRestored != null) _onRestored = onRestored;
+    return _initialization ??= _initialize();
+  }
+
+  Future<FCDraft?> _initialize() async {
+    if (!_attached && !_disposed) {
+      _openedReply = contentController.text;
+      _openedTitle = titleController.text;
+      _openedExtra = _extra.toString();
+      _observeText();
+      _attach();
+      _attached = true;
+    }
     try {
       final result = await _draftProxy.loadDraftAsync(draftKey);
-      if (_disposed) return null;
+      if (!result.result) {
+        throw Exception(
+            result.resultText ?? appL10n().somethingWentWrongTryAgain);
+      }
       final draft = result.draft;
-      if (result.result && draft != null) {
-        restored = draft;
-        _sequence = draft.sequence;
-        final reply = draft.reply;
-        final title = draft.topicTitle ?? draft.title ?? '';
-        // Only seed the field if it's currently empty — the caller may
-        // already have populated initial text (e.g. quote prefill) and
-        // we don't want to clobber that.
-        if (reply.isNotEmpty && contentController.text.isEmpty) {
-          contentController.text = reply;
-          contentController.selection = TextSelection.fromPosition(
-            TextPosition(offset: reply.length),
+      _sequence = draft?.sequence ?? 0;
+      _lastSavedReply = draft?.reply ?? '';
+      _lastSavedTitle = draft?.topicTitle ?? draft?.title ?? '';
+      _loadedExtra = {...?draft?.data}
+        ..remove('reply')
+        ..remove('title');
+      _loadError = null;
+      _loaded = true;
+      // A queued close/discard still needs the sequence, but must never
+      // read disposed controllers or hydrate a discarded composer.
+      if (_disposed || _discarded) return null;
+
+      _restoring = true;
+      try {
+        if (!_replyChangedBeforeLoad && contentController.text.isEmpty) {
+          contentController.text = _lastSavedReply;
+          contentController.selection = TextSelection.collapsed(
+            offset: contentController.text.length,
           );
         }
-        if (title.isNotEmpty && titleController.text.isEmpty) {
-          titleController.text = title;
+        if (!_titleChangedBeforeLoad && titleController.text.isEmpty) {
+          titleController.text = _lastSavedTitle;
         }
-        _lastSavedReply = reply;
-        _lastSavedTitle = title;
+      } finally {
+        _restoring = false;
+        _observeText();
       }
+      // Text entered during the read is work to save, not opening state.
+      if (!_replyChangedBeforeLoad) _openedReply = contentController.text;
+      if (!_titleChangedBeforeLoad) _openedTitle = titleController.text;
+      _lastSavedExtra = _extraChangedBeforeLoad ? '' : _extra.toString();
+      if (!_extraChangedBeforeLoad) _openedExtra = _lastSavedExtra;
+      _onRestored?.call(draft);
+      if (_replyChangedBeforeLoad ||
+          _titleChangedBeforeLoad ||
+          _extraChangedBeforeLoad) {
+        _scheduleSave();
+      }
+      return draft;
     } catch (e) {
+      _loadError = e;
       AppLogger.debug('DiscourseDraftController initial load failed: $e');
+      return null;
     }
-    if (_disposed) return null;
-    // Metadata edited during the read has never been saved. Keep it
-    // dirty so completing the load cannot silently acknowledge it.
-    _lastSavedExtra = _extraChangedBeforeLoad ? '' : _extra.toString();
-    _openedReply = contentController.text;
-    _openedTitle = titleController.text;
-    _openedExtra = _extraChangedBeforeLoad ? openedExtra : _lastSavedExtra;
-    _loaded = true;
-    _attach();
-    if (_extraChangedBeforeLoad) _onChanged();
-    return restored;
+  }
+
+  Future<void> _ensureLoaded() async {
+    if (_loaded) return;
+    if (_loadError != null) {
+      _initialization = null;
+      _loadError = null;
+    }
+    await initialize();
+    if (!_loaded) {
+      throw _loadError ?? Exception(appL10n().somethingWentWrongTryAgain);
+    }
+  }
+
+  void _observeText() {
+    _observedReply = contentController.text;
+    _observedTitle = titleController.text;
+    _lastTimedText = '$_observedTitle\u0000$_observedReply';
   }
 
   /// Takes what the composer holds now as what it opened with, for a page
@@ -178,14 +232,21 @@ class DiscourseDraftController {
   }
 
   void _onChanged() {
-    // Counted before the load guard: typing while a draft loads is typing.
-    // The listeners also fire on cursor moves, so only a changed text counts.
+    if (_disposed || _discarded || _restoring) return;
+    if (!_loaded) {
+      _replyChangedBeforeLoad |= contentController.text != _observedReply;
+      _titleChangedBeforeLoad |= titleController.text != _observedTitle;
+    }
     final text = '${titleController.text}\u0000${contentController.text}';
     if (text != _lastTimedText) {
-      _lastTimedText = text;
       DiscourseComposerTiming.instance.typed(_timingSession);
     }
-    if (!_loaded || _disposed || _discarded) return;
+    _observeText();
+    if (!_loaded) return;
+    _scheduleSave();
+  }
+
+  void _scheduleSave() {
     _debounce?.cancel();
     // The timer fires into the void, so swallow save failures here —
     // otherwise a failed saveDraftAsync becomes an unhandled async
@@ -268,6 +329,8 @@ class DiscourseDraftController {
   /// Force a save right now (skipping the debounce). Useful when the
   /// user backgrounds the app or the page is about to be popped.
   Future<void> flushNow() async {
+    if (_disposed || _discarded) return;
+    await _ensureLoaded();
     _debounce?.cancel();
     // Wait out any in-flight save first so we don't silently no-op,
     // then flush whatever is still unsaved.
@@ -289,8 +352,9 @@ class DiscourseDraftController {
     _debounce?.cancel();
     // Deleting with the previous sequence while a save is in flight can
     // silently do nothing, or the save can recreate a deleted draft.
-    await _waitForSave(_inFlightSave);
     try {
+      await _ensureLoaded();
+      await _waitForSave(_inFlightSave);
       await _delete();
     } catch (_) {
       // Cleanup after a successful post remains best-effort: it must not
@@ -324,17 +388,36 @@ class DiscourseDraftController {
     _debounce?.cancel();
     contentController.removeListener(_onChanged);
     titleController.removeListener(_onChanged);
-    if (_loaded && !_discarded && !_disposed) {
-      // Capture before the page disposes its controllers. Even an expired
-      // debounce may have queued edits behind the active save. Serialize
-      // this snapshot (including a cleared draft) with that save's sequence.
+    if (!_discarded &&
+        !_disposed &&
+        (_loaded ||
+            contentController.text.isNotEmpty ||
+            titleController.text.isNotEmpty)) {
       final reply = contentController.text;
       final title = titleController.text;
       final extra = _extra;
+      // A closing page cannot hydrate later. Preserve untouched fields
+      // from the response while applying the captured edits, so typing a
+      // reply before load does not erase a saved title or selected tags.
+      final loading = !_loaded;
+      final restoreReply = loading && !_replyChangedBeforeLoad && reply.isEmpty;
+      final restoreTitle = loading && !_titleChangedBeforeLoad && title.isEmpty;
+      final extraChanged = _extraChangedBeforeLoad;
       final inFlight = _inFlightSave;
       _disposed = true;
-      _waitForSave(inFlight)
-          .then((_) => _saveSnapshot(reply, title, extra))
+      () async {
+        await _ensureLoaded();
+        await _waitForSave(inFlight);
+        await _saveSnapshot(
+          restoreReply ? _lastSavedReply : reply,
+          restoreTitle ? _lastSavedTitle : title,
+          !loading
+              ? extra
+              : extraChanged
+                  ? {..._loadedExtra, ...extra}
+                  : {...extra, ..._loadedExtra},
+        );
+      }()
           .catchError((Object e) {
         AppLogger.debug('DiscourseDraftController final save failed: $e');
       });

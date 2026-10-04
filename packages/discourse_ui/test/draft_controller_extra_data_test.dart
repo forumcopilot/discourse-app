@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseComposerTiming;
+
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/utils/discourse_draft_controller.dart';
 import 'package:flutter/widgets.dart';
@@ -45,6 +48,176 @@ void main() {
         extraData: const {'action': 'privateMessage'},
         extraDataBuilder: () => {'recipients': recipients.join(',')},
       );
+
+  void storedDraft() {
+    drafts.stored =
+        FCDraft(draftKey: 'new_private_message_1', sequence: 7, data: {
+      'reply': 'Server body',
+      'title': 'Server title',
+      'tags': ['saved-tag']
+    });
+  }
+
+  test('typing during load counts but restored text does not', () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final timing = DiscourseComposerTiming.instance;
+    final previousClock = timing.clock;
+    var now = DateTime.utc(2026, 10, 3);
+    timing.clock = () => now;
+    final c = controller([]);
+    try {
+      final loading = c.initialize();
+      c.contentController.text = 'New words';
+      final beforeLoad = timing.current![DiscourseComposerTiming.typingKey];
+      now = now.add(const Duration(seconds: 2));
+      drafts.loadGate!.complete();
+      await loading;
+      final afterLoad = timing.current![DiscourseComposerTiming.typingKey];
+      await c.flushNow();
+      expect(beforeLoad, 100);
+      expect(afterLoad, 100);
+    } finally {
+      c.dispose();
+      timing.clock = previousClock;
+    }
+  });
+
+  test('typing during load stays dirty and is autosaved', () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final loading = c.initialize();
+    c.contentController.text = 'New words';
+    drafts.loadGate!.complete();
+    await loading;
+    final changed = c.changedSinceOpened;
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    final saves = List.of(drafts.saves);
+    c.dispose();
+    expect(changed, isTrue);
+    expect(saves.single['reply'], 'New words');
+    expect(drafts.saveSequences.first, 7);
+  });
+
+  test('typing then clearing a field while loading does not restore it',
+      () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final loading = c.initialize();
+    c.contentController.text = 'Temporary';
+    c.contentController.clear();
+    c.titleController.text = 'Temporary title';
+    c.titleController.clear();
+    drafts.loadGate!.complete();
+    await loading;
+    final reply = c.contentController.text;
+    final title = c.titleController.text;
+    c.dispose();
+    expect(reply, isEmpty);
+    expect(title, isEmpty);
+  });
+
+  test('explicit save waits for the loaded sequence', () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final loading = c.initialize();
+    c.contentController.text = 'Keep this';
+    final saving = c.flushNow();
+    await Future<void>.delayed(Duration.zero);
+    final savedEarly = drafts.saves.isNotEmpty;
+    drafts.loadGate!.complete();
+    await loading;
+    await saving;
+    c.dispose();
+    expect(savedEarly, isFalse);
+    expect(drafts.saveSequences, [7]);
+    expect(drafts.saves.single['reply'], 'Keep this');
+  });
+
+  test('discard waits for load and does not hydrate discarded writing',
+      () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final loading = c.initialize();
+    final discarding = c.discard();
+    await Future<void>.delayed(Duration.zero);
+    final deletedEarly = drafts.deletes.isNotEmpty;
+    drafts.loadGate!.complete();
+    final restored = await loading;
+    await discarding;
+    final text = c.contentController.text;
+    c.dispose();
+    expect(deletedEarly, isFalse);
+    expect(drafts.deleteSequences, [7]);
+    expect(restored, isNull);
+    expect(text, isEmpty);
+  });
+
+  test('closing during load saves captured writing after load completes',
+      () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final loading = c.initialize();
+    c.contentController.text = 'Final words';
+    c.dispose();
+    c.contentController.dispose();
+    c.titleController.dispose();
+    drafts.loadGate!.complete();
+    await loading;
+    await Future<void>.delayed(Duration.zero);
+    expect(drafts.saves.single['reply'], 'Final words');
+    expect(drafts.saves.single['title'], 'Server title');
+    expect(drafts.saves.single['tags'], ['saved-tag']);
+    expect(drafts.saveSequences, [7]);
+  });
+
+  test('closing an untouched composer during load preserves the server draft',
+      () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final loading = c.initialize();
+    c.dispose();
+    c.contentController.dispose();
+    c.titleController.dispose();
+    drafts.loadGate!.complete();
+    await loading;
+    await Future<void>.delayed(Duration.zero);
+    expect(drafts.saves, isEmpty);
+    expect(drafts.deletes, isEmpty);
+  });
+
+  test('failed load blocks saving until a successful retry supplies sequence',
+      () async {
+    storedDraft();
+    drafts.loadError = 'Cannot load draft';
+    final c = controller([]);
+    await c.initialize();
+    c.contentController.text = 'Keep this';
+    await expectLater(c.flushNow(), throwsA(isA<Exception>()));
+    expect(drafts.saves, isEmpty);
+    drafts.loadError = null;
+    await c.flushNow();
+    c.dispose();
+    expect(drafts.saveSequences, [7]);
+    expect(drafts.saves.single['reply'], 'Keep this');
+  });
+
+  test('initialization shares one read', () async {
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final a = c.initialize();
+    final b = c.initialize();
+    drafts.loadGate!.complete();
+    await Future.wait([a, b]);
+    c.dispose();
+    expect(drafts.loads, 1);
+  });
 
   test('explicit save reports rejection and can be retried', () async {
     final c = controller([]);
@@ -280,6 +453,9 @@ void main() {
 class _Drafts implements IFCDraftProxy {
   FCDraft? stored;
   Completer<void>? saveGate;
+  Completer<void>? loadGate;
+  String? loadError;
+  int loads = 0;
   String? saveError;
   final List<int> saveSequences = [];
   final List<int> deleteSequences = [];
@@ -295,8 +471,14 @@ class _Drafts implements IFCDraftProxy {
   }
 
   @override
-  Future<FCLoadDraftResult> loadDraftAsync(String draftKey) async =>
-      FCLoadDraftResult(result: true, draft: stored);
+  Future<FCLoadDraftResult> loadDraftAsync(String draftKey) async {
+    loads++;
+    await loadGate?.future;
+    return FCLoadDraftResult(
+        result: loadError == null,
+        resultText: loadError,
+        draft: loadError == null ? stored : null);
+  }
 
   @override
   Future<FCSaveDraftResult> saveDraftAsync({

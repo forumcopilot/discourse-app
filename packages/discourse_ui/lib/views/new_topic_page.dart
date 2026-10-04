@@ -90,7 +90,7 @@ class _NewTopicPageState extends State<NewTopicPage> {
     // initialize() restores one asynchronously, so wait for it and fill
     // only a composer that is still empty. Getting this order wrong would
     // silently overwrite unsaved work with a blank skeleton.
-    _draftController.initialize().then((draft) {
+    _draftController.initialize(onRestored: (draft) {
       if (!mounted) return;
       if (!_tagsChanged) {
         setState(() => _tags = draftTagNames(draft?.data['tags']));

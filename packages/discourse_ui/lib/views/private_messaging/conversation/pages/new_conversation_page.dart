@@ -110,7 +110,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
       },
       extraDataBuilder: () => {'recipients': _recipients.join(',')},
     );
-    _draft.initialize().then((draft) {
+    _draft.initialize(onRestored: (draft) {
       final saved = draft?.data['recipients']?.toString() ?? '';
       if (!mounted || saved.isEmpty) return;
       setState(() {
@@ -120,7 +120,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
           }
         }
       });
-      _draft.markOpened();
+      _draft.markExtraDataOpened();
     });
   }
 
