@@ -44,6 +44,23 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
   bool _loading = true;
   bool _busy = false;
   DateTime? _endsAt;
+  late final Object _accountSession;
+
+  bool get _sessionCurrent =>
+      identical(_accountSession, widget.siteContext.configurationSession);
+
+  // This tile belongs to the account that opened it. A completed forum
+  // request must not become a fresh relay request for a replacement account.
+  bool _checkSession() {
+    if (!mounted) return false;
+    if (_sessionCurrent) return true;
+    setState(() {
+      _loading = false;
+      _busy = false;
+      _endsAt = null;
+    });
+    return false;
+  }
 
   static List<_DndDuration> _durations(AppLocalizations l10n) => [
         _DndDuration(value: '30', label: l10n.durationMinutes(30)),
@@ -63,6 +80,7 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
   @override
   void initState() {
     super.initState();
+    _accountSession = widget.siteContext.configurationSession;
     DoNotDisturbTile._changes.addListener(_loadStatus);
     _loadStatus();
   }
@@ -74,8 +92,9 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
   }
 
   Future<void> _loadStatus() async {
+    if (!mounted || !_checkSession()) return;
     final result = await _proxy.getDoNotDisturbStatusAsync();
-    if (!mounted) return;
+    if (!mounted || !_checkSession()) return;
     setState(() {
       _loading = false;
       if (result.result) {
@@ -93,9 +112,10 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
   }
 
   Future<void> _enter(String duration) async {
+    if (!mounted || !_checkSession()) return;
     setState(() => _busy = true);
     final result = await _proxy.enterDoNotDisturbAsync(duration);
-    if (!mounted) return;
+    if (!mounted || !_checkSession()) return;
     setState(() {
       _busy = false;
       if (result.result) {
@@ -115,9 +135,10 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
   }
 
   Future<void> _leave() async {
+    if (!mounted || !_checkSession()) return;
     setState(() => _busy = true);
     final result = await _proxy.leaveDoNotDisturbAsync();
-    if (!mounted) return;
+    if (!mounted || !_checkSession()) return;
     setState(() {
       _busy = false;
       if (result.result) {
@@ -137,6 +158,7 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
   }
 
   Future<void> _showDurationPicker() async {
+    if (!mounted || !_checkSession()) return;
     final duration = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
@@ -159,6 +181,7 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
         );
       },
     );
+    if (!mounted || !_checkSession()) return;
     if (duration != null) {
       await _enter(duration);
     }
@@ -179,6 +202,15 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    if (!_sessionCurrent) {
+      return ListTile(
+        leading: const Icon(Icons.do_not_disturb_on_outlined),
+        title: Text(AppLocalizations.of(context)!.doNotDisturb),
+        subtitle: Text(AppLocalizations.of(context)!.accountSessionChanged),
+        enabled: false,
+      );
+    }
 
     if (_loading) {
       return ListTile(

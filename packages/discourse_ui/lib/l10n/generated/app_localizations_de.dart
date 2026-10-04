@@ -9,6 +9,14 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
+  String get accountSessionChanged =>
+      'Deine Anmeldung hat sich geändert. Öffne diesen Bildschirm erneut, um fortzufahren.';
+
+  @override
+  String get draftSessionChanged =>
+      'Deine Anmeldung hat sich geändert. Kopiere deinen Text, bevor du den Editor erneut öffnest, um mit Entwürfen zu arbeiten.';
+
+  @override
   String get uploadSessionChanged =>
       'Deine Anmeldung hat sich während des Uploads geändert. Öffne diesen Bildschirm erneut, bevor du es noch einmal versuchst.';
 

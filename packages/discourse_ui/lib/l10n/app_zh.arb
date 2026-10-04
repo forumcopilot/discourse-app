@@ -1,4 +1,6 @@
 {
+  "accountSessionChanged": "登录状态已改变。请重新打开此页面以继续。",
+  "draftSessionChanged": "登录状态已改变。请先复制文本，再重新打开编辑器处理草稿。",
   "uploadSessionChanged": "上传过程中登录状态已改变。请重新打开此页面后再试。",
   "@@locale": "zh",
   "submissionUnconfirmed": "无法确认是否已发送。您输入的内容已保留。请先查看论坛，再决定是否重试。",

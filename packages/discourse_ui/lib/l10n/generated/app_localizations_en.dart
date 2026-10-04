@@ -9,6 +9,14 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get accountSessionChanged =>
+      'Your sign-in changed. Reopen this screen to continue.';
+
+  @override
+  String get draftSessionChanged =>
+      'Your sign-in changed. Copy your text before reopening the composer to work with drafts.';
+
+  @override
   String get uploadSessionChanged =>
       'Your sign-in changed during the upload. Reopen this screen before trying again.';
 

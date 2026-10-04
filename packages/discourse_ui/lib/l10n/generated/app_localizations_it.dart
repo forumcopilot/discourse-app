@@ -9,6 +9,14 @@ class AppLocalizationsIt extends AppLocalizations {
   AppLocalizationsIt([String locale = 'it']) : super(locale);
 
   @override
+  String get accountSessionChanged =>
+      'La tua sessione è cambiata. Riapri questa schermata per continuare.';
+
+  @override
+  String get draftSessionChanged =>
+      'La tua sessione è cambiata. Copia il testo prima di riaprire l’editor per lavorare sulle bozze.';
+
+  @override
   String get uploadSessionChanged =>
       'La tua sessione è cambiata durante il caricamento. Riapri questa schermata prima di riprovare.';
 

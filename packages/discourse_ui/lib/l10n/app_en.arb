@@ -1,4 +1,8 @@
 {
+  "accountSessionChanged": "Your sign-in changed. Reopen this screen to continue.",
+  "@accountSessionChanged": {"description": "An account-specific screen no longer belongs to the current sign-in; disable its stale controls."},
+  "draftSessionChanged": "Your sign-in changed. Copy your text before reopening the composer to work with drafts.",
+  "@draftSessionChanged": {"description": "A draft operation belongs to an earlier sign-in; preserve the editor text and explain how to recover it."},
   "uploadSessionChanged": "Your sign-in changed during the upload. Reopen this screen before trying again.",
   "@uploadSessionChanged": {"description": "An attachment upload overlapped a logout or credential change; its result cannot be used in the current session."},
   "@@locale": "en",

@@ -116,6 +116,18 @@ abstract class AppLocalizations {
     Locale('zh')
   ];
 
+  /// An account-specific screen no longer belongs to the current sign-in; disable its stale controls.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sign-in changed. Reopen this screen to continue.'**
+  String get accountSessionChanged;
+
+  /// A draft operation belongs to an earlier sign-in; preserve the editor text and explain how to recover it.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sign-in changed. Copy your text before reopening the composer to work with drafts.'**
+  String get draftSessionChanged;
+
   /// An attachment upload overlapped a logout or credential change; its result cannot be used in the current session.
   ///
   /// In en, this message translates to:

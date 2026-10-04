@@ -9,6 +9,14 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
+  String get accountSessionChanged =>
+      'Je aanmelding is gewijzigd. Open dit scherm opnieuw om verder te gaan.';
+
+  @override
+  String get draftSessionChanged =>
+      'Je aanmelding is gewijzigd. Kopieer je tekst voordat je de editor opnieuw opent om met concepten te werken.';
+
+  @override
   String get uploadSessionChanged =>
       'Je aanmelding is tijdens het uploaden gewijzigd. Open dit scherm opnieuw voordat je het nogmaals probeert.';
 

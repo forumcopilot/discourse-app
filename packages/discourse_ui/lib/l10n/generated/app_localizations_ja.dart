@@ -9,6 +9,13 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
+  String get accountSessionChanged => 'ログイン状態が変わりました。続けるには、この画面を開き直してください。';
+
+  @override
+  String get draftSessionChanged =>
+      'ログイン状態が変わりました。下書きを編集するには、入力した文章をコピーしてから投稿画面を開き直してください。';
+
+  @override
   String get uploadSessionChanged =>
       'アップロード中にログイン状態が変わりました。この画面を開き直してから、もう一度お試しください。';
 

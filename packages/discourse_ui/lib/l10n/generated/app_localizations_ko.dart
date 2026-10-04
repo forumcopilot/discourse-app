@@ -9,6 +9,13 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
+  String get accountSessionChanged => '로그인 상태가 변경되었습니다. 계속하려면 이 화면을 다시 열어 주세요.';
+
+  @override
+  String get draftSessionChanged =>
+      '로그인 상태가 변경되었습니다. 초안을 편집하려면 입력한 내용을 복사한 후 작성 화면을 다시 열어 주세요.';
+
+  @override
   String get uploadSessionChanged =>
       '업로드 중에 로그인 상태가 변경되었습니다. 이 화면을 다시 연 후 다시 시도해 주세요.';
 

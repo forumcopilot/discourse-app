@@ -1,4 +1,6 @@
 {
+  "accountSessionChanged": "La tua sessione è cambiata. Riapri questa schermata per continuare.",
+  "draftSessionChanged": "La tua sessione è cambiata. Copia il testo prima di riaprire l’editor per lavorare sulle bozze.",
   "uploadSessionChanged": "La tua sessione è cambiata durante il caricamento. Riapri questa schermata prima di riprovare.",
   "@@locale": "it",
   "submissionUnconfirmed": "Non è stato possibile confermare l’invio. Il testo è stato conservato. Controlla il forum prima di riprovare.",

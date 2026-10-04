@@ -9,6 +9,14 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
+  String get accountSessionChanged =>
+      'Votre session a changé. Rouvrez cet écran pour continuer.';
+
+  @override
+  String get draftSessionChanged =>
+      'Votre session a changé. Copiez votre texte avant de rouvrir l’éditeur pour travailler sur les brouillons.';
+
+  @override
   String get uploadSessionChanged =>
       'Votre session a changé pendant le téléversement. Rouvrez cet écran avant de réessayer.';
 

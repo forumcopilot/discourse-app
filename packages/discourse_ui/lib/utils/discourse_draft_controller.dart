@@ -2,10 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseComposerTiming;
+    show DiscourseComposerTiming, DiscourseSiteContextExtension;
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_draft.dart';
 import 'package:forumcopilot_sdk/interfaces/i_fc_draft_proxy.dart';
+import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 
 import '../core/logging/app_logger.dart';
 import '../l10n/app_l10n.dart';
@@ -43,7 +44,20 @@ class DiscourseDraftController {
 
   // Keep delayed saves on the forum that opened this composer, even if
   // another forum becomes the globally selected site before they finish.
-  late final IFCDraftProxy _draftProxy = SiteProxyService.getDraftProxy();
+  final IFCDraftProxy _draftProxy = SiteProxyService.getDraftProxy();
+  final _siteContext = SiteProxyFactory.context;
+  final Object? _accountSession =
+      SiteProxyFactory.context?.configurationSession;
+
+  bool get _sessionCurrent =>
+      identical(_accountSession, _siteContext?.configurationSession);
+
+  void _ensureSession() {
+    if (!_sessionCurrent) {
+      _debounce?.cancel();
+      throw Exception(appL10n().draftSessionChanged);
+    }
+  }
 
   Timer? _debounce;
   bool _saving = false;
@@ -109,6 +123,7 @@ class DiscourseDraftController {
   Future<FCDraft?> initialize({void Function(FCDraft?)? onRestored}) {
     // Keep page-owned metadata restoration attached when Save draft retries
     // a failed read; a one-shot `.then` would miss the successful retry.
+    if (!_sessionCurrent) return Future.value(null);
     if (onRestored != null) _onRestored = onRestored;
     return _initialization ??= _initialize();
   }
@@ -123,7 +138,9 @@ class DiscourseDraftController {
       _attached = true;
     }
     try {
+      _ensureSession();
       final result = await _draftProxy.loadDraftAsync(draftKey);
+      _ensureSession();
       if (!result.result) {
         throw Exception(
             result.resultText ?? appL10n().somethingWentWrongTryAgain);
@@ -185,12 +202,14 @@ class DiscourseDraftController {
   }
 
   Future<void> _ensureLoaded() async {
+    _ensureSession();
     if (_loaded) return;
     if (_loadError != null) {
       _initialization = null;
       _loadError = null;
     }
     await initialize();
+    _ensureSession();
     if (!_loaded) {
       throw _loadError ?? Exception(appL10n().somethingWentWrongTryAgain);
     }
@@ -243,7 +262,7 @@ class DiscourseDraftController {
   }
 
   void _onChanged() {
-    if (_disposed || _discarded || _restoring) return;
+    if (_disposed || _discarded || _restoring || !_sessionCurrent) return;
     if (!_loaded) {
       _replyChangedBeforeLoad |= contentController.text != _observedReply;
       _titleChangedBeforeLoad |= titleController.text != _observedTitle;
@@ -259,6 +278,7 @@ class DiscourseDraftController {
 
   void _scheduleSave() {
     _debounce?.cancel();
+    if (!_sessionCurrent) return;
     // The timer fires into the void, so swallow save failures here —
     // otherwise a failed saveDraftAsync becomes an unhandled async
     // exception in the root zone.
@@ -271,6 +291,7 @@ class DiscourseDraftController {
 
   Future<void> _flush() async {
     if (_disposed || _discarded) return;
+    _ensureSession();
     if (_saving) {
       // A save is already in flight — remember to re-flush when it
       // completes so edits made meanwhile aren't dropped.
@@ -305,6 +326,7 @@ class DiscourseDraftController {
     String title,
     Map<String, dynamic> extra,
   ) async {
+    _ensureSession();
     final extraKey = extra.toString();
     if (reply == _lastSavedReply &&
         title == _lastSavedTitle &&
@@ -326,6 +348,7 @@ class DiscourseDraftController {
           if (title.isNotEmpty) 'title': title,
         },
       );
+      _ensureSession();
       if (!result.result) {
         throw Exception(
             result.resultText ?? appL10n().somethingWentWrongTryAgain);
@@ -374,7 +397,7 @@ class DiscourseDraftController {
         return;
       }
       _discarded = false;
-      if (!_disposed) {
+      if (!_disposed && _sessionCurrent) {
         if (_needsHydration) _restoreLoadedDraft();
         if (_loaded) _scheduleSave();
       }
@@ -383,8 +406,10 @@ class DiscourseDraftController {
   }
 
   Future<void> _delete() async {
+    _ensureSession();
     final result =
         await _draftProxy.deleteDraftAsync(draftKey, sequence: _sequence);
+    _ensureSession();
     if (!result.result) {
       throw Exception(
           result.resultText ?? appL10n().somethingWentWrongTryAgain);
@@ -410,6 +435,7 @@ class DiscourseDraftController {
     titleController.removeListener(_onChanged);
     if (!_discarded &&
         !_disposed &&
+        _sessionCurrent &&
         (_loaded ||
             contentController.text.isNotEmpty ||
             titleController.text.isNotEmpty)) {
