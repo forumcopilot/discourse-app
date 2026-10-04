@@ -7,6 +7,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_draft.dart';
 
 import '../theme/design_tokens.dart';
 import '../utils/emoji_shortcodes.dart';
+import '../utils/draft_tags.dart';
 import '../utils/markdown_preview.dart';
 import '../utils/time_utils.dart';
 import 'lists/posts_list.dart';
@@ -372,10 +373,7 @@ class _DraftTile extends StatelessWidget {
       _ => draft.topicTitle,
     };
     final untitled = title == null || title.trim().isEmpty;
-    final tags = ((draft.data['tags'] as List?) ?? const [])
-        .map((t) => t.toString())
-        .where((t) => t.isNotEmpty)
-        .toList();
+    final tags = draftTagNames(draft.data['tags']);
     final categoryId = draft.categoryId?.toString() ?? '';
     final preview = markdownPreviewText(draft.reply);
 

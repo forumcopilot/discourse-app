@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:discourse_ui/services/site_proxy_service.dart';
 
 import '../../l10n/generated/app_localizations.dart';
@@ -71,6 +72,17 @@ class _TagInputFieldState extends State<TagInputField> {
     super.initState();
     _tags.addAll(widget.initial);
     _controller.addListener(_onInputChanged);
+  }
+
+  @override
+  void didUpdateWidget(covariant TagInputField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!listEquals(oldWidget.initial, widget.initial)) {
+      _tags
+        ..clear()
+        ..addAll(widget.initial);
+      _suggestions = _suggestions.where((tag) => !_tags.contains(tag)).toList();
+    }
   }
 
   @override
@@ -168,7 +180,9 @@ class _TagInputFieldState extends State<TagInputField> {
             labelText: widget.label ?? l10n.tags,
             hintText: atCap
                 ? l10n.tagInputMaxReached
-                : (_tags.isEmpty ? l10n.tagInputAddTag : l10n.tagInputAddAnother),
+                : (_tags.isEmpty
+                    ? l10n.tagInputAddTag
+                    : l10n.tagInputAddAnother),
             counterText: cap == null ? null : '${_tags.length}/$cap',
           ),
           textInputAction: TextInputAction.done,
