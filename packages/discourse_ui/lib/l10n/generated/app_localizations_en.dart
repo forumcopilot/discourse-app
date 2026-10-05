@@ -5214,4 +5214,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatViewChannel => 'View';
+
+  @override
+  String get mediaPlay => 'Play';
+
+  @override
+  String get mediaPause => 'Pause';
 }

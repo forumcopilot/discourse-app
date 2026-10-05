@@ -4946,4 +4946,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chatViewChannel => '查看';
+
+  @override
+  String get mediaPlay => '播放';
+
+  @override
+  String get mediaPause => '暂停';
 }

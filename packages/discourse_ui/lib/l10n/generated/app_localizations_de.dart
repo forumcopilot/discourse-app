@@ -5307,4 +5307,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get chatViewChannel => 'Ansehen';
+
+  @override
+  String get mediaPlay => 'Abspielen';
+
+  @override
+  String get mediaPause => 'Pausieren';
 }

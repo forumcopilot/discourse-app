@@ -5011,4 +5011,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get chatViewChannel => '보기';
+
+  @override
+  String get mediaPlay => '재생';
+
+  @override
+  String get mediaPause => '일시 정지';
 }

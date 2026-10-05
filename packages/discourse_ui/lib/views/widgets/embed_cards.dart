@@ -459,12 +459,16 @@ class _PostAudioPlayerState extends State<PostAudioPlayer>
             )
           else if (_failed)
             IconButton(
+              tooltip: AppLocalizations.of(context)?.viewOnWeb ?? 'View on Web',
               // It would not play here; the browser may manage.
               onPressed: () => UrlUtils.openUrl(widget.src),
               icon: Icon(Icons.open_in_new, color: colorScheme.error),
             )
           else
             IconButton(
+              tooltip: (value?.isPlaying ?? false)
+                  ? (AppLocalizations.of(context)?.mediaPause ?? 'Pause')
+                  : (AppLocalizations.of(context)?.mediaPlay ?? 'Play'),
               onPressed: _toggle,
               icon: Icon(
                 (value?.isPlaying ?? false)

@@ -6532,5 +6532,13 @@
   "chatAvailableChannels": "Available channels",
   "chatAvailableChannelsDescription": "Channels you can view or join.",
   "chatAllChannelsJoined": "You have joined all available channels.",
-  "chatViewChannel": "View"
+  "chatViewChannel": "View",
+  "mediaPlay": "Play",
+  "mediaPause": "Pause",
+  "@mediaPlay": {
+    "description": "Accessible label for an audio or video play button"
+  },
+  "@mediaPause": {
+    "description": "Accessible label for an audio or video pause button"
+  }
 }

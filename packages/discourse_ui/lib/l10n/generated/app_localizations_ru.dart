@@ -5329,4 +5329,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get chatViewChannel => 'Просмотреть';
+
+  @override
+  String get mediaPlay => 'Воспроизвести';
+
+  @override
+  String get mediaPause => 'Пауза';
 }

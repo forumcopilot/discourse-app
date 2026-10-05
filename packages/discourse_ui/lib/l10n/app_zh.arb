@@ -1573,5 +1573,7 @@
   "chatAvailableChannels": "可用频道",
   "chatAvailableChannelsDescription": "您可以查看或加入的频道。",
   "chatAllChannelsJoined": "您已加入所有可用频道。",
-  "chatViewChannel": "查看"
+  "chatViewChannel": "查看",
+  "mediaPlay": "播放",
+  "mediaPause": "暂停"
 }

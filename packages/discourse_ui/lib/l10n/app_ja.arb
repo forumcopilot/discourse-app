@@ -1573,5 +1573,7 @@
   "chatAvailableChannels": "利用可能なチャンネル",
   "chatAvailableChannelsDescription": "閲覧または参加できるチャンネル。",
   "chatAllChannelsJoined": "利用可能なすべてのチャンネルに参加しています。",
-  "chatViewChannel": "表示"
+  "chatViewChannel": "表示",
+  "mediaPlay": "再生",
+  "mediaPause": "一時停止"
 }

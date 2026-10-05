@@ -1573,5 +1573,7 @@
   "chatAvailableChannels": "Canaux disponibles",
   "chatAvailableChannelsDescription": "Canaux que vous pouvez consulter ou rejoindre.",
   "chatAllChannelsJoined": "Vous avez rejoint tous les canaux disponibles.",
-  "chatViewChannel": "Voir"
+  "chatViewChannel": "Voir",
+  "mediaPlay": "Lire",
+  "mediaPause": "Mettre en pause"
 }

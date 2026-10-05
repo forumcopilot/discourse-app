@@ -8513,6 +8513,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View'**
   String get chatViewChannel;
+
+  /// Accessible label for an audio or video play button
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get mediaPlay;
+
+  /// Accessible label for an audio or video pause button
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get mediaPause;
 }
 
 class _AppLocalizationsDelegate
