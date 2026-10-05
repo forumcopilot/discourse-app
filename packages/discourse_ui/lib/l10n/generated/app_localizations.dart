@@ -128,6 +128,24 @@ abstract class AppLocalizations {
   /// **'Your sign-in changed. Copy your text before reopening the composer to work with drafts.'**
   String get draftSessionChanged;
 
+  /// After Discard failed (offline, or the sign-in changed): offer to close the composer without discarding; an earlier saved draft is kept.
+  ///
+  /// In en, this message translates to:
+  /// **'Close anyway? A draft saved earlier stays in Drafts.'**
+  String get discardFailedCloseQuestion;
+
+  /// Button: stay in the composer.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get keepEditing;
+
+  /// Button: close the composer although its draft could not be discarded.
+  ///
+  /// In en, this message translates to:
+  /// **'Close anyway'**
+  String get closeAnyway;
+
   /// An attachment upload overlapped a logout or credential change; its result cannot be used in the current session.
   ///
   /// In en, this message translates to:

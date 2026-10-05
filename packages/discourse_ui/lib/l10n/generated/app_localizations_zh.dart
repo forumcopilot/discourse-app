@@ -15,6 +15,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get draftSessionChanged => '登录状态已改变。请先复制文本，再重新打开编辑器处理草稿。';
 
   @override
+  String get discardFailedCloseQuestion => '仍要关闭吗？之前保存的草稿会保留在“草稿”中。';
+
+  @override
+  String get keepEditing => '继续编辑';
+
+  @override
+  String get closeAnyway => '仍然关闭';
+
+  @override
   String get uploadSessionChanged => '上传过程中登录状态已改变。请重新打开此页面后再试。';
 
   @override

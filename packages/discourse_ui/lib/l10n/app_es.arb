@@ -1,6 +1,9 @@
 {
   "accountSessionChanged": "Tu sesión ha cambiado. Vuelve a abrir esta pantalla para continuar.",
   "draftSessionChanged": "Tu sesión ha cambiado. Copia tu texto antes de volver a abrir el editor para trabajar con borradores.",
+  "discardFailedCloseQuestion": "¿Cerrar de todos modos? Un borrador guardado antes se queda en Borradores.",
+  "keepEditing": "Seguir editando",
+  "closeAnyway": "Cerrar de todos modos",
   "uploadSessionChanged": "Tu sesión cambió durante la subida. Vuelve a abrir esta pantalla antes de intentarlo de nuevo.",
   "@@locale": "es",
   "submissionUnconfirmed": "No pudimos confirmar que se haya enviado. Se ha conservado tu texto. Revisa el foro antes de volver a intentarlo.",

@@ -17,6 +17,16 @@ class AppLocalizationsRu extends AppLocalizations {
       'Сеанс входа изменился. Скопируйте текст, прежде чем снова открыть редактор для работы с черновиками.';
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Всё равно закрыть? Сохранённый ранее черновик останется в разделе «Черновики».';
+
+  @override
+  String get keepEditing => 'Продолжить';
+
+  @override
+  String get closeAnyway => 'Всё равно закрыть';
+
+  @override
   String get uploadSessionChanged =>
       'Во время загрузки изменился сеанс входа. Откройте этот экран заново, прежде чем повторить попытку.';
 

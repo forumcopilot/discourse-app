@@ -17,6 +17,16 @@ class AppLocalizationsIt extends AppLocalizations {
       'La tua sessione è cambiata. Copia il testo prima di riaprire l’editor per lavorare sulle bozze.';
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Chiudere comunque? Una bozza salvata in precedenza resta in Bozze.';
+
+  @override
+  String get keepEditing => 'Continua a scrivere';
+
+  @override
+  String get closeAnyway => 'Chiudi comunque';
+
+  @override
   String get uploadSessionChanged =>
       'La tua sessione è cambiata durante il caricamento. Riapri questa schermata prima di riprovare.';
 

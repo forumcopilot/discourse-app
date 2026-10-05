@@ -139,8 +139,10 @@ void main() {
     await tester.tap(find.text('Discard'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
+    expect(find.textContaining('Cannot discard draft'), findsOneWidget);
+    await tester.tap(find.text('Keep editing'));
+    await tester.pumpAndSettle();
     expect(find.text('Do not lose this'), findsOneWidget);
-    expect(find.text('Cannot discard draft'), findsOneWidget);
     await tester.tap(find.descendant(
         of: find.byType(AppBar), matching: find.byTooltip('Close')));
     await tester.pumpAndSettle();
@@ -148,6 +150,30 @@ void main() {
     await tester.pumpAndSettle();
     expect(attempts, 2);
     expect(find.text('Topic'), findsOneWidget);
+  });
+
+  testWidgets('a Discard that cannot reach the forum offers Close anyway',
+      (tester) async {
+    // Offline, or the sign-in changed under the composer: Discard and Save
+    // draft both fail, and deleting every word was the only way out.
+    var attempts = 0;
+    final closed = await open(tester, onDiscard: () async {
+      attempts++;
+      throw Exception("Couldn't reach the forum");
+    });
+    await type(tester, 'Throw this away');
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Discard'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining("Couldn't reach the forum"), findsOneWidget);
+    expect(find.textContaining('A draft saved earlier stays in Drafts'),
+        findsOneWidget);
+    await tester.tap(find.text('Close anyway'));
+    await tester.pumpAndSettle();
+    expect(attempts, 1, reason: 'closing anyway does not try again');
+    expect(find.text('Topic'), findsOneWidget);
+    expect(await closed, isNull);
   });
 
   testWidgets('Back cannot start another close while a draft is saving',

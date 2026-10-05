@@ -512,6 +512,106 @@ void main() {
     c.dispose();
   });
 
+  group('closing and failed operations', () {
+    DiscourseDraftController prefilled(String text) => DiscourseDraftController(
+          draftKey: 'new_topic_1',
+          titleController: TextEditingController(),
+          contentController: TextEditingController(text: text),
+          debounceDuration: const Duration(milliseconds: 1),
+        );
+
+    Future<void> settle() => Future<void>.delayed(const Duration(milliseconds: 20));
+
+    test('an untouched templated composer saves nothing on close', () async {
+      // Each New Topic has its own key: saving the template on every Back
+      // left a new junk draft each time.
+      final c = prefilled('Category template');
+      await c.initialize();
+      c.dispose();
+      await settle();
+      expect(drafts.saves, isEmpty);
+      expect(drafts.deletes, isEmpty);
+    });
+
+    test('closing an untouched composer before its read saves nothing',
+        () async {
+      drafts.loadGate = Completer<void>();
+      final c = prefilled('Category template');
+      unawaited(c.initialize());
+      c.dispose();
+      drafts.loadGate!.complete();
+      await settle();
+      expect(drafts.saves, isEmpty);
+    });
+
+    test('an edited template is saved on close', () async {
+      final c = prefilled('Category template');
+      await c.initialize();
+      c.contentController.text = 'Category template, filled in';
+      c.dispose();
+      await settle();
+      expect(drafts.saves.single['reply'], 'Category template, filled in');
+    });
+
+    test('typing after a failed first read reads again and autosaves',
+        () async {
+      storedDraft();
+      drafts.loadError = 'Offline';
+      final c = controller([]);
+      await c.initialize();
+      drafts.loadError = null;
+      c.contentController.text = 'Written while offline';
+      await settle();
+      final loads = drafts.loads;
+      final saves = List.of(drafts.saves);
+      c.dispose();
+      expect(loads, 2);
+      expect(saves.single['reply'], 'Written while offline');
+      expect(drafts.saveSequences.single, 7,
+          reason: 'saved on the sequence the second read supplied');
+    });
+
+    test('closing right after a failed Discard saves nothing', () async {
+      final c = controller([]);
+      await c.initialize();
+      c.contentController.text = 'Throw this away';
+      drafts.throwDelete = true;
+      await expectLater(c.discard(), throwsException);
+      await settle();
+      c.dispose();
+      await settle();
+      expect(drafts.saves, isEmpty,
+          reason: 'Close anyway must not save what the writer discarded');
+    });
+
+    test('editing after a failed Discard saves again', () async {
+      final c = controller([]);
+      await c.initialize();
+      c.contentController.text = 'Throw this away';
+      drafts.throwDelete = true;
+      await expectLater(c.discard(), throwsException);
+      c.contentController.text = 'Changed my mind';
+      await settle();
+      c.dispose();
+      expect(drafts.saves.last['reply'], 'Changed my mind');
+    });
+
+    test('after a failed Discard, Save draft rewrites unchanged text',
+        () async {
+      // The DELETE may have run with only its answer lost: the draft must
+      // not be assumed to still be on the forum.
+      storedDraft();
+      final c = controller([]);
+      await c.initialize();
+      drafts.throwDelete = true;
+      await expectLater(c.discard(), throwsException);
+      drafts.throwDelete = false;
+      await c.flushNow();
+      c.dispose();
+      expect(drafts.saves.single['reply'], 'Server body');
+    });
+  });
+
   test('changes are counted from what the composer opened with', () async {
     drafts.stored = FCDraft(
       draftKey: 'new_private_message_1',

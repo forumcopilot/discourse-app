@@ -17,6 +17,16 @@ class AppLocalizationsPt extends AppLocalizations {
       'Sua sessão mudou. Copie seu texto antes de reabrir o editor para trabalhar com rascunhos.';
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Fechar mesmo assim? Um rascunho salvo antes continua em Rascunhos.';
+
+  @override
+  String get keepEditing => 'Continuar editando';
+
+  @override
+  String get closeAnyway => 'Fechar mesmo assim';
+
+  @override
   String get uploadSessionChanged =>
       'Sua sessão mudou durante o envio. Reabra esta tela antes de tentar novamente.';
 

@@ -101,6 +101,7 @@ class _DiscardChangesScopeState extends State<DiscardChangesScope> {
       return;
     }
     setState(() => _closing = true);
+    Object? failure;
     try {
       switch (choice) {
         case _Choice.saveDraft:
@@ -109,19 +110,50 @@ class _DiscardChangesScopeState extends State<DiscardChangesScope> {
           await widget.onDiscard?.call();
       }
     } catch (error) {
-      if (mounted) {
-        SnackbarHelper.showError(
-            context, describeError(error, context: context));
-      }
-      return;
-    } finally {
-      _asking = false;
-      if (mounted) setState(() => _closing = false);
+      failure = error;
     }
-    if (!mounted) return;
+    if (mounted) setState(() => _closing = false);
+    var close = failure == null;
+    if (failure != null && mounted) {
+      final message = describeError(failure, context: context);
+      if (choice == _Choice.discard) {
+        // Offline, or after the sign-in changed under the form, Discard
+        // cannot reach the draft, and Save draft cannot either: without
+        // this the only way out was to delete every word.
+        close = await _askCloseAnyway(message);
+      } else {
+        SnackbarHelper.showError(context, message);
+      }
+    }
+    _asking = false;
+    if (!close || !mounted) return;
     final route = ModalRoute.of(context);
     // Navigator.pop closes the form regardless of the scope below.
     if (route != null && route.isCurrent) Navigator.of(context).pop();
+  }
+
+  /// Why Discard failed, and whether to close without it. Closing keeps
+  /// whatever draft the forum already has; the form saves nothing more.
+  Future<bool> _askCloseAnyway(String reason) async {
+    final l10n = AppLocalizations.of(context)!;
+    final close = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        actionsOverflowDirection: VerticalDirection.up,
+        content: Text('$reason\n\n${l10n.discardFailedCloseQuestion}'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialog, false),
+            child: Text(l10n.keepEditing),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialog, true),
+            child: Text(l10n.closeAnyway),
+          ),
+        ],
+      ),
+    );
+    return close == true;
   }
 
   @override

@@ -1,6 +1,9 @@
 {
   "accountSessionChanged": "Sua sessão mudou. Reabra esta tela para continuar.",
   "draftSessionChanged": "Sua sessão mudou. Copie seu texto antes de reabrir o editor para trabalhar com rascunhos.",
+  "discardFailedCloseQuestion": "Fechar mesmo assim? Um rascunho salvo antes continua em Rascunhos.",
+  "keepEditing": "Continuar editando",
+  "closeAnyway": "Fechar mesmo assim",
   "uploadSessionChanged": "Sua sessão mudou durante o envio. Reabra esta tela antes de tentar novamente.",
   "@@locale": "pt",
   "submissionUnconfirmed": "Não foi possível confirmar o envio. Seu texto foi mantido. Verifique o fórum antes de tentar novamente.",

@@ -16,6 +16,15 @@ class AppLocalizationsJa extends AppLocalizations {
       'ログイン状態が変わりました。下書きを編集するには、入力した文章をコピーしてから投稿画面を開き直してください。';
 
   @override
+  String get discardFailedCloseQuestion => 'このまま閉じますか？以前に保存した下書きは「下書き」に残ります。';
+
+  @override
+  String get keepEditing => '編集を続ける';
+
+  @override
+  String get closeAnyway => 'このまま閉じる';
+
+  @override
   String get uploadSessionChanged =>
       'アップロード中にログイン状態が変わりました。この画面を開き直してから、もう一度お試しください。';
 

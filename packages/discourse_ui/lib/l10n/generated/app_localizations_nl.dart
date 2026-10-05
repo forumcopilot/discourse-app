@@ -17,6 +17,16 @@ class AppLocalizationsNl extends AppLocalizations {
       'Je aanmelding is gewijzigd. Kopieer je tekst voordat je de editor opnieuw opent om met concepten te werken.';
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Toch sluiten? Een eerder opgeslagen concept blijft bij Concepten.';
+
+  @override
+  String get keepEditing => 'Verder bewerken';
+
+  @override
+  String get closeAnyway => 'Toch sluiten';
+
+  @override
   String get uploadSessionChanged =>
       'Je aanmelding is tijdens het uploaden gewijzigd. Open dit scherm opnieuw voordat je het nogmaals probeert.';
 

@@ -17,6 +17,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your sign-in changed. Copy your text before reopening the composer to work with drafts.';
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Close anyway? A draft saved earlier stays in Drafts.';
+
+  @override
+  String get keepEditing => 'Keep editing';
+
+  @override
+  String get closeAnyway => 'Close anyway';
+
+  @override
   String get uploadSessionChanged =>
       'Your sign-in changed during the upload. Reopen this screen before trying again.';
 

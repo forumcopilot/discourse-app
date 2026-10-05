@@ -17,6 +17,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'Deine Anmeldung hat sich geändert. Kopiere deinen Text, bevor du den Editor erneut öffnest, um mit Entwürfen zu arbeiten.';
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Trotzdem schließen? Ein bereits gespeicherter Entwurf bleibt unter Entwürfe.';
+
+  @override
+  String get keepEditing => 'Weiter bearbeiten';
+
+  @override
+  String get closeAnyway => 'Trotzdem schließen';
+
+  @override
   String get uploadSessionChanged =>
       'Deine Anmeldung hat sich während des Uploads geändert. Öffne diesen Bildschirm erneut, bevor du es noch einmal versuchst.';
 

@@ -17,6 +17,16 @@ class AppLocalizationsFr extends AppLocalizations {
       'Votre session a changé. Copiez votre texte avant de rouvrir l’éditeur pour travailler sur les brouillons.';
 
   @override
+  String get discardFailedCloseQuestion =>
+      'Fermer quand même ? Un brouillon déjà enregistré reste dans Brouillons.';
+
+  @override
+  String get keepEditing => 'Continuer à écrire';
+
+  @override
+  String get closeAnyway => 'Fermer quand même';
+
+  @override
   String get uploadSessionChanged =>
       'Votre session a changé pendant le téléversement. Rouvrez cet écran avant de réessayer.';
 

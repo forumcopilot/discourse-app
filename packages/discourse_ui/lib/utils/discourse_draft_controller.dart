@@ -84,6 +84,21 @@ class DiscourseDraftController {
   String _lastSavedExtra = '';
   bool _discarded = false;
 
+  /// Whether this composer has sent a save (or delete) of the server draft.
+  /// Until it has, closing a composer the writer never touched saves
+  /// nothing: a category template or a quote it opened with is not a draft.
+  bool _savedSinceOpened = false;
+
+  /// After a Discard that failed, the server may or may not still hold the
+  /// draft (the DELETE's answer can be what got lost), so the next save
+  /// writes even when the text matches what was last saved.
+  bool _serverDraftUnknown = false;
+
+  /// What the composer held when a Discard failed. Closing with exactly
+  /// that ("Close anyway") must not save the writing the writer chose to
+  /// throw away; any edit after it clears this.
+  String? _textAtFailedDiscard;
+
   /// This composer's typing-time session (DiscourseComposerTiming): every
   /// post composer has a draft controller, so it is the one place that sees
   /// the writer type in all of them.
@@ -215,6 +230,9 @@ class DiscourseDraftController {
     }
   }
 
+  String get _snapshot =>
+      '${titleController.text}\u0000${contentController.text}\u0000$_extra';
+
   void _observeText() {
     _observedReply = contentController.text;
     _observedTitle = titleController.text;
@@ -272,7 +290,13 @@ class DiscourseDraftController {
       DiscourseComposerTiming.instance.typed(_timingSession);
     }
     _observeText();
-    if (!_loaded) return;
+    if (_textAtFailedDiscard != null && _snapshot != _textAtFailedDiscard) {
+      _textAtFailedDiscard = null;
+    }
+    // A failed first read must not stop autosave for the whole session:
+    // the next pause in typing reads again, and restoring the draft then
+    // saves what was written meanwhile (see _restoreLoadedDraft).
+    if (!_loaded && _loadError == null) return;
     _scheduleSave();
   }
 
@@ -283,7 +307,7 @@ class DiscourseDraftController {
     // otherwise a failed saveDraftAsync becomes an unhandled async
     // exception in the root zone.
     _debounce = Timer(debounceDuration, () {
-      _flush().catchError((Object e) {
+      (_loaded ? _flush() : _ensureLoaded()).catchError((Object e) {
         AppLogger.debug('DiscourseDraftController debounced flush failed: $e');
       });
     });
@@ -328,17 +352,23 @@ class DiscourseDraftController {
   ) async {
     _ensureSession();
     final extraKey = extra.toString();
-    if (reply == _lastSavedReply &&
+    if (!_serverDraftUnknown &&
+        reply == _lastSavedReply &&
         title == _lastSavedTitle &&
         extraKey == _lastSavedExtra) {
       return;
     }
     if (reply.trim().isEmpty && title.trim().isEmpty) {
-      if (_lastSavedReply.trim().isNotEmpty ||
+      if (_serverDraftUnknown ||
+          _lastSavedReply.trim().isNotEmpty ||
           _lastSavedTitle.trim().isNotEmpty) {
+        _savedSinceOpened = true;
         await _delete();
       }
     } else {
+      // Counted once sent: a save still in flight when the composer closes
+      // may land, and the close must then follow it up.
+      _savedSinceOpened = true;
       final result = await _draftProxy.saveDraftAsync(
         draftKey: draftKey,
         sequence: _sequence,
@@ -358,6 +388,7 @@ class DiscourseDraftController {
     _lastSavedReply = reply;
     _lastSavedTitle = title;
     _lastSavedExtra = extraKey;
+    _serverDraftUnknown = false;
   }
 
   /// Force a save right now (skipping the debounce). Useful when the
@@ -397,10 +428,13 @@ class DiscourseDraftController {
         return;
       }
       _discarded = false;
+      _serverDraftUnknown = true;
       if (!_disposed && _sessionCurrent) {
         if (_needsHydration) _restoreLoadedDraft();
-        if (_loaded) _scheduleSave();
       }
+      // Not saved again on its own: the writer asked to throw this away.
+      // Editing it again, Save draft, or closing with changes saves it.
+      _textAtFailedDiscard = _snapshot;
       rethrow;
     }
   }
@@ -427,14 +461,24 @@ class DiscourseDraftController {
   /// Stops watching. What was typed in the last moments before the
   /// composer closed, still waiting out the debounce, is saved on the way
   /// out: it used to be dropped, so a draft reopened without its last
-  /// words.
+  /// words. A composer the writer never touched saves nothing, and neither
+  /// does one closed right after a failed Discard.
   void dispose() {
     DiscourseComposerTiming.instance.close(_timingSession);
     _debounce?.cancel();
     contentController.removeListener(_onChanged);
     titleController.removeListener(_onChanged);
+    final untouched = _openedReply != null &&
+        !_savedSinceOpened &&
+        contentController.text == _openedReply &&
+        titleController.text == _openedTitle &&
+        _extra.toString() == _openedExtra;
+    final abandoned =
+        _textAtFailedDiscard != null && _snapshot == _textAtFailedDiscard;
     if (!_discarded &&
         !_disposed &&
+        !untouched &&
+        !abandoned &&
         _sessionCurrent &&
         (_loaded ||
             contentController.text.isNotEmpty ||
