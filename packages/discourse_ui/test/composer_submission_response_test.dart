@@ -157,7 +157,9 @@ void main() {
       if (kind == 'topic') {
         expect(composer(tester).pageAfterSubmit!(), isNull);
       } else {
-        expect(composer(tester).onSuccess!(true), isNull);
+        // Posted, with nothing to scroll to: the topic refreshes. Null is
+        // what closing without posting returns (3f32fda).
+        expect(composer(tester).onSuccess!(true), isTrue);
       }
       await close(tester);
     });

@@ -381,8 +381,9 @@ class _ReplyPageState extends State<ReplyPage> {
               }
             },
             // Never null: null is what closing without posting returns, and
-            // the topic is left alone then (a reply queued for approval, or
-            // one that came back without an id, still refreshes it).
+            // the topic is left alone then (a reply queued for approval still
+            // refreshes it; one that came back without an id is unconfirmed
+            // and keeps the composer open, see confirmedPostId).
             onSuccess: (success) {
               return _createdPostId ?? true;
             },
