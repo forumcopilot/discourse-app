@@ -540,6 +540,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get notifications => 'Notifiche';
 
   @override
+  String get notificationsTab => 'Avvisi';
+
+  @override
   String get forums => 'Categorie';
 
   @override

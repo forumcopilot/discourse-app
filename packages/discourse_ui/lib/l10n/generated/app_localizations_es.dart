@@ -541,6 +541,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get notifications => 'Notificaciones';
 
   @override
+  String get notificationsTab => 'Avisos';
+
+  @override
   String get forums => 'Categorías';
 
   @override

@@ -522,6 +522,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notifications => '通知';
 
   @override
+  String get notificationsTab => '通知';
+
+  @override
   String get forums => 'カテゴリ';
 
   @override

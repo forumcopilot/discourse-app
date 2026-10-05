@@ -518,6 +518,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notifications => '알림';
 
   @override
+  String get notificationsTab => '알림';
+
+  @override
   String get forums => '카테고리';
 
   @override

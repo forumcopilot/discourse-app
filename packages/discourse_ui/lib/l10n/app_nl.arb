@@ -312,6 +312,7 @@
     "description": "Home tab title"
   },
   "notifications": "Meldingen",
+  "notificationsTab": "Meldingen",
   "@notifications": {
     "description": "Notifications tab title"
   },

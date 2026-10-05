@@ -543,6 +543,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get notifications => 'Benachrichtigungen';
 
   @override
+  String get notificationsTab => 'Meldungen';
+
+  @override
   String get forums => 'Kategorien';
 
   @override

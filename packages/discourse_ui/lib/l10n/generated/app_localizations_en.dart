@@ -536,6 +536,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifications => 'Notifications';
 
   @override
+  String get notificationsTab => 'Alerts';
+
+  @override
   String get forums => 'Categories';
 
   @override

@@ -1040,6 +1040,12 @@ abstract class AppLocalizations {
   /// **'Notifications'**
   String get notifications;
 
+  /// Short bottom navigation label for Notifications. Keep concise so it fits on narrow phones with larger text.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get notificationsTab;
+
   /// Categories tab title (Discourse-native term; the ARB key keeps the legacy 'forums' name for compatibility)
   ///
   /// In en, this message translates to:

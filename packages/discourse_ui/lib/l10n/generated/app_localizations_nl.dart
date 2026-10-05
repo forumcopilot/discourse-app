@@ -541,6 +541,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get notifications => 'Meldingen';
 
   @override
+  String get notificationsTab => 'Meldingen';
+
+  @override
   String get forums => 'Categorieën';
 
   @override

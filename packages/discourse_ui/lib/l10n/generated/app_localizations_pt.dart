@@ -540,6 +540,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get notifications => 'Notificações';
 
   @override
+  String get notificationsTab => 'Avisos';
+
+  @override
   String get forums => 'Categorias';
 
   @override

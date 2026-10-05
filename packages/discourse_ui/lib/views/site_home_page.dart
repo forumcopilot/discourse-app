@@ -1107,7 +1107,8 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
               isLabelVisible: _unreadAlertsCount > 0,
               child: const Icon(Icons.notifications_outlined),
             ),
-            label: l10n.notifications,
+            label: l10n.notificationsTab,
+            tooltip: l10n.notifications,
           );
         case _profileTab:
           return NavigationDestination(
