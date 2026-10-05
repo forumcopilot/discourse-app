@@ -44,6 +44,10 @@ void main() {
         lastSeenAt: DateTime.now().subtract(const Duration(hours: 2)),
         trustLevel: 3,
         userGroups: const ['meetup-hosts'],
+        customFields: [
+          FCUserCustomField(name: 'last_chat_channel_id', value: '9'),
+          FCUserCustomField(name: 'plugin_internal_state', value: 'stored'),
+        ],
       );
 
   setUp(() {
@@ -137,6 +141,25 @@ void main() {
     expect(find.text('Riverside Studio'), findsOneWidget);
     expect(find.text('Set a status'), findsNothing,
         reason: "nobody sets someone else's status");
+  });
+
+  testWidgets('public profile fields stay visible without raw plugin metadata',
+      (tester) async {
+    DiscourseUserProfileExtras.store(
+      forum,
+      'alice',
+      const DiscourseUserProfileExtras(fields: [
+        (name: 'Pronouns', value: 'she/her'),
+      ]),
+    );
+    await pump(tester);
+    await tester.tap(find.text('Summary'));
+    await tester.pumpAndSettle();
+    expect(find.text('Pronouns'), findsOneWidget);
+    expect(find.text('she/her'), findsOneWidget);
+    expect(find.text('last_chat_channel_id'), findsNothing);
+    expect(find.text('plugin_internal_state'), findsNothing);
+    expect(find.text('Trust level 3'), findsOneWidget);
   });
 
   testWidgets('your own profile offers to set a status where the forum has them',
