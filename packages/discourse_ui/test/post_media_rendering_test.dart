@@ -203,6 +203,18 @@ void main() {
   });
 
   group('videos', () {
+    testWidgets('video previews expose an accessible tap action', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await _render(tester, '''
+<video controls><source src="https://forum.example.com/clip.mp4"></video>
+<p><a href="https://vimeo.com/76979871" class="onebox">https://vimeo.com/76979871</a></p>''');
+      for (final label in ['Video', 'Vimeo']) {
+        expect(tester.getSemantics(find.bySemanticsLabel(label)),
+            matchesSemantics(label: label, isButton: true, hasTapAction: true));
+      }
+      semantics.dispose();
+    });
+
     const lazyYouTube = """
 <p>Before the video.</p>
 <div class="youtube-onebox lazy-video-container" data-video-id="aqz-KE-bpKQ" data-video-title="Big Buck Bunny 60fps 4K" data-video-start-time="42" data-video-list-id="" data-provider-name="youtube">
