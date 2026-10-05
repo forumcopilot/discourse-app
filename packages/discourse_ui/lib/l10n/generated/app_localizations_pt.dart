@@ -9,6 +9,32 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
+  String get accountSessionChanged =>
+      'Sua sessão mudou. Reabra esta tela para continuar.';
+
+  @override
+  String get draftSessionChanged =>
+      'Sua sessão mudou. Copie seu texto antes de reabrir o editor para trabalhar com rascunhos.';
+
+  @override
+  String get discardFailedCloseQuestion =>
+      'Fechar mesmo assim? Um rascunho salvo antes continua em Rascunhos.';
+
+  @override
+  String get keepEditing => 'Continuar editando';
+
+  @override
+  String get closeAnyway => 'Fechar mesmo assim';
+
+  @override
+  String get uploadSessionChanged =>
+      'Sua sessão mudou durante o envio. Reabra esta tela antes de tentar novamente.';
+
+  @override
+  String get submissionUnconfirmed =>
+      'Não foi possível confirmar o envio. Seu texto foi mantido. Verifique o fórum antes de tentar novamente.';
+
+  @override
   String get loginTitle => 'Entrar';
 
   @override

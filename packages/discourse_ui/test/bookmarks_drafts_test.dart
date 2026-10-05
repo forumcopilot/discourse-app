@@ -121,6 +121,13 @@ void main() {
       expect(find.text('design'), findsOneWidget, reason: "the new topic's tags");
     });
 
+    testWidgets('web draft tag objects show their names', (tester) async {
+      drafts.tags = [{'id': 3, 'name': 'design'}];
+      await pump(tester, DraftsListPage(siteContext: ctx));
+      expect(find.text('design'), findsOneWidget);
+      expect(find.textContaining('{id:'), findsNothing);
+    });
+
     testWidgets('discard with Undo, no dialog', (tester) async {
       await pump(tester, DraftsListPage(siteContext: ctx));
       await tester.tap(find.byTooltip('Discard').first);
@@ -206,6 +213,7 @@ class _Bookmarks extends DiscourseBookmarkProxy {
 }
 
 class _Drafts implements IFCDraftProxy {
+  List<Object> tags = ['design'];
   final deleted = <String>[];
 
   @override
@@ -235,10 +243,10 @@ class _Drafts implements IFCDraftProxy {
         sequence: 0,
         categoryId: 4,
         updatedAt: now.subtract(const Duration(days: 14)),
-        data: const {
+        data: {
           'title': '',
           'reply': '![shot|690x388](upload://a.png) crash',
-          'tags': ['design'],
+          'tags': tags,
         },
       ),
     ]);

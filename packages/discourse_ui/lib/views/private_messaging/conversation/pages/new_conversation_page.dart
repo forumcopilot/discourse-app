@@ -13,6 +13,7 @@ import '../../../../services/attachment_upload_service.dart';
 import '../../../../theme/design_tokens.dart';
 import '../../../../utils/app_navigation.dart';
 import '../../../../utils/discourse_draft_controller.dart';
+import '../../../../utils/post_submission.dart';
 import '../../../lists/posts_list.dart' show PostsListMode;
 import '../../../post_page.dart';
 
@@ -77,6 +78,7 @@ class NewConversationPage extends StatefulWidget {
 
 class _NewConversationPageState extends State<NewConversationPage> {
   final List<String> _recipients = [];
+  bool _recipientsChanged = false;
   final Map<String, String?> _recipientIcons = {};
 
   /// Recipients that are groups (a message can go to a group's inbox).
@@ -110,9 +112,11 @@ class _NewConversationPageState extends State<NewConversationPage> {
       },
       extraDataBuilder: () => {'recipients': _recipients.join(',')},
     );
-    _draft.initialize().then((draft) {
+    _draft.initialize(onRestored: (draft) {
       final saved = draft?.data['recipients']?.toString() ?? '';
-      if (!mounted || saved.isEmpty) return;
+      // A late read (including a retry) must not add back a recipient the
+      // writer removed, or expand the audience they have already chosen.
+      if (!mounted || _recipientsChanged || saved.isEmpty) return;
       setState(() {
         for (final name in saved.split(',').map((n) => n.trim())) {
           if (name.isNotEmpty && !_recipients.contains(name)) {
@@ -120,7 +124,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
           }
         }
       });
-      _draft.markOpened();
+      _draft.markExtraDataOpened();
     });
   }
 
@@ -133,6 +137,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
   }
 
   void _setRecipients(void Function() change) {
+    _recipientsChanged = true;
     setState(change);
     _draft.touch();
   }
@@ -158,9 +163,9 @@ class _NewConversationPageState extends State<NewConversationPage> {
           ? message
           : l10n.messageCouldNotBeSent);
     }
-    if (result.convId.isEmpty) throw Exception(l10n.messageSentWithoutId);
-    _created = (id: result.convId, title: title);
-    await _draft.discard();
+    final id = confirmedPostId(result.convId, l10n.submissionUnconfirmed);
+    _created = (id: id, title: title);
+    await _draft.discard(afterSubmit: true);
     return true;
   }
 
@@ -175,7 +180,7 @@ class _NewConversationPageState extends State<NewConversationPage> {
       groupId: '',
       currentAttachmentCount: _attachmentIds.length,
     );
-    if (outcome.cancelled) return null;
+    if (!mounted || outcome.cancelled) return null;
     if (!outcome.succeeded) {
       if (mounted && outcome.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(

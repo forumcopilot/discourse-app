@@ -9,6 +9,32 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
+  String get accountSessionChanged =>
+      'Je aanmelding is gewijzigd. Open dit scherm opnieuw om verder te gaan.';
+
+  @override
+  String get draftSessionChanged =>
+      'Je aanmelding is gewijzigd. Kopieer je tekst voordat je de editor opnieuw opent om met concepten te werken.';
+
+  @override
+  String get discardFailedCloseQuestion =>
+      'Toch sluiten? Een eerder opgeslagen concept blijft bij Concepten.';
+
+  @override
+  String get keepEditing => 'Verder bewerken';
+
+  @override
+  String get closeAnyway => 'Toch sluiten';
+
+  @override
+  String get uploadSessionChanged =>
+      'Je aanmelding is tijdens het uploaden gewijzigd. Open dit scherm opnieuw voordat je het nogmaals probeert.';
+
+  @override
+  String get submissionUnconfirmed =>
+      'We konden niet bevestigen dat dit is verzonden. Je tekst is behouden. Controleer het forum voordat je het opnieuw probeert.';
+
+  @override
   String get loginTitle => 'Inloggen';
 
   @override

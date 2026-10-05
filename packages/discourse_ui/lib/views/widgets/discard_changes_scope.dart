@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/generated/app_localizations.dart';
+import '../../utils/error_message.dart';
+import '../../utils/snackbar_helper.dart';
 
 /// Asks before a form with unsaved changes is closed, whichever way: its ✕,
 /// Back, Android's back gesture. The composers and edit forms used to close
@@ -56,6 +58,7 @@ enum _Choice { discard, saveDraft }
 
 class _DiscardChangesScopeState extends State<DiscardChangesScope> {
   bool _asking = false;
+  bool _closing = false;
 
   Future<void> _ask() async {
     if (_asking || widget.busy) return;
@@ -93,18 +96,64 @@ class _DiscardChangesScopeState extends State<DiscardChangesScope> {
         ],
       ),
     );
-    _asking = false;
-    if (choice == null || !mounted) return;
-    switch (choice) {
-      case _Choice.saveDraft:
-        await widget.onSaveDraft?.call();
-      case _Choice.discard:
-        await widget.onDiscard?.call();
+    if (choice == null || !mounted) {
+      _asking = false;
+      return;
     }
-    if (!mounted) return;
+    setState(() => _closing = true);
+    Object? failure;
+    try {
+      switch (choice) {
+        case _Choice.saveDraft:
+          await widget.onSaveDraft?.call();
+        case _Choice.discard:
+          await widget.onDiscard?.call();
+      }
+    } catch (error) {
+      failure = error;
+    }
+    if (mounted) setState(() => _closing = false);
+    var close = failure == null;
+    if (failure != null && mounted) {
+      final message = describeError(failure, context: context);
+      if (choice == _Choice.discard) {
+        // Offline, or after the sign-in changed under the form, Discard
+        // cannot reach the draft, and Save draft cannot either: without
+        // this the only way out was to delete every word.
+        close = await _askCloseAnyway(message);
+      } else {
+        SnackbarHelper.showError(context, message);
+      }
+    }
+    _asking = false;
+    if (!close || !mounted) return;
     final route = ModalRoute.of(context);
     // Navigator.pop closes the form regardless of the scope below.
     if (route != null && route.isCurrent) Navigator.of(context).pop();
+  }
+
+  /// Why Discard failed, and whether to close without it. Closing keeps
+  /// whatever draft the forum already has; the form saves nothing more.
+  Future<bool> _askCloseAnyway(String reason) async {
+    final l10n = AppLocalizations.of(context)!;
+    final close = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        actionsOverflowDirection: VerticalDirection.up,
+        content: Text('$reason\n\n${l10n.discardFailedCloseQuestion}'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialog, false),
+            child: Text(l10n.keepEditing),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialog, true),
+            child: Text(l10n.closeAnyway),
+          ),
+        ],
+      ),
+    );
+    return close == true;
   }
 
   @override
@@ -112,11 +161,11 @@ class _DiscardChangesScopeState extends State<DiscardChangesScope> {
     return ListenableBuilder(
       listenable: widget.listenable,
       builder: (context, child) => PopScope(
-        canPop: !widget.busy && !widget.hasChanges(),
+        canPop: !_closing && !widget.busy && !widget.hasChanges(),
         onPopInvokedWithResult: (didPop, _) {
           if (!didPop) _ask();
         },
-        child: child!,
+        child: AbsorbPointer(absorbing: _closing, child: child!),
       ),
       child: widget.child,
     );

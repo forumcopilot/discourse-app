@@ -73,8 +73,8 @@ class DiscourseClient {
     Map<String, String>? extraHeaders,
     bool useCache = true,
   }) async {
-    await FCDioClient.instance.initialize();
-
+    // Initialization yields even when the transport is already ready. Work
+    // started by one account must not pick up replacement credentials there.
     final session = context.configurationSession;
     final headers = <String, String>{
       'Accept': 'application/json',
@@ -82,6 +82,16 @@ class DiscourseClient {
       if (body != null) 'Content-Type': 'application/json',
       ...?extraHeaders,
     };
+    await FCDioClient.instance.initialize();
+    if (!identical(session, context.configurationSession)) {
+      // Status 0 denotes a local failure: no request was sent to the forum.
+      return FCCallResult(
+        statusCode: 0,
+        body: jsonEncode({
+          'errors': ['Your sign-in changed before the request could be sent.'],
+        }),
+      );
+    }
 
     // Some callers embed a query string in `path` ('/x.json?a=1').
     // `Uri.replace(path: ...)` percent-encodes an embedded '?' (→ '%3F'),

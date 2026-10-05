@@ -9,6 +9,32 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get accountSessionChanged =>
+      'Tu sesión ha cambiado. Vuelve a abrir esta pantalla para continuar.';
+
+  @override
+  String get draftSessionChanged =>
+      'Tu sesión ha cambiado. Copia tu texto antes de volver a abrir el editor para trabajar con borradores.';
+
+  @override
+  String get discardFailedCloseQuestion =>
+      '¿Cerrar de todos modos? Un borrador guardado antes se queda en Borradores.';
+
+  @override
+  String get keepEditing => 'Seguir editando';
+
+  @override
+  String get closeAnyway => 'Cerrar de todos modos';
+
+  @override
+  String get uploadSessionChanged =>
+      'Tu sesión cambió durante la subida. Vuelve a abrir esta pantalla antes de intentarlo de nuevo.';
+
+  @override
+  String get submissionUnconfirmed =>
+      'No pudimos confirmar que se haya enviado. Se ha conservado tu texto. Revisa el foro antes de volver a intentarlo.';
+
+  @override
   String get loginTitle => 'Iniciar sesión';
 
   @override

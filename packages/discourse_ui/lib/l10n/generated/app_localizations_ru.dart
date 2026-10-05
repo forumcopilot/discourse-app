@@ -9,6 +9,32 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
+  String get accountSessionChanged =>
+      'Сеанс входа изменился. Откройте этот экран заново, чтобы продолжить.';
+
+  @override
+  String get draftSessionChanged =>
+      'Сеанс входа изменился. Скопируйте текст, прежде чем снова открыть редактор для работы с черновиками.';
+
+  @override
+  String get discardFailedCloseQuestion =>
+      'Всё равно закрыть? Сохранённый ранее черновик останется в разделе «Черновики».';
+
+  @override
+  String get keepEditing => 'Продолжить';
+
+  @override
+  String get closeAnyway => 'Всё равно закрыть';
+
+  @override
+  String get uploadSessionChanged =>
+      'Во время загрузки изменился сеанс входа. Откройте этот экран заново, прежде чем повторить попытку.';
+
+  @override
+  String get submissionUnconfirmed =>
+      'Не удалось подтвердить отправку. Ваш текст сохранён. Проверьте форум, прежде чем повторять попытку.';
+
+  @override
   String get loginTitle => 'Вход';
 
   @override

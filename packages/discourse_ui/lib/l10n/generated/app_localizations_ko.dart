@@ -9,6 +9,31 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
+  String get accountSessionChanged => '로그인 상태가 변경되었습니다. 계속하려면 이 화면을 다시 열어 주세요.';
+
+  @override
+  String get draftSessionChanged =>
+      '로그인 상태가 변경되었습니다. 초안을 편집하려면 입력한 내용을 복사한 후 작성 화면을 다시 열어 주세요.';
+
+  @override
+  String get discardFailedCloseQuestion =>
+      '그래도 닫을까요? 이전에 저장한 글은 임시 저장에 남아 있습니다.';
+
+  @override
+  String get keepEditing => '계속 작성';
+
+  @override
+  String get closeAnyway => '그래도 닫기';
+
+  @override
+  String get uploadSessionChanged =>
+      '업로드 중에 로그인 상태가 변경되었습니다. 이 화면을 다시 연 후 다시 시도해 주세요.';
+
+  @override
+  String get submissionUnconfirmed =>
+      '전송 여부를 확인하지 못했습니다. 작성한 내용은 유지되었습니다. 다시 시도하기 전에 포럼을 확인해 주세요.';
+
+  @override
   String get loginTitle => '로그인';
 
   @override

@@ -124,8 +124,29 @@ void main() {
     expect(refreshes, ['99']);
   });
 
-  testWidgets('a reply that posts without an id still refreshes the topic',
+  testWidgets('a reply queued for approval still refreshes the topic',
       (tester) async {
+    posts.newPostId = null;
+    posts.state = 1;
+    await open(tester, quote: false);
+    await tester.enterText(find.byType(TextField).last, 'A reply');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(FilledButton, 'Reply'));
+    // The sending spinner keeps animating under the dialog: pump frames.
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(find.text('Post Needs Approval'), findsOneWidget);
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    expect(posts.replies, ['A reply']);
+    expect(refreshes, [null]);
+  });
+
+  testWidgets('a reply that comes back without an id keeps the composer open',
+      (tester) async {
+    // Unconfirmed (#17): it may or may not have posted, so the writing stays
+    // and the topic is left where it was.
     posts.newPostId = null;
     await open(tester, quote: false);
     await tester.enterText(find.byType(TextField).last, 'A reply');
@@ -133,13 +154,15 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Reply'));
     await tester.pumpAndSettle();
     expect(posts.replies, ['A reply']);
-    expect(refreshes, [null]);
+    expect(find.text('A reply'), findsOneWidget);
+    expect(refreshes, isEmpty);
   });
 }
 
 class _Posts implements IFCPostProxy {
   final replies = <String>[];
   String? newPostId = '99';
+  int state = 0;
 
   @override
   Future<FCQuotePostResult> getQuotePostAsync(String postId) async =>
@@ -157,7 +180,7 @@ class _Posts implements IFCPostProxy {
       String? groupId,
       bool returnHtml) async {
     replies.add(textBody);
-    return FCReplyPostResult(result: true, postId: newPostId);
+    return FCReplyPostResult(result: true, postId: newPostId, state: state);
   }
 
   @override

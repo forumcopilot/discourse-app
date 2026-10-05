@@ -9,6 +9,32 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
+  String get accountSessionChanged =>
+      'Votre session a changé. Rouvrez cet écran pour continuer.';
+
+  @override
+  String get draftSessionChanged =>
+      'Votre session a changé. Copiez votre texte avant de rouvrir l’éditeur pour travailler sur les brouillons.';
+
+  @override
+  String get discardFailedCloseQuestion =>
+      'Fermer quand même ? Un brouillon déjà enregistré reste dans Brouillons.';
+
+  @override
+  String get keepEditing => 'Continuer à écrire';
+
+  @override
+  String get closeAnyway => 'Fermer quand même';
+
+  @override
+  String get uploadSessionChanged =>
+      'Votre session a changé pendant le téléversement. Rouvrez cet écran avant de réessayer.';
+
+  @override
+  String get submissionUnconfirmed =>
+      'Nous n’avons pas pu confirmer l’envoi. Votre texte a été conservé. Vérifiez le forum avant de réessayer.';
+
+  @override
   String get loginTitle => 'Connexion';
 
   @override

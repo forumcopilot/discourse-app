@@ -116,6 +116,48 @@ abstract class AppLocalizations {
     Locale('zh')
   ];
 
+  /// An account-specific screen no longer belongs to the current sign-in; disable its stale controls.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sign-in changed. Reopen this screen to continue.'**
+  String get accountSessionChanged;
+
+  /// A draft operation belongs to an earlier sign-in; preserve the editor text and explain how to recover it.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sign-in changed. Copy your text before reopening the composer to work with drafts.'**
+  String get draftSessionChanged;
+
+  /// After Discard failed (offline, or the sign-in changed): offer to close the composer without discarding; an earlier saved draft is kept.
+  ///
+  /// In en, this message translates to:
+  /// **'Close anyway? A draft saved earlier stays in Drafts.'**
+  String get discardFailedCloseQuestion;
+
+  /// Button: stay in the composer.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get keepEditing;
+
+  /// Button: close the composer although its draft could not be discarded.
+  ///
+  /// In en, this message translates to:
+  /// **'Close anyway'**
+  String get closeAnyway;
+
+  /// An attachment upload overlapped a logout or credential change; its result cannot be used in the current session.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sign-in changed during the upload. Reopen this screen before trying again.'**
+  String get uploadSessionChanged;
+
+  /// A successful post HTTP response lacked a usable ID; keep the editor and caution against duplicate submissions.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t confirm that this was sent. Your text has been kept. Check the forum before trying again.'**
+  String get submissionUnconfirmed;
+
   /// No description provided for @loginTitle.
   ///
   /// In en, this message translates to:

@@ -1,3 +1,8 @@
+import 'dart:async';
+
+import 'package:discourse_core/discourse_core.dart'
+    show DiscourseComposerTiming;
+
 import 'package:discourse_ui/services/site_proxy_service.dart';
 import 'package:discourse_ui/utils/discourse_draft_controller.dart';
 import 'package:flutter/widgets.dart';
@@ -43,6 +48,354 @@ void main() {
         extraData: const {'action': 'privateMessage'},
         extraDataBuilder: () => {'recipients': recipients.join(',')},
       );
+
+  void storedDraft() {
+    drafts.stored =
+        FCDraft(draftKey: 'new_private_message_1', sequence: 7, data: {
+      'reply': 'Server body',
+      'title': 'Server title',
+      'tags': ['saved-tag']
+    });
+  }
+
+  test('typing during load counts but restored text does not', () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final timing = DiscourseComposerTiming.instance;
+    final previousClock = timing.clock;
+    var now = DateTime.utc(2026, 10, 3);
+    timing.clock = () => now;
+    final c = controller([]);
+    try {
+      final loading = c.initialize();
+      c.contentController.text = 'New words';
+      final beforeLoad = timing.current![DiscourseComposerTiming.typingKey];
+      now = now.add(const Duration(seconds: 2));
+      drafts.loadGate!.complete();
+      await loading;
+      final afterLoad = timing.current![DiscourseComposerTiming.typingKey];
+      await c.flushNow();
+      expect(beforeLoad, 100);
+      expect(afterLoad, 100);
+    } finally {
+      c.dispose();
+      timing.clock = previousClock;
+    }
+  });
+
+  test('typing during load stays dirty and is autosaved', () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final loading = c.initialize();
+    c.contentController.text = 'New words';
+    drafts.loadGate!.complete();
+    await loading;
+    final changed = c.changedSinceOpened;
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    final saves = List.of(drafts.saves);
+    c.dispose();
+    expect(changed, isTrue);
+    expect(saves.single['reply'], 'New words');
+    expect(drafts.saveSequences.first, 7);
+  });
+
+  test('typing then clearing a field while loading does not restore it',
+      () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final loading = c.initialize();
+    c.contentController.text = 'Temporary';
+    c.contentController.clear();
+    c.titleController.text = 'Temporary title';
+    c.titleController.clear();
+    drafts.loadGate!.complete();
+    await loading;
+    final reply = c.contentController.text;
+    final title = c.titleController.text;
+    c.dispose();
+    expect(reply, isEmpty);
+    expect(title, isEmpty);
+  });
+
+  test('explicit save waits for the loaded sequence', () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final loading = c.initialize();
+    c.contentController.text = 'Keep this';
+    final saving = c.flushNow();
+    await Future<void>.delayed(Duration.zero);
+    final savedEarly = drafts.saves.isNotEmpty;
+    drafts.loadGate!.complete();
+    await loading;
+    await saving;
+    c.dispose();
+    expect(savedEarly, isFalse);
+    expect(drafts.saveSequences, [7]);
+    expect(drafts.saves.single['reply'], 'Keep this');
+  });
+
+  test('discard waits for load and does not hydrate discarded writing',
+      () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final loading = c.initialize();
+    final discarding = c.discard();
+    await Future<void>.delayed(Duration.zero);
+    final deletedEarly = drafts.deletes.isNotEmpty;
+    drafts.loadGate!.complete();
+    final restored = await loading;
+    await discarding;
+    final text = c.contentController.text;
+    c.dispose();
+    expect(deletedEarly, isFalse);
+    expect(drafts.deleteSequences, [7]);
+    expect(restored, isNull);
+    expect(text, isEmpty);
+  });
+
+  test('closing during load saves captured writing after load completes',
+      () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final loading = c.initialize();
+    c.contentController.text = 'Final words';
+    c.dispose();
+    c.contentController.dispose();
+    c.titleController.dispose();
+    drafts.loadGate!.complete();
+    await loading;
+    await Future<void>.delayed(Duration.zero);
+    expect(drafts.saves.single['reply'], 'Final words');
+    expect(drafts.saves.single['title'], 'Server title');
+    expect(drafts.saves.single['tags'], ['saved-tag']);
+    expect(drafts.saveSequences, [7]);
+  });
+
+  test('closing an untouched composer during load preserves the server draft',
+      () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final loading = c.initialize();
+    c.dispose();
+    c.contentController.dispose();
+    c.titleController.dispose();
+    drafts.loadGate!.complete();
+    await loading;
+    await Future<void>.delayed(Duration.zero);
+    expect(drafts.saves, isEmpty);
+    expect(drafts.deletes, isEmpty);
+  });
+
+  test('failed load blocks saving until a successful retry supplies sequence',
+      () async {
+    storedDraft();
+    drafts.loadError = 'Cannot load draft';
+    final c = controller([]);
+    await c.initialize();
+    c.contentController.text = 'Keep this';
+    await expectLater(c.flushNow(), throwsA(isA<Exception>()));
+    expect(drafts.saves, isEmpty);
+    drafts.loadError = null;
+    await c.flushNow();
+    c.dispose();
+    expect(drafts.saveSequences, [7]);
+    expect(drafts.saves.single['reply'], 'Keep this');
+  });
+
+  test('initialization shares one read', () async {
+    drafts.loadGate = Completer<void>();
+    final c = controller([]);
+    final a = c.initialize();
+    final b = c.initialize();
+    drafts.loadGate!.complete();
+    await Future.wait([a, b]);
+    c.dispose();
+    expect(drafts.loads, 1);
+  });
+
+  test('explicit save reports rejection and can be retried', () async {
+    final c = controller([]);
+    await c.initialize();
+    c.contentController.text = 'Keep this';
+    drafts.saveError = 'Draft limit reached';
+    await expectLater(c.flushNow(), throwsA(isA<Exception>()));
+    drafts.saveError = null;
+    await c.flushNow();
+    expect(drafts.saves.last['reply'], 'Keep this');
+    c.dispose();
+  });
+
+  test('explicit discard reports refusal and can be retried', () async {
+    final c = controller([]);
+    await c.initialize();
+    c.contentController.text = 'Keep this';
+    drafts.deleteError = 'Cannot discard draft';
+    await expectLater(c.discard(), throwsA(isA<Exception>()));
+    expect(c.contentController.text, 'Keep this');
+    expect(c.changedSinceOpened, isTrue);
+    drafts.deleteError = null;
+    await c.discard();
+    c.dispose();
+    expect(drafts.deletes, hasLength(2));
+    expect(drafts.saves, isEmpty);
+  });
+
+  test('editing and autosave continue after a thrown discard error', () async {
+    final c = controller([]);
+    await c.initialize();
+    c.contentController.text = 'Keep this';
+    drafts.throwDelete = true;
+    await expectLater(c.discard(), throwsA(isA<Exception>()));
+    c.contentController.text = 'More writing';
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    expect(drafts.saves.last['reply'], 'More writing');
+    c.dispose();
+  });
+
+  test('discard load failure is reported and a retry uses the saved sequence',
+      () async {
+    storedDraft();
+    drafts.loadError = 'Cannot load draft';
+    final c = controller([]);
+    await c.initialize();
+    await expectLater(c.discard(), throwsA(isA<Exception>()));
+    expect(drafts.deletes, isEmpty);
+    drafts.loadError = null;
+    await c.discard();
+    c.dispose();
+    expect(drafts.deleteSequences, [7]);
+  });
+
+  test('failed discard during load restores untouched fields and metadata',
+      () async {
+    storedDraft();
+    drafts.loadGate = Completer<void>();
+    drafts.deleteError = 'Cannot discard draft';
+    final c = controller([]);
+    FCDraft? restored;
+    final loading = c.initialize(onRestored: (draft) => restored = draft);
+    c.contentController.text = 'Early writing';
+    final rejected = expectLater(c.discard(), throwsA(isA<Exception>()));
+    drafts.loadGate!.complete();
+    await loading;
+    await rejected;
+    expect(c.contentController.text, 'Early writing');
+    expect(c.titleController.text, 'Server title');
+    expect(restored?.data['tags'], ['saved-tag']);
+    expect(c.changedSinceOpened, isTrue);
+    await c.flushNow();
+    expect(drafts.saves.last['reply'], 'Early writing');
+    expect(drafts.saveSequences, [7]);
+    c.dispose();
+  });
+
+  test('failed discard after autosave preserves later edits and sequence',
+      () async {
+    final c = controller([]);
+    await c.initialize();
+    drafts.saveGate = Completer<void>();
+    c.contentController.text = 'Old words';
+    final saving = c.flushNow();
+    await Future<void>.delayed(Duration.zero);
+    c.contentController.text = 'Later words';
+    drafts.deleteError = 'Cannot discard draft';
+    final rejected = expectLater(c.discard(), throwsA(isA<Exception>()));
+    drafts.saveGate!.complete();
+    await saving;
+    await rejected;
+    await c.flushNow();
+    expect(drafts.deleteSequences, [1]);
+    expect(drafts.saveSequences, [0, 1]);
+    expect(drafts.saves.last['reply'], 'Later words');
+    c.dispose();
+  });
+
+  test('discard waits for autosave and deletes its returned sequence',
+      () async {
+    final c = controller([]);
+    await c.initialize();
+    drafts.saveGate = Completer<void>();
+    c.contentController.text = 'Old words';
+    final saving = c.flushNow();
+    await Future<void>.delayed(Duration.zero);
+    c.contentController.text = 'New words';
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+    final discarding = c.discard();
+    final deletedEarly = drafts.deletes.isNotEmpty;
+    drafts.saveGate!.complete();
+    await saving;
+    await discarding;
+    c.dispose();
+    expect(deletedEarly, isFalse);
+    expect(drafts.saves, hasLength(1));
+    expect(drafts.deleteSequences, [1]);
+  });
+
+  for (final letDebounceFire in [false, true]) {
+    test(
+        'closing during autosave preserves final text (debounce: $letDebounceFire)',
+        () async {
+      final c = controller([]);
+      await c.initialize();
+      drafts.saveGate = Completer<void>();
+      c.contentController.text = 'Old words';
+      final saving = c.flushNow();
+      await Future<void>.delayed(Duration.zero);
+      c.contentController.text = 'Final words';
+      if (letDebounceFire) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
+      c.dispose();
+      c.contentController.dispose();
+      c.titleController.dispose();
+      final savesBeforeCompletion = drafts.saves.length;
+      drafts.saveGate!.complete();
+      await saving;
+      await Future<void>.delayed(Duration.zero);
+      expect(savesBeforeCompletion, 1);
+      expect(drafts.saves.last['reply'], 'Final words');
+      expect(drafts.saveSequences, [0, 1]);
+    });
+  }
+
+  test('clearing and closing deletes after the active save', () async {
+    final c = controller([]);
+    await c.initialize();
+    drafts.saveGate = Completer<void>();
+    c.contentController.text = 'Old words';
+    final saving = c.flushNow();
+    await Future<void>.delayed(Duration.zero);
+    c.contentController.clear();
+    c.dispose();
+    drafts.saveGate!.complete();
+    await saving;
+    await Future<void>.delayed(Duration.zero);
+    expect(drafts.deleteSequences, [1]);
+  });
+
+  test('a queued final save stays on the original forum proxy', () async {
+    final c = controller([]);
+    await c.initialize();
+    drafts.saveGate = Completer<void>();
+    c.contentController.text = 'Old words';
+    final saving = c.flushNow();
+    await Future<void>.delayed(Duration.zero);
+    c.contentController.text = 'Final words';
+    c.dispose();
+    final otherForum = _Drafts();
+    SiteProxyFactory.register('drafts-test', _Factory(otherForum));
+    drafts.saveGate!.complete();
+    await saving;
+    await Future<void>.delayed(Duration.zero);
+    expect(drafts.saves.last['reply'], 'Final words');
+    expect(otherForum.saves, isEmpty);
+  });
 
   test('the restored draft is handed back with its recipients', () async {
     drafts.stored = FCDraft(
@@ -96,8 +449,7 @@ void main() {
     c.dispose();
   });
 
-  test('what was typed just before closing is saved on the way out',
-      () async {
+  test('what was typed just before closing is saved on the way out', () async {
     final c = DiscourseDraftController(
       draftKey: 'topic_5',
       titleController: TextEditingController(),
@@ -142,6 +494,180 @@ void main() {
     c.dispose();
   });
 
+  test('restored metadata does not mark edited text as unchanged', () async {
+    drafts.stored = FCDraft(
+      draftKey: 'new_private_message_1',
+      sequence: 3,
+      data: {'reply': 'Original', 'recipients': 'bob'},
+    );
+    final recipients = <String>[];
+    final c = controller(recipients);
+    await c.initialize();
+    c.contentController.text = 'Still editing';
+    recipients.add('bob');
+    c.markExtraDataOpened();
+    expect(c.changedSinceOpened, isTrue);
+    await c.flushNow();
+    expect(drafts.saves.last['reply'], 'Still editing');
+    c.dispose();
+  });
+
+  group('closing and failed operations', () {
+    DiscourseDraftController prefilled(String text) => DiscourseDraftController(
+          draftKey: 'new_topic_1',
+          titleController: TextEditingController(),
+          contentController: TextEditingController(text: text),
+          debounceDuration: const Duration(milliseconds: 1),
+        );
+
+    Future<void> settle() => Future<void>.delayed(const Duration(milliseconds: 20));
+
+    test('an untouched templated composer saves nothing on close', () async {
+      // Each New Topic has its own key: saving the template on every Back
+      // left a new junk draft each time.
+      final c = prefilled('Category template');
+      await c.initialize();
+      c.dispose();
+      await settle();
+      expect(drafts.saves, isEmpty);
+      expect(drafts.deletes, isEmpty);
+    });
+
+    test('closing an untouched composer before its read saves nothing',
+        () async {
+      drafts.loadGate = Completer<void>();
+      final c = prefilled('Category template');
+      unawaited(c.initialize());
+      c.dispose();
+      drafts.loadGate!.complete();
+      await settle();
+      expect(drafts.saves, isEmpty);
+    });
+
+    test('an edited template is saved on close', () async {
+      final c = prefilled('Category template');
+      await c.initialize();
+      c.contentController.text = 'Category template, filled in';
+      c.dispose();
+      await settle();
+      expect(drafts.saves.single['reply'], 'Category template, filled in');
+    });
+
+    test('typing after a failed first read reads again and autosaves',
+        () async {
+      storedDraft();
+      drafts.loadError = 'Offline';
+      final c = controller([]);
+      await c.initialize();
+      drafts.loadError = null;
+      c.contentController.text = 'Written while offline';
+      await settle();
+      final loads = drafts.loads;
+      final saves = List.of(drafts.saves);
+      c.dispose();
+      expect(loads, 2);
+      expect(saves.single['reply'], 'Written while offline');
+      expect(drafts.saveSequences.single, 7,
+          reason: 'saved on the sequence the second read supplied');
+    });
+
+    test('closing right after a failed Discard saves nothing', () async {
+      final c = controller([]);
+      await c.initialize();
+      c.contentController.text = 'Throw this away';
+      drafts.throwDelete = true;
+      await expectLater(c.discard(), throwsException);
+      await settle();
+      c.dispose();
+      await settle();
+      expect(drafts.saves, isEmpty,
+          reason: 'Close anyway must not save what the writer discarded');
+    });
+
+    test('editing after a failed Discard saves again', () async {
+      final c = controller([]);
+      await c.initialize();
+      c.contentController.text = 'Throw this away';
+      drafts.throwDelete = true;
+      await expectLater(c.discard(), throwsException);
+      c.contentController.text = 'Changed my mind';
+      await settle();
+      c.dispose();
+      expect(drafts.saves.last['reply'], 'Changed my mind');
+    });
+
+    test('a quote that arrives late is not saved over the topic draft',
+        () async {
+      storedDraft();
+      final c = prefilled('[quote]short[/quote]');
+      await c.initialize();
+      c.setOpeningContent(const TextEditingValue(
+          text: '[quote]fetched[/quote][quote]short[/quote]'));
+      await settle();
+      c.dispose();
+      await settle();
+      expect(drafts.saves, isEmpty);
+      expect(drafts.deletes, isEmpty);
+    });
+
+    test('a late quote before the read is not counted as writing', () async {
+      storedDraft();
+      drafts.loadGate = Completer<void>();
+      final c = prefilled('[quote]short[/quote]');
+      unawaited(c.initialize());
+      c.setOpeningContent(const TextEditingValue(text: '[quote]fetched[/quote]'));
+      drafts.loadGate!.complete();
+      await settle();
+      c.dispose();
+      await settle();
+      expect(drafts.saves, isEmpty);
+    });
+
+    test('writing typed before a late quote is still saved', () async {
+      final c = prefilled('');
+      await c.initialize();
+      c.contentController.text = 'My reply';
+      c.setOpeningContent(
+          const TextEditingValue(text: '[quote]fetched[/quote]My reply'));
+      c.dispose();
+      await settle();
+      expect(drafts.saves.last['reply'], '[quote]fetched[/quote]My reply');
+    });
+
+    test('a failed Discard that made the first read saves nothing', () async {
+      storedDraft();
+      drafts.loadGate = Completer<void>();
+      final c = controller([]);
+      unawaited(c.initialize());
+      c.contentController.text = 'Throw this away';
+      drafts.throwDelete = true;
+      final discarding = c.discard();
+      drafts.loadGate!.complete();
+      await expectLater(discarding, throwsException);
+      await settle();
+      final saves = List.of(drafts.saves);
+      c.dispose();
+      await settle();
+      expect(saves, isEmpty);
+      expect(drafts.saves, isEmpty);
+    });
+
+    test('after a failed Discard, Save draft rewrites unchanged text',
+        () async {
+      // The DELETE may have run with only its answer lost: the draft must
+      // not be assumed to still be on the forum.
+      storedDraft();
+      final c = controller([]);
+      await c.initialize();
+      drafts.throwDelete = true;
+      await expectLater(c.discard(), throwsException);
+      drafts.throwDelete = false;
+      await c.flushNow();
+      c.dispose();
+      expect(drafts.saves.single['reply'], 'Server body');
+    });
+  });
+
   test('changes are counted from what the composer opened with', () async {
     drafts.stored = FCDraft(
       draftKey: 'new_private_message_1',
@@ -167,6 +693,15 @@ void main() {
 
 class _Drafts implements IFCDraftProxy {
   FCDraft? stored;
+  Completer<void>? saveGate;
+  Completer<void>? loadGate;
+  String? loadError;
+  int loads = 0;
+  String? saveError;
+  String? deleteError;
+  bool throwDelete = false;
+  final List<int> saveSequences = [];
+  final List<int> deleteSequences = [];
   final List<Map<String, dynamic>> saves = [];
   final List<String> deletes = [];
 
@@ -174,12 +709,21 @@ class _Drafts implements IFCDraftProxy {
   Future<FCDeleteDraftResult> deleteDraftAsync(String draftKey,
       {int sequence = 0}) async {
     deletes.add(draftKey);
-    return FCDeleteDraftResult(result: true);
+    deleteSequences.add(sequence);
+    if (throwDelete) throw Exception('Delete failed');
+    return FCDeleteDraftResult(
+        result: deleteError == null, resultText: deleteError);
   }
 
   @override
-  Future<FCLoadDraftResult> loadDraftAsync(String draftKey) async =>
-      FCLoadDraftResult(result: true, draft: stored);
+  Future<FCLoadDraftResult> loadDraftAsync(String draftKey) async {
+    loads++;
+    await loadGate?.future;
+    return FCLoadDraftResult(
+        result: loadError == null,
+        resultText: loadError,
+        draft: loadError == null ? stored : null);
+  }
 
   @override
   Future<FCSaveDraftResult> saveDraftAsync({
@@ -188,6 +732,11 @@ class _Drafts implements IFCDraftProxy {
     int sequence = 0,
   }) async {
     saves.add(data);
+    saveSequences.add(sequence);
+    await saveGate?.future;
+    if (saveError != null) {
+      return FCSaveDraftResult(result: false, resultText: saveError);
+    }
     return FCSaveDraftResult(result: true, sequence: sequence + 1);
   }
 

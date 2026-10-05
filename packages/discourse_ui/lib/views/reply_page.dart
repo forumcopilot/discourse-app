@@ -12,6 +12,7 @@ import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import '../utils/discourse_draft_controller.dart';
+import '../utils/post_submission.dart';
 import '../services/attachment_upload_service.dart';
 
 class ReplyPage extends StatefulWidget {
@@ -119,10 +120,12 @@ class _ReplyPageState extends State<ReplyPage> {
         // The compose page may already have seeded it from initialContent.
         if (existing.contains(quote.trim())) return;
         final merged = existing.isEmpty ? quote : '$quote$existing';
-        _contentController.value = TextEditingValue(
+        // Opening content, not writing: closing an untouched quote reply
+        // must not save the quote over the topic's draft.
+        _draftController.setOpeningContent(TextEditingValue(
           text: merged,
           selection: TextSelection.collapsed(offset: quote.length),
-        );
+        ));
       });
     }
     _titleController = TextEditingController();
@@ -164,7 +167,7 @@ class _ReplyPageState extends State<ReplyPage> {
   Future<bool> _handleSubmitWithDraftDiscard(String title, String content) async {
     final ok = await _handleSubmit(title, content);
     if (ok) {
-      await _draftController.discard();
+      await _draftController.discard(afterSubmit: true);
     }
     return ok;
   }
@@ -239,14 +242,8 @@ class _ReplyPageState extends State<ReplyPage> {
           _createdPostId = null;
           if (mounted) await showPostNeedsApproval(context);
         } else {
-          // Store the postId synchronously for immediate use in onSuccess callback
-          // Only store if postId is not null and not empty
-          if (result.postId != null && result.postId!.isNotEmpty) {
-            _createdPostId = result.postId;
-          } else {
-            _createdPostId = null;
-            debugPrint('⚠️ [REPLY] Warning: postId is null or empty after successful submission');
-          }
+          _createdPostId = confirmedPostId(
+              result.postId, l10n.submissionUnconfirmed);
         }
         return true;
       } else {
@@ -302,7 +299,7 @@ class _ReplyPageState extends State<ReplyPage> {
       currentAttachmentCount: _attachmentIds.length,
     );
 
-    if (outcome.cancelled) return null;
+    if (!mounted || outcome.cancelled) return null;
     if (!outcome.succeeded) {
       if (mounted && outcome.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -384,8 +381,9 @@ class _ReplyPageState extends State<ReplyPage> {
               }
             },
             // Never null: null is what closing without posting returns, and
-            // the topic is left alone then (a reply queued for approval, or
-            // one that came back without an id, still refreshes it).
+            // the topic is left alone then (a reply queued for approval still
+            // refreshes it; one that came back without an id is unconfirmed
+            // and keeps the composer open, see confirmedPostId).
             onSuccess: (success) {
               return _createdPostId ?? true;
             },

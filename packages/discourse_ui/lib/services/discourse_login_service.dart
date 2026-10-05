@@ -186,19 +186,31 @@ class DiscourseLoginService {
   /// Turns [group] on or off, on the backend first: the switch only moves
   /// once the backend has it. False when it could not be saved.
   Future<bool> setPushGroupMuted(String group, bool muted) async {
-    final current = await mutedPushGroups();
-    final next = {...current};
+    final session = siteContext.configurationSession;
+    final userId = siteContext.currentUserId;
+    final prefs = await SharedPreferences.getInstance();
+    final suffix = prefs.getString(_notificationsSuffixKey);
+    final granted = prefs.getBool(_notificationsGrantKey);
+    bool current() => identical(session, siteContext.configurationSession) &&
+        userId == siteContext.currentUserId &&
+        suffix == prefs.getString(_notificationsSuffixKey) &&
+        granted == prefs.getBool(_notificationsGrantKey);
+    if (!current()) return false;
+    final next =
+        (prefs.getStringList(_notificationsMutedKey) ?? const <String>[]).toSet();
     muted ? next.add(group) : next.remove(group);
+    final clientId = await notificationsClientId();
+    if (!current()) return false;
     final ok = await NotificationKeyService.setMutedGroups(
       siteUrl: siteContext.site.url,
-      clientId: await notificationsClientId(),
+      clientId: clientId,
       muted: next.toList(),
     );
-    if (ok) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setStringList(_notificationsMutedKey, next.toList());
-    }
-    return ok;
+    // The response belongs to the original grant. Its forum-scoped cache
+    // may already have been reset for a replacement account or grant.
+    if (!ok || !current()) return false;
+    await prefs.setStringList(_notificationsMutedKey, next.toList());
+    return current();
   }
 
   Future<bool> _isInstallBound() async {
@@ -240,20 +252,36 @@ class DiscourseLoginService {
   /// report. Never throws.
   Future<void> syncDoNotDisturb(DateTime? until) async {
     if (!AppForumConfig.isNotificationsGrantEnabled) return;
+    final session = siteContext.configurationSession;
+    final userId = siteContext.currentUserId;
     try {
-      if (!await hasNotificationsGrant() || !await _isInstallBound()) return;
+      final prefs = await SharedPreferences.getInstance();
+      final suffix = prefs.getString(_notificationsSuffixKey);
+      bool current() => identical(session, siteContext.configurationSession) &&
+          userId == siteContext.currentUserId &&
+          suffix == prefs.getString(_notificationsSuffixKey) &&
+          (prefs.getBool(_notificationsGrantKey) ?? false);
+      if (!current() ||
+          !await hasNotificationsGrant() ||
+          !await _isInstallBound() ||
+          !current()) {
+        return;
+      }
       final active =
           until != null && until.isAfter(DateTime.now().toUtc()) ? until : null;
       final state = active?.toUtc().toIso8601String() ?? 'off';
-      final prefs = await SharedPreferences.getInstance();
       if (prefs.getString(_notificationsDndReportedKey) == state) return;
 
+      final clientId = await notificationsClientId();
+      if (!current()) return;
       final ok = await NotificationKeyService.setDoNotDisturb(
         siteUrl: siteContext.site.url,
-        clientId: await notificationsClientId(),
+        clientId: clientId,
         until: active,
       );
-      if (ok) await prefs.setString(_notificationsDndReportedKey, state);
+      if (ok && current()) {
+        await prefs.setString(_notificationsDndReportedKey, state);
+      }
     } catch (e) {
       AppLogger.debug(
           'DiscourseLoginService: Could not sync Do Not Disturb: $e');

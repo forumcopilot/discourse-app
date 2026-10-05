@@ -328,7 +328,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
     // still over the limit after that gets the resize question.
     var image = picked;
     final optimized = await optimizePhotoForForum(
-        File(picked.path), getCurrentSiteContext()?.mediaOptimization);
+        File(picked.path), widget.siteContext.mediaOptimization);
     if (optimized != null) image = XFile(optimized.path);
     final maxBytes = constraints.size;
     final pickedBytes = await File(image.path).length();
@@ -438,7 +438,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
   /// The paperclip: any file the forum accepts.
   void _handleFileUpload() async {
     if (widget.onFileUpload == null) return;
-    final siteContext = getCurrentSiteContext();
+    final siteContext = widget.siteContext;
     final pickConstraints = getAttachmentConstraintsFromSiteContext(siteContext);
     if (!canAddMoreAttachments(_uploads.length, pickConstraints)) {
       _showNotice(AppLocalizations.of(context)!
@@ -458,7 +458,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
   void _handleImageUpload({bool fromCamera = false}) async {
     if (widget.onFileUpload == null) return;
     final constraints = getAttachmentConstraintsFromSiteContext(
-        getCurrentSiteContext(),
+        widget.siteContext,
         isImage: true);
     if (!canAddMoreAttachments(_uploads.length, constraints)) {
       _showNotice(AppLocalizations.of(context)!
@@ -494,22 +494,30 @@ class _MessageComposePageState extends State<MessageComposePage> {
   /// max_attachment_size_kb) and prepares a photo the forum's way. Null when
   /// it cannot be sent; the reason has been shown.
   Future<XFile?> _prepare(XFile file) async {
-    final isImage =
-        discourseUploadKind(file.name) == DiscourseUploadKind.image;
-    final constraints = getAttachmentConstraintsFromSiteContext(
-        getCurrentSiteContext(),
-        isImage: isImage);
-    if (constraints == null) return file;
-    final validation = await validateFile(file, constraints, isImage,
-        currentAttachmentCount: _uploads.length);
-    if (!validation.isValid) {
+    try {
+      final isImage =
+          discourseUploadKind(file.name) == DiscourseUploadKind.image;
+      final constraints = getAttachmentConstraintsFromSiteContext(
+          widget.siteContext,
+          isImage: isImage);
+      if (constraints == null) return file;
+      final validation = await validateFile(file, constraints, isImage,
+          currentAttachmentCount: _uploads.length);
+      if (!validation.isValid) {
+        if (mounted) {
+          _showNotice(
+              '${file.name}: ${validation.errorMessage ?? AppLocalizations.of(context)!.failedToUploadFilePleaseTryAgain}');
+        }
+        return null;
+      }
+      return isImage ? await _prepareImageForUpload(file, constraints) : file;
+    } catch (e) {
       if (mounted) {
-        _showNotice(
-            '${file.name}: ${validation.errorMessage ?? AppLocalizations.of(context)!.failedToUploadFilePleaseTryAgain}');
+        _showNotice(AppLocalizations.of(context)!
+            .failedToUploadFile2(describeError(e)));
       }
       return null;
     }
-    return isImage ? _prepareImageForUpload(file, constraints) : file;
   }
 
   /// A plain notice (M3's default snackbar colours). It replaces the

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseMediaOptimizationContext;
+    show DiscourseMediaOptimizationContext, DiscourseSiteContextExtension;
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
 
@@ -43,8 +43,8 @@ class AttachmentUploadOutcome {
   final String? fileName;
   final int? fileSize;
 
-  /// True when the user declined (e.g. said no to resizing). Not an
-  /// error: nothing should be shown for it.
+  /// True when the user declined (e.g. said no to resizing) or the
+  /// composer closed. Not an error: nothing should be shown for it.
   final bool cancelled;
 
   bool get succeeded => shortUrl != null && shortUrl!.isNotEmpty;
@@ -68,9 +68,8 @@ class AttachmentUploadService {
   ///
   /// [uploadType] and [targetId] are the SDK's `uploadAttachmentAsync`
   /// coordinates ("post" plus the forum/topic id; "chat" for a chat
-  /// message's files). [groupId] threads Discourse's upload group through
-  /// consecutive uploads in one composer session; pass what the previous
-  /// call returned.
+  /// message's files). [groupId] is retained for SDK compatibility;
+  /// Discourse uploads have no group and ignore this argument.
   static Future<AttachmentUploadOutcome> upload({
     required BuildContext context,
     required XFile file,
@@ -79,66 +78,89 @@ class AttachmentUploadService {
     required String groupId,
     required int currentAttachmentCount,
   }) async {
-    final siteContext = getCurrentSiteContext();
-    final isImage = isImageFile(file.name);
-    final constraints = getAttachmentConstraintsFromSiteContext(
-      siteContext,
-      isImage: isImage,
-    );
-
-    if (!canAddMoreAttachments(currentAttachmentCount, constraints)) {
-      return AttachmentUploadOutcome(
-        errorMessage:
-            appL10n().maximumAttachmentsAllowed(constraints?.count ?? 0),
-      );
+    if (!context.mounted) {
+      return const AttachmentUploadOutcome(cancelled: true);
     }
-
-    // A photo is first prepared the way the forum's own composer prepares
-    // it (scaled to 1920 px and recompressed, when the forum asks for that);
-    // the checks below then apply to what will actually be uploaded.
-    var toUpload = file;
-    if (isImage && siteContext != null) {
-      final optimized = await optimizePhotoForForum(
-          File(file.path), siteContext.mediaOptimization);
-      if (optimized != null) toUpload = XFile(optimized.path);
-    }
-    if (constraints != null) {
-      final validation = await validateFile(
-        toUpload,
-        constraints,
-        isImage,
-        currentAttachmentCount: currentAttachmentCount,
+    final siteContext = SiteProxyFactory.context;
+    final session = siteContext?.configurationSession;
+    bool sessionChanged() =>
+        !identical(session, siteContext?.configurationSession);
+    AttachmentUploadOutcome changedAccount() => AttachmentUploadOutcome(
+          errorMessage: appL10n().uploadSessionChanged,
+        );
+    try {
+      // Resolve the proxy before file I/O or a resize prompt can yield to
+      // navigation. The upload and its limits must belong to the same forum.
+      final proxy = SiteProxyFactory.getAttachmentProxy();
+      final isImage = isImageFile(file.name);
+      final constraints = getAttachmentConstraintsFromSiteContext(
+        siteContext,
+        isImage: isImage,
       );
-      if (!validation.isValid) {
+
+      if (!canAddMoreAttachments(currentAttachmentCount, constraints)) {
         return AttachmentUploadOutcome(
           errorMessage:
-              validation.errorMessage ?? appL10n().attachmentValidationFailed,
+              appL10n().maximumAttachmentsAllowed(constraints?.count ?? 0),
         );
       }
 
-      if (isImage) {
-        final prepared = await _prepareImage(context, toUpload, constraints);
-        if (prepared == null) {
-          return const AttachmentUploadOutcome(cancelled: true);
-        }
-        toUpload = prepared;
+      // A photo is first prepared the way the forum's own composer prepares
+      // it (scaled to 1920 px and recompressed, when the forum asks for that);
+      // the checks below then apply to what will actually be uploaded.
+      var toUpload = file;
+      if (isImage && siteContext != null) {
+        final optimized = await optimizePhotoForForum(
+            File(file.path), siteContext.mediaOptimization);
+        if (optimized != null) toUpload = XFile(optimized.path);
       }
-    }
+      if (constraints != null) {
+        final validation = await validateFile(
+          toUpload,
+          constraints,
+          isImage,
+          currentAttachmentCount: currentAttachmentCount,
+        );
+        if (!validation.isValid) {
+          return AttachmentUploadOutcome(
+            errorMessage:
+                validation.errorMessage ?? appL10n().attachmentValidationFailed,
+          );
+        }
 
-    try {
+        if (isImage) {
+          if (!context.mounted) {
+            return const AttachmentUploadOutcome(cancelled: true);
+          }
+          if (sessionChanged()) return changedAccount();
+          final prepared = await _prepareImage(context, toUpload, constraints);
+          if (prepared == null) {
+            return const AttachmentUploadOutcome(cancelled: true);
+          }
+          toUpload = prepared;
+        }
+      }
+
       final bytes = await toUpload.readAsBytes();
-      final result = await SiteProxyFactory.getAttachmentProxy()
-          .uploadAttachmentAsync(
+      if (!context.mounted) {
+        return const AttachmentUploadOutcome(cancelled: true);
+      }
+      if (sessionChanged()) return changedAccount();
+      final result = await proxy.uploadAttachmentAsync(
         uploadType,
         targetId,
         groupId,
         toUpload.name,
         bytes,
       );
+      if (!context.mounted) {
+        return const AttachmentUploadOutcome(cancelled: true);
+      }
+      if (sessionChanged()) return changedAccount();
       if (!result.result) {
         return AttachmentUploadOutcome(
-          errorMessage: result.resultText ??
-              appL10n().failedToUploadFilePleaseTryAgain,
+          errorMessage:
+              result.resultText ?? appL10n().failedToUploadFilePleaseTryAgain,
         );
       }
       // Discourse's short_url arrives in `groupId` — the SDK slot is
@@ -156,6 +178,7 @@ class AttachmentUploadService {
         fileSize: bytes.length,
       );
     } catch (e) {
+      if (sessionChanged()) return changedAccount();
       AppLogger.debug('Attachment upload failed: $e');
       return AttachmentUploadOutcome(
         errorMessage: appL10n().failedToUploadFile2('$e'),
@@ -193,8 +216,7 @@ class AttachmentUploadService {
     }
     if (!proceed) return null;
 
-    final shrunk =
-        await shrinkImageToFit(File(image.path), maxBytes: maxBytes);
+    final shrunk = await shrinkImageToFit(File(image.path), maxBytes: maxBytes);
     if (shrunk == null) return null;
     // No `name:` override here — XFile ignores it on mobile. The shrink
     // writes the file under its original basename instead, so the name

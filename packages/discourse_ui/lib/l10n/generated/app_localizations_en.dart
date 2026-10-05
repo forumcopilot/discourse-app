@@ -9,6 +9,32 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get accountSessionChanged =>
+      'Your sign-in changed. Reopen this screen to continue.';
+
+  @override
+  String get draftSessionChanged =>
+      'Your sign-in changed. Copy your text before reopening the composer to work with drafts.';
+
+  @override
+  String get discardFailedCloseQuestion =>
+      'Close anyway? A draft saved earlier stays in Drafts.';
+
+  @override
+  String get keepEditing => 'Keep editing';
+
+  @override
+  String get closeAnyway => 'Close anyway';
+
+  @override
+  String get uploadSessionChanged =>
+      'Your sign-in changed during the upload. Reopen this screen before trying again.';
+
+  @override
+  String get submissionUnconfirmed =>
+      'We couldn\'t confirm that this was sent. Your text has been kept. Check the forum before trying again.';
+
+  @override
   String get loginTitle => 'Login';
 
   @override
