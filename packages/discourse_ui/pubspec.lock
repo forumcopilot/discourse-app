@@ -215,6 +215,13 @@ packages:
       relative: true
     source: path
     version: "1.0.0"
+  discourse_notifications:
+    dependency: "direct main"
+    description:
+      path: "../discourse_notifications"
+      relative: true
+    source: path
+    version: "0.1.0"
   emojis:
     dependency: "direct dev"
     description:

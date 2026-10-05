@@ -19,6 +19,8 @@ dependencies:
     path: ../forumcopilot_sdk
   discourse_core:
     path: ../discourse_core
+  discourse_notifications:
+    path: ../discourse_notifications
   discourse_appearance:
     path: ../discourse_appearance
   xml: ^6.3.0

@@ -174,7 +174,9 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
       try {
         // Wrap the initialization process with timeout
         final siteContext = await _initializeSiteWithTimeout(site, generation);
+        _ensureCurrentGeneration(generation, 'publishing context');
         currentSiteContext.value = siteContext;
+        isInitialized.value = true;
       } catch (e, stackTrace) {
         // Force hide loader completely - call hide multiple times to ensure counter reaches 0
         // This is necessary because show() might have been called multiple times
@@ -372,7 +374,6 @@ class DiscourseSiteController extends DiscourseGlobalLoaderController with Error
     // success from a timed-out attempt must not set isInitialized=true
     // while currentSite has already been cleared or replaced.
     _ensureCurrentGeneration(generation, 'finalization');
-    isInitialized.value = true;
 
     AppLogger.debug('Recording visit for site: ${site.name}');
     AppLogger.debug('Site details - ID: ${site.id}, URL: ${site.url}');

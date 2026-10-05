@@ -135,3 +135,28 @@ opening a destination. Read marking and foreground display use the same check.
 Older payloads without identity fail closed with an explanatory message; ordinary
 shared links continue to work. Deploy the backend payload update before releasing
 the app update. Live account switching and FCM delivery require device verification.
+
+### Guarded Android display (account switches)
+
+Android clients which use `AccountNotifications.handle` in **both** FCM message
+handlers initialize `AccountNotifications` after creating notification channels.
+Only then does `NotificationInstallation` advertise `account_guarded_v1`. The
+backend sends title/body in data, with no notification block: Android must not
+render private text before the recipient check.
+
+`discourse_notifications` keeps a native, persistent forum → user map. Its
+platform-thread methods serialize checking/display with account replacement and
+tray cancellation across foreground/background Flutter engines. A signed-out
+forum has a durable empty entry; startup snapshot migration cannot overwrite it.
+Login and a new notification grant publish the new identity. Logout invalidates
+it before backend cleanup, including offline logout. Other forums keep their
+entries. Notification taps still pass through the existing route recipient guard.
+
+Upgrading clears unowned legacy tray notifications once because those entries
+have no reliable forum ownership. Already queued legacy FCM notification payloads
+cannot be recalled. Older hosts which do not install both handlers must retain
+legacy delivery; Apple delivery is unchanged. Android force-stop prevents FCM
+execution until the user opens the app again.
+
+Native identity tests: after a Flutter Android build bootstraps Gradle, run
+`cd android && ./gradlew :discourse_notifications:testDebugUnitTest`.

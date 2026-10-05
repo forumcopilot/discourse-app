@@ -75,15 +75,16 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
   bool get _isViewingMessages => _isCurrentTab(_messagesTab);
 
   // Add keys for each tab
-  final GlobalKey<TopicListTabState> _topicListKey = GlobalKey();
-  final GlobalKey<PrivateMessageListTabState> _pmListKey = GlobalKey();
-  final GlobalKey<NotificationListTabState> _notificationTabKey = GlobalKey();
-  final GlobalKey<ProfileTabState> _profileTabKey = GlobalKey();
-  final GlobalKey<ChatChannelListPageState> _chatListKey = GlobalKey();
+  GlobalKey<TopicListTabState> _topicListKey = GlobalKey();
+  GlobalKey<PrivateMessageListTabState> _pmListKey = GlobalKey();
+  GlobalKey<NotificationListTabState> _notificationTabKey = GlobalKey();
+  GlobalKey<ProfileTabState> _profileTabKey = GlobalKey();
+  GlobalKey<ChatChannelListPageState> _chatListKey = GlobalKey();
 
   // Add workers to listen for auth or forum changes
   Worker? _siteWorker;
   SiteContext? _siteContext;
+  SiteContext? _listenedContext;
 
   // Store listener callbacks so we can remove them in dispose
   VoidCallback? _loginStateListener;
@@ -347,6 +348,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
 
       _siteWorker = ever(siteController.isInitialized, (isInitialized) {
         if (isInitialized) {
+          _adoptSiteContext(siteController.currentSiteContext.value);
           AppLogger.debug('🏁 [SITE_HOME] Site initialization completed - refreshing all tabs');
           _recreateTabController();
           _applyPendingTab();
@@ -371,9 +373,38 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     }
   }
 
+  /// Logout reinitializes the controller with a new context. Recreate the
+  /// account-bound tabs so their listeners, proxies and requests belong to it.
+  void _adoptSiteContext(SiteContext? next) {
+    if (next == null || identical(next, _siteContext)) return;
+    _detachLoginStateListener();
+    _siteContext = next;
+    SiteProxyService.initialize(next);
+    _topicListKey = GlobalKey();
+    _pmListKey = GlobalKey();
+    _notificationTabKey = GlobalKey();
+    _profileTabKey = GlobalKey();
+    _chatListKey = GlobalKey();
+    _boardStats = null;
+    _unreadConversationsCount = 0;
+    _unreadAlertsCount = 0;
+    _setupLoginStateListener();
+  }
+
+  void _detachLoginStateListener() {
+    _loginStateDebounceTimer?.cancel();
+    if (_loginStateListener != null) {
+      _listenedContext?.isLoggedInNotifier.removeListener(_loginStateListener!);
+    }
+    _listenedContext = null;
+    _loginStateListener = null;
+  }
+
   /// Set up login state listener for site context
   void _setupLoginStateListener() {
     if (_siteContext == null) return;
+    _detachLoginStateListener();
+    _listenedContext = _siteContext;
 
     // Initialize stable login state
     _lastStableLoginState = _siteContext!.isLoggedIn;
@@ -1092,6 +1123,8 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
 
   /// Load board statistics once for sharing between tabs
   Future<void> _loadBoardStats() async {
+    final owner = _siteContext;
+    final session = owner?.configurationSession;
     if (_siteContext == null) {
       return;
     }
@@ -1100,7 +1133,8 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
       AppLogger.debug('📊 [SITE_HOME] Loading board stats...');
       final forumProxy = SiteProxyFactory.getForumProxy();
       final stats = await forumProxy.getBoardStatAsync();
-      if (mounted) {
+      if (mounted && identical(owner, _siteContext) &&
+              identical(session, owner?.configurationSession)) {
         setState(() {
           _boardStats = stats;
         });
@@ -1114,6 +1148,8 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
 
   /// Fetch inbox statistics to update the badge count
   Future<void> _fetchInboxStat() async {
+    final owner = _siteContext;
+    final session = owner?.configurationSession;
     if (_siteContext == null || !_siteContext!.isLoggedIn) {
       return;
     }
@@ -1130,7 +1166,8 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
 
         if (inboxStat.result) {
           AppLogger.debug('📬 [SITE_HOME] Inbox stat fetched: ${inboxStat.unreadConversations} unread conversations, $unreadAlerts unread alerts');
-          if (mounted) {
+          if (mounted && identical(owner, _siteContext) &&
+              identical(session, owner?.configurationSession)) {
             setState(() {
               _unreadConversationsCount = inboxStat.unreadConversations;
               _unreadAlertsCount = unreadAlerts;
@@ -1144,7 +1181,8 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
         final inboxStat = await conversationProxy.getInboxStatAsync();
         if (inboxStat.result) {
           AppLogger.debug('📬 [SITE_HOME] Inbox stat fetched: ${inboxStat.unreadConversations} unread conversations');
-          if (mounted) {
+          if (mounted && identical(owner, _siteContext) &&
+              identical(session, owner?.configurationSession)) {
             setState(() {
               _unreadConversationsCount = inboxStat.unreadConversations;
               // unreadAlerts not available for this proxy type
@@ -1195,10 +1233,7 @@ class _SiteHomePageState extends State<SiteHomePage> with TickerProviderStateMix
     _requestedTabWorker = null;
 
     // Remove login state listener if it exists
-    if (_loginStateListener != null && _siteContext != null) {
-      _siteContext!.isLoggedInNotifier.removeListener(_loginStateListener!);
-      _loginStateListener = null;
-    }
+    _detachLoginStateListener();
 
     // Dispose worker
     _siteWorker?.dispose();
