@@ -719,36 +719,43 @@ class _EnumTile<T> extends StatelessWidget {
             onChanged: (v) {
               if (v != null) Navigator.of(sheetContext).pop(v);
             },
-            child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SheetTitle(title),
-              if (subtitle != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    DesignTokens.spacingL,
-                    0,
-                    DesignTokens.spacingL,
-                    DesignTokens.spacingS,
-                  ),
-                  child: Text(
-                    subtitle!,
-                    style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(sheetContext).colorScheme.onSurfaceVariant,
-                        ),
-                  ),
-                ),
-              ...options.map((opt) {
-                final isSelected = opt.value == value;
-                return RadioListTile<T>(
-                  title: Text(opt.label),
-                  value: opt.value,
-                  selected: isSelected,
-                );
-              }),
-              SizedBox(height: DesignTokens.spacingS),
-            ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SheetTitle(title),
+                  if (subtitle != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        DesignTokens.spacingL,
+                        0,
+                        DesignTokens.spacingL,
+                        DesignTokens.spacingS,
+                      ),
+                      child: Text(
+                        subtitle!,
+                        style: Theme.of(sheetContext)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(
+                              color: Theme.of(sheetContext)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                      ),
+                    ),
+                  ...options.map((opt) {
+                    final isSelected = opt.value == value;
+                    return RadioListTile<T>(
+                      title: Text(opt.label),
+                      value: opt.value,
+                      selected: isSelected,
+                    );
+                  }),
+                  SizedBox(height: DesignTokens.spacingS),
+                ],
+              ),
             ),
           ),
         );
