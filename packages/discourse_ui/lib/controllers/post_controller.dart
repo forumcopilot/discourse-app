@@ -138,7 +138,8 @@ class PostController extends DiscourseGlobalLoaderController with ErrorHandlingM
             !sortedNew.any((p) => p.postNumber == 1);
         newData = ThreadViewData(
           topic: keepsPoll
-              ? threadsResult.copyWith(poll: existing.topic.poll)
+              ? threadsResult.copyWith(
+                  poll: existing.topic.poll, hasPoll: existing.topic.hasPoll)
               : threadsResult,
           posts: mergedPosts,
           currentStartNum: newStartNum, // 0-based, derived from min postNumber

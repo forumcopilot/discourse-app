@@ -164,6 +164,7 @@ void main() {
       final page = await proxy.getThreadAsync('11', 25, 2, true);
       expect(page.poll, isNull,
           reason: "post 25's poll is the reply's, not the topic's");
+      expect(page.hasPoll, isFalse);
       expect(page.posts.first.polls.single.postId, '125');
     });
 
@@ -186,6 +187,7 @@ void main() {
       await proxy.loadPoll('11', 101);
       final page = await proxy.getThreadAsync('11', 1, 20, true);
       expect(page.poll?.postId, '101');
+      expect(page.hasPoll, isTrue, reason: 'the mini poll bar shows on it');
     });
   });
 

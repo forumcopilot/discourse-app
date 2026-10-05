@@ -219,6 +219,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         url: _topicWebUrl(t, id),
         shortContent: posts.isNotEmpty ? posts.first.content : '',
         poll: poll,
+        hasPoll: poll != null,
       );
     } catch (e) {
       return _emptyThread(message: describeApiError(e));
@@ -330,6 +331,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         isLiked: (t['liked'] as bool?) ?? false,
         canLike: true,
         poll: poll,
+        hasPoll: poll != null,
       );
     } catch (e) {
       return _emptyThreadByPost(message: describeApiError(e));
@@ -459,6 +461,7 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
         isLiked: (t['liked'] as bool?) ?? false,
         canLike: true,
         poll: poll,
+        hasPoll: poll != null,
       );
     } catch (e) {
       return _emptyThreadByUnread(message: describeApiError(e));
