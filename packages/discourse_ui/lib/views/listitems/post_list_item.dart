@@ -966,13 +966,16 @@ class _PostListItemState extends State<PostListItem> {
 
   /// The live poll named [name] in this post, for RichTextContent to draw
   /// where the body places it. The first post's topic poll comes from the
-  /// thread (kept current by the mini poll bar too); any other poll from
-  /// the post itself, updated in place after a vote.
+  /// thread (kept current by the mini poll bar too) when it is this post's;
+  /// any other poll from the post itself, updated in place after a vote.
+  /// Names alone do not identify a poll: most are "poll".
   Widget? _pollWidget(String name) {
+    final candidate = widget.poll;
     final topicPoll = widget.post.postNumber == 1 &&
-            widget.poll != null &&
-            widget.poll!.pollId == name
-        ? widget.poll
+            candidate != null &&
+            candidate.pollId == name &&
+            (candidate.postId == null || candidate.postId == widget.post.id)
+        ? candidate
         : null;
     final polls = widget.post.polls;
     final index = polls.indexWhere((p) => p.pollId == name);

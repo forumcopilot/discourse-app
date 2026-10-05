@@ -132,15 +132,14 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       final posts =
           rawPosts.map((p) => _postFrom(p, topicId: topicId)).toList();
 
-      // Pull a poll out of the first post if present so the topic header
-      // can render a Twitter-style poll card.
-      final firstPostJson = rawPosts.isNotEmpty
-          ? rawPosts.firstWhere(
-              (p) => (p['post_number'] as int?) == 1,
-              orElse: () => rawPosts.first,
-            )
-          : null;
-      final poll = firstPostJson == null
+      // The topic's poll is the opening post's, for the mini poll bar. A
+      // page without post 1 has none: its first post is a reply, and a
+      // reply's poll (often also named "poll") is that reply's own.
+      final firstPostJson = rawPosts.firstWhere(
+        (p) => (p['post_number'] as int?) == 1,
+        orElse: () => const {},
+      );
+      final poll = firstPostJson.isEmpty
           ? null
           : _firstPollFromPost(firstPostJson, topicId: topicId);
 
@@ -391,13 +390,12 @@ class DiscoursePostProxy extends BaseDiscourseProxy implements IFCPostProxy {
       }
       final posts =
           rawPosts.map((p) => _postFrom(p, topicId: topicId)).toList();
-      final firstPostJson = rawPosts.isNotEmpty
-          ? rawPosts.firstWhere(
-              (p) => (p['post_number'] as int?) == 1,
-              orElse: () => rawPosts.first,
-            )
-          : null;
-      final poll = firstPostJson == null
+      // Only the opening post's poll is the topic's (see getThreadAsync).
+      final firstPostJson = rawPosts.firstWhere(
+        (p) => (p['post_number'] as int?) == 1,
+        orElse: () => const {},
+      );
+      final poll = firstPostJson.isEmpty
           ? null
           : _firstPollFromPost(firstPostJson, topicId: topicId);
       final details = (t['details'] as Map<String, dynamic>?) ?? const {};

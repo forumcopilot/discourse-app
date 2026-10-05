@@ -143,6 +143,52 @@ void main() {
     expect(proxy.reads, isEmpty);
   });
 
+  group('the topic poll is the opening post\'s only', () {
+    Map<String, dynamic> reply(int number, int id) => {
+          'id': id,
+          'post_number': number,
+          'post_type': 1,
+          'username': 'b',
+          'cooked': '',
+          'polls': [pollJson('poll')],
+        };
+
+    test('a page without post 1 has no topic poll', () async {
+      final proxy = RecordingPollProxy('https://one.example');
+      proxy.nextGet = {
+        'id': 11,
+        'post_stream': {
+          'posts': [reply(25, 125), reply(26, 126)]
+        },
+      };
+      final page = await proxy.getThreadAsync('11', 25, 2, true);
+      expect(page.poll, isNull,
+          reason: "post 25's poll is the reply's, not the topic's");
+      expect(page.posts.first.polls.single.postId, '125');
+    });
+
+    test('an unread anchor past post 1 has no topic poll', () async {
+      final proxy = RecordingPollProxy('https://one.example');
+      proxy.nextGet = {
+        'id': 11,
+        'last_read_post_number': 24,
+        'highest_post_number': 26,
+        'post_stream': {
+          'posts': [reply(25, 125), reply(26, 126)]
+        },
+      };
+      final page = await proxy.getThreadByUnreadAsync('11', 20, true);
+      expect(page.poll, isNull);
+    });
+
+    test("post 1's poll is the topic's", () async {
+      final proxy = RecordingPollProxy('https://one.example');
+      await proxy.loadPoll('11', 101);
+      final page = await proxy.getThreadAsync('11', 1, 20, true);
+      expect(page.poll?.postId, '101');
+    });
+  });
+
   test('invalid identity or foreign option ids send no request', () async {
     final proxy = RecordingPollProxy('https://one.example');
     final target = await proxy.loadPoll('11', 101);
