@@ -132,8 +132,15 @@ class PostController extends DiscourseGlobalLoaderController with ErrorHandlingM
         final existing = threadDataOutput.value!;
         final mergedPosts = _mergePosts(existing.posts, sortedNew);
         final newStartNum = _startNumFromPosts(mergedPosts, existing.currentStartNum);
+        // The topic's poll is read from post 1, so a later page has none;
+        // keep the one already shown (and kept current by votes).
+        final keepsPoll = threadsResult.poll == null &&
+            !sortedNew.any((p) => p.postNumber == 1);
         newData = ThreadViewData(
-          topic: threadsResult,
+          topic: keepsPoll
+              ? threadsResult.copyWith(
+                  poll: existing.topic.poll, hasPoll: existing.topic.hasPoll)
+              : threadsResult,
           posts: mergedPosts,
           currentStartNum: newStartNum, // 0-based, derived from min postNumber
           position: _lastPostNumber(mergedPosts, newStartNum),
