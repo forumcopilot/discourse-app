@@ -77,6 +77,45 @@ void main() {
         'replacement-state');
   }
 
+  testWidgets('picker can rebuild after its profile tile leaves the viewport',
+      (tester) async {
+    final visible = ValueNotifier(true);
+    addTearDown(visible.dispose);
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Scaffold(
+          body: ValueListenableBuilder<bool>(
+        valueListenable: visible,
+        builder: (_, shown, __) => shown
+            ? DoNotDisturbTile(siteContext: site, users: users)
+            : const SizedBox.shrink(),
+      )),
+    ));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Do not disturb'));
+    await tester.pumpAndSettle();
+    // A lazy profile list can dispose its tile when text scaling shifts
+    // the visible rows, while the modal route stays open above that list.
+    visible.value = false;
+    await tester.pumpAndSettle();
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    tester.view.physicalSize = const Size(640, 360);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await tester.ensureVisible(find.text('Until tomorrow'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Until tomorrow'));
+    await tester.pumpAndSettle();
+    expect(find.text('Until tomorrow'), findsNothing);
+    expect(users.enters, 0);
+    expect(calls, isEmpty);
+  });
+
   for (final textScale in [1.0, 2.0]) {
     testWidgets(
         'short screen at text scale $textScale can select the last duration',

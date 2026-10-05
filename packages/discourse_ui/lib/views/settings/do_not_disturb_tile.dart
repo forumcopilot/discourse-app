@@ -163,14 +163,17 @@ class DoNotDisturbTileState extends State<DoNotDisturbTile> {
       context: context,
       showDragHandle: true,
       builder: (sheetContext) {
+        // The profile list can dispose this tile after a text-size or
+        // viewport change while the modal route is still on screen.
+        final l10n = AppLocalizations.of(sheetContext)!;
         return SafeArea(
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SheetTitle(AppLocalizations.of(context)!.pauseNotificationsFor),
-                ..._durations(AppLocalizations.of(context)!).map(
+                SheetTitle(l10n.pauseNotificationsFor),
+                ..._durations(l10n).map(
                   (d) => ListTile(
                     title: Text(d.label),
                     onTap: () => Navigator.of(sheetContext).pop(d.value),
