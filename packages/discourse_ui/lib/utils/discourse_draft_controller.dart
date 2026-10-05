@@ -239,6 +239,24 @@ class DiscourseDraftController {
     _lastTimedText = '$_observedTitle\u0000$_observedReply';
   }
 
+  /// Puts text the composer opens with but receives late (a quote fetched
+  /// after the page opened) into the editor without counting it as
+  /// writing, so an untouched quote reply is not saved over the topic's
+  /// draft. Text the writer typed before it arrived still counts.
+  void setOpeningContent(TextEditingValue value) {
+    final untouched = _openedReply == null ||
+        (contentController.text == _openedReply &&
+            !_replyChangedBeforeLoad);
+    _restoring = true;
+    try {
+      contentController.value = value;
+    } finally {
+      _restoring = false;
+      _observeText();
+    }
+    if (untouched) _openedReply = contentController.text;
+  }
+
   /// Takes what the composer holds now as what it opened with, for a page
   /// that restores more of the draft itself once [initialize] has returned
   /// (New Message's recipients). Without it the restored recipients read
@@ -432,6 +450,9 @@ class DiscourseDraftController {
       if (!_disposed && _sessionCurrent) {
         if (_needsHydration) _restoreLoadedDraft();
       }
+      // Restoring schedules a save of text typed before the read, and the
+      // writer asked to throw that away.
+      _debounce?.cancel();
       // Not saved again on its own: the writer asked to throw this away.
       // Editing it again, Save draft, or closing with changes saves it.
       _textAtFailedDiscard = _snapshot;

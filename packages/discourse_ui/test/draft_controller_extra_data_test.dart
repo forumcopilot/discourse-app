@@ -596,6 +596,62 @@ void main() {
       expect(drafts.saves.last['reply'], 'Changed my mind');
     });
 
+    test('a quote that arrives late is not saved over the topic draft',
+        () async {
+      storedDraft();
+      final c = prefilled('[quote]short[/quote]');
+      await c.initialize();
+      c.setOpeningContent(const TextEditingValue(
+          text: '[quote]fetched[/quote][quote]short[/quote]'));
+      await settle();
+      c.dispose();
+      await settle();
+      expect(drafts.saves, isEmpty);
+      expect(drafts.deletes, isEmpty);
+    });
+
+    test('a late quote before the read is not counted as writing', () async {
+      storedDraft();
+      drafts.loadGate = Completer<void>();
+      final c = prefilled('[quote]short[/quote]');
+      unawaited(c.initialize());
+      c.setOpeningContent(const TextEditingValue(text: '[quote]fetched[/quote]'));
+      drafts.loadGate!.complete();
+      await settle();
+      c.dispose();
+      await settle();
+      expect(drafts.saves, isEmpty);
+    });
+
+    test('writing typed before a late quote is still saved', () async {
+      final c = prefilled('');
+      await c.initialize();
+      c.contentController.text = 'My reply';
+      c.setOpeningContent(
+          const TextEditingValue(text: '[quote]fetched[/quote]My reply'));
+      c.dispose();
+      await settle();
+      expect(drafts.saves.last['reply'], '[quote]fetched[/quote]My reply');
+    });
+
+    test('a failed Discard that made the first read saves nothing', () async {
+      storedDraft();
+      drafts.loadGate = Completer<void>();
+      final c = controller([]);
+      unawaited(c.initialize());
+      c.contentController.text = 'Throw this away';
+      drafts.throwDelete = true;
+      final discarding = c.discard();
+      drafts.loadGate!.complete();
+      await expectLater(discarding, throwsException);
+      await settle();
+      final saves = List.of(drafts.saves);
+      c.dispose();
+      await settle();
+      expect(saves, isEmpty);
+      expect(drafts.saves, isEmpty);
+    });
+
     test('after a failed Discard, Save draft rewrites unchanged text',
         () async {
       // The DELETE may have run with only its answer lost: the draft must

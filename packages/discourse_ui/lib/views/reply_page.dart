@@ -120,10 +120,12 @@ class _ReplyPageState extends State<ReplyPage> {
         // The compose page may already have seeded it from initialContent.
         if (existing.contains(quote.trim())) return;
         final merged = existing.isEmpty ? quote : '$quote$existing';
-        _contentController.value = TextEditingValue(
+        // Opening content, not writing: closing an untouched quote reply
+        // must not save the quote over the topic's draft.
+        _draftController.setOpeningContent(TextEditingValue(
           text: merged,
           selection: TextSelection.collapsed(offset: quote.length),
-        );
+        ));
       });
     }
     _titleController = TextEditingController();
