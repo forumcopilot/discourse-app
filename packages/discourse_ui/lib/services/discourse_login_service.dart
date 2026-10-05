@@ -169,7 +169,35 @@ class DiscourseLoginService {
       if (!current()) return false;
       if (!await write()) throw StateError('Could not persist notification grant');
     }
+    if (suffix != null && installBound && current()) {
+      await _retireLegacyGrantOnce(prefs);
+    }
     return current();
+  }
+
+  String get _legacyGrantRetiredKey =>
+      '${siteContext.discourseStoragePrefix}_notifications_legacy_retired';
+
+  /// Grants made before each grant had its own client id all used one per
+  /// forum (`<install>:notify`). One that outlived a sign-out (older builds
+  /// forgot it locally even when the relay was unreachable) keeps polling
+  /// the previous account and pushing it to this phone, next to the new
+  /// grant. Once a new grant is stored, the relay knows this installation
+  /// and answers OK when there is nothing to remove, so queue the old id's
+  /// revoke then, once per forum. Never fails the grant.
+  Future<void> _retireLegacyGrantOnce(SharedPreferences prefs) async {
+    if (prefs.getBool(_legacyGrantRetiredKey) ?? false) return;
+    try {
+      await NotificationGrantCleanup.enqueue(
+          siteContext.site.url,
+          await _authManager.clientIdFor(
+              suffix: AppForumConfig.userApiNotificationsClientIdSuffix));
+      // Sent with the outbox's next drain (at launch, and every minute
+      // while the app is open), not as a side effect of marking the grant.
+      await prefs.setBool(_legacyGrantRetiredKey, true);
+    } catch (e) {
+      AppLogger.warning('Could not queue the legacy notifications grant: $e');
+    }
   }
 
   /// Whether this forum's grant was registered under the phone's
@@ -407,6 +435,10 @@ class DiscourseLoginService {
 
     final response = await _client.get(siteContext, '/session/current.json');
     if (response.statusCode < 200 || response.statusCode >= 300) {
+      // Storing the key dropped the forum's capabilities; without a reload
+      // the forum stays on defaults (no logo, colours, Home views or flag
+      // types) for the rest of the session.
+      await _refreshConfiguration();
       throw StateError(
         'GET /session/current.json failed (${response.statusCode}): ${response.body}',
       );
@@ -423,14 +455,8 @@ class DiscourseLoginService {
     _applyChatFlags(cu);
 
     // Permissions and visible categories change with the new API key. Load
-    // them before notifying the UI that login completed. A configuration
-    // outage must not discard an otherwise successful authentication.
-    try {
-      await DiscourseConfigProxy(siteContext, client: _client)
-          .getConfig(siteContext.site.pluginUrl, forceRefresh: true);
-    } catch (e) {
-      AppLogger.warning('Could not refresh configuration after sign-in: $e');
-    }
+    // them before notifying the UI that login completed.
+    await _refreshConfiguration();
 
     siteContext.setLoginData(result);
     siteContext.resetOnLogin();
@@ -439,6 +465,18 @@ class DiscourseLoginService {
     await siteContext.saveLoginSnapshot(result.toJson());
 
     return result;
+  }
+
+  /// Reload the forum's configuration for the key now in place. A
+  /// configuration outage must not discard an otherwise successful
+  /// authentication, so this never throws.
+  Future<void> _refreshConfiguration() async {
+    try {
+      await DiscourseConfigProxy(siteContext, client: _client)
+          .getConfig(siteContext.site.pluginUrl, forceRefresh: true);
+    } catch (e) {
+      AppLogger.warning('Could not refresh configuration after sign-in: $e');
+    }
   }
 
   /// Surface the most recently completed handshake from disk on app start —
@@ -569,6 +607,9 @@ class DiscourseLoginService {
           AppLogger.info(
               'DiscourseLoginService: Background revalidation found the User '
               'API Key revoked (HTTP ${response.statusCode}) — signing out');
+          // As at launch: the separate notifications key would otherwise
+          // keep being polled for an account no longer signed in here.
+          await retireNotificationsGrant();
           await siteContext.clearUserApiCredentials();
           // Flip login state so the UI (profile, badges) updates live.
           siteContext.clearLoginData();
