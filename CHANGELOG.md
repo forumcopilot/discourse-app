@@ -6,11 +6,35 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
-### Fixed
+## [1.0.48] - 2026-10-05
 
-- Refresh user-specific site capabilities when credentials change and honor forced configuration refreshes. Ignore late replies from older sessions or refreshes, and prevent old HTTP responses from undoing a refresh.
-- Submit poll votes using the displayed post and poll name, eliminating cross-topic and cross-forum option-digest collisions. Votes without a complete target no longer guess the first post; stale cards cannot submit through another forum's active proxy.
-- Keep Discourse API credentials on their original origin when a server redirects a request. Reads follow at most five redirects with the same scheme, host, and port; writes and uploads are never replayed through redirects.
+### Added
+- **Chat lists the channels you could join**, below the ones you're in, so they can be browsed and joined from the chat list. Channel icons use the forum's own emoji artwork, aliases included.
+- **Close anyway.** When Discard can't reach the forum (offline, or after your sign-in changed under the composer), the composer offers Keep editing or Close anyway. A draft saved earlier stays in Drafts. Before, the only way out was to delete every word.
+
+### Changed
+- **Each New Topic is its own draft**, as on the web: starting another no longer reopens the last one, which waits in Drafts.
+- **A post the forum answered without confirming** (no post id came back) keeps your text and says so, instead of closing as if it had posted; check the forum before sending again. A post queued for approval still closes and says it needs approval, and the topic refreshes.
+
+### Fixed
+- **Your forum key stays with the forum.** A request that the server redirects to another address, scheme or port no longer takes the key along, and writes and uploads are never replayed through a redirect. The key is also no longer written to the device log when a forum shows a Cloudflare check, and image redirects no longer log their response headers.
+- **Drafts keep your writing.**
+  - The last words typed before closing are saved, and edits made while a draft loads or saves are kept.
+  - Tags and message recipients come back with the draft.
+  - Autosave picks up again after a failed first read.
+  - Backing out of an untouched composer saves nothing. A category's topic template used to become a new draft each time, and closing an untouched quote reply overwrote the topic's reply draft.
+- **The Drafts list** loads past its first page. A draft you delete without undoing is still deleted after you leave the page, and a failed delete comes back with the reason.
+- **Switching accounts keeps them apart.**
+  - Cached forum data, notifications, uploads, drafts and notification settings started under one account never land in another.
+  - A push opens only for the account it was sent to, on its exact forum (subfolder installs included).
+  - The forum's settings (logo, colours, Home views, permissions) reload when the account changes, also after a sign-in that fails halfway.
+- **Notifications of a previous account stop.** A notifications grant left over from an older build is retired, and so is the grant of a key the forum revoked.
+- **Polls vote on the poll you see.** After scrolling, a reply's poll no longer stands in for the topic's, and the poll bar shows without voting first.
+- **Attachments.** A file that can't be prepared says so, and an upload that finishes after its composer closed goes nowhere.
+- **Invitations and featured topics** load beyond their first page, and featured topic choices can be searched.
+- **Closing or reopening a private message** says when it fails, and the editor stays open.
+- **Closing a reply composer keeps your place in the topic.** Reply with Quote, then Discard, used to jump. Chat conversations scroll back through earlier messages again.
+- **Do Not Disturb**: the duration sheet scrolls on short screens, and it no longer breaks when the profile list is rebuilt behind it.
 
 ## [1.0.47] - 2026-10-02
 
