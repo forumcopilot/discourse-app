@@ -21,8 +21,9 @@ class GrantedAuth extends DiscourseAuthManager {
 }
 
 class LoginClient extends DiscourseClient {
-  LoginClient({this.configOffline = false});
+  LoginClient({this.configOffline = false, this.sessionStatus = 200});
   final bool configOffline;
+  final int sessionStatus;
   final paths = <String>[];
   @override
   Future<FCCallResult> get(SiteContext context, String path,
@@ -32,6 +33,9 @@ class LoginClient extends DiscourseClient {
     paths.add(path);
     expect(context.hasUserApiKey, isTrue);
     if (path == '/session/current.json') {
+      if (sessionStatus != 200) {
+        return FCCallResult(statusCode: sessionStatus, body: '{}');
+      }
       return FCCallResult(
           statusCode: 200,
           body: jsonEncode({
@@ -60,6 +64,30 @@ void main() {
     FlutterSecureStorage.setMockInitialValues({});
     DiscourseSiteCapabilities.reset();
   });
+  test('a sign-in that fails after the key is stored reloads capabilities',
+      () async {
+    // Storing the key drops them; without a reload the forum stayed on
+    // defaults (no logo, colours, Home views) for the rest of the session.
+    const url = 'https://forum.example';
+    final context = SiteContext(
+        siteType: 'discourse',
+        site: Site(
+            name: 'Forum',
+            url: url,
+            baseUrl: url,
+            description: '',
+            siteType: 'discourse'));
+    final client = LoginClient(sessionStatus: 502);
+    await expectLater(
+        DiscourseLoginService(context,
+                client: client, authManager: GrantedAuth(context))
+            .finishLogin('dummy-payload'),
+        throwsStateError);
+    expect(context.isLoggedIn, isFalse);
+    expect(client.paths, contains('/site.json'));
+    expect(DiscourseSiteCapabilities.forSite(url).canCreateTag, isTrue);
+  });
+
   for (final offline in [false, true]) {
     test(
         offline

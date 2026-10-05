@@ -63,6 +63,7 @@ void main() {
       () async {
     final context = account();
     final login = DiscourseLoginService(context);
+    final legacy = await login.notificationsClientId();
     final first = await login.beginNotificationsGrant();
     await login.markNotificationsGranted(installBound: true);
     await login.retireNotificationsGrant();
@@ -77,7 +78,8 @@ void main() {
         second.clientId);
     reachable = true;
     await NotificationGrantCleanup.instance.retryPending();
-    expect(deleted, everyElement(first.clientId));
+    expect(deleted.where((id) => id != legacy), everyElement(first.clientId));
+    expect(deleted, isNot(contains(second.clientId)));
     final count = deleted.length;
     await NotificationGrantCleanup.instance.retryPending();
     expect(deleted.length, count);
@@ -118,6 +120,37 @@ void main() {
     expect(deleted, contains(legacy));
     final next = await login.beginNotificationsGrant();
     expect(next.clientId, isNot(legacy));
+  });
+
+  test('a new grant retires the pre-rotation client id once', () async {
+    // Before each grant had its own id, one that outlived a sign-out (the
+    // relay unreachable) kept pushing the previous account to this phone.
+    final login = DiscourseLoginService(account());
+    final legacy = await login.notificationsClientId();
+    reachable = true;
+    final grant = await login.beginNotificationsGrant();
+    await login.markNotificationsGranted(installBound: true);
+    await NotificationGrantCleanup.instance.retryPending();
+    expect(deleted, [legacy]);
+    expect(await login.hasNotificationsGrant(), isTrue);
+
+    await login.retireNotificationsGrant();
+    await login.beginNotificationsGrant();
+    await login.markNotificationsGranted(installBound: true);
+    await NotificationGrantCleanup.instance.retryPending();
+    expect(deleted.where((id) => id == legacy), hasLength(1),
+        reason: 'once per forum');
+    expect(deleted, contains(grant.clientId));
+  });
+
+  test('a grant the relay does not tie to this installation queues nothing',
+      () async {
+    final login = DiscourseLoginService(account());
+    reachable = true;
+    await login.beginNotificationsGrant();
+    await login.markNotificationsGranted();
+    await NotificationGrantCleanup.instance.retryPending();
+    expect(deleted, isEmpty);
   });
 
   test('late in-flight revoke cannot delete a new grant', () async {
