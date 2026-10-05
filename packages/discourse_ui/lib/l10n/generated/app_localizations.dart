@@ -8495,6 +8495,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This notification cannot be opened with the current account. Open Notifications to see updates for this account.'**
   String get notificationAccountMismatch;
+
+  /// No description provided for @chatJoinedChannels.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined channels'**
+  String get chatJoinedChannels;
+
+  /// No description provided for @chatAvailableChannels.
+  ///
+  /// In en, this message translates to:
+  /// **'Available channels'**
+  String get chatAvailableChannels;
+
+  /// No description provided for @chatAvailableChannelsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Channels you can view or join.'**
+  String get chatAvailableChannelsDescription;
+
+  /// No description provided for @chatAllChannelsJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'You have joined all available channels.'**
+  String get chatAllChannelsJoined;
+
+  /// No description provided for @chatViewChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get chatViewChannel;
 }
 
 class _AppLocalizationsDelegate

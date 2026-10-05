@@ -6,22 +6,22 @@ An open-source Flutter mobile app for a **single Discourse community**.
 
 Point it at your forum's URL, build it, ship it. It talks to Discourse's **stock REST/JSON API** using **User API Keys** — the same mechanism Discourse's own official app uses. There is **no server-side plugin to install**, no admin API key to hand out, and nothing to run alongside your forum.
 
-Targets Android, iOS, macOS, Windows, Linux, and web. Flutter `^3.6.1` / Dart `^3.6.1`. MIT licensed.
+Targets Android, iOS, macOS, Windows, Linux, and web. Flutter 3.32 or newer (CI builds with 3.38.7), Dart `^3.6.1`. MIT licensed.
 
 <p align="center">
-  <img src="docs/screenshots/forum-home.png" width="196" alt="A forum's home in the app: its logo, description and stats, then the Latest / Hot / New / Unread tabs">
+  <img src="docs/screenshots/forum-home.png" width="196" alt="Godot Forum's home in dark mode: its logo, description, activity and search in the forum's header colours, then the Latest / Hot / Top / Categories views">
   &nbsp;
-  <img src="docs/screenshots/thread.png" width="196" alt="A thread with posts, reactions and the reply bar">
+  <img src="docs/screenshots/categories.png" width="196" alt="Home Assistant Community's categories in its own blue: each a card with the category's colour, description, weekly count and subcategory chips">
   &nbsp;
-  <img src="docs/screenshots/drawer.png" width="196" alt="The drawer: sign in, tags, users, groups, badges, notifications">
+  <img src="docs/screenshots/thread.png" width="196" alt="A Blender Artists topic: category and tags under the title, then the post's text and image">
   &nbsp;
-  <img src="docs/screenshots/abda-home.png" width="196" alt="ABDA, the multi-forum app built on this project">
+  <img src="docs/screenshots/abda-home.png" width="196" alt="ABDA's home: your forums as icons, a featured forum, and the directory by category">
 </p>
-<p align="center"><sub>First three: this app on meta.discourse.org, as shipped inside <a href="https://betterdiscourse.app">ABDA</a> (the "Switch forum" row is ABDA's; a single-forum fork has no such thing). Last: ABDA's own home, the forum chooser that wraps this code.</sub></p>
+<p align="center"><sub>First three: this app inside <a href="https://betterdiscourse.app">ABDA</a> on Godot Forum, Home Assistant Community and Blender Artists, each in its own forum's logo and colours. Last: ABDA's own home, the forum chooser that wraps this code.</sub></p>
 
 ## Try it without building anything
 
-**[ABDA – A Better Discourse App](https://betterdiscourse.app)** is this project shipped as a product: the exact screens in this repo, plus a directory of 900+ public Discourse forums to open them against. Open your own forum in it by address and you are looking at what a fork of this repo gives your community — minus the forum chooser, plus your name and icon. It is on its way to the App Store and Google Play; the site carries the download links as they go live, and until then the quick start below builds the same thing.
+**[ABDA – A Better Discourse App](https://betterdiscourse.app)** is this project shipped as a product: the exact screens in this repo, plus a directory of 2,400+ public Discourse forums to open them against. Open your own forum in it by address and you are looking at what a fork of this repo gives your community — minus the forum chooser, plus your name and icon. It is on its way to the App Store and Google Play; the site carries the download links as they go live, and until then the quick start below builds the same thing.
 
 ---
 
@@ -44,7 +44,7 @@ The code is free so you can see exactly what you would be getting. Most communit
 
 - **Your forum's app** — name, icon, colours, splash, store listings, and the App Store and Play Store submissions handled end to end.
 - **Features this repo does not have** — a screen for your plugin, single sign-on with your existing accounts, paywalled categories, in-app purchases, offline reading, whatever your community actually needs.
-- **Push notifications** — two client paths, both off by default, see [docs/push.md](docs/push.md). *Relay*: with `pushApiBaseUrl` set, the User API Key handshake requests the `push` scope and a `push_url`, and Discourse POSTs notifications there — but only on forums whose owner allowlisted the URL. *Notifications grant*: with `notificationsApiBaseUrl` set, the app asks the user for a second, notifications-only key after sign-in and hands it to that backend, which polls the forum and delivers what arrives; this needs nothing from the forum's admins. Neither backend is in this repo; `NotificationKeyService` documents the grant contract. With both unset the app runs exactly as before and needs no real Firebase project — the committed `.example` placeholders are enough to compile (see Quick start).
+- **Push notifications** — the app's side is finished and off by default, in two forms (see [docs/push.md](docs/push.md)). *Relay*: with `pushApiBaseUrl` set, the User API Key handshake requests the `push` scope and a `push_url`, and Discourse POSTs each notification there — but only on forums whose owner allowlisted the URL. *Notifications grant*: with `notificationsApiBaseUrl` set, the app asks the reader for a second, notifications-only key after sign-in and hands it to that backend, which polls the forum and delivers what arrives; this needs nothing from the forum's admins, and it is how ABDA's push works in production. Neither backend is in this repo. With both unset the app needs no real Firebase project — the committed `.example` placeholders are enough to compile (see Quick start).
 - **Beyond forums** — the same team builds and ships Flutter apps generally. If you have a mobile product in mind that is not a forum at all, we are happy to talk.
 
 **Get in touch: [forumcopilot@gmail.com](mailto:forumcopilot@gmail.com)** — say what community or product it is for and roughly what you want, and you will get a real reply, usually the same day.
@@ -68,19 +68,23 @@ Three layers, each replaceable:
 │                         IFC*Proxy interfaces, FC* entities    │
 ├──────────────────────────────────────────────────────────────┤
 │  packages/discourse_core      the Discourse implementation    │
-│                         REST calls + JSON → FC* converters    │
+│                         REST + MessageBus, JSON → FC* entities│
 └──────────────────────────────────────────────────────────────┘
                               ↕ HTTPS
                         your Discourse forum
 ```
 
-**Configuration is compile-time.** `AppForumConfig` in `packages/discourse_ui/lib/config/app_forum_config.dart` holds the forum URL, display name, and branding. There is no runtime forum picker — that is the point of a single-forum app.
+**Configuration is compile-time.** `AppForumConfig` in `packages/discourse_ui/lib/config/app_forum_config.dart` holds the forum URL, display name, and branding. There is no runtime forum picker — that is the point of a single-forum app. (The same packages can also be mounted by a multi-forum host through `DiscourseHost`; that is how ABDA uses them.)
 
-**Authentication is Discourse's User API Key handshake.** On first sign-in the app generates an RSA-2048 keypair, opens your forum's own `/user-api-key/new` page in an in-app webview, and the user signs in there — with their password, 2FA, passkey, or SSO, whatever your forum already uses. Discourse returns an encrypted payload; the app decrypts it with its private key and stores the resulting API key. **The app never sees the user's password.** No plugin, no OAuth app registration, no admin token.
+**Authentication is Discourse's User API Key handshake.** On first sign-in the app generates an RSA-2048 keypair and opens your forum's own `/user-api-key/new` page in the system's browser sign-in sheet — ASWebAuthenticationSession on iOS and macOS, Chrome's Auth Tab on Android — as Discourse's official app does. The user signs in there with whatever your forum already uses (password, 2FA, passkey, Google, SSO), their password manager fills it as it would in the browser, and someone already signed in to the forum in the browser only taps Authorize. Discourse returns an encrypted payload; the app decrypts it with its private key and keeps the resulting API key in the platform's secure storage. **The app never sees the user's password.** No plugin, no OAuth app registration, no admin token. Platforms without the sheet fall back to an in-app web view.
 
-**Data flows through a proxy layer.** UI code never calls HTTP directly — it asks `SiteProxyFactory` for a typed proxy (`getTopicProxy()`, `getPostProxy()`, …) and gets back the `discourse_core` implementation. Each proxy calls stock Discourse endpoints and converts the JSON into the SDK's `FC*` entities. Responses share one shape: `FC*Result { result, resultText, …payload }`.
+**Data flows through a proxy layer.** UI code never calls HTTP directly — it asks `SiteProxyFactory` for a typed proxy (`getTopicProxy()`, `getPostProxy()`, …) and gets back the `discourse_core` implementation. Each proxy calls stock Discourse endpoints and converts the JSON into the SDK's `FC*` entities. Responses share one shape: `FC*Result { result, resultText, …payload }`. What Discourse says that the shared SDK has no field for — read state, message counts, chat threads, the forum's reaction set — is kept per forum in `discourse_core` side stores, fed by the same payloads.
 
-**Posts render as Discourse renders them.** Discourse cooks Markdown to HTML server-side and serves it in the post stream's `cooked` field. The app renders that HTML directly with `flutter_html` — so oneboxes, quotes, code blocks, mentions and emoji look the way your forum's own theme produces them. Embedded YouTube and Twitter/X links are lifted out and given native cards, since a mobile app can't run an iframe.
+**Live updates come over MessageBus**, as on Discourse's web client: while a screen needs them, the app long-polls `/message-bus` for chat messages, edits and reactions, a topic's reactions, reading done on another device, and message counts. It stops in the background, to stay within the User API Key's request budget.
+
+**Posts render as Discourse renders them.** Discourse cooks Markdown to HTML server-side and serves it in the post stream's `cooked` field. The app renders that HTML with `flutter_html`, plus native widgets for what the web draws with CSS or JavaScript: tables, link previews, polls, spoilers, local dates in the reader's time zone, maths, calendar events, highlighted code, image grids and moderator-action notices. A phone app does not run third-party iframes, so YouTube, Vimeo, Spotify and other embeds become preview cards that open the site or its app. Links into the same forum open on the app's own screens.
+
+**It wears the forum's colours.** The forum's light and dark colour schemes (from `/site.json`) become the app's theme, applied the way Material 3 uses a brand colour: the accent on buttons and links, darkened only as far as text needs to stay legible, and the page kept neutral. The forum's header colours and logo lead its home, and categories wear their own colour and mark wherever they are named. Readers choose Light, Dark or the device setting, and forum pages in web views follow. A fork with its own brand turns this off with `AppForumConfig.useForumColors`.
 
 **State is GetX** (`Get.put` / `Obx`), navigation goes through a `globalNavigatorKey` so SDK code can raise dialogs (e.g. a Cloudflare challenge) without a `BuildContext`.
 
@@ -91,67 +95,81 @@ Three layers, each replaceable:
 <details open>
 <summary><b>Browsing &amp; reading</b></summary>
 
-- **Home** — Discourse-native tabs: **Latest / Hot / New / Unread / Top** (Hot appears when the forum offers it), with a period selector on Top (All / Yearly / Quarterly / Monthly / Weekly / Daily). The forum's own logo and wordmark in the header and drawer.
-- **Categories** — each category's tile in its own `color` / `text_color`, topic-count badges, sub-categories, category-filtered lists with Latest / Hot / New.
-- **Topic view** — rendered from Discourse's `cooked` HTML: Markdown, oneboxes, quoted posts, code blocks, mentions, native Unicode emoji, lightboxed images. Category and tags under the title, file attachments as download cards, and share / copy-link on every post.
-- **Tags** — chips on topic rows, tag-filtered lists, and a global Tags directory with search and popularity/alphabetical sort.
-- **Polls** — full voting widget with result charts.
-- **Suggested Topics** footer, mirroring Discourse web.
-- **Solution banner** on accepted answers (`discourse-solved`).
+- **Home** — the forum's own header (its logo, header colours, description, activity and a search field) over its own navigation bar (`top_menu`): Latest, Hot, New, Unread, Top and Categories in the forum's order, opening on its homepage, with New and Unread counts. Top has a period selector.
+- **Categories** — a card per category with the mark the forum set (uploaded logo, icon, emoji or colour), its description, "N new this week", new and unread counts, and subcategories. A category's page has a header tinted in its colour, its notification level, and Latest / Hot / New / Unread.
+- **Drawer** — the forum's map, like the web's sidebar: My posts, Users, Groups, Badges and About, then your own sidebar categories and tags (or the forum's defaults).
+- **Read state as on the web** — a dot for new topics, a count for unread replies, titles that step back only once read to the end, Dismiss new and Dismiss unread, and lists that update live when you read on another device.
+- **Topic view** — the cooked post HTML (see *How it works*), opening after the last post you read; status icons on the title with Discourse's explanations; the topic map under the first post; the post's actions in one row as on the web; vote arrows on post-voting topics; share and copy link with the forum's own address.
+- **Tags** — chips on topic rows, tag-filtered lists, and a Tags directory with search and popularity/alphabetical sort.
+- **Polls** — vote, change or remove a vote, results and voters, in topics and in messages.
+- **Suggested and related topics** (related from discourse-ai) after the last post, as ordinary topic rows.
+- **Solved** (`discourse-solved`) — the accepted answer under the question, and marking one where the forum allows it.
+- **Appearance** — System default, Light or Dark.
 </details>
 
 <details>
 <summary><b>Writing</b></summary>
 
-- **Markdown composer** — Discourse-flavored Markdown, the only markup Discourse actually cooks.
-- New topic with category + tag selection; reply, quote, edit, delete.
-- **Attachments** — image and file uploads via `/uploads`, written the way Discourse web writes them (`![name|WxH]`, `[name|attachment] (size)`). An image over the forum's size limit offers to resize just enough to fit, keeping its format.
-- **Server-side drafts** — composer state round-trips through `/drafts.json`, so a draft started in the app appears in the web composer and vice versa.
+- **Markdown composer** — Discourse-flavored Markdown, the only markup Discourse actually cooks, in full-screen forms for New Topic, Reply, Quote, Edit and New Message. Closing one with unsaved writing asks first, in Discourse's words.
+- New topic with category and tags; reply (linked to the post it answers), quote, edit, delete; staff whispers and wiki posts.
+- **Uploads go where you are writing**, as on the web: a placeholder at the cursor that becomes Discourse's Markdown when the upload lands. Photos, videos, audio and files from the gallery, the file picker or the camera; three or more photos make a `[grid]`; photos are shrunk the way the forum's own web composer would, and one still over the size limit offers to resize.
+- **Server-side drafts** — replies, new topics and new messages round-trip through `/drafts.json`, so a draft started in the app continues in the web composer and vice versa.
 - **Post revisions** — view a post's edit history.
-- **Whisper / wiki** — staff whispers and wiki-editable posts.
 </details>
 
 <details>
 <summary><b>Social &amp; account</b></summary>
 
-- **Likes and emoji reactions** (`discourse-reactions`) behind one canonical affordance — tap to like, long-press for the emoji picker, chips below the post.
-- **Bookmarks** with reminders, **follow/unfollow** (`discourse-follow`), **ignore user**.
-- **Notifications** — the full `/notifications.json` feed with type-aware rendering and per-type icon badges across all 39 Discourse notification types, filterable to Unread.
-- **Notification levels** — Watching / Tracking / Normal / Muted on topics, categories and tags.
-- **Profile** — trust level (with explainer) and badges as their own sections, the Discourse summary (top replies and topics, most liked by, most replied to, top links), and activity tabs (Replies / Topics / Likes / Solved) that stay pinned while you scroll. Inline bio/location/website editing, avatar upload.
-- **Account** — change email, change password, notification preferences, do-not-disturb, ignored users, invites.
-- **Private messages** — conversation-style, with attachments and likes.
+- **Reactions** (`discourse-reactions`) as on the web: a react button that shows your reaction (tap to like or undo, long-press for the forum's own emoji set) beside a summary of who reacted, per emoji, updating live while you read.
+- **User cards** — tapping a name or avatar opens the person's card over the page: bio, status, local time, featured badges, and Message, Chat or Profile where the forum allows.
+- **The Profile tab is your account** — My posts (your activity, filtered as the web's tabs are, with posts waiting for approval), Drafts, Bookmarks, Badges, Invites, notification settings, Do not disturb and Appearance.
+- **Edit profile** — whatever the forum lets you change: picture (a new photo, letter avatar, Gravatar or an earlier upload), cover and card background, name, About me, location, website, title, flair, primary group, featured topic, the forum's own profile questions, time zone, birthday, hiding the profile; and a **status**, which can pause notifications.
+- **Bookmarks** with reminders, labels, pins and search; **follow** (`discourse-follow`); **mute and ignore** people.
+- **Notifications** — the full `/notifications.json` feed, saying who did what for every type, filterable to Unread.
+- **Notification levels** — Watching / Tracking / Normal / Muted on topics, categories and tags, with Discourse's reason for the current one.
+- **Account** — change email and password, ignored users, and Delete account where the forum allows members to.
 </details>
 
 <details>
-<summary><b>Search, chat &amp; moderation</b></summary>
+<summary><b>Messages &amp; chat</b></summary>
 
-- **Search** — free text plus a structured filter sheet: status (`open` / `closed` / `solved` / `unsolved` / `noreplies` / `archived`), personal scopes (`in:bookmarks` / `in:liked` / `in:posted` / `in:watching` / …), tags, and sort order.
-- **Chat** (`discourse-chat`) — channel browser, channel view, composer, DMs, and message reactions. Currently polls; see *Not yet implemented*.
-- **Moderation** (staff only) — pin, close, archive, unlist, rename, delete, move topic, merge topics, ban/silence, and the reviewables queue.
+- **Private messages** open in the topic page and get everything a topic post has (reactions, bookmarks, polls, edit history), plus participants, Invite and Remove, Archive (also a swipe) and Leave. The lists are Inbox, Unread, New, Sent and Archive, and each group inbox, with counts kept live the way the web counts them.
+- **Chat** (`discourse-chat`), live over MessageBus: channels and DMs with unread badges and starred chats first, group chats, threads and My Threads, chat search, each conversation's settings (notifications, mute, members, leave), and every message action (reactions, reply, edit, copy, bookmark, pin, flag). The composer has @ and # suggestions, "is typing…", photos and files, and drafts kept on the forum.
+</details>
+
+<details>
+<summary><b>Search &amp; moderation</b></summary>
+
+- **Search** — free text plus a structured filter sheet: status (`open` / `closed` / `solved` / `unsolved` / `noreplies` / `archived`), personal scopes (`in:bookmarks` / `in:likes` / `in:posted` / `in:watching` / `in:messages` / …), tags, and sort order.
+- **Flags** — the forum's own flag types, in its order and language.
+- **Moderation** (staff only) — Pin Topic… (in its category or globally, until a date), close, archive, unlist, rename, delete and undelete, move, merge, suspend and silence, Delete spammer, and the review queue with Discourse's own actions.
+</details>
+
+<details>
+<summary><b>Push notifications</b> (optional)</summary>
+
+Off by default; see [docs/push.md](docs/push.md). With a backend configured, readers turn notifications on from a page that shows what they will get, and choose per kind (replies and mentions, messages and chat, likes and reactions, everything else), each with its own Android channel. Chat direct messages are included, Do not disturb is respected, and a tap opens what the notification is about.
 </details>
 
 <details>
 <summary><b>Localisation</b></summary>
 
-ARB-based, English template at `packages/discourse_ui/lib/l10n/app_en.arb`, with de / es / fr / it / ja / ko / nl / pt / ru / zh. Terminology is Discourse-native — *Topic*, *Category*, *Watching*, *Solution*.
+ARB-based, English template at `packages/discourse_ui/lib/l10n/app_en.arb`, with de / es / fr / it / ja / ko / nl / pt / ru / zh, using Discourse's own translation wherever Discourse has the string. Terminology is Discourse's — *Topic*, *Category*, *Watching*, *Flag*, *Solution*.
 </details>
 
 ---
 
 ## Not yet implemented
 
-- **Push notifications** — the client side is done: with a relay configured, the User API Key handshake requests the `push` scope and registers a `push_url`, and Discourse POSTs notifications there. What's missing is **the relay backend** that forwards those to FCM/APNs. See [docs/push.md](docs/push.md) for the decision and what an admin has to enable. With no relay configured the app runs exactly as before and needs no real Firebase project — the committed `.example` placeholders are enough to compile (see Quick start). (Forum Copilot runs a hosted relay — [get in touch](mailto:forumcopilot@gmail.com).)
-- **Chat over MessageBus** — chat polls every 4s today; Discourse web subscribes over MessageBus for sub-second latency. The same swap would speed up topic live-updates and the notification badge.
-- **Chat threads and uploads** — reactions work; threaded replies and file uploads don't yet.
+- **Push backends** — both client paths are complete, but neither server is in this repo: a relay that forwards Discourse's POSTs to FCM/APNs, or a grant backend that polls the forum ([docs/push.md](docs/push.md) is the contract). ABDA's grant backend runs in production; push delivery for a fork is part of what Forum Copilot sets up — [get in touch](mailto:forumcopilot@gmail.com).
 - **Markdown preview in the composer** — the editor is text-only for now.
-- **Other Discourse plugins** — Calendar, Cakeday, Assign, Templates. Each follows the same recipe as reactions/post-voting: typed model, proxy method, small UI.
+- **More of Discourse's plugins** — calendar events and Assign's notices already display, but creating events, assigning, Templates and Cakeday are not there. Each follows the same recipe as reactions and post voting: typed model, proxy method, small UI.
 
 ---
 
 ## Quick start
 
-**Prerequisites:** Flutter `^3.6.1`, plus Xcode (iOS/macOS) and/or Android Studio for the platforms you target.
+**Prerequisites:** Flutter 3.32 or newer, plus Xcode (iOS/macOS) and/or Android Studio for the platforms you target.
 
 ```bash
 git clone https://github.com/forumcopilot/discourse-app.git
@@ -179,19 +197,18 @@ Edit `packages/discourse_ui/lib/config/app_forum_config.dart`:
 static const String forumName    = 'My Community';
 static const String forumBaseUrl = 'https://forum.example.com';
 
-/// Shown to the user on your forum's User API Key grant page.
-static const String userApiApplicationName = 'My Community Mobile';
+/// Shown on your forum's grant page ("… would like to access your account")
+/// and later in the user's Preferences → Security → Apps.
+static const String defaultUserApiApplicationName = 'My Community';
 ```
 
-That's the minimum. Optional: `forumDescription`, `logoUrl`, `pushApiBaseUrl` (push relay), and the Android passkey identifiers.
+That's the minimum. Optional: `forumDescription`, `logoUrl`, `defaultUseForumColors` (`false` keeps your own brand colours instead of the forum's), `defaultPushApiBaseUrl` / `defaultNotificationsApiBaseUrl` (push, see [docs/push.md](docs/push.md)), and the Android passkey identifiers (`androidPackageName`, `androidSha256CertFingerprint`).
 
-The grant redirect defaults to `discourse://auth_redirect` — the universal scheme every Discourse instance already allowlists, so the handshake works against any forum without an admin changing settings. To use your own scheme instead, set `userApiAuthRedirect` and have the forum admin add it to `allowed_user_api_auth_redirects`.
+The sign-in redirect defaults to `discourse://auth_redirect` — the scheme every Discourse instance already allowlists, so the handshake works against any forum without an admin changing settings. To use your own scheme instead, set `userApiAuthRedirect`, have the forum admin add it to `allowed_user_api_auth_redirects`, and change the scheme on `flutter_web_auth_2`'s `CallbackActivity` in `android/app/src/main/AndroidManifest.xml` to match.
 
 ### Codegen
 
 `buildlib.sh` resolves each nested package (`dart pub get` in each — root `flutter pub get` does not do this, and skipping it leaves the analyzer with hundreds of unresolved imports), runs `build_runner` inside `packages/forumcopilot_sdk`, then `flutter gen-l10n`. **Re-run it after** editing an ARB file or any `dart_mappable` / `json_annotation` annotated class in the SDK. The SDK is the only package with generated code.
-
-> ⚠ On Dart 3.10 the `dart_mappable` build hook fails with `'dart compile' does not support build hooks`. Until that's fixed upstream, hand-edit the affected `.mapper.dart` — recent commits show the pattern.
 
 ### Release build
 
@@ -225,17 +242,17 @@ Set `forumBaseUrl = 'http://localhost:4200'` to point the app at it. For a physi
 
 ```
 lib/
-├─ main.dart                              # init + push bootstrap, then ForumCopilotApp
-└─ l10n/                                  # app-level ARB
+└─ main.dart                              # init + push bootstrap, then ForumCopilotApp
 
 packages/discourse_ui/                    # the entire UI layer
 ├─ lib/config/app_forum_config.dart       # ← the file a fork normally edits
 ├─ lib/controllers/                       # GetX controllers
 ├─ lib/views/                             # pages + widgets
-├─ lib/services/                          # init, push, site proxy wiring
+├─ lib/services/                          # init, sign-in, push, links, forum theme
+├─ lib/host/                              # DiscourseHost: hooks for multi-forum hosts
 ├─ lib/utils/                             # cooked-HTML extraction, URLs, time, files
 ├─ lib/core/                              # logging, errors, cache, memory
-├─ lib/theme/                             # design tokens + theme
+├─ lib/theme/                             # design tokens, Material 3 theme, forum colours
 └─ lib/l10n/                              # ARB files + generated localisations
 
 packages/forumcopilot_sdk/                # forum-agnostic contracts
@@ -245,10 +262,10 @@ packages/forumcopilot_sdk/                # forum-agnostic contracts
 
 packages/discourse_core/                  # the Discourse implementation
 ├─ lib/factory/                           # DiscourseProxyFactory
-├─ lib/src/proxy/                         # per-area proxies (Topic, Post, Search, Chat, …)
-├─ lib/src/data/                          # typed Discourse models
-├─ lib/src/network/                       # Dio client + User API Key handshake
-└─ lib/src/converter/                     # Discourse JSON → FC* entities
+├─ lib/src/proxy/                         # per-area proxies (Topic, Post, Search, Chat, …): REST → FC*
+├─ lib/src/data/                          # per-forum side stores: read state, chat, messages, site
+├─ lib/src/network/                       # Dio client, User API Key handshake, MessageBus
+└─ lib/src/util/                          # Discourse links, HTML text, quotes, site URLs
 
 packages/discourse_appearance/            # plugin: in-app light/dark → native UI + web views
 
@@ -271,13 +288,15 @@ Order of preference:
 
 Concepts that took route 1 and are now first-class: tags, polls, bookmarks, four-level notification levels, structured search filters, server-side drafts, emoji reactions, post voting, suggested topics, badges, trust levels, accepted answers, and chat.
 
-**To add a feature:** update the interface in `packages/forumcopilot_sdk/lib/interfaces/`, add or extend the entity in `models/`, implement it in `packages/discourse_core/lib/` (proxy + converter), re-run codegen, then build the UI in `packages/discourse_ui/`.
+Facts only Discourse has, which no other forum platform would fill in, stay out of the shared SDK: they live in `discourse_core` as per-forum side stores that the proxies record into from every payload — `DiscourseTopicTracking` (Discourse's TopicTrackingState), `DiscourseMessageTracking`, `DiscourseChatChannelDetails`, `DiscourseValidReactions`, `DiscourseSiteCapabilities` and others.
+
+**To add a feature:** update the interface in `packages/forumcopilot_sdk/lib/interfaces/`, add or extend the entity in `models/`, implement it in `packages/discourse_core/lib/` (the proxy calls Discourse and converts its JSON), re-run codegen, then build the UI in `packages/discourse_ui/`. The SDK here is a vendored copy of a canonical one shared with other apps; [CONTRIBUTING.md](CONTRIBUTING.md) says how to change it.
 
 ---
 
 ## Changelog
 
-See [`CHANGELOG.md`](CHANGELOG.md). It follows *Keep a Changelog*; the **[Unreleased]** section is what has landed since the last tagged release.
+See [`CHANGELOG.md`](CHANGELOG.md). It follows *Keep a Changelog*; the **[Unreleased]** section is what has landed since the last tagged release. Each tagged version also has a [GitHub Release](https://github.com/forumcopilot/discourse-app/releases) with the same notes.
 
 ---
 

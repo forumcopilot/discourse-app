@@ -5297,4 +5297,21 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get notificationAccountMismatch =>
       'Diese Benachrichtigung kann mit dem aktuellen Konto nicht geöffnet werden. Öffne die Benachrichtigungen, um Updates für dieses Konto zu sehen.';
+
+  @override
+  String get chatJoinedChannels => 'Beigetretene Kanäle';
+
+  @override
+  String get chatAvailableChannels => 'Verfügbare Kanäle';
+
+  @override
+  String get chatAvailableChannelsDescription =>
+      'Kanäle, die du ansehen oder denen du beitreten kannst.';
+
+  @override
+  String get chatAllChannelsJoined =>
+      'Du bist allen verfügbaren Kanälen beigetreten.';
+
+  @override
+  String get chatViewChannel => 'Ansehen';
 }

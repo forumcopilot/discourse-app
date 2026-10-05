@@ -96,6 +96,10 @@ class _ChatChannelViewState extends State<ChatChannelView> {
   /// after the scroll to a new message used to leave it half off screen.
   bool _atBottom = true;
 
+  /// The list's length when its metrics were last reported, to tell growth
+  /// from scrolling.
+  double _lastMaxScrollExtent = 0;
+
   /// The target message's row, for scrolling to it.
   final _targetKey = GlobalKey();
 
@@ -288,9 +292,15 @@ class _ChatChannelViewState extends State<ChatChannelView> {
   void _onScroll() {
     final position = _scroll.position;
     // Only the reader's own scrolling moves them off (or back onto) the
-    // newest message; growth below them does not.
-    if (position.userScrollDirection != ScrollDirection.idle) {
-      _setAtBottom(position.pixels >= position.maxScrollExtent - 48);
+    // newest message; growth below them does not. Any move up leaves it;
+    // coming down, the last few points count as there.
+    switch (position.userScrollDirection) {
+      case ScrollDirection.forward:
+        _setAtBottom(position.pixels >= position.maxScrollExtent);
+      case ScrollDirection.reverse:
+        _setAtBottom(position.pixels >= position.maxScrollExtent - 48);
+      case ScrollDirection.idle:
+        break;
     }
     // Scrolling down from an unread line or a notified message: the next
     // messages load as the end comes near.
@@ -360,9 +370,14 @@ class _ChatChannelViewState extends State<ChatChannelView> {
                 NotificationListener<ScrollMetricsNotification>(
                   onNotification: (n) {
                     // Content grew under a reader at the newest message: keep
-                    // them there.
+                    // them there. Only growth counts: every frame of a drag
+                    // also reports new metrics, and taking those for growth
+                    // put the reader back at the end as they scrolled up.
                     final p = n.metrics;
-                    if (_atBottom &&
+                    final grew = p.maxScrollExtent > _lastMaxScrollExtent + 0.5;
+                    _lastMaxScrollExtent = p.maxScrollExtent;
+                    if (grew &&
+                        _atBottom &&
                         _positioned &&
                         _scroll.hasClients &&
                         p.pixels < p.maxScrollExtent) {

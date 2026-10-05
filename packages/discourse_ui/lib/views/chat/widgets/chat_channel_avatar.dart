@@ -64,7 +64,10 @@ class ChatChannelAvatar extends StatelessWidget {
       ),
       child: d?.emoji != null
           ? ReactionGlyph(
-              reactionId: d!.emoji!, size: size * 0.5, siteContext: siteContext)
+              reactionId: d!.emoji!,
+              size: size * 0.5,
+              siteContext: siteContext,
+              preferImage: true)
           : Text(
               '#',
               style: TextStyle(

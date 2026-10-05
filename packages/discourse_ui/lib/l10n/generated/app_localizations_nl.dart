@@ -5253,4 +5253,21 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get notificationAccountMismatch =>
       'Deze melding kan niet worden geopend met het huidige account. Open Meldingen om updates voor dit account te bekijken.';
+
+  @override
+  String get chatJoinedChannels => 'Aangesloten kanalen';
+
+  @override
+  String get chatAvailableChannels => 'Beschikbare kanalen';
+
+  @override
+  String get chatAvailableChannelsDescription =>
+      'Kanalen die je kunt bekijken of waar je aan kunt deelnemen.';
+
+  @override
+  String get chatAllChannelsJoined =>
+      'Je neemt deel aan alle beschikbare kanalen.';
+
+  @override
+  String get chatViewChannel => 'Bekijken';
 }

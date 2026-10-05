@@ -380,8 +380,11 @@ class _ReplyPageState extends State<ReplyPage> {
                 });
               }
             },
+            // Never null: null is what closing without posting returns, and
+            // the topic is left alone then (a reply queued for approval, or
+            // one that came back without an id, still refreshes it).
             onSuccess: (success) {
-              return _createdPostId;
+              return _createdPostId ?? true;
             },
           );
           if (isLoading) {
@@ -442,8 +445,9 @@ class _ReplyPageState extends State<ReplyPage> {
             });
           }
         },
+        // Never null (see the quote composer above).
         onSuccess: (success) {
-          return _createdPostId;
+          return _createdPostId ?? true;
         },
       );
     }

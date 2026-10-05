@@ -5003,4 +5003,19 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get notificationAccountMismatch =>
       'この通知は現在のアカウントでは開けません。「通知」を開くと、このアカウントの更新を確認できます。';
+
+  @override
+  String get chatJoinedChannels => '参加中のチャンネル';
+
+  @override
+  String get chatAvailableChannels => '利用可能なチャンネル';
+
+  @override
+  String get chatAvailableChannelsDescription => '閲覧または参加できるチャンネル。';
+
+  @override
+  String get chatAllChannelsJoined => '利用可能なすべてのチャンネルに参加しています。';
+
+  @override
+  String get chatViewChannel => '表示';
 }
