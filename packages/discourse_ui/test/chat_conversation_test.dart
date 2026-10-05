@@ -161,6 +161,49 @@ void main() {
       expect(find.byIcon(Icons.reply), findsOneWidget);
     });
 
+    testWidgets('a slow drag up from the newest message stays where the reader leaves it', (tester) async {
+      // Seen on an iPhone (v1.0.47): every frame of a drag counts as a change
+      // of the scroll metrics, and a reader within 48 points of the end was
+      // put back at the end, so a chat could not be scrolled up at all.
+      final base = DateTime.now().subtract(const Duration(hours: 3));
+      chat.channel = {'id': 1, 'title': 'general', 'chatable_type': 'Category'};
+      chat.messages = [
+        for (var i = 0; i < 30; i++)
+          _msg(200 + i, i.isEven ? 7 : 8, i.isEven ? 'samr' : 'priya', base.add(Duration(minutes: i * 6)),
+              'message number $i'),
+      ];
+      await pump(tester);
+      final position = tester.state<ScrollableState>(find.byType(Scrollable).first).position;
+      final bottom = position.maxScrollExtent;
+      expect(position.pixels, bottom, reason: 'opens at the newest');
+      final gesture = await tester.startGesture(tester.getCenter(find.byType(ListView)));
+      for (var i = 0; i < 20; i++) {
+        await gesture.moveBy(const Offset(0, 10));
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await gesture.up();
+      await tester.pumpAndSettle();
+      expect(position.pixels, lessThan(bottom - 150), reason: 'the drag moved the list');
+    });
+
+    testWidgets('at the newest message, a message that grows keeps the reader there', (tester) async {
+      final base = DateTime.now().subtract(const Duration(hours: 3));
+      chat.channel = {'id': 1, 'title': 'general', 'chatable_type': 'Category'};
+      chat.messages = [
+        for (var i = 0; i < 30; i++)
+          _msg(300 + i, i.isEven ? 7 : 8, i.isEven ? 'samr' : 'priya', base.add(Duration(minutes: i * 6)),
+              'message number $i'),
+      ];
+      await pump(tester);
+      final position = tester.state<ScrollableState>(find.byType(Scrollable).first).position;
+      final before = position.maxScrollExtent;
+      // Someone reacts to the newest message: its row grows by the chips.
+      chat.onEvent!(const DiscourseChatReaction(messageId: 329, emoji: 'heart', username: 'kim', added: true));
+      await tester.pumpAndSettle();
+      expect(position.maxScrollExtent, greaterThan(before));
+      expect(position.pixels, position.maxScrollExtent);
+    });
+
     testWidgets('the "last visit" line also when the channel says nothing of unread', (tester) async {
       // A channel opened from a link: its own response has the last read
       // message but no unread count.
@@ -217,7 +260,12 @@ class _Chat extends DiscourseChatProxy {
   }
 
   @override
-  void Function()? watchChannel(int channelId, void Function(DiscourseChatEvent event) onEvent) => () {};
+  void Function()? watchChannel(int channelId, void Function(DiscourseChatEvent event) onEvent) {
+    this.onEvent = onEvent;
+    return () {};
+  }
+
+  void Function(DiscourseChatEvent event)? onEvent;
 }
 
 class _Factory implements SiteProxyFactory {

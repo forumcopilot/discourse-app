@@ -6525,5 +6525,10 @@
   "@chatPlaceholderGroup": {
     "description": "Composer hint in a group chat (Discourse chat.placeholder_group)"
   },
-  "notificationAccountMismatch": "This notification cannot be opened with the current account. Open Notifications to see updates for this account."
+  "notificationAccountMismatch": "This notification cannot be opened with the current account. Open Notifications to see updates for this account.",
+  "chatJoinedChannels": "Joined channels",
+  "chatAvailableChannels": "Available channels",
+  "chatAvailableChannelsDescription": "Channels you can view or join.",
+  "chatAllChannelsJoined": "You have joined all available channels.",
+  "chatViewChannel": "View"
 }

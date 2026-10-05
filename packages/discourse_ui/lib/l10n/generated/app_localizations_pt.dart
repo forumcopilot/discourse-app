@@ -5259,4 +5259,20 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get notificationAccountMismatch =>
       'Esta notificação não pode ser aberta com a conta atual. Abra Notificações para ver as atualizações desta conta.';
+
+  @override
+  String get chatJoinedChannels => 'Canais em que participa';
+
+  @override
+  String get chatAvailableChannels => 'Canais disponíveis';
+
+  @override
+  String get chatAvailableChannelsDescription =>
+      'Canais que pode ver ou aos quais pode aderir.';
+
+  @override
+  String get chatAllChannelsJoined => 'Aderiu a todos os canais disponíveis.';
+
+  @override
+  String get chatViewChannel => 'Ver';
 }

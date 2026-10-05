@@ -1724,5 +1724,10 @@
   "messagePersonal": "Persoonlijk",
   "messageListIncoming": "{count, plural, one{{count} nieuw of bijgewerkt topic weergeven} other{{count} nieuwe of bijgewerkte topics weergeven}}",
   "chatPlaceholderGroup": "Chatten in groep",
-  "notificationAccountMismatch": "Deze melding kan niet worden geopend met het huidige account. Open Meldingen om updates voor dit account te bekijken."
+  "notificationAccountMismatch": "Deze melding kan niet worden geopend met het huidige account. Open Meldingen om updates voor dit account te bekijken.",
+  "chatJoinedChannels": "Aangesloten kanalen",
+  "chatAvailableChannels": "Beschikbare kanalen",
+  "chatAvailableChannelsDescription": "Kanalen die je kunt bekijken of waar je aan kunt deelnemen.",
+  "chatAllChannelsJoined": "Je neemt deel aan alle beschikbare kanalen.",
+  "chatViewChannel": "Bekijken"
 }

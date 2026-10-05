@@ -26,6 +26,7 @@ import 'chat_browse_channels_page.dart';
 import 'chat_people_sheet.dart';
 import 'chat_search_page.dart';
 import 'widgets/chat_channel_avatar.dart';
+import 'widgets/chat_available_channels.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/not_signed_in_view.dart';
 import '../widgets/resettable_widget.dart';
@@ -48,8 +49,8 @@ String _channelDisplayTitle(BuildContext context, FCChatChannel ch) {
 /// The halves of the chat list, as Discourse's chat footer on a phone.
 enum _ChatHalf { channels, dms, threads }
 
-/// Top-level Chat surface: lists the user's joined channels and opens
-/// the selected one in a full-page route.
+/// Top-level Chat surface: joined channels above permission-filtered
+/// discovery, with direct messages and threads in separate tabs.
 ///
 /// Discourse Chat users typically belong to a handful of category-
 /// linked public channels plus DMs. We render both groups in one list
@@ -80,6 +81,8 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     with FCTabStatefulWidget<ChatChannelListPage> {
   List<FCChatChannel>? _channels;
   bool _loading = false;
+  int _loadGeneration = 0;
+  int _discoveryRevision = 0;
   String? _error;
 
   /// Discourse keeps channels and direct messages apart (Channels / DMs),
@@ -121,6 +124,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
       if (isLoggedIn != _wasLoggedIn || username != _lastLoadedUsername) {
         _wasLoggedIn = isLoggedIn;
         _lastLoadedUsername = username;
+        _channels = null;
         _load();
       }
     };
@@ -141,6 +145,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
 
   @override
   void dispose() {
+    _loadGeneration++;
     _stopWatching?.call();
     widget.siteContext.isLoggedInNotifier.removeListener(_authStateListener);
     super.dispose();
@@ -226,6 +231,9 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
   }
 
   Future<void> _load() async {
+    final generation = ++_loadGeneration;
+    _stopWatching?.call();
+    _stopWatching = null;
     // `/chat/api/me/channels` is "my channels" — it needs a session, and
     // answers 403 without one. Same gate as
     // DiscourseTopicProxy.markTopicReadAsync puts on the timings beacon:
@@ -246,7 +254,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     });
     try {
       final result = await SiteProxyService.getChatProxy().getMyChannelsAsync();
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       setState(() {
         _loading = false;
         if (!result.result) {
@@ -260,12 +268,13 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
         // ("Ask an admin to invite you" was wrong too — Discourse users
         // browse and join channels themselves.)
         _channels = result.channels;
+        _discoveryRevision++;
       });
       _publishUnread();
       _watch();
       if (_half == _ChatHalf.threads) unawaited(_loadThreads());
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       setState(() {
         _channels = const [];
         _loading = false;
@@ -288,7 +297,9 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
       if (r.result) {
         _threads = r.threads;
       } else {
-        _threadsError = r.resultText.isNotEmpty ? r.resultText : AppLocalizations.of(context)!.chatNotAvailable;
+        _threadsError = r.resultText.isNotEmpty
+            ? r.resultText
+            : AppLocalizations.of(context)!.chatNotAvailable;
       }
     });
   }
@@ -498,15 +509,17 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     final canDm = widget.siteContext.chatCanDirectMessage;
     final hasChannels = widget.siteContext.chatPublicChannelsEnabled;
     final hasDms = canDm || all.any((c) => c.chatableType == 'DirectMessage');
-    final autoDms = !all.any((c) => c.chatableType != 'DirectMessage') &&
-        all.any((c) => c.chatableType == 'DirectMessage');
     final site = widget.siteContext.site.url;
     final discourse = SiteProxyService.getChatProxy() is DiscourseChatProxy;
-    final threadsOn = discourse && DiscourseChatSettings.forSite(site).threadsEnabled;
-    final searchOn = discourse && DiscourseChatSettings.forSite(site).searchEnabled;
+    final threadsOn =
+        discourse && DiscourseChatSettings.forSite(site).threadsEnabled;
+    final searchOn =
+        discourse && DiscourseChatSettings.forSite(site).searchEnabled;
     final showThreads = threadsOn && _half == _ChatHalf.threads;
-    final picked = _half == null || _half == _ChatHalf.threads ? null : _half == _ChatHalf.dms;
-    final showDms = hasChannels && hasDms ? (picked ?? autoDms) : !hasChannels;
+    final picked = _half == null || _half == _ChatHalf.threads
+        ? null
+        : _half == _ChatHalf.dms;
+    final showDms = hasChannels && hasDms ? (picked ?? false) : !hasChannels;
     final half = all
         .where((c) => (c.chatableType == 'DirectMessage') == showDms)
         .toList();
@@ -550,10 +563,13 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
         ButtonSegment(
           value: _ChatHalf.threads,
           icon: three ? null : const Icon(Icons.forum_outlined),
-          label: segmentLabel(l10n.chatMyThreads, (_threads ?? const []).any((t) => t.unreadCount > 0)),
+          label: segmentLabel(l10n.chatMyThreads,
+              (_threads ?? const []).any((t) => t.unreadCount > 0)),
         ),
     ];
-    final selected = showThreads ? _ChatHalf.threads : (showDms ? _ChatHalf.dms : _ChatHalf.channels);
+    final selected = showThreads
+        ? _ChatHalf.threads
+        : (showDms ? _ChatHalf.dms : _ChatHalf.channels);
 
     final header = Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -566,15 +582,42 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
         children: [
           Expanded(
             child: segments.length > 1
-                ? SegmentedButton<_ChatHalf>(
-                    segments: segments,
-                    selected: {selected},
-                    showSelectedIcon: false,
-                    onSelectionChanged: (sel) {
-                      setState(() => _half = sel.first);
-                      if (sel.first == _ChatHalf.threads && _threads == null) unawaited(_loadThreads());
-                    },
-                  )
+                ? LayoutBuilder(builder: (context, constraints) {
+                    void select(_ChatHalf half) {
+                      setState(() => _half = half);
+                      if (half == _ChatHalf.threads && _threads == null) {
+                        unawaited(_loadThreads());
+                      }
+                    }
+
+                    // Keep every destination readable with larger text or
+                    // too little room for one row of navigation controls.
+                    final scale =
+                        MediaQuery.textScalerOf(context).scale(14) / 14;
+                    if (scale > 1.3 ||
+                        constraints.maxWidth < segments.length * 100 * scale) {
+                      return Wrap(
+                        spacing: DesignTokens.spacingS,
+                        runSpacing: DesignTokens.spacingXS,
+                        children: [
+                          for (final segment in segments)
+                            ChoiceChip(
+                              label: segment.label!,
+                              avatar: segment.icon,
+                              selected: selected == segment.value,
+                              showCheckmark: false,
+                              onSelected: (_) => select(segment.value),
+                            ),
+                        ],
+                      );
+                    }
+                    return SegmentedButton<_ChatHalf>(
+                      segments: segments,
+                      selected: {selected},
+                      showSelectedIcon: false,
+                      onSelectionChanged: (values) => select(values.first),
+                    );
+                  })
                 : const SizedBox.shrink(),
           ),
           if (searchOn)
@@ -587,9 +630,11 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
       ),
     );
 
-    if (showThreads) return _buildThreads(header);
+    if (showThreads) {
+      return _buildThreads(header);
+    }
 
-    if (half.isEmpty) {
+    if (half.isEmpty && showDms) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
@@ -658,6 +703,14 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
 
     final rows = <Widget>[
       header,
+      if (!showDms) sectionTitle(l10n.chatJoinedChannels),
+      if (!showDms && half.isEmpty)
+        Padding(
+          padding: const EdgeInsets.all(DesignTokens.spacingL),
+          child: Text(l10n.chatNoChannels,
+              style: textTheme.bodyMedium
+                  ?.copyWith(color: colorScheme.onSurfaceVariant)),
+        ),
       if (starred.isNotEmpty) ...[
         sectionTitle(l10n.chatStarred),
         for (final ch in starred) tile(ch),
@@ -665,16 +718,29 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
           sectionTitle(showDms ? l10n.chatDms : l10n.chatChannels),
       ],
       for (final ch in rest) tile(ch),
-      if (!showDms)
-        ListTile(
-          leading: SizedBox(
-            width: 44,
-            child: Icon(Icons.travel_explore, color: colorScheme.primary),
-          ),
-          title: Text(l10n.chatBrowseAllChannels,
-              style: textTheme.bodyLarge?.copyWith(color: colorScheme.primary)),
-          onTap: _browse,
+      if (!showDms && discourse)
+        ChatAvailableChannels(
+          key: ValueKey(
+              '${widget.siteContext.site.url}:${widget.siteContext.currentUsername}'),
+          siteContext: widget.siteContext,
+          joinedIds: half.map((c) => c.id).toSet(),
+          revision: _discoveryRevision,
+          onOpen: _open,
+          onJoined: (channel) {
+            setState(() {
+              channel.isFollowing = true;
+              _channels = [
+                ...?_channels?.where((c) => c.id != channel.id),
+                channel
+              ];
+            });
+            _publishUnread();
+            _watch();
+            unawaited(_load());
+          },
         ),
+      if (!showDms && !discourse)
+        ListTile(title: Text(l10n.chatBrowseAllChannels), onTap: _browse),
       // Room for the floating button over the last row.
       const SizedBox(height: 88),
     ];
@@ -698,18 +764,24 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
     } else if (threads == null || threads.isEmpty) {
       content = Padding(
         padding: const EdgeInsets.only(top: DesignTokens.spacingXL),
-        child: EmptyStateView(icon: Icons.forum_outlined, message: _threadsError ?? l10n.chatMyThreadsEmpty),
+        child: EmptyStateView(
+            icon: Icons.forum_outlined,
+            message: _threadsError ?? l10n.chatMyThreadsEmpty),
       );
     } else {
       content = Column(
-        children: [for (final t in threads) _ThreadTile(thread: t, onTap: () => _openThread(t))],
+        children: [
+          for (final t in threads)
+            _ThreadTile(thread: t, onTap: () => _openThread(t))
+        ],
       );
     }
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
         header,
-        if (_threadsLoading && threads != null) const LinearProgressIndicator(minHeight: 2),
+        if (_threadsLoading && threads != null)
+          const LinearProgressIndicator(minHeight: 2),
         content,
         const SizedBox(height: 88),
       ],
@@ -734,7 +806,9 @@ class _ThreadTile extends StatelessWidget {
     final om = thread.originalMessage;
     final first = om == null
         ? ''
-        : withEmojiShortcodes(stripHtmlToText(om.cooked.isNotEmpty ? om.cooked : om.message)).trim();
+        : withEmojiShortcodes(
+                stripHtmlToText(om.cooked.isNotEmpty ? om.cooked : om.message))
+            .trim();
     final title = thread.title ?? (first.isNotEmpty ? first : l10n.chatThread);
     final unread = thread.unreadCount > 0;
     final when = thread.lastReplyAt ?? om?.createdAt;
@@ -745,13 +819,16 @@ class _ThreadTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingM),
+        padding: const EdgeInsets.symmetric(
+            horizontal: DesignTokens.spacingL, vertical: DesignTokens.spacingM),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             UserAvatar(
               username: om?.authorUsername ?? '',
-              iconUrl: om?.authorAvatarUrl?.isEmpty ?? true ? null : om?.authorAvatarUrl,
+              iconUrl: om?.authorAvatarUrl?.isEmpty ?? true
+                  ? null
+                  : om?.authorAvatarUrl,
               radius: 22,
             ),
             const SizedBox(width: DesignTokens.spacingM),
@@ -766,24 +843,31 @@ class _ThreadTile extends StatelessWidget {
                           title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: textTheme.titleSmall?.copyWith(fontWeight: unread ? FontWeight.w700 : FontWeight.w500),
+                          style: textTheme.titleSmall?.copyWith(
+                              fontWeight:
+                                  unread ? FontWeight.w700 : FontWeight.w500),
                         ),
                       ),
                       if (when != null) ...[
                         const SizedBox(width: DesignTokens.spacingS),
                         Text(formatChatListTime(context, when),
                             style: textTheme.bodySmall?.copyWith(
-                                color: unread ? colorScheme.primary : colorScheme.onSurfaceVariant)),
+                                color: unread
+                                    ? colorScheme.primary
+                                    : colorScheme.onSurfaceVariant)),
                       ],
                     ],
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    [if (channel != null && channel.isNotEmpty) '#$channel', l10n.chatThreadReplies(thread.replyCount)]
-                        .join(' · '),
+                    [
+                      if (channel != null && channel.isNotEmpty) '#$channel',
+                      l10n.chatThreadReplies(thread.replyCount)
+                    ].join(' · '),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                    style: textTheme.bodySmall
+                        ?.copyWith(color: colorScheme.onSurfaceVariant),
                   ),
                   if (last != null && last.isNotEmpty) ...[
                     const SizedBox(height: 2),
@@ -795,12 +879,14 @@ class _ThreadTile extends StatelessWidget {
                               if (thread.lastReplyUser != null)
                                 TextSpan(
                                     text: '${thread.lastReplyUser!.username}: ',
-                                    style: const TextStyle(fontWeight: FontWeight.w600)),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w600)),
                               TextSpan(text: last),
                             ]),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                            style: textTheme.bodyMedium
+                                ?.copyWith(color: colorScheme.onSurfaceVariant),
                           ),
                         ),
                         if (unread) ...[

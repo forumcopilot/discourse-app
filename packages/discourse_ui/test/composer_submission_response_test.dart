@@ -157,7 +157,8 @@ void main() {
       if (kind == 'topic') {
         expect(composer(tester).pageAfterSubmit!(), isNull);
       } else {
-        expect(composer(tester).onSuccess!(true), isNull);
+        expect(composer(tester).onSuccess!(true), isTrue,
+            reason: 'queued replies refresh the topic; null means cancelled');
       }
       await close(tester);
     });
