@@ -45,6 +45,14 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
   /// provide it and the vote-removal / voters affordances are hidden.
   int? get _hostPostId => int.tryParse(widget.poll.postId ?? '');
 
+  /// Whether [proxy] talks to the forum this card's poll is on. The active
+  /// forum can change under a card still on screen (a page left open across
+  /// a forum switch); the `/polls/*` endpoints are addressed by post id and
+  /// poll name only, so the other forum's proxy would act on whatever post
+  /// has that id there.
+  bool _servesThisForum(DiscoursePostProxy proxy) =>
+      proxy.siteContext.site.pluginUrl == widget.siteContext.site.pluginUrl;
+
   int get _maxSelections => widget.poll.maxVotes == 0 ? widget.poll.responses.length : widget.poll.maxVotes;
 
   void _toggleOption(String responseId) {
@@ -74,7 +82,7 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
       // another forum if navigation changed the active site.
       FCPoll? updated;
       if (postProxy is DiscoursePostProxy) {
-        if (postProxy.siteContext.site.pluginUrl == widget.siteContext.site.pluginUrl) {
+        if (_servesThisForum(postProxy)) {
           updated = await postProxy.votePollAsync(
             widget.topicId, _selectedIds.toList(), poll: widget.poll);
         }
@@ -112,6 +120,10 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
     if (_isRemovingVote || _isSubmitting) return;
     final proxy = SiteProxyService.getPostProxy();
     if (proxy is! DiscoursePostProxy) return;
+    if (!_servesThisForum(proxy)) {
+      _showError(AppLocalizations.of(context)!.pollRemoveVoteFailed);
+      return;
+    }
 
     setState(() => _isRemovingVote = true);
     try {
@@ -153,7 +165,7 @@ class _ThreadPollCardState extends State<ThreadPollCard> {
     final proxy = SiteProxyService.getPostProxy();
     if (proxy is! DiscoursePostProxy) return;
     final postId = _hostPostId;
-    if (postId == null) {
+    if (postId == null || !_servesThisForum(proxy)) {
       _showError(AppLocalizations.of(context)!.pollVotersLoadFailed);
       return;
     }
