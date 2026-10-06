@@ -1,21 +1,46 @@
 package com.forumcopilot.discourse_notifications
 
+import java.net.IDN
 import java.net.URI
 
-/** Full forum identity: schemes, ports and subfolder case are significant. */
+/** Forum identity as the relay keys it: host, port and subfolder (whose case
+ * is significant). The scheme is not: the relay files http:// and https:// of
+ * one host under one forum and echoes whichever was registered first, so a
+ * strict scheme match silently dropped every push for that forum.
+ */
 internal object NotificationIdentity {
-    fun forum(raw: String?): String? = try {
-        val uri = URI(raw ?: "")
-        val scheme = uri.scheme?.lowercase()
-        val host = uri.host?.lowercase()
-        if (scheme !in listOf("http", "https") || host.isNullOrBlank() ||
-            uri.rawUserInfo != null || uri.rawQuery != null || uri.rawFragment != null) null
-        else {
-            val port = if (uri.port == -1 || (scheme == "https" && uri.port == 443) ||
-                (scheme == "http" && uri.port == 80)) "" else ":${uri.port}"
-            "$scheme://$host$port${(uri.rawPath ?: "").trimEnd('/')}"
+    fun forum(raw: String?): String? {
+        try {
+            val uri = URI(raw?.trim() ?: "")
+            val scheme = uri.scheme?.lowercase()
+            if (scheme !in listOf("http", "https") ||
+                uri.rawUserInfo != null || uri.rawQuery != null || uri.rawFragment != null) return null
+            // java.net.URI leaves host null for hosts it won't parse as a
+            // server authority (an underscore, a non-ASCII name). Read those
+            // from the raw authority instead of refusing the forum.
+            var host = uri.host
+            var port = uri.port
+            if (host == null) {
+                val authority = uri.rawAuthority ?: return null
+                if ('@' in authority) return null
+                val colon = authority.lastIndexOf(':')
+                if (colon > 0 && colon < authority.length - 1 &&
+                    authority.substring(colon + 1).all { it.isDigit() }) {
+                    host = authority.substring(0, colon)
+                    port = authority.substring(colon + 1).toInt()
+                } else {
+                    host = authority
+                }
+            }
+            if (host.isNullOrBlank()) return null
+            val ascii = IDN.toASCII(host, IDN.ALLOW_UNASSIGNED).lowercase()
+            val defaultPort = if (scheme == "https") 443 else 80
+            val portPart = if (port == -1 || port == defaultPort) "" else ":$port"
+            return "$ascii$portPart${(uri.rawPath ?: "").trimEnd('/')}"
+        } catch (_: Exception) {
+            return null
         }
-    } catch (_: Exception) { null }
+    }
 
     fun messageKey(data: Map<String, String>): String? {
         user(data["notification_id"])?.let { return "notification:$it" }

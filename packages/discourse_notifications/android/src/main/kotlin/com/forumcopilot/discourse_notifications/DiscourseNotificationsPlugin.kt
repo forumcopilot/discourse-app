@@ -14,6 +14,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import org.json.JSONObject
+import java.security.SecureRandom
 
 /** All MethodChannel calls run on the platform main thread, across engines.
  * Persist before returning; logout and display cannot pass each other in the
@@ -103,8 +104,13 @@ class DiscourseNotificationsPlugin : FlutterPlugin, MethodChannel.MethodCallHand
         if (!NotificationIdentity.permits(prefs.getString("account:$forum", null), user)) return false
         val icon = iconId(prefs.getString("icon", "") ?: "")
         if (icon == 0) return false
-        val channelId = data["channel_id"] ?: "forum_copilot_channel"
-        if (Build.VERSION.SDK_INT >= 26 && manager.getNotificationChannel(channelId) == null) return false
+        // A channel this build doesn't have (an older app, a new group on the
+        // relay) falls back to the default one rather than dropping the push.
+        var channelId = data["channel_id"] ?: DEFAULT_CHANNEL
+        if (Build.VERSION.SDK_INT >= 26 && manager.getNotificationChannel(channelId) == null) {
+            channelId = DEFAULT_CHANNEL
+            if (manager.getNotificationChannel(channelId) == null) return false
+        }
         val notificationId = NotificationIdentity.messageKey(data) ?: return false
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName) ?: return false
         intent.action = ACTION
@@ -112,6 +118,9 @@ class DiscourseNotificationsPlugin : FlutterPlugin, MethodChannel.MethodCallHand
         intent.data = Uri.Builder().scheme("discourse-notification").authority("open")
             .appendPath(forum).appendPath(user).appendPath(notificationId).build()
         intent.putExtra(PAYLOAD, JSONObject(data).toString())
+        // The launcher activity is exported: only an intent carrying this
+        // app-private token opens a notification route.
+        intent.putExtra(TOKEN, tapToken())
         val pending = PendingIntent.getActivity(context, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(context, channelId)
@@ -120,14 +129,39 @@ class DiscourseNotificationsPlugin : FlutterPlugin, MethodChannel.MethodCallHand
             .setContentText(data["body"])
             .setStyle(Notification.BigTextStyle().bigText(data["body"]))
             .setAutoCancel(true).setContentIntent(pending).setGroup(tag(forum, user))
+        accentColor()?.let { builder.setColor(it) }
+        data["notification_count"]?.toIntOrNull()?.takeIf { it > 0 }?.let { builder.setNumber(it) }
         manager.notify(tag(forum, user), notificationId.hashCode(), builder.build())
         return true
+    }
+
+    /** Random, created once, kept in this app's private preferences. */
+    private fun tapToken(): String {
+        prefs.getString("tap_token", null)?.let { return it }
+        val bytes = ByteArray(16).also { SecureRandom().nextBytes(it) }
+        val token = bytes.joinToString("") { "%02x".format(it) }
+        prefs.edit().putString("tap_token", token).commit()
+        return token
+    }
+
+    private fun accentColor(): Int? {
+        val id = context.resources.getIdentifier("default_notification_color", "color", context.packageName)
+        if (id == 0) return null
+        return try {
+            if (Build.VERSION.SDK_INT >= 23) context.getColor(id) else context.resources.getColor(id)
+        } catch (_: Exception) { null }
     }
 
     private fun consume(intent: Intent?): Map<String, String>? {
         if (intent?.action != ACTION) return null
         val payload = intent.getStringExtra(PAYLOAD) ?: return null
+        val token = intent.getStringExtra(TOKEN)
         intent.removeExtra(PAYLOAD)
+        intent.removeExtra(TOKEN)
+        // Reopening from Recents after the process died re-delivers the
+        // original intent: that is not a new tap.
+        if ((intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) return null
+        if (token == null || token != prefs.getString("tap_token", null)) return null
         return try {
             val json = JSONObject(payload)
             json.keys().asSequence().associateWith { json.getString(it) }
@@ -153,5 +187,7 @@ class DiscourseNotificationsPlugin : FlutterPlugin, MethodChannel.MethodCallHand
         private const val TAG_PREFIX = "discourse-account:"
         private const val ACTION = "com.forumcopilot.NOTIFICATION_OPEN"
         private const val PAYLOAD = "discourse_notification_payload"
+        private const val TOKEN = "discourse_notification_token"
+        private const val DEFAULT_CHANNEL = "forum_copilot_channel"
     }
 }

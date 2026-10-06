@@ -1,4 +1,5 @@
 import 'account_notifications.dart';
+import 'notification_installation.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -104,11 +105,20 @@ class NotificationService with ServiceErrorHandlingMixin {
       }
 
       await _createAndroidNotificationChannel();
-      await AccountNotifications.initialize(onTap: (data) {
-        // Initial intents may arrive while the host is constructing its router.
-        WidgetsBinding.instance.addPostFrameCallback((_) => _navigateFromNotification(data));
-        WidgetsBinding.instance.ensureVisualUpdate();
-      });
+      // Like every step here, a failure must not stop the rest: the FCM
+      // token and message handlers below carry legacy and iOS push too.
+      try {
+        await AccountNotifications.initialize(onTap: (data) {
+          // Initial intents may arrive while the host is constructing its router.
+          WidgetsBinding.instance.addPostFrameCallback((_) => _navigateFromNotification(data));
+          WidgetsBinding.instance.ensureVisualUpdate();
+        });
+        // Now that guarded display is ready, tell the backend: a report
+        // sent before this said legacy.
+        unawaited(NotificationInstallation.report());
+      } catch (e) {
+        AppLogger.debug('⚠️ [NotificationService] Account-guarded notifications unavailable: $e');
+      }
 
       // Get FCM token with better error handling
       try {

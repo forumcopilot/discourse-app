@@ -265,16 +265,23 @@ class DiscourseLoginService {
   /// Persist cleanup before forgetting local state. New grants then get a
   /// different client ID; retries can safely outlive logout and app restarts.
   Future<void> retireNotificationsGrant() async {
-    await AccountNotifications.retire(siteContext);
-    if (!AppForumConfig.isNotificationsGrantEnabled) return;
-    final prefs = await SharedPreferences.getInstance();
-    // A started grant may have reached the relay even if its response was lost.
-    if ((prefs.getBool(_notificationsGrantKey) ?? false) || prefs.containsKey(_notificationsSuffixKey)) {
-      await NotificationGrantCleanup.enqueue(
-          siteContext.site.url, await notificationsClientId());
+    AccountNotifications.markRetired(siteContext);
+    if (AppForumConfig.isNotificationsGrantEnabled) {
+      final prefs = await SharedPreferences.getInstance();
+      // A started grant may have reached the relay even if its response was lost.
+      if ((prefs.getBool(_notificationsGrantKey) ?? false) || prefs.containsKey(_notificationsSuffixKey)) {
+        await NotificationGrantCleanup.enqueue(
+            siteContext.site.url, await notificationsClientId());
+      }
+      await clearNotificationsGrant();
     }
-    await clearNotificationsGrant();
-    unawaited(NotificationGrantCleanup.instance.retryPending());
+    // Last: a grant completing meanwhile (markNotificationsGranted) may
+    // have set this account natively again; with its client id cleared
+    // above, nothing can after this.
+    await AccountNotifications.retire(siteContext);
+    if (AppForumConfig.isNotificationsGrantEnabled) {
+      unawaited(NotificationGrantCleanup.instance.retryPending());
+    }
   }
 
   /// Tell the notifications backend about this forum's Do Not Disturb, so
@@ -505,7 +512,18 @@ class DiscourseLoginService {
   /// revoked server-side) drops credentials.
   Future<bool> restorePersistedSession() async {
     await siteContext.loadUserApiCredentials();
-    if (!siteContext.hasUserApiKey || AccountNotifications.isRetired(siteContext)) return false;
+    if (!siteContext.hasUserApiKey) {
+      // No one is signed in here, yet a grant may survive (a restore from
+      // backup brings preferences back but not the key): its pushes have
+      // no owner on this phone.
+      try {
+        await retireNotificationsGrant();
+      } catch (e) {
+        AppLogger.debug('Could not retire an orphaned notifications grant: $e');
+      }
+      return false;
+    }
+    if (AccountNotifications.isRetired(siteContext)) return false;
     final session = siteContext.configurationSession;
 
     String failureReason;

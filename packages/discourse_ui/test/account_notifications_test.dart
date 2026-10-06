@@ -1,8 +1,10 @@
 import 'package:discourse_core/discourse_core.dart';
 import 'package:discourse_notifications/discourse_notifications.dart';
+import 'package:discourse_ui/config/app_forum_config.dart';
 import 'package:discourse_ui/services/account_notifications.dart';
 import 'package:discourse_ui/services/discourse_login_service.dart';
 import 'package:discourse_ui/services/notification_installation.dart';
+import 'package:discourse_ui/services/notification_key_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -65,6 +67,78 @@ void main() {
     await AccountNotifications.activate(context, session, newGrant: true);
     expect(calls.last.arguments['userId'], '7');
   });
+  test('a native failure never breaks sign-in or sign-out', () async {
+    // A forum address the native side could not read used to throw out of
+    // finishLogin (half-applied) and handleLogout (no way to sign out).
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(DiscourseNotifications.channel, (call) async {
+      calls.add(call);
+      throw PlatformException(code: 'notification_error', message: 'Invalid forum');
+    });
+    final context = account();
+    await AccountNotifications.activate(
+        context, context.configurationSession, newGrant: true);
+    await AccountNotifications.retire(context);
+    await DiscourseLoginService(context).retireNotificationsGrant();
+    expect(calls.map((c) => c.method), everyElement('setAccount'));
+  });
+
+  group('with the notifications backend', () {
+    setUp(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+              const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
+              (_) async => null);
+      AppForumConfig.setNotificationsApiBaseUrl('https://relay.example/api');
+      NotificationKeyService.requestOverride = (_, __, ___) async => null;
+    });
+    tearDown(() {
+      NotificationKeyService.requestOverride = null;
+      AppForumConfig.setNotificationsApiBaseUrl(null);
+    });
+
+    test('a grant finishing during sign-out cannot restore the account',
+        () async {
+      final context = account();
+      final login = DiscourseLoginService(context);
+      final grant = await login.beginNotificationsGrant();
+      final session = context.configurationSession;
+      calls.clear();
+      final signingOut = login.retireNotificationsGrant();
+      // The grant lands while sign-out is queueing the relay revoke; the
+      // page passes what it started with, as enable_notifications_page does.
+      await Future<void>.delayed(Duration.zero);
+      final granting = login.markNotificationsGranted(
+          installBound: true,
+          expectedSession: session,
+          expectedClientId: grant.clientId);
+      await Future.wait([signingOut, granting.catchError((_) => false)]);
+      final accounts = calls
+          .where((c) => c.method == 'setAccount')
+          .map((c) => c.arguments['userId'])
+          .toList();
+      expect(accounts.last, isNull,
+          reason: 'signed out: this forum shows no one\'s notifications');
+    });
+
+    test('no key on launch retires a grant left behind', () async {
+      // A restore from backup brings preferences back, not the key.
+      final context = account(id: null);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(
+          '${context.discourseStoragePrefix}_notifications_key_granted', true);
+      expect(await DiscourseLoginService(context).restorePersistedSession(),
+          isFalse);
+      expect(prefs.getBool(
+              '${context.discourseStoragePrefix}_notifications_key_granted'),
+          isNull);
+      expect(
+          prefs.getKeys().where((k) => k.startsWith('notifications_pending_revoke:')),
+          hasLength(1));
+      expect(calls.last.arguments, {'forum': context.site.url, 'userId': null});
+    });
+  });
+
   test('guarded rejection never falls back to unguarded display', () async {
     expect(
         await AccountNotifications.handle(
