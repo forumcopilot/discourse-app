@@ -25,7 +25,8 @@ import 'post_body_extensions.dart';
 ///  * `div.poll[data-poll-name]` — the post's live poll, in place, via
 ///    [pollBuilder]; the app drew the first post's poll above the text and
 ///    left the cooked option list, with a vote count frozen at cook time,
-///    where the author put it.
+///    where the author put it. A poll inside a quote stays as cooked (see
+///    [_inQuote]).
 class DiscourseBlocksExtension extends HtmlExtension {
   const DiscourseBlocksExtension({
     required this.onOpen,
@@ -55,7 +56,24 @@ class DiscourseBlocksExtension extends HtmlExtension {
             c.contains('spoiled') ||
             c.contains('discourse-post-event') ||
             c.contains('math') ||
-            (c.contains('poll') && pollBuilder != null && context.attributes['data-poll-name'] != null);
+            (c.contains('poll') &&
+                pollBuilder != null &&
+                context.attributes['data-poll-name'] != null &&
+                !_inQuote(context));
+    }
+    return false;
+  }
+
+  /// Whether the element is inside a `blockquote`: a quote of another post,
+  /// whose poll is that post's markup as it was cooked. Discourse makes no
+  /// poll of it — the server skips quoted `div.poll`s when it reads a post's
+  /// polls (`DiscoursePoll::Poll.extract`) and the web does not draw them
+  /// (`attachPolls` in extend-for-poll) — so it must not take this post's
+  /// live poll of the same name ("poll", usually), which then showed twice
+  /// and took votes from inside the quote.
+  static bool _inQuote(ExtensionContext context) {
+    for (var p = context.node.parent; p != null; p = p.parent) {
+      if (p.localName == 'blockquote') return true;
     }
     return false;
   }
