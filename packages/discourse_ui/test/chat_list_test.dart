@@ -87,6 +87,12 @@ Map<String, dynamic> _dm(int id, String title, List<Map<String, dynamic>> users,
         },
     };
 
+Map<String, dynamic> _threads(String title) => {
+      'threads': [
+        {'id': 5, 'channel_id': 1, 'title': title},
+      ],
+    };
+
 void main() {
   late _Chat chat;
 
@@ -444,6 +450,82 @@ void main() {
     expect(chat.watched, isNull);
   });
 
+  group("My Threads belong to the account that loaded them", () {
+    late SiteContext reader;
+
+    Future<void> openThreads(WidgetTester tester) async {
+      DiscourseChatSettings.set(
+          _site, const DiscourseChatSettings(threadsEnabled: true));
+      chat.list = {
+        'public_channels': [_channel(1, 'general')],
+        'direct_message_channels': []
+      };
+      reader = _ctx();
+      await tester.pumpWidget(MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: ChatChannelListPage(siteContext: reader),
+      ));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('My Threads'));
+      await tester.pump();
+    }
+
+    Future<void> switchAccount(WidgetTester tester) async {
+      reader.setLoginData(null);
+      await tester.pump();
+      reader.setLoginData(FCLoginResult(
+          result: true,
+          resultText: '',
+          user: FCUser(id: '3', username: 'bob')));
+      // Not pumpAndSettle: a spinner turns while the threads are asked for.
+      for (var i = 0; i < 5; i++) {
+        await tester.pump();
+      }
+    }
+
+    testWidgets('signing in as someone else clears the last list',
+        (tester) async {
+      await openThreads(tester);
+      chat.threadRequests.single.complete(_threads('Alice thread'));
+      await tester.pumpAndSettle();
+      expect(find.text('Alice thread'), findsOneWidget);
+      await switchAccount(tester);
+      expect(chat.threadRequests, hasLength(2),
+          reason: "the new account's threads are asked for");
+      expect(find.text('Alice thread'), findsNothing);
+      chat.threadRequests.last.complete(_threads('Bob thread'));
+      await tester.pumpAndSettle();
+      expect(find.text('Bob thread'), findsOneWidget);
+    });
+
+    testWidgets("a late answer for the last account is dropped",
+        (tester) async {
+      await openThreads(tester);
+      await switchAccount(tester);
+      chat.threadRequests.last.complete(_threads('Bob thread'));
+      await tester.pumpAndSettle();
+      chat.threadRequests.first.complete(_threads('Alice thread'));
+      await tester.pumpAndSettle();
+      expect(find.text('Bob thread'), findsOneWidget);
+      expect(find.text('Alice thread'), findsNothing);
+    });
+
+    testWidgets('resetting the tab drops the loaded threads', (tester) async {
+      await openThreads(tester);
+      chat.threadRequests.single.complete(_threads('Alice thread'));
+      await tester.pumpAndSettle();
+      tester
+          .state<ChatChannelListPageState>(find.byType(ChatChannelListPage))
+          .resetTab();
+      await tester.pump();
+      expect(find.text('Alice thread'), findsNothing);
+      chat.threadRequests.last.complete(_threads('Alice thread, again'));
+      await tester.pumpAndSettle();
+      expect(find.text('Alice thread, again'), findsOneWidget);
+    });
+  });
+
   testWidgets('a swipe closes a DM', (tester) async {
     chat.list = {
       'public_channels': [_channel(1, 'general')],
@@ -502,6 +584,7 @@ class _Chat extends DiscourseChatProxy {
   Map<String, dynamic> browse = const {};
   Map<int, Map<String, dynamic>> browsePages = {};
   final List<int> browseOffsets = [];
+  final List<Completer<Map<String, dynamic>>> threadRequests = [];
   final List<String> calls = [];
   List<int>? watched;
   void Function(DiscourseChatListEvent)? onEvent;
@@ -512,6 +595,11 @@ class _Chat extends DiscourseChatProxy {
     calls.add('GET $path');
     if (path == '/chat/api/me/channels') {
       return pendingList?.future ?? Future.value(list);
+    }
+    if (path == '/chat/api/me/threads') {
+      final request = Completer<Map<String, dynamic>>();
+      threadRequests.add(request);
+      return request.future;
     }
     if (path == '/chat/api/channels') {
       final offset = query?['offset'] as int? ?? 0;

@@ -97,6 +97,10 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
   bool _threadsLoading = false;
   String? _threadsError;
 
+  /// Bumped for each threads request and when the account changes, so an
+  /// answer for an earlier request (or the last account) is dropped.
+  int _threadsGeneration = 0;
+
   // Track login state so the channel list reloads after an in-session
   // login/logout (same pattern as NotificationListTab). Without this
   // the page keeps the guest-time "You need to be logged in" error
@@ -124,7 +128,7 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
       if (isLoggedIn != _wasLoggedIn || username != _lastLoadedUsername) {
         _wasLoggedIn = isLoggedIn;
         _lastLoadedUsername = username;
-        _channels = null;
+        _forgetAccount();
         _load();
       }
     };
@@ -227,7 +231,20 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
   void resetTab() {
     _wasLoggedIn = widget.siteContext.isLoggedIn;
     _lastLoadedUsername = widget.siteContext.loginDataOutput?.user?.username;
+    _forgetAccount(keepChannels: true);
     _load();
+  }
+
+  /// Drops what was loaded for the previous account (or the site before
+  /// it was set up again), and any answer still on its way for it: the
+  /// threads too, or My Threads went on listing the last account's.
+  /// [keepChannels] leaves the channel list up while it reloads.
+  void _forgetAccount({bool keepChannels = false}) {
+    if (!keepChannels) _channels = null;
+    _threads = null;
+    _threadsError = null;
+    _threadsLoading = false;
+    _threadsGeneration++;
   }
 
   Future<void> _load() async {
@@ -286,12 +303,13 @@ class ChatChannelListPageState extends FCStatefulWidget<ChatChannelListPage>
   Future<void> _loadThreads() async {
     final proxy = SiteProxyService.getChatProxy();
     if (proxy is! DiscourseChatProxy) return;
+    final generation = ++_threadsGeneration;
     setState(() {
       _threadsLoading = true;
       _threadsError = null;
     });
     final r = await proxy.getMyThreadsAsync();
-    if (!mounted) return;
+    if (!mounted || generation != _threadsGeneration) return;
     setState(() {
       _threadsLoading = false;
       if (r.result) {
