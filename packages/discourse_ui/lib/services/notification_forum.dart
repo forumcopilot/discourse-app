@@ -8,29 +8,42 @@ import '../host/discourse_host.dart';
 class NotificationForum {
   NotificationForum._();
 
-  /// Credentials belong to a full forum base URL. Neither a directory ID nor
-  /// a hostname alone establishes that an open session belongs to this forum.
+  /// Credentials belong to a forum's base URL. Neither a directory ID nor a
+  /// hostname alone establishes that an open session belongs to this forum:
+  /// the port and the subfolder must agree too ([identity]).
   static bool matches(Site? a, Site? b) {
     if (a == null || b == null) return false;
-    final left = _identity(a.pluginUrl);
-    final right = _identity(b.pluginUrl);
+    final left = identity(a.pluginUrl);
+    final right = identity(b.pluginUrl);
     return left != null && left == right;
   }
 
-  static (String, String, int, String)? _identity(String value) {
-    final uri = Uri.tryParse(value.trim());
+  /// A forum as the notifications backend keys it (abda-push's SiteUrl, and
+  /// NotificationIdentity on Android): the host in lower case, the port
+  /// unless it is the scheme's default, and the subfolder without trailing
+  /// slashes, its case kept (`forum.example:8443/Sub`).
+  ///
+  /// Not the scheme. The backend files http:// and https:// of one host as
+  /// one forum and sends back, as `site_url`, whichever was registered
+  /// first, so a strict match dropped every push for a forum saved here
+  /// under the other scheme, or left it unopenable.
+  ///
+  /// Null, matching nothing, for anything but an absolute http(s) URL with
+  /// a host and no user info, query or fragment.
+  static String? identity(String? value) {
+    final uri = Uri.tryParse((value ?? '').trim());
     if (uri == null ||
         (uri.scheme != 'http' && uri.scheme != 'https') ||
         uri.host.isEmpty ||
-        uri.userInfo.isNotEmpty) {
+        uri.userInfo.isNotEmpty ||
+        uri.hasQuery ||
+        uri.hasFragment) {
       return null;
     }
-    return (
-      uri.scheme,
-      uri.host,
-      uri.port,
-      uri.path.replaceAll(RegExp(r'/+$'), ''),
-    );
+    final defaultPort = uri.scheme == 'https' ? 443 : 80;
+    final port = uri.port == defaultPort ? '' : ':${uri.port}';
+    return '${uri.host.toLowerCase()}$port'
+        '${uri.path.replaceAll(RegExp(r'/+$'), '')}';
   }
 
   static Future<Site?> resolve(int siteId, Map<String, dynamic> data) async {

@@ -212,6 +212,40 @@ void main() {
     });
   }
 
+  test('a push naming the forum under the other scheme is still its own', () {
+    // The relay keys forums without the scheme and echoes whichever spelling
+    // registered first.
+    for (final siteUrl in [
+      'http://forum.example/sub',
+      'http://FORUM.example:80/sub/',
+    ]) {
+      final route = DiscourseNotificationRoute.from({
+        'type': 'discourse_notification',
+        'site_url': siteUrl,
+        'recipient_user_id': '7',
+        'topic_id': 42,
+      });
+      expect(route.permits(account()), isTrue, reason: siteUrl);
+      expect(route.permits(account(id: '8')), isFalse, reason: siteUrl);
+    }
+    for (final siteUrl in [
+      'http://forum.example:443/sub',
+      'http://forum.example/Sub',
+      'https://forum.example/sub?x=1',
+      'https://someone@forum.example/sub',
+      'forum.example/sub',
+    ]) {
+      expect(
+          DiscourseNotificationRoute.from({
+            'site_url': siteUrl,
+            'recipient_user_id': '7',
+            'topic_id': 42,
+          }).permits(account()),
+          isFalse,
+          reason: siteUrl);
+    }
+  });
+
   test('legacy or malformed push recipients fail closed; links still work', () {
     for (final recipient in [null, '', '7.5', 'invalid', '-1']) {
       final route = DiscourseNotificationRoute.from({

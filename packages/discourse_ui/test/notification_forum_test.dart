@@ -26,10 +26,27 @@ void main() {
         isTrue);
   });
 
-  test('same host cannot reuse another scheme, port or subfolder session', () {
+  test('the scheme does not separate a forum, as the relay keys it', () {
+    // The backend files http:// and https:// of one host as one forum and
+    // echoes whichever registered first as site_url.
     final current = forum('https://example.com/forum');
     for (final url in [
       'http://example.com/forum',
+      'http://EXAMPLE.com:80/forum/',
+      'https://example.com:443/forum',
+    ]) {
+      expect(NotificationForum.matches(current, forum(url)), isTrue,
+          reason: url);
+    }
+    expect(NotificationForum.identity('https://Example.COM:8443/Sub/'),
+        'example.com:8443/Sub');
+  });
+
+  test('same host cannot reuse another port or subfolder session', () {
+    final current = forum('https://example.com/forum');
+    for (final url in [
+      'https://example.com:80/forum',
+      'http://example.com:443/forum',
       'https://example.com:8443/forum',
       'https://example.com',
       'https://example.com/forum/nested',
@@ -57,8 +74,16 @@ void main() {
 
   test('missing or malformed forum addresses do not match', () {
     expect(NotificationForum.matches(null, null), isFalse);
-    for (final url in ['', '/relative', 'ftp://example.com']) {
-      expect(NotificationForum.matches(forum(url), forum(url)), isFalse);
+    for (final url in [
+      '',
+      '/relative',
+      'ftp://example.com',
+      'https://user@example.com',
+      'https://example.com/?x=1',
+      'https://example.com/#top',
+    ]) {
+      expect(NotificationForum.matches(forum(url), forum(url)), isFalse,
+          reason: url);
     }
   });
 

@@ -75,7 +75,7 @@ specification:
 | field | meaning |
 |---|---|
 | `type` | `discourse_notification` — what marks the payload as this backend's |
-| `site_url` | the forum, as the backend spells it; how a multi-forum app picks which of its forums to open |
+| `site_url` | the forum, as the backend spells it; how a multi-forum app picks which of its forums to open. The backend keys forums without the scheme and echoes whichever was registered first, so the app matches host, port and subfolder, not the scheme (`NotificationForum.identity`, `NotificationIdentity` on Android) |
 | `topic_id` | the topic to open, when the notification is about one |
 | `post_number` | position within that topic; the app opens the page holding it |
 | `content_id` | the post *id* where `/notifications.json` exposed one (`data.original_post_id`) — a better anchor than the post number, since Discourse resolves it exactly. Left out for a collapsed row ("3 replies"), which should open at the first unread `post_number` |
