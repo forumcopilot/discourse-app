@@ -4646,6 +4646,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pollVotersNotVisible => 'Проголосовавшие в этом опросе скрыты.';
 
   @override
+  String get pollRankedChoiceHint =>
+      'Нажимайте на варианты в порядке предпочтения. Варианты без места считаются воздержанием.';
+
+  @override
+  String get pollRankAbstain => 'Воздержание';
+
+  @override
+  String pollRank(int rank) {
+    return 'Место $rank';
+  }
+
+  @override
+  String get pollRankedChoiceWinner => 'Победитель';
+
+  @override
+  String get pollRankedChoiceTied => 'Ничья';
+
+  @override
   String solutionSolvedByInPost(String name, int postNumber) {
     return 'Решено пользователем $name в сообщении #$postNumber';
   }

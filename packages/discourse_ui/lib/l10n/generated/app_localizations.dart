@@ -7450,6 +7450,36 @@ abstract class AppLocalizations {
   /// **'Voters are not visible for this poll.'**
   String get pollVotersNotVisible;
 
+  /// Above a ranked-choice poll's options while the reader can vote: each tap gives the next rank (1 = first choice); an option left unranked is Discourse's "Abstain"
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the options in order of preference. Unranked options count as Abstain.'**
+  String get pollRankedChoiceHint;
+
+  /// Screen-reader label of an option the reader has not ranked in a ranked-choice poll (Discourse's "Abstain" rank)
+  ///
+  /// In en, this message translates to:
+  /// **'Abstain'**
+  String get pollRankAbstain;
+
+  /// Screen-reader label of the rank badge on a ranked-choice poll option (1 = first choice)
+  ///
+  /// In en, this message translates to:
+  /// **'Rank {rank}'**
+  String pollRank(int rank);
+
+  /// Beside the option that won a ranked-choice poll (the instant-runoff outcome)
+  ///
+  /// In en, this message translates to:
+  /// **'Winner'**
+  String get pollRankedChoiceWinner;
+
+  /// Beside each option still tied when a ranked-choice poll's runoff rounds ran out
+  ///
+  /// In en, this message translates to:
+  /// **'Tied'**
+  String get pollRankedChoiceTied;
+
   /// Byline of the solution card under a solved topic's first post: who wrote the accepted answer and its post number
   ///
   /// In en, this message translates to:

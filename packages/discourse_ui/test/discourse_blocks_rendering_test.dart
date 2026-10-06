@@ -157,6 +157,31 @@ void main() {
     expect(_renderedText(tester), isNot(contains('voters')));
   });
 
+  testWidgets('a quoted poll stays as cooked; only the post\'s own is live', (tester) async {
+    // A reply with its own poll that quotes another post's poll: both are
+    // named "poll". Discourse makes no poll of the quoted one, so the live
+    // poll is the reply's alone and the quote keeps its cooked options.
+    await _render(
+      tester,
+      '<aside class="quote" data-username="ann" data-post="1" data-topic="7">'
+      '<div class="title">ann:</div><blockquote>'
+      '<div class="poll" data-poll-name="poll" data-poll-status="open">'
+      '<div class="poll-container"><ul><li data-poll-option-id="q">Quoted option</li></ul></div>'
+      '<div class="poll-info"><span class="info-number">3</span> voters</div></div>'
+      '</blockquote></aside>'
+      '<p>Mine</p><div class="poll" data-poll-name="poll" data-poll-status="open">'
+      '<div class="poll-container"><ul><li data-poll-option-id="a">Own option</li></ul></div></div>',
+      pollBuilder: (name) => name == 'poll' ? const SizedBox(key: Key('live-poll'), height: 80) : null,
+    );
+    expect(find.byKey(const Key('live-poll')), findsOneWidget);
+    expect(tester.getRect(find.byKey(const Key('live-poll'))).top,
+        greaterThan(tester.getRect(find.text('Mine', findRichText: true)).bottom));
+    final text = _renderedText(tester);
+    expect(text, contains('Quoted option'));
+    expect(text, isNot(contains('Own option')));
+    expect(text, isNot(contains('voters')));
+  });
+
   testWidgets('without live data the cooked poll stays, minus its stale count', (tester) async {
     await _render(tester,
         '<div class="poll" data-poll-name="poll"><div class="poll-container"><ul><li>Yes</li></ul></div>'

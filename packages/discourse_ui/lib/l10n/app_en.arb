@@ -5685,6 +5685,31 @@
   "@pollVotersNotVisible": {
     "description": "In the poll voters sheet, when the forum will not say who voted (a private poll)"
   },
+  "pollRankedChoiceHint": "Tap the options in order of preference. Unranked options count as Abstain.",
+  "@pollRankedChoiceHint": {
+    "description": "Above a ranked-choice poll's options while the reader can vote: each tap gives the next rank (1 = first choice); an option left unranked is Discourse's \"Abstain\""
+  },
+  "pollRankAbstain": "Abstain",
+  "@pollRankAbstain": {
+    "description": "Screen-reader label of an option the reader has not ranked in a ranked-choice poll (Discourse's \"Abstain\" rank)"
+  },
+  "pollRank": "Rank {rank}",
+  "@pollRank": {
+    "description": "Screen-reader label of the rank badge on a ranked-choice poll option (1 = first choice)",
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      }
+    }
+  },
+  "pollRankedChoiceWinner": "Winner",
+  "@pollRankedChoiceWinner": {
+    "description": "Beside the option that won a ranked-choice poll (the instant-runoff outcome)"
+  },
+  "pollRankedChoiceTied": "Tied",
+  "@pollRankedChoiceTied": {
+    "description": "Beside each option still tied when a ranked-choice poll's runoff rounds ran out"
+  },
   "solutionSolvedByInPost": "Solved by {name} in post #{postNumber}",
   "@solutionSolvedByInPost": {
     "description": "Byline of the solution card under a solved topic's first post: who wrote the accepted answer and its post number",

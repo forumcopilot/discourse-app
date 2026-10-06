@@ -22,6 +22,35 @@ SiteContext contextFor(String url) => SiteContext(
 class RecordingPosts extends DiscoursePostProxy {
   RecordingPosts(super.context);
   final writes = <Map<String, dynamic>>[];
+  final deletes = <String>[];
+  final reads = <String>[];
+
+  @override
+  Future<Map<String, dynamic>> apiDelete(String path,
+      {Map<String, dynamic>? query, Object? body}) async {
+    deletes.add('$path $query');
+    return {
+      'poll': {
+        'name': 'second',
+        'options': [
+          {'id': 'yes', 'html': 'Yes'}
+        ]
+      }
+    };
+  }
+
+  @override
+  Future<Map<String, dynamic>> apiGet(String path,
+      {Map<String, dynamic>? query}) async {
+    reads.add('$path $query');
+    return {
+      'voters': {
+        'yes': [
+          {'username': 'sam'}
+        ]
+      }
+    };
+  }
 
   @override
   Future<Map<String, dynamic>> apiPut(String path,
@@ -94,6 +123,68 @@ void main() {
         expect(updated?.postId, '202');
         expect(updated?.pollId, 'second');
       }
+    });
+  }
+
+  // Removing a vote and listing voters go to /polls/* by post id and poll
+  // name, like voting: a card left on screen from another forum must not
+  // send them to the active one.
+  for (final otherForum in [false, true]) {
+    Future<RecordingPosts> pumpVotedCard(WidgetTester tester) async {
+      final context = contextFor('https://forum.example/one');
+      final posts = RecordingPosts(
+          otherForum ? contextFor('https://forum.example/two') : context);
+      SiteProxyService.initialize(posts.siteContext);
+      SiteProxyFactory.register('discourse', PollFactory(posts));
+      await tester.pumpWidget(MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+            body: ThreadPollCard(
+          topicId: '11',
+          siteContext: context,
+          poll: FCPoll(
+              pollId: 'second',
+              topicId: '11',
+              postId: '202',
+              question: 'Choose',
+              hasVoted: true,
+              canViewResults: true,
+              publicVotes: true,
+              voterCount: 1,
+              responses: [
+                FCPollResponse(
+                    id: 'yes', text: 'Yes', voteCount: 1, viewerVotedFor: true)
+              ]),
+          onVoteSuccess: (_) {},
+        )),
+      ));
+      return posts;
+    }
+
+    testWidgets(
+        otherForum
+            ? 'a stale forum card removes no vote on the active forum'
+            : 'Remove vote retracts the displayed post\'s named poll',
+        (tester) async {
+      final posts = await pumpVotedCard(tester);
+      await tester.tap(find.text('Remove vote'));
+      await tester.pumpAndSettle();
+      expect(posts.deletes,
+          otherForum ? isEmpty : ['/polls/vote {post_id: 202, poll_name: second}']);
+    });
+
+    testWidgets(
+        otherForum
+            ? 'a stale forum card lists no voters from the active forum'
+            : 'Show voters lists the displayed post\'s named poll',
+        (tester) async {
+      final posts = await pumpVotedCard(tester);
+      await tester.tap(find.text('Show voters'));
+      await tester.pumpAndSettle();
+      expect(posts.reads,
+          otherForum ? isEmpty : ['/polls/voters.json {post_id: 202, poll_name: second, page: 1}']);
+      expect(find.text('sam'), otherForum ? findsNothing : findsOneWidget);
     });
   }
 }

@@ -4385,6 +4385,24 @@ class AppLocalizationsKo extends AppLocalizations {
   String get pollVotersNotVisible => '이 투표의 투표자는 공개되지 않습니다.';
 
   @override
+  String get pollRankedChoiceHint =>
+      '선호하는 순서대로 선택지를 탭하세요. 순위를 정하지 않은 선택지는 기권으로 처리됩니다.';
+
+  @override
+  String get pollRankAbstain => '기권';
+
+  @override
+  String pollRank(int rank) {
+    return '$rank순위';
+  }
+
+  @override
+  String get pollRankedChoiceWinner => '당선';
+
+  @override
+  String get pollRankedChoiceTied => '동률';
+
+  @override
   String solutionSolvedByInPost(String name, int postNumber) {
     return '$name님이 게시물 #$postNumber에서 해결';
   }
