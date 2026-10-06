@@ -9,6 +9,7 @@ import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../data/attachment/discourse_media_optimization.dart';
 import '../data/attachment/discourse_upload_limits.dart';
+import '../data/emoji/discourse_emoji_set.dart';
 import '../data/site/discourse_site_capabilities.dart';
 
 /// Discourse implementation of [IFCConfigProxy].
@@ -295,6 +296,9 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
       // Group chat size, search, threads and pins, which change what chat
       // offers.
       DiscourseChatSettings.storeFromClientSettings(siteContext.site.url, settings);
+      // …and the forum's emoji set, which says where a standard emoji's
+      // artwork is without reading /emojis.json.
+      DiscourseEmojiSet.storeFromClientSettings(siteContext.site.url, settings);
     } catch (e) {
       if (e is DiscourseApiException && e.statusCode == 0) noResponse = e;
       // ignore: avoid_print

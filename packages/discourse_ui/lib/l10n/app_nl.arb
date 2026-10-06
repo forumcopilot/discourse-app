@@ -1673,7 +1673,6 @@
   "chatNewMessage": "Nieuw bericht",
   "chatStarred": "Favorieten",
   "chatBrowseChannels": "Kanalen bekijken",
-  "chatBrowseAllChannels": "Alle kanalen bekijken",
   "chatFilterAll": "Alles",
   "chatFilterOpen": "Open",
   "chatFilterClosed": "Gesloten",
@@ -1736,11 +1735,9 @@
   "messageListIncoming": "{count, plural, one{{count} nieuw of bijgewerkt topic weergeven} other{{count} nieuwe of bijgewerkte topics weergeven}}",
   "chatPlaceholderGroup": "Chatten in groep",
   "notificationAccountMismatch": "Deze melding kan niet worden geopend met het huidige account. Open Meldingen om updates voor dit account te bekijken.",
-  "chatJoinedChannels": "Aangesloten kanalen",
-  "chatAvailableChannels": "Beschikbare kanalen",
-  "chatAvailableChannelsDescription": "Kanalen die je kunt bekijken of waar je aan kunt deelnemen.",
-  "chatAllChannelsJoined": "Je neemt deel aan alle beschikbare kanalen.",
-  "chatViewChannel": "Bekijken",
   "mediaPlay": "Afspelen",
-  "mediaPause": "Pauzeren"
+  "mediaPause": "Pauzeren",
+  "chatChannelStatusReadOnly": "Alleen-lezen",
+  "chatChannelStatusClosed": "Gesloten",
+  "chatChannelStatusArchived": "Gearchiveerd"
 }

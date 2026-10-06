@@ -1516,7 +1516,6 @@
   "chatNewMessage": "Neue Nachricht",
   "chatStarred": "Mit Sternchen",
   "chatBrowseChannels": "Kanäle durchsuchen",
-  "chatBrowseAllChannels": "Alle Kanäle durchsuchen",
   "chatFilterAll": "Alle",
   "chatFilterOpen": "Offen",
   "chatFilterClosed": "Geschlossen",
@@ -1579,11 +1578,9 @@
   "messageListIncoming": "{count, plural, one{Zeige {count} neues oder aktualisiertes Thema} other{Zeige {count} neue oder aktualisierte Themen}}",
   "chatPlaceholderGroup": "In der Gruppe chatten",
   "notificationAccountMismatch": "Diese Benachrichtigung kann mit dem aktuellen Konto nicht geöffnet werden. Öffne die Benachrichtigungen, um Updates für dieses Konto zu sehen.",
-  "chatJoinedChannels": "Beigetretene Kanäle",
-  "chatAvailableChannels": "Verfügbare Kanäle",
-  "chatAvailableChannelsDescription": "Kanäle, die du ansehen oder denen du beitreten kannst.",
-  "chatAllChannelsJoined": "Du bist allen verfügbaren Kanälen beigetreten.",
-  "chatViewChannel": "Ansehen",
   "mediaPlay": "Abspielen",
-  "mediaPause": "Pausieren"
+  "mediaPause": "Pausieren",
+  "chatChannelStatusReadOnly": "Schreibgeschützt",
+  "chatChannelStatusClosed": "Geschlossen",
+  "chatChannelStatusArchived": "Archiviert"
 }

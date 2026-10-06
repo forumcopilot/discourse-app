@@ -6,6 +6,7 @@ class DiscourseChatSettings {
     this.searchEnabled = true,
     this.threadsEnabled = false,
     this.pinnedMessages = false,
+    this.archivingAllowed = false,
   });
 
   /// How many people besides the creator a group chat may have
@@ -21,6 +22,10 @@ class DiscourseChatSettings {
 
   /// Pinned messages (`chat_pinned_messages`).
   final bool pinnedMessages;
+
+  /// Channels can be archived (`chat_allow_archiving_channels`): the web's
+  /// Browse channels has an Archived tab only then.
+  final bool archivingAllowed;
 
   static final Map<String, DiscourseChatSettings> _bySite = {};
 
@@ -42,6 +47,7 @@ class DiscourseChatSettings {
       searchEnabled: settings['chat_search_enabled'] != false,
       threadsEnabled: settings['chat_threads_enabled'] == true,
       pinnedMessages: settings['chat_pinned_messages'] == true,
+      archivingAllowed: settings['chat_allow_archiving_channels'] == true,
     );
   }
 

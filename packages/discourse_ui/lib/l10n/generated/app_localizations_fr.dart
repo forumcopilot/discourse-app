@@ -5055,9 +5055,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chatBrowseChannels => 'Parcourir les canaux';
 
   @override
-  String get chatBrowseAllChannels => 'Parcourir tous les canaux';
-
-  @override
   String get chatFilterAll => 'Tout';
 
   @override
@@ -5319,25 +5316,17 @@ class AppLocalizationsFr extends AppLocalizations {
       'Cette notification ne peut pas être ouverte avec le compte actuel. Ouvrez les notifications pour voir les nouveautés de ce compte.';
 
   @override
-  String get chatJoinedChannels => 'Canaux rejoints';
-
-  @override
-  String get chatAvailableChannels => 'Canaux disponibles';
-
-  @override
-  String get chatAvailableChannelsDescription =>
-      'Canaux que vous pouvez consulter ou rejoindre.';
-
-  @override
-  String get chatAllChannelsJoined =>
-      'Vous avez rejoint tous les canaux disponibles.';
-
-  @override
-  String get chatViewChannel => 'Voir';
-
-  @override
   String get mediaPlay => 'Lire';
 
   @override
   String get mediaPause => 'Mettre en pause';
+
+  @override
+  String get chatChannelStatusReadOnly => 'Lecture seule';
+
+  @override
+  String get chatChannelStatusClosed => 'Fermé';
+
+  @override
+  String get chatChannelStatusArchived => 'Archivé';
 }

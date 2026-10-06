@@ -28,8 +28,14 @@ class ChatChannelAvatar extends StatelessWidget {
   final SiteContext siteContext;
   final double size;
 
+  /// Decorative: every row that shows it names the channel beside it, and
+  /// its emoji's label made a screen reader say ":computer:" before each
+  /// channel's name.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      ExcludeSemantics(child: _avatar(context));
+
+  Widget _avatar(BuildContext context) {
     final d = details;
     final colorScheme = Theme.of(context).colorScheme;
     if (channel.chatableType == 'DirectMessage') {

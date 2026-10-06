@@ -4715,9 +4715,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chatBrowseChannels => '浏览频道';
 
   @override
-  String get chatBrowseAllChannels => '浏览所有频道';
-
-  @override
   String get chatFilterAll => '所有';
 
   @override
@@ -4967,23 +4964,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notificationAccountMismatch => '无法使用当前账号打开此通知。请打开“通知”查看此账号的最新消息。';
 
   @override
-  String get chatJoinedChannels => '已加入的频道';
-
-  @override
-  String get chatAvailableChannels => '可用频道';
-
-  @override
-  String get chatAvailableChannelsDescription => '您可以查看或加入的频道。';
-
-  @override
-  String get chatAllChannelsJoined => '您已加入所有可用频道。';
-
-  @override
-  String get chatViewChannel => '查看';
-
-  @override
   String get mediaPlay => '播放';
 
   @override
   String get mediaPause => '暂停';
+
+  @override
+  String get chatChannelStatusReadOnly => '只读';
+
+  @override
+  String get chatChannelStatusClosed => '已关闭';
+
+  @override
+  String get chatChannelStatusArchived => '已归档';
 }

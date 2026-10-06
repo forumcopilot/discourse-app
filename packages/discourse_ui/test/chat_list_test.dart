@@ -87,14 +87,26 @@ Map<String, dynamic> _dm(int id, String title, List<Map<String, dynamic>> users,
         },
     };
 
+Map<String, dynamic> _threads(String title) => {
+      'threads': [
+        {'id': 5, 'channel_id': 1, 'title': title},
+      ],
+    };
+
 void main() {
   late _Chat chat;
+  var emojiListFetches = 0;
 
   setUp(() {
     DiscourseChatChannelDetails.clear();
     DiscourseChatSettings.clear();
     DiscourseCustomEmoji.clear();
-    DiscourseCustomEmoji.fetchOverride = (_) async => <String, dynamic>{};
+    DiscourseEmojiSet.clear();
+    emojiListFetches = 0;
+    DiscourseCustomEmoji.fetchOverride = (_) async {
+      emojiListFetches++;
+      return <String, dynamic>{};
+    };
     ChatUnread.clear();
     chat = _Chat(_ctx());
     SiteProxyFactory.register('chat-test', _Factory(chat));
@@ -248,14 +260,37 @@ void main() {
             of: find.text('off-topic'), matching: find.byType(Opacity)),
         findsOneWidget);
     expect(find.byType(ChatChannelAvatar), findsNWidgets(3));
-    expect(find.text('Joined channels'), findsOneWidget);
-    expect(find.text('Available channels'), findsOneWidget);
+    // Discourse's words: no invented "Joined channels" / "Available
+    // channels" headings; the channels to join sit under "Browse channels".
+    expect(find.text('Joined channels'), findsNothing);
+    expect(find.text('Available channels'), findsNothing);
+    expect(find.text('Browse channels'), findsOneWidget);
     expect(ChatUnread.of(_ctx()).value,
         const ChatUnreadState(urgent: 1, any: true));
   });
 
   testWidgets(
-      'live: a new message moves its excerpt and badge without a refresh',
+      "channel emoji: the forum's artwork without /emojis.json, and no "
+      'shortcode read before the name', (tester) async {
+    final semantics = tester.ensureSemantics();
+    DiscourseEmojiSet.set(_site, 'twitter');
+    chat.list = {
+      'public_channels': [_channel(2, 'support', emoji: 'computer')],
+      'direct_message_channels': [],
+    };
+    await pump(tester);
+    expect(emojiListFetches, 0,
+        reason: 'a standard emoji has a known address in the set');
+    final image = tester.widget<Image>(find.descendant(
+        of: find.byType(ChatChannelAvatar), matching: find.byType(Image)));
+    expect(((image.image as ResizeImage).imageProvider as NetworkImage).url,
+        '$_site/images/emoji/twitter/computer.png?v=15');
+    expect(find.bySemanticsLabel(RegExp(':computer:|💻')), findsNothing);
+    expect(find.bySemanticsLabel(RegExp('support')), findsWidgets);
+    semantics.dispose();
+  });
+
+  testWidgets('live: a new message moves its excerpt and badge without a refresh',
       (tester) async {
     chat.list = {
       'public_channels': [],
@@ -295,7 +330,7 @@ void main() {
     };
     await pump(tester);
     expect(find.byType(ChatBrowseChannelsPage), findsNothing);
-    expect(find.text('Available channels'), findsOneWidget);
+    expect(find.text('Browse channels'), findsOneWidget);
     expect(find.text('Anything goes'), findsOneWidget);
     expect(find.text('30 members'), findsOneWidget);
     await tester.tap(find.text('Join'));
@@ -304,7 +339,7 @@ void main() {
     expect(find.text('Join'), findsNothing);
     expect(find.text('off-topic'), findsOneWidget);
     expect(tester.getTopLeft(find.text('off-topic')).dy,
-        lessThan(tester.getTopLeft(find.text('Available channels')).dy));
+        lessThan(tester.getTopLeft(find.text('Browse channels')).dy));
   });
 
   testWidgets('discovery excludes joined channels and private conversations',
@@ -337,7 +372,9 @@ void main() {
     expect(find.text('Members-only planning'), findsOneWidget);
     expect(find.text('private conversation'), findsNothing);
     expect(find.text('Join'), findsOneWidget);
-    expect(find.text('View'), findsOneWidget);
+    // As the web's card: no button where there is nothing to do; a tap
+    // opens the channel.
+    expect(find.text('View'), findsNothing);
     expect(find.text('Archived'), findsOneWidget);
   });
 
@@ -385,7 +422,7 @@ void main() {
     await tester.pump();
     expect(find.text('Join denied'), findsOneWidget);
     expect(tester.getTopLeft(find.text('New channel')).dy,
-        greaterThan(tester.getTopLeft(find.text('Available channels')).dy));
+        greaterThan(tester.getTopLeft(find.text('Browse channels')).dy));
     expect(find.text('Join'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 5));
@@ -394,8 +431,11 @@ void main() {
   testWidgets(
       'pagination advances past followed channels without false empty state',
       (tester) async {
+    // Followed open channels are the reader's own list (/me/channels).
     chat.list = {
-      'public_channels': [_channel(1, 'general')],
+      'public_channels': [
+        for (var id = 1; id <= 25; id++) _channel(id, 'followed $id')
+      ],
       'direct_message_channels': []
     };
     chat.browsePages = {
@@ -415,12 +455,415 @@ void main() {
       },
     };
     await pump(tester);
-    expect(find.text('You have joined all available channels.'), findsNothing);
-    await tester.tap(find.text('Load more'));
+    await tester.dragUntilVisible(find.text('Browse channels'),
+        find.byType(ListView), const Offset(0, -300));
     await tester.pumpAndSettle();
+    // A page of channels the reader has all joined reads the next at once,
+    // rather than leaving only Load more.
     expect(chat.browseOffsets, [0, 25]);
+    expect(find.text('No channels found'), findsNothing);
     expect(find.text('Next page channel'), findsOneWidget);
     expect(find.text('Load more'), findsNothing);
+  });
+
+  testWidgets('reading on alone stops after a few pages', (tester) async {
+    chat.list = {
+      'public_channels': [
+        for (var id = 1; id <= 200; id++) _channel(id, 'followed $id')
+      ],
+      'direct_message_channels': []
+    };
+    chat.browseAll = [
+      for (var id = 1; id <= 200; id++) _channel(id, 'followed $id')
+    ];
+    await pump(tester);
+    await tester.dragUntilVisible(find.text('Browse channels'),
+        find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
+    expect(chat.browseOffsets, [0, 25, 50, 75]);
+    await tester.ensureVisible(find.text('Load more'));
+      await tester.pumpAndSettle();
+    await tester.tap(find.text('Load more'));
+    await tester.pumpAndSettle();
+    expect(chat.browseOffsets, [0, 25, 50, 75, 100, 125, 150, 175]);
+  });
+
+  group('discovery keeps the pages the reader loaded', () {
+    Map<String, dynamic> joinable(int id) => {
+          'id': id,
+          'title': 'open $id',
+          'chatable_type': 'Category',
+          'meta': {'can_join_chat_channel': true},
+        };
+
+    Future<void> loadTwoPages(WidgetTester tester) async {
+      chat.list = {
+        'public_channels': [_channel(100, 'general')],
+        'direct_message_channels': [
+          _dm(5, 'samr', [_user(7, 'samr')])
+        ],
+      };
+      chat.browseAll = [for (var id = 1; id <= 26; id++) joinable(id)];
+      await pump(tester);
+      await tester.ensureVisible(find.text('Load more'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Load more'));
+      await tester.pumpAndSettle();
+      expect(chat.browseOffsets, [0, 25]);
+      expect(find.text('open 26'), findsOneWidget);
+    }
+
+    testWidgets('when the list is read again (back from a channel, a change)',
+        (tester) async {
+      await loadTwoPages(tester);
+      final listReads =
+          chat.calls.where((c) => c == 'GET /chat/api/me/channels').length;
+      chat.onEvent!(const DiscourseChatListChanged());
+      await tester.pumpAndSettle();
+      expect(chat.calls.where((c) => c == 'GET /chat/api/me/channels'),
+          hasLength(listReads + 1));
+      expect(chat.browseOffsets, [0, 25],
+          reason: 'no second request for the channels to join');
+      expect(find.text('open 26'), findsOneWidget);
+    });
+
+    testWidgets('after a join', (tester) async {
+      await loadTwoPages(tester);
+      // Mid-screen, clear of the floating button.
+      Scrollable.ensureVisible(
+          tester.element(find.byKey(const ValueKey('available-channel-3'))),
+          alignment: 0.5);
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(
+          of: find.byKey(const ValueKey('available-channel-3')),
+          matching: find.text('Join')));
+      await tester.pumpAndSettle();
+      expect(chat.calls, contains('POST /chat/api/channels/3/memberships/me'));
+      expect(chat.browseOffsets, [0, 25]);
+      expect(find.byKey(const ValueKey('available-channel-3')), findsNothing,
+          reason: 'joined: in the list above now');
+      expect(find.text('open 26'), findsOneWidget);
+    });
+
+    testWidgets('a pull to refresh reads them all again in one request',
+        (tester) async {
+      await loadTwoPages(tester);
+      await tester.widget<RefreshIndicator>(find.byType(RefreshIndicator))
+          .onRefresh();
+      await tester.pumpAndSettle();
+      expect(chat.browseQueries, hasLength(3));
+      expect(chat.browseQueries.last, containsPair('offset', 0));
+      expect(chat.browseQueries.last, containsPair('limit', 27),
+          reason: 'one more than loaded, to learn whether more exist');
+      expect(find.text('open 26'), findsOneWidget);
+      expect(find.text('Load more'), findsNothing,
+          reason: 'all 26 were loaded; nothing more to load');
+    });
+
+    testWidgets('across DMs and back', (tester) async {
+      await loadTwoPages(tester);
+      await tester.dragUntilVisible(
+          find.text('DMs'), find.byType(ListView), const Offset(0, 300));
+      await tester.pumpAndSettle();
+      await showDms(tester);
+      await tester.tap(find.text('Channels'));
+      await tester.pumpAndSettle();
+      expect(chat.browseOffsets, [0, 25]);
+      await tester.dragUntilVisible(
+          find.text('open 26'), find.byType(ListView), const Offset(0, -300));
+      expect(find.text('open 26'), findsOneWidget);
+    });
+
+    testWidgets('a channel left elsewhere is offered again', (tester) async {
+      await loadTwoPages(tester);
+      chat.list = {
+        'public_channels': [],
+        'direct_message_channels': chat.list['direct_message_channels'],
+      };
+      chat.browseAll = [
+        {
+          ..._channel(100, 'general'),
+          'current_user_membership': {'following': false},
+          'meta': {'can_join_chat_channel': true},
+        },
+        ...?chat.browseAll,
+      ];
+      chat.onEvent!(const DiscourseChatListChanged());
+      await tester.pumpAndSettle();
+      expect(chat.browseQueries.last, containsPair('offset', 0));
+      expect(find.byKey(const ValueKey('available-channel-100')),
+          findsOneWidget);
+    });
+
+    testWidgets('another account starts over', (tester) async {
+      final reader = _ctx();
+      chat.list = {
+        'public_channels': [_channel(100, 'general')],
+        'direct_message_channels': [],
+      };
+      chat.browseAll = [for (var id = 1; id <= 26; id++) joinable(id)];
+      await tester.pumpWidget(MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: ChatChannelListPage(siteContext: reader),
+      ));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Load more'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Load more'));
+      await tester.pumpAndSettle();
+      reader.setLoginData(null);
+      await tester.pump();
+      reader.setLoginData(FCLoginResult(
+          result: true, resultText: '', user: FCUser(id: '3', username: 'bob')));
+      await tester.pumpAndSettle();
+      expect(chat.browseOffsets, [0, 25, 0]);
+      expect(find.text('open 26'), findsNothing);
+    });
+  });
+
+  testWidgets('Retry after a failed refresh reads the pages again',
+      (tester) async {
+    chat.list = {
+      'public_channels': [_channel(100, 'general')],
+      'direct_message_channels': [],
+    };
+    chat.browseAll = [
+      for (var id = 1; id <= 26; id++)
+        {
+          'id': id,
+          'title': 'open $id',
+          'meta': {'can_join_chat_channel': true},
+        }
+    ];
+    await pump(tester);
+    await tester.ensureVisible(find.text('Load more'));
+      await tester.pumpAndSettle();
+    await tester.tap(find.text('Load more'));
+    await tester.pumpAndSettle();
+    chat.failDiscovery = true;
+    await tester.widget<RefreshIndicator>(find.byType(RefreshIndicator))
+        .onRefresh();
+    await tester.pumpAndSettle();
+    expect(find.text('Discovery unavailable'), findsOneWidget);
+    expect(find.text('open 26'), findsOneWidget,
+        reason: 'what was shown stays while the refresh failed');
+    chat.failDiscovery = false;
+    await tester.ensureVisible(find.text('Retry'));
+      await tester.pumpAndSettle();
+    await tester.tap(find.text('Retry'));
+    await tester.pumpAndSettle();
+    expect(chat.browseQueries.last, containsPair('offset', 0),
+        reason: 'not appended after the pages already shown');
+    expect(find.text('Discovery unavailable'), findsNothing);
+    expect(find.text('open 26'), findsOneWidget);
+  });
+
+  test("a channel's status is translated in every language", () {
+    final en = lookupAppLocalizations(const Locale('en'));
+    for (final locale in AppLocalizations.supportedLocales) {
+      if (locale.languageCode == 'en') continue;
+      final l10n = lookupAppLocalizations(locale);
+      for (final (word, english) in [
+        (l10n.chatChannelStatusReadOnly, en.chatChannelStatusReadOnly),
+        (l10n.chatChannelStatusClosed, en.chatChannelStatusClosed),
+        (l10n.chatChannelStatusArchived, en.chatChannelStatusArchived),
+      ]) {
+        expect(word, isNot(english), reason: '$locale');
+      }
+    }
+  });
+
+  testWidgets('every channel joined: nothing is said under the reader\'s own',
+      (tester) async {
+    chat.list = {
+      'public_channels': [_channel(1, 'general')],
+      'direct_message_channels': [],
+    };
+    chat.browse = {
+      'channels': [_channel(1, 'general')]
+    };
+    await pump(tester);
+    // The web's list has no such state; "No channels found" belongs to
+    // Browse channels, which lists joined channels too.
+    expect(find.text('No channels found'), findsNothing);
+    expect(find.text('Load more'), findsNothing);
+  });
+
+  testWidgets('a channel left elsewhere is offered though its row says '
+      'followed', (tester) async {
+    // The browse row's following flag is a snapshot from when the page was
+    // read; the reader's own list is what is current.
+    chat.list = {'public_channels': [], 'direct_message_channels': []};
+    chat.browse = {
+      'channels': [_channel(5, 'left elsewhere')]
+    };
+    await pump(tester);
+    expect(find.text('left elsewhere'), findsOneWidget);
+  });
+
+  testWidgets('a channel with no members shows no count, as on the web',
+      (tester) async {
+    chat.list = {'public_channels': [], 'direct_message_channels': []};
+    chat.browse = {
+      'channels': [
+        {
+          'id': 9,
+          'title': 'brand new',
+          'memberships_count': 0,
+          'meta': {'can_join_chat_channel': true},
+        },
+      ],
+    };
+    await pump(tester);
+    expect(find.text('brand new'), findsOneWidget);
+    expect(find.text('0 members'), findsNothing);
+  });
+
+  group('joining, as the web allows it', () {
+    testWidgets('only an open channel is offered to join', (tester) async {
+      chat.list = {'public_channels': [], 'direct_message_channels': []};
+      chat.browse = {
+        'channels': [
+          {
+            'id': 9,
+            'title': 'announcements',
+            'status': 'read_only',
+            'meta': {'can_join_chat_channel': true},
+          },
+          {
+            'id': 10,
+            'title': 'lounge',
+            'meta': {'can_join_chat_channel': true},
+          },
+        ],
+      };
+      await pump(tester);
+      expect(
+          find.descendant(
+              of: find.byKey(const ValueKey('available-channel-9')),
+              matching: find.text('Join')),
+          findsNothing,
+          reason: 'a read-only channel would vanish from both lists');
+      expect(find.text('Read Only'), findsOneWidget,
+          reason: "Discourse's status word, not the composer's hint");
+      expect(find.textContaining('cannot send new messages'), findsNothing);
+      expect(
+          find.descendant(
+              of: find.byKey(const ValueKey('available-channel-10')),
+              matching: find.text('Join')),
+          findsOneWidget);
+    });
+
+    testWidgets('discovery asks for open channels', (tester) async {
+      chat.list = {'public_channels': [], 'direct_message_channels': []};
+      await pump(tester);
+      expect(chat.browseQueries.single, containsPair('status', 'open'));
+    });
+  });
+
+  group('Browse channels', () {
+    Future<void> openBrowse(WidgetTester tester) async {
+      await tester.ensureVisible(find.text('Browse channels'));
+      await tester.tap(find.text('Browse channels'));
+      await tester.pumpAndSettle();
+      expect(find.byType(ChatBrowseChannelsPage), findsOneWidget);
+    }
+
+    setUp(() {
+      chat.list = {
+        'public_channels': [_channel(1, 'general')],
+        'direct_message_channels': [],
+      };
+    });
+
+    testWidgets("opens from the chat list, on the web's Open tab",
+        (tester) async {
+      chat.browseAll = [
+        {..._channel(1, 'general')},
+        {
+          'id': 2,
+          'title': 'planning',
+          'meta': {'can_join_chat_channel': true}
+        },
+        {
+          'id': 3,
+          'title': 'old news',
+          'status': 'closed',
+          'meta': {'can_join_chat_channel': true}
+        },
+      ];
+      await pump(tester);
+      await openBrowse(tester);
+      final chips = tester
+          .widgetList<ChoiceChip>(find.byType(ChoiceChip))
+          .map((c) => ((c.label as Text).data, c.selected))
+          .toList();
+      expect(chips, [('All', false), ('Open', true), ('Closed', false)],
+          reason: 'Archived only where the forum archives channels');
+      expect(chat.browseQueries.last, containsPair('status', 'open'));
+      expect(find.text('old news'), findsNothing);
+      expect(find.widgetWithText(OutlinedButton, 'Leave'), findsOneWidget,
+          reason: 'general is followed');
+      expect(find.widgetWithText(FilledButton, 'Join'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'plan');
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pumpAndSettle();
+      expect(chat.browseQueries.last, containsPair('filter', 'plan'));
+      expect(find.text('planning'), findsOneWidget);
+      expect(find.text('general'), findsNothing);
+    });
+
+    testWidgets('an Archived tab where the forum archives channels',
+        (tester) async {
+      DiscourseChatSettings.set(
+          _site, const DiscourseChatSettings(archivingAllowed: true));
+      chat.browseAll = [];
+      await pump(tester);
+      await openBrowse(tester);
+      expect(find.widgetWithText(ChoiceChip, 'Archived'), findsOneWidget);
+    });
+
+    testWidgets('a followed channel closed since can be found and left',
+        (tester) async {
+      chat.browseAll = [
+        {
+          'id': 4,
+          'title': 'old project',
+          'status': 'closed',
+          'current_user_membership': {'following': true},
+          'meta': {'can_join_chat_channel': true},
+        },
+      ];
+      await pump(tester);
+      await openBrowse(tester);
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Closed'));
+      await tester.pumpAndSettle();
+      expect(chat.browseQueries.last, containsPair('status', 'closed'));
+      expect(find.text('old project'), findsOneWidget);
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Leave'));
+      await tester.pumpAndSettle();
+      expect(chat.calls, contains('DELETE /chat/api/channels/4/memberships/me'));
+    });
+
+    testWidgets('reads the next page at the end of the list', (tester) async {
+      chat.browseAll = [
+        for (var id = 10; id < 40; id++)
+          {
+            'id': id,
+            'title': 'channel $id',
+            'meta': {'can_join_chat_channel': true}
+          }
+      ];
+      await pump(tester);
+      await openBrowse(tester);
+      await tester.dragUntilVisible(find.text('channel 39'),
+          find.byType(ListView).last, const Offset(0, -300));
+      await tester.pumpAndSettle();
+      expect(chat.browseQueries.last, containsPair('offset', 25));
+      expect(find.text('channel 39'), findsOneWidget);
+    });
   });
 
   testWidgets('logging out discards an in-flight channel response',
@@ -442,6 +885,82 @@ void main() {
     expect(find.text('Sign in to use chat'), findsOneWidget);
     expect(find.text('Old account channel'), findsNothing);
     expect(chat.watched, isNull);
+  });
+
+  group("My Threads belong to the account that loaded them", () {
+    late SiteContext reader;
+
+    Future<void> openThreads(WidgetTester tester) async {
+      DiscourseChatSettings.set(
+          _site, const DiscourseChatSettings(threadsEnabled: true));
+      chat.list = {
+        'public_channels': [_channel(1, 'general')],
+        'direct_message_channels': []
+      };
+      reader = _ctx();
+      await tester.pumpWidget(MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: ChatChannelListPage(siteContext: reader),
+      ));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('My Threads'));
+      await tester.pump();
+    }
+
+    Future<void> switchAccount(WidgetTester tester) async {
+      reader.setLoginData(null);
+      await tester.pump();
+      reader.setLoginData(FCLoginResult(
+          result: true,
+          resultText: '',
+          user: FCUser(id: '3', username: 'bob')));
+      // Not pumpAndSettle: a spinner turns while the threads are asked for.
+      for (var i = 0; i < 5; i++) {
+        await tester.pump();
+      }
+    }
+
+    testWidgets('signing in as someone else clears the last list',
+        (tester) async {
+      await openThreads(tester);
+      chat.threadRequests.single.complete(_threads('Alice thread'));
+      await tester.pumpAndSettle();
+      expect(find.text('Alice thread'), findsOneWidget);
+      await switchAccount(tester);
+      expect(chat.threadRequests, hasLength(2),
+          reason: "the new account's threads are asked for");
+      expect(find.text('Alice thread'), findsNothing);
+      chat.threadRequests.last.complete(_threads('Bob thread'));
+      await tester.pumpAndSettle();
+      expect(find.text('Bob thread'), findsOneWidget);
+    });
+
+    testWidgets("a late answer for the last account is dropped",
+        (tester) async {
+      await openThreads(tester);
+      await switchAccount(tester);
+      chat.threadRequests.last.complete(_threads('Bob thread'));
+      await tester.pumpAndSettle();
+      chat.threadRequests.first.complete(_threads('Alice thread'));
+      await tester.pumpAndSettle();
+      expect(find.text('Bob thread'), findsOneWidget);
+      expect(find.text('Alice thread'), findsNothing);
+    });
+
+    testWidgets('resetting the tab drops the loaded threads', (tester) async {
+      await openThreads(tester);
+      chat.threadRequests.single.complete(_threads('Alice thread'));
+      await tester.pumpAndSettle();
+      tester
+          .state<ChatChannelListPageState>(find.byType(ChatChannelListPage))
+          .resetTab();
+      await tester.pump();
+      expect(find.text('Alice thread'), findsNothing);
+      chat.threadRequests.last.complete(_threads('Alice thread, again'));
+      await tester.pumpAndSettle();
+      expect(find.text('Alice thread, again'), findsOneWidget);
+    });
   });
 
   testWidgets('a swipe closes a DM', (tester) async {
@@ -501,7 +1020,13 @@ class _Chat extends DiscourseChatProxy {
   Map<String, dynamic> list = const {};
   Map<String, dynamic> browse = const {};
   Map<int, Map<String, dynamic>> browsePages = {};
+
+  /// When set, the forum's channels: each request gets its offset/limit
+  /// slice, as the server answers.
+  List<Map<String, dynamic>>? browseAll;
   final List<int> browseOffsets = [];
+  final List<Map<String, dynamic>> browseQueries = [];
+  final List<Completer<Map<String, dynamic>>> threadRequests = [];
   final List<String> calls = [];
   List<int>? watched;
   void Function(DiscourseChatListEvent)? onEvent;
@@ -513,9 +1038,31 @@ class _Chat extends DiscourseChatProxy {
     if (path == '/chat/api/me/channels') {
       return pendingList?.future ?? Future.value(list);
     }
+    if (path == '/chat/api/me/threads') {
+      final request = Completer<Map<String, dynamic>>();
+      threadRequests.add(request);
+      return request.future;
+    }
     if (path == '/chat/api/channels') {
       final offset = query?['offset'] as int? ?? 0;
       browseOffsets.add(offset);
+      browseQueries.add({...?query});
+      final all = browseAll;
+      if (all != null) {
+        final limit = query?['limit'] as int? ?? 25;
+        final status = query?['status'];
+        final filter = (query?['filter'] as String? ?? '').toLowerCase();
+        return {
+          'channels': all
+              .where((c) => status == null || (c['status'] ?? 'open') == status)
+              .where((c) =>
+                  filter.isEmpty ||
+                  (c['title'] as String).toLowerCase().contains(filter))
+              .skip(offset)
+              .take(limit)
+              .toList()
+        };
+      }
       return browsePages[offset] ?? browse;
     }
     return const {};
@@ -527,7 +1074,7 @@ class _Chat extends DiscourseChatProxy {
     calls.add('POST $path');
     if (path.contains('/memberships/me')) {
       final id = int.parse(path.split('/')[4]);
-      final row = (browse['channels'] as List)
+      final row = [...?browseAll, ...?(browse['channels'] as List?)]
           .cast<Map<String, dynamic>>()
           .firstWhere((c) => c['id'] == id);
       row['current_user_membership'] = {'following': true};

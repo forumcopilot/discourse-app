@@ -1516,7 +1516,6 @@
   "chatNewMessage": "新しいメッセージ",
   "chatStarred": "スター付き",
   "chatBrowseChannels": "チャンネルを閲覧する",
-  "chatBrowseAllChannels": "すべてのチャンネルを閲覧する",
   "chatFilterAll": "すべて",
   "chatFilterOpen": "オープン",
   "chatFilterClosed": "閉鎖",
@@ -1579,11 +1578,9 @@
   "messageListIncoming": "{count, plural, other{{count} 件の新規/更新トピックを見る}}",
   "chatPlaceholderGroup": "グループチャット",
   "notificationAccountMismatch": "この通知は現在のアカウントでは開けません。「通知」を開くと、このアカウントの更新を確認できます。",
-  "chatJoinedChannels": "参加中のチャンネル",
-  "chatAvailableChannels": "利用可能なチャンネル",
-  "chatAvailableChannelsDescription": "閲覧または参加できるチャンネル。",
-  "chatAllChannelsJoined": "利用可能なすべてのチャンネルに参加しています。",
-  "chatViewChannel": "表示",
   "mediaPlay": "再生",
-  "mediaPause": "一時停止"
+  "mediaPause": "一時停止",
+  "chatChannelStatusReadOnly": "読み取り専用",
+  "chatChannelStatusClosed": "閉鎖",
+  "chatChannelStatusArchived": "アーカイブ済み"
 }

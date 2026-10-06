@@ -4782,9 +4782,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get chatBrowseChannels => 'チャンネルを閲覧する';
 
   @override
-  String get chatBrowseAllChannels => 'すべてのチャンネルを閲覧する';
-
-  @override
   String get chatFilterAll => 'すべて';
 
   @override
@@ -5035,23 +5032,17 @@ class AppLocalizationsJa extends AppLocalizations {
       'この通知は現在のアカウントでは開けません。「通知」を開くと、このアカウントの更新を確認できます。';
 
   @override
-  String get chatJoinedChannels => '参加中のチャンネル';
-
-  @override
-  String get chatAvailableChannels => '利用可能なチャンネル';
-
-  @override
-  String get chatAvailableChannelsDescription => '閲覧または参加できるチャンネル。';
-
-  @override
-  String get chatAllChannelsJoined => '利用可能なすべてのチャンネルに参加しています。';
-
-  @override
-  String get chatViewChannel => '表示';
-
-  @override
   String get mediaPlay => '再生';
 
   @override
   String get mediaPause => '一時停止';
+
+  @override
+  String get chatChannelStatusReadOnly => '読み取り専用';
+
+  @override
+  String get chatChannelStatusClosed => '閉鎖';
+
+  @override
+  String get chatChannelStatusArchived => 'アーカイブ済み';
 }

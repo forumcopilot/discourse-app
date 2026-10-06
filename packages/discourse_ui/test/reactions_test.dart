@@ -264,29 +264,79 @@ void main() {
         'https://cdn.example/discourse.png');
   });
 
-  testWidgets(
-      'channel icons use the forum emoji artwork instead of platform glyphs',
-      (tester) async {
-    final arrived = Completer<Object?>();
-    DiscourseCustomEmoji.fetchOverride = (_) => arrived.future;
-    addTearDown(() => DiscourseCustomEmoji.fetchOverride = null);
-    await tester.pumpWidget(_app(ReactionGlyph(
-        reactionId: 'art', size: 20, siteContext: _ctx(), preferImage: true)));
-    expect(find.text('🎨'), findsOneWidget,
-        reason: 'Unicode remains the loading fallback');
-    arrived.complete({
-      'default': [
-        {
-          'name': 'artist_palette',
-          'url': '//cdn.example/emoji/artist_palette.png'
-        }
-      ]
+  group('channel icons (preferImage)', () {
+    late int fetches;
+    setUp(() {
+      fetches = 0;
+      DiscourseCustomEmoji.clear();
+      DiscourseEmojiSet.clear();
+      DiscourseCustomEmoji.fetchOverride = (_) async {
+        fetches++;
+        return {
+          'default': [
+            {'name': 'discourse', 'url': '//cdn.example/discourse.png'}
+          ]
+        };
+      };
     });
-    await tester.pump();
-    await tester.pump();
-    final image = tester.widget<Image>(find.byType(Image));
-    expect(((image.image as ResizeImage).imageProvider as NetworkImage).url,
-        'https://cdn.example/emoji/artist_palette.png');
+    tearDown(() {
+      DiscourseCustomEmoji.fetchOverride = null;
+      DiscourseEmojiSet.clear();
+    });
+
+    String url(WidgetTester tester) {
+      final image = tester.widget<Image>(find.byType(Image));
+      return ((image.image as ResizeImage).imageProvider as NetworkImage).url;
+    }
+
+    testWidgets(
+        "a standard emoji is the forum's artwork, without reading /emojis.json",
+        (tester) async {
+      DiscourseEmojiSet.set(_forum, 'apple');
+      await tester.pumpWidget(_app(ReactionGlyph(
+          reactionId: 'art', size: 20, siteContext: _ctx(), preferImage: true)));
+      await tester.pump();
+      expect(url(tester), '$_forum/images/emoji/apple/art.png?v=15',
+          reason: 'an alias has its own file, as on the web');
+      expect(fetches, 0);
+    });
+
+    testWidgets('the platform emoji stands in while the set is unknown',
+        (tester) async {
+      await tester.pumpWidget(_app(ReactionGlyph(
+          reactionId: 'art', size: 20, siteContext: _ctx(), preferImage: true)));
+      await tester.pump();
+      expect(find.text('🎨'), findsOneWidget);
+      expect(find.byType(Image), findsNothing);
+      expect(fetches, 0);
+    });
+
+    testWidgets("a forum's own emoji still comes from its list",
+        (tester) async {
+      DiscourseEmojiSet.set(_forum, 'twitter');
+      await tester.pumpWidget(_app(ReactionGlyph(
+          reactionId: 'discourse',
+          size: 20,
+          siteContext: _ctx(),
+          preferImage: true)));
+      await tester.pump();
+      await tester.pump();
+      expect(fetches, 1);
+      expect(url(tester), 'https://cdn.example/discourse.png');
+    });
+
+    testWidgets('a served external_emoji_url is used as the web does',
+        (tester) async {
+      DiscourseEmojiSet.set(_forum, 'twitter',
+          externalUrl: 'https://emoji.example/');
+      await tester.pumpWidget(_app(ReactionGlyph(
+          reactionId: 'computer',
+          size: 20,
+          siteContext: _ctx(),
+          preferImage: true)));
+      await tester.pump();
+      expect(url(tester), 'https://emoji.example/twitter/computer.png?v=15');
+    });
   });
 
   group('on a post', () {
